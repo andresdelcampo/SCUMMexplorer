@@ -564,6 +564,41 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "roomOps" && runtime?.RoomCameraBounds is { } bounds &&
+                instruction.Operands.StartsWith("roomScroll,", StringComparison.Ordinal))
+            {
+                // o5_roomOps SO_ROOM_SCROLL: both limits are kept half a screen from the
+                // room's edges and stored in VAR_CAMERA_MIN_X/MAX_X (v3: vars 17 and 18).
+                var scroll = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (scroll.Length == 3 && TryReadValue(scroll[1], knownVariables, out var scrollMin, out _) &&
+                    TryReadValue(scroll[2], knownVariables, out var scrollMax, out _))
+                {
+                    var low = (ushort)Math.Clamp((int)scrollMin, bounds.Min, bounds.Max);
+                    var high = (ushort)Math.Clamp((int)scrollMax, bounds.Min, bounds.Max);
+                    knownVariables["var[0x011]"] = low;
+                    knownVariables["var[0x012]"] = high;
+                    RefreshBitAliases("var[0x011]", knownVariables);
+                    RefreshBitAliases("var[0x012]", knownVariables);
+                    MarkEstimated(estimated, "var[0x011]", onEstimatedPath || OperandIsEstimated(scroll[1], estimated, knownVariables));
+                    MarkEstimated(estimated, "var[0x012]", onEstimatedPath || OperandIsEstimated(scroll[2], estimated, knownVariables));
+                    // setCameraAt and moveCamera clamp to the minimum, then the maximum,
+                    // so the maximum wins if the limits cross.
+                    runtime.CameraRange = (Math.Min(low, high), high);
+                    trace.Add($"camera limits = {low}..{high} (roomScroll)");
+                    if (knownVariables.TryGetValue("var[0x002]", out var cameraNow) &&
+                        (cameraNow < runtime.CameraRange.Value.Min || cameraNow > runtime.CameraRange.Value.Max))
+                    {
+                        var inside = (ushort)Math.Clamp((int)cameraNow, runtime.CameraRange.Value.Min, runtime.CameraRange.Value.Max);
+                        knownVariables["var[0x002]"] = inside;
+                        RefreshBitAliases("var[0x002]", knownVariables);
+                        trace.Add($"camera x = {inside}: moved inside the new limits");
+                        limitations.Add($"timing not simulated: the camera moves 8 pixels a frame into its new limits and reaches x = {inside} at once (+0x{instruction.Offset:X4})");
+                    }
+                    pc = next;
+                    continue;
+                }
+            }
+
             if (instruction.Operation == "actorFollowCamera" && runtime?.CameraRange is { } followRange)
             {
                 // o5_actorFollowCamera -> setCameraFollows (v3): the camera follows the

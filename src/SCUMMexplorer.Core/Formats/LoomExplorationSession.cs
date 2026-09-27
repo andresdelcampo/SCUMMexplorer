@@ -342,9 +342,14 @@ public sealed class LoomExplorationSession
         _runtime.Actors.ShowActorsIn(CurrentPlacement());
         // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
         var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
-        _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
+        _runtime.RoomCameraBounds = _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
         _runtime.GlobalVariables[CameraVariable] = 160;
         _runtime.EstimatedVariables.Remove(CameraVariable);
+        // startScene resets VAR_CAMERA_MIN_X and VAR_CAMERA_MAX_X (v3: vars 17 and 18).
+        _runtime.GlobalVariables["var[0x011]"] = 160;
+        _runtime.GlobalVariables["var[0x012]"] = (ushort)Math.Max(160, roomWidth - 160);
+        _runtime.EstimatedVariables.Remove("var[0x011]");
+        _runtime.EstimatedVariables.Remove("var[0x012]");
         foreach (var item in _currentObjects)
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
         _runtime.GlobalVariables["var[0x004]"] = (ushort)room.ResourceId!.Value;

@@ -126,4 +126,29 @@ public sealed class LoomActorTests
         Assert.True(session.CameraEstimated);
         Assert.Contains(session.Snapshot.Uncertainties, item => item.StartsWith("Camera x (var[0x002]) = 480 is an estimate", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void RoomScrollLocksRoom04sCameraToTheHalfItsEntryPicks()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game,
+            new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
+        (int? X, ushort Min, ushort Max) Camera() => (session.CameraX,
+            session.Snapshot.KnownGlobalVariables["var[0x011]"], session.Snapshot.KnownGlobalVariables["var[0x012]"]);
+
+        // startScene: VAR_CAMERA_MIN_X/MAX_X (vars 17, 18) are half a screen from Room 03's edges.
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 3));
+        Assert.Equal((160, (ushort)160, (ushort)160), Camera());
+
+        // Arriving from Room 03, the entry starts local 205: roomScroll 480, 488 (488 is kept at
+        // 640 - 160) and setCameraAt 480, the right half.
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 4));
+        Assert.Equal((480, (ushort)480, (ushort)480), Camera());
+
+        // From Room 64 (var[0x070] = 0x40), local 204: roomScroll 152, 160 and setCameraAt 160.
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 64));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 4));
+        Assert.Equal((160, (ushort)160, (ushort)160), Camera());
+    }
 }

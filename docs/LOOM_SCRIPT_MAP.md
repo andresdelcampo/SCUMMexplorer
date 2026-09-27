@@ -10,6 +10,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | --- | --- | --- |
 | `var[0x001]` | Ego actor (`VAR_EGO`); 1 after the boot | ScummVM; script 001 +0x0184 |
 | `var[0x002]` | Camera x (`VAR_CAMERA_POS_X`). The session keeps it clamped to [160, room width − 160] and sets it to 160 on room entry; `loadRoomWithEgo` puts it on the ego, and `actorFollowCamera` moves it onto the actor when the actor is outside the triggers (strips 10–30). After the boot it is 800 (Room 02, the ego at 828). Readers: script 044 +0x0361, Room 02 object 153, Room 04 local 201 and objects 169/170, Room 24 local 204, Room 34 local 200. | ScummVM; modelled 27 Sep |
+| `var[0x011]`, `var[0x012]` | Camera limits (`VAR_CAMERA_MIN_X`/`MAX_X`, v3 numbering 17/18). Room entry sets them to [160, width − 160]; `roomOps roomScroll` narrows them (Room 04 locals 204/205). | ScummVM; modelled 27 Sep |
 | `var[0x003]` | A message is on screen (`VAR_HAVE_MSG`). Many scripts wait while it is nonzero. | ScummVM |
 | `var[0x004]` | Current room (`VAR_ROOM`) | ScummVM |
 | `var[0x005]` | `VAR_OVERRIDE`: 1 when the player skipped a cutscene; `endCutscene` clears it | ScummVM |
@@ -27,6 +28,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `var[0x062]`, `var[0x063]` | Room 69: which note is expected next; the number of wrong tries |
 | `var[0x066]`, `var[0x067]`, `var[0x068]` | Selected object; hovered object; the close-up image `verbOps` shows in the verb area (script 008) |
 | `var[0x069]` | Input-loop state (script 006) |
+| `var[0x070]` | The previous room: script 015 (before-exit hook) +0x001A stores `var[0x004]` there. Room 04's entry reads it to pick a screen half. |
 | `var[0x071]` | The object the player arrived through (Room 22's entry reads it) |
 | `var[0x0A2]` | Script 039 plays nothing when it is nonzero (+0x001A); reading: a music-off setting |
 | `var[0x0A3]`, `var[0x0A4]` | The sound script 039 last started; the next call stops it first (+0x0000–0x0015) |
@@ -50,7 +52,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | 007 | Runs a sentence | `startObject obj, verb` when ego is close enough (`getDist ≤ 3`) |
 | 008 | Verb-area close-up | Shows `var[0x068]` through `verbOps 0x36 image` |
 | 014 | After-entry hook | Room-dependent setup; starts script 18 in some rooms |
-| 015 | Before-exit hook | Clears `bit[0xD7A]`, **stops script 42**, clears the hover, starts scripts 008 and 028 |
+| 015 | Before-exit hook | Clears `bit[0xD7A]`, **stops script 42**, stores the room being left in `var[0x070]` (+0x001A), clears the hover, starts scripts 008 and 028 |
 | 016 | Prints a line at a variable y (`print` with an empty text) | |
 | 039 (0x27), 040 (0x28) | Sound players: stop the previous sound, start the argument's sound, loop while it plays | The session reads a started sound as playing (estimate), so these stay pending. Script 039 starts the sound after one `breakHere` (+0x0021, +0x0038). The intro's sound 25 comes from script 044 +0x02C3. |
 | 042 | Room 03's actor 2 (random position and time on screen, `bit[0xD7A]`) | |
@@ -81,7 +83,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 - **Room 69: intro screen.** The entry starts local 202 (difficulty menu). Objects 876–878 pick the difficulty and start local 201 (the random draft and guild symbol), which chains to 204 (the question). Note objects 886–897 start local 203 [note index]. Local 203 checks the draft and starts 205 after a correct draft or the third wrong try. Local 205 sets `bit[0xD6B]`.
 - **Room 03: lake.** Objects 161–164 reach Rooms 05, 04, 10 through locals 200–202, which wait while `bit[0xD7A]` is set. Object 160 leads to Room 02 directly.
 - **Room 10.** Object 295 starts script 052 (a cutscene through Room 11 into Room 13).
-- **Room 04.** Two screens. Outside a cutscene, the entry (+0x0013–0x003F) picks a half by the previous room (`var[0x070]`; 0x46 also reads `var[0x0AC]`, 0x40 is Room 64). Local 204 does `roomScroll 152, 160` and `setCameraAt 160` (left half); local 205 does `roomScroll 480, 488` and `setCameraAt 480` (right half). The camera is locked to that half (decoded; `roomScroll` is not modelled). Objects 169/170 (verb 0x37) pan between the halves.
+- **Room 04.** Two screens. Outside a cutscene, the entry (+0x0013–0x003F) picks a half by the previous room (`var[0x070]`; 0x46 also reads `var[0x0AC]`, 0x40 is Room 64). Local 204 does `roomScroll 152, 160` and `setCameraAt 160` (left half); local 205 does `roomScroll 480, 488` and `setCameraAt 480` (right half). The camera is locked to that half (decoded; `roomScroll` modelled 27 Sep). Objects 169/170 (verb 0x37) pan between the halves.
 - **Room 16.** Its entry starts script 039 with sound 30 on the first visit (`bit[0xDBE]`, decoded); the sound starts one frame later.
 - **Room 22.** Its entry picks local 210/211/212 by `var[0x071]`, which makes exit 400 or 402 untouchable (class 24).
 

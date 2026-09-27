@@ -43,11 +43,14 @@ public sealed class LoomScriptRuntimeState
     /// </summary>
     public Func<int, (bool Running, string? Estimate)>? ScriptRunning { get; set; }
     /// <summary>
-    /// The camera's x range in the current room (half a screen from each edge),
-    /// or null when no room is loaded. Camera commands keep <c>var[0x002]</c>
-    /// (ScummVM <c>VAR_CAMERA_POS_X</c>) inside it.
+    /// The camera's x limits in the current room, or null when no room is loaded:
+    /// <c>VAR_CAMERA_MIN_X</c>/<c>MAX_X</c> (<c>var[0x011]</c>/<c>var[0x012]</c>), which
+    /// room entry sets to half a screen from each edge and <c>roomOps roomScroll</c>
+    /// narrows. Camera commands keep <c>var[0x002]</c> (<c>VAR_CAMERA_POS_X</c>) inside them.
     /// </summary>
     public (int Min, int Max)? CameraRange { get; set; }
+    /// <summary>Half a screen from each edge of the current room: the widest camera limits (<c>cameraMoved</c>).</summary>
+    public (int Min, int Max)? RoomCameraBounds { get; set; }
     /// <summary>The current room's walk boxes (flags as <c>setBoxFlags</c> left them), or null outside a room.</summary>
     public LoomWalkBoxSet? WalkBoxes { get; set; }
     /// <summary>Why the current room's box flags are unknown (a <c>setBoxFlags</c> with an unknown box), or null.</summary>

@@ -276,7 +276,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
 == Room 41 (2 images, faithful=False, pending=4)
    paint order: 
    draw queue:  
-   entry script stopped: presentation operation not applied: roomOps; presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
    interface images (verb area, not room artwork): 635,636
    nothing visible after fallback
    doorways: 37
@@ -319,7 +319,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
 == Room 47 (5 images, faithful=False, pending=2)
    paint order: 698,699
    draw queue:  698,699
-   entry script stopped: presentation operation not applied: roomOps; presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
    interface images (verb area, not room artwork): 702
    doorways: 46,50
 == Room 49 (13 images, faithful=False, pending=1)
