@@ -115,6 +115,19 @@ internal static class Program
                 await Task.Delay(300);
                 Capture("script-dialogue.png");
                 report.Add($"Checked script dialogue={scriptDialogue.Key}; lines={scriptDialogue.Count()}; source={scriptDialogue.First().Source}");
+                report.Add($"LeftoverIndexEntries={extraction.LeftoverEntries.Count}");
+                report.AddRange(extraction.LeftoverEntries.Select(item => "  " + item.Describe()));
+                var details = Named<TextBlock>("ExtractionDetails").Text;
+                Check(extraction.LeftoverEntries.Count > 0 &&
+                      extraction.LeftoverEntries.All(item => details.Contains(item.Describe())) &&
+                      extraction.Diagnostics.All(line => !extraction.LeftoverEntries.Any(item => line.StartsWith(item.Entry.Name + ":"))),
+                    "Extraction details list leftover index entries separately, not as decode failures");
+                var expander = (Expander)((FrameworkElement)Named<TextBlock>("ExtractionDetails").Parent).Parent;
+                expander.IsExpanded = true;
+                await Task.Delay(300);
+                expander.BringIntoView();
+                await Task.Delay(300);
+                Capture("extraction-details.png");
                 Named<ComboBox>("KindFilter").SelectedIndex = 0;
                 rooms.SelectedItem = rooms.Items.OfType<ComboBoxItem>().First(i => i.Tag is int id && id == 3);
                 search.Text = "Primero me tendré";

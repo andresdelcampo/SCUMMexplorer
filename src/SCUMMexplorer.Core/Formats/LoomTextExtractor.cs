@@ -17,8 +17,16 @@ public sealed record LoomTextEntry(string Text, string Kind, string Source, int?
 
 public sealed record LoomTextExtraction(IReadOnlyList<LoomTextEntry> Entries,
     int DecodedBytes, int CandidateBytes, int UnresolvedPaths, int ResourcesVisited,
-    int ResourcesSkipped, IReadOnlyList<string> Diagnostics)
+    int ResourcesSkipped, IReadOnlyList<string> Diagnostics,
+    IReadOnlyList<LflLeftoverIndexEntry>? LeftoverIndexEntries = null)
 {
+    /// <summary>
+    /// Indexed scripts whose 00.LFL offset points inside another resource.
+    /// They are not text sources and are not counted as skipped ranges, but
+    /// they stay listed so coverage claims can name them.
+    /// </summary>
+    public IReadOnlyList<LflLeftoverIndexEntry> LeftoverEntries => LeftoverIndexEntries ?? [];
+
     public string Coverage => CandidateBytes == 0 ? "No script bytes were visited." :
         $"{DecodedBytes:N0} instruction bytes decoded across {ResourcesVisited:N0} decode ranges; ranges can overlap when verbs share stored code.";
 }
@@ -41,6 +49,8 @@ public sealed class LoomTextExtractor
         var visited = 0;
         var skipped = 0;
         var diagnostics = new List<string>();
+        var leftovers = new List<LflLeftoverIndexEntry>();
+        var chains = new LflResourceChain();
 
         void Skip(string source, Exception ex)
         {
@@ -153,6 +163,11 @@ public sealed class LoomTextExtractor
 
         foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
         {
+            if (chains.FindLeftover(game, resource) is { } leftover)
+            {
+                leftovers.Add(leftover);
+                continue;
+            }
             try { Add(scripts.Decode(resource), null); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { Skip(resource.Name, ex); }
         }
@@ -206,7 +221,8 @@ public sealed class LoomTextExtractor
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { Skip($"Room {roomId:00} objects and local scripts", ex); }
         }
 
-        return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics);
+        return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics,
+            leftovers);
     }
 
     /// <summary>

@@ -1,0 +1,37 @@
+Entries=719; ranges=1419; unresolved=2; skipped=0
+Stored line=6
+Spoken line=580
+Object name=133
+DialogueGroups=129; groupedLines=379; objectLinked=345
+Script dialogue groups=46; entries=230
+Cutscene groups=83; entries=149
+Room 70 / Local script 203 +0x0012: the instruction or its operands are truncated
+Room 70 / Local script 204 +0x0045: the instruction or its operands are truncated
+PASS: No empty, single-character or symbol-only text remains after ignoring control markers
+PASS: Gallery exposes every extracted entry
+PASS: Search narrows to matching original text
+PASS: Room 03 filter retains its cliff text
+PASS: Searching the stored object name finds its linked spoken lines
+PASS: Spanish accents render as Unicode in original dialogue
+PASS: Object 165 association is visible beside Room 03 without expanding source details
+PASS: Linked original room artwork renders
+PASS: Room visit action visible and keyboard focusable
+PASS: Empty search clears previous text and room action
+PASS: Object-name filter includes extracted names
+PASS: Conversation view has one selectable row per extracted group
+PASS: Searching a later cutscene line finds its group
+PASS: Search preserves the complete extracted group transcript
+PASS: Transcript begins with the first stored line and its decoded speaker
+PASS: Cutscene transcript visibly identifies source order
+Checked cutscene=04:04:6E53:cutscene:1; lines=9; source=Room 04 / Local script 200
+PASS: Unmarked script dialogue exposes its complete extracted group with multiple speakers
+PASS: Unmarked dialogue is visibly distinguished from cutscene markers
+Checked script dialogue=script:56:15D0:dialogue:0; lines=20; source=Indexed script 68 / 56.LFL
+LeftoverIndexEntries=4
+  Script 00: leftover index entry (points inside Costume 01); 01.LFL 0x9E07 is 11387 bytes into the resource at 0x718C.
+  Script 51: leftover index entry (points inside Script 49); 11.LFL 0x4775 is 728 bytes into the resource at 0x449D.
+  Script 55: leftover index entry (points inside Room 18); 18.LFL 0x41FB is 16891 bytes into the resource at 0x0000.
+  Script 116: leftover index entry (points inside Script 114); 02.LFL 0x6F67 is 26 bytes into the resource at 0x6F4D.
+PASS: Extraction details list leftover index entries separately, not as decode failures
+PASS: Visit room dispatch opens Room 03 in MainWindow
+Actual WPF windows rendered; synthetic routed button event used. Physical input not tested.

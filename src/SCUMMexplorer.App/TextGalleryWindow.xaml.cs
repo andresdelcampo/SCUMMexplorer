@@ -47,6 +47,10 @@ public partial class TextGalleryWindow : Window
             $"{extraction.ResourcesVisited:N0} script ranges visited. {extraction.Coverage} " +
             $"{extraction.UnresolvedPaths:N0} unresolved paths; {extraction.ResourcesSkipped:N0} ranges skipped. " +
             "The current decoder follows reachable instructions only, so text behind undecoded or unreachable code may be missing. Storage order does not establish scene order." +
+            (extraction.LeftoverEntries.Count == 0 ? "" : Environment.NewLine + Environment.NewLine +
+                $"{extraction.LeftoverEntries.Count:N0} leftover index entries are not text sources: 00.LFL lists them, " +
+                "but their offsets point inside another resource, so there is no script to read. They are not counted as skipped." +
+                Environment.NewLine + string.Join(Environment.NewLine, extraction.LeftoverEntries.Select(item => item.Describe()))) +
             (extraction.Diagnostics.Count == 0 ? "" : Environment.NewLine + Environment.NewLine +
                 string.Join(Environment.NewLine, extraction.Diagnostics.Take(8)) +
                 (extraction.Diagnostics.Count > 8 ? Environment.NewLine + "More details are not shown." : ""));
