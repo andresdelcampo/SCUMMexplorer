@@ -41,6 +41,8 @@ internal static class Program
                     report.Add($"Room {room:00}: active images {string.Join(',', images.Where(selection.IsActive).Select(i => i.Id))}");
                     foreach (string name in new[] {"SessionStatusText", "ObjectsNote", "StatusText"})
                         report.Add(name + ": " + ((TextBlock)window.FindName(name)).Text);
+                    foreach (var button in ((Panel)window.FindName("RoomNavigationButtons")).Children.OfType<Button>())
+                        report.Add($"Doorway button \"{button.Content}\": {button.ToolTip?.ToString()?.Replace("\n", " | ")}");
                     var bitmap = new RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32);
                     bitmap.Render(window);
                     var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));

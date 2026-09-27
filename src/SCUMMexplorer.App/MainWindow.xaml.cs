@@ -1805,13 +1805,23 @@ public partial class MainWindow : Window
         }
         _roomNavigationCandidates = candidates.DistinctBy(item =>
             (item.Object.Id, item.Verb.VerbId, item.TargetRoomId)).ToArray();
-        foreach (var candidate in _roomNavigationCandidates)
+        // One button per target room; every hotspot that leads there stays in its tooltip.
+        foreach (var target in _roomNavigationCandidates.GroupBy(item => item.TargetRoomId))
         {
+            var candidate = target.First();
+            // Verbs that share one code block are one source; name them all.
+            var sources = target.GroupBy(item => (item.Object.Id, item.Verb.ScriptOffset, item.InstructionOffset, item.Path))
+                .Select(source =>
+                    $"{room.Name} object {source.Key.Id} ({string.Join(", ", source.Select(item => item.Verb.Label).Distinct())}) " +
+                    $"code 0x{source.Key.ScriptOffset:X4}, room-load instruction +0x{source.Key.InstructionOffset:X4} ({source.Key.Path})")
+                .ToArray();
             var button = new Button
             {
-                Content = $"Open Room {candidate.TargetRoomId:00}",
-                ToolTip = $"Static candidate: {room.Name} object {candidate.Object.Id} code 0x{candidate.Verb.ScriptOffset:X4}, " +
-                          $"room-load instruction +0x{candidate.InstructionOffset:X4} ({candidate.Path}). Open directly for exploration; script conditions and effects are not simulated.",
+                Content = $"Open Room {target.Key:00}",
+                ToolTip = (sources.Length == 1
+                              ? $"Static candidate: {sources[0]}."
+                              : $"Static candidates ({sources.Length} sources):\n• {string.Join("\n• ", sources)}") +
+                          "\nOpen directly for exploration; script conditions and effects are not simulated.",
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Padding = new Thickness(8, 5, 8, 5),
                 Margin = new Thickness(0, 0, 0, 5),
