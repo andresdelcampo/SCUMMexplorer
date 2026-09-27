@@ -158,6 +158,43 @@ public sealed class LoomBoundedScriptExecutorTests
         Assert.Equal(50, Assert.Single(second.Events, item => item.Kind == LoomScriptEventKind.RoomLoaded).TargetId);
     }
 
+    [Fact]
+    public void StopScriptZeroEndsTheCurrentScript()
+    {
+        var script = Script(
+            new(0, 0, "stopScript", "0x00", "62 00"),
+            new(2, 0, "setState", "0x000A, 0x0001", "00 00 00 00"),
+            new(6, 0, "stopObjectCode", "", "00"));
+
+        var run = new LoomBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte> { [10] = 0 }, Array.Empty<LoomRoomObjectRecord>());
+
+        Assert.True(run.ReachedStop);
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(0, run.ObjectStates[10]);
+    }
+
+    [Fact]
+    public void StopScriptOfAnotherScriptNeedsASessionToApplyIt()
+    {
+        var script = Script(
+            new(0, 0, "stopScript", "0x2A", "62 2A"),
+            new(2, 0, "stopObjectCode", "", "00"));
+        var executor = new LoomBoundedScriptExecutor();
+
+        var alone = executor.Execute(script, new Dictionary<int, byte>(), Array.Empty<LoomRoomObjectRecord>());
+        Assert.Contains("needs a session", alone.UnresolvedReason, StringComparison.Ordinal);
+
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        LoomScriptEvent? stopped = null;
+        var handled = executor.Execute(script, runtime.ObjectStates, [], runtime: runtime,
+            onEvent: (scriptEvent, _) => { stopped = scriptEvent; return ""; });
+
+        Assert.True(handled.ReachedStop);
+        Assert.Equal(LoomScriptEventKind.ScriptStopped, stopped?.Kind);
+        Assert.Equal(0x2A, stopped?.TargetId);
+    }
+
     private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
         new(1, 1, 0, 32, 16, instructions, null, null, [], []);
 }

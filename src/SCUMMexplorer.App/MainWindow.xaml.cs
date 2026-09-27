@@ -627,10 +627,37 @@ public partial class MainWindow : Window
     private void AdvanceFrame_Click(object sender, RoutedEventArgs e)
     {
         if (_session is null || _currentRoomResource is not { } room || _currentRoom is null) return;
-        _session.AdvanceFrame();
+        var snapshot = _session.AdvanceFrame();
+        // A continued script can reach a room load; the session has already
+        // entered that room, so show it as ActivateObjectVerb does.
+        if (snapshot.RoomId is int reached && reached != room.ResourceId &&
+            _game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } targetRoom)
+        {
+            StatusText.Text = $"Entered Room {reached:00}";
+            StatusText.ToolTip = _session.LastAction?.Evidence;
+            SelectResourceInTree(targetRoom);
+            return;
+        }
         ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
         UpdateRoomNavigationActions(room);
         RefreshRoomPreview();
+    }
+
+    /// <summary>Frames an exit click may continue before falling back to browsing.</summary>
+    private const int ExitContinuationFrames = 8;
+
+    private bool ContinueToReachedRoom()
+    {
+        if (_session is null || _game is null || _currentRoomResource is not { } room ||
+            _session.Snapshot.PendingScripts == 0 || !_session.ContinueUntilRoomChanges(ExitContinuationFrames))
+            return false;
+        if (_session.Snapshot.RoomId is not int reached ||
+            _game.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom || targetRoom == room)
+            return false;
+        StatusText.Text = $"Entered Room {reached:00}";
+        StatusText.ToolTip = _session.LastAction?.Evidence;
+        SelectResourceInTree(targetRoom);
+        return true;
     }
 
     private void ShowLastObjectAction(int? roomId)
@@ -645,7 +672,7 @@ public partial class MainWindow : Window
         ObjectActionPanel.Visibility = Visibility.Visible;
         ObjectVerbButtons.Children.Clear();
         ObjectActionNote.Text = action.DestinationRoomId is int target
-            ? $"Entered Room {target:00}. Exploration state remains incomplete."
+            ? $"Entered Room {target:00} through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete."
             : _session!.Snapshot.PendingScripts > 0
                 ? "No room load reached; the session has pending scripts. Exploration state remains incomplete."
             : "Interaction completed without opening another room. Exploration state remains incomplete.";
@@ -1539,12 +1566,13 @@ public partial class MainWindow : Window
                 .Where(candidate => codeOnlyChoices.Any(choice => choice.Object.Id == candidate.Object.Id)).ToArray();
             if (codeOnlyDestinations.Length > 0)
             {
-                // A code-only exit: run its verb, and if the bounded run does
-                // not reach the room load, open the possible destination.
+                // A code-only exit: run its verb and continue the scripts it
+                // left pending for a few frames, as the game keeps running.
+                // Only if no room load is reached, open the possible destination.
                 var exitVerb = codeOnlyDestinations[0];
                 if (codeOnlyDestinations.Length == 1)
                 {
-                    if (!ActivateObjectVerb(exitVerb.Object, exitVerb.Verb))
+                    if (!ActivateObjectVerb(exitVerb.Object, exitVerb.Verb) && !ContinueToReachedRoom())
                         OpenRoomDestination(exitVerb);
                 }
                 else ShowRoomDestinationChoices(codeOnlyDestinations);

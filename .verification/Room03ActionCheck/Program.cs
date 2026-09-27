@@ -19,6 +19,9 @@ internal static class Program
         var output = args[1];
         var objectId = int.Parse(args[2]);
         var expectedRoom = int.Parse(args[3]);
+        // Optional reverse check: object and verb in the destination that should lead back to Room 03.
+        int? reverseObject = args.Length > 4 ? int.Parse(args[4]) : null;
+        var reverseVerb = args.Length > 5 ? Convert.ToInt32(args[5], 16) : 0;
         Directory.CreateDirectory(output);
         var report = new List<string> { "Real MainWindow; in-process coordinate and routed-key dispatch. No physical mouse/keyboard input." };
         var app = new Application();
@@ -30,7 +33,10 @@ internal static class Program
         int? DisplayedRoom() => ((GameResource?)Field("_currentRoomResource"))?.ResourceId;
         async Task WaitRoom(int room)
         {
-            for (int i = 0; i < 100 && DisplayedRoom() != room; i++) await Task.Delay(100);
+            // The room view loads asynchronously; wait for its object records as well.
+            for (int i = 0; i < 100 && (DisplayedRoom() != room ||
+                     ((IReadOnlyList<LoomRoomObjectRecord>)Field("_currentRoomObjectRecords")!).Count == 0); i++)
+                await Task.Delay(100);
             Check(DisplayedRoom() == room, $"Room {room:00} displayed");
             await Task.Delay(300);
             window.UpdateLayout();
@@ -71,12 +77,14 @@ internal static class Program
                 { RoutedEvent = Keyboard.KeyDownEvent });
             report.Add("Dispatched synthetic routed Enter (not physical keyboard input).");
         }
-        void CompleteChoice(bool keyboard)
+        void CompleteChoice(bool keyboard, int room = 3, int? id = null, int verb = 0)
         {
-            if (Session().LastAction is { } action && action.SourceRoomId == 3 && action.ObjectId == objectId) return;
+            var target = id ?? objectId;
+            if (Session().LastAction is { } action && action.SourceRoomId == room && action.ObjectId == target) return;
             var choices = Named<StackPanel>("ObjectVerbButtons").Children.OfType<Button>()
-                .Where(b => b.ToolTip?.ToString()?.Contains($"Object {objectId} ") == true).ToArray();
-            Check(choices.Length > 0, $"Decoded object {objectId} interaction offered");
+                .Where(b => b.ToolTip?.ToString()?.Contains($"Object {target} ") == true &&
+                            (verb == 0 || b.ToolTip!.ToString()!.Contains($"0x{verb:X2}"))).ToArray();
+            Check(choices.Length > 0, $"Decoded object {target} interaction offered");
             if (keyboard) Enter(choices[0]);
             else choices[0].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }
@@ -101,6 +109,24 @@ internal static class Program
                 report.Add("SessionStatusText: " + Named<TextBlock>("SessionStatusText").Text);
                 Capture(label);
                 return;
+            }
+            if (action?.DestinationRoomId is null)
+            {
+                Check(Session().Snapshot.PendingScripts > 0, $"{label}: the started script is pending after the click");
+                report.Add("After the click: " + Named<TextBlock>("ObjectActionNote").Text);
+                await WaitRoom(3);
+                Capture(label + "-pending");
+                for (var frame = 1; frame <= 3 && Session().Snapshot.RoomId == 3; frame++)
+                {
+                    Check(Named<Button>("AdvanceFrameButton").IsEnabled, "Continue button is enabled while scripts are pending");
+                    var pendingBefore = Session().Snapshot.PendingScripts;
+                    var guard = $"_currentRoom {(Field("_currentRoom") is null ? "null" : "set")}, _currentRoomResource {DisplayedRoom():00}";
+                    Call("AdvanceFrame_Click", window, new RoutedEventArgs());
+                    report.Add($"Continue pressed (frame {frame}); pending {pendingBefore} -> {Session().Snapshot.PendingScripts}; {guard}; session room {Session().Snapshot.RoomId:00}.");
+                }
+                action = Session().LastAction;
+                report.AddRange(Session().SessionTrace.TakeLast(4).Select(line => "Session: " + line));
+                report.AddRange(Session().Snapshot.Uncertainties.TakeLast(6).Select(line => "Session uncertainty: " + line));
             }
             Check(action?.SourceRoomId == 3 && action.ObjectId == objectId && action.DestinationRoomId == expectedRoom,
                 $"{label}: object {objectId} execution reached Room {expectedRoom:00}");
@@ -139,13 +165,17 @@ internal static class Program
                 await BrowseRoom(3);
                 Call("ResetSession_Click", window, new RoutedEventArgs());
                 Named<System.Windows.Controls.Primitives.ToggleButton>("SessionModeToggle").IsChecked = false;
+                var inspectSelection = (RoomObjectSelection)Field("_objectSelection")!;
+                var inspectObjects = (IReadOnlyList<RoomObjectImage>)Field("_objects")!;
+                report.Add($"Inspection setup: {inspectObjects.Count} images; hit at ({x},{y}) = {inspectSelection.HitTest(x, y)?.Id.ToString() ?? "none"}; room {DisplayedRoom():00}; current room image {(Field("_currentRoom") is null ? "null" : "set")}.");
                 var beforeInspection = Session().LastAction;
                 Call("HandleRoomPoint", x, y);
                 Check(Session().LastAction == beforeInspection && DisplayedRoom() == 3,
                     "Inspection-mode click at the same overlap does not execute an action or navigate");
-                Check(Named<TextBlock>("StatusText").Text.Contains("Object 166", StringComparison.Ordinal),
-                    "Inspection-mode click still selects stored overlapping artwork 166");
                 report.Add("Inspection StatusText: " + Named<TextBlock>("StatusText").Text);
+                // 166 is object 165's close-up, a verb-area image (27 September): it is not room artwork.
+                Check(!Named<TextBlock>("StatusText").Text.Contains("Object 166", StringComparison.Ordinal),
+                    "Inspection-mode click does not paint verb-area close-up 166 onto the room");
                 Capture("inspection-artwork");
                 Named<System.Windows.Controls.Primitives.ToggleButton>("SessionModeToggle").IsChecked = true;
                 if (expectedRoom == 0)
@@ -153,6 +183,29 @@ internal static class Program
                     await BrowseRoom(4);
                     Capture("room-04-browse-only");
                     report.Add("Room04 image rendered through direct catalog browsing only, not a reached transition. Reverse traversal unresolved.");
+                }
+                else if (reverseObject is int back)
+                {
+                    await BrowseRoom(3);
+                    Call("ResetSession_Click", window, new RoutedEventArgs());
+                    var hotspotAgain = Named<StackPanel>("ObjectList").Children.OfType<Button>().Single(b => b.Tag is int id && id == objectId);
+                    hotspotAgain.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    CompleteChoice(keyboard: false);
+                    await VerifyAction("forward-for-reverse");
+                    var reverseHotspot = Named<StackPanel>("ObjectList").Children.OfType<Button>().Single(b => b.Tag is int id && id == back);
+                    reverseHotspot.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    CompleteChoice(keyboard: false, room: expectedRoom, id: back, verb: reverseVerb);
+                    await WaitRoom(expectedRoom);
+                    for (var frame = 1; frame <= 3 && Session().Snapshot.RoomId == expectedRoom; frame++)
+                        Call("AdvanceFrame_Click", window, new RoutedEventArgs());
+                    var reverse = Session().LastAction;
+                    Check(reverse?.SourceRoomId == expectedRoom && reverse.ObjectId == back && reverse.DestinationRoomId == 3 &&
+                          reverse.ReachedRoomLoad is not null,
+                        $"Reverse: Room {expectedRoom:00} object {back} reached a room load back to Room 03");
+                    report.Add(reverse!.Evidence);
+                    await WaitRoom(3);
+                    report.Add("ObjectActionNote: " + Named<TextBlock>("ObjectActionNote").Text);
+                    Capture("reverse-room-03");
                 }
                 else report.Add("Reverse traversal is not asserted by this harness; catalog return was setup only.");
             }

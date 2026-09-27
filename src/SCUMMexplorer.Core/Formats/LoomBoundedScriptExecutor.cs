@@ -226,6 +226,31 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "stopScript")
+            {
+                // o5_stopScript: 0 ends the current script like stopObjectCode;
+                // another number ends that script's running slots, which only
+                // a session tracking the other scripts can apply.
+                if (!TryReadValue(instruction.Operands.Trim(), knownVariables, out var stopped, out var stopDetail))
+                {
+                    unresolved = $"stopScript target is unknown ({stopDetail}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                if (stopped == 0)
+                {
+                    reachedStop = true;
+                    break;
+                }
+                if (eventHandling != "")
+                {
+                    unresolved = $"stopScript {stopped} needs a session that tracks running scripts at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                trace.Add($"script {stopped} stopped");
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "setOwnerOf")
             {
                 var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);

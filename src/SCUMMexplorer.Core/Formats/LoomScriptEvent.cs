@@ -7,6 +7,7 @@ public enum LoomScriptEventKind
 {
     ScriptStarted,
     ScriptChained,
+    ScriptStopped,
     ObjectScriptStarted,
     MusicStarted,
     MusicStopped,
@@ -51,6 +52,7 @@ public sealed record LoomScriptEvent(
         {
             LoomScriptEventKind.ScriptStarted => "starts script",
             LoomScriptEventKind.ScriptChained => "chains to script",
+            LoomScriptEventKind.ScriptStopped => "stops script",
             LoomScriptEventKind.ObjectScriptStarted => "starts object script",
             LoomScriptEventKind.MusicStarted => "starts music",
             LoomScriptEventKind.MusicStopped => "stops music",
@@ -82,6 +84,9 @@ public sealed record LoomScriptEvent(
         {
             "startScript" => (LoomScriptEventKind.ScriptStarted, ResourceKind.Script, ParseLiteral(first)),
             "chainScript" => (LoomScriptEventKind.ScriptChained, ResourceKind.Script, ParseLiteral(first)),
+            // stopScript 0 ends the current script (o5_stopScript) and names no other script.
+            "stopScript" when ParseLiteral(first) != 0 =>
+                (LoomScriptEventKind.ScriptStopped, ResourceKind.Script, ParseLiteral(first)),
             "startObject" => (LoomScriptEventKind.ObjectScriptStarted, ResourceKind.Object, ParseLiteral(first)),
             "startMusic" => (LoomScriptEventKind.MusicStarted, ResourceKind.Sound, ParseLiteral(first)),
             "stopMusic" => (LoomScriptEventKind.MusicStopped, (ResourceKind?)null, (int?)null),

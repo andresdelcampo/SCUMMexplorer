@@ -177,19 +177,64 @@ public sealed class LoomExplorationSession
         return action;
     }
 
+    /// <summary>
+    /// Continues every pending script by one frame. When a continued script
+    /// reaches a literal room load, the session visits that room, as
+    /// <see cref="ActivateObjectVerb"/> does for a load reached directly, and
+    /// the last action records the continued load as its outcome.
+    /// </summary>
     public LoomSessionSnapshot AdvanceFrame()
     {
+        var beforeEvents = _visitEvents.Count;
         var runnable = _pending.ToArray();
         _pending.Clear();
+        _stopped.Clear();
         foreach (var item in runnable)
         {
             if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
-            RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0);
+            // An earlier script in this frame may have stopped this one.
+            if (item.ScriptNumber is int number && _stopped.Contains(number)) continue;
+            RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0, item.ScriptNumber);
         }
+        var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
+            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached);
+        if (roomLoad is null || _currentRoom?.ResourceId is not int sourceRoomId) return Snapshot;
+        var target = roomLoad.TargetId is int id ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
+        if (target is null)
+        {
+            _uncertainties.Add($"Reached room load has no indexed destination ({roomLoad.Operands}).");
+            return Snapshot;
+        }
+        var beforeUncertainties = _uncertainties.Count;
+        var action = LastAction is { ReachedRoomLoad: null } pending && pending.SourceRoomId == sourceRoomId
+            ? pending with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId }
+            : new LoomObjectActionResult(sourceRoomId, 0, 0, roomLoad.Offset, null, null, roomLoad,
+                target.ResourceId, []);
+        _uncertainties.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} reached {roomLoad.Operation} after a frame advance.");
+        VisitRoom(target, action);
+        LastAction = action with { Uncertainties = [.. action.Uncertainties, .. _uncertainties.Skip(beforeUncertainties)] };
         return Snapshot;
     }
 
+    /// <summary>
+    /// Advances frames, at most <paramref name="maxFrames"/>, while scripts are
+    /// pending and the session stays in the same room. Returns true when a
+    /// continued script reached a room load that the session entered.
+    /// </summary>
+    public bool ContinueUntilRoomChanges(int maxFrames)
+    {
+        var room = _currentRoom?.ResourceId;
+        for (var frame = 0; frame < maxFrames && _pending.Count > 0 && _currentRoom?.ResourceId == room; frame++)
+            AdvanceFrame();
+        return _currentRoom?.ResourceId != room;
+    }
+
     private readonly List<LoomScriptEvent> _visitEvents = [];
+    private readonly List<string> _visitTrace = [];
+    private readonly HashSet<int> _stopped = [];
+
+    /// <summary>Session-level steps (such as stopped scripts) in the order they were applied.</summary>
+    public IReadOnlyList<string> SessionTrace => _visitTrace;
 
     private void RunGlobalHook(int variableId, string phase)
     {
@@ -231,7 +276,7 @@ public sealed class LoomExplorationSession
         }
         try
         {
-            return RunScript(_reader.Decode(resource), _currentObjects, startOffset, locals, depth);
+            return RunScript(_reader.Decode(resource), _currentObjects, startOffset, locals, depth, scriptId);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -258,7 +303,7 @@ public sealed class LoomExplorationSession
                 _uncertainties.Add($"Room {_currentRoom.ResourceId:00} has no local script {scriptId:00}.");
                 return null;
             }
-            return RunScript(script, _currentObjects, startOffset, locals, depth);
+            return RunScript(script, _currentObjects, startOffset, locals, depth, scriptId);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -278,7 +323,7 @@ public sealed class LoomExplorationSession
 
     private LoomBoundedScriptResult RunScript(LoomScriptDisassembly script,
         IReadOnlyList<LoomRoomObjectRecord> objects, int startOffset,
-        IReadOnlyDictionary<string, ushort>? locals, int depth)
+        IReadOnlyDictionary<string, ushort>? locals, int depth, int? scriptNumber = null)
     {
         if (depth >= MaxNestedScripts)
         {
@@ -297,7 +342,7 @@ public sealed class LoomExplorationSession
                 .Where(pair => pair.Key.StartsWith("local[", StringComparison.Ordinal))
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
             _pending.Add(new PendingScript(script, objects.ToArray(), next, preservedLocals,
-                script.Context is null ? null : _currentRoom?.ResourceId));
+                script.Context is null ? null : _currentRoom?.ResourceId, scriptNumber));
         }
         return result;
     }
@@ -324,6 +369,17 @@ public sealed class LoomExplorationSession
                 return "";
             case LoomScriptEventKind.ScriptChained:
                 return "chainScript changes the current script's control flow";
+            case LoomScriptEventKind.ScriptStopped:
+                if (scriptEvent.TargetId is not int stoppedScript)
+                    return "stopped script depends on an unknown variable";
+                // ScummEngine::stopScript ends every running slot with this
+                // number; a script that is not running is left as it is.
+                var removed = _pending.RemoveAll(item => item.ScriptNumber == stoppedScript);
+                _stopped.Add(stoppedScript);
+                _visitTrace.Add(removed == 0
+                    ? $"stopScript {stoppedScript} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: script {stoppedScript} was not running"
+                    : $"stopScript {stoppedScript} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: ended its pending run");
+                return "";
             case LoomScriptEventKind.ObjectScriptStarted:
                 _uncertainties.Add("A started object script has an unresolved entrypoint; the parent continues without its effects.");
                 return "";
@@ -374,5 +430,5 @@ public sealed class LoomExplorationSession
 
     private sealed record PendingScript(LoomScriptDisassembly Script,
         IReadOnlyList<LoomRoomObjectRecord> RoomObjects, int Offset,
-        IReadOnlyDictionary<string, ushort> Locals, int? RoomId);
+        IReadOnlyDictionary<string, ushort> Locals, int? RoomId, int? ScriptNumber);
 }

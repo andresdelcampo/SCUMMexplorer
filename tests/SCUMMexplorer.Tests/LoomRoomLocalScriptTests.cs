@@ -50,13 +50,20 @@ public sealed class LoomRoomLocalScriptTests
         finally { Directory.Delete(Path.GetDirectoryName(room.FilePath)!, recursive: true); }
     }
 
+    // LOOM Room 03 local script 200: breakHere; equalZero bit[0xD7A] back to
+    // breakHere; stopScript 0x2A; loadRoomWithEgo 0xA7, 0x04. SCUMM's
+    // jumpRelative branches when the condition is false, so the script waits
+    // while the bit is set and continues once it is clear.
+    private static readonly byte[] WaitWhileBitSetThenLoad =
+    [
+        0x80, 0x28, 0x7A, 0x8D, 0xFA, 0xFF, 0x62, 0x2A,
+        0x24, 0xA7, 0x00, 0x04, 0x44, 0x02, 0x82, 0x00, 0xA0
+    ];
+
     [Fact]
-    public void StartedRoomLocalScriptRemainsPendingWhenItsRecordedGateIsZero()
+    public void StartedRoomLocalScriptReachesItsRoomLoadAfterAFrameWhenTheBitIsClear()
     {
-        WithSession(BuildRoom03LocalAction([
-            0x80, 0x28, 0x7A, 0x8D, 0xFA, 0xFF, 0x62, 0x2A,
-            0x24, 0xA7, 0x00, 0x04, 0x44, 0x02, 0x82, 0x00, 0xA0
-        ]), (session, room) =>
+        WithSession(BuildRoom03LocalAction(WaitWhileBitSetThenLoad), (session, room) =>
         {
             session.VisitRoom(room);
             var action = session.ActivateObjectVerb(162, 0x38);
@@ -64,9 +71,30 @@ public sealed class LoomRoomLocalScriptTests
             Assert.Null(action.DestinationRoomId);
             Assert.True(session.Snapshot.PendingScripts > 0);
             Assert.DoesNotContain(action.Uncertainties, item => item.Contains("Indexed script 200", StringComparison.Ordinal));
+
             var afterFrame = session.AdvanceFrame();
-            Assert.Equal(3, afterFrame.RoomId);
-            Assert.Null(action.ReachedRoomLoad);
+
+            Assert.Equal(4, afterFrame.RoomId);
+            Assert.Equal(4, session.LastAction?.DestinationRoomId);
+            Assert.Equal(8, session.LastAction?.ReachedRoomLoad?.Offset);
+            // Script 42 is not running, so stopScript 0x2A has nothing to end.
+            Assert.Contains(session.SessionTrace, line => line.Contains("script 42 was not running", StringComparison.Ordinal));
+        });
+    }
+
+    [Fact]
+    public void StartedRoomLocalScriptWaitsWhileItsBitIsSet()
+    {
+        // move bit[0xD7A] = 1, then the same wait-and-load code.
+        WithSession(BuildRoom03LocalAction([0x1A, 0x7A, 0x8D, 0x01, 0x00, .. WaitWhileBitSetThenLoad]), (session, room) =>
+        {
+            session.VisitRoom(room);
+            session.ActivateObjectVerb(162, 0x38);
+
+            Assert.False(session.ContinueUntilRoomChanges(3));
+            Assert.Equal(3, session.Snapshot.RoomId);
+            Assert.True(session.Snapshot.PendingScripts > 0);
+            Assert.Null(session.LastAction?.ReachedRoomLoad);
         });
     }
 
