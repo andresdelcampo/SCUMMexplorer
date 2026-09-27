@@ -16,7 +16,7 @@ LOOM script 68 (in `56.LFL`) runs straight through two `loadRoom 0x38` calls. At
 | Check | Result |
 | --- | --- |
 | Room 56 opening frame 779 then 782 | Holds after the follow-up change. Covered by `Room56OpeningFrameIsTheFaceThenItsMouth`. |
-| Room 58 opening frame 792 | **No evidence.** No decoded script loads Room 58 or references objects 790–795 by literal. The view uses a labelled seeded random pick (790, 795) and has no gap. Global scripts 0, 51, 55 and 116 fail to decode ("declares N bytes … past the end of"), so one of them might be the missing source. Covered by `Room58WithoutScriptEvidenceUsesALabelledRandomPickAndLeavesNoGap`. |
+| Room 58 opening frame 792 | **No evidence.** No decoded script loads Room 58 or references objects 790–795 by literal. The view uses a labelled seeded random pick (790, 795) and has no gap. Global scripts 0, 51, 55 and 116 fail to decode, but they are [leftover index entries that no code starts](../global-script-index/validation.md), so they are not the missing source. Covered by `Room58WithoutScriptEvidenceUsesALabelledRandomPickAndLeavesNoGap`. |
 | Room 17 filled by one consistent local-script batch | The session already reaches local script 202 (`[364,363,365,366]`), so no estimate is needed. Covered by `Room17HolesAreFilledByOneConsistentLocalScriptBatch`. |
 | Room 03 doorways 02, 04, 05, 10 | Holds. Covered by `Room03DoorwaysIncludeExitsReachedThroughLocalScripts`. |
 | Room 86 cycling to 925 fills 926–928 | Holds: exactly one of 926–928 (a seeded pick among local script 202's three single-image batches) is drawn on top, and no gap remains. Covered by `Room86CyclingToTheOpenHoodFillsItsFaceCutout`. |

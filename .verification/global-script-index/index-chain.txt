@@ -1,0 +1,34 @@
+script 0: 01.LFL 0x9E07 is not a resource start; inside 0x718C (+11387 bytes), owned by costume 1; chain covers file exactly: True
+script 116: 02.LFL 0x6F67 is not a resource start; inside 0x6F4D (+26 bytes), owned by script 114; chain covers file exactly: True
+costume 21: 03.LFL 0x3D6E is not a resource start; inside 0x-001 (+-1 bytes), owned by ?; chain covers file exactly: True
+costume 42: 09.LFL 0x7916 is not a resource start; inside 0x719E (+1912 bytes), owned by costume 37; chain covers file exactly: True
+costume 20: 10.LFL 0x86C1 is not a resource start; inside 0x-001 (+-1 bytes), owned by ?; chain covers file exactly: True
+script 51: 11.LFL 0x4775 is not a resource start; inside 0x449D (+728 bytes), owned by script 49; chain covers file exactly: True
+costume 66: 15.LFL 0x4B7D is not a resource start; inside 0x482A (+851 bytes), owned by costume 62; chain covers file exactly: True
+costume 70: 15.LFL 0x5C0A is not a resource start; inside 0x-001 (+-1 bytes), owned by ?; chain covers file exactly: True
+costume 91: 16.LFL 0xD8EA is not a resource start; inside 0x-001 (+-1 bytes), owned by ?; chain covers file exactly: True
+script 55: 18.LFL 0x41FB is not a resource start; inside 0x0000 (+16891 bytes), owned by room 18; chain covers file exactly: True
+costume 171: 18.LFL 0x48BB is not a resource start; inside 0x43A4 (+1303 bytes), owned by costume 71; chain covers file exactly: True
+costume 174: 19.LFL 0x7D74 is not a resource start; inside 0x7ADE (+662 bytes), owned by costume 163; chain covers file exactly: True
+costume 175: 19.LFL 0x815F is not a resource start; inside 0x7ADE (+1665 bytes), owned by costume 163; chain covers file exactly: True
+costume 89: 20.LFL 0x458D is not a resource start; inside 0x40B9 (+1236 bytes), owned by costume 72; chain covers file exactly: True
+21.LFL missing: room 21
+21.LFL missing: costume 75
+21.LFL missing: costume 74
+costume 90: 22.LFL 0x5648 is not a resource start; inside 0x-001 (+-1 bytes), owned by ?; chain covers file exactly: True
+costume 136: 27.LFL 0x1F24 is not a resource start; inside 0x1EFD (+39 bytes), owned by costume 76; chain covers file exactly: True
+costume 176: 47.LFL 0x53D7 is not a resource start; inside 0x521B (+444 bytes), owned by script 100; chain covers file exactly: True
+48.LFL missing: room 48
+costume 172: 53.LFL 0x762F is not a resource start; inside 0x5DBB (+6260 bytes), owned by ?; chain covers file exactly: True
+costume 173: 53.LFL 0x8EA2 is not a resource start; inside 0x5DBB (+12519 bytes), owned by ?; chain covers file exactly: True
+sound 24: 69.LFL 0x18B4 is not a resource start; inside 0x0000 (+6324 bytes), owned by room 69; chain covers file exactly: True
+sound 79: 70.LFL 0x3844 is not a resource start; inside 0x-001 (+-1 bytes), owned by ?; chain covers file exactly: True
+71.LFL missing: room 71
+72.LFL missing: room 72
+73.LFL missing: room 73
+74.LFL missing: room 74
+75.LFL missing: room 75
+76.LFL missing: room 76
+77.LFL missing: room 77
+78.LFL missing: room 78
+80.LFL missing: room 80

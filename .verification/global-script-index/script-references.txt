@@ -1,0 +1,188 @@
+CALL script 004 +0x00F9 startScript 0xCB, []
+CALL script 046 +0x1412 startScript 0xCB, []
+CALL script 061 +0x0016 startScript 0xCB, [0x0001, 0x0028, 0x0086]
+CALL script 062 +0x0002 startScript 0xCB, [0x0001, 0x0168, 0x0078]
+CALL script 104 +0x06EE startScript 0xCB, []
+CALL script 106 +0x0511 startScript 0xCB, []
+DUMP +0x0000 move var[0x025] = 0x0005
+DUMP +0x0005 roomOps roomPalette, 0x0000, 0x0005
+DUMP +0x000B move bit[0xD75] = 0x0000
+DUMP +0x0010 breakHere 
+DUMP +0x0011 move local[0x000] = 0x00CD
+DUMP +0x0016 startScript 0xCC, []
+DUMP +0x0019 startScript local[0x000], []
+DUMP +0x001D breakHere 
+DUMP +0x001E notEqualZero bit[0xD75], branch +0x0003 -> 0x0026
+DUMP +0x0023 jumpRelative +10  ->  0x0030
+DUMP +0x0026 equalZero var[0x003], branch +0xFFF2 -> 0x001D
+DUMP +0x002B notEqualZero bit[0xD75], branch +0xFFE9 -> 0x0019
+DUMP +0x0030 move bit[0xD75] = 0x0000
+DUMP +0x0035 increment local[0x000]
+DUMP +0x0038 isLess local[0x000], 0x00DE, branch +0xFFD7 -> 0x0016
+DUMP +0x003F waitFor message
+DUMP +0x0041 breakHere 
+DUMP +0x0042 print 0xFE, [center; position, 0x00A0, 0x00A0; color, 0x05; text, "FIN"]
+DUMP +0x0051 breakHere 
+DUMP +0x0052 roomOps roomPalette, 0x0001, 0x0005
+DUMP +0x0058 breakHere 
+DUMP +0x0059 roomOps roomPalette, 0x0009, 0x0005
+DUMP +0x005F breakHere 
+DUMP +0x0060 roomOps roomPalette, 0x000B, 0x0005
+DUMP +0x0066 breakHere 
+DUMP +0x0067 roomOps roomPalette, 0x000F, 0x0005
+DUMP +0x006D breakHere 
+DUMP +0x006E stopObjectCode 
+CALL Room 04 entry +0x002C startScript 0xCD, []
+CALL Room 04 entry +0x003F startScript 0xCD, []
+CALL Room 04 entry +0x00BA startScript 0xCB, []
+CALL Room 04 object 169 Verb 0x37 +0x0035 startScript 0xCD, []
+CALL Room 06 object 206 Verb 0x3F +0x000C startScript 0xCB, []
+CALL Room 06 object 207 Verb 0x3F +0x000A startScript 0xCD, []
+CALL Room 08 object 256 Verb 0x36 +0x0027 startScript 0xCD, []
+CALL Room 08 object 257 Verb 0x36 +0x0027 startScript 0xCD, []
+CALL Room 09 entry +0x00C8 startScript 0xCB, []
+CALL Room 10 entry +0x0057 startScript 0xCB, []
+CALL Room 10 local 200 +0x00BD startScript 0xCB, []
+CALL Room 10 object 297 Verb 0x36 +0x0000 startScript 0xCD, [0x00CE]
+CALL Room 10 object 298 Verb 0x36 +0x0000 startScript 0xCD, [0x00CF]
+CALL Room 10 object 299 Verb 0x36 +0x0000 startScript 0xCD, [0x00D0]
+CALL Room 10 object 300 Verb 0x36 +0x0000 startScript 0xCD, [0x00D1]
+CALL Room 13 entry +0x00B4 startScript 0xCB, []
+CALL Room 13 entry +0x00BA startScript 0xCD, []
+CALL Room 16 entry +0x008D startScript 0xCD, []
+CALL Room 16 object 350 Verb 0x36 +0x0000 startScript 0xCB, []
+CALL Room 17 entry +0x0044 startScript 0xCB, []
+CALL Room 17 entry +0x0064 startScript 0xCB, []
+CALL Room 17 local 200 +0x0055 startScript 0xCB, []
+CALL Room 17 object 357 Verb 0x56 +0x000F startScript 0xCD, []
+CALL Room 17 object 358 Verb 0x56 +0x000F startScript 0xCD, []
+CALL Room 18 object 367 Verb 0x36 +0x0009 startScript 0xCD, [0x0001]
+CALL Room 18 object 368 Verb 0x38 +0x0009 startScript 0xCD, [0x0001]
+CALL Room 18 object 372 Verb 0x36 +0x0000 startScript 0xCD, [0x0000]
+CALL Room 18 object 372 Verb 0x56 +0x0005 startScript 0xCD, [0x0001]
+CALL Room 18 object 374 Verb 0x36 +0x000B startScript 0xCD, [0x0001]
+CALL Room 20 object 390 Verb 0x36 +0x0000 startScript 0xCB, []
+CALL Room 20 object 391 Verb 0x36 +0x0000 startScript 0xCB, []
+CALL Room 22 local 214 +0x001B startScript 0xCB, []
+CALL Room 22 object 403 Verb 0x36 +0x0000 startScript 0xCD, []
+CALL Room 23 local 202 +0x00B0 startScript 0xCD, []
+CALL Room 23 local 202 +0x00BF startScript 0xCB, []
+CALL Room 24 entry +0x009D startScript 0xCB, []
+CALL Room 24 entry +0x00B0 startScript 0xCB, []
+CALL Room 24 local 200 +0x0025 startScript 0xCB, []
+CALL Room 24 local 204 +0x0047 startScript 0xCD, []
+CALL Room 25 object 447 Verb 0x36 +0x0061 startScript 0xCD, []
+CALL Room 28 object 466 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 467 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 468 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 469 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 470 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 470 Verb 0x3C +0x0000 startScript 0xCD, []
+CALL Room 28 object 471 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 471 Verb 0x3C +0x0000 startScript 0xCD, []
+CALL Room 28 object 472 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 472 Verb 0x3C +0x0000 startScript 0xCD, []
+CALL Room 28 object 473 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 473 Verb 0x3D +0x0000 startScript 0xCD, []
+CALL Room 28 object 474 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 474 Verb 0x3D +0x0000 startScript 0xCD, []
+CALL Room 28 object 475 Verb 0x38 +0x0000 startScript 0xCB, []
+CALL Room 28 object 475 Verb 0x3D +0x0000 startScript 0xCD, []
+CALL Room 31 object 523 Verb 0x45 +0x0000 startScript 0xCB, []
+CALL Room 31 object 524 Verb 0x46 +0x0000 startScript 0xCB, []
+CALL Room 33 entry +0x009A startScript 0xCB, []
+CALL Room 33 local 200 +0x0000 startScript 0xCD, [0x0000]
+CALL Room 33 local 202 +0x0000 startScript 0xCD, [0x0000]
+CALL Room 33 local 202 +0x005B startScript 0xCB, []
+CALL Room 33 object 544 Verb 0x41 +0x000B startScript 0xCD, [0x0001]
+CALL Room 33 object 544 Verb 0x42 +0x0005 startScript 0xCD, [0x0001]
+CALL Room 33 object 544 Verb 0x56 +0x0000 startScript 0xCD, [0x0001]
+CALL Room 34 local 201 +0x0010 startScript 0xCB, []
+CALL Room 34 object 557 Verb 0x36 +0x000A startScript 0xCD, []
+CALL Room 34 object 560 Verb 0x36 +0x0005 startScript 0xCD, []
+CALL Room 35 entry +0x008A startScript 0xCB, []
+CALL Room 35 local 202 +0x0018 chainScript 0xCB, []
+CALL Room 35 local 204 +0x051F startScript 0xCB, []
+CALL Room 35 local 204 +0x0633 startScript 0xCB, []
+CALL Room 35 local 204 +0x073E startScript 0xCB, []
+CALL Room 35 local 204 +0x07C9 startScript 0xCB, []
+CALL Room 35 local 210 +0x0076 startScript 0xCB, []
+CALL Room 36 entry +0x00E8 startScript 0xCB, []
+CALL Room 37 entry +0x0094 startScript 0xCB, []
+CALL Room 37 object 604 Verb 0x45 +0x0005 startScript 0xCD, []
+CALL Room 37 object 604 Verb 0x46 +0x0005 startScript 0xCD, []
+CALL Room 38 local 203 +0x006B startScript 0xCD, []
+CALL Room 38 object 616 Verb 0x3B +0x0000 startScript 0xCB, []
+CALL Room 38 object 617 Verb 0x3A +0x0000 startScript 0xCB, []
+CALL Room 41 entry +0x00CB startScript 0xCB, []
+CALL Room 41 local 200 +0x03CC startScript 0xCB, []
+CALL Room 41 object 633 Verb 0x42 +0x0000 startScript 0xCD, []
+CALL Room 43 entry +0x00B1 startScript 0xCB, []
+CALL Room 43 entry +0x019D startScript 0xCD, []
+CALL Room 46 object 682 Verb 0x56 +0x000F startScript 0xCD, []
+CALL Room 46 object 683 Verb 0x56 +0x000F startScript 0xCD, []
+CALL Room 46 object 684 Verb 0x56 +0x000F startScript 0xCD, []
+CALL Room 46 object 685 Verb 0x3B +0x0000 startScript 0xCB, []
+CALL Room 46 object 685 Verb 0x56 +0x000F startScript 0xCD, []
+CALL Room 47 entry +0x011E startScript 0xCB, []
+CALL Room 47 entry +0x0131 startScript 0xCD, []
+CALL Room 51 local 202 +0x000C startScript 0xCB, []
+CALL Room 62 local 201 +0x007C chainScript 0xCD, []
+CALL Room 62 local 202 +0x007C chainScript 0xCD, []
+CALL Room 62 local 203 +0x007C chainScript 0xCD, []
+CALL Room 62 local 204 +0x007C chainScript 0xCD, []
+CALL Room 62 object 809 Verb 0x3C +0x0005 startScript 0xCB, []
+CALL Room 66 entry +0x0102 startScript 0xCB, []
+CALL Room 66 entry +0x0108 startScript 0xCD, []
+CALL Room 69 local 203 +0x01D8 startScript 0xCD, []
+CALL Room 69 local 203 +0x0241 startScript 0xCD, []
+CALL Room 69 object 886 Fallback verb +0x0000 startScript 0xCB, [0x0000]
+CALL Room 69 object 887 Fallback verb +0x0000 startScript 0xCB, [0x0001]
+CALL Room 69 object 888 Fallback verb +0x0000 startScript 0xCB, [0x0002]
+CALL Room 69 object 889 Fallback verb +0x0000 startScript 0xCB, [0x0003]
+CALL Room 69 object 890 Fallback verb +0x0000 startScript 0xCB, [0x0004]
+CALL Room 69 object 891 Fallback verb +0x0000 startScript 0xCB, [0x0005]
+CALL Room 69 object 892 Fallback verb +0x0000 startScript 0xCB, [0x0006]
+CALL Room 69 object 893 Fallback verb +0x0000 startScript 0xCB, [0x0007]
+CALL Room 69 object 894 Fallback verb +0x0000 startScript 0xCB, [0x0008]
+CALL Room 69 object 895 Fallback verb +0x0000 startScript 0xCB, [0x0009]
+CALL Room 69 object 896 Fallback verb +0x0000 startScript 0xCB, [0x000A]
+CALL Room 69 object 897 Fallback verb +0x0000 startScript 0xCB, [0x000B]
+CALL Room 70 object 900 Fallback verb +0x0000 startScript 0xCD, [0x0384, 0x0389]
+CALL Room 70 object 901 Fallback verb +0x0000 startScript 0xCD, [0x0385, 0x038A]
+CALL Room 70 object 902 Fallback verb +0x0000 startScript 0xCD, [0x0386, 0x038B]
+CALL Room 70 object 910 Fallback verb +0x0000 startScript 0xCD, [0x0388, 0x038D]
+CALL Room 70 object 911 Fallback verb +0x0000 startScript 0xCD, [0x0387, 0x038C]
+Decoded sources: 1370; global script count declared in 00.LFL: 200
+Literal references to scripts 0, 51, 55, 116: 22
+  script 001 +0x0231 freezeScripts 0x00
+  script 003 +0x0016 freezeScripts 0x00
+  script 005 +0x0021 stopScript 0x00
+  script 018 +0x007D stopScript 0x00
+  script 022 +0x0062 stopScript 0x00
+  script 026 +0x004E stopScript 0x00
+  script 031 +0x0019 stopScript 0x00
+  script 031 +0x024D stopScript 0x00
+  script 049 +0x002A stopScript 0x00
+  script 075 +0x002F stopScript 0x00
+  script 091 +0x0020 stopScript 0x00
+  script 106 +0x0514 freezeScripts 0x00
+  script 112 +0x0024 stopScript 0x00
+  script 115 +0x0027 stopScript 0x00
+  Room 16 local 204 +0x0070 stopScript 0x00
+  Room 20 local 210 +0x0419 stopScript 0x00
+  Room 34 local 200 +0x0057 stopScript 0x00
+  Room 34 local 201 +0x012B stopScript 0x00
+  Room 47 local 205 +0x01AB stopScript 0x00
+  Room 47 local 205 +0x01B2 stopScript 0x00
+  Room 70 local 200 +0x003B stopScript 0x00
+  Room 70 local 201 +0x01B4 stopScript 0x00
+Script references through a variable (target unknown): 3
+  Room 02 local 203 +0x0019 startScript local[0x000], []
+  Room 10 local 205 +0x0015 startScript local[0x000], [local[0x002]]
+  Room 10 local 205 +0x001D isScriptRunning var[0x000], local[0x000]
+Decode failures: 4
+  script 000: Script 00 declares 33139 bytes at 0x9E07, past the end of 01.LFL.
+  script 051: Script 51 declares 17151 bytes at 0x4775, past the end of 11.LFL.
+  script 055: Script 55 declares 25292 bytes at 0x41FB, past the end of 18.LFL.
+  script 116: Script 116 declares 65280 bytes at 0x6F67, past the end of 02.LFL.
