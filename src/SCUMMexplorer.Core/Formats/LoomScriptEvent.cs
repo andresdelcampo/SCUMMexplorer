@@ -15,6 +15,7 @@ public enum LoomScriptEventKind
     SoundStopped,
     CutsceneStarted,
     CutsceneEnded,
+    ScriptsFrozen,
     Dialogue,
     RoomLoaded,
     ObjectStateChanged,
@@ -38,7 +39,8 @@ public sealed record LoomScriptEvent(
     string Operands,
     ResourceKind? TargetKind,
     int? TargetId,
-    LoomScriptEventCertainty Certainty)
+    LoomScriptEventCertainty Certainty,
+    bool FreezeResistant = false)
 {
     public string Format()
     {
@@ -60,6 +62,7 @@ public sealed record LoomScriptEvent(
             LoomScriptEventKind.SoundStopped => "stops sound",
             LoomScriptEventKind.CutsceneStarted => "begins cutscene",
             LoomScriptEventKind.CutsceneEnded => "ends cutscene",
+            LoomScriptEventKind.ScriptsFrozen => Operands == "0x00" ? "unfreezes scripts" : "freezes scripts",
             LoomScriptEventKind.Dialogue => "dialogue",
             LoomScriptEventKind.RoomLoaded => "loads room",
             LoomScriptEventKind.ObjectStateChanged => "changes object state",
@@ -94,6 +97,7 @@ public sealed record LoomScriptEvent(
             "stopSound" => (LoomScriptEventKind.SoundStopped, ResourceKind.Sound, ParseLiteral(first)),
             "cutscene" => (LoomScriptEventKind.CutsceneStarted, (ResourceKind?)null, (int?)null),
             "endCutscene" => (LoomScriptEventKind.CutsceneEnded, (ResourceKind?)null, (int?)null),
+            "freezeScripts" => (LoomScriptEventKind.ScriptsFrozen, (ResourceKind?)null, (int?)null),
             "print" or "printEgo" => (LoomScriptEventKind.Dialogue, (ResourceKind?)null, (int?)null),
             "loadRoom" => (LoomScriptEventKind.RoomLoaded, ResourceKind.Room, ParseLiteral(first)),
             "loadRoomWithEgo" => (LoomScriptEventKind.RoomLoaded, ResourceKind.Room, ParseLiteral(SecondArgument(instruction.Operands))),
@@ -105,8 +109,10 @@ public sealed record LoomScriptEvent(
         };
 
         if (kind is null) return null;
+        // o5_startScript: opcode bit 0x20 makes the started script freeze-resistant.
         return new LoomScriptEvent(script.ScriptId, script.Context ?? $"Script {script.ScriptId:00}",
-            instruction.Offset, kind.Value, operation, instruction.Operands, targetKind, targetId, certainty);
+            instruction.Offset, kind.Value, operation, instruction.Operands, targetKind, targetId, certainty,
+            operation == "startScript" && (instruction.Opcode & 0x20) != 0);
     }
 
     private static string FirstArgument(string operands)

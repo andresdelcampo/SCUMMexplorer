@@ -183,7 +183,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    interface images (verb area, not room artwork): 448
    nothing visible after fallback
    doorways: 24
-== Room 26 (14 images, faithful=False, pending=0)
+== Room 26 (14 images, faithful=False, pending=1)
    paint order: 451,450
    draw queue:  
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
@@ -202,7 +202,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    interface images (verb area, not room artwork): 497,498,499
    state set by reached code: 476=1,477=1,478=1,479=1,480=1,481=1,482=1,483=0,484=0,485=0,486=0,487=0,488=0,489=0,490=0,491=0,492=0,493=0,494=0,495=0,496=0
    doorways: 
-== Room 29 (3 images, faithful=False, pending=0)
+== Room 29 (3 images, faithful=False, pending=1)
    paint order: 500
    draw queue:  500
    doorways: 
@@ -236,7 +236,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    interface images (verb area, not room artwork): 582,583,584,585
    state set by reached code: 563=0,573=1,574=1,575=1,576=1,577=0,578=0,579=0,580=0,581=0
    doorways: 33,35,46
-== Room 35 (7 images, faithful=False, pending=0)
+== Room 35 (7 images, faithful=False, pending=1)
    paint order: 594
    draw queue:  594
    entry script stopped: presentation operation not applied: resourceRoutines
@@ -275,7 +275,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    draw queue:  624,625
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
    doorways: 
-== Room 41 (2 images, faithful=False, pending=2)
+== Room 41 (2 images, faithful=False, pending=3)
    paint order: 
    draw queue:  
    entry script stopped: presentation operation not applied: setCameraAt; presentation operation not applied: roomOps; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors
@@ -290,7 +290,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    entry state 638=0: Room 42 entry script +0x0004 sets it to 0 on every path
    nothing visible after fallback
    doorways: 
-== Room 43 (7 images, faithful=False, pending=1)
+== Room 43 (7 images, faithful=False, pending=2)
    paint order: 645
    draw queue:  645
    entry script stopped: presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
@@ -318,7 +318,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    interface images (verb area, not room artwork): 691,692,693,694
    state set by reached code: 686=0
    doorways: 26,47
-== Room 47 (5 images, faithful=False, pending=0)
+== Room 47 (5 images, faithful=False, pending=1)
    paint order: 698,699
    draw queue:  698,699
    entry script stopped: presentation operation not applied: setCameraAt; presentation operation not applied: roomOps; presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; and 3 more omitted behaviors
@@ -432,7 +432,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    paint order: 867
    draw queue:  867
    doorways: 
-== Room 68 (6 images, faithful=False, pending=1)
+== Room 68 (6 images, faithful=False, pending=2)
    paint order: 873,870
    draw queue:  873,870
    entry script stopped: presentation operation not applied: roomOps

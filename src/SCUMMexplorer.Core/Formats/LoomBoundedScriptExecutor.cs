@@ -419,6 +419,69 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation is "cutscene" or "endCutscene" or "freezeScripts")
+            {
+                // beginCutscene/endCutscene run the scripts in VAR_CUTSCENE_START_SCRIPT and
+                // VAR_CUTSCENE_END_SCRIPT, and freezeScripts suspends other running
+                // scripts; only a session that runs scripts can apply them.
+                if (eventHandling == "")
+                {
+                    pc = next;
+                    continue;
+                }
+                unresolved = $"{instruction.Operation} needs a session that runs and tracks scripts at +0x{instruction.Offset:X4}";
+                break;
+            }
+
+            if (instruction.Operation is "delay" or "delayVariable" ||
+                instruction.Operation == "waitFor" && (instruction.Operands is "message" or "camera" ||
+                                                       instruction.Operands.StartsWith("actor,", StringComparison.Ordinal)))
+            {
+                // o5_delay and o5_delayVariable pause the script for a time; o5_wait
+                // breaks while the actor walks, the message shows or the camera
+                // moves. None of these is simulated, so the script continues on
+                // the next frame. Only timing is compressed; no state is set.
+                var waited = instruction.Operation switch
+                {
+                    "delay" => $"a delay of {ReadDelay(instruction.Operands)} jiffies",
+                    "delayVariable" => $"a delay of {instruction.Operands} jiffies",
+                    _ when instruction.Operands == "message" => "waiting for the message to finish",
+                    _ when instruction.Operands == "camera" => "waiting for the camera",
+                    _ => $"waiting for actor {instruction.Operands[6..].Trim()} to stop walking"
+                };
+                trace.Add($"{waited} at +0x{instruction.Offset:X4} continues on the next frame");
+                limitations.Add($"timing not simulated: {waited} continues on the next frame (+0x{instruction.Offset:X4})");
+                resumeOffset = next;
+                break;
+            }
+
+            if (instruction.Operation == "isSoundRunning")
+            {
+                // o5_isSoundRunning: 0 for sound 0, else whether the sound plays.
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (runtime is null || parts.Length != 2 || !TryGetVariableKey(parts[0], knownVariables, out var resultKey) ||
+                    !TryReadValue(parts[1], knownVariables, out var sound, out _))
+                {
+                    unresolved = $"isSoundRunning needs a session and a known sound ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                // A sound started on this route is read as still playing, because its
+                // length is not simulated: that value, and what follows from it, is an
+                // estimate. A sound this route never started is silent in this preview.
+                var running = sound != 0 && runtime.ActiveSounds.Contains(sound);
+                knownVariables[resultKey] = running ? (ushort)1 : (ushort)0;
+                RefreshBitAliases(resultKey, knownVariables);
+                MarkEstimated(estimated, resultKey, onEstimatedPath || running ||
+                    OperandIsEstimated(parts[1], estimated, knownVariables));
+                if (sound != 0)
+                    limitations.Add(running
+                        ? $"isSoundRunning reads sound {sound} as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x{instruction.Offset:X4})"
+                        : $"isSoundRunning reads sound {sound} as silent because this route did not start it (+0x{instruction.Offset:X4})");
+                trace.Add($"{resultKey} = {(running ? 1 : 0)}: sound {sound} {(running ? "started on this route (estimate)" : "not started on this route")}");
+                pc = next;
+                continue;
+            }
+
             if (IsPresentationOperation(instruction.Operation))
             {
                 if (eventHandling == "")
@@ -934,6 +997,11 @@ public sealed class LoomBoundedScriptExecutor
         values = literals;
         return true;
     }
+
+    private static string ReadDelay(string operand) =>
+        operand.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
+        int.TryParse(operand.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var jiffies)
+            ? jiffies.ToString(CultureInfo.InvariantCulture) : operand;
 
     private static bool TryReadLiteral(string operand, out ushort value)
     {

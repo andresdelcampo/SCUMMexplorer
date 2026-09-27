@@ -647,7 +647,13 @@ public partial class MainWindow : Window
     }
 
     /// <summary>Frames an exit click may continue before falling back to browsing.</summary>
-    private const int ExitContinuationFrames = 8;
+    /// <remarks>
+    /// Delays and waits each take one session frame, so a cutscene exit such as
+    /// Room 10 object 295 (script 052: a message, 15 animation frames, a delay,
+    /// then Room 11) needs about 18. A click that falls short leaves its script
+    /// pending, and that load would later fire during an unrelated click.
+    /// </remarks>
+    private const int ExitContinuationFrames = 32;
 
     private bool ContinueToReachedRoom()
     {

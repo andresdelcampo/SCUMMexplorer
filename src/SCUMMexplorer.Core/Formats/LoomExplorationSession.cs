@@ -223,8 +223,14 @@ public sealed class LoomExplorationSession
             if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
             // An earlier script in this frame may have stopped this one.
             if (item.ScriptNumber is int number && _stopped.Contains(number)) continue;
+            // runAllScripts skips frozen slots; they keep their place.
+            if (item.Frame.FreezeCount > 0)
+            {
+                _pending.Add(item);
+                continue;
+            }
             RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0, item.ScriptNumber,
-                item.EstimatedLocals, item.PathEstimated);
+                item.EstimatedLocals, item.PathEstimated, item.Frame);
         }
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
             item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached);
@@ -263,6 +269,17 @@ public sealed class LoomExplorationSession
     private readonly List<string> _visitTrace = [];
     private readonly HashSet<int> _stopped = [];
     private readonly List<LoomRandomPick> _picks = [];
+    // Scripts running now, outermost first; the last one is the current script.
+    private readonly List<ScriptFrame> _executing = [];
+    // beginCutscene's vm.cutSceneData stack, and the script whose cutscene start
+    // script is running (vm.cutSceneScriptIndex), which freezeScripts leaves running.
+    private readonly Stack<ushort> _cutsceneData = new();
+    private ScriptFrame? _cutsceneOwner;
+
+    /// <summary>ScummVM <c>VAR_CUTSCENE_START_SCRIPT</c>, <c>VAR_CUTSCENE_END_SCRIPT</c> and <c>VAR_OVERRIDE</c>.</summary>
+    private const string CutsceneStartScriptVariable = "var[0x023]";
+    private const string CutsceneEndScriptVariable = "var[0x024]";
+    private const string OverrideVariable = "var[0x005]";
 
     /// <summary>Session-level steps (such as stopped scripts) in the order they were applied.</summary>
     public IReadOnlyList<string> SessionTrace => _visitTrace;
@@ -298,7 +315,8 @@ public sealed class LoomExplorationSession
 
     private LoomBoundedScriptResult? RunIndexedScript(int scriptId, int startOffset,
         IReadOnlyDictionary<string, ushort>? locals, int depth,
-        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false)
+        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
+        ScriptFrame? frame = null)
     {
         var resource = _game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script && item.ResourceId == scriptId);
         if (resource is null)
@@ -309,7 +327,7 @@ public sealed class LoomExplorationSession
         try
         {
             return RunScript(_reader.Decode(resource), _currentObjects, startOffset, locals, depth, scriptId,
-                estimatedLocals, pathEstimated);
+                estimatedLocals, pathEstimated, frame);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -320,10 +338,12 @@ public sealed class LoomExplorationSession
 
     private LoomBoundedScriptResult? RunStartedScript(int scriptId, int startOffset,
         IReadOnlyDictionary<string, ushort>? locals, int depth,
-        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false)
+        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
+        bool freezeResistant = false)
     {
+        var frame = new ScriptFrame { FreezeResistant = freezeResistant };
         if (scriptId < _globalScriptCount)
-            return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated);
+            return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated, frame);
         if (_currentRoom is null)
         {
             _uncertainties.Add($"Local script {scriptId:00} cannot run before a room is loaded.");
@@ -338,7 +358,7 @@ public sealed class LoomExplorationSession
                 return null;
             }
             return RunScript(script, _currentObjects, startOffset, locals, depth, scriptId,
-                estimatedLocals, pathEstimated);
+                estimatedLocals, pathEstimated, frame);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -359,7 +379,8 @@ public sealed class LoomExplorationSession
     private LoomBoundedScriptResult RunScript(LoomScriptDisassembly script,
         IReadOnlyList<LoomRoomObjectRecord> objects, int startOffset,
         IReadOnlyDictionary<string, ushort>? locals, int depth, int? scriptNumber = null,
-        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false)
+        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
+        ScriptFrame? frame = null)
     {
         if (depth >= MaxNestedScripts)
         {
@@ -367,10 +388,21 @@ public sealed class LoomExplorationSession
             return new LoomBoundedScriptResult(_runtime.ObjectStates, _runtime.ObjectPositions,
                 _runtime.GlobalVariables, [], [], 0, false, "nested script limit reached");
         }
-        var result = _executor.Execute(script, _runtime.ObjectStates, objects,
-            runtime: _runtime, startOffset: startOffset, initialLocals: locals,
-            onEvent: (scriptEvent, _) => HandleEvent(scriptEvent, depth),
-            estimatedLocals: estimatedLocals, pathEstimated: pathEstimated);
+        frame ??= new ScriptFrame();
+        frame.Label = script.Context ?? $"Script {script.ScriptId:00}";
+        _executing.Add(frame);
+        LoomBoundedScriptResult result;
+        try
+        {
+            result = _executor.Execute(script, _runtime.ObjectStates, objects,
+                runtime: _runtime, startOffset: startOffset, initialLocals: locals,
+                onEvent: (scriptEvent, _) => HandleEvent(scriptEvent, depth),
+                estimatedLocals: estimatedLocals, pathEstimated: pathEstimated);
+        }
+        finally
+        {
+            _executing.RemoveAt(_executing.Count - 1);
+        }
         var label = script.Context ?? $"Script {script.ScriptId:00}";
         foreach (var pick in result.RandomPicks)
         {
@@ -386,7 +418,7 @@ public sealed class LoomExplorationSession
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
             _pending.Add(new PendingScript(script, objects.ToArray(), next, preservedLocals,
                 script.Context is null ? null : _currentRoom?.ResourceId, scriptNumber,
-                result.EstimatedLocals, result.PathEstimated));
+                result.EstimatedLocals, result.PathEstimated, frame));
         }
         return result;
     }
@@ -412,8 +444,14 @@ public sealed class LoomExplorationSession
                 // behind a seeded pick, or given a picked value, runs as an estimate.
                 RunStartedScript(scriptId, 0, locals, depth + 1,
                     EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
-                    scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
+                    scriptEvent.Certainty != LoomScriptEventCertainty.Reached, scriptEvent.FreezeResistant);
                 return "";
+            case LoomScriptEventKind.CutsceneStarted:
+                return BeginCutscene(scriptEvent, depth);
+            case LoomScriptEventKind.CutsceneEnded:
+                return EndCutscene(scriptEvent, depth);
+            case LoomScriptEventKind.ScriptsFrozen:
+                return FreezeScripts(scriptEvent);
             case LoomScriptEventKind.ScriptChained:
                 return "chainScript changes the current script's control flow";
             case LoomScriptEventKind.ScriptStopped:
@@ -450,6 +488,98 @@ public sealed class LoomExplorationSession
             default:
                 return null;
         }
+    }
+
+    /// <summary>
+    /// ScummEngine::beginCutscene: pushes the first argument as the cutscene's
+    /// data and runs the script in <c>VAR_CUTSCENE_START_SCRIPT</c> with the
+    /// arguments. The calling script stays exempt from a freeze while it runs.
+    /// </summary>
+    private string BeginCutscene(LoomScriptEvent scriptEvent, int depth)
+    {
+        if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var arguments))
+            return "cutscene arguments depend on unknown variables";
+        _cutsceneData.Push(arguments.GetValueOrDefault("local[0x000]"));
+        if (!_runtime.GlobalVariables.TryGetValue(CutsceneStartScriptVariable, out var startScript))
+        {
+            _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: the cutscene start script ({CutsceneStartScriptVariable}) is unknown; its effects were not applied.");
+            return "";
+        }
+        _visitTrace.Add($"cutscene at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4} runs script {startScript}");
+        if (startScript == 0) return "";
+        var owner = _cutsceneOwner;
+        _cutsceneOwner = _executing.Count > 0 ? _executing[^1] : null;
+        try
+        {
+            RunStartedScript(startScript, 0, arguments, depth + 1,
+                EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+                scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
+        }
+        finally
+        {
+            _cutsceneOwner = owner;
+        }
+        return "";
+    }
+
+    /// <summary>
+    /// ScummEngine::endCutscene: clears <c>VAR_OVERRIDE</c>, pops the cutscene's
+    /// data and runs the script in <c>VAR_CUTSCENE_END_SCRIPT</c> with it.
+    /// </summary>
+    private string EndCutscene(LoomScriptEvent scriptEvent, int depth)
+    {
+        var estimate = scriptEvent.Certainty != LoomScriptEventCertainty.Reached;
+        _runtime.GlobalVariables[OverrideVariable] = 0;
+        if (estimate) _runtime.EstimatedVariables.Add(OverrideVariable);
+        else _runtime.EstimatedVariables.Remove(OverrideVariable);
+        ushort data = 0;
+        if (_cutsceneData.Count > 0) data = _cutsceneData.Pop();
+        else _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: endCutscene without a cutscene begun on this route; its data is taken as 0.");
+        if (!_runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var endScript))
+        {
+            _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: the cutscene end script ({CutsceneEndScriptVariable}) is unknown; its effects were not applied.");
+            return "";
+        }
+        _visitTrace.Add($"endCutscene at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4} runs script {endScript}");
+        if (endScript != 0)
+            RunStartedScript(endScript, 0, new Dictionary<string, ushort> { ["local[0x000]"] = data }, depth + 1,
+                [], estimate);
+        return "";
+    }
+
+    /// <summary>
+    /// ScummEngine::freezeScripts and unfreezeScripts. A nonzero flag freezes
+    /// every other running script, except freeze-resistant ones when the flag
+    /// is below 0x80, and leaves the cutscene's owner running; 0 undoes one
+    /// freeze. A frozen script keeps its place and does not run on later frames.
+    /// </summary>
+    private string FreezeScripts(LoomScriptEvent scriptEvent)
+    {
+        var operand = scriptEvent.Operands.Trim();
+        ushort flag;
+        if (operand.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
+            ushort.TryParse(operand.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var literal))
+            flag = literal;
+        else if (!_runtime.GlobalVariables.TryGetValue(operand, out flag))
+            return "freezeScripts flag depends on an unknown variable";
+        var current = _executing.Count > 0 ? _executing[^1] : null;
+        var slots = _executing.Where(frame => frame != current)
+            .Concat(_pending.Select(item => item.Frame)).Distinct().ToArray();
+        if (flag != 0)
+        {
+            foreach (var slot in slots.Where(slot => !slot.FreezeResistant || flag >= 0x80))
+                slot.FreezeCount++;
+            if (_cutsceneOwner is not null) _cutsceneOwner.FreezeCount = 0;
+        }
+        else
+        {
+            foreach (var slot in slots.Where(slot => slot.FreezeCount > 0))
+                slot.FreezeCount--;
+        }
+        var frozen = slots.Where(slot => slot.FreezeCount > 0).Select(slot => slot.Label).ToArray();
+        _visitTrace.Add($"freezeScripts {operand} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: " +
+                        (frozen.Length == 0 ? "no script is frozen" : $"frozen: {string.Join(", ", frozen)}"));
+        return "";
     }
 
     private static string[] EstimatedArguments(string operands, IReadOnlySet<string> estimatedGlobals)
@@ -491,5 +621,17 @@ public sealed class LoomExplorationSession
     private sealed record PendingScript(LoomScriptDisassembly Script,
         IReadOnlyList<LoomRoomObjectRecord> RoomObjects, int Offset,
         IReadOnlyDictionary<string, ushort> Locals, int? RoomId, int? ScriptNumber,
-        IReadOnlyCollection<string> EstimatedLocals, bool PathEstimated);
+        IReadOnlyCollection<string> EstimatedLocals, bool PathEstimated, ScriptFrame Frame);
+
+    /// <summary>
+    /// The freeze state of one running script slot (ScummVM <c>ScriptSlot</c>'s
+    /// <c>freezeResistant</c> and <c>freezeCount</c>). It stays with the script
+    /// while it runs and while it waits for a later frame.
+    /// </summary>
+    private sealed class ScriptFrame
+    {
+        public bool FreezeResistant { get; init; }
+        public int FreezeCount { get; set; }
+        public string Label { get; set; } = "";
+    }
 }
