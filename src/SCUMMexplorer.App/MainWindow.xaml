@@ -64,6 +64,7 @@
                     <Grid>
                         <Image x:Name="RoomPreview" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True" Margin="12" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseLeftButtonUp="RoomPreview_MouseLeftButtonUp" MouseMove="RoomPreview_MouseMove" MouseLeave="RoomPreview_MouseLeave"/>
                         <Canvas x:Name="RoomNavigationOverlay" Visibility="Collapsed" Margin="12" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="RoomNavigationOverlay_SizeChanged"/>
+                        <Canvas x:Name="HotspotHighlightOverlay" Visibility="Collapsed" Margin="12" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="HotspotHighlightOverlay_SizeChanged"/>
                         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20" Background="#E8192632">
                             <CheckBox x:Name="RoomNavigationToggle" Content="Show doorways" Visibility="Collapsed" IsChecked="True"
                                       Margin="8,5,8,2" Foreground="#E7E0D2"

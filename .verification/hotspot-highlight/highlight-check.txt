@@ -1,0 +1,24 @@
+Real MainWindow; synthetic MouseEnter/MouseLeave and Keyboard.Focus on hotspot rows. No physical input.
+Room 03: 6 hotspot rows
+PASS Room 03 row "→ Room 02" object 160 rect (256,0) 64x72 via focus: box at (410,6,96,3) 102,7x115,5; cleared after leave: True
+PASS Room 03 row "→ Room 05" object 161 rect (168,88) 152x56 via hover: box at (269,5,237,5) 243,8x89,8; cleared after leave: True
+PASS Room 03 row "→ Room 04" object 162 rect (0,0) 72x72 via hover: box at (0,96,3) 115,5x115,5; cleared after leave: True
+PASS Room 03 row "→ Room 10 · 4" object 163 rect (48,88) 48x40 via hover: box at (77,237,5) 77x64,2; cleared after leave: True
+PASS Room 03 row "→ Room 10 · 5" object 164 rect (0,80) 128x56 via hover: box at (0,224,6) 205,3x89,8; cleared after leave: True
+PASS Room 03 row "cielo" object 165 rect (80,8) 96x16 via hover: box at (128,3,109,2) 154x25,7; cleared after leave: True
+Room 10: 8 hotspot rows
+PASS Room 10 row "→ Room 03" object 284 rect (288,0) 32x72 via focus: box at (462,96,3) 51,3x115,5; cleared after leave: True
+PASS Room 10 row "→ Room 05" object 285 rect (304,72) 16x72 via hover: box at (487,6,211,8) 25,7x115,5; cleared after leave: True
+PASS Room 10 row "→ Room 13" object 295 rect (192,88) 104x40 via hover: box at (308,237,5) 166,8x64,2; cleared after leave: True
+PASS Room 10 row "almeja" object 296 rect (56,96) 16x8 via hover: box at (89,8,250,3) 25,7x12,8; cleared after leave: True
+PASS Room 10 row "gaviota · 14" object 297 rect (32,48) 8x16 via hover: box at (51,3,173,3) 12,8x25,7; cleared after leave: True
+PASS Room 10 row "gaviota · 15" object 298 rect (96,40) 16x16 via hover: box at (154,160,5) 25,7x25,7; cleared after leave: True
+PASS Room 10 row "gaviota · 16" object 299 rect (136,8) 16x16 via hover: box at (218,1,109,2) 25,7x25,7; cleared after leave: True
+PASS Room 10 row "gaviota · 17" object 300 rect (224,16) 8x16 via hover: box at (359,3,122) 12,8x25,7; cleared after leave: True
+Room 17: 5 hotspot rows
+PASS Room 17 row "→ Room 16 · 1" object 352 rect (0,0) 24x144 via focus: box at (0,96,3) 38,5x231; cleared after leave: True
+PASS Room 17 row "→ Room 22" object 353 rect (304,0) 16x144 via hover: box at (487,6,96,3) 25,7x231; cleared after leave: True
+PASS Room 17 row "→ Room 16 · 5" object 356 rect (144,40) 32x40 via hover: box at (231,160,5) 51,3x64,2; cleared after leave: True
+PASS Room 17 row "tumba · 6" object 357 rect (32,104) 24x16 via hover: box at (51,3,263,1) 38,5x25,7; cleared after leave: True
+PASS Room 17 row "tumba · 7" object 358 rect (216,104) 24x16 via hover: box at (346,5,263,1) 38,5x25,7; cleared after leave: True
+Failures: 0

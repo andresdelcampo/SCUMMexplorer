@@ -1486,6 +1486,7 @@ public partial class MainWindow : Window
             : $"Object {selected.Id} · position {selectedPosition.X}, {selectedPosition.Y}";
 
         ObjectList.Children.Clear();
+        ShowHotspotHighlight(null);
         var interactive = SessionModeToggle.IsChecked == true && _session is not null;
         if (interactive)
         {
@@ -1521,6 +1522,11 @@ public partial class MainWindow : Window
                     BorderThickness = new Thickness(0)
                 };
                 button.Click += ObjectButton_Click;
+                // Hovering or focusing a row outlines its box on the room.
+                button.MouseEnter += (_, _) => ShowHotspotHighlight(record);
+                button.GotKeyboardFocus += (_, _) => ShowHotspotHighlight(record);
+                button.MouseLeave += (_, _) => { if (!button.IsKeyboardFocused) ShowHotspotHighlight(null); };
+                button.LostKeyboardFocus += (_, _) => { if (!button.IsMouseOver) ShowHotspotHighlight(null); };
                 ObjectList.Children.Add(button);
             }
             ShowObjectListSection("HOTSPOTS");
@@ -1989,6 +1995,45 @@ public partial class MainWindow : Window
             Canvas.SetTop(label, offsetY + y * scale + 2);
             RoomNavigationOverlay.Children.Add(label);
         }
+    }
+
+    private LoomRoomObjectRecord? _highlightedHotspot;
+
+    private void HotspotHighlightOverlay_SizeChanged(object sender, SizeChangedEventArgs e) =>
+        ShowHotspotHighlight(_highlightedHotspot);
+
+    /// <summary>
+    /// Outlines a hotspot's box on the room image (at its current position in
+    /// the session), or clears the outline when <paramref name="record"/> is null.
+    /// </summary>
+    private void ShowHotspotHighlight(LoomRoomObjectRecord? record)
+    {
+        _highlightedHotspot = record;
+        HotspotHighlightOverlay.Children.Clear();
+        HotspotHighlightOverlay.Visibility = record is null ? Visibility.Collapsed : Visibility.Visible;
+        if (record is null || _currentRoom is null || HotspotHighlightOverlay.ActualWidth <= 0 ||
+            HotspotHighlightOverlay.ActualHeight <= 0) return;
+
+        var room = _currentRoom;
+        var scale = Math.Min(HotspotHighlightOverlay.ActualWidth / room.Width,
+            HotspotHighlightOverlay.ActualHeight / room.Height);
+        if (scale <= 0) return;
+        var offsetX = (HotspotHighlightOverlay.ActualWidth - room.Width * scale) / 2;
+        var offsetY = (HotspotHighlightOverlay.ActualHeight - room.Height * scale) / 2;
+        var at = _session?.Snapshot.ObjectPositions.TryGetValue(record.Id, out var current) == true
+            ? current : new RoomObjectPosition(record.X, record.Y);
+        var bounds = new Border
+        {
+            Width = Math.Max(1, record.Width * scale),
+            Height = Math.Max(1, record.Height * scale),
+            BorderThickness = new Thickness(Math.Clamp(scale, 2, 3)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(120, 220, 255)),
+            Background = new SolidColorBrush(Color.FromArgb(56, 120, 220, 255)),
+            CornerRadius = new CornerRadius(2)
+        };
+        Canvas.SetLeft(bounds, offsetX + at.X * scale);
+        Canvas.SetTop(bounds, offsetY + at.Y * scale);
+        HotspotHighlightOverlay.Children.Add(bounds);
     }
 
     private void UpdateRoomMusicActions()
