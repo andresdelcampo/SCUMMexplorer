@@ -277,6 +277,26 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "setVarRange")
+            {
+                // o5_setVarRange: each listed literal goes to the next variable,
+                // starting at the result variable (_resultVarNumber++).
+                if (!TryReadVarRange(instruction.Operands, knownVariables, out var destination, out var keys, out var values))
+                {
+                    unresolved = $"setVarRange operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                var indexEstimated = OperandIsEstimated(destination, estimated, knownVariables, indexOnly: true);
+                for (var index = 0; index < keys.Count; index++)
+                {
+                    knownVariables[keys[index]] = values[index];
+                    RefreshBitAliases(keys[index], knownVariables);
+                    MarkEstimated(estimated, keys[index], onEstimatedPath || indexEstimated);
+                }
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "setState")
             {
                 var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
@@ -879,6 +899,39 @@ public sealed class LoomBoundedScriptExecutor
         var match = VariablePattern.Match(ResolveIndexed(operand, variables));
         if (!match.Success || match.Groups[1].Value == "bit") return false;
         variableKey = $"{match.Groups[1].Value}[0x{int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]";
+        return true;
+    }
+
+    /// <summary>
+    /// Reads <c>setVarRange</c> operands as the decoder prints them
+    /// (<c>var[0x0B3], count=5, [0x0294, ...]</c>): the variables written, in
+    /// order, and their literal values. Signed words are kept as their 16-bit
+    /// pattern, as SCUMM stores them.
+    /// </summary>
+    internal static bool TryReadVarRange(string operands, IDictionary<string, ushort> variables,
+        out string destination, out IReadOnlyList<string> keys, out IReadOnlyList<ushort> values)
+    {
+        keys = [];
+        values = [];
+        var countAt = operands.IndexOf(", count=", StringComparison.Ordinal);
+        var open = operands.IndexOf('[', Math.Max(countAt, 0));
+        destination = countAt < 0 ? "" : operands[..countAt].Trim();
+        if (countAt < 0 || open < 0 || !operands.EndsWith(']') ||
+            !int.TryParse(operands[(countAt + 8)..open].Trim(' ', ','), NumberStyles.Integer,
+                CultureInfo.InvariantCulture, out var count) ||
+            !TryGetVariableKey(destination, variables, out var first)) return false;
+        var literals = new List<ushort>();
+        foreach (var item in operands[(open + 1)..^1].Split(',', StringSplitOptions.TrimEntries))
+        {
+            if (!TryReadLiteral(item, out var value)) return false;
+            literals.Add(value);
+        }
+        if (literals.Count != count || count == 0) return false;
+        var match = VariablePattern.Match(first);
+        var kind = match.Groups[1].Value;
+        var start = int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        keys = Enumerable.Range(start, count).Select(number => $"{kind}[0x{number:X3}]").ToArray();
+        values = literals;
         return true;
     }
 

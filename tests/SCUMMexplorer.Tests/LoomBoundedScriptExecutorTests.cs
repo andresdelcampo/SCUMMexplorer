@@ -27,6 +27,28 @@ public sealed class LoomBoundedScriptExecutorTests
     }
 
     [Fact]
+    public void SetVarRangeWritesConsecutiveVariables()
+    {
+        // o5_setVarRange: values go to the result variable and the ones after it.
+        var script = Script(
+            new(0, 0, "setVarRange", "local[0x004], count=3, [0x0A, 0x0B, 0xFFF0]", "00 00 00 00 00"),
+            new(5, 0, "move", "local[0x001] = 0x0001", "00 00 00 00 00"),
+            new(10, 0, "isEqual", "local[0x004+local[0x001]], 0x000B, branch +0x0005 -> 0x0014", "00 00 00 00 00"),
+            new(15, 0, "setState", "0x000A, 0x0001", "00 00 00 00 00"),
+            new(20, 0, "isGreater", "local[0x006], 0x0000, branch +0x0005 -> 0x001E", "00 00 00 00 00"),
+            new(25, 0, "setState", "0x000B, 0x0001", "00 00 00 00 00"),
+            new(30, 0, "stopObjectCode", "", "00"));
+
+        var run = new LoomBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte> { [10] = 0, [11] = 0 }, Array.Empty<LoomRoomObjectRecord>());
+
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal((byte)1, run.ObjectStates[10]);
+        // 0xFFF0 is the signed word -16, so o5_isGreater (0 > -16) falls through.
+        Assert.Equal((byte)1, run.ObjectStates[11]);
+    }
+
+    [Fact]
     public void RelationalComparisonUsesSignedWords()
     {
         var script = Script(

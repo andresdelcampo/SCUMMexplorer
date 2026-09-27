@@ -24,15 +24,15 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    nothing visible after fallback
    doorways: 02,04,05,10
 == Room 04 (20 images, faithful=False, pending=1)
-   paint order: 187,184,181,178
-   draw queue:  
+   paint order: 178,181,184,187
+   draw queue:  178,181,184,187
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
    interface images (verb area, not room artwork): 190,191,192,193,194,195,196,198
    nothing visible; fallback estimate shows 178,181,184,187
-   fallback 178: first stored image for this position; no decoded script draws it
-   fallback 181: first stored image for this position; no decoded script draws it
-   fallback 184: first stored image for this position; no decoded script draws it
-   fallback 187: first stored image for this position; no decoded script draws it
+   fallback 178: Room 04 local script 201 +0x0082, last frame from the table set at +0x000C
+   fallback 181: Room 04 local script 201 +0x0082, last frame from the table set at +0x0024
+   fallback 184: Room 04 local script 201 +0x0082, last frame from the table set at +0x003C
+   fallback 187: Room 04 local script 201 +0x0082, last frame from the table set at +0x0054
    doorways: 03,64
 == Room 05 (0 images, faithful=False, pending=0)
    paint order: 
@@ -275,10 +275,10 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    draw queue:  624,625
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
    doorways: 
-== Room 41 (2 images, faithful=False, pending=0)
+== Room 41 (2 images, faithful=False, pending=2)
    paint order: 
    draw queue:  
-   entry script stopped: operation 'setVarRange' is not modeled at +0x00ED
+   entry script stopped: presentation operation not applied: setCameraAt; presentation operation not applied: roomOps; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors
    interface images (verb area, not room artwork): 635,636
    nothing visible after fallback
    doorways: 37
@@ -357,7 +357,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    paint order: 764
    draw queue:  764
    doorways: 
-== Room 54 (3 images, faithful=False, pending=0)
+== Room 54 (3 images, faithful=False, pending=1)
    paint order: 770
    draw queue:  770
    entry script stopped: presentation operation not applied: lights
@@ -437,10 +437,11 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    draw queue:  873,870
    entry script stopped: presentation operation not applied: roomOps
    doorways: 
-== Room 69 (11 images, faithful=False, pending=0)
+== Room 69 (11 images, faithful=False, pending=1)
    paint order: 876,877,878
    draw queue:  876,877,878
-   entry script stopped: operation 'setVarRange' is not modeled at +0x003B
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: cursorCommand
+   state set by reached code: 898=0
    entry state 898=0: Room 69 entry script +0x0048 sets it to 0 on every path
    nothing visible; fallback estimate shows 876,877,878
    fallback 876: Room 69 local script 202 +0x0001

@@ -77,6 +77,56 @@ public sealed class LoomSceneEvidenceTests
         Assert.Empty(LoomSceneDrawBatches.FindUnavoidableStates(variable, "entry"));
     }
 
+    [Fact]
+    public void ALoopOverALiteralLocalTableRestsOnItsLastFrame()
+    {
+        // Room 04 local 201's shape: the argument picks a table, and the loop
+        // draws entries 0..4 (o5_isLess jumps back while the index is <= 4).
+        var script = Script(
+            I(0x00, "isEqual", "local[0x000], 0x00AB, branch +0x000C -> 0x0013"),
+            I(0x07, "setVarRange", "local[0x006], count=5, [0xB3, 0xB4, 0xB4, 0xB3, 0xB2]"),
+            I(0x10, "jumpRelative", "+0  ->  0x0013"),
+            I(0x13, "move", "local[0x003] = 0x0000"),
+            I(0x18, "move", "local[0x004] = local[0x006+local[0x003]]"),
+            I(0x1F, "drawObject", "local[0x004], at, 0x00FF, 0x00FF"),
+            I(0x26, "breakHere", ""),
+            I(0x27, "increment", "local[0x003]"),
+            I(0x2A, "isLess", "local[0x003], 0x0004, branch +0xFFE7 -> 0x0018"),
+            I(0x31, "stopObjectCode", ""));
+        var rects = new Dictionary<int, (int, int, int, int)>
+        {
+            [0xB2] = (8, 8, 16, 16), [0xB3] = (8, 8, 16, 16), [0xB4] = (8, 8, 16, 16)
+        };
+
+        var batch = Assert.Single(LoomSceneDrawBatches.FindLocalTableRestFrames(script, "Room 04 local script 201", rects));
+
+        Assert.Equal([0xB2], batch.Steps.Select(step => step.ObjectId));
+        Assert.Equal(LoomSceneDrawBatches.OtherScriptPriority, batch.Priority);
+        Assert.Equal("Room 04 local script 201 +0x001F, last frame from the table set at +0x0007", batch.Source);
+    }
+
+    [Fact]
+    public void DrawsOfArgumentsOrUnknownLocalsGiveNoRestFrame()
+    {
+        // Room 70 local 205's shape: the drawn objects are the script's arguments.
+        var arguments = Script(
+            I(0x00, "drawObject", "local[0x001], at, 0x00FF, 0x00FF"),
+            I(0x07, "breakHere", ""),
+            I(0x08, "drawObject", "local[0x000], at, 0x00FF, 0x00FF"),
+            I(0x0F, "setVarRange", "local[0x006], count=2, [0x10, 0x11]"),
+            I(0x18, "stopObjectCode", ""));
+        Assert.Empty(LoomSceneDrawBatches.FindLocalTableRestFrames(arguments, "s", new Dictionary<int, (int, int, int, int)>()));
+
+        // A table entry overwritten by a result is no longer known.
+        var overwritten = Script(
+            I(0x00, "setVarRange", "local[0x006], count=2, [0x10, 0x11]"),
+            I(0x09, "getRandomNr", "local[0x006], 0x0005"),
+            I(0x0E, "drawObject", "local[0x006], at, 0x00FF, 0x00FF"),
+            I(0x15, "stopObjectCode", ""));
+        Assert.Empty(LoomSceneDrawBatches.FindLocalTableRestFrames(overwritten, "s",
+            new Dictionary<int, (int, int, int, int)> { [0x10] = (0, 0, 8, 8) }));
+    }
+
     private static LoomScriptInstruction I(int offset, string operation, string operands) =>
         new(offset, 0, operation, operands, "");
 

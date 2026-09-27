@@ -86,6 +86,7 @@ public sealed class LoomFirstVisitRenderingTests
     [InlineData(2, 157, "opening frame of Room 02 in script 106 +0x03A0")]
     [InlineData(65, 830, "opening frame of Room 65 in script 72 +0x0029")]
     [InlineData(43, 645, "script 91 +0x009C")]
+    [InlineData(4, 178, "Room 04 local script 201 +0x0082, last frame from the table set at +0x000C")]
     public void NothingVisibleFallbackOpensOnTheStrongestScriptBatch(int roomId, int objectId, string source)
     {
         if (Data.Value is not { } data) return;
@@ -124,6 +125,21 @@ public sealed class LoomFirstVisitRenderingTests
         Assert.DoesNotContain(estimates, item => item.ObjectId == objectId);
         Assert.DoesNotContain(estimates, item => item.Reason == RoomObjectSelection.FirstStoredImageReason);
         Assert.Empty(selection.VisibleGaps());
+    }
+
+    [Theory]
+    [InlineData(41)]
+    [InlineData(69)]
+    public void EntryScriptsRunPastSetVarRange(int roomId)
+    {
+        if (Data.Value is not { } data) return;
+        var session = new LoomExplorationSession(data.Game, data.Index);
+        session.VisitRoom(data.Room(roomId));
+
+        var run = session.LastEntryRun!;
+        Assert.DoesNotContain("setVarRange", run.UnresolvedReason ?? "", StringComparison.Ordinal);
+        Assert.Contains(session.LastEntryScript!.Instructions, item => item.Operation == "setVarRange" &&
+            item.Offset < (run.ResumeOffset ?? int.MaxValue));
     }
 
     [Fact]

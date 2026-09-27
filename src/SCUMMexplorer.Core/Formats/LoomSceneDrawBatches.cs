@@ -89,17 +89,28 @@ public sealed class LoomSceneDrawBatches
             catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
         }
 
+        var rectByObject = new Dictionary<int, (int X, int Y, int Width, int Height)>();
+        foreach (var (_, (_, records, _)) in roomRecords)
+            foreach (var record in records)
+                rectByObject.TryAdd(record.Id, (record.X, record.Y, record.Width, record.Height));
+
         var byRoom = new Dictionary<int, List<RoomDrawBatch>>();
         var decoded = new List<(LoomScriptDisassembly Script, string Source)>();
+        void Add(int roomId, RoomDrawBatch batch)
+        {
+            if (!byRoom.TryGetValue(roomId, out var list)) byRoom[roomId] = list = [];
+            list.Add(batch);
+        }
         void Scan(LoomScriptDisassembly? script, int priority, string source)
         {
             if (script is null) return;
             decoded.Add((script, source));
             foreach (var (roomId, batch) in ScanScript(script, priority, source, roomByObject))
-            {
-                if (!byRoom.TryGetValue(roomId, out var list)) byRoom[roomId] = list = [];
-                list.Add(batch);
-            }
+                Add(roomId, batch);
+            foreach (var batch in FindLocalTableRestFrames(script, source, rectByObject))
+                foreach (var group in batch.Steps.Where(step => roomByObject.ContainsKey(step.ObjectId))
+                             .GroupBy(step => roomByObject[step.ObjectId]))
+                    Add(group.Key, batch with { Steps = group.ToArray() });
         }
 
         foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
@@ -314,6 +325,223 @@ public sealed class LoomSceneDrawBatches
         Flush();
         return results;
     }
+
+    private static readonly Regex LocalOperand = new(@"^local\[0x(?<number>[0-9A-Fa-f]+)\]$", RegexOptions.CultureInvariant);
+    private static readonly Regex IndexedLocal = new(@"^local\[0x(?<base>[0-9A-Fa-f]+)\+local\[0x(?<index>[0-9A-Fa-f]+)\]\]$",
+        RegexOptions.CultureInvariant);
+    private static readonly Regex LeadingLocal = new(@"^local\[0x(?<number>[0-9A-Fa-f]+)\](?:\s*(?:=|,)|$)", RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// Finds draws whose object comes from a literal table in the script's own
+    /// locals: <c>setVarRange local[..]</c> fills the table and a loop reads it
+    /// through an indexed operand (<c>local[B+local[I]]</c>) up to a literal
+    /// bound. Room 04 local script 201 animates its four fences this way.
+    /// Each control path is followed with the literal locals it sets; a
+    /// comparison whose operands are known is decided as ScummVM does
+    /// (<c>jumpRelative</c> skips when the condition is false), any other
+    /// branch is followed both ways. Locals that come from elsewhere
+    /// (arguments, globals, results) stay unknown, and a path that draws an
+    /// unknown local gives nothing. A path that draws at least one table entry
+    /// gives one batch: its rest frame, the last image drawn at each position
+    /// before the script ends, since <c>drawObject</c> sets the drawn object's
+    /// state and clears the others at its position. It is a static candidate
+    /// for what the script leaves on screen, not proof that the path runs.
+    /// </summary>
+    internal static IEnumerable<RoomDrawBatch> FindLocalTableRestFrames(LoomScriptDisassembly script, string source,
+        IReadOnlyDictionary<int, (int X, int Y, int Width, int Height)> rectByObject)
+    {
+        var instructions = script.Instructions;
+        if (!instructions.Any(item => item.Operation == "drawObject" && item.Operands.StartsWith("local[", StringComparison.Ordinal)) ||
+            !instructions.Any(item => item.Operation == "setVarRange" && item.Operands.StartsWith("local[", StringComparison.Ordinal)))
+            return [];
+        var indexByOffset = new Dictionary<int, int>();
+        for (var index = 0; index < instructions.Count; index++) indexByOffset[instructions[index].Offset] = index;
+
+        const int stepBudget = 50_000;
+        const int pathLimit = 256;
+        var steps = 0;
+        var results = new List<RoomDrawBatch>();
+        var seenBatches = new HashSet<string>();
+        var visited = new HashSet<string>();
+        var work = new Stack<(int Index, Dictionary<int, (int Value, int TableOffset)> Locals, List<(int ObjectId, int Offset, int TableOffset)> Draws)>();
+        work.Push((0, new(), new()));
+        var paths = 0;
+
+        bool TryValue(string operand, Dictionary<int, (int Value, int TableOffset)> locals, out int value, out int table)
+        {
+            value = 0;
+            table = -1;
+            if (TryReadLiteral(operand, out value)) { value = (short)value; return true; }
+            var local = LocalOperand.Match(operand);
+            if (local.Success && locals.TryGetValue(Hex(local.Groups["number"].Value), out var known))
+            {
+                (value, table) = known;
+                return true;
+            }
+            var indexed = IndexedLocal.Match(operand);
+            if (indexed.Success && locals.TryGetValue(Hex(indexed.Groups["index"].Value), out var at) &&
+                locals.TryGetValue(Hex(indexed.Groups["base"].Value) + at.Value, out var entry))
+            {
+                (value, table) = entry;
+                return true;
+            }
+            return false;
+        }
+
+        while (work.Count > 0 && paths < pathLimit)
+        {
+            var (index, locals, draws) = work.Pop();
+            var ended = false;
+            while (!ended)
+            {
+                if (++steps > stepBudget) return results;
+                if (index < 0 || index >= instructions.Count) { ended = true; break; }
+                var instruction = instructions[index];
+                var operands = instruction.Operands;
+                // A path that returns to a branch with the same locals would repeat
+                // itself (or another path already went on from here): it has no
+                // end of its own, so it gives no rest frame.
+                if (instruction.Operation is "jumpRelative" || operands.Contains("branch", StringComparison.Ordinal))
+                {
+                    var key = $"{index}:{string.Join(";", locals.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}={pair.Value.Value}"))}";
+                    if (!visited.Add(key)) { draws = null!; break; }
+                }
+                switch (instruction.Operation)
+                {
+                    case "stopObjectCode" or "chainScript":
+                        ended = true;
+                        continue;
+                    case "stopScript" when TryReadLiteral(operands, out var stopped) && stopped == 0:
+                        ended = true;
+                        continue;
+                    case "setVarRange":
+                    {
+                        var countAt = operands.IndexOf(", count=", StringComparison.Ordinal);
+                        var open = operands.IndexOf('[', Math.Max(countAt, 0));
+                        var destination = countAt < 0 ? null : LocalOperand.Match(operands[..countAt].Trim());
+                        if (destination is { Success: true } && open > 0 && operands.EndsWith(']'))
+                        {
+                            var start = Hex(destination.Groups["number"].Value);
+                            var values = operands[(open + 1)..^1].Split(',', StringSplitOptions.TrimEntries);
+                            for (var item = 0; item < values.Length; item++)
+                            {
+                                if (TryReadLiteral(values[item], out var value)) locals[start + item] = ((short)value, instruction.Offset);
+                                else locals.Remove(start + item);
+                            }
+                        }
+                        index++;
+                        continue;
+                    }
+                    case "move":
+                    {
+                        var parts = operands.Split(" = ", 2, StringSplitOptions.TrimEntries);
+                        var target = LocalOperand.Match(parts[0]);
+                        if (target.Success)
+                        {
+                            var number = Hex(target.Groups["number"].Value);
+                            if (parts.Length == 2 && TryValue(parts[1], locals, out var value, out var table))
+                                locals[number] = (value, table);
+                            else locals.Remove(number);
+                        }
+                        index++;
+                        continue;
+                    }
+                    case "increment" or "decrement":
+                    {
+                        var target = LocalOperand.Match(operands.Trim());
+                        if (target.Success && locals.TryGetValue(Hex(target.Groups["number"].Value), out var known))
+                            locals[Hex(target.Groups["number"].Value)] =
+                                ((short)(known.Value + (instruction.Operation == "increment" ? 1 : -1)), known.TableOffset);
+                        index++;
+                        continue;
+                    }
+                    case "drawObject":
+                    {
+                        var parts = operands.Split(',', StringSplitOptions.TrimEntries);
+                        if (parts.Length == 0 || !TryValue(parts[0], locals, out var objectId, out var table))
+                        {
+                            draws = null!;
+                            ended = true;
+                            continue;
+                        }
+                        draws.Add((objectId, instruction.Offset, table));
+                        index++;
+                        continue;
+                    }
+                    case "jumpRelative":
+                    {
+                        var match = BranchTarget.Match(operands);
+                        index = match.Success && indexByOffset.TryGetValue(Hex(match.Groups["target"].Value), out var found) ? found : -1;
+                        if (index < 0) { draws = null!; ended = true; }
+                        continue;
+                    }
+                }
+                if (operands.Contains("branch", StringComparison.Ordinal))
+                {
+                    var match = BranchTarget.Match(operands);
+                    if (!match.Success || !indexByOffset.TryGetValue(Hex(match.Groups["target"].Value), out var target))
+                    {
+                        draws = null!;
+                        ended = true;
+                        continue;
+                    }
+                    var parts = operands[..operands.IndexOf("branch", StringComparison.Ordinal)]
+                        .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    bool? condition = null;
+                    if (parts.Length >= 1 && TryValue(parts[0], locals, out var a, out _))
+                    {
+                        if (instruction.Operation is "equalZero") condition = a == 0;
+                        else if (instruction.Operation is "notEqualZero") condition = a != 0;
+                        else if (parts.Length >= 2 && TryValue(parts[1], locals, out var b, out _))
+                            // o5_isEqual and friends: a is the variable, b the second operand.
+                            condition = instruction.Operation switch
+                            {
+                                "isEqual" => b == a,
+                                "isNotEqual" => b != a,
+                                "isLess" => b < a,
+                                "isGreater" => b > a,
+                                "isLessEqual" => b <= a,
+                                "isGreaterEqual" => b >= a,
+                                _ => null
+                            };
+                    }
+                    if (condition is null)
+                        work.Push((target, new(locals), new(draws)));
+                    index = condition == false ? target : index + 1;
+                    continue;
+                }
+                // Any other instruction that names a local first may write it (results such as getRandomNr).
+                var written = LeadingLocal.Match(operands);
+                if (written.Success && instruction.Operation is not ("startScript" or "print" or "printEgo"))
+                    locals.Remove(Hex(written.Groups["number"].Value));
+                index++;
+            }
+            paths++;
+            if (draws is null || !draws.Any(draw => draw.TableOffset >= 0)) continue;
+
+            // The rest frame: the last draw at each position, in draw order.
+            var last = new Dictionary<(int, int, int, int), (int ObjectId, int Offset, int TableOffset, int Order)>();
+            for (var order = 0; order < draws.Count; order++)
+            {
+                var draw = draws[order];
+                if (!rectByObject.TryGetValue(draw.ObjectId, out var rect)) continue;
+                last[rect] = (draw.ObjectId, draw.Offset, draw.TableOffset, order);
+            }
+            var rest = last.Values.OrderBy(item => item.Order).ToArray();
+            if (rest.Length == 0) continue;
+            var fromTable = rest.Where(item => item.TableOffset >= 0).ToArray();
+            var reason = fromTable.Length == 0
+                ? $"{source} +0x{rest[^1].Offset:X4}"
+                : $"{source} +0x{fromTable[0].Offset:X4}, last frame from the table set at +0x{fromTable[0].TableOffset:X4}";
+            var batch = new RoomDrawBatch(rest.Select(item => new RoomDrawStep(item.ObjectId, null, null)).ToArray(),
+                OtherScriptPriority, reason);
+            if (seenBatches.Add(string.Join(",", batch.Steps.Select(step => step.ObjectId)) + "|" + reason))
+                results.Add(batch);
+        }
+        return results;
+    }
+
+    private static int Hex(string text) => int.Parse(text, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 
     private static bool TryReadDraw(string operands, out RoomDrawStep step)
     {
