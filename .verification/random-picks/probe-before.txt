@@ -1,0 +1,103 @@
+
+######## Room 03 object 162 verb 0x36
+== Room 03 catalog visit: room 03, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Script 01 +0x0000: script requests Room 69; room transition awaits bounded session dispatch at +0x0160
+   uncertainty: Room 03 selected from the catalog; the route to it was not executed from game input.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 03 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   entry script 42 started: False
+   action: Room 03 object 162, verb 0x36, code 0x2D3A; no room load was reached.
+== after action: room 03, pending 2, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Object 162 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+== frame 1: room 04, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   session: stopScript 42 at Room 03 local script 200 +0x0006: script 42 was not running
+   uncertainty: Sound 25 was started; its natural completion time is not simulated.
+   uncertainty: Room 03 local script 200 +0x0001: script requests Room 04; room transition awaits bounded session dispatch at +0x0008
+   uncertainty: Room 03 local script 200 +0x0008 reached loadRoomWithEgo after a frame advance.
+   uncertainty: Room 03 object 162, verb 0x36, code 0x2D3A; loadRoomWithEgo at Room 03 local script 200 +0x0008 → Room 04. Actor walk and input dispatch were not simulated.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 04 local script 205 +0x0000: presentation operation not applied: setClass; presentation operation not applied: roomOps; presentation operation not applied: setCameraAt
+   uncertainty: Room 04 local script 203 +0x0000: operation 'getRandomNr' is not modeled at +0x0000
+   uncertainty: Room 04 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors
+   last action: Room 03 object 162, verb 0x36, code 0x2D3A; loadRoomWithEgo at Room 03 local script 200 +0x0008 → Room 04.
+   reverse action: Room 04 object 167, verb 0x38, code 0x66E7; no room load was reached.
+== after reverse action: room 04, pending 2, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Object 167 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+== reverse frame 1: room 03, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Room 04 Object 167 Verb 0x38 +0x0001: script requests Room 03; room transition awaits bounded session dispatch at +0x0006
+   uncertainty: Room 04 Object 167 Verb 0x38 +0x0006 reached loadRoomWithEgo after a frame advance.
+   uncertainty: Room 04 object 167, verb 0x38, code 0x66E7; loadRoomWithEgo at Room 04 Object 167 Verb 0x38 +0x0006 → Room 03. Actor walk and input dispatch were not simulated.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 03 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   last action: Room 04 object 167, verb 0x38, code 0x66E7; loadRoomWithEgo at Room 04 Object 167 Verb 0x38 +0x0006 → Room 03.
+
+######## Room 03 object 161 verb 0x36
+== Room 03 catalog visit: room 03, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Script 01 +0x0000: script requests Room 69; room transition awaits bounded session dispatch at +0x0160
+   uncertainty: Room 03 selected from the catalog; the route to it was not executed from game input.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 03 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   entry script 42 started: False
+   action: Room 03 object 161, verb 0x36, code 0x2D1D; no room load was reached.
+== after action: room 03, pending 2, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Object 161 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+== frame 1: room 05, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   session: stopScript 42 at Room 03 local script 201 +0x0006: script 42 was not running
+   uncertainty: Sound 25 was started; its natural completion time is not simulated.
+   uncertainty: Room 03 local script 201 +0x0001: script requests Room 05; room transition awaits bounded session dispatch at +0x0008
+   uncertainty: Room 03 local script 201 +0x0008 reached loadRoomWithEgo after a frame advance.
+   uncertainty: Room 03 object 161, verb 0x36, code 0x2D1D; loadRoomWithEgo at Room 03 local script 201 +0x0008 → Room 05. Actor walk and input dispatch were not simulated.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 05 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 4 more omitted behaviors
+   last action: Room 03 object 161, verb 0x36, code 0x2D1D; loadRoomWithEgo at Room 03 local script 201 +0x0008 → Room 05.
+
+######## Room 03 object 163 verb 0x36
+== Room 03 catalog visit: room 03, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Script 01 +0x0000: script requests Room 69; room transition awaits bounded session dispatch at +0x0160
+   uncertainty: Room 03 selected from the catalog; the route to it was not executed from game input.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 03 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   entry script 42 started: False
+   action: Room 03 object 163, verb 0x36, code 0x2D57; no room load was reached.
+== after action: room 03, pending 2, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Object 163 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+== frame 1: room 10, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   session: stopScript 42 at Room 03 local script 202 +0x0006: script 42 was not running
+   uncertainty: Sound 25 was started; its natural completion time is not simulated.
+   uncertainty: Room 03 local script 202 +0x0001: script requests Room 10; room transition awaits bounded session dispatch at +0x0008
+   uncertainty: Room 03 local script 202 +0x0008 reached loadRoomWithEgo after a frame advance.
+   uncertainty: Room 03 object 163, verb 0x36, code 0x2D57; loadRoomWithEgo at Room 03 local script 202 +0x0008 → Room 10. Actor walk and input dispatch were not simulated.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Room 10 local script 204 +0x0000: presentation operation not applied: setClass
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 10 entry script +0x0000: operation 'isScriptRunning' is not modeled at +0x012A
+   last action: Room 03 object 163, verb 0x36, code 0x2D57; loadRoomWithEgo at Room 03 local script 202 +0x0008 → Room 10.
+
+######## Room 03 object 164 verb 0x38
+== Room 03 catalog visit: room 03, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Script 01 +0x0000: script requests Room 69; room transition awaits bounded session dispatch at +0x0160
+   uncertainty: Room 03 selected from the catalog; the route to it was not executed from game input.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 03 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   entry script 42 started: False
+   action: Room 03 object 164, verb 0x38, code 0x2D95; no room load was reached.
+== after action: room 03, pending 2, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   uncertainty: Object 164 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+== frame 1: room 10, pending 1, bit[0xD62]=1, bit[0xD6E]=0, bit[0xD7A]=0, var[0x003]=0
+   session: stopScript 42 at Room 03 local script 202 +0x0006: script 42 was not running
+   uncertainty: Sound 25 was started; its natural completion time is not simulated.
+   uncertainty: Room 03 local script 202 +0x0001: script requests Room 10; room transition awaits bounded session dispatch at +0x0008
+   uncertainty: Room 03 local script 202 +0x0008 reached loadRoomWithEgo after a frame advance.
+   uncertainty: Room 03 object 164, verb 0x38, code 0x2D95; loadRoomWithEgo at Room 03 local script 202 +0x0008 → Room 10. Actor walk and input dispatch were not simulated.
+   uncertainty: Script 16 +0x0000: presentation operation not applied: print
+   uncertainty: Room 10 local script 204 +0x0000: presentation operation not applied: setClass
+   uncertainty: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertainty: Room 10 entry script +0x0000: operation 'isScriptRunning' is not modeled at +0x012A
+   last action: Room 03 object 164, verb 0x38, code 0x2D95; loadRoomWithEgo at Room 03 local script 202 +0x0008 → Room 10.

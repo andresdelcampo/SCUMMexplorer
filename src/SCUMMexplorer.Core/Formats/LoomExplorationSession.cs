@@ -16,8 +16,16 @@ public sealed record LoomSessionSnapshot(
     int PendingScripts,
     IReadOnlyList<string> Uncertainties,
     IReadOnlyList<int>? DrawQueue = null,
-    IReadOnlyCollection<int>? StatesSetInRoom = null)
+    IReadOnlyCollection<int>? StatesSetInRoom = null,
+    IReadOnlyList<LoomRandomPick>? Picks = null,
+    IReadOnlyCollection<int>? EstimatedObjectStates = null)
 {
+    /// <summary>Every seeded <c>getRandomNr</c> stand-in taken on this route, in order.</summary>
+    public IReadOnlyList<LoomRandomPick> RandomPicks => Picks ?? [];
+
+    /// <summary>Objects whose state or draw followed a seeded pick. These are estimates, not reached states.</summary>
+    public IReadOnlyCollection<int> EstimatedStates => EstimatedObjectStates ?? [];
+
     /// <summary>Objects drawn since the last redraw, in call order (painted over directory order).</summary>
     public IReadOnlyList<int> DrawOrder => DrawQueue ?? [];
 
@@ -60,7 +68,7 @@ public sealed class LoomExplorationSession
     private GameResource? _currentRoom;
     private IReadOnlyList<LoomRoomObjectRecord> _currentObjects = [];
 
-    public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects)
+    public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -69,12 +77,17 @@ public sealed class LoomExplorationSession
         _game = game;
         _reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
         _verbs = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
-        _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners);
+        _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners)
+        {
+            Random = new LoomSeededRandom(randomSeed)
+        };
         _globalScriptCount = ReadGlobalScriptCount(game);
         // ScummVM runs indexed script 1 at boot for this release family.
         RunIndexedScript(1, 0, null, 0);
     }
 
+    /// <summary>Seed of the stand-in random source; every <c>getRandomNr</c> value is a labelled pick from it.</summary>
+    public int RandomSeed => _runtime.Random.Seed;
     public LoomScriptDisassembly? LastEntryScript { get; private set; }
     public LoomBoundedScriptResult? LastEntryRun { get; private set; }
     public LoomObjectActionResult? LastAction { get; private set; }
@@ -95,7 +108,9 @@ public sealed class LoomExplorationSession
         _pending.Count,
         _uncertainties.ToArray(),
         _runtime.DrawQueue.ToArray(),
-        _runtime.StatesSetInRoom.Order().ToArray());
+        _runtime.StatesSetInRoom.Order().ToArray(),
+        _picks.ToArray(),
+        _runtime.EstimatedStates.Order().ToArray());
 
     private int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue("var[0x001]", out var ego)
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
@@ -122,6 +137,7 @@ public sealed class LoomExplorationSession
         // startScene clears the draw queue before the entry scripts run.
         _runtime.DrawQueue.Clear();
         _runtime.StatesSetInRoom.Clear();
+        _runtime.EstimatedStates.Clear();
         _currentObjects = _objects.Decode(File.ReadAllBytes(room.FilePath));
         foreach (var item in _currentObjects)
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
@@ -194,7 +210,8 @@ public sealed class LoomExplorationSession
             if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
             // An earlier script in this frame may have stopped this one.
             if (item.ScriptNumber is int number && _stopped.Contains(number)) continue;
-            RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0, item.ScriptNumber);
+            RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0, item.ScriptNumber,
+                item.EstimatedLocals, item.PathEstimated);
         }
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
             item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached);
@@ -232,6 +249,7 @@ public sealed class LoomExplorationSession
     private readonly List<LoomScriptEvent> _visitEvents = [];
     private readonly List<string> _visitTrace = [];
     private readonly HashSet<int> _stopped = [];
+    private readonly List<LoomRandomPick> _picks = [];
 
     /// <summary>Session-level steps (such as stopped scripts) in the order they were applied.</summary>
     public IReadOnlyList<string> SessionTrace => _visitTrace;
@@ -266,7 +284,8 @@ public sealed class LoomExplorationSession
     }
 
     private LoomBoundedScriptResult? RunIndexedScript(int scriptId, int startOffset,
-        IReadOnlyDictionary<string, ushort>? locals, int depth)
+        IReadOnlyDictionary<string, ushort>? locals, int depth,
+        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false)
     {
         var resource = _game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script && item.ResourceId == scriptId);
         if (resource is null)
@@ -276,7 +295,8 @@ public sealed class LoomExplorationSession
         }
         try
         {
-            return RunScript(_reader.Decode(resource), _currentObjects, startOffset, locals, depth, scriptId);
+            return RunScript(_reader.Decode(resource), _currentObjects, startOffset, locals, depth, scriptId,
+                estimatedLocals, pathEstimated);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -286,10 +306,11 @@ public sealed class LoomExplorationSession
     }
 
     private LoomBoundedScriptResult? RunStartedScript(int scriptId, int startOffset,
-        IReadOnlyDictionary<string, ushort>? locals, int depth)
+        IReadOnlyDictionary<string, ushort>? locals, int depth,
+        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false)
     {
         if (scriptId < _globalScriptCount)
-            return RunIndexedScript(scriptId, startOffset, locals, depth);
+            return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated);
         if (_currentRoom is null)
         {
             _uncertainties.Add($"Local script {scriptId:00} cannot run before a room is loaded.");
@@ -303,7 +324,8 @@ public sealed class LoomExplorationSession
                 _uncertainties.Add($"Room {_currentRoom.ResourceId:00} has no local script {scriptId:00}.");
                 return null;
             }
-            return RunScript(script, _currentObjects, startOffset, locals, depth, scriptId);
+            return RunScript(script, _currentObjects, startOffset, locals, depth, scriptId,
+                estimatedLocals, pathEstimated);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -323,7 +345,8 @@ public sealed class LoomExplorationSession
 
     private LoomBoundedScriptResult RunScript(LoomScriptDisassembly script,
         IReadOnlyList<LoomRoomObjectRecord> objects, int startOffset,
-        IReadOnlyDictionary<string, ushort>? locals, int depth, int? scriptNumber = null)
+        IReadOnlyDictionary<string, ushort>? locals, int depth, int? scriptNumber = null,
+        IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false)
     {
         if (depth >= MaxNestedScripts)
         {
@@ -333,16 +356,24 @@ public sealed class LoomExplorationSession
         }
         var result = _executor.Execute(script, _runtime.ObjectStates, objects,
             runtime: _runtime, startOffset: startOffset, initialLocals: locals,
-            onEvent: (scriptEvent, _) => HandleEvent(scriptEvent, depth));
+            onEvent: (scriptEvent, _) => HandleEvent(scriptEvent, depth),
+            estimatedLocals: estimatedLocals, pathEstimated: pathEstimated);
+        var label = script.Context ?? $"Script {script.ScriptId:00}";
+        foreach (var pick in result.RandomPicks)
+        {
+            _picks.Add(pick);
+            _uncertainties.Add($"{label} +0x{startOffset:X4}: {pick.Describe()}.");
+        }
         if (result.UnresolvedReason is not null)
-            _uncertainties.Add($"{script.Context ?? $"Script {script.ScriptId:00}"} +0x{startOffset:X4}: {result.UnresolvedReason}");
+            _uncertainties.Add($"{label} +0x{startOffset:X4}: {result.UnresolvedReason}");
         if (result.ResumeOffset is int next)
         {
             var preservedLocals = result.KnownVariables
                 .Where(pair => pair.Key.StartsWith("local[", StringComparison.Ordinal))
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
             _pending.Add(new PendingScript(script, objects.ToArray(), next, preservedLocals,
-                script.Context is null ? null : _currentRoom?.ResourceId, scriptNumber));
+                script.Context is null ? null : _currentRoom?.ResourceId, scriptNumber,
+                result.EstimatedLocals, result.PathEstimated));
         }
         return result;
     }
@@ -364,8 +395,11 @@ public sealed class LoomExplorationSession
                     return "";
                 }
                 // startScript launches a child. An unresolved child does not
-                // cancel instructions remaining in the caller.
-                RunStartedScript(scriptId, 0, locals, depth + 1);
+                // cancel instructions remaining in the caller. A child started
+                // behind a seeded pick, or given a picked value, runs as an estimate.
+                RunStartedScript(scriptId, 0, locals, depth + 1,
+                    EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+                    scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
                 return "";
             case LoomScriptEventKind.ScriptChained:
                 return "chainScript changes the current script's control flow";
@@ -396,11 +430,24 @@ public sealed class LoomExplorationSession
                 if (scriptEvent.TargetId is not int stoppedId) return "stopped sound target depends on an unknown variable";
                 _runtime.ActiveSounds.Remove(stoppedId);
                 return "";
+            case LoomScriptEventKind.RoomLoaded when scriptEvent.Certainty != LoomScriptEventCertainty.Reached:
+                return $"possible Room {scriptEvent.TargetId?.ToString("00", CultureInfo.InvariantCulture) ?? "dynamic"} load follows a seeded pick, so the session does not enter it";
             case LoomScriptEventKind.RoomLoaded:
                 return $"script requests Room {scriptEvent.TargetId?.ToString("00", CultureInfo.InvariantCulture) ?? "dynamic"}; room transition awaits bounded session dispatch";
             default:
                 return null;
         }
+    }
+
+    private static string[] EstimatedArguments(string operands, IReadOnlySet<string> estimatedGlobals)
+    {
+        var open = operands.IndexOf('[');
+        var close = operands.LastIndexOf(']');
+        if (open < 0 || close <= open) return [];
+        return operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select((argument, index) => (argument, index))
+            .Where(item => estimatedGlobals.Contains(item.argument))
+            .Select(item => $"local[0x{item.index:X3}]").ToArray();
     }
 
     private static bool TryReadLocalArguments(string operands,
@@ -430,5 +477,6 @@ public sealed class LoomExplorationSession
 
     private sealed record PendingScript(LoomScriptDisassembly Script,
         IReadOnlyList<LoomRoomObjectRecord> RoomObjects, int Offset,
-        IReadOnlyDictionary<string, ushort> Locals, int? RoomId, int? ScriptNumber);
+        IReadOnlyDictionary<string, ushort> Locals, int? RoomId, int? ScriptNumber,
+        IReadOnlyCollection<string> EstimatedLocals, bool PathEstimated);
 }

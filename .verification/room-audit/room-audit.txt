@@ -23,7 +23,7 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    interface images (verb area, not room artwork): 166
    nothing visible after fallback
    doorways: 02,04,05,10
-== Room 04 (20 images, faithful=False, pending=0)
+== Room 04 (20 images, faithful=False, pending=1)
    paint order: 187,184,181,178
    draw queue:  
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors

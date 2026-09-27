@@ -14,8 +14,17 @@ public sealed record LoomBoundedScriptResult(
     bool ReachedStop,
     string? UnresolvedReason,
     int? ResumeOffset = null,
-    IReadOnlyList<int>? DrawQueue = null)
+    IReadOnlyList<int>? DrawQueue = null,
+    IReadOnlyList<LoomRandomPick>? Picks = null,
+    IReadOnlyCollection<string>? EstimatedLocalKeys = null,
+    bool PathEstimated = false)
 {
+    /// <summary>Seeded stand-ins for <c>getRandomNr</c> taken during this run, in order.</summary>
+    public IReadOnlyList<LoomRandomPick> RandomPicks => Picks ?? [];
+
+    /// <summary>Local variables that hold a value derived from a seeded pick when the run ended.</summary>
+    public IReadOnlyCollection<string> EstimatedLocals => EstimatedLocalKeys ?? [];
+
     /// <summary>
     /// Objects drawn by <c>drawObject</c> since the last redraw-causing
     /// <c>setState</c>, in call order. SCUMM paints these over the room's
@@ -55,6 +64,8 @@ public sealed class LoomBoundedScriptExecutor
 {
     private const int DefaultInstructionLimit = 4096;
     private static readonly Regex VariablePattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\]$", RegexOptions.Compiled);
+    // readVar/writeVar with the 0x2000 flag: base plus a literal or the value of another variable.
+    private static readonly Regex IndexedPattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\+(.+)\]$", RegexOptions.Compiled);
 
     public LoomBoundedScriptResult Execute(
         LoomScriptDisassembly script,
@@ -64,7 +75,9 @@ public sealed class LoomBoundedScriptExecutor
         LoomScriptRuntimeState? runtime = null,
         int startOffset = 0,
         IReadOnlyDictionary<string, ushort>? initialLocals = null,
-        Func<LoomScriptEvent, LoomScriptRuntimeState, string?>? onEvent = null)
+        Func<LoomScriptEvent, LoomScriptRuntimeState, string?>? onEvent = null,
+        IReadOnlyCollection<string>? estimatedLocals = null,
+        bool pathEstimated = false)
     {
         ArgumentNullException.ThrowIfNull(script);
         ArgumentNullException.ThrowIfNull(initialObjectStates);
@@ -88,6 +101,13 @@ public sealed class LoomBoundedScriptExecutor
         var trace = new List<string>();
         var events = new List<LoomScriptEvent>();
         var limitations = new HashSet<string>(StringComparer.Ordinal);
+        // Values that come from a seeded getRandomNr pick, and whether control
+        // flow has branched on one. Effects under either are estimates.
+        var estimated = new HashSet<string>(StringComparer.Ordinal);
+        if (runtime is not null) estimated.UnionWith(runtime.EstimatedVariables);
+        if (estimatedLocals is not null) estimated.UnionWith(estimatedLocals);
+        var onEstimatedPath = pathEstimated;
+        var picks = new List<LoomRandomPick>();
         var instructions = script.Instructions;
         var indexByOffset = instructions.Select((instruction, index) => (instruction.Offset, index))
             .ToDictionary(item => item.Offset, item => item.index);
@@ -155,13 +175,20 @@ public sealed class LoomBoundedScriptExecutor
                     unresolved = $"could not resolve branch at +0x{instruction.Offset:X4}";
                     break;
                 }
+                if (!onEstimatedPath && ConditionReadsEstimate(instruction, estimated, runtime?.EstimatedStates, knownVariables))
+                {
+                    onEstimatedPath = true;
+                    trace.Add($"branch at +0x{instruction.Offset:X4} reads a seeded pick; later steps are estimates");
+                }
                 // SCUMM's jumpRelative skips to the encoded target when the
                 // condition is false; a true condition runs the next opcode.
                 pc = condition ? next : target;
                 continue;
             }
 
-            var scriptEvent = LoomScriptEvent.FromInstruction(script, instruction, LoomScriptEventCertainty.Reached);
+            // An event behind a branch on a seeded pick is a possible outcome, not a reached one.
+            var scriptEvent = LoomScriptEvent.FromInstruction(script, instruction,
+                onEstimatedPath ? LoomScriptEventCertainty.Conditional : LoomScriptEventCertainty.Reached);
             if (scriptEvent is { TargetId: null, Kind: LoomScriptEventKind.MusicStarted or
                     LoomScriptEventKind.SoundStarted or LoomScriptEventKind.SoundStopped } &&
                 TryReadValue(instruction.Operands.Trim(), knownVariables, out var soundId, out _))
@@ -171,8 +198,11 @@ public sealed class LoomBoundedScriptExecutor
             if (scriptEvent is not null && runtime is not null && onEvent is not null)
             {
                 CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
+                CopyEstimatedGlobals(estimated, runtime.EstimatedVariables);
                 eventHandling = onEvent(scriptEvent, runtime);
                 foreach (var (key, value) in runtime.GlobalVariables) knownVariables[key] = value;
+                estimated.RemoveWhere(IsGlobalKey);
+                estimated.UnionWith(runtime.EstimatedVariables);
                 if (!string.IsNullOrEmpty(eventHandling))
                 {
                     unresolved = $"{eventHandling} at +0x{instruction.Offset:X4}";
@@ -187,6 +217,37 @@ public sealed class LoomBoundedScriptExecutor
                     unresolved = $"{detail} at +0x{instruction.Offset:X4}";
                     break;
                 }
+                var operationParts = instruction.Operands.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (TryNormalizeKey(operationParts[0], knownVariables, out var destination))
+                    MarkEstimated(estimated, destination, onEstimatedPath ||
+                        OperandIsEstimated(operationParts[2], estimated, knownVariables) ||
+                        OperandIsEstimated(operationParts[0], estimated, knownVariables, indexOnly: true) ||
+                        (operationParts[1] != "=" && IsEstimated(destination, estimated)));
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "getRandomNr")
+            {
+                // o5_getRandomNr: result = getRandomNumber(max), 0..max inclusive.
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (runtime is null)
+                {
+                    unresolved = $"getRandomNr needs a session's seeded random source at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                if (parts.Length != 2 || !TryGetVariableKey(parts[0], knownVariables, out var resultKey) ||
+                    !TryReadValue(parts[1], knownVariables, out var max, out _))
+                {
+                    unresolved = $"getRandomNr operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                var pick = runtime.Random.Pick(script.Context ?? $"Script {script.ScriptId:00}", instruction.Offset, max);
+                knownVariables[resultKey] = (ushort)pick.Value;
+                RefreshBitAliases(resultKey, knownVariables);
+                MarkEstimated(estimated, resultKey, true);
+                picks.Add(pick);
+                trace.Add($"{resultKey} = {pick.Value}: seeded pick of 0..{max} (seed {pick.Seed}, draw {pick.Draw})");
                 pc = next;
                 continue;
             }
@@ -194,7 +255,7 @@ public sealed class LoomBoundedScriptExecutor
             if (instruction.Operation is "increment" or "decrement")
             {
                 if (!TryReadValue(instruction.Operands, knownVariables, out var value, out var detail) ||
-                    !TryGetVariableKey(instruction.Operands, out var variableKey))
+                    !TryGetVariableKey(instruction.Operands, knownVariables, out var variableKey))
                 {
                     unresolved = $"{instruction.Operation} cannot update its variable ({detail}; {instruction.Operands}) at +0x{instruction.Offset:X4}";
                     break;
@@ -203,6 +264,7 @@ public sealed class LoomBoundedScriptExecutor
                     ? unchecked((ushort)(value + 1))
                     : unchecked((ushort)(value - 1));
                 RefreshBitAliases(variableKey, knownVariables);
+                if (onEstimatedPath) MarkEstimated(estimated, variableKey, true);
                 pc = next;
                 continue;
             }
@@ -218,10 +280,21 @@ public sealed class LoomBoundedScriptExecutor
                     break;
                 }
                 states[(int)objectId] = (byte)state;
-                runtime?.StatesSetInRoom.Add((int)objectId);
+                var stateEstimated = onEstimatedPath || OperandIsEstimated(parts[0], estimated, knownVariables) ||
+                                     OperandIsEstimated(parts[1], estimated, knownVariables);
+                if (stateEstimated)
+                {
+                    // Not a reached state: it only happened because of a seeded pick.
+                    runtime?.EstimatedStates.Add((int)objectId);
+                }
+                else
+                {
+                    runtime?.StatesSetInRoom.Add((int)objectId);
+                    runtime?.EstimatedStates.Remove((int)objectId);
+                }
                 // o5_setState marks the rectangle dirty and clears the draw queue.
                 drawQueue.Clear();
-                trace.Add($"object {objectId} set to state {state}");
+                trace.Add($"object {objectId} set to state {state}{(stateEstimated ? " (estimate: follows a seeded pick)" : "")}");
                 pc = next;
                 continue;
             }
@@ -287,6 +360,12 @@ public sealed class LoomBoundedScriptExecutor
                     unresolved = $"{detail} at +0x{instruction.Offset:X4}";
                     break;
                 }
+                if (onEstimatedPath || instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
+                        .Any(operand => OperandIsEstimated(operand, estimated, knownVariables)))
+                {
+                    runtime?.EstimatedStates.Add(drawQueue[^1]);
+                    trace[^1] += " (estimate: follows a seeded pick)";
+                }
                 pc = next;
                 continue;
             }
@@ -325,10 +404,77 @@ public sealed class LoomBoundedScriptExecutor
         if (unresolved is null && limitations.Count > 0)
             unresolved = string.Join("; ", limitations.Take(5)) + (limitations.Count > 5 ? $"; and {limitations.Count - 5} more omitted behaviors" : "");
 
-        if (runtime is not null) CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
+        if (runtime is not null)
+        {
+            CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
+            CopyEstimatedGlobals(estimated, runtime.EstimatedVariables);
+        }
         return new LoomBoundedScriptResult(new Dictionary<int, byte>(states),
             new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
-            trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray());
+            trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray(),
+            picks, estimated.Where(key => !IsGlobalKey(key)).ToArray(), onEstimatedPath);
+    }
+
+    private static bool IsGlobalKey(string key) =>
+        key.StartsWith("var[", StringComparison.Ordinal) || key.StartsWith("bit[", StringComparison.Ordinal);
+
+    private static void CopyEstimatedGlobals(IEnumerable<string> source, HashSet<string> destination)
+    {
+        var globals = source.Where(IsGlobalKey).ToArray();
+        destination.Clear();
+        destination.UnionWith(globals);
+    }
+
+    private static bool TryNormalizeKey(string operand, IDictionary<string, ushort> variables, out string key)
+    {
+        key = "";
+        var match = VariablePattern.Match(ResolveIndexed(operand, variables));
+        if (!match.Success) return false;
+        key = $"{match.Groups[1].Value}[0x{int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]";
+        return true;
+    }
+
+    private static bool IsEstimated(string key, IReadOnlySet<string> estimated)
+    {
+        if (estimated.Contains(key)) return true;
+        // A bit reads its backing global word.
+        return key.StartsWith("bit[0x", StringComparison.Ordinal) &&
+               int.TryParse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var bit) &&
+               estimated.Contains($"var[0x{bit >> 4:X3}]");
+    }
+
+    /// <summary>
+    /// True when the operand's value, or for an indexed operand the index that
+    /// chooses it, came from a seeded pick.
+    /// </summary>
+    private static bool OperandIsEstimated(string operand, IReadOnlySet<string> estimated,
+        IDictionary<string, ushort> variables, bool indexOnly = false)
+    {
+        var indexed = IndexedPattern.Match(operand.Trim());
+        if (indexed.Success && OperandIsEstimated(indexed.Groups[3].Value, estimated, variables)) return true;
+        return !indexOnly && TryNormalizeKey(operand, variables, out var key) && IsEstimated(key, estimated);
+    }
+
+    private static void MarkEstimated(HashSet<string> estimated, string key, bool value)
+    {
+        if (value) estimated.Add(key);
+        else estimated.Remove(key);
+        // A word written as a whole replaces what its bits held.
+        if (!key.StartsWith("var[0x", StringComparison.Ordinal) ||
+            !int.TryParse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var word)) return;
+        for (var bit = 0; bit < 16; bit++) estimated.Remove($"bit[0x{word * 16 + bit:X3}]");
+    }
+
+    private static bool ConditionReadsEstimate(LoomScriptInstruction instruction,
+        IReadOnlySet<string> estimated, IReadOnlySet<int>? estimatedStates, IDictionary<string, ushort> variables)
+    {
+        var expression = instruction.Operands;
+        var branchIndex = expression.IndexOf(", branch ", StringComparison.Ordinal);
+        if (branchIndex >= 0) expression = expression[..branchIndex];
+        var values = expression.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (values.Any(value => OperandIsEstimated(value, estimated, variables))) return true;
+        return instruction.Operation is "ifState" or "ifNotState" && estimatedStates is not null &&
+               values.Length > 0 && TryReadLiteral(values[0], out var objectId) && estimatedStates.Contains(objectId);
     }
 
     private static void CopyGlobalVariables(IReadOnlyDictionary<string, ushort> source,
@@ -411,7 +557,7 @@ public sealed class LoomBoundedScriptExecutor
             detail = $"could not parse {instruction.Operation} operands ({instruction.Operands})";
             return false;
         }
-        var keyMatch = VariablePattern.Match(parts[0]);
+        var keyMatch = VariablePattern.Match(ResolveIndexed(parts[0], variables));
         if (!keyMatch.Success)
         {
             detail = $"cannot write destination ({parts[0]})";
@@ -609,10 +755,27 @@ public sealed class LoomBoundedScriptExecutor
                int.TryParse(targetText.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out target);
     }
 
+    /// <summary>
+    /// Rewrites an indexed operand such as <c>var[0x0B3+local[0x002]]</c> as the
+    /// plain variable it addresses now (ScummVM <c>readVar</c>/<c>writeVar</c>
+    /// with 0x2000). Other operands, and indexes that are unknown, are returned unchanged.
+    /// </summary>
+    private static string ResolveIndexed(string operand, IDictionary<string, ushort>? variables)
+    {
+        var trimmed = operand.Trim();
+        var match = IndexedPattern.Match(trimmed);
+        if (!match.Success || variables is null) return trimmed;
+        var inner = match.Groups[3].Value;
+        if (!TryReadLiteral(inner, out var index) && !TryReadValue(inner, variables, out index, out _)) return trimmed;
+        var address = int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) + (index & 0xFFF);
+        return $"{match.Groups[1].Value}[0x{address:X3}]";
+    }
+
     private static bool TryReadValue(string operand, IDictionary<string, ushort> variables,
         out ushort value, out string detail)
     {
         value = 0;
+        operand = ResolveIndexed(operand, variables);
         var match = VariablePattern.Match(operand);
         if (match.Success)
         {
@@ -644,10 +807,10 @@ public sealed class LoomBoundedScriptExecutor
         return false;
     }
 
-    private static bool TryGetVariableKey(string operand, out string variableKey)
+    private static bool TryGetVariableKey(string operand, IDictionary<string, ushort> variables, out string variableKey)
     {
         variableKey = "";
-        var match = VariablePattern.Match(operand.Trim());
+        var match = VariablePattern.Match(ResolveIndexed(operand, variables));
         if (!match.Success || match.Groups[1].Value == "bit") return false;
         variableKey = $"{match.Groups[1].Value}[0x{int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]";
         return true;

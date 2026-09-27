@@ -26,4 +26,10 @@ public sealed class LoomScriptRuntimeState
     public List<int> DrawQueue { get; } = [];
     /// <summary>Objects whose state reached <c>setState</c> calls set since the last room entry.</summary>
     public HashSet<int> StatesSetInRoom { get; } = [];
+    /// <summary>Stand-in for the engine's random source; every value it gives is a labelled pick.</summary>
+    public LoomSeededRandom Random { get; set; } = new(0);
+    /// <summary>Global variables whose value came from a seeded pick, directly or through arithmetic or a branch on one.</summary>
+    public HashSet<string> EstimatedVariables { get; } = new(StringComparer.Ordinal);
+    /// <summary>Objects whose state was set by code that ran only because of a seeded pick.</summary>
+    public HashSet<int> EstimatedStates { get; } = [];
 }
