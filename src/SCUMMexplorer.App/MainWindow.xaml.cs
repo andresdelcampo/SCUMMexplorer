@@ -43,6 +43,7 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _previewCancellation;
     private RoomImage? _currentRoom;
     private GameResource? _currentRoomResource;
+    private LoomWalkBoxSet? _currentWalkBoxes;
     private IReadOnlyList<LoomRoomObjectRecord> _currentRoomObjectRecords = [];
     private IReadOnlyDictionary<int, string> _roomObjectNames = new Dictionary<int, string>();
     private IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> _roomVerbs =
@@ -247,6 +248,8 @@ public partial class MainWindow : Window
         RoomMaskToggle.IsChecked = false;
         RoomMaskToggle.IsEnabled = false;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
+        WalkBoxToggle.Visibility = Visibility.Collapsed;
+        WalkBoxOverlay.Visibility = Visibility.Collapsed;
         PreviewMessage.Visibility = Visibility.Visible;
         GameTitle.Text = game.Title;
         GameInfo.Text = game.Platform == "DOS" ? "DOS edition" : game.Platform;
@@ -351,6 +354,8 @@ public partial class MainWindow : Window
             Grid.SetColumnSpan(ContentPanel, 2);
             RoomPreview.Visibility = Visibility.Collapsed;
             RoomMaskToggle.Visibility = Visibility.Collapsed;
+            WalkBoxToggle.Visibility = Visibility.Collapsed;
+            WalkBoxOverlay.Visibility = Visibility.Collapsed;
             RoomNavigationToggle.Visibility = Visibility.Collapsed;
             PreviewMessage.Visibility = Visibility.Collapsed;
             ScriptPanel.Visibility = Visibility.Visible;
@@ -401,6 +406,8 @@ public partial class MainWindow : Window
         RoomMaskToggle.IsChecked = false;
         RoomMaskToggle.IsEnabled = false;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
+        WalkBoxToggle.Visibility = Visibility.Collapsed;
+        WalkBoxOverlay.Visibility = Visibility.Collapsed;
         RoomNavigationToggle.Visibility = Visibility.Collapsed;
         ClearObjectList();
         ObjectsNote.Text = "Reading room objects…";
@@ -408,6 +415,7 @@ public partial class MainWindow : Window
         _objects = [];
         _objectSelection = new([]);
         _currentRoomResource = null;
+        _currentWalkBoxes = null;
         _currentRoomObjectRecords = [];
         _roomObjectNames = new Dictionary<int, string>();
         _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
@@ -434,6 +442,7 @@ public partial class MainWindow : Window
         {
             var bytes = await File.ReadAllBytesAsync(resource.FilePath, token);
             var room = _roomDecoder.Decode(bytes);
+            _currentWalkBoxes = TryReadWalkBoxes(bytes);
             if (_game?.Id == GameId.IndianaJones3)
             {
                 if (token.IsCancellationRequested) return;
@@ -455,6 +464,7 @@ public partial class MainWindow : Window
                 RefreshRoomPreview();
                 RoomPreview.Visibility = Visibility.Visible;
                 RoomMaskToggle.Visibility = Visibility.Visible;
+                ShowWalkBoxToggle();
                 PreviewMessage.Visibility = Visibility.Collapsed;
                 PageSubtitle.Text = "EGA background preview · object and script decoding is not yet verified.";
                 StatusText.Text = $"{resource.Name} ready · {room.Width} × {room.Height}";
@@ -475,6 +485,7 @@ public partial class MainWindow : Window
             RefreshRoomPreview();
             RoomPreview.Visibility = Visibility.Visible;
             RoomMaskToggle.Visibility = Visibility.Visible;
+            ShowWalkBoxToggle();
             PreviewMessage.Visibility = Visibility.Collapsed;
             StatusText.Text = $"{resource.Name} ready";
             StatusText.ToolTip = $"{room.Width} × {room.Height} · {objectRecords.Count} object records · {objects.Count} images";
@@ -1021,6 +1032,8 @@ public partial class MainWindow : Window
         _costumePoses = new Dictionary<int, RoomImage>();
         RoomPreview.Visibility = Visibility.Collapsed;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
+        WalkBoxToggle.Visibility = Visibility.Collapsed;
+        WalkBoxOverlay.Visibility = Visibility.Collapsed;
         AudioPanel.Visibility = Visibility.Collapsed;
         ScriptPanel.Visibility = Visibility.Collapsed;
         PreviewMessage.Visibility = Visibility.Collapsed;
@@ -1158,6 +1171,8 @@ public partial class MainWindow : Window
         _previewCancellation?.Cancel();
         RoomPreview.Visibility = Visibility.Collapsed;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
+        WalkBoxToggle.Visibility = Visibility.Collapsed;
+        WalkBoxOverlay.Visibility = Visibility.Collapsed;
         PreviewMessage.Visibility = Visibility.Collapsed;
         AudioPanel.Visibility = Visibility.Visible;
         ClearObjectList();
@@ -1474,6 +1489,7 @@ public partial class MainWindow : Window
         RoomPreview.Source = RoomMaskToggle.IsChecked == true && depthMask is not null
             ? CreateMaskOverlayBitmap(room.Width, room.Height, pixels, room.Palette, depthMask.Pixels.ToArray())
             : CreateBitmap(room.Width, room.Height, pixels, room.Palette);
+        RefreshWalkBoxOverlay();
 
         var selected = _objects.FirstOrDefault(obj => obj.Id == _selectedObject);
         var selectedPosition = selected is null ? default : _objectSelection.GetPosition(selected);
@@ -1582,6 +1598,120 @@ public partial class MainWindow : Window
     }
 
     private void RoomMaskToggle_Changed(object sender, RoutedEventArgs e) => RefreshRoomPreview();
+
+    private void WalkBoxToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (WalkBoxOverlay is null) return;
+        RefreshWalkBoxOverlay();
+        WalkBoxOverlay.Dispatcher.BeginInvoke(RefreshWalkBoxOverlay, DispatcherPriority.Loaded);
+    }
+
+    private void WalkBoxOverlay_SizeChanged(object sender, SizeChangedEventArgs e) => RefreshWalkBoxOverlay();
+
+    private static LoomWalkBoxSet? TryReadWalkBoxes(byte[] roomBytes)
+    {
+        try { return LoomWalkBoxReader.Read(roomBytes); }
+        catch (InvalidDataException) { return null; }
+    }
+
+    private void ShowWalkBoxToggle()
+    {
+        WalkBoxToggle.Visibility = Visibility.Visible;
+        WalkBoxToggle.IsEnabled = _currentWalkBoxes is { Count: > 0 };
+        RefreshWalkBoxOverlay();
+    }
+
+    /// <summary>
+    /// The walk boxes of the displayed room (ScummVM <c>boxes.cpp</c>): the
+    /// session's copy while it is in this room, since <c>setBoxFlags</c> can
+    /// change their flags, otherwise the stored ones.
+    /// </summary>
+    private LoomWalkBoxSet? DisplayedWalkBoxes() =>
+        SessionModeToggle.IsChecked == true && _session?.CurrentWalkBoxes is { } live &&
+        _session.Snapshot.RoomId == _currentRoomResource?.ResourceId
+            ? live : _currentWalkBoxes;
+
+    /// <summary>
+    /// Draws each walk box as its quadrangle with its number. Most LOOM boxes
+    /// are line segments, the paths actors walk along. Invisible boxes are
+    /// dashed; boxes outside the room image are listed in the tooltip.
+    /// </summary>
+    private void RefreshWalkBoxOverlay()
+    {
+        WalkBoxOverlay.Children.Clear();
+        var boxes = DisplayedWalkBoxes();
+        WalkBoxToggle.ToolTip = boxes is null ? "No walk boxes were read for this room." : DescribeWalkBoxes(boxes);
+        var show = WalkBoxToggle.IsChecked == true && boxes is not null && _currentRoom is not null &&
+                   WalkBoxToggle.Visibility == Visibility.Visible;
+        WalkBoxOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        if (!show || WalkBoxOverlay.ActualWidth <= 0 || WalkBoxOverlay.ActualHeight <= 0) return;
+
+        var room = _currentRoom!;
+        var scale = Math.Min(WalkBoxOverlay.ActualWidth / room.Width, WalkBoxOverlay.ActualHeight / room.Height);
+        if (scale <= 0) return;
+        var offsetX = (WalkBoxOverlay.ActualWidth - room.Width * scale) / 2;
+        var offsetY = (WalkBoxOverlay.ActualHeight - room.Height * scale) / 2;
+        WalkBoxOverlay.Clip = new RectangleGeometry(new Rect(offsetX, offsetY, room.Width * scale, room.Height * scale));
+        Point Map(double x, double y) => new(offsetX + (x + 0.5) * scale, offsetY + (y + 0.5) * scale);
+
+        foreach (var box in boxes!.Boxes)
+        {
+            var invisible = (boxes.GetFlags(box.Index) & LoomWalkBox.InvisibleFlag) != 0;
+            var accent = invisible ? Color.FromRgb(170, 170, 170) : Color.FromRgb(110, 235, 140);
+            var shape = new System.Windows.Shapes.Polygon
+            {
+                Points = new PointCollection(box.Corners.Select(point => Map(point.X, point.Y))),
+                Stroke = new SolidColorBrush(accent),
+                StrokeThickness = Math.Clamp(scale * 0.75, 1.5, 3),
+                StrokeLineJoin = PenLineJoin.Round,
+                Fill = box.IsLine ? null : new SolidColorBrush(Color.FromArgb(48, accent.R, accent.G, accent.B))
+            };
+            if (invisible) shape.StrokeDashArray = [3, 2];
+            WalkBoxOverlay.Children.Add(shape);
+
+            var label = new Border
+            {
+                Child = new TextBlock
+                {
+                    Text = box.Index.ToString(),
+                    Foreground = Brushes.White,
+                    FontWeight = FontWeights.SemiBold,
+                    FontSize = Math.Clamp(scale * 4.5, 8, 11),
+                    Margin = new Thickness(3, 0, 3, 0)
+                },
+                Background = new SolidColorBrush(Color.FromArgb(208, 17, 24, 32)),
+                BorderBrush = new SolidColorBrush(accent),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(2)
+            };
+            label.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var centre = Map(box.Corners.Average(point => point.X), box.Corners.Average(point => point.Y));
+            Canvas.SetLeft(label, centre.X - label.DesiredSize.Width / 2);
+            Canvas.SetTop(label, centre.Y - label.DesiredSize.Height / 2);
+            WalkBoxOverlay.Children.Add(label);
+        }
+    }
+
+    private string DescribeWalkBoxes(LoomWalkBoxSet boxes)
+    {
+        var lines = new List<string>
+        {
+            $"{boxes.Count} walk boxes ({boxes.Boxes.Count(box => box.IsLine)} line segments) from the room's box table at 0x{boxes.TableOffset:X4}."
+        };
+        if (_currentRoom is { } room)
+        {
+            var outside = boxes.Boxes.Where(box =>
+                    box.Corners.Max(point => point.X) < 0 || box.Corners.Min(point => point.X) >= room.Width ||
+                    box.Corners.Max(point => point.Y) < 0 || box.Corners.Min(point => point.Y) >= room.Height)
+                .Select(box => box.Index).ToArray();
+            if (outside.Length > 0) lines.Add($"Outside the room image: box {string.Join(", ", outside)}.");
+        }
+        var flagged = boxes.Boxes.Where(box => boxes.GetFlags(box.Index) != 0)
+            .Select(box => $"{box.Index} (0x{boxes.GetFlags(box.Index):X2})").ToArray();
+        if (flagged.Length > 0) lines.Add($"Flags: box {string.Join(", ", flagged)}; 0x80 means invisible (dashed).");
+        if (boxes.MatrixTruncated) lines.Add("The box matrix is truncated in the game data.");
+        return string.Join("\n", lines);
+    }
 
     private void RoomNavigationToggle_Changed(object sender, RoutedEventArgs e)
     {

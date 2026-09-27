@@ -60,6 +60,12 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | 108 | Glassmakers scene; opens Room 56 on 779 and 782 (+0x0188) | |
 | 113, 114 | Ambient actors during the intro (random positions) | Seeded picks |
 
+## Walk boxes (decoded, ScummVM `room.cpp`/`boxes.cpp`)
+
+- Table at the word at room + 0x15: a count byte, 18-byte boxes, then the matrix up to the image (+0x0A). All 76 rooms fit exactly.
+- LOOM's walkable areas are mostly line segments. Room 02 is a chain of 15 (box 4 is what script 045 watches). Room 17 has one quadrangle (box 8). Close-ups have one box outside the image.
+- Flags: 0x80 invisible (Room 05, 0x81); 0xA0 invisible and player-only (Rooms 09 and 34).
+
 ## Room notes
 
 - **Room 69: intro screen.** The entry starts local 202 (difficulty menu). Objects 876–878 pick the difficulty and start local 201 (the random draft and guild symbol), which chains to 204 (the question). Note objects 886–897 start local 203 [note index]. Local 203 checks the draft and starts 205 after a correct draft or the third wrong try. Local 205 sets `bit[0xD6B]`.

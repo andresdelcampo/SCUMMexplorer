@@ -48,4 +48,6 @@ public sealed class LoomScriptRuntimeState
     /// (ScummVM <c>VAR_CAMERA_POS_X</c>) inside it.
     /// </summary>
     public (int Min, int Max)? CameraRange { get; set; }
+    /// <summary>The current room's walk boxes (flags as <c>setBoxFlags</c> left them), or null outside a room.</summary>
+    public LoomWalkBoxSet? WalkBoxes { get; set; }
 }

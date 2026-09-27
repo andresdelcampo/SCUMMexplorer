@@ -228,6 +228,13 @@ public sealed class LoomExplorationSession
     /// <summary>Seed of the stand-in random source; every <c>getRandomNr</c> value is a labelled pick from it.</summary>
     public int RandomSeed => _runtime.Random.Seed;
     public LoomScriptDisassembly? LastEntryScript { get; private set; }
+
+    /// <summary>
+    /// The current room's walk boxes, read afresh on each entry as ScummVM's
+    /// <c>resetRoomSubBlocks</c> does; <c>setBoxFlags</c> changes this copy. Null
+    /// when no room is loaded or its box table could not be read.
+    /// </summary>
+    public LoomWalkBoxSet? CurrentWalkBoxes => _runtime.WalkBoxes;
     public LoomBoundedScriptResult? LastEntryRun { get; private set; }
     public LoomObjectActionResult? LastAction { get; private set; }
     public IReadOnlyList<LoomScriptEvent> LastVisitEvents { get; private set; } = [];
@@ -287,6 +294,12 @@ public sealed class LoomExplorationSession
         _runtime.EstimatedStates.Clear();
         var roomBytes = File.ReadAllBytes(room.FilePath);
         _currentObjects = _objects.Decode(roomBytes);
+        try { _runtime.WalkBoxes = LoomWalkBoxReader.Read(roomBytes); }
+        catch (InvalidDataException ex)
+        {
+            _runtime.WalkBoxes = null;
+            _uncertainties.Add($"Room {room.ResourceId:00} walk boxes could not be read: {ex.Message}");
+        }
         // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
         var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
         _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
