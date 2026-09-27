@@ -90,6 +90,7 @@ public partial class MainWindow : Window
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         _roomPanTimer.Tick += RoomPanTimer_Tick;
+        _cameraPanTimer.Tick += CameraPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
         _adlibGainDebounceTimer.Tick += async (_, _) =>
         {
@@ -410,6 +411,7 @@ public partial class MainWindow : Window
         PreviewDescription.Text = "Reading the room background…";
         PreviewMessage.Visibility = Visibility.Visible;
         StatusText.Visibility = Visibility.Visible;
+        StopCameraPan();
         RoomViewport.ScrollToHorizontalOffset(0);
         RoomPreview.Source = null;
         RoomPreview.Visibility = Visibility.Collapsed;
@@ -1230,11 +1232,43 @@ public partial class MainWindow : Window
     {
         if (_pendingCameraX is not int cameraX || _currentRoom is null) return;
         _pendingCameraX = null;
+        StopCameraPan();
         if (NormalRoomWidthToggle.IsChecked != true) return;
         RoomViewport.UpdateLayout();
-        var left = (cameraX - Math.Min(320, _currentRoom.Width) / 2.0) * _roomDisplayScale;
-        RoomViewport.ScrollToHorizontalOffset(Math.Clamp(left, 0, RoomViewport.ScrollableWidth));
+        var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
+            RoomViewport.ScrollableWidth / _roomDisplayScale);
+        if (CameraPanToggle.IsChecked == true && left > 0)
+        {
+            // Presentation only: slide from the left edge to the camera.
+            RoomViewport.ScrollToHorizontalOffset(0);
+            _cameraPanTargetSourceX = left;
+            _cameraPanTimer.Start();
+            return;
+        }
+        RoomViewport.ScrollToHorizontalOffset(left * _roomDisplayScale);
     }
+
+    // The optional entry pan: ScummVM moveCamera's 8-pixel step, one per tick.
+    private readonly DispatcherTimer _cameraPanTimer = new() { Interval = TimeSpan.FromMilliseconds(75) };
+    private double _cameraPanTargetSourceX;
+
+    private void CameraPanTimer_Tick(object? sender, EventArgs e)
+    {
+        if (_currentRoom is null || NormalRoomWidthToggle.IsChecked != true)
+        {
+            StopCameraPan();
+            return;
+        }
+        var target = _cameraPanTargetSourceX * _roomDisplayScale;
+        var next = Math.Min(target, RoomViewport.HorizontalOffset + 8 * _roomDisplayScale);
+        RoomViewport.ScrollToHorizontalOffset(next);
+        // ScrollViewer applies the offset on its next layout pass; make it now.
+        RoomViewport.UpdateLayout();
+        UpdateRoomScrollButtons();
+        if (next >= target - 0.01) StopCameraPan();
+    }
+
+    private void StopCameraPan() => _cameraPanTimer.Stop();
 
     private void UpdateRoomScrollButtons()
     {
@@ -1290,6 +1324,7 @@ public partial class MainWindow : Window
     private void BeginRoomPan(int direction, double maximumStep, Button? button = null, Key? key = null)
     {
         StopRoomPan();
+        StopCameraPan();
         if (NormalRoomWidthToggle.IsChecked != true || RoomViewport.ScrollableWidth <= 0.5 ||
             (direction < 0 && RoomViewport.HorizontalOffset <= 0.5) ||
             (direction > 0 && RoomViewport.HorizontalOffset >= RoomViewport.ScrollableWidth - 0.5)) return;

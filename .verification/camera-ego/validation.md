@@ -32,3 +32,27 @@ Scripts that read `var[0x002]` (from `code.tsv`): script 044 +0x0361, Room 02 ob
 **Blockers** ([before](blockers-before.txt), [after](blockers-after.txt)): no stop was added or removed. The 149 "presentation operation not applied: actorFollowCamera" notes (the boot's and script 003's, the cutscene end hook) are now camera results. 72 read the ego as unknown after a catalog visit, so the camera is labelled unknown. There are also 38 "within the triggers" estimates, 22 walk-end estimates and 1 unknown walk end.
 
 **Viewport captures** ([Room 02 after the boot](viewport/step-01-room-02.png), [Room 04 after object 162](room03-action/coordinate-action.png)): Room 02 opens on the cliff and the tree, where the ego stands; Room 04 opens on its right-hand section (scrollbar at the right end, right arrow disabled), where the ego arrives from Room 03. Catalog visits still open at the left edge ([Room 03](viewport/step-02-room-03.png)).
+
+## Optional entry pan (presentation)
+
+The user asked for the camera move to be playable, and optional. A new checkbox, **"Pan to the camera on entry"** (off by default), sits in the room view's options. When it is on, a room entered in the session opens its 320-px view at the left edge and slides to the camera: 8 source pixels per 75 ms tick (8 px is ScummVM `moveCamera`'s step; the tick is not the game's timing). A manual pan (buttons, keys, hold) or a new room stops it. The tooltip says what it is: a presentation effect. In the game, a room load, `loadRoomWithEgo` and `actorFollowCamera` put the camera there at once; only script pans and walks scroll. The full-panorama view is unaffected.
+
+[`CameraPanCheck`](CameraPanCheck/Program.cs) (real MainWindow, synthetic calls): **6/6 PASS** ([report](pan-check/camera-pan-check.txt)).
+- Pan off: Room 02 opens at source x 640 (camera 800), and Room 03 (camera 160) at 0.
+- Pan on: Room 02 starts at 0, moves in 80 steps of at most 8 source px, and ends at 640.
+- A manual pan stops it.
+
+Captures: [off](pan-check/room-02-pan-off.png), [midway](pan-check/room-02-pan-midway.png) (over the sea), [end](pan-check/room-02-pan-end.png).
+
+ScrollViewer applies an offset only on its next layout pass, so the last step never landed until the tick forced one (`RoomViewport.UpdateLayout()`). The harness found this: it ended at 632 instead of 640.
+
+**PresentationCheck** (room viewport geometry): **39/39 PASS** ([report](presentation-check/geometry-check.txt)). Its pan-button checks assumed Room 04 opens at the left edge. Now the view opens at the camera, which Room 04's entry puts on its right half, so the harness scrolls to the left edge before those checks. No other assertion changed.
+
+## Finding: Room 04 locks the camera to one half (decoded)
+
+Room 04's entry (+0x0013–0x003F) runs only outside a cutscene (`bit[0xD6E]` = 0). It starts local 204 or 205, depending on the previous room (`var[0x070]`) and `var[0x0AC]`:
+
+- Local 204 does `roomOps roomScroll 152, 160` and `setCameraAt 160`: the left half.
+- Local 205 does `roomOps roomScroll 480, 488` and `setCameraAt 480`: the right half.
+
+So a catalog visit from Room 02 opens on the right half (camera 480), and so does the Room 03 route. `roomScroll` (ScummVM `o5_roomOps` case 1: `VAR_CAMERA_MIN_X`/`MAX_X`) is not modelled yet. The session's camera range stays [160, width − 160], so a later pan or follow could leave the half the game allows.

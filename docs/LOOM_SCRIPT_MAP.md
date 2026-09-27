@@ -81,6 +81,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 - **Room 69: intro screen.** The entry starts local 202 (difficulty menu). Objects 876–878 pick the difficulty and start local 201 (the random draft and guild symbol), which chains to 204 (the question). Note objects 886–897 start local 203 [note index]. Local 203 checks the draft and starts 205 after a correct draft or the third wrong try. Local 205 sets `bit[0xD6B]`.
 - **Room 03: lake.** Objects 161–164 reach Rooms 05, 04, 10 through locals 200–202, which wait while `bit[0xD7A]` is set. Object 160 leads to Room 02 directly.
 - **Room 10.** Object 295 starts script 052 (a cutscene through Room 11 into Room 13).
+- **Room 04.** Two screens. Outside a cutscene, the entry (+0x0013–0x003F) picks a half by the previous room (`var[0x070]`; 0x46 also reads `var[0x0AC]`, 0x40 is Room 64). Local 204 does `roomScroll 152, 160` and `setCameraAt 160` (left half); local 205 does `roomScroll 480, 488` and `setCameraAt 480` (right half). The camera is locked to that half (decoded; `roomScroll` is not modelled). Objects 169/170 (verb 0x37) pan between the halves.
 - **Room 16.** Its entry starts script 039 with sound 30 on the first visit (`bit[0xDBE]`, decoded); the sound starts one frame later.
 - **Room 22.** Its entry picks local 210/211/212 by `var[0x071]`, which makes exit 400 or 402 untouchable (class 24).
 

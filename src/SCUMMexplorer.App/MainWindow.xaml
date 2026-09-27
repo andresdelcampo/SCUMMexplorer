@@ -69,6 +69,9 @@
                                           Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
                                           ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
                                           Checked="NormalRoomWidthToggle_Changed" Unchecked="NormalRoomWidthToggle_Changed"/>
+                                <CheckBox x:Name="CameraPanToggle" Content="Pan to the camera on entry" IsChecked="False"
+                                          Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
+                                          ToolTip="Presentation only: a room entered in the session slides from its left edge to where its camera is, 8 source pixels a step (ScummVM's scroll step; not the game's timing). In the game, a room load or loadRoomWithEgo puts the camera there at once; only script pans and walks scroll."/>
                                 <CheckBox x:Name="RoomNavigationToggle" Content="Show doorways" Visibility="Collapsed" IsChecked="True"
                                           Margin="0,0,14,0" Foreground="#E7E0D2"
                                           Checked="RoomNavigationToggle_Changed" Unchecked="RoomNavigationToggle_Changed"/>

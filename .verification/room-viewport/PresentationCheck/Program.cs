@@ -62,6 +62,9 @@ internal static class Program
                 Check(roomScale > 1, $"room enlarged to use available area: scale {roomScale}");
                 Check(viewport.ActualHeight <= source.PixelHeight * roomScale + 24, $"normal viewport hugs scaled room height: {viewport.ActualHeight}/{source.PixelHeight * roomScale}");
                 Check(viewport.ScrollableWidth > 0, "wide Room 04 scrolls");
+                // Since 27 September the view opens at the session's camera, which Room 04's
+                // entry puts on its right half (local 205); start the pan checks from the left edge.
+                viewport.ScrollToHorizontalOffset(0); window.UpdateLayout();
                 var beforeTap = viewport.HorizontalOffset;
                 Call("PanButton_Click", Control<Button>("ScrollRoomRightButton"), new RoutedEventArgs());
                 await Task.Delay(100); window.UpdateLayout();
