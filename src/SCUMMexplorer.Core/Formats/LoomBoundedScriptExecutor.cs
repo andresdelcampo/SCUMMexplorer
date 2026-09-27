@@ -564,6 +564,34 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "findObject" && runtime is not null)
+            {
+                // o5_findObject: result = findObject(x, y) over the current room's objects.
+                var find = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (find.Length != 3 || !TryGetVariableKey(find[0], knownVariables, out var foundKey) ||
+                    !TryReadValue(find[1], knownVariables, out var findX, out _) ||
+                    !TryReadValue(find[2], knownVariables, out var findY, out _))
+                {
+                    unresolved = $"findObject operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                var (found, findUnknown) = FindObjectAt(roomObjects, states, runtime, unchecked((short)findX), unchecked((short)findY));
+                if (findUnknown is not null)
+                {
+                    unresolved = $"findObject at ({(short)findX}, {(short)findY}) {findUnknown} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                knownVariables[foundKey] = (ushort)found;
+                RefreshBitAliases(foundKey, knownVariables);
+                MarkEstimated(estimated, foundKey, onEstimatedPath ||
+                    OperandIsEstimated(find[1], estimated, knownVariables) || OperandIsEstimated(find[2], estimated, knownVariables));
+                trace.Add($"{foundKey} = {found}: findObject at ({(short)findX}, {(short)findY})");
+                if (runtime.VirtualMouse is { } mouse && mouse == ((short)findX, (short)findY) && runtime.VirtualMouseAssumption is { } assumption)
+                    limitations.Add($"findObject at +0x{instruction.Offset:X4} reads the virtual mouse: {assumption}");
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "roomOps" && runtime?.RoomCameraBounds is { } bounds &&
                 instruction.Operands.StartsWith("roomScroll,", StringComparison.Ordinal))
             {
@@ -772,6 +800,38 @@ public sealed class LoomBoundedScriptExecutor
             new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
             trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray(),
             picks, estimated.Where(key => !IsGlobalKey(key)).ToArray(), onEstimatedPath);
+    }
+
+    /// <summary>
+    /// ScummVM <c>ScummEngine::findObject</c>: the first object in directory order
+    /// that is not untouchable (class 24), whose parent chain is in the states it
+    /// requires, and whose box contains the point; 0 when none. Unknown is set
+    /// when an object whose box contains the point has a parent of unknown state.
+    /// </summary>
+    private static (int Found, string? Unknown) FindObjectAt(IReadOnlyList<LoomRoomObjectRecord> roomObjects,
+        IReadOnlyDictionary<int, byte> states, LoomScriptRuntimeState runtime, int x, int y)
+    {
+        var byLocalIndex = roomObjects.GroupBy(item => item.LocalIndex).ToDictionary(group => group.Key, group => group.First());
+        foreach (var record in roomObjects)
+        {
+            if (record.Id < 1 || runtime.ObjectClasses.TryGetValue(record.Id, out var classes) &&
+                LoomObjectClasses.Has(classes, LoomObjectClasses.Untouchable)) continue;
+            var at = runtime.ObjectPositions.TryGetValue(record.Id, out var moved) ? (moved.X, moved.Y) : (record.X, record.Y);
+            if (!(at.Item1 <= x && at.Item1 + record.Width > x && at.Item2 <= y && at.Item2 + record.Height > y)) continue;
+            var current = record;
+            var parentsMatch = true;
+            for (var remaining = roomObjects.Count; current.ParentLocalIndex != 0; remaining--)
+            {
+                if (remaining < 0 || !byLocalIndex.TryGetValue(current.ParentLocalIndex, out var parent))
+                    return (0, $"hits object {record.Id}, whose parent chain cannot be read");
+                if (!states.TryGetValue(parent.Id, out var parentState))
+                    return (0, $"hits object {record.Id}, whose parent {parent.Id} has an unknown state");
+                if ((parentState & 0x0F) != current.ParentRequiredState) { parentsMatch = false; break; }
+                current = parent;
+            }
+            if (parentsMatch) return (record.Id, null);
+        }
+        return (0, null);
     }
 
     private static bool IsActorQuery(string operation) => operation is

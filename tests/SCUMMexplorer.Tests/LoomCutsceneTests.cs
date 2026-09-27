@@ -168,8 +168,9 @@ public sealed class LoomCutsceneTests
         session.ActivateObjectVerb(295, 0x38);
 
         Assert.Contains("cutscene at Script 52 +0x0000 runs script 2", session.SessionTrace);
-        // Script 002 freezes every other slot; the cutscene's own script keeps running.
-        Assert.Contains("freezeScripts 0x7F at Script 02 +0x0004: frozen: Room 10 Object 295 Verb 0x38, Room 10 local script 200",
+        // Script 002 freezes every other slot, including the input loop (script 006);
+        // the cutscene's own script keeps running.
+        Assert.Contains("freezeScripts 0x7F at Script 02 +0x0004: frozen: Room 10 Object 295 Verb 0x38, Script 06, Room 10 local script 200",
             session.SessionTrace);
         Assert.Equal((ushort)1, session.Snapshot.KnownGlobalVariables["bit[0xD6E]"]);
 

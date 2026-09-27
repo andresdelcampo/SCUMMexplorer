@@ -353,6 +353,8 @@ public sealed class LoomExplorationSession
         foreach (var item in _currentObjects)
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
         _runtime.GlobalVariables["var[0x004]"] = (ushort)room.ResourceId!.Value;
+        _roomSize = (roomWidth, (roomBytes[6] ^ 0xFF) | ((roomBytes[7] ^ 0xFF) << 8));
+        PlaceVirtualMouse();
         _uncertainties.Add(arrival);
 
         RunGlobalHook(28, "before room entry");
@@ -409,6 +411,30 @@ public sealed class LoomExplorationSession
 
     /// <summary>ScummVM <c>VAR_CAMERA_POS_X</c>.</summary>
     private const string CameraVariable = "var[0x002]";
+
+    // The current room's width and height in pixels.
+    private (int Width, int Height)? _roomSize;
+
+    /// <summary>
+    /// ScummVM's main loop puts the pointer's room position in <c>VAR_VIRT_MOUSE_X/Y</c>
+    /// (vars 20 and 21) every frame. The session has no pointer, so it states one:
+    /// the pointer rests just below the room picture (over the verb area), under
+    /// the camera's centre. No room object reaches that row, so <c>findObject</c>
+    /// finds nothing there, and the input loop idles as it would with the pointer
+    /// off the room. This is assumed input, and every read of it is labelled.
+    /// </summary>
+    private void PlaceVirtualMouse()
+    {
+        if (_roomSize is not { } size) return;
+        var x = CameraX ?? size.Width / 2;
+        var y = size.Height;
+        _runtime.GlobalVariables["var[0x014]"] = (ushort)x;
+        _runtime.GlobalVariables["var[0x015]"] = (ushort)y;
+        _runtime.EstimatedVariables.Remove("var[0x014]");
+        _runtime.EstimatedVariables.Remove("var[0x015]");
+        _runtime.VirtualMouse = (x, y);
+        _runtime.VirtualMouseAssumption = $"assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at ({x}, {y})";
+    }
 
     /// <summary>The camera's centre x in room pixels (<c>var[0x002]</c>), or null when it is unknown.</summary>
     public int? CameraX => _runtime.GlobalVariables.TryGetValue(CameraVariable, out var x) ? x : null;
@@ -527,6 +553,7 @@ public sealed class LoomExplorationSession
     /// </summary>
     public LoomSessionSnapshot AdvanceFrame()
     {
+        PlaceVirtualMouse();
         var beforeEvents = _visitEvents.Count;
         var runnable = _pending.ToArray();
         _pending.Clear();

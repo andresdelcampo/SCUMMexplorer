@@ -38,6 +38,16 @@ foreach (var step in args.Skip(1))
         Console.WriteLine($"== set var[0x{Convert.ToInt32(name, 16):X3}] = {value}");
         continue;
     }
+    // "?014,015": prints global words (hex numbers), or "unknown".
+    if (step.StartsWith('?'))
+    {
+        foreach (var name in step[1..].Split(','))
+        {
+            var key = $"var[0x{Convert.ToInt32(name, 16):X3}]";
+            Console.WriteLine($"   {key} = {(session.Snapshot.KnownGlobalVariables.TryGetValue(key, out var value) ? value.ToString() : "unknown")}");
+        }
+        continue;
+    }
     // "sounds": lists the reached sound commands so far.
     if (step == "sounds")
     {

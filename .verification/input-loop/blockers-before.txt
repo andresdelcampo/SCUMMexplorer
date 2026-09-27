@@ -1,0 +1,545 @@
+blocked: 0 instruction sites in 0 scripts; rooms: 
+picked: 13 instruction sites in 11 scripts; rooms: 01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,79,81,82,83,84,85,86,87
+  Room 04 local script 203	+0x0000
+  Room 18 local script 204	+0x008A
+  Room 30 Object 511 Verb 0x38	+0x0006
+  Room 30 Object 512 Verb 0x38	+0x0006
+  Room 30 Object 513 Verb 0x38	+0x0006
+  Room 41 local script 209	+0x0001
+  Room 43 local script 205	+0x0030
+  Room 43 local script 205	+0x003C
+  Room 69 local script 202	+0x00B0
+  Script 113	+0x0037
+  Script 114	+0x0047
+  Script 42	+0x0026
+  Script 42	+0x004F
+
+Where scripts that picked stopped next (other uncertainties from the same script):
+  Room 18 local script 204	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+  Room 30 Object 511 Verb 0x38	+0x0000: presentation operation not applied: lights; timing not simulated: a delay of 60 jiffies continues on the next frame (+0x002F)
+  Room 30 Object 511 Verb 0x38	+0x0033: presentation operation not applied: lights; timing not simulated: waiting for actor 0x01 to stop walking continues on the next frame (+0x003D)
+  Room 30 Object 512 Verb 0x38	+0x0000: presentation operation not applied: lights; timing not simulated: a delay of 60 jiffies continues on the next frame (+0x0013)
+  Room 30 Object 512 Verb 0x38	+0x0017: presentation operation not applied: lights; timing not simulated: waiting for actor 0x01 to stop walking continues on the next frame (+0x0036)
+  Room 30 Object 513 Verb 0x38	+0x0000: presentation operation not applied: lights; timing not simulated: a delay of 60 jiffies continues on the next frame (+0x0013)
+  Room 30 Object 513 Verb 0x38	+0x0017: presentation operation not applied: lights; timing not simulated: waiting for actor 0x01 to stop walking continues on the next frame (+0x0036)
+  Room 41 local script 209	+0x0001: presentation operation not applied: animateActor
+  Room 43 local script 205	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; timing not simulated: a delay of local[0x001] jiffies continues on the next frame (+0x0039)
+  Room 43 local script 205	+0x003C: presentation operation not applied: animateActor
+  Room 43 local script 205	+0x004C: presentation operation not applied: animateActor; timing not simulated: a delay of local[0x001] jiffies continues on the next frame (+0x0039)
+  Room 69 local script 202	+0x0017: presentation operation not applied: print
+  Room 69 local script 202	+0x0053: presentation operation not applied: print
+  Room 69 local script 202	+0x00B0: presentation operation not applied: print
+  Script 113	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+  Script 113	+0x0068: presentation operation not applied: animateActor
+  Script 114	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+  Script 114	+0x003D: presentation operation not applied: animateActor
+  Script 114	+0x0078: presentation operation not applied: animateActor
+  Script 42	+0x0000: presentation operation not applied: animateActor
+  Script 42	+0x0021: presentation operation not applied: animateActor
+
+Uncertainty shapes (count of visits and actions that show each):
+    635  #isSoundRunning reads sound # as playing because this route started it; its length is not simulated, so what follows is an estimate #
+    513  Object # verb #x# was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+    427  #presentation operation not applied: print
+    423  #presentation operation not applied: cursorCommand
+    412  #presentation operation not applied: animateActor
+    296  Sound # was started; its natural completion time is not simulated.
+    212  #isSoundRunning reads sound # as silent because this route did not start it #
+    188  Object # is untouchable # in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.
+    163  #presentation operation not applied: lights
+    133  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+    130  #timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+    127  #getRandomNr at # picked # of #..# #; what follows from it is an estimate, not a reached game state.
+    127  #operation 'verbOps' is not modeled at #
+    115  #getActorWalkBox reads actor #, whose walk box the preview does not know # at #
+    113  #presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame #
+    102  #timing not simulated: a delay of # jiffies continues on the next frame #
+     93  #timing not simulated: the camera pan reaches x = # at once #
+     92  Script # # reached loadRoom after a frame advance.
+     91  #timing not simulated: waiting for the message to finish continues on the next frame #
+     90  #presentation operation not applied: resourceRoutines
+     85  #presentation operation not applied: oldRoomEffect
+     83  #presentation operation not applied: animateActor; timing not simulated: a delay of # jiffies continues on the next frame #
+     83  #presentation operation not applied: faceActor
+     81  #presentation operation not applied: print; timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+     80  A started script has a dynamic target; the parent continues without its effects.
+     76  #operation 'findObject' is not modeled at #
+     76  #presentation operation not applied: cursorCommand; presentation operation not applied: resourceRoutines
+     76  #presentation operation not applied: drawBox
+     76  #presentation operation not applied: oldRoomEffect; presentation operation not applied: print
+     76  #presentation operation not applied: resourceRoutines; presentation operation not applied: cursorCommand
+     76  #presentation operation not applied: roomOps; presentation operation not applied: cursorCommand; presentation operation not applied: stringOps
+     76  Player input assumed: script # # waits for bit[#xD#B], which only Room # local script # sets #, so the preview starts it as if the player had answered. Choices made on that screen were not simulated.
+     76  Room # entered by Script # # # after a frame advance.
+     76  Room # entered by Script # # # during the boot.
+     76  Script # # reached loadRoom during the boot.
+     75  Room # selected from the catalog; the route to it was not executed from game input.
+     72  #presentation operation not applied: cursorCommand; camera x #
+     66  #script requests Room #; room transition awaits bounded session dispatch at #
+     64  Started script # has arguments depending on unknown variables; the parent continues without its effects.
+     38  Camera x #; the walk's end stays within the camera's triggers.
+     26  Object # verb #x#A was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     25  #getActorX reads actor #, whose position the preview does not know # at #
+     22  Camera x #.
+     22  Object # verb #x#B was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     21  Object # verb #xFF was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     15  #presentation operation not applied: animateActor; timing not simulated: a delay of local[#x#] jiffies continues on the next frame #
+     15  Room # object #, verb #x#, code #x#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+     14  #presentation operation not applied: animateActor; timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+     13  #getActorX reads actor #: actor #'s walkActorTo at # is taken to end at #
+     12  Object # verb #x#C was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     12  Object # verb #x#D was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     10  Object # verb #x#E was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     10  Object # verb #x#F was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+      9  #presentation operation not applied: lights; timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+      8  #presentation operation not applied: animateActor; getActorX reads actor #: actor #'s putActor at # follows a seeded pick, so what follows is an estimate #
+      8  Script # # reached loadRoom during the action.
+      7  #presentation operation not applied: lights; timing not simulated: a delay of # jiffies continues on the next frame #
+      7  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; presentation operation not applied: roomOps; presentation operation not applied: lights
+      7  Room # Object # Verb #x# # reached loadRoomWithEgo after a frame advance.
+      5  #presentation operation not applied: lights; presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+      5  Room # object #, verb #x#, code #x#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      5  Room # object #, verb #x#, code #x#B#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      4  #presentation operation not applied: resourceRoutines; presentation operation not applied: setObjectName; presentation operation not applied: animateActor
+      4  Room # local script # # reached loadRoomWithEgo after a frame advance.
+      4  Room # object #, verb #x#, code #x#A#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      4  Room # object #, verb #x#, code #x#D#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  #operation 'expression' is not modeled at #
+      3  #presentation operation not applied: animateActor; presentation operation not applied: oldRoomEffect
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; presentation operation not applied: setObjectName
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; timing not simulated: a delay of local[#x#] jiffies continues on the next frame #
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: animateActor
+      3  Room # object #, verb #x#, code #x#D; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  Room # object #, verb #x#, code #x#E#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  Room # object #, verb #x#, code #x#F#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  #presentation operation not applied: animateActor; presentation operation not applied: resourceRoutines
+      2  #presentation operation not applied: animateActor; timing not simulated: waiting for the message to finish continues on the next frame #
+      2  #presentation operation not applied: lights; presentation operation not applied: animateActor; timing not simulated: a delay of # jiffies continues on the next frame #
+      2  #presentation operation not applied: roomOps
+      2  #presentation operation not applied: setObjectName
+      2  #timing not simulated: the camera moves # pixels a frame into its new limits and reaches x = # at once #
+      2  Room # object #, verb #x#, code #x#A#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#A; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#C#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#C#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#D#; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#E#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#F; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#FC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  #isScriptRunning #: script # ended at a step the preview does not model, so it may still run in the game, so what follows is an estimate #; presentation operation not applied: print
+      1  #operation 'getActorCostume' is not modeled at #
+      1  #operation 'getActorElevation' is not modeled at #
+      1  #presentation operation not applied: animateActor; presentation operation not applied: lights
+      1  #presentation operation not applied: animateActor; timing not simulated: the camera pan reaches x = # at once #
+      1  #presentation operation not applied: resourceRoutines; timing not simulated: a delay of # jiffies continues on the next frame #
+      1  A started object script has an unresolved entrypoint; the parent continues without its effects.
+      1  Camera x # is unknown: it follows the ego's walk from Room # Object # Verb #x# #, whose end is unknown.
+      1  Room # object #, verb #x#, code #x#A#C; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#A#F; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#AE#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#AE; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#B#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#B; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#B; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#BB#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#C; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#C; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#CBC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#CF#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#CF; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#A; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#C; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#D; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DD#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DE; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DF#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DF; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#C; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#D; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#E; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#F; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#EC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#EF; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#F#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FAD; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FCB; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FD#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+
+Every occurrence:
+  picked	Room 04 local script 203	+0x0000	Room 03 object 162 verb 0x36
+  picked	Room 04 local script 203	+0x0000	Room 04 visit
+  picked	Room 04 local script 203	+0x0000	Room 64 object 825 verb 0x36
+  picked	Room 18 local script 204	+0x008A	Room 16 object 346 verb 0x38
+  picked	Room 18 local script 204	+0x008A	Room 18 visit
+  picked	Room 18 local script 204	+0x008A	Room 22 object 402 verb 0x38
+  picked	Room 30 Object 511 Verb 0x38	+0x0006	Room 30 object 511 verb 0x38
+  picked	Room 30 Object 512 Verb 0x38	+0x0006	Room 30 object 512 verb 0x38
+  picked	Room 30 Object 513 Verb 0x38	+0x0006	Room 30 object 513 verb 0x38
+  picked	Room 41 local script 209	+0x0001	Room 41 object 631 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 631 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 object 632 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 632 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x41
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x42
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x4B
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x56
+  picked	Room 41 local script 209	+0x0001	Room 41 object 634 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 634 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 visit
+  picked	Room 43 local script 205	+0x0030	Room 43 object 640 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 640 verb 0x56
+  picked	Room 43 local script 205	+0x0030	Room 43 object 641 verb 0x36
+  picked	Room 43 local script 205	+0x0030	Room 43 object 641 verb 0x38
+  picked	Room 43 local script 205	+0x0030	Room 43 object 641 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 642 verb 0x36
+  picked	Room 43 local script 205	+0x0030	Room 43 object 642 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x36
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x3A
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x3B
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x56
+  picked	Room 43 local script 205	+0x0030	Room 43 object 650 verb 0x38
+  picked	Room 43 local script 205	+0x0030	Room 43 object 650 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 visit
+  picked	Room 43 local script 205	+0x0030	Room 44 object 652 verb 0x38
+  picked	Room 43 local script 205	+0x0030	Room 45 object 655 verb 0x38
+  picked	Room 43 local script 205	+0x003C	Room 43 object 640 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 640 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 640 verb 0x56
+  picked	Room 43 local script 205	+0x003C	Room 43 object 641 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 641 verb 0x38
+  picked	Room 43 local script 205	+0x003C	Room 43 object 641 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 642 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 642 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x3A
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x3B
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x56
+  picked	Room 43 local script 205	+0x003C	Room 43 object 650 verb 0x38
+  picked	Room 43 local script 205	+0x003C	Room 43 object 650 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 visit
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 876 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 877 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 878 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 886 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 887 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 888 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 889 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 890 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 891 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 892 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 893 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 894 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 895 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 896 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 897 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 visit
+  picked	Script 113	+0x0037	Room 01 visit
+  picked	Script 113	+0x0037	Room 02 visit
+  picked	Script 113	+0x0037	Room 03 visit
+  picked	Script 113	+0x0037	Room 04 visit
+  picked	Script 113	+0x0037	Room 05 visit
+  picked	Script 113	+0x0037	Room 06 visit
+  picked	Script 113	+0x0037	Room 07 visit
+  picked	Script 113	+0x0037	Room 08 visit
+  picked	Script 113	+0x0037	Room 09 visit
+  picked	Script 113	+0x0037	Room 10 visit
+  picked	Script 113	+0x0037	Room 11 visit
+  picked	Script 113	+0x0037	Room 12 visit
+  picked	Script 113	+0x0037	Room 13 visit
+  picked	Script 113	+0x0037	Room 14 visit
+  picked	Script 113	+0x0037	Room 15 visit
+  picked	Script 113	+0x0037	Room 16 visit
+  picked	Script 113	+0x0037	Room 17 visit
+  picked	Script 113	+0x0037	Room 18 visit
+  picked	Script 113	+0x0037	Room 19 visit
+  picked	Script 113	+0x0037	Room 20 visit
+  picked	Script 113	+0x0037	Room 22 visit
+  picked	Script 113	+0x0037	Room 23 visit
+  picked	Script 113	+0x0037	Room 24 visit
+  picked	Script 113	+0x0037	Room 25 visit
+  picked	Script 113	+0x0037	Room 26 visit
+  picked	Script 113	+0x0037	Room 27 visit
+  picked	Script 113	+0x0037	Room 28 visit
+  picked	Script 113	+0x0037	Room 29 visit
+  picked	Script 113	+0x0037	Room 30 visit
+  picked	Script 113	+0x0037	Room 31 visit
+  picked	Script 113	+0x0037	Room 32 visit
+  picked	Script 113	+0x0037	Room 33 visit
+  picked	Script 113	+0x0037	Room 34 visit
+  picked	Script 113	+0x0037	Room 35 visit
+  picked	Script 113	+0x0037	Room 36 visit
+  picked	Script 113	+0x0037	Room 37 visit
+  picked	Script 113	+0x0037	Room 38 visit
+  picked	Script 113	+0x0037	Room 39 visit
+  picked	Script 113	+0x0037	Room 40 visit
+  picked	Script 113	+0x0037	Room 41 visit
+  picked	Script 113	+0x0037	Room 42 visit
+  picked	Script 113	+0x0037	Room 43 visit
+  picked	Script 113	+0x0037	Room 44 visit
+  picked	Script 113	+0x0037	Room 45 visit
+  picked	Script 113	+0x0037	Room 46 visit
+  picked	Script 113	+0x0037	Room 47 visit
+  picked	Script 113	+0x0037	Room 49 visit
+  picked	Script 113	+0x0037	Room 50 visit
+  picked	Script 113	+0x0037	Room 51 visit
+  picked	Script 113	+0x0037	Room 52 visit
+  picked	Script 113	+0x0037	Room 53 visit
+  picked	Script 113	+0x0037	Room 54 visit
+  picked	Script 113	+0x0037	Room 55 visit
+  picked	Script 113	+0x0037	Room 56 visit
+  picked	Script 113	+0x0037	Room 57 visit
+  picked	Script 113	+0x0037	Room 58 visit
+  picked	Script 113	+0x0037	Room 59 visit
+  picked	Script 113	+0x0037	Room 60 visit
+  picked	Script 113	+0x0037	Room 61 visit
+  picked	Script 113	+0x0037	Room 62 visit
+  picked	Script 113	+0x0037	Room 63 visit
+  picked	Script 113	+0x0037	Room 64 visit
+  picked	Script 113	+0x0037	Room 65 visit
+  picked	Script 113	+0x0037	Room 66 visit
+  picked	Script 113	+0x0037	Room 67 visit
+  picked	Script 113	+0x0037	Room 68 visit
+  picked	Script 113	+0x0037	Room 69 visit
+  picked	Script 113	+0x0037	Room 70 visit
+  picked	Script 113	+0x0037	Room 79 visit
+  picked	Script 113	+0x0037	Room 81 visit
+  picked	Script 113	+0x0037	Room 82 visit
+  picked	Script 113	+0x0037	Room 83 visit
+  picked	Script 113	+0x0037	Room 84 visit
+  picked	Script 113	+0x0037	Room 85 visit
+  picked	Script 113	+0x0037	Room 86 visit
+  picked	Script 113	+0x0037	Room 87 visit
+  picked	Script 114	+0x0047	Room 01 visit
+  picked	Script 114	+0x0047	Room 02 visit
+  picked	Script 114	+0x0047	Room 03 visit
+  picked	Script 114	+0x0047	Room 04 visit
+  picked	Script 114	+0x0047	Room 05 visit
+  picked	Script 114	+0x0047	Room 06 visit
+  picked	Script 114	+0x0047	Room 07 visit
+  picked	Script 114	+0x0047	Room 08 visit
+  picked	Script 114	+0x0047	Room 09 visit
+  picked	Script 114	+0x0047	Room 10 visit
+  picked	Script 114	+0x0047	Room 11 visit
+  picked	Script 114	+0x0047	Room 12 visit
+  picked	Script 114	+0x0047	Room 13 visit
+  picked	Script 114	+0x0047	Room 14 visit
+  picked	Script 114	+0x0047	Room 15 visit
+  picked	Script 114	+0x0047	Room 16 visit
+  picked	Script 114	+0x0047	Room 17 visit
+  picked	Script 114	+0x0047	Room 18 visit
+  picked	Script 114	+0x0047	Room 19 visit
+  picked	Script 114	+0x0047	Room 20 visit
+  picked	Script 114	+0x0047	Room 22 visit
+  picked	Script 114	+0x0047	Room 23 visit
+  picked	Script 114	+0x0047	Room 24 visit
+  picked	Script 114	+0x0047	Room 25 visit
+  picked	Script 114	+0x0047	Room 26 visit
+  picked	Script 114	+0x0047	Room 27 visit
+  picked	Script 114	+0x0047	Room 28 visit
+  picked	Script 114	+0x0047	Room 29 visit
+  picked	Script 114	+0x0047	Room 30 visit
+  picked	Script 114	+0x0047	Room 31 visit
+  picked	Script 114	+0x0047	Room 32 visit
+  picked	Script 114	+0x0047	Room 33 visit
+  picked	Script 114	+0x0047	Room 34 visit
+  picked	Script 114	+0x0047	Room 35 visit
+  picked	Script 114	+0x0047	Room 36 visit
+  picked	Script 114	+0x0047	Room 37 visit
+  picked	Script 114	+0x0047	Room 38 visit
+  picked	Script 114	+0x0047	Room 39 visit
+  picked	Script 114	+0x0047	Room 40 visit
+  picked	Script 114	+0x0047	Room 41 visit
+  picked	Script 114	+0x0047	Room 42 visit
+  picked	Script 114	+0x0047	Room 43 visit
+  picked	Script 114	+0x0047	Room 44 visit
+  picked	Script 114	+0x0047	Room 45 visit
+  picked	Script 114	+0x0047	Room 46 visit
+  picked	Script 114	+0x0047	Room 47 visit
+  picked	Script 114	+0x0047	Room 49 visit
+  picked	Script 114	+0x0047	Room 50 visit
+  picked	Script 114	+0x0047	Room 51 visit
+  picked	Script 114	+0x0047	Room 52 visit
+  picked	Script 114	+0x0047	Room 53 visit
+  picked	Script 114	+0x0047	Room 54 visit
+  picked	Script 114	+0x0047	Room 55 visit
+  picked	Script 114	+0x0047	Room 56 visit
+  picked	Script 114	+0x0047	Room 57 visit
+  picked	Script 114	+0x0047	Room 58 visit
+  picked	Script 114	+0x0047	Room 59 visit
+  picked	Script 114	+0x0047	Room 60 visit
+  picked	Script 114	+0x0047	Room 61 visit
+  picked	Script 114	+0x0047	Room 62 visit
+  picked	Script 114	+0x0047	Room 63 visit
+  picked	Script 114	+0x0047	Room 64 visit
+  picked	Script 114	+0x0047	Room 65 visit
+  picked	Script 114	+0x0047	Room 66 visit
+  picked	Script 114	+0x0047	Room 67 visit
+  picked	Script 114	+0x0047	Room 68 visit
+  picked	Script 114	+0x0047	Room 69 visit
+  picked	Script 114	+0x0047	Room 70 visit
+  picked	Script 114	+0x0047	Room 79 visit
+  picked	Script 114	+0x0047	Room 81 visit
+  picked	Script 114	+0x0047	Room 82 visit
+  picked	Script 114	+0x0047	Room 83 visit
+  picked	Script 114	+0x0047	Room 84 visit
+  picked	Script 114	+0x0047	Room 85 visit
+  picked	Script 114	+0x0047	Room 86 visit
+  picked	Script 114	+0x0047	Room 87 visit
+  picked	Script 42	+0x0026	Room 01 visit
+  picked	Script 42	+0x0026	Room 02 visit
+  picked	Script 42	+0x0026	Room 03 visit
+  picked	Script 42	+0x0026	Room 04 visit
+  picked	Script 42	+0x0026	Room 05 visit
+  picked	Script 42	+0x0026	Room 06 visit
+  picked	Script 42	+0x0026	Room 07 visit
+  picked	Script 42	+0x0026	Room 08 visit
+  picked	Script 42	+0x0026	Room 09 visit
+  picked	Script 42	+0x0026	Room 10 visit
+  picked	Script 42	+0x0026	Room 11 visit
+  picked	Script 42	+0x0026	Room 12 visit
+  picked	Script 42	+0x0026	Room 13 visit
+  picked	Script 42	+0x0026	Room 14 visit
+  picked	Script 42	+0x0026	Room 15 visit
+  picked	Script 42	+0x0026	Room 16 visit
+  picked	Script 42	+0x0026	Room 17 visit
+  picked	Script 42	+0x0026	Room 18 visit
+  picked	Script 42	+0x0026	Room 19 visit
+  picked	Script 42	+0x0026	Room 20 visit
+  picked	Script 42	+0x0026	Room 22 visit
+  picked	Script 42	+0x0026	Room 23 visit
+  picked	Script 42	+0x0026	Room 24 visit
+  picked	Script 42	+0x0026	Room 25 visit
+  picked	Script 42	+0x0026	Room 26 visit
+  picked	Script 42	+0x0026	Room 27 visit
+  picked	Script 42	+0x0026	Room 28 visit
+  picked	Script 42	+0x0026	Room 29 visit
+  picked	Script 42	+0x0026	Room 30 visit
+  picked	Script 42	+0x0026	Room 31 visit
+  picked	Script 42	+0x0026	Room 32 visit
+  picked	Script 42	+0x0026	Room 33 visit
+  picked	Script 42	+0x0026	Room 34 visit
+  picked	Script 42	+0x0026	Room 35 visit
+  picked	Script 42	+0x0026	Room 36 visit
+  picked	Script 42	+0x0026	Room 37 visit
+  picked	Script 42	+0x0026	Room 38 visit
+  picked	Script 42	+0x0026	Room 39 visit
+  picked	Script 42	+0x0026	Room 40 visit
+  picked	Script 42	+0x0026	Room 41 visit
+  picked	Script 42	+0x0026	Room 42 visit
+  picked	Script 42	+0x0026	Room 43 visit
+  picked	Script 42	+0x0026	Room 44 visit
+  picked	Script 42	+0x0026	Room 45 visit
+  picked	Script 42	+0x0026	Room 46 visit
+  picked	Script 42	+0x0026	Room 47 visit
+  picked	Script 42	+0x0026	Room 49 visit
+  picked	Script 42	+0x0026	Room 50 visit
+  picked	Script 42	+0x0026	Room 51 visit
+  picked	Script 42	+0x0026	Room 52 visit
+  picked	Script 42	+0x0026	Room 53 visit
+  picked	Script 42	+0x0026	Room 54 visit
+  picked	Script 42	+0x0026	Room 55 visit
+  picked	Script 42	+0x0026	Room 56 visit
+  picked	Script 42	+0x0026	Room 57 visit
+  picked	Script 42	+0x0026	Room 58 visit
+  picked	Script 42	+0x0026	Room 59 visit
+  picked	Script 42	+0x0026	Room 60 visit
+  picked	Script 42	+0x0026	Room 61 visit
+  picked	Script 42	+0x0026	Room 62 visit
+  picked	Script 42	+0x0026	Room 63 visit
+  picked	Script 42	+0x0026	Room 64 visit
+  picked	Script 42	+0x0026	Room 65 visit
+  picked	Script 42	+0x0026	Room 66 visit
+  picked	Script 42	+0x0026	Room 67 visit
+  picked	Script 42	+0x0026	Room 68 visit
+  picked	Script 42	+0x0026	Room 69 visit
+  picked	Script 42	+0x0026	Room 70 visit
+  picked	Script 42	+0x0026	Room 79 visit
+  picked	Script 42	+0x0026	Room 81 visit
+  picked	Script 42	+0x0026	Room 82 visit
+  picked	Script 42	+0x0026	Room 83 visit
+  picked	Script 42	+0x0026	Room 84 visit
+  picked	Script 42	+0x0026	Room 85 visit
+  picked	Script 42	+0x0026	Room 86 visit
+  picked	Script 42	+0x0026	Room 87 visit
+  picked	Script 42	+0x004F	Room 01 visit
+  picked	Script 42	+0x004F	Room 02 visit
+  picked	Script 42	+0x004F	Room 03 visit
+  picked	Script 42	+0x004F	Room 04 visit
+  picked	Script 42	+0x004F	Room 05 visit
+  picked	Script 42	+0x004F	Room 06 visit
+  picked	Script 42	+0x004F	Room 07 visit
+  picked	Script 42	+0x004F	Room 08 visit
+  picked	Script 42	+0x004F	Room 09 visit
+  picked	Script 42	+0x004F	Room 10 visit
+  picked	Script 42	+0x004F	Room 11 visit
+  picked	Script 42	+0x004F	Room 12 visit
+  picked	Script 42	+0x004F	Room 13 visit
+  picked	Script 42	+0x004F	Room 14 visit
+  picked	Script 42	+0x004F	Room 15 visit
+  picked	Script 42	+0x004F	Room 16 visit
+  picked	Script 42	+0x004F	Room 17 visit
+  picked	Script 42	+0x004F	Room 18 visit
+  picked	Script 42	+0x004F	Room 19 visit
+  picked	Script 42	+0x004F	Room 20 visit
+  picked	Script 42	+0x004F	Room 22 visit
+  picked	Script 42	+0x004F	Room 23 visit
+  picked	Script 42	+0x004F	Room 24 visit
+  picked	Script 42	+0x004F	Room 25 visit
+  picked	Script 42	+0x004F	Room 26 visit
+  picked	Script 42	+0x004F	Room 27 visit
+  picked	Script 42	+0x004F	Room 28 visit
+  picked	Script 42	+0x004F	Room 29 visit
+  picked	Script 42	+0x004F	Room 30 visit
+  picked	Script 42	+0x004F	Room 31 visit
+  picked	Script 42	+0x004F	Room 32 visit
+  picked	Script 42	+0x004F	Room 33 visit
+  picked	Script 42	+0x004F	Room 34 visit
+  picked	Script 42	+0x004F	Room 35 visit
+  picked	Script 42	+0x004F	Room 36 visit
+  picked	Script 42	+0x004F	Room 37 visit
+  picked	Script 42	+0x004F	Room 38 visit
+  picked	Script 42	+0x004F	Room 39 visit
+  picked	Script 42	+0x004F	Room 40 visit
+  picked	Script 42	+0x004F	Room 41 visit
+  picked	Script 42	+0x004F	Room 42 visit
+  picked	Script 42	+0x004F	Room 43 visit
+  picked	Script 42	+0x004F	Room 44 visit
+  picked	Script 42	+0x004F	Room 45 visit
+  picked	Script 42	+0x004F	Room 46 visit
+  picked	Script 42	+0x004F	Room 47 visit
+  picked	Script 42	+0x004F	Room 49 visit
+  picked	Script 42	+0x004F	Room 50 visit
+  picked	Script 42	+0x004F	Room 51 visit
+  picked	Script 42	+0x004F	Room 52 visit
+  picked	Script 42	+0x004F	Room 53 visit
+  picked	Script 42	+0x004F	Room 54 visit
+  picked	Script 42	+0x004F	Room 55 visit
+  picked	Script 42	+0x004F	Room 56 visit
+  picked	Script 42	+0x004F	Room 57 visit
+  picked	Script 42	+0x004F	Room 58 visit
+  picked	Script 42	+0x004F	Room 59 visit
+  picked	Script 42	+0x004F	Room 60 visit
+  picked	Script 42	+0x004F	Room 61 visit
+  picked	Script 42	+0x004F	Room 62 visit
+  picked	Script 42	+0x004F	Room 63 visit
+  picked	Script 42	+0x004F	Room 64 visit
+  picked	Script 42	+0x004F	Room 65 visit
+  picked	Script 42	+0x004F	Room 66 visit
+  picked	Script 42	+0x004F	Room 67 visit
+  picked	Script 42	+0x004F	Room 68 visit
+  picked	Script 42	+0x004F	Room 69 visit
+  picked	Script 42	+0x004F	Room 70 visit
+  picked	Script 42	+0x004F	Room 79 visit
+  picked	Script 42	+0x004F	Room 81 visit
+  picked	Script 42	+0x004F	Room 82 visit
+  picked	Script 42	+0x004F	Room 83 visit
+  picked	Script 42	+0x004F	Room 84 visit
+  picked	Script 42	+0x004F	Room 85 visit
+  picked	Script 42	+0x004F	Room 86 visit
+  picked	Script 42	+0x004F	Room 87 visit

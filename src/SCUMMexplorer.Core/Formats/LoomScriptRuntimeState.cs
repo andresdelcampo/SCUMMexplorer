@@ -51,6 +51,13 @@ public sealed class LoomScriptRuntimeState
     public (int Min, int Max)? CameraRange { get; set; }
     /// <summary>Half a screen from each edge of the current room: the widest camera limits (<c>cameraMoved</c>).</summary>
     public (int Min, int Max)? RoomCameraBounds { get; set; }
+    /// <summary>
+    /// The virtual mouse the session put in <c>var[0x014]</c>/<c>var[0x015]</c>
+    /// (ScummVM <c>VAR_VIRT_MOUSE_X/Y</c>) this frame, and the input assumption
+    /// behind it; null outside a session room.
+    /// </summary>
+    public (int X, int Y)? VirtualMouse { get; set; }
+    public string? VirtualMouseAssumption { get; set; }
     /// <summary>The current room's walk boxes (flags as <c>setBoxFlags</c> left them), or null outside a room.</summary>
     public LoomWalkBoxSet? WalkBoxes { get; set; }
     /// <summary>Why the current room's box flags are unknown (a <c>setBoxFlags</c> with an unknown box), or null.</summary>

@@ -14,7 +14,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `var[0x003]` | A message is on screen (`VAR_HAVE_MSG`). Many scripts wait while it is nonzero. | ScummVM |
 | `var[0x004]` | Current room (`VAR_ROOM`) | ScummVM |
 | `var[0x005]` | `VAR_OVERRIDE`: 1 when the player skipped a cutscene; `endCutscene` clears it | ScummVM |
-| `var[0x014]`, `var[0x015]` | Virtual mouse x/y. Script 006 reads them each frame. | ScummVM (reading) |
+| `var[0x014]`, `var[0x015]` | Virtual mouse x/y (`VAR_VIRT_MOUSE_X/Y`, vars 20/21), written by the engine every frame. Script 006 reads them. The session has no pointer and states one: just below the room picture, under the camera (for example (800, 144)), labelled as assumed input. | ScummVM; modelled 27 Sep |
 | `var[0x01C]`–`var[0x01F]` | Room hooks: before entry, after entry, before exit, after exit (`VAR_ENTRY_SCRIPT`, `…2`, `VAR_EXIT_SCRIPT`, `…2`). The boot sets `var[0x01D] = 14` and `var[0x01E] = 15`. | ScummVM; script 001 |
 | `var[0x023]`, `var[0x024]` | Cutscene start and end scripts (`VAR_CUTSCENE_START_SCRIPT`/`END`): 2 and 3 | ScummVM; script 001 +0x017A |
 | `var[0x030]` | Sound card (`VAR_SOUNDCARD`). 0 in the session; scripts branch on 3 and 4 (AdLib, Roland) when choosing sounds. | ScummVM (reading) |
@@ -48,7 +48,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | 001 | Boot | Loads Room 69, waits for `bit[0xD6B]`, sets the hooks, plays script 044, chains to 006. See the [boot validation](../.verification/boot/validation.md). |
 | 002 | Cutscene start hook | Cursor and input off, `freezeScripts 0x7F`, `bit[0xD6E] = 1`, `var[0x005] = 0`; with argument 1, starts script 19 |
 | 003 | Cutscene end hook | Cursor and input on, unfreeze, camera follows ego (+0x0018 `actorFollowCamera var[0x001]`), `bit[0xD6E] = 0`; with argument 1, starts script 18 unless `bit[0xD61]` is set |
-| 006 | Input loop (runs forever) | Reads the mouse (`var[0x014]`/`var[0x015]`), `findObject`, hover verb 0x37, walking, and starts script 007 (verb 0x38 or 0x36). **Not modelled:** it stops at `findObject` +0x0096. |
+| 006 | Input loop (runs forever) | Reads the mouse (`var[0x014]`/`var[0x015]`, movement against `var[0x06E]`/`var[0x06F]`, idle count `var[0x00C]`), `findObject` +0x0096. When an object is found, it sets the hover (`var[0x067]`) and starts script 008; on a click (`local[0]`), it runs verb 0x37, walks the ego and starts script 007 (verb 0x38 or 0x36). With nothing under the pointer it idles (+0x01AA, `breakHere`). The session runs it with the assumed pointer below the room, so it idles (27 Sep). |
 | 007 | Runs a sentence | `startObject obj, verb` when ego is close enough (`getDist ≤ 3`) |
 | 008 | Verb-area close-up | Shows `var[0x068]` through `verbOps 0x36 image` |
 | 014 | After-entry hook | Room-dependent setup; starts script 18 in some rooms |
@@ -107,6 +107,6 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 
 1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown, mostly the ego after a catalog visit. `getActorCostume`, `getActorElevation`, walk timing and paths, and step-by-step camera movement are not modelled.
 2. `verbOps`: verb-bar setup (Room 01 local 211 on the boot route).
-3. `findObject`: needs a mouse position; the input loop (script 006) depends on it.
+3. A real pointer: `findObject` is modelled, but the session's pointer is an assumed rest position below the room, so hover and click paths in script 006 are not exercised.
 4. `startScript` with a dynamic target (a variable that is not known).
 5. `expression` in some forms.
