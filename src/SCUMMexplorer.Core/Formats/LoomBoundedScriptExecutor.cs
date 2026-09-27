@@ -218,6 +218,7 @@ public sealed class LoomBoundedScriptExecutor
                     break;
                 }
                 states[(int)objectId] = (byte)state;
+                runtime?.StatesSetInRoom.Add((int)objectId);
                 // o5_setState marks the rectangle dirty and clears the draw queue.
                 drawQueue.Clear();
                 trace.Add($"object {objectId} set to state {state}");

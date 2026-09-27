@@ -19,3 +19,4 @@ Exe/
 # Generated verification output
 .verification/verify.log
 .verification/room-audit/*.bmp
+.verification/fallback-evidence/code.tsv

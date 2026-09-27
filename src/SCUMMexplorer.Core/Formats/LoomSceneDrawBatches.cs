@@ -15,6 +15,10 @@ namespace SCUMMexplorer.Core.Formats;
 /// it (LOOM script 68 shows Room 56 as 779 and 782, and only later as 781). These
 /// batches are static candidates used to close gaps; they do not prove which
 /// branch runs.
+/// The same scan also finds interface images: objects whose image a
+/// <c>verbOps ... image</c> call shows in the verb area below the room (LOOM's
+/// distaff and the close-up of the selected object). ScummVM copies such an
+/// image into a verb (<c>setVerbObject</c>); it is not room artwork.
 /// </summary>
 public sealed class LoomSceneDrawBatches
 {
@@ -23,11 +27,41 @@ public sealed class LoomSceneDrawBatches
     public const int OtherScriptPriority = 1;
 
     private static readonly Regex Literal = new(@"^0x(?<value>[0-9A-Fa-f]+)$", RegexOptions.CultureInvariant);
+    private static readonly Regex VerbImage = new(@"image, (?<operand>0x[0-9A-Fa-f]+|var\[0x[0-9A-Fa-f]+\])",
+        RegexOptions.CultureInvariant);
+    private static readonly Regex LiteralAssignment = new(@"^(?<variable>var\[0x[0-9A-Fa-f]+\]) = 0x(?<value>[0-9A-Fa-f]+)$",
+        RegexOptions.CultureInvariant);
+    private static readonly Regex BranchTarget = new(@"->\s*0x(?<target>[0-9A-Fa-f]+)", RegexOptions.CultureInvariant);
     private readonly IReadOnlyDictionary<int, IReadOnlyList<RoomDrawBatch>> _byRoom;
+    private readonly IReadOnlyDictionary<int, IReadOnlyDictionary<int, RoomStateEvidence>> _entryStates;
 
-    private LoomSceneDrawBatches(IReadOnlyDictionary<int, IReadOnlyList<RoomDrawBatch>> byRoom) => _byRoom = byRoom;
+    private LoomSceneDrawBatches(IReadOnlyDictionary<int, IReadOnlyList<RoomDrawBatch>> byRoom,
+        IReadOnlyDictionary<int, string> interfaceImages,
+        IReadOnlyDictionary<int, IReadOnlyDictionary<int, RoomStateEvidence>> entryStates)
+    {
+        _byRoom = byRoom;
+        InterfaceImages = interfaceImages;
+        _entryStates = entryStates;
+    }
 
-    public static LoomSceneDrawBatches Empty { get; } = new(new Dictionary<int, IReadOnlyList<RoomDrawBatch>>());
+    public static LoomSceneDrawBatches Empty { get; } = new(new Dictionary<int, IReadOnlyList<RoomDrawBatch>>(),
+        new Dictionary<int, string>(), new Dictionary<int, IReadOnlyDictionary<int, RoomStateEvidence>>());
+
+    /// <summary>
+    /// States that a room's entry script sets on every path through it (see
+    /// <see cref="FindUnavoidableStates"/>), keyed by object.
+    /// </summary>
+    public IReadOnlyDictionary<int, RoomStateEvidence> EntryStatesForRoom(int roomId) =>
+        _entryStates.TryGetValue(roomId, out var states) ? states : new Dictionary<int, RoomStateEvidence>();
+
+    /// <summary>
+    /// Objects whose image decoded code shows as a verb image, with the
+    /// instruction that establishes it. A literal operand names the object
+    /// directly; a global-variable operand names every literal assigned to
+    /// that variable anywhere in decoded code. Local-variable operands are not
+    /// followed.
+    /// </summary>
+    public IReadOnlyDictionary<int, string> InterfaceImages { get; }
 
     public IReadOnlyList<RoomDrawBatch> ForRoom(int roomId) =>
         _byRoom.TryGetValue(roomId, out var batches) ? batches : [];
@@ -56,9 +90,11 @@ public sealed class LoomSceneDrawBatches
         }
 
         var byRoom = new Dictionary<int, List<RoomDrawBatch>>();
+        var decoded = new List<(LoomScriptDisassembly Script, string Source)>();
         void Scan(LoomScriptDisassembly? script, int priority, string source)
         {
             if (script is null) return;
+            decoded.Add((script, source));
             foreach (var (roomId, batch) in ScanScript(script, priority, source, roomByObject))
             {
                 if (!byRoom.TryGetValue(roomId, out var list)) byRoom[roomId] = list = [];
@@ -73,9 +109,19 @@ public sealed class LoomSceneDrawBatches
         }
 
         var globalCount = ReadGlobalScriptCount(game);
+        var entryStates = new Dictionary<int, IReadOnlyDictionary<int, RoomStateEvidence>>();
         foreach (var (roomId, (room, records, bytes)) in roomRecords)
         {
-            try { Scan(reader.DecodeRoomEntry(room), EntryScriptPriority, $"Room {roomId:00} entry script"); }
+            try
+            {
+                var entry = reader.DecodeRoomEntry(room);
+                Scan(entry, EntryScriptPriority, $"Room {roomId:00} entry script");
+                if (entry is not null)
+                {
+                    var states = FindUnavoidableStates(entry, $"Room {roomId:00} entry script");
+                    if (states.Count > 0) entryStates[roomId] = states;
+                }
+            }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
             foreach (var localId in ReadLocalScriptIds(bytes, globalCount))
             {
@@ -99,7 +145,112 @@ public sealed class LoomSceneDrawBatches
         }
 
         return new LoomSceneDrawBatches(byRoom.ToDictionary(pair => pair.Key,
-            pair => (IReadOnlyList<RoomDrawBatch>)pair.Value));
+            pair => (IReadOnlyList<RoomDrawBatch>)pair.Value), FindInterfaceImages(decoded), entryStates);
+    }
+
+    /// <summary>
+    /// Finds literal <c>setState</c> calls that every control path from the
+    /// start of the script to its end must pass, so they hold whichever branch
+    /// runs. An object qualifies only when the script sets it exactly once; a
+    /// <c>setState</c> with a variable object makes the whole script ineligible.
+    /// A path ends at <c>stopObjectCode</c>, <c>stopScript 0x00</c>,
+    /// <c>chainScript</c>, the end of the code or an unreadable branch target.
+    /// This is static evidence for the state right after the script, not proof
+    /// that later scripts leave it unchanged.
+    /// </summary>
+    internal static IReadOnlyDictionary<int, RoomStateEvidence> FindUnavoidableStates(LoomScriptDisassembly script,
+        string source)
+    {
+        var result = new Dictionary<int, RoomStateEvidence>();
+        var instructions = script.Instructions;
+        var sets = new List<(int Index, int ObjectId, int State)>();
+        for (var index = 0; index < instructions.Count; index++)
+        {
+            if (instructions[index].Operation != "setState") continue;
+            var parts = instructions[index].Operands.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length < 2 || !TryReadLiteral(parts[0], out var objectId) ||
+                !TryReadLiteral(parts[1], out var state) || state > byte.MaxValue)
+                return result;
+            sets.Add((index, objectId, state));
+        }
+        if (sets.Count == 0) return result;
+
+        var indexByOffset = new Dictionary<int, int>();
+        for (var index = 0; index < instructions.Count; index++) indexByOffset[instructions[index].Offset] = index;
+
+        // Successor indices; -1 is an exit.
+        IEnumerable<int> Next(int index)
+        {
+            var instruction = instructions[index];
+            if (instruction.Operation is "stopObjectCode" or "chainScript" ||
+                instruction.Operation == "stopScript" && TryReadLiteral(instruction.Operands, out var stopped) && stopped == 0)
+            {
+                yield return -1;
+                yield break;
+            }
+            var match = BranchTarget.Match(instruction.Operands);
+            var target = match.Success && indexByOffset.TryGetValue(
+                int.Parse(match.Groups["target"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture), out var found)
+                ? found : -1;
+            if (instruction.Operation == "jumpRelative")
+            {
+                yield return target;
+                yield break;
+            }
+            yield return index + 1 < instructions.Count ? index + 1 : -1;
+            if (instruction.Operands.Contains("branch", StringComparison.Ordinal)) yield return target;
+        }
+
+        bool ExitReachableAvoiding(int avoided)
+        {
+            var seen = new HashSet<int>();
+            var work = new Stack<int>();
+            work.Push(0);
+            while (work.Count > 0)
+            {
+                var index = work.Pop();
+                if (index == -1) return true;
+                if (index == avoided || !seen.Add(index)) continue;
+                foreach (var next in Next(index)) work.Push(next);
+            }
+            return false;
+        }
+
+        foreach (var group in sets.GroupBy(item => item.ObjectId).Where(group => group.Count() == 1))
+        {
+            var (index, objectId, state) = group.Single();
+            if (!ExitReachableAvoiding(index))
+                result[objectId] = new RoomStateEvidence((byte)state,
+                    $"{source} +0x{instructions[index].Offset:X4} sets it to {state} on every path");
+        }
+        return result;
+    }
+
+    internal static IReadOnlyDictionary<int, string> FindInterfaceImages(
+        IReadOnlyList<(LoomScriptDisassembly Script, string Source)> sources)
+    {
+        var found = new Dictionary<int, string>();
+        var variables = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var (script, source) in sources)
+            foreach (var instruction in script.Instructions.Where(item => item.Operation == "verbOps"))
+                foreach (Match match in VerbImage.Matches(instruction.Operands))
+                {
+                    var operand = match.Groups["operand"].Value;
+                    var where = $"verbOps image in {source} +0x{instruction.Offset:X4}";
+                    if (TryReadLiteral(operand, out var id)) found.TryAdd(id, where);
+                    else variables.TryAdd(operand, where);
+                }
+        if (variables.Count == 0) return found;
+        foreach (var (script, source) in sources)
+            foreach (var instruction in script.Instructions.Where(item => item.Operation == "move"))
+            {
+                var match = LiteralAssignment.Match(instruction.Operands.Trim());
+                if (!match.Success || !variables.TryGetValue(match.Groups["variable"].Value, out var shownBy)) continue;
+                var id = int.Parse(match.Groups["value"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                if (id != 0)
+                    found.TryAdd(id, $"{match.Groups["variable"].Value} set in {source} +0x{instruction.Offset:X4}, shown by {shownBy}");
+            }
+        return found;
     }
 
     internal static IEnumerable<(int RoomId, RoomDrawBatch Batch)> ScanScript(LoomScriptDisassembly script,

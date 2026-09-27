@@ -12,6 +12,9 @@ public readonly record struct RoomDrawStep(int ObjectId, int? X = null, int? Y =
 /// </summary>
 public sealed record RoomDrawBatch(IReadOnlyList<RoomDrawStep> Steps, int Priority, string Source);
 
+/// <summary>An object state that static script evidence establishes, with that evidence.</summary>
+public readonly record struct RoomStateEvidence(byte State, string Source);
+
 /// <summary>An image shown to close a gap that the reached script state left open.</summary>
 public sealed record RoomArtworkEstimate(int ObjectId, string Reason);
 
@@ -46,6 +49,7 @@ public sealed class RoomObjectSelection
     private readonly RoomImage? _background;
     private readonly List<int> _drawQueue = [];
     private readonly Dictionary<int, double> _blackFractions = [];
+    private readonly HashSet<int> _interfaceImages = [];
     private IReadOnlyList<RoomDrawBatch> _batches = [];
     private int _seed;
 
@@ -122,6 +126,17 @@ public sealed class RoomObjectSelection
         return true;
     }
 
+    /// <summary>
+    /// Marks images that decoded code shows only in the verb area below the
+    /// room (see <c>LoomSceneDrawBatches.InterfaceImages</c>). They are never
+    /// used to estimate room artwork, their rectangles are not room gaps, and
+    /// a click on empty background does not reach them. Reached state still
+    /// paints them, as SCUMM's room redraw would.
+    /// </summary>
+    public void ExcludeInterfaceImages(IEnumerable<int> objectIds) => _interfaceImages.UnionWith(objectIds);
+
+    private bool IsRoomArtwork(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) && ParentStateMatches(obj);
+
     public bool HasAlternatives(RoomObjectImage obj) => Peers(obj).Count(ParentStateMatches) > 1;
 
     /// <summary>
@@ -180,16 +195,27 @@ public sealed class RoomObjectSelection
     /// their first stored image. Cut-outs opened by these images are then
     /// closed as in <see cref="FillGaps"/>. This is a viewer fallback, not a
     /// SCUMM state transition; every image it shows is returned with its source.
+    /// Interface images are never shown. A position whose state reached code
+    /// set (<paramref name="statesSetByCode"/>) is still shown from a batch,
+    /// because that draw may run after the reached <c>setState</c> (script 106
+    /// sets Room 02's 157 to 0 on entry and then draws it in the opening
+    /// frame), but it never gets the first-stored-image guess. A position no
+    /// batch covers next takes a state its room's entry script sets on every
+    /// path (<paramref name="entryStates"/>): a nonzero state shows that image,
+    /// a zero state leaves the position empty. Only then does the first stored
+    /// image apply.
     /// </summary>
     public IReadOnlyList<RoomArtworkEstimate> ShowUnresolvedArtwork(IReadOnlyList<RoomDrawBatch>? batches = null,
-        int seed = 0)
+        int seed = 0, IReadOnlyCollection<int>? statesSetByCode = null,
+        IReadOnlyDictionary<int, RoomStateEvidence>? entryStates = null)
     {
         _batches = batches ?? _batches;
         _seed = seed;
         var estimates = new List<RoomArtworkEstimate>();
         var random = new Random(seed);
 
-        bool Open(RoomObjectImage obj) => !Peers(obj).Any(IsActive) &&
+        bool Open(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) &&
+                                          !Peers(obj).Any(IsActive) &&
                                           !_objects.Any(other => IsActive(other) && Intersects(obj, other));
 
         // Strongest evidence first: each round shows the empty position whose
@@ -204,7 +230,7 @@ public sealed class RoomObjectSelection
             foreach (var obj in _objects)
             {
                 if (skipped.Contains(Rect(obj)) || !Open(obj)) continue;
-                var members = Peers(obj).Where(ParentStateMatches).Select(peer => peer.Id).ToHashSet();
+                var members = Peers(obj).Where(IsRoomArtwork).Select(peer => peer.Id).ToHashSet();
                 var group = _batches.Where(item => item.Steps.Any(step => members.Contains(step.ObjectId)))
                     .GroupBy(item => item.Priority).OrderByDescending(items => items.Key)
                     .Select(items => items.OrderBy(item => item.Source, StringComparer.Ordinal).ToArray())
@@ -221,7 +247,7 @@ public sealed class RoomObjectSelection
             foreach (var step in chosen.Steps)
             {
                 var obj = _objects.FirstOrDefault(item => item.Id == step.ObjectId);
-                if (obj is null || !ParentStateMatches(obj)) continue;
+                if (obj is null || !IsRoomArtwork(obj)) continue;
                 // As in FillGaps: keep what is already visible elsewhere.
                 if (!bestMembers.Contains(obj.Id) && Peers(obj).Any(IsActive)) continue;
                 if (!DrawObject(obj.Id, step.X, step.Y)) continue;
@@ -235,7 +261,19 @@ public sealed class RoomObjectSelection
 
         foreach (var obj in _objects)
         {
-            if (!Open(obj)) continue;
+            if (!Open(obj) || Peers(obj).Any(peer => statesSetByCode?.Contains(peer.Id) == true)) continue;
+            var evidence = entryStates is null ? [] : Peers(obj).Where(peer => entryStates.ContainsKey(peer.Id)).ToArray();
+            if (evidence.Length > 0)
+            {
+                foreach (var peer in evidence.Where(peer => (entryStates![peer.Id].State & 0x0F) != 0 && IsRoomArtwork(peer)))
+                {
+                    _states[peer.Id] = entryStates![peer.Id].State;
+                    _knownStates.Add(peer.Id);
+                    if (IsActive(peer)) estimates.Add(new RoomArtworkEstimate(peer.Id, entryStates[peer.Id].Source));
+                    else _states[peer.Id] = 0;
+                }
+                continue;
+            }
             _states[obj.Id] = 1;
             if (IsActive(obj)) estimates.Add(new RoomArtworkEstimate(obj.Id, FirstStoredImageReason));
             else _states[obj.Id] = 0;
@@ -293,7 +331,7 @@ public sealed class RoomObjectSelection
                 foreach (var step in chosen.Steps)
                 {
                     var obj = _objects.FirstOrDefault(item => item.Id == step.ObjectId);
-                    if (obj is null || !ParentStateMatches(obj)) continue;
+                    if (obj is null || !IsRoomArtwork(obj)) continue;
                     // Keep reached state elsewhere: only fill this gap or
                     // positions that currently show nothing.
                     if (!memberIds.Contains(obj.Id) && Peers(obj).Any(IsActive)) continue;
@@ -303,7 +341,7 @@ public sealed class RoomObjectSelection
                 if (gap.Any(IsActive)) continue;
             }
 
-            var candidates = gap.Where(obj => ParentStateMatches(obj) && BlackFraction(obj) <= CandidateMaxBlack).ToArray();
+            var candidates = gap.Where(obj => IsRoomArtwork(obj) && BlackFraction(obj) <= CandidateMaxBlack).ToArray();
             if (candidates.Length == 0) continue;
             var pick = candidates[random.Next(candidates.Length)];
             if (DrawObject(pick.Id))
@@ -317,10 +355,10 @@ public sealed class RoomObjectSelection
     {
         if (_background is null) return [];
         var composite = Compose(_background);
-        return _objects.GroupBy(Rect)
+        return _objects.Where(obj => !_interfaceImages.Contains(obj.Id)).GroupBy(Rect)
             .Where(group => IsGap(composite, group.Key))
             .Select(group => new RoomGap(group.Key.X, group.Key.Y, group.Key.Width, group.Key.Height,
-                group.Any(obj => ParentStateMatches(obj) && BlackFraction(obj) <= CandidateMaxBlack)))
+                group.Any(obj => IsRoomArtwork(obj) && BlackFraction(obj) <= CandidateMaxBlack)))
             .ToArray();
     }
 
@@ -337,7 +375,7 @@ public sealed class RoomObjectSelection
                                        rect.Item1 + rect.Item3 > area.X + area.Width ||
                                        rect.Item2 + rect.Item4 > area.Y + area.Height)) continue;
             var members = group.ToList();
-            if (!members.Any(obj => ParentStateMatches(obj) && BlackFraction(obj) <= CandidateMaxBlack)) continue;
+            if (!members.Any(obj => IsRoomArtwork(obj) && BlackFraction(obj) <= CandidateMaxBlack)) continue;
             if (!IsGap(composite, rect)) continue;
             var size = rect.Item3 * rect.Item4;
             if (size <= bestArea) continue;
@@ -451,7 +489,7 @@ public sealed class RoomObjectSelection
 
         // When the background shows through, the first stored image at that
         // rectangle can still be reached by clicking its recorded bounds.
-        return _objects.FirstOrDefault(obj => ParentStateMatches(obj) && Contains(obj, x, y));
+        return _objects.FirstOrDefault(obj => IsRoomArtwork(obj) && Contains(obj, x, y));
     }
 
     public RoomObjectImage? Next(RoomObjectImage current)

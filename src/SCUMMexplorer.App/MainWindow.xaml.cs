@@ -499,7 +499,7 @@ public partial class MainWindow : Window
             var snapshot = visit ? _session.VisitRoom(resource) : _session.Snapshot;
             _objectSelection = new RoomObjectSelection(images, snapshot.ObjectStates,
                 snapshot.ObjectPositions, records, _currentRoom, _indexedStates, snapshot.DrawOrder);
-            if (!snapshot.IsFaithful) CloseArtworkGaps(resource, images);
+            if (!snapshot.IsFaithful) CloseArtworkGaps(resource, images, snapshot.StatesSetByCode);
             var run = _session.LastEntryRun;
             var script = _session.LastEntryScript;
             RoomEntryTraceOutput.Text = (script?.Format() ?? "No embedded entry script.") +
@@ -574,9 +574,11 @@ public partial class MainWindow : Window
     /// a seeded random stored image. If nothing is visible at all, empty
     /// positions are shown from script draw batches with the same priorities,
     /// and only positions no batch covers use their first stored image.
-    /// Estimates stay labelled.
+    /// Estimates stay labelled. Verb-area images are never used, and
+    /// positions whose state reached code set keep it.
     /// </summary>
-    private void CloseArtworkGaps(GameResource resource, IReadOnlyList<RoomObjectImage> images)
+    private void CloseArtworkGaps(GameResource resource, IReadOnlyList<RoomObjectImage> images,
+        IReadOnlyCollection<int>? statesSetByCode = null)
     {
         if (_game is not null && _sceneBatches is null)
         {
@@ -587,9 +589,11 @@ public partial class MainWindow : Window
             }
         }
         var roomId = resource.ResourceId ?? 0;
+        _objectSelection.ExcludeInterfaceImages((_sceneBatches ?? LoomSceneDrawBatches.Empty).InterfaceImages.Keys);
         _artworkEstimates = _objectSelection.FillGaps(_sceneBatches?.ForRoom(roomId), seed: roomId);
         if (!images.Any(_objectSelection.IsActive))
-            _artworkEstimates = [.. _artworkEstimates, .. _objectSelection.ShowUnresolvedArtwork(_sceneBatches?.ForRoom(roomId), seed: roomId)];
+            _artworkEstimates = [.. _artworkEstimates, .. _objectSelection.ShowUnresolvedArtwork(_sceneBatches?.ForRoom(roomId), seed: roomId, statesSetByCode,
+                _sceneBatches?.EntryStatesForRoom(roomId))];
         _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
     }
 

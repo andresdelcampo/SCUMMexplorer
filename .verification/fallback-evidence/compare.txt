@@ -1,0 +1,90 @@
+rooms using the first-stored-image fallback: before 24 ['01', '02', '03', '04', '08', '09', '16', '18', '20', '23', '25', '30', '36', '37', '38', '41', '42', '43', '44', '46', '51', '64', '65', '69']
+                                             after  4 ['01', '04', '20', '30']
+
+Room 01: paint 146,145,144,140,139,138,134,133,132,128,127,126,122,121,120,116,115,114,110,109,108,104,103,100  ->  152
+     interface images (verb area, not room artwork): 100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151
+     fallback 152: first stored image for this position; no decoded script draws it
+Room 02: paint 158,155,157  ->  157
+     interface images (verb area, not room artwork): 158,159
+     state set by reached code: 155=0,157=0
+     fallback 157: opening frame of Room 02 in script 106 +0x03A0
+Room 03: paint 166  ->  (background only)
+     interface images (verb area, not room artwork): 166
+     nothing visible after fallback
+Room 04: paint 190,187,184,181,178  ->  187,184,181,178
+     interface images (verb area, not room artwork): 190,191,192,193,194,195,196,198
+     fallback 178: first stored image for this position; no decoded script draws it
+     fallback 181: first stored image for this position; no decoded script draws it
+     fallback 184: first stored image for this position; no decoded script draws it
+     fallback 187: first stored image for this position; no decoded script draws it
+Room 08: paint 265,264,260,259  ->  (background only)
+     interface images (verb area, not room artwork): 260,261,262,266
+     state set by reached code: 259=0,263=0,264=0,265=0
+     nothing visible after fallback
+Room 09: paint 276  ->  (background only)
+     interface images (verb area, not room artwork): 276,277,278,279,280,281,282
+     nothing visible after fallback
+Room 16: paint 351  ->  (background only)
+     interface images (verb area, not room artwork): 351
+     nothing visible after fallback
+Room 18: paint 375,373  ->  (background only)
+     interface images (verb area, not room artwork): 375,376,377,378
+     nothing visible after fallback
+Room 20: paint 397,396,395,394,393,392  ->  396,395,394,393,392
+     interface images (verb area, not room artwork): 397,398,399
+     fallback 392: first stored image for this position; no decoded script draws it
+     fallback 393: first stored image for this position; no decoded script draws it
+     fallback 394: first stored image for this position; no decoded script draws it
+     fallback 395: first stored image for this position; no decoded script draws it
+     fallback 396: first stored image for this position; no decoded script draws it
+Room 23: paint 428,426  ->  (background only)
+     interface images (verb area, not room artwork): 428
+     state set by reached code: 426=0,427=0
+     nothing visible after fallback
+Room 25: paint 448  ->  (background only)
+     interface images (verb area, not room artwork): 448
+     nothing visible after fallback
+Room 36: paint 600  ->  (background only)
+     state set by reached code: 600=0
+     nothing visible after fallback
+Room 37: paint 608,606,605  ->  (background only)
+     interface images (verb area, not room artwork): 606,607
+     state set by reached code: 605=0,608=0
+     nothing visible after fallback
+Room 38: paint 619,614  ->  614
+     interface images (verb area, not room artwork): 619,620,621,622
+     fallback 614: opening frame of Room 38 in script 86 +0x0549
+Room 41: paint 635  ->  (background only)
+     interface images (verb area, not room artwork): 635,636
+     nothing visible after fallback
+Room 42: paint 638,637  ->  (background only)
+     state set by reached code: 637=0,638=0
+     nothing visible after fallback
+Room 43: paint 647,644,645  ->  645
+     interface images (verb area, not room artwork): 647,648,649,651
+     state set by reached code: 644=0,645=0
+     fallback 645: script 91 +0x009C
+Room 44: paint 654  ->  (background only)
+     interface images (verb area, not room artwork): 654
+     nothing visible after fallback
+Room 46: paint 691,686  ->  686
+     interface images (verb area, not room artwork): 691,692,693,694
+     fallback 686: Room 46 entry script +0x0111
+Room 51: paint 762,744,745,746,753,754,755  ->  744,745,746,753,754,755
+     interface images (verb area, not room artwork): 762,763
+     fallback 744: Room 51 local script 200 +0x0000
+     fallback 745: Room 51 local script 200 +0x0000
+     fallback 746: Room 51 local script 200 +0x0000
+     fallback 753: Room 51 local script 200 +0x009A
+     fallback 754: Room 51 local script 200 +0x009A
+     fallback 755: Room 51 local script 200 +0x009A
+Room 64: paint 826  ->  (background only)
+     state set by reached code: 826=0
+     nothing visible after fallback
+Room 65: paint 832,830  ->  830
+     interface images (verb area, not room artwork): 832
+     fallback 830: opening frame of Room 65 in script 72 +0x0029
+Room 69: paint 898,876,877,878  ->  876,877,878
+     fallback 876: Room 69 local script 202 +0x0001
+     fallback 877: Room 69 local script 202 +0x0001
+     fallback 878: Room 69 local script 202 +0x0001

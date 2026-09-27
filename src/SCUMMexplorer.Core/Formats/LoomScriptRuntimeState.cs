@@ -24,4 +24,6 @@ public sealed class LoomScriptRuntimeState
     public HashSet<int> ActiveSounds { get; } = [];
     /// <summary>drawObject calls since the last room entry or setState, in call order.</summary>
     public List<int> DrawQueue { get; } = [];
+    /// <summary>Objects whose state reached <c>setState</c> calls set since the last room entry.</summary>
+    public HashSet<int> StatesSetInRoom { get; } = [];
 }

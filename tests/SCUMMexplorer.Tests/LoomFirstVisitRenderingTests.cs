@@ -44,6 +44,44 @@ public sealed class LoomFirstVisitRenderingTests
         Assert.Empty(selection.VisibleGaps());
     }
 
+    [Fact]
+    public void VerbAreaImagesAreFoundAndKeptOffTheRoom()
+    {
+        if (Data.Value is not { } data) return;
+        // Room 01's distaff pieces are literal verbOps images; object close-ups
+        // reach verb 0x36 through var[0x068], which each object's verb 0x39 sets.
+        Assert.All(Enumerable.Range(100, 52), id => Assert.StartsWith("verbOps image in ",
+            data.Batches.InterfaceImages[id], StringComparison.Ordinal));
+        Assert.Equal("var[0x068] set in Room 03 object 165 Verb 0x39 +0x0000, shown by verbOps image in script 08 +0x002D",
+            data.Batches.InterfaceImages[166]);
+        Assert.False(data.Batches.InterfaceImages.ContainsKey(152));
+
+        var (title, titleEstimates, _) = data.FirstVisit(1);
+        Assert.Equal([152], title.PaintOrder().Select(obj => obj.Id));
+        Assert.Equal([152], titleEstimates.Select(item => item.ObjectId));
+
+        // Room 03 has no room artwork at all: its only image is object 165's close-up.
+        var (lake, lakeEstimates, _) = data.FirstVisit(3);
+        Assert.Empty(lake.PaintOrder());
+        Assert.Empty(lakeEstimates);
+        Assert.Empty(lake.VisibleGaps());
+    }
+
+    [Theory]
+    [InlineData(18, 373, "Room 18 entry script +0x00DA sets it to 0 on every path")]
+    [InlineData(42, 637, "Room 42 entry script +0x0000 sets it to 0 on every path")]
+    public void EntryStatesSetOnEveryPathKeepTheirObjectsHidden(int roomId, int objectId, string source)
+    {
+        if (Data.Value is not { } data) return;
+        Assert.Equal(new RoomStateEvidence(0, source), data.Batches.EntryStatesForRoom(roomId)[objectId]);
+
+        var (selection, estimates, _) = data.FirstVisit(roomId);
+
+        Assert.DoesNotContain(estimates, item => item.ObjectId == objectId);
+        Assert.False(selection.IsActive(data.Images(roomId).Single(obj => obj.Id == objectId)));
+        Assert.Empty(selection.VisibleGaps());
+    }
+
     [Theory]
     [InlineData(2, 157, "opening frame of Room 02 in script 106 +0x03A0")]
     [InlineData(38, 614, "opening frame of Room 38 in script 86 +0x0549")]
@@ -163,10 +201,12 @@ public sealed class LoomFirstVisitRenderingTests
             IReadOnlyList<RoomArtworkEstimate> estimates = [];
             if (!snapshot.IsFaithful)
             {
+                selection.ExcludeInterfaceImages(Batches.InterfaceImages.Keys);
                 estimates = selection.FillGaps(Batches.ForRoom(id), seed: id);
                 // As in MainWindow.CloseArtworkGaps: when nothing is visible, show the fallback estimate.
                 if (!images.Any(selection.IsActive))
-                    estimates = [.. estimates, .. selection.ShowUnresolvedArtwork(Batches.ForRoom(id), seed: id)];
+                    estimates = [.. estimates, .. selection.ShowUnresolvedArtwork(Batches.ForRoom(id), seed: id,
+                        snapshot.StatesSetByCode, Batches.EntryStatesForRoom(id))];
             }
             return (selection, estimates, background);
         }

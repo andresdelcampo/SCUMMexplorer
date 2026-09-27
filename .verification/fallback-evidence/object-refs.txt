@@ -1,0 +1,609 @@
+== Room 01
+   object 100 local 1 image (0,0) 32x24
+   object 101 local 2 image (0,0) 32x24
+   object 102 local 3 image (0,0) 32x24
+   object 103 local 4 image (24,72) 32x24
+   object 104 local 5 image (24,40) 32x24
+   object 105 local 6 image (0,0) 32x24
+   object 106 local 7 image (0,0) 24x24
+   object 107 local 8 image (0,0) 24x24
+   object 108 local 9 image (64,104) 24x24
+   object 109 local 10 image (64,72) 24x24
+   object 110 local 11 image (64,40) 24x24
+   object 111 local 12 image (0,0) 24x24
+   object 112 local 13 image (0,0) 24x24
+   object 113 local 14 image (0,0) 24x24
+   object 114 local 15 image (96,104) 24x24
+   object 115 local 16 image (96,72) 24x24
+   object 116 local 17 image (96,40) 24x24
+   object 117 local 18 image (0,0) 24x24
+   object 118 local 19 image (0,0) 24x24
+   object 119 local 20 image (0,0) 24x24
+   object 120 local 21 image (128,104) 24x24
+   object 121 local 22 image (128,72) 24x24
+   object 122 local 23 image (128,40) 24x24
+   object 123 local 24 image (0,0) 24x24
+   object 124 local 25 image (0,0) 24x24
+   object 125 local 26 image (0,0) 24x24
+   object 126 local 27 image (160,104) 24x24
+   object 127 local 28 image (160,72) 24x24
+   object 128 local 29 image (160,40) 24x24
+   object 129 local 30 image (0,0) 24x24
+   object 130 local 31 image (0,0) 24x24
+   object 131 local 32 image (0,0) 24x24
+   object 132 local 33 image (192,104) 24x24
+   object 133 local 34 image (192,72) 24x24
+   object 134 local 35 image (192,40) 24x24
+   object 135 local 36 image (0,0) 24x24
+   object 136 local 37 image (0,0) 24x24
+   object 137 local 38 image (0,0) 24x24
+   object 138 local 39 image (224,104) 24x24
+   object 139 local 40 image (224,72) 24x24
+   object 140 local 41 image (224,40) 24x24
+   object 141 local 42 image (0,0) 24x24
+   object 142 local 43 image (0,0) 40x16
+   object 143 local 44 image (0,0) 40x16
+   object 144 local 45 image (256,104) 40x16
+   object 145 local 46 image (256,72) 40x16
+   object 146 local 47 image (256,40) 40x16
+   object 147 local 48 image (0,0) 40x16
+   object 148 local 49 image (0,0) 168x24
+   object 149 local 50 image (0,0) 24x24
+   object 150 local 51 image (0,0) 24x24
+   object 151 local 52 image (0,0) 48x16
+   object 152 local 53 image (48,40) 224x64
+   script 005 +0x002E startScript 0x07, [var[0x066], 0x0036]   [102]
+   script 026 +0x0071 startScript 0x07, [var[0x067], 0x0055]   [103]
+   script 026 +0x007F startScript 0x07, [var[0x067], local[0x003]]   [103]
+   script 026 +0x008D startScript 0x07, [var[0x067], 0x0056]   [103]
+   script 044 +0x00C7 setState 0x0098, 0x00   [152]
+   script 050 +0x0044 startScript 0xCA, [0x0186, 0x0078]   [120]
+   script 056 +0x000F startScript 0xCA, [0x0001, 0x0168, 0x0078]   [120]
+   script 057 +0x0006 startScript 0xC8, [0x0001, 0x0124, 0x0080]   [128]
+   script 058 +0x0002 startScript 0xC8, [0x0001, 0x0168, 0x0078]   [120]
+   script 059 +0x0016 startScript 0xCA, [0x0001, 0x0096, 0x0067]   [103,150]
+   script 060 +0x0002 startScript 0xC9, [0x0001, 0x0168, 0x0078]   [120]
+   script 061 +0x0016 startScript 0xCB, [0x0001, 0x0028, 0x0086]   [134]
+   script 062 +0x0002 startScript 0xCB, [0x0001, 0x0168, 0x0078]   [120]
+   script 063 +0x0006 startScript 0xC9, [0x0001, 0x001C, 0x0080]   [128]
+   script 106 +0x036C setState 0x0098, 0x00   [152]
+   Room 02 entry +0x0010 startScript 0x10, [0x0070]   [112]
+   Room 02 entry +0x0052 startScript 0x11, [var[0x07C]]   [124]
+   Room 02 object 153 Verb 0x38 +0x0015 setState 0x0098, 0x00   [152]
+   Room 02 object 154 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x0327, 0x001B, 0x0064]   [100]
+   Room 04 object 175 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00B0, 0x005A, 0x0078]   [120]
+   Room 04 object 176 Verb 0x3A +0x0000 startScript 0x29, [0x0005, 0x0030, 0x0078, 0x0064]   [100,120]
+   Room 04 object 176 Verb 0x3B +0x0000 startScript 0x29, [0x0005, 0x0030, 0x0078, 0x0064]   [100,120]
+   Room 04 object 176 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x0030, 0x0078, 0x0064]   [100,120]
+   Room 04 object 177 Verb 0x3B +0x0000 startScript 0x29, [0x0005, 0x00AE, 0x0070, 0x0064]   [100,112]
+   Room 04 object 177 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00AE, 0x0070, 0x0064]   [100,112]
+   Room 06 local 200 +0x00C7 startScript 0x08, [var[0x066]]   [102]
+   Room 06 local 215 +0x003D startScript 0x08, [var[0x066]]   [102]
+   Room 06 object 207 Verb 0x56 +0x0000 startScript 0x29, [0x0003, 0x0064, 0x002C]   [100]
+   Room 06 object 209 Verb 0x56 +0x0000 startScript 0x29, [0x0003, 0x011A, 0x0070, 0x0064]   [100,112]
+   Room 06 object 210 Verb 0x56 +0x0000 startScript 0x29, [0x0003, 0x0046, 0x007C]   [124]
+   Room 06 object 214 Verb 0x56 +0x0005 startScript 0x29, [0x0003, 0x00D0, 0x006A, 0x0064]   [100,106]
+   Room 06 object 214 Verb 0x56 +0x0017 startScript 0x29, [0x0003, 0x00D4, 0x006A, 0x0064]   [100,106]
+   Room 09 object 270 Verb 0x56 +0x0000 startScript 0x29, [0x000A, 0x008C, 0x0083]   [131,140]
+   Room 10 entry +0x001D startScript 0x10, [0x0070]   [112]
+   Room 10 entry +0x011E startScript 0xCA, [0x00E4, 0x0078]   [120]
+   Room 10 object 296 Verb 0x3A +0x000D startScript 0x29, [0x0007, 0x0041, 0x0065, 0x0064]   [100,101]
+   Room 10 object 296 Verb 0x3B +0x0067 startScript 0x29, [0x0007, 0x0041, 0x0065, 0x0064]   [100,101]
+   Room 10 object 296 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0041, 0x0065, 0x0064]   [100,101]
+   Room 10 object 297 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0025, 0x003A, 0x0064]   [100]
+   Room 10 object 298 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0069, 0x002F, 0x0064]   [100,105]
+   Room 10 object 299 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0092, 0x0010, 0x0064]   [100,146]
+   Room 10 object 300 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x00E4, 0x0019, 0x0064]   [100]
+   Room 13 object 325 Verb 0x3A +0x0000 startScript 0x29, [0x0003, 0x006C, 0x003C, 0x0000]   [108]
+   Room 13 object 325 Verb 0x41 +0x0000 startScript 0x29, [0x0003, 0x006C, 0x003C, 0x0000]   [108]
+   Room 13 object 325 Verb 0x56 +0x0000 startScript 0x29, [0x0003, 0x006C, 0x003C, 0x0000]   [108]
+   Room 15 entry +0x0019 startScript 0x11, [var[0x07C]]   [124]
+   Room 17 entry +0x002B startScript 0x11, [var[0x07C]]   [124]
+   Room 17 object 358 Verb 0x3A +0x0000 startScript 0xCE, [0x00ED, 0x0078]   [120]
+   Room 17 object 358 Verb 0x3B +0x0000 startScript 0x29, [0x0004, 0x00ED, 0x0078, 0x0000]   [120]
+   Room 17 object 358 Verb 0x56 +0x0000 startScript 0x29, [0x0004, 0x00ED, 0x0078, 0x0000]   [120]
+   Room 18 entry +0x002F startScript 0x11, [var[0x07C]]   [124]
+   Room 18 object 369 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x001F, 0x0067, 0x0064]   [100,103]
+   Room 18 object 370 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x0066, 0x0053, 0x0064]   [100,102]
+   Room 18 object 371 Verb 0x3A +0x0000 startScript 0x29, [0x0008, 0x0094, 0x005F, 0x0064]   [100,148]
+   Room 18 object 371 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x0094, 0x005F, 0x0064]   [100,148]
+   Room 20 local 215 +0x0000 startScript 0x29, [0x0007, 0x005E, 0x0043, 0x0064]   [100]
+   Room 20 object 388 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0007, 0x006B, 0x0064]   [100,107]
+   Room 20 object 389 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0131, 0x006B, 0x0064]   [100,107]
+   Room 22 entry +0x0099 startScript 0x11, [var[0x07C]]   [124]
+   Room 22 local 214 +0x004E startScript 0x08, [var[0x066]]   [102]
+   Room 22 object 403 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0006, 0x0065, 0x0000]   [101]
+   Room 22 object 404 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x00C2, 0x003C, 0x0064]   [100]
+   Room 23 entry +0x0041 startScript 0x11, [var[0x07C]]   [124]
+   Room 24 entry +0x0006 startScript 0x11, [var[0x07C]]   [124]
+   Room 24 local 213 +0x003D startScript 0x08, [var[0x066]]   [102]
+   Room 24 object 431 Verb 0x3B +0x0000 startScript 0x29, [0x0008, 0x0092, 0x0052, 0x0000]   [146]
+   Room 24 object 431 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x0092, 0x0052, 0x0000]   [146]
+   Room 24 object 433 Verb 0x3F +0x0000 startScript 0x29, [0x0008, 0x0160, 0x0068, 0x0020]   [104]
+   Room 24 object 433 Verb 0x47 +0x0000 startScript 0x29, [0x0008, 0x0160, 0x0068, 0x0020]   [104]
+   Room 24 object 433 Verb 0x49 +0x0000 startScript 0x29, [0x0008, 0x0160, 0x0068, 0x0020]   [104]
+   Room 24 object 433 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x0160, 0x0068, 0x0020]   [104]
+   Room 27 entry +0x0013 startScript 0x10, [0x0078]   [120]
+   Room 30 entry +0x0022 startScript 0x10, [0x0078]   [120]
+   Room 31 object 523 Verb 0x46 +0x0000 startScript 0x29, [0x0008, 0x006A, 0x007D, 0x0000]   [106,125]
+   Room 31 object 523 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x006A, 0x007D, 0x0000]   [106,125]
+   Room 31 object 524 Verb 0x45 +0x0000 startScript 0x29, [0x0008, 0x0020, 0x0074, 0x0000]   [116]
+   Room 31 object 524 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x0020, 0x0074, 0x0000]   [116]
+   Room 33 entry +0x000D startScript 0x10, [0x0070]   [112]
+   Room 34 object 561 Verb 0x43 +0x000E startScript 0x29, [0x0006, 0x0048, 0x0064, 0x0010]   [100]
+   Room 34 object 561 Verb 0x56 +0x000E startScript 0x29, [0x0006, 0x0048, 0x0064, 0x0010]   [100]
+   Room 34 object 562 Verb 0x3B +0x0000 startScript 0x29, [0x0006, 0x0105, 0x0048, 0x0064]   [100]
+   Room 34 object 562 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x0105, 0x0048, 0x0064]   [100]
+   Room 34 object 586 Verb 0x43 +0x0000 startScript 0x29, [0x0006, 0x0048, 0x0064, 0x0010]   [100]
+   Room 34 object 586 Verb 0x44 +0x0000 startScript 0x29, [0x0006, 0x0048, 0x0064, 0x0010]   [100]
+   Room 34 object 586 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x0048, 0x0064, 0x0010]   [100]
+   Room 35 entry +0x0000 startScript 0x10, [0x0070]   [112]
+   Room 36 entry +0x000B startScript 0x11, [var[0x07C]]   [124]
+   Room 37 object 604 Verb 0x45 +0x000B startScript 0x29, [0x0006, 0x00D8, 0x005C, 0x0064]   [100]
+   Room 37 object 604 Verb 0x46 +0x000B startScript 0x29, [0x0006, 0x00D8, 0x005C, 0x0064]   [100]
+   Room 37 object 604 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x00D8, 0x005C, 0x0064]   [100]
+   Room 38 object 610 Verb 0x3C +0x0005 startScript 0x29, [0x0006, 0x00AA, 0x0078, 0x0000]   [120]
+   Room 38 object 610 Verb 0x3D +0x000B startScript 0x29, [0x0006, 0x00AA, 0x0078, 0x0000]   [120]
+   Room 38 object 610 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x00AA, 0x0078, 0x0000]   [120]
+   Room 38 object 616 Verb 0x3A +0x0000 startScript 0x29, [0x0006, 0x0078, 0x0058, 0x0000]   [120]
+   Room 38 object 616 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x0078, 0x0058, 0x0000]   [120]
+   Room 41 local 200 +0x0167 startScript 0xC9, [0x00C0, 0x0083, 0x00F7]   [131]
+   Room 41 local 200 +0x0334 startScript 0xC9, [0x0070, 0x0083, 0x00F8]   [112,131]
+   Room 41 local 200 +0x03A9 startScript 0xC9, [0x0000, 0x0083, 0x00F8]   [131]
+   Room 41 local 200 +0x0440 startScript 0xC9, [0x0070, 0x005D, 0x00F6]   [112]
+   Room 43 object 640 Verb 0x56 +0x0000 startScript 0x29, [0x000B, 0x00FE, 0x0049, 0x0064]   [100]
+   Room 43 object 643 Verb 0x3B +0x0000 startScript 0x29, [0x000B, 0x0065, 0x003A, 0x0064]   [100,101]
+   Room 43 object 643 Verb 0x56 +0x0000 startScript 0x29, [0x000B, 0x0065, 0x003A, 0x0064]   [100,101]
+   Room 46 entry +0x0016 startScript 0x11, [0x0001, 0x007B]   [123]
+   Room 46 object 684 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x02B0, 0x0067, 0x0000]   [103]
+   Room 47 entry +0x0042 startScript 0x11, [0x0000, 0x007C]   [124]
+   Room 47 object 697 Verb 0x56 +0x0000 startScript 0x29, [0x0008, 0x0204, 0x0072, 0x0008]   [114]
+   Room 62 local 201 +0x0035 startScript 0xCE, [0x0006, 0x0003, 0x0098, 0x0066, 0x032E]   [102,152]
+   Room 62 local 201 +0x0059 startScript 0xCE, [0x000C, 0x0002, 0x00E4, 0x006C, 0x032F]   [108]
+   Room 62 local 202 +0x002E startScript 0xCE, [0x0006, 0x0003, 0x0098, 0x0066, 0x032C]   [102,152]
+   Room 62 local 202 +0x0059 startScript 0xCE, [0x000C, 0x0002, 0x00E4, 0x006C, 0x032D]   [108]
+   Room 62 local 203 +0x0035 startScript 0xCE, [0x000C, 0x0002, 0x00E4, 0x006C, 0x032D]   [108]
+   Room 62 local 203 +0x0059 startScript 0xCE, [0x0006, 0x0003, 0x0098, 0x0066, 0x032C]   [102,152]
+   Room 62 local 204 +0x002E startScript 0xCE, [0x000C, 0x0002, 0x00E4, 0x006C, 0x032F]   [108]
+   Room 62 local 204 +0x0059 startScript 0xCE, [0x0006, 0x0003, 0x0098, 0x0066, 0x032E]   [102,152]
+   Room 62 local 206 +0x0071 startScript 0x08, [var[0x066]]   [102]
+   Room 62 object 808 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x009C, 0x0064, 0x0064]   [100]
+   Room 62 object 809 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00DE, 0x006E, 0x0064]   [100,110]
+   Room 62 object 810 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00B8, 0x0050, 0x0064]   [100]
+   Room 63 object 820 Verb 0x56 +0x0000 startScript 0x29, [0x0004, 0x009C, 0x0064, 0x0064]   [100]
+   Room 65 entry +0x0009 startScript 0x10, [0x0078]   [120]
+   Room 65 object 828 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00A0, 0x0064, 0x0000]   [100]
+   Room 66 entry +0x001F startScript 0x11, [0x0000, 0x007C]   [124]
+== Room 03
+   object 160 local 1 no image
+   object 161 local 2 no image
+   object 162 local 3 no image
+   object 163 local 4 no image
+   object 164 local 5 no image
+   object 165 local 6 no image
+   object 166 local 7 image (0,0) 48x40
+   Room 09 object 272 Verb 0x56 +0x0000 startScript 0x29, [0x000A, 0x00A0, 0x0032]   [160]
+   Room 65 object 828 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00A0, 0x0064, 0x0000]   [160]
+== Room 04
+   object 167 local 1 no image
+   object 168 local 2 no image
+   object 169 local 3 no image
+   object 170 local 4 no image
+   object 171 local 5 no image
+   object 172 local 6 no image
+   object 173 local 7 no image
+   object 174 local 8 no image
+   object 175 local 9 no image
+   object 176 local 10 no image
+   object 177 local 11 no image
+   object 178 local 12 image (336,40) 24x24
+   object 179 local 13 image (336,40) 24x24
+   object 180 local 14 image (336,40) 24x24
+   object 181 local 15 image (368,80) 16x8
+   object 182 local 16 image (368,80) 16x8
+   object 183 local 17 image (368,80) 16x8
+   object 184 local 18 image (472,56) 8x24
+   object 185 local 19 image (472,56) 8x24
+   object 186 local 20 image (472,56) 8x24
+   object 187 local 21 image (568,56) 16x24
+   object 188 local 22 image (568,56) 16x24
+   object 189 local 23 image (568,56) 16x24
+   object 190 local 24 image (0,0) 48x40
+   object 191 local 25 image (0,0) 48x40
+   object 192 local 26 image (0,0) 48x40
+   object 193 local 27 image (0,0) 48x40
+   object 194 local 28 image (0,0) 48x40
+   object 195 local 29 image (0,0) 48x40
+   object 196 local 30 image (0,0) 48x40
+   object 197 local 31 no image
+   object 198 local 32 image (0,0) 48x40
+   script 004 +0x00FF startScript 0xC9, [var[0x0AA]]   [170]
+   Room 04 local 202 +0x001A setClass 0x00AF, [0x0098]   [175]
+   Room 04 local 202 +0x010A ifClassOfIs 0x00AB, [0x0004], branch +0x000E -> 0x0121   [171]
+   Room 04 local 202 +0x0113 setClass 0x00AB, [0x0084]   [171]
+   Room 04 local 202 +0x011A setClass 0x00AB, [0x0003]   [171]
+   Room 04 local 202 +0x0121 ifClassOfIs 0x00AC, [0x0004], branch +0x000E -> 0x0138   [172]
+   Room 04 local 202 +0x012A setClass 0x00AC, [0x0084]   [172]
+   Room 04 local 202 +0x0131 setClass 0x00AC, [0x0003]   [172]
+   Room 04 local 202 +0x0138 ifClassOfIs 0x00AD, [0x0004], branch +0x000E -> 0x014F   [173]
+   Room 04 local 202 +0x0141 setClass 0x00AD, [0x0084]   [173]
+   Room 04 local 202 +0x0148 setClass 0x00AD, [0x0003]   [173]
+   Room 04 local 202 +0x014F ifClassOfIs 0x00AE, [0x0004], branch +0x000E -> 0x0166   [174]
+   Room 04 local 202 +0x0158 setClass 0x00AE, [0x0084]   [174]
+   Room 04 local 202 +0x015F setClass 0x00AE, [0x0003]   [174]
+   Room 04 local 204 +0x0000 setClass 0x00AA, [0x0098]   [170]
+   Room 04 local 204 +0x0007 setClass 0x00A9, [0x0018]   [169]
+   Room 04 local 205 +0x0000 setClass 0x00AA, [0x0018]   [170]
+   Room 04 local 205 +0x0007 setClass 0x00A9, [0x0098]   [169]
+   Room 04 object 169 Verb 0x37 +0x0012 walkActorToObject 0x01, 0x00A9   [169]
+   Room 04 object 170 Verb 0x37 +0x0012 walkActorToObject 0x01, 0x00AA   [170]
+   Room 04 object 171 Verb 0x36 +0x0000 startScript 0xC8, [0x00AB]   [171]
+   Room 04 object 172 Verb 0x36 +0x0000 startScript 0xC8, [0x00AC]   [172]
+   Room 04 object 173 Verb 0x36 +0x0000 startScript 0xC8, [0x00AD]   [173]
+   Room 04 object 174 Verb 0x36 +0x0000 startScript 0xC8, [0x00AE]   [174]
+   Room 04 object 175 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00B0, 0x005A, 0x0078]   [176]
+   Room 04 object 177 Verb 0x36 +0x001C ifClassOfIs 0x00B1, [0x0004], branch +0x0029 -> 0x004E   [177]
+   Room 04 object 177 Verb 0x36 +0x0025 setClass 0x00B1, [0x0084]   [177]
+   Room 04 object 177 Verb 0x3B +0x0000 startScript 0x29, [0x0005, 0x00AE, 0x0070, 0x0064]   [174]
+   Room 04 object 177 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00AE, 0x0070, 0x0064]   [174]
+   Room 22 object 404 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x00C2, 0x003C, 0x0064]   [194]
+   Room 38 object 610 Verb 0x3C +0x0005 startScript 0x29, [0x0006, 0x00AA, 0x0078, 0x0000]   [170]
+   Room 38 object 610 Verb 0x3D +0x000B startScript 0x29, [0x0006, 0x00AA, 0x0078, 0x0000]   [170]
+   Room 38 object 610 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x00AA, 0x0078, 0x0000]   [170]
+   Room 41 local 200 +0x0167 startScript 0xC9, [0x00C0, 0x0083, 0x00F7]   [192]
+   Room 62 object 810 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x00B8, 0x0050, 0x0064]   [184]
+== Room 08
+   object 253 local 1 no image
+   object 254 local 2 no image
+   object 255 local 3 no image
+   object 256 local 4 no image
+   object 257 local 5 no image
+   object 258 local 6 no image
+   object 259 local 7 image (728,16) 48x48
+   object 260 local 8 image (0,0) 48x40
+   object 261 local 9 image (0,0) 48x40
+   object 262 local 10 image (0,0) 48x40
+   object 263 local 11 image (24,24) 56x96
+   object 264 local 12 image (248,24) 56x96
+   object 265 local 13 image (464,24) 56x96
+   object 266 local 14 image (0,0) 48x40
+   script 004 +0x00D3 startScript 0xCA, [0x00FF]   [255]
+   script 046 +0x0005 setClass 0x00FF, [0x0098]   [255]
+   script 046 +0x137A setClass 0x00FE, [0x0018]   [254]
+   Room 08 entry +0x0066 setState 0x0103, 0x01   [259]
+   Room 08 entry +0x0073 setState 0x0103, 0x00   [259]
+   Room 08 entry +0x0082 setState 0x0107, 0x01   [263]
+   Room 08 entry +0x0089 setState 0x0107, 0x00   [263]
+   Room 08 entry +0x0092 setState 0x0108, 0x01   [264]
+   Room 08 entry +0x0099 setState 0x0108, 0x00   [264]
+   Room 08 entry +0x00A2 setState 0x0109, 0x01   [265]
+   Room 08 entry +0x00A9 setState 0x0109, 0x00   [265]
+   Room 08 entry +0x00AD ifClassOfIs 0x00FF, [0x0018], branch +0x0003 -> 0x00B9   [255]
+   Room 08 local 211 +0x0012 setClass 0x0100, [0x0084]   [256]
+   Room 08 local 211 +0x0057 setState 0x0107, 0x00   [263]
+   Room 08 local 212 +0x0053 setState 0x0107, 0x01   [263]
+   Room 08 local 213 +0x0012 setClass 0x0101, [0x0084]   [257]
+   Room 08 local 213 +0x0057 setState 0x0108, 0x01   [264]
+   Room 08 local 214 +0x0053 setState 0x0108, 0x00   [264]
+   Room 08 local 215 +0x0012 setClass 0x0102, [0x0084]   [258]
+   Room 08 local 215 +0x0057 setState 0x0109, 0x01   [265]
+   Room 08 local 216 +0x0005 startScript 0xD1, [0x0102]   [258]
+   Room 08 local 216 +0x0053 setState 0x0109, 0x00   [265]
+   Room 08 object 256 Verb 0x36 +0x0000 ifClassOfIs 0x0100, [0x0003], branch +0x0075 -> 0x007E   [256]
+   Room 08 object 256 Verb 0x36 +0x000E setClass 0x0100, [0x0083]   [256]
+   Room 08 object 256 Verb 0x36 +0x0018 ifClassOfIs 0x0101, [0x0003], branch +0x0006 -> 0x0027   [257]
+   Room 08 object 257 Verb 0x36 +0x0000 ifClassOfIs 0x0101, [0x0003], branch +0x0083 -> 0x008C   [257]
+   Room 08 object 257 Verb 0x36 +0x000E setClass 0x0101, [0x0083]   [257]
+   Room 08 object 257 Verb 0x36 +0x0018 ifClassOfIs 0x0100, [0x0003], branch +0x0006 -> 0x0027   [256]
+   Room 08 object 258 Verb 0x36 +0x0000 ifClassOfIs 0x0102, [0x0003], branch +0x0096 -> 0x009F   [258]
+   Room 08 object 258 Verb 0x36 +0x000E setClass 0x0102, [0x0083]   [258]
+   Room 09 object 267 Verb 0x38 +0x0000 setClass 0x00FE, [0x0018]   [254]
+   Room 34 object 562 Verb 0x3B +0x0000 startScript 0x29, [0x0006, 0x0105, 0x0048, 0x0064]   [261]
+   Room 34 object 562 Verb 0x56 +0x0000 startScript 0x29, [0x0006, 0x0105, 0x0048, 0x0064]   [261]
+   Room 43 object 640 Verb 0x56 +0x0000 startScript 0x29, [0x000B, 0x00FE, 0x0049, 0x0064]   [254]
+== Room 09
+   object 267 local 1 no image
+   object 268 local 2 no image
+   object 269 local 3 no image
+   object 270 local 4 no image
+   object 271 local 5 no image
+   object 272 local 6 no image
+   object 273 local 7 no image
+   object 274 local 8 no image
+   object 275 local 9 no image
+   object 276 local 10 image (0,0) 48x40
+   object 277 local 11 image (0,0) 48x40
+   object 278 local 12 image (0,0) 48x40
+   object 279 local 13 image (0,0) 48x40
+   object 280 local 14 image (0,0) 48x40
+   object 281 local 15 image (0,0) 48x40
+   object 282 local 16 image (0,0) 48x40
+   object 283 local 17 no image
+   script 031 +0x0209 ifClassOfIs 0x010F, [0x0018], branch +0x0015 -> 0x0227   [271]
+   script 031 +0x030C ifClassOfIs 0x010F, [0x0018], branch +0x0003 -> 0x0318   [271]
+   script 046 +0x13B5 setClass 0x010F, [0x0018]   [271]
+   script 046 +0x13D1 putActorAtObject 0x0B, 0x010F   [271]
+   script 046 +0x13FF setClass 0x010E, [0x0018]   [270]
+   script 047 +0x0020 setClass 0x010C, [0x0098]   [268]
+   script 047 +0x0027 setClass 0x010B, [0x0018]   [267]
+   script 047 +0x0CD3 setClass 0x010E, [0x0098]   [270]
+   script 101 +0x0050 putActorAtObject 0x05, 0x010B   [267]
+   script 105 +0x000A setClass 0x0112, [0x0098]   [274]
+   script 105 +0x0018 setClass 0x011B, [0x0018]   [283]
+   Room 06 object 209 Verb 0x56 +0x0000 startScript 0x29, [0x0003, 0x011A, 0x0070, 0x0064]   [282]
+   Room 08 local 213 +0x003B startScript 0xCF, [0x0111, 0x004A, 0x0001]   [273]
+   Room 08 local 214 +0x0037 startScript 0xCF, [0x0111, 0x004A, 0x0000]   [273]
+   Room 08 object 257 Verb 0x56 +0x0000 startScript 0x29, [0x000B, 0x0111, 0x004A]   [273]
+   Room 09 entry +0x0061 setClass 0x010B, [0x0098]   [267]
+   Room 09 entry +0x0068 setClass 0x010C, [0x0018]   [268]
+   Room 09 entry +0x008D ifClassOfIs 0x0112, [0x0018], branch +0x0006 -> 0x009C   [274]
+   Room 09 entry +0x009C setClass 0x011B, [0x0018]   [283]
+   Room 09 entry +0x00AE setClass 0x010E, [0x0098]   [270]
+   Room 09 entry +0x00B5 setClass 0x010F, [0x0098]   [271]
+   Room 09 entry +0x00BF ifClassOfIs 0x010E, [0x0018], branch +0x000F -> 0x00D7   [270]
+   Room 09 entry +0x00CB ifClassOfIs 0x010F, [0x0018], branch +0x0003 -> 0x00D7   [271]
+   Room 09 local 203 +0x001E putActorAtObject 0x09, 0x010E   [270]
+   Room 09 local 203 +0x0033 setClass 0x010E, [0x0018]   [270]
+   Room 09 local 204 +0x0018 putActorAtObject 0x0B, 0x010F   [271]
+   Room 09 local 204 +0x001F setClass 0x010F, [0x0018]   [271]
+   Room 09 local 209 +0x009A ifClassOfIs 0x0110, [0x0003], branch +0x00EC -> 0x018F   [272]
+   Room 09 local 209 +0x00A3 setClass 0x0110, [0x0083]   [272]
+   Room 09 local 211 +0x000D setClass 0x010B, [0x0098]   [267]
+   Room 09 local 211 +0x0014 setClass 0x010C, [0x0018, 0x0003]   [268]
+   Room 09 local 211 +0x0026 setClass 0x010E, [0x0098]   [270]
+   Room 09 local 211 +0x002D setClass 0x010F, [0x0098]   [271]
+   Room 09 local 214 +0x0016 walkActorToObject 0x01, 0x010C   [268]
+   Room 09 local 214 +0x0082 walkActorToObject 0x01, 0x010E   [270]
+   Room 09 local 214 +0x00B0 walkActorToObject 0x01, 0x010C   [268]
+   Room 09 local 217 +0x000B setClass 0x0113, [0x0018]   [275]
+   Room 09 local 217 +0x0012 setClass 0x010D, [0x0018]   [269]
+   Room 09 local 217 +0x0019 setClass 0x010B, [0x0098]   [267]
+   Room 09 local 217 +0x0020 setClass 0x010C, [0x0018, 0x0003]   [268]
+   Room 09 local 218 +0x000F setClass 0x0111, [0x0018]   [273]
+   Room 09 local 218 +0x0016 setClass 0x0112, [0x0098]   [274]
+   Room 09 local 218 +0x001D setClass 0x011B, [0x0018]   [283]
+   Room 09 local 219 +0x000F setClass 0x0111, [0x0018]   [273]
+   Room 09 local 219 +0x0016 setClass 0x0112, [0x0098]   [274]
+   Room 09 local 219 +0x001D setClass 0x011B, [0x0018]   [283]
+   Room 09 local 220 +0x000F setClass 0x0112, [0x0018]   [274]
+   Room 09 local 220 +0x0016 setClass 0x011B, [0x0098]   [283]
+   Room 09 local 220 +0x001D setClass 0x0111, [0x0098]   [273]
+   Room 09 local 221 +0x0095 ifClassOfIs 0x0113, [0x0003], branch +0x002E -> 0x00CC   [275]
+   Room 09 local 221 +0x009E setClass 0x0113, [0x0083]   [275]
+   Room 09 local 223 +0x028A putActorAtObject 0x01, 0x0111   [273]
+   Room 09 local 224 +0x03BF setClass 0x0112, [0x0018]   [274]
+   Room 09 local 224 +0x03C6 setClass 0x011B, [0x0098]   [283]
+   Room 09 local 224 +0x03CD setClass 0x0111, [0x0098]   [273]
+   Room 09 object 271 Verb 0x38 +0x000F setClass 0x010F, [0x0098]   [271]
+   Room 09 object 271 Verb 0x38 +0x0027 putActorAtObject 0x01, 0x010F   [271]
+   Room 22 object 405 Verb 0x3A +0x0000 startScript 0x29, [0x0007, 0x0118, 0x004C]   [280]
+   Room 22 object 405 Verb 0x45 +0x000B startScript 0x29, [0x0007, 0x0118, 0x004C]   [280]
+   Room 22 object 405 Verb 0x46 +0x0005 startScript 0x29, [0x0007, 0x0118, 0x004C]   [280]
+   Room 22 object 405 Verb 0x56 +0x0000 startScript 0x29, [0x0007, 0x0118, 0x004C]   [280]
+== Room 16
+   object 344 local 1 no image
+   object 345 local 2 no image
+   object 346 local 3 no image
+   object 347 local 4 no image
+   object 348 local 5 no image
+   object 349 local 6 no image
+   object 350 local 7 no image
+   object 351 local 8 image (0,0) 48x40
+   Room 04 object 171 Verb 0x3A +0x0000 startScript 0x29, [0x0005, 0x015C, 0x0038]   [348]
+   Room 04 object 171 Verb 0x3B +0x0000 startScript 0x29, [0x0005, 0x015C, 0x0038]   [348]
+   Room 04 object 171 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x015C, 0x0038]   [348]
+   Room 16 entry +0x0059 setClass 0x0159, [0x0018]   [345]
+   Room 16 entry +0x0063 setClass 0x015D, [0x0018]   [349]
+   Room 16 entry +0x0074 setClass 0x0159, [0x0018]   [345]
+   Room 16 entry +0x007E setClass 0x015D, [0x0018]   [349]
+   Room 16 local 205 +0x0027 setClass 0x015D, [0x0018]   [349]
+   Room 16 local 205 +0x002E setClass 0x0159, [0x0098]   [345]
+   Room 16 local 205 +0x003F setClass 0x015D, [0x0018]   [349]
+   Room 16 local 205 +0x0046 setClass 0x0159, [0x0098]   [345]
+   Room 16 local 205 +0x0057 setClass 0x015D, [0x0098]   [349]
+   Room 16 local 205 +0x005E setClass 0x0159, [0x0018]   [345]
+   Room 16 local 205 +0x006F setClass 0x015D, [0x0098]   [349]
+   Room 16 local 205 +0x0076 setClass 0x0159, [0x0018]   [345]
+   Room 16 local 205 +0x008E setClass 0x015D, [0x0018]   [349]
+   Room 16 local 205 +0x0095 setClass 0x0159, [0x0098]   [345]
+   Room 16 local 205 +0x009F setClass 0x015D, [0x0098]   [349]
+   Room 16 local 205 +0x00A6 setClass 0x0159, [0x0018]   [345]
+== Room 18
+   object 367 local 1 no image
+   object 368 local 2 no image
+   object 369 local 3 no image
+   object 370 local 4 no image
+   object 371 local 5 no image
+   object 372 local 6 no image
+   object 373 local 7 image (160,72) 16x40
+   object 374 local 8 no image
+   object 375 local 9 image (0,0) 48x40
+   object 376 local 10 image (0,0) 48x40
+   object 377 local 11 image (0,0) 48x40
+   object 378 local 12 image (0,0) 48x40
+   script 064 +0x0000 ifClassOfIs 0x0173, [0x0004], branch +0x004D -> 0x0056   [371]
+   script 065 +0x02F9 putActorAtObject 0x01, 0x0172   [370]
+   script 071 +0x0000 ifClassOfIs 0x0173, [0x0004], branch +0x002B -> 0x0034   [371]
+   script 071 +0x0009 setClass 0x0173, [0x0084]   [371]
+   Room 04 object 172 Verb 0x3A +0x0000 startScript 0x29, [0x0005, 0x0176, 0x0055]   [374]
+   Room 04 object 172 Verb 0x3B +0x0000 startScript 0x29, [0x0005, 0x0176, 0x0055]   [374]
+   Room 04 object 172 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x0176, 0x0055]   [374]
+   Room 18 entry +0x003C setClass 0x016F, [0x0098]   [367]
+   Room 18 entry +0x0043 setClass 0x0170, [0x0098]   [368]
+   Room 18 entry +0x004A setClass 0x0173, [0x0098]   [371]
+   Room 18 entry +0x0051 setClass 0x0171, [0x0018]   [369]
+   Room 18 entry +0x0058 setClass 0x0172, [0x0018]   [370]
+   Room 18 entry +0x0062 setClass 0x016F, [0x0018]   [367]
+   Room 18 entry +0x0069 setClass 0x0170, [0x0018]   [368]
+   Room 18 entry +0x0070 ifClassOfIs 0x0176, [0x0098], branch +0x0007 -> 0x0080   [374]
+   Room 18 entry +0x0079 setClass 0x0173, [0x0018]   [371]
+   Room 18 entry +0x0080 setClass 0x0171, [0x0098]   [369]
+   Room 18 entry +0x0087 setClass 0x0172, [0x0098]   [370]
+   Room 18 entry +0x00DA setState 0x0175, 0x00   [373]
+   Room 18 entry +0x00DE ifClassOfIs 0x0174, [0x0018], branch +0x0003 -> 0x00EA   [372]
+   Room 18 local 202 +0x0000 setState 0x0175, 0x01   [373]
+   Room 18 local 202 +0x0090 setState 0x0175, 0x00   [373]
+   Room 18 local 202 +0x0095 ifClassOfIs 0x0173, [0x0083], branch +0x00D9 -> 0x0177   [371]
+   Room 18 local 202 +0x009E setClass 0x0173, [0x0003]   [371]
+   Room 18 local 202 +0x00A5 ifClassOfIs 0x0172, [0x0003], branch +0x000D -> 0x00BB   [370]
+   Room 18 local 202 +0x00FD ifClassOfIs 0x0172, [0x0003], branch +0x0025 -> 0x012B   [370]
+   Room 18 local 202 +0x012E ifClassOfIs 0x0172, [0x0003], branch +0x0040 -> 0x0177   [370]
+   Room 18 local 205 +0x02D7 setClass 0x0176, [0x0098]   [374]
+   Room 18 local 205 +0x02DE setClass 0x0173, [0x0018]   [371]
+   Room 18 local 205 +0x02E5 setClass 0x0174, [0x0098]   [372]
+   Room 18 local 205 +0x0304 putActorAtObject 0x01, 0x0174   [372]
+   Room 18 object 367 Verb 0x36 +0x0000 ifClassOfIs 0x0174, [0x0018], branch +0x0009 -> 0x0012   [372]
+   Room 18 object 368 Verb 0x38 +0x0000 ifClassOfIs 0x0174, [0x0018], branch +0x0009 -> 0x0012   [372]
+   Room 18 object 370 Verb 0x36 +0x0000 setClass 0x0172, [0x0083]   [370]
+   Room 18 object 374 Verb 0x36 +0x0005 startScript 0x08, [0x0173]   [371]
+   Room 20 local 207 +0x053E setClass 0x0173, [0x0083]   [371]
+== Room 20
+   object 386 local 1 no image
+   object 387 local 2 no image
+   object 388 local 3 no image
+   object 389 local 4 no image
+   object 390 local 5 no image
+   object 391 local 6 no image
+   object 392 local 7 image (88,40) 32x56
+   object 393 local 8 image (120,0) 16x64
+   object 394 local 9 image (136,40) 40x24
+   object 395 local 10 image (176,0) 16x64
+   object 396 local 11 image (192,56) 16x8
+   object 397 local 12 image (0,0) 48x40
+   object 398 local 13 image (0,0) 48x40
+   object 399 local 14 image (0,0) 48x40
+   script 050 +0x0044 startScript 0xCA, [0x0186, 0x0078]   [390]
+   Room 16 local 204 +0x0007 startScript 0x29, [0x0004, 0x0184, 0x0018, 0x0000]   [388]
+   Room 16 object 350 Verb 0x56 +0x0000 startScript 0x29, [0x0004, 0x0184, 0x0018, 0x0000]   [388]
+   Room 46 object 682 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x0188, 0x0057, 0x0000]   [392]
+== Room 23
+   object 418 local 1 no image
+   object 419 local 2 no image
+   object 420 local 3 no image
+   object 421 local 4 no image
+   object 422 local 5 no image
+   object 423 local 6 no image
+   object 424 local 7 no image
+   object 425 local 8 no image
+   object 426 local 9 image (72,40) 32x56
+   object 427 local 10 image (96,32) 32x64
+   object 428 local 11 image (0,0) 48x40
+   Room 23 entry +0x0034 setState 0x01AB, 0x00   [427]
+   Room 23 entry +0x0038 setState 0x01AA, 0x00   [426]
+   Room 23 entry +0x006F ifClassOfIs 0x01A3, [0x0098], branch +0x0058 -> 0x00D0   [419]
+   Room 23 entry +0x00B8 ifClassOfIs 0x01A6, [0x0018], branch +0x0009 -> 0x00CA   [422]
+   Room 23 local 202 +0x0029 setClass 0x01A6, [0x0018, 0x0081]   [422]
+   Room 23 local 202 +0x0122 ifClassOfIs 0x01A6, [0x0003], branch +0x0017 -> 0x0142   [422]
+   Room 23 local 202 +0x012B setClass 0x01A6, [0x0083]   [422]
+   Room 23 local 202 +0x0183 setClass 0x01A6, [0x0083]   [422]
+   Room 23 local 203 +0x0000 setState 0x01AB, 0x01   [427]
+   Room 23 local 203 +0x001C setState 0x01AB, 0x00   [427]
+   Room 23 local 203 +0x0024 setClass 0x01A7, [0x0018]   [423]
+   Room 23 local 204 +0x0028 setClass 0x01A8, [0x0018]   [424]
+   Room 23 local 205 +0x0028 setClass 0x01A9, [0x0018]   [425]
+   Room 23 local 208 +0x0038 setClass 0x01A6, [0x0018, 0x0081]   [422]
+   Room 23 local 208 +0x0042 setClass 0x01A7, [0x0018]   [423]
+   Room 23 local 208 +0x0049 setClass 0x01A8, [0x0018]   [424]
+   Room 23 local 208 +0x0050 setClass 0x01A9, [0x0018]   [425]
+   Room 23 local 210 +0x0228 setClass 0x01A5, [0x0098]   [421]
+   Room 23 local 210 +0x022F setClass 0x01A3, [0x0018]   [419]
+   Room 23 local 211 +0x0041 setState 0x01AA, 0x00   [426]
+   Room 23 local 211 +0x0045 setState 0x01AB, 0x00   [427]
+   Room 23 local 211 +0x0049 setClass 0x01A6, [0x0098]   [422]
+   Room 23 local 211 +0x0050 setClass 0x01A7, [0x0098]   [423]
+   Room 23 local 211 +0x0057 setClass 0x01A8, [0x0098]   [424]
+   Room 23 local 211 +0x005E setClass 0x01A9, [0x0098]   [425]
+   Room 23 local 215 +0x0000 setClass 0x01A6, [0x0098]   [422]
+   Room 23 local 216 +0x0003 setState 0x01AB, 0x01   [427]
+   Room 23 local 216 +0x0008 setClass 0x01A7, [0x0098]   [423]
+   Room 23 local 216 +0x001B setState 0x01AB, 0x00   [427]
+   Room 23 local 217 +0x0000 setClass 0x01A8, [0x0098]   [424]
+   Room 23 local 218 +0x0000 setClass 0x01A9, [0x0098]   [425]
+   Room 23 local 227 +0x0000 setState 0x01AA, 0x00   [426]
+   Room 23 local 228 +0x0009 setState 0x01AA, 0x01   [426]
+   Room 23 local 232 +0x0002 ifClassOfIs 0x01A6, [0x0004], branch +0x0040 -> 0x004B   [422]
+   Room 23 local 232 +0x000B setClass 0x01A6, [0x0084]   [422]
+   Room 23 object 421 Verb 0x36 +0x0000 ifClassOfIs 0x01A6, [0x0081], branch +0x0019 -> 0x0022   [422]
+== Room 25
+   object 446 local 1 no image
+   object 447 local 2 no image
+   object 448 local 3 image (0,0) 48x40
+   Room 25 local 204 +0x0082 ifClassOfIs 0x01BF, [0x0003], branch +0x004D -> 0x00D8   [447]
+   Room 25 local 204 +0x008B setClass 0x01BF, [0x0083]   [447]
+   Room 25 local 204 +0x0126 walkActorToObject 0x01, 0x01BF   [447]
+   Room 25 local 208 +0x000C walkActorToObject 0x01, 0x01BE   [446]
+   Room 25 object 447 Verb 0x36 +0x0000 ifClassOfIs 0x01BF, [0x0003], branch +0x002A -> 0x0033   [447]
+   Room 25 object 447 Verb 0x36 +0x0009 setClass 0x01BF, [0x0083]   [447]
+== Room 36
+   object 598 local 1 no image
+   object 599 local 2 no image
+   object 600 local 3 image (96,88) 64x16
+   Room 36 entry +0x002F setClass 0x0257, [0x0018]   [599]
+   Room 36 entry +0x003C setClass 0x0257, [0x0098]   [599]
+   Room 36 local 200 +0x0094 setClass 0x0257, [0x0018]   [599]
+   Room 36 local 200 +0x00C3 setClass 0x0257, [0x0098]   [599]
+   Room 36 local 201 +0x0000 setState 0x0258, 0x00   [600]
+   Room 36 local 201 +0x0010 setClass 0x0256, [0x0018]   [598]
+   Room 36 local 202 +0x0000 setState 0x0258, 0x01   [600]
+   Room 36 local 202 +0x0010 setClass 0x0256, [0x0098]   [598]
+   Room 46 object 683 Verb 0x56 +0x0000 startScript 0x29, [0x0005, 0x0258, 0x0037, 0x0000]   [600]
+== Room 37
+   object 601 local 1 no image
+   object 602 local 2 no image
+   object 603 local 3 no image
+   object 604 local 4 no image
+   object 605 local 5 image (184,72) 64x24
+   object 606 local 6 image (0,0) 48x40
+   object 607 local 7 image (0,0) 48x40
+   object 608 local 8 image (112,16) 32x64
+   Room 37 entry +0x0000 setState 0x0260, 0x00   [608]
+   Room 37 entry +0x001E setState 0x025D, 0x01   [605]
+   Room 37 entry +0x0025 setState 0x025D, 0x00   [605]
+   Room 37 entry +0x0086 setClass 0x025A, [0x0098]   [602]
+   Room 37 entry +0x008D setClass 0x025B, [0x0098]   [603]
+   Room 37 local 202 +0x000C setClass 0x025A, [0x0018]   [602]
+   Room 37 local 202 +0x0013 setClass 0x025B, [0x0018]   [603]
+   Room 37 local 205 +0x007C setState 0x025D, 0x00   [605]
+   Room 37 local 205 +0x0088 setState 0x025D, 0x01   [605]
+   Room 37 local 205 +0x00B3 startScript 0x08, [0x025C]   [604]
+== Room 41
+   object 630 local 1 no image
+   object 631 local 2 no image
+   object 632 local 3 no image
+   object 633 local 4 no image
+   object 634 local 5 no image
+   object 635 local 6 image (0,0) 48x40
+   object 636 local 7 image (0,0) 48x40
+   Room 41 entry +0x00CE ifClassOfIs 0x0277, [0x0018], branch +0x0003 -> 0x00DA   [631]
+   Room 41 entry +0x00DA ifClassOfIs 0x0278, [0x0003], branch +0x0003 -> 0x00E6   [632]
+   Room 41 entry +0x01DB ifClassOfIs 0x0278, [0x0003], branch +0x0006 -> 0x01EA   [632]
+   Room 41 entry +0x01EA ifClassOfIs 0x0278, [0x0018], branch +0x0006 -> 0x01F9   [632]
+   Room 41 entry +0x01F9 ifClassOfIs 0x0277, [0x0083], branch +0x0006 -> 0x0208   [631]
+   Room 41 local 200 +0x07DB setClass 0x0277, [0x0018, 0x0083]   [631]
+   Room 41 local 206 +0x0005 setClass 0x027A, [0x0018]   [634]
+   Room 41 local 206 +0x000C setClass 0x0279, [0x0098]   [633]
+   Room 41 local 207 +0x0013 setClass 0x0279, [0x0018]   [633]
+   Room 41 local 207 +0x001A setClass 0x027A, [0x0098]   [634]
+   Room 41 local 208 +0x0023 setClass 0x0278, [0x0018, 0x0083]   [632]
+   Room 41 object 632 Verb 0x36 +0x0088 setClass 0x0278, [0x0098]   [632]
+== Room 42
+   object 637 local 1 image (192,32) 104x24
+   object 638 local 2 image (32,40) 80x24
+   Room 42 entry +0x0000 setState 0x027D, 0x00   [637]
+   Room 42 entry +0x0004 setState 0x027E, 0x00   [638]
+== Room 44
+   object 652 local 1 no image
+   object 653 local 2 no image
+   object 654 local 3 image (0,0) 48x40
+== Room 64
+   object 825 local 1 no image
+   object 826 local 2 image (120,8) 72x32
+   Room 64 entry +0x0012 setState 0x033A, 0x01   [826]
+   Room 64 entry +0x0019 setState 0x033A, 0x00   [826]
+== Room 58
+   object 790 local 1 image (184,0) 104x88
+   object 791 local 2 image (184,0) 104x88
+   object 792 local 3 image (184,0) 104x88
+   object 793 local 4 image (216,24) 40x16
+   object 794 local 5 image (216,24) 40x16
+   object 795 local 6 image (216,24) 40x16

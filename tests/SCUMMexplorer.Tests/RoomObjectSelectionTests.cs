@@ -393,6 +393,61 @@ public sealed class RoomObjectSelectionTests
         Assert.DoesNotContain(selection.Compose(background), pixel => pixel == 0);
     }
 
+    [Fact]
+    public void InterfaceImagesAreNeverUsedAsRoomArtwork()
+    {
+        var background = new RoomImage(32, 24, Enumerable.Repeat((byte)2, 32 * 24).ToArray(), Palette);
+        var icon = Filled(1, 0, 0, 8, 8, 3);
+        var room = Filled(2, 16, 0, 8, 8, 4);
+        var selection = new RoomObjectSelection([icon, room], new Dictionary<int, byte> { [1] = 0, [2] = 0 },
+            background: background);
+        selection.ExcludeInterfaceImages([1]);
+
+        var estimate = Assert.Single(selection.ShowUnresolvedArtwork());
+
+        Assert.Equal(2, estimate.ObjectId);
+        Assert.False(selection.IsActive(icon));
+        Assert.Null(selection.HitTest(2, 2));
+        Assert.Equal(room, selection.HitTest(18, 2));
+    }
+
+    [Fact]
+    public void AReachedStateBlocksOnlyTheStoredImageGuess()
+    {
+        var a = Filled(1, 0, 0, 8, 8, 1);
+        var b = Filled(2, 16, 0, 8, 8, 2);
+        var selection = new RoomObjectSelection([a, b], new Dictionary<int, byte> { [1] = 0, [2] = 0 });
+
+        // Both were set to 0 by reached code; a later batch still draws 1.
+        var estimates = selection.ShowUnresolvedArtwork(
+            [new RoomDrawBatch([new RoomDrawStep(1)], LoomSceneDrawBatches.OpeningFramePriority, "opening frame")],
+            statesSetByCode: [1, 2]);
+
+        Assert.Equal([(1, "opening frame")], estimates.Select(item => (item.ObjectId, item.Reason)));
+        Assert.False(selection.IsActive(b));
+    }
+
+    [Fact]
+    public void AnUnavoidableEntryStateReplacesTheStoredImageGuess()
+    {
+        var hidden = Filled(1, 0, 0, 8, 8, 1);
+        var shownFirst = Filled(2, 16, 0, 8, 8, 2);
+        var shownSecond = Filled(3, 16, 0, 8, 8, 3);
+        var guessed = Filled(4, 32, 0, 8, 8, 4);
+        var selection = new RoomObjectSelection([hidden, shownFirst, shownSecond, guessed]);
+
+        var estimates = selection.ShowUnresolvedArtwork(entryStates: new Dictionary<int, RoomStateEvidence>
+        {
+            [1] = new(0, "entry +0x0000 sets it to 0 on every path"),
+            [3] = new(1, "entry +0x0004 sets it to 1 on every path"),
+        });
+
+        Assert.Equal([(3, "entry +0x0004 sets it to 1 on every path"), (4, RoomObjectSelection.FirstStoredImageReason)],
+            estimates.Select(item => (item.ObjectId, item.Reason)));
+        Assert.False(selection.IsActive(hidden));
+        Assert.False(selection.IsActive(shownFirst));
+    }
+
     private static RoomObjectImage Image(int id, int x, int y, int width, int height) =>
         new(id, x, y, width, height, new byte[width * height]);
 

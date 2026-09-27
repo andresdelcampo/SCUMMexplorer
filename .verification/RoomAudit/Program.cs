@@ -38,9 +38,11 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
         IReadOnlyList<RoomArtworkEstimate> fallback = [];
         if (!snapshot.IsFaithful)
         {
+            selection.ExcludeInterfaceImages(batches.InterfaceImages.Keys);
             estimates = selection.FillGaps(batches.ForRoom(id), seed: id);
             if (!images.Any(selection.IsActive))
-                fallback = selection.ShowUnresolvedArtwork(batches.ForRoom(id), seed: id);
+                fallback = selection.ShowUnresolvedArtwork(batches.ForRoom(id), seed: id, snapshot.StatesSetByCode,
+                    batches.EntryStatesForRoom(id));
         }
         var after = selection.VisibleGaps();
 
@@ -60,6 +62,14 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
         report.AppendLine($"== Room {id:00} ({images.Count} images, faithful={snapshot.IsFaithful}, pending={snapshot.PendingScripts})");
         report.AppendLine($"   paint order: {string.Join(',', selection.PaintOrder().Select(o => o.Id))}");
         report.AppendLine($"   draw queue:  {string.Join(',', selection.DrawQueue)}");
+        if (session.LastEntryRun?.UnresolvedReason is { } stop) report.AppendLine($"   entry script stopped: {stop}");
+        var interfaceHere = images.Where(i => batches.InterfaceImages.ContainsKey(i.Id)).Select(i => i.Id).ToArray();
+        if (interfaceHere.Length > 0) report.AppendLine($"   interface images (verb area, not room artwork): {string.Join(',', interfaceHere)}");
+        var keptByCode = images.Where(i => snapshot.StatesSetByCode.Contains(i.Id)).Select(i => $"{i.Id}={snapshot.ObjectStates.GetValueOrDefault(i.Id)}").ToArray();
+        if (keptByCode.Length > 0) report.AppendLine($"   state set by reached code: {string.Join(',', keptByCode)}");
+        foreach (var (objectId, evidence) in batches.EntryStatesForRoom(id).Where(pair => images.Any(i => i.Id == pair.Key)).OrderBy(pair => pair.Key))
+            report.AppendLine($"   entry state {objectId}={evidence.State}: {evidence.Source}");
+        if (!snapshot.IsFaithful && !images.Any(selection.IsActive)) report.AppendLine("   nothing visible after fallback");
         if (fallback.Count > 0) report.AppendLine($"   nothing visible; fallback estimate shows {string.Join(',', fallback.Select(e => e.ObjectId))}");
         foreach (var e in fallback) report.AppendLine($"   fallback {e.ObjectId}: {e.Reason}");
         foreach (var e in estimates) report.AppendLine($"   estimate {e.ObjectId}: {e.Reason}");

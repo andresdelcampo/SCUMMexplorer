@@ -15,10 +15,14 @@ public sealed record LoomSessionSnapshot(
     IReadOnlyCollection<int> ActiveSounds,
     int PendingScripts,
     IReadOnlyList<string> Uncertainties,
-    IReadOnlyList<int>? DrawQueue = null)
+    IReadOnlyList<int>? DrawQueue = null,
+    IReadOnlyCollection<int>? StatesSetInRoom = null)
 {
     /// <summary>Objects drawn since the last redraw, in call order (painted over directory order).</summary>
     public IReadOnlyList<int> DrawOrder => DrawQueue ?? [];
+
+    /// <summary>Objects whose state a reached <c>setState</c> set since this room was entered.</summary>
+    public IReadOnlyCollection<int> StatesSetByCode => StatesSetInRoom ?? [];
 
     public bool IsFaithful => RoomId.HasValue && PendingScripts == 0 && Uncertainties.Count == 0;
 }
@@ -90,7 +94,8 @@ public sealed class LoomExplorationSession
         _runtime.ActiveSounds.Order().ToArray(),
         _pending.Count,
         _uncertainties.ToArray(),
-        _runtime.DrawQueue.ToArray());
+        _runtime.DrawQueue.ToArray(),
+        _runtime.StatesSetInRoom.Order().ToArray());
 
     private int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue("var[0x001]", out var ego)
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
@@ -116,6 +121,7 @@ public sealed class LoomExplorationSession
         _currentRoom = room;
         // startScene clears the draw queue before the entry scripts run.
         _runtime.DrawQueue.Clear();
+        _runtime.StatesSetInRoom.Clear();
         _currentObjects = _objects.Decode(File.ReadAllBytes(room.FilePath));
         foreach (var item in _currentObjects)
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));

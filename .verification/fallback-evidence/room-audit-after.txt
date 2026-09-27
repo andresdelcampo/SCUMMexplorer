@@ -1,0 +1,523 @@
+Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
+
+== Room 01 (53 images, faithful=False, pending=0)
+   paint order: 152
+   draw queue:  
+   interface images (verb area, not room artwork): 100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151
+   nothing visible; fallback estimate shows 152
+   fallback 152: first stored image for this position; no decoded script draws it
+   doorways: 
+== Room 02 (4 images, faithful=False, pending=0)
+   paint order: 157
+   draw queue:  157
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x007A
+   interface images (verb area, not room artwork): 158,159
+   state set by reached code: 155=0,157=0
+   nothing visible; fallback estimate shows 157
+   fallback 157: opening frame of Room 02 in script 106 +0x03A0
+   doorways: 03
+== Room 03 (1 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 166
+   nothing visible after fallback
+   doorways: 02,04,05,10
+== Room 04 (20 images, faithful=False, pending=0)
+   paint order: 187,184,181,178
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors
+   interface images (verb area, not room artwork): 190,191,192,193,194,195,196,198
+   nothing visible; fallback estimate shows 178,181,184,187
+   fallback 178: first stored image for this position; no decoded script draws it
+   fallback 181: first stored image for this position; no decoded script draws it
+   fallback 184: first stored image for this position; no decoded script draws it
+   fallback 187: first stored image for this position; no decoded script draws it
+   doorways: 03,64
+== Room 05 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 4 more omitted behaviors
+   nothing visible after fallback
+   doorways: 03,06,07,10,62,63
+== Room 06 (39 images, faithful=False, pending=0)
+   paint order: 221,222,223,224,212,233,234,235,229,230,215,216
+   draw queue:  221,222,223,224,212,233,234,235,229,230,215,216
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 239,240,241,242,243,244,245,246,247,248,249,250
+   doorways: 05
+== Room 07 (0 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 05,08,09,50
+== Room 08 (8 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x00AD
+   interface images (verb area, not room artwork): 260,261,262,266
+   state set by reached code: 259=0,263=0,264=0,265=0
+   nothing visible after fallback
+   doorways: 07,09
+== Room 09 (7 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x00BF
+   interface images (verb area, not room artwork): 276,277,278,279,280,281,282
+   nothing visible after fallback
+   doorways: 08
+== Room 10 (17 images, faithful=False, pending=0)
+   paint order: 303,302,301,293
+   draw queue:  
+   entry script stopped: operation 'isScriptRunning' is not modeled at +0x012A
+   interface images (verb area, not room artwork): 310
+   state set by reached code: 293=1,301=1,302=1,303=1,304=0,305=0,306=0
+   entry state 304=0: Room 10 entry script +0x00A9 sets it to 0 on every path
+   entry state 305=0: Room 10 entry script +0x00AD sets it to 0 on every path
+   entry state 306=0: Room 10 entry script +0x00B1 sets it to 0 on every path
+   doorways: 03,05,13
+== Room 11 (9 images, faithful=False, pending=1)
+   paint order: 312
+   draw queue:  312
+   state set by reached code: 315=0,316=0,317=0,318=0,319=0
+   doorways: 
+== Room 12 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x0013
+   nothing visible after fallback
+   doorways: 13
+== Room 13 (12 images, faithful=False, pending=0)
+   paint order: 327,330,334,336
+   draw queue:  327,330,334,336
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x00C0
+   interface images (verb area, not room artwork): 337
+   estimate 327: Room 13 entry script +0x0101
+   estimate 330: Room 13 entry script +0x0101
+   estimate 334: Room 13 entry script +0x0101
+   estimate 336: Room 13 entry script +0x0101
+   doorways: 
+== Room 14 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 15 (4 images, faithful=False, pending=1)
+   paint order: 340,341
+   draw queue:  340,341
+   doorways: 16,23
+== Room 16 (1 images, faithful=False, pending=2)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 351
+   nothing visible after fallback
+   doorways: 15,17,18,22,23
+== Room 17 (10 images, faithful=False, pending=1)
+   paint order: 364,363,365,366
+   draw queue:  364,363,365,366
+   entry script stopped: presentation operation not applied: actorOps; presentation operation not applied: resourceRoutines
+   interface images (verb area, not room artwork): 361,362
+   doorways: 16,22
+== Room 18 (5 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x0070
+   interface images (verb area, not room artwork): 375,376,377,378
+   entry state 373=0: Room 18 entry script +0x00DA sets it to 0 on every path
+   nothing visible after fallback
+   doorways: 16,22
+== Room 19 (7 images, faithful=False, pending=0)
+   paint order: 385
+   draw queue:  385
+   entry script stopped: presentation operation not applied: resourceRoutines
+   state set by reached code: 379=0,380=0,381=0,382=0,383=0,384=0,385=0
+   entry state 379=0: Room 19 entry script +0x0028 sets it to 0 on every path
+   entry state 380=0: Room 19 entry script +0x002C sets it to 0 on every path
+   entry state 381=0: Room 19 entry script +0x0030 sets it to 0 on every path
+   entry state 382=0: Room 19 entry script +0x0034 sets it to 0 on every path
+   entry state 383=0: Room 19 entry script +0x0038 sets it to 0 on every path
+   entry state 384=0: Room 19 entry script +0x003C sets it to 0 on every path
+   entry state 385=0: Room 19 entry script +0x0040 sets it to 0 on every path
+   nothing visible; fallback estimate shows 385
+   fallback 385: script 94 +0x00B6
+   doorways: 
+== Room 20 (8 images, faithful=False, pending=0)
+   paint order: 396,395,394,393,392
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 397,398,399
+   nothing visible; fallback estimate shows 392,393,394,395,396
+   fallback 392: first stored image for this position; no decoded script draws it
+   fallback 393: first stored image for this position; no decoded script draws it
+   fallback 394: first stored image for this position; no decoded script draws it
+   fallback 395: first stored image for this position; no decoded script draws it
+   fallback 396: first stored image for this position; no decoded script draws it
+   doorways: 
+== Room 22 (10 images, faithful=False, pending=0)
+   paint order: 406
+   draw queue:  406
+   entry script stopped: operation 'debug' is not modeled at +0x009F
+   interface images (verb area, not room artwork): 414,415,416,417
+   state set by reached code: 408=0
+   entry state 408=0: Room 22 entry script +0x0039 sets it to 0 on every path
+   doorways: 16,17,18
+== Room 23 (3 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x006F
+   interface images (verb area, not room artwork): 428
+   state set by reached code: 426=0,427=0
+   entry state 426=0: Room 23 entry script +0x0038 sets it to 0 on every path
+   entry state 427=0: Room 23 entry script +0x0034 sets it to 0 on every path
+   nothing visible after fallback
+   doorways: 15,16,24
+== Room 24 (12 images, faithful=False, pending=2)
+   paint order: 435
+   draw queue:  
+   entry script stopped: presentation operation not applied: actorOps; presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 442,443
+   state set by reached code: 435=1
+   doorways: 23,25
+== Room 25 (1 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 448
+   nothing visible after fallback
+   doorways: 24
+== Room 26 (14 images, faithful=False, pending=0)
+   paint order: 450,451
+   draw queue:  450,451
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x0027
+   interface images (verb area, not room artwork): 462
+   doorways: 46
+== Room 27 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 28 (24 images, faithful=False, pending=0)
+   paint order: 482,481,480,479,478,477,476
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: setBoxFlags; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors
+   interface images (verb area, not room artwork): 497,498,499
+   state set by reached code: 476=1,477=1,478=1,479=1,480=1,481=1,482=1,483=0,484=0,485=0,486=0,487=0,488=0,489=0,490=0,491=0,492=0,493=0,494=0,495=0,496=0
+   doorways: 
+== Room 29 (3 images, faithful=False, pending=0)
+   paint order: 500
+   draw queue:  500
+   doorways: 
+== Room 30 (3 images, faithful=False, pending=0)
+   paint order: 504,520
+   draw queue:  520
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x000E
+   nothing visible; fallback estimate shows 520,504
+   fallback 520: Room 30 entry script +0x002E
+   fallback 504: first stored image for this position; no decoded script draws it
+   doorways: 33
+== Room 31 (11 images, faithful=False, pending=0)
+   paint order: 526,527,528,529
+   draw queue:  526,527,528,529
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x0055
+   interface images (verb area, not room artwork): 534,535,536
+   doorways: 
+== Room 32 (2 images, faithful=False, pending=1)
+   paint order: 541
+   draw queue:  541
+   entry script stopped: presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors
+   state set by reached code: 540=0
+   doorways: 30
+== Room 33 (12 images, faithful=False, pending=0)
+   paint order: 547,548,549,550
+   draw queue:  547,548,549,550
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x0019
+   interface images (verb area, not room artwork): 555,556
+   estimate 547: Room 33 entry script +0x007E
+   estimate 548: Room 33 entry script +0x007E
+   estimate 549: Room 33 entry script +0x007E
+   estimate 550: Room 33 entry script +0x007E
+   doorways: 30,34
+== Room 34 (23 images, faithful=False, pending=1)
+   paint order: 576,575,574,573
+   draw queue:  
+   entry script stopped: presentation operation not applied: setClass; presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: setObjectName; presentation operation not applied: actorOps; and 3 more omitted behaviors
+   interface images (verb area, not room artwork): 582,583,584,585
+   state set by reached code: 563=0,573=1,574=1,575=1,576=1,577=0,578=0,579=0,580=0,581=0
+   doorways: 33,35,46
+== Room 35 (7 images, faithful=False, pending=0)
+   paint order: 594
+   draw queue:  594
+   entry script stopped: presentation operation not applied: resourceRoutines
+   interface images (verb area, not room artwork): 595,597
+   doorways: 34,36
+== Room 36 (1 images, faithful=False, pending=3)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: setClass; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   state set by reached code: 600=0
+   nothing visible after fallback
+   doorways: 35,37
+== Room 37 (4 images, faithful=False, pending=2)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 2 more omitted behaviors
+   interface images (verb area, not room artwork): 606,607
+   state set by reached code: 605=0,608=0
+   entry state 608=0: Room 37 entry script +0x0000 sets it to 0 on every path
+   nothing visible after fallback
+   doorways: 36,38,41
+== Room 38 (9 images, faithful=False, pending=0)
+   paint order: 614
+   draw queue:  614
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x005B
+   interface images (verb area, not room artwork): 619,620,621,622
+   nothing visible; fallback estimate shows 614
+   fallback 614: opening frame of Room 38 in script 86 +0x0549
+   doorways: 37
+== Room 39 (0 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 40 (6 images, faithful=False, pending=2)
+   paint order: 624,625
+   draw queue:  624,625
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   doorways: 
+== Room 41 (2 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x00CE
+   interface images (verb area, not room artwork): 635,636
+   nothing visible after fallback
+   doorways: 37
+== Room 42 (2 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   state set by reached code: 637=0,638=0
+   entry state 637=0: Room 42 entry script +0x0000 sets it to 0 on every path
+   entry state 638=0: Room 42 entry script +0x0004 sets it to 0 on every path
+   nothing visible after fallback
+   doorways: 
+== Room 43 (7 images, faithful=False, pending=1)
+   paint order: 645
+   draw queue:  645
+   entry script stopped: presentation operation not applied: setClass; presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and 2 more omitted behaviors
+   interface images (verb area, not room artwork): 647,648,649,651
+   state set by reached code: 644=0,645=0
+   nothing visible; fallback estimate shows 645
+   fallback 645: script 91 +0x009C
+   doorways: 44,45,46
+== Room 44 (1 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps
+   interface images (verb area, not room artwork): 654
+   nothing visible after fallback
+   doorways: 
+== Room 45 (24 images, faithful=False, pending=0)
+   paint order: 657
+   draw queue:  657
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x001D
+   interface images (verb area, not room artwork): 680
+   doorways: 
+== Room 46 (9 images, faithful=False, pending=0)
+   paint order: 686
+   draw queue:  686
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x0040
+   interface images (verb area, not room artwork): 691,692,693,694
+   nothing visible; fallback estimate shows 686
+   fallback 686: Room 46 entry script +0x0111
+   doorways: 26,47
+== Room 47 (5 images, faithful=False, pending=0)
+   paint order: 698,699
+   draw queue:  698,699
+   entry script stopped: presentation operation not applied: setCameraAt; presentation operation not applied: roomOps; presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; and 4 more omitted behaviors
+   interface images (verb area, not room artwork): 702
+   doorways: 46,50
+== Room 49 (13 images, faithful=False, pending=0)
+   paint order: 708,709,710,711
+   draw queue:  708,709,710,711
+   entry script stopped: presentation operation not applied: actorOps; presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 720
+   doorways: 46
+== Room 50 (18 images, faithful=False, pending=0)
+   paint order: 726,727,728,723,724,725
+   draw queue:  726,727,728,723,724,725
+   doorways: 07,47
+== Room 51 (20 images, faithful=False, pending=0)
+   paint order: 744,745,746,753,754,755
+   draw queue:  744,745,746,753,754,755
+   entry script stopped: operation 'ifClassOfIs' is not modeled at +0x0087
+   interface images (verb area, not room artwork): 762,763
+   nothing visible; fallback estimate shows 744,745,746,753,754,755
+   fallback 744: Room 51 local script 200 +0x0000
+   fallback 745: Room 51 local script 200 +0x0000
+   fallback 746: Room 51 local script 200 +0x0000
+   fallback 753: Room 51 local script 200 +0x009A
+   fallback 754: Room 51 local script 200 +0x009A
+   fallback 755: Room 51 local script 200 +0x009A
+   doorways: 
+== Room 52 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines
+   nothing visible after fallback
+   doorways: 
+== Room 53 (6 images, faithful=False, pending=0)
+   paint order: 764
+   draw queue:  764
+   doorways: 
+== Room 54 (3 images, faithful=False, pending=0)
+   paint order: 770
+   draw queue:  770
+   entry script stopped: presentation operation not applied: lights
+   doorways: 
+== Room 55 (6 images, faithful=False, pending=0)
+   paint order: 773,776
+   draw queue:  773,776
+   doorways: 
+== Room 56 (6 images, faithful=False, pending=0)
+   paint order: 779,782
+   draw queue:  779,782
+   estimate 779: opening frame of Room 56 in script 68 +0x0103
+   estimate 782: opening frame of Room 56 in script 68 +0x0103
+   doorways: 
+== Room 57 (5 images, faithful=False, pending=0)
+   paint order: 787
+   draw queue:  787
+   doorways: 
+== Room 58 (6 images, faithful=False, pending=0)
+   paint order: 790,795
+   draw queue:  790,795
+   estimate 790: random choice among the images stored for this position
+   estimate 795: random choice among the images stored for this position
+   doorways: 
+== Room 59 (6 images, faithful=False, pending=0)
+   paint order: 796
+   draw queue:  796
+   doorways: 
+== Room 60 (5 images, faithful=False, pending=0)
+   paint order: 804
+   draw queue:  804
+   doorways: 
+== Room 61 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: resourceRoutines
+   nothing visible after fallback
+   doorways: 
+== Room 62 (7 images, faithful=False, pending=0)
+   paint order: 815,814
+   draw queue:  815,814
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 2 more omitted behaviors
+   interface images (verb area, not room artwork): 816,817,818
+   doorways: 05
+== Room 63 (0 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 05
+== Room 64 (1 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   entry script stopped: presentation operation not applied: roomOps
+   state set by reached code: 826=0
+   nothing visible after fallback
+   doorways: 04
+== Room 65 (3 images, faithful=False, pending=1)
+   paint order: 830
+   draw queue:  830
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 832
+   nothing visible; fallback estimate shows 830
+   fallback 830: opening frame of Room 65 in script 72 +0x0029
+   doorways: 
+== Room 66 (32 images, faithful=False, pending=3)
+   paint order: 834,835,840,841
+   draw queue:  834,835,840,841
+   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: setClass; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and 1 more omitted behaviors
+   interface images (verb area, not room artwork): 865
+   doorways: 
+== Room 67 (4 images, faithful=False, pending=0)
+   paint order: 867
+   draw queue:  867
+   doorways: 
+== Room 68 (6 images, faithful=False, pending=1)
+   paint order: 873,870
+   draw queue:  873,870
+   entry script stopped: presentation operation not applied: roomOps
+   doorways: 
+== Room 69 (11 images, faithful=False, pending=0)
+   paint order: 876,877,878
+   draw queue:  876,877,878
+   entry script stopped: operation 'setVarRange' is not modeled at +0x003B
+   entry state 898=0: Room 69 entry script +0x0048 sets it to 0 on every path
+   nothing visible; fallback estimate shows 876,877,878
+   fallback 876: Room 69 local script 202 +0x0001
+   fallback 877: Room 69 local script 202 +0x0001
+   fallback 878: Room 69 local script 202 +0x0001
+   doorways: 
+== Room 70 (10 images, faithful=False, pending=0)
+   paint order: 900,901,902
+   draw queue:  900,901,902
+   entry script stopped: presentation operation not applied: resourceRoutines
+   nothing visible; fallback estimate shows 900,901,902
+   fallback 900: Room 70 local script 206 +0x003A
+   fallback 901: Room 70 local script 206 +0x003A
+   fallback 902: Room 70 local script 206 +0x003A
+   doorways: 
+== Room 79 (6 images, faithful=False, pending=0)
+   paint order: 912,913
+   draw queue:  912,913
+   doorways: 
+== Room 81 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 82 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 83 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 84 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 85 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   nothing visible after fallback
+   doorways: 
+== Room 86 (11 images, faithful=False, pending=0)
+   paint order: 925,927
+   draw queue:  925,927
+   entry script stopped: presentation operation not applied: resourceRoutines
+   state set by reached code: 918=0,919=0,920=0,921=0,922=0,923=0,924=0,925=0,926=0,927=0,928=0
+   entry state 918=0: Room 86 entry script +0x0003 sets it to 0 on every path
+   entry state 919=0: Room 86 entry script +0x0007 sets it to 0 on every path
+   entry state 920=0: Room 86 entry script +0x000B sets it to 0 on every path
+   entry state 921=0: Room 86 entry script +0x000F sets it to 0 on every path
+   entry state 922=0: Room 86 entry script +0x0013 sets it to 0 on every path
+   entry state 923=0: Room 86 entry script +0x0017 sets it to 0 on every path
+   entry state 924=0: Room 86 entry script +0x001B sets it to 0 on every path
+   entry state 925=0: Room 86 entry script +0x001F sets it to 0 on every path
+   entry state 926=0: Room 86 entry script +0x0023 sets it to 0 on every path
+   entry state 927=0: Room 86 entry script +0x0027 sets it to 0 on every path
+   entry state 928=0: Room 86 entry script +0x002B sets it to 0 on every path
+   nothing visible; fallback estimate shows 925,927
+   fallback 925: script 111 +0x0078
+   fallback 927: Room 86 local script 202 +0x0009
+   doorways: 
+== Room 87 (3 images, faithful=False, pending=0)
+   paint order: 929
+   draw queue:  929
+   doorways: 
