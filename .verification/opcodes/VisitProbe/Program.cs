@@ -38,6 +38,12 @@ foreach (var step in args.Skip(1))
         Console.WriteLine($"== set var[0x{Convert.ToInt32(name, 16):X3}] = {value}");
         continue;
     }
+    // "sounds": lists the reached sound commands so far.
+    if (step == "sounds")
+    {
+        foreach (var item in session.ReachedSoundEvents) Console.WriteLine("   sound: " + item.Format());
+        continue;
+    }
     // "+N": advances N frames.
     if (step.StartsWith('+'))
     {

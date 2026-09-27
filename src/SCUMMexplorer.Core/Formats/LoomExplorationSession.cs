@@ -242,6 +242,15 @@ public sealed class LoomExplorationSession
         item.Certainty == LoomScriptEventCertainty.Reached && item.Kind is
             LoomScriptEventKind.MusicStarted or LoomScriptEventKind.SoundStarted or
             LoomScriptEventKind.MusicStopped or LoomScriptEventKind.SoundStopped).ToArray();
+
+    /// <summary>
+    /// Every sound command the session met, in route order, with the room that was
+    /// current and the room whose code started the chain of scripts that ran it.
+    /// </summary>
+    public IReadOnlyList<LoomSessionSoundEvent> SoundEvents => _soundEvents;
+
+    /// <summary>The route position at which the current room was last entered (after the previous room's exit code).</summary>
+    public int RoomEntrySequence { get; private set; }
     public LoomSessionSnapshot Snapshot => new(
         _currentRoom?.ResourceId,
         new Dictionary<int, byte>(_runtime.ObjectStates),
@@ -313,6 +322,7 @@ public sealed class LoomExplorationSession
 
         _currentRoom = room;
         _runtime.CurrentRoom = room.ResourceId;
+        RoomEntrySequence = _visitEvents.Count;
         // startScene clears the draw queue before the entry scripts run.
         _runtime.DrawQueue.Clear();
         _runtime.StatesSetInRoom.Clear();
@@ -598,6 +608,7 @@ public sealed class LoomExplorationSession
     }
 
     private readonly List<LoomScriptEvent> _visitEvents = [];
+    private readonly List<LoomSessionSoundEvent> _soundEvents = [];
     private readonly List<string> _visitTrace = [];
     private readonly HashSet<int> _stopped = [];
     private readonly List<LoomRandomPick> _picks = [];
@@ -684,9 +695,11 @@ public sealed class LoomExplorationSession
     private LoomBoundedScriptResult? RunStartedScript(int scriptId, int startOffset,
         IReadOnlyDictionary<string, ushort>? locals, int depth,
         IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
-        bool freezeResistant = false)
+        bool freezeResistant = false, ScriptFrame? parent = null)
     {
-        var frame = new ScriptFrame { FreezeResistant = freezeResistant };
+        // A started script carries the room origin of the script that started it.
+        parent ??= _executing.Count > 0 ? _executing[^1] : null;
+        var frame = new ScriptFrame { FreezeResistant = freezeResistant, OriginRoom = parent?.OriginRoom };
         if (scriptId < _globalScriptCount)
             return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated, frame);
         if (_currentRoom is null)
@@ -738,6 +751,7 @@ public sealed class LoomExplorationSession
         frame.Number = scriptNumber;
         // Indexed scripts run in global slots; room entry, exit, local and verb code is room-owned.
         frame.Global = script.Context is null;
+        if (!frame.Global) frame.OriginRoom = _currentRoom?.ResourceId;
         _executing.Add(frame);
         LoomBoundedScriptResult result;
         try
@@ -769,7 +783,7 @@ public sealed class LoomExplorationSession
             _chained = null;
             _visitTrace.Add($"{label} chains to script {chain.Script}");
             RunStartedScript(chain.Script, 0, chain.Arguments, depth, chain.EstimatedArguments, chain.PathEstimated,
-                frame.FreezeResistant);
+                frame.FreezeResistant, frame);
         }
         if (result.ResumeOffset is int next)
         {
@@ -786,6 +800,10 @@ public sealed class LoomExplorationSession
     private string? HandleEvent(LoomScriptEvent scriptEvent, int depth)
     {
         _visitEvents.Add(scriptEvent);
+        if (scriptEvent.Kind is LoomScriptEventKind.MusicStarted or LoomScriptEventKind.SoundStarted or
+            LoomScriptEventKind.MusicStopped or LoomScriptEventKind.SoundStopped)
+            _soundEvents.Add(new LoomSessionSoundEvent(scriptEvent, _visitEvents.Count - 1, _runtime.CurrentRoom,
+                _executing.Count > 0 ? _executing[^1].OriginRoom : null));
         switch (scriptEvent.Kind)
         {
             case LoomScriptEventKind.ScriptStarted:
@@ -1028,5 +1046,11 @@ public sealed class LoomExplorationSession
         public bool Global { get; set; }
         public int FreezeCount { get; set; }
         public string Label { get; set; } = "";
+        /// <summary>
+        /// The room whose entry, exit, local or verb code started this chain of
+        /// scripts; null when it began in a global script the engine started
+        /// (the boot or a room hook).
+        /// </summary>
+        public int? OriginRoom { get; set; }
     }
 }

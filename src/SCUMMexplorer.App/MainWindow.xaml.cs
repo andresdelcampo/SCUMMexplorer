@@ -2399,16 +2399,22 @@ public partial class MainWindow : Window
             .ToDictionary(group => group.Key, group => group.First());
         bool IsMusic(int id) => soundById.TryGetValue(id, out var resource) &&
             _adlibDecoder.HasMusic(resource);
-        var reached = SessionModeToggle.IsChecked == true && _session is not null
-            ? LoomSoundCueResolver.Resolve(_session.ReachedSoundEvents, IsMusic)
+        var reached = SessionModeToggle.IsChecked == true && _session is not null &&
+                      _session.Snapshot.RoomId == room.ResourceId
+            ? LoomSoundCueResolver.ResolveForRoom(_session.SoundEvents, room.ResourceId!.Value,
+                _session.RoomEntrySequence, IsMusic)
             : new LoomReachedSoundCue(null, false, 0);
         var possible = _roomSoundCandidates.Analyze(_game, room, _currentRoomObjectRecords);
         if (reached.Start?.TargetId is int currentId && soundById.TryGetValue(currentId, out var current))
         {
             SelectRoomCue(current, reached.Start.Format(), reached: true);
-            RoomMusicNote.Text = "The cue above began on your route." +
+            RoomMusicNote.Text = (reached.StartedBeforeEntry
+                    ? "This room's code started the cue above on an earlier visit, and nothing reached has stopped it."
+                    : "The cue above began after you entered this room.") +
                 (reached.OtherActiveMusicCount > 0 ? " Other tracks may also be active." : "");
-            RoomMusicNote.ToolTip = "The session follows reached sound commands, but does not simulate when a track ends naturally.";
+            RoomMusicNote.ToolTip = "The session follows reached sound commands, but does not simulate when a track ends naturally. " +
+                "Only cues started since this room was entered, or started by this room's own code and not stopped, are shown; " +
+                "cues carried over from other rooms are left out.";
         }
         else
         {
