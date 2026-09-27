@@ -84,8 +84,8 @@ public sealed class LoomFirstVisitRenderingTests
 
     [Theory]
     [InlineData(2, 157, "opening frame of Room 02 in script 106 +0x03A0")]
-    [InlineData(38, 614, "opening frame of Room 38 in script 86 +0x0549")]
-    [InlineData(30, 520, "Room 30 entry script +0x002E")]
+    [InlineData(65, 830, "opening frame of Room 65 in script 72 +0x0029")]
+    [InlineData(43, 645, "script 91 +0x009C")]
     public void NothingVisibleFallbackOpensOnTheStrongestScriptBatch(int roomId, int objectId, string source)
     {
         if (Data.Value is not { } data) return;
@@ -105,6 +105,24 @@ public sealed class LoomFirstVisitRenderingTests
         }
         Assert.Equal(images.Where(selection.IsActive).Select(obj => obj.Id).Order(),
             estimates.Select(item => item.ObjectId).Distinct().Order());
+        Assert.Empty(selection.VisibleGaps());
+    }
+
+    // Once setClass and ifClassOfIs are modelled, these entries run past their
+    // class tests and draw the image themselves; no estimate is needed.
+    [Theory]
+    [InlineData(30, 520)]
+    [InlineData(38, 614)]
+    [InlineData(46, 687)]
+    public void EntryScriptsThatTestClassesDrawTheirRoomsThemselves(int roomId, int objectId)
+    {
+        if (Data.Value is not { } data) return;
+        var (selection, estimates, _) = data.FirstVisit(roomId);
+
+        Assert.True(selection.IsActive(data.Images(roomId).Single(obj => obj.Id == objectId)));
+        Assert.Contains(objectId, selection.DrawQueue);
+        Assert.DoesNotContain(estimates, item => item.ObjectId == objectId);
+        Assert.DoesNotContain(estimates, item => item.Reason == RoomObjectSelection.FirstStoredImageReason);
         Assert.Empty(selection.VisibleGaps());
     }
 

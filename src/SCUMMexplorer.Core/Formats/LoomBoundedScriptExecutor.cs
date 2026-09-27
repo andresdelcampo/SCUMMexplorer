@@ -134,6 +134,13 @@ public sealed class LoomBoundedScriptExecutor
                 break;
             }
 
+            if (instruction.Operation == "debug")
+            {
+                // o5_debug reads its operand and only logs it in debug builds.
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "breakHere")
             {
                 resumeOffset = next;
@@ -152,7 +159,8 @@ public sealed class LoomBoundedScriptExecutor
 
             if (IsConditional(instruction.Operation))
             {
-                if (!TryEvaluateCondition(instruction, knownVariables, states, out var condition, out var conditionDetail))
+                if (!TryEvaluateCondition(instruction, knownVariables, states, runtime?.ObjectClasses,
+                        out var condition, out var conditionDetail))
                 {
                     if (!TrySkipPresentationOnlyBranch(instructionIndex, next, instructions, indexByOffset, out var join))
                     {
@@ -324,6 +332,27 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "setClass" && runtime is not null &&
+                TryReadClassOperands(instruction.Operands, knownVariables, out var classObject, out var classValues) &&
+                runtime.ObjectClasses.TryGetValue(classObject, out var classBits))
+            {
+                // o5_setClass/putClass: 0 clears every class; 0x80|n sets class n; n clears it.
+                foreach (var value in classValues)
+                {
+                    var cls = value & 0x7F;
+                    if (value == 0) classBits = 0;
+                    else if (cls is >= 1 and <= 32)
+                        classBits = (value & 0x80) != 0 ? classBits | (1u << (cls - 1)) : classBits & ~(1u << (cls - 1));
+                }
+                runtime.ObjectClasses[classObject] = classBits;
+                var classEstimated = onEstimatedPath || instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
+                    .Any(operand => OperandIsEstimated(operand.Trim('[', ']', ' '), estimated, knownVariables));
+                if (classEstimated) runtime.EstimatedStates.Add(classObject);
+                trace.Add($"object {classObject} classes set to 0x{classBits:X6}{(classEstimated ? " (estimate: follows a seeded pick)" : "")}");
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "setOwnerOf")
             {
                 var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
@@ -473,8 +502,8 @@ public sealed class LoomBoundedScriptExecutor
         if (branchIndex >= 0) expression = expression[..branchIndex];
         var values = expression.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (values.Any(value => OperandIsEstimated(value, estimated, variables))) return true;
-        return instruction.Operation is "ifState" or "ifNotState" && estimatedStates is not null &&
-               values.Length > 0 && TryReadLiteral(values[0], out var objectId) && estimatedStates.Contains(objectId);
+        return instruction.Operation is "ifState" or "ifNotState" or "ifClassOfIs" && estimatedStates is not null &&
+               values.Length > 0 && TryReadValue(values[0], variables, out var objectId, out _) && estimatedStates.Contains(objectId);
     }
 
     private static void CopyGlobalVariables(IReadOnlyDictionary<string, ushort> source,
@@ -487,16 +516,53 @@ public sealed class LoomBoundedScriptExecutor
 
     private static bool IsConditional(string operation) => operation is
         "isGreaterEqual" or "isNotEqual" or "isLessEqual" or "isLess" or "isEqual" or "isGreater" or
-        "equalZero" or "notEqualZero" or "ifState" or "ifNotState";
+        "equalZero" or "notEqualZero" or "ifState" or "ifNotState" or "ifClassOfIs";
+
+    /// <summary>Reads "obj, [c1, c2, ...]" as used by setClass and ifClassOfIs.</summary>
+    private static bool TryReadClassOperands(string operands, IDictionary<string, ushort> variables,
+        out int objectId, out IReadOnlyList<int> classes)
+    {
+        objectId = 0;
+        classes = [];
+        var open = operands.IndexOf(", [", StringComparison.Ordinal);
+        var close = open < 0 ? -1 : operands.IndexOf(']', open + 3);
+        if (open < 0 || close < 0 || !TryReadValue(operands[..open], variables, out var rawObject, out _)) return false;
+        var values = new List<int>();
+        foreach (var item in operands[(open + 3)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (!TryReadValue(item, variables, out var value, out _)) return false;
+            values.Add(value);
+        }
+        objectId = rawObject;
+        classes = values;
+        return true;
+    }
 
     private static bool TryEvaluateCondition(LoomScriptInstruction instruction,
         IDictionary<string, ushort> variables, IReadOnlyDictionary<int, byte> objectStates,
-        out bool result, out string detail)
+        IReadOnlyDictionary<int, uint>? objectClasses, out bool result, out string detail)
     {
         result = false;
         var expression = instruction.Operands;
         var branchIndex = expression.IndexOf(", branch ", StringComparison.Ordinal);
         if (branchIndex >= 0) expression = expression[..branchIndex];
+        if (instruction.Operation == "ifClassOfIs")
+        {
+            // o5_ifClassOfIs: true unless a listed class 0x80|n is missing or a listed n is present.
+            if (!TryReadClassOperands(expression, variables, out var classObject, out var classes))
+            {
+                detail = $"class test operands ({expression})";
+                return false;
+            }
+            if (objectClasses is null || !objectClasses.TryGetValue(classObject, out var bits))
+            {
+                detail = $"object {classObject} classes, which this run does not track";
+                return false;
+            }
+            result = classes.All(cls => LoomObjectClasses.Has(bits, cls & 0x7F) == ((cls & 0x80) != 0));
+            detail = "known object classes";
+            return true;
+        }
         var values = expression.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (values.Length == 0)
         {

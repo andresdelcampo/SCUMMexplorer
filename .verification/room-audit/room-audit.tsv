@@ -11,7 +11,7 @@ room	faithful	gapsBefore	gapsAfter	unfillable	estimates	doorways
 10	False	0	0	0	0	03,05,13
 11	False	0	0	0	0	
 12	False	0	0	0	0	13
-13	False	2	0	0	4	
+13	False	0	0	0	0	
 14	False	0	0	0	0	
 15	False	0	0	0	0	16,23
 16	False	0	0	0	0	15,17,18,22,23
@@ -30,7 +30,7 @@ room	faithful	gapsBefore	gapsAfter	unfillable	estimates	doorways
 30	False	0	0	0	0	33
 31	False	0	0	0	0	
 32	False	0	0	0	0	30
-33	False	3	0	0	4	30,34
+33	False	0	0	0	0	30,34
 34	False	0	0	0	0	33,35,46
 35	False	0	0	0	0	34,36
 36	False	0	0	0	0	35,37

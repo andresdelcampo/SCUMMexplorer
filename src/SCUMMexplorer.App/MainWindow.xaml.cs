@@ -1560,24 +1560,22 @@ public partial class MainWindow : Window
     {
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
-            var codeOnlyChoices = FindVerbChoicesAt(x, y)
-                .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
-            var codeOnlyDestinations = FindNavigationCandidatesAt(x, y)
-                .Where(candidate => codeOnlyChoices.Any(choice => choice.Object.Id == candidate.Object.Id)).ToArray();
-            if (codeOnlyDestinations.Length > 0)
+            // Room hotspots navigate. Among doorways at this point, the first
+            // touchable one in directory order takes the click, as ScummVM's
+            // findObject picks it. Untouchable doorways stay reachable as
+            // labelled exploration actions.
+            var doorways = DoorwaysAt(x, y);
+            if (doorways.Count > 0)
             {
-                // A code-only exit: run its verb and continue the scripts it
-                // left pending for a few frames, as the game keeps running.
-                // Only if no room load is reached, open the possible destination.
-                var exitVerb = codeOnlyDestinations[0];
-                if (codeOnlyDestinations.Length == 1)
-                {
-                    if (!ActivateObjectVerb(exitVerb.Object, exitVerb.Verb) && !ContinueToReachedRoom())
-                        OpenRoomDestination(exitVerb);
-                }
-                else ShowRoomDestinationChoices(codeOnlyDestinations);
+                var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
+                if (live.Length > 0) FollowDoorway(live[0]);
+                else if (doorways.Count == 1) FollowDoorway(doorways[0]);
+                else ShowDoorwayMenu(doorways.Select(record => (DoorwayLabel(record), DoorwayToolTip(record),
+                    (Action)(() => FollowDoorway(record)))).ToArray());
                 return;
             }
+            var codeOnlyChoices = FindVerbChoicesAt(x, y)
+                .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
             if (codeOnlyChoices.Length > 0)
             {
                 if (codeOnlyChoices.Length == 1)
@@ -1586,21 +1584,6 @@ public partial class MainWindow : Window
                 return;
             }
             if (CycleArtworkAt(x, y)) return;
-            var destinations = FindNavigationCandidatesAt(x, y);
-            if (destinations.Count == 1)
-            {
-                OpenRoomDestination(destinations[0]);
-                return;
-            }
-            if (destinations.Count > 1)
-            {
-                var verbs = destinations.DistinctBy(candidate =>
-                    (candidate.Object.Id, candidate.Verb.VerbId)).ToArray();
-                if (verbs.Length == 1 && ActivateObjectVerb(verbs[0].Object, verbs[0].Verb))
-                    return;
-                ShowRoomDestinationChoices(destinations);
-                return;
-            }
             var choices = FindVerbChoicesAt(x, y);
             if (choices.Count == 1) ActivateObjectVerb(choices[0].Object, choices[0].Verb);
             else ShowObjectVerbChoices(choices);
@@ -1642,16 +1625,18 @@ public partial class MainWindow : Window
         }
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
-            var codeOnlyChoices = FindVerbChoicesAt(x, y)
-                .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
-            var codeOnlyDestinations = FindNavigationCandidatesAt(x, y)
-                .Where(candidate => codeOnlyChoices.Any(choice => choice.Object.Id == candidate.Object.Id)).ToArray();
-            if (codeOnlyDestinations.Length > 0)
+            var doorways = DoorwaysAt(x, y);
+            if (doorways.Count > 0)
             {
+                var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
                 RoomPreview.Cursor = Cursors.Hand;
-                RoomPreview.ToolTip = $"Click to go to possible Room {string.Join(" or ", codeOnlyDestinations.Select(item => item.TargetRoomId.ToString("00")))}.";
+                RoomPreview.ToolTip = live.Length > 0 || doorways.Count == 1
+                    ? $"Click to go to {DoorwayLabel(live.Length > 0 ? live[0] : doorways[0])}. {DoorwayToolTip(live.Length > 0 ? live[0] : doorways[0])}"
+                    : $"Click to choose: {string.Join(" or ", doorways.Select(DoorwayLabel))}. None of these hotspots is live in this preview.";
                 return;
             }
+            var codeOnlyChoices = FindVerbChoicesAt(x, y)
+                .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
             if (codeOnlyChoices.Length > 0)
             {
                 RoomPreview.Cursor = Cursors.Hand;
@@ -1674,19 +1659,6 @@ public partial class MainWindow : Window
                     ? $"Click to cycle Object {artwork.Id} through stored images and room background."
                     : $"Click to cycle Object {artwork.Id} through stored images."
                 : $"Click to restore the first stored image at this position.";
-            return;
-        }
-        IReadOnlyList<RoomVerbDestination> destinations = SessionModeToggle.IsChecked == true
-            ? FindNavigationCandidatesAt(x, y) : [];
-        if (destinations.Count > 0)
-        {
-            RoomPreview.Cursor = Cursors.Hand;
-            RoomPreview.ToolTip = destinations.Count == 1
-                ? $"Open possible Room {destinations[0].TargetRoomId:00} directly."
-                : destinations.DistinctBy(candidate =>
-                    (candidate.Object.Id, candidate.Verb.VerbId)).Count() == 1
-                    ? "Click to follow this doorway's script. Other possible destinations are listed at right."
-                    : $"Choose among {destinations.Count} possible rooms.";
             return;
         }
         if (SessionModeToggle.IsChecked != true)
@@ -1734,42 +1706,80 @@ public partial class MainWindow : Window
         snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
         ParentStateMatches(record, snapshot);
 
-    private IReadOnlyList<RoomVerbDestination> FindNavigationCandidatesAt(int x, int y)
+    /// <summary>
+    /// Doorway hotspots at a room point that are present in the room (owned by
+    /// it, parent state matching), in directory order.
+    /// </summary>
+    private IReadOnlyList<LoomRoomObjectRecord> DoorwaysAt(int x, int y)
     {
-        var positions = _session?.Snapshot.ObjectPositions;
-        return _roomNavigationCandidates.Where(candidate =>
+        if (_session?.Snapshot is not { } snapshot) return [];
+        return VisibleDoorways(snapshot).Where(record =>
         {
-            var record = candidate.Object;
-            var position = positions is not null && positions.TryGetValue(record.Id, out var current)
+            var position = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
                 ? current : new RoomObjectPosition(record.X, record.Y);
-            return x >= position.X && x < position.X + record.Width &&
-                   y >= position.Y && y < position.Y + record.Height;
-        }).DistinctBy(candidate => candidate.TargetRoomId).ToArray();
+            return x >= position.X && x < position.X + record.Width && y >= position.Y && y < position.Y + record.Height;
+        }).ToArray();
     }
 
-    private void ShowRoomDestinationChoices(IReadOnlyList<RoomVerbDestination> destinations)
+    private IEnumerable<LoomRoomObjectRecord> VisibleDoorways(LoomSessionSnapshot snapshot) =>
+        _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
+            .Where(record => record.Width > 0 && record.Height > 0 &&
+                             snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
+                             ParentStateMatches(record, snapshot))
+            .OrderBy(record => record.LocalIndex);
+
+    private int[] DoorwayTargets(LoomRoomObjectRecord record) => _roomNavigationCandidates
+        .Where(candidate => candidate.Object.Id == record.Id).Select(candidate => candidate.TargetRoomId)
+        .Distinct().Order().ToArray();
+
+    private string DoorwayLabel(LoomRoomObjectRecord record) =>
+        "Room " + string.Join(" / ", DoorwayTargets(record).Select(id => id.ToString("00")));
+
+    private string DoorwayToolTip(LoomRoomObjectRecord record)
     {
-        ObjectActionPanel.Visibility = Visibility.Visible;
-        ObjectActionTraceExpander.Visibility = Visibility.Collapsed;
-        ObjectVerbButtons.Children.Clear();
-        ObjectActionNote.Text = "Choose a possible destination found in the room scripts.";
-        foreach (var candidate in destinations)
+        var targets = DoorwayTargets(record);
+        var text = $"Object {record.Id}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))}. " +
+                   "Clicking runs its verb and follows the room load it reaches; if none is reached, the room opens for browsing.";
+        return _session?.Snapshot.IsUntouchable(record.Id) == true
+            ? text + " This hotspot is untouchable in the current preview (class 24), so the game would not select it here; " +
+              "the click is an exploration action."
+            : text;
+    }
+
+    /// <summary>
+    /// Runs a doorway's verb and continues pending scripts. When no room load
+    /// is reached, opens its only possible room, or offers its possible rooms.
+    /// </summary>
+    private void FollowDoorway(LoomRoomObjectRecord record)
+    {
+        var routes = _roomNavigationCandidates.Where(candidate => candidate.Object.Id == record.Id).ToArray();
+        if (routes.Length == 0) return;
+        if (ActivateObjectVerb(record, routes[0].Verb) || ContinueToReachedRoom()) return;
+        var targets = routes.DistinctBy(candidate => candidate.TargetRoomId).OrderBy(candidate => candidate.TargetRoomId).ToArray();
+        if (targets.Length == 1)
         {
-            var button = new Button
-            {
-                Content = $"Open Room {candidate.TargetRoomId:00}",
-                ToolTip = $"Open directly for exploration. Object {candidate.Object.Id} · {candidate.Verb.Label}. " +
-                          "The route's conditions and effects are not simulated.",
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(7, 4, 7, 4),
-                Margin = new Thickness(0, 0, 0, 4),
-                Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
-            };
-            button.Click += (_, _) => OpenRoomDestination(candidate);
-            ObjectVerbButtons.Children.Add(button);
+            OpenRoomDestination(targets[0]);
+            return;
         }
+        ShowDoorwayMenu(targets.Select(candidate => ($"Room {candidate.TargetRoomId:00}",
+            $"No room load was reached. Open Room {candidate.TargetRoomId:00} directly for exploration; " +
+            $"object {candidate.Object.Id}'s script can load it ({candidate.Path}).",
+            (Action)(() => OpenRoomDestination(candidate)))).ToArray());
+    }
+
+    private ContextMenu? _doorwayMenu;
+
+    private void ShowDoorwayMenu(IReadOnlyList<(string Label, string ToolTip, Action Choose)> items)
+    {
+        var menu = new ContextMenu { PlacementTarget = RoomPreview, Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint };
+        foreach (var (label, toolTip, choose) in items)
+        {
+            var item = new MenuItem { Header = label, ToolTip = toolTip };
+            item.Click += (_, _) => choose();
+            menu.Items.Add(item);
+        }
+        _doorwayMenu = menu;
+        menu.IsOpen = true;
     }
 
     private void OpenRoomDestination(RoomVerbDestination candidate)
@@ -1887,47 +1897,57 @@ public partial class MainWindow : Window
         var offsetX = (RoomNavigationOverlay.ActualWidth - room.Width * scale) / 2;
         var offsetY = (RoomNavigationOverlay.ActualHeight - room.Height * scale) / 2;
 
-        foreach (var group in _roomNavigationCandidates.GroupBy(candidate => candidate.Object.Id))
+        if (_session?.Snapshot is not { } snapshot) return;
+        // Doorways that share one rectangle get one box and one label.
+        foreach (var group in VisibleDoorways(snapshot).GroupBy(record =>
+                 {
+                     var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
+                         ? current : new RoomObjectPosition(record.X, record.Y);
+                     return (at.X, at.Y, record.Width, record.Height);
+                 }))
         {
-            var record = group.First().Object;
-            if (record.Width <= 0 || record.Height <= 0) continue;
-            var targetIds = group.Select(candidate => candidate.TargetRoomId).Distinct().ToArray();
-            var destinationText = string.Join(", ", targetIds.Select(id => $"Room {id:00}"));
-            var position = _session?.Snapshot.ObjectPositions.TryGetValue(record.Id, out var current) == true
-                ? current : new RoomObjectPosition(record.X, record.Y);
+            var (x, y, width, height) = group.Key;
+            var targetIds = group.SelectMany(DoorwayTargets).Distinct().Order().ToArray();
+            var live = group.Any(record => !snapshot.IsUntouchable(record.Id));
+            var toolTip = string.Join("\n", group.Select(DoorwayToolTip));
+            var accent = live ? Color.FromRgb(255, 207, 105) : Color.FromRgb(190, 176, 150);
 
             var bounds = new Border
             {
-                Width = record.Width * scale,
-                Height = record.Height * scale,
+                Width = width * scale,
+                Height = height * scale,
                 BorderThickness = new Thickness(Math.Clamp(scale, 1, 3)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(255, 207, 105)),
-                Background = new SolidColorBrush(Color.FromArgb(48, 247, 187, 72)),
+                BorderBrush = new SolidColorBrush(accent),
+                Background = new SolidColorBrush(Color.FromArgb((byte)(live ? 48 : 24), 247, 187, 72)),
                 CornerRadius = new CornerRadius(2),
-                ToolTip = $"Possible destinations: {destinationText}. Click to follow the doorway's script."
+                ToolTip = toolTip
             };
-            Canvas.SetLeft(bounds, offsetX + position.X * scale);
-            Canvas.SetTop(bounds, offsetY + position.Y * scale);
+            Canvas.SetLeft(bounds, offsetX + x * scale);
+            Canvas.SetTop(bounds, offsetY + y * scale);
             RoomNavigationOverlay.Children.Add(bounds);
 
             var label = new Border
             {
                 Child = new TextBlock
                 {
-                    Text = targetIds.Length == 1 ? $"Room {targetIds[0]:00}?" : "Doorway?",
+                    Text = "Room " + string.Join(" / ", targetIds.Select(id => id.ToString("00"))),
+                    FontStyle = live ? FontStyles.Normal : FontStyles.Italic,
                     Foreground = Brushes.White,
                     FontWeight = FontWeights.SemiBold,
                     FontSize = Math.Clamp(scale * 6, 8, 13),
                     Margin = new Thickness(4, 2, 4, 2)
                 },
                 Background = new SolidColorBrush(Color.FromArgb(224, 17, 24, 32)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(255, 207, 105)),
+                BorderBrush = new SolidColorBrush(accent),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(2),
-                ToolTip = $"Possible destinations: {destinationText}. Click to follow the doorway's script."
+                ToolTip = toolTip
             };
-            Canvas.SetLeft(label, offsetX + position.X * scale + 2);
-            Canvas.SetTop(label, offsetY + position.Y * scale + 2);
+            // Keep the label inside the room image, even for a narrow box at its edge.
+            label.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Canvas.SetLeft(label, Math.Max(offsetX, Math.Min(offsetX + x * scale + 2,
+                offsetX + room.Width * scale - label.DesiredSize.Width - 2)));
+            Canvas.SetTop(label, offsetY + y * scale + 2);
             RoomNavigationOverlay.Children.Add(label);
         }
     }

@@ -18,8 +18,18 @@ public sealed record LoomSessionSnapshot(
     IReadOnlyList<int>? DrawQueue = null,
     IReadOnlyCollection<int>? StatesSetInRoom = null,
     IReadOnlyList<LoomRandomPick>? Picks = null,
-    IReadOnlyCollection<int>? EstimatedObjectStates = null)
+    IReadOnlyCollection<int>? EstimatedObjectStates = null,
+    IReadOnlyDictionary<int, uint>? Classes = null)
 {
+    /// <summary>Class bits per object number; empty when the index gave none.</summary>
+    public IReadOnlyDictionary<int, uint> ObjectClasses => Classes ?? new Dictionary<int, uint>();
+
+    /// <summary>
+    /// ScummVM <c>findObject</c> skips untouchable objects. Unknown classes count as touchable.
+    /// </summary>
+    public bool IsUntouchable(int objectId) =>
+        ObjectClasses.TryGetValue(objectId, out var bits) && LoomObjectClasses.Has(bits, LoomObjectClasses.Untouchable);
+
     /// <summary>Every seeded <c>getRandomNr</c> stand-in taken on this route, in order.</summary>
     public IReadOnlyList<LoomRandomPick> RandomPicks => Picks ?? [];
 
@@ -77,7 +87,7 @@ public sealed class LoomExplorationSession
         _game = game;
         _reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
         _verbs = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
-        _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners)
+        _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes)
         {
             Random = new LoomSeededRandom(randomSeed)
         };
@@ -110,7 +120,8 @@ public sealed class LoomExplorationSession
         _runtime.DrawQueue.ToArray(),
         _runtime.StatesSetInRoom.Order().ToArray(),
         _picks.ToArray(),
-        _runtime.EstimatedStates.Order().ToArray());
+        _runtime.EstimatedStates.Order().ToArray(),
+        new Dictionary<int, uint>(_runtime.ObjectClasses));
 
     private int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue("var[0x001]", out var ego)
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
@@ -163,6 +174,8 @@ public sealed class LoomExplorationSession
         var beforeUncertainties = _uncertainties.Count;
         var beforeEvents = _visitEvents.Count;
         _uncertainties.Add($"Object {objectId} verb 0x{verbId:X2} was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.");
+        if (Snapshot.IsUntouchable(objectId))
+            _uncertainties.Add($"Object {objectId} is untouchable (class {LoomObjectClasses.Untouchable}) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.");
         LoomScriptDisassembly? script = null;
         LoomBoundedScriptResult? run = null;
         try

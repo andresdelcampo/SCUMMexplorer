@@ -1,0 +1,17 @@
+Room 22: active images 406,409,412,413
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a room image to cycle its artwork. Use possible doorway buttons to navigate and the hotspot list for script interactions.
+StatusText: Room 22 ready
+Doorway button "Open Room 17": Static candidate: Room 22 object 400 (Verb 0x38) code 0x3E1E, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Open Room 16": Static candidate: Room 22 object 401 (Verb 0x38) code 0x3E3D, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Open Room 18": Static candidate: Room 22 object 402 (Verb 0x38) code 0x3E5C, room-load instruction +0x0005 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Room 05: active images 
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a room image to cycle its artwork. Use possible doorway buttons to navigate and the hotspot list for script interactions.
+StatusText: Room 05 ready
+Doorway button "Open Room 06": Static candidate: Room 05 object 199 (Verb 0x38) code 0x5994, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Open Room 03": Static candidate: Room 05 object 200 (Verb 0x38) code 0x59B3, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Open Room 07": Static candidate: Room 05 object 201 (Verb 0x38) code 0x59D2, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Open Room 10": Static candidate: Room 05 object 202 (Verb 0x38) code 0x59F1, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Open Room 62": Static candidate: Room 05 object 203 (Verb 0x38) code 0x5A10, room-load instruction +0x0005 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Open Room 63": Static candidate: Room 05 object 203 (Verb 0x38) code 0x5A10, room-load instruction +0x0010 (direct). | Open directly for exploration; script conditions and effects are not simulated.

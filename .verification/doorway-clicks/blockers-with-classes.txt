@@ -1,0 +1,110 @@
+blocked: 0 instruction sites in 0 scripts; rooms: 
+picked: 3 instruction sites in 3 scripts; rooms: 03,04,16,18,22,43,64
+  Room 04 local script 203	+0x0000
+  Room 18 local script 204	+0x008A
+  Room 43 local script 205	+0x0030
+
+Where scripts that picked stopped next (other uncertainties from the same script):
+  Room 18 local script 204	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+  Room 43 local script 205	+0x0000: operation 'delayVariable' is not modeled at +0x0039
+
+Uncertainty shapes (count of visits and actions that show each):
+    513  Object # verb #x# was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+    333  #operation 'cutscene' is not modeled at #
+    310  #presentation operation not applied: print
+    193  #operation 'getActorWalkBox' is not modeled at #
+    189  Object # is untouchable # in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.
+    135  #script requests Room #; room transition awaits bounded session dispatch at #
+    102  #presentation operation not applied: actorOps; presentation operation not applied: animateActor
+     79  Sound # was started; its natural completion time is not simulated.
+     76  Room # selected from the catalog; the route to it was not executed from game input.
+     75  #operation 'isSoundRunning' is not modeled at #
+     34  #presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+     26  #operation 'getActorX' is not modeled at #
+     26  Object # verb #x#A was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     22  Object # verb #x#B was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     21  #presentation operation not applied: actorOps
+     21  Object # verb #xFF was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     20  #presentation operation not applied: setBoxFlags
+     14  Room # object #, verb #x#, code #x#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+     13  #operation 'isScriptRunning' is not modeled at #
+     13  #presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; and # more omitted behaviors
+     12  Object # verb #x#C was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     12  Object # verb #x#D was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     11  #presentation operation not applied: resourceRoutines
+     10  #presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor
+     10  Object # verb #x#E was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     10  Object # verb #x#F was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+      8  #operation 'waitFor' is not modeled at #
+      8  #presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+      7  #getRandomNr at # picked # of #..# #; what follows from it is an estimate, not a reached game state.
+      6  #chainScript changes the current script's control flow at #
+      6  #operation 'verbOps' is not modeled at #
+      5  #operation 'delay' is not modeled at #
+      5  #operation 'setVarRange' is not modeled at #
+      5  #presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+      5  #presentation operation not applied: cursorCommand
+      5  Room # object #, verb #x#, code #x#B#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      4  #presentation operation not applied: actorOps; presentation operation not applied: resourceRoutines
+      4  #presentation operation not applied: animateActor
+      4  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; presentation operation not applied: actorOps; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+      4  Room # local script # # reached loadRoomWithEgo after a frame advance.
+      4  Room # object #, verb #x#, code #x#A#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  #operation 'drawBox' is not modeled at #
+      3  #presentation operation not applied: actorOps; presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+      3  #presentation operation not applied: putActorInRoom
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: setBoxFlags
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and # more omitted behaviors
+      3  #presentation operation not applied: roomOps; presentation operation not applied: setCameraAt
+      3  #presentation operation not applied: setCameraAt; presentation operation not applied: roomOps; presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; and # more omitted behaviors
+      3  #presentation operation not applied: walkActorTo
+      3  Room # object #, verb #x#, code #x#D#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  Room # object #, verb #x#, code #x#D; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  Room # object #, verb #x#, code #x#E#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  #presentation operation not applied: actorOps; presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+      2  #presentation operation not applied: lights
+      2  #presentation operation not applied: lights; presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and # more omitted behaviors
+      2  #presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: setObjectName
+      2  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+      2  #presentation operation not applied: roomOps
+      2  #presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and # more omitted behaviors
+      2  #presentation operation not applied: setBoxFlags; presentation operation not applied: resourceRoutines; presentation operation not applied: setObjectName; presentation operation not applied: actorOps; presentation operation not applied: animateActor; and # more omitted behaviors
+      2  Room # object #, verb #x#, code #x#A; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#C#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#D#; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#F#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#FC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Started script # has arguments depending on unknown variables; the parent continues without its effects.
+      1  #operation 'delayVariable' is not modeled at #
+      1  #operation 'freezeScripts' is not modeled at #
+      1  #operation 'getActorCostume' is not modeled at #
+      1  #presentation operation not applied: resourceRoutines; presentation operation not applied: setBoxFlags; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; and # more omitted behaviors
+      1  A started object script has an unresolved entrypoint; the parent continues without its effects.
+      1  Room # Object # Verb #x# # reached loadRoomWithEgo after a frame advance.
+      1  Room # object #, verb #x#, code #x#AE#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#B; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#C; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#A; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#D; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DD#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DE; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DF#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#C; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#D; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#E; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#F; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#EC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FAD; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FCB; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FD#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+
+Every occurrence:
+  picked	Room 04 local script 203	+0x0000	Room 03 object 162 verb 0x36
+  picked	Room 04 local script 203	+0x0000	Room 04 visit
+  picked	Room 04 local script 203	+0x0000	Room 64 object 825 verb 0x36
+  picked	Room 18 local script 204	+0x008A	Room 16 object 346 verb 0x38
+  picked	Room 18 local script 204	+0x008A	Room 18 visit
+  picked	Room 18 local script 204	+0x008A	Room 22 object 402 verb 0x38
+  picked	Room 43 local script 205	+0x0030	Room 43 visit
