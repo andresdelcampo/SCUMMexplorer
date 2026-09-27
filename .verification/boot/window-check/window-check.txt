@@ -1,0 +1,24 @@
+Room 01: active images 152
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 01 ready
+Room 02: active images 157
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 1 scene details use an artwork estimate because the entry state is unresolved (from opening frame of Room 02 in script 106 +0x03A0).
+StatusText: Room 02 ready
+Doorway button "Room 03": Static candidate: Room 02 object 153 (Verb 0x38) code 0x5CBC, room-load instruction +0x002B (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Room 06: active images 212,215,216,225,226,227,228,231,232,233,234,235
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 06 ready
+Doorway button "Room 05": Static candidate: Room 06 object 204 (Verb 0x38) code 0x4FCB, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Room 38: active images 612,618
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 38 ready
+Doorway button "Room 37": Static candidates (2 sources): | • Room 38 object 609 (Verb 0x38) code 0x21D2, room-load instruction +0x0005 (direct) | • Room 38 object 623 (Verb 0x38) code 0x21FC, room-load instruction +0x0000 (direct) | Open directly for exploration; script conditions and effects are not simulated.
+Room 62: active images 812,815
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 62 ready
+Doorway button "Room 05": Static candidate: Room 62 object 807 (Verb 0x38) code 0x2E8F, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.

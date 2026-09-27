@@ -73,9 +73,10 @@ public sealed class LoomFirstVisitRenderingTests
             data.Batches.InterfaceImages[166]);
         Assert.False(data.Batches.InterfaceImages.ContainsKey(152));
 
+        // The boot's opening cutscene passes through Room 01, so 152's state is known: no estimate.
         var (title, titleEstimates, _) = data.FirstVisit(1);
         Assert.Equal([152], title.PaintOrder().Select(obj => obj.Id));
-        Assert.Equal([152], titleEstimates.Select(item => item.ObjectId));
+        Assert.Empty(titleEstimates);
 
         // Room 03 has no room artwork at all: its only image is object 165's close-up.
         var (lake, lakeEstimates, _) = data.FirstVisit(3);
@@ -130,7 +131,8 @@ public sealed class LoomFirstVisitRenderingTests
     // class tests and draw the image themselves; no estimate is needed.
     [Theory]
     [InlineData(30, 520)]
-    [InlineData(38, 614)]
+    // Room 38 draws 612 since the boot sets bit[0xD83] (script 001 +0x01B1).
+    [InlineData(38, 612)]
     [InlineData(46, 687)]
     public void EntryScriptsThatTestClassesDrawTheirRoomsThemselves(int roomId, int objectId)
     {

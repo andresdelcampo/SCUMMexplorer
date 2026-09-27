@@ -73,12 +73,19 @@ public sealed class LoomExplorationSession
     private readonly LoomObjectVerbReader _verbs;
     private readonly LoomScriptRuntimeState _runtime;
     private readonly int _globalScriptCount;
-    private readonly List<string> _uncertainties = [];
+    private readonly UncertaintyList _uncertainties = [];
     private readonly List<PendingScript> _pending = [];
     private GameResource? _currentRoom;
     private IReadOnlyList<LoomRoomObjectRecord> _currentObjects = [];
 
-    public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0)
+    /// <param name="completeBoot">
+    /// When true (the default), the boot runs past the intro screen and the
+    /// opening cutscene until script 001 hands over to the input loop; see
+    /// <see cref="CompleteBoot"/>. When false, it stops at script 001's first
+    /// room load, as before 27 September.
+    /// </param>
+    public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
+        bool completeBoot = true)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -94,7 +101,107 @@ public sealed class LoomExplorationSession
         _globalScriptCount = ReadGlobalScriptCount(game);
         _runtime.ScriptRunning = IsScriptRunning;
         // ScummVM runs indexed script 1 at boot for this release family.
-        RunIndexedScript(1, 0, null, 0);
+        if (!completeBoot)
+        {
+            RunIndexedScript(1, 0, null, 0);
+            return;
+        }
+        _booting = true;
+        _dispatchScope++;
+        try
+        {
+            RunIndexedScript(1, 0, null, 0);
+        }
+        finally
+        {
+            _dispatchScope--;
+        }
+        DispatchRequestedLoads("during the boot");
+        CompleteBoot();
+        _booting = false;
+        LastAction = null;
+    }
+
+    /// <summary>Frames the boot may run after script 001's first room load.</summary>
+    public const int BootFrameLimit = 5000;
+
+    /// <summary>
+    /// Continues the boot after script 001 has entered its first room. When
+    /// script 001 waits for a bit that only a local script of that room sets,
+    /// and the room's own code starts that script after player input (the
+    /// intro screen's difficulty and draft check: Room 69 local 205 sets
+    /// <c>bit[0xD6B]</c>, and local 203 starts it after a correct draft or a
+    /// third wrong one), the session starts that script as if the player had
+    /// answered, and labels it. Frames then run until script 001 has ended or
+    /// chained on and no cutscene is open, at most <see cref="BootFrameLimit"/>.
+    /// </summary>
+    private void CompleteBoot()
+    {
+        if (_currentRoom is null) return;
+        if (FindAwaitedInput() is { } input)
+        {
+            _uncertainties.Add(input.Note);
+            _visitTrace.Add($"boot: starts Room {_currentRoom.ResourceId:00} local script {input.LocalScript} as the player's answer would");
+            _dispatchScope++;
+            try
+            {
+                RunStartedScript(input.LocalScript, 0, null, 0);
+            }
+            finally
+            {
+                _dispatchScope--;
+            }
+            DispatchRequestedLoads("during the boot");
+        }
+        var frames = 0;
+        while (frames < BootFrameLimit && (_pending.Any(item => item.ScriptNumber == 1) || InCutscene) && _pending.Count > 0)
+        {
+            AdvanceFrame();
+            frames++;
+        }
+        BootFrames = frames;
+        if (_pending.Any(item => item.ScriptNumber == 1))
+            _uncertainties.Add($"The boot (script 001) was still running after {frames} frames; the preview stopped following it.");
+        _visitTrace.Add($"boot: {frames} frames after script 001's first room load; now in Room {_currentRoom?.ResourceId:00}");
+    }
+
+    /// <summary>Frames the completed boot ran after script 001's first room load.</summary>
+    public int BootFrames { get; private set; }
+
+    /// <summary>
+    /// Script 001 waiting (<c>breakHere</c>, then a branch back while a bit is 0)
+    /// for a bit that exactly one local script of the current room sets to 1.
+    /// Returns that local script and a note naming the room code that starts it.
+    /// </summary>
+    private (int LocalScript, string Note)? FindAwaitedInput()
+    {
+        if (_currentRoom is null || _pending.FirstOrDefault(item => item.ScriptNumber == 1) is not { } boot) return null;
+        var wait = boot.Script.Instructions.FirstOrDefault(item => item.Offset == boot.Offset);
+        if (wait is not { Operation: "notEqualZero" } || !wait.Operands.StartsWith("bit[", StringComparison.Ordinal)) return null;
+        var bit = wait.Operands[..(wait.Operands.IndexOf(']') + 1)];
+        var setters = new List<(int Local, int Offset)>();
+        var starters = new List<string>();
+        for (var local = _globalScriptCount; local < 256; local++)
+        {
+            LoomScriptDisassembly? script;
+            try { script = _reader.DecodeRoomLocalScript(_currentRoom, local, _globalScriptCount); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
+            if (script is null) continue;
+            foreach (var item in script.Instructions)
+            {
+                if (item.Operation == "move" && item.Operands == $"{bit} = 0x0001") setters.Add((local, item.Offset));
+                if (item.Operation == "startScript" && item.Operands.StartsWith("0x", StringComparison.Ordinal))
+                    starters.Add($"{local}:{item.Operands[..4]}:{item.Offset:X4}");
+            }
+        }
+        if (setters.Count != 1) return null;
+        var (setter, setOffset) = setters[0];
+        var startedBy = starters.Where(item => Convert.ToInt32(item.Split(':')[1], 16) == setter)
+            .Select(item => $"local {item.Split(':')[0]} +0x{item.Split(':')[2]}").ToArray();
+        if (startedBy.Length == 0) return null;
+        return (setter, $"Player input assumed: script 001 +0x{wait.Offset:X4} waits for {bit}, which only Room {_currentRoom.ResourceId:00} " +
+                        $"local script {setter} sets (+0x{setOffset:X4}). The room's own code starts it after the player's input " +
+                        $"({string.Join(", ", startedBy)}), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.");
     }
 
     /// <summary>
@@ -155,7 +262,14 @@ public sealed class LoomExplorationSession
         if (room.Kind != ResourceKind.Room || room.ResourceId is null)
             throw new InvalidDataException("The session can only visit an indexed room.");
         if (_currentRoom?.ResourceId == room.ResourceId) return Snapshot;
+        _uncertainties.StartStep();
+        return EnterRoom(room, reachedAction is null
+            ? $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input."
+            : $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.");
+    }
 
+    private LoomSessionSnapshot EnterRoom(GameResource room, string arrival)
+    {
         var eventsBeforeVisit = _visitEvents.Count;
         if (_currentRoom is not null)
         {
@@ -171,14 +285,16 @@ public sealed class LoomExplorationSession
         _runtime.DrawQueue.Clear();
         _runtime.StatesSetInRoom.Clear();
         _runtime.EstimatedStates.Clear();
-        _currentObjects = _objects.Decode(File.ReadAllBytes(room.FilePath));
+        var roomBytes = File.ReadAllBytes(room.FilePath);
+        _currentObjects = _objects.Decode(roomBytes);
+        // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
+        var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
+        _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
+        _runtime.GlobalVariables["var[0x002]"] = 160;
         foreach (var item in _currentObjects)
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
-        _runtime.GlobalVariables["var[0x004]"] = (ushort)room.ResourceId.Value;
-        if (reachedAction is null)
-            _uncertainties.Add($"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input.");
-        else
-            _uncertainties.Add($"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.");
+        _runtime.GlobalVariables["var[0x004]"] = (ushort)room.ResourceId!.Value;
+        _uncertainties.Add(arrival);
 
         RunGlobalHook(28, "before room entry");
         RunEmbeddedRoomScript(room, exit: false);
@@ -193,6 +309,7 @@ public sealed class LoomExplorationSession
             throw new InvalidOperationException("Visit a room before activating an object verb.");
         var record = _currentObjects.FirstOrDefault(item => item.Id == objectId) ??
                      throw new InvalidDataException($"Object {objectId} has no code record in Room {sourceRoomId:00}.");
+        _uncertainties.StartStep();
         var beforeUncertainties = _uncertainties.Count;
         var beforeEvents = _visitEvents.Count;
         _uncertainties.Add($"Object {objectId} verb 0x{verbId:X2} was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.");
@@ -302,6 +419,7 @@ public sealed class LoomExplorationSession
     /// </summary>
     public bool ContinueUntilRoomChanges(int maxFrames, int maxCutsceneFrames = 1000)
     {
+        _uncertainties.StartStep();
         var room = _currentRoom?.ResourceId;
         var frames = 0;
         var cutsceneFrames = 0;
@@ -361,7 +479,15 @@ public sealed class LoomExplorationSession
     /// </summary>
     private void EnterReachedLoad(LoomScriptEvent roomLoad, GameResource target, ScriptFrame? frame, string when)
     {
-        var sourceRoomId = _currentRoom?.ResourceId ?? 0;
+        if (_currentRoom is null || _booting)
+        {
+            _actionLoadFrame = frame;
+            _uncertainties.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} reached {roomLoad.Operation} {when}.");
+            if (target.ResourceId != _currentRoom?.ResourceId)
+                EnterRoom(target, $"Room {target.ResourceId:00} entered by {roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} ({roomLoad.Operation}) {when}.");
+            return;
+        }
+        var sourceRoomId = _currentRoom.ResourceId ?? 0;
         var beforeUncertainties = _uncertainties.Count;
         LoomObjectActionResult action;
         if (LastAction is { ReachedRoomLoad: null } pending && pending.SourceRoomId == sourceRoomId)
@@ -409,9 +535,14 @@ public sealed class LoomExplorationSession
     // Room loads by global scripts: the script pauses after the load, the session
     // enters the room, and the script resumes there (only inside an action or frame).
     private int _dispatchScope;
+    // True while the constructor runs the boot; its loads are not player actions.
+    private bool _booting;
     private (LoomScriptEvent Event, ScriptFrame Frame)? _requestedLoad;
     private readonly HashSet<LoomScriptEvent> _dispatchedLoads = new(ReferenceEqualityComparer.Instance);
     private ScriptFrame? _actionLoadFrame;
+    // chainScript: the script that chained, and what it starts once it has ended.
+    private (ScriptFrame Frame, int Script, IReadOnlyDictionary<string, ushort> Arguments,
+        IReadOnlyCollection<string> EstimatedArguments, bool PathEstimated)? _chained;
     // Script numbers whose last run ended at a step the preview does not model.
     private readonly HashSet<int> _endedUnmodelled = [];
 
@@ -558,6 +689,13 @@ public sealed class LoomExplorationSession
             if (!result.ReachedStop && result.ResumeOffset is null) _endedUnmodelled.Add(number);
             else _endedUnmodelled.Remove(number);
         }
+        if (_chained is { } chain && chain.Frame == frame)
+        {
+            _chained = null;
+            _visitTrace.Add($"{label} chains to script {chain.Script}");
+            RunStartedScript(chain.Script, 0, chain.Arguments, depth, chain.EstimatedArguments, chain.PathEstimated,
+                frame.FreezeResistant);
+        }
         if (result.ResumeOffset is int next)
         {
             var preservedLocals = result.KnownVariables
@@ -600,7 +738,16 @@ public sealed class LoomExplorationSession
             case LoomScriptEventKind.ScriptsFrozen:
                 return FreezeScripts(scriptEvent);
             case LoomScriptEventKind.ScriptChained:
-                return "chainScript changes the current script's control flow";
+                // o5_chainScript ends the current script and starts the target in
+                // its place, with the arguments and its freeze resistance.
+                if (scriptEvent.TargetId is not int chained)
+                    return "chained script depends on an unknown variable";
+                if (_executing.Count == 0 || !TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var chainArguments))
+                    return "chained script arguments depend on unknown variables";
+                _chained = (_executing[^1], chained, chainArguments,
+                    EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+                    scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
+                return LoomBoundedScriptExecutor.StopAfterEvent;
             case LoomScriptEventKind.ScriptStopped:
                 if (scriptEvent.TargetId is not int stoppedScript)
                     return "stopped script depends on an unknown variable";
@@ -771,6 +918,21 @@ public sealed class LoomExplorationSession
         }
         locals = values;
         return true;
+    }
+
+    /// <summary>
+    /// The route's uncertainties in order. A script that loops for many frames
+    /// reports the same limitation each frame; within one step (a visit, an
+    /// action or a run of frames, see <see cref="StartStep"/>) it is kept once.
+    /// </summary>
+    private sealed class UncertaintyList : List<string>
+    {
+        private readonly HashSet<string> _seen = new(StringComparer.Ordinal);
+        public new void Add(string item)
+        {
+            if (_seen.Add(item)) base.Add(item);
+        }
+        public void StartStep() => _seen.Clear();
     }
 
     private sealed record PendingScript(LoomScriptDisassembly Script,

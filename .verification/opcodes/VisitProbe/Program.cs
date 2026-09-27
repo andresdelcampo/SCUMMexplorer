@@ -24,6 +24,7 @@ void Show(string label)
     uncertainties = snapshot.Uncertainties.Count;
 }
 
+Show($"boot ({session.BootFrames} frames)");
 foreach (var step in args.Skip(1))
 {
     // "var023=2": sets a global word through the session's test seam.

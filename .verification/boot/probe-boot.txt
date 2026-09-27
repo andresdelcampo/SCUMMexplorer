@@ -1,0 +1,153 @@
+﻿== boot (110 frames): room 02, pending 4
+   trace: Script 01 continues at +0x0162 in Room 69 after loadRoom
+   trace: boot: starts Room 69 local script 205 as the player's answer would
+   trace: stopScript 202 at Room 69 local script 205 +0x002C: ended its pending run
+   trace: stopScript 204 at Room 69 local script 205 +0x002E: script 204 was not running
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: stopScript 202 at Room 69 exit script +0x0000: script 202 was not running
+   trace: Script 44 continues at +0x00C4 in Room 01 after loadRoom
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: Script 44 continues at +0x0241 in Room 02 after loadRoom
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: stopScript 45 at Room 02 exit script +0x0000: script 45 was not running
+   trace: Script 44 continues at +0x024A in Room 01 after loadRoom
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: Script 44 continues at +0x027F in Room 02 after loadRoom
+   trace: stopScript 113 at Script 44 +0x03B6: ended its pending run
+   trace: stopScript 114 at Script 44 +0x03B8: ended its pending run
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: stopScript 45 at Room 02 exit script +0x0000: script 45 was not running
+   trace: Script 44 continues at +0x03BC in Room 53 after loadRoom
+   trace: stopScript 200 at Script 44 +0x041B: ended its pending run
+   trace: stopScript 201 at Script 44 +0x0532: script 201 was not running
+   trace: stopScript 200 at Script 44 +0x0534: ended its pending run
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: Script 44 continues at +0x0538 in Room 02 after loadRoom
+   trace: stopScript 113 at Script 44 +0x062F: script 113 was not running
+   trace: stopScript 114 at Script 44 +0x0631: script 114 was not running
+   trace: freezeScripts 0x00 at Script 01 +0x0231: no script is frozen
+   trace: Script 01 chains to script 6
+   trace: boot: 110 frames after script 001's first room load; now in Room 02
+   uncertain: Script 01 +0x0000: presentation operation not applied: roomOps; presentation operation not applied: cursorCommand; presentation operation not applied: stringOps
+   uncertain: Script 01 +0x0160 reached loadRoom during the boot.
+   uncertain: Room 69 entered by Script 01 +0x0160 (loadRoom) during the boot.
+   uncertain: Room 69 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: cursorCommand
+   uncertain: Player input assumed: script 001 +0x0166 waits for bit[0xD6B], which only Room 69 local script 205 sets (+0x0048). The room's own code starts it after the player's input (local 203 +0x01D8, local 203 +0x0241), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.
+   uncertain: Room 69 local script 205 +0x0000: presentation operation not applied: cursorCommand
+   uncertain: Room 69 local script 205 +0x0031: presentation operation not applied: drawBox
+   uncertain: Script 44 +0x0000: presentation operation not applied: cursorCommand; presentation operation not applied: resourceRoutines
+   uncertain: Script 01 +0x0166: presentation operation not applied: resourceRoutines
+   uncertain: Script 44 +0x002B: presentation operation not applied: oldRoomEffect
+   uncertain: Script 44 +0x00C2 reached loadRoom after a frame advance.
+   uncertain: Room 69 object 0, verb 0x00, code 0x00C2; loadRoom at Script 44 +0x00C2 → Room 01. Actor walk and input dispatch were not simulated.
+   uncertain: Room 01 local script 211 +0x0000: operation 'verbOps' is not modeled at +0x000C
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Script 44 +0x00C4: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertain: Sound 25 was started; its natural completion time is not simulated.
+   uncertain: A started script has a dynamic target; the parent continues without its effects.
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 44 +0x022F: timing not simulated: waiting for the message to finish continues on the next frame (+0x0238)
+   uncertain: Script 44 +0x023B: timing not simulated: a delay of 60 jiffies continues on the next frame (+0x023B)
+   uncertain: Script 44 passed through Room 01 (loadRoom at +0x00C2) before this load.
+   uncertain: Script 44 +0x023F reached loadRoom after a frame advance.
+   uncertain: Room 69 object 0, verb 0x00, code 0x00C2; loadRoom at Script 44 +0x023F → Room 02. Actor walk and input dispatch were not simulated.
+   uncertain: Script 16 +0x0000: presentation operation not applied: print
+   uncertain: Room 02 local script 200 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Room 02 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Script 44 +0x0241: timing not simulated: a delay of 60 jiffies continues on the next frame (+0x0244)
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 44 passed through Room 02 (loadRoom at +0x023F) before this load.
+   uncertain: Script 44 +0x0248 reached loadRoom after a frame advance.
+   uncertain: Room 69 object 0, verb 0x00, code 0x00C2; loadRoom at Script 44 +0x0248 → Room 01. Actor walk and input dispatch were not simulated.
+   uncertain: Room 01 local script 211 +0x0000: operation 'verbOps' is not modeled at +0x000C
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 113 +0x0000: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Script 114 +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertain: Script 44 +0x0252: timing not simulated: a delay of 60 jiffies continues on the next frame (+0x0258)
+   uncertain: Room 01 local script 210 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo
+   uncertain: Room 01 local script 210 +0x0045: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo
+   uncertain: Script 114 +0x003D: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x003D: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: animateActor
+   uncertain: Room 01 local script 210 +0x0057: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo
+   uncertain: Room 01 local script 210 +0x0069: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 1); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: animateActor
+   uncertain: Room 01 local script 210 +0x007B: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo
+   uncertain: Room 01 local script 210 +0x008D: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 1); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: animateActor
+   uncertain: Room 01 local script 210 +0x009F: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x09 to stop walking continues on the next frame (+0x00AE)
+   uncertain: Room 01 local script 210 +0x00B1: presentation operation not applied: putActorInRoom
+   uncertain: Script 44 passed through Room 01 (loadRoom at +0x0248) before this load.
+   uncertain: Script 44 +0x027D reached loadRoom after a frame advance.
+   uncertain: Room 69 object 0, verb 0x00, code 0x00C2; loadRoom at Script 44 +0x027D → Room 02. Actor walk and input dispatch were not simulated.
+   uncertain: Script 16 +0x0000: presentation operation not applied: print
+   uncertain: Room 02 local script 200 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Room 02 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Script 44 +0x027F: presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; timing not simulated: a delay of 60 jiffies continues on the next frame (+0x02B3)
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 2); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 3); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 4); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: animateActor
+   uncertain: Script 44 +0x02CA: timing not simulated: the camera pan reaches x = 472 at once (+0x02CA); timing not simulated: waiting for the camera continues on the next frame (+0x02CD)
+   uncertain: Script 44 +0x02CF: timing not simulated: a delay of 60 jiffies continues on the next frame (+0x02CF)
+   uncertain: Script 44 +0x02D3: presentation operation not applied: actorOps; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x0315)
+   uncertain: Script 44 +0x0318: presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x032B)
+   uncertain: Script 44 +0x032E: presentation operation not applied: actorOps; presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x034A)
+   uncertain: Script 44 +0x034D: timing not simulated: the camera pan reaches x = 744 at once (+0x034D); presentation operation not applied: putActor
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 2); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: animateActor
+   uncertain: Script 44 +0x0361: presentation operation not applied: actorOps; presentation operation not applied: putActor; presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x037F)
+   uncertain: Script 44 +0x0382: presentation operation not applied: actorOps; presentation operation not applied: putActor; presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x03A1)
+   uncertain: Script 44 +0x03A4: presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x03AA)
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 5); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 44 passed through Room 02 (loadRoom at +0x027D) before this load.
+   uncertain: Script 44 +0x03BA reached loadRoom after a frame advance.
+   uncertain: Room 69 object 0, verb 0x00, code 0x00C2; loadRoom at Script 44 +0x03BA → Room 53. Actor walk and input dispatch were not simulated.
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Script 44 +0x03BC: presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Room 53 local script 200 +0x0006: presentation operation not applied: actorOps
+   uncertain: Script 44 +0x03F0: presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame (+0x0418)
+   uncertain: Script 44 +0x041B: presentation operation not applied: walkActorTo; presentation operation not applied: print; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x0455)
+   uncertain: Script 44 +0x0458: presentation operation not applied: putActorInRoom
+   uncertain: Room 53 local script 201 +0x0000: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x001C)
+   uncertain: Script 44 +0x0473: timing not simulated: waiting for the message to finish continues on the next frame (+0x0479)
+   uncertain: Room 53 local script 201 +0x001F: presentation operation not applied: animateActor
+   uncertain: Script 44 +0x049C: presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame (+0x04CD)
+   uncertain: Script 44 +0x04F0: presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame (+0x052F)
+   uncertain: Script 44 passed through Room 53 (loadRoom at +0x03BA) before this load.
+   uncertain: Script 44 +0x0536 reached loadRoom after a frame advance.
+   uncertain: Room 69 object 0, verb 0x00, code 0x00C2; loadRoom at Script 44 +0x0536 → Room 02. Actor walk and input dispatch were not simulated.
+   uncertain: Script 16 +0x0000: presentation operation not applied: print
+   uncertain: Room 02 local script 200 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Room 02 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Script 44 +0x0538: presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 44 +0x0567: presentation operation not applied: animateActor
+   uncertain: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertain: Script 44 +0x0570: presentation operation not applied: animateActor
+   uncertain: Room 02 local script 201 +0x0000: presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x0006)
+   uncertain: Script 44 +0x0584: presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame (+0x05A4)
+   uncertain: Room 02 local script 201 +0x0009: presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x000F)
+   uncertain: Room 02 local script 201 +0x0012: presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x0018)
+   uncertain: Room 02 local script 202 +0x0001: presentation operation not applied: faceActor
+   uncertain: Script 44 +0x05AA: presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame (+0x05D3)
+   uncertain: Room 02 local script 201 +0x001B: presentation operation not applied: actorOps; presentation operation not applied: putActor
+   uncertain: Script 44 +0x05D6: presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame (+0x0606)
+   uncertain: Script 44 +0x0609: presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame (+0x062C)
+   uncertain: Script 42 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertain: Script 44 +0x062F: presentation operation not applied: oldRoomEffect; presentation operation not applied: print
+   uncertain: Room 02 local script 201 +0x0030: presentation operation not applied: walkActorTo; timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x0036)
+   uncertain: Script 45 +0x0001: operation 'getActorWalkBox' is not modeled at +0x0001
+   uncertain: Script 42 +0x0021: getRandomNr at +0x0026 picked 3 of 0..4 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 42 +0x0021: getRandomNr at +0x004F picked 0 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 42 +0x0021: presentation operation not applied: putActorInRoom; presentation operation not applied: putActor; presentation operation not applied: animateActor
+   uncertain: Script 01 +0x0226: presentation operation not applied: actorFollowCamera; presentation operation not applied: cursorCommand
+   uncertain: Script 06 +0x0000: operation 'findObject' is not modeled at +0x0096

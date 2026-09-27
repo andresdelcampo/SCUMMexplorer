@@ -42,4 +42,10 @@ public sealed class LoomScriptRuntimeState
     /// Null outside a session.
     /// </summary>
     public Func<int, (bool Running, string? Estimate)>? ScriptRunning { get; set; }
+    /// <summary>
+    /// The camera's x range in the current room (half a screen from each edge),
+    /// or null when no room is loaded. Camera commands keep <c>var[0x002]</c>
+    /// (ScummVM <c>VAR_CAMERA_POS_X</c>) inside it.
+    /// </summary>
+    public (int Min, int Max)? CameraRange { get; set; }
 }

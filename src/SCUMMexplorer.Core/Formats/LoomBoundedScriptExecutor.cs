@@ -70,6 +70,12 @@ public sealed class LoomBoundedScriptExecutor
     /// instruction, and the caller resumes it at <see cref="LoomBoundedScriptResult.ResumeOffset"/>.
     /// </summary>
     public const string PauseAfterEvent = "\u0001pause-after-event";
+
+    /// <summary>
+    /// Returned by an event handler when the instruction ends the current script
+    /// (such as <c>chainScript</c>, which starts another script in its place).
+    /// </summary>
+    public const string StopAfterEvent = "\u0001stop-after-event";
     private static readonly Regex VariablePattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\]$", RegexOptions.Compiled);
     // readVar/writeVar with the 0x2000 flag: base plus a literal or the value of another variable.
     private static readonly Regex IndexedPattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\+(.+)\]$", RegexOptions.Compiled);
@@ -218,6 +224,12 @@ public sealed class LoomBoundedScriptExecutor
                 foreach (var (key, value) in runtime.GlobalVariables) knownVariables[key] = value;
                 estimated.RemoveWhere(IsGlobalKey);
                 estimated.UnionWith(runtime.EstimatedVariables);
+                if (eventHandling == StopAfterEvent)
+                {
+                    trace.Add($"{instruction.Operation} at +0x{instruction.Offset:X4} ends this script");
+                    reachedStop = true;
+                    break;
+                }
                 if (eventHandling == PauseAfterEvent)
                 {
                     trace.Add($"{instruction.Operation} at +0x{instruction.Offset:X4} handed to the session; the script resumes after it");
@@ -515,6 +527,25 @@ public sealed class LoomBoundedScriptExecutor
                 if (answer.Estimate is not null)
                     limitations.Add($"isScriptRunning {queried}: {answer.Estimate}, so what follows is an estimate (+0x{instruction.Offset:X4})");
                 trace.Add($"{resultKey} = {(answer.Running ? 1 : 0)}: script {queried} {(answer.Running ? "is running" : "is not running")} in this session{(answer.Estimate is null ? "" : " (estimate)")}");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation is "setCameraAt" or "panCameraTo" && runtime?.CameraRange is { } range &&
+                TryReadValue(instruction.Operands.Trim(), knownVariables, out var cameraX, out _))
+            {
+                // setCameraAt places the camera; panCameraTo moves it 8 pixels a
+                // frame towards the destination. Both keep it half a screen from
+                // the room's edges and publish it in VAR_CAMERA_POS_X (var 2).
+                // The pan is not stepped: the camera arrives at once (labelled).
+                var clamped = (ushort)Math.Clamp(cameraX, range.Min, range.Max);
+                knownVariables["var[0x002]"] = clamped;
+                RefreshBitAliases("var[0x002]", knownVariables);
+                MarkEstimated(estimated, "var[0x002]", onEstimatedPath ||
+                    OperandIsEstimated(instruction.Operands.Trim(), estimated, knownVariables));
+                trace.Add($"camera x = {clamped} ({instruction.Operation} {instruction.Operands})");
+                if (instruction.Operation == "panCameraTo")
+                    limitations.Add($"timing not simulated: the camera pan reaches x = {clamped} at once (+0x{instruction.Offset:X4})");
                 pc = next;
                 continue;
             }
@@ -952,7 +983,7 @@ public sealed class LoomBoundedScriptExecutor
         "setCameraAt" or "panCameraTo" or "lights" or "resourceRoutines" or "print" or "printEgo" or
         "startScript" or "chainScript" or "startObject" or "startMusic" or "stopMusic" or "startSound" or
         "stopSound" or "cursorCommand" or "stringOps" or "oldRoomEffect" or "setBoxFlags" or
-        "setObjectName" or "actorFollowCamera";
+        "setObjectName" or "actorFollowCamera" or "drawBox";
 
     private static bool TryGetBranchTarget(string operands, out int target)
     {

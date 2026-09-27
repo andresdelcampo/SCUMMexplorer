@@ -108,9 +108,11 @@ public sealed class LoomRandomPickTests
         var session = new LoomExplorationSession(game,
             new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), randomSeed: 4);
 
+        var picksBeforeVisit = session.Snapshot.RandomPicks.Count;
         var snapshot = session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 4));
 
-        var pick = Assert.Single(snapshot.RandomPicks);
+        // The boot's opening cutscene takes picks of its own (scripts 42, 113, 114).
+        var pick = Assert.Single(snapshot.RandomPicks.Skip(picksBeforeVisit));
         Assert.Equal(("Room 04 local script 203", 0x0000, 0x20, 4), (pick.Source, pick.Offset, pick.Max, pick.Seed));
         Assert.DoesNotContain(snapshot.Uncertainties, line => line.Contains("'getRandomNr' is not modeled", StringComparison.Ordinal));
         Assert.Contains(snapshot.Uncertainties, line => line.Contains("seeded pick, seed 4", StringComparison.Ordinal));

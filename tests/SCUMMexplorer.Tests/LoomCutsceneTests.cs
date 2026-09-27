@@ -108,7 +108,8 @@ public sealed class LoomCutsceneTests
     {
         if (Load() is not { } data) return;
         var (game, index) = data;
-        var session = new LoomExplorationSession(game, index);
+        // Without the boot's own pending scripts, so only the synthetic starts are running.
+        var session = new LoomExplorationSession(game, index, completeBoot: false);
         // Scripts 39 and 40 start a sound and wait while it plays, so both stay pending.
         // Opcode 0x2A is startScript with bit 0x20: script 39 starts freeze-resistant.
         session.RunTopLevelScript(Script(
@@ -134,7 +135,8 @@ public sealed class LoomCutsceneTests
     {
         if (Load() is not { } data) return;
         var (game, index) = data;
-        var session = new LoomExplorationSession(game, index);
+        // Without hooks, so the cutscene runs no start or end script.
+        var session = new LoomExplorationSession(game, index, completeBoot: false);
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 10));
 
         // Object 295 starts script 052: a cutscene that loads Room 11, then Room 13.
@@ -158,9 +160,9 @@ public sealed class LoomCutsceneTests
         if (Load() is not { } data) return;
         var (game, index) = data;
         var session = new LoomExplorationSession(game, index);
-        // Values script 001 sets once the intro ends (+0x0160 onwards); the boot does not reach them yet.
-        session.SetGlobalWord(0x023, 2);
-        session.SetGlobalWord(0x024, 3);
+        // The completed boot sets the hooks (script 001 +0x017A and +0x017F).
+        Assert.Equal((ushort)2, session.Snapshot.KnownGlobalVariables["var[0x023]"]);
+        Assert.Equal((ushort)3, session.Snapshot.KnownGlobalVariables["var[0x024]"]);
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 10));
 
         session.ActivateObjectVerb(295, 0x38);
