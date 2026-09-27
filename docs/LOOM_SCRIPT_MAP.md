@@ -84,7 +84,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 
 ## Not modelled yet (by frequency in Blockers)
 
-1. `getActorWalkBox`, `getActorX`/`getActorY`, `getActorCostume`, `getActorElevation`: need actor positions and walk boxes (ScummVM `Actor`, `BoxMgr`).
+1. `getActorWalkBox`, `getActorX`/`getActorY`, `getActorCostume`, `getActorElevation`: need actor positions and walk boxes (ScummVM `Actor`, `boxes.cpp`). See the [analysis](../.verification/actor-queries/analysis.md).
 2. `verbOps`: verb-bar setup (Room 01 local 211 on the boot route).
 3. `findObject`: needs a mouse position; the input loop (script 006) depends on it.
 4. `startScript` with a dynamic target (a variable that is not known).
