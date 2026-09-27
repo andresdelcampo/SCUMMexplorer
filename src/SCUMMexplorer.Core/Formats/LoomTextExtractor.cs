@@ -186,10 +186,7 @@ public sealed class LoomTextExtractor
                 var plain = LflEncoding.DecodeXorFF(encoded);
                 var records = _objects.Decode(encoded);
                 var tables = verbs.ReadAll(encoded, records);
-                var roomObjectNames = new Dictionary<int, string>();
-                foreach (var record in records)
-                    if (TryReadObjectName(plain, record.CodeOffset, out var name, out _) && HasUsefulText(name))
-                        roomObjectNames[record.Id] = name;
+                var roomObjectNames = ReadObjectNames(plain, records);
                 foreach (var record in records)
                 {
                     if (TryReadObjectName(plain, record.CodeOffset, out var objectName, out var nameOffset))
@@ -374,6 +371,22 @@ public sealed class LoomTextExtractor
         if (cursor >= roomEnd || found.Distinct().Count() != found.Count) return false;
         ids = found.ToArray();
         return true;
+    }
+
+    /// <summary>
+    /// Stored object names of one room (the name in each object's code header),
+    /// keyed by object id. Names that are blank or only symbols are left out.
+    /// Scripts can rename objects at run time (<c>setObjectName</c>); these are
+    /// the names as stored.
+    /// </summary>
+    public static IReadOnlyDictionary<int, string> ReadObjectNames(byte[] plainRoom,
+        IEnumerable<LoomRoomObjectRecord> records)
+    {
+        var names = new Dictionary<int, string>();
+        foreach (var record in records)
+            if (TryReadObjectName(plainRoom, record.CodeOffset, out var name, out _) && HasUsefulText(name))
+                names[record.Id] = name;
+        return names;
     }
 
     private static bool TryReadObjectName(byte[] room, int codeOffset, out string name, out int nameOffset)

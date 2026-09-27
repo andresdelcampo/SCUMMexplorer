@@ -23,6 +23,21 @@ public sealed class LoomRoomObjectsTests
         Assert.Contains(snapshot.Uncertainties, item => item.Contains("Script 16", StringComparison.Ordinal));
         Assert.True(session.LastEntryRun!.InstructionsVisited > 20);
     }
+    [Fact]
+    public void StoredObjectNamesLabelRoom17Hotspots()
+    {
+        var path = Path.Combine(GameFolder(), "17.LFL");
+        if (!File.Exists(path)) return;
+        var bytes = File.ReadAllBytes(path);
+        var records = new LoomRoomObjectDirectory().Decode(bytes);
+
+        var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
+
+        // Two graves share one stored name; the side panel tells them apart by index.
+        Assert.Equal(2, names.Values.Count(name => name == "tumba"));
+        Assert.All(names.Keys, id => Assert.Contains(records, record => record.Id == id));
+    }
+
     [Theory]
     [InlineData(28)]
     [InlineData(33)]

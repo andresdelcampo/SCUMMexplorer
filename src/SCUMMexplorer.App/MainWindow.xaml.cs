@@ -44,6 +44,7 @@ public partial class MainWindow : Window
     private RoomImage? _currentRoom;
     private GameResource? _currentRoomResource;
     private IReadOnlyList<LoomRoomObjectRecord> _currentRoomObjectRecords = [];
+    private IReadOnlyDictionary<int, string> _roomObjectNames = new Dictionary<int, string>();
     private IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> _roomVerbs =
         new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
     private IReadOnlyList<RoomVerbDestination> _roomNavigationCandidates = [];
@@ -214,7 +215,7 @@ public partial class MainWindow : Window
         _objectSelection = new([]);
         _estimatedObjectIds = new HashSet<int>();
         _selectedObject = null;
-        ObjectList.Children.Clear();
+        ClearObjectList();
         ObjectsNote.Text = "Choose a room.";
         SessionModeToggle.Visibility = _session is null ? Visibility.Collapsed : Visibility.Visible;
         SessionActions.Visibility = _session is null ? Visibility.Collapsed : Visibility.Visible;
@@ -401,13 +402,14 @@ public partial class MainWindow : Window
         RoomMaskToggle.IsEnabled = false;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
         RoomNavigationToggle.Visibility = Visibility.Collapsed;
-        ObjectList.Children.Clear();
+        ClearObjectList();
         ObjectsNote.Text = "Reading room objects…";
         _currentRoom = null;
         _objects = [];
         _objectSelection = new([]);
         _currentRoomResource = null;
         _currentRoomObjectRecords = [];
+        _roomObjectNames = new Dictionary<int, string>();
         _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
         _roomNavigationCandidates = [];
         RoomNavigationButtons.Children.Clear();
@@ -444,7 +446,7 @@ public partial class MainWindow : Window
                 _objectSelection = new RoomObjectSelection([], background: room);
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
-                ObjectList.Children.Clear();
+                ClearObjectList();
                 ObjectsNote.Text = "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
                 ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
@@ -466,6 +468,7 @@ public partial class MainWindow : Window
             _currentRoomResource = resource;
             _currentRoomObjectRecords = objectRecords;
             _roomVerbs = _verbReader.ReadAll(bytes, objectRecords);
+            _roomObjectNames = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), objectRecords);
             _objects = objects;
             ApplyRoomState(resource, objectRecords, objects, visit: true);
             UpdateRoomNavigationActions(resource);
@@ -521,8 +524,8 @@ public partial class MainWindow : Window
                 : string.Join(Environment.NewLine, snapshot.Uncertainties.TakeLast(8));
             AdvanceFrameButton.IsEnabled = snapshot.PendingScripts > 0;
             ObjectsNote.Text = _estimatedObjectIds.Count == 0
-                ? "Click a room image to cycle its artwork. Use possible doorway buttons to navigate and the hotspot list for script interactions."
-                : $"{_estimatedObjectIds.Count} scene details use an artwork estimate because the entry state is unresolved{EstimateSummary()}. Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.";
+                ? "Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions."
+                : $"{_estimatedObjectIds.Count} scene details use an artwork estimate because the entry state is unresolved{EstimateSummary()}.";
             ShowLastObjectAction(resource.ResourceId);
             return;
         }
@@ -1002,7 +1005,7 @@ public partial class MainWindow : Window
         _currentRoom = null;
         _objects = [];
         _selectedObject = null;
-        ObjectList.Children.Clear();
+        ClearObjectList();
         CostumePreview.Source = null;
         CostumePreview.Visibility = Visibility.Collapsed;
         CostumePoseCombo.Items.Clear();
@@ -1150,7 +1153,7 @@ public partial class MainWindow : Window
         RoomMaskToggle.Visibility = Visibility.Collapsed;
         PreviewMessage.Visibility = Visibility.Collapsed;
         AudioPanel.Visibility = Visibility.Visible;
-        ObjectList.Children.Clear();
+        ClearObjectList();
         ObjectsNote.Text = "Choose a room to inspect its objects.";
         ObjectAssetPreview.Source = null;
         ObjectAssetPreview.Visibility = Visibility.Collapsed;
@@ -1479,20 +1482,33 @@ public partial class MainWindow : Window
         var interactive = SessionModeToggle.IsChecked == true && _session is not null;
         if (interactive)
         {
-            foreach (var record in _currentRoomObjectRecords.OrderBy(item => item.LocalIndex))
+            var hotspots = _currentRoomObjectRecords.OrderBy(item => item.LocalIndex)
+                .Where(record => IsVerbHotspotAvailable(record, _session!.Snapshot) &&
+                                 _roomVerbs.TryGetValue(record.Id, out var verbs) && verbs.Count > 0)
+                .Select(record =>
+                {
+                    // The stored name, else the rooms a doorway can load, else its index.
+                    var name = _roomObjectNames.TryGetValue(record.Id, out var stored) ? stored : null;
+                    var doorway = DoorwayTargets(record).Length > 0 ? "→ " + DoorwayLabel(record) : null;
+                    var label = name is null ? doorway ?? $"Hotspot {record.LocalIndex}"
+                        : doorway is null ? name : $"{name} {doorway}";
+                    return (Record: record, Name: name, Label: label);
+                }).ToArray();
+            var repeated = hotspots.GroupBy(item => item.Label).Where(group => group.Count() > 1)
+                .Select(group => group.Key).ToHashSet();
+            foreach (var (record, name, label) in hotspots)
             {
-                var snapshot = _session!.Snapshot;
-                if (!IsVerbHotspotAvailable(record, snapshot) ||
-                    !_roomVerbs.TryGetValue(record.Id, out var verbs) || verbs.Count == 0) continue;
                 var button = new Button
                 {
-                    Content = $"Hotspot {record.LocalIndex} · interact",
-                    ToolTip = $"Object {record.Id} · {record.X}, {record.Y} · {record.Width} × {record.Height}. " +
+                    Content = repeated.Contains(label) ? $"{label} · {record.LocalIndex}" : label,
+                    ToolTip = $"Hotspot {record.LocalIndex} · object {record.Id}" +
+                              (name is null ? "" : $" · stored name \"{name}\"") +
+                              $" · {record.X}, {record.Y} · {record.Width} × {record.Height}. " +
                               "Choose a decoded interaction. Use Enter or Space to activate this hotspot.",
                     Tag = record.Id,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
-                    Margin = new Thickness(0, 0, 0, 5),
-                    Padding = new Thickness(8, 6, 8, 6),
+                    Margin = new Thickness(0, 0, 0, 3),
+                    Padding = new Thickness(8, 3, 8, 3),
                     Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
                     Foreground = Brushes.Beige,
                     BorderThickness = new Thickness(0)
@@ -1500,6 +1516,7 @@ public partial class MainWindow : Window
                 button.Click += ObjectButton_Click;
                 ObjectList.Children.Add(button);
             }
+            ShowObjectListSection("HOTSPOTS");
             return;
         }
         for (var index = 0; index < _objects.Count; index++)
@@ -1515,8 +1532,8 @@ public partial class MainWindow : Window
                           (_estimatedObjectIds.Contains(obj.Id) ? " · artwork estimate; not a script-proven state" : ""),
                 Tag = obj.Id,
                 HorizontalContentAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(0, 0, 0, 5),
-                Padding = new Thickness(8, 6, 8, 6),
+                Margin = new Thickness(0, 0, 0, 3),
+                Padding = new Thickness(8, 3, 8, 3),
                 Background = obj.Id == _selectedObject ? new SolidColorBrush(Color.FromRgb(183, 132, 66)) : new SolidColorBrush(Color.FromRgb(39, 54, 66)),
                 Foreground = obj.Id == _selectedObject ? Brushes.Black : Brushes.Beige,
                 BorderThickness = new Thickness(0)
@@ -1524,6 +1541,19 @@ public partial class MainWindow : Window
             button.Click += ObjectButton_Click;
             ObjectList.Children.Add(button);
         }
+        ShowObjectListSection("SCENE DETAILS");
+    }
+
+    private void ShowObjectListSection(string heading)
+    {
+        ObjectListHeader.Text = $"{heading} · {ObjectList.Children.Count}";
+        ObjectListSection.Visibility = ObjectList.Children.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void ClearObjectList()
+    {
+        ObjectList.Children.Clear();
+        ObjectListSection.Visibility = Visibility.Collapsed;
     }
 
     private void ObjectButton_Click(object sender, RoutedEventArgs e)
@@ -1598,7 +1628,7 @@ public partial class MainWindow : Window
         if (obj is null) return false;
         _estimatedObjectIds = new HashSet<int>();
         ObjectsNote.Text = SessionModeToggle.IsChecked == true
-            ? "Room-image choices are local to this view. Use the hotspot list for script interactions."
+            ? "Room-image choices are local to this view. Hotspots run script interactions."
             : "Asset inspection: click an image area to cycle its stored alternatives. The selection is local to this view.";
         var wasVisible = _objectSelection.IsActive(obj);
         var next = _objectSelection.Next(obj);
@@ -1859,14 +1889,13 @@ public partial class MainWindow : Window
                 .ToArray();
             var button = new Button
             {
-                Content = $"Open Room {target.Key:00}",
+                Content = $"Room {target.Key:00}",
                 ToolTip = (sources.Length == 1
                               ? $"Static candidate: {sources[0]}."
                               : $"Static candidates ({sources.Length} sources):\n• {string.Join("\n• ", sources)}") +
                           "\nOpen directly for exploration; script conditions and effects are not simulated.",
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(8, 5, 8, 5),
-                Margin = new Thickness(0, 0, 0, 5),
+                Padding = new Thickness(8, 3, 8, 3),
+                Margin = new Thickness(0, 0, 5, 5),
                 Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
                 Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
@@ -1874,6 +1903,9 @@ public partial class MainWindow : Window
             button.Click += (_, _) => OpenRoomDestination(candidate);
             RoomNavigationButtons.Children.Add(button);
         }
+        RoomNavigationHeader.Text = $"DOORWAYS · {RoomNavigationButtons.Children.Count}";
+        RoomNavigationPanel.ToolTip = "Possible doorways: rooms that decoded hotspot code can load. " +
+                                      "A button opens the room directly for exploration; clicking a doorway box on the room runs its script.";
         RoomNavigationPanel.Visibility = _roomNavigationCandidates.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         RoomNavigationToggle.Visibility = _roomNavigationCandidates.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && RoomNavigationToggle.IsChecked == true
@@ -1968,7 +2000,7 @@ public partial class MainWindow : Window
         if (reached.Start?.TargetId is int currentId && soundById.TryGetValue(currentId, out var current))
         {
             SelectRoomCue(current, reached.Start.Format(), reached: true);
-            RoomMusicNote.Text = "This cue began on your route. Press Play to hear it." +
+            RoomMusicNote.Text = "The cue above began on your route." +
                 (reached.OtherActiveMusicCount > 0 ? " Other tracks may also be active." : "");
             RoomMusicNote.ToolTip = "The session follows reached sound commands, but does not simulate when a track ends naturally.";
         }
@@ -1980,7 +2012,7 @@ public partial class MainWindow : Window
             if (!stillPossible) ClearRoomCue();
             RoomMusicNote.Text = reached.HasUnknownSoundTarget
                 ? "The music for this visit is uncertain."
-                : "No music has been confirmed here. The tracks below may play in this room.";
+                : "No music has been confirmed here. These tracks may play in this room.";
             RoomMusicNote.ToolTip = reached.HasUnknownSoundTarget
                 ? "A reached sound command has a target that the bounded interpreter could not resolve."
                 : "Possible tracks come from static room and object script paths; those paths have not been reached.";
@@ -1994,12 +2026,12 @@ public partial class MainWindow : Window
             var evidence = string.Join(Environment.NewLine, group.Select(item => item.Evidence));
             var button = new Button
             {
-                Content = $"▶ Possible: {target.Name}",
+                Content = $"▶ {target.Name}",
                 ToolTip = "Static script possibility; execution has not reached this cue." +
                           Environment.NewLine + evidence,
                 HorizontalContentAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(7, 4, 7, 4),
-                Margin = new Thickness(0, 0, 0, 4),
+                Padding = new Thickness(7, 2, 7, 2),
+                Margin = new Thickness(0, 0, 0, 3),
                 Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
                 Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
@@ -2020,6 +2052,8 @@ public partial class MainWindow : Window
                 Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
                 TextWrapping = TextWrapping.Wrap
             });
+        var possibleTracks = RoomMusicButtons.Children.OfType<Button>().Count();
+        RoomMusicMoreHeader.Text = possibleTracks == 0 ? "Other possible music" : $"Other possible music · {possibleTracks}";
         if (RoomMusicButtons.Children.Count == 0)
             RoomMusicButtons.Children.Add(new TextBlock
             {
@@ -2036,8 +2070,8 @@ public partial class MainWindow : Window
         _roomSelectedCue = sound;
         _roomCueSourceRoomId = _currentRoomResource?.ResourceId;
         _roomCueReached = reached;
-        RoomCueTitle.Text = $"{(reached ? "Started cue" : "Possible cue")}: {sound.Name}";
-        RoomCueEvidence.Text = reached ? "From this session's route" : "From room script data";
+        RoomCueTitle.Text = $"{(reached ? "Started" : "Possible")}: {sound.Name}";
+        RoomCueEvidence.Text = reached ? "from this session's route" : "from room script data";
         RoomCueEvidence.ToolTip = evidence;
         RoomCueTitle.ToolTip = evidence;
         RoomCuePlayButton.IsEnabled = true;
@@ -2052,7 +2086,7 @@ public partial class MainWindow : Window
         _roomSelectedCue = null;
         _roomCueSourceRoomId = null;
         _roomCueReached = false;
-        RoomCueTitle.Text = "No current cue established";
+        RoomCueTitle.Text = "No cue established";
         RoomCueTitle.ToolTip = null;
         RoomCueEvidence.Text = "";
         RoomCueEvidence.ToolTip = null;

@@ -1,0 +1,32 @@
+Room 03: active images 
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 03 ready
+Doorway button "Room 02": Static candidate: Room 03 object 160 (Verb 0x38) code 0x2D71, room-load instruction +0x0005 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 05": Static candidate: Room 03 object 161 (Verb 0x36, Verb 0x38) code 0x2D1D, room-load instruction +0x0008 (local script 201). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 04": Static candidate: Room 03 object 162 (Verb 0x36, Verb 0x38) code 0x2D3A, room-load instruction +0x0008 (local script 200). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 10": Static candidates (2 sources): | • Room 03 object 163 (Verb 0x36, Verb 0x38) code 0x2D57, room-load instruction +0x0008 (local script 202) | • Room 03 object 164 (Verb 0x38) code 0x2D95, room-load instruction +0x0008 (local script 202) | Open directly for exploration; script conditions and effects are not simulated.
+Room 04: active images 178,181,184,187
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 4 scene details use an artwork estimate because the entry state is unresolved (from first stored image for this position; no decoded script draws it).
+StatusText: Room 04 ready
+Doorway button "Room 03": Static candidate: Room 04 object 167 (Verb 0x38) code 0x66E7, room-load instruction +0x0006 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 64": Static candidate: Room 04 object 177 (Verb 0x36) code 0x6A3E, room-load instruction +0x000C (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Room 17: active images 363,364,365,366
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 17 ready
+Doorway button "Room 16": Static candidates (2 sources): | • Room 17 object 352 (Verb 0x38) code 0x4DF4, room-load instruction +0x0000 (direct) | • Room 17 object 356 (Verb 0x38) code 0x4DD5, room-load instruction +0x0000 (direct) | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 22": Static candidate: Room 17 object 353 (Verb 0x38) code 0x4E13, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Room 22: active images 406,409,412,413
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 22 ready
+Doorway button "Room 17": Static candidate: Room 22 object 400 (Verb 0x38) code 0x3E1E, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 16": Static candidate: Room 22 object 401 (Verb 0x38) code 0x3E3D, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 18": Static candidate: Room 22 object 402 (Verb 0x38) code 0x3E5C, room-load instruction +0x0005 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Room 38: active images 614
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 38 ready
+Doorway button "Room 37": Static candidates (2 sources): | • Room 38 object 609 (Verb 0x38) code 0x21D2, room-load instruction +0x0005 (direct) | • Room 38 object 623 (Verb 0x38) code 0x21FC, room-load instruction +0x0000 (direct) | Open directly for exploration; script conditions and effects are not simulated.
