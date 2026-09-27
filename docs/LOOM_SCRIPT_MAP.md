@@ -9,7 +9,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | Variable | Meaning | Source |
 | --- | --- | --- |
 | `var[0x001]` | Ego actor (`VAR_EGO`); 1 after the boot | ScummVM; script 001 +0x0184 |
-| `var[0x002]` | Camera x (`VAR_CAMERA_POS_X`). The session keeps it clamped to [160, room width − 160] and sets it to 160 on room entry. | ScummVM; modelled 27 Sep |
+| `var[0x002]` | Camera x (`VAR_CAMERA_POS_X`). The session keeps it clamped to [160, room width − 160] and sets it to 160 on room entry; `loadRoomWithEgo` puts it on the ego, and `actorFollowCamera` moves it onto the actor when the actor is outside the triggers (strips 10–30). After the boot it is 800 (Room 02, the ego at 828). Readers: script 044 +0x0361, Room 02 object 153, Room 04 local 201 and objects 169/170, Room 24 local 204, Room 34 local 200. | ScummVM; modelled 27 Sep |
 | `var[0x003]` | A message is on screen (`VAR_HAVE_MSG`). Many scripts wait while it is nonzero. | ScummVM |
 | `var[0x004]` | Current room (`VAR_ROOM`) | ScummVM |
 | `var[0x005]` | `VAR_OVERRIDE`: 1 when the player skipped a cutscene; `endCutscene` clears it | ScummVM |
@@ -45,7 +45,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | --- | --- | --- |
 | 001 | Boot | Loads Room 69, waits for `bit[0xD6B]`, sets the hooks, plays script 044, chains to 006. See the [boot validation](../.verification/boot/validation.md). |
 | 002 | Cutscene start hook | Cursor and input off, `freezeScripts 0x7F`, `bit[0xD6E] = 1`, `var[0x005] = 0`; with argument 1, starts script 19 |
-| 003 | Cutscene end hook | Cursor and input on, unfreeze, camera follows ego, `bit[0xD6E] = 0`; with argument 1, starts script 18 unless `bit[0xD61]` is set |
+| 003 | Cutscene end hook | Cursor and input on, unfreeze, camera follows ego (+0x0018 `actorFollowCamera var[0x001]`), `bit[0xD6E] = 0`; with argument 1, starts script 18 unless `bit[0xD61]` is set |
 | 006 | Input loop (runs forever) | Reads the mouse (`var[0x014]`/`var[0x015]`), `findObject`, hover verb 0x37, walking, and starts script 007 (verb 0x38 or 0x36). **Not modelled:** it stops at `findObject` +0x0096. |
 | 007 | Runs a sentence | `startObject obj, verb` when ego is close enough (`getDist ≤ 3`) |
 | 008 | Verb-area close-up | Shows `var[0x068]` through `verbOps 0x36 image` |
@@ -73,6 +73,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 
 - 12 actors (1–12). Actor 1 is the ego (`var[0x001]`). After the boot (opening cutscene) the ego stands in Room 02 at (828, 60), box 0, under the tree (decoded run). Actors 10 and 11 are put over the sea at (137, 42) with `ignoreBoxes` (box 255) after seeded picks (reading: the swans).
 - `loadRoomWithEgo obj, room, walkTo=(x, y)` (v3): the ego stands at the object's walk point unless the entry code put it, then walks to (x, y) when x ≠ −1 (ScummVM). Room 03 local 200 +0x0008 brings the ego into Room 04 and walks it to (580, 132), box 0 (decoded; the walk end is an estimate).
+- Script 001 +0x0233 `actorFollowCamera var[0x001]` ends the boot with the camera on the ego: x 800 in Room 02 (decoded run; ScummVM `setCameraFollows`).
 - `getActorX`/`getActorY` with a number of 13 or more read an object's walk point (ScummVM `getObjX`).
 
 ## Room notes
@@ -95,13 +96,13 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `isScriptRunning` | Executing, pending or frozen global/local scripts; estimate if the script ended at an unmodelled step | `IsScriptRunning` |
 | `isSoundRunning` | Sounds started on the route read as playing (estimate) | executor |
 | `delay`, `waitFor` actor/message/camera | Continue on the next frame (labelled timing) | executor |
-| Camera | `var[0x002]`, pans arrive at once | executor, `CameraRange` |
+| Camera | `var[0x002]`, pans arrive at once; `loadRoomWithEgo` and `actorFollowCamera` follow `setCameraFollows`'s triggers; the camera follows a walk's end at once (estimate) | executor, session `PlaceEgoAfterEntry`, `CameraRange` |
 | `getRandomNr` | Seeded pick, labelled; later steps are estimates | executor |
 | Sound commands (music row) | Each command keeps the room whose code began its script chain (`ScriptFrame.OriginRoom`). The room view shows cues started since entry, or started by the room itself and not stopped. | session `SoundEvents`, `LoomSoundCueResolver.ResolveForRoom` |
 
 ## Not modelled yet (by frequency in Blockers)
 
-1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown, mostly the ego after a catalog visit. `getActorCostume`, `getActorElevation`, walk timing and paths, and the camera following the ego are not modelled.
+1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown, mostly the ego after a catalog visit. `getActorCostume`, `getActorElevation`, walk timing and paths, and step-by-step camera movement are not modelled.
 2. `verbOps`: verb-bar setup (Room 01 local 211 on the boot route).
 3. `findObject`: needs a mouse position; the input loop (script 006) depends on it.
 4. `startScript` with a dynamic target (a variable that is not known).

@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Rendering;
 
@@ -560,6 +560,54 @@ public sealed class LoomBoundedScriptExecutor
                 trace.Add($"camera x = {clamped} ({instruction.Operation} {instruction.Operands})");
                 if (instruction.Operation == "panCameraTo")
                     limitations.Add($"timing not simulated: the camera pan reaches x = {clamped} at once (+0x{instruction.Offset:X4})");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "actorFollowCamera" && runtime?.CameraRange is { } followRange)
+            {
+                // o5_actorFollowCamera -> setCameraFollows (v3): the camera follows the
+                // actor, and moves onto it at once when the actor is outside the
+                // camera's triggers (strips 10 and 30 of the 40 on screen).
+                var operand = instruction.Operands.Trim();
+                string? cameraUnknown = null;
+                if (!TryReadValue(operand, knownVariables, out var followed, out _) || !LoomActorTable.IsValid(followed))
+                    cameraUnknown = $"it follows an actor the preview cannot read ({operand})";
+                else
+                {
+                    var actor = runtime.Actors[followed];
+                    if (actor.Room is null || actor.X is not int actorX)
+                        cameraUnknown = $"it follows actor {followed}, whose position is unknown" +
+                                        (actor.Unknown is null ? "" : $" ({actor.Unknown})");
+                    else if (actor.Room != runtime.CurrentRoom)
+                        cameraUnknown = $"it follows actor {followed} into Room {actor.Room:00}, which would load that room (not modelled)";
+                    else if (!knownVariables.TryGetValue("var[0x002]", out var cameraBefore))
+                        cameraUnknown = "the camera's position before it was unknown";
+                    else
+                    {
+                        var strip = actorX / 8 - (cameraBefore / 8 - 20);
+                        var wasEstimated = estimated.Contains("var[0x002]");
+                        if (strip is < 10 or > 30)
+                        {
+                            var clamped = (ushort)Math.Clamp(actorX, followRange.Min, followRange.Max);
+                            knownVariables["var[0x002]"] = clamped;
+                            RefreshBitAliases("var[0x002]", knownVariables);
+                            trace.Add($"camera x = {clamped}: it follows actor {followed} at x = {actorX} (actorFollowCamera)");
+                        }
+                        else trace.Add($"camera x stays {cameraBefore}: actor {followed} at x = {actorX} is within its triggers (actorFollowCamera)");
+                        MarkEstimated(estimated, "var[0x002]", onEstimatedPath || actor.Estimate is not null || wasEstimated ||
+                            OperandIsEstimated(operand, estimated, knownVariables));
+                        if (actor.Estimate is not null)
+                            limitations.Add($"camera x follows actor {followed}, whose position is an estimate ({actor.Estimate}) (+0x{instruction.Offset:X4})");
+                    }
+                }
+                if (cameraUnknown is not null)
+                {
+                    knownVariables.Remove("var[0x002]");
+                    runtime.GlobalVariables.Remove("var[0x002]");
+                    estimated.Remove("var[0x002]");
+                    limitations.Add($"camera x (var[0x002]) is unknown after actorFollowCamera: {cameraUnknown} (+0x{instruction.Offset:X4})");
+                }
                 pc = next;
                 continue;
             }

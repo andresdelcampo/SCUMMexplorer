@@ -343,7 +343,8 @@ public sealed class LoomExplorationSession
         // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
         var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
         _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
-        _runtime.GlobalVariables["var[0x002]"] = 160;
+        _runtime.GlobalVariables[CameraVariable] = 160;
+        _runtime.EstimatedVariables.Remove(CameraVariable);
         foreach (var item in _currentObjects)
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
         _runtime.GlobalVariables["var[0x004]"] = (ushort)room.ResourceId!.Value;
@@ -353,15 +354,17 @@ public sealed class LoomExplorationSession
         RunEmbeddedRoomScript(room, exit: false);
         RunGlobalHook(29, "after room entry");
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo);
+        else if (withEgo is not null) ForgetCamera($"{withEgo.SourceLabel} +0x{withEgo.Offset:X4} puts the camera on the ego, whose actor number is unknown");
         LastVisitEvents = _visitEvents.Skip(eventsBeforeVisit).ToArray();
         return Snapshot;
     }
 
     /// <summary>
     /// o5_loadRoomWithEgo after <c>startScene</c> (v3/v4): unless the entry code
-    /// put the ego somewhere, it stands at the object's walk point; then, when the
-    /// instruction gives a destination, it walks there. The walk is taken to end
-    /// at once, an estimate (see <see cref="LoomActorTable.Walk"/>).
+    /// put the ego somewhere, it stands at the object's walk point; the camera is
+    /// put on the ego and follows it; then, when the instruction gives a
+    /// destination, the ego walks there. The walk is taken to end at once, an
+    /// estimate (see <see cref="LoomActorTable.Walk"/>).
     /// </summary>
     private void PlaceEgoAfterEntry(LoomScriptEvent load, int ego)
     {
@@ -381,11 +384,77 @@ public sealed class LoomExplorationSession
                     _runtime.Actors.MarkEstimate(ego, $"the ego's arrival at {source} follows a seeded pick");
             }
         }
+        // camera._cur.x = ego x (o5_loadRoomWithEgo, "based on disassembly"), then
+        // setCameraFollows(ego); VAR_CAMERA_POS_X takes the value on the next loop.
+        var placed = _runtime.Actors[ego];
+        if (placed.X is not int egoX || placed.Room != _currentRoom?.ResourceId)
+            ForgetCamera($"{source} puts the camera on the ego, whose position is unknown" +
+                         (placed.Unknown is null ? "" : $" ({placed.Unknown})"));
+        else SetCamera(egoX, placed.Estimate is null ? null : $"the camera is put on the ego at {source}, whose position is an estimate ({placed.Estimate})",
+            $"{source}: camera x = {{0}} (the ego's x)");
         if (arguments[2] is int x && x != -1 && arguments[3] is int y)
+        {
             _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), $"the ego's walk from {source}");
+            FollowEgoWalk(_runtime.Actors[ego], source);
+        }
         var state = _runtime.Actors[ego];
         _visitTrace.Add($"{source}: the ego (actor {ego}) stands at ({state.X?.ToString() ?? "?"}, {state.Y?.ToString() ?? "?"}), box {state.WalkBox?.ToString() ?? "?"}" +
                         (state.Estimate is null ? "" : $" (estimate: {state.Estimate})"));
+    }
+
+    /// <summary>ScummVM <c>VAR_CAMERA_POS_X</c>.</summary>
+    private const string CameraVariable = "var[0x002]";
+
+    /// <summary>The camera's centre x in room pixels (<c>var[0x002]</c>), or null when it is unknown.</summary>
+    public int? CameraX => _runtime.GlobalVariables.TryGetValue(CameraVariable, out var x) ? x : null;
+
+    /// <summary>True when <see cref="CameraX"/> comes from an estimate (a walk end, a seeded pick, an instant pan).</summary>
+    public bool CameraEstimated => _runtime.EstimatedVariables.Contains(CameraVariable);
+
+    /// <summary>Puts the camera at <paramref name="x"/>, kept half a screen from the room's edges (<c>cameraMoved</c>).</summary>
+    private void SetCamera(int x, string? estimate, string trace)
+    {
+        var (min, max) = _runtime.CameraRange ?? (160, 160);
+        var clamped = (ushort)Math.Clamp(x, min, max);
+        _runtime.GlobalVariables[CameraVariable] = clamped;
+        if (estimate is null) _runtime.EstimatedVariables.Remove(CameraVariable);
+        else
+        {
+            _runtime.EstimatedVariables.Add(CameraVariable);
+            _uncertainties.Add($"Camera x (var[0x002]) = {clamped} is an estimate: {estimate}.");
+        }
+        _visitTrace.Add(string.Format(System.Globalization.CultureInfo.InvariantCulture, trace, clamped) +
+                        (estimate is null ? "" : " (estimate)"));
+    }
+
+    private void ForgetCamera(string reason)
+    {
+        _runtime.GlobalVariables.Remove(CameraVariable);
+        _runtime.EstimatedVariables.Remove(CameraVariable);
+        _uncertainties.Add($"Camera x (var[0x002]) is unknown: {reason}.");
+    }
+
+    /// <summary>
+    /// ScummVM <c>moveCamera</c> in follow mode: once the followed actor is more
+    /// than 10 strips (80 pixels) from the camera's centre strip, the camera moves
+    /// to the actor. The walk ends at once in this preview, so the camera takes the
+    /// end point at once too, and both are estimates.
+    /// </summary>
+    private void FollowEgoWalk(LoomActorSnapshot walked, string source)
+    {
+        if (!_runtime.GlobalVariables.TryGetValue(CameraVariable, out var camera)) return;
+        if (walked.X is not int endX || walked.Room != _currentRoom?.ResourceId)
+        {
+            ForgetCamera($"it follows the ego's walk from {source}, whose end is unknown");
+            return;
+        }
+        // _screenStartStrip = camera / 8 - 20; the triggers are strips 10 and 30.
+        var strip = endX / 8 - (camera / 8 - 20);
+        var reason = $"it follows the ego's walk from {source}, which is taken to end at once ({walked.Estimate ?? "walk timing and path not simulated"})";
+        if (strip is < 10 or > 30)
+            SetCamera(endX, reason, $"{source}: the camera follows the ego's walk to x = {{0}}");
+        else if (_runtime.EstimatedVariables.Add(CameraVariable))
+            _uncertainties.Add($"Camera x (var[0x002]) = {camera} is an estimate: {reason}; the walk's end stays within the camera's triggers.");
     }
 
     public LoomObjectActionResult ActivateObjectVerb(int objectId, int verbId)

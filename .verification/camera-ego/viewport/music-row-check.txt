@@ -1,0 +1,5 @@
+﻿Real MainWindow; synthetic tree selection and Continue clicks. No physical input.
+Exploration mode: True
+INFO Room 02 (now Room 02), expect -: title "No cue established"; evidence "" []; note "No music has been confirmed here. These tracks may play in this room."; more "Other possible music · 4"; capture step-01-room-02.png
+INFO Room 03 (now Room 03), expect -: title "No cue established"; evidence "" []; note "No music has been confirmed here. These tracks may play in this room."; more "Other possible music · 1"; capture step-02-room-03.png
+Failures: 0

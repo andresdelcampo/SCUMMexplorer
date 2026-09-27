@@ -17,7 +17,7 @@ var trace = 0;
 void Show(string label)
 {
     var snapshot = session.Snapshot;
-    Console.WriteLine($"== {label}: room {snapshot.RoomId:00}, pending {snapshot.PendingScripts}");
+    Console.WriteLine($"== {label}: room {snapshot.RoomId:00}, pending {snapshot.PendingScripts}, camera x {session.CameraX?.ToString() ?? "unknown"}{(session.CameraEstimated ? " (estimate)" : "")}");
     foreach (var line in session.SessionTrace.Skip(trace)) Console.WriteLine("   trace: " + line);
     foreach (var line in snapshot.Uncertainties.Skip(uncertainties)) Console.WriteLine("   uncertain: " + line);
     foreach (var actor in session.Actors.Where(a => a.Room == snapshot.RoomId || a.Unknown is not null && a.Number == 1))

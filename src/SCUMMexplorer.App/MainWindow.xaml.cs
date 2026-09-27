@@ -539,7 +539,11 @@ public partial class MainWindow : Window
                                         Environment.NewLine + "Known global variables: " + snapshot.KnownGlobalVariables.Count +
                                         "; inventory: " + (snapshot.InventoryKnown ? snapshot.Inventory.Count.ToString() : "unknown") +
                                         "; script-started sounds: " +
-                                        (snapshot.ActiveSounds.Count == 0 ? "none known" : string.Join(", ", snapshot.ActiveSounds));
+                                        (snapshot.ActiveSounds.Count == 0 ? "none known" : string.Join(", ", snapshot.ActiveSounds)) +
+                                        "; camera x (var[0x002]): " + (_session.CameraX?.ToString() ?? "unknown") +
+                                        (_session.CameraEstimated ? " (estimate)" : "");
+            // A room entered in the session opens where its camera is, not at the left edge.
+            if (visit) _pendingCameraX = _session.CameraX;
             RoomEntryTraceExpander.Header = "Advanced room details";
             RoomEntryTraceExpander.Visibility = Visibility.Visible;
             ShowScriptEvents(RoomEntryEventButtons, _session.LastVisitEvents);
@@ -1205,10 +1209,31 @@ public partial class MainWindow : Window
         RoomSceneSurface.Width = room.Width * _roomDisplayScale;
         RoomSceneSurface.Height = room.Height * _roomDisplayScale;
         RoomViewport.Height = RoomSceneSurface.Height + (hasHorizontalScroll ? 17 : 0);
-        RoomViewport.Dispatcher.BeginInvoke(UpdateRoomScrollButtons, DispatcherPriority.Loaded);
+        RoomViewport.Dispatcher.BeginInvoke(() =>
+        {
+            ApplyPendingCamera();
+            UpdateRoomScrollButtons();
+        }, DispatcherPriority.Loaded);
         RefreshWalkBoxOverlay();
         RefreshRoomNavigationOverlay();
         ShowHotspotHighlight(_highlightedHotspot);
+    }
+
+    // The session's camera x for the room just entered, applied once the view is laid out.
+    private int? _pendingCameraX;
+
+    /// <summary>
+    /// In the 320-pixel view, scrolls so the camera's x (<c>var[0x002]</c>, the
+    /// centre of the game's screen) is in the middle, as the game would show it.
+    /// </summary>
+    private void ApplyPendingCamera()
+    {
+        if (_pendingCameraX is not int cameraX || _currentRoom is null) return;
+        _pendingCameraX = null;
+        if (NormalRoomWidthToggle.IsChecked != true) return;
+        RoomViewport.UpdateLayout();
+        var left = (cameraX - Math.Min(320, _currentRoom.Width) / 2.0) * _roomDisplayScale;
+        RoomViewport.ScrollToHorizontalOffset(Math.Clamp(left, 0, RoomViewport.ScrollableWidth));
     }
 
     private void UpdateRoomScrollButtons()

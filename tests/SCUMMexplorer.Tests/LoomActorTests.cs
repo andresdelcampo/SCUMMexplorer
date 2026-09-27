@@ -99,4 +99,31 @@ public sealed class LoomActorTests
         Assert.NotNull(arrived.WalkBox);
         Assert.Contains("taken to end", arrived.Estimate);
     }
+
+    [Fact]
+    public void TheCameraFollowsTheEgoAfterTheBootAndLoadRoomWithEgo()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game,
+            new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
+
+        // Script 001 +0x0233 actorFollowCamera: the ego at x 828 is past the triggers,
+        // so the camera moves onto it, kept half a screen from Room 02's right edge (960 - 160).
+        Assert.Equal(800, session.CameraX);
+        Assert.False(session.CameraEstimated);
+
+        // startScene: a catalog visit starts at the left edge.
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 3));
+        Assert.Equal(160, session.CameraX);
+
+        // o5_loadRoomWithEgo puts the camera on the ego, which then walks to (580, 132);
+        // Room 04 is 640 wide, so the camera stops at 480, an estimate like the walk.
+        session.ActivateObjectVerb(162, 0x36);
+        Assert.True(session.ContinueUntilRoomChanges(8));
+        Assert.Equal(4, session.Snapshot.RoomId);
+        Assert.Equal(480, session.CameraX);
+        Assert.True(session.CameraEstimated);
+        Assert.Contains(session.Snapshot.Uncertainties, item => item.StartsWith("Camera x (var[0x002]) = 480 is an estimate", StringComparison.Ordinal));
+    }
 }
