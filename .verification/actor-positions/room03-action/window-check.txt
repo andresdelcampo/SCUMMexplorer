@@ -1,0 +1,91 @@
+Real MainWindow; in-process coordinate and routed-key dispatch. No physical mouse/keyboard input.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 03 selected by catalog browsing.
+PASS: Exploration mode enabled
+Coordinate dispatch at room pixel (24,24) in decoded rectangle (0,0,72,72).
+PASS: coordinate-action: object 162 execution reached Room 04
+PASS: Destination came from a reached room-load event
+Room 03 object 162, verb 0x36, code 0x2D3A; loadRoomWithEgo at Room 03 local script 200 +0x0008 → Room 04.
+PASS: Room 04 displayed
+PASS: Destination/background bitmap exists
+PASS: Visible action label retains incomplete-state warning
+ObjectActionNote: Entered Room 04 through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete.
+SessionStatusText: Exploration state is incomplete. Hover for details.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 03 selected by catalog browsing.
+PASS: Action button is enabled, focusable and a tab stop
+PASS: Action button accepts keyboard focus
+Dispatched synthetic routed Enter (not physical keyboard input).
+PASS: Decoded object 162 interaction offered
+PASS: Action button is enabled, focusable and a tab stop
+PASS: Action button accepts keyboard focus
+Dispatched synthetic routed Enter (not physical keyboard input).
+PASS: keyboard-action: the started script is pending after the click
+After the click: No room load reached; the session has pending scripts. Exploration state remains incomplete.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+PASS: Continue button is enabled while scripts are pending
+Continue pressed (frame 1); pending 2 -> 2; _currentRoom set, _currentRoomResource 03; session room 04.
+Session: stopScript 45 at Room 02 exit script +0x0000: ended its pending run
+Session: stopScript 42 at Room 03 local script 200 +0x0006: script 42 was not running
+Session: stopScript 42 at Script 15 +0x000A: script 42 was not running
+Session: Room 03 local script 200 +0x0008: the ego (actor 1) stands at (580, 132), box 0 (estimate: the ego's walk from Room 03 local script 200 +0x0008 is taken to end at (580, 132), box 0, at once (walk timing and path are not simulated))
+Session uncertainty: Script 16 +0x0000: presentation operation not applied: print
+Session uncertainty: Script 17 +0x0000: presentation operation not applied: animateActor
+Session uncertainty: Room 04 local script 205 +0x0000: presentation operation not applied: roomOps
+Session uncertainty: Room 04 local script 203 +0x0000: getRandomNr at +0x0000 picked 6 of 0..32 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+Session uncertainty: Room 04 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: animateActor
+Session uncertainty: Script 14 +0x0000: presentation operation not applied: lights
+PASS: keyboard-action: object 162 execution reached Room 04
+PASS: Destination came from a reached room-load event
+Room 03 object 162, verb 0x36, code 0x2D3A; loadRoomWithEgo at Room 03 local script 200 +0x0008 → Room 04.
+PASS: Room 04 displayed
+PASS: Destination/background bitmap exists
+PASS: Visible action label retains incomplete-state warning
+ObjectActionNote: Entered Room 04 through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete.
+SessionStatusText: Exploration state is incomplete. Hover for details.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 03 selected by catalog browsing.
+Inspection setup: 1 images; hit at (24,24) = none; room 03; current room image set.
+PASS: Inspection-mode click at the same overlap does not execute an action or navigate
+Inspection StatusText: Room 03 ready
+PASS: Inspection-mode click does not paint verb-area close-up 166 onto the room
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 03 selected by catalog browsing.
+PASS: Decoded object 162 interaction offered
+PASS: forward-for-reverse: the started script is pending after the click
+After the click: No room load reached; the session has pending scripts. Exploration state remains incomplete.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+PASS: Continue button is enabled while scripts are pending
+Continue pressed (frame 1); pending 2 -> 2; _currentRoom set, _currentRoomResource 03; session room 04.
+Session: stopScript 45 at Room 02 exit script +0x0000: ended its pending run
+Session: stopScript 42 at Room 03 local script 200 +0x0006: script 42 was not running
+Session: stopScript 42 at Script 15 +0x000A: script 42 was not running
+Session: Room 03 local script 200 +0x0008: the ego (actor 1) stands at (580, 132), box 0 (estimate: the ego's walk from Room 03 local script 200 +0x0008 is taken to end at (580, 132), box 0, at once (walk timing and path are not simulated))
+Session uncertainty: Script 16 +0x0000: presentation operation not applied: print
+Session uncertainty: Script 17 +0x0000: presentation operation not applied: animateActor
+Session uncertainty: Room 04 local script 205 +0x0000: presentation operation not applied: roomOps
+Session uncertainty: Room 04 local script 203 +0x0000: getRandomNr at +0x0000 picked 6 of 0..32 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+Session uncertainty: Room 04 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: animateActor
+Session uncertainty: Script 14 +0x0000: presentation operation not applied: lights
+PASS: forward-for-reverse: object 162 execution reached Room 04
+PASS: Destination came from a reached room-load event
+Room 03 object 162, verb 0x36, code 0x2D3A; loadRoomWithEgo at Room 03 local script 200 +0x0008 → Room 04.
+PASS: Room 04 displayed
+PASS: Destination/background bitmap exists
+PASS: Visible action label retains incomplete-state warning
+ObjectActionNote: Entered Room 04 through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete.
+SessionStatusText: Exploration state is incomplete. Hover for details.
+PASS: Decoded object 167 interaction offered
+PASS: Room 04 displayed
+PASS: Destination/background bitmap exists
+PASS: Reverse: Room 04 object 167 reached a room load back to Room 03
+Room 04 object 167, verb 0x38, code 0x66E7; loadRoomWithEgo at Room 04 Object 167 Verb 0x38 +0x0006 → Room 03.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+ObjectActionNote: Entered Room 03 through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete.

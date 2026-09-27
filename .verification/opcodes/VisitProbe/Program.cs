@@ -1,4 +1,4 @@
-﻿using SCUMMexplorer.Core.Discovery;
+using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Formats;
 
 // Usage: VisitProbe <game folder> <step>...
@@ -20,6 +20,8 @@ void Show(string label)
     Console.WriteLine($"== {label}: room {snapshot.RoomId:00}, pending {snapshot.PendingScripts}");
     foreach (var line in session.SessionTrace.Skip(trace)) Console.WriteLine("   trace: " + line);
     foreach (var line in snapshot.Uncertainties.Skip(uncertainties)) Console.WriteLine("   uncertain: " + line);
+    foreach (var actor in session.Actors.Where(a => a.Room == snapshot.RoomId || a.Unknown is not null && a.Number == 1))
+        Console.WriteLine($"   actor {actor.Number}: room {actor.Room?.ToString() ?? "?"}, ({actor.X?.ToString() ?? "?"}, {actor.Y?.ToString() ?? "?"}), box {actor.WalkBox?.ToString() ?? "?"}, {(actor.Visible is bool v ? v ? "visible" : "hidden" : "visibility ?")}{(actor.Unknown is null ? "" : " unknown: " + actor.Unknown)}{(actor.Estimate is null ? "" : " estimate: " + actor.Estimate)}");
     trace = session.SessionTrace.Count;
     uncertainties = snapshot.Uncertainties.Count;
 }
@@ -34,6 +36,13 @@ foreach (var step in args.Skip(1))
         typeof(LoomExplorationSession).GetMethod("SetGlobalWord", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
             .Invoke(session, [Convert.ToInt32(name, 16), value]);
         Console.WriteLine($"== set var[0x{Convert.ToInt32(name, 16):X3}] = {value}");
+        continue;
+    }
+    // "+N": advances N frames.
+    if (step.StartsWith('+'))
+    {
+        for (var n = int.Parse(step[1..]); n > 0 && session.Snapshot.PendingScripts > 0; n--) session.AdvanceFrame();
+        Show($"after {step} frames");
         continue;
     }
     var parts = step.Split('/');

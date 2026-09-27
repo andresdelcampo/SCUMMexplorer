@@ -71,6 +71,9 @@ internal static class Program
                     var ok = overlay.Visibility == Visibility.Visible && toggle.IsEnabled &&
                              shapes.Length == list.Length && labels.Length == list.Length;
                     report.Add($"Room {room:00}: {width}x{height}, {list.Length} boxes, {shapes.Length} outlines, {labels.Length} labels, scale {scale:0.###}");
+                    var markers = overlay.Children.OfType<Ellipse>().ToArray();
+                    report.Add($"  {markers.Length} actor markers: " + string.Join("; ", markers.Select(m =>
+                        $"({(Canvas.GetLeft(m) + 5 - offsetX) / scale - 0.5:0},{(Canvas.GetTop(m) + 5 - offsetY) / scale - 0.5:0}){(m.StrokeDashArray.Count > 0 ? " estimate" : "")}")));
                     for (var index = 0; index < list.Length && index < shapes.Length; index++)
                     {
                         var box = list[index];

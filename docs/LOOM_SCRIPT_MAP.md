@@ -52,7 +52,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | 039 (0x27), 040 (0x28) | Sound players: stop the previous sound, start the argument's sound, loop while it plays | The session reads a started sound as playing (estimate), so these stay pending |
 | 042 | Room 03's actor 2 (random position and time on screen, `bit[0xD7A]`) | |
 | 044 | **Opening cutscene** | Rooms 01, 02, 01, 02, 53, 02; waits on the camera (+0x0361) and on local scripts (`isScriptRunning` 0xD1/0xD2); two overrides |
-| 045 | Room 02 walk-box watcher | Starts a cutscene when ego enters box 4. Blocked by `getActorWalkBox`. |
+| 045 | Room 02 walk-box watcher | Starts a cutscene when ego enters box 4. After the boot the ego is in box 0 (the cliff top, (828, 60)), so it waits for a box change (decoded; actor model 27 Sep). |
 | 052 | Room 10 object 295 → Room 11 → Room 13 cutscene | |
 | 086 | Firewood scene; opens Room 58 on 792 (+0x018A) | Body behind `beginOverride` |
 | 090 | Room 42 flashes (637, 638) | Transient draws; not batches |
@@ -65,6 +65,12 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 - Table at the word at room + 0x15: a count byte, 18-byte boxes, then the matrix up to the image (+0x0A). All 76 rooms fit exactly.
 - LOOM's walkable areas are mostly line segments. Room 02 is a chain of 15 (box 4 is what script 045 watches). Room 17 has one quadrangle (box 8). Close-ups have one box outside the image.
 - Flags: 0x80 invisible (Room 05, 0x81); 0xA0 invisible and player-only (Rooms 09 and 34).
+
+## Actors (ScummVM `actor.cpp`; modelled 27 September)
+
+- 12 actors (1–12). Actor 1 is the ego (`var[0x001]`). After the boot (opening cutscene) the ego stands in Room 02 at (828, 60), box 0, under the tree (decoded run). Actors 10 and 11 are put over the sea at (137, 42) with `ignoreBoxes` (box 255) after seeded picks (reading: the swans).
+- `loadRoomWithEgo obj, room, walkTo=(x, y)` (v3): the ego stands at the object's walk point unless the entry code put it, then walks to (x, y) when x ≠ −1 (ScummVM). Room 03 local 200 +0x0008 brings the ego into Room 04 and walks it to (580, 132), box 0 (decoded; the walk end is an estimate).
+- `getActorX`/`getActorY` with a number of 13 or more read an object's walk point (ScummVM `getObjX`).
 
 ## Room notes
 
@@ -90,7 +96,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 
 ## Not modelled yet (by frequency in Blockers)
 
-1. `getActorWalkBox`, `getActorX`/`getActorY`, `getActorCostume`, `getActorElevation`: need actor positions and walk boxes (ScummVM `Actor`, `boxes.cpp`). See the [analysis](../.verification/actor-queries/analysis.md).
+1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown, mostly the ego after a catalog visit. `getActorCostume`, `getActorElevation`, walk timing and paths, and the camera following the ego are not modelled.
 2. `verbOps`: verb-bar setup (Room 01 local 211 on the boot route).
 3. `findObject`: needs a mouse position; the input loop (script 006) depends on it.
 4. `startScript` with a dynamic target (a variable that is not known).

@@ -40,7 +40,8 @@ public sealed record LoomScriptEvent(
     ResourceKind? TargetKind,
     int? TargetId,
     LoomScriptEventCertainty Certainty,
-    bool FreezeResistant = false)
+    bool FreezeResistant = false,
+    IReadOnlyList<int?>? ResolvedArguments = null)
 {
     public string Format()
     {

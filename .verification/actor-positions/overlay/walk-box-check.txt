@@ -1,0 +1,32 @@
+Real MainWindow; WalkBoxToggle ticked through IsChecked, panorama view, doorways hidden. No physical input.
+Room 02: 960x144, 15 boxes, 15 outlines, 15 labels, scale 0,997
+  7 actor markers: (828,60); (540,108) estimate; (739,102) estimate; (540,108); (811,60); (137,42) estimate; (137,42) estimate
+  box  0 flags 0x00 inside  corners (830,60) (830,60) (811,60) (811,60): outline maps back exactly
+  box  1 flags 0x01 inside  corners (888,80) (888,80) (832,60) (832,60): outline maps back exactly
+  box  2 flags 0x00 inside  corners (910,80) (910,80) (890,80) (890,80): outline maps back exactly
+  box  3 flags 0x12 inside  corners (912,80) (912,80) (890,118) (890,118): outline maps back exactly
+  box  4 flags 0x00 inside  corners (888,118) (888,118) (837,118) (837,118): outline maps back exactly
+  box  5 flags 0x00 inside  corners (792,118) (792,118) (835,118) (835,118): outline maps back exactly
+  box  6 flags 0x00 inside  corners (738,102) (738,102) (790,118) (790,118): outline maps back exactly
+  box  7 flags 0x01 inside  corners (736,102) (736,102) (698,116) (698,116): outline maps back exactly
+  box  8 flags 0x00 inside  corners (660,116) (660,116) (696,116) (696,116): outline maps back exactly
+  box  9 flags 0x11 inside  corners (658,116) (658,116) (640,134) (640,134): outline maps back exactly
+  box 10 flags 0x00 inside  corners (630,134) (630,134) (638,134) (638,134): outline maps back exactly
+  box 11 flags 0x00 inside  corners (628,126) (628,126) (628,134) (628,134): outline maps back exactly
+  box 12 flags 0x01 inside  corners (611,110) (611,110) (628,124) (628,124): outline maps back exactly
+  box 13 flags 0x00 inside  corners (609,110) (609,110) (570,114) (570,114): outline maps back exactly
+  box 14 flags 0x00 inside  corners (540,108) (540,108) (568,114) (568,114): outline maps back exactly
+PASS Room 02
+PASS Room 02 unticking hides the overlay
+Room 03: 320x144, 7 boxes, 7 outlines, 7 labels, scale 2,992
+  4 actor markers: (227,94); (259,67); (278,62); (278,62)
+  box  0 flags 0x00 inside  corners (41,63) (41,63) (121,63) (121,63): outline maps back exactly
+  box  1 flags 0x00 inside  corners (157,71) (157,71) (123,63) (123,63): outline maps back exactly
+  box  2 flags 0x00 inside  corners (159,71) (159,71) (241,71) (241,71): outline maps back exactly
+  box  3 flags 0x00 inside  corners (220,73) (220,73) (227,94) (227,94): outline maps back exactly
+  box  4 flags 0x00 inside  corners (278,62) (278,62) (244,71) (244,71): outline maps back exactly
+  box  5 flags 0x00 inside  corners (157,72) (157,72) (138,82) (138,82): outline maps back exactly
+  box  6 flags 0x00 inside  corners (138,84) (138,84) (117,103) (117,103): outline maps back exactly
+PASS Room 03
+PASS Room 03 unticking hides the overlay
+Failures: 0

@@ -270,14 +270,38 @@ public sealed class LoomExplorationSession
             throw new InvalidDataException("The session can only visit an indexed room.");
         if (_currentRoom?.ResourceId == room.ResourceId) return Snapshot;
         _uncertainties.StartStep();
+        if (reachedAction is null && _runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && LoomActorTable.IsValid(ego))
+            _runtime.Actors.Forget(ego, $"Room {room.ResourceId:00} was selected from the catalog, so where the ego would arrive was not executed");
         return EnterRoom(room, reachedAction is null
             ? $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input."
-            : $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.");
+            : $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction?.ReachedRoomLoad);
     }
 
-    private LoomSessionSnapshot EnterRoom(GameResource room, string arrival)
+    /// <summary>ScummVM <c>VAR_EGO</c>.</summary>
+    private const string EgoVariable = "var[0x001]";
+
+    /// <summary>Actor rooms, positions and walk boxes as reached code left them (actors 1–12).</summary>
+    public IReadOnlyList<LoomActorSnapshot> Actors => _runtime.Actors.Snapshot();
+
+    private LoomActorTable.Placement CurrentPlacement() =>
+        new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses);
+
+    private LoomSessionSnapshot EnterRoom(GameResource room, string arrival, LoomScriptEvent? load = null)
     {
         var eventsBeforeVisit = _visitEvents.Count;
+        var withEgo = load is { Operation: "loadRoomWithEgo", ResolvedArguments: { Count: 4 } } ? load : null;
+        int? ego = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoValue) && LoomActorTable.IsValid(egoValue) ? egoValue : null;
+        if (withEgo is not null)
+        {
+            // o5_loadRoomWithEgo: ego->putActor(room) before startScene; the ego
+            // keeps its coordinates and is hidden, since the room is not current yet.
+            if (ego is int egoNumber)
+            {
+                var before = _runtime.Actors[egoNumber];
+                _runtime.Actors.Put(egoNumber, before.X, before.Y, room.ResourceId, CurrentPlacement(), ego);
+            }
+            else _runtime.Actors.ForgetAll($"{load!.SourceLabel} +0x{load.Offset:X4} moves the ego, whose actor number (var[0x001]) is unknown");
+        }
         if (_currentRoom is not null)
         {
             RunGlobalHook(30, "before room exit");
@@ -288,18 +312,24 @@ public sealed class LoomExplorationSession
         }
 
         _currentRoom = room;
+        _runtime.CurrentRoom = room.ResourceId;
         // startScene clears the draw queue before the entry scripts run.
         _runtime.DrawQueue.Clear();
         _runtime.StatesSetInRoom.Clear();
         _runtime.EstimatedStates.Clear();
+        // startScene hides every actor before the new room is loaded.
+        _runtime.Actors.HideAll();
         var roomBytes = File.ReadAllBytes(room.FilePath);
         _currentObjects = _objects.Decode(roomBytes);
+        _runtime.WalkBoxFlagsUnknown = null;
         try { _runtime.WalkBoxes = LoomWalkBoxReader.Read(roomBytes); }
         catch (InvalidDataException ex)
         {
             _runtime.WalkBoxes = null;
             _uncertainties.Add($"Room {room.ResourceId:00} walk boxes could not be read: {ex.Message}");
         }
+        // showActors: actors whose room is the new one are shown, adjusted into its boxes.
+        _runtime.Actors.ShowActorsIn(CurrentPlacement());
         // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
         var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
         _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
@@ -312,8 +342,40 @@ public sealed class LoomExplorationSession
         RunGlobalHook(28, "before room entry");
         RunEmbeddedRoomScript(room, exit: false);
         RunGlobalHook(29, "after room entry");
+        if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo);
         LastVisitEvents = _visitEvents.Skip(eventsBeforeVisit).ToArray();
         return Snapshot;
+    }
+
+    /// <summary>
+    /// o5_loadRoomWithEgo after <c>startScene</c> (v3/v4): unless the entry code
+    /// put the ego somewhere, it stands at the object's walk point; then, when the
+    /// instruction gives a destination, it walks there. The walk is taken to end
+    /// at once, an estimate (see <see cref="LoomActorTable.Walk"/>).
+    /// </summary>
+    private void PlaceEgoAfterEntry(LoomScriptEvent load, int ego)
+    {
+        var arguments = load.ResolvedArguments!;
+        var source = $"{load.SourceLabel} +0x{load.Offset:X4}";
+        if (!_runtime.Actors.EgoPositioned)
+        {
+            var record = arguments[0] is int objectId ? _currentObjects.FirstOrDefault(item => item.Id == objectId) : null;
+            if (record is null)
+                _runtime.Actors.Forget(ego, arguments[0] is null
+                    ? $"{source} brings the ego in at an object the preview cannot read"
+                    : $"{source} brings the ego in at object {arguments[0]}, which is not in Room {_currentRoom?.ResourceId:00}");
+            else
+            {
+                _runtime.Actors.Put(ego, record.WalkX, record.WalkY, _currentRoom?.ResourceId, CurrentPlacement(), ego);
+                if (_runtime.EstimatedVariables.Contains(EgoVariable) || load.Certainty != LoomScriptEventCertainty.Reached)
+                    _runtime.Actors.MarkEstimate(ego, $"the ego's arrival at {source} follows a seeded pick");
+            }
+        }
+        if (arguments[2] is int x && x != -1 && arguments[3] is int y)
+            _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), $"the ego's walk from {source}");
+        var state = _runtime.Actors[ego];
+        _visitTrace.Add($"{source}: the ego (actor {ego}) stands at ({state.X?.ToString() ?? "?"}, {state.Y?.ToString() ?? "?"}), box {state.WalkBox?.ToString() ?? "?"}" +
+                        (state.Estimate is null ? "" : $" (estimate: {state.Estimate})"));
     }
 
     public LoomObjectActionResult ActivateObjectVerb(int objectId, int verbId)
@@ -497,7 +559,7 @@ public sealed class LoomExplorationSession
             _actionLoadFrame = frame;
             _uncertainties.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} reached {roomLoad.Operation} {when}.");
             if (target.ResourceId != _currentRoom?.ResourceId)
-                EnterRoom(target, $"Room {target.ResourceId:00} entered by {roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} ({roomLoad.Operation}) {when}.");
+                EnterRoom(target, $"Room {target.ResourceId:00} entered by {roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} ({roomLoad.Operation}) {when}.", roomLoad);
             return;
         }
         var sourceRoomId = _currentRoom.ResourceId ?? 0;

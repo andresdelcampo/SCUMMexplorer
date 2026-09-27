@@ -1882,6 +1882,37 @@ public partial class MainWindow : Window
             Canvas.SetTop(label, centre.Y - label.DesiredSize.Height / 2);
             WalkBoxOverlay.Children.Add(label);
         }
+
+        // Actors the session places in this room: a marker at the feet, dashed when the position is an estimate.
+        if (!ReferenceEquals(boxes, _session?.CurrentWalkBoxes)) return;
+        foreach (var actor in _session!.Actors.Where(item => item.Room == _session.Snapshot.RoomId && item.X is not null && item.Y is not null))
+        {
+            var feet = Map(actor.X!.Value, actor.Y!.Value);
+            var marker = new System.Windows.Shapes.Ellipse
+            {
+                Width = 10, Height = 10,
+                Stroke = new SolidColorBrush(Color.FromRgb(255, 190, 70)),
+                StrokeThickness = 2,
+                Fill = new SolidColorBrush(Color.FromArgb(120, 255, 190, 70))
+            };
+            // The overlay is not hit-testable, so the details go on the checkbox's tooltip.
+            WalkBoxToggle.ToolTip += $"\nActor {actor.Number} (A{actor.Number}) at ({actor.X}, {actor.Y}), walk box {actor.WalkBox?.ToString() ?? "unknown"}" +
+                                     (actor.Visible == false ? ", hidden" : "") + (actor.Estimate is null ? "" : $"; estimate: {actor.Estimate}");
+            if (actor.Estimate is not null) marker.StrokeDashArray = [2, 1.5];
+            Canvas.SetLeft(marker, feet.X - 5);
+            Canvas.SetTop(marker, feet.Y - 5);
+            WalkBoxOverlay.Children.Add(marker);
+            var name = new TextBlock
+            {
+                Text = $"A{actor.Number}",
+                Foreground = new SolidColorBrush(Color.FromRgb(255, 190, 70)),
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 10
+            };
+            Canvas.SetLeft(name, feet.X + 6);
+            Canvas.SetTop(name, feet.Y - 14);
+            WalkBoxOverlay.Children.Add(name);
+        }
     }
 
     private string DescribeWalkBoxes(LoomWalkBoxSet boxes)

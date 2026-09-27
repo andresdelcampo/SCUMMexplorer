@@ -186,6 +186,8 @@ public sealed class LoomBoundedScriptExecutor
                     {
                         var possibleEvent = LoomScriptEvent.FromInstruction(script, possible, LoomScriptEventCertainty.Conditional);
                         if (possibleEvent is not null) events.Add(possibleEvent);
+                        if (runtime is not null && IsActorPlacement(possible.Operation))
+                            ForgetPossiblePlacement(possible, runtime, knownVariables, instruction.Offset);
                     }
                     pc = join;
                     continue;
@@ -214,6 +216,10 @@ public sealed class LoomBoundedScriptExecutor
                     LoomScriptEventKind.SoundStarted or LoomScriptEventKind.SoundStopped } &&
                 TryReadValue(instruction.Operands.Trim(), knownVariables, out var soundId, out _))
                 scriptEvent = scriptEvent with { TargetId = soundId };
+            // The session applies loadRoomWithEgo's ego steps after the room entry,
+            // so it needs the object and walk destination as they are now.
+            if (scriptEvent is { Operation: "loadRoomWithEgo" })
+                scriptEvent = scriptEvent with { ResolvedArguments = ResolveLoadRoomWithEgo(instruction.Operands, knownVariables) };
             if (scriptEvent is not null) events.Add(scriptEvent);
             string? eventHandling = null;
             if (scriptEvent is not null && runtime is not null && onEvent is not null)
@@ -375,6 +381,14 @@ public sealed class LoomBoundedScriptExecutor
                 trace.Add($"script {stopped} stopped");
                 pc = next;
                 continue;
+            }
+
+            if (instruction.Operation == "setClass" && runtime is not null &&
+                TryReadClassOperands(instruction.Operands, knownVariables, out var classActor, out var actorClasses) &&
+                LoomActorTable.IsValid(classActor) && actorClasses.Contains(0))
+            {
+                // o5_setClass, small header: class 0 on an actor also clears its ignoreBoxes.
+                runtime.Actors.SetIgnoreBoxes(classActor, false);
             }
 
             if (instruction.Operation == "setClass" && runtime is not null &&
@@ -573,6 +587,65 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (runtime is not null && instruction.Operation == "isActorInBox")
+            {
+                // o5_isActorInBox: jumpRelative(checkXYInBoxBounds(box, actor x, actor y)).
+                if (!TryEvaluateActorInBox(instruction.Operands, runtime, knownVariables, out var inBox, out var boxDetail, out var boxEstimate))
+                {
+                    unresolved = $"{boxDetail} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                if (!TryGetBranchTarget(instruction.Operands, out var boxTarget))
+                {
+                    unresolved = $"could not resolve branch at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                var boxOperands = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (!onEstimatedPath && (boxEstimate is not null || boxOperands.Take(2).Any(operand => OperandIsEstimated(operand, estimated, knownVariables))))
+                {
+                    onEstimatedPath = true;
+                    if (boxEstimate is not null) limitations.Add($"isActorInBox reads {boxEstimate}, so what follows is an estimate (+0x{instruction.Offset:X4})");
+                    trace.Add($"branch at +0x{instruction.Offset:X4} reads an estimated actor position; later steps are estimates");
+                }
+                pc = inBox ? next : boxTarget;
+                continue;
+            }
+
+            if (runtime is not null && IsActorQuery(instruction.Operation))
+            {
+                var queryParts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (queryParts.Length != 2 || !TryGetVariableKey(queryParts[0], knownVariables, out var queryKey))
+                {
+                    unresolved = $"{instruction.Operation} operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                if (!TryAnswerActorQuery(instruction.Operation, queryParts[1], runtime, roomObjects, knownVariables,
+                        out var answer, out var queryDetail, out var queryEstimate))
+                {
+                    unresolved = $"{queryDetail} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                knownVariables[queryKey] = unchecked((ushort)answer);
+                RefreshBitAliases(queryKey, knownVariables);
+                MarkEstimated(estimated, queryKey, onEstimatedPath || queryEstimate is not null ||
+                    OperandIsEstimated(queryParts[1], estimated, knownVariables));
+                if (queryEstimate is not null)
+                    limitations.Add($"{instruction.Operation} reads {queryEstimate}, so what follows is an estimate (+0x{instruction.Offset:X4})");
+                trace.Add($"{queryKey} = {answer}: {instruction.Operation} {queryParts[1]}{(queryEstimate is null ? "" : " (estimate)")}");
+                pc = next;
+                continue;
+            }
+
+            if (runtime is not null && IsActorPlacement(instruction.Operation))
+            {
+                var placementEstimated = onEstimatedPath || instruction.Operands
+                    .Split(new[] { ',', '[', ']', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Any(operand => OperandIsEstimated(operand, estimated, knownVariables));
+                ApplyActorPlacement(instruction, runtime, roomObjects, knownVariables, placementEstimated, trace);
+                pc = next;
+                continue;
+            }
+
             if (IsPresentationOperation(instruction.Operation))
             {
                 if (eventHandling == "")
@@ -616,6 +689,292 @@ public sealed class LoomBoundedScriptExecutor
             new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
             trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray(),
             picks, estimated.Where(key => !IsGlobalKey(key)).ToArray(), onEstimatedPath);
+    }
+
+    private static bool IsActorQuery(string operation) => operation is
+        "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom";
+
+    private static bool IsActorPlacement(string operation) => operation is
+        "putActor" or "putActorAtObject" or "putActorInRoom" or "walkActorTo" or "walkActorToObject" or
+        "walkActorToActor" or "actorOps" or "setBoxFlags";
+
+    /// <summary>ScummVM <c>OF_OWNER_ROOM</c>: the object lies in a room, not in an inventory.</summary>
+    private const int RoomOwner = 0x0F;
+
+    private static readonly Regex WalkToPattern = new(@"walkTo=\((-?\d+), (-?\d+)\)", RegexOptions.Compiled);
+
+    /// <summary>loadRoomWithEgo's object, room and walk destination (x = -1: no walk), each null when unknown.</summary>
+    private static IReadOnlyList<int?> ResolveLoadRoomWithEgo(string operands, IDictionary<string, ushort> variables)
+    {
+        var parts = operands.Split(',', StringSplitOptions.TrimEntries);
+        int? Read(int index) => parts.Length > index && TryReadValue(parts[index], variables, out var value, out _) ? value : null;
+        var walk = WalkToPattern.Match(operands);
+        return
+        [
+            Read(0), Read(1),
+            walk.Success ? int.Parse(walk.Groups[1].Value, CultureInfo.InvariantCulture) : null,
+            walk.Success ? int.Parse(walk.Groups[2].Value, CultureInfo.InvariantCulture) : null
+        ];
+    }
+
+    private static int? ReadSignedWord(string operand, IDictionary<string, ushort> variables) =>
+        TryReadValue(operand, variables, out var value, out _) ? unchecked((short)value) : null;
+
+    private static LoomActorTable.Placement PlacementOf(LoomScriptRuntimeState runtime) =>
+        new(runtime.CurrentRoom, runtime.WalkBoxes, runtime.WalkBoxFlagsUnknown, runtime.ObjectClasses);
+
+    /// <summary>
+    /// ScummVM <c>whereIsObject</c> then <c>getObjectXYPos</c> for v3: an object of
+    /// the current room gives its walk point. Found is false for an object that
+    /// is in no room and no inventory; the point is null when that is unknown
+    /// (an unknown number, or an object held in an inventory, which is not modelled).
+    /// </summary>
+    private static (bool Found, (int X, int Y)? Point) FindObjectWalkPoint(int? objectId,
+        IReadOnlyList<LoomRoomObjectRecord> roomObjects, LoomScriptRuntimeState runtime)
+    {
+        if (objectId is not int id) return (true, null);
+        if (id < 1) return (false, null);
+        var owned = runtime.ObjectOwners.TryGetValue(id, out var owner);
+        if (owned && owner != RoomOwner) return (true, null);
+        var record = roomObjects.FirstOrDefault(item => item.Id == id);
+        if (record is not null) return (true, (record.WalkX, record.WalkY));
+        return owned ? (false, null) : (true, null);
+    }
+
+    /// <summary>
+    /// Applies an actor command to the session's actor table with its operands
+    /// resolved now. An operand that cannot be read makes what it sets unknown;
+    /// an unknown actor number makes every actor unknown. Values that follow a
+    /// seeded pick are marked as estimates.
+    /// </summary>
+    private static void ApplyActorPlacement(LoomScriptInstruction instruction, LoomScriptRuntimeState runtime,
+        IReadOnlyList<LoomRoomObjectRecord> roomObjects, IDictionary<string, ushort> variables, bool estimate,
+        List<string> trace)
+    {
+        var actors = runtime.Actors;
+        var place = PlacementOf(runtime);
+        int? ego = variables.TryGetValue("var[0x001]", out var egoValue) ? egoValue : null;
+        var label = $"{instruction.Operation} at +0x{instruction.Offset:X4}";
+        var operands = instruction.Operands;
+        var parts = operands.Split(',', StringSplitOptions.TrimEntries);
+        int? Read(int index) => parts.Length > index && TryReadValue(parts[index], variables, out var value, out _) ? value : null;
+
+        if (instruction.Operation == "setBoxFlags")
+        {
+            // o5_setBoxFlags: the current room's box gets the flags byte.
+            if (Read(0) is not int box || Read(1) is not int flags)
+                runtime.WalkBoxFlagsUnknown = $"changed by {label} with an unknown box ({operands})";
+            else if (runtime.WalkBoxes?.SetFlags(box, (byte)flags) == true)
+                trace.Add($"walk box {box} flags = 0x{flags:X2}");
+            return;
+        }
+
+        var numberOperand = instruction.Operation == "actorOps" ? operands[..Math.Max(0, operands.IndexOf(", [", StringComparison.Ordinal))] : parts[0];
+        if (!TryReadValue(numberOperand, variables, out var rawNumber, out _))
+        {
+            actors.ForgetAll($"{label} names an actor the preview cannot read ({numberOperand})");
+            trace.Add($"{label}: unknown actor number; every actor's position is now unknown");
+            return;
+        }
+        int number = rawNumber;
+        if (!LoomActorTable.IsValid(number))
+        {
+            trace.Add($"{label}: actor {number} is not a valid actor; ignored");
+            return;
+        }
+        switch (instruction.Operation)
+        {
+            case "putActor":
+                actors.Put(number, ReadSignedWord(parts[1], variables), ReadSignedWord(parts[2], variables), place, ego);
+                break;
+            case "putActorAtObject":
+            {
+                // o5_putActorAtObject: the object's walk point, or (240, 120) when it is not found.
+                var (found, point) = FindObjectWalkPoint(Read(1), roomObjects, runtime);
+                if (!found) point = (240, 120);
+                if (point is null) actors.Put(number, null, null, place, ego);
+                else actors.Put(number, point.Value.X, point.Value.Y, place, ego);
+                break;
+            }
+            case "putActorInRoom":
+                actors.PutInRoom(number, Read(1), place, ego);
+                break;
+            case "walkActorTo":
+                actors.Walk(number, ReadSignedWord(parts[1], variables), ReadSignedWord(parts[2], variables), place, $"actor {number}'s {label}");
+                break;
+            case "walkActorToObject":
+            {
+                // o5_walkActorToObject: walks only when the object is found.
+                var (found, point) = FindObjectWalkPoint(Read(1), roomObjects, runtime);
+                if (!found) break;
+                actors.Walk(number, point?.X, point?.Y, place, $"actor {number}'s {label}");
+                break;
+            }
+            case "walkActorToActor":
+            {
+                // o5_walkActorToActor: both actors must be in the current room; the walk
+                // ends dist pixels to the near side of the other actor (0xFF: by width).
+                var target = Read(1) is int other && LoomActorTable.IsValid(other) ? actors[other] : null;
+                var walker = actors[number];
+                if (walker.Room is null || Read(1) is null || (target is not null && target.Room is null))
+                {
+                    actors.Forget(number, $"{label}: whether both actors are in the room is unknown");
+                    break;
+                }
+                if (target is null || walker.Room != place.CurrentRoom || target.Room != place.CurrentRoom) break;
+                if (Read(2) is not int distance || distance == 0xFF || target.X is null || target.Y is null || walker.X is null)
+                {
+                    actors.Forget(number, $"{label}: the distance or an actor position is unknown");
+                    break;
+                }
+                var x = target.X < walker.X ? target.X + distance : target.X - distance;
+                actors.Walk(number, x, target.Y, place, $"actor {number}'s {label}");
+                break;
+            }
+            case "actorOps":
+                foreach (var item in operands[(operands.IndexOf('[') + 1)..operands.LastIndexOf(']')]
+                             .Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                {
+                    if (item == "init")
+                    {
+                        // initActor(0): also clears the actor's classes.
+                        actors.Init(number);
+                        runtime.ObjectClasses[number] = 0;
+                    }
+                    else if (item is "ignoreBoxes" or "followBoxes")
+                    {
+                        actors.SetIgnoreBoxes(number, item == "ignoreBoxes");
+                        var room = actors[number].Room;
+                        if (room is null) actors.Forget(number, $"{label}: whether it is in the current room is unknown");
+                        else if (room == place.CurrentRoom) actors.Replace(number, place, ego);
+                    }
+                    else if (item.StartsWith("costume", StringComparison.Ordinal))
+                        actors.CostumeChanged(number, place);
+                }
+                break;
+        }
+        if (estimate) actors.MarkEstimate(number, $"actor {number}'s {label} follows a seeded pick");
+        var state = actors[number];
+        trace.Add($"actor {number}: {label} → room {Show(state.Room)}, ({Show(state.X)}, {Show(state.Y)}), box {Show(state.WalkBox)}, " +
+                  $"{(state.Visible is bool visible ? visible ? "visible" : "hidden" : "visibility unknown")}{(state.Estimate is null ? "" : " (estimate)")}");
+    }
+
+    /// <summary>An actor command on a branch the preview could not decide may have run: what it sets becomes unknown.</summary>
+    private static void ForgetPossiblePlacement(LoomScriptInstruction possible, LoomScriptRuntimeState runtime,
+        IDictionary<string, ushort> variables, int branchOffset)
+    {
+        var reason = $"{possible.Operation} at +0x{possible.Offset:X4} may run on a branch the preview could not decide (+0x{branchOffset:X4})";
+        if (possible.Operation == "setBoxFlags")
+        {
+            runtime.WalkBoxFlagsUnknown ??= reason;
+            return;
+        }
+        var operand = possible.Operands.Split(',', StringSplitOptions.TrimEntries)[0];
+        if (TryReadValue(operand, variables, out var number, out _))
+        {
+            if (LoomActorTable.IsValid(number)) runtime.Actors.Forget(number, reason);
+        }
+        else runtime.Actors.ForgetAll(reason);
+    }
+
+    private static string Show(int? value) => value?.ToString(CultureInfo.InvariantCulture) ?? "?";
+
+    /// <summary>
+    /// o5_getActorWalkBox (the actor's walk box, in any room), o5_getActorRoom,
+    /// and o5_getActorX/Y through <c>getObjX</c>/<c>getObjY</c>: an actor number
+    /// gives its position; another number gives the object's walk point, or -1
+    /// when the object is not found. Fails when the value is unknown.
+    /// </summary>
+    private static bool TryAnswerActorQuery(string operation, string operand, LoomScriptRuntimeState runtime,
+        IReadOnlyList<LoomRoomObjectRecord> roomObjects, IDictionary<string, ushort> variables,
+        out int answer, out string detail, out string? estimate)
+    {
+        answer = 0;
+        estimate = null;
+        if (!TryReadValue(operand, variables, out var raw, out var readDetail))
+        {
+            detail = $"{operation} names an actor the preview cannot read ({readDetail})";
+            return false;
+        }
+        int number = raw;
+        if (operation is "getActorX" or "getActorY")
+        {
+            if (number < 1)
+            {
+                detail = "known value";
+                return true;
+            }
+            if (number >= LoomActorTable.Count)
+            {
+                var (found, point) = FindObjectWalkPoint(number, roomObjects, runtime);
+                if (found && point is null)
+                {
+                    detail = $"{operation} reads object {number}, whose position the preview does not know (it is held or not in this room's records)";
+                    return false;
+                }
+                answer = !found ? -1 : operation == "getActorX" ? point!.Value.X : point!.Value.Y;
+                detail = "known value";
+                return true;
+            }
+        }
+        if (!LoomActorTable.IsValid(number))
+        {
+            if (operation == "getActorRoom")
+            {
+                detail = "known value";
+                return true;
+            }
+            detail = $"{operation} names actor {number}, which is not a valid actor";
+            return false;
+        }
+        var actor = runtime.Actors[number];
+        int? value = operation switch
+        {
+            "getActorWalkBox" => actor.WalkBox,
+            "getActorRoom" => actor.Room,
+            "getActorX" => actor.X,
+            _ => actor.Y
+        };
+        if (value is null)
+        {
+            detail = $"{operation} reads actor {number}, whose {(operation == "getActorWalkBox" ? "walk box" : operation == "getActorRoom" ? "room" : "position")} the preview does not know ({actor.Unknown ?? "not known"})";
+            return false;
+        }
+        answer = value.Value;
+        if (actor.Estimate is not null) estimate = $"actor {number}: {actor.Estimate}";
+        detail = "known value";
+        return true;
+    }
+
+    private static bool TryEvaluateActorInBox(string operands, LoomScriptRuntimeState runtime,
+        IDictionary<string, ushort> variables, out bool inBox, out string detail, out string? estimate)
+    {
+        inBox = false;
+        estimate = null;
+        var parts = operands.Split(',', StringSplitOptions.TrimEntries);
+        if (parts.Length < 3 || !TryReadValue(parts[0], variables, out var number, out _) ||
+            !TryReadValue(parts[1], variables, out var box, out _))
+        {
+            detail = $"isActorInBox operands are unknown ({operands})";
+            return false;
+        }
+        if (!LoomActorTable.IsValid(number))
+        {
+            detail = $"isActorInBox names actor {number}, which is not a valid actor";
+            return false;
+        }
+        var actor = runtime.Actors[number];
+        if (actor.X is not int x || actor.Y is not int y || runtime.WalkBoxes is null)
+        {
+            detail = runtime.WalkBoxes is null
+                ? "isActorInBox needs the current room's walk boxes"
+                : $"isActorInBox reads actor {number}, whose position the preview does not know ({actor.Unknown ?? "not known"})";
+            return false;
+        }
+        inBox = runtime.WalkBoxes.Contains(box, x, y);
+        if (actor.Estimate is not null) estimate = $"actor {number}: {actor.Estimate}";
+        detail = "known value";
+        return true;
     }
 
     private static bool IsGlobalKey(string key) =>

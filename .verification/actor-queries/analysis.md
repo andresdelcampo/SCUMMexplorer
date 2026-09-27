@@ -1,5 +1,7 @@
 # Analysis: actor queries (`getActorWalkBox`, `getActorX`, `getActorY`), deferred (27 September 2026)
 
+**Superseded:** the walk boxes and actor positions were modelled later the same day; see the [walk-box validation](../walk-boxes/validation.md) and the [actor-position validation](../actor-positions/validation.md).
+
 Task 3 of the 27 September session asked for `getActorWalkBox`/`getActorX` "only if actor state can be followed without inventing it". It cannot yet, so no code was changed. This note records why and what would be needed.
 
 ## Where they occur

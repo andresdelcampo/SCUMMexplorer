@@ -50,4 +50,10 @@ public sealed class LoomScriptRuntimeState
     public (int Min, int Max)? CameraRange { get; set; }
     /// <summary>The current room's walk boxes (flags as <c>setBoxFlags</c> left them), or null outside a room.</summary>
     public LoomWalkBoxSet? WalkBoxes { get; set; }
+    /// <summary>Why the current room's box flags are unknown (a <c>setBoxFlags</c> with an unknown box), or null.</summary>
+    public string? WalkBoxFlagsUnknown { get; set; }
+    /// <summary>Actor rooms, positions and walk boxes as reached code left them.</summary>
+    public LoomActorTable Actors { get; } = new();
+    /// <summary>The current room's number, or null outside a room.</summary>
+    public int? CurrentRoom { get; set; }
 }
