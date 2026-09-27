@@ -1,0 +1,21 @@
+02	   fallback 157: opening frame of Room 02 in script 106 +0x03A0
+19	   fallback 385: script 94 +0x00B6
+30	   fallback 520: Room 30 entry script +0x002E
+38	   fallback 614: opening frame of Room 38 in script 86 +0x0549
+43	   fallback 645: script 91 +0x009C
+46	   fallback 686: Room 46 entry script +0x0111
+51	   fallback 744: Room 51 local script 200 +0x0000
+51	   fallback 745: Room 51 local script 200 +0x0000
+51	   fallback 746: Room 51 local script 200 +0x0000
+51	   fallback 753: Room 51 local script 200 +0x009A
+51	   fallback 754: Room 51 local script 200 +0x009A
+51	   fallback 755: Room 51 local script 200 +0x009A
+65	   fallback 830: opening frame of Room 65 in script 72 +0x0029
+69	   fallback 876: Room 69 local script 202 +0x0001
+69	   fallback 877: Room 69 local script 202 +0x0001
+69	   fallback 878: Room 69 local script 202 +0x0001
+70	   fallback 900: Room 70 local script 206 +0x003A
+70	   fallback 901: Room 70 local script 206 +0x003A
+70	   fallback 902: Room 70 local script 206 +0x003A
+86	   fallback 925: script 111 +0x0078
+86	   fallback 927: Room 86 local script 202 +0x0009

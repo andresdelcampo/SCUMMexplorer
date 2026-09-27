@@ -35,12 +35,12 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
             records, background, index.States, snapshot.DrawOrder);
         var before = selection.VisibleGaps();
         IReadOnlyList<RoomArtworkEstimate> estimates = [];
-        IReadOnlyList<int> fallback = [];
+        IReadOnlyList<RoomArtworkEstimate> fallback = [];
         if (!snapshot.IsFaithful)
         {
             estimates = selection.FillGaps(batches.ForRoom(id), seed: id);
             if (!images.Any(selection.IsActive))
-                fallback = selection.ShowUnresolvedArtwork();
+                fallback = selection.ShowUnresolvedArtwork(batches.ForRoom(id), seed: id);
         }
         var after = selection.VisibleGaps();
 
@@ -60,7 +60,8 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
         report.AppendLine($"== Room {id:00} ({images.Count} images, faithful={snapshot.IsFaithful}, pending={snapshot.PendingScripts})");
         report.AppendLine($"   paint order: {string.Join(',', selection.PaintOrder().Select(o => o.Id))}");
         report.AppendLine($"   draw queue:  {string.Join(',', selection.DrawQueue)}");
-        if (fallback.Count > 0) report.AppendLine($"   nothing visible; fallback estimate shows {string.Join(',', fallback)}");
+        if (fallback.Count > 0) report.AppendLine($"   nothing visible; fallback estimate shows {string.Join(',', fallback.Select(e => e.ObjectId))}");
+        foreach (var e in fallback) report.AppendLine($"   fallback {e.ObjectId}: {e.Reason}");
         foreach (var e in estimates) report.AppendLine($"   estimate {e.ObjectId}: {e.Reason}");
         foreach (var g in after) report.AppendLine($"   GAP ({g.X},{g.Y}) {g.Width}x{g.Height}{(g.Fillable ? "" : " [no usable stored image]")}");
         report.AppendLine($"   doorways: {string.Join(',', exits.Select(e => e.ToString("00")))}");

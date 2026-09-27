@@ -44,6 +44,32 @@ public sealed class LoomFirstVisitRenderingTests
         Assert.Empty(selection.VisibleGaps());
     }
 
+    [Theory]
+    [InlineData(2, 157, "opening frame of Room 02 in script 106 +0x03A0")]
+    [InlineData(38, 614, "opening frame of Room 38 in script 86 +0x0549")]
+    [InlineData(30, 520, "Room 30 entry script +0x002E")]
+    public void NothingVisibleFallbackOpensOnTheStrongestScriptBatch(int roomId, int objectId, string source)
+    {
+        if (Data.Value is not { } data) return;
+        var (selection, estimates, _) = data.FirstVisit(roomId);
+        var images = data.Images(roomId);
+
+        Assert.Contains(estimates, item => item.ObjectId == objectId && item.Reason == source);
+        Assert.True(selection.IsActive(images.Single(obj => obj.Id == objectId)));
+        // Every shown image is labelled, and the stored-image estimate is kept
+        // only for positions that no decoded script draws.
+        var drawn = data.Batches.ForRoom(roomId).SelectMany(batch => batch.Steps).Select(step => step.ObjectId).ToHashSet();
+        foreach (var item in estimates.Where(item => item.Reason == RoomObjectSelection.FirstStoredImageReason))
+        {
+            var obj = images.Single(image => image.Id == item.ObjectId);
+            Assert.DoesNotContain(images, other => other.X == obj.X && other.Y == obj.Y && other.Width == obj.Width &&
+                                                   other.Height == obj.Height && drawn.Contains(other.Id));
+        }
+        Assert.Equal(images.Where(selection.IsActive).Select(obj => obj.Id).Order(),
+            estimates.Select(item => item.ObjectId).Distinct().Order());
+        Assert.Empty(selection.VisibleGaps());
+    }
+
     [Fact]
     public void Room17HolesAreFilledByOneConsistentLocalScriptBatch()
     {
@@ -139,7 +165,8 @@ public sealed class LoomFirstVisitRenderingTests
             {
                 estimates = selection.FillGaps(Batches.ForRoom(id), seed: id);
                 // As in MainWindow.CloseArtworkGaps: when nothing is visible, show the fallback estimate.
-                if (!images.Any(selection.IsActive)) selection.ShowUnresolvedArtwork();
+                if (!images.Any(selection.IsActive))
+                    estimates = [.. estimates, .. selection.ShowUnresolvedArtwork(Batches.ForRoom(id), seed: id)];
             }
             return (selection, estimates, background);
         }

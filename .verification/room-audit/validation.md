@@ -24,5 +24,5 @@ LOOM script 68 (in `56.LFL`) runs straight through two `loadRoom 0x38` calls. At
 ## Remaining limits
 
 - No room is faithful on a fresh first visit, so every view is a state preview.
-- 27 rooms show nothing from the session and fall back to `ShowUnresolvedArtwork`. These have no gaps, but the fallback does not use script batches.
+- 27 rooms show nothing from the session and fall back to `ShowUnresolvedArtwork`. These have no gaps. Since the [script-backed fallback](../fallback-batches/validation.md), 11 of them take their images from script draw batches; the other 16 show the labelled first stored image.
 - The gap test only examines stored-image rectangles. Black areas that no image covers are part of the background and are not counted.

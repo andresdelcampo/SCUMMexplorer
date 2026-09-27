@@ -571,8 +571,10 @@ public partial class MainWindow : Window
     /// <summary>
     /// Fills gaps the reached state leaves open: first with script draw batches
     /// (the opening frame of a room loaded by a script is preferred), then with
-    /// a seeded random stored image. If nothing is visible at all, the
-    /// non-overlapping estimate is used as before. Estimates stay labelled.
+    /// a seeded random stored image. If nothing is visible at all, empty
+    /// positions are shown from script draw batches with the same priorities,
+    /// and only positions no batch covers use their first stored image.
+    /// Estimates stay labelled.
     /// </summary>
     private void CloseArtworkGaps(GameResource resource, IReadOnlyList<RoomObjectImage> images)
     {
@@ -586,10 +588,9 @@ public partial class MainWindow : Window
         }
         var roomId = resource.ResourceId ?? 0;
         _artworkEstimates = _objectSelection.FillGaps(_sceneBatches?.ForRoom(roomId), seed: roomId);
-        var estimated = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
         if (!images.Any(_objectSelection.IsActive))
-            estimated.UnionWith(_objectSelection.ShowUnresolvedArtwork());
-        _estimatedObjectIds = estimated;
+            _artworkEstimates = [.. _artworkEstimates, .. _objectSelection.ShowUnresolvedArtwork(_sceneBatches?.ForRoom(roomId), seed: roomId)];
+        _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
     }
 
     private string EstimateSummary()

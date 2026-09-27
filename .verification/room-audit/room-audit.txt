@@ -4,21 +4,54 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 146,145,144,140,139,138,134,133,132,128,127,126,122,121,120,116,115,114,110,109,108,104,103,100
    draw queue:  
    nothing visible; fallback estimate shows 100,103,104,108,109,110,114,115,116,120,121,122,126,127,128,132,133,134,138,139,140,144,145,146
+   fallback 100: first stored image for this position; no decoded script draws it
+   fallback 103: first stored image for this position; no decoded script draws it
+   fallback 104: first stored image for this position; no decoded script draws it
+   fallback 108: first stored image for this position; no decoded script draws it
+   fallback 109: first stored image for this position; no decoded script draws it
+   fallback 110: first stored image for this position; no decoded script draws it
+   fallback 114: first stored image for this position; no decoded script draws it
+   fallback 115: first stored image for this position; no decoded script draws it
+   fallback 116: first stored image for this position; no decoded script draws it
+   fallback 120: first stored image for this position; no decoded script draws it
+   fallback 121: first stored image for this position; no decoded script draws it
+   fallback 122: first stored image for this position; no decoded script draws it
+   fallback 126: first stored image for this position; no decoded script draws it
+   fallback 127: first stored image for this position; no decoded script draws it
+   fallback 128: first stored image for this position; no decoded script draws it
+   fallback 132: first stored image for this position; no decoded script draws it
+   fallback 133: first stored image for this position; no decoded script draws it
+   fallback 134: first stored image for this position; no decoded script draws it
+   fallback 138: first stored image for this position; no decoded script draws it
+   fallback 139: first stored image for this position; no decoded script draws it
+   fallback 140: first stored image for this position; no decoded script draws it
+   fallback 144: first stored image for this position; no decoded script draws it
+   fallback 145: first stored image for this position; no decoded script draws it
+   fallback 146: first stored image for this position; no decoded script draws it
    doorways: 
 == Room 02 (4 images, faithful=False, pending=0)
-   paint order: 158,157,155
-   draw queue:  
-   nothing visible; fallback estimate shows 155,157,158
+   paint order: 158,155,157
+   draw queue:  157
+   nothing visible; fallback estimate shows 157,155,158
+   fallback 157: opening frame of Room 02 in script 106 +0x03A0
+   fallback 155: first stored image for this position; no decoded script draws it
+   fallback 158: first stored image for this position; no decoded script draws it
    doorways: 03
 == Room 03 (1 images, faithful=False, pending=1)
    paint order: 166
    draw queue:  
    nothing visible; fallback estimate shows 166
+   fallback 166: first stored image for this position; no decoded script draws it
    doorways: 02,04,05,10
 == Room 04 (20 images, faithful=False, pending=0)
    paint order: 190,187,184,181,178
    draw queue:  
    nothing visible; fallback estimate shows 178,181,184,187,190
+   fallback 178: first stored image for this position; no decoded script draws it
+   fallback 181: first stored image for this position; no decoded script draws it
+   fallback 184: first stored image for this position; no decoded script draws it
+   fallback 187: first stored image for this position; no decoded script draws it
+   fallback 190: first stored image for this position; no decoded script draws it
    doorways: 03,64
 == Room 05 (0 images, faithful=False, pending=0)
    paint order: 
@@ -36,11 +69,16 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 265,264,260,259
    draw queue:  
    nothing visible; fallback estimate shows 259,260,264,265
+   fallback 259: first stored image for this position; no decoded script draws it
+   fallback 260: first stored image for this position; no decoded script draws it
+   fallback 264: first stored image for this position; no decoded script draws it
+   fallback 265: first stored image for this position; no decoded script draws it
    doorways: 07,09
 == Room 09 (7 images, faithful=False, pending=0)
    paint order: 276
    draw queue:  
    nothing visible; fallback estimate shows 276
+   fallback 276: first stored image for this position; no decoded script draws it
    doorways: 08
 == Room 10 (17 images, faithful=False, pending=0)
    paint order: 303,302,301,293
@@ -74,6 +112,7 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 351
    draw queue:  
    nothing visible; fallback estimate shows 351
+   fallback 351: first stored image for this position; no decoded script draws it
    doorways: 15,17,18,22,23
 == Room 17 (10 images, faithful=False, pending=1)
    paint order: 364,363,365,366
@@ -83,16 +122,25 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 375,373
    draw queue:  
    nothing visible; fallback estimate shows 373,375
+   fallback 373: first stored image for this position; no decoded script draws it
+   fallback 375: first stored image for this position; no decoded script draws it
    doorways: 16,22
 == Room 19 (7 images, faithful=False, pending=0)
-   paint order: 379
-   draw queue:  
-   nothing visible; fallback estimate shows 379
+   paint order: 385
+   draw queue:  385
+   nothing visible; fallback estimate shows 385
+   fallback 385: script 94 +0x00B6
    doorways: 
 == Room 20 (8 images, faithful=False, pending=0)
    paint order: 397,396,395,394,393,392
    draw queue:  
    nothing visible; fallback estimate shows 392,393,394,395,396,397
+   fallback 392: first stored image for this position; no decoded script draws it
+   fallback 393: first stored image for this position; no decoded script draws it
+   fallback 394: first stored image for this position; no decoded script draws it
+   fallback 395: first stored image for this position; no decoded script draws it
+   fallback 396: first stored image for this position; no decoded script draws it
+   fallback 397: first stored image for this position; no decoded script draws it
    doorways: 
 == Room 22 (10 images, faithful=False, pending=0)
    paint order: 406
@@ -102,6 +150,8 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 428,426
    draw queue:  
    nothing visible; fallback estimate shows 426,428
+   fallback 426: first stored image for this position; no decoded script draws it
+   fallback 428: first stored image for this position; no decoded script draws it
    doorways: 15,16,24
 == Room 24 (12 images, faithful=False, pending=2)
    paint order: 435
@@ -111,6 +161,7 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 448
    draw queue:  
    nothing visible; fallback estimate shows 448
+   fallback 448: first stored image for this position; no decoded script draws it
    doorways: 24
 == Room 26 (14 images, faithful=False, pending=0)
    paint order: 450,451
@@ -129,9 +180,11 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    draw queue:  500
    doorways: 
 == Room 30 (3 images, faithful=False, pending=0)
-   paint order: 519,504
-   draw queue:  
-   nothing visible; fallback estimate shows 504,519
+   paint order: 504,520
+   draw queue:  520
+   nothing visible; fallback estimate shows 520,504
+   fallback 520: Room 30 entry script +0x002E
+   fallback 504: first stored image for this position; no decoded script draws it
    doorways: 33
 == Room 31 (11 images, faithful=False, pending=0)
    paint order: 526,527,528,529
@@ -161,16 +214,22 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 600
    draw queue:  
    nothing visible; fallback estimate shows 600
+   fallback 600: first stored image for this position; no decoded script draws it
    doorways: 35,37
 == Room 37 (4 images, faithful=False, pending=2)
    paint order: 608,606,605
    draw queue:  
    nothing visible; fallback estimate shows 605,606,608
+   fallback 605: first stored image for this position; no decoded script draws it
+   fallback 606: first stored image for this position; no decoded script draws it
+   fallback 608: first stored image for this position; no decoded script draws it
    doorways: 36,38,41
 == Room 38 (9 images, faithful=False, pending=0)
-   paint order: 619,612
-   draw queue:  
-   nothing visible; fallback estimate shows 612,619
+   paint order: 619,614
+   draw queue:  614
+   nothing visible; fallback estimate shows 614,619
+   fallback 614: opening frame of Room 38 in script 86 +0x0549
+   fallback 619: first stored image for this position; no decoded script draws it
    doorways: 37
 == Room 39 (0 images, faithful=False, pending=1)
    paint order: 
@@ -184,21 +243,28 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 635
    draw queue:  
    nothing visible; fallback estimate shows 635
+   fallback 635: first stored image for this position; no decoded script draws it
    doorways: 37
 == Room 42 (2 images, faithful=False, pending=0)
    paint order: 638,637
    draw queue:  
    nothing visible; fallback estimate shows 637,638
+   fallback 637: first stored image for this position; no decoded script draws it
+   fallback 638: first stored image for this position; no decoded script draws it
    doorways: 
 == Room 43 (7 images, faithful=False, pending=1)
-   paint order: 647,645,644
-   draw queue:  
-   nothing visible; fallback estimate shows 644,645,647
+   paint order: 647,644,645
+   draw queue:  645
+   nothing visible; fallback estimate shows 645,644,647
+   fallback 645: script 91 +0x009C
+   fallback 644: first stored image for this position; no decoded script draws it
+   fallback 647: first stored image for this position; no decoded script draws it
    doorways: 44,45,46
 == Room 44 (1 images, faithful=False, pending=0)
    paint order: 654
    draw queue:  
    nothing visible; fallback estimate shows 654
+   fallback 654: first stored image for this position; no decoded script draws it
    doorways: 
 == Room 45 (24 images, faithful=False, pending=0)
    paint order: 657
@@ -206,8 +272,10 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    doorways: 
 == Room 46 (9 images, faithful=False, pending=0)
    paint order: 691,686
-   draw queue:  
+   draw queue:  686
    nothing visible; fallback estimate shows 686,691
+   fallback 686: Room 46 entry script +0x0111
+   fallback 691: first stored image for this position; no decoded script draws it
    doorways: 26,47
 == Room 47 (5 images, faithful=False, pending=0)
    paint order: 698,699
@@ -222,9 +290,16 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    draw queue:  726,727,728,723,724,725
    doorways: 07,47
 == Room 51 (20 images, faithful=False, pending=0)
-   paint order: 762,749,748,747,746,745,744
-   draw queue:  
-   nothing visible; fallback estimate shows 744,745,746,747,748,749,762
+   paint order: 762,744,745,746,753,754,755
+   draw queue:  744,745,746,753,754,755
+   nothing visible; fallback estimate shows 744,745,746,753,754,755,762
+   fallback 744: Room 51 local script 200 +0x0000
+   fallback 745: Room 51 local script 200 +0x0000
+   fallback 746: Room 51 local script 200 +0x0000
+   fallback 753: Room 51 local script 200 +0x009A
+   fallback 754: Room 51 local script 200 +0x009A
+   fallback 755: Room 51 local script 200 +0x009A
+   fallback 762: first stored image for this position; no decoded script draws it
    doorways: 
 == Room 52 (0 images, faithful=False, pending=0)
    paint order: 
@@ -282,11 +357,14 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    paint order: 826
    draw queue:  
    nothing visible; fallback estimate shows 826
+   fallback 826: first stored image for this position; no decoded script draws it
    doorways: 04
 == Room 65 (3 images, faithful=False, pending=1)
    paint order: 832,830
-   draw queue:  
+   draw queue:  830
    nothing visible; fallback estimate shows 830,832
+   fallback 830: opening frame of Room 65 in script 72 +0x0029
+   fallback 832: first stored image for this position; no decoded script draws it
    doorways: 
 == Room 66 (32 images, faithful=False, pending=3)
    paint order: 834,835,840,841
@@ -301,14 +379,21 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    draw queue:  873,870
    doorways: 
 == Room 69 (11 images, faithful=False, pending=0)
-   paint order: 898,878,877,876
-   draw queue:  
+   paint order: 898,876,877,878
+   draw queue:  876,877,878
    nothing visible; fallback estimate shows 876,877,878,898
+   fallback 876: Room 69 local script 202 +0x0001
+   fallback 877: Room 69 local script 202 +0x0001
+   fallback 878: Room 69 local script 202 +0x0001
+   fallback 898: first stored image for this position; no decoded script draws it
    doorways: 
 == Room 70 (10 images, faithful=False, pending=0)
-   paint order: 902,901,900
-   draw queue:  
+   paint order: 900,901,902
+   draw queue:  900,901,902
    nothing visible; fallback estimate shows 900,901,902
+   fallback 900: Room 70 local script 206 +0x003A
+   fallback 901: Room 70 local script 206 +0x003A
+   fallback 902: Room 70 local script 206 +0x003A
    doorways: 
 == Room 79 (6 images, faithful=False, pending=0)
    paint order: 912,913
@@ -335,9 +420,11 @@ Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
    draw queue:  
    doorways: 
 == Room 86 (11 images, faithful=False, pending=0)
-   paint order: 918
-   draw queue:  
-   nothing visible; fallback estimate shows 918
+   paint order: 925,927
+   draw queue:  925,927
+   nothing visible; fallback estimate shows 925,927
+   fallback 925: script 111 +0x0078
+   fallback 927: Room 86 local script 202 +0x0009
    doorways: 
 == Room 87 (3 images, faithful=False, pending=0)
    paint order: 929

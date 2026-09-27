@@ -168,25 +168,81 @@ public sealed class RoomObjectSelection
         return pixels;
     }
 
+    public const string FirstStoredImageReason = "first stored image for this position; no decoded script draws it";
+
     /// <summary>
     /// Supplies a reproducible artwork estimate where a partial script run
     /// leaves no image. Existing script-visible images always take precedence.
-    /// This is a viewer fallback, not a SCUMM state transition.
+    /// An empty position that no active image overlaps is first shown with a
+    /// script draw batch, with the priorities <see cref="FillGaps"/> uses: the
+    /// strongest batch that draws one of its images, applied as a whole, with a
+    /// seeded pick among equally strong batches. Positions no batch covers get
+    /// their first stored image. Cut-outs opened by these images are then
+    /// closed as in <see cref="FillGaps"/>. This is a viewer fallback, not a
+    /// SCUMM state transition; every image it shows is returned with its source.
     /// </summary>
-    public IReadOnlyList<int> ShowUnresolvedArtwork()
+    public IReadOnlyList<RoomArtworkEstimate> ShowUnresolvedArtwork(IReadOnlyList<RoomDrawBatch>? batches = null,
+        int seed = 0)
     {
-        var added = new List<int>();
+        _batches = batches ?? _batches;
+        _seed = seed;
+        var estimates = new List<RoomArtworkEstimate>();
+        var random = new Random(seed);
+
+        bool Open(RoomObjectImage obj) => !Peers(obj).Any(IsActive) &&
+                                          !_objects.Any(other => IsActive(other) && Intersects(obj, other));
+
+        // Strongest evidence first: each round shows the empty position whose
+        // best covering batch has the highest priority (directory order breaks
+        // ties), since that batch may also fill other empty positions.
+        var skipped = new HashSet<(int, int, int, int)>();
+        for (var round = 0; round < 256; round++)
+        {
+            RoomDrawBatch[]? best = null;
+            HashSet<int>? bestMembers = null;
+            RoomObjectImage? bestPosition = null;
+            foreach (var obj in _objects)
+            {
+                if (skipped.Contains(Rect(obj)) || !Open(obj)) continue;
+                var members = Peers(obj).Where(ParentStateMatches).Select(peer => peer.Id).ToHashSet();
+                var group = _batches.Where(item => item.Steps.Any(step => members.Contains(step.ObjectId)))
+                    .GroupBy(item => item.Priority).OrderByDescending(items => items.Key)
+                    .Select(items => items.OrderBy(item => item.Source, StringComparer.Ordinal).ToArray())
+                    .FirstOrDefault();
+                if (group is null || best is not null && group[0].Priority <= best[0].Priority) continue;
+                best = group;
+                bestMembers = members;
+                bestPosition = obj;
+            }
+            if (best is null || bestMembers is null || bestPosition is null) break;
+
+            var chosen = best[random.Next(best.Length)];
+            var shown = false;
+            foreach (var step in chosen.Steps)
+            {
+                var obj = _objects.FirstOrDefault(item => item.Id == step.ObjectId);
+                if (obj is null || !ParentStateMatches(obj)) continue;
+                // As in FillGaps: keep what is already visible elsewhere.
+                if (!bestMembers.Contains(obj.Id) && Peers(obj).Any(IsActive)) continue;
+                if (!DrawObject(obj.Id, step.X, step.Y)) continue;
+                estimates.Add(new RoomArtworkEstimate(obj.Id, chosen.Source));
+                shown |= bestMembers.Contains(obj.Id);
+            }
+            // A batch that could not show its position is not retried; the
+            // position falls through to the stored-image estimate below.
+            if (!shown) skipped.Add(Rect(bestPosition));
+        }
+
         foreach (var obj in _objects)
         {
-            if (IsActive(obj) || _objects.Any(other => IsActive(other) && Intersects(obj, other)))
-                continue;
-            var peers = Peers(obj);
-            if (peers.Any(peer => IsActive(peer))) continue;
+            if (!Open(obj)) continue;
             _states[obj.Id] = 1;
-            if (IsActive(obj)) added.Add(obj.Id);
+            if (IsActive(obj)) estimates.Add(new RoomArtworkEstimate(obj.Id, FirstStoredImageReason));
             else _states[obj.Id] = 0;
         }
-        return added;
+
+        estimates.AddRange(FillGapsWithin(null));
+        return estimates;
     }
 
     /// <summary>

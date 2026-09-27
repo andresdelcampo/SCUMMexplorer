@@ -1,0 +1,20 @@
+Room 02: active images 155,157,158
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 3 scene details use an artwork estimate because the entry state is unresolved (from opening frame of Room 02 in script 106 +0x03A0; first stored image for this position; no decoded script draws it). Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.
+StatusText: Room 02 ready
+Room 30: active images 504,520
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 2 scene details use an artwork estimate because the entry state is unresolved (from Room 30 entry script +0x002E; first stored image for this position; no decoded script draws it). Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.
+StatusText: Room 30 ready
+Room 38: active images 614,619
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 2 scene details use an artwork estimate because the entry state is unresolved (from opening frame of Room 38 in script 86 +0x0549; first stored image for this position; no decoded script draws it). Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.
+StatusText: Room 38 ready
+Room 86: active images 925,927
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 2 scene details use an artwork estimate because the entry state is unresolved (from script 111 +0x0078; Room 86 local script 202 +0x0009). Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.
+StatusText: Room 86 ready
+Room 01: active images 100,103,104,108,109,110,114,115,116,120,121,122,126,127,128,132,133,134,138,139,140,144,145,146
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 24 scene details use an artwork estimate because the entry state is unresolved (from first stored image for this position; no decoded script draws it). Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.
+StatusText: Room 01 ready
