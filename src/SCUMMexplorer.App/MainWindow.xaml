@@ -62,73 +62,90 @@
                 </StackPanel>
                 <Border Grid.Row="1" Background="#0B1117" BorderBrush="#334452" BorderThickness="1" CornerRadius="3">
                     <Grid>
-                        <Image x:Name="RoomPreview" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True" Margin="12" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseLeftButtonUp="RoomPreview_MouseLeftButtonUp" MouseMove="RoomPreview_MouseMove" MouseLeave="RoomPreview_MouseLeave"/>
-                        <Canvas x:Name="RoomNavigationOverlay" Visibility="Collapsed" Margin="12" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="RoomNavigationOverlay_SizeChanged"/>
-                        <Canvas x:Name="WalkBoxOverlay" Visibility="Collapsed" Margin="12" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="WalkBoxOverlay_SizeChanged"/>
-                        <Canvas x:Name="HotspotHighlightOverlay" Visibility="Collapsed" Margin="12" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="HotspotHighlightOverlay_SizeChanged"/>
-                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20" Background="#E8192632">
-                            <CheckBox x:Name="RoomNavigationToggle" Content="Show doorways" Visibility="Collapsed" IsChecked="True"
-                                      Margin="8,5,8,2" Foreground="#E7E0D2"
-                                      Checked="RoomNavigationToggle_Changed" Unchecked="RoomNavigationToggle_Changed"/>
-                            <CheckBox x:Name="RoomMaskToggle" Content="Show depth areas" Visibility="Collapsed"
-                                      Margin="8,2,8,2" Foreground="#E7E0D2" IsEnabled="False"
-                                      Checked="RoomMaskToggle_Changed" Unchecked="RoomMaskToggle_Changed"/>
-                            <CheckBox x:Name="WalkBoxToggle" Content="Show walk boxes" Visibility="Collapsed"
-                                      Margin="8,2,8,5" Foreground="#E7E0D2" IsEnabled="False"
-                                      Checked="WalkBoxToggle_Changed" Unchecked="WalkBoxToggle_Changed"/>
-                        </StackPanel>
+                        <Grid x:Name="RoomDisplayLayout" Visibility="Collapsed" SizeChanged="RoomDisplayLayout_SizeChanged">
+                            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                            <WrapPanel Grid.Row="0" Margin="10,8,10,6" VerticalAlignment="Center">
+                                <CheckBox x:Name="NormalRoomWidthToggle" Content="Normal room view (320 source px)" IsChecked="True"
+                                          Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
+                                          ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
+                                          Checked="NormalRoomWidthToggle_Changed" Unchecked="NormalRoomWidthToggle_Changed"/>
+                                <CheckBox x:Name="RoomNavigationToggle" Content="Show doorways" Visibility="Collapsed" IsChecked="True"
+                                          Margin="0,0,14,0" Foreground="#E7E0D2"
+                                          Checked="RoomNavigationToggle_Changed" Unchecked="RoomNavigationToggle_Changed"/>
+                                <CheckBox x:Name="RoomMaskToggle" Content="Show depth areas" Visibility="Collapsed"
+                                          Margin="0,0,14,0" Foreground="#E7E0D2" IsEnabled="False"
+                                          Checked="RoomMaskToggle_Changed" Unchecked="RoomMaskToggle_Changed"/>
+                                <CheckBox x:Name="WalkBoxToggle" Content="Show walk boxes" Visibility="Collapsed"
+                                          Foreground="#E7E0D2" IsEnabled="False"
+                                          Checked="WalkBoxToggle_Changed" Unchecked="WalkBoxToggle_Changed"/>
+                            </WrapPanel>
+                            <Grid x:Name="RoomViewportHost" Grid.Row="1" SizeChanged="RoomViewportHost_SizeChanged">
+                                <StackPanel x:Name="RoomDisplayGroup" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <ScrollViewer x:Name="RoomViewport" HorizontalScrollBarVisibility="Auto"
+                                                  VerticalScrollBarVisibility="Disabled" CanContentScroll="False"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  Focusable="True" SizeChanged="RoomViewport_SizeChanged" ScrollChanged="RoomViewport_ScrollChanged"
+                                                  PreviewKeyDown="RoomViewport_PreviewKeyDown"
+                                                  LostKeyboardFocus="RoomViewport_LostKeyboardFocus" Background="#0B1117">
+                                        <Grid x:Name="RoomSceneSurface">
+                                            <Image x:Name="RoomPreview" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True"
+                                                   RenderOptions.BitmapScalingMode="NearestNeighbor" MouseLeftButtonUp="RoomPreview_MouseLeftButtonUp"
+                                                   MouseMove="RoomPreview_MouseMove" MouseLeave="RoomPreview_MouseLeave"/>
+                                            <Canvas x:Name="RoomNavigationOverlay" Visibility="Collapsed" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="RoomNavigationOverlay_SizeChanged"/>
+                                            <Canvas x:Name="WalkBoxOverlay" Visibility="Collapsed" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="WalkBoxOverlay_SizeChanged"/>
+                                            <Canvas x:Name="HotspotHighlightOverlay" Visibility="Collapsed" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="HotspotHighlightOverlay_SizeChanged"/>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel x:Name="RoomControlsPanel" Grid.Row="2" Margin="0,4,0,8"
+                                        HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                <StackPanel x:Name="RoomScrollButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6" Visibility="Collapsed">
+                                    <Button x:Name="ScrollRoomLeftButton" Content="←" ToolTip="Scroll room left" AutomationProperties.Name="Scroll room left"
+                                            Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                            LostMouseCapture="PanButton_LostMouseCapture" Width="34" Height="27" Margin="0,0,5,0"
+                                            Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                    <Button x:Name="ScrollRoomRightButton" Content="→" ToolTip="Scroll room right" AutomationProperties.Name="Scroll room right"
+                                            Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                            LostMouseCapture="PanButton_LostMouseCapture" Width="34" Height="27"
+                                            Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                </StackPanel>
+                                <StackPanel x:Name="RoomMusicPanel" Visibility="Collapsed" HorizontalAlignment="Center" MaxWidth="420">
+                                    <DockPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="MUSIC" Style="{StaticResource PanelHeading}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <Button x:Name="RoomCuePlayButton" Content="▶" ToolTip="Play room cue" AutomationProperties.Name="Play room cue" Click="RoomCuePlay_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                        <Button x:Name="RoomCuePauseButton" Content="Ⅱ" ToolTip="Pause room cue" AutomationProperties.Name="Pause room cue" Click="RoomCuePause_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                        <Button x:Name="RoomCueStopButton" Content="■" ToolTip="Stop room cue" AutomationProperties.Name="Stop room cue" Click="RoomCueStop_Click" Width="28" Height="24" Margin="0,0,7,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                        <TextBlock x:Name="RoomCueTitle" Foreground="#E7E0D2" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                    <WrapPanel Margin="0,3,0,0" HorizontalAlignment="Center">
+                                        <TextBlock x:Name="RoomCueTime" Text="0:00 / 0:00" Foreground="#B8AA8C" FontSize="11" Margin="0,0,8,0"/>
+                                        <TextBlock x:Name="RoomCueEvidence" Foreground="#B8AA8C" FontSize="11" Margin="0,0,8,0"/>
+                                        <TextBlock x:Name="RoomCueStatus" Foreground="#B8AA8C" FontSize="11"/>
+                                    </WrapPanel>
+                                    <Expander x:Name="RoomMusicMoreExpander" IsExpanded="False" Foreground="#E7E0D2" Margin="0,4,0,0"
+                                              HorizontalAlignment="Center" HorizontalContentAlignment="Center">
+                                        <Expander.Header><TextBlock x:Name="RoomMusicMoreHeader" Text="Other possible music" FontSize="11.5" HorizontalAlignment="Center"/></Expander.Header>
+                                        <StackPanel Margin="0,3,0,0">
+                                            <TextBlock x:Name="RoomMusicNote" Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,4" TextAlignment="Center"/>
+                                            <ScrollViewer MaxHeight="84" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                                <StackPanel x:Name="RoomMusicButtons" HorizontalAlignment="Center"/>
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </Expander>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
                         <Grid x:Name="CostumePanel" Visibility="Collapsed" Margin="28">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid Margin="0,0,0,18" Background="#0B1117">
-                                <Image x:Name="CostumePreview" Visibility="Collapsed" Stretch="Uniform" Margin="18"
-                                       SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                            <ScrollViewer x:Name="CostumePoseScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                          SizeChanged="CostumePoseScrollViewer_SizeChanged"
+                                          Background="#0B1117">
+                                <WrapPanel x:Name="CostumePoseGallery" Margin="18" HorizontalAlignment="Center"/>
+                            </ScrollViewer>
+                            <Grid IsHitTestVisible="False">
                                 <TextBlock x:Name="CostumeMessage" Text="Reading costume…" HorizontalAlignment="Center"
                                            VerticalAlignment="Center" MaxWidth="460" Margin="28" TextWrapping="Wrap"
                                            TextAlignment="Center" Foreground="#AAB4BA"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="POSE" Foreground="#9B927F" FontSize="11" FontWeight="Bold"
-                                           VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                <Button x:Name="PreviousCostumePoseButton" Grid.Column="1" Content="←"
-                                        ToolTip="Previous pose" AutomationProperties.Name="Previous costume pose"
-                                        Click="PreviousCostumePoseButton_Click" Width="34" Height="32" Margin="0,0,6,0"
-                                        IsEnabled="False" Background="#273642" Foreground="#E7E0D2"
-                                        BorderBrush="#4A5962" FontSize="16"/>
-                                <ComboBox x:Name="CostumePoseCombo" Grid.Column="2" Height="32"
-                                          SelectionChanged="CostumePoseCombo_SelectionChanged"
-                                          Background="#F4F1E9" Foreground="#111820" BorderBrush="#A99F8D">
-                                    <ComboBox.ItemContainerStyle>
-                                        <Style TargetType="ComboBoxItem">
-                                            <Setter Property="Foreground" Value="#111820"/>
-                                            <Setter Property="Background" Value="#F4F1E9"/>
-                                            <Setter Property="Padding" Value="8,3"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsHighlighted" Value="True">
-                                                    <Setter Property="Background" Value="#C7E6F4"/>
-                                                    <Setter Property="Foreground" Value="#111820"/>
-                                                </Trigger>
-                                                <Trigger Property="IsSelected" Value="True">
-                                                    <Setter Property="Background" Value="#C7E6F4"/>
-                                                    <Setter Property="Foreground" Value="#111820"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ComboBox.ItemContainerStyle>
-                                </ComboBox>
-                                <Button x:Name="NextCostumePoseButton" Grid.Column="3" Content="→"
-                                        ToolTip="Next pose" AutomationProperties.Name="Next costume pose"
-                                        Click="NextCostumePoseButton_Click" Width="34" Height="32" Margin="6,0,0,0"
-                                        IsEnabled="False" Background="#273642" Foreground="#E7E0D2"
-                                        BorderBrush="#4A5962" FontSize="16"/>
                             </Grid>
                         </Grid>
                         <StackPanel x:Name="AudioPanel" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Width="380">
@@ -230,29 +247,6 @@
                                 </Expander.Header>
                                 <StackPanel x:Name="ObjectList" Margin="0,4,0,0"/>
                             </Expander>
-                            <StackPanel x:Name="RoomMusicPanel" Visibility="Collapsed" Margin="0,8,0,0">
-                                <TextBlock Text="MUSIC" Style="{StaticResource PanelHeading}"/>
-                                <DockPanel Margin="0,5,0,0">
-                                    <Button x:Name="RoomCuePlayButton" Content="▶" ToolTip="Play room cue" AutomationProperties.Name="Play room cue" Click="RoomCuePlay_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                    <Button x:Name="RoomCuePauseButton" Content="Ⅱ" ToolTip="Pause room cue" AutomationProperties.Name="Pause room cue" Click="RoomCuePause_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                    <Button x:Name="RoomCueStopButton" Content="■" ToolTip="Stop room cue" AutomationProperties.Name="Stop room cue" Click="RoomCueStop_Click" Width="28" Height="24" Margin="0,0,7,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                    <TextBlock x:Name="RoomCueTitle" Foreground="#E7E0D2" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                                </DockPanel>
-                                <WrapPanel Margin="0,3,0,0">
-                                    <TextBlock x:Name="RoomCueTime" Text="0:00 / 0:00" Foreground="#B8AA8C" FontSize="11" Margin="0,0,8,0"/>
-                                    <TextBlock x:Name="RoomCueEvidence" Foreground="#B8AA8C" FontSize="11" Margin="0,0,8,0"/>
-                                    <TextBlock x:Name="RoomCueStatus" Foreground="#B8AA8C" FontSize="11"/>
-                                </WrapPanel>
-                                <Expander x:Name="RoomMusicMoreExpander" IsExpanded="False" Foreground="#E7E0D2" Margin="0,4,0,0">
-                                    <Expander.Header>
-                                        <TextBlock x:Name="RoomMusicMoreHeader" Text="Other possible music" FontSize="11.5"/>
-                                    </Expander.Header>
-                                    <StackPanel Margin="0,3,0,0">
-                                        <TextBlock x:Name="RoomMusicNote" Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,4"/>
-                                        <StackPanel x:Name="RoomMusicButtons"/>
-                                    </StackPanel>
-                                </Expander>
-                            </StackPanel>
                             <StackPanel x:Name="ObjectAssetSection" Margin="0,4,0,0">
                                 <Image x:Name="ObjectAssetPreview" Height="72" Stretch="Uniform" Visibility="Collapsed" Margin="0,8,0,0" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                                 <TextBlock x:Name="ObjectAssetDescription" Foreground="#B8AA8C" TextWrapping="Wrap" Margin="0,5,0,0"/>

@@ -20,3 +20,15 @@ Exe/
 .verification/verify.log
 .verification/room-audit/*.bmp
 .verification/fallback-evidence/code.tsv
+
+# Room presentation: keep the reproducible harness and final text evidence only.
+# Screenshots, interim reports and future rerun directories remain local.
+.verification/room-viewport/*
+!.verification/room-viewport/validation.md
+!.verification/room-viewport/PresentationCheck/
+.verification/room-viewport/PresentationCheck/*
+!.verification/room-viewport/PresentationCheck/Program.cs
+!.verification/room-viewport/PresentationCheck/PresentationCheck.csproj
+!.verification/room-viewport/followup-20260927-03/
+.verification/room-viewport/followup-20260927-03/*
+!.verification/room-viewport/followup-20260927-03/geometry-check.txt

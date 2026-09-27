@@ -1,4 +1,5 @@
 using System.IO;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -32,6 +33,7 @@ public partial class MainWindow : Window
     private readonly LoomAdlibAudio _adlibDecoder = new();
     private readonly MediaPlayer _audioPlayer = new();
     private readonly DispatcherTimer _audioTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
+    private readonly DispatcherTimer _roomPanTimer = new() { Interval = TimeSpan.FromMilliseconds(75) };
     private readonly DispatcherTimer _adlibGainDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private static readonly string LastFolderFile = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -67,14 +69,12 @@ public partial class MainWindow : Window
     private GameResource? _selectedSound;
     private bool _changingAudioFormat;
     private bool _playWhenReady;
-    private bool _changingCostumePose;
     private AudioSurface _audioSurface;
     private GameResource? _roomSelectedCue;
     private GameResource? _roomRenderedCue;
     private int? _roomCueSourceRoomId;
     private bool _roomCueReached;
     private enum AudioSurface { None, Resource, Room }
-    private IReadOnlyDictionary<int, RoomImage> _costumePoses = new Dictionary<int, RoomImage>();
     private sealed record RoomVerbDestination(LoomRoomObjectRecord Object, LoomObjectVerbEntry Verb,
         int TargetRoomId, int InstructionOffset, string Path = "direct");
     private LoomSceneDrawBatches? _sceneBatches;
@@ -86,7 +86,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Loaded += (_, _) => ReopenLastFolder();
-        Closed += (_, _) => StopAudio();
+        Closed += (_, _) => { StopRoomPan(); StopAudio(); };
+        Deactivated += (_, _) => StopRoomPan();
+        PreviewKeyUp += MainWindow_PreviewKeyUp;
+        _roomPanTimer.Tick += RoomPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
         _adlibGainDebounceTimer.Tick += async (_, _) =>
         {
@@ -196,14 +199,14 @@ public partial class MainWindow : Window
         _relationshipIndex = null;
         _selectedResource = null;
         ConnectionsButton.Visibility = Visibility.Collapsed;
+        StatusText.Visibility = Visibility.Visible;
         StopAudio();
         AudioPanel.Visibility = Visibility.Collapsed;
         ScriptPanel.Visibility = Visibility.Collapsed;
         CostumePanel.Visibility = Visibility.Collapsed;
-        CostumePreview.Source = null;
-        CostumePoseCombo.Items.Clear();
-        UpdateCostumePoseNavigation();
-        _costumePoses = new Dictionary<int, RoomImage>();
+        CostumePoseGallery.Children.Clear();
+        RoomDisplayLayout.Visibility = Visibility.Collapsed;
+        StopRoomPan();
         RoomObjectPanel.Visibility = Visibility.Visible;
         Grid.SetColumnSpan(ContentPanel, 1);
         _previewCancellation?.Cancel();
@@ -245,7 +248,6 @@ public partial class MainWindow : Window
         ObjectAssetDescription.Text = "";
         RoomPreview.Source = null;
         RoomPreview.Visibility = Visibility.Collapsed;
-        RoomMaskToggle.IsChecked = false;
         RoomMaskToggle.IsEnabled = false;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
         WalkBoxToggle.Visibility = Visibility.Collapsed;
@@ -298,20 +300,6 @@ public partial class MainWindow : Window
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        _currentRoomResource = null;
-        _currentRoomObjectRecords = [];
-        _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
-        _roomNavigationCandidates = [];
-        RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
-        RoomEntryTraceOutput.Text = "";
-        RoomEntryEventButtons.Children.Clear();
-        RoomNavigationPanel.Visibility = Visibility.Collapsed;
-        RoomNavigationOverlay.Visibility = Visibility.Collapsed;
-        RoomNavigationToggle.Visibility = Visibility.Collapsed;
-        RoomMusicPanel.Visibility = Visibility.Collapsed;
-        RoomPreview.ToolTip = null;
-        RoomPreview.Cursor = Cursors.Arrow;
-        ScriptEventButtons.Children.Clear();
         if (e.NewValue is not TreeViewItem { Tag: GameResource resource })
         {
             _selectedResource = null;
@@ -330,7 +318,25 @@ public partial class MainWindow : Window
             }
             return;
         }
+        StopRoomPan();
+        RoomDisplayLayout.Visibility = Visibility.Collapsed;
+        _currentRoomResource = null;
+        _currentRoomObjectRecords = [];
+        _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
+        _roomNavigationCandidates = [];
+        RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
+        RoomEntryTraceOutput.Text = "";
+        RoomEntryEventButtons.Children.Clear();
+        RoomNavigationPanel.Visibility = Visibility.Collapsed;
+        RoomNavigationOverlay.Visibility = Visibility.Collapsed;
+        RoomNavigationToggle.Visibility = Visibility.Collapsed;
+        RoomMusicPanel.Visibility = Visibility.Collapsed;
+        RoomPreview.ToolTip = null;
+        RoomPreview.Cursor = Cursors.Arrow;
+        ScriptEventButtons.Children.Clear();
         _selectedResource = resource;
+        StatusText.Visibility = Visibility.Visible;
+        StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         UpdateConnectionsButton();
         if (resource.Kind == ResourceKind.Sound)
         {
@@ -349,6 +355,7 @@ public partial class MainWindow : Window
         {
             _previewCancellation?.Cancel();
             _currentRoom = null;
+            RoomDisplayLayout.Visibility = Visibility.Collapsed;
             CostumePanel.Visibility = Visibility.Collapsed;
             RoomObjectPanel.Visibility = Visibility.Collapsed;
             Grid.SetColumnSpan(ContentPanel, 2);
@@ -397,13 +404,15 @@ public partial class MainWindow : Window
         var token = _previewCancellation.Token;
         PageTitle.Text = resource.Name;
         PageSubtitle.Text = "Explore the scene and its possible paths.";
+        StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         PageSubtitle.ToolTip = resource.FilePath;
         PreviewTitle.Text = resource.Name;
         PreviewDescription.Text = "Reading the room background…";
         PreviewMessage.Visibility = Visibility.Visible;
+        StatusText.Visibility = Visibility.Visible;
+        RoomViewport.ScrollToHorizontalOffset(0);
         RoomPreview.Source = null;
         RoomPreview.Visibility = Visibility.Collapsed;
-        RoomMaskToggle.IsChecked = false;
         RoomMaskToggle.IsEnabled = false;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
         WalkBoxToggle.Visibility = Visibility.Collapsed;
@@ -462,6 +471,10 @@ public partial class MainWindow : Window
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
                 UpdateRoomNavigationActions(resource);
                 RefreshRoomPreview();
+                RoomDisplayLayout.Visibility = Visibility.Visible;
+                UpdateRoomViewportLayout();
+                StatusText.HorizontalAlignment = HorizontalAlignment.Center;
+                StatusText.Visibility = Visibility.Collapsed;
                 RoomPreview.Visibility = Visibility.Visible;
                 RoomMaskToggle.Visibility = Visibility.Visible;
                 ShowWalkBoxToggle();
@@ -483,6 +496,10 @@ public partial class MainWindow : Window
             ApplyRoomState(resource, objectRecords, objects, visit: true);
             UpdateRoomNavigationActions(resource);
             RefreshRoomPreview();
+            RoomDisplayLayout.Visibility = Visibility.Visible;
+            UpdateRoomViewportLayout();
+            StatusText.HorizontalAlignment = HorizontalAlignment.Center;
+            StatusText.Visibility = Visibility.Collapsed;
             RoomPreview.Visibility = Visibility.Visible;
             RoomMaskToggle.Visibility = Visibility.Visible;
             ShowWalkBoxToggle();
@@ -1024,12 +1041,9 @@ public partial class MainWindow : Window
         _objects = [];
         _selectedObject = null;
         ClearObjectList();
-        CostumePreview.Source = null;
-        CostumePreview.Visibility = Visibility.Collapsed;
-        CostumePoseCombo.Items.Clear();
-        CostumePoseCombo.IsEnabled = false;
-        UpdateCostumePoseNavigation();
-        _costumePoses = new Dictionary<int, RoomImage>();
+        CostumePoseGallery.Children.Clear();
+        CostumePoseScrollViewer.ScrollToTop();
+        RoomDisplayLayout.Visibility = Visibility.Collapsed;
         RoomPreview.Visibility = Visibility.Collapsed;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
         WalkBoxToggle.Visibility = Visibility.Collapsed;
@@ -1042,7 +1056,8 @@ public partial class MainWindow : Window
         Grid.SetColumnSpan(ContentPanel, 2);
 
         PageTitle.Text = resource.Name;
-        PageSubtitle.Text = "Static pose preview · choose a pose below";
+        PageSubtitle.Text = "Static pose gallery · all stored decodable poses at the same pixel scale";
+        StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         CostumeMessage.Text = "Reading costume…";
         CostumeMessage.Visibility = Visibility.Visible;
         StatusText.Text = $"{resource.Name} · reading costume";
@@ -1056,16 +1071,38 @@ public partial class MainWindow : Window
             var summary = _costumeReader.Decode(container, resourceOffset);
             var availableCount = 0;
             var damagedPoseCount = 0;
-            var poses = new Dictionary<int, RoomImage>();
-            _changingCostumePose = true;
             foreach (var slot in summary.AnimationSlots.Where(slot => slot.HasData))
             {
                 try
                 {
                     var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index);
                     if (pose is null) continue;
-                    poses.Add(slot.Index, pose);
-                    CostumePoseCombo.Items.Add(new ComboBoxItem { Content = $"Pose {slot.Index:00}", Tag = slot.Index });
+                    var poseCard = new StackPanel
+                    {
+                        Margin = new Thickness(16, 14, 16, 22),
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    poseCard.Children.Add(new TextBlock
+                    {
+                        Text = $"POSE {slot.Index:00}",
+                        Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)),
+                        FontSize = 11,
+                        FontWeight = FontWeights.Bold,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Thickness(0, 0, 0, 8)
+                    });
+                    var poseImage = new Image
+                    {
+                        Source = CreateCostumeBitmap(pose.Width, pose.Height, pose.Pixels.ToArray(), pose.Palette),
+                        Width = pose.Width,
+                        Height = pose.Height,
+                        Stretch = Stretch.Uniform,
+                        SnapsToDevicePixels = true,
+                        ToolTip = $"Pose {slot.Index:00} · {pose.Width} × {pose.Height} pixels"
+                    };
+                    RenderOptions.SetBitmapScalingMode(poseImage, BitmapScalingMode.NearestNeighbor);
+                    poseCard.Children.Add(poseImage);
+                    CostumePoseGallery.Children.Add(poseCard);
                     availableCount++;
                 }
                 catch (InvalidDataException)
@@ -1073,14 +1110,10 @@ public partial class MainWindow : Window
                     damagedPoseCount++;
                 }
             }
-            _changingCostumePose = false;
-            _costumePoses = poses;
-
             if (availableCount > 0)
             {
-                CostumePoseCombo.IsEnabled = true;
-                CostumePoseCombo.SelectedIndex = 0;
-                ShowSelectedCostumePose();
+                CostumeMessage.Visibility = Visibility.Collapsed;
+                CostumePoseScrollViewer.Dispatcher.BeginInvoke(ApplyCostumePoseScale, DispatcherPriority.Loaded);
                 StatusText.Text = $"{resource.Name} · {availableCount} stored poses";
             }
             else
@@ -1093,10 +1126,8 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException or NotSupportedException)
         {
-            _changingCostumePose = false;
             CostumeMessage.Text = CostumeErrorMessage(ex);
             CostumeMessage.Visibility = Visibility.Visible;
-            CostumePreview.Visibility = Visibility.Collapsed;
             StatusText.Text = $"{resource.Name} · picture unavailable";
         }
     }
@@ -1114,40 +1145,199 @@ public partial class MainWindow : Window
         return "The costume image data is incomplete or unreadable. No image is available.";
     }
 
-    private void CostumePoseCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NormalRoomWidthToggle_Changed(object sender, RoutedEventArgs e)
     {
-        if (!_changingCostumePose) ShowSelectedCostumePose();
+        StopRoomPan();
+        UpdateRoomViewportLayout();
     }
 
-    private void PreviousCostumePoseButton_Click(object sender, RoutedEventArgs e) => MoveCostumePose(-1);
+    private void CostumePoseScrollViewer_SizeChanged(object sender, SizeChangedEventArgs e) => ApplyCostumePoseScale();
 
-    private void NextCostumePoseButton_Click(object sender, RoutedEventArgs e) => MoveCostumePose(1);
-
-    private void MoveCostumePose(int direction)
+    private void ApplyCostumePoseScale()
     {
-        var nextIndex = CostumePoseCombo.SelectedIndex + direction;
-        if (nextIndex < 0 || nextIndex >= CostumePoseCombo.Items.Count) return;
-        CostumePoseCombo.SelectedIndex = nextIndex;
+        var scale = Math.Clamp(CostumePoseScrollViewer.ViewportWidth / 250.0, 2, 4);
+        foreach (var card in CostumePoseGallery.Children.OfType<StackPanel>())
+        {
+            if (card.Children.OfType<Image>().FirstOrDefault() is not { Source: BitmapSource bitmap } image) continue;
+            image.Width = bitmap.PixelWidth * scale;
+            image.Height = bitmap.PixelHeight * scale;
+        }
     }
 
-    private void UpdateCostumePoseNavigation()
+    private void RoomDisplayLayout_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateRoomViewportLayout();
+
+    private void RoomViewportHost_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateRoomViewportLayout();
+
+    private void RoomViewport_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        var selectedIndex = CostumePoseCombo.SelectedIndex;
-        PreviousCostumePoseButton.IsEnabled = CostumePoseCombo.IsEnabled && selectedIndex > 0;
-        NextCostumePoseButton.IsEnabled = CostumePoseCombo.IsEnabled &&
-                                          selectedIndex >= 0 && selectedIndex < CostumePoseCombo.Items.Count - 1;
+        UpdateRoomScrollButtons();
     }
 
-    private void ShowSelectedCostumePose()
-    {
-        UpdateCostumePoseNavigation();
-        if (CostumePoseCombo.SelectedItem is not ComboBoxItem { Tag: int poseIndex } ||
-            !_costumePoses.TryGetValue(poseIndex, out var pose)) return;
+    private void RoomViewport_ScrollChanged(object sender, ScrollChangedEventArgs e) => UpdateRoomScrollButtons();
 
-        CostumePreview.Source = CreateCostumeBitmap(pose.Width, pose.Height, pose.Pixels.ToArray(), pose.Palette);
-        CostumePreview.Visibility = Visibility.Visible;
-        CostumeMessage.Visibility = Visibility.Collapsed;
-        CostumeMessage.Text = "";
+    private double _roomDisplayScale = 1;
+    private readonly Stopwatch _roomPanStopwatch = new();
+    private bool _roomPanActive;
+    private int _roomPanDirection;
+    private double _roomPanMaximumStep;
+    private Key? _roomPanKey;
+    private Button? _roomPanMouseButton;
+    private bool _roomPanMouseGesture;
+
+    private void UpdateRoomViewportLayout()
+    {
+        if (_currentRoom is not { } room || RoomViewport is null) return;
+        var normalSize = NormalRoomWidthToggle.IsChecked == true;
+        var availableWidth = Math.Max(1, RoomViewportHost.ActualWidth);
+        var availableHeight = Math.Max(1, RoomViewportHost.ActualHeight);
+        var visibleSourceWidth = normalSize ? Math.Min(320, room.Width) : room.Width;
+        RoomScrollButtonsPanel.Visibility = normalSize && room.Width > visibleSourceWidth
+            ? Visibility.Visible : Visibility.Collapsed;
+        var hasHorizontalScroll = normalSize && room.Width > visibleSourceWidth;
+        var usableHeight = Math.Max(1, availableHeight - (hasHorizontalScroll ? 17 : 0));
+        _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth, usableHeight / room.Height);
+        _roomDisplayScale = Math.Max(0.1, _roomDisplayScale);
+        RoomViewport.HorizontalScrollBarVisibility = normalSize
+            ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
+        RoomViewport.VerticalAlignment = VerticalAlignment.Center;
+
+        RoomViewport.Width = visibleSourceWidth * _roomDisplayScale;
+        RoomSceneSurface.Width = room.Width * _roomDisplayScale;
+        RoomSceneSurface.Height = room.Height * _roomDisplayScale;
+        RoomViewport.Height = RoomSceneSurface.Height + (hasHorizontalScroll ? 17 : 0);
+        RoomViewport.Dispatcher.BeginInvoke(UpdateRoomScrollButtons, DispatcherPriority.Loaded);
+        RefreshWalkBoxOverlay();
+        RefreshRoomNavigationOverlay();
+        ShowHotspotHighlight(_highlightedHotspot);
+    }
+
+    private void UpdateRoomScrollButtons()
+    {
+        var canScroll = NormalRoomWidthToggle.IsChecked == true && RoomViewport.ScrollableWidth > 0.5;
+        RoomScrollButtonsPanel.Visibility = canScroll ? Visibility.Visible : Visibility.Collapsed;
+        ScrollRoomLeftButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset > 0.5;
+        ScrollRoomRightButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset < RoomViewport.ScrollableWidth - 0.5;
+    }
+
+    internal static double GetRoomPanStep(TimeSpan elapsed, double maximumStep)
+    {
+        const double initialStep = 2;
+        const double accelerationSeconds = 1.75;
+        var progress = Math.Clamp(elapsed.TotalSeconds / accelerationSeconds, 0, 1);
+        return initialStep + (Math.Max(initialStep, maximumStep) - initialStep) * progress;
+    }
+
+    private void PanButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not Button button) return;
+        var direction = ReferenceEquals(button, ScrollRoomLeftButton) ? -1 : 1;
+        BeginRoomPan(direction, maximumStep: 160, button: button);
+        _roomPanMouseGesture = true;
+        e.Handled = true;
+    }
+
+    private void PanButton_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (ReferenceEquals(sender, _roomPanMouseButton)) StopRoomPan();
+        _roomPanMouseGesture = true;
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => _roomPanMouseGesture = false));
+        e.Handled = true;
+    }
+
+    private void PanButton_LostMouseCapture(object sender, MouseEventArgs e)
+    {
+        if (!ReferenceEquals(sender, _roomPanMouseButton)) return;
+        StopRoomPan();
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => _roomPanMouseGesture = false));
+    }
+
+    private void PanButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_roomPanMouseGesture)
+        {
+            _roomPanMouseGesture = false;
+            return;
+        }
+        var direction = ReferenceEquals(sender, ScrollRoomLeftButton) ? -1 : 1;
+        PanRoomBySourcePixels(direction * 2);
+    }
+
+    private void BeginRoomPan(int direction, double maximumStep, Button? button = null, Key? key = null)
+    {
+        StopRoomPan();
+        if (NormalRoomWidthToggle.IsChecked != true || RoomViewport.ScrollableWidth <= 0.5 ||
+            (direction < 0 && RoomViewport.HorizontalOffset <= 0.5) ||
+            (direction > 0 && RoomViewport.HorizontalOffset >= RoomViewport.ScrollableWidth - 0.5)) return;
+
+        RoomViewport.Focus();
+        _roomPanActive = true;
+        _roomPanDirection = Math.Sign(direction);
+        _roomPanMaximumStep = Math.Max(2, maximumStep);
+        _roomPanMouseButton = button;
+        _roomPanKey = key;
+        _roomPanStopwatch.Restart();
+        if (button is not null && !button.CaptureMouse())
+        {
+            StopRoomPan();
+            return;
+        }
+        PanRoomBySourcePixels(_roomPanDirection * 2);
+        if (!_roomPanActive) return;
+        _roomPanTimer.Start();
+    }
+
+    private void RoomPanTimer_Tick(object? sender, EventArgs e)
+    {
+        if (!_roomPanActive || _currentRoom is null || NormalRoomWidthToggle.IsChecked != true)
+        {
+            StopRoomPan();
+            return;
+        }
+        PanRoomBySourcePixels(_roomPanDirection * GetRoomPanStep(_roomPanStopwatch.Elapsed, _roomPanMaximumStep));
+    }
+
+    private void PanRoomBySourcePixels(double sourcePixels)
+    {
+        var previous = RoomViewport.HorizontalOffset;
+        var requested = previous + sourcePixels * _roomDisplayScale;
+        var target = Math.Clamp(requested, 0, RoomViewport.ScrollableWidth);
+        RoomViewport.ScrollToHorizontalOffset(target);
+        UpdateRoomScrollButtons();
+        if (Math.Abs(target - previous) < 0.01) StopRoomPan();
+    }
+
+    private void StopRoomPan()
+    {
+        _roomPanTimer.Stop();
+        _roomPanStopwatch.Reset();
+        _roomPanActive = false;
+        _roomPanKey = null;
+        _roomPanMouseGesture = false;
+        var capturedButton = _roomPanMouseButton;
+        _roomPanMouseButton = null;
+        if (capturedButton?.IsMouseCaptured == true) capturedButton.ReleaseMouseCapture();
+    }
+
+    private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        if (_roomPanKey != e.Key) return;
+        StopRoomPan();
+        e.Handled = true;
+    }
+
+    private void RoomViewport_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (_roomPanKey is not null) StopRoomPan();
+    }
+
+    private void RoomViewport_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!RoomViewport.IsKeyboardFocusWithin || NormalRoomWidthToggle.IsChecked != true) return;
+        var direction = e.Key == Key.Left ? -1 : e.Key == Key.Right ? 1 : 0;
+        if (direction == 0) return;
+        if (!_roomPanActive || _roomPanKey != e.Key)
+            BeginRoomPan(direction, maximumStep: 64, key: e.Key);
+        e.Handled = true;
     }
 
     private async Task ShowAudio(GameResource resource, bool preserveFormat = false, bool autoPlay = false)
@@ -1155,6 +1345,7 @@ public partial class MainWindow : Window
         StopAudio();
         _audioSurface = AudioSurface.Resource;
         CostumePanel.Visibility = Visibility.Collapsed;
+        RoomDisplayLayout.Visibility = Visibility.Collapsed;
         ScriptPanel.Visibility = Visibility.Collapsed;
         RoomObjectPanel.Visibility = Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, 2);
@@ -1181,6 +1372,7 @@ public partial class MainWindow : Window
         ObjectAssetPreview.Visibility = Visibility.Collapsed;
         ObjectAssetDescription.Text = "";
         PageTitle.Text = resource.Name;
+        StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         PageSubtitle.Text = "Play this sound on demand.";
         PageSubtitle.ToolTip = resource.FilePath;
         AudioTitle.Text = resource.Name;
@@ -1725,6 +1917,7 @@ public partial class MainWindow : Window
 
     private void RoomPreview_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        RoomViewport.Focus();
         if (!TryGetRoomImagePoint(e.GetPosition(RoomPreview), out var x, out var y)) return;
         HandleRoomPoint(x, y);
     }
