@@ -1,6 +1,6 @@
 # Validation: old-v3 walk boxes (27 September 2026)
 
-Status: **reader done; overlay built but not yet checked by eye.** Builds with 0 warnings; 164/164 tests pass (8 new in `LoomWalkBoxTests`).
+Status: **done.** Reader and overlay built; the overlay was checked by eye in Rooms 02, 03, 17 and 30. Builds with 0 warnings; 164/164 tests pass (8 in `LoomWalkBoxTests`). Room audit rerun: 0 gaps in 76 rooms, **0 changed renders** (`compare-png.ps1`).
 
 ## Layout (checked against ScummVM source)
 
@@ -13,10 +13,25 @@ What the data shows: LOOM's walkable areas are mostly **line segments** (paths).
 ## Code
 
 - `Formats/LoomWalkBoxes.cs`: `LoomWalkBoxReader`, `LoomWalkBoxSet` with ports of `checkXYInBoxBounds` (v3: no line-segment tolerance, as ScummVM documents for LOOM DOS EGA), `closestPtOnLine`, `getClosestPtOnBox`, `Actor::adjustXYToBeInBox` (thresholds 30/80/0, 0xFFFF bound, v3 last-valid-point quirk, invisible/player-only skip), `getNextBox`, and `getBoxBaseAddr`'s "one past the last box" workaround. `SetFlags` is ready for `setBoxFlags`.
-- The session reads the current room's boxes on entry (`CurrentWalkBoxes`, `LoomScriptRuntimeState.WalkBoxes`). Nothing uses them yet; no behaviour or render changed.
-- App: a **"Show walk boxes"** checkbox under "Show depth areas" draws each box (outlined quadrangle or segment, dashed if invisible) with its number. The tooltip lists the count, boxes outside the image and the flags.
+- The session reads the current room's boxes on entry (`CurrentWalkBoxes`, `LoomScriptRuntimeState.WalkBoxes`).
+- App: a **"Show walk boxes"** checkbox draws each box (outlined quadrangle or segment, dashed if invisible) with its number. The tooltip lists the count, boxes outside the image and the flags.
 
-## Not done yet
+## Overlay check (WalkBoxCheck)
 
-- **By-eye check of the overlay**: extend a WPF harness (like `hotspot-highlight/HighlightCheck`) to tick `WalkBoxToggle` and capture Rooms 02, 03, 17 and 30, then compare with each room's floor. ScummVM's debugger was not used.
-- The room audit was not rerun. The change is additive, so no render should change.
+[`WalkBoxCheck`](WalkBoxCheck/Program.cs) drives the real `MainWindow` by reflection: it opens `Games\loom`, browses to each room, turns off **Normal room view** (full panorama) and **Show doorways**, ticks `WalkBoxToggle`, and renders `RoomSceneSurface`. It checks that the overlay shows one outline and one label per box, that every outline point maps back to its box corner in room pixels exactly (same scale and centring as the room image), and that unticking hides the overlay. Synthetic property changes, no physical input.
+
+```powershell
+dotnet build .verification\walk-boxes\WalkBoxCheck\WalkBoxCheck.csproj
+Start-Process -Wait -NoNewWindow -WorkingDirectory $PWD -FilePath Exe\WalkBoxCheck\Debug\net10.0-windows\WalkBoxCheck.exe -ArgumentList 'Games\loom','.verification\walk-boxes\capture','2','3','17','30'
+```
+
+Result: **8/8 PASS, 0 failures** ([report](capture/walk-box-check.txt)).
+
+By eye ([Room 02](capture/room-02-walk-boxes.png), [03](capture/room-03-walk-boxes.png), [17](capture/room-17-walk-boxes.png), [30](capture/room-30-walk-boxes.png)):
+
+- **Room 02** (cliff, 960 px): boxes 0–14 form one path from the tree on the cliff top (box 0, x 811–830, y 60) along the rock edge and down the ridge to x 540. The path lies on the drawn rock throughout; box 4 (x 837–888, y 118), the one script 045 watches, is the ledge below the tree.
+- **Room 03** (lake): box 0 is the high path along the cliff on the left, boxes 1–2 cross the middle of the shore, box 4 leads up to the right-hand exit, box 3 goes down to the tents, and boxes 5–6 descend the steps to the jetty. Every segment sits on a drawn path.
+- **Room 17**: box 0 runs along the middle row of the graveyard, 1–3 lead to the right edge, box 8 (the one quadrangle) is the foreground floor, and 11 leads off the left edge. Boxes 3–6 and 10 run past x 320, outside the image: exits off the right edge, as the tooltip lists.
+- **Room 30** (dark cave, 960 px): segments follow the lit ledges (21–27 along the right ledge, 38–40 along the left one). Box 28 and 48 lie partly outside the image (exits). Box 46 (x 114–121, y 126) is an isolated segment.
+
+No box contradicts the floor it is drawn on. This is a visual check against the room artwork; ScummVM's debugger (`boxes` command) was not used.

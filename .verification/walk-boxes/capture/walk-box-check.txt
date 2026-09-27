@@ -1,0 +1,100 @@
+Real MainWindow; WalkBoxToggle ticked through IsChecked, panorama view, doorways hidden. No physical input.
+Room 02: 960x144, 15 boxes, 15 outlines, 15 labels, scale 0,997
+  box  0 flags 0x00 inside  corners (830,60) (830,60) (811,60) (811,60): outline maps back exactly
+  box  1 flags 0x01 inside  corners (888,80) (888,80) (832,60) (832,60): outline maps back exactly
+  box  2 flags 0x00 inside  corners (910,80) (910,80) (890,80) (890,80): outline maps back exactly
+  box  3 flags 0x12 inside  corners (912,80) (912,80) (890,118) (890,118): outline maps back exactly
+  box  4 flags 0x00 inside  corners (888,118) (888,118) (837,118) (837,118): outline maps back exactly
+  box  5 flags 0x00 inside  corners (792,118) (792,118) (835,118) (835,118): outline maps back exactly
+  box  6 flags 0x00 inside  corners (738,102) (738,102) (790,118) (790,118): outline maps back exactly
+  box  7 flags 0x01 inside  corners (736,102) (736,102) (698,116) (698,116): outline maps back exactly
+  box  8 flags 0x00 inside  corners (660,116) (660,116) (696,116) (696,116): outline maps back exactly
+  box  9 flags 0x11 inside  corners (658,116) (658,116) (640,134) (640,134): outline maps back exactly
+  box 10 flags 0x00 inside  corners (630,134) (630,134) (638,134) (638,134): outline maps back exactly
+  box 11 flags 0x00 inside  corners (628,126) (628,126) (628,134) (628,134): outline maps back exactly
+  box 12 flags 0x01 inside  corners (611,110) (611,110) (628,124) (628,124): outline maps back exactly
+  box 13 flags 0x00 inside  corners (609,110) (609,110) (570,114) (570,114): outline maps back exactly
+  box 14 flags 0x00 inside  corners (540,108) (540,108) (568,114) (568,114): outline maps back exactly
+PASS Room 02
+PASS Room 02 unticking hides the overlay
+Room 03: 320x144, 7 boxes, 7 outlines, 7 labels, scale 2,992
+  box  0 flags 0x00 inside  corners (41,63) (41,63) (121,63) (121,63): outline maps back exactly
+  box  1 flags 0x00 inside  corners (157,71) (157,71) (123,63) (123,63): outline maps back exactly
+  box  2 flags 0x00 inside  corners (159,71) (159,71) (241,71) (241,71): outline maps back exactly
+  box  3 flags 0x00 inside  corners (220,73) (220,73) (227,94) (227,94): outline maps back exactly
+  box  4 flags 0x00 inside  corners (278,62) (278,62) (244,71) (244,71): outline maps back exactly
+  box  5 flags 0x00 inside  corners (157,72) (157,72) (138,82) (138,82): outline maps back exactly
+  box  6 flags 0x00 inside  corners (138,84) (138,84) (117,103) (117,103): outline maps back exactly
+PASS Room 03
+PASS Room 03 unticking hides the overlay
+Room 17: 320x144, 12 boxes, 12 outlines, 12 labels, scale 2,992
+  box  0 flags 0x00 inside  corners (93,82) (93,82) (213,82) (213,82): outline maps back exactly
+  box  1 flags 0x00 inside  corners (215,82) (215,82) (242,86) (242,86): outline maps back exactly
+  box  2 flags 0x00 inside  corners (244,86) (244,86) (283,86) (283,86): outline maps back exactly
+  box  3 flags 0x00 OUTSIDE corners (286,86) (286,86) (328,99) (328,99): outline maps back exactly
+  box  4 flags 0x00 OUTSIDE corners (334,99) (334,99) (330,99) (330,99): outline maps back exactly
+  box  5 flags 0x00 OUTSIDE corners (334,101) (334,101) (334,110) (334,110): outline maps back exactly
+  box  6 flags 0x00 OUTSIDE corners (226,111) (226,111) (334,111) (334,111): outline maps back exactly
+  box  7 flags 0x00 inside  corners (222,111) (222,111) (192,123) (192,123): outline maps back exactly
+  box  8 flags 0x00 inside  corners (86,125) (192,125) (210,134) (67,134): outline maps back exactly
+  box  9 flags 0x00 inside  corners (213,134) (213,134) (248,141) (248,141): outline maps back exactly
+  box 10 flags 0x00 OUTSIDE corners (336,141) (336,141) (251,141) (251,141): outline maps back exactly
+  box 11 flags 0x00 inside  corners (0,134) (0,134) (65,134) (65,134): outline maps back exactly
+PASS Room 17
+PASS Room 17 unticking hides the overlay
+Room 30: 960x144, 52 boxes, 52 outlines, 52 labels, scale 0,997
+  box  0 flags 0x00 inside  corners (574,38) (574,38) (548,42) (548,42): outline maps back exactly
+  box  1 flags 0x00 inside  corners (503,44) (503,44) (558,44) (558,44): outline maps back exactly
+  box  2 flags 0x00 inside  corners (560,44) (560,44) (620,46) (620,46): outline maps back exactly
+  box  3 flags 0x00 inside  corners (622,48) (622,48) (616,58) (616,58): outline maps back exactly
+  box  4 flags 0x00 inside  corners (616,60) (616,60) (588,74) (588,74): outline maps back exactly
+  box  5 flags 0x00 inside  corners (586,74) (586,74) (560,78) (560,78): outline maps back exactly
+  box  6 flags 0x00 inside  corners (528,78) (528,78) (558,78) (558,78): outline maps back exactly
+  box  7 flags 0x00 inside  corners (560,62) (560,62) (541,76) (541,76): outline maps back exactly
+  box  8 flags 0x00 inside  corners (506,76) (506,76) (526,78) (526,78): outline maps back exactly
+  box  9 flags 0x00 inside  corners (496,74) (496,74) (504,76) (504,76): outline maps back exactly
+  box 10 flags 0x00 inside  corners (496,68) (496,68) (496,72) (496,72): outline maps back exactly
+  box 11 flags 0x00 inside  corners (508,68) (508,68) (498,68) (498,68): outline maps back exactly
+  box 12 flags 0x00 inside  corners (622,46) (622,46) (650,42) (650,42): outline maps back exactly
+  box 13 flags 0x00 inside  corners (682,38) (682,38) (652,42) (652,42): outline maps back exactly
+  box 14 flags 0x00 inside  corners (558,98) (558,98) (548,124) (548,124): outline maps back exactly
+  box 15 flags 0x00 inside  corners (470,120) (470,120) (548,126) (548,126): outline maps back exactly
+  box 16 flags 0x00 inside  corners (403,118) (403,118) (462,120) (462,120): outline maps back exactly
+  box 17 flags 0x00 inside  corners (550,126) (550,126) (558,126) (558,126): outline maps back exactly
+  box 18 flags 0x00 inside  corners (586,118) (586,118) (560,126) (560,126): outline maps back exactly
+  box 19 flags 0x00 inside  corners (594,110) (604,110) (592,118) (588,118): outline maps back exactly
+  box 20 flags 0x00 inside  corners (658,90) (658,90) (608,94) (608,94): outline maps back exactly
+  box 21 flags 0x00 inside  corners (766,70) (767,70) (660,90) (660,90): outline maps back exactly
+  box 22 flags 0x00 inside  corners (828,66) (828,66) (768,70) (768,70): outline maps back exactly
+  box 23 flags 0x00 inside  corners (830,66) (830,66) (850,69) (850,69): outline maps back exactly
+  box 24 flags 0x00 inside  corners (852,69) (852,69) (866,69) (866,69): outline maps back exactly
+  box 25 flags 0x00 inside  corners (902,63) (902,63) (868,69) (868,69): outline maps back exactly
+  box 26 flags 0x00 inside  corners (904,63) (904,63) (918,64) (918,64): outline maps back exactly
+  box 27 flags 0x00 inside  corners (920,64) (920,64) (952,68) (952,68): outline maps back exactly
+  box 28 flags 0x00 OUTSIDE corners (954,68) (954,68) (968,68) (968,68): outline maps back exactly
+  box 29 flags 0x00 inside  corners (460,116) (460,116) (480,134) (480,134): outline maps back exactly
+  box 30 flags 0x00 inside  corners (414,82) (414,82) (460,114) (460,114): outline maps back exactly
+  box 31 flags 0x00 inside  corners (408,71) (408,71) (414,80) (414,80): outline maps back exactly
+  box 32 flags 0x00 inside  corners (378,80) (378,80) (412,82) (412,82): outline maps back exactly
+  box 33 flags 0x00 inside  corners (358,78) (358,78) (376,80) (376,80): outline maps back exactly
+  box 34 flags 0x00 inside  corners (356,66) (356,66) (358,76) (358,76): outline maps back exactly
+  box 35 flags 0x00 inside  corners (378,66) (378,66) (358,66) (358,66): outline maps back exactly
+  box 36 flags 0x00 inside  corners (458,56) (458,56) (410,71) (410,71): outline maps back exactly
+  box 37 flags 0x02 inside  corners (468,56) (468,56) (460,56) (460,56): outline maps back exactly
+  box 38 flags 0x00 inside  corners (322,46) (322,46) (258,51) (258,51): outline maps back exactly
+  box 39 flags 0x00 inside  corners (256,51) (256,51) (190,58) (190,58): outline maps back exactly
+  box 40 flags 0x00 inside  corners (188,58) (188,58) (86,66) (86,66): outline maps back exactly
+  box 41 flags 0x00 inside  corners (280,104) (280,104) (260,108) (260,108): outline maps back exactly
+  box 42 flags 0x00 inside  corners (310,96) (310,96) (282,104) (282,104): outline maps back exactly
+  box 43 flags 0x00 inside  corners (290,92) (290,92) (308,96) (308,96): outline maps back exactly
+  box 44 flags 0x00 inside  corners (296,31) (297,31) (374,31) (374,31): outline maps back exactly
+  box 45 flags 0x00 inside  corners (376,31) (376,31) (422,36) (422,36): outline maps back exactly
+  box 46 flags 0x00 inside  corners (121,126) (121,126) (114,126) (114,126): outline maps back exactly
+  box 47 flags 0x01 inside  corners (680,38) (680,38) (662,38) (662,38): outline maps back exactly
+  box 48 flags 0x00 OUTSIDE corners (480,136) (480,136) (503,159) (503,159): outline maps back exactly
+  box 49 flags 0x02 inside  corners (322,48) (322,48) (310,64) (310,64): outline maps back exactly
+  box 50 flags 0x00 inside  corners (258,108) (258,108) (250,108) (250,108): outline maps back exactly
+  box 51 flags 0x01 inside  corners (424,36) (424,36) (440,48) (440,48): outline maps back exactly
+PASS Room 30
+PASS Room 30 unticking hides the overlay
+Failures: 0
