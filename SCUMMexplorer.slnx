@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/SCUMMexplorer.Core/SCUMMexplorer.Core.csproj" />
+  <Project Path="src/SCUMMexplorer.App/SCUMMexplorer.App.csproj" />
+  <Project Path="tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj" />
+</Solution>

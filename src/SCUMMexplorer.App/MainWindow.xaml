@@ -1,0 +1,252 @@
+﻿<Window x:Class="SCUMMexplorer.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SCUMMexplorer.App"
+        mc:Ignorable="d"
+        Title="SCUMMexplorer" Height="760" Width="1180" MinHeight="600" MinWidth="900"
+        Background="#101821" Foreground="#E7E0D2">
+    <Window.Resources>
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Foreground" Value="#E7E0D2"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Foreground" Value="#15212B"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="58"/><RowDefinition Height="*"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="#192632" BorderBrush="#334452" BorderThickness="0,0,0,1">
+            <Grid Margin="18,0">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="SCUMMexplorer" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="Explore the game beyond its files" Foreground="#B8AA8C" FontSize="13" VerticalAlignment="Center" Margin="12,2,0,0"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="Game Texts" Click="GameTexts_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                    <Button Content="Open Game Folder…" Click="OpenFolder_Click" Padding="16,8" Margin="0,9,0,9" Background="#B78442" Foreground="#111820" BorderThickness="0" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="285"/><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="#151F29" BorderBrush="#334452" BorderThickness="0,0,1,0" Padding="15">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,4,0,18">
+                        <TextBlock Text="GAME FOLDER" Foreground="#9B927F" FontSize="11" FontWeight="Bold"/>
+                        <TextBlock x:Name="GameTitle" Text="No game open" FontSize="20" FontWeight="SemiBold" Margin="0,8,0,2"/>
+                        <TextBlock x:Name="GameInfo" Text="Choose a game folder to begin." Foreground="#AAB4BA" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <TreeView x:Name="ResourceTree" Background="Transparent" BorderThickness="0" Foreground="#E7E0D2" SelectedItemChanged="ResourceTree_SelectedItemChanged"/>
+                </DockPanel>
+            </Border>
+            <Grid x:Name="ContentPanel" Grid.Column="1" Margin="26">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock x:Name="PageTitle" Text="Welcome to SCUMMexplorer" FontSize="24" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="PageSubtitle" Text="Open a game folder to explore its rooms and resources." Foreground="#AAB4BA" Margin="0,5,0,0"/>
+                    <Button x:Name="ConnectionsButton" Content="Connections" Visibility="Collapsed"
+                            Click="ConnectionsButton_Click" HorizontalAlignment="Left" Margin="0,9,0,0"
+                            Padding="10,5" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                </StackPanel>
+                <Border Grid.Row="1" Background="#0B1117" BorderBrush="#334452" BorderThickness="1" CornerRadius="3">
+                    <Grid>
+                        <Image x:Name="RoomPreview" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True" Margin="12" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseLeftButtonUp="RoomPreview_MouseLeftButtonUp" MouseMove="RoomPreview_MouseMove" MouseLeave="RoomPreview_MouseLeave"/>
+                        <Canvas x:Name="RoomNavigationOverlay" Visibility="Collapsed" Margin="12" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="RoomNavigationOverlay_SizeChanged"/>
+                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20">
+                            <CheckBox x:Name="RoomNavigationToggle" Content="Show doorways" Visibility="Collapsed" IsChecked="True"
+                                      Padding="8,5" Background="#E8192632" Foreground="#E7E0D2"
+                                      BorderBrush="#657783" Checked="RoomNavigationToggle_Changed" Unchecked="RoomNavigationToggle_Changed"/>
+                            <CheckBox x:Name="RoomMaskToggle" Content="Show depth areas" Visibility="Collapsed"
+                                      Padding="8,5" Background="#E8192632" Foreground="#E7E0D2"
+                                      BorderBrush="#657783" IsEnabled="False"
+                                      Checked="RoomMaskToggle_Changed" Unchecked="RoomMaskToggle_Changed"/>
+                        </StackPanel>
+                        <Grid x:Name="CostumePanel" Visibility="Collapsed" Margin="28">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Margin="0,0,0,18" Background="#0B1117">
+                                <Image x:Name="CostumePreview" Visibility="Collapsed" Stretch="Uniform" Margin="18"
+                                       SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                                <TextBlock x:Name="CostumeMessage" Text="Reading costume…" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" MaxWidth="460" Margin="28" TextWrapping="Wrap"
+                                           TextAlignment="Center" Foreground="#AAB4BA"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="POSE" Foreground="#9B927F" FontSize="11" FontWeight="Bold"
+                                           VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <Button x:Name="PreviousCostumePoseButton" Grid.Column="1" Content="←"
+                                        ToolTip="Previous pose" AutomationProperties.Name="Previous costume pose"
+                                        Click="PreviousCostumePoseButton_Click" Width="34" Height="32" Margin="0,0,6,0"
+                                        IsEnabled="False" Background="#273642" Foreground="#E7E0D2"
+                                        BorderBrush="#4A5962" FontSize="16"/>
+                                <ComboBox x:Name="CostumePoseCombo" Grid.Column="2" Height="32"
+                                          SelectionChanged="CostumePoseCombo_SelectionChanged"
+                                          Background="#F4F1E9" Foreground="#111820" BorderBrush="#A99F8D">
+                                    <ComboBox.ItemContainerStyle>
+                                        <Style TargetType="ComboBoxItem">
+                                            <Setter Property="Foreground" Value="#111820"/>
+                                            <Setter Property="Background" Value="#F4F1E9"/>
+                                            <Setter Property="Padding" Value="8,3"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsHighlighted" Value="True">
+                                                    <Setter Property="Background" Value="#C7E6F4"/>
+                                                    <Setter Property="Foreground" Value="#111820"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Background" Value="#C7E6F4"/>
+                                                    <Setter Property="Foreground" Value="#111820"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ComboBox.ItemContainerStyle>
+                                </ComboBox>
+                                <Button x:Name="NextCostumePoseButton" Grid.Column="3" Content="→"
+                                        ToolTip="Next pose" AutomationProperties.Name="Next costume pose"
+                                        Click="NextCostumePoseButton_Click" Width="34" Height="32" Margin="6,0,0,0"
+                                        IsEnabled="False" Background="#273642" Foreground="#E7E0D2"
+                                        BorderBrush="#4A5962" FontSize="16"/>
+                            </Grid>
+                        </Grid>
+                        <StackPanel x:Name="AudioPanel" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Width="380">
+                            <TextBlock Text="SOUND PLAYER" Foreground="#B78442" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="AudioTitle" FontSize="24" FontWeight="SemiBold" TextAlignment="Center" Margin="0,12,0,3"/>
+                            <TextBlock x:Name="AudioDescription" Foreground="#AAB4BA" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                            <ComboBox x:Name="AudioFormatCombo" Width="160" HorizontalAlignment="Center" Margin="0,0,0,14" SelectionChanged="AudioFormatCombo_SelectionChanged" Visibility="Collapsed">
+                                <ComboBoxItem Content="PC speaker"/>
+                                <ComboBoxItem Content="AdLib FM"/>
+                            </ComboBox>
+                            <StackPanel x:Name="AdlibGainPanel" Visibility="Collapsed" Margin="12,0,12,12">
+                                <DockPanel LastChildFill="True">
+                                    <TextBlock Text="AdLib level" Foreground="#E7E0D2" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="AdlibGainValue" Text="+6.0 dB" Foreground="#B8AA8C" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                                </DockPanel>
+                                <Slider x:Name="AdlibGainSlider" Minimum="0" Maximum="24" Value="6" TickFrequency="3"
+                                        IsSnapToTickEnabled="False" ValueChanged="AdlibGainSlider_ValueChanged"
+                                        ToolTip="AdLib playback gain. Peaks are kept below clipping; some tracks may reach their safe maximum before 24 dB."/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="PlayButton" Content="▶" ToolTip="Play" AutomationProperties.Name="Play" Click="PlayButton_Click" Width="44" Height="36" Margin="4" FontSize="15" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                <Button x:Name="PauseButton" Content="Ⅱ" ToolTip="Pause" AutomationProperties.Name="Pause" Click="PauseButton_Click" Width="44" Height="36" Margin="4" FontSize="15" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                <Button x:Name="StopButton" Content="■" ToolTip="Stop" AutomationProperties.Name="Stop" Click="StopButton_Click" Width="44" Height="36" Margin="4" FontSize="15" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                            </StackPanel>
+                            <TextBlock x:Name="AudioTime" Text="0:00 / 0:00" Foreground="#B8AA8C" HorizontalAlignment="Center" Margin="0,14,0,0"/>
+                        </StackPanel>
+                        <Grid x:Name="ScriptPanel" Visibility="Collapsed" Margin="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="ScriptNote" Text="DOS LOOM old-v3 bytecode disassembly. Scripts are not executed."
+                                       Foreground="#B8AA8C" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                            <ScrollViewer Grid.Row="1" MaxHeight="76" VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,8">
+                                <StackPanel x:Name="ScriptEventButtons"/>
+                            </ScrollViewer>
+                            <TextBox x:Name="ScriptOutput" Grid.Row="2" IsReadOnly="True" AcceptsReturn="True"
+                                     IsReadOnlyCaretVisible="True" TextWrapping="NoWrap"
+                                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                     Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
+                                     FontFamily="Consolas" FontSize="13" Padding="4"/>
+                        </Grid>
+                        <StackPanel x:Name="PreviewMessage" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520" Margin="30">
+                            <TextBlock Text="ROOM BACKGROUND" Foreground="#B78442" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="PreviewTitle" Text="Your game will appear here" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,10,0,6"/>
+                            <TextBlock x:Name="PreviewDescription" Text="SCUMMexplorer is being built around game concepts: rooms first, with their objects, scripts, characters and sounds close at hand." TextWrapping="Wrap" TextAlignment="Center" Foreground="#AAB4BA"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <TextBlock Grid.Row="2" x:Name="StatusText" Text="Ready" Foreground="#9B927F" Margin="0,12,0,0"/>
+            </Grid>
+            <Border x:Name="RoomObjectPanel" Grid.Column="2" Background="#151F29" BorderBrush="#334452" BorderThickness="1,0,0,0" Padding="14">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,4,0,14">
+                        <TextBlock Text="IN THIS ROOM" Foreground="#B78442" FontSize="11" FontWeight="Bold"/>
+                        <CheckBox x:Name="SessionModeToggle" Content="Interactive mode" ToolTip="Uncheck to browse room artwork without script or doorway actions." IsChecked="True"
+                                  Checked="SessionMode_Changed" Unchecked="SessionMode_Changed"
+                                  Foreground="#E7E0D2" Margin="0,9,0,0" Visibility="Collapsed"/>
+                        <StackPanel x:Name="SessionActions" Orientation="Horizontal" Visibility="Collapsed" Margin="0,7,0,0">
+                            <Button Content="Restart exploration" Click="ResetSession_Click" Padding="7,3" Margin="0,0,6,0"
+                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                            <Button x:Name="AdvanceFrameButton" Content="Continue scene" ToolTip="Advance scripts paused at a frame boundary." Click="AdvanceFrame_Click" Padding="7,3"
+                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                        </StackPanel>
+                        <TextBlock x:Name="SessionStatusText" Foreground="#B8AA8C" TextWrapping="Wrap" Margin="0,7,0,0"/>
+                        <TextBlock x:Name="ObjectsNote" Text="Choose a room." Foreground="#AAB4BA" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                        <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,10,0,0">
+                            <TextBlock Text="INTERACTION" Foreground="#B78442" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock x:Name="ObjectActionNote" Foreground="#AAB4BA" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            <ScrollViewer MaxHeight="110" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel x:Name="ObjectVerbButtons" Margin="0,5,0,0"/>
+                            </ScrollViewer>
+                            <Expander x:Name="ObjectActionTraceExpander" Header="Advanced action details" Visibility="Collapsed"
+                                      Foreground="#E7E0D2" Background="#0B1117" Margin="0,5,0,0">
+                                <TextBox x:Name="ObjectActionTraceOutput" IsReadOnly="True" AcceptsReturn="True"
+                                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                         Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
+                                         FontFamily="Consolas" FontSize="11" Height="140"/>
+                            </Expander>
+                        </StackPanel>
+                        <StackPanel x:Name="RoomNavigationPanel" Visibility="Collapsed" Margin="0,12,0,0">
+                            <TextBlock Text="POSSIBLE DOORWAYS" Foreground="#B78442" FontSize="11" FontWeight="Bold"/>
+                            <ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel x:Name="RoomNavigationButtons" Margin="0,5,0,0"/>
+                            </ScrollViewer>
+                        </StackPanel>
+                        <StackPanel x:Name="RoomMusicPanel" Visibility="Collapsed" Margin="0,10,0,0">
+                            <TextBlock Text="ROOM MUSIC" Foreground="#B78442" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock x:Name="RoomCueTitle" Foreground="#E7E0D2" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                            <TextBlock x:Name="RoomCueEvidence" Foreground="#B8AA8C" TextWrapping="Wrap" FontSize="11" Margin="0,2,0,0"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <Button x:Name="RoomCuePlayButton" Content="▶" ToolTip="Play room cue" AutomationProperties.Name="Play room cue" Click="RoomCuePlay_Click" Width="38" Height="31" Margin="0,0,5,0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                <Button x:Name="RoomCuePauseButton" Content="Ⅱ" ToolTip="Pause room cue" AutomationProperties.Name="Pause room cue" Click="RoomCuePause_Click" Width="38" Height="31" Margin="0,0,5,0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                <Button x:Name="RoomCueStopButton" Content="■" ToolTip="Stop room cue" AutomationProperties.Name="Stop room cue" Click="RoomCueStop_Click" Width="38" Height="31" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                <TextBlock x:Name="RoomCueTime" Text="0:00 / 0:00" Foreground="#B8AA8C" VerticalAlignment="Center" Margin="9,0,0,0"/>
+                            </StackPanel>
+                            <TextBlock x:Name="RoomCueStatus" Foreground="#B8AA8C" FontSize="11" Margin="0,3,0,0"/>
+                            <TextBlock x:Name="RoomMusicNote" Foreground="#AAB4BA" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            <TextBlock Text="OTHER POSSIBLE MUSIC" Foreground="#B78442" FontSize="10" FontWeight="Bold" Margin="0,8,0,0"/>
+                            <ScrollViewer MaxHeight="90" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel x:Name="RoomMusicButtons" Margin="0,4,0,0"/>
+                            </ScrollViewer>
+                        </StackPanel>
+                        <Expander x:Name="RoomEntryTraceExpander" Header="Advanced room details"
+                                  Visibility="Collapsed" IsExpanded="False" Margin="0,10,0,0"
+                                  Foreground="#E7E0D2" Background="#0B1117">
+                            <StackPanel>
+                                <TextBox x:Name="RoomEntryTraceOutput" IsReadOnly="True" AcceptsReturn="True"
+                                         IsReadOnlyCaretVisible="True" TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                         Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
+                                         FontFamily="Consolas" FontSize="11" Padding="4" Height="150"/>
+                                <ScrollViewer MaxHeight="90" VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled" Margin="0,6,0,0">
+                                    <StackPanel x:Name="RoomEntryEventButtons"/>
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Expander>
+                        <Image x:Name="ObjectAssetPreview" Height="72" Stretch="Uniform" Visibility="Collapsed" Margin="0,12,0,0" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                        <TextBlock x:Name="ObjectAssetDescription" Foreground="#B8AA8C" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="ObjectList"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+        <Border Grid.Row="2" Grid.ColumnSpan="2" Background="#192632" BorderBrush="#334452" BorderThickness="0,1,0,0">
+            <TextBlock x:Name="FooterText" Text="No game loaded" Foreground="#9B927F" FontSize="11" Margin="14,0" VerticalAlignment="Center"/>
+        </Border>
+    </Grid>
+</Window>

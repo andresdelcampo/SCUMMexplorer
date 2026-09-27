@@ -1,0 +1,20 @@
+Entries=780; ranges=1419; unresolved=2; skipped=4
+Stored line=7
+Spoken line=639
+Object name=134
+Script 00: Script 00 declares 33139 bytes at 0x9E07, past the end of 01.LFL.
+Script 51: Script 51 declares 17151 bytes at 0x4775, past the end of 11.LFL.
+Script 55: Script 55 declares 25292 bytes at 0x41FB, past the end of 18.LFL.
+Script 116: Script 116 declares 65280 bytes at 0x6F67, past the end of 02.LFL.
+Room 70 / Local script 203 +0x0012: the instruction or its operands are truncated
+Room 70 / Local script 204 +0x0045: the instruction or its operands are truncated
+PASS: Gallery exposes every extracted entry
+PASS: Search narrows to matching original text
+PASS: Room 03 filter retains its cliff text
+PASS: Spanish accents render as Unicode in original dialogue
+PASS: Linked original room artwork renders
+PASS: Room visit action visible and keyboard focusable
+PASS: Visit room dispatch opens Room 03 in MainWindow
+PASS: Empty search clears previous text and room action
+PASS: Object-name filter includes extracted names
+Actual WPF windows rendered; synthetic routed button event used. Physical input not tested.

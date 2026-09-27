@@ -1,0 +1,12 @@
+[0000] (05) drawObject(926,255,255);
+[0007] (80) breakHere();
+[0008] (80) breakHere();
+[0009] (05) drawObject(927,255,255);
+[0010] (80) breakHere();
+[0011] (80) breakHere();
+[0012] (05) drawObject(928,255,255);
+[0019] (80) breakHere();
+[001A] (80) breakHere();
+[001B] (18) goto 0000;
+[001E] (A0) stopObjectCode();
+END

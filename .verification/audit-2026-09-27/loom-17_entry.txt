@@ -1,0 +1,36 @@
+[0000] (48) if (VAR_VIDEOMODE == 4) {
+[0007] (33)   RoomColor(1,2);
+[000D] (33)   RoomColor(15,14);
+[0013] (33)   RoomColor(0,7);
+[0019] (33)   RoomColor(14,10);
+[001F] (33)   RoomColor(15,11);
+[0025] (**) }
+[0025] (0A) startScript(16,[16]);
+[002B] (0A) startScript(17,[Var[124]]);
+[0031] (13) ActorOps(1,[TalkColor(207)]);
+[0036] (48) if (Var[112] == 70) {
+[003D] (78)   if (Var[171] < 5) {
+[0044] (0A)     startScript(203,[]);
+[0047] (78)   } else if (Var[171] < 8) {
+[0051] (0A)     startScript(204,[]);
+[0054] (18)   } else {
+[0057] (0A)     startScript(202,[]);
+[005A] (**)   }
+[005A] (48) } else if (Var[113] == 345) {
+[0064] (0A)   startScript(203,[]);
+[0067] (18) } else {
+[006A] (0A)   startScript(202,[]);
+[006D] (**) }
+[006D] (28) if (!Var[219 Bit 9]) {
+[0072] (0C)   Resource.loadCostume(73);
+[0075] (0C)   Resource.loadScript(68);
+[0078] (0C)   Resource.loadRoom(56);
+[007B] (**) }
+[007B] (28) if (!Var[214 Bit 14]) {
+[0080] (0A)   startScript(200,[]);
+[0083] (**) }
+[0083] (28) if (!Var[214 Bit 2]) {
+[0088] (2A)   startScript(201,[],F);
+[008B] (**) }
+[008B] (00) stopObjectCode();
+END

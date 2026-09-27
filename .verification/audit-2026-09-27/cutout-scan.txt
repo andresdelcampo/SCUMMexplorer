@@ -1,0 +1,82 @@
+room 06: bg hole 100% black under rect (80, 72, 40, 24) (obj 212 black 26%)
+room 06: bg hole 100% black under rect (184, 88, 40, 32) (obj 215 black 20%)
+room 06: bg hole 100% black under rect (224, 104, 8, 16) (obj 216 black 23%)
+room 06: bg hole 100% black under rect (192, 88, 32, 32) (obj 217 black 17%)
+room 06: bg hole 100% black under rect (16, 32, 24, 40) (obj 221 black 21%)
+room 06: bg hole 100% black under rect (72, 8, 24, 40) (obj 224 black 24%)
+room 06: bg hole 100% black under rect (224, 72, 8, 32) (obj 229 black 18%)
+room 06: bg hole 100% black under rect (232, 56, 32, 48) (obj 230 black 24%)
+room 06: bg hole 100% black under rect (40, 112, 48, 24) (obj 234 black 20%)
+room 13: bg hole 100% black under rect (64, 8, 80, 40) (obj 327 black 0%)
+room 13: bg hole 100% black under rect (40, 96, 104, 24) (obj 330 black 3%)
+room 15: bg hole 100% black under rect (48, 72, 48, 56) (obj 340 black 7%)
+room 15: bg hole 100% black under rect (160, 88, 56, 40) (obj 341 black 4%)
+room 17: bg hole 100% black under rect (248, 56, 48, 40) (obj 354 black 0%)
+room 17: bg hole 100% black under rect (184, 48, 40, 40) (obj 355 black 0%)
+room 17: bg hole 100% black under rect (216, 80, 40, 16) (obj 359 black 0%)
+room 17: bg hole 100% black under rect (208, 96, 56, 32) (obj 360 black 0%)
+room 19: obj 382 (#4 16x16@152,64) inside obj 381 (#3); container black under it 100%; order container first
+room 19: obj 383 (#5 16x16@152,64) inside obj 381 (#3); container black under it 100%; order container first
+room 19: obj 384 (#6 16x16@152,64) inside obj 381 (#3); container black under it 100%; order container first
+room 22: bg hole 100% black under rect (272, 72, 16, 16) (obj 406 black 0%)
+room 24: bg hole 100% black under rect (216, 96, 296, 16) (obj 435 black 1%)
+room 24: bg hole 100% black under rect (216, 96, 168, 16) (obj 436 black 0%)
+room 24: bg hole 100% black under rect (384, 96, 128, 16) (obj 438 black 4%)
+room 28: bg hole 100% black under rect (192, 88, 32, 16) (obj 476 black 22%)
+room 28: bg hole 100% black under rect (336, 48, 40, 88) (obj 480 black 18%)
+room 28: bg hole 100% black under rect (0, 0, 48, 40) (obj 497 black 4%)
+room 31: bg hole 100% black under rect (56, 88, 48, 56) (obj 527 black 25%)
+room 31: bg hole 100% black under rect (104, 96, 72, 48) (obj 528 black 10%)
+room 31: bg hole 100% black under rect (176, 128, 48, 16) (obj 529 black 0%)
+room 33: bg hole 100% black under rect (144, 56, 32, 80) (obj 545 black 2%)
+room 33: bg hole 100% black under rect (176, 64, 32, 72) (obj 546 black 0%)
+room 33: bg hole 100% black under rect (88, 56, 88, 80) (obj 547 black 15%)
+room 33: bg hole 100% black under rect (208, 64, 24, 72) (obj 549 black 1%)
+room 33: bg hole 100% black under rect (232, 88, 72, 48) (obj 550 black 18%)
+room 33: bg hole 100% black under rect (88, 56, 56, 80) (obj 551 black 22%)
+room 33: bg hole 100% black under rect (144, 56, 32, 40) (obj 552 black 13%)
+room 33: bg hole 100% black under rect (176, 64, 56, 72) (obj 553 black 12%)
+room 35: bg hole 100% black under rect (32, 32, 48, 64) (obj 590 black 25%)
+room 38: obj 612 (#4 64x24@144,104) inside obj 618 (#10); container black under it 100%; order overlay first
+room 38: obj 613 (#5 64x24@144,104) inside obj 618 (#10); container black under it 100%; order overlay first
+room 38: obj 614 (#6 64x24@144,104) inside obj 618 (#10); container black under it 100%; order overlay first
+room 38: obj 615 (#7 64x24@144,104) inside obj 618 (#10); container black under it 100%; order overlay first
+room 38: bg hole 100% black under rect (0, 0, 48, 40) (obj 619 black 6%)
+room 40: bg hole 100% black under rect (72, 112, 144, 16) (obj 624 black 19%)
+room 46: obj 687 (#7 32x64@872,16) inside obj 686 (#6); container black under it 98%; order container first
+room 46: obj 688 (#8 40x64@904,16) inside obj 686 (#6); container black under it 99%; order container first
+room 46: obj 689 (#9 40x64@904,16) inside obj 686 (#6); container black under it 99%; order container first
+room 46: obj 690 (#10 32x64@872,16) inside obj 686 (#6); container black under it 98%; order container first
+room 53: obj 767 (#4 48x16@240,48) inside obj 766 (#3); container black under it 100%; order container first
+room 53: obj 768 (#5 48x16@240,48) inside obj 766 (#3); container black under it 100%; order container first
+room 53: obj 769 (#6 48x16@240,48) inside obj 766 (#3); container black under it 100%; order container first
+room 53: bg hole 100% black under rect (184, 0, 136, 128) (obj 764 black 20%)
+room 55: bg hole 100% black under rect (184, 64, 56, 32) (obj 773 black 10%)
+room 55: bg hole 100% black under rect (184, 48, 56, 48) (obj 774 black 11%)
+room 55: bg hole 100% black under rect (184, 48, 56, 16) (obj 776 black 12%)
+room 56: obj 782 (#4 40x8@88,56) inside obj 779 (#1); container black under it 100%; order container first
+room 56: obj 783 (#5 40x8@88,56) inside obj 779 (#1); container black under it 100%; order container first
+room 56: obj 784 (#6 40x8@88,56) inside obj 779 (#1); container black under it 100%; order container first
+room 56: bg hole 100% black under rect (80, 40, 48, 56) (obj 779 black 13%)
+room 56: bg hole 100% black under rect (80, 40, 48, 24) (obj 780 black 3%)
+room 56: bg hole 100% black under rect (88, 56, 40, 8) (obj 782 black 3%)
+room 57: bg hole 100% black under rect (64, 56, 40, 16) (obj 787 black 5%)
+room 58: obj 793 (#4 40x16@216,24) inside obj 790 (#1); container black under it 100%; order container first
+room 58: obj 794 (#5 40x16@216,24) inside obj 790 (#1); container black under it 100%; order container first
+room 58: obj 795 (#6 40x16@216,24) inside obj 790 (#1); container black under it 100%; order container first
+room 58: bg hole 100% black under rect (184, 0, 104, 88) (obj 790 black 28%)
+room 58: bg hole 100% black under rect (216, 24, 40, 16) (obj 793 black 12%)
+room 60: bg hole 100% black under rect (200, 64, 32, 8) (obj 804 black 27%)
+room 68: bg hole 100% black under rect (168, 64, 40, 24) (obj 870 black 0%)
+room 68: bg hole 100% black under rect (232, 80, 24, 16) (obj 873 black 7%)
+room 79: bg hole 100% black under rect (112, 48, 16, 16) (obj 913 black 15%)
+room 86: obj 922 (#5 16x16@152,64) inside obj 921 (#4); container black under it 100%; order container first
+room 86: obj 923 (#6 16x16@152,64) inside obj 921 (#4); container black under it 100%; order container first
+room 86: obj 924 (#7 16x16@152,64) inside obj 921 (#4); container black under it 100%; order container first
+room 86: obj 922 (#5 16x16@152,64) inside obj 925 (#8); container black under it 100%; order overlay first
+room 86: obj 923 (#6 16x16@152,64) inside obj 925 (#8); container black under it 100%; order overlay first
+room 86: obj 924 (#7 16x16@152,64) inside obj 925 (#8); container black under it 100%; order overlay first
+room 86: obj 926 (#9 48x56@136,40) inside obj 925 (#8); container black under it 100%; order container first
+room 86: obj 927 (#10 48x56@136,40) inside obj 925 (#8); container black under it 100%; order container first
+room 86: obj 928 (#11 48x56@136,40) inside obj 925 (#8); container black under it 100%; order container first
+room 87: bg hole 100% black under rect (216, 56, 56, 16) (obj 929 black 26%)

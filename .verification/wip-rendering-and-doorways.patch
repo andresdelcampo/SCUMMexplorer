@@ -1,0 +1,1241 @@
+diff --git a/src/SCUMMexplorer.App/MainWindow.xaml.cs b/src/SCUMMexplorer.App/MainWindow.xaml.cs
+index d15a567..9ae972f 100644
+--- a/src/SCUMMexplorer.App/MainWindow.xaml.cs
++++ b/src/SCUMMexplorer.App/MainWindow.xaml.cs
+@@ -74,7 +74,10 @@ public partial class MainWindow : Window
+     private enum AudioSurface { None, Resource, Room }
+     private IReadOnlyDictionary<int, RoomImage> _costumePoses = new Dictionary<int, RoomImage>();
+     private sealed record RoomVerbDestination(LoomRoomObjectRecord Object, LoomObjectVerbEntry Verb,
+-        int TargetRoomId, int InstructionOffset);
++        int TargetRoomId, int InstructionOffset, string Path = "direct");
++    private LoomSceneDrawBatches? _sceneBatches;
++    private LoomDoorwayFinder? _doorwayFinder;
++    private IReadOnlyList<RoomArtworkEstimate> _artworkEstimates = [];
+     private sealed record RoomVerbChoice(LoomRoomObjectRecord Object, LoomObjectVerbEntry Verb);
+ 
+     public MainWindow()
+@@ -154,6 +157,8 @@ public partial class MainWindow : Window
+         _game = game;
+         _scriptReader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+         _verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
++        _sceneBatches = null;
++        _doorwayFinder = null;
+         _indexedObjectSnapshot = indexedSnapshot;
+         _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
+         _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot);
+@@ -493,9 +498,8 @@ public partial class MainWindow : Window
+         {
+             var snapshot = visit ? _session.VisitRoom(resource) : _session.Snapshot;
+             _objectSelection = new RoomObjectSelection(images, snapshot.ObjectStates,
+-                snapshot.ObjectPositions, records, _currentRoom, _indexedStates);
+-            if (visit && !snapshot.IsFaithful && !images.Any(_objectSelection.IsActive))
+-                _estimatedObjectIds = _objectSelection.ShowUnresolvedArtwork().ToHashSet();
++                snapshot.ObjectPositions, records, _currentRoom, _indexedStates, snapshot.DrawOrder);
++            if (!snapshot.IsFaithful) CloseArtworkGaps(resource, images);
+             var run = _session.LastEntryRun;
+             var script = _session.LastEntryScript;
+             RoomEntryTraceOutput.Text = (script?.Format() ?? "No embedded entry script.") +
+@@ -518,7 +522,7 @@ public partial class MainWindow : Window
+             AdvanceFrameButton.IsEnabled = snapshot.PendingScripts > 0;
+             ObjectsNote.Text = _estimatedObjectIds.Count == 0
+                 ? "Click a room image to cycle its artwork. Use possible doorway buttons to navigate and the hotspot list for script interactions."
+-                : $"{_estimatedObjectIds.Count} scene details use an artwork estimate because the entry state is unresolved. Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.";
++                : $"{_estimatedObjectIds.Count} scene details use an artwork estimate because the entry state is unresolved{EstimateSummary()}. Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.";
+             ShowLastObjectAction(resource.ResourceId);
+             return;
+         }
+@@ -529,6 +533,7 @@ public partial class MainWindow : Window
+         RoomEntryTraceExpander.Header = "Advanced room details";
+         AdvanceFrameButton.IsEnabled = false;
+         _objectSelection = new RoomObjectSelection(images, _indexedStates, background: _currentRoom);
++        _artworkEstimates = [];
+         ObjectsNote.Text = images.Count == 0
+             ? $"{records.Count} local object records; no decoded images. The room opens at its pre-entry index state."
+             : $"{records.Count} local object records, {images.Count} stored images. The display uses pre-entry index states, not the first-visit game view. Click an image area to inspect its stored images.";
+@@ -542,10 +547,9 @@ public partial class MainWindow : Window
+                 var run = _scriptExecutor.Execute(entryScript, _indexedStates, records);
+                 ShowScriptEvents(RoomEntryEventButtons, run.Events);
+                 _objectSelection = new RoomObjectSelection(images, run.ObjectStates,
+-                    run.ObjectPositions, background: _currentRoom);
+-                if ((run.UnresolvedReason is not null || run.ResumeOffset.HasValue) &&
+-                    !images.Any(_objectSelection.IsActive))
+-                    _estimatedObjectIds = _objectSelection.ShowUnresolvedArtwork().ToHashSet();
++                    run.ObjectPositions, background: _currentRoom, drawQueue: run.DrawOrder);
++                if (run.UnresolvedReason is not null || run.ResumeOffset.HasValue)
++                    CloseArtworkGaps(resource, images);
+                 RoomEntryTraceOutput.Text = entryScript.Format() + Environment.NewLine +
+                                             "BOUNDED INTERPRETATION" + Environment.NewLine + run.FormatSummary();
+                 RoomEntryTraceExpander.Visibility = Visibility.Visible;
+@@ -556,7 +560,7 @@ public partial class MainWindow : Window
+         }
+         catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
+         {
+-            _estimatedObjectIds = _objectSelection.ShowUnresolvedArtwork().ToHashSet();
++            CloseArtworkGaps(resource, images);
+             RoomEntryTraceOutput.Text = $"Room entry script could not be interpreted: {ex.Message}";
+             RoomEntryTraceExpander.Visibility = Visibility.Visible;
+             ObjectsNote.Text = $"{records.Count} local object records, {images.Count} stored images. The entry script is unavailable; {_estimatedObjectIds.Count} details use an artwork estimate.";
+@@ -564,6 +568,36 @@ public partial class MainWindow : Window
+         UpdateRoomMusicActions();
+     }
+ 
++    /// <summary>
++    /// Fills gaps the reached state leaves open: first with script draw batches
++    /// (the opening frame of a room loaded by a script is preferred), then with
++    /// a seeded random stored image. If nothing is visible at all, the
++    /// non-overlapping estimate is used as before. Estimates stay labelled.
++    /// </summary>
++    private void CloseArtworkGaps(GameResource resource, IReadOnlyList<RoomObjectImage> images)
++    {
++        if (_game is not null && _sceneBatches is null)
++        {
++            try { _sceneBatches = LoomSceneDrawBatches.Build(_game); }
++            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
++            {
++                _sceneBatches = LoomSceneDrawBatches.Empty;
++            }
++        }
++        var roomId = resource.ResourceId ?? 0;
++        _artworkEstimates = _objectSelection.FillGaps(_sceneBatches?.ForRoom(roomId), seed: roomId);
++        var estimated = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
++        if (!images.Any(_objectSelection.IsActive))
++            estimated.UnionWith(_objectSelection.ShowUnresolvedArtwork());
++        _estimatedObjectIds = estimated;
++    }
++
++    private string EstimateSummary()
++    {
++        var sources = _artworkEstimates.Select(item => item.Reason).Distinct().ToArray();
++        return sources.Length == 0 ? "" : $" (from {string.Join("; ", sources.Take(2))}{(sources.Length > 2 ? "; …" : "")})";
++    }
++
+     private void SessionMode_Changed(object sender, RoutedEventArgs e)
+     {
+         if (_currentRoomResource is not { } room || _currentRoom is null) return;
+@@ -1387,23 +1421,9 @@ public partial class MainWindow : Window
+     {
+         if (_currentRoom is null) return;
+         var room = _currentRoom;
+-        var pixels = room.Pixels.ToArray();
+-        // Old SCUMM paints local objects from the end of the room directory
+-        // toward the start. Preserve that order for overlapping images.
+-        for (var objectIndex = _objects.Count - 1; objectIndex >= 0; objectIndex--)
+-        {
+-            var obj = _objects[objectIndex];
+-            if (!_objectSelection.IsActive(obj)) continue;
+-            var position = _objectSelection.GetPosition(obj);
+-            var left = Math.Max(0, position.X);
+-            var right = Math.Min(room.Width, position.X + obj.Width);
+-            var top = Math.Max(0, position.Y);
+-            var bottom = Math.Min(room.Height, position.Y + obj.Height);
+-            for (var y = top; y < bottom; y++)
+-                if (left < right)
+-                    Array.Copy(obj.Pixels, (y - position.Y) * obj.Width + left - position.X,
+-                        pixels, y * room.Width + left, right - left);
+-        }
++        // SCUMM repaints active objects in reverse directory order, then
++        // paints queued drawObject calls on top in call order.
++        var pixels = _objectSelection.Compose(room);
+         var depthMask = room.DepthMask;
+         RoomMaskToggle.IsEnabled = depthMask is not null;
+         RoomMaskToggle.ToolTip = depthMask is null
+@@ -1510,6 +1530,21 @@ public partial class MainWindow : Window
+         {
+             var codeOnlyChoices = FindVerbChoicesAt(x, y)
+                 .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
++            var codeOnlyDestinations = FindNavigationCandidatesAt(x, y)
++                .Where(candidate => codeOnlyChoices.Any(choice => choice.Object.Id == candidate.Object.Id)).ToArray();
++            if (codeOnlyDestinations.Length > 0)
++            {
++                // A code-only exit: run its verb, and if the bounded run does
++                // not reach the room load, open the possible destination.
++                var exitVerb = codeOnlyDestinations[0];
++                if (codeOnlyDestinations.Length == 1)
++                {
++                    if (!ActivateObjectVerb(exitVerb.Object, exitVerb.Verb))
++                        OpenRoomDestination(exitVerb);
++                }
++                else ShowRoomDestinationChoices(codeOnlyDestinations);
++                return;
++            }
+             if (codeOnlyChoices.Length > 0)
+             {
+                 if (codeOnlyChoices.Length == 1)
+@@ -1576,6 +1611,14 @@ public partial class MainWindow : Window
+         {
+             var codeOnlyChoices = FindVerbChoicesAt(x, y)
+                 .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
++            var codeOnlyDestinations = FindNavigationCandidatesAt(x, y)
++                .Where(candidate => codeOnlyChoices.Any(choice => choice.Object.Id == candidate.Object.Id)).ToArray();
++            if (codeOnlyDestinations.Length > 0)
++            {
++                RoomPreview.Cursor = Cursors.Hand;
++                RoomPreview.ToolTip = $"Click to go to possible Room {string.Join(" or ", codeOnlyDestinations.Select(item => item.TargetRoomId.ToString("00")))}.";
++                return;
++            }
+             if (codeOnlyChoices.Length > 0)
+             {
+                 RoomPreview.Cursor = Cursors.Hand;
+@@ -1744,6 +1787,7 @@ public partial class MainWindow : Window
+             return;
+         }
+         var candidates = new List<RoomVerbDestination>();
++        _doorwayFinder ??= new LoomDoorwayFinder(_game);
+         foreach (var record in _currentRoomObjectRecords)
+         {
+             if (!_roomVerbs.TryGetValue(record.Id, out var verbs)) continue;
+@@ -1752,14 +1796,10 @@ public partial class MainWindow : Window
+                 LoomScriptDisassembly script;
+                 try { script = _verbReader.Decode(room, record, verb.VerbId); }
+                 catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
+-                foreach (var instruction in script.Instructions)
+-                {
+-                    var possible = LoomScriptEvent.FromInstruction(script, instruction,
+-                        LoomScriptEventCertainty.StaticPotential);
+-                    if (possible is not { Kind: LoomScriptEventKind.RoomLoaded, TargetId: int targetId } ||
+-                        !_game.Rooms.Any(item => item.ResourceId == targetId)) continue;
+-                    candidates.Add(new RoomVerbDestination(record, verb, targetId, instruction.Offset));
+-                }
++                // Follow started room-local and global scripts too: many exits
++                // (for example Room 03's town and cemetery paths) load the room there.
++                foreach (var target in _doorwayFinder.Find(room, script))
++                    candidates.Add(new RoomVerbDestination(record, verb, target.RoomId, target.InstructionOffset, target.Path));
+             }
+         }
+         _roomNavigationCandidates = candidates.DistinctBy(item =>
+@@ -1770,7 +1810,7 @@ public partial class MainWindow : Window
+             {
+                 Content = $"Open Room {candidate.TargetRoomId:00}",
+                 ToolTip = $"Static candidate: {room.Name} object {candidate.Object.Id} code 0x{candidate.Verb.ScriptOffset:X4}, " +
+-                          $"room-load instruction +0x{candidate.InstructionOffset:X4}. Open directly for exploration; script conditions and effects are not simulated.",
++                          $"room-load instruction +0x{candidate.InstructionOffset:X4} ({candidate.Path}). Open directly for exploration; script conditions and effects are not simulated.",
+                 HorizontalContentAlignment = HorizontalAlignment.Left,
+                 Padding = new Thickness(8, 5, 8, 5),
+                 Margin = new Thickness(0, 0, 0, 5),
+diff --git a/src/SCUMMexplorer.Core/Formats/LoomBoundedScriptExecutor.cs b/src/SCUMMexplorer.Core/Formats/LoomBoundedScriptExecutor.cs
+index b12be61..e97df75 100644
+--- a/src/SCUMMexplorer.Core/Formats/LoomBoundedScriptExecutor.cs
++++ b/src/SCUMMexplorer.Core/Formats/LoomBoundedScriptExecutor.cs
+@@ -13,8 +13,16 @@ public sealed record LoomBoundedScriptResult(
+     int InstructionsVisited,
+     bool ReachedStop,
+     string? UnresolvedReason,
+-    int? ResumeOffset = null)
++    int? ResumeOffset = null,
++    IReadOnlyList<int>? DrawQueue = null)
+ {
++    /// <summary>
++    /// Objects drawn by <c>drawObject</c> since the last redraw-causing
++    /// <c>setState</c>, in call order. SCUMM paints these over the room's
++    /// directory-order redraw.
++    /// </summary>
++    public IReadOnlyList<int> DrawOrder => DrawQueue ?? [];
++
+     public string FormatSummary()
+     {
+         var status = ResumeOffset.HasValue ? "paused at frame boundary" :
+@@ -76,6 +84,7 @@ public sealed class LoomBoundedScriptExecutor
+             knownVariables[key] = initialLocals is not null && initialLocals.TryGetValue(key, out var value)
+                 ? value : (ushort)0;
+         }
++        var drawQueue = runtime?.DrawQueue ?? new List<int>();
+         var trace = new List<string>();
+         var events = new List<LoomScriptEvent>();
+         var limitations = new HashSet<string>(StringComparer.Ordinal);
+@@ -209,6 +218,8 @@ public sealed class LoomBoundedScriptExecutor
+                     break;
+                 }
+                 states[(int)objectId] = (byte)state;
++                // o5_setState marks the rectangle dirty and clears the draw queue.
++                drawQueue.Clear();
+                 trace.Add($"object {objectId} set to state {state}");
+                 pc = next;
+                 continue;
+@@ -245,7 +256,7 @@ public sealed class LoomBoundedScriptExecutor
+             if (instruction.Operation == "drawObject")
+             {
+                 if (!TryApplyDrawObject(instruction.Operands, roomObjects, states, positions,
+-                        knownVariables, trace, out var detail))
++                        knownVariables, trace, drawQueue, out var detail))
+                 {
+                     unresolved = $"{detail} at +0x{instruction.Offset:X4}";
+                     break;
+@@ -291,7 +302,7 @@ public sealed class LoomBoundedScriptExecutor
+         if (runtime is not null) CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
+         return new LoomBoundedScriptResult(new Dictionary<int, byte>(states),
+             new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
+-            trace, events, visited, reachedStop, unresolved, resumeOffset);
++            trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray());
+     }
+ 
+     private static void CopyGlobalVariables(IReadOnlyDictionary<string, ushort> source,
+@@ -450,7 +461,7 @@ public sealed class LoomBoundedScriptExecutor
+     private static bool TryApplyDrawObject(string operands, IReadOnlyList<LoomRoomObjectRecord> roomObjects,
+         IDictionary<int, byte> states, IDictionary<int, RoomObjectPosition> positions,
+         IDictionary<string, ushort> variables, ICollection<string> trace,
+-        out string detail)
++        ICollection<int> drawQueue, out string detail)
+     {
+         var parts = operands.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+         if (parts.Length == 0 || !TryReadValue(parts[0], variables, out var rawId, out _))
+@@ -502,6 +513,7 @@ public sealed class LoomBoundedScriptExecutor
+             if (states.ContainsKey(peer.Id)) states[peer.Id] = 0;
+         }
+         states[objectId] = state;
++        drawQueue.Add(objectId);
+         trace.Add($"object {objectId} drawn at {position.X},{position.Y} in state {state}");
+         detail = "known state";
+         return true;
+diff --git a/src/SCUMMexplorer.Core/Formats/LoomDoorwayFinder.cs b/src/SCUMMexplorer.Core/Formats/LoomDoorwayFinder.cs
+new file mode 100644
+index 0000000..2d65597
+--- /dev/null
++++ b/src/SCUMMexplorer.Core/Formats/LoomDoorwayFinder.cs
+@@ -0,0 +1,136 @@
++using System.Globalization;
++using System.Text.RegularExpressions;
++using SCUMMexplorer.Core.Domain;
++
++namespace SCUMMexplorer.Core.Formats;
++
++/// <summary>A possible room destination reached statically from an object verb.</summary>
++public sealed record LoomDoorwayTarget(int RoomId, int InstructionOffset, string Path);
++
++/// <summary>
++/// Finds room loads that an object verb can reach, directly or through the
++/// scripts it starts. Room-local scripts often hold the actual exit (for
++/// example LOOM Room 03 objects 161–164 start local scripts 200–202, which load
++/// Rooms 04, 05 and 10). Global scripts are followed only for
++/// <c>loadRoomWithEgo</c>, the ego's own room change, so cutscenes that visit
++/// other rooms are not mistaken for doorways. Literal script arguments are
++/// substituted for the callee's locals. All results are possible destinations;
++/// their conditions are not evaluated.
++/// </summary>
++public sealed class LoomDoorwayFinder
++{
++    private const int MaxDepth = 3;
++    private static readonly Regex Literal = new(@"^0x(?<value>[0-9A-Fa-f]+)$", RegexOptions.CultureInvariant);
++    private static readonly Regex LocalVariable = new(@"^local\[0x(?<index>[0-9A-Fa-f]+)\]$", RegexOptions.CultureInvariant);
++    private readonly GameLibrary _game;
++    private readonly LoomScriptReader _reader;
++    private readonly int _globalScriptCount;
++    private readonly Dictionary<string, LoomScriptDisassembly?> _cache = [];
++
++    public LoomDoorwayFinder(GameLibrary game)
++    {
++        _game = game ?? throw new ArgumentNullException(nameof(game));
++        _reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
++        var indexPath = Path.Combine(game.FolderPath, "00.LFL");
++        try
++        {
++            _globalScriptCount = File.Exists(indexPath)
++                ? new LflIndexReader().ReadDeclaredScriptCount(indexPath)
++                : DefaultScriptCount(game);
++        }
++        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException)
++        {
++            _globalScriptCount = DefaultScriptCount(game);
++        }
++    }
++
++    public IReadOnlyList<LoomDoorwayTarget> Find(GameResource room, LoomScriptDisassembly verbScript)
++    {
++        ArgumentNullException.ThrowIfNull(room);
++        ArgumentNullException.ThrowIfNull(verbScript);
++        var results = new List<LoomDoorwayTarget>();
++        Walk(room, verbScript, null, 0, "", allowPlainLoad: true, [], results);
++        return results.DistinctBy(item => item.RoomId).ToArray();
++    }
++
++    private void Walk(GameResource room, LoomScriptDisassembly script, IReadOnlyDictionary<int, int>? locals,
++        int depth, string path, bool allowPlainLoad, HashSet<string> visiting, List<LoomDoorwayTarget> results)
++    {
++        foreach (var instruction in script.Instructions)
++        {
++            if (instruction.Operation is "loadRoom" or "loadRoomWithEgo")
++            {
++                if (instruction.Operation == "loadRoom" && !allowPlainLoad) continue;
++                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
++                var operand = instruction.Operation == "loadRoom" ? parts[0] : parts.ElementAtOrDefault(1) ?? "";
++                if (TryResolve(operand, locals, out var target) &&
++                    _game.Rooms.Any(item => item.ResourceId == target) && target != room.ResourceId)
++                    results.Add(new LoomDoorwayTarget(target, instruction.Offset,
++                        path.Length == 0 ? "direct" : path.TrimStart(' ', '→')));
++                continue;
++            }
++            if (depth >= MaxDepth || instruction.Operation is not ("startScript" or "chainScript")) continue;
++            var split = instruction.Operands.Split(',', 2, StringSplitOptions.TrimEntries);
++            if (!TryResolve(split[0], locals, out var scriptId)) continue;
++            var arguments = ReadArguments(split.ElementAtOrDefault(1), locals);
++            var isLocal = scriptId >= _globalScriptCount;
++            var key = isLocal ? $"{room.ResourceId}:{scriptId}" : $"g:{scriptId}";
++            if (!visiting.Add(key)) continue;
++            var child = Load(room, scriptId, isLocal, key);
++            if (child is not null)
++                Walk(room, child, arguments, depth + 1,
++                    $"{path} → {(isLocal ? "local" : "global")} script {scriptId}", allowPlainLoad && isLocal,
++                    visiting, results);
++            visiting.Remove(key);
++        }
++    }
++
++    private LoomScriptDisassembly? Load(GameResource room, int scriptId, bool isLocal, string key)
++    {
++        if (_cache.TryGetValue(key, out var cached)) return cached;
++        LoomScriptDisassembly? script = null;
++        try
++        {
++            if (isLocal) script = _reader.DecodeRoomLocalScript(room, scriptId, _globalScriptCount);
++            else if (_game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script &&
++                         item.ResourceId == scriptId) is { } resource)
++                script = _reader.Decode(resource);
++        }
++        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException)
++        {
++            script = null;
++        }
++        _cache[key] = script;
++        return script;
++    }
++
++    private static Dictionary<int, int>? ReadArguments(string? list, IReadOnlyDictionary<int, int>? locals)
++    {
++        if (list is null) return null;
++        var open = list.IndexOf('[');
++        var close = list.LastIndexOf(']');
++        if (open < 0 || close <= open) return null;
++        var values = new Dictionary<int, int>();
++        var items = list[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
++        for (var index = 0; index < items.Length; index++)
++            if (TryResolve(items[index], locals, out var value)) values[index] = value;
++        return values;
++    }
++
++    private static bool TryResolve(string operand, IReadOnlyDictionary<int, int>? locals, out int value)
++    {
++        value = 0;
++        var text = operand.Trim();
++        var literal = Literal.Match(text);
++        if (literal.Success)
++            return int.TryParse(literal.Groups["value"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out value);
++        var local = LocalVariable.Match(text);
++        return local.Success && locals is not null &&
++               int.TryParse(local.Groups["index"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var index) &&
++               locals.TryGetValue(index, out value);
++    }
++
++    private static int DefaultScriptCount(GameLibrary game) =>
++        game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
++            .Select(item => item.ResourceId!.Value).DefaultIfEmpty(-1).Max() + 1;
++}
+diff --git a/src/SCUMMexplorer.Core/Formats/LoomExplorationSession.cs b/src/SCUMMexplorer.Core/Formats/LoomExplorationSession.cs
+index 377f723..f97e053 100644
+--- a/src/SCUMMexplorer.Core/Formats/LoomExplorationSession.cs
++++ b/src/SCUMMexplorer.Core/Formats/LoomExplorationSession.cs
+@@ -14,8 +14,12 @@ public sealed record LoomSessionSnapshot(
+     bool InventoryKnown,
+     IReadOnlyCollection<int> ActiveSounds,
+     int PendingScripts,
+-    IReadOnlyList<string> Uncertainties)
++    IReadOnlyList<string> Uncertainties,
++    IReadOnlyList<int>? DrawQueue = null)
+ {
++    /// <summary>Objects drawn since the last redraw, in call order (painted over directory order).</summary>
++    public IReadOnlyList<int> DrawOrder => DrawQueue ?? [];
++
+     public bool IsFaithful => RoomId.HasValue && PendingScripts == 0 && Uncertainties.Count == 0;
+ }
+ 
+@@ -85,7 +89,8 @@ public sealed class LoomExplorationSession
+         _runtime.GlobalVariables.ContainsKey("var[0x001]"),
+         _runtime.ActiveSounds.Order().ToArray(),
+         _pending.Count,
+-        _uncertainties.ToArray());
++        _uncertainties.ToArray(),
++        _runtime.DrawQueue.ToArray());
+ 
+     private int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue("var[0x001]", out var ego)
+         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
+@@ -109,6 +114,8 @@ public sealed class LoomExplorationSession
+         }
+ 
+         _currentRoom = room;
++        // startScene clears the draw queue before the entry scripts run.
++        _runtime.DrawQueue.Clear();
+         _currentObjects = _objects.Decode(File.ReadAllBytes(room.FilePath));
+         foreach (var item in _currentObjects)
+             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
+diff --git a/src/SCUMMexplorer.Core/Formats/LoomSceneDrawBatches.cs b/src/SCUMMexplorer.Core/Formats/LoomSceneDrawBatches.cs
+new file mode 100644
+index 0000000..7e06d00
+--- /dev/null
++++ b/src/SCUMMexplorer.Core/Formats/LoomSceneDrawBatches.cs
+@@ -0,0 +1,217 @@
++using System.Globalization;
++using System.Text.RegularExpressions;
++using SCUMMexplorer.Core.Domain;
++using SCUMMexplorer.Core.Rendering;
++
++namespace SCUMMexplorer.Core.Formats;
++
++/// <summary>
++/// Collects the <c>drawObject</c> runs stored in a game's scripts, grouped by the
++/// room that owns the drawn objects. A run ends at a frame break, a jump or
++/// branch, a stop or a room load, so its images appear together on screen.
++/// The draws directly after a literal <c>loadRoom</c> are that room's opening
++/// frame, the strongest static evidence of what a first visit shows. These
++/// batches are static candidates used to close gaps; they do not prove which
++/// branch runs.
++/// </summary>
++public sealed class LoomSceneDrawBatches
++{
++    public const int OpeningFramePriority = 3;
++    public const int EntryScriptPriority = 2;
++    public const int OtherScriptPriority = 1;
++
++    private static readonly Regex Literal = new(@"^0x(?<value>[0-9A-Fa-f]+)$", RegexOptions.CultureInvariant);
++    private readonly IReadOnlyDictionary<int, IReadOnlyList<RoomDrawBatch>> _byRoom;
++
++    private LoomSceneDrawBatches(IReadOnlyDictionary<int, IReadOnlyList<RoomDrawBatch>> byRoom) => _byRoom = byRoom;
++
++    public static LoomSceneDrawBatches Empty { get; } = new(new Dictionary<int, IReadOnlyList<RoomDrawBatch>>());
++
++    public IReadOnlyList<RoomDrawBatch> ForRoom(int roomId) =>
++        _byRoom.TryGetValue(roomId, out var batches) ? batches : [];
++
++    public static LoomSceneDrawBatches Build(GameLibrary game)
++    {
++        ArgumentNullException.ThrowIfNull(game);
++        if (game.Version != ScummVersion.V3) return Empty;
++        var dialect = ScummScriptDialects.For(game.Id);
++        var reader = new LoomScriptReader(dialect);
++        var verbReader = new LoomObjectVerbReader(dialect);
++        var directory = new LoomRoomObjectDirectory();
++
++        var roomByObject = new Dictionary<int, int>();
++        var roomRecords = new Dictionary<int, (GameResource Room, IReadOnlyList<LoomRoomObjectRecord> Records, byte[] Bytes)>();
++        foreach (var room in game.Rooms.Where(item => item.ResourceId.HasValue))
++        {
++            try
++            {
++                var bytes = File.ReadAllBytes(room.FilePath);
++                var records = directory.Decode(bytes);
++                roomRecords[room.ResourceId!.Value] = (room, records, bytes);
++                foreach (var record in records) roomByObject.TryAdd(record.Id, room.ResourceId.Value);
++            }
++            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
++        }
++
++        var byRoom = new Dictionary<int, List<RoomDrawBatch>>();
++        void Scan(LoomScriptDisassembly? script, int priority, string source)
++        {
++            if (script is null) return;
++            foreach (var (roomId, batch) in ScanScript(script, priority, source, roomByObject))
++            {
++                if (!byRoom.TryGetValue(roomId, out var list)) byRoom[roomId] = list = [];
++                list.Add(batch);
++            }
++        }
++
++        foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
++        {
++            try { Scan(reader.Decode(resource), OtherScriptPriority, $"script {resource.ResourceId:00}"); }
++            catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
++        }
++
++        var globalCount = ReadGlobalScriptCount(game);
++        foreach (var (roomId, (room, records, bytes)) in roomRecords)
++        {
++            try { Scan(reader.DecodeRoomEntry(room), EntryScriptPriority, $"Room {roomId:00} entry script"); }
++            catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
++            foreach (var localId in ReadLocalScriptIds(bytes, globalCount))
++            {
++                try { Scan(reader.DecodeRoomLocalScript(room, localId, globalCount), OtherScriptPriority,
++                    $"Room {roomId:00} local script {localId}"); }
++                catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
++            }
++            IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> tables;
++            try { tables = verbReader.ReadAll(bytes, records); }
++            catch (Exception ex) when (ex is InvalidDataException or ArgumentException) { continue; }
++            foreach (var record in records)
++            {
++                if (!tables.TryGetValue(record.Id, out var verbs)) continue;
++                foreach (var verb in verbs.DistinctBy(item => item.ScriptOffset))
++                {
++                    try { Scan(verbReader.Decode(room, record, verb.VerbId), OtherScriptPriority,
++                        $"Room {roomId:00} object {record.Id} {verb.Label}"); }
++                    catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
++                }
++            }
++        }
++
++        return new LoomSceneDrawBatches(byRoom.ToDictionary(pair => pair.Key,
++            pair => (IReadOnlyList<RoomDrawBatch>)pair.Value));
++    }
++
++    internal static IEnumerable<(int RoomId, RoomDrawBatch Batch)> ScanScript(LoomScriptDisassembly script,
++        int priority, string source, IReadOnlyDictionary<int, int> roomByObject)
++    {
++        var results = new List<(int, RoomDrawBatch)>();
++        var steps = new List<RoomDrawStep>();
++        int? loadedRoom = null;
++        var batchStart = 0;
++
++        void Flush()
++        {
++            if (steps.Count > 0)
++            {
++                foreach (var group in steps.Where(step => roomByObject.ContainsKey(step.ObjectId))
++                             .GroupBy(step => roomByObject[step.ObjectId]))
++                {
++                    var opening = loadedRoom == group.Key;
++                    results.Add((group.Key, new RoomDrawBatch(group.ToArray(),
++                        opening ? OpeningFramePriority : priority,
++                        opening ? $"opening frame of Room {group.Key:00} in {source} +0x{batchStart:X4}"
++                                : $"{source} +0x{batchStart:X4}")));
++                }
++            }
++            steps.Clear();
++        }
++
++        foreach (var instruction in script.Instructions)
++        {
++            switch (instruction.Operation)
++            {
++                case "drawObject":
++                    if (TryReadDraw(instruction.Operands, out var step))
++                    {
++                        if (steps.Count == 0) batchStart = instruction.Offset;
++                        steps.Add(step);
++                    }
++                    break;
++                case "loadRoom":
++                case "loadRoomWithEgo":
++                    Flush();
++                    var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
++                    var roomOperand = instruction.Operation == "loadRoom" ? parts[0] : parts.ElementAtOrDefault(1) ?? "";
++                    loadedRoom = TryReadLiteral(roomOperand, out var room) ? room : null;
++                    break;
++                case "breakHere":
++                case "stopObjectCode":
++                case "jumpRelative":
++                case "isGreaterEqual" or "isNotEqual" or "isLessEqual" or "isLess" or "isEqual" or "isGreater" or
++                    "equalZero" or "notEqualZero" or "ifClassOfIs" or "isActorInBox" or "ifState" or "ifNotState":
++                    Flush();
++                    loadedRoom = null;
++                    break;
++                case "setState":
++                    // A redraw separates what was drawn before from what follows.
++                    Flush();
++                    break;
++            }
++        }
++        Flush();
++        return results;
++    }
++
++    private static bool TryReadDraw(string operands, out RoomDrawStep step)
++    {
++        step = default;
++        var parts = operands.Split(',', StringSplitOptions.TrimEntries);
++        if (parts.Length == 0 || !TryReadLiteral(parts[0], out var id)) return false;
++        int? x = null, y = null;
++        if (parts.Length >= 4 && parts[1] == "at" && TryReadLiteral(parts[2], out var tileX) &&
++            TryReadLiteral(parts[3], out var tileY) && tileX != 0xFF)
++        {
++            x = tileX * 8;
++            y = tileY * 8;
++        }
++        else if (parts.Length >= 4 && parts[1] == "at" && !(TryReadLiteral(parts[2], out _) && TryReadLiteral(parts[3], out _)))
++            return false;
++        step = new RoomDrawStep(id, x, y);
++        return true;
++    }
++
++    private static bool TryReadLiteral(string text, out int value)
++    {
++        value = 0;
++        var match = Literal.Match(text.Trim());
++        return match.Success && int.TryParse(match.Groups["value"].Value, NumberStyles.HexNumber,
++            CultureInfo.InvariantCulture, out value);
++    }
++
++    private static int ReadGlobalScriptCount(GameLibrary game)
++    {
++        var indexPath = Path.Combine(game.FolderPath, "00.LFL");
++        try
++        {
++            if (File.Exists(indexPath)) return new LflIndexReader().ReadDeclaredScriptCount(indexPath);
++        }
++        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException) { }
++        return game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
++                   .Select(item => item.ResourceId!.Value).DefaultIfEmpty(-1).Max() + 1;
++    }
++
++    internal static IReadOnlyList<int> ReadLocalScriptIds(byte[] encoded, int globalScriptCount)
++    {
++        var data = LflEncoding.DecodeXorFF(encoded);
++        if (data.Length < 29) return [];
++        var roomEnd = data[0] | data[1] << 8;
++        var cursor = 29 + data[20] * 4 + data[23] + data[24];
++        if (roomEnd > data.Length || cursor >= roomEnd) return [];
++        var found = new List<int>();
++        while (cursor < roomEnd - 2 && data[cursor] != 0)
++        {
++            if (data[cursor] >= globalScriptCount) found.Add(data[cursor]);
++            cursor += 3;
++        }
++        return found.Distinct().ToArray();
++    }
++}
+diff --git a/src/SCUMMexplorer.Core/Formats/LoomScriptRuntimeState.cs b/src/SCUMMexplorer.Core/Formats/LoomScriptRuntimeState.cs
+index 38a7556..9fb7aea 100644
+--- a/src/SCUMMexplorer.Core/Formats/LoomScriptRuntimeState.cs
++++ b/src/SCUMMexplorer.Core/Formats/LoomScriptRuntimeState.cs
+@@ -22,4 +22,6 @@ public sealed class LoomScriptRuntimeState
+     public Dictionary<string, ushort> GlobalVariables { get; } = new(StringComparer.Ordinal);
+     public HashSet<int> Inventory { get; } = [];
+     public HashSet<int> ActiveSounds { get; } = [];
++    /// <summary>drawObject calls since the last room entry or setState, in call order.</summary>
++    public List<int> DrawQueue { get; } = [];
+ }
+diff --git a/src/SCUMMexplorer.Core/Rendering/RoomObjectSelection.cs b/src/SCUMMexplorer.Core/Rendering/RoomObjectSelection.cs
+index 92e567a..18668c5 100644
+--- a/src/SCUMMexplorer.Core/Rendering/RoomObjectSelection.cs
++++ b/src/SCUMMexplorer.Core/Rendering/RoomObjectSelection.cs
+@@ -2,13 +2,33 @@ namespace SCUMMexplorer.Core.Rendering;
+ 
+ public readonly record struct RoomObjectPosition(int X, int Y);
+ 
++/// <summary>One <c>drawObject</c> call found in stored script code; X/Y are room pixels when the call moves the object.</summary>
++public readonly record struct RoomDrawStep(int ObjectId, int? X = null, int? Y = null);
++
+ /// <summary>
+-/// Holds each object's state and current position. Script operations can set a
+-/// state directly or draw after moving and clearing exact-bounds peers. Viewer
+-/// clicks inspect those peers in directory order, then state zero.
++/// A run of <c>drawObject</c> calls that a script makes within one frame.
++/// Higher priority batches carry stronger first-visit evidence, for example
++/// the frame drawn right after a script loads the room.
++/// </summary>
++public sealed record RoomDrawBatch(IReadOnlyList<RoomDrawStep> Steps, int Priority, string Source);
++
++/// <summary>An image shown to close a gap that the reached script state left open.</summary>
++public sealed record RoomArtworkEstimate(int ObjectId, string Reason);
++
++/// <summary>
++/// Holds each object's state, current position and paint order. SCUMM
++/// repaints active objects in reverse room-directory order whenever the room is
++/// redrawn, then paints queued <c>drawObject</c> calls on top in call order.
++/// <c>setState</c> causes a redraw and clears that queue. Viewer clicks act as
++/// <c>drawObject</c> calls.
+ /// </summary>
+ public sealed class RoomObjectSelection
+ {
++    private const double GapInsideBlack = 0.9;
++    private const double GapRingBlack = 0.6;
++    private const double CandidateMaxBlack = 0.6;
++    private const double CutoutBlack = 0.9;
++
+     private readonly IReadOnlyList<RoomObjectImage> _objects;
+     private readonly Dictionary<int, byte> _states;
+     private readonly HashSet<int> _knownStates = [];
+@@ -17,16 +37,21 @@ public sealed class RoomObjectSelection
+     private readonly IReadOnlyDictionary<int, LoomRoomObjectRecord>? _recordsById;
+     private readonly IReadOnlyDictionary<int, LoomRoomObjectRecord>? _recordsByLocalIndex;
+     private readonly RoomImage? _background;
++    private readonly List<int> _drawQueue = [];
++    private readonly Dictionary<int, double> _blackFractions = [];
++    private IReadOnlyList<RoomDrawBatch> _batches = [];
++    private int _seed;
+ 
+     public RoomObjectSelection(IReadOnlyList<RoomObjectImage> objects,
+         IReadOnlyDictionary<int, byte>? initialStates = null,
+         IReadOnlyDictionary<int, RoomObjectPosition>? initialPositions = null,
+         IReadOnlyList<LoomRoomObjectRecord>? roomRecords = null,
+         RoomImage? background = null,
+-        IReadOnlyDictionary<int, byte>? indexedStates = null)
++        IReadOnlyDictionary<int, byte>? indexedStates = null,
++        IReadOnlyList<int>? drawQueue = null)
+     {
+         _objects = objects;
+-        _background = background;
++        _background = background is { IsValid: true } ? background : null;
+         if (roomRecords is not null)
+         {
+             _recordsById = roomRecords.ToDictionary(record => record.Id);
+@@ -53,6 +78,9 @@ public sealed class RoomObjectSelection
+                         initialStates.TryGetValue(record.Id, out var recordState) ? recordState : (byte)0;
+                     if (known) _knownStates.Add(record.Id);
+                 }
++        if (drawQueue is not null)
++            foreach (var id in drawQueue)
++                if (_positions.ContainsKey(id)) Enqueue(id);
+         foreach (var obj in objects)
+         {
+             RememberBackgroundIfEmpty(obj);
+@@ -62,6 +90,9 @@ public sealed class RoomObjectSelection
+         }
+     }
+ 
++    /// <summary>Objects drawn since the last redraw, in call order.</summary>
++    public IReadOnlyList<int> DrawQueue => _drawQueue;
++
+     public bool IsActive(RoomObjectImage obj)
+     {
+         return _states.TryGetValue(obj.Id, out var state) && (state & 0x0F) != 0 &&
+@@ -86,8 +117,49 @@ public sealed class RoomObjectSelection
+ 
+     public bool HasAlternatives(RoomObjectImage obj) => Peers(obj).Count(ParentStateMatches) > 1;
+ 
++    /// <summary>
++    /// Hiding is offered when the room background behind the image has no
++    /// cut-out gap. Without a decoded background, the index must show that
++    /// the position can be empty.
++    /// </summary>
+     public bool CanShowBackground(RoomObjectImage obj) =>
+-        _backgroundPossible.Contains(obj.Id) && HasBackgroundArtwork(obj);
++        _background is null ? _backgroundPossible.Contains(obj.Id) : !IsBackgroundGap(obj);
++
++    /// <summary>
++    /// Active images from bottom to top: a directory-order redraw of every
++    /// active image, then queued <c>drawObject</c> calls in call order.
++    /// </summary>
++    public IReadOnlyList<RoomObjectImage> PaintOrder()
++    {
++        var byId = _objects.GroupBy(obj => obj.Id).ToDictionary(group => group.Key, group => group.First());
++        var queued = new List<RoomObjectImage>();
++        var seen = new HashSet<int>();
++        for (var index = _drawQueue.Count - 1; index >= 0; index--)
++        {
++            var id = _drawQueue[index];
++            if (!seen.Add(id) || !byId.TryGetValue(id, out var obj) || !IsActive(obj)) continue;
++            queued.Insert(0, obj);
++        }
++        var order = new List<RoomObjectImage>();
++        // Old SCUMM paints local objects from the end of the room directory
++        // toward the start, so an earlier directory entry covers a later one.
++        for (var index = _objects.Count - 1; index >= 0; index--)
++        {
++            var obj = _objects[index];
++            if (IsActive(obj) && !seen.Contains(obj.Id)) order.Add(obj);
++        }
++        order.AddRange(queued);
++        return order;
++    }
++
++    /// <summary>Paints the active images over a copy of the room background.</summary>
++    public byte[] Compose(RoomImage room)
++    {
++        ArgumentNullException.ThrowIfNull(room);
++        var pixels = room.Pixels.ToArray();
++        foreach (var obj in PaintOrder()) Paint(obj, pixels, room.Width, room.Height);
++        return pixels;
++    }
+ 
+     /// <summary>
+     /// Supplies a reproducible artwork estimate where a partial script run
+@@ -110,6 +182,147 @@ public sealed class RoomObjectSelection
+         return added;
+     }
+ 
++    /// <summary>
++    /// Closes visible gaps: rectangles that show solid colour 0 while the
++    /// surrounding pixels do not, where stored images of that exact size can
++    /// fill them. A gap is closed by repainting an already active image, then
++    /// by the strongest script draw batch that includes one of its images
++    /// (applied as a whole so images that are drawn together stay together),
++    /// and otherwise by a seeded random choice. Larger gaps are filled first
++    /// so a container is chosen before the inserts in its cut-outs.
++    /// </summary>
++    public IReadOnlyList<RoomArtworkEstimate> FillGaps(IReadOnlyList<RoomDrawBatch>? batches = null, int seed = 0)
++    {
++        _batches = batches ?? _batches;
++        _seed = seed;
++        return FillGapsWithin(null);
++    }
++
++    private List<RoomArtworkEstimate> FillGapsWithin((int X, int Y, int Width, int Height)? region)
++    {
++        var estimates = new List<RoomArtworkEstimate>();
++        if (_background is null) return estimates;
++        var random = new Random(_seed);
++        var tried = new HashSet<(int, int, int, int)>();
++        for (var iteration = 0; iteration < 256; iteration++)
++        {
++            var composite = Compose(_background);
++            var gap = FindGap(composite, region, tried);
++            if (gap is null) break;
++            var rect = Rect(gap[0]);
++            tried.Add(rect);
++
++            var active = gap.FirstOrDefault(IsActive);
++            if (active is not null)
++            {
++                Enqueue(active.Id);
++                continue;
++            }
++
++            var memberIds = gap.Select(obj => obj.Id).ToHashSet();
++            var batch = _batches.Where(item => item.Steps.Any(step => memberIds.Contains(step.ObjectId)))
++                .GroupBy(item => item.Priority).OrderByDescending(group => group.Key)
++                .Select(group => group.OrderBy(item => item.Source, StringComparer.Ordinal).ToArray())
++                .FirstOrDefault();
++            if (batch is { Length: > 0 })
++            {
++                var chosen = batch[random.Next(batch.Length)];
++                foreach (var step in chosen.Steps)
++                {
++                    var obj = _objects.FirstOrDefault(item => item.Id == step.ObjectId);
++                    if (obj is null || !ParentStateMatches(obj)) continue;
++                    // Keep reached state elsewhere: only fill this gap or
++                    // positions that currently show nothing.
++                    if (!memberIds.Contains(obj.Id) && Peers(obj).Any(IsActive)) continue;
++                    if (DrawObject(obj.Id, step.X, step.Y))
++                        estimates.Add(new RoomArtworkEstimate(obj.Id, chosen.Source));
++                }
++                if (gap.Any(IsActive)) continue;
++            }
++
++            var candidates = gap.Where(obj => ParentStateMatches(obj) && BlackFraction(obj) <= CandidateMaxBlack).ToArray();
++            if (candidates.Length == 0) continue;
++            var pick = candidates[random.Next(candidates.Length)];
++            if (DrawObject(pick.Id))
++                estimates.Add(new RoomArtworkEstimate(pick.Id, "random choice among the images stored for this position"));
++        }
++        return estimates;
++    }
++
++    private List<RoomObjectImage>? FindGap(byte[] composite, (int X, int Y, int Width, int Height)? region,
++        HashSet<(int, int, int, int)> tried)
++    {
++        List<RoomObjectImage>? best = null;
++        var bestArea = -1;
++        foreach (var group in _objects.GroupBy(Rect))
++        {
++            var rect = group.Key;
++            if (tried.Contains(rect)) continue;
++            if (region is { } area && (rect.Item1 < area.X || rect.Item2 < area.Y ||
++                                       rect.Item1 + rect.Item3 > area.X + area.Width ||
++                                       rect.Item2 + rect.Item4 > area.Y + area.Height)) continue;
++            var members = group.ToList();
++            if (!members.Any(obj => ParentStateMatches(obj) && BlackFraction(obj) <= CandidateMaxBlack)) continue;
++            if (!IsGap(composite, rect)) continue;
++            var size = rect.Item3 * rect.Item4;
++            if (size <= bestArea) continue;
++            best = members;
++            bestArea = size;
++        }
++        return best;
++    }
++
++    private bool IsGap(byte[] pixels, (int X, int Y, int Width, int Height) rect)
++    {
++        if (_background is null) return false;
++        var (inside, ring) = BlackFractions(pixels, _background.Width, _background.Height, rect);
++        return inside >= GapInsideBlack && ring <= GapRingBlack;
++    }
++
++    private bool IsBackgroundGap(RoomObjectImage obj)
++    {
++        if (_background is null) return false;
++        var (inside, ring) = BlackFractions(_background.Pixels.ToArray(), _background.Width, _background.Height, Rect(obj));
++        return inside >= 0.5 && ring <= GapRingBlack;
++    }
++
++    private static (double Inside, double Ring) BlackFractions(byte[] pixels, int width, int height,
++        (int X, int Y, int Width, int Height) rect)
++    {
++        var left = Math.Max(0, rect.X);
++        var right = Math.Min(width, rect.X + rect.Width);
++        var top = Math.Max(0, rect.Y);
++        var bottom = Math.Min(height, rect.Y + rect.Height);
++        if (left >= right || top >= bottom) return (0, 1);
++        var black = 0;
++        for (var y = top; y < bottom; y++)
++            for (var x = left; x < right; x++)
++                if (pixels[y * width + x] == 0) black++;
++        var inside = black / (double)((right - left) * (bottom - top));
++
++        var ringTotal = 0;
++        var ringBlack = 0;
++        void Sample(int x, int y)
++        {
++            if (x < 0 || y < 0 || x >= width || y >= height) return;
++            ringTotal++;
++            if (pixels[y * width + x] == 0) ringBlack++;
++        }
++        for (var x = left - 1; x <= right; x++) { Sample(x, top - 1); Sample(x, bottom); }
++        for (var y = top; y < bottom; y++) { Sample(left - 1, y); Sample(right, y); }
++        // A rectangle covering the whole room has no surroundings to compare.
++        var ring = ringTotal == 0 ? 0 : ringBlack / (double)ringTotal;
++        return (inside, ring);
++    }
++
++    private double BlackFraction(RoomObjectImage obj)
++    {
++        if (_blackFractions.TryGetValue(obj.Id, out var value)) return value;
++        value = obj.Pixels.Length == 0 ? 1 : obj.Pixels.Count(pixel => pixel == 0) / (double)obj.Pixels.Length;
++        _blackFractions[obj.Id] = value;
++        return value;
++    }
++
+     public RoomObjectPosition GetPosition(RoomObjectImage obj) => _positions[obj.Id];
+ 
+     public bool SetState(int objectId, byte state)
+@@ -117,6 +330,9 @@ public sealed class RoomObjectSelection
+         if (!_states.ContainsKey(objectId)) return false;
+         _states[objectId] = state;
+         _knownStates.Add(objectId);
++        // o5_setState marks the object's rectangle dirty, which redraws the
++        // room in directory order and clears the pending draw queue.
++        _drawQueue.Clear();
+         var obj = _objects.FirstOrDefault(item => item.Id == objectId);
+         if (obj is not null) RememberBackgroundIfEmpty(obj);
+         return true;
+@@ -133,17 +349,30 @@ public sealed class RoomObjectSelection
+         // local objects after applying any position change.
+         foreach (var peer in Peers(obj)) _states[peer.Id] = 0;
+         _states[objectId] = state;
++        _knownStates.Add(objectId);
++        Enqueue(objectId);
+         return true;
+     }
+ 
+-    public bool Select(RoomObjectImage obj) => DrawObject(obj.Id);
++    /// <summary>
++    /// Shows an image as a viewer <c>drawObject</c> call, then repaints or
++    /// estimates the inserts that belong in its cut-outs, as the game's scripts
++    /// do after drawing such an image.
++    /// </summary>
++    public bool Select(RoomObjectImage obj)
++    {
++        if (!DrawObject(obj.Id)) return false;
++        var position = GetPosition(obj);
++        FillGapsWithin((position.X, position.Y, obj.Width, obj.Height));
++        return true;
++    }
+ 
+     public RoomObjectImage? HitTest(int x, int y)
+     {
+-        // Old SCUMM draws local objects in reverse directory order, so the
+-        // first matching image is the topmost one at this pixel.
+-        var visible = _objects.FirstOrDefault(obj => IsActive(obj) && Contains(obj, x, y));
+-        if (visible is not null) return visible;
++        // The last painted image at this pixel is the one the viewer sees.
++        var order = PaintOrder();
++        for (var index = order.Count - 1; index >= 0; index--)
++            if (Contains(order[index], x, y)) return order[index];
+ 
+         // When the background shows through, the first stored image at that
+         // rectangle can still be reached by clicking its recorded bounds.
+@@ -166,6 +395,7 @@ public sealed class RoomObjectSelection
+         {
+             if (CanShowBackground(current))
+             {
++                foreach (var insert in CutoutInserts(current)) _states[insert.Id] = 0;
+                 foreach (var peer in peers) _states[peer.Id] = 0;
+                 return null;
+             }
+@@ -177,6 +407,51 @@ public sealed class RoomObjectSelection
+         return peers[index + 1];
+     }
+ 
++    /// <summary>Active images that sit in a solid colour-0 cut-out of the container.</summary>
++    private IEnumerable<RoomObjectImage> CutoutInserts(RoomObjectImage container)
++    {
++        var outer = GetPosition(container);
++        foreach (var obj in _objects)
++        {
++            if (obj.Id == container.Id || !IsActive(obj) || Rect(obj) == Rect(container)) continue;
++            var inner = GetPosition(obj);
++            if (inner.X < outer.X || inner.Y < outer.Y || inner.X + obj.Width > outer.X + container.Width ||
++                inner.Y + obj.Height > outer.Y + container.Height) continue;
++            var black = 0;
++            for (var y = 0; y < obj.Height; y++)
++                for (var x = 0; x < obj.Width; x++)
++                    if (container.Pixels[(inner.Y - outer.Y + y) * container.Width + inner.X - outer.X + x] == 0) black++;
++            if (black >= CutoutBlack * obj.Width * obj.Height) yield return obj;
++        }
++    }
++
++    private void Enqueue(int objectId)
++    {
++        _drawQueue.Remove(objectId);
++        _drawQueue.Add(objectId);
++    }
++
++    private (int X, int Y, int Width, int Height) Rect(RoomObjectImage obj)
++    {
++        var position = GetPosition(obj);
++        return (position.X, position.Y, obj.Width, obj.Height);
++    }
++
++    private static void Paint(RoomObjectImage obj, byte[] pixels, int width, int height, RoomObjectPosition position)
++    {
++        var left = Math.Max(0, position.X);
++        var right = Math.Min(width, position.X + obj.Width);
++        var top = Math.Max(0, position.Y);
++        var bottom = Math.Min(height, position.Y + obj.Height);
++        for (var y = top; y < bottom; y++)
++            if (left < right)
++                Array.Copy(obj.Pixels, (y - position.Y) * obj.Width + left - position.X,
++                    pixels, y * width + left, right - left);
++    }
++
++    private void Paint(RoomObjectImage obj, byte[] pixels, int width, int height) =>
++        Paint(obj, pixels, width, height, GetPosition(obj));
++
+     private List<RoomObjectImage> Peers(RoomObjectImage obj) =>
+         _objects.Where(item => GetPosition(item) == GetPosition(obj) &&
+                                item.Width == obj.Width && item.Height == obj.Height).ToList();
+@@ -202,19 +477,4 @@ public sealed class RoomObjectSelection
+         return a.X < b.X + second.Width && b.X < a.X + first.Width &&
+                a.Y < b.Y + second.Height && b.Y < a.Y + first.Height;
+     }
+-
+-    private bool HasBackgroundArtwork(RoomObjectImage obj)
+-    {
+-        if (_background is null) return true;
+-        var position = GetPosition(obj);
+-        var left = Math.Max(0, position.X);
+-        var right = Math.Min(_background.Width, position.X + obj.Width);
+-        var top = Math.Max(0, position.Y);
+-        var bottom = Math.Min(_background.Height, position.Y + obj.Height);
+-        var pixels = _background.Pixels.Span;
+-        for (var y = top; y < bottom; y++)
+-            for (var x = left; x < right; x++)
+-                if (pixels[y * _background.Width + x] != 0) return true;
+-        return false;
+-    }
+ }
+diff --git a/tests/SCUMMexplorer.Tests/RoomObjectSelectionTests.cs b/tests/SCUMMexplorer.Tests/RoomObjectSelectionTests.cs
+index fdb8c82..72515a0 100644
+--- a/tests/SCUMMexplorer.Tests/RoomObjectSelectionTests.cs
++++ b/tests/SCUMMexplorer.Tests/RoomObjectSelectionTests.cs
+@@ -106,18 +106,96 @@ public sealed class RoomObjectSelectionTests
+     }
+ 
+     [Fact]
+-    public void HitTestPrefersFirstDirectoryImageOverLaterOverlappingImage()
++    public void DirectoryOrderPaintsEarlierEntryOnTopUntilADrawCallRepaints()
+     {
+-        var lower = Image(1, 8, 0, 16, 16);
+-        var upper = Image(2, 12, 0, 8, 8);
+-        var selection = new RoomObjectSelection([lower, upper]);
++        var lower = Filled(1, 8, 0, 16, 16, 1);
++        var upper = Filled(2, 12, 0, 8, 8, 2);
++        var selection = new RoomObjectSelection([lower, upper],
++            new Dictionary<int, byte> { [1] = 1, [2] = 1 });
+ 
+-        Assert.True(selection.Select(lower));
++        // Full redraw: the first directory entry is painted last.
++        Assert.Equal([upper, lower], selection.PaintOrder());
+         Assert.Equal(lower, selection.HitTest(14, 2));
++
++        // drawObject paints over the redraw in call order.
+         Assert.True(selection.Select(upper));
+-        Assert.Equal(lower, selection.HitTest(14, 2));
+-        Assert.Null(selection.Next(lower));
+         Assert.Equal(upper, selection.HitTest(14, 2));
++        Assert.Equal(lower, selection.HitTest(9, 2));
++        Assert.True(selection.Select(lower));
++        Assert.Equal(lower, selection.HitTest(14, 2));
++
++        // setState redraws the room and clears the queue.
++        Assert.True(selection.SetState(2, 1));
++        Assert.Empty(selection.DrawQueue);
++        Assert.Equal(lower, selection.HitTest(14, 2));
++    }
++
++    [Fact]
++    public void ScriptDrawQueueKeepsInsertAboveItsCutoutContainer()
++    {
++        // Room 56 pattern: a face whose eye area is colour 0, drawn before the eyes.
++        var face = Cutout(779, 0, 0, 24, 16, 8, 8, 8, 8, 12);
++        var eyes = Filled(782, 8, 8, 8, 8, 10);
++        var states = new Dictionary<int, byte> { [779] = 1, [782] = 1 };
++        var background = new RoomImage(24, 16, new byte[24 * 16], Palette);
++
++        var redrawOnly = new RoomObjectSelection([face, eyes], states, background: background);
++        Assert.Equal(0, redrawOnly.Compose(background)[9 * 24 + 9]);
++
++        var scripted = new RoomObjectSelection([face, eyes], states, background: background,
++            drawQueue: [779, 782]);
++        Assert.Equal(10, scripted.Compose(background)[9 * 24 + 9]);
++        Assert.Equal(eyes, scripted.HitTest(9, 9));
++        Assert.Equal(face, scripted.HitTest(1, 1));
++    }
++
++    [Fact]
++    public void GapFillingUsesScriptBatchesAndThenInsertsForCutouts()
++    {
++        var bgPixels = Enumerable.Repeat((byte)2, 32 * 24).ToArray();
++        for (var y = 4; y < 20; y++)
++            for (var x = 8; x < 24; x++) bgPixels[y * 32 + x] = 0;
++        var background = new RoomImage(32, 24, bgPixels, Palette);
++        var face = Cutout(10, 8, 4, 16, 16, 12, 12, 8, 8, 12);
++        var fullFace = Filled(11, 8, 4, 16, 16, 13);
++        var eyes = Filled(12, 12, 12, 8, 8, 10);
++        var blink = Filled(13, 12, 12, 8, 8, 11);
++        var selection = new RoomObjectSelection([face, fullFace, eyes, blink],
++            new Dictionary<int, byte> { [10] = 0, [11] = 0, [12] = 0, [13] = 0 }, background: background);
++
++        var estimates = selection.FillGaps(
++            [new RoomDrawBatch([new RoomDrawStep(10), new RoomDrawStep(13)], 3, "opening frame")]);
++
++        Assert.Equal([10, 13], estimates.Select(item => item.ObjectId));
++        Assert.All(estimates, item => Assert.Equal("opening frame", item.Reason));
++        var composite = selection.Compose(background);
++        Assert.DoesNotContain(composite, pixel => pixel == 0);
++
++        // Cycling the face keeps the eyes painted in its cut-out.
++        Assert.Equal(fullFace, selection.Next(face));
++        Assert.Equal(face, selection.Next(fullFace));
++        Assert.Equal(11, selection.Compose(background)[13 * 32 + 13]);
++        Assert.False(selection.CanShowBackground(face));
++    }
++
++    [Fact]
++    public void GapWithoutBatchIsFilledFromStoredImagesAndBlackScenesAreLeftAlone()
++    {
++        var bgPixels = Enumerable.Repeat((byte)3, 16 * 16).ToArray();
++        for (var y = 0; y < 8; y++)
++            for (var x = 0; x < 8; x++) bgPixels[(y + 4) * 16 + x + 4] = 0;
++        var background = new RoomImage(16, 16, bgPixels, Palette);
++        var first = Filled(1, 4, 4, 8, 8, 5);
++        var second = Filled(2, 4, 4, 8, 8, 6);
++        var selection = new RoomObjectSelection([first, second], background: background);
++
++        var estimate = Assert.Single(selection.FillGaps(seed: 7));
++        Assert.Contains(estimate.ObjectId, new[] { 1, 2 });
++        Assert.DoesNotContain(selection.Compose(background), pixel => pixel == 0);
++
++        var dark = new RoomImage(16, 16, new byte[256], Palette);
++        var darkSelection = new RoomObjectSelection([Filled(3, 4, 4, 8, 8, 5)], background: dark);
++        Assert.Empty(darkSelection.FillGaps());
+     }
+ 
+     [Fact]
+@@ -244,6 +322,21 @@ public sealed class RoomObjectSelectionTests
+     private static RoomObjectImage Image(int id, int x, int y, int width, int height) =>
+         new(id, x, y, width, height, new byte[width * height]);
+ 
++    private static readonly uint[] Palette = Enumerable.Range(0, 16).Select(value => 0xFF000000u | (uint)value).ToArray();
++
++    private static RoomObjectImage Filled(int id, int x, int y, int width, int height, byte colour) =>
++        new(id, x, y, width, height, Enumerable.Repeat(colour, width * height).ToArray());
++
++    private static RoomObjectImage Cutout(int id, int x, int y, int width, int height,
++        int holeX, int holeY, int holeWidth, int holeHeight, byte colour)
++    {
++        var pixels = Enumerable.Repeat(colour, width * height).ToArray();
++        for (var row = holeY - y; row < holeY - y + holeHeight; row++)
++            for (var column = holeX - x; column < holeX - x + holeWidth; column++)
++                pixels[row * width + column] = 0;
++        return new RoomObjectImage(id, x, y, width, height, pixels);
++    }
++
+     private static LoomRoomObjectRecord Record(RoomObjectImage image, int localIndex,
+         int parentIndex, byte parentState) =>
+         new(image.Id, localIndex, image.X, image.Y, image.Width, image.Height,

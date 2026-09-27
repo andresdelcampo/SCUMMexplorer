@@ -1,0 +1,87 @@
+[0000] (9A) Local[1] = VAR_VERB_SCRIPT;
+[0005] (1A) VAR_VERB_SCRIPT = 18;
+[000A] (0A) startScript(21,[3]);
+[0010] (80) breakHere();
+[0011] (1A) Local[2] = 1;
+[0016] (AE) UnknownWait();
+[0018] (B6) walkActorToObject(??Var??[1024],12800);
+[001D] (00) stopObjectCode();
+[001E] (14) print(10,[Text("\xADNo le reconozco! \xADVd. debe ser el intruso!")]);
+[004D] (18) goto 11F3;
+[0050] (48) if (Local[0] == 1) {
+[0057] (18)   goto 0064;
+[005A] (48) } else if (Local[0] == 2) {
+[0064] (14)   print(10,[Text("Buenas tardes. Disfrute de su estancia en el Castillo.")]);
+[009E] (18)   goto 11FC;
+[00A1] (48) } else if (Local[0] == 3) {
+[00AB] (14)   print(10,[Text("Se\xA4or, solo los que estan relacionados con la" + newline() + "coleccion de arte pueden estar en esta zona.")]);
+[010A] (48) } else if (Local[0] == 4) {
+[0114] (14)   print(10,[Text("Saludos, se\xA4or.")]);
+[0127] (48) } else if (Local[0] == 5) {
+[0131] (14)   print(10,[Text("Esto^ Lo siento, pero esto es una zona restringida.")]);
+[0168] (48) } else if (Local[0] == 7) {
+[0172] (14)   print(10,[Text("Saludos, se\xA4or. \xADEsta es una zona de alto secreto!")]);
+[01A8] (48) } else if (Local[0] == 8) {
+[01B2] (14)   print(10,[Text("Hola. Da gusto ver una cara nueva por aqui. Pero no" + newline() + "deberias alejarte tanto de tu puesto.")]);
+[0210] (48) } else if (Local[0] == 9) {
+[021A] (14)   print(10,[Text("Esto^ \xA8quieres algo?")]);
+[0232] (18)   /* goto 0235; */
+[0235] (**) }
+[0235] (AE) UnknownWait();
+[0237] (01) putActor(44,31235,1656);
+[023D] (02) startMusic(173);
+[023F] (53) ActorOps(111,[DefaultAnims(),WalkSpeed(97,??Local??[3940 + Var[33]]),IgnoreBoxes(),Costume(115),UnknownFF(),InitAnimNr(97),TalkColor(116),Costume(108),Name("nes estan arrugados")]);
+[0268] (7A) VerbOps(121,[On(),Text("\xA8Que tal, amigo? \xA8Como va la guardia de hoy?")]);
+[029A] (7A) VerbOps(122,[On(),Text("Vengo en mision oficial. \xA8Puedo pasar?")]);
+[02C6] (7A) VerbOps(124,[On(),Text("Ofrece un objeto")]);
+[02DC] (7A) VerbOps(125,[On(),Text("Da un pu\xA4etazo")]);
+[02F0] (1A) Var[114] = 0;
+[02F5] (80) breakHere();
+[02F6] (A8) unless (Var[114]) goto 02F5;
+[02FB] (48) if (Var[114] == 120) {
+[0302] (14)   print(10,[Text("Lo siento se\xA4or, no he tenido tiempo para plancharlos.")]);
+[033C] (18)   goto 0511;
+[033F] (48) } else if (Var[114] == 121) {
+[0349] (48)   if (Local[0] == 4) {
+[0350] (14)     print(10,[Text("Muy aburrido, como siempre. No logro acordarme de ti.")]);
+[0389] (48)   } else if (Local[0] == 7) {
+[0393] (14)     print(10,[Text("Siempre estoy contento de cumplir con mi deber." + wait() + "Me resultas extra\xA4o." + wait() + "Aqui no se permite entrar a nadie sin autorizacion.")]);
+[0411] (18)   } else {
+[0414] (14)     print(10,[Text("Aburrido, como siempre. \xA8Te conozco?")]);
+[043C] (**)   }
+[043C] (18)   goto 07BC;
+[043F] (48) } else if (Var[114] == 122) {
+[0449] (44)   if (Var[182] > 2) {
+[0450] (14)     print(10,[Text("Hay un intruso por ahi. Tendre que registrarle.")]);
+[0483] (AE)     UnknownWait();
+[0485] (01)     putActor(15,25924,24938);
+[048B] (6D)     putActorInRoom(101,??Local??[288 + ??Local??[1397]]);
+[0491] (20)     stopMusic();
+[0492] (74)     Var[101 + ??Local??[869]] = getDist(25960,??Local??[1312 + ??Local??[366]]);
+[049D] (20)     stopMusic();
+[049E] (6D)     putActorInRoom(97,??Local??[3950 + 46]);
+[04A4] (18)     goto 11F3;
+[04A7] (18)   } else {
+[04AA] (48)     if (Local[0] == 8) {
+[04B1] (14)       print(10,[Text("Oficial - bueno, puede pasar.")]);
+[04D2] (18)       goto 11FC;
+[04D5] (**)     }
+[04D5] (14)     print(10,[Text("Pero si no te reconozco.")]);
+[04F1] (18)     goto 07BC;
+[04F4] (**)   }
+[04F4] (48) } else if (Var[114] == 124) {
+[04FE] (18)   goto 0F3F;
+[0501] (48) } else if (Var[114] == 125) {
+[050B] (18)   goto 11F3;
+[050E] (18)   /* goto 0511; */
+[0511] (**) }
+[0511] (1A) Local[2] = 2;
+[0516] (AE) UnknownWait();
+[0518] (01) putActor(44,31235,1656);
+[051E] (02) startMusic(173);
+[0520] (56) ??Local??[2401 + Var[97]] = getActorMoving(101);
+[0526] (78) if (??Local??[1379 + ??Local??[371]] < 8225) {
+[052F] (20)   stopMusic();
+[0530] (64)   loadRoomWithEgo(25449,??Local??[869 + ??Local??[288]],25973,25888);
+[053B] (72)   loadRoom(101);
+ERROR: do_room_ops_old: unknown subop 9!

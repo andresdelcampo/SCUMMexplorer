@@ -1,0 +1,345 @@
+Rooms with remaining gaps: 0; gaps before filling: 8; after: 0
+
+== Room 01 (53 images, faithful=False, pending=0)
+   paint order: 146,145,144,140,139,138,134,133,132,128,127,126,122,121,120,116,115,114,110,109,108,104,103,100
+   draw queue:  
+   nothing visible; fallback estimate shows 100,103,104,108,109,110,114,115,116,120,121,122,126,127,128,132,133,134,138,139,140,144,145,146
+   doorways: 
+== Room 02 (4 images, faithful=False, pending=0)
+   paint order: 158,157,155
+   draw queue:  
+   nothing visible; fallback estimate shows 155,157,158
+   doorways: 03
+== Room 03 (1 images, faithful=False, pending=1)
+   paint order: 166
+   draw queue:  
+   nothing visible; fallback estimate shows 166
+   doorways: 02,04,05,10
+== Room 04 (20 images, faithful=False, pending=0)
+   paint order: 190,187,184,181,178
+   draw queue:  
+   nothing visible; fallback estimate shows 178,181,184,187,190
+   doorways: 03,64
+== Room 05 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 03,06,07,10,62,63
+== Room 06 (39 images, faithful=False, pending=0)
+   paint order: 221,222,223,224,212,233,234,235,229,230,215,216
+   draw queue:  221,222,223,224,212,233,234,235,229,230,215,216
+   doorways: 05
+== Room 07 (0 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   doorways: 05,08,09,50
+== Room 08 (8 images, faithful=False, pending=0)
+   paint order: 265,264,260,259
+   draw queue:  
+   nothing visible; fallback estimate shows 259,260,264,265
+   doorways: 07,09
+== Room 09 (7 images, faithful=False, pending=0)
+   paint order: 276
+   draw queue:  
+   nothing visible; fallback estimate shows 276
+   doorways: 08
+== Room 10 (17 images, faithful=False, pending=0)
+   paint order: 303,302,301,293
+   draw queue:  
+   doorways: 03,05,13
+== Room 11 (9 images, faithful=False, pending=1)
+   paint order: 312
+   draw queue:  312
+   doorways: 
+== Room 12 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 13
+== Room 13 (12 images, faithful=False, pending=0)
+   paint order: 327,330,334,336
+   draw queue:  327,330,334,336
+   estimate 327: Room 13 entry script +0x0101
+   estimate 330: Room 13 entry script +0x0101
+   estimate 334: Room 13 entry script +0x0101
+   estimate 336: Room 13 entry script +0x0101
+   doorways: 
+== Room 14 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 15 (4 images, faithful=False, pending=1)
+   paint order: 340,341
+   draw queue:  340,341
+   doorways: 16,23
+== Room 16 (1 images, faithful=False, pending=2)
+   paint order: 351
+   draw queue:  
+   nothing visible; fallback estimate shows 351
+   doorways: 15,17,18,22,23
+== Room 17 (10 images, faithful=False, pending=1)
+   paint order: 364,363,365,366
+   draw queue:  364,363,365,366
+   doorways: 16,22
+== Room 18 (5 images, faithful=False, pending=0)
+   paint order: 375,373
+   draw queue:  
+   nothing visible; fallback estimate shows 373,375
+   doorways: 16,22
+== Room 19 (7 images, faithful=False, pending=0)
+   paint order: 379
+   draw queue:  
+   nothing visible; fallback estimate shows 379
+   doorways: 
+== Room 20 (8 images, faithful=False, pending=0)
+   paint order: 397,396,395,394,393,392
+   draw queue:  
+   nothing visible; fallback estimate shows 392,393,394,395,396,397
+   doorways: 
+== Room 22 (10 images, faithful=False, pending=0)
+   paint order: 406
+   draw queue:  406
+   doorways: 16,17,18
+== Room 23 (3 images, faithful=False, pending=0)
+   paint order: 428,426
+   draw queue:  
+   nothing visible; fallback estimate shows 426,428
+   doorways: 15,16,24
+== Room 24 (12 images, faithful=False, pending=2)
+   paint order: 435
+   draw queue:  
+   doorways: 23,25
+== Room 25 (1 images, faithful=False, pending=1)
+   paint order: 448
+   draw queue:  
+   nothing visible; fallback estimate shows 448
+   doorways: 24
+== Room 26 (14 images, faithful=False, pending=0)
+   paint order: 450,451
+   draw queue:  450,451
+   doorways: 46
+== Room 27 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 28 (24 images, faithful=False, pending=0)
+   paint order: 482,481,480,479,478,477,476
+   draw queue:  
+   doorways: 
+== Room 29 (3 images, faithful=False, pending=0)
+   paint order: 500
+   draw queue:  500
+   doorways: 
+== Room 30 (3 images, faithful=False, pending=0)
+   paint order: 519,504
+   draw queue:  
+   nothing visible; fallback estimate shows 504,519
+   doorways: 33
+== Room 31 (11 images, faithful=False, pending=0)
+   paint order: 526,527,528,529
+   draw queue:  526,527,528,529
+   doorways: 
+== Room 32 (2 images, faithful=False, pending=1)
+   paint order: 541
+   draw queue:  541
+   doorways: 30
+== Room 33 (12 images, faithful=False, pending=0)
+   paint order: 547,548,549,550
+   draw queue:  547,548,549,550
+   estimate 547: Room 33 entry script +0x007E
+   estimate 548: Room 33 entry script +0x007E
+   estimate 549: Room 33 entry script +0x007E
+   estimate 550: Room 33 entry script +0x007E
+   doorways: 30,34
+== Room 34 (23 images, faithful=False, pending=1)
+   paint order: 576,575,574,573
+   draw queue:  
+   doorways: 33,35,46
+== Room 35 (7 images, faithful=False, pending=0)
+   paint order: 594
+   draw queue:  594
+   doorways: 34,36
+== Room 36 (1 images, faithful=False, pending=3)
+   paint order: 600
+   draw queue:  
+   nothing visible; fallback estimate shows 600
+   doorways: 35,37
+== Room 37 (4 images, faithful=False, pending=2)
+   paint order: 608,606,605
+   draw queue:  
+   nothing visible; fallback estimate shows 605,606,608
+   doorways: 36,38,41
+== Room 38 (9 images, faithful=False, pending=0)
+   paint order: 619,612
+   draw queue:  
+   nothing visible; fallback estimate shows 612,619
+   doorways: 37
+== Room 39 (0 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 40 (6 images, faithful=False, pending=2)
+   paint order: 624,625
+   draw queue:  624,625
+   doorways: 
+== Room 41 (2 images, faithful=False, pending=0)
+   paint order: 635
+   draw queue:  
+   nothing visible; fallback estimate shows 635
+   doorways: 37
+== Room 42 (2 images, faithful=False, pending=0)
+   paint order: 638,637
+   draw queue:  
+   nothing visible; fallback estimate shows 637,638
+   doorways: 
+== Room 43 (7 images, faithful=False, pending=1)
+   paint order: 647,645,644
+   draw queue:  
+   nothing visible; fallback estimate shows 644,645,647
+   doorways: 44,45,46
+== Room 44 (1 images, faithful=False, pending=0)
+   paint order: 654
+   draw queue:  
+   nothing visible; fallback estimate shows 654
+   doorways: 
+== Room 45 (24 images, faithful=False, pending=0)
+   paint order: 657
+   draw queue:  657
+   doorways: 
+== Room 46 (9 images, faithful=False, pending=0)
+   paint order: 691,686
+   draw queue:  
+   nothing visible; fallback estimate shows 686,691
+   doorways: 26,47
+== Room 47 (5 images, faithful=False, pending=0)
+   paint order: 698,699
+   draw queue:  698,699
+   doorways: 46,50
+== Room 49 (13 images, faithful=False, pending=0)
+   paint order: 708,709,710,711
+   draw queue:  708,709,710,711
+   doorways: 46
+== Room 50 (18 images, faithful=False, pending=0)
+   paint order: 726,727,728,723,724,725
+   draw queue:  726,727,728,723,724,725
+   doorways: 07,47
+== Room 51 (20 images, faithful=False, pending=0)
+   paint order: 762,749,748,747,746,745,744
+   draw queue:  
+   nothing visible; fallback estimate shows 744,745,746,747,748,749,762
+   doorways: 
+== Room 52 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 53 (6 images, faithful=False, pending=0)
+   paint order: 764
+   draw queue:  764
+   doorways: 
+== Room 54 (3 images, faithful=False, pending=0)
+   paint order: 770
+   draw queue:  770
+   doorways: 
+== Room 55 (6 images, faithful=False, pending=0)
+   paint order: 773,776
+   draw queue:  773,776
+   doorways: 
+== Room 56 (6 images, faithful=False, pending=0)
+   paint order: 779,782
+   draw queue:  779,782
+   estimate 779: opening frame of Room 56 in script 68 +0x0103
+   estimate 782: opening frame of Room 56 in script 68 +0x0103
+   doorways: 
+== Room 57 (5 images, faithful=False, pending=0)
+   paint order: 787
+   draw queue:  787
+   doorways: 
+== Room 58 (6 images, faithful=False, pending=0)
+   paint order: 790,795
+   draw queue:  790,795
+   estimate 790: random choice among the images stored for this position
+   estimate 795: random choice among the images stored for this position
+   doorways: 
+== Room 59 (6 images, faithful=False, pending=0)
+   paint order: 796
+   draw queue:  796
+   doorways: 
+== Room 60 (5 images, faithful=False, pending=0)
+   paint order: 804
+   draw queue:  804
+   doorways: 
+== Room 61 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 62 (7 images, faithful=False, pending=0)
+   paint order: 815,814
+   draw queue:  815,814
+   doorways: 05
+== Room 63 (0 images, faithful=False, pending=1)
+   paint order: 
+   draw queue:  
+   doorways: 05
+== Room 64 (1 images, faithful=False, pending=0)
+   paint order: 826
+   draw queue:  
+   nothing visible; fallback estimate shows 826
+   doorways: 04
+== Room 65 (3 images, faithful=False, pending=1)
+   paint order: 832,830
+   draw queue:  
+   nothing visible; fallback estimate shows 830,832
+   doorways: 
+== Room 66 (32 images, faithful=False, pending=3)
+   paint order: 834,835,840,841
+   draw queue:  834,835,840,841
+   doorways: 
+== Room 67 (4 images, faithful=False, pending=0)
+   paint order: 867
+   draw queue:  867
+   doorways: 
+== Room 68 (6 images, faithful=False, pending=1)
+   paint order: 873,870
+   draw queue:  873,870
+   doorways: 
+== Room 69 (11 images, faithful=False, pending=0)
+   paint order: 898,878,877,876
+   draw queue:  
+   nothing visible; fallback estimate shows 876,877,878,898
+   doorways: 
+== Room 70 (10 images, faithful=False, pending=0)
+   paint order: 902,901,900
+   draw queue:  
+   nothing visible; fallback estimate shows 900,901,902
+   doorways: 
+== Room 79 (6 images, faithful=False, pending=0)
+   paint order: 912,913
+   draw queue:  912,913
+   doorways: 
+== Room 81 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 82 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 83 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 84 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 85 (0 images, faithful=False, pending=0)
+   paint order: 
+   draw queue:  
+   doorways: 
+== Room 86 (11 images, faithful=False, pending=0)
+   paint order: 918
+   draw queue:  
+   nothing visible; fallback estimate shows 918
+   doorways: 
+== Room 87 (3 images, faithful=False, pending=0)
+   paint order: 929
+   draw queue:  929
+   doorways: 

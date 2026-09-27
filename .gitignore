@@ -1,0 +1,21 @@
+# Local game data (copyrighted; never commit)
+Games/
+
+# ScummVM Windows build used for runtime comparison (binaries only)
+scummvm/
+
+# Build output (see Directory.Build.props), at any depth
+Exe/
+[Bb]in/
+[Oo]bj/
+
+# IDE and user files
+.idea/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Generated verification output
+.verification/verify.log
+.verification/room-audit/*.bmp

@@ -1,0 +1,349 @@
+[0000] (9A) Local[1] = VAR_VERB_SCRIPT;
+[0005] (1A) VAR_VERB_SCRIPT = 18;
+[000A] (0A) startScript(21,[3]);
+[0010] (80) breakHere();
+[0011] (1A) Local[2] = 1;
+[0016] (AE) WaitForMessage();
+[0017] (38) if (Var[182] >= 4) {
+[001E] (14)   print(10,[Text("\xADNo le reconozco! \xADVd. debe ser el intruso!")]);
+[004D] (18) } else {
+[0050] (48)   if (Local[0] == 1) {
+[0057] (18)     goto 0064;
+[005A] (48)   } else if (Local[0] == 2) {
+[0064] (14)     print(10,[Text("Buenas tardes. Disfrute de su estancia en el Castillo.")]);
+[009E] (18)     goto 11FC;
+[00A1] (48)   } else if (Local[0] == 3) {
+[00AB] (14)     print(10,[Text("Se\xA4or, solo los que estan relacionados con la" + newline() + "coleccion de arte pueden estar en esta zona.")]);
+[010A] (48)   } else if (Local[0] == 4) {
+[0114] (14)     print(10,[Text("Saludos, se\xA4or.")]);
+[0127] (48)   } else if (Local[0] == 5) {
+[0131] (14)     print(10,[Text("Esto^ Lo siento, pero esto es una zona restringida.")]);
+[0168] (48)   } else if (Local[0] == 7) {
+[0172] (14)     print(10,[Text("Saludos, se\xA4or. \xADEsta es una zona de alto secreto!")]);
+[01A8] (48)   } else if (Local[0] == 8) {
+[01B2] (14)     print(10,[Text("Hola. Da gusto ver una cara nueva por aqui. Pero no" + newline() + "deberias alejarte tanto de tu puesto.")]);
+[0210] (48)   } else if (Local[0] == 9) {
+[021A] (14)     print(10,[Text("Esto^ \xA8quieres algo?")]);
+[0232] (18)     /* goto 0235; */
+[0235] (**)   }
+[0235] (AE)   WaitForMessage();
+[0236] (2C)   CursorShow();
+[0238] (2C)   UserputOn();
+[023A] (7A)   VerbOps(120,[On(),Text("\xADSoldado! Tus pantalones estan arrugados")]);
+[0268] (7A)   VerbOps(121,[On(),Text("\xA8Que tal, amigo? \xA8Como va la guardia de hoy?")]);
+[029A] (7A)   VerbOps(122,[On(),Text("Vengo en mision oficial. \xA8Puedo pasar?")]);
+[02C6] (7A)   VerbOps(124,[On(),Text("Ofrece un objeto")]);
+[02DC] (7A)   VerbOps(125,[On(),Text("Da un pu\xA4etazo")]);
+[02F0] (1A)   Var[114] = 0;
+[02F5] (80)   breakHere();
+[02F6] (A8)   unless (Var[114]) goto 02F5;
+[02FB] (48)   if (Var[114] == 120) {
+[0302] (14)     print(10,[Text("Lo siento se\xA4or, no he tenido tiempo para plancharlos.")]);
+[033C] (18)     goto 0511;
+[033F] (48)   } else if (Var[114] == 121) {
+[0349] (48)     if (Local[0] == 4) {
+[0350] (14)       print(10,[Text("Muy aburrido, como siempre. No logro acordarme de ti.")]);
+[0389] (48)     } else if (Local[0] == 7) {
+[0393] (14)       print(10,[Text("Siempre estoy contento de cumplir con mi deber." + wait() + "Me resultas extra\xA4o." + wait() + "Aqui no se permite entrar a nadie sin autorizacion.")]);
+[0411] (18)     } else {
+[0414] (14)       print(10,[Text("Aburrido, como siempre. \xA8Te conozco?")]);
+[043C] (**)     }
+[043C] (18)     goto 07BC;
+[043F] (48)   } else if (Var[114] == 122) {
+[0449] (44)     if (Var[182] > 2) {
+[0450] (14)       print(10,[Text("Hay un intruso por ahi. Tendre que registrarle.")]);
+[0483] (AE)       WaitForMessage();
+[0484] (14)       print(1,[Text("Dejame que te eche una mano.")]);
+[04A4] (18)       goto 11F3;
+[04A7] (18)     } else {
+[04AA] (48)       if (Local[0] == 8) {
+[04B1] (14)         print(10,[Text("Oficial - bueno, puede pasar.")]);
+[04D2] (18)         goto 11FC;
+[04D5] (**)       }
+[04D5] (14)       print(10,[Text("Pero si no te reconozco.")]);
+[04F1] (18)       goto 07BC;
+[04F4] (**)     }
+[04F4] (48)   } else if (Var[114] == 124) {
+[04FE] (18)     goto 0F3F;
+[0501] (48)   } else if (Var[114] == 125) {
+[050B] (18)     goto 11F3;
+[050E] (18)     /* goto 0511; */
+[0511] (**)   }
+[0511] (1A)   Local[2] = 2;
+[0516] (AE)   WaitForMessage();
+[0517] (2C)   CursorShow();
+[0519] (2C)   UserputOn();
+[051B] (7A)   VerbOps(120,[On(),Text("\xADVaya excusa! \xA8Y dices que eres un oficial?")]);
+[054C] (7A)   VerbOps(121,[On(),Text("\xA8Y tampoco has podido quitarte esa mancha de la guerrera?")]);
+[058B] (7A)   VerbOps(122,[Off()]);
+[058F] (7A)   VerbOps(124,[On()]);
+[0593] (7A)   VerbOps(125,[On()]);
+[0597] (1A)   Var[114] = 0;
+[059C] (80)   breakHere();
+[059D] (A8)   unless (Var[114]) goto 059C;
+[05A2] (48)   if (Var[114] == 120) {
+[05A9] (14)     print(10,[Text("Pues no, soy cabo" + newline() + "Y Vd. es un impostor.")]);
+[05D5] (18)     goto 11F3;
+[05D8] (48)   } else if (Var[114] == 121) {
+[05E2] (14)     print(10,[Text("Bueno, ya sabe como el cocinero rocia todo con su" + newline() + "salsa `Sorpresa de Silesia`.")]);
+[0635] (18)     goto 0655;
+[0638] (48)   } else if (Var[114] == 124) {
+[0642] (18)     goto 0F3F;
+[0645] (48)   } else if (Var[114] == 125) {
+[064F] (18)     goto 11F3;
+[0652] (18)     /* goto 0655; */
+[0655] (**)   }
+[0655] (1A)   Local[2] = 3;
+[065A] (AE)   WaitForMessage();
+[065B] (2C)   CursorShow();
+[065D] (2C)   UserputOn();
+[065F] (7A)   VerbOps(120,[On(),Text("\xA8Salsa? \xADChorradas! Quitate de en medio, rapido.")]);
+[0695] (7A)   VerbOps(121,[On(),Text("Quizas debieras usar la salsa para limpiarte los zapatos.")]);
+[06D4] (7A)   VerbOps(122,[Off()]);
+[06D8] (7A)   VerbOps(124,[On()]);
+[06DC] (7A)   VerbOps(125,[On()]);
+[06E0] (1A)   Var[114] = 0;
+[06E5] (80)   breakHere();
+[06E6] (A8)   unless (Var[114]) goto 06E5;
+[06EB] (48)   if (Var[114] == 120) {
+[06F2] (48)     if (Local[0] == 5) {
+[06F9] (14)       print(10,[Text("Si, se\xA4or, lo que Vd. diga.")]);
+[0718] (18)       goto 11FC;
+[071B] (18)     } else {
+[071E] (14)       print(10,[Text("Me esta calentando Vd.")]);
+[0738] (18)       goto 11F3;
+[073B] (**)     }
+[073B] (48)   } else if (Var[114] == 121) {
+[0745] (14)     print(10,[Text("\xA8Zapatos? \xA8No reconoce Vd. nuestras botas de uniforme?" + newline() + "\xA8A todo esto, Vd. quien es?")]);
+[079C] (18)     goto 11F3;
+[079F] (48)   } else if (Var[114] == 124) {
+[07A9] (18)     goto 0F3F;
+[07AC] (48)   } else if (Var[114] == 125) {
+[07B6] (18)     goto 11F3;
+[07B9] (18)     /* goto 07BC; */
+[07BC] (**)   }
+[07BC] (1A)   Local[2] = 4;
+[07C1] (AE)   WaitForMessage();
+[07C2] (2C)   CursorShow();
+[07C4] (2C)   UserputOn();
+[07C6] (7A)   VerbOps(120,[On(),Text("\xA8Como? \xA8No me reconoces?")]);
+[07E4] (7A)   VerbOps(121,[On(),Text("No, me han trasladado hoy. Nuevas ordenes.")]);
+[0814] (7A)   VerbOps(122,[Off()]);
+[0818] (7A)   VerbOps(124,[On()]);
+[081C] (7A)   VerbOps(125,[On()]);
+[0820] (1A)   Var[114] = 0;
+[0825] (80)   breakHere();
+[0826] (A8)   unless (Var[114]) goto 0825;
+[082B] (48)   if (Var[114] == 120) {
+[0832] (48)     if (Local[0] == 4) {
+[0839] (14)       print(10,[Text("\xADNo! De todos modos \xA8Quien se cree Vd. que es?")]);
+[086B] (18)     } else {
+[086E] (14)       print(10,[Text("\xADNo, NO le reconozco - identifiquese!")]);
+[0897] (**)     }
+[0897] (18)     goto 08E0;
+[089A] (48)   } else if (Var[114] == 121) {
+[08A4] (14)     print(10,[Text("\xA8Ordenes? \xA8Puedo verlas?")]);
+[08C0] (18)     goto 0C80;
+[08C3] (48)   } else if (Var[114] == 124) {
+[08CD] (18)     goto 0F3F;
+[08D0] (48)   } else if (Var[114] == 125) {
+[08DA] (18)     goto 11F3;
+[08DD] (18)     /* goto 08E0; */
+[08E0] (**)   }
+[08E0] (1A)   Local[2] = 5;
+[08E5] (AE)   WaitForMessage();
+[08E6] (2C)   CursorShow();
+[08E8] (2C)   UserputOn();
+[08EA] (7A)   VerbOps(120,[On(),Text("Soy el Capitan Heinrich. Vengo a inspeccionar su unidad.")]);
+[0928] (7A)   VerbOps(121,[On(),Text("\xADSoldado, que forma es esa de hablar a un oficial!")]);
+[0960] (7A)   VerbOps(122,[Off()]);
+[0964] (7A)   VerbOps(124,[On()]);
+[0968] (7A)   VerbOps(125,[On()]);
+[096C] (1A)   Var[114] = 0;
+[0971] (80)   breakHere();
+[0972] (A8)   unless (Var[114]) goto 0971;
+[0977] (48)   if (Var[114] == 120) {
+[097E] (14)     print(10,[Text("Ya hemos tenido una inspeccion esta ma\xA4ana. \xADALTO!")]);
+[09B4] (18)     goto 11F3;
+[09B7] (48)   } else if (Var[114] == 121) {
+[09C1] (14)     print(10,[Text("Lo siento. Pero no me habian dicho que viniera alguien hoy." + newline() + "Debo pedirle pruebas.")]);
+[0A17] (18)     goto 0A37;
+[0A1A] (48)   } else if (Var[114] == 124) {
+[0A24] (18)     goto 0F3F;
+[0A27] (48)   } else if (Var[114] == 125) {
+[0A31] (18)     goto 11F3;
+[0A34] (18)     /* goto 0A37; */
+[0A37] (**)   }
+[0A37] (1A)   Local[2] = 6;
+[0A3C] (AE)   WaitForMessage();
+[0A3D] (2C)   CursorShow();
+[0A3F] (2C)   UserputOn();
+[0A41] (A8)   if (Var[187]) {
+[0A46] (7A)     VerbOps(120,[On(),Text("El Coronel Vogel me conoce. Llamele inmediatamente.")]);
+[0A7F] (18)   } else {
+[0A82] (7A)     VerbOps(120,[On(),Text("Tu comandante me conoce. Llamale inmediatamente.")]);
+[0AB8] (**)   }
+[0AB8] (7A)   VerbOps(121,[On(),Text("\xA8Pruebas? \xA8Como crees que he llegado hasta aqui?")]);
+[0AEE] (7A)   VerbOps(122,[Off()]);
+[0AF2] (7A)   VerbOps(124,[On()]);
+[0AF6] (7A)   VerbOps(125,[On()]);
+[0AFA] (1A)   Var[114] = 0;
+[0AFF] (80)   breakHere();
+[0B00] (A8)   unless (Var[114]) goto 0AFF;
+[0B05] (48)   if (Var[114] == 120) {
+[0B0C] (A8)     if (Var[187]) {
+[0B11] (48)       if (Local[0] == 4) {
+[0B18] (14)         print(10,[Text("Bueno, quizas no haga falta. \xADHeil Hitler!")]);
+[0B46] (18)         goto 11FC;
+[0B49] (18)       } else {
+[0B4C] (14)         print(10,[Text("\xA8Cree que me va a intimidar? Tengo una voluntad de hierro.")]);
+[0B8A] (AE)         WaitForMessage();
+[0B8B] (14)         print(1,[Text("Pues a ver si tienes una mandibula de cristal.")]);
+[0BBD] (18)         goto 11F3;
+[0BC0] (**)       }
+[0BC0] (18)     } else {
+[0BC3] (14)       print(10,[Text("\xA8Y Vd. no sabe su nombre? \xADCreo que Vd. es el intruso!")]);
+[0BFD] (AE)       WaitForMessage();
+[0BFE] (14)       print(1,[Text("Bueno, tengo que reconocer^")]);
+[0C1D] (18)       goto 11F3;
+[0C20] (**)     }
+[0C20] (48)   } else if (Var[114] == 121) {
+[0C2A] (14)     print(10,[Text("Dejare que el Coronel decida eso." + wait() + "\xAD\xAD\xADTOMA ESTO!!!")]);
+[0C60] (18)     goto 11F3;
+[0C63] (48)   } else if (Var[114] == 124) {
+[0C6D] (18)     goto 0F3F;
+[0C70] (48)   } else if (Var[114] == 125) {
+[0C7A] (18)     goto 11F3;
+[0C7D] (18)     /* goto 0C80; */
+[0C80] (**)   }
+[0C80] (1A)   Local[2] = 7;
+[0C85] (AE)   WaitForMessage();
+[0C86] (2C)   CursorShow();
+[0C88] (2C)   UserputOn();
+[0C8A] (7A)   VerbOps(120,[On(),Text("A ver^ una de gambas, otra de calamares.")]);
+[0CB8] (7A)   VerbOps(121,[On(),Text("Las tengo aqui^ pero no las vas a querer.")]);
+[0CE7] (7A)   VerbOps(122,[On(),Text("Claro. \xA8Tienes autoridad para ver documentos secretos?")]);
+[0D23] (7A)   VerbOps(124,[On()]);
+[0D27] (7A)   VerbOps(125,[On()]);
+[0D2B] (1A)   Var[114] = 0;
+[0D30] (80)   breakHere();
+[0D31] (A8)   unless (Var[114]) goto 0D30;
+[0D36] (48)   if (Var[114] == 120) {
+[0D3D] (14)     print(10,[Text("No se pase Vd.")]);
+[0D4F] (18)     goto 11F3;
+[0D52] (48)   } else if (Var[114] == 121) {
+[0D5C] (14)     print(10,[Text("\xADALTO! \xADDemelos!")]);
+[0D70] (18)     goto 11F3;
+[0D73] (48)   } else if (Var[114] == 122) {
+[0D7D] (48)     if (Local[0] == 9) {
+[0D84] (1A)       Var[95 Bit 10] = 1;
+[0D89] (14)       print(10,[Text("Pues no, Siegfried si tiene - el trabaja arriba. Pero^" + newline() + "Supongo que no hay problema si tiene esa autoridad.")]);
+[0DF8] (18)       goto 11FC;
+[0DFB] (48)     } else if (Local[0] == 7) {
+[0E05] (A8)       if (Var[95 Bit 10]) {
+[0E0A] (14)         print(10,[Text("Si, la tengo, pero no obstante necesito^")]);
+[0E36] (AE)         WaitForMessage();
+[0E37] (14)         print(1,[Text("Un momento, \xA8eres Siegfried? " + wait() + "Me han dicho que preguntara por ti.")]);
+[0E7D] (AE)         WaitForMessage();
+[0E7E] (14)         print(10,[Text("Oh^ De nuevo han olvidado avisarme." + wait() + "Pase Vd.")]);
+[0EAF] (18)         goto 11FC;
+[0EB2] (**)       }
+[0EB2] (18)       /* goto 0EB5; */
+[0EB5] (**)     }
+[0EB5] (14)     print(10,[Text("Pues no, pero^ Sigo necesitando algun tipo de prueba.")]);
+[0EEE] (AE)     WaitForMessage();
+[0EEF] (14)     print(1,[Text("No hay problema, esto tiene mucha autoridad.")]);
+[0F1F] (18)     goto 11F3;
+[0F22] (48)   } else if (Var[114] == 124) {
+[0F2C] (18)     goto 0F3F;
+[0F2F] (48)   } else if (Var[114] == 125) {
+[0F39] (18)     goto 11F3;
+[0F3C] (18)     /* goto 0F3F; */
+[0F3F] (**)   }
+[0F3F] (0A)   startScript(21,[6]);
+[0F45] (2C)   CursorShow();
+[0F47] (2C)   UserputOn();
+[0F49] (1A)   Var[114] = 0;
+[0F4E] (80)   breakHere();
+[0F4F] (A8)   unless (Var[114]) goto 0F4E;
+[0F54] (AB)   saveVerbs(101,108,5);
+[0F59] (48)   if (Var[114] == 14) {
+[0F60] (18)   } else {
+[0F63] (0A)     startScript(13,[0,1,10,21]);
+[0F72] (80)     breakHere();
+[0F73] (48)     if (Var[114] == 842) {
+[0F7A] (14)       print(10,[Text("\xA8Dinero? No creo que Vd. me deba dinero.")]);
+[0FA6] (18)       goto 1197;
+[0FA9] (48)     } else if (Var[114] == 128) {
+[0FB3] (48)       if (Local[0] == 3) {
+[0FBA] (14)         print(10,[Text("Ah, Tiene Vd. uno de esos cuadros de la Copa." + wait() + "Lo pondre en la caja fuerte con los demas.")]);
+[1017] (29)         setOwnerOf(128,0);
+[101B] (0A)         startScript(114,[]);
+[101E] (18)         goto 11FC;
+[1021] (**)       }
+[1021] (14)       print(10,[Text("\xA8Un cuadro? Eso no es cosa mia.")]);
+[1044] (18)       goto 1197;
+[1047] (48)     } else if (Var[114] == 337) {
+[1051] (48)       if (Local[0] == 2) {
+[1058] (1D)         if (classOfIs(337,[138])) {
+[1061] (14)           print(10,[Text("Gracias por la copa.")]);
+[1079] (AE)           WaitForMessage();
+[107A] (0A)           startScript(13,[0,10,1,21]);
+[1089] (14)           print(10,[Text("Aqui tiene su jarro.")]);
+[10A1] (5D)           setClass(337,[10]);
+[10A8] (18)           goto 11FC;
+[10AB] (18)         } else {
+[10AE] (14)           print(10,[Text("Una jarro vacio - \xA8Para que lo quiero?")]);
+[10D8] (18)           goto 11F3;
+[10DB] (**)         }
+[10DB] (18)       } else {
+[10DE] (1D)         if (classOfIs(337,[138])) {
+[10E7] (14)           print(10,[Text("No bebo cuando estoy de servicio.")]);
+[110C] (18)           goto 1197;
+[110F] (**)         }
+[110F] (18)         goto 117E;
+[1112] (**)       }
+[1112] (48)     } else if (Var[114] == 520) {
+[111C] (1D)       if (classOfIs(520,[138])) {
+[1125] (48)         if (Local[0] == 2) {
+[112C] (14)           print(10,[Text("No puedo beber TANTA cantidad.")]);
+[114E] (18)           goto 1197;
+[1151] (**)         }
+[1151] (18)         goto 10E7;
+[1154] (**)       }
+[1154] (14)       print(10,[Text("\xADVd. robo el trofeo del Coronel!")]);
+[1178] (18)       goto 11F3;
+[117B] (18)     } else {
+[117E] (14)       print(10,[Text("\xADEso no lo quiero!")]);
+[1194] (18)       /* goto 1197; */
+[1197] (**)     }
+[1197] (**)   }
+[1197] (AE)   WaitForMessage();
+[1198] (48)   if (Local[2] == 1) {
+[119F] (18)     goto 0011;
+[11A2] (48)   } else if (Local[2] == 2) {
+[11AC] (18)     goto 0511;
+[11AF] (48)   } else if (Local[2] == 3) {
+[11B9] (18)     goto 0655;
+[11BC] (48)   } else if (Local[2] == 4) {
+[11C6] (18)     goto 07BC;
+[11C9] (48)   } else if (Local[2] == 5) {
+[11D3] (18)     goto 08E0;
+[11D6] (48)   } else if (Local[2] == 6) {
+[11E0] (18)     goto 0A37;
+[11E3] (48)   } else if (Local[2] == 7) {
+[11ED] (18)     goto 0C80;
+[11F0] (18)     /* goto 11F3; */
+[11F3] (**)   }
+[11F3] (**) }
+[11F3] (AE) WaitForMessage();
+[11F4] (1A) Var[115] = 1;
+[11F9] (18) goto 1205;
+[11FC] (AE) WaitForMessage();
+[11FD] (1A) Var[115] = 2;
+[1202] (18) /* goto 1205; */
+[1205] (9A) VAR_VERB_SCRIPT = Local[1];
+[120A] (2C) CursorShow();
+[120C] (2C) UserputOn();
+[120E] (A0) stopObjectCode();
+END

@@ -1,0 +1,62 @@
+[0000] (40) cutscene([0]);
+[0005] (1A) Var[103] = 0;
+[000A] (0A) startScript(8,[0]);
+[0010] (5C) oldRoomEffect-set(128);
+[0014] (80) breakHere();
+[0015] (72) loadRoom(86);
+[0017] (32) setCameraAt(160);
+[001A] (2E) delay(60);
+[001E] (5D) setClass(2,[0,150,148]);
+[002B] (13) ActorOps(2,[Costume(4),Elevation(100)]);
+[0033] (11) animateCostume(2,250);
+[0036] (2D) putActorInRoom(2,86);
+[0039] (01) putActor(2,160,182);
+[003F] (2A) startScript(40,[23],F);
+[0045] (11) animateCostume(2,12);
+[0048] (1A) Local[0] = 1;
+[004D] (80) breakHere();
+[004E] (46) Local[0]++;
+[0051] (44) unless (Local[0] > 6) goto 004D;
+[0058] (11) animateCostume(2,13);
+[005B] (1A) Local[0] = 1;
+[0060] (80) breakHere();
+[0061] (46) Local[0]++;
+[0064] (44) unless (Local[0] > 12) goto 0060;
+[006B] (0A) startScript(200,[]);
+[006E] (48) if (Var[198] == 0) {
+[0075] (46)   Var[198]++;
+[0078] (05)   drawObject(925,255,255);
+[007F] (0A)   startScript(202,[]);
+[0082] (80)   breakHere();
+[0083] (68)   VAR_RESULT = isScriptRunning(200);
+[0087] (28)   unless (!VAR_RESULT) goto 0082;
+[008C] (2E)   delay(180);
+[0090] (48) } else if (Var[198] == 1) {
+[009A] (46)   Var[198]++;
+[009D] (0A)   startScript(201,[]);
+[00A0] (80)   breakHere();
+[00A1] (68)   VAR_RESULT = isScriptRunning(201);
+[00A5] (28)   unless (!VAR_RESULT) goto 00A0;
+[00AA] (48) } else if (Var[198] == 2) {
+[00B4] (1A)   Var[198] = 0;
+[00B9] (05)   drawObject(918,255,255);
+[00C0] (80)   breakHere();
+[00C1] (68)   VAR_RESULT = isScriptRunning(200);
+[00C5] (28)   unless (!VAR_RESULT) goto 00C0;
+[00CA] (2E)   delay(60);
+[00CE] (05)   drawObject(919,255,255);
+[00D5] (80)   breakHere();
+[00D6] (05)   drawObject(920,255,255);
+[00DD] (2E)   delay(120);
+[00E1] (18)   /* goto 00E4; */
+[00E4] (**) }
+[00E4] (72) loadRoom(31);
+[00E6] (32) setCameraAt(160);
+[00E9] (80) breakHere();
+[00EA] (5C) oldRoomEffect-set(-32512);
+[00EE] (80) breakHere();
+[00EF] (14) print(1,[Center(),Pos(160,Var[166]),Text()]);
+[00F9] (80) breakHere();
+[00FA] (C0) endCutscene();
+[00FB] (A0) stopObjectCode();
+END

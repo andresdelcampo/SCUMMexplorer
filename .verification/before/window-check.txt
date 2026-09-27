@@ -1,0 +1,8 @@
+Room 03: active images 166
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 1 scene details use an artwork estimate because the entry state is unresolved. Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.
+StatusText: Room 03 ready
+Room 17: active images 354,355,360,361
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 4 scene details use an artwork estimate because the entry state is unresolved. Click a room image to cycle artwork; use doorway buttons and the hotspot list for actions.
+StatusText: Room 17 ready

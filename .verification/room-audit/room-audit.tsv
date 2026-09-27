@@ -1,0 +1,77 @@
+room	faithful	gapsBefore	gapsAfter	unfillable	estimates	doorways
+01	False	0	0	0	0	
+02	False	0	0	0	0	03
+03	False	0	0	0	0	02,04,05,10
+04	False	0	0	0	0	03,64
+05	False	0	0	0	0	03,06,07,10,62,63
+06	False	0	0	0	0	05
+07	False	0	0	0	0	05,08,09,50
+08	False	0	0	0	0	07,09
+09	False	0	0	0	0	08
+10	False	0	0	0	0	03,05,13
+11	False	0	0	0	0	
+12	False	0	0	0	0	13
+13	False	2	0	0	4	
+14	False	0	0	0	0	
+15	False	0	0	0	0	16,23
+16	False	0	0	0	0	15,17,18,22,23
+17	False	0	0	0	0	16,22
+18	False	0	0	0	0	16,22
+19	False	0	0	0	0	
+20	False	0	0	0	0	
+22	False	0	0	0	0	16,17,18
+23	False	0	0	0	0	15,16,24
+24	False	0	0	0	0	23,25
+25	False	0	0	0	0	24
+26	False	0	0	0	0	46
+27	False	0	0	0	0	
+28	False	0	0	0	0	
+29	False	0	0	0	0	
+30	False	0	0	0	0	33
+31	False	0	0	0	0	
+32	False	0	0	0	0	30
+33	False	3	0	0	4	30,34
+34	False	0	0	0	0	33,35,46
+35	False	0	0	0	0	34,36
+36	False	0	0	0	0	35,37
+37	False	0	0	0	0	36,38,41
+38	False	0	0	0	0	37
+39	False	0	0	0	0	
+40	False	0	0	0	0	
+41	False	0	0	0	0	37
+42	False	0	0	0	0	
+43	False	0	0	0	0	44,45,46
+44	False	0	0	0	0	
+45	False	0	0	0	0	
+46	False	0	0	0	0	26,47
+47	False	0	0	0	0	46,50
+49	False	0	0	0	0	46
+50	False	0	0	0	0	07,47
+51	False	0	0	0	0	
+52	False	0	0	0	0	
+53	False	0	0	0	0	
+54	False	0	0	0	0	
+55	False	0	0	0	0	
+56	False	2	0	0	2	
+57	False	0	0	0	0	
+58	False	1	0	0	2	
+59	False	0	0	0	0	
+60	False	0	0	0	0	
+61	False	0	0	0	0	
+62	False	0	0	0	0	05
+63	False	0	0	0	0	05
+64	False	0	0	0	0	04
+65	False	0	0	0	0	
+66	False	0	0	0	0	
+67	False	0	0	0	0	
+68	False	0	0	0	0	
+69	False	0	0	0	0	
+70	False	0	0	0	0	
+79	False	0	0	0	0	
+81	False	0	0	0	0	
+82	False	0	0	0	0	
+83	False	0	0	0	0	
+84	False	0	0	0	0	
+85	False	0	0	0	0	
+86	False	0	0	0	0	
+87	False	0	0	0	0	

@@ -1,0 +1,174 @@
+using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using SCUMMexplorer.App;
+using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Formats;
+using SCUMMexplorer.Core.Rendering;
+
+internal static class Program
+{
+    const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
+    [STAThread]
+    static void Main(string[] args)
+    {
+        var output = args[1];
+        var objectId = int.Parse(args[2]);
+        var expectedRoom = int.Parse(args[3]);
+        Directory.CreateDirectory(output);
+        var report = new List<string> { "Real MainWindow; in-process coordinate and routed-key dispatch. No physical mouse/keyboard input." };
+        var app = new Application();
+        var window = new MainWindow();
+        object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
+        object? Call(string name, params object[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
+        T Named<T>(string name) where T : FrameworkElement => (T)window.FindName(name);
+        LoomExplorationSession Session() => (LoomExplorationSession)Field("_session")!;
+        int? DisplayedRoom() => ((GameResource?)Field("_currentRoomResource"))?.ResourceId;
+        async Task WaitRoom(int room)
+        {
+            for (int i = 0; i < 100 && DisplayedRoom() != room; i++) await Task.Delay(100);
+            Check(DisplayedRoom() == room, $"Room {room:00} displayed");
+            await Task.Delay(300);
+            window.UpdateLayout();
+            Check(Named<Image>("RoomPreview").Source is BitmapSource, "Destination/background bitmap exists");
+        }
+        async Task BrowseRoom(int room)
+        {
+            var item = Named<TreeView>("ResourceTree").Items.OfType<TreeViewItem>()
+                .SelectMany(g => g.Items.OfType<TreeViewItem>())
+                .First(i => i.Tag is GameResource r && r.Kind == ResourceKind.Room && r.ResourceId == room);
+            Call("SelectResourceInTree", item.Tag);
+            await WaitRoom(room);
+            report.Add($"Setup only: Room {room:00} selected by catalog browsing.");
+        }
+        void Check(bool condition, string message)
+        {
+            if (!condition) throw new Exception(message);
+            report.Add("PASS: " + message);
+        }
+        void Capture(string name)
+        {
+            window.UpdateLayout();
+            var bitmap = new RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(window);
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            using var stream = File.Create(Path.Combine(output, name + ".png"));
+            encoder.Save(stream);
+        }
+        void Enter(Button button)
+        {
+            Check(button.Focusable && button.IsTabStop && button.IsEnabled, "Action button is enabled, focusable and a tab stop");
+            button.BringIntoView();
+            window.UpdateLayout();
+            Check(button.Focus(), "Action button accepts keyboard focus");
+            var source = PresentationSource.FromVisual(button) ?? throw new Exception("No WPF presentation source");
+            button.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, source, Environment.TickCount, Key.Enter)
+                { RoutedEvent = Keyboard.KeyDownEvent });
+            report.Add("Dispatched synthetic routed Enter (not physical keyboard input).");
+        }
+        void CompleteChoice(bool keyboard)
+        {
+            if (Session().LastAction is { } action && action.SourceRoomId == 3 && action.ObjectId == objectId) return;
+            var choices = Named<StackPanel>("ObjectVerbButtons").Children.OfType<Button>()
+                .Where(b => b.ToolTip?.ToString()?.Contains($"Object {objectId} ") == true).ToArray();
+            Check(choices.Length > 0, $"Decoded object {objectId} interaction offered");
+            if (keyboard) Enter(choices[0]);
+            else choices[0].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        }
+        async Task VerifyAction(string label)
+        {
+            var action = Session().LastAction;
+            if (expectedRoom == 0)
+            {
+                Check(action?.SourceRoomId == 3 && action.ObjectId == objectId, $"{label}: object {objectId} verb executed");
+                Check(action!.DestinationRoomId is null && action.ReachedRoomLoad is null,
+                    "Waiting child does not invent a reached destination");
+                Check(Session().Snapshot.PendingScripts > 0, "Child script remains pending");
+                report.Add(action.Evidence);
+                report.AddRange(action.Uncertainties.Select(value => "Unresolved: " + value));
+                await WaitRoom(3);
+                Call("AdvanceFrame_Click", window, new RoutedEventArgs());
+                Check(DisplayedRoom() == 3 && Session().Snapshot.RoomId == 3 && Session().Snapshot.PendingScripts > 0,
+                    "Advancing a frame retains Room03 and its unresolved waiting script");
+                Check(Named<TextBlock>("ObjectActionNote").Text.Contains("incomplete", StringComparison.OrdinalIgnoreCase),
+                    "Visible action label retains incomplete-state warning");
+                report.Add("ObjectActionNote: " + Named<TextBlock>("ObjectActionNote").Text);
+                report.Add("SessionStatusText: " + Named<TextBlock>("SessionStatusText").Text);
+                Capture(label);
+                return;
+            }
+            Check(action?.SourceRoomId == 3 && action.ObjectId == objectId && action.DestinationRoomId == expectedRoom,
+                $"{label}: object {objectId} execution reached Room {expectedRoom:00}");
+            Check(action!.ReachedRoomLoad is not null, "Destination came from a reached room-load event");
+            report.Add(action.Evidence);
+            await WaitRoom(expectedRoom);
+            var note = Named<TextBlock>("ObjectActionNote").Text;
+            Check(note.Contains("incomplete", StringComparison.OrdinalIgnoreCase), "Visible action label retains incomplete-state warning");
+            report.Add("ObjectActionNote: " + note);
+            report.Add("SessionStatusText: " + Named<TextBlock>("SessionStatusText").Text);
+            Capture(label);
+        }
+        window.ContentRendered += async (_, _) =>
+        {
+            try
+            {
+                Call("OpenGameFolder", args[0]);
+                await BrowseRoom(3);
+                Check(Named<System.Windows.Controls.Primitives.ToggleButton>("SessionModeToggle").IsChecked == true, "Exploration mode enabled");
+                Capture("room-03-before");
+                var records = (IReadOnlyList<LoomRoomObjectRecord>)Field("_currentRoomObjectRecords")!;
+                var record = records.Single(r => r.Id == objectId);
+                // The upper-left quarter also covers the stored image overlapping object 162.
+                int x = record.X + record.Width / 3, y = record.Y + record.Height / 3;
+                report.Add($"Coordinate dispatch at room pixel ({x},{y}) in decoded rectangle ({record.X},{record.Y},{record.Width},{record.Height}).");
+                Call("HandleRoomPoint", x, y);
+                CompleteChoice(keyboard: false);
+                await VerifyAction("coordinate-action");
+
+                await BrowseRoom(3);
+                Call("ResetSession_Click", window, new RoutedEventArgs());
+                var hotspot = Named<StackPanel>("ObjectList").Children.OfType<Button>().Single(b => b.Tag is int id && id == objectId);
+                Enter(hotspot);
+                CompleteChoice(keyboard: true);
+                await VerifyAction("keyboard-action");
+                await BrowseRoom(3);
+                Call("ResetSession_Click", window, new RoutedEventArgs());
+                Named<System.Windows.Controls.Primitives.ToggleButton>("SessionModeToggle").IsChecked = false;
+                var beforeInspection = Session().LastAction;
+                Call("HandleRoomPoint", x, y);
+                Check(Session().LastAction == beforeInspection && DisplayedRoom() == 3,
+                    "Inspection-mode click at the same overlap does not execute an action or navigate");
+                Check(Named<TextBlock>("StatusText").Text.Contains("Object 166", StringComparison.Ordinal),
+                    "Inspection-mode click still selects stored overlapping artwork 166");
+                report.Add("Inspection StatusText: " + Named<TextBlock>("StatusText").Text);
+                Capture("inspection-artwork");
+                Named<System.Windows.Controls.Primitives.ToggleButton>("SessionModeToggle").IsChecked = true;
+                if (expectedRoom == 0)
+                {
+                    await BrowseRoom(4);
+                    Capture("room-04-browse-only");
+                    report.Add("Room04 image rendered through direct catalog browsing only, not a reached transition. Reverse traversal unresolved.");
+                }
+                else report.Add("Reverse traversal is not asserted by this harness; catalog return was setup only.");
+            }
+            catch (Exception ex)
+            {
+                report.Add("FAIL: " + ex);
+                Capture("failure");
+                Environment.ExitCode = 1;
+            }
+            finally
+            {
+                File.WriteAllLines(Path.Combine(output, "window-check.txt"), report);
+                window.Close();
+                app.Shutdown();
+            }
+        };
+        app.Run(window);
+    }
+}

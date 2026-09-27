@@ -1,0 +1,49 @@
+Real MainWindow; in-process coordinate and routed-key dispatch. No physical mouse/keyboard input.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 03 selected by catalog browsing.
+PASS: Exploration mode enabled
+Coordinate dispatch at room pixel (24,24) in decoded rectangle (0,0,72,72).
+PASS: Decoded object 162 interaction offered
+PASS: coordinate-action: object 162 verb executed
+PASS: Waiting child does not invent a reached destination
+PASS: Child script remains pending
+Room 03 object 162, verb 0x36, code 0x2D3A; no room load was reached.
+Unresolved: Object 162 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+PASS: Advancing a frame retains Room03 and its unresolved waiting script
+PASS: Visible action label retains incomplete-state warning
+ObjectActionNote: No room load reached; the session has pending scripts. Exploration state remains incomplete.
+SessionStatusText: Exploration state is incomplete. Hover for details.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 03 selected by catalog browsing.
+PASS: Action button is enabled, focusable and a tab stop
+PASS: Action button accepts keyboard focus
+Dispatched synthetic routed Enter (not physical keyboard input).
+PASS: Decoded object 162 interaction offered
+PASS: Action button is enabled, focusable and a tab stop
+PASS: Action button accepts keyboard focus
+Dispatched synthetic routed Enter (not physical keyboard input).
+PASS: keyboard-action: object 162 verb executed
+PASS: Waiting child does not invent a reached destination
+PASS: Child script remains pending
+Room 03 object 162, verb 0x36, code 0x2D3A; no room load was reached.
+Unresolved: Object 162 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+PASS: Advancing a frame retains Room03 and its unresolved waiting script
+PASS: Visible action label retains incomplete-state warning
+ObjectActionNote: No room load reached; the session has pending scripts. Exploration state remains incomplete.
+SessionStatusText: Exploration state is incomplete. Hover for details.
+PASS: Room 03 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 03 selected by catalog browsing.
+PASS: Inspection-mode click at the same overlap does not execute an action or navigate
+PASS: Inspection-mode click still selects stored overlapping artwork 166
+Inspection StatusText: Object 166 · room background shown
+PASS: Room 04 displayed
+PASS: Destination/background bitmap exists
+Setup only: Room 04 selected by catalog browsing.
+Room04 image rendered through direct catalog browsing only, not a reached transition. Reverse traversal unresolved.

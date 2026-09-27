@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)Exe\$(MSBuildProjectName)\</BaseOutputPath>
+  </PropertyGroup>
+</Project>
