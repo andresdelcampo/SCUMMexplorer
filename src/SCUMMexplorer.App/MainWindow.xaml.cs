@@ -646,12 +646,13 @@ public partial class MainWindow : Window
         RefreshRoomPreview();
     }
 
-    /// <summary>Frames an exit click may continue before falling back to browsing.</summary>
+    /// <summary>Frames an exit click may continue outside a cutscene before falling back to browsing.</summary>
     /// <remarks>
-    /// Delays and waits each take one session frame, so a cutscene exit such as
-    /// Room 10 object 295 (script 052: a message, 15 animation frames, a delay,
-    /// then Room 11) needs about 18. A click that falls short leaves its script
-    /// pending, and that load would later fire during an unrelated click.
+    /// Delays and waits each take one session frame. Frames inside a cutscene do
+    /// not count: the session follows it until it ends (up to 1000 frames), so
+    /// Room 10 object 295 (script 052) passes through Room 11 and ends in Room 13
+    /// after 65 frames. A click that falls short leaves its script pending, and
+    /// that load would later fire during an unrelated click.
     /// </remarks>
     private const int ExitContinuationFrames = 32;
 

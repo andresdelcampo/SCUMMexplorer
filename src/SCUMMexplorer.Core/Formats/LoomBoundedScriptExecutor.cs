@@ -63,6 +63,13 @@ public sealed record LoomBoundedScriptResult(
 public sealed class LoomBoundedScriptExecutor
 {
     private const int DefaultInstructionLimit = 4096;
+
+    /// <summary>
+    /// Returned by an event handler that applies the event itself (such as a
+    /// room load that a global script survives): the run pauses right after the
+    /// instruction, and the caller resumes it at <see cref="LoomBoundedScriptResult.ResumeOffset"/>.
+    /// </summary>
+    public const string PauseAfterEvent = "\u0001pause-after-event";
     private static readonly Regex VariablePattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\]$", RegexOptions.Compiled);
     // readVar/writeVar with the 0x2000 flag: base plus a literal or the value of another variable.
     private static readonly Regex IndexedPattern = new(@"^(var|local|bit)\[0x([0-9A-Fa-f]+)\+(.+)\]$", RegexOptions.Compiled);
@@ -211,6 +218,12 @@ public sealed class LoomBoundedScriptExecutor
                 foreach (var (key, value) in runtime.GlobalVariables) knownVariables[key] = value;
                 estimated.RemoveWhere(IsGlobalKey);
                 estimated.UnionWith(runtime.EstimatedVariables);
+                if (eventHandling == PauseAfterEvent)
+                {
+                    trace.Add($"{instruction.Operation} at +0x{instruction.Offset:X4} handed to the session; the script resumes after it");
+                    resumeOffset = next;
+                    break;
+                }
                 if (!string.IsNullOrEmpty(eventHandling))
                 {
                     unresolved = $"{eventHandling} at +0x{instruction.Offset:X4}";
@@ -478,6 +491,53 @@ public sealed class LoomBoundedScriptExecutor
                         ? $"isSoundRunning reads sound {sound} as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x{instruction.Offset:X4})"
                         : $"isSoundRunning reads sound {sound} as silent because this route did not start it (+0x{instruction.Offset:X4})");
                 trace.Add($"{resultKey} = {(running ? 1 : 0)}: sound {sound} {(running ? "started on this route (estimate)" : "not started on this route")}");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "isScriptRunning")
+            {
+                // o5_isScriptRunning: whether a global or local script slot with
+                // this number is running. Only a session knows its scripts.
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (runtime?.ScriptRunning is null || parts.Length != 2 ||
+                    !TryGetVariableKey(parts[0], knownVariables, out var resultKey) ||
+                    !TryReadValue(parts[1], knownVariables, out var queried, out _))
+                {
+                    unresolved = $"isScriptRunning needs a session that tracks scripts and a known script ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                var answer = runtime.ScriptRunning(queried);
+                knownVariables[resultKey] = answer.Running ? (ushort)1 : (ushort)0;
+                RefreshBitAliases(resultKey, knownVariables);
+                MarkEstimated(estimated, resultKey, onEstimatedPath || answer.Estimate is not null ||
+                    OperandIsEstimated(parts[1], estimated, knownVariables));
+                if (answer.Estimate is not null)
+                    limitations.Add($"isScriptRunning {queried}: {answer.Estimate}, so what follows is an estimate (+0x{instruction.Offset:X4})");
+                trace.Add($"{resultKey} = {(answer.Running ? 1 : 0)}: script {queried} {(answer.Running ? "is running" : "is not running")} in this session{(answer.Estimate is null ? "" : " (estimate)")}");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "beginOverride")
+            {
+                // ScummEngine::beginOverride records the jump that follows and
+                // steps over it. The jump runs only when the player skips the
+                // cutscene; the preview never skips, so the normal path runs.
+                if (!indexByOffset.TryGetValue(next, out var jumpIndex) || instructions[jumpIndex].Operation != "jumpRelative")
+                {
+                    unresolved = $"beginOverride at +0x{instruction.Offset:X4} is not followed by its skip jump";
+                    break;
+                }
+                var jump = instructions[jumpIndex];
+                trace.Add($"override set at +0x{instruction.Offset:X4}; its skip jump (+0x{jump.Offset:X4}) runs only if the player skips the cutscene, which the preview does not");
+                pc = jump.Offset + EncodedLength(jump.Bytes);
+                continue;
+            }
+
+            if (instruction.Operation == "endOverride")
+            {
+                // o5_beginOverride with 0: clears the recorded skip point.
                 pc = next;
                 continue;
             }

@@ -24,6 +24,8 @@ Status: **partial, parked.** It builds with 0 warnings, 144/144 tests pass, the 
 
 ## Open
 
+Items 1, 3 and 4 were closed on 27 September by the [cutscene continuation work](../cutscene-continuation/validation.md): global scripts carry on after a room load (Room 10 object 295 ends in Room 13; DoorwayClickCheck 75/75), `LoomCutsceneTests` covers these opcodes, and WindowCheck captures were taken.
+
 1. Decide how a cutscene room load (Room 11 here) relates to the exit's destination (13). Options: keep continuing a script that loads a room and carries on (ScummVM keeps a global script running), or list both rooms on the box.
 2. Complete the boot (script 001 after the Room 69 load), so the hooks and the cutscene scripts are known.
 3. Add unit tests: `cutscene`/`endCutscene` with known hooks, freeze and unfreeze, one-frame waits, `isSoundRunning`.

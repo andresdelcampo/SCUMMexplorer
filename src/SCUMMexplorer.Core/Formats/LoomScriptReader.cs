@@ -274,6 +274,11 @@ internal static class LoomScriptDisassembler
                     FormatBytes(code.AsSpan(start, end - start).ToArray())));
 
                 if (operation == "stopObjectCode") continue;
+                // ScummEngine::beginOverride records the jump that follows it (taken
+                // only when the player skips the cutscene) and steps over it, so
+                // the code after that jump is the cutscene's normal path.
+                if (operation == "beginOverride" && end + 3 <= code.Length && code[end] == 0x18)
+                    queued.Enqueue(end + 3);
                 if (IsBranchOperation(operation))
                 {
                     var displacement = BinaryPrimitives.ReadInt16LittleEndian(code.AsSpan(end - 2, 2));

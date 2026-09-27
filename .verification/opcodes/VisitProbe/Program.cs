@@ -1,10 +1,10 @@
-using SCUMMexplorer.Core.Discovery;
+﻿using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Formats;
 
 // Usage: VisitProbe <game folder> <step>...
 // A step is "R" (visit Room R from the catalog) or "R/O/V" (visit Room R, then
 // activate object O's verb V, in hex). After each action, pending scripts are
-// continued for up to 8 frames, as a doorway click does in the app. Prints the
+// continued as a doorway click does in the app. Prints the
 // session trace, reached events and uncertainties added by each step.
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 var folder = args[0];
@@ -26,6 +26,15 @@ void Show(string label)
 
 foreach (var step in args.Skip(1))
 {
+    // "var023=2": sets a global word through the session's test seam.
+    if (step.StartsWith("var", StringComparison.Ordinal) && step.Contains('='))
+    {
+        var (name, value) = (step[3..step.IndexOf('=')], ushort.Parse(step[(step.IndexOf('=') + 1)..]));
+        typeof(LoomExplorationSession).GetMethod("SetGlobalWord", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .Invoke(session, [Convert.ToInt32(name, 16), value]);
+        Console.WriteLine($"== set var[0x{Convert.ToInt32(name, 16):X3}] = {value}");
+        continue;
+    }
     var parts = step.Split('/');
     var roomId = int.Parse(parts[0]);
     if (session.Snapshot.RoomId != roomId)
@@ -39,11 +48,18 @@ foreach (var step in args.Skip(1))
     var action = session.ActivateObjectVerb(objectId, verb);
     Console.WriteLine($"   action: {action.Evidence}");
     Show($"object {objectId} verb 0x{verb:X2}");
-    for (var frame = 1; frame <= 8 && session.Snapshot.PendingScripts > 0 && session.Snapshot.RoomId == roomId; frame++)
+    // As a doorway click: up to 32 frames outside a cutscene, 1000 inside one,
+    // until the session has left the room and no cutscene is open.
+    int frames = 0, cutsceneFrames = 0, frame = 0;
+    while (session.Snapshot.PendingScripts > 0)
     {
+        var inCutscene = session.InCutscene;
+        if (!inCutscene && session.Snapshot.RoomId != roomId) break;
+        if (inCutscene ? cutsceneFrames++ >= 1000 : frames++ >= 32) break;
+        var before = session.Snapshot.RoomId;
         session.AdvanceFrame();
-        Show($"frame {frame}");
-        if (session.Snapshot.RoomId != roomId)
+        Show($"frame {++frame}{(inCutscene ? " (cutscene)" : "")}");
+        if (session.Snapshot.RoomId != before)
             Console.WriteLine($"   entered Room {session.Snapshot.RoomId:00}: {session.LastAction?.Evidence}");
     }
 }

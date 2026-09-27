@@ -1,0 +1,140 @@
+﻿== visit Room 10: room 10, pending 1
+   uncertain: Script 01 +0x0000: script requests Room 69; room transition awaits bounded session dispatch at +0x0160
+   uncertain: Room 10 selected from the catalog; the route to it was not executed from game input.
+   uncertain: Script 16 +0x0000: presentation operation not applied: print
+   uncertain: Script 17 +0x0000: presentation operation not applied: actorOps; presentation operation not applied: animateActor
+   uncertain: Room 10 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   action: Room 10 object 295, verb 0x38, code 0x35BC; no room load was reached.
+== object 295 verb 0x38: room 10, pending 2
+   trace: cutscene at Script 52 +0x0000 runs script 0
+   uncertain: Object 295 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+   uncertain: Object 295 is untouchable (class 24) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.
+   uncertain: Script 52 +0x0000: timing not simulated: waiting for the message to finish continues on the next frame (+0x0005)
+== frame 1 (cutscene): room 10, pending 1
+   uncertain: Room 10 local script 200 +0x0001: operation 'getActorWalkBox' is not modeled at +0x0001
+== frame 2 (cutscene): room 10, pending 1
+   uncertain: Script 52 +0x0013: presentation operation not applied: actorOps; presentation operation not applied: putActor; presentation operation not applied: animateActor
+== frame 3 (cutscene): room 10, pending 1
+== frame 4 (cutscene): room 10, pending 1
+== frame 5 (cutscene): room 10, pending 1
+== frame 6 (cutscene): room 10, pending 1
+== frame 7 (cutscene): room 10, pending 1
+== frame 8 (cutscene): room 10, pending 1
+== frame 9 (cutscene): room 10, pending 1
+== frame 10 (cutscene): room 10, pending 1
+== frame 11 (cutscene): room 10, pending 1
+== frame 12 (cutscene): room 10, pending 1
+== frame 13 (cutscene): room 10, pending 1
+== frame 14 (cutscene): room 10, pending 1
+== frame 15 (cutscene): room 10, pending 1
+== frame 16 (cutscene): room 10, pending 1
+== frame 17 (cutscene): room 10, pending 1
+   uncertain: Script 52 +0x0033: presentation operation not applied: animateActor
+== frame 18 (cutscene): room 10, pending 1
+   uncertain: Script 52 +0x0041: timing not simulated: a delay of 60 jiffies continues on the next frame (+0x0041)
+== frame 19 (cutscene): room 11, pending 2
+   trace: Script 52 continues at +0x0047 in Room 11 after loadRoom
+   uncertain: Script 52 +0x0045 reached loadRoom after a frame advance.
+   uncertain: Room 10 object 295, verb 0x38, code 0x35BC; loadRoom at Script 52 +0x0045 → Room 11. Actor walk and input dispatch were not simulated.
+   uncertain: Script 52 +0x0047: presentation operation not applied: setCameraAt; presentation operation not applied: actorOps; presentation operation not applied: animateActor; presentation operation not applied: putActorInRoom; presentation operation not applied: putActor
+   entered Room 11: Room 10 object 295, verb 0x38, code 0x35BC; loadRoom at Script 52 +0x0045 → Room 11.
+== frame 20 (cutscene): room 11, pending 2
+== frame 21 (cutscene): room 11, pending 3
+== frame 22 (cutscene): room 11, pending 3
+   uncertain: Sound 25 was started; its natural completion time is not simulated.
+   uncertain: Script 52 +0x00C6: presentation operation not applied: walkActorTo
+== frame 23 (cutscene): room 11, pending 3
+== frame 24 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 25 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 26 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 27 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 28 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 29 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 30 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 31 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 32 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 33 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 34 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 35 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 36 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 37 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 38 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 39 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 40 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 41 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 42 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 43 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 44 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 45 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 46 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 47 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 48 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 49 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 50 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 51 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 52 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 53 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 54 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 55 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 56 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 57 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 58 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 59 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 60 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 61 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 62 (cutscene): room 11, pending 4
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Room 11 local script 210 +0x0000: timing not simulated: waiting for actor 0x03 to stop walking continues on the next frame (+0x0000)
+== frame 63 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Room 11 local script 210 +0x0003: presentation operation not applied: putActorInRoom
+== frame 64 (cutscene): room 11, pending 3
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+== frame 65 (cutscene): room 13, pending 3
+   trace: endCutscene at Script 52 +0x017C runs script 0
+   trace: Script 52 continues at +0x0185 in Room 13 after loadRoomWithEgo
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 52 passed through Room 11 (loadRoom at +0x0045) before this load.
+   uncertain: Script 52 +0x017D reached loadRoomWithEgo after a frame advance.
+   uncertain: Room 10 object 295, verb 0x38, code 0x35BC; loadRoomWithEgo at Script 52 +0x017D → Room 13. Actor walk and input dispatch were not simulated.
+   uncertain: Script 16 +0x0000: presentation operation not applied: print
+   uncertain: Room 13 entry script +0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: actorOps
+   entered Room 13: Room 10 object 295, verb 0x38, code 0x35BC; loadRoomWithEgo at Script 52 +0x017D → Room 13.

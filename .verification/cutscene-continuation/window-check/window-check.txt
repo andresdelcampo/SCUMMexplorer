@@ -1,0 +1,28 @@
+Room 03: active images 
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 03 ready
+Doorway button "Room 02": Static candidate: Room 03 object 160 (Verb 0x38) code 0x2D71, room-load instruction +0x0005 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 05": Static candidate: Room 03 object 161 (Verb 0x36, Verb 0x38) code 0x2D1D, room-load instruction +0x0008 (local script 201). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 04": Static candidate: Room 03 object 162 (Verb 0x36, Verb 0x38) code 0x2D3A, room-load instruction +0x0008 (local script 200). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 10": Static candidates (2 sources): | • Room 03 object 163 (Verb 0x36, Verb 0x38) code 0x2D57, room-load instruction +0x0008 (local script 202) | • Room 03 object 164 (Verb 0x38) code 0x2D95, room-load instruction +0x0008 (local script 202) | Open directly for exploration; script conditions and effects are not simulated.
+Room 10: active images 293,301,302,303
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 10 ready
+Doorway button "Room 03": Static candidate: Room 10 object 284 (Verb 0x38) code 0x3578, room-load instruction +0x0003 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 05": Static candidate: Room 10 object 285 (Verb 0x38) code 0x359A, room-load instruction +0x0003 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 13": Static candidate: Room 10 object 295 (Verb 0x38) code 0x35BC, room-load instruction +0x017D (global script 52). | Open directly for exploration; script conditions and effects are not simulated.
+Room 15: active images 340,341
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions.
+StatusText: Room 15 ready
+Doorway button "Room 23": Static candidate: Room 15 object 338 (Verb 0x38) code 0x44DF, room-load instruction +0x0026 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 16": Static candidate: Room 15 object 339 (Verb 0x38) code 0x4524, room-load instruction +0x000B (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Room 43: active images 645
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: 1 scene details use an artwork estimate because the entry state is unresolved (from script 91 +0x009C).
+StatusText: Room 43 ready
+Doorway button "Room 46": Static candidate: Room 43 object 639 (Verb 0x38) code 0x45B0, room-load instruction +0x00EF (global script 96). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 45": Static candidate: Room 43 object 639 (Verb 0x38) code 0x45B0, room-load instruction +0x0025 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 44": Static candidate: Room 43 object 639 (Verb 0x38) code 0x45B0, room-load instruction +0x0030 (direct). | Open directly for exploration; script conditions and effects are not simulated.

@@ -18,9 +18,12 @@ public sealed class LoomFirstVisitRenderingTests
     public void Room56OpeningFrameIsTheFaceThenItsMouth()
     {
         if (Data.Value is not { } data) return;
-        var opening = data.Batches.ForRoom(56).Where(batch => batch.Priority == LoomSceneDrawBatches.OpeningFramePriority);
-        // Script 68 loads Room 56 twice; only the first load is the opening frame.
-        Assert.Equal([779, 782], Assert.Single(opening).Steps.Select(step => step.ObjectId));
+        var opening = data.Batches.ForRoom(56).Where(batch => batch.Priority == LoomSceneDrawBatches.OpeningFramePriority).ToArray();
+        // Script 68 loads Room 56 twice; only its first load is an opening frame. Script 108's
+        // cutscene body (after its beginOverride) opens the room on the same face and mouth.
+        Assert.Equal(["opening frame of Room 56 in script 108 +0x0188", "opening frame of Room 56 in script 68 +0x0103"],
+            opening.Select(batch => batch.Source).Order(StringComparer.Ordinal));
+        Assert.All(opening, batch => Assert.Equal([779, 782], batch.Steps.Select(step => step.ObjectId)));
 
         var (selection, estimates, background) = data.FirstVisit(56);
 
@@ -31,16 +34,30 @@ public sealed class LoomFirstVisitRenderingTests
     }
 
     [Fact]
-    public void Room58WithoutScriptEvidenceUsesALabelledRandomPickAndLeavesNoGap()
+    public void Room58OpensOnScript86sCutsceneFrame()
     {
         if (Data.Value is not { } data) return;
-        // No decoded script draws or loads Room 58 by literal, so no batch exists.
-        Assert.Empty(data.Batches.ForRoom(58));
+        // Script 86's cutscene body lies after its beginOverride skip jump. Until the
+        // disassembler followed beginOverride, no decoded code loaded Room 58.
+        var opening = Assert.Single(data.Batches.ForRoom(58), batch => batch.Priority == LoomSceneDrawBatches.OpeningFramePriority);
+        Assert.Equal("opening frame of Room 58 in script 86 +0x018A", opening.Source);
 
         var (selection, estimates, _) = data.FirstVisit(58);
 
-        Assert.NotEmpty(estimates);
-        Assert.All(estimates, item => Assert.StartsWith("random choice", item.Reason, StringComparison.Ordinal));
+        Assert.Equal([new RoomArtworkEstimate(792, opening.Source)], estimates);
+        Assert.Empty(selection.VisibleGaps());
+    }
+
+    [Fact]
+    public void DrawsTheSameScriptUndoesAreNotBatches()
+    {
+        if (Data.Value is not { } data) return;
+        // Script 90 flashes 637 and 638 in Room 42 (drawObject, breakHere, setState 0).
+        Assert.DoesNotContain(data.Batches.ForRoom(42), batch => batch.Source.StartsWith("script 90 ", StringComparison.Ordinal));
+        // Script 99 draws Room 20's images and leaves them; they were the stored-image guess before.
+        var (selection, estimates, _) = data.FirstVisit(20);
+        Assert.Equal([392, 393, 394, 395, 396], estimates.Select(item => item.ObjectId).Order());
+        Assert.All(estimates, item => Assert.Equal("script 99 +0x02BB", item.Reason));
         Assert.Empty(selection.VisibleGaps());
     }
 

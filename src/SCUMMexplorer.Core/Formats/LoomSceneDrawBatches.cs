@@ -273,11 +273,12 @@ public sealed class LoomSceneDrawBatches
         var openedRooms = new HashSet<int>();
         var batchStart = 0;
 
-        void Flush()
+        void Flush(int end)
         {
             if (steps.Count > 0)
             {
-                foreach (var group in steps.Where(step => roomByObject.ContainsKey(step.ObjectId))
+                foreach (var group in steps.Where(step => roomByObject.ContainsKey(step.ObjectId) &&
+                                                          !UndoneLater(script.Instructions, end, step.ObjectId))
                              .GroupBy(step => roomByObject[step.ObjectId]))
                 {
                     var opening = loadedRoom == group.Key;
@@ -290,8 +291,9 @@ public sealed class LoomSceneDrawBatches
             steps.Clear();
         }
 
-        foreach (var instruction in script.Instructions)
+        for (var index = 0; index < script.Instructions.Count; index++)
         {
+            var instruction = script.Instructions[index];
             switch (instruction.Operation)
             {
                 case "drawObject":
@@ -303,7 +305,7 @@ public sealed class LoomSceneDrawBatches
                     break;
                 case "loadRoom":
                 case "loadRoomWithEgo":
-                    Flush();
+                    Flush(index);
                     var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
                     var roomOperand = instruction.Operation == "loadRoom" ? parts[0] : parts.ElementAtOrDefault(1) ?? "";
                     loadedRoom = TryReadLiteral(roomOperand, out var room) && openedRooms.Add(room) ? room : null;
@@ -313,17 +315,49 @@ public sealed class LoomSceneDrawBatches
                 case "jumpRelative":
                 case "isGreaterEqual" or "isNotEqual" or "isLessEqual" or "isLess" or "isEqual" or "isGreater" or
                     "equalZero" or "notEqualZero" or "ifClassOfIs" or "isActorInBox" or "ifState" or "ifNotState":
-                    Flush();
+                    Flush(index);
                     loadedRoom = null;
                     break;
                 case "setState":
                     // A redraw separates what was drawn before from what follows.
-                    Flush();
+                    Flush(index);
                     break;
             }
         }
-        Flush();
+        Flush(script.Instructions.Count);
         return results;
+    }
+
+    /// <summary>
+    /// True when the straight-line code after <paramref name="start"/> sets the
+    /// object back to state 0 before any branch, jump, room load, stop or new
+    /// draw of it (frame breaks and other commands may come between). Such a
+    /// draw is a passing frame, such as script 90's flashes in Room 42, not
+    /// something the room keeps showing.
+    /// </summary>
+    private static bool UndoneLater(IReadOnlyList<LoomScriptInstruction> instructions, int start, int objectId)
+    {
+        for (var index = start; index < instructions.Count; index++)
+        {
+            var instruction = instructions[index];
+            switch (instruction.Operation)
+            {
+                case "setState":
+                    var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                    if (parts.Length == 2 && TryReadLiteral(parts[0], out var target) && target == objectId)
+                        return TryReadLiteral(parts[1], out var state) && state == 0;
+                    if (parts.Length != 2 || !TryReadLiteral(parts[0], out _)) return false;
+                    break;
+                case "drawObject":
+                    if (!TryReadDraw(instruction.Operands, out var step) || step.ObjectId == objectId) return false;
+                    break;
+                case "stopObjectCode" or "jumpRelative" or "loadRoom" or "loadRoomWithEgo" or
+                    "isGreaterEqual" or "isNotEqual" or "isLessEqual" or "isLess" or "isEqual" or "isGreater" or
+                    "equalZero" or "notEqualZero" or "ifClassOfIs" or "isActorInBox" or "ifState" or "ifNotState":
+                    return false;
+            }
+        }
+        return false;
     }
 
     private static readonly Regex LocalOperand = new(@"^local\[0x(?<number>[0-9A-Fa-f]+)\]$", RegexOptions.CultureInvariant);

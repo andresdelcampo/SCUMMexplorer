@@ -36,4 +36,10 @@ public sealed class LoomScriptRuntimeState
     public HashSet<string> EstimatedVariables { get; } = new(StringComparer.Ordinal);
     /// <summary>Objects whose state, class or draw was set by code that ran only because of a seeded pick.</summary>
     public HashSet<int> EstimatedStates { get; } = [];
+    /// <summary>
+    /// Answers <c>isScriptRunning</c> from the session's running and pending
+    /// scripts; <c>Estimate</c> says why the answer may differ from the game.
+    /// Null outside a session.
+    /// </summary>
+    public Func<int, (bool Running, string? Estimate)>? ScriptRunning { get; set; }
 }

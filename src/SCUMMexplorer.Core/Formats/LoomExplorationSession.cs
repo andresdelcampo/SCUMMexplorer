@@ -92,9 +92,31 @@ public sealed class LoomExplorationSession
             Random = new LoomSeededRandom(randomSeed)
         };
         _globalScriptCount = ReadGlobalScriptCount(game);
+        _runtime.ScriptRunning = IsScriptRunning;
         // ScummVM runs indexed script 1 at boot for this release family.
         RunIndexedScript(1, 0, null, 0);
     }
+
+    /// <summary>
+    /// True while a cutscene begun on this route is open: its script is still
+    /// running and has not reached <c>endCutscene</c> (ScummVM's cutscene stack).
+    /// The player has no control then, so a click's outcome is where it ends.
+    /// </summary>
+    public bool InCutscene => _cutscenes.Any(item => IsAlive(item.Owner));
+
+    /// <summary>
+    /// Test seam: gives a global word a value, as reached code would, so tests
+    /// can exercise hooks the boot has not set. Never used by the app.
+    /// </summary>
+    internal void SetGlobalWord(int variable, ushort value) =>
+        _runtime.GlobalVariables[$"var[0x{variable:X3}]"] = value;
+
+    /// <summary>Test seam: runs a synthetic script at the top level, as a frame would. Never used by the app.</summary>
+    internal LoomBoundedScriptResult RunTopLevelScript(LoomScriptDisassembly script) =>
+        RunScript(script, _currentObjects, 0, null, 0);
+
+    private bool IsAlive(ScriptFrame? frame) =>
+        frame is not null && (_executing.Contains(frame) || _pending.Any(item => item.Frame == frame));
 
     /// <summary>Seed of the stand-in random source; every <c>getRandomNr</c> value is a labelled pick from it.</summary>
     public int RandomSeed => _runtime.Random.Seed;
@@ -178,6 +200,7 @@ public sealed class LoomExplorationSession
             _uncertainties.Add($"Object {objectId} is untouchable (class {LoomObjectClasses.Untouchable}) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.");
         LoomScriptDisassembly? script = null;
         LoomBoundedScriptResult? run = null;
+        _dispatchScope++;
         try
         {
             script = _verbs.Decode(_currentRoom, record, verbId);
@@ -187,8 +210,22 @@ public sealed class LoomExplorationSession
         {
             _uncertainties.Add($"Room {sourceRoomId:00} Object {objectId} verb 0x{verbId:X2}: {ex.Message}");
         }
+        finally
+        {
+            _dispatchScope--;
+        }
+        LastAction = new LoomObjectActionResult(sourceRoomId, objectId, verbId,
+            script?.ResourceOffset ?? record.CodeOffset, script, run, null, null,
+            _uncertainties.Skip(beforeUncertainties).ToArray());
+        // A global script the verb started may have loaded a room and carried on.
+        if (DispatchRequestedLoads("during the action"))
+        {
+            LastAction = LastAction with { Uncertainties = _uncertainties.Skip(beforeUncertainties).ToArray() };
+            return LastAction;
+        }
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
-            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached);
+            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
+            !_dispatchedLoads.Contains(item));
         var targetId = roomLoad?.TargetId;
         var target = targetId is int id
             ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
@@ -218,51 +255,145 @@ public sealed class LoomExplorationSession
         var runnable = _pending.ToArray();
         _pending.Clear();
         _stopped.Clear();
-        foreach (var item in runnable)
+        _dispatchScope++;
+        try
         {
-            if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
-            // An earlier script in this frame may have stopped this one.
-            if (item.ScriptNumber is int number && _stopped.Contains(number)) continue;
-            // runAllScripts skips frozen slots; they keep their place.
-            if (item.Frame.FreezeCount > 0)
+            foreach (var item in runnable)
             {
-                _pending.Add(item);
-                continue;
+                // A room load earlier in this frame ended the room's scripts.
+                if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
+                // An earlier script in this frame may have stopped this one.
+                if (item.ScriptNumber is int number && _stopped.Contains(number)) continue;
+                // runAllScripts skips frozen slots; they keep their place.
+                if (item.Frame.FreezeCount > 0)
+                {
+                    _pending.Add(item);
+                    continue;
+                }
+                RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0, item.ScriptNumber,
+                    item.EstimatedLocals, item.PathEstimated, item.Frame);
+                DispatchRequestedLoads("after a frame advance");
             }
-            RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0, item.ScriptNumber,
-                item.EstimatedLocals, item.PathEstimated, item.Frame);
+        }
+        finally
+        {
+            _dispatchScope--;
         }
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
-            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached);
-        if (roomLoad is null || _currentRoom?.ResourceId is not int sourceRoomId) return Snapshot;
+            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
+            !_dispatchedLoads.Contains(item));
+        if (roomLoad is null || _currentRoom is null) return Snapshot;
         var target = roomLoad.TargetId is int id ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
         if (target is null)
         {
             _uncertainties.Add($"Reached room load has no indexed destination ({roomLoad.Operands}).");
             return Snapshot;
         }
-        var beforeUncertainties = _uncertainties.Count;
-        var action = LastAction is { ReachedRoomLoad: null } pending && pending.SourceRoomId == sourceRoomId
-            ? pending with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId }
-            : new LoomObjectActionResult(sourceRoomId, 0, 0, roomLoad.Offset, null, null, roomLoad,
-                target.ResourceId, []);
-        _uncertainties.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} reached {roomLoad.Operation} after a frame advance.");
-        VisitRoom(target, action);
-        LastAction = action with { Uncertainties = [.. action.Uncertainties, .. _uncertainties.Skip(beforeUncertainties)] };
+        EnterReachedLoad(roomLoad, target, null, "after a frame advance");
         return Snapshot;
     }
 
     /// <summary>
-    /// Advances frames, at most <paramref name="maxFrames"/>, while scripts are
-    /// pending and the session stays in the same room. Returns true when a
-    /// continued script reached a room load that the session entered.
+    /// Advances frames while scripts are pending, until the session has left
+    /// the room and no cutscene is open. Frames outside a cutscene count
+    /// against <paramref name="maxFrames"/>; frames inside one count against
+    /// <paramref name="maxCutsceneFrames"/>, because the player has no control
+    /// until the cutscene ends. Returns true when the session is in another room.
     /// </summary>
-    public bool ContinueUntilRoomChanges(int maxFrames)
+    public bool ContinueUntilRoomChanges(int maxFrames, int maxCutsceneFrames = 1000)
     {
         var room = _currentRoom?.ResourceId;
-        for (var frame = 0; frame < maxFrames && _pending.Count > 0 && _currentRoom?.ResourceId == room; frame++)
+        var frames = 0;
+        var cutsceneFrames = 0;
+        while (_pending.Count > 0)
+        {
+            var inCutscene = InCutscene;
+            if (!inCutscene && _currentRoom?.ResourceId != room) break;
+            if (inCutscene ? cutsceneFrames++ >= maxCutsceneFrames : frames++ >= maxFrames)
+            {
+                if (inCutscene)
+                    _uncertainties.Add($"A cutscene was still open after {maxCutsceneFrames} continued frames; the preview stopped following it.");
+                break;
+            }
             AdvanceFrame();
+        }
         return _currentRoom?.ResourceId != room;
+    }
+
+    /// <summary>
+    /// Enters the room a global script loaded and resumes that script there in
+    /// the same frame. In ScummVM, <c>startScene</c> ends room, object and local
+    /// scripts, but a global script returns from <c>loadRoom</c> and carries on
+    /// (a cutscene can pass through several rooms). Returns true when a room was entered.
+    /// </summary>
+    private bool DispatchRequestedLoads(string when)
+    {
+        var entered = false;
+        for (var hop = 0; hop < MaxNestedScripts && _requestedLoad is { } request; hop++)
+        {
+            _requestedLoad = null;
+            var item = _pending.FirstOrDefault(pending => pending.Frame == request.Frame);
+            if (item is null) continue;
+            _pending.Remove(item);
+            _dispatchedLoads.Add(request.Event);
+            var target = _game.Rooms.First(room => room.ResourceId == request.Event.TargetId);
+            EnterReachedLoad(request.Event, target, request.Frame, when);
+            entered = true;
+            _visitTrace.Add($"{request.Event.SourceLabel} continues at +0x{item.Offset:X4} in Room {target.ResourceId:00} after {request.Event.Operation}");
+            _dispatchScope++;
+            try
+            {
+                RunScript(item.Script, _currentObjects, item.Offset, item.Locals, 0, item.ScriptNumber,
+                    item.EstimatedLocals, item.PathEstimated, item.Frame);
+            }
+            finally
+            {
+                _dispatchScope--;
+            }
+        }
+        return entered;
+    }
+
+    /// <summary>
+    /// Visits the room a reached load names and records it as the outcome of
+    /// the last action when it follows from it: the action's own script, or a
+    /// later load by the same global script that carried the action's first load.
+    /// </summary>
+    private void EnterReachedLoad(LoomScriptEvent roomLoad, GameResource target, ScriptFrame? frame, string when)
+    {
+        var sourceRoomId = _currentRoom?.ResourceId ?? 0;
+        var beforeUncertainties = _uncertainties.Count;
+        LoomObjectActionResult action;
+        if (LastAction is { ReachedRoomLoad: null } pending && pending.SourceRoomId == sourceRoomId)
+            action = pending with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId };
+        else if (frame is not null && frame == _actionLoadFrame &&
+                 LastAction is { ReachedRoomLoad: { } earlier } last && last.DestinationRoomId == sourceRoomId)
+        {
+            _uncertainties.Add($"{earlier.SourceLabel} passed through Room {sourceRoomId:00} ({earlier.Operation} at +0x{earlier.Offset:X4}) before this load.");
+            action = last with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId };
+        }
+        else
+            action = new LoomObjectActionResult(sourceRoomId, 0, 0, roomLoad.Offset, null, null, roomLoad,
+                target.ResourceId, []);
+        _actionLoadFrame = frame;
+        _uncertainties.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} reached {roomLoad.Operation} {when}.");
+        VisitRoom(target, action);
+        LastAction = action with { Uncertainties = [.. action.Uncertainties, .. _uncertainties.Skip(beforeUncertainties)] };
+    }
+
+    /// <summary>
+    /// ScummEngine::isScriptRunning: a global or local script slot with this
+    /// number is running (executing, waiting for a later frame, or frozen).
+    /// A script that ended at a step the preview does not model might still
+    /// run in the game, so that answer is an estimate.
+    /// </summary>
+    private (bool Running, string? Estimate) IsScriptRunning(int number)
+    {
+        var running = _executing.Any(frame => frame.Number == number) ||
+                      _pending.Any(item => item.ScriptNumber == number);
+        return running || !_endedUnmodelled.Contains(number)
+            ? (running, null)
+            : (false, $"script {number} ended at a step the preview does not model, so it may still run in the game");
     }
 
     private readonly List<LoomScriptEvent> _visitEvents = [];
@@ -273,8 +404,16 @@ public sealed class LoomExplorationSession
     private readonly List<ScriptFrame> _executing = [];
     // beginCutscene's vm.cutSceneData stack, and the script whose cutscene start
     // script is running (vm.cutSceneScriptIndex), which freezeScripts leaves running.
-    private readonly Stack<ushort> _cutsceneData = new();
+    private readonly Stack<(ushort Data, ScriptFrame? Owner)> _cutscenes = new();
     private ScriptFrame? _cutsceneOwner;
+    // Room loads by global scripts: the script pauses after the load, the session
+    // enters the room, and the script resumes there (only inside an action or frame).
+    private int _dispatchScope;
+    private (LoomScriptEvent Event, ScriptFrame Frame)? _requestedLoad;
+    private readonly HashSet<LoomScriptEvent> _dispatchedLoads = new(ReferenceEqualityComparer.Instance);
+    private ScriptFrame? _actionLoadFrame;
+    // Script numbers whose last run ended at a step the preview does not model.
+    private readonly HashSet<int> _endedUnmodelled = [];
 
     /// <summary>ScummVM <c>VAR_CUTSCENE_START_SCRIPT</c>, <c>VAR_CUTSCENE_END_SCRIPT</c> and <c>VAR_OVERRIDE</c>.</summary>
     private const string CutsceneStartScriptVariable = "var[0x023]";
@@ -390,6 +529,9 @@ public sealed class LoomExplorationSession
         }
         frame ??= new ScriptFrame();
         frame.Label = script.Context ?? $"Script {script.ScriptId:00}";
+        frame.Number = scriptNumber;
+        // Indexed scripts run in global slots; room entry, exit, local and verb code is room-owned.
+        frame.Global = script.Context is null;
         _executing.Add(frame);
         LoomBoundedScriptResult result;
         try
@@ -411,6 +553,11 @@ public sealed class LoomExplorationSession
         }
         if (result.UnresolvedReason is not null)
             _uncertainties.Add($"{label} +0x{startOffset:X4}: {result.UnresolvedReason}");
+        if (scriptNumber is int number)
+        {
+            if (!result.ReachedStop && result.ResumeOffset is null) _endedUnmodelled.Add(number);
+            else _endedUnmodelled.Remove(number);
+        }
         if (result.ResumeOffset is int next)
         {
             var preservedLocals = result.KnownVariables
@@ -483,6 +630,14 @@ public sealed class LoomExplorationSession
                 return "";
             case LoomScriptEventKind.RoomLoaded when scriptEvent.Certainty != LoomScriptEventCertainty.Reached:
                 return $"possible Room {scriptEvent.TargetId?.ToString("00", CultureInfo.InvariantCulture) ?? "dynamic"} load follows a seeded pick, so the session does not enter it";
+            case LoomScriptEventKind.RoomLoaded when _dispatchScope > 0 && _requestedLoad is null &&
+                                                      _executing.Count > 0 && _executing[^1].Global &&
+                                                      scriptEvent.TargetId is int loadedRoom &&
+                                                      _game.Rooms.Any(room => room.ResourceId == loadedRoom):
+                // A global script survives startScene: pause it here, enter the
+                // room, then resume it there (DispatchRequestedLoads).
+                _requestedLoad = (scriptEvent, _executing[^1]);
+                return LoomBoundedScriptExecutor.PauseAfterEvent;
             case LoomScriptEventKind.RoomLoaded:
                 return $"script requests Room {scriptEvent.TargetId?.ToString("00", CultureInfo.InvariantCulture) ?? "dynamic"}; room transition awaits bounded session dispatch";
             default:
@@ -499,7 +654,7 @@ public sealed class LoomExplorationSession
     {
         if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var arguments))
             return "cutscene arguments depend on unknown variables";
-        _cutsceneData.Push(arguments.GetValueOrDefault("local[0x000]"));
+        _cutscenes.Push((arguments.GetValueOrDefault("local[0x000]"), _executing.Count > 0 ? _executing[^1] : null));
         if (!_runtime.GlobalVariables.TryGetValue(CutsceneStartScriptVariable, out var startScript))
         {
             _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: the cutscene start script ({CutsceneStartScriptVariable}) is unknown; its effects were not applied.");
@@ -533,7 +688,7 @@ public sealed class LoomExplorationSession
         if (estimate) _runtime.EstimatedVariables.Add(OverrideVariable);
         else _runtime.EstimatedVariables.Remove(OverrideVariable);
         ushort data = 0;
-        if (_cutsceneData.Count > 0) data = _cutsceneData.Pop();
+        if (_cutscenes.Count > 0) data = _cutscenes.Pop().Data;
         else _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: endCutscene without a cutscene begun on this route; its data is taken as 0.");
         if (!_runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var endScript))
         {
@@ -631,6 +786,9 @@ public sealed class LoomExplorationSession
     private sealed class ScriptFrame
     {
         public bool FreezeResistant { get; init; }
+        /// <summary>Global or local script number; null for room entry, exit and verb code.</summary>
+        public int? Number { get; set; }
+        public bool Global { get; set; }
         public int FreezeCount { get; set; }
         public string Label { get; set; } = "";
     }
