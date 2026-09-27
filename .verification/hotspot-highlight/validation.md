@@ -14,3 +14,15 @@ A second canvas over the room image (`HotspotHighlightOverlay`, not hit-testable
 dotnet build .verification/hotspot-highlight/HighlightCheck/HighlightCheck.csproj
 Start-Process -Wait -NoNewWindow -WorkingDirectory $PWD -FilePath Exe\HighlightCheck\Debug\net10.0-windows\HighlightCheck.exe -ArgumentList "Games\loom", ".verification\hotspot-highlight", "3", "10", "17"
 ```
+
+## Reverse link: hovering the room highlights the row (27 September 2026)
+
+In exploration mode, moving the pointer over the room highlights the hotspot row of the object under it, scrolls the row into view and outlines its box. The object is the one ScummVM's `findObject` would pick among the listed hotspots: the first in directory order whose box, at its current position, contains the point, with touchable objects before untouchable ones. Leaving the room image clears both. Inspection mode's scene-detail list keeps its own colours and is not affected. `HotspotRowRecordAt` and `ShowHoveredHotspotRow` live in `MainWindow`.
+
+[`ReverseHoverCheck`](ReverseHoverCheck/Program.cs): **22/22 PASS** in Rooms 03, 10 and 17 ([report](reverse/reverse-hover-check.txt)).
+- For every row, the pointer is put at the centre of the row's box. The check confirms that exactly the picked row is highlighted, one outline is drawn, and both clear after `RoomPreview_MouseLeave`.
+- A point off the room highlights nothing.
+- In Room 03, the centre of object 164's box ("→ Room 10 · 5") lies inside object 163's box, which comes first in the directory, so 163's row lights, as `findObject` would pick it.
+- WPF's synthetic mouse events carry no position, so the harness passes the point in room pixels to the same methods `RoomPreview_MouseMove` calls. There is no physical input.
+
+Capture: [Room 10, pointer on the Room 03 exit](reverse/room-10-hover-row-0.png). The forward check was rerun: [HighlightCheck](reverse/forward/highlight-check.txt) is still 19/19.

@@ -1754,6 +1754,7 @@ public partial class MainWindow : Window
             : $"Object {selected.Id} · position {selectedPosition.X}, {selectedPosition.Y}";
 
         ObjectList.Children.Clear();
+        _hoveredHotspotRowId = null;
         ShowHotspotHighlight(null);
         var interactive = SessionModeToggle.IsChecked == true && _session is not null;
         if (interactive)
@@ -1834,6 +1835,7 @@ public partial class MainWindow : Window
     private void ClearObjectList()
     {
         ObjectList.Children.Clear();
+        _hoveredHotspotRowId = null;
         ObjectListSection.Visibility = Visibility.Collapsed;
     }
 
@@ -2078,8 +2080,10 @@ public partial class MainWindow : Window
         {
             RoomPreview.Cursor = Cursors.Arrow;
             RoomPreview.ToolTip = null;
+            ShowHoveredHotspotRow(null);
             return;
         }
+        ShowHoveredHotspotRow(SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null);
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             var doorways = DoorwaysAt(x, y);
@@ -2138,6 +2142,53 @@ public partial class MainWindow : Window
     {
         RoomPreview.Cursor = Cursors.Arrow;
         RoomPreview.ToolTip = null;
+        ShowHoveredHotspotRow(null);
+    }
+
+    /// <summary>
+    /// The listed hotspot under a room point, as findObject would pick it: the
+    /// first listed object in directory order whose box (at its current position)
+    /// contains the point, touchable objects before untouchable ones.
+    /// </summary>
+    private LoomRoomObjectRecord? HotspotRowRecordAt(int x, int y)
+    {
+        if (_session is null) return null;
+        var listed = ObjectList.Children.OfType<Button>().Select(button => button.Tag).OfType<int>().ToHashSet();
+        if (listed.Count == 0) return null;
+        var snapshot = _session.Snapshot;
+        var hits = _currentRoomObjectRecords.OrderBy(item => item.LocalIndex).Where(record =>
+        {
+            if (!listed.Contains(record.Id)) return false;
+            var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
+                ? current : new RoomObjectPosition(record.X, record.Y);
+            return at.X <= x && x < at.X + record.Width && at.Y <= y && y < at.Y + record.Height;
+        }).ToArray();
+        return hits.FirstOrDefault(record => !snapshot.IsUntouchable(record.Id)) ?? hits.FirstOrDefault();
+    }
+
+    private int? _hoveredHotspotRowId;
+    private static readonly SolidColorBrush HotspotRowBrush = new(Color.FromRgb(39, 54, 66));
+    private static readonly SolidColorBrush HoveredHotspotRowBrush = new(Color.FromRgb(46, 92, 116));
+
+    /// <summary>
+    /// Hovering the room highlights the hotspot row of the object under the
+    /// pointer, scrolls it into view and outlines its box; null clears it.
+    /// </summary>
+    private void ShowHoveredHotspotRow(LoomRoomObjectRecord? record)
+    {
+        // Inspection mode lists scene details with their own colours.
+        if (SessionModeToggle.IsChecked != true || _hoveredHotspotRowId == record?.Id) return;
+        _hoveredHotspotRowId = record?.Id;
+        foreach (var button in ObjectList.Children.OfType<Button>())
+        {
+            if (button.Tag is not int id || !_currentRoomObjectRecords.Any(item => item.Id == id)) continue;
+            var hovered = id == record?.Id;
+            button.Background = hovered ? HoveredHotspotRowBrush : HotspotRowBrush;
+            if (hovered) button.BringIntoView();
+        }
+        // The row's own hover and focus outline take the box when the pointer leaves the room.
+        if (record is not null || ObjectList.Children.OfType<Button>().All(button => !button.IsMouseOver && !button.IsKeyboardFocused))
+            ShowHotspotHighlight(record);
     }
 
     private IReadOnlyList<RoomVerbChoice> FindVerbChoicesAt(int x, int y)
