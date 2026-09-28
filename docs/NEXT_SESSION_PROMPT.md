@@ -1,38 +1,35 @@
-Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md first, then docs/LOOM_EGA_PLAN.md: "What the app shows today", milestones M2 and M3, and "Known issues". Then read docs/LOOM_SCRIPT_MAP.md, especially "Messages, charset and actor commands" (the Drawing actors, `setClass` on an actor, Facing on a direction-locked box, Bobbin's facing after the opening and Walking bullets), "Actors", "How the session maps ScummVM behaviour" and "Not modelled yet". docs/CHANGELOG.md lists the finished work.
+Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md first, then docs/LOOM_EGA_PLAN.md: "What the app shows today", milestone M3 and "Known issues". Then read docs/LOOM_SCRIPT_MAP.md, especially "Messages, charset and actor commands" (the Walking, Room 02's changes of scene and Camera bullets), "How the session maps ScummVM behaviour" and "Not modelled yet". docs/CHANGELOG.md lists the finished work.
 
 State at the start:
 
 * Git: master. The latest commits:
-  * 3d4d1a6 "Draw actors in the room (M2c)";
-  * aa9ceba "Add offline Indy EGA conversation tree exporter" (another agent's);
-  * dc8807f, the previous next-session prompt;
-  * 9615e52 (M2b), 1694d38 (M2a).
+  * the next-session prompt after M3a;
+  * ba66860 "Walk actors in steps and move the camera per frame (M3a)";
+  * 9ca1d2c, the previous next-session prompt;
+  * 3d4d1a6 (M2c), aa9ceba (another agent's Indy EGA conversation exporter).
 * Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code. If `git status` shows their uncommitted changes, commit only your own files and check `git diff` hunk by hunk.
 * `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 223/223 with SCUMM_SOUND_TEST_ROOT=Games\loom and SCUMM_INDY3_EGA_TEST_ROOT=Games\IndyCru\EGA.
 * RoomAudit: 0 gaps in all 76 rooms; `compare-png.ps1`: 0 changed renders.
-* Blockers (.verification/actor-draw/blockers-after.txt, 1,446 lines): the only real stops left are `expression` (3).
-* WPF checks: ActorDrawCheck 0 failures (new, `.verification/actor-draw/ActorDrawCheck`). Not rerun last session, because the click path, doorways and room loading did not change: MessageAppCheck, ClickInputCheck, CameraPanCheck and VerbAreaCheck (0 failures before), DoorwayClickCheck (75/75 before).
-* Worktree clean-up is pending: `.claude/worktrees/focused-pasteur-76af82` (branch `claude/focused-pasteur-76af82`, clean, at dc8807f, already in master; its Games/scummvm junctions were already removed) could not be removed by the agent, because the permission check refused it. The Codex worktree `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` (detached at 8878cd9, a pre-rebase copy of master's 739adc8, with untracked evidence folders) was left for the user to decide. Don't remove worktrees unless the user asks again.
+* Blockers (.verification/walk-steps/blockers-after.txt, 1,419 lines): the only real stops left are `expression` (3).
+* WPF checks: ActorDrawCheck 0 failures; DoorwayClickCheck on Rooms 02, 03, 04, 08 and 10: 13/13 (10 through the game's click; before M3a it was 11: Room 02 object 153 now stops at script 045's scene change and takes the labelled fallback). Not rerun last session: MessageAppCheck, ClickInputCheck, CameraPanCheck and VerbAreaCheck (0 failures before M3a).
+* Worktrees: `.claude/worktrees/focused-pasteur-76af82` and the Codex worktree `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` were left for the user to decide. `.claude/worktrees/affectionate-tharp-697cdd` (at 9ca1d2c) belongs to another session. Don't remove worktrees unless the user asks.
 
 Done last session:
 
-* M2c (.verification/actor-draw/validation.md):
-  * `LoomActorRenderer` (src/SCUMMexplorer.Core/Rendering/LoomActorRenderer.cs) uses ScummVM's `processActors` exchange sort (for each j, each i: swap when y[j] < y[i]) and draws each visible actor with a costume at (x, y − elevation), clipped to the room, into an indexed layer (0xFF transparent).
-  * The app's `RoomActorOverlay` (MainWindow.xaml, between the room image and the other overlays) is redrawn by `UpdateActorLayer()` from `RefreshRoomPreview` and `ShowPlaybackFrame`. It shows only in the explore mode, while the session is in the shown room. The App keeps a costume cache per game (`_actorCostumes`).
-  * Session fixes: `setClass` class 22 on an actor sets or clears `ignoreBoxes` (ScummVM `putClass` → `classChanged`); a standing actor's turn is remapped by its box's flags (`remapDirection`), and `adjustActorPos` turns an actor on a box with `flags & 7` to its facing.
-  * ScummVM comparison (the user drove scummvm.exe through the opening): Room 02 after the opening matches in position, costume (no distaff), frames and the red leaf (actor 5, costume 8). **Bobbin's facing differs:** ScummVM shows him in left profile, the app facing the viewer. The cause is decoded: Room 02 local 202 runs `faceActor 1, 3` every frame while local 201 flies the fairy off left, but the session's walks end at once, so the fairy has left before the first `faceActor`. M3a fixes this.
-  * ActorDrawCheck: after a click on box 4 (860, 118), script 045's cutscene switches the ego to costume 2 and walks it to (756, 107) (at once). Script 042's swan speck (actor 2, costume 5) animates frame by frame on the playback clock.
-* What the user sees: actors in the rooms. Bobbin under the tree, the leaf, animated actors moving at 10 frames a second, talk text over Bobbin. Bobbin jumps to a walk's end.
+* M3a (.verification/walk-steps/validation.md):
+  * `LoomActorTable` ports ScummVM `Actor_v3` walks: `startWalkActor`, `walkActor` (box by box with `getNextBox`, `findPathTowardsOld` and `getGates`), `calcMovementFactor` and `actorWalkStep`. Turns take frames (`turnToDirection` sets `MF_TURN`; `updateActorDirection` uses `actorTurnInterpolateTable`, and `remapDirection` has its walking form). `putActor`, `hideActor` and `adjustActorPos` stop a walk. A walk from an unknown start point, box or facing, and a catalog visit's assumed arrival walk, still end at once (`WalkAtOnce`, labelled).
+  * `LoomCamera` (new) is `moveCamera`, with follow mode, pans and the 8-pixel strip rounding. `panCameraTo` pans; `actorFollowCamera` jumps only when the actor is more than 160 px away.
+  * `AdvanceFrame` ends with `walkActors`, then `moveCamera`. `waitFor actor`/`camera` break until the arrival and go on at once otherwise. `getActorMoving` answers. `walkActorToObject` passes the object's direction.
+  * The app's playback plays on while the ego walks or turns or the camera moves (`EgoMoving`, `CameraMoving`). It does not wait for every actor, because ambient walkers (script 042's swan) never stop.
+  * Frame counts: boot 421 → 725 (still ends in Room 02 at (828, 60)), script 052 74 → 267, the Elders' trial 2,119 → 2,784.
+* What the user sees: Bobbin ends the boot in left profile, as in ScummVM. He walks along the path with his walk animation and turns over frames, and the camera follows him 8 pixels a frame. Room 02's scene changes (script 045, boxes 4/5/10/11) now interrupt a click's walk down the path. He stops at (756, 107) in the smaller costume, and the player clicks again. This follows from the decoded code but **has not been compared with ScummVM**.
 
 Tasks, in order:
 
-1. M3a: walking in steps. Port ScummVM `Actor::startWalkActor`, `walkActor`, `calcMovementFactor`, `actorWalkStep` and the box path (`findPathTowards`/`getNextBox`, already partly in `LoomWalkBoxSet`) for v3, with `walkSpeed` (x, y), the walk frame (`startAnimActor(_walkFrame)` at the start of each leg, the stand frame at the end, `turnToDirection(destdir)`), and `MF_TURN` turns over frames (`updateActorDirection` with `actorTurnInterpolateTable`, remapped as in M2c).
-   * The session's `AdvanceFrame` then steps the walking actors each frame (ScummVM `processActors` order: `walkActor` for every actor, then draw and `animateCostume`). `waitFor actor` waits for the real arrival, and `getActorMoving` (4 sites) can be answered.
-   * The camera follows the ego each step (ScummVM `moveCamera` with `setCameraFollows`, the 8-pixel strip rounding) instead of jumping to the walk's end.
-   * Remove the walk-at-once estimate where the walk is now stepped. Keep the labels for anything still estimated. Check that the boot still ends in Room 02 at (828, 60), and that the ego now ends in left profile (Room 02 local 202). This changes the boot's frame count; check `LoomBootTests`, the Room 03/04 arrivals, script 052 (Room 10 object 295 → Room 13) and the Elders' trial frame counts.
-   * Verification: extend ActorDrawCheck. The ego's walk animation plays during a click's playback (walk frame 9 with the limbs stepping), the ego moves a few pixels each frame, and the camera follows. Compare with ScummVM by eye (ask the user to drive ScummVM; synthetic input does not reach its SDL window) and record each comparison. Rerun the audit, Blockers and DoorwayClickCheck on a few rooms (the walk and room-click path changes).
-2. M3b: frame timing (`delay`, `delayVariable` in jiffies; the engine timers). See the plan.
-3. Optional, small: crop the view to the 128 room rows the game shows. Room 02's actor 4 at (433, 129) is one more reason: it is visible in the app but not in the game.
+1. ScummVM comparison of M3a, short. Ask the user to drive `scummvm.exe` (see the tooling notes) from the end of the opening: click Room 02's exit (the path on the left) and say when to capture. Check by eye that Bobbin walks down the path, that the scene change at box 4 stops him in the smaller costume near (756, 107) and waits for another click, and that the camera follows. Record each comparison in `.verification/walk-steps/validation.md`. If ScummVM goes on walking after the scene change, find out why from the ScummVM source (for example `beginCutscene` or the sentence script) before changing the session.
+2. M3b: frame timing. Model `delay` and `delayVariable` in jiffies, as ScummVM `o5_delay`/`o5_delayVariable` do (the slot's delay, counted down by the frame's jiffies before the scripts run). Also model the engine timers (`VAR_TMR_1..4`, and `VAR_TIMER` if v3 has it; check `scummLoop_updateScummVars` and `vars.cpp`). The Blockers labels "a delay of # jiffies continues on the next frame" (83) should go. Recheck the boot, script 052 and the Elders' trial frame counts, and LoomBootTests.
+   * Verification: a unit test for a delay's frame count, the Blockers diff, and one WPF harness that shows a delayed cutscene step on the playback clock (extend ActorDrawCheck or MessageAppCheck).
+3. Optional, small: crop the view to the 128 room rows the game shows. Room 02's actor 4 at (433, 129) is visible in the app but not in the game.
 
 Rules:
 
@@ -73,4 +70,8 @@ Tooling notes:
 * ScummVM sources: curl raw files from github.com/scummvm/scummvm engines/scumm (actor.cpp, boxes.cpp, camera.cpp, costume.cpp, base-costume.cpp, object.cpp, script_v5.cpp, scumm.cpp, util.cpp) into the scratchpad. The walk code is in actor.cpp (`startWalkActor`, `walkActor`, `calcMovementFactor`, `actorWalkStep`, `updateActorDirection`, `remapDirection`); `findPathTowards` and `getNextBox` are in boxes.cpp; `moveCamera` is in camera.cpp.
 * Commit messages: write them to a file and use `git commit -F`.
 * Harnesses call private methods through reflection with every argument, because `MethodInfo.Invoke` does not fill optional parameters. `PlaybackRunning` is a private property.
+* Blockers takes about 15 minutes since M3a: each of its ~600 sessions boots, and the boot now runs 725 frames. Run it in the background.
+* To measure a change against the previous commit, add a temporary worktree at HEAD in the scratchpad (`git worktree add --detach <scratch>\head HEAD`), junction `Games` into it, build and run the probe there, then remove the junction with `cmd /c rmdir` before `git worktree remove --force`.
+* `LoomActors.cs` is LF in the working tree; most other files are CRLF. Python patches should detect the line endings per file.
+* DoorwayClickCheck hangs if playback never ends. Playback waits only for the ego (`EgoMoving`) and the camera, never for every actor, because ambient walkers never stop.
 * The auto-mode permission check sometimes fails for minutes at a time. After a few failures in a row, stop and tell the user rather than burn the 10-failure limit.
