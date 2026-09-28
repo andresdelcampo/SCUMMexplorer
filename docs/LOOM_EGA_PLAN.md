@@ -45,7 +45,7 @@ Each milestone ends with something the user can see in the running app, verified
 
 ### M2. Actors on screen
 
-- **2a. Costume animation (Core).** Extend `LoomCostumeRenderer` from static poses to ScummVM's `ClassicCostumeLoader` for format 0x58. An animation is `frame * 4 + direction`. Each limb has a start command and a length, so the command index advances per frame and loops or stops. Handle the mirror flag for left-facing directions, the stop and hide commands (0x79 and 0x7A), and the palette mapping (`actorOps palette`, 380 sites).
+- **2a. Next: costume animation (Core).** Extend `LoomCostumeRenderer` from static poses to ScummVM's `ClassicCostumeLoader` for format 0x58. An animation is `frame * 4 + direction`. Each limb has a start command and a length, so the command index advances per frame and loops or stops. Handle the mirror flag for left-facing directions, the stop and hide commands (0x79 and 0x7A), and the palette mapping (`actorOps palette`, 380 sites).
 - **2b. Actor state (Core).** Model the rest of `actorOps`: `costume`, `elevation`, `walkSpeed`, `init`/`walk`/`stand`/`talkAnimation` and `talkColor`. Model `animateActor`, with ScummVM's `Actor::animateActor` mapping: 0xFC–0xFF stop, 0xF8–0xFB set the direction, 0xF4–0xF7 turn, and any other value starts that frame (see the [script map](LOOM_SCRIPT_MAP.md#messages-charset-and-actor-commands-decoded-counts-scummvm-references-for-milestones-m1m3)). Also model `faceActor` and the actor's current frame. This also answers `getActorCostume` and `getActorElevation` (two of the Blockers stops).
 - **2c. Draw actors in the room**, sorted by y (ScummVM `processActors`), clipped to the room. Priority masks (actors behind foreground objects) are a follow-up: decode them only if a verified room shows the problem.
 - **Verification:** after the boot, the ego stands in Room 02 at (828, 60) in its stand frame. Room 01's intro locals 200–208 show their points of light while they run. Screenshots are compared by eye with the ScummVM build in `scummvm/`, and each comparison is recorded.
@@ -73,7 +73,8 @@ Build a discoverable, spoiler-aware index of secrets from verified triggers and 
 
 ### Known issues
 
-- WPF checks that fail since the UI refresh (committed as 92c2e3c): CameraPanCheck, 2 FAIL ("Room 02/04 pan off: view starts at source x 0"), and VerbAreaCheck, 1 FAIL ("off again: the strip is gone and the room has its size back"). Fix these, or update the harnesses to the new layout, when M1 touches the room view.
+- The app shows all 144 rows of a room image, but LOOM's room screen is 128 rows (ScummVM `initScreens(16, 144)`, not resized in v3), so the game never shows the last 16. In Room 02 they are black. Check other rooms before cropping ([view checks](../.verification/view-checks/validation.md)).
+- CameraPanCheck and VerbAreaCheck pass again since 28 September ([view checks](../.verification/view-checks/validation.md)).
 - Stored-text coverage is incomplete: Room 70 locals 203 and 204 are truncated, and unreachable code is not scanned.
 
 ## Evidence rules

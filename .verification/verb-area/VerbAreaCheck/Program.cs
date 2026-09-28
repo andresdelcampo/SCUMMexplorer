@@ -72,6 +72,9 @@ internal static class Program
                     source.CopyPixels(new Int32Rect(0, y, source.PixelWidth, 1), row, source.PixelWidth, 0);
                     return row[x];
                 }
+                // Whether the strip image still shows verb slots (the slot picture is Indexed8; the text-only verb screen is plain black).
+                bool AnyPixelOfSlots() => strip.Visibility == Visibility.Visible && image.Source is BitmapSource { Format: var format } &&
+                                          format == PixelFormats.Indexed8 && AnyPixel(0, 0, 320, 56);
                 bool AnyPixel(int left, int top, int width, int height)
                 {
                     for (var y = top; y < top + height; y++)
@@ -162,8 +165,27 @@ internal static class Program
 
                 toggle.IsChecked = false;
                 await Settle();
-                Check(strip.Visibility != Visibility.Visible && Math.Abs(viewport.ActualHeight - roomHeightOff) < 0.5,
-                    $"off again: the strip is gone and the room has its size back ({viewport.ActualHeight:0.#})");
+                // Since M1c the verb screen stays under the room while a script's text is there (the click on
+                // object 156 drew its name, "cielo"); then only that text is shown. The room fits the space it has
+                // (the controls under it may have grown since the first check, so its height is not compared with it).
+                var verbText = Session().Messages.OnScreen.Where(m => m.Y >= 144).Select(m => m.Text).ToArray();
+                // The layout's rule: the room and the verb screen (56 rows, and 36 px kept for its note) share the host's height.
+                var roomImage = Field("_currentRoom")!;
+                var roomWidth = (int)roomImage.GetType().GetProperty("Width")!.GetValue(roomImage)!;
+                var roomHeight = (int)roomImage.GetType().GetProperty("Height")!.GetValue(roomImage)!;
+                var normal = ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("NormalRoomWidthToggle")).IsChecked == true;
+                var visibleWidth = normal ? Math.Min(320, roomWidth) : roomWidth;
+                var scroll = normal && roomWidth > visibleWidth ? 17 : 0;
+                var shown = strip.Visibility == Visibility.Visible;
+                var expectedScale = Math.Min(host.ActualWidth / visibleWidth,
+                    (host.ActualHeight - scroll - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0)));
+                var roomFits = Math.Abs((double)Field("_roomDisplayScale")! - expectedScale) < 0.01 &&
+                               Math.Abs(viewport.ActualHeight - (roomHeight * expectedScale + scroll)) < 1;
+                Check((verbText.Length == 0 ? strip.Visibility != Visibility.Visible : note.Text.StartsWith("Verb screen: text the game printed there", StringComparison.Ordinal)) &&
+                      !AnyPixelOfSlots() && roomFits,
+                    $"off again: the verb slots are gone{(verbText.Length == 0 ? " with the strip" : $"; the verb screen keeps the game's text [{string.Join(", ", verbText)}]: \"{note.Text}\"")}; " +
+                    $"the room fills its space (room {viewport.ActualWidth:0.#} x {viewport.ActualHeight:0.#} in {host.ActualWidth:0.#} x {host.ActualHeight:0.#}; first {roomHeightOff:0.#} high)");
+                Save("room-02-verb-area-off-again.png");
                 report.Add($"Failures: {failures}");
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }

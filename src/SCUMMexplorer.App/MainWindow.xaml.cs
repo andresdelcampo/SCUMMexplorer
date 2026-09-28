@@ -1508,7 +1508,13 @@ public partial class MainWindow : Window
         UpdateRoomScrollButtons();
     }
 
-    private void RoomViewport_ScrollChanged(object sender, ScrollChangedEventArgs e) => UpdateRoomScrollButtons();
+    private void RoomViewport_ScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        // A camera kept while the view could not scroll is applied once it can.
+        if (_pendingCameraX is not null && (e.ExtentWidthChange != 0 || e.ViewportWidthChange != 0) && RoomViewport.ScrollableWidth > 0.5)
+            ApplyPendingCamera();
+        UpdateRoomScrollButtons();
+    }
 
     private double _roomDisplayScale = 1;
     private readonly Stopwatch _roomPanStopwatch = new();
@@ -1569,10 +1575,18 @@ public partial class MainWindow : Window
     private void ApplyPendingCamera()
     {
         if (_pendingCameraX is not int cameraX || _currentRoom is null) return;
+        if (NormalRoomWidthToggle.IsChecked != true)
+        {
+            _pendingCameraX = null;
+            StopCameraPan();
+            return;
+        }
+        RoomViewport.UpdateLayout();
+        // The first room opened is not always laid out yet: keep the camera until
+        // the view can scroll (RoomViewport_ScrollChanged applies it then).
+        if (_currentRoom.Width > 320 && RoomViewport.ScrollableWidth < 0.5) return;
         _pendingCameraX = null;
         StopCameraPan();
-        if (NormalRoomWidthToggle.IsChecked != true) return;
-        RoomViewport.UpdateLayout();
         var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
             RoomViewport.ScrollableWidth / _roomDisplayScale);
         if (CameraPanToggle.IsChecked == true && left > 0)
