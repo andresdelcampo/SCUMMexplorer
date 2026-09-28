@@ -1,0 +1,27 @@
+﻿Real MainWindow; the room pointer is given in room pixels to the handler's own methods. No physical input.
+Room 03: 6 hotspot rows
+PASS Room 03 pointer (288,36), centre of row "→ Room 02" (object 160): highlighted "→ Room 02"; outline 107,5x120,9; cleared after leave: True
+PASS Room 03 pointer (244,116), centre of row "→ Room 05" (object 161): highlighted "→ Room 05"; outline 255,2x94; cleared after leave: True
+PASS Room 03 pointer (36,36), centre of row "→ Room 04" (object 162): highlighted "→ Room 04"; outline 120,9x120,9; cleared after leave: True
+PASS Room 03 pointer (72,108), centre of row "→ Room 10 · 4" (object 163): highlighted "→ Room 10 · 4"; outline 80,6x67,2; cleared after leave: True
+PASS Room 03 pointer (64,108), centre of row "→ Room 10 · 5" (object 164): highlighted "→ Room 10 · 4" (object 163 comes first there); outline 80,6x67,2; cleared after leave: True
+PASS Room 03 pointer (128,16), centre of row "cielo" (object 165): highlighted "cielo"; outline 161,2x26,9; cleared after leave: True
+PASS Room 03 pointer (-5,-5): no row highlighted
+Room 10: 8 hotspot rows
+PASS Room 10 pointer (304,36), centre of row "→ Room 03" (object 284): highlighted "→ Room 03"; outline 53,7x120,9; cleared after leave: True
+PASS Room 10 pointer (312,108), centre of row "→ Room 05" (object 285): highlighted "→ Room 05"; outline 26,9x120,9; cleared after leave: True
+PASS Room 10 pointer (244,108), centre of row "→ Room 13" (object 295): highlighted "→ Room 13"; outline 174,6x67,2; cleared after leave: True
+PASS Room 10 pointer (64,100), centre of row "almeja" (object 296): highlighted "almeja"; outline 26,9x13,4; cleared after leave: True
+PASS Room 10 pointer (36,56), centre of row "gaviota · 14" (object 297): highlighted "gaviota · 14"; outline 13,4x26,9; cleared after leave: True
+PASS Room 10 pointer (104,48), centre of row "gaviota · 15" (object 298): highlighted "gaviota · 15"; outline 26,9x26,9; cleared after leave: True
+PASS Room 10 pointer (144,16), centre of row "gaviota · 16" (object 299): highlighted "gaviota · 16"; outline 26,9x26,9; cleared after leave: True
+PASS Room 10 pointer (228,24), centre of row "gaviota · 17" (object 300): highlighted "gaviota · 17"; outline 13,4x26,9; cleared after leave: True
+PASS Room 10 pointer (-5,-5): no row highlighted
+Room 17: 5 hotspot rows
+PASS Room 17 pointer (12,72), centre of row "→ Room 16 · 1" (object 352): highlighted "→ Room 16 · 1"; outline 40,3x241,8; cleared after leave: True
+PASS Room 17 pointer (312,72), centre of row "→ Room 22" (object 353): highlighted "→ Room 22"; outline 26,9x241,8; cleared after leave: True
+PASS Room 17 pointer (160,60), centre of row "→ Room 16 · 5" (object 356): highlighted "→ Room 16 · 5"; outline 53,7x67,2; cleared after leave: True
+PASS Room 17 pointer (44,112), centre of row "tumba · 6" (object 357): highlighted "tumba · 6"; outline 40,3x26,9; cleared after leave: True
+PASS Room 17 pointer (228,112), centre of row "tumba · 7" (object 358): highlighted "tumba · 7"; outline 40,3x26,9; cleared after leave: True
+PASS Room 17 pointer (-5,-5): no row highlighted
+Failures: 0
