@@ -34,6 +34,7 @@ internal static class Program
         string Text(string name) => window.FindName(name) switch
         {
             TextBlock block => block.Text,
+            Button button => button.Content?.ToString() ?? "",
             _ => "?"
         };
         window.ContentRendered += async (_, _) =>
@@ -65,12 +66,14 @@ internal static class Program
                         for (int n = 0; n < 100 && Field("_currentRoomResource") != item.Tag; n++) await Task.Delay(100);
                         label = $"Room {room:00}";
                     }
-                    await Task.Delay(300);
+                    await Task.Delay(500);
                     window.UpdateLayout();
                     var current = Field("_currentRoomResource");
                     var roomId = (int?)current?.GetType().GetProperty("ResourceId")?.GetValue(current);
                     var title = Text("RoomCueTitle");
                     var note = Text("RoomMusicNote");
+                    var more = Text("RoomMusicMoreButton");
+                    var panelVisible = ((FrameworkElement)window.FindName("RoomMusicPanel")).Visibility == Visibility.Visible;
                     var ok = true;
                     if (parts.Length > 1)
                     {
@@ -85,11 +88,55 @@ internal static class Program
                         }
                         if (!ok) failures++;
                     }
+                    if (roomId == 4 && panelVisible)
+                    {
+                        ok = false;
+                        failures++;
+                        report.Add("FAIL no qualifying music should hide the player panel.");
+                    }
+                    if (roomId == 8)
+                    {
+                        var choices = (StackPanel)window.FindName("RoomMusicButtons");
+                        var currentCue = Field("_roomSelectedCue");
+                        var currentId = (int?)currentCue?.GetType().GetProperty("ResourceId")?.GetValue(currentCue);
+                        var alternate = choices.Children.OfType<Button>().FirstOrDefault();
+                        if (currentId != 31 || alternate is null)
+                        {
+                            failures++;
+                            report.Add($"FAIL expected Sound 31 default plus an alternate; selected {currentId}, menu choices {choices.Children.Count}.");
+                        }
+                        else
+                        {
+                            alternate.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, alternate));
+                            await Task.Delay(600);
+                            var defaultReturned = choices.Children.OfType<Button>()
+                                .FirstOrDefault(button => button.Content?.ToString()?.Contains("Sound 31", StringComparison.Ordinal) == true);
+                            var alternateId = (int?)Field("_roomSelectedCue")?.GetType().GetProperty("ResourceId")?.GetValue(Field("_roomSelectedCue"));
+                            if (alternateId == 31 || defaultReturned is null)
+                            {
+                                failures++;
+                                report.Add($"FAIL alternate should become selected and Sound 31 should return to the menu; selected {alternateId}.");
+                            }
+                            else
+                            {
+                                defaultReturned.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, defaultReturned));
+                                await Task.Delay(600);
+                                var restoredId = (int?)Field("_roomSelectedCue")?.GetType().GetProperty("ResourceId")?.GetValue(Field("_roomSelectedCue"));
+                                if (restoredId != 31)
+                                {
+                                    failures++;
+                                    report.Add($"FAIL choosing Sound 31 again should restore the default; selected {restoredId}.");
+                                }
+                                else report.Add("PASS Room 08: longest default selected; alternate can replace it and original Sound 31 can be selected again.");
+                            }
+                        }
+                    }
+                    window.UpdateLayout();
                     var file = $"step-{++index:00}-room-{roomId:00}{(parts[0] == "+" ? "-continue" : "")}.png";
                     Save(file);
                     report.Add($"{(parts.Length > 1 ? ok ? "PASS" : "FAIL" : "INFO")} {label} (now Room {roomId:00}), expect {(parts.Length > 1 ? parts[1] : "-")}: " +
                                $"title \"{title}\"; evidence \"{Text("RoomCueEvidence")}\" [{((TextBlock)window.FindName("RoomCueEvidence")).ToolTip}]; " +
-                               $"note \"{note}\"; more \"{Text("RoomMusicMoreHeader")}\"; capture {file}");
+                               $"note \"{note}\"; player visible {panelVisible}; more \"{more}\"; capture {file}");
                 }
                 report.Add($"Failures: {failures}");
             }

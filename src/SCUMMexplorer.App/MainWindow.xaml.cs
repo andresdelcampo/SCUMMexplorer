@@ -77,6 +77,10 @@ public partial class MainWindow : Window
     private GameResource? _roomRenderedCue;
     private int? _roomCueSourceRoomId;
     private bool _roomCueReached;
+    private bool _roomCueManuallySelected;
+    private readonly Dictionary<int, TimeSpan> _roomCueDurations = [];
+    private readonly Dictionary<int, (bool IsMusic, TimeSpan? Duration)> _roomCueTrackCache = [];
+    private int _roomMusicUpdateGeneration;
     private enum AudioSurface { None, Resource, Room }
     private sealed record RoomVerbDestination(LoomRoomObjectRecord Object, LoomObjectVerbEntry Verb,
         int TargetRoomId, int InstructionOffset, string Path = "direct");
@@ -109,7 +113,11 @@ public partial class MainWindow : Window
             var surface = _audioSurface;
             var message = args.ErrorException?.Message ?? "Audio playback failed.";
             StopAudio();
-            if (surface == AudioSurface.Room) RoomCueStatus.Text = $"Playback unavailable: {message}";
+            if (surface == AudioSurface.Room)
+            {
+                RoomCueStatus.Text = $"Playback unavailable: {message}";
+                RoomCuePlayButton.ToolTip = RoomCueStatus.Text;
+            }
             else
             {
                 AudioDescription.Text = message;
@@ -248,6 +256,9 @@ public partial class MainWindow : Window
         _roomSelectedCue = null;
         _roomRenderedCue = null;
         _roomCueSourceRoomId = null;
+        _roomCueManuallySelected = false;
+        _roomCueDurations.Clear();
+        _roomCueTrackCache.Clear();
         RoomPreview.ToolTip = null;
         RoomPreview.Cursor = Cursors.Arrow;
         ScriptEventButtons.Children.Clear();
@@ -1889,6 +1900,7 @@ public partial class MainWindow : Window
         {
             if (token.IsCancellationRequested) return;
             RoomCueStatus.Text = $"Playback unavailable: {ex.Message}";
+            RoomCuePlayButton.ToolTip = RoomCueStatus.Text;
             RoomCuePlayButton.IsEnabled = true;
             RoomCuePauseButton.IsEnabled = false;
             RoomCueStopButton.IsEnabled = false;
@@ -3098,57 +3110,117 @@ public partial class MainWindow : Window
         HotspotHighlightOverlay.Children.Add(bounds);
     }
 
-    private void UpdateRoomMusicActions()
+    private async void UpdateRoomMusicActions()
     {
+        var generation = ++_roomMusicUpdateGeneration;
         RoomMusicButtons.Children.Clear();
+        RoomMusicPanel.Visibility = Visibility.Collapsed;
+        RoomMusicMoreButton.Visibility = Visibility.Collapsed;
         if (_game is null || _currentRoomResource is not { } room) return;
-        var soundById = _game.Resources.Where(item => item.Kind == ResourceKind.Sound &&
-                item.ResourceId.HasValue).GroupBy(item => item.ResourceId!.Value)
-            .ToDictionary(group => group.Key, group => group.First());
-        bool IsMusic(int id) => soundById.TryGetValue(id, out var resource) &&
-            _adlibDecoder.HasMusic(resource);
-        var reached = SessionModeToggle.IsChecked == true && _session is not null &&
-                      _session.Snapshot.RoomId == room.ResourceId
-            ? LoomSoundCueResolver.ResolveForRoom(_session.SoundEvents, room.ResourceId!.Value,
-                _session.RoomEntrySequence, IsMusic)
-            : new LoomReachedSoundCue(null, false, 0);
-        var possible = _roomSoundCandidates.Analyze(_game, room, _currentRoomObjectRecords);
-        if (reached.Start?.TargetId is int currentId && soundById.TryGetValue(currentId, out var current))
+        var game = _game;
+        var soundById = game.Resources.Where(item => item.Kind == ResourceKind.Sound && item.ResourceId.HasValue)
+            .GroupBy(item => item.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
+        var possible = _roomSoundCandidates.Analyze(game, room, _currentRoomObjectRecords);
+        var session = SessionModeToggle.IsChecked == true && _session?.Snapshot.RoomId == room.ResourceId
+            ? _session : null;
+        var events = session?.SoundEvents.ToArray() ?? [];
+        var entrySequence = session?.RoomEntrySequence ?? 0;
+        var idsToInspect = possible.Where(item => item.SoundId.HasValue).Select(item => item.SoundId!.Value)
+            .Concat(events.Where(item => item.Event.TargetId.HasValue).Select(item => item.Event.TargetId!.Value))
+            .Distinct().ToArray();
+        var cachedTracks = idsToInspect.Where(_roomCueTrackCache.ContainsKey)
+            .ToDictionary(id => id, id => _roomCueTrackCache[id]);
+        Dictionary<int, (bool IsMusic, TimeSpan? Duration)> scannedTracks;
+        try
         {
-            SelectRoomCue(current, reached.Start.Format(), reached: true);
-            RoomMusicNote.Text = (reached.StartedBeforeEntry
-                    ? "This room's code started the cue above on an earlier visit, and nothing reached has stopped it."
-                    : "The cue above began after you entered this room.") +
-                (reached.OtherActiveMusicCount > 0 ? " Other tracks may also be active." : "");
-            RoomMusicNote.ToolTip = "The session follows reached sound commands, but does not simulate when a track ends naturally. " +
-                "Only cues started since this room was entered, or started by this room's own code and not stopped, are shown; " +
-                "cues carried over from other rooms are left out.";
+            scannedTracks = await Task.Run(() =>
+            {
+                var decoder = new LoomAdlibAudio();
+                var results = new Dictionary<int, (bool IsMusic, TimeSpan? Duration)>(cachedTracks);
+                foreach (var id in idsToInspect)
+                {
+                    if (results.ContainsKey(id) || !soundById.TryGetValue(id, out var resource)) continue;
+                    try
+                    {
+                        if (!decoder.HasMusic(resource)) { results[id] = (false, null); continue; }
+                        results[id] = (true, decoder.EstimateDuration(resource));
+                    }
+                    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+                    {
+                        results[id] = (false, null);
+                    }
+                }
+                return results;
+            });
         }
-        else
+        catch (Exception)
         {
-            var stillPossible = !_roomCueReached && _roomCueSourceRoomId == room.ResourceId &&
-                _roomSelectedCue?.ResourceId is int selectedId &&
-                possible.Any(item => item.SoundId == selectedId);
-            if (!stillPossible) ClearRoomCue();
-            RoomMusicNote.Text = reached.HasUnknownSoundTarget
-                ? "The music for this visit is uncertain."
-                : "No music has been confirmed here. These tracks may play in this room.";
-            RoomMusicNote.ToolTip = reached.HasUnknownSoundTarget
-                ? "A reached sound command has a target that the bounded interpreter could not resolve."
-                : "Possible tracks come from static room and object script paths; those paths have not been reached.";
+            if (generation == _roomMusicUpdateGeneration && ReferenceEquals(game, _game) && room == _currentRoomResource)
+                RoomMusicPanel.Visibility = Visibility.Collapsed;
+            return;
+        }
+        if (generation != _roomMusicUpdateGeneration || !ReferenceEquals(game, _game) || room != _currentRoomResource) return;
+        foreach (var (id, result) in scannedTracks)
+        {
+            _roomCueTrackCache[id] = result;
+            if (result.Duration is TimeSpan duration) _roomCueDurations[id] = duration;
+        }
+        bool IsMusic(int id) => scannedTracks.TryGetValue(id, out var result) && result.IsMusic;
+        var reached = session is not null
+            ? LoomSoundCueResolver.ResolveForRoom(events, room.ResourceId!.Value, entrySequence, IsMusic)
+            : new LoomReachedSoundCue(null, false, 0);
+        var reachedId = reached.Start?.TargetId;
+        var evidenceById = possible.Where(item => item.SoundId.HasValue)
+            .GroupBy(item => item.SoundId!.Value)
+            .ToDictionary(group => group.Key, group => string.Join(Environment.NewLine, group.Select(item => item.Evidence)));
+        var candidateIds = evidenceById.Keys.Concat(reachedId.HasValue ? [reachedId.Value] : []).Distinct();
+        var candidates = new List<(GameResource Resource, TimeSpan Duration)>();
+        foreach (var id in candidateIds)
+        {
+            if (!soundById.TryGetValue(id, out var resource) || !scannedTracks.TryGetValue(id, out var result) ||
+                !result.IsMusic || result.Duration is not TimeSpan duration || duration.TotalSeconds < 15) continue;
+            candidates.Add((resource, duration));
+        }
+        candidates = candidates.OrderByDescending(item => item.Duration).ThenBy(item => item.Resource.ResourceId).ToList();
+        if (candidates.Count == 0)
+        {
+            ClearRoomCue();
+            return;
         }
 
-        foreach (var group in possible.Where(item => item.SoundId is int id && IsMusic(id) &&
-                     item.SoundId != reached.Start?.TargetId)
-                 .GroupBy(item => item.SoundId!.Value).OrderBy(item => item.Key))
+        var manuallySelected = _roomCueManuallySelected && _roomCueSourceRoomId == room.ResourceId
+            ? candidates.FirstOrDefault(item => item.Resource.ResourceId == _roomSelectedCue?.ResourceId)
+            : default;
+        var selected = manuallySelected.Resource is not null ? manuallySelected : candidates[0];
+        var selectedId = selected.Resource.ResourceId!.Value;
+        var selectedReached = selectedId == reachedId;
+        var selectedEvidence = selectedReached
+            ? reached.Start!.Format()
+            : evidenceById.GetValueOrDefault(selectedId, "Reached room cue.");
+        SelectRoomCue(selected.Resource, selectedEvidence, selectedReached,
+            manuallySelected.Resource is not null);
+
+        var note = reached.HasUnknownSoundTarget
+            ? "A reached sound command has an unresolved target; this selection uses the longest measured local music candidate."
+            : selectedReached
+                ? reached.StartedBeforeEntry
+                    ? "This room's code started the cue on an earlier visit."
+                    : "This cue began after you entered this room."
+                : "Possible room music from static script paths; those paths have not been reached.";
+        RoomMusicNote.Text = note;
+        RoomMusicNote.ToolTip = "Room music candidates shorter than 15 seconds are omitted. The default is the longest first-pass estimate; looped tracks are measured through their first loop boundary, with estimates capped at 3:00.";
+        RoomMusicMoreButton.ToolTip = RoomMusicNote.Text + " " + RoomMusicNote.ToolTip;
+        RoomCueTitle.ToolTip = selectedEvidence + Environment.NewLine + note;
+
+        foreach (var item in candidates.Where(item => item.Resource.ResourceId != selectedId))
         {
-            var target = soundById[group.Key];
-            var evidence = string.Join(Environment.NewLine, group.Select(item => item.Evidence));
+            var id = item.Resource.ResourceId!.Value;
+            var evidence = id == reachedId ? reached.Start!.Format() : evidenceById.GetValueOrDefault(id, "");
+            var isReached = id == reachedId;
             var button = new Button
             {
-                Content = $"▶ {target.Name}",
-                ToolTip = "Static script possibility; execution has not reached this cue." +
-                          Environment.NewLine + evidence,
+                Content = $"▶ {item.Resource.Name} · {FormatRoomCueDuration(item.Duration)}",
+                ToolTip = (isReached ? "Reached during this session. " : "Static script possibility; execution has not reached this cue. ") + evidence,
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Padding = new Thickness(7, 2, 7, 2),
                 Margin = new Thickness(0, 0, 0, 3),
@@ -3158,42 +3230,44 @@ public partial class MainWindow : Window
             };
             button.Click += async (_, _) =>
             {
-                SelectRoomCue(target, evidence, reached: false);
+                SelectRoomCue(item.Resource, evidence, isReached, manuallySelected: true);
+                RoomMusicMoreButton.ContextMenu!.IsOpen = false;
+                UpdateRoomMusicActions();
                 await PlayRoomCueAsync();
             };
             RoomMusicButtons.Children.Add(button);
         }
-        if (possible.Any(item => item.SoundId is null))
-            RoomMusicButtons.Children.Add(new TextBlock
-            {
-                Text = "Another possible cue has an unknown track.",
-                ToolTip = string.Join(Environment.NewLine,
-                    possible.Where(item => item.SoundId is null).Select(item => item.Evidence)),
-                Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
-                TextWrapping = TextWrapping.Wrap
-            });
-        var possibleTracks = RoomMusicButtons.Children.OfType<Button>().Count();
-        RoomMusicMoreHeader.Text = possibleTracks == 0 ? "Other possible music" : $"Other possible music · {possibleTracks}";
-        if (RoomMusicButtons.Children.Count == 0)
-            RoomMusicButtons.Children.Add(new TextBlock
-            {
-                Text = "No other local music candidates found.",
-                Foreground = new SolidColorBrush(Color.FromRgb(170, 180, 186)),
-                TextWrapping = TextWrapping.Wrap
-            });
+        RoomMusicMoreButton.Content = $"Other possible music · {RoomMusicButtons.Children.Count} ▾";
+        RoomMusicMoreButton.Visibility = RoomMusicButtons.Children.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         RoomMusicPanel.Visibility = Visibility.Visible;
     }
 
-    private void SelectRoomCue(GameResource sound, string evidence, bool reached)
+    private void RoomMusicMore_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { ContextMenu: { } menu } button)
+        {
+            menu.PlacementTarget = button;
+            menu.IsOpen = true;
+        }
+    }
+
+    private static string FormatRoomCueDuration(TimeSpan duration) =>
+        $"{(int)duration.TotalMinutes}:{duration.Seconds:00}";
+
+    private void SelectRoomCue(GameResource sound, string evidence, bool reached, bool manuallySelected = false)
     {
         if (_roomSelectedCue != sound && _audioSurface == AudioSurface.Room) StopAudio();
         _roomSelectedCue = sound;
         _roomCueSourceRoomId = _currentRoomResource?.ResourceId;
         _roomCueReached = reached;
+        _roomCueManuallySelected = manuallySelected;
         RoomCueTitle.Text = $"{(reached ? "Started" : "Possible")}: {sound.Name}";
         RoomCueEvidence.Text = reached ? "from this session's route" : "from room script data";
         RoomCueEvidence.ToolTip = evidence;
         RoomCueTitle.ToolTip = evidence;
+        RoomCuePlayButton.ToolTip = "Play room cue";
+        if (_roomCueDurations.TryGetValue(sound.ResourceId ?? -1, out var duration))
+            RoomCueTime.Text = $"0:00 / {FormatRoomCueDuration(duration)}";
         RoomCuePlayButton.IsEnabled = true;
         RoomCuePauseButton.IsEnabled = _audioSurface == AudioSurface.Room && _audioReady;
         RoomCueStopButton.IsEnabled = _audioSurface == AudioSurface.Room;
@@ -3206,6 +3280,7 @@ public partial class MainWindow : Window
         _roomSelectedCue = null;
         _roomCueSourceRoomId = null;
         _roomCueReached = false;
+        _roomCueManuallySelected = false;
         RoomCueTitle.Text = "No cue established";
         RoomCueTitle.ToolTip = null;
         RoomCueEvidence.Text = "";

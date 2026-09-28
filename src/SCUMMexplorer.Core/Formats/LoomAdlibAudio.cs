@@ -24,6 +24,23 @@ public sealed class LoomAdlibAudio
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException) { return false; }
     }
 
+    /// <summary>Estimates the first pass duration from the track's event clock without rendering PCM.</summary>
+    public TimeSpan EstimateDuration(GameResource resource)
+    {
+        var data = ReadTrack(resource);
+        if (data.Length < 0x94 || data[2] != 0x80)
+            throw new NotSupportedException("This AdLib resource is not a music track.");
+        var player = new MusicPlayer(data);
+        var callbacks = 0;
+        while (player.Active && !player.LoopBoundaryReached && callbacks < CallbackRate * MaxSeconds)
+        {
+            player.Tick();
+            callbacks++;
+        }
+        if (callbacks == 0) throw new InvalidDataException("AdLib music has no duration.");
+        return TimeSpan.FromSeconds((double)callbacks / CallbackRate);
+    }
+
     public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
     {
         var data = ReadTrack(resource);
@@ -172,6 +189,7 @@ public sealed class LoomAdlibAudio
         public Opl3Chip Chip { get; } = new();
         public bool Active { get; private set; } = true;
         public bool EndedNormally { get; private set; }
+        public bool LoopBoundaryReached { get; private set; }
 
         public MusicPlayer(byte[] data)
         {
@@ -213,6 +231,7 @@ public sealed class LoomAdlibAudio
                     if (meta == 0x2f)
                     {
                         if (!_loop || _loopStart < 0x93 || _loopStart >= _data.Length) { End(true); return; }
+                        LoopBoundaryReached = true;
                         _position = _loopStart;
                         continue;
                     }

@@ -166,29 +166,32 @@
                                             LostMouseCapture="PanButton_LostMouseCapture" Width="34" Height="27"
                                             Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                 </StackPanel>
-                                <StackPanel x:Name="RoomMusicPanel" Visibility="Collapsed" HorizontalAlignment="Center" MaxWidth="420">
-                                    <DockPanel HorizontalAlignment="Center">
+                                <StackPanel x:Name="RoomMusicPanel" Visibility="Collapsed" HorizontalAlignment="Center" MaxWidth="720">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <TextBlock Text="MUSIC" Style="{StaticResource PanelHeading}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                         <Button x:Name="RoomCuePlayButton" Content="▶" ToolTip="Play room cue" AutomationProperties.Name="Play room cue" Click="RoomCuePlay_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         <Button x:Name="RoomCuePauseButton" Content="Ⅱ" ToolTip="Pause room cue" AutomationProperties.Name="Pause room cue" Click="RoomCuePause_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         <Button x:Name="RoomCueStopButton" Content="■" ToolTip="Stop room cue" AutomationProperties.Name="Stop room cue" Click="RoomCueStop_Click" Width="28" Height="24" Margin="0,0,7,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                        <TextBlock x:Name="RoomCueTitle" Foreground="#E7E0D2" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                                    </DockPanel>
-                                    <WrapPanel Margin="0,3,0,0" HorizontalAlignment="Center">
-                                        <TextBlock x:Name="RoomCueTime" Text="0:00 / 0:00" Foreground="#B8AA8C" FontSize="11" Margin="0,0,8,0"/>
-                                        <TextBlock x:Name="RoomCueEvidence" Foreground="#B8AA8C" FontSize="11" Margin="0,0,8,0"/>
-                                        <TextBlock x:Name="RoomCueStatus" Foreground="#B8AA8C" FontSize="11"/>
-                                    </WrapPanel>
-                                    <Expander x:Name="RoomMusicMoreExpander" IsExpanded="False" Foreground="#E7E0D2" Margin="0,4,0,0"
-                                              HorizontalAlignment="Center" HorizontalContentAlignment="Center">
-                                        <Expander.Header><TextBlock x:Name="RoomMusicMoreHeader" Text="Other possible music" FontSize="11.5" HorizontalAlignment="Center"/></Expander.Header>
-                                        <StackPanel Margin="0,3,0,0">
-                                            <TextBlock x:Name="RoomMusicNote" Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,4" TextAlignment="Center"/>
-                                            <ScrollViewer MaxHeight="84" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                                <StackPanel x:Name="RoomMusicButtons" HorizontalAlignment="Center"/>
-                                            </ScrollViewer>
-                                        </StackPanel>
-                                    </Expander>
+                                        <TextBlock x:Name="RoomCueTitle" Width="220" Foreground="#E7E0D2" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="RoomCueTime" Text="0:00 / 0:00" Foreground="#B8AA8C" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock x:Name="RoomCueEvidence" Visibility="Collapsed" Foreground="#B8AA8C" FontSize="11"/>
+                                        <TextBlock x:Name="RoomCueStatus" Visibility="Collapsed" Foreground="#B8AA8C" FontSize="11"/>
+                                        <Button x:Name="RoomMusicMoreButton" Content="Other possible music" Visibility="Collapsed"
+                                                ToolTip="Possible tracks come from static room and object script paths." Padding="6,2"
+                                                Click="RoomMusicMore_Click"
+                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <Border Padding="5" Background="#101820">
+                                                        <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                                            <StackPanel x:Name="RoomMusicButtons" HorizontalAlignment="Center"/>
+                                                        </ScrollViewer>
+                                                    </Border>
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                        </Button>
+                                        <TextBlock x:Name="RoomMusicNote" Visibility="Collapsed"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
