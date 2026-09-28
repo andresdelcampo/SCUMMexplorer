@@ -963,10 +963,12 @@ public partial class MainWindow : Window
 
     /// <summary>Frames an exit click may continue outside a cutscene before falling back to browsing.</summary>
     /// <remarks>
-    /// Delays and waits each take one session frame. Frames inside a cutscene do
-    /// not count: the session follows it until it ends (up to 1000 frames), so
-    /// Room 10 object 295 (script 052) passes through Room 11 and ends in Room 13
-    /// after 65 frames. A click that falls short leaves its script pending, and
+    /// Delays and actor waits take one session frame; a message lasts its talk
+    /// delay. Frames inside a cutscene do not count: the session follows it until
+    /// it ends (up to <see cref="LoomExplorationSession.CutsceneFrameLimit"/> frames),
+    /// so Room 10 object 295 (script 052) passes through Room 11 and ends in Room 13,
+    /// and Room 08's door plays the Elders' trial (script 046, 2,120 frames) to
+    /// Room 09. A click that falls short leaves its script pending, and
     /// that load would later fire during an unrelated click.
     /// </remarks>
     private const int ExitContinuationFrames = 32;

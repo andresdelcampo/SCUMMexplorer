@@ -389,22 +389,44 @@ public sealed class LoomTextExtractor
         return names;
     }
 
+    /// <summary>
+    /// The stored name bytes of each object of one room (ScummVM <c>getObjOrActorName</c>
+    /// for a room object: the string the object's code header points to), as the
+    /// charset draws them; objects without a readable name are left out.
+    /// </summary>
+    public static IReadOnlyDictionary<int, byte[]> ReadObjectNameBytes(byte[] plainRoom,
+        IEnumerable<LoomRoomObjectRecord> records)
+    {
+        var names = new Dictionary<int, byte[]>();
+        foreach (var record in records)
+            if (TryReadObjectNameBytes(plainRoom, record.CodeOffset, out var start, out var length))
+                names[record.Id] = plainRoom.AsSpan(start, length).ToArray();
+        return names;
+    }
+
     private static bool TryReadObjectName(byte[] room, int codeOffset, out string name, out int nameOffset)
     {
         name = "";
         nameOffset = 0;
-        if (codeOffset < 0 || codeOffset > room.Length - 17) return false;
-        var length = room[codeOffset] | room[codeOffset + 1] << 8;
-        var end = codeOffset + length;
-        var relative = room[codeOffset + 16];
-        var start = codeOffset + relative;
-        if (length < 18 || end > room.Length || relative < 17 || start >= end) return false;
-        var bytes = room.AsSpan(start, end - start);
-        var terminator = FindStringTerminator(bytes);
-        if (terminator <= 0) return false;
+        if (!TryReadObjectNameBytes(room, codeOffset, out var start, out var length)) return false;
         nameOffset = start;
-        name = LoomScummTextDecoder.DecodeRawString(bytes[..terminator]);
+        name = LoomScummTextDecoder.DecodeRawString(room.AsSpan(start, length));
         return !string.IsNullOrWhiteSpace(name);
+    }
+
+    private static bool TryReadObjectNameBytes(byte[] room, int codeOffset, out int start, out int length)
+    {
+        start = length = 0;
+        if (codeOffset < 0 || codeOffset > room.Length - 17) return false;
+        var size = room[codeOffset] | room[codeOffset + 1] << 8;
+        var end = codeOffset + size;
+        var relative = room[codeOffset + 16];
+        start = codeOffset + relative;
+        if (size < 18 || end > room.Length || relative < 17 || start >= end) return false;
+        var terminator = FindStringTerminator(room.AsSpan(start, end - start));
+        if (terminator <= 0) return false;
+        length = terminator;
+        return true;
     }
 
     private static int FindStringTerminator(ReadOnlySpan<byte> bytes)
@@ -454,6 +476,110 @@ public static class LoomScummTextDecoder
             else output.Append(DecodeByte(value));
         }
         return output.ToString();
+    }
+
+    /// <summary>The bytes of a disassembler string literal's escaped contents (without the quotes).</summary>
+    public static byte[] ParseEscaped(string value) => ParseBytes(value).ToArray();
+
+    /// <summary>Charset glyph codes as DOS CP437 text.</summary>
+    public static string DecodeGlyphs(IEnumerable<byte> glyphs) => string.Concat(glyphs.Select(DecodeByte));
+
+    /// <summary>
+    /// ScummVM <c>convertMessageToString</c> for v3: codes 1, 2, 3 and 8 are kept,
+    /// 9, 10, 12, 13 and 14 are kept with their operand, 4 writes a variable's
+    /// value, and '@' (a filler) is dropped. Codes 5, 6 and 7 (a verb, a name, a
+    /// string) are not modelled; <paramref name="note"/> says so.
+    /// </summary>
+    public static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables, out string? note) =>
+        ConvertMessage(text, variables, null, out note);
+
+    /// <summary>
+    /// A variable number as ScummVM <c>readVar</c> reads it (v3): 0x8000 a bit
+    /// variable, 0x4000 a local of the running script (the low 12 bits), else a
+    /// global word; null for an indexed (0x2000) number, which is not modelled here.
+    /// </summary>
+    public static string? VariableKey(int number) =>
+        (number & 0x2000) != 0 ? null
+        : (number & 0x8000) != 0 ? $"bit[0x{number & 0x7FFF:X3}]"
+        : (number & 0x4000) != 0 ? $"local[0x{number & 0x0FFF:X3}]"
+        : $"var[0x{number & 0x1FFF:X3}]";
+
+    /// <summary>
+    /// <see cref="ConvertMessage(IReadOnlyList{byte}, IReadOnlyDictionary{string, ushort}, out string?)"/>
+    /// with code 6 (<c>convertNameMessage</c>): the name of the object whose number
+    /// the variable holds, from <paramref name="objectName"/>. Actors' names (numbers below 13) are not modelled.
+    /// </summary>
+    public static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables,
+        Func<int, byte[]?>? objectName, out string? note)
+    {
+        note = null;
+        var output = new List<byte>();
+        for (var i = 0; i < text.Count; i++)
+        {
+            var c = text[i];
+            if (c == 0) break;
+            if (c != 0xFF)
+            {
+                if (c != (byte)'@') output.Add(c);
+                continue;
+            }
+            if (i + 1 >= text.Count) break;
+            var code = text[++i];
+            if (code is 1 or 2 or 3 or 8)
+            {
+                output.Add(0xFF);
+                output.Add(code);
+                continue;
+            }
+            if (i + 2 >= text.Count) break;
+            var value = text[i + 1] | (text[i + 2] << 8);
+            switch (code)
+            {
+                case 4:
+                    if (TryReadVariable(value, variables, out var number))
+                        output.AddRange(Encoding.ASCII.GetBytes(((short)number).ToString(CultureInfo.InvariantCulture)));
+                    else note = $"the text shows the value of variable 0x{value:X4}, which is unknown here";
+                    break;
+                case 6:
+                    // convertNameMessage: readVar, then getObjOrActorName (numbers below _numActors are actors).
+                    if (!TryReadVariable(value, variables, out var named))
+                        note = $"the text shows the name of the object in variable 0x{value:X4}, which is unknown here";
+                    else if (named == 0) { }
+                    else if (named < LoomActorTable.Count)
+                        note = $"the text shows actor {named}'s name, which is not modelled and left out";
+                    else if (objectName?.Invoke(named) is { } name)
+                        output.AddRange(ConvertMessage(name, variables, null, out _));
+                    else
+                        note = $"the text shows object {named}'s name, which the preview does not have (the object is not in the current room)";
+                    break;
+                case 5 or 7:
+                    note = $"the text includes {(code == 5 ? "a verb's name" : "a string")} (code {code}), which is not modelled and left out";
+                    break;
+                case 9 or 10 or 12 or 13 or 14:
+                    output.Add(0xFF);
+                    output.Add(code);
+                    output.Add(text[i + 1]);
+                    output.Add(text[i + 2]);
+                    break;
+                default:
+                    // An invalid code: ScummVM drops the two bytes and reads on.
+                    continue;
+            }
+            i += 2;
+        }
+        return output;
+    }
+
+    private static bool TryReadVariable(int number, IReadOnlyDictionary<string, ushort> variables, out ushort value)
+    {
+        value = 0;
+        var key = VariableKey(number);
+        if (key is null) return false;
+        if (!key.StartsWith("bit", StringComparison.Ordinal)) return variables.TryGetValue(key, out value);
+        var bit = number & 0x7FFF;
+        if (!variables.TryGetValue($"var[0x{bit >> 4:X3}]", out var word)) return false;
+        value = (ushort)((word >> (bit & 15)) & 1);
+        return true;
     }
 
     private static List<byte> ParseBytes(string value)

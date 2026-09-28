@@ -52,13 +52,22 @@ public sealed class LoomActorTable
         if (actor.Estimate is null || actor.EstimateIsWalk) actor.Estimate = reason;
     }
 
-    /// <summary><c>initActor(0)</c> (actorOps "init"): clears the last valid point and ignoreBoxes; room and position stay.</summary>
+    /// <summary><c>initActor(0)</c> (actorOps "init"): clears the last valid point and ignoreBoxes and resets the talk colour to 15; room and position stay.</summary>
     public void Init(int number)
     {
         var actor = _actors[number];
         actor.LastValidX = actor.LastValidY = 0;
         actor.IgnoreBoxes = false;
+        actor.TalkColor = DefaultTalkColor;
     }
+
+    /// <summary>ScummVM <c>initActor</c>: every mode sets <c>_talkColor</c> to 15.</summary>
+    public const int DefaultTalkColor = 15;
+
+    /// <summary>The colour of the actor's talk text (<c>actorOps talkColor</c>, ScummVM <c>_talkColor</c>).</summary>
+    public int TalkColor(int number) => _actors[number].TalkColor;
+
+    public void SetTalkColor(int number, int color) => _actors[number].TalkColor = color;
 
     /// <summary><c>_ignoreBoxes</c> from actorOps, or cleared by <c>setClass</c> 0 on an actor (small header).</summary>
     public void SetIgnoreBoxes(int number, bool value) => _actors[number].IgnoreBoxes = value;
@@ -322,6 +331,7 @@ public sealed class LoomActorTable
         public int? DestBox { get; set; } = 0;
         public bool? Visible { get; set; } = false;
         public bool? IgnoreBoxes { get; set; } = false;
+        public int TalkColor { get; set; } = DefaultTalkColor;
         public int? LastValidX { get; set; } = 0;
         public int? LastValidY { get; set; } = 0;
         public string? Unknown { get; set; }

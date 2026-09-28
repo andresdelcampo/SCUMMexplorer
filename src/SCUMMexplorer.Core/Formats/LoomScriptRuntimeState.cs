@@ -70,6 +70,10 @@ public sealed class LoomScriptRuntimeState
     public string? WalkBoxFlagsUnknown { get; set; }
     /// <summary>Actor rooms, positions and walk boxes as reached code left them.</summary>
     public LoomActorTable Actors { get; } = new();
+    /// <summary>The stored name of an object of the current room (text code 6), or null; set by the session at each room entry.</summary>
+    public Func<int, byte[]?>? ObjectName { get; set; }
+    /// <summary>Messages as reached <c>print</c>s left them: text slots, the talk message and its delay, drawn strings.</summary>
+    public LoomMessageTable Messages { get; } = new();
     /// <summary>Verb slots as reached <c>verbOps</c> left them (the verb bar and the verb-area close-up).</summary>
     public LoomVerbTable Verbs { get; } = new();
     /// <summary>The current room's number, or null outside a room.</summary>

@@ -5,7 +5,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    draw queue:  
    interface images (verb area, not room artwork): 100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151
    doorways: 
-== Room 02 (4 images, faithful=False, pending=6)
+== Room 02 (4 images, faithful=False, pending=4)
    paint order: 157
    draw queue:  157
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor

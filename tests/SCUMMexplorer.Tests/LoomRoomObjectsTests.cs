@@ -20,7 +20,10 @@ public sealed class LoomRoomObjectsTests
             Assert.Equal((byte)1, snapshot.ObjectStates[id]);
         foreach (var id in Enumerable.Range(497, 3))
             Assert.Equal((byte)0, snapshot.ObjectStates[id]);
-        Assert.Contains(snapshot.Uncertainties, item => item.Contains("Script 16", StringComparison.Ordinal));
+        // The entry's child, script 016, runs to its end: its empty print sets text slot 0
+        // (line height 10, centred at x 160, y from its argument) for the lines that follow.
+        Assert.Contains(session.Messages.Log, message => message.Source == "Script 16 +0x0005" &&
+            message.X == 160 && message.LineHeight == 10 && message.Text == "");
         Assert.True(session.LastEntryRun!.InstructionsVisited > 20);
     }
     [Fact]

@@ -522,6 +522,33 @@ public sealed class LoomBoundedScriptExecutor
                 break;
             }
 
+            if (runtime is not null && instruction.Operation is "print" or "printEgo")
+            {
+                if (!TryReadPrint(instruction, script, knownVariables, estimated, onEstimatedPath, runtime, out var request, out var printDetail))
+                {
+                    unresolved = $"{printDetail} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                trace.Add(runtime.Messages.Print(request, runtime));
+                knownVariables[LoomMessageTable.HaveMsgVariable] = runtime.GlobalVariables[LoomMessageTable.HaveMsgVariable];
+                pc = next;
+                continue;
+            }
+
+            if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands == "message")
+            {
+                // o5_wait (SO_WAIT_FOR_MESSAGE): while VAR_HAVE_MSG is set, the script breaks
+                // here and tries again next frame; the frame counts the talk delay down.
+                if (TryReadValue(LoomMessageTable.HaveMsgVariable, knownVariables, out var haveMsg, out _) && haveMsg != 0)
+                {
+                    trace.Add($"waiting for the message to finish at +0x{instruction.Offset:X4} (VAR_HAVE_MSG = {haveMsg}, talk delay {runtime.Messages.TalkDelay} jiffies left)");
+                    resumeOffset = instruction.Offset;
+                    break;
+                }
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation is "delay" or "delayVariable" ||
                 instruction.Operation == "waitFor" && (instruction.Operands is "message" or "camera" ||
                                                        instruction.Operands.StartsWith("actor,", StringComparison.Ordinal)))
@@ -1178,6 +1205,9 @@ public sealed class LoomBoundedScriptExecutor
                     }
                     else if (item.StartsWith("costume", StringComparison.Ordinal))
                         actors.CostumeChanged(number, place);
+                    else if (item.StartsWith("talkColor,", StringComparison.Ordinal) &&
+                             TryReadValue(item["talkColor,".Length..].Trim(), variables, out var talkColor, out _))
+                        actors.SetTalkColor(number, talkColor & 0xFF);
                 }
                 break;
         }
@@ -1185,6 +1215,59 @@ public sealed class LoomBoundedScriptExecutor
         var state = actors[number];
         trace.Add($"actor {number}: {label} → room {Show(state.Room)}, ({Show(state.X)}, {Show(state.Y)}), box {Show(state.WalkBox)}, " +
                   $"{(state.Visible is bool visible ? visible ? "visible" : "hidden" : "visibility unknown")}{(state.Estimate is null ? "" : " (estimate)")}");
+    }
+
+    /// <summary>
+    /// Reads a <c>print</c> or <c>printEgo</c> as ScummVM's <c>o5_print</c> does:
+    /// the actor (<c>getVarOrDirectByte</c>, or <c>VAR_EGO</c>), each subcommand's
+    /// operands as they are now, and the text's bytes. An operand that cannot be
+    /// read stays null; values that follow a seeded pick make the message an estimate.
+    /// </summary>
+    private static bool TryReadPrint(LoomScriptInstruction instruction, LoomScriptDisassembly script,
+        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, bool onEstimatedPath,
+        LoomScriptRuntimeState runtime, out LoomPrintRequest request, out string detail)
+    {
+        request = null!;
+        var operands = instruction.Operands;
+        var split = operands.IndexOf(", [", StringComparison.Ordinal);
+        if (split < 0 || !operands.EndsWith(']'))
+        {
+            detail = $"print operands are not in the expected form ({operands})";
+            return false;
+        }
+        var actorOperand = instruction.Operation == "printEgo" ? "var[0x001]" : operands[..split].Trim();
+        if (!TryReadValue(actorOperand, variables, out var actor, out _))
+        {
+            detail = $"print names an actor the preview cannot read ({actorOperand})";
+            return false;
+        }
+        var body = operands[(split + 3)..^1];
+        byte[]? text = null;
+        var textAt = body.IndexOf("text, \"", StringComparison.Ordinal);
+        if (textAt >= 0)
+        {
+            var close = body.LastIndexOf('"');
+            text = LoomScummTextDecoder.ParseEscaped(body[(textAt + 7)..close]);
+            body = body[..textAt];
+        }
+        var estimate = onEstimatedPath || OperandIsEstimated(actorOperand, estimated, variables)
+            ? "the print follows a seeded pick" : null;
+        var operations = new List<LoomPrintOperation>();
+        foreach (var item in body.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = item.Split(',', StringSplitOptions.TrimEntries);
+            int? Read(int index)
+            {
+                if (parts.Length <= index || !TryReadValue(parts[index], variables, out var value, out _)) return null;
+                if (OperandIsEstimated(parts[index], estimated, variables)) estimate ??= $"the print's {parts[0]} follows a seeded pick";
+                return (short)value;
+            }
+            operations.Add(new LoomPrintOperation(parts[0], Read(1), Read(2)));
+        }
+        request = new LoomPrintRequest(actor & 0xFF, operations, text, script.Context ?? $"Script {script.ScriptId:00}",
+            instruction.Offset, runtime.CurrentRoom, estimate, new Dictionary<string, ushort>(variables, StringComparer.Ordinal));
+        detail = "";
+        return true;
     }
 
     /// <summary>An actor command on a branch the preview could not decide may have run: what it sets becomes unknown.</summary>

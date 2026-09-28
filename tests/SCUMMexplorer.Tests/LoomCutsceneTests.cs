@@ -17,7 +17,6 @@ public sealed class LoomCutsceneTests
 
     [Theory]
     [InlineData("delay", "0x00003C", "a delay of 60 jiffies")]
-    [InlineData("waitFor", "message", "waiting for the message to finish")]
     [InlineData("waitFor", "actor, 0x03", "waiting for actor 0x03 to stop walking")]
     public void WaitsContinueOnTheNextFrameWithATimingLabel(string operation, string operands, string label)
     {
@@ -31,6 +30,21 @@ public sealed class LoomCutsceneTests
         Assert.Equal(4, run.ResumeOffset);
         Assert.False(run.ReachedStop);
         Assert.Contains($"timing not simulated: {label} continues on the next frame", run.UnresolvedReason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AWaitForMessageGoesOnAtOnceWhenNoMessageIsShown()
+    {
+        // o5_wait breaks only while VAR_HAVE_MSG is set (LoomMessageTests covers the wait itself).
+        var script = Script(
+            new(0, 0, "waitFor", "message", "AE 02"),
+            new(2, 0, "stopObjectCode", "", "00"));
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+
+        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+
+        Assert.Null(run.ResumeOffset);
+        Assert.True(run.ReachedStop);
     }
 
     [Fact]

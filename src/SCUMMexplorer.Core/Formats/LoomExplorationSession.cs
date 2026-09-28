@@ -19,8 +19,12 @@ public sealed record LoomSessionSnapshot(
     IReadOnlyCollection<int>? StatesSetInRoom = null,
     IReadOnlyList<LoomRandomPick>? Picks = null,
     IReadOnlyCollection<int>? EstimatedObjectStates = null,
-    IReadOnlyDictionary<int, uint>? Classes = null)
+    IReadOnlyDictionary<int, uint>? Classes = null,
+    IReadOnlyList<LoomMessage>? Messages = null)
 {
+    /// <summary>The messages on the screen: strings drawn since the room was drawn, then the talk message.</summary>
+    public IReadOnlyList<LoomMessage> ScreenMessages => Messages ?? [];
+
     /// <summary>Class bits per object number; empty when the index gave none.</summary>
     public IReadOnlyDictionary<int, uint> ObjectClasses => Classes ?? new Dictionary<int, uint>();
 
@@ -171,6 +175,17 @@ public sealed class LoomExplorationSession
         _visitTrace.Add($"boot: {frames} frames after script 001's first room load; now in Room {_currentRoom?.ResourceId:00}");
     }
 
+    /// <summary>
+    /// Jiffies (1/60 s) per frame: ScummVM's main loop waits <c>VAR_TIMER_NEXT</c>
+    /// (<c>var[0x013]</c>) jiffies, at least 1. The boot sets 6 (script 001 +0x0017).
+    /// </summary>
+    public int FrameJiffies => Math.Max(1, _runtime.GlobalVariables.TryGetValue(TimerNextVariable, out var next) ? next : 0);
+
+    private const string TimerNextVariable = "var[0x013]";
+
+    /// <summary>Frames a continued cutscene may run (about 33 minutes at 10 frames a second) before the preview stops following it.</summary>
+    public const int CutsceneFrameLimit = 20000;
+
     /// <summary>Frames the completed boot ran after script 001's first room load.</summary>
     public int BootFrames { get; private set; }
 
@@ -272,7 +287,11 @@ public sealed class LoomExplorationSession
         _runtime.StatesSetInRoom.Order().ToArray(),
         _picks.ToArray(),
         _runtime.EstimatedStates.Order().ToArray(),
-        new Dictionary<int, uint>(_runtime.ObjectClasses));
+        new Dictionary<int, uint>(_runtime.ObjectClasses),
+        _runtime.Messages.OnScreen);
+
+    /// <summary>The message state: the talk message, its delay and <c>VAR_HAVE_MSG</c>, and drawn strings.</summary>
+    public LoomMessageTable Messages => _runtime.Messages;
 
     private int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue("var[0x001]", out var ego)
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
@@ -290,6 +309,7 @@ public sealed class LoomExplorationSession
         if (reachedAction is not null)
             return EnterRoom(room, $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction.ReachedRoomLoad);
         var arrival = $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input.";
+        _runtime.Messages.RouteSkipped($"Room {room.ResourceId:00} was selected from the catalog, so prints on the route to it did not run");
         if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
             return EnterRoom(room, arrival);
         var (assumed, label, chosen) = PickCatalogArrival(room.ResourceId.Value, ego);
@@ -400,8 +420,13 @@ public sealed class LoomExplorationSession
         _runtime.EstimatedStates.Clear();
         // startScene hides every actor before the new room is loaded.
         _runtime.Actors.HideAll();
+        // startScene stops the talk and the room redraw erases drawn strings.
+        _runtime.Messages.RoomEntered(_runtime);
         var roomBytes = File.ReadAllBytes(room.FilePath);
         _currentObjects = _objects.Decode(roomBytes);
+        // getObjOrActorName for text code 6: the stored names of this room's objects.
+        var objectNames = LoomTextExtractor.ReadObjectNameBytes(LflEncoding.DecodeXorFF(roomBytes), _currentObjects);
+        _runtime.ObjectName = id => objectNames.TryGetValue(id, out var name) ? name : null;
         _runtime.WalkBoxFlagsUnknown = null;
         try { _runtime.WalkBoxes = LoomWalkBoxReader.Read(roomBytes); }
         catch (InvalidDataException ex)
@@ -1042,6 +1067,9 @@ public sealed class LoomExplorationSession
     /// </summary>
     public LoomSessionSnapshot AdvanceFrame()
     {
+        // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
+        // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
+        _runtime.Messages.StartFrame(FrameJiffies, _runtime);
         PlaceVirtualMouse();
         var beforeEvents = _visitEvents.Count;
         var runnable = _pending.ToArray();
@@ -1095,8 +1123,12 @@ public sealed class LoomExplorationSession
     /// against <paramref name="maxFrames"/>; frames inside one count against
     /// <paramref name="maxCutsceneFrames"/>, because the player has no control
     /// until the cutscene ends. Returns true when the session is in another room.
+    /// Since messages last their talk delay (<see cref="LoomMessageTable"/>),
+    /// cutscenes take the game's number of frames: the Elders' trial (script 046,
+    /// from Room 08's door) runs 2,120 frames, about 3.5 minutes at 10 frames a
+    /// second, so the default limit is <see cref="CutsceneFrameLimit"/>.
     /// </summary>
-    public bool ContinueUntilRoomChanges(int maxFrames, int maxCutsceneFrames = 1000)
+    public bool ContinueUntilRoomChanges(int maxFrames, int maxCutsceneFrames = CutsceneFrameLimit)
     {
         _uncertainties.StartStep();
         var room = _currentRoom?.ResourceId;

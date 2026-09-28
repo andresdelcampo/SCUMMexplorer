@@ -897,7 +897,8 @@ internal static class LoomScriptDisassembler
                 0x02 => Join("clipped", ReadParam(cursor, 2, sub, 0x80)),
                 0x03 => Join("erase", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x04 => "center",
-                0x06 => Join("left", ReadParam(cursor, 2, sub, 0x80)),
+                // v3 reads the line height here (ScummVM decodeParseString, SO_LEFT for later versions).
+                0x06 => Join("height", ReadParam(cursor, 2, sub, 0x80)),
                 0x07 => "overhead",
                 0x08 => Join("sayVoice", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x0F => Join("text", ReadScummString(cursor)),
