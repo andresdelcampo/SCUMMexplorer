@@ -6,6 +6,8 @@ using SCUMMexplorer.Core.Formats;
 // activate object O's verb V, in hex). After each action, pending scripts are
 // continued as a doorway click does in the app. Prints the
 // session trace, reached events and uncertainties added by each step.
+// "@x,y" puts the pointer over the room (assumed hover input), "@off" takes it
+// off, and "verbs" prints the verb slots.
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 var folder = args[0];
 var game = new GameFolderScanner().Scan(folder);
@@ -49,6 +51,25 @@ foreach (var step in args.Skip(1))
         continue;
     }
     // "sounds": lists the reached sound commands so far.
+    if (step.StartsWith('@'))
+    {
+        // "@x,y" puts the pointer over the room (assumed hover input); "@off" takes it off.
+        session.SetPointer(step == "@off" ? null : (int.Parse(step[1..].Split(',')[0]), int.Parse(step[1..].Split(',')[1])));
+        Console.WriteLine($"== pointer {(session.Pointer is { } p ? $"({p.X}, {p.Y})" : "off")}");
+        continue;
+    }
+    if (step == "verbs")
+    {
+        foreach (var slot in session.Verbs) Console.WriteLine($"   {slot.Describe()}" + (slot.Estimate is null ? "" : $" (estimate: {slot.Estimate})") + (slot.Unknown is null ? "" : $" (unknown: {slot.Unknown})"));
+        continue;
+    }
+    if (step.StartsWith("class", StringComparison.Ordinal))
+    {
+        // "class165,166" prints the class bits of objects.
+        foreach (var id in step[5..].Split(',').Select(int.Parse))
+            Console.WriteLine($"   object {id} classes 0x{session.Snapshot.ObjectClasses.GetValueOrDefault(id):X8}");
+        continue;
+    }
     if (step == "sounds")
     {
         foreach (var item in session.ReachedSoundEvents) Console.WriteLine("   sound: " + item.Format());

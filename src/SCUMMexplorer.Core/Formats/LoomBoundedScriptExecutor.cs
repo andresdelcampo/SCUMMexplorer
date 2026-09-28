@@ -220,6 +220,24 @@ public sealed class LoomBoundedScriptExecutor
             // so it needs the object and walk destination as they are now.
             if (scriptEvent is { Operation: "loadRoomWithEgo" })
                 scriptEvent = scriptEvent with { ResolvedArguments = ResolveLoadRoomWithEgo(instruction.Operands, knownVariables) };
+            // A started script receives its arguments' values; the session reads only
+            // globals and literals, so known, non-estimated locals are passed as literals.
+            if (scriptEvent is { Kind: LoomScriptEventKind.ScriptStarted or LoomScriptEventKind.ScriptChained or
+                    LoomScriptEventKind.ObjectScriptStarted })
+                scriptEvent = scriptEvent with { Operands = SubstituteLocalArguments(scriptEvent.Operands, knownVariables, estimated) };
+            // o5_startObject: the object (word) and verb (byte) as they are now.
+            if (scriptEvent is { Kind: LoomScriptEventKind.ObjectScriptStarted })
+            {
+                var listStart = ArgumentListStart(instruction.Operands);
+                var head = (listStart < 0 ? instruction.Operands : instruction.Operands[..listStart]).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                int? Read(int index) => head.Length > index && TryReadValue(head[index], knownVariables, out var value, out _) ? value : null;
+                scriptEvent = scriptEvent with
+                {
+                    ResolvedArguments = [Read(0), Read(1)],
+                    Certainty = head.Any(operand => OperandIsEstimated(operand, estimated, knownVariables))
+                        ? LoomScriptEventCertainty.Conditional : scriptEvent.Certainty
+                };
+            }
             if (scriptEvent is not null) events.Add(scriptEvent);
             string? eventHandling = null;
             if (scriptEvent is not null && runtime is not null && onEvent is not null)
@@ -675,6 +693,49 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "verbOps" && runtime is not null)
+            {
+                // o5_verbOps: changes one verb slot (see LoomVerbTable). This is game
+                // state (script 006 and the close-up script 008 test it through
+                // var[0x068]); drawing the verb area is left to presentation.
+                var open = ArgumentListStart(instruction.Operands);
+                var verbOperand = open > 0 ? instruction.Operands[..open].Trim().TrimEnd(',').Trim() : "";
+                if (open < 0 || !instruction.Operands.EndsWith(']') ||
+                    !TryReadValue(verbOperand, knownVariables, out var verbId, out _))
+                {
+                    runtime.Verbs.ForgetAll($"verbOps at +0x{instruction.Offset:X4} changes a verb the preview cannot read ({instruction.Operands})");
+                    limitations.Add($"verbOps changes a verb the preview cannot read, so every verb slot is unknown (+0x{instruction.Offset:X4})");
+                    pc = next;
+                    continue;
+                }
+                var operations = new List<(string Name, int?[] Values, string? Text)>();
+                var verbEstimated = onEstimatedPath || OperandIsEstimated(verbOperand, estimated, knownVariables);
+                foreach (var item in instruction.Operands[(open + 1)..^1].Split("; ", StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var comma = item.IndexOf(',');
+                    var name = (comma < 0 ? item : item[..comma]).Trim();
+                    var rest = comma < 0 ? "" : item[(comma + 1)..].Trim();
+                    if (name == "name")
+                    {
+                        operations.Add((name, [], rest.Trim('"')));
+                        continue;
+                    }
+                    var values = rest.Length == 0 ? [] : rest.Split(',', StringSplitOptions.TrimEntries)
+                        .Select(operand =>
+                        {
+                            if (OperandIsEstimated(operand, estimated, knownVariables)) verbEstimated = true;
+                            return TryReadValue(operand, knownVariables, out var value, out _) ? (int?)value : null;
+                        }).ToArray();
+                    operations.Add((name, values, null));
+                }
+                var applied = runtime.Verbs.Apply(verbId, operations,
+                    objectId => roomObjects.Any(record => record.Id == objectId), runtime.CurrentRoom,
+                    verbEstimated ? $"verbOps at +0x{instruction.Offset:X4} reads an estimate" : null);
+                trace.Add(applied + (verbEstimated ? " (estimate)" : ""));
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "beginOverride")
             {
                 // ScummEngine::beginOverride records the jump that follows and
@@ -845,6 +906,35 @@ public sealed class LoomBoundedScriptExecutor
     private const int RoomOwner = 0x0F;
 
     private static readonly Regex WalkToPattern = new(@"walkTo=\((-?\d+), (-?\d+)\)", RegexOptions.Compiled);
+
+    /// <summary>
+    /// The index of the <c>[</c> that opens an instruction's trailing argument list
+    /// (<c>startScript 0x08, [local[0x002]]</c>), matched from its closing <c>]</c>
+    /// so that <c>local[…]</c> operands before or inside it are skipped; −1 when there is none.
+    /// </summary>
+    internal static int ArgumentListStart(string operands)
+    {
+        var close = operands.LastIndexOf(']');
+        var depth = 0;
+        for (var index = close; index >= 0; index--)
+        {
+            if (operands[index] == ']') depth++;
+            else if (operands[index] == '[' && --depth == 0) return index;
+        }
+        return -1;
+    }
+
+    private static string SubstituteLocalArguments(string operands, IDictionary<string, ushort> variables, IReadOnlySet<string> estimated)
+    {
+        var open = ArgumentListStart(operands);
+        var close = operands.LastIndexOf(']');
+        if (open < 0 || close <= open) return operands;
+        var arguments = operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(argument => argument.StartsWith("local[", StringComparison.Ordinal) &&
+                                variables.TryGetValue(argument, out var value) && !estimated.Contains(argument)
+                ? $"0x{value:X4}" : argument);
+        return $"{operands[..(open + 1)]}{string.Join(", ", arguments)}{operands[close..]}";
+    }
 
     /// <summary>loadRoomWithEgo's object, room and walk destination (x = -1: no walk), each null when unknown.</summary>
     private static IReadOnlyList<int?> ResolveLoadRoomWithEgo(string operands, IDictionary<string, ushort> variables)

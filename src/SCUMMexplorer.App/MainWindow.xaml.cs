@@ -661,7 +661,9 @@ public partial class MainWindow : Window
         else SessionStatusText.Text = "Session reset. Select a room to visit it.";
     }
 
-    private void AdvanceFrame_Click(object sender, RoutedEventArgs e)
+    private void AdvanceFrame_Click(object sender, RoutedEventArgs e) => AdvanceOneFrame();
+
+    private void AdvanceOneFrame()
     {
         if (_session is null || _currentRoomResource is not { } room || _currentRoom is null) return;
         var snapshot = _session.AdvanceFrame();
@@ -1742,6 +1744,7 @@ public partial class MainWindow : Window
             ? CreateMaskOverlayBitmap(room.Width, room.Height, pixels, room.Palette, depthMask.Pixels.ToArray())
             : CreateBitmap(room.Width, room.Height, pixels, room.Palette);
         RefreshWalkBoxOverlay();
+        UpdateVerbArea();
 
         var selected = _objects.FirstOrDefault(obj => obj.Id == _selectedObject);
         var selectedPosition = selected is null ? default : _objectSelection.GetPosition(selected);
@@ -2081,9 +2084,12 @@ public partial class MainWindow : Window
             RoomPreview.Cursor = Cursors.Arrow;
             RoomPreview.ToolTip = null;
             ShowHoveredHotspotRow(null);
+            SendPointerToGame(null, null);
             return;
         }
-        ShowHoveredHotspotRow(SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null);
+        var hoveredRow = SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null;
+        ShowHoveredHotspotRow(hoveredRow);
+        SendPointerToGame((x, y), hoveredRow?.Id ?? 0);
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             var doorways = DoorwaysAt(x, y);
@@ -2143,6 +2149,56 @@ public partial class MainWindow : Window
         RoomPreview.Cursor = Cursors.Arrow;
         RoomPreview.ToolTip = null;
         ShowHoveredHotspotRow(null);
+        SendPointerToGame(null, null);
+    }
+
+    // The room and the object under the pointer (0: none) when a frame last ran for the game pointer.
+    private (int? Room, int? Target)? _gamePointerTarget;
+
+    /// <summary>
+    /// "Pointer as game input": gives the pointer's room position to the session
+    /// as the virtual mouse (assumed input, no click). A frame runs only when the
+    /// object under the pointer changes, so the input loop sees the new hover once.
+    /// </summary>
+    private void SendPointerToGame((int X, int Y)? point, int? target)
+    {
+        if (GamePointerToggle.IsChecked != true || SessionModeToggle.IsChecked != true || _session is null ||
+            _currentRoomResource is not { } room || _session.Snapshot.RoomId != room.ResourceId) return;
+        _session.SetPointer(point);
+        if (_gamePointerTarget == (room.ResourceId, target)) return;
+        _gamePointerTarget = (room.ResourceId, target);
+        AdvanceOneFrame();
+    }
+
+    private void GamePointerToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        _gamePointerTarget = null;
+        if (GamePointerToggle.IsChecked != true) _session?.SetPointer(null);
+        UpdateVerbArea();
+    }
+
+    /// <summary>
+    /// Shows the verb-area close-up (verb 0x36) while the game pointer is on and
+    /// the verb is on: script 008 sets it from the hovered object's verb 0x39
+    /// (<c>var[0x068]</c>). It is game state reached from assumed hover input.
+    /// </summary>
+    private void UpdateVerbArea()
+    {
+        var closeUp = GamePointerToggle.IsChecked == true ? _session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
+        if (closeUp is not { Mode: 1, ImageObject: int image } || _session is null)
+        {
+            VerbAreaPanel.Visibility = Visibility.Collapsed;
+            return;
+        }
+        var snapshot = _session.Snapshot;
+        var picture = closeUp.ImageRoom == snapshot.RoomId ? _objects.FirstOrDefault(item => item.Id == image) : null;
+        VerbAreaImage.Source = picture is null || _currentRoom is null ? null
+            : CreateBitmap(picture.Width, picture.Height, picture.Pixels, _currentRoom.Palette);
+        var hovered = snapshot.KnownGlobalVariables.TryGetValue("var[0x066]", out var selected) ? $" for object {selected}" : "";
+        VerbAreaText.Text = $"Verb area close-up: object {image}'s image (verb 0x36, script 008{hovered}). " +
+                            "Game state reached from assumed hover input; no click was sent." +
+                            (closeUp.Estimate is null ? "" : $" Estimate: {closeUp.Estimate}.");
+        VerbAreaPanel.Visibility = Visibility.Visible;
     }
 
     /// <summary>

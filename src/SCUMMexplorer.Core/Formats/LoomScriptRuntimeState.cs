@@ -64,6 +64,8 @@ public sealed class LoomScriptRuntimeState
     public string? WalkBoxFlagsUnknown { get; set; }
     /// <summary>Actor rooms, positions and walk boxes as reached code left them.</summary>
     public LoomActorTable Actors { get; } = new();
+    /// <summary>Verb slots as reached <c>verbOps</c> left them (the verb bar and the verb-area close-up).</summary>
+    public LoomVerbTable Verbs { get; } = new();
     /// <summary>The current room's number, or null outside a room.</summary>
     public int? CurrentRoom { get; set; }
 }

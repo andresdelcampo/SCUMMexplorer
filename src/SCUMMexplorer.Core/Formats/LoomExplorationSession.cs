@@ -404,6 +404,7 @@ public sealed class LoomExplorationSession
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
         _runtime.GlobalVariables["var[0x004]"] = (ushort)room.ResourceId!.Value;
         _roomSize = (roomWidth, (roomBytes[6] ^ 0xFF) | ((roomBytes[7] ^ 0xFF) << 8));
+        _pointer = null;
         PlaceVirtualMouse();
         _uncertainties.Add(arrival);
 
@@ -478,6 +479,16 @@ public sealed class LoomExplorationSession
     private void PlaceVirtualMouse()
     {
         if (_roomSize is not { } size) return;
+        if (_pointer is { } pointer)
+        {
+            _runtime.GlobalVariables["var[0x014]"] = (ushort)pointer.X;
+            _runtime.GlobalVariables["var[0x015]"] = (ushort)pointer.Y;
+            _runtime.EstimatedVariables.Remove("var[0x014]");
+            _runtime.EstimatedVariables.Remove("var[0x015]");
+            _runtime.VirtualMouse = pointer;
+            _runtime.VirtualMouseAssumption = $"assumed input: the pointer rests over the room at ({pointer.X}, {pointer.Y}), placed by the explorer's hover, with no click";
+            return;
+        }
         var x = CameraX ?? size.Width / 2;
         var y = size.Height;
         _runtime.GlobalVariables["var[0x014]"] = (ushort)x;
@@ -487,6 +498,29 @@ public sealed class LoomExplorationSession
         _runtime.VirtualMouse = (x, y);
         _runtime.VirtualMouseAssumption = $"assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at ({x}, {y})";
     }
+
+    // The pointer over the current room given by SetPointer, or null (no pointer over the room).
+    private (int X, int Y)? _pointer;
+
+    /// <summary>
+    /// Puts the pointer over the current room at a room-pixel point, or takes it
+    /// off (null). This is assumed input: from the next frame the virtual mouse
+    /// (<c>var[0x014]</c>/<c>var[0x015]</c>) reads it, so the input loop (script 006)
+    /// sees what is under it; no click is made. Points outside the room picture
+    /// count as no pointer. Entering another room takes the pointer off.
+    /// </summary>
+    public void SetPointer((int X, int Y)? point)
+    {
+        _pointer = point is { } p && _roomSize is { } size && p.X >= 0 && p.Y >= 0 && p.X < size.Width && p.Y < size.Height
+            ? p : null;
+        PlaceVirtualMouse();
+    }
+
+    /// <summary>The pointer the session reads as the virtual mouse, or null when it assumes none over the room.</summary>
+    public (int X, int Y)? Pointer => _pointer;
+
+    /// <summary>Verb slots as reached <c>verbOps</c> left them: the verb bar and the verb-area close-up (verb 0x36).</summary>
+    public IReadOnlyList<LoomVerbSnapshot> Verbs => _runtime.Verbs.Snapshot();
 
     /// <summary>The camera's centre x in room pixels (<c>var[0x002]</c>), or null when it is unknown.</summary>
     public int? CameraX => _runtime.GlobalVariables.TryGetValue(CameraVariable, out var x) ? x : null;
@@ -625,7 +659,9 @@ public sealed class LoomExplorationSession
                     _pending.Add(item);
                     continue;
                 }
-                RunScript(item.Script, item.RoomObjects, item.Offset, item.Locals, 0, item.ScriptNumber,
+                // Every script works on the current room's objects (ScummVM _objs): a global
+                // script pended in an earlier room must not see that room's objects.
+                RunScript(item.Script, _currentObjects, item.Offset, item.Locals, 0, item.ScriptNumber,
                     item.EstimatedLocals, item.PathEstimated, item.Frame);
                 DispatchRequestedLoads("after a frame advance");
             }
@@ -878,6 +914,54 @@ public sealed class LoomExplorationSession
         }
     }
 
+    /// <summary>
+    /// o5_startObject → runObjectScript (v3): nothing happens for object 0 or an
+    /// object that is neither in the room nor held (<c>WIO_NOT_FOUND</c>), or
+    /// when the object has no entry for the verb and no fallback
+    /// (<c>getVerbEntrypoint</c> 0). Otherwise the verb's code runs at once with
+    /// the arguments as locals (<c>runScriptNested</c>). Held objects' code is
+    /// not modelled; stopping the object's earlier script (<c>stopObjectScript</c>) is not modelled.
+    /// </summary>
+    private void StartObjectScript(LoomScriptEvent scriptEvent, int depth)
+    {
+        var source = $"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}";
+        if (scriptEvent.ResolvedArguments is not [int objectId, int verbId])
+        {
+            _uncertainties.Add($"{source}: startObject reads an object or verb the preview does not know ({scriptEvent.Operands}); the parent continues without its effects.");
+            return;
+        }
+        if (objectId == 0 || _currentRoom is null) return;
+        var record = _currentObjects.FirstOrDefault(item => item.Id == objectId);
+        if (record is null)
+        {
+            _uncertainties.Add($"{source}: startObject {objectId}, verb 0x{verbId:X2}: the object is not in Room {_currentRoom.ResourceId:00}; its code runs only if it is held, and inventory code is not modelled.");
+            return;
+        }
+        if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var locals))
+        {
+            _uncertainties.Add($"{source}: startObject {objectId} has arguments depending on unknown variables; the parent continues without its effects.");
+            return;
+        }
+        LoomScriptDisassembly script;
+        try { script = _verbs.Decode(_currentRoom, record, verbId); }
+        catch (InvalidDataException ex) when (ex.Message.Contains("has no verb", StringComparison.Ordinal))
+        {
+            _visitTrace.Add($"{source}: object {objectId} has no verb 0x{verbId:X2} and no fallback, so startObject does nothing");
+            return;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            _uncertainties.Add($"{source}: object {objectId} verb 0x{verbId:X2} could not be decoded: {ex.Message}");
+            return;
+        }
+        var parent = _executing.Count > 0 ? _executing[^1] : null;
+        _visitTrace.Add($"{source}: startObject runs object {objectId} verb 0x{verbId:X2}");
+        RunScript(script, _currentObjects, 0, locals, depth + 1, null,
+            EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+            scriptEvent.Certainty != LoomScriptEventCertainty.Reached,
+            new ScriptFrame { OriginRoom = parent?.OriginRoom });
+    }
+
     private static int ReadGlobalScriptCount(GameLibrary game)
     {
         var indexPath = Path.Combine(game.FolderPath, "00.LFL");
@@ -943,7 +1027,7 @@ public sealed class LoomExplorationSession
             var preservedLocals = result.KnownVariables
                 .Where(pair => pair.Key.StartsWith("local[", StringComparison.Ordinal))
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
-            _pending.Add(new PendingScript(script, objects.ToArray(), next, preservedLocals,
+            _pending.Add(new PendingScript(script, next, preservedLocals,
                 script.Context is null ? null : _currentRoom?.ResourceId, scriptNumber,
                 result.EstimatedLocals, result.PathEstimated, frame));
         }
@@ -1006,7 +1090,7 @@ public sealed class LoomExplorationSession
                     : $"stopScript {stoppedScript} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: ended its pending run");
                 return "";
             case LoomScriptEventKind.ObjectScriptStarted:
-                _uncertainties.Add("A started object script has an unresolved entrypoint; the parent continues without its effects.");
+                StartObjectScript(scriptEvent, depth);
                 return "";
             case LoomScriptEventKind.MusicStarted:
             case LoomScriptEventKind.SoundStarted:
@@ -1132,7 +1216,7 @@ public sealed class LoomExplorationSession
 
     private static string[] EstimatedArguments(string operands, IReadOnlySet<string> estimatedGlobals)
     {
-        var open = operands.IndexOf('[');
+        var open = LoomBoundedScriptExecutor.ArgumentListStart(operands);
         var close = operands.LastIndexOf(']');
         if (open < 0 || close <= open) return [];
         return operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
@@ -1145,7 +1229,7 @@ public sealed class LoomExplorationSession
         IReadOnlyDictionary<string, ushort> globals, out IReadOnlyDictionary<string, ushort> locals)
     {
         var values = new Dictionary<string, ushort>(StringComparer.Ordinal);
-        var open = operands.IndexOf('[');
+        var open = LoomBoundedScriptExecutor.ArgumentListStart(operands);
         var close = operands.LastIndexOf(']');
         if (open < 0 || close <= open) { locals = values; return true; }
         var arguments = operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -1181,8 +1265,7 @@ public sealed class LoomExplorationSession
         public void StartStep() => _seen.Clear();
     }
 
-    private sealed record PendingScript(LoomScriptDisassembly Script,
-        IReadOnlyList<LoomRoomObjectRecord> RoomObjects, int Offset,
+    private sealed record PendingScript(LoomScriptDisassembly Script, int Offset,
         IReadOnlyDictionary<string, ushort> Locals, int? RoomId, int? ScriptNumber,
         IReadOnlyCollection<string> EstimatedLocals, bool PathEstimated, ScriptFrame Frame);
 
