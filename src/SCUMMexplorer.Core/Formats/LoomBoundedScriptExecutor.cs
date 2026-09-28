@@ -508,8 +508,63 @@ public sealed class LoomBoundedScriptExecutor
                 };
                 trace.Add($"{waited} at +0x{instruction.Offset:X4} continues on the next frame");
                 limitations.Add($"timing not simulated: {waited} continues on the next frame (+0x{instruction.Offset:X4})");
+                // The script goes on only after the walk has ended, so the actor
+                // then stands where the walk was taken to end.
+                if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands.StartsWith("actor,", StringComparison.Ordinal) &&
+                    TryReadValue(instruction.Operands[6..].Trim(), knownVariables, out var waitedActor, out _) &&
+                    LoomActorTable.IsValid(waitedActor) && runtime.Actors.WalkWaited(waitedActor))
+                    trace.Add($"actor {waitedActor}'s walk has ended when the script goes on, so its position is no longer an estimate (only the walk's duration is not simulated)");
                 resumeOffset = next;
                 break;
+            }
+
+            if (runtime is not null && instruction.Operation == "cursorCommand")
+            {
+                // o5_cursorCommand: userInputOn/Off set _userPut to 1/0; the soft forms add or take one.
+                var command = instruction.Operands.Split(',', StringSplitOptions.TrimEntries)[0];
+                var before = runtime.UserPut;
+                runtime.UserPut = command switch
+                {
+                    "userInputOn" => 1,
+                    "userInputOff" => 0,
+                    "userInputSoftOn" => runtime.UserPut + 1,
+                    "userInputSoftOff" => runtime.UserPut - 1,
+                    _ => runtime.UserPut
+                };
+                if (runtime.UserPut != before)
+                {
+                    if (onEstimatedPath) runtime.UserPutEstimate = $"{command} at +0x{instruction.Offset:X4} follows a seeded pick";
+                    else if (command is "userInputOn" or "userInputOff") runtime.UserPutEstimate = null;
+                    trace.Add($"user input {(runtime.UserPut > 0 ? "on" : "off")} ({command}, _userPut = {runtime.UserPut})");
+                }
+                pc = next;
+                continue;
+            }
+
+            if (runtime is not null && instruction.Operation == "getDist")
+            {
+                // o5_getDist: result = getObjActToObjActDist(a, b).
+                var distParts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (distParts.Length != 3 || !TryGetVariableKey(distParts[0], knownVariables, out var distKey))
+                {
+                    unresolved = $"getDist operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                if (!TryMeasureDistance(distParts[1], distParts[2], runtime, roomObjects, knownVariables,
+                        out var distance, out var distDetail, out var distEstimate))
+                {
+                    unresolved = $"{distDetail} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                knownVariables[distKey] = (ushort)distance;
+                RefreshBitAliases(distKey, knownVariables);
+                MarkEstimated(estimated, distKey, onEstimatedPath || distEstimate is not null ||
+                    OperandIsEstimated(distParts[1], estimated, knownVariables) || OperandIsEstimated(distParts[2], estimated, knownVariables));
+                if (distEstimate is not null)
+                    limitations.Add($"getDist reads {distEstimate}, so what follows is an estimate (+0x{instruction.Offset:X4})");
+                trace.Add($"{distKey} = {distance}: getDist {distParts[1]}, {distParts[2]}{(distEstimate is null ? "" : " (estimate)")}");
+                pc = next;
+                continue;
             }
 
             if (instruction.Operation == "isSoundRunning")
@@ -1176,6 +1231,76 @@ public sealed class LoomBoundedScriptExecutor
         answer = value.Value;
         if (actor.Estimate is not null) estimate = $"actor {number}: {actor.Estimate}";
         detail = "known value";
+        return true;
+    }
+
+    /// <summary>
+    /// ScummVM <c>getObjActToObjActDist</c>: numbers below 13 are actors, others
+    /// objects. Two actors in the same room that is not the current one are 0
+    /// apart; an actor outside the current room or an object that is not found
+    /// gives 0xFF. When the first is an actor and the second an object, the
+    /// object's walk point is adjusted into the actor's walk boxes first. The
+    /// distance is the larger of the x and y differences (<c>getDist</c>).
+    /// </summary>
+    private static bool TryMeasureDistance(string first, string second, LoomScriptRuntimeState runtime,
+        IReadOnlyList<LoomRoomObjectRecord> roomObjects, IDictionary<string, ushort> variables,
+        out int distance, out string detail, out string? estimate)
+    {
+        distance = 0;
+        estimate = null;
+        detail = "known value";
+        if (!TryReadValue(first, variables, out var a, out _) || !TryReadValue(second, variables, out var b, out _))
+        {
+            detail = $"getDist reads an object or actor the preview cannot read ({first}, {second})";
+            return false;
+        }
+        var actorA = LoomActorTable.IsValid(a) ? runtime.Actors[a] : null;
+        var actorB = LoomActorTable.IsValid(b) ? runtime.Actors[b] : null;
+        if (actorA is not null && actorB is not null)
+        {
+            if (actorA.Room is null || actorB.Room is null)
+            {
+                detail = $"getDist reads actors {a} and {b}, one of whose rooms the preview does not know";
+                return false;
+            }
+            if (actorA.Room == actorB.Room && actorA.Room != 0 && actorA.Room != runtime.CurrentRoom) return true;
+        }
+        var estimates = new List<string>();
+        (int X, int Y)? Locate(int number, LoomActorSnapshot? actor, out string? unknown)
+        {
+            unknown = null;
+            if (number < LoomActorTable.Count)
+            {
+                // getObjectOrActorXY: an actor counts only in the current room.
+                if (actor is null) return null;
+                if (actor.Room is null) { unknown = $"getDist reads actor {number}, whose room the preview does not know ({actor.Unknown ?? "not known"})"; return null; }
+                if (actor.Room != runtime.CurrentRoom) return null;
+                if (actor.X is not int x || actor.Y is not int y) { unknown = $"getDist reads actor {number}, whose position the preview does not know ({actor.Unknown ?? "not known"})"; return null; }
+                if (actor.Estimate is not null) estimates.Add($"actor {number}: {actor.Estimate}");
+                return (x, y);
+            }
+            var (found, point) = FindObjectWalkPoint(number, roomObjects, runtime);
+            if (found && point is null) unknown = $"getDist reads object {number}, whose position the preview does not know (it is held or not in this room's records)";
+            return point;
+        }
+        var pointA = Locate(a, actorA, out var unknownA);
+        if (unknownA is not null) { detail = unknownA; return false; }
+        if (pointA is null) { distance = 0xFF; return true; }
+        var pointB = Locate(b, actorB, out var unknownB);
+        if (unknownB is not null) { detail = unknownB; return false; }
+        if (pointB is null) { distance = 0xFF; return true; }
+        var (x2, y2) = pointB.Value;
+        if (actorA is not null && actorB is null)
+        {
+            if (runtime.Actors.AdjustPoint(a, x2, y2, PlacementOf(runtime)) is not { } adjusted)
+            {
+                detail = $"getDist adjusts object {b}'s position into actor {a}'s walk boxes, which the preview does not know";
+                return false;
+            }
+            (x2, y2) = adjusted;
+        }
+        distance = Math.Max(Math.Abs(pointA.Value.X - x2), Math.Abs(pointA.Value.Y - y2));
+        if (estimates.Count > 0) estimate = string.Join("; ", estimates);
         return true;
     }
 

@@ -14,7 +14,10 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `var[0x003]` | A message is on screen (`VAR_HAVE_MSG`). Many scripts wait while it is nonzero. | ScummVM |
 | `var[0x004]` | Current room (`VAR_ROOM`) | ScummVM |
 | `var[0x005]` | `VAR_OVERRIDE`: 1 when the player skipped a cutscene; `endCutscene` clears it | ScummVM |
-| `var[0x014]`, `var[0x015]` | Virtual mouse x/y (`VAR_VIRT_MOUSE_X/Y`, vars 20/21), written by the engine every frame. Script 006 reads them. The session has no pointer and states one: just below the room picture, under the camera (for example (800, 144)), labelled as assumed input. | ScummVM; modelled 27 Sep |
+| `var[0x014]`, `var[0x015]` | Virtual mouse x/y (`VAR_VIRT_MOUSE_X/Y`, vars 20/21), written by the engine every frame. Script 006 reads them. The session has no pointer and states one: just below the room picture, under the camera (for example (800, 144)), labelled as assumed input. The optional hover or click puts it at the explorer's point; after a click it stays there. | ScummVM; modelled 27 Sep, click 28 Sep |
+| `var[0x00C]` | `VAR_TMR_2` (v3 var 12): jiffies the engine adds every frame (`scummLoop`). Script 006 resets it on each click (+0x0068) and reads it for a double click (+0x000A, at most 0x28). The session does not run the timers; a click states it (60 for a single click, 10 between the clicks of a double click), labelled. | ScummVM; decoded |
+| `var[0x013]` | `VAR_TIMER_NEXT` (v3 var 19): jiffies per frame; the boot sets 6 (script 001 +0x0017), script 044 sets 0 and 6 around the intro | ScummVM; decoded |
+| `var[0x020]` | `VAR_VERB_SCRIPT` (v3 var 32): the script `runInputScript` runs for every click or key. **Script 001 +0x016B sets it to 5.** Script 004 saves and restores it around setting 200 (+0x008F); Room 02's entry and script 106 set 0x73, Room 69's entry 0xC8, script 115 sets 5 again. | ScummVM; decoded 28 Sep |
 | `var[0x01C]`–`var[0x01F]` | Room hooks: before entry, after entry, before exit, after exit (`VAR_ENTRY_SCRIPT`, `…2`, `VAR_EXIT_SCRIPT`, `…2`). The boot sets `var[0x01D] = 14` and `var[0x01E] = 15`. | ScummVM; script 001 |
 | `var[0x023]`, `var[0x024]` | Cutscene start and end scripts (`VAR_CUTSCENE_START_SCRIPT`/`END`): 2 and 3 | ScummVM; script 001 +0x017A |
 | `var[0x030]` | Sound card (`VAR_SOUNDCARD`). 0 in the session; scripts branch on 3 and 4 (AdLib, Roland) when choosing sounds. | ScummVM (reading) |
@@ -27,7 +30,11 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `var[0x052..0x055]` | Room 69's random draft (four notes) for the draft check |
 | `var[0x062]`, `var[0x063]` | Room 69: which note is expected next; the number of wrong tries |
 | `var[0x066]`, `var[0x067]`, `var[0x068]` | The object whose close-up is shown (script 008 +0x0019); the clicked object (script 006 +0x00AB, cleared by many scripts); the close-up image object, set by the object's verb 0x39 and shown by `verbOps 0x36` (script 008) |
-| `var[0x069]` | Input-loop state (script 006) |
+| `var[0x069]` | A click is recorded (script 006 +0x0077); the next click within the timer window at nearly the same point is a double click. The boot clears it (+0x023B). |
+| `var[0x06A]`, `var[0x06B]` | The clicked object's walk point (script 006 `getActorX/Y` on it), or the clicked point when nothing is under it |
+| `var[0x06C]`, `var[0x06D]` | The pointer point `findObject` is asked about (script 006 +0x0082–0x0091) |
+| `var[0x06E]`, `var[0x06F]` | Where the last click was (script 006 +0x006D); the double-click test allows 6 px across and 3 down |
+| `bit[0xD63]`, `bit[0xD64]` | Script 006 sets `bit[0xD63]` while an object's verb 0x37 runs; a verb 0x37 that sets `bit[0xD64]` stops the walk and the sentence (+0x00E4) (decoded; reading: 0x37 is the "on click" verb, for example Room 04's pans) |
 | `var[0x070]` | The previous room: script 015 (before-exit hook) +0x001A stores `var[0x004]` there. Room 04's entry reads it to pick a screen half. |
 | `var[0x071]` | The object the player arrived through (Room 22's entry reads it). Script 006 sets it when the clicked object has class 2 (+0x00C7, +0x0143), the class of the exit hotspots (Room 03 objects 160–163). |
 | `var[0x0A2]` | Script 039 plays nothing when it is nonzero (+0x001A); reading: a music-off setting |
@@ -49,8 +56,9 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | 001 | Boot | Loads Room 69, waits for `bit[0xD6B]`, sets the hooks, plays script 044, chains to 006. See the [boot validation](../.verification/boot/validation.md). |
 | 002 | Cutscene start hook | Cursor and input off, `freezeScripts 0x7F`, `bit[0xD6E] = 1`, `var[0x005] = 0`; with argument 1, starts script 19 |
 | 003 | Cutscene end hook | Cursor and input on, unfreeze, camera follows ego (+0x0018 `actorFollowCamera var[0x001]`), `bit[0xD6E] = 0`; with argument 1, starts script 18 unless `bit[0xD61]` is set |
-| 006 | Input loop (runs forever) | Reads the mouse (`var[0x014]`/`var[0x015]`, movement against `var[0x06E]`/`var[0x06F]`, idle count `var[0x00C]`), `findObject` +0x0096. Hover, no click (+0x0116): a class-1 object starts script 008 with it while `var[0x067]` is 0. On a click (`local[0]`) it sets `var[0x067]`, runs verb 0x37, walks the ego and starts script 007 (verb 0x38 or 0x36). With nothing under the pointer, it starts script 008 with 0 if a close-up is shown (+0x01AA), then `breakHere`. The session assumes no pointer (it idles), unless the app's optional "Pointer as game input" places one (28 Sep; hover only, no click). |
-| 007 | Runs a sentence | `startObject obj, verb` when ego is close enough (`getDist ≤ 3`) |
+| 005 | Input script (`VAR_VERB_SCRIPT`, set by the boot) | Runs for every click or key with `local[0]` = area, `local[1]` = verb or key, `local[2]` = button (ScummVM `runInputScript`). Area 2 (room click): +0x000C `chainScript 0x06, [1]`. Area 1 (verb area): verb 0x36 → script 007 `[var[0x066], 0x36]` after the ego's walk; 0x35 → script 009; 0x31–0x33 and the distaff notes → script 010. Area 4 (keys): notes by letter; Escape (0x1B), only outside a cutscene (`bit[0xD6E]` = 0) and when `bit[0xD66]` is 0, turns the close-up off and runs scripts 028 and 021 inside a cutscene of its own (reading: an options or pause screen, not checked); text speed; F5–F8 (0x13F–0x142): scripts 043/004, music and effects on/off, full or fast animation (`bit[0xD62]`), restart; the version line (0x16). Decoded 28 Sep; the session sends room clicks only. |
+| 006 | Input loop (runs forever) | Reads the mouse (`var[0x014]`/`var[0x015]`), `findObject` +0x0096. Hover, no click (+0x0116): a class-1 object starts script 008 with it while `var[0x067]` is 0. A click restarts it from +0x0000 with `local[0]` = 1 (script 005's `chainScript`; ScummVM `runScript` stops the running copy): +0x0005–0x005E is the double-click test (`var[0x069]`, timer `var[0x00C]` ≤ 0x28, movement against `var[0x06E]`/`var[0x06F]`), which sets `local[1]`. Then for the object under the pointer: `var[0x067]` = it (class 1) or 0, `var[0x071]` = it (class 2), verb 0x37, `walkActorToObject`, `waitFor actor`, script 007 with 0x38, and with 0x36 too on a double click. With nothing under it, the ego walks to the point; a shown close-up is turned off (+0x01AA). The session sends a click only through `Click` (the app's optional "Click as game input", 28 Sep). |
+| 007 | Runs a sentence | `getDist obj, ego`: within 3, `startObject obj, verb` (and the name printed for a class-1 object that was clicked); farther, a shown close-up of it is turned off (chain to 008 with 0). Decoded; run by the session since 28 Sep. |
 | 008 | Verb-area close-up | With an object: `var[0x066]` = it, `startObject obj, 0x39` (sets `var[0x068]`), `verbOps 0x36 [at 248, 152; image var[0x068]; on]`; prints the object's name when it is the clicked one and the ego is near. With 0: `verbOps 0x36 off`, `drawBox` over the area. Decoded; run by the session since 28 Sep. |
 | 014 | After-entry hook | Room-dependent setup; starts script 18 in some rooms |
 | 015 | Before-exit hook | Clears `bit[0xD7A]`, **stops script 42**, stores the room being left in `var[0x070]` (+0x001A), clears the hover, starts scripts 008 and 028 |
@@ -112,13 +120,18 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `getRandomNr` | Seeded pick, labelled; later steps are estimates | executor |
 | `verbOps` | Verb slots as state (`LoomVerbTable`); the app shows only the close-up (verb 0x36) when the pointer is on | executor, `LoomVerbs.cs` |
 | `startObject` (`runObjectScript`) | Runs the object's verb (or fallback) at once with the arguments; held objects are labelled | session `StartObjectScript` |
-| The pointer | No pointer over the room (assumed), or the app's hover when "Pointer as game input" is on; never a click | session `SetPointer`, `PlaceVirtualMouse` |
+| The pointer | No pointer over the room (assumed), or the app's hover when "Pointer as game input" is on | session `SetPointer`, `PlaceVirtualMouse` |
+| `checkExecVerbs` → `runInputScript(2, 0, 1)` for a room click | `Click(x, y, doubleClick)` runs `var[0x020]`'s script with `[2, 0, 1]`, with the point and the timer (`var[0x00C]`) stated as assumed input; refused while `_userPut` ≤ 0 | session `Click`, app "Click as game input" |
+| `runScript` stops a running copy unless recursive | A started script (opcode bit 0x40 clear), a chained one (the slot's flag) or a hook ends the pending copies of the same number first | session `RunStartedScript` |
+| `cursorCommand` user input (`_userPut`) | Kept as a number; clicks are refused at 0 or below | executor, `LoomScriptRuntimeState.UserPut` |
+| `getObjActToObjActDist` (`getDist`) | Actor and object positions, 0xFF outside the room, the object's point adjusted into the actor's boxes | executor `TryMeasureDistance` |
+| Walks | End at once (estimate); after `waitFor actor` the end is no longer an estimate; when every box routes to the end box, an estimate about the start does not carry to the end | `LoomActorTable.Walk`, `WalkWaited` |
 | Sound commands (music row) | Each command keeps the room whose code began its script chain (`ScriptFrame.OriginRoom`). The room view shows cues started since entry, or started by the room itself and not stopped. | session `SoundEvents`, `LoomSoundCueResolver.ResolveForRoom` |
 
 ## Not modelled yet (by frequency in Blockers)
 
 1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown. After a catalog visit the ego takes a source-backed assumed arrival, so only Rooms 32, 43 and 65 (no literal arrival) still stop ([validation](../.verification/catalog-arrivals/validation.md)). `getActorCostume`, `getActorElevation`, walk timing and paths, and step-by-step camera movement are not modelled.
-2. A click: the hover path of script 006 runs with the optional pointer (28 Sep), but clicks (`local[0]`, verb 0x37, script 007's sentences) are not sent.
+2. Input beyond a room click: room clicks go through scripts 005, 006 and 007 when sent ([validation](../.verification/click-input/validation.md)), but clicks in the verb area (area 1: the distaff, the close-up icon) and keys (area 4) are not sent, and the engine timers are not run.
 3. Inventory object code and `stopObjectScript`.
 4. `startScript` with a dynamic target (a variable that is not known).
 5. `expression` in some forms.

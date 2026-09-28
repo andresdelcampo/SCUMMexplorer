@@ -49,11 +49,16 @@ public sealed record LoomObjectActionResult(
     int SourceRoomId, int ObjectId, int VerbId, int ScriptOffset,
     LoomScriptDisassembly? Script, LoomBoundedScriptResult? Run,
     LoomScriptEvent? ReachedRoomLoad, int? DestinationRoomId,
-    IReadOnlyList<string> Uncertainties)
+    IReadOnlyList<string> Uncertainties, string? Input = null)
 {
+    /// <summary>True when the action was a click sent through the game's input scripts, not a direct verb call.</summary>
+    public bool IsGameInput => Input is not null;
+
+    private string Source => Input ?? $"Room {SourceRoomId:00} object {ObjectId}, verb 0x{VerbId:X2}, code 0x{ScriptOffset:X4}";
+
     public string Evidence => ReachedRoomLoad is null
-        ? $"Room {SourceRoomId:00} object {ObjectId}, verb 0x{VerbId:X2}, code 0x{ScriptOffset:X4}; no room load was reached."
-        : $"Room {SourceRoomId:00} object {ObjectId}, verb 0x{VerbId:X2}, code 0x{ScriptOffset:X4}; " +
+        ? $"{Source}; no room load was reached."
+        : $"{Source}; " +
           $"{ReachedRoomLoad.Operation} at {ReachedRoomLoad.SourceLabel} +0x{ReachedRoomLoad.Offset:X4} → " +
           (DestinationRoomId is int target ? $"Room {target:00}" : "unresolved room") + ".";
 }
@@ -279,6 +284,8 @@ public sealed class LoomExplorationSession
             throw new InvalidDataException("The session can only visit an indexed room.");
         if (_currentRoom?.ResourceId == room.ResourceId) return Snapshot;
         _uncertainties.StartStep();
+        if (reachedAction is { IsGameInput: true })
+            return EnterRoom(room, $"{reachedAction.Evidence} The click went through the game's input scripts (005, 006, 007); walks were taken to end at once.", reachedAction.ReachedRoomLoad);
         if (reachedAction is not null)
             return EnterRoom(room, $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction.ReachedRoomLoad);
         var arrival = $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input.";
@@ -455,6 +462,11 @@ public sealed class LoomExplorationSession
         if (arguments[2] is int x && x != -1 && arguments[3] is int y)
         {
             _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), $"the ego's walk from {source}");
+            // The walk's destination comes from the same assumed or picked arrival.
+            if (assumedArrival is not null)
+                _runtime.Actors.MarkEstimate(ego, $"assumed arrival at {source} after a catalog visit");
+            else if (_runtime.EstimatedVariables.Contains(EgoVariable) || load.Certainty != LoomScriptEventCertainty.Reached)
+                _runtime.Actors.MarkEstimate(ego, $"the ego's arrival at {source} follows a seeded pick");
             FollowEgoWalk(_runtime.Actors[ego], source);
         }
         var state = _runtime.Actors[ego];
@@ -486,7 +498,7 @@ public sealed class LoomExplorationSession
             _runtime.EstimatedVariables.Remove("var[0x014]");
             _runtime.EstimatedVariables.Remove("var[0x015]");
             _runtime.VirtualMouse = pointer;
-            _runtime.VirtualMouseAssumption = $"assumed input: the pointer rests over the room at ({pointer.X}, {pointer.Y}), placed by the explorer's hover, with no click";
+            _runtime.VirtualMouseAssumption = $"assumed input: the pointer rests over the room at ({pointer.X}, {pointer.Y}), {_pointerNote}";
             return;
         }
         var x = CameraX ?? size.Width / 2;
@@ -499,8 +511,10 @@ public sealed class LoomExplorationSession
         _runtime.VirtualMouseAssumption = $"assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at ({x}, {y})";
     }
 
-    // The pointer over the current room given by SetPointer, or null (no pointer over the room).
+    // The pointer over the current room given by SetPointer or Click, or null (no pointer over the room).
     private (int X, int Y)? _pointer;
+    private string _pointerNote = HoverNote;
+    private const string HoverNote = "placed by the explorer's hover, with no click";
 
     /// <summary>
     /// Puts the pointer over the current room at a room-pixel point, or takes it
@@ -513,7 +527,111 @@ public sealed class LoomExplorationSession
     {
         _pointer = point is { } p && _roomSize is { } size && p.X >= 0 && p.Y >= 0 && p.X < size.Width && p.Y < size.Height
             ? p : null;
+        _pointerNote = HoverNote;
         PlaceVirtualMouse();
+    }
+
+    /// <summary>ScummVM <c>VAR_VERB_SCRIPT</c> (v3: var 32): the script <c>runInputScript</c> runs for every click. The boot sets it to 5 (script 001 +0x016B).</summary>
+    private const string VerbScriptVariable = "var[0x020]";
+    /// <summary>ScummVM <c>VAR_TMR_2</c> (v3: var 12), jiffies the engine adds every frame; script 006 resets it on a click and reads it to find a double click.</summary>
+    private const string ClickTimerVariable = "var[0x00C]";
+    /// <summary>ScummVM <c>kSceneClickArea</c>: a click in the room picture.</summary>
+    public const int SceneClickArea = 2;
+    /// <summary>Assumed time since the previous click for a single click: one second (60 jiffies), past script 006's 40-jiffy double-click window.</summary>
+    public const int SingleClickGap = 60;
+    /// <summary>Assumed time between the two clicks of a double click: 10 jiffies, inside script 006's 40-jiffy window.</summary>
+    public const int DoubleClickGap = 10;
+
+    /// <summary>
+    /// Sends a left click at a room point to the game, as ScummVM's
+    /// <c>checkExecVerbs</c> does for a click in the room: <c>runInputScript(2, 0, 1)</c>
+    /// runs the script in <c>VAR_VERB_SCRIPT</c> (script 005) with those arguments,
+    /// which chains a room click into the input loop (script 006, <c>local[0]</c> = 1).
+    /// Script 006 then does what it does with the object under the pointer: verb
+    /// 0x37, the ego's walk, and script 007's sentence. This is assumed input: the
+    /// point, and the time since the previous click (<see cref="SingleClickGap"/>, or
+    /// <see cref="DoubleClickGap"/> between the two clicks of a double click), which
+    /// the engine's timer would give. The click is not sent while user input is off
+    /// (<c>cursorCommand</c>), or when no input script is set. The pointer stays at
+    /// the point afterwards. Walks end at once, as elsewhere; a <c>waitFor actor</c>
+    /// makes the script go on on the next frame, so the sentence and anything it
+    /// loads follow in later frames (<see cref="AdvanceFrame"/>).
+    /// </summary>
+    public LoomObjectActionResult Click(int x, int y, bool doubleClick = false)
+    {
+        if (_currentRoom?.ResourceId is not int sourceRoomId)
+            throw new InvalidOperationException("Visit a room before clicking in it.");
+        _uncertainties.StartStep();
+        var beforeUncertainties = _uncertainties.Count;
+        var beforeEvents = _visitEvents.Count;
+        var input = $"A {(doubleClick ? "double click" : "click")} at ({x}, {y}) in Room {sourceRoomId:00}, sent to the game's input script as assumed input";
+        string? refused = null;
+        ushort verbScript = 0;
+        if (_roomSize is not { } size || x < 0 || y < 0 || x >= size.Width || y >= size.Height)
+            refused = "the point is outside the room picture";
+        else if (_runtime.UserPut <= 0)
+            refused = "user input is off (cursorCommand), and ScummVM's checkExecVerbs reads no click then";
+        else if (!_runtime.GlobalVariables.TryGetValue(VerbScriptVariable, out verbScript) || verbScript == 0)
+            refused = $"no input script is set ({VerbScriptVariable}, VAR_VERB_SCRIPT, is 0)";
+        if (refused is not null)
+        {
+            _uncertainties.Add($"{input}: not sent, because {refused}.");
+            LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
+                _uncertainties.Skip(beforeUncertainties).ToArray(), input);
+            return LastAction;
+        }
+        _uncertainties.Add($"{input}. ScummVM runInputScript({SceneClickArea}, 0, 1) runs script {verbScript} (var[0x020], VAR_VERB_SCRIPT, set by script 001 +0x016B); the click's point and timing are the explorer's, not the game's.");
+        if (_runtime.UserPutEstimate is not null)
+            _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
+        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        _dispatchScope++;
+        try
+        {
+            if (doubleClick) SendSceneClick(verbScript, x, y, SingleClickGap, "the first click of a double click");
+            SendSceneClick(verbScript, x, y, doubleClick ? DoubleClickGap : SingleClickGap,
+                doubleClick ? "the second click of a double click" : "a single click");
+        }
+        finally
+        {
+            _dispatchScope--;
+        }
+        var action = LastAction with { Uncertainties = _uncertainties.Skip(beforeUncertainties).ToArray() };
+        LastAction = action;
+        if (DispatchRequestedLoads("during the click"))
+        {
+            LastAction = LastAction with { Uncertainties = _uncertainties.Skip(beforeUncertainties).ToArray() };
+            return LastAction;
+        }
+        var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
+            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
+            !_dispatchedLoads.Contains(item));
+        var target = roomLoad?.TargetId is int id ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
+        if (roomLoad is not null && target is not null)
+        {
+            action = action with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId };
+            VisitRoom(target, action);
+            action = action with { Uncertainties = _uncertainties.Skip(beforeUncertainties).ToArray() };
+        }
+        LastAction = action;
+        return action;
+    }
+
+    private void SendSceneClick(int verbScript, int x, int y, int gap, string which)
+    {
+        _pointer = (x, y);
+        _pointerNote = "where the explorer clicked; it stays there after the click";
+        PlaceVirtualMouse();
+        _runtime.VirtualMouseAssumption = $"assumed input: {which} at ({x}, {y}), sent by the explorer";
+        _runtime.GlobalVariables[ClickTimerVariable] = (ushort)gap;
+        _runtime.EstimatedVariables.Remove(ClickTimerVariable);
+        _uncertainties.Add($"Assumed input timing for {which}: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = {gap}; the engine's timer is not simulated.");
+        _visitTrace.Add($"click: {which} at ({x}, {y}) runs script {verbScript} with [{SceneClickArea}, 0, 1] (runInputScript)");
+        RunStartedScript(verbScript, 0, new Dictionary<string, ushort>(StringComparer.Ordinal)
+        {
+            ["local[0x000]"] = SceneClickArea,
+            ["local[0x001]"] = 0,
+            ["local[0x002]"] = 1
+        }, 0);
     }
 
     /// <summary>The pointer the session reads as the virtual mouse, or null when it assumes none over the room.</summary>
@@ -884,11 +1002,21 @@ public sealed class LoomExplorationSession
     private LoomBoundedScriptResult? RunStartedScript(int scriptId, int startOffset,
         IReadOnlyDictionary<string, ushort>? locals, int depth,
         IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
-        bool freezeResistant = false, ScriptFrame? parent = null)
+        bool freezeResistant = false, ScriptFrame? parent = null, bool recursive = false)
     {
         // A started script carries the room origin of the script that started it.
         parent ??= _executing.Count > 0 ? _executing[^1] : null;
-        var frame = new ScriptFrame { FreezeResistant = freezeResistant, OriginRoom = parent?.OriginRoom };
+        // runScript: a start that is not recursive first ends the running copies (stopScript).
+        if (!recursive)
+        {
+            var ended = _pending.RemoveAll(item => item.ScriptNumber == scriptId);
+            if (ended > 0)
+            {
+                _stopped.Add(scriptId);
+                _visitTrace.Add($"script {scriptId} started again: runScript ended its running copy first");
+            }
+        }
+        var frame = new ScriptFrame { FreezeResistant = freezeResistant, Recursive = recursive, OriginRoom = parent?.OriginRoom };
         if (scriptId < _globalScriptCount)
             return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated, frame);
         if (_currentRoom is null)
@@ -1020,7 +1148,7 @@ public sealed class LoomExplorationSession
             _chained = null;
             _visitTrace.Add($"{label} chains to script {chain.Script}");
             RunStartedScript(chain.Script, 0, chain.Arguments, depth, chain.EstimatedArguments, chain.PathEstimated,
-                frame.FreezeResistant, frame);
+                frame.FreezeResistant, frame, frame.Recursive);
         }
         if (result.ResumeOffset is int next)
         {
@@ -1059,7 +1187,8 @@ public sealed class LoomExplorationSession
                 // behind a seeded pick, or given a picked value, runs as an estimate.
                 RunStartedScript(scriptId, 0, locals, depth + 1,
                     EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
-                    scriptEvent.Certainty != LoomScriptEventCertainty.Reached, scriptEvent.FreezeResistant);
+                    scriptEvent.Certainty != LoomScriptEventCertainty.Reached, scriptEvent.FreezeResistant,
+                    recursive: scriptEvent.Recursive);
                 return "";
             case LoomScriptEventKind.CutsceneStarted:
                 return BeginCutscene(scriptEvent, depth);
@@ -1277,6 +1406,8 @@ public sealed class LoomExplorationSession
     private sealed class ScriptFrame
     {
         public bool FreezeResistant { get; init; }
+        /// <summary>ScummVM <c>ScriptSlot.recursive</c>: a <c>chainScript</c> from this slot passes it on.</summary>
+        public bool Recursive { get; init; }
         /// <summary>Global or local script number; null for room entry, exit and verb code.</summary>
         public int? Number { get; set; }
         public bool Global { get; set; }

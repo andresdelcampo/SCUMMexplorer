@@ -1,0 +1,9 @@
+﻿Real MainWindow; synthetic tree selection and Continue clicks. No physical input.
+Exploration mode: True
+PASS Room 02 (now Room 02), expect none: title "No cue established"; evidence "" []; note "No music has been confirmed here. These tracks may play in this room."; more "Other possible music · 4"; capture step-01-room-02.png
+PASS Room 03 (now Room 03), expect none: title "No cue established"; evidence "" []; note "No music has been confirmed here. These tracks may play in this room."; more "Other possible music · 1"; capture step-02-room-03.png
+INFO Room 16 (now Room 16), expect -: title "No cue established"; evidence "" []; note "No music has been confirmed here. These tracks may play in this room."; more "Other possible music · 2"; capture step-03-room-16.png
+PASS Continue (now Room 16), expect 30: title "Started: Sound 30"; evidence "from this session's route" [Script 39 +0x0038 · starts sound Sound 30]; note "The cue above began after you entered this room."; more "Other possible music · 1"; capture step-04-room-16-continue.png
+PASS Room 17 (now Room 17), expect none: title "No cue established"; evidence "" []; note "No music has been confirmed here. These tracks may play in this room."; more "Other possible music · 1"; capture step-05-room-17.png
+PASS Room 16 (now Room 16), expect 30*: title "Started: Sound 30"; evidence "from this session's route" [Script 39 +0x0038 · starts sound Sound 30]; note "This room's code started the cue above on an earlier visit, and nothing reached has stopped it."; more "Other possible music · 1"; capture step-06-room-16.png
+Failures: 0

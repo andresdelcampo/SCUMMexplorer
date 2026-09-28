@@ -58,6 +58,24 @@ foreach (var step in args.Skip(1))
         Console.WriteLine($"== pointer {(session.Pointer is { } p ? $"({p.X}, {p.Y})" : "off")}");
         continue;
     }
+    if (step.StartsWith('!'))
+    {
+        // "!x,y" sends a click to the game (assumed input); "!!x,y" a double click.
+        var doubleClick = step.StartsWith("!!", StringComparison.Ordinal);
+        var point = step.TrimStart('!').Split(',').Select(int.Parse).ToArray();
+        var clicked = session.Click(point[0], point[1], doubleClick);
+        Console.WriteLine($"   click: {clicked.Evidence}");
+        Show($"{(doubleClick ? "double click" : "click")} at ({point[0]}, {point[1]})");
+        continue;
+    }
+    if (step == "objects")
+    {
+        // "objects" lists the current room's objects: box, walk point and classes.
+        var room = game.Rooms.Single(item => item.ResourceId == session.Snapshot.RoomId);
+        foreach (var record in new SCUMMexplorer.Core.Rendering.LoomRoomObjectDirectory().Decode(File.ReadAllBytes(room.FilePath)))
+            Console.WriteLine($"   object {record.Id}: ({record.X}, {record.Y}, {record.Width}, {record.Height}), walk ({record.WalkX}, {record.WalkY}), classes 0x{session.Snapshot.ObjectClasses.GetValueOrDefault(record.Id):X8}");
+        continue;
+    }
     if (step == "verbs")
     {
         foreach (var slot in session.Verbs) Console.WriteLine($"   {slot.Describe()}" + (slot.Estimate is null ? "" : $" (estimate: {slot.Estimate})") + (slot.Unknown is null ? "" : $" (unknown: {slot.Unknown})"));
@@ -78,7 +96,16 @@ foreach (var step in args.Skip(1))
     // "+N": advances N frames.
     if (step.StartsWith('+'))
     {
-        for (var n = int.Parse(step[1..]); n > 0 && session.Snapshot.PendingScripts > 0; n--) session.AdvanceFrame();
+        var startRoom = session.Snapshot.RoomId;
+        for (var n = int.Parse(step[1..]); n > 0 && session.Snapshot.PendingScripts > 0; n--)
+        {
+            session.AdvanceFrame();
+            if (session.Snapshot.RoomId != startRoom)
+            {
+                Console.WriteLine($"   entered Room {session.Snapshot.RoomId:00}: {session.LastAction?.Evidence}");
+                startRoom = session.Snapshot.RoomId;
+            }
+        }
         Show($"after {step} frames");
         continue;
     }

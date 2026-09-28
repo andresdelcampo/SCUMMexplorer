@@ -100,7 +100,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    paint order: 340,341
    draw queue:  340,341
    doorways: 16,23
-== Room 16 (1 images, faithful=False, pending=4)
+== Room 16 (1 images, faithful=False, pending=3)
    paint order: 
    draw queue:  
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
@@ -167,7 +167,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    entry state 427=0: Room 23 entry script +0x0034 sets it to 0 on every path
    nothing visible after fallback
    doorways: 15,16,24
-== Room 24 (12 images, faithful=False, pending=4)
+== Room 24 (12 images, faithful=False, pending=3)
    paint order: 435
    draw queue:  
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
@@ -204,7 +204,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    paint order: 500
    draw queue:  500
    doorways: 
-== Room 30 (3 images, faithful=False, pending=4)
+== Room 30 (3 images, faithful=False, pending=3)
    paint order: 520
    draw queue:  520
    entry script stopped: presentation operation not applied: lights; presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
@@ -240,7 +240,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
    entry script stopped: presentation operation not applied: resourceRoutines
    interface images (verb area, not room artwork): 595,597
    doorways: 34,36
-== Room 36 (1 images, faithful=False, pending=5)
+== Room 36 (1 images, faithful=False, pending=4)
    paint order: 
    draw queue:  
    entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
@@ -437,7 +437,7 @@ Rooms with remaining gaps: 0; gaps before filling: 3; after: 0
 == Room 69 (11 images, faithful=False, pending=3)
    paint order: 876,877,878
    draw queue:  876,877,878
-   entry script stopped: presentation operation not applied: resourceRoutines; presentation operation not applied: cursorCommand
+   entry script stopped: presentation operation not applied: resourceRoutines
    state set by reached code: 898=0
    entry state 898=0: Room 69 entry script +0x0048 sets it to 0 on every path
    nothing visible; fallback estimate shows 876,877,878

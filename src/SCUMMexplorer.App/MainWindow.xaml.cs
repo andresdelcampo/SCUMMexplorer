@@ -718,7 +718,9 @@ public partial class MainWindow : Window
         ObjectActionPanel.Visibility = Visibility.Visible;
         ObjectVerbButtons.Children.Clear();
         ObjectActionNote.Text = action.DestinationRoomId is int target
-            ? $"Entered Room {target:00} through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete."
+            ? action.IsGameInput
+                ? $"Entered Room {target:00}: an assumed click went through the game's input scripts (005, 006, 007) to the reached room load. Walks end at once; exploration state remains incomplete."
+                : $"Entered Room {target:00} through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete."
             : _session!.Snapshot.PendingScripts > 0
                 ? "No room load reached; the session has pending scripts. Exploration state remains incomplete."
             : "Interaction completed without opening another room. Exploration state remains incomplete.";
@@ -2014,8 +2016,103 @@ public partial class MainWindow : Window
     private void RoomPreview_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         RoomViewport.Focus();
+        if (_gameClickPairSent)
+        {
+            // The second press of a double click was sent on its way down.
+            _gameClickPairSent = false;
+            return;
+        }
         if (!TryGetRoomImagePoint(e.GetPosition(RoomPreview), out var x, out var y)) return;
+        if (GameClickActive)
+        {
+            QueueGameClick(x, y);
+            return;
+        }
         HandleRoomPoint(x, y);
+    }
+
+    private void RoomPreview_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        // A second press while a single click waits for the double-click time makes a double click.
+        if (!GameClickActive || _pendingGameClick is not { } first || _gameClickTimer?.IsEnabled != true ||
+            _session!.Snapshot.RoomId != first.Room) return;
+        _gameClickTimer.Stop();
+        _pendingGameClick = null;
+        _gameClickPairSent = true;
+        SendClickToGame(first.X, first.Y, doubleClick: true);
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetDoubleClickTime();
+
+    private bool GameClickActive => GameClickToggle.IsChecked == true && SessionModeToggle.IsChecked == true && _session is not null;
+
+    // "Click as game input": a single click waits for the system double-click time before it is sent.
+    private DispatcherTimer? _gameClickTimer;
+    private (int X, int Y, int? Room)? _pendingGameClick;
+    private bool _gameClickPairSent;
+
+    private void QueueGameClick(int x, int y)
+    {
+        _pendingGameClick = (x, y, _session?.Snapshot.RoomId);
+        if (_gameClickTimer is null)
+        {
+            _gameClickTimer = new DispatcherTimer(DispatcherPriority.Input, Dispatcher)
+            {
+                Interval = TimeSpan.FromMilliseconds(GetDoubleClickTime())
+            };
+            _gameClickTimer.Tick += (_, _) =>
+            {
+                _gameClickTimer.Stop();
+                if (_pendingGameClick is { } pending && GameClickActive && _session!.Snapshot.RoomId == pending.Room)
+                    SendClickToGame(pending.X, pending.Y, doubleClick: false);
+                _pendingGameClick = null;
+            };
+        }
+        _gameClickTimer.Stop();
+        _gameClickTimer.Start();
+    }
+
+    private void GameClickToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        _gameClickTimer?.Stop();
+        _pendingGameClick = null;
+        _gameClickPairSent = false;
+        UpdateVerbArea();
+    }
+
+    /// <summary>
+    /// "Click as game input": sends the click to the session as the game's own
+    /// input path would receive it (<see cref="LoomExplorationSession.Click"/>), then
+    /// continues frames as a doorway click does, so the ego's walk and script 007's
+    /// sentence run and a room load they reach opens the destination.
+    /// </summary>
+    private void SendClickToGame(int x, int y, bool doubleClick)
+    {
+        if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return;
+        var action = _session.Click(x, y, doubleClick);
+        var what = doubleClick ? "Double click" : "Click";
+        if (action.DestinationRoomId is int destination &&
+            _game.Rooms.FirstOrDefault(item => item.ResourceId == destination) is { } target && target != sourceRoom)
+        {
+            StatusText.Text = $"{what} sent to the game: entered Room {destination:00}";
+            StatusText.ToolTip = action.Evidence;
+            SelectResourceInTree(target);
+            return;
+        }
+        if (ContinueToReachedRoom())
+        {
+            StatusText.Text = $"{what} sent to the game: entered Room {_session.Snapshot.RoomId:00}";
+            return;
+        }
+        var sent = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
+        StatusText.Text = sent is null ? $"{what} sent to the game (assumed input); no room load was reached" : $"{what} not sent to the game";
+        StatusText.ToolTip = (sent ?? action.Evidence) + (action.Uncertainties.Count == 0 ? "" :
+            Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties));
+        ApplyRoomState(sourceRoom, _currentRoomObjectRecords, _objects, visit: false);
+        UpdateRoomNavigationActions(sourceRoom);
+        RefreshRoomPreview();
+        UpdateVerbArea();
     }
 
     private void HandleRoomPoint(int x, int y)
@@ -2090,6 +2187,13 @@ public partial class MainWindow : Window
         var hoveredRow = SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null;
         ShowHoveredHotspotRow(hoveredRow);
         SendPointerToGame((x, y), hoveredRow?.Id ?? 0);
+        if (GameClickActive)
+        {
+            RoomPreview.Cursor = Cursors.Hand;
+            RoomPreview.ToolTip = (hoveredRow is null ? "Nothing listed here. " : $"Object {hoveredRow.Id}. ") +
+                                  "Click as game input is on: a click is sent to the game's input script (assumed input), not run as a direct verb.";
+            return;
+        }
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             var doorways = DoorwaysAt(x, y);
@@ -2184,7 +2288,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateVerbArea()
     {
-        var closeUp = GamePointerToggle.IsChecked == true ? _session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
+        var closeUp = GamePointerToggle.IsChecked == true || GameClickToggle.IsChecked == true
+            ? _session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
         if (closeUp is not { Mode: 1, ImageObject: int image } || _session is null)
         {
             VerbAreaPanel.Visibility = Visibility.Collapsed;
@@ -2196,7 +2301,9 @@ public partial class MainWindow : Window
             : CreateBitmap(picture.Width, picture.Height, picture.Pixels, _currentRoom.Palette);
         var hovered = snapshot.KnownGlobalVariables.TryGetValue("var[0x066]", out var selected) ? $" for object {selected}" : "";
         VerbAreaText.Text = $"Verb area close-up: object {image}'s image (verb 0x36, script 008{hovered}). " +
-                            "Game state reached from assumed hover input; no click was sent." +
+                            (_session.LastAction is { IsGameInput: true } click && click.SourceRoomId == snapshot.RoomId
+                                ? "Game state reached from an assumed click sent to the game's input script."
+                                : "Game state reached from assumed hover input; no click was sent.") +
                             (closeUp.Estimate is null ? "" : $" Estimate: {closeUp.Estimate}.");
         VerbAreaPanel.Visibility = Visibility.Visible;
     }

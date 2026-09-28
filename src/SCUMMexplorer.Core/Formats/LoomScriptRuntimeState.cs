@@ -68,4 +68,12 @@ public sealed class LoomScriptRuntimeState
     public LoomVerbTable Verbs { get; } = new();
     /// <summary>The current room's number, or null outside a room.</summary>
     public int? CurrentRoom { get; set; }
+    /// <summary>
+    /// ScummVM <c>_userPut</c>: <c>cursorCommand userInputOn</c>/<c>Off</c> set it to
+    /// 1/0 and the soft forms add or take one; clicks are read only while it is
+    /// above 0 (<c>checkExecVerbs</c>). It starts at 0.
+    /// </summary>
+    public int UserPut { get; set; }
+    /// <summary>Why <see cref="UserPut"/> is an estimate (it was set on a path behind a seeded pick), or null.</summary>
+    public string? UserPutEstimate { get; set; }
 }

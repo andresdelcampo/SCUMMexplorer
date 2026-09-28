@@ -45,7 +45,12 @@ public sealed class LoomActorTable
 
     public void Forget(int number, string reason) => _actors[number].Forget(reason);
 
-    public void MarkEstimate(int number, string reason) => _actors[number].Estimate ??= reason;
+    public void MarkEstimate(int number, string reason)
+    {
+        // A reason other than a walk's timing outlasts the walk (see WalkWaited).
+        var actor = _actors[number];
+        if (actor.Estimate is null || actor.EstimateIsWalk) actor.Estimate = reason;
+    }
 
     /// <summary><c>initActor(0)</c> (actorOps "init"): clears the last valid point and ignoreBoxes; room and position stay.</summary>
     public void Init(int number)
@@ -182,12 +187,53 @@ public sealed class LoomActorTable
                 return;
             }
         }
-        if (actor.X == endX && actor.Y == endY) return;
+        // When every box of the room has a route to the end box (or the actor ignores
+        // boxes), the walk ends there wherever it started, so an estimate about the
+        // start (an assumed arrival, a seeded pick) no longer applies to the end.
+        var fromAnywhere = actor.IgnoreBoxes == true || (place.Boxes is { } boxes &&
+            Enumerable.Range(0, boxes.Count).All(box => box == endBox || boxes.GetNextBox(box, endBox) >= 0));
+        if (actor.X == endX && actor.Y == endY && !(fromAnywhere && actor.Estimate is not null && !actor.EstimateIsWalk)) return;
         actor.X = endX;
         actor.Y = endY;
         actor.WalkBox = endBox;
         actor.DestBox = endBox;
-        actor.Estimate ??= $"{label} is taken to end at ({endX}, {endY}), box {BoxName(endBox)}, at once (walk timing and path are not simulated)";
+        if (fromAnywhere && !actor.EstimateIsWalk) actor.Estimate = null;
+        if (actor.Estimate is null)
+        {
+            actor.Estimate = $"{label} is taken to end at ({endX}, {endY}), box {BoxName(endBox)}, at once (walk timing and path are not simulated)";
+            actor.EstimateIsWalk = true;
+        }
+    }
+
+    /// <summary>
+    /// <c>o5_wait</c> for an actor: the script goes on only once the actor has
+    /// stopped walking, so the walk has reached the end <see cref="Walk"/> gave
+    /// it. When that walk was the only reason the position was an estimate, it
+    /// is no longer one; only how long the walk took is not simulated. Returns
+    /// true when an estimate was cleared.
+    /// </summary>
+    public bool WalkWaited(int number)
+    {
+        var actor = _actors[number];
+        if (!actor.EstimateIsWalk || actor.X is null) return false;
+        actor.Estimate = null;
+        actor.EstimateIsWalk = false;
+        return true;
+    }
+
+    /// <summary>
+    /// <c>Actor::adjustXYToBeInBox</c> for a point, as <c>getObjActToObjActDist</c>
+    /// does for an object's position; null when the actor's box mode, the room's
+    /// boxes or the actor's last valid point are unknown.
+    /// </summary>
+    public (int X, int Y)? AdjustPoint(int number, int x, int y, Placement place)
+    {
+        var actor = _actors[number];
+        if (actor.IgnoreBoxes is null) return null;
+        if (actor.IgnoreBoxes == true) return (x, y);
+        if (place.Boxes is null || place.BoxesUnknown is not null) return null;
+        var adjusted = AdjustXY(actor, x, y, place);
+        return adjusted is null ? null : (adjusted.Value.X, adjusted.Value.Y);
     }
 
     /// <summary><c>startScene</c>: hides every actor and clears <see cref="EgoPositioned"/>.</summary>
@@ -279,7 +325,18 @@ public sealed class LoomActorTable
         public int? LastValidX { get; set; } = 0;
         public int? LastValidY { get; set; } = 0;
         public string? Unknown { get; set; }
-        public string? Estimate { get; set; }
+        public string? Estimate
+        {
+            get => _estimate;
+            set
+            {
+                _estimate = value;
+                EstimateIsWalk = false;
+            }
+        }
+        private string? _estimate;
+        /// <summary>True when <see cref="Estimate"/> says only that a walk was taken to end at once.</summary>
+        public bool EstimateIsWalk { get; set; }
 
         public void Forget(string reason)
         {

@@ -41,7 +41,8 @@ public sealed record LoomScriptEvent(
     int? TargetId,
     LoomScriptEventCertainty Certainty,
     bool FreezeResistant = false,
-    IReadOnlyList<int?>? ResolvedArguments = null)
+    IReadOnlyList<int?>? ResolvedArguments = null,
+    bool Recursive = false)
 {
     public string Format()
     {
@@ -110,10 +111,12 @@ public sealed record LoomScriptEvent(
         };
 
         if (kind is null) return null;
-        // o5_startScript: opcode bit 0x20 makes the started script freeze-resistant.
+        // o5_startScript: opcode bit 0x20 makes the started script freeze-resistant;
+        // bit 0x40 makes it recursive (runScript then does not stop a running copy).
         return new LoomScriptEvent(script.ScriptId, script.Context ?? $"Script {script.ScriptId:00}",
             instruction.Offset, kind.Value, operation, instruction.Operands, targetKind, targetId, certainty,
-            operation == "startScript" && (instruction.Opcode & 0x20) != 0);
+            operation == "startScript" && (instruction.Opcode & 0x20) != 0,
+            Recursive: operation == "startScript" && (instruction.Opcode & 0x40) != 0);
     }
 
     private static string FirstArgument(string operands)
