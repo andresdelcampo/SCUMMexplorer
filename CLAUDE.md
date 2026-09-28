@@ -50,7 +50,7 @@ dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 - A decoded branch or room load is a **possible** outcome. Calling a verb directly is an **exploration action**. A partial session is a **state preview**. Label estimates as estimates.
 - Do not add room-specific hacks or invent states. The user's product rules are:
   - Rooms should show no gaps and should show their first-visit state. When in doubt, pick at random and label the pick.
-  - Objects are clickable and cycle through their alternatives. Hiding an object is allowed only if the background behind it has no gap.
+  - Objects respond as in the game, with Bobbin on screen (decided 28 September). A single click walks Bobbin to the object and uses it (scripts 005–007, verb 0x38; exits lead on). A double click also looks at it (verb 0x36: the description). Cycling an object's stored images belongs only to the inspection mode, and the mode's text says so. There is no hidden modifier gesture such as Alt+click. Hiding an object is allowed only if the background behind it has no gap.
   - Room hotspots navigate between rooms.
 
 ## Workflow notes
