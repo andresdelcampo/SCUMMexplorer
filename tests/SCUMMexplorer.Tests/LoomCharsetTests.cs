@@ -56,4 +56,21 @@ public sealed class LoomCharsetTests
         // The text's own colour is the actor's talk colour (low 4 bits).
         Assert.Contains(layer.Pixels, pixel => pixel == (message.Color & 0x0F));
     }
+
+    [Fact]
+    public void EachVirtualScreenClipsTextAtItsOwnBottom()
+    {
+        if (!File.Exists(Path.Combine(Folder, "99.LFL"))) return;
+        var charset = LoomCharset.TryLoad(Folder, 0, out _)!;
+        // initScreens(16, 144): the text screen is rows 0–15 and the room screen rows 16–143.
+        // A line whose top is in the text screen stops at row 15 (printChar clips at vs->h).
+        var glyphs = "AAAA"u8.ToArray();
+        LoomMessage At(int y) => new(LoomMessageKind.Drawn, LoomMessageTable.NoActor, 1, [glyphs],
+            10, y, false, 0, LoomMessageTable.DefaultRight, 15, null, "test", 0, 0, null);
+        var inText = LoomMessageRenderer.Render(At(12), charset).Bounds!.Value;
+        Assert.Equal(12, inText.Top);
+        Assert.Equal(LoomMessageRenderer.RoomScreenTop, inText.Bottom);
+        var inRoom = LoomMessageRenderer.Render(At(140), charset).Bounds!.Value;
+        Assert.Equal(LoomMessageRenderer.VerbScreenTop, inRoom.Bottom);
+    }
 }

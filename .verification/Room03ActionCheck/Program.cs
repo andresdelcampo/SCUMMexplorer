@@ -26,6 +26,8 @@ internal static class Program
         var report = new List<string> { "Real MainWindow; in-process coordinate and routed-key dispatch. No physical mouse/keyboard input." };
         var app = new Application();
         var window = new MainWindow();
+        // Since M1d a click plays on a timer; the harness runs the frames at once, as before.
+        typeof(MainWindow).GetField("_playInstantly", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.SetValue(window, true);
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
         object? Call(string name, params object[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
         T Named<T>(string name) where T : FrameworkElement => (T)window.FindName(name);

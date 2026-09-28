@@ -60,6 +60,9 @@ public partial class MainWindow : Window
     private IReadOnlyDictionary<int, byte> _indexedStates = new Dictionary<int, byte>();
     private LoomIndexedObjectSnapshot? _indexedObjectSnapshot;
     private LoomExplorationSession? _session;
+    // Charset 0 (99.LFL) for messages, or why it could not be read (then a labelled UI font is used).
+    private LoomCharset? _charset;
+    private string? _charsetError;
     private int? _selectedObject;
     private string? _audioFile;
     private byte[]? _adlibBaseWave;
@@ -181,7 +184,10 @@ public partial class MainWindow : Window
         _doorwayFinder = null;
         _indexedObjectSnapshot = indexedSnapshot;
         _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
+        StopScenePlayback();
         _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot);
+        _charsetError = null;
+        _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
         ShowGame(game);
         StartRelationshipIndexBuild(game);
         try
@@ -514,6 +520,8 @@ public partial class MainWindow : Window
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
+        // Opening another view stops the playback clock, unless the playback itself entered the room.
+        if (!_playbackEnteringRoom) StopScenePlayback();
         if (e.NewValue is not TreeViewItem { Tag: GameResource resource })
         {
             _selectedResource = null;
@@ -932,6 +940,7 @@ public partial class MainWindow : Window
 
     private void SessionMode_Changed(object sender, RoutedEventArgs e)
     {
+        StopScenePlayback();
         if (_currentRoomResource is not { } room || _currentRoom is null) return;
         ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: SessionModeToggle.IsChecked == true);
         UpdateRoomNavigationActions(room);
@@ -941,6 +950,7 @@ public partial class MainWindow : Window
     private void ResetSession_Click(object sender, RoutedEventArgs e)
     {
         if (_game is null || _indexedObjectSnapshot is null) return;
+        StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
         if (_currentRoomResource is { } room && _currentRoom is not null)
         {
@@ -951,7 +961,11 @@ public partial class MainWindow : Window
         else SessionStatusText.Text = "Session reset. Select a room to visit it.";
     }
 
-    private void AdvanceFrame_Click(object sender, RoutedEventArgs e) => AdvanceOneFrame();
+    private void AdvanceFrame_Click(object sender, RoutedEventArgs e)
+    {
+        StopScenePlayback();
+        AdvanceOneFrame();
+    }
 
     private void AdvanceOneFrame()
     {
@@ -1517,7 +1531,7 @@ public partial class MainWindow : Window
         var hasHorizontalScroll = normalSize && room.Width > visibleSourceWidth;
         var usableHeight = Math.Max(1, availableHeight - (hasHorizontalScroll ? 17 : 0));
         // The optional verb strip shares the height: 56 screen rows at the room's scale, and its note.
-        var verbStrip = VerbStripShown();
+        var verbStrip = VerbScreenShown();
         if (verbStrip) usableHeight = Math.Max(1, usableHeight - VerbStripNoteHeight);
         _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth,
             usableHeight / (room.Height + (verbStrip ? LoomVerbArea.Height : 0)));
@@ -1532,6 +1546,8 @@ public partial class MainWindow : Window
         RoomViewport.Height = RoomSceneSurface.Height + (hasHorizontalScroll ? 17 : 0);
         VerbStripImage.Width = LoomVerbArea.Width * _roomDisplayScale;
         VerbStripImage.Height = LoomVerbArea.Height * _roomDisplayScale;
+        VerbMessageOverlay.Width = VerbStripImage.Width;
+        VerbMessageOverlay.Height = VerbStripImage.Height;
         VerbStripNote.MaxWidth = Math.Max(160, RoomViewport.Width);
         RoomViewport.Dispatcher.BeginInvoke(() =>
         {
@@ -2110,6 +2126,7 @@ public partial class MainWindow : Window
             : CreateBitmap(room.Width, room.Height, pixels, room.Palette);
         RefreshWalkBoxOverlay();
         UpdateVerbArea();
+        UpdateMessageLayer();
 
         var selected = _objects.FirstOrDefault(obj => obj.Id == _selectedObject);
         var selectedPosition = selected is null ? default : _objectSelection.GetPosition(selected);
@@ -2386,6 +2403,7 @@ public partial class MainWindow : Window
             return;
         }
         if (!TryGetRoomImagePoint(e.GetPosition(RoomPreview), out var x, out var y)) return;
+        if (SkipTalkAt(x, y)) return;
         if (GameClickActive)
         {
             QueueGameClick(x, y);
@@ -2450,33 +2468,42 @@ public partial class MainWindow : Window
     private bool SendClickToGame(int x, int y, bool doubleClick) =>
         SendInputToGame(() => _session!.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click");
 
-    private bool SendInputToGame(Func<LoomObjectActionResult> send, string what)
+    /// <summary>
+    /// Sends input to the session, shows its first result, and plays the frames
+    /// that follow on the playback clock (<see cref="StartPlayback"/>). A click on
+    /// <paramref name="doorways"/> that reaches no room load falls back to the
+    /// doorway's direct verb when playback ends. Returns whether the session is
+    /// in another room so far (with the clock running, a later frame may still get there).
+    /// </summary>
+    private bool SendInputToGame(Func<LoomObjectActionResult> send, string what,
+        IReadOnlyList<LoomRoomObjectRecord>? doorways = null)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
+        var playing = PlaybackRunning;
         var action = send();
-        if (action.DestinationRoomId is int destination &&
-            _game.Rooms.FirstOrDefault(item => item.ResourceId == destination) is { } target && target != sourceRoom)
+        var refused = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
+        if (playing && refused is not null)
         {
-            StatusText.Text = $"{what} sent to the game: entered Room {destination:00}";
-            StatusText.ToolTip = action.Evidence;
-            SelectResourceInTree(target);
+            // Input is off while a scene plays (a cutscene): the game ignores the click and the scene goes on.
+            StatusText.Text = $"{what} not sent to the game while the scene plays";
+            StatusText.ToolTip = refused;
+            return false;
+        }
+        if (action.DestinationRoomId is int destination && destination != sourceRoom.ResourceId)
+        {
+            StartPlayback(what, action, sourceRoom, doorways: null, leftRoom: true);
             return true;
         }
-        if (ContinueToReachedRoom())
-        {
-            StatusText.Text = $"{what} sent to the game: entered Room {_session.Snapshot.RoomId:00}";
-            return true;
-        }
-        var sent = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
-        StatusText.Text = sent is null ? $"{what} sent to the game (assumed input); no room load was reached" : $"{what} not sent to the game";
-        StatusText.ToolTip = (sent ?? action.Evidence) + (action.Uncertainties.Count == 0 ? "" :
+        StatusText.Text = refused is null ? $"{what} sent to the game (assumed input)" : $"{what} not sent to the game";
+        StatusText.ToolTip = (refused ?? action.Evidence) + (action.Uncertainties.Count == 0 ? "" :
             Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties));
         ApplyRoomState(sourceRoom, _currentRoomObjectRecords, _objects, visit: false);
         UpdateRoomNavigationActions(sourceRoom);
         RefreshRoomPreview();
-        UpdateVerbArea();
-        UpdateVerbStrip();
-        return false;
+        // Refused input changes nothing on screen, so the frames that follow run at once
+        // and a doorway's fallback is not delayed.
+        StartPlayback(what, action, sourceRoom, doorways, leftRoom: false, instant: refused is not null);
+        return _session.Snapshot.RoomId != sourceRoom.ResourceId;
     }
 
     /// <summary>
@@ -2496,25 +2523,452 @@ public partial class MainWindow : Window
         _lastDoorwayFallback = null;
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
-            var roomBefore = _currentRoomResource;
-            var doorways = DoorwaysAt(x, y);
-            if (SendClickToGame(x, y, doubleClick) || doorways.Count == 0 || _currentRoomResource != roomBefore) return;
-            var why = StatusText.Text;
-            var refused = _session.LastAction?.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
-            _lastDoorwayFallback = refused ?? $"{why}: {_session.LastAction?.Evidence}";
-            // Among doorways at this point, the first touchable one in directory
-            // order is the one ScummVM's findObject picks. Untouchable doorways
-            // stay reachable as labelled exploration actions.
-            var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
-            if (live.Length > 0) FollowDoorway(live[0]);
-            else if (doorways.Count == 1) FollowDoorway(doorways[0]);
-            else ShowDoorwayMenu(doorways.Select(record => (DoorwayLabel(record), DoorwayToolTip(record),
-                (Action)(() => FollowDoorway(record)))).ToArray());
-            StatusText.ToolTip = $"{why}. The doorway's verb then ran directly, an exploration action, not the game's click." +
-                                 (StatusText.ToolTip is string tip ? Environment.NewLine + tip : "");
+            SendInputToGame(() => _session.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click", DoorwaysAt(x, y));
             return;
         }
         CycleArtworkAt(x, y);
+    }
+
+    /// <summary>
+    /// The game's click on a doorway reached no room load: the doorway's verb runs
+    /// directly, labelled as an exploration action, not the game's click.
+    /// </summary>
+    private void FollowDoorwayFallback(IReadOnlyList<LoomRoomObjectRecord> doorways)
+    {
+        if (_session is null) return;
+        var why = StatusText.Text;
+        var refused = _session.LastAction?.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
+        _lastDoorwayFallback = refused ?? $"{why}: {_session.LastAction?.Evidence}";
+        // Among doorways at this point, the first touchable one in directory
+        // order is the one ScummVM's findObject picks. Untouchable doorways
+        // stay reachable as labelled exploration actions.
+        var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
+        if (live.Length > 0) FollowDoorway(live[0]);
+        else if (doorways.Count == 1) FollowDoorway(doorways[0]);
+        else ShowDoorwayMenu(doorways.Select(record => (DoorwayLabel(record), DoorwayToolTip(record),
+            (Action)(() => FollowDoorway(record)))).ToArray());
+        StatusText.ToolTip = $"{why}. The doorway's verb then ran directly, an exploration action, not the game's click." +
+                             (StatusText.ToolTip is string tip ? Environment.NewLine + tip : "");
+    }
+
+    // ---- Playback clock (M1d) -------------------------------------------------
+
+    /// <summary>One run of the playback clock after an input.</summary>
+    private sealed class Playback
+    {
+        public required string What { get; init; }
+        public LoomObjectActionResult? Action { get; init; }
+        public required GameResource SourceRoom { get; init; }
+        public IReadOnlyList<LoomRoomObjectRecord>? Doorways { get; init; }
+        public bool LeftRoom { get; set; }
+        public int IdleFrames { get; set; }
+        public int CutsceneFrames { get; set; }
+        public int WaitTicks { get; set; }
+        public string? Note { get; set; }
+        public string? FrameSignature { get; set; }
+        public int? CameraX { get; set; }
+    }
+
+    private Playback? _playback;
+    private DispatcherTimer? _playbackTimer;
+    // Harnesses set this to run a playback's frames at once, as the synchronous
+    // continuation did before M1d, so their results stay comparable.
+    private bool _playInstantly = false;
+    // True while the playback itself opens the room the session entered.
+    private bool _playbackEnteringRoom;
+    // The room the playback last asked the view to open.
+    private int? _playbackRequestedRoom;
+
+    private bool PlaybackRunning => _playbackTimer?.IsEnabled == true;
+
+    /// <summary>ScummVM's frame: <c>VAR_TIMER_NEXT</c> jiffies of 1/60 s (6 in LOOM: 10 frames a second).</summary>
+    private TimeSpan PlaybackFrameInterval() =>
+        TimeSpan.FromSeconds(Math.Clamp(_session?.FrameJiffies ?? 6, 1, LoomMessageTable.MaxFrameDelta) / 60.0);
+
+    /// <summary>
+    /// Plays the frames after an input on a timer at the game's frame rate,
+    /// redrawing each frame (object states, camera, messages), until no talk
+    /// message is on screen and the scripts wait for input: no script is
+    /// pending, or <see cref="ExitContinuationFrames"/> frames outside a cutscene
+    /// passed (or the session left the room). Frames inside a cutscene do not
+    /// count, up to <see cref="LoomExplorationSession.CutsceneFrameLimit"/>. A room
+    /// load reached while playing opens that room, and playback goes on there.
+    /// </summary>
+    private void StartPlayback(string what, LoomObjectActionResult? action, GameResource sourceRoom,
+        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false)
+    {
+        _playback = new Playback
+        {
+            What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom,
+            CameraX = _session?.CameraX
+        };
+        _playbackRequestedRoom = null;
+        if (_playInstantly || instant)
+        {
+            _playbackTimer?.Stop();
+            while (PlaybackStep()) { }
+            FinishPlayback();
+            return;
+        }
+        if (!PlaybackShouldContinue())
+        {
+            FinishPlayback();
+            return;
+        }
+        if (_playbackTimer is null)
+        {
+            _playbackTimer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+            _playbackTimer.Tick += PlaybackTimer_Tick;
+        }
+        _playbackTimer.Interval = PlaybackFrameInterval();
+        if (!_playbackTimer.IsEnabled) _playbackTimer.Start();
+        ShowPlaybackFrame();
+    }
+
+    /// <summary>Stops the clock where it is (the user interrupted); nothing more is played.</summary>
+    private void StopScenePlayback()
+    {
+        _playbackTimer?.Stop();
+        _playback = null;
+    }
+
+    private bool PlaybackShouldContinue()
+    {
+        if (_session is not { } session || _playback is not { } playback) return false;
+        var talking = session.Messages.HaveMsg != 0;
+        if (session.Snapshot.PendingScripts == 0 && !talking) return false;
+        if (session.InCutscene)
+        {
+            if (playback.CutsceneFrames < LoomExplorationSession.CutsceneFrameLimit) return true;
+            playback.Note = $"A cutscene was still open after {LoomExplorationSession.CutsceneFrameLimit} frames; playback stopped following it.";
+            return false;
+        }
+        return talking || !playback.LeftRoom && playback.IdleFrames < ExitContinuationFrames;
+    }
+
+    /// <summary>Advances the session by one frame if playback goes on; returns whether it did.</summary>
+    private bool PlaybackStep()
+    {
+        if (!PlaybackShouldContinue()) return false;
+        var session = _session!;
+        var playback = _playback!;
+        if (session.InCutscene) playback.CutsceneFrames++;
+        else playback.IdleFrames++;
+        var room = session.Snapshot.RoomId;
+        session.AdvanceFrame();
+        if (session.Snapshot.RoomId != room) playback.LeftRoom = true;
+        return true;
+    }
+
+    private void PlaybackTimer_Tick(object? sender, EventArgs e)
+    {
+        if (_session is null || _playback is not { } playback || _game is null)
+        {
+            StopScenePlayback();
+            return;
+        }
+        // A room the playback entered is still loading: the next frame waits for it,
+        // so the view's room load cannot take the session back to another room.
+        if (!ViewShowsSessionRoom())
+        {
+            if (++playback.WaitTicks > 100) StopScenePlayback();
+            return;
+        }
+        playback.WaitTicks = 0;
+        if (!PlaybackStep())
+        {
+            FinishPlayback();
+            return;
+        }
+        _playbackTimer!.Interval = PlaybackFrameInterval();
+        ShowPlaybackFrame();
+    }
+
+    /// <summary>Whether the view shows the session's room; if not, asks the view to open it (once).</summary>
+    private bool ViewShowsSessionRoom()
+    {
+        if (_session?.Snapshot.RoomId is not int roomId || _game is null) return false;
+        if (_currentRoomResource?.ResourceId == roomId && _currentRoom is not null) return true;
+        if (_playbackRequestedRoom != roomId && _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is { } target)
+            EnterPlaybackRoom(target);
+        return false;
+    }
+
+    private void EnterPlaybackRoom(GameResource target)
+    {
+        _playbackRequestedRoom = target.ResourceId;
+        StatusText.Text = "You step into another scene.";
+        StatusText.ToolTip = $"Room {target.ResourceId:00} · " + (_session?.LastAction?.Evidence ?? "");
+        _playbackEnteringRoom = true;
+        try { SelectResourceInTree(target); }
+        finally { _playbackEnteringRoom = false; }
+    }
+
+    /// <summary>Redraws the frame: the room when object states changed, the camera when it moved, and the messages.</summary>
+    private void ShowPlaybackFrame()
+    {
+        if (_session is not { } session || _playback is not { } playback || !ViewShowsSessionRoom() ||
+            _currentRoomResource is not { } room) return;
+        var snapshot = session.Snapshot;
+        var signature = FrameSignature(snapshot);
+        if (signature != playback.FrameSignature)
+        {
+            var first = playback.FrameSignature is null;
+            playback.FrameSignature = signature;
+            if (!first)
+            {
+                ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+                UpdateRoomNavigationActions(room);
+                RefreshRoomPreview();
+            }
+        }
+        if (session.CameraX != playback.CameraX)
+        {
+            playback.CameraX = session.CameraX;
+            if (session.CameraX is int cameraX) ScrollToGameCamera(cameraX);
+        }
+        UpdateMessageLayer();
+        UpdateVerbArea();
+    }
+
+    private static string FrameSignature(LoomSessionSnapshot snapshot) =>
+        string.Join(",", snapshot.ObjectStates.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value}")) + "|" +
+        string.Join(",", snapshot.ObjectPositions.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value.X},{pair.Value.Y}")) + "|" +
+        string.Join(",", snapshot.DrawOrder);
+
+    /// <summary>Scrolls the 320-pixel view to the game's camera without the entry pan.</summary>
+    private void ScrollToGameCamera(int cameraX)
+    {
+        if (_currentRoom is null || NormalRoomWidthToggle.IsChecked != true) return;
+        StopCameraPan();
+        var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
+            RoomViewport.ScrollableWidth / _roomDisplayScale);
+        RoomViewport.ScrollToHorizontalOffset(left * _roomDisplayScale);
+    }
+
+    /// <summary>
+    /// The end of a playback: says where the input led, shows the final state and,
+    /// when a doorway click reached no room load, runs the doorway's fallback.
+    /// </summary>
+    private void FinishPlayback()
+    {
+        _playbackTimer?.Stop();
+        if (_playback is not { } playback || _session is not { } session || _game is null)
+        {
+            _playback = null;
+            return;
+        }
+        _playback = null;
+        var snapshot = session.Snapshot;
+        var note = playback.Note is null ? "" : Environment.NewLine + playback.Note;
+        if (snapshot.RoomId is int reached && reached != playback.SourceRoom.ResourceId)
+        {
+            if (_currentRoomResource?.ResourceId != reached && _playbackRequestedRoom != reached &&
+                _game.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } target)
+                EnterPlaybackRoom(target);
+            else if (_currentRoomResource is { } shown && shown.ResourceId == reached && _currentRoom is not null)
+            {
+                ApplyRoomState(shown, _currentRoomObjectRecords, _objects, visit: false);
+                UpdateRoomNavigationActions(shown);
+                RefreshRoomPreview();
+            }
+            StatusText.Text = $"{playback.What} sent to the game: entered Room {reached:00}";
+            StatusText.ToolTip = (playback.Action?.Evidence ?? session.LastAction?.Evidence ?? "") + note;
+            return;
+        }
+        if (playback.Action is { } action)
+        {
+            var refused = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
+            StatusText.Text = refused is null ? $"{playback.What} sent to the game (assumed input); no room load was reached" : $"{playback.What} not sent to the game";
+            StatusText.ToolTip = (refused ?? action.Evidence) + (action.Uncertainties.Count == 0 ? "" :
+                Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties)) + note;
+        }
+        if (_currentRoomResource is { } room && _currentRoom is not null && room.ResourceId == snapshot.RoomId)
+        {
+            ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+            UpdateRoomNavigationActions(room);
+            RefreshRoomPreview();
+        }
+        if (playback.Doorways is { Count: > 0 } doorways && _currentRoomResource?.ResourceId == playback.SourceRoom.ResourceId)
+            FollowDoorwayFallback(doorways);
+    }
+
+    // ---- Messages on screen (M1c) ---------------------------------------------
+
+    // The talk text's rectangle in room pixels (right and bottom exclusive), for a click that skips it.
+    private (int Left, int Top, int Right, int Bottom)? _talkTextRect;
+    // Verb-screen text (screen rows 144–199) as a 320 × 56 layer, or null.
+    private BitmapSource? _verbMessageBitmap;
+
+    /// <summary>The game's camera left edge in room pixels (ScummVM <c>virtscr[0].xstart</c>).</summary>
+    private int GameCameraLeft(RoomImage room)
+    {
+        var visible = Math.Min(LoomMessageRenderer.ScreenWidth, room.Width);
+        return Math.Clamp((_session?.CameraX ?? visible / 2) - visible / 2, 0, room.Width - visible);
+    }
+
+    /// <summary>
+    /// Draws the session's messages over the room and in the verb screen, at their
+    /// screen positions relative to the game's camera: screen row y is room row
+    /// y − 16 (ScummVM <c>initScreens(16, 144)</c>), rows 144–199 are the verb screen.
+    /// Charset 0 draws them; if it cannot be read, a UI font does, labelled as not the game's.
+    /// </summary>
+    private void UpdateMessageLayer()
+    {
+        _talkTextRect = null;
+        var room = _currentRoom;
+        var session = _session;
+        var messages = GameClickActive && room is not null && session!.Snapshot.RoomId == _currentRoomResource?.ResourceId
+            ? session.Messages.OnScreen : [];
+        var verbBefore = _verbMessageBitmap is not null;
+        if (messages.Count == 0 || room is null)
+        {
+            RoomMessageOverlay.Source = null;
+            RoomMessageOverlay.Visibility = Visibility.Collapsed;
+            RoomMessageOverlay.ToolTip = null;
+            _verbMessageBitmap = null;
+        }
+        else
+        {
+            var left = GameCameraLeft(room);
+            if (_charset is { } charset)
+            {
+                var layer = LoomMessageRenderer.Render(messages, charset);
+                RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
+                _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
+                if (session!.Messages.Talk is { Y: < LoomMessageRenderer.VerbScreenTop } talk &&
+                    LoomMessageRenderer.Render(talk, charset).Bounds is { } bounds)
+                    _talkTextRect = (bounds.Left + left, bounds.Top - LoomMessageRenderer.RoomScreenTop,
+                        bounds.Right + left, bounds.Bottom - LoomMessageRenderer.RoomScreenTop);
+            }
+            else
+            {
+                (RoomMessageOverlay.Source, _verbMessageBitmap, _talkTextRect) =
+                    FallbackMessageBitmaps(messages, session!.Messages.Talk, room, left);
+                ObjectsNote.Text = $"Messages use a UI font, not the game's ({_charsetError ?? "charset 0 is unavailable"}).";
+            }
+            RoomMessageOverlay.Visibility = Visibility.Visible;
+        }
+        VerbMessageOverlay.Source = _verbMessageBitmap;
+        VerbMessageOverlay.Visibility = _verbMessageBitmap is null ? Visibility.Collapsed : Visibility.Visible;
+        if (verbBefore != (_verbMessageBitmap is not null))
+        {
+            UpdateVerbStrip();
+            UpdateRoomViewportLayout();
+        }
+    }
+
+    private static BitmapSource MessageRoomBitmap(LoomMessageLayer layer, RoomImage room, int cameraLeft)
+    {
+        var pixels = new byte[room.Width * room.Height * 4];
+        for (var screenY = LoomMessageRenderer.RoomScreenTop; screenY < LoomMessageRenderer.VerbScreenTop; screenY++)
+        {
+            var y = screenY - LoomMessageRenderer.RoomScreenTop;
+            if (y >= room.Height) break;
+            for (var x = 0; x < layer.Width; x++)
+            {
+                var index = layer.Pixels[screenY * layer.Width + x];
+                var roomX = cameraLeft + x;
+                if (index == LoomMessageRenderer.Transparent || roomX >= room.Width) continue;
+                SetBgra(pixels, (y * room.Width + roomX) * 4, index < room.Palette.Count ? room.Palette[index] : 0xFF000000u);
+            }
+        }
+        return FrozenBgra(room.Width, room.Height, pixels);
+    }
+
+    // The verb screen's text on a transparent 320 × 56 layer, or null when there is none.
+    private static BitmapSource? MessageVerbBitmap(LoomMessageLayer layer, IReadOnlyList<uint> palette)
+    {
+        var pixels = new byte[LoomVerbArea.Width * LoomVerbArea.Height * 4];
+        var any = false;
+        for (var y = 0; y < LoomVerbArea.Height; y++)
+        for (var x = 0; x < LoomVerbArea.Width; x++)
+        {
+            var index = layer.Pixels[(LoomVerbArea.Top + y) * layer.Width + x];
+            if (index == LoomMessageRenderer.Transparent) continue;
+            SetBgra(pixels, (y * LoomVerbArea.Width + x) * 4, index < palette.Count ? palette[index] : 0xFF000000u);
+            any = true;
+        }
+        return any ? FrozenBgra(LoomVerbArea.Width, LoomVerbArea.Height, pixels) : null;
+    }
+
+    private static void SetBgra(byte[] pixels, int at, uint argb)
+    {
+        pixels[at] = (byte)argb;
+        pixels[at + 1] = (byte)(argb >> 8);
+        pixels[at + 2] = (byte)(argb >> 16);
+        pixels[at + 3] = 0xFF;
+    }
+
+    private static BitmapSource FrozenBgra(int width, int height, byte[] pixels)
+    {
+        var bitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgra32, null, pixels, width * 4);
+        bitmap.Freeze();
+        return bitmap;
+    }
+
+    /// <summary>
+    /// Presentation when charset 0 cannot be read: each message's lines in a UI font
+    /// at the message's position and EGA colour. It is not the game's font.
+    /// </summary>
+    private (BitmapSource Room, BitmapSource? Verb, (int, int, int, int)? Talk) FallbackMessageBitmaps(
+        IReadOnlyList<LoomMessage> messages, LoomMessage? talk, RoomImage room, int cameraLeft)
+    {
+        var typeface = new Typeface("Consolas");
+        var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        (int, int, int, int)? talkRect = null;
+        BitmapSource Draw(int width, int height, Func<LoomMessage, bool> include, int offsetX, int offsetY, bool keepTalk)
+        {
+            var visual = new DrawingVisual();
+            using (var context = visual.RenderOpen())
+            {
+                foreach (var message in messages.Where(include))
+                {
+                    var argb = (message.Color & 0x0F) < room.Palette.Count ? room.Palette[message.Color & 0x0F] : 0xFFFFFFFFu;
+                    var brush = new SolidColorBrush(Color.FromRgb((byte)(argb >> 16), (byte)(argb >> 8), (byte)argb));
+                    var top = message.Y + offsetY;
+                    foreach (var line in message.Lines)
+                    {
+                        var text = new FormattedText(line, System.Globalization.CultureInfo.CurrentCulture,
+                            FlowDirection.LeftToRight, typeface, 8, brush, dpi);
+                        var x = message.X + offsetX - (message.Center ? text.Width / 2 : 0);
+                        context.DrawText(text, new Point(Math.Max(offsetX, x), top));
+                        if (keepTalk && ReferenceEquals(message, talk))
+                        {
+                            var rect = ((int)x, top, (int)Math.Ceiling(x + text.Width), top + (int)Math.Ceiling(text.Height));
+                            talkRect = talkRect is { } r
+                                ? (Math.Min(r.Item1, rect.Item1), Math.Min(r.Item2, rect.Item2), Math.Max(r.Item3, rect.Item3), Math.Max(r.Item4, rect.Item4))
+                                : rect;
+                        }
+                        top += message.LineHeight != 0 ? message.LineHeight : 8;
+                    }
+                }
+            }
+            var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(visual);
+            bitmap.Freeze();
+            return bitmap;
+        }
+        var roomBitmap = Draw(room.Width, room.Height, message => message.Y < LoomMessageRenderer.VerbScreenTop,
+            cameraLeft, -LoomMessageRenderer.RoomScreenTop, keepTalk: true);
+        BitmapSource? verb = messages.Any(message => message.Y >= LoomMessageRenderer.VerbScreenTop)
+            ? Draw(LoomVerbArea.Width, LoomVerbArea.Height, message => message.Y >= LoomMessageRenderer.VerbScreenTop,
+                0, -LoomVerbArea.Top, keepTalk: false)
+            : null;
+        return (roomBitmap, verb, talkRect);
+    }
+
+    /// <summary>A click on the talk text: ScummVM's talk-stop key ('.') ends its delay, as assumed input.</summary>
+    private bool SkipTalkAt(int x, int y)
+    {
+        if (!GameClickActive || _talkTextRect is not { } rect || _session!.Messages.Talk is null ||
+            x < rect.Left - 2 || x >= rect.Right + 2 || y < rect.Top - 2 || y >= rect.Bottom + 2) return false;
+        _session.Messages.SkipTalkDelay();
+        StatusText.Text = "Text skipped (the game's talk-stop key '.', assumed input)";
+        StatusText.ToolTip = "ScummVM's '.' key sets the talk delay to 0, so the next frame ends the message or shows its next part.";
+        if (!PlaybackRunning && _currentRoomResource is { } room)
+            StartPlayback("Text skip", null, room, doorways: null, leftRoom: false);
+        return true;
     }
 
     private bool CycleArtworkAt(int x, int y)
@@ -2615,6 +3069,8 @@ public partial class MainWindow : Window
         if (GamePointerToggle.IsChecked != true || SessionModeToggle.IsChecked != true || _session is null ||
             _currentRoomResource is not { } room || _session.Snapshot.RoomId != room.ResourceId) return;
         _session.SetPointer(point);
+        // While the playback clock runs, its frames see the pointer.
+        if (PlaybackRunning) return;
         if (_gamePointerTarget == (room.ResourceId, target)) return;
         _gamePointerTarget = (room.ResourceId, target);
         AdvanceOneFrame();
@@ -2644,10 +3100,25 @@ public partial class MainWindow : Window
     /// (<see cref="LoomVerbArea.Compose"/>), drawn under the room at its scale.
     /// It shows game state; the drawing itself is not the game's.
     /// </summary>
+    // The verb screen is shown for the strip, or for text a script printed there (rows 144–199).
+    private bool VerbScreenShown() => VerbStripShown() || _verbMessageBitmap is not null && _currentRoom is not null;
+
     private void UpdateVerbStrip()
     {
         if (!VerbStripShown())
         {
+            if (VerbScreenShown())
+            {
+                // Only the verb screen's text: on the screen's black, with the strip itself off.
+                VerbStripImage.Source = FrozenBgra(LoomVerbArea.Width, LoomVerbArea.Height,
+                    Enumerable.Range(0, LoomVerbArea.Width * LoomVerbArea.Height).SelectMany(_ => new byte[] { 0, 0, 0, 0xFF }).ToArray());
+                VerbStripNote.Text = "Verb screen: text the game printed there. The verb strip itself is off.";
+                VerbStripNote.ToolTip = string.Join(Environment.NewLine, _session?.Messages.OnScreen
+                    .Where(message => message.Y >= LoomVerbArea.Top)
+                    .Select(message => $"\"{message.Text}\" at ({message.X}, {message.Y}) from {message.Source}") ?? []);
+                VerbStripPanel.Visibility = Visibility.Visible;
+                return;
+            }
             VerbStripPanel.Visibility = Visibility.Collapsed;
             VerbStripImage.Source = null;
             return;

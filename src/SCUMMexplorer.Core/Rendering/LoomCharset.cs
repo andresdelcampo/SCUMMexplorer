@@ -124,7 +124,12 @@ public static class LoomMessageRenderer
 {
     public const int ScreenWidth = 320;
     public const int ScreenHeight = 200;
-    /// <summary>ScummVM <c>initScreens(16, 144)</c> for v3: the room is rows 0–143, the verb screen rows 144–199.</summary>
+    /// <summary>
+    /// ScummVM <c>initScreens(16, 144)</c> for v3 (<c>gfx.cpp</c>): the text screen is rows 0–15,
+    /// the room (main) screen rows 16–143, so screen row y is room row y − 16, and the verb
+    /// screen rows 144–199. <c>printChar</c> draws at <c>_top - vs-&gt;topline</c> and clips at the screen's bottom.
+    /// </summary>
+    public const int RoomScreenTop = 16;
     public const int VerbScreenTop = 144;
     public const byte Transparent = 0xFF;
     private const byte ShadowColor = 0;
@@ -205,9 +210,9 @@ public static class LoomMessageRenderer
         if (glyph == '@') return false;
         var width = charset.CharWidth(glyph);
         if (left + width > right + 1) return false;
-        // findVirtScreen(top): the room screen or the verb screen, each clipped at its bottom.
-        var screenTop = top >= VerbScreenTop ? VerbScreenTop : 0;
-        var screenBottom = top >= VerbScreenTop ? ScreenHeight : VerbScreenTop;
+        // findVirtScreen(top): the text, room or verb screen, each clipped at its bottom.
+        var screenTop = top >= VerbScreenTop ? VerbScreenTop : top >= RoomScreenTop ? RoomScreenTop : 0;
+        var screenBottom = top >= VerbScreenTop ? ScreenHeight : top >= RoomScreenTop ? VerbScreenTop : RoomScreenTop;
         if (top < 0 || top >= ScreenHeight) return false;
         DrawBits1(layer, charset.Glyph(glyph), left, top, width, LoomCharset.GlyphRows, color, shadow, screenTop, screenBottom);
         left += width;

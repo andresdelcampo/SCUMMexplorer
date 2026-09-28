@@ -100,6 +100,9 @@ internal static class Program
                 Call("QueueGameClick", 700, 40);
                 Call("RoomPreview_MouseLeftButtonDown", null, null);
                 Call("RoomPreview_MouseLeftButtonUp", null, null);
+                // Since M1d the frames after a click play on the app's clock (10 a second): wait for them.
+                var playing = typeof(MainWindow).GetProperty("PlaybackRunning", Private)!;
+                for (var n = 0; n < 150 && (bool)playing.GetValue(window)!; n++) await Task.Delay(100);
                 window.UpdateLayout();
                 Check(Traced("the second click of a double click") || Session().Snapshot.Uncertainties.Any(line => line.Contains("the second click of a double click", StringComparison.Ordinal)),
                     "a second press while the first click waits is sent as a double click");

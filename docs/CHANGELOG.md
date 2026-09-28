@@ -60,6 +60,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | Replan | Priorities moved to visible behaviour: interactions, on-screen text, actors, playback. Plan and changelog cleaned up; no code changed | [plan](LOOM_EGA_PLAN.md) |
 | M1e: the game's click by default | Explore-mode clicks go through scripts 005–007; double click adds verb 0x36; doorways fall back to their verb, labelled (75/75: 29 by the game's click); inspection mode cycles artwork | [game-click](../.verification/game-click/validation.md) |
 | M1a/M1b: messages and the game's font (Core) | `print` → text slots, talk message, talk delay, `VAR_HAVE_MSG`, `waitFor message`; object names in text (code 6); charset 0 from `99.LFL` drawn as `CharsetRendererV3`. Blockers 5839 → 4979; cutscene cap 1000 → 20,000 frames | [messages](../.verification/messages/validation.md) |
+| M1c/M1d: messages on screen and clicks that play forward (app) | Messages drawn in charset 0 over the room and in the verb screen (room row = screen y − 16); a click plays at 10 frames a second until the talk ends and scripts wait; clicking text skips it (assumed input). MessageAppCheck 0 failures; DoorwayClickCheck 75/75, identical to M1e; ClickInputCheck 0 failures; tests 206/206 | [messages-app](../.verification/messages-app/validation.md) |
 
 ## State at the end of 28 September
 

@@ -54,8 +54,10 @@ for (var y = 0; y < 200; y++)
     for (var x = 0; x < 320; x++)
     {
         uint color = 0;
-        if (y < Math.Min(144, background.Height) && viewLeft + x < background.Width)
-            color = background.Palette[roomPixels[y * background.Width + viewLeft + x]];
+        // initScreens(16, 144): the room screen is rows 16–143, so screen row y shows room row y − 16.
+        var roomY = y - LoomMessageRenderer.RoomScreenTop;
+        if (roomY >= 0 && y < LoomMessageRenderer.VerbScreenTop && roomY < background.Height && viewLeft + x < background.Width)
+            color = background.Palette[roomPixels[roomY * background.Width + viewLeft + x]];
         var text = layer.Pixels[y * 320 + x];
         if (text != LoomMessageRenderer.Transparent) color = background.Palette[text];
         screen[y * 320 + x] = color;

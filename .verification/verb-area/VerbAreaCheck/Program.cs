@@ -25,6 +25,8 @@ internal static class Program
         Directory.CreateDirectory(output);
         var app = new Application();
         var window = new MainWindow();
+        // Since M1d a click plays on a timer; the harness runs the frames at once, as before.
+        typeof(MainWindow).GetField("_playInstantly", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.SetValue(window, true);
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
         void Save(string file)
