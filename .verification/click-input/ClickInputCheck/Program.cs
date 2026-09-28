@@ -74,7 +74,7 @@ internal static class Program
                 var action = Session().LastAction;
                 Check(Session().Snapshot.RoomId == 3 && action is { IsGameInput: true, DestinationRoomId: 3 },
                     $"on: a click at (450, 60) in Room 02 reaches Room 03 through the game's input: {action?.Evidence}");
-                Check(Traced("runs script 5 with [2, 0, 1]") && Traced("Script 05 chains to script 6") &&
+                Check(Traced("runs script 5 with [2, 0, 0]") && Traced("Script 05 chains to script 6") &&
                       Traced("Script 07 +0x002E: startObject runs object 153 verb 0x38"),
                     "on: the trace shows runInputScript → script 005 → script 006 → script 007 → object 153 verb 0x38");
                 var note = (TextBlock)window.FindName("ObjectActionNote");

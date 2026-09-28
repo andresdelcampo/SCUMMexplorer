@@ -2086,6 +2086,7 @@ public partial class MainWindow : Window
         _pendingGameClick = null;
         _gameClickPairSent = false;
         UpdateVerbArea();
+        UpdateVerbStrip();
     }
 
     /// <summary>
@@ -2094,11 +2095,13 @@ public partial class MainWindow : Window
     /// continues frames as a doorway click does, so the ego's walk and script 007's
     /// sentence run and a room load they reach opens the destination.
     /// </summary>
-    private void SendClickToGame(int x, int y, bool doubleClick)
+    private void SendClickToGame(int x, int y, bool doubleClick) =>
+        SendInputToGame(() => _session!.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click");
+
+    private void SendInputToGame(Func<LoomObjectActionResult> send, string what)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return;
-        var action = _session.Click(x, y, doubleClick);
-        var what = doubleClick ? "Double click" : "Click";
+        var action = send();
         if (action.DestinationRoomId is int destination &&
             _game.Rooms.FirstOrDefault(item => item.ResourceId == destination) is { } target && target != sourceRoom)
         {
@@ -2120,6 +2123,7 @@ public partial class MainWindow : Window
         UpdateRoomNavigationActions(sourceRoom);
         RefreshRoomPreview();
         UpdateVerbArea();
+        UpdateVerbStrip();
     }
 
     private void HandleRoomPoint(int x, int y)
@@ -2290,8 +2294,6 @@ public partial class MainWindow : Window
 
     // Height kept for the verb strip's note under the strip.
     private const double VerbStripNoteHeight = 36;
-    // Object images of rooms that verbs take their images from, by room file.
-    private readonly Dictionary<string, IReadOnlyList<RoomObjectImage>> _verbImageRooms = new(StringComparer.OrdinalIgnoreCase);
 
     private bool VerbStripShown() =>
         VerbAreaToggle.IsChecked == true && _session is not null && _game?.Id == GameId.Loom && _currentRoom is not null;
@@ -2315,7 +2317,7 @@ public partial class MainWindow : Window
             VerbStripImage.Source = null;
             return;
         }
-        var picture = LoomVerbArea.Compose(_session!.Verbs, VerbImage);
+        var picture = _session!.VerbArea();
         VerbStripImage.Source = CreateBitmap(picture.Width, picture.Height, picture.Pixels, _currentRoom!.Palette);
         var drawn = picture.Items.Count == 0
             ? "no image verb is on in the session's state"
@@ -2324,7 +2326,8 @@ public partial class MainWindow : Window
                   ? ", " + VerbRanges(picture.Items.Where(item => item.Mode == 2).Select(item => item.VerbId)) + " dim" : "");
         var estimate = picture.Items.Any(item => item.Estimate is not null) ? " Some follow an estimate." : "";
         var notes = picture.Notes.Count == 0 ? "" : $" {picture.Notes.Count} not drawn.";
-        VerbStripNote.Text = $"Verb area: presentation of the session's verb slots, not the game's drawing; {drawn}.{estimate}{notes}";
+        var clicks = GameClickActive ? " Clicks on verbs that are on go to the game as assumed input." : "";
+        VerbStripNote.Text = $"Verb area: presentation of the session's verb slots, not the game's drawing; {drawn}.{estimate}{notes}{clicks}";
         VerbStripNote.ToolTip = string.Join(Environment.NewLine, picture.Items.Select(item =>
                 $"verb 0x{item.VerbId:X2} (slot {item.Slot}): object {item.ImageObject}'s image from Room {item.ImageRoom:00} at ({item.X}, {item.Y})" +
                 (item.Mode == 2 ? ", dim" : "") + (item.Estimate is null ? "" : $"; estimate: {item.Estimate}"))
@@ -2349,17 +2352,43 @@ public partial class MainWindow : Window
         return string.Join(", ", parts);
     }
 
-    private RoomObjectImage? VerbImage(int roomId, int objectId)
+    // The verb strip's screen point (x 0–319, y 144–199) under the mouse, or null off the strip.
+    private (int X, int Y)? VerbStripPoint(Point position)
     {
-        var resource = _game?.Rooms.FirstOrDefault(item => item.ResourceId == roomId);
-        if (resource is null) return null;
-        if (!_verbImageRooms.TryGetValue(resource.FilePath, out var images))
-        {
-            try { images = _objectDecoder.Decode(File.ReadAllBytes(resource.FilePath)); }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { images = []; }
-            _verbImageRooms[resource.FilePath] = images;
-        }
-        return images.FirstOrDefault(item => item.Id == objectId);
+        if (VerbStripImage.ActualWidth <= 0 || VerbStripImage.ActualHeight <= 0) return null;
+        var x =(int)(position.X / VerbStripImage.ActualWidth * LoomVerbArea.Width);
+        var y = (int)(position.Y / VerbStripImage.ActualHeight * LoomVerbArea.Height);
+        if (x is < 0 or >= LoomVerbArea.Width || y is < 0 or >= LoomVerbArea.Height) return null;
+        return (x, LoomVerbArea.Top + y);
+    }
+
+    // With "Click as game input" on, only verbs whose slot is on (findVerbAtPos) react.
+    private LoomVerbAreaItem? ClickableVerbAt(Point position) =>
+        GameClickActive && VerbStripShown() && VerbStripPoint(position) is { } point
+            ? LoomVerbArea.FindVerbAt(_session!.VerbArea().Items, point.X, point.Y) : null;
+
+    private void VerbStripImage_MouseMove(object sender, MouseEventArgs e)
+    {
+        var verb = ClickableVerbAt(e.GetPosition(VerbStripImage));
+        VerbStripImage.Cursor = verb is null ? null : Cursors.Hand;
+        VerbStripImage.ToolTip = verb is null ? null
+            : $"Verb 0x{verb.VerbId:X2} (slot {verb.Slot}): a click goes to the game's input script as assumed input (runInputScript(1, 0x{verb.VerbId:X2}, 0)).";
+    }
+
+    /// <summary>
+    /// "Click as game input" on the verb strip: a click on a verb that is on goes
+    /// to the session as ScummVM's <c>checkExecVerbs</c> would send it
+    /// (<see cref="LoomExplorationSession.ClickVerbArea"/>); elsewhere nothing is sent.
+    /// </summary>
+    private void VerbStripImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) =>
+        ClickVerbStrip(e.GetPosition(VerbStripImage));
+
+    // Returns whether the click was sent (a point in the strip's own coordinates).
+    private bool ClickVerbStrip(Point position)
+    {
+        if (ClickableVerbAt(position) is not { } verb || VerbStripPoint(position) is not { } point) return false;
+        SendInputToGame(() => _session!.ClickVerbArea(point.X, point.Y), $"Click on verb 0x{verb.VerbId:X2}");
+        return true;
     }
 
     /// <summary>

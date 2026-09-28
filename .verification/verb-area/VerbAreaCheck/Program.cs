@@ -10,7 +10,9 @@ using SCUMMexplorer.Core.Formats;
 // "Show verb area" (presentation): in the real MainWindow, checks that the strip
 // is off by default, sits under the room at the room's scale without clipping,
 // draws the verbs the session's slots have on (after script 018, and the close-up
-// after a hover), and goes away again. Script 018 is started through the
+// after a hover), sends clicks on verbs that are on to the game when "Click as
+// game input" is on (a note with nothing aimed at, then after aiming at an
+// object), and goes away again. Script 018 is started through the
 // session's internal test seam, as the tests do. No physical input.
 // Arguments: <Games\loom> <output folder>.
 internal static class Program
@@ -119,6 +121,40 @@ internal static class Program
                     $"hover on object 156: the close-up (verb 0x36, {closeUp?.Describe()}) is drawn at (248, 152): \"{note.Text}\"");
                 Save("room-02-verb-area-close-up.png");
                 pointer.IsChecked = false;
+
+                // "Click as game input" on the strip: verbs that are on go to script 005 as runInputScript(1, verb, 0).
+                var clicks = (CheckBox)window.FindName("GameClickToggle");
+                var status = (TextBlock)window.FindName("StatusText");
+                Point StripPoint(int x, int y) => new((x + 0.5) * image.ActualWidth / 320, (y - 144 + 0.5) * image.ActualHeight / 56);
+                bool ClickStrip(int x, int y) => (bool)Call("ClickVerbStrip", StripPoint(x, y))!;
+                bool TracedSince(int from, string text) => Session().SessionTrace.Skip(from).Any(line => line.Contains(text, StringComparison.Ordinal));
+                ushort? Var(int number) => Session().Snapshot.KnownGlobalVariables.TryGetValue($"var[0x{number:X3}]", out var value) ? value : null;
+                var third = Session().VerbArea().Items.Single(item => item.VerbId == 0x03);
+                var before = Session().SessionTrace.Count;
+                Check(!ClickStrip(third.X + 1, third.Y + 1) && Session().SessionTrace.Count == before,
+                    "click input off: a click on note 0x03 in the strip sends nothing");
+                clicks.IsChecked = true;
+                await Settle();
+                Check(note.Text.Contains("Clicks on verbs that are on go to the game as assumed input", StringComparison.Ordinal),
+                    $"click input on: the note says verb clicks are assumed input: \"{note.Text}\"");
+                before = Session().SessionTrace.Count;
+                Check(!ClickStrip(100, 195) && Session().SessionTrace.Count == before,
+                    "click input on: a click on the strip where no verb is on sends nothing");
+                var sent = ClickStrip(third.X + 1, third.Y + 1);
+                await Settle();
+                Check(sent && TracedSince(before, "verb 0x03 (slot 3), runs script 5 with [1, 3, 0]") && TracedSince(before, "Script 10 chains to script 13") &&
+                      status.Text.Contains("Click on verb 0x03 sent to the game (assumed input)", StringComparison.Ordinal),
+                    $"a click on note 0x03 with nothing aimed at reaches script 013 through scripts 005 and 010: \"{status.Text}\"");
+                // Aim at object 156 (class 1) with a room click, then play the note: script 010 records it.
+                Call("SendClickToGame", 700, 40, false);
+                await Settle();
+                before = Session().SessionTrace.Count;
+                sent = ClickStrip(third.X + 1, third.Y + 1);
+                await Settle();
+                Check(sent && Var(0x067) == 156 && Var(0x056) == 3 && Var(0x062) == 1 && TracedSince(before, "Script 10 chains to script 27"),
+                    $"after aiming at object 156, note 0x03 is recorded (var[0x056] = {Var(0x056)}, var[0x062] = {Var(0x062)}) and script 027 runs");
+                Save("room-02-verb-area-note-click.png");
+                clicks.IsChecked = false;
 
                 toggle.IsChecked = false;
                 await Settle();

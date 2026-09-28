@@ -601,7 +601,7 @@ public sealed class LoomExplorationSession
 
     /// <summary>
     /// Sends a left click at a room point to the game, as ScummVM's
-    /// <c>checkExecVerbs</c> does for a click in the room: <c>runInputScript(2, 0, 1)</c>
+    /// <c>checkExecVerbs</c> does for a click in the room: <c>runInputScript(2, 0, 0)</c>
     /// runs the script in <c>VAR_VERB_SCRIPT</c> (script 005) with those arguments,
     /// which chains a room click into the input loop (script 006, <c>local[0]</c> = 1).
     /// Script 006 then does what it does with the object under the pointer: verb
@@ -637,7 +637,7 @@ public sealed class LoomExplorationSession
                 _uncertainties.Skip(beforeUncertainties).ToArray(), input);
             return LastAction;
         }
-        _uncertainties.Add($"{input}. ScummVM runInputScript({SceneClickArea}, 0, 1) runs script {verbScript} (var[0x020], VAR_VERB_SCRIPT, set by script 001 +0x016B); the click's point and timing are the explorer's, not the game's.");
+        _uncertainties.Add($"{input}. ScummVM runInputScript({SceneClickArea}, 0, {InputMode}) runs script {verbScript} (var[0x020], VAR_VERB_SCRIPT, set by script 001 +0x016B); the click's point and timing are the explorer's, not the game's.");
         if (_runtime.UserPutEstimate is not null)
             _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
         LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
@@ -652,7 +652,123 @@ public sealed class LoomExplorationSession
         {
             _dispatchScope--;
         }
-        var action = LastAction with { Uncertainties = _uncertainties.Skip(beforeUncertainties).ToArray() };
+        return FinishInput(beforeUncertainties, beforeEvents);
+    }
+
+    /// <summary>
+    /// The third argument of <c>runInputScript</c>: ScummVM's <c>checkExecVerbs</c>
+    /// passes the mouse button only for versions above 3 (<c>_game.version &gt; 3 ? code : 0</c>),
+    /// so LOOM's input script always gets 0. Script 005 +0x0000 sets <c>local[2]</c> = 0 first anyway.
+    /// </summary>
+    public const int InputMode = 0;
+    /// <summary>ScummVM <c>kVerbClickArea</c>: a click in the verb screen.</summary>
+    public const int VerbClickArea = 1;
+    /// <summary>ScummVM <c>VAR_MOUSE_X</c>/<c>VAR_MOUSE_Y</c> (v3: vars 44 and 45), the pointer's screen point; script 005 reads x for verb 0x31.</summary>
+    private const string MouseXVariable = "var[0x02C]";
+    private const string MouseYVariable = "var[0x02D]";
+
+    /// <summary>
+    /// The verb area as the session's verb slots would draw it, with each image
+    /// verb's rectangle from its object's image in the room it was taken from
+    /// (<see cref="LoomVerbArea.Compose"/>).
+    /// </summary>
+    public LoomVerbAreaPicture VerbArea() => LoomVerbArea.Compose(_runtime.Verbs.Snapshot(), VerbImage);
+
+    private readonly Dictionary<int, IReadOnlyList<RoomObjectImage>> _verbImageRooms = [];
+
+    private RoomObjectImage? VerbImage(int roomId, int objectId)
+    {
+        if (!_verbImageRooms.TryGetValue(roomId, out var images))
+        {
+            var resource = _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId);
+            try { images = resource is null ? [] : new LoomRoomObjects().Decode(File.ReadAllBytes(resource.FilePath)); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { images = []; }
+            _verbImageRooms[roomId] = images;
+        }
+        return images.FirstOrDefault(item => item.Id == objectId);
+    }
+
+    /// <summary>
+    /// Sends a left click at a screen point in the verb area (rows
+    /// <see cref="LoomVerbArea.Top"/>–199) to the game, as ScummVM's
+    /// <c>checkExecVerbs</c> does: <c>findVerbAtPos</c> over the verb slots
+    /// (<see cref="LoomVerbArea.FindVerbAt"/>), then <c>runInputScript(1, verb, 0)</c>
+    /// on a verb that is on, or <c>runInputScript(1, 0, 0)</c> elsewhere in the verb
+    /// screen. Script 005 (area 1) turns a distaff note into script 010, verb 0x35
+    /// into script 009 and the close-up (0x36) into script 007. This is assumed
+    /// input: the point, which the session puts in <c>VAR_MOUSE_X</c>/<c>Y</c>
+    /// (<c>var[0x02C]</c>/<c>var[0x02D]</c>), is the explorer's. The pointer is off the
+    /// room picture then, so the room pointer is taken off. Refused while user input
+    /// is off or when no input script is set, as <see cref="Click"/> is. Verbs the
+    /// session cannot draw (unknown mode, image or position, text verbs) cannot be found.
+    /// </summary>
+    public LoomObjectActionResult ClickVerbArea(int x, int y)
+    {
+        if (_currentRoom?.ResourceId is not int sourceRoomId)
+            throw new InvalidOperationException("Visit a room before clicking in the verb area.");
+        _uncertainties.StartStep();
+        var beforeUncertainties = _uncertainties.Count;
+        var beforeEvents = _visitEvents.Count;
+        var area = VerbArea();
+        var verb = LoomVerbArea.FindVerbAt(area.Items, x, y);
+        var input = verb is null
+            ? $"A click at screen ({x}, {y}) in the verb area, on no verb that is on, sent to the game's input script as assumed input"
+            : $"A click at screen ({x}, {y}) on verb 0x{verb.VerbId:X2} (slot {verb.Slot}) in the verb area, sent to the game's input script as assumed input";
+        string? refused = null;
+        ushort verbScript = 0;
+        if (x < 0 || x >= LoomVerbArea.Width || y < LoomVerbArea.Top || y >= LoomVerbArea.Top + LoomVerbArea.Height)
+            refused = "the point is outside the verb area";
+        else if (_runtime.UserPut <= 0)
+            refused = "user input is off (cursorCommand), and ScummVM's checkExecVerbs reads no click then";
+        else if (!_runtime.GlobalVariables.TryGetValue(VerbScriptVariable, out verbScript) || verbScript == 0)
+            refused = $"no input script is set ({VerbScriptVariable}, VAR_VERB_SCRIPT, is 0)";
+        if (refused is not null)
+        {
+            _uncertainties.Add($"{input}: not sent, because {refused}.");
+            LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
+                _uncertainties.Skip(beforeUncertainties).ToArray(), input);
+            return LastAction;
+        }
+        var verbId = verb?.VerbId ?? 0;
+        _uncertainties.Add($"{input}. ScummVM checkExecVerbs: findVerbAtPos, then runInputScript({VerbClickArea}, 0x{verbId:X2}, {InputMode}) runs script {verbScript} " +
+                           "(var[0x020], VAR_VERB_SCRIPT); the click's point is the explorer's, not the game's, and is put in var[0x02C]/var[0x02D] (VAR_MOUSE_X/Y).");
+        if (verb?.Estimate is { } estimate)
+            _uncertainties.Add($"Verb 0x{verbId:X2}'s slot follows an estimate: {estimate}.");
+        if (area.Notes.Count > 0)
+            _uncertainties.Add($"Verbs the session cannot draw cannot be found by the click: {string.Join("; ", area.Notes)}.");
+        if (_runtime.UserPutEstimate is not null)
+            _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
+        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        _dispatchScope++;
+        try
+        {
+            // The pointer is over the verb screen, below the room picture (VAR_VIRT_MOUSE_Y past the room).
+            _pointer = null;
+            PlaceVirtualMouse();
+            _runtime.GlobalVariables[MouseXVariable] = (ushort)x;
+            _runtime.GlobalVariables[MouseYVariable] = (ushort)y;
+            _runtime.EstimatedVariables.Remove(MouseXVariable);
+            _runtime.EstimatedVariables.Remove(MouseYVariable);
+            _visitTrace.Add($"click: verb area at screen ({x}, {y}), " + (verb is null ? "on no verb" : $"verb 0x{verbId:X2} (slot {verb.Slot})") +
+                            $", runs script {verbScript} with [{VerbClickArea}, {verbId}, {InputMode}] (runInputScript)");
+            RunStartedScript(verbScript, 0, new Dictionary<string, ushort>(StringComparer.Ordinal)
+            {
+                ["local[0x000]"] = VerbClickArea,
+                ["local[0x001]"] = (ushort)verbId,
+                ["local[0x002]"] = InputMode
+            }, 0);
+        }
+        finally
+        {
+            _dispatchScope--;
+        }
+        return FinishInput(beforeUncertainties, beforeEvents);
+    }
+
+    // After an input script ran: dispatch the loads it requested, or visit the room a reached load names.
+    private LoomObjectActionResult FinishInput(int beforeUncertainties, int beforeEvents)
+    {
+        var action = LastAction! with { Uncertainties = _uncertainties.Skip(beforeUncertainties).ToArray() };
         LastAction = action;
         if (DispatchRequestedLoads("during the click"))
         {
@@ -682,12 +798,12 @@ public sealed class LoomExplorationSession
         _runtime.GlobalVariables[ClickTimerVariable] = (ushort)gap;
         _runtime.EstimatedVariables.Remove(ClickTimerVariable);
         _uncertainties.Add($"Assumed input timing for {which}: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = {gap}; the engine's timer is not simulated.");
-        _visitTrace.Add($"click: {which} at ({x}, {y}) runs script {verbScript} with [{SceneClickArea}, 0, 1] (runInputScript)");
+        _visitTrace.Add($"click: {which} at ({x}, {y}) runs script {verbScript} with [{SceneClickArea}, 0, {InputMode}] (runInputScript)");
         RunStartedScript(verbScript, 0, new Dictionary<string, ushort>(StringComparer.Ordinal)
         {
             ["local[0x000]"] = SceneClickArea,
             ["local[0x001]"] = 0,
-            ["local[0x002]"] = 1
+            ["local[0x002]"] = InputMode
         }, 0);
     }
 

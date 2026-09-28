@@ -114,7 +114,8 @@
                                     <StackPanel x:Name="VerbStripPanel" Visibility="Collapsed" HorizontalAlignment="Center" Margin="0,2,0,0">
                                         <Border Background="#000000" BorderBrush="#334452" BorderThickness="0,1,0,0" HorizontalAlignment="Center">
                                             <Image x:Name="VerbStripImage" Stretch="Fill" SnapsToDevicePixels="True"
-                                                   RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                                                   RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                                   MouseLeftButtonUp="VerbStripImage_MouseLeftButtonUp" MouseMove="VerbStripImage_MouseMove"/>
                                         </Border>
                                         <TextBlock x:Name="VerbStripNote" Foreground="#B8AA8C" FontSize="11" TextWrapping="Wrap"
                                                    TextTrimming="CharacterEllipsis" MaxHeight="30"

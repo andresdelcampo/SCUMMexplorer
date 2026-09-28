@@ -42,7 +42,7 @@ public sealed class LoomClickInputTests
         // Room 02 object 153 (class 2, box (376, 8) 176x120, walk point (540, 108)).
         var click = session.Click(450, 60);
         Assert.True(click.IsGameInput);
-        Assert.Contains(session.SessionTrace, line => line.Contains("runs script 5 with [2, 0, 1]", StringComparison.Ordinal));
+        Assert.Contains(session.SessionTrace, line => line.Contains("runs script 5 with [2, 0, 0]", StringComparison.Ordinal));
         Assert.Contains(session.SessionTrace, line => line.Contains("Script 05 chains to script 6", StringComparison.Ordinal));
         // Script 006 +0x014C: a class-2 object is the exit the player arrives through.
         Assert.Equal((ushort?)153, Var(session, 0x071));
