@@ -105,8 +105,16 @@ internal static class Program
                 object[] mapArguments = [screenSample, 0, 0];
                 var mapped = (bool)typeof(MainWindow).GetMethod("TryGetRoomImagePoint", flags)!.Invoke(window, mapArguments)!;
                 Check(mapped && Math.Abs((int)mapArguments[1] - screenSample.X / roomScale) <= 1, $"scrolled point maps to source x {(int)mapArguments[1]} at offset {viewport.HorizontalOffset}");
+                var exitToggle = Control<CheckBox>("RoomNavigationToggle");
+                Check(exitToggle.IsChecked == false, "doorway overlay is opt-in by default");
+                exitToggle.IsChecked = true;
+                await Task.Delay(100);
+                window.UpdateLayout();
                 var overlay = Control<Canvas>("RoomNavigationOverlay");
-                Check(Math.Abs(overlay.ActualWidth - preview.ActualWidth) < .1 && Math.Abs(overlay.ActualHeight - preview.ActualHeight) < .1, "doorway overlay and image share size after pan");
+                Check(overlay.Visibility == Visibility.Visible &&
+                      Math.Abs(overlay.ActualWidth - preview.ActualWidth) < .1 &&
+                      Math.Abs(overlay.ActualHeight - preview.ActualHeight) < .1,
+                    $"opted-in doorway overlay and image share size after pan ({overlay.Visibility}, {overlay.ActualWidth}x{overlay.ActualHeight} / {preview.ActualWidth}x{preview.ActualHeight})");
                 var music = Control<StackPanel>("RoomMusicPanel");
                 Check(music.TranslatePoint(new Point(), window).Y >= viewport.TranslatePoint(new Point(0, viewport.ActualHeight), window).Y, "music under viewport");
                 var layout = Control<Grid>("RoomDisplayLayout");

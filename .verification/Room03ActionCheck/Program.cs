@@ -134,7 +134,9 @@ internal static class Program
             report.Add(action.Evidence);
             await WaitRoom(expectedRoom);
             var note = Named<TextBlock>("ObjectActionNote").Text;
-            Check(note.Contains("incomplete", StringComparison.OrdinalIgnoreCase), "Visible action label retains incomplete-state warning");
+            Check(note.Contains("preview", StringComparison.OrdinalIgnoreCase) ||
+                  note.Contains("unresolved", StringComparison.OrdinalIgnoreCase),
+                "Visible action label retains the state-preview or unresolved-result warning");
             report.Add("ObjectActionNote: " + note);
             report.Add("SessionStatusText: " + Named<TextBlock>("SessionStatusText").Text);
             Capture(label);
@@ -158,6 +160,13 @@ internal static class Program
 
                 await BrowseRoom(3);
                 Call("ResetSession_Click", window, new RoutedEventArgs());
+                // The text-based hotspot catalog is an Advanced-mode aid; enter it explicitly
+                // before exercising the keyboard path, then focus the contextual choice.
+                var advancedToggle = Named<System.Windows.Controls.Primitives.ToggleButton>("AdvancedModeToggle");
+                advancedToggle.IsChecked = true;
+                Call("AdvancedModeToggle_Click", advancedToggle, new RoutedEventArgs());
+                Named<Expander>("ObjectListSection").IsExpanded = true;
+                window.UpdateLayout();
                 var hotspot = Named<StackPanel>("ObjectList").Children.OfType<Button>().Single(b => b.Tag is int id && id == objectId);
                 Enter(hotspot);
                 CompleteChoice(keyboard: true);

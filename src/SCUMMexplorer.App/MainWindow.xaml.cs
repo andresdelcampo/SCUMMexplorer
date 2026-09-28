@@ -41,6 +41,7 @@ public partial class MainWindow : Window
     private GameLibrary? _game;
     private LoomRelationshipIndex? _relationshipIndex;
     private GameResource? _selectedResource;
+    private GameResource? _lastViewedRoomResource;
     private int _relationshipBuildGeneration;
     private CancellationTokenSource? _previewCancellation;
     private RoomImage? _currentRoom;
@@ -115,6 +116,7 @@ public partial class MainWindow : Window
                 StopButton.IsEnabled = false;
             }
         };
+        UpdateAdvancedMode();
     }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -201,6 +203,7 @@ public partial class MainWindow : Window
         Interlocked.Increment(ref _relationshipBuildGeneration);
         _relationshipIndex = null;
         _selectedResource = null;
+        _lastViewedRoomResource = null;
         ConnectionsButton.Visibility = Visibility.Collapsed;
         StatusText.Visibility = Visibility.Visible;
         StopAudio();
@@ -260,6 +263,8 @@ public partial class MainWindow : Window
         GameInfo.Text = game.Platform == "DOS" ? "DOS edition" : game.Platform;
         GameInfo.ToolTip = $"{game.Version switch { ScummVersion.Unknown => "SCUMM version unconfirmed", _ => $"SCUMM {game.Version}" }} · {game.Platform}";
         ResourceTree.Items.Clear();
+        RoomCardList.Children.Clear();
+        RoomCardScroll.Visibility = Visibility.Visible;
 
         var rooms = new TreeViewItem { Header = $"Rooms  ({game.Rooms.Count()})", IsExpanded = false };
         foreach (var room in game.Rooms)
@@ -279,6 +284,9 @@ public partial class MainWindow : Window
             foreach (var item in group) node.Items.Add(new TreeViewItem { Header = item.Name, Tag = item });
             ResourceTree.Items.Add(node);
         }
+
+        PopulateRoomCards(game);
+        UpdateAdvancedMode();
 
         PageTitle.Text = game.Title;
         PageSubtitle.Text = game.Id switch
@@ -301,24 +309,126 @@ public partial class MainWindow : Window
         FooterText.ToolTip = game.FolderPath;
     }
 
+    private async void PopulateRoomCards(GameLibrary game)
+    {
+        foreach (var roomResource in game.Rooms)
+        {
+            if (!ReferenceEquals(_game, game)) return;
+            var preview = new Image
+            {
+                Stretch = System.Windows.Media.Stretch.Uniform,
+                SnapsToDevicePixels = true,
+                ToolTip = roomResource.Name
+            };
+            RenderOptions.SetBitmapScalingMode(preview, BitmapScalingMode.NearestNeighbor);
+            var button = new Button
+            {
+                Width = 96,
+                Height = 72,
+                Padding = new Thickness(3),
+                Margin = new Thickness(2),
+                Background = new SolidColorBrush(Color.FromRgb(11, 17, 23)),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(64, 82, 96)),
+                BorderThickness = new Thickness(1),
+                Content = preview,
+                ToolTip = $"Open {roomResource.Name}",
+                Tag = roomResource
+            };
+            System.Windows.Automation.AutomationProperties.SetName(button, $"Open {roomResource.Name} background");
+            button.Click += (_, _) => SelectResourceInTree(roomResource);
+            var selectedRoom = _selectedResource?.ResourceId == roomResource.ResourceId ||
+                               _lastViewedRoomResource?.ResourceId == roomResource.ResourceId;
+            if (selectedRoom)
+            {
+                button.BorderBrush = new SolidColorBrush(Color.FromRgb(183, 132, 66));
+                button.BorderThickness = new Thickness(2);
+            }
+            RoomCardList.Children.Add(button);
+
+            try
+            {
+                var decoded = await _roomDecoder.DecodeAsync(roomResource.FilePath);
+                if (!ReferenceEquals(_game, game)) return;
+                preview.Source = CreateBitmap(decoded.Width, decoded.Height,
+                    decoded.Pixels.ToArray(), decoded.Palette);
+            }
+            catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
+            {
+                preview.ToolTip = $"{roomResource.Name} background preview unavailable";
+                button.Content = new TextBlock
+                {
+                    Text = "Preview unavailable",
+                    Foreground = new SolidColorBrush(Color.FromRgb(170, 180, 186)),
+                    FontSize = 10,
+                    TextWrapping = TextWrapping.Wrap,
+                    TextAlignment = TextAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+            }
+        }
+    }
+
+    private bool IsAdvancedMode => AdvancedModeToggle.IsChecked == true;
+
+    private void AdvancedModeToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (!IsAdvancedMode && _selectedResource is { Kind: not ResourceKind.Room })
+        {
+            var returnRoom = _lastViewedRoomResource ?? _game?.Rooms.FirstOrDefault();
+            if (returnRoom is not null) SelectResourceInTree(returnRoom);
+        }
+        UpdateAdvancedMode();
+    }
+
+    private void UpdateAdvancedMode()
+    {
+        var advanced = IsAdvancedMode;
+        var rootGrid = ContentPanel.Parent as Grid;
+        var showRoomDetails = advanced && _selectedResource?.Kind == ResourceKind.Room;
+        if (rootGrid is not null && rootGrid.ColumnDefinitions.Count > 2)
+            rootGrid.ColumnDefinitions[2].Width = new GridLength(showRoomDetails ? 290 : 0);
+        RoomObjectPanel.Visibility = showRoomDetails ? Visibility.Visible : Visibility.Collapsed;
+        Grid.SetColumnSpan(ContentPanel, showRoomDetails ? 1 : 2);
+        ResourceTree.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        RoomCardScroll.Visibility = _game is null || advanced ? Visibility.Collapsed : Visibility.Visible;
+        CameraPanToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        GamePointerToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        GameClickToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        GameKeysToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        VerbAreaToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
+        WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
+            ? Visibility.Visible : Visibility.Collapsed;
+        RoomEntryTraceExpander.Visibility = advanced && !string.IsNullOrWhiteSpace(RoomEntryTraceOutput.Text)
+            ? Visibility.Visible : Visibility.Collapsed;
+        ObjectActionTraceExpander.Visibility = advanced && !string.IsNullOrWhiteSpace(ObjectActionTraceOutput.Text)
+            ? Visibility.Visible : Visibility.Collapsed;
+        ObjectListSection.Visibility = advanced && ObjectList.Children.Count > 0
+            ? Visibility.Visible : Visibility.Collapsed;
+        RoomNavigationPanel.Visibility = advanced && RoomNavigationButtons.Children.Count > 0
+            ? Visibility.Visible : Visibility.Collapsed;
+        ObjectVerbButtons.Visibility = Visibility.Visible;
+        UpdateConnectionsButton();
+    }
+
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         if (e.NewValue is not TreeViewItem { Tag: GameResource resource })
         {
             _selectedResource = null;
             UpdateConnectionsButton();
+            UpdateAdvancedMode();
             if (AudioPanel.Visibility == Visibility.Visible || CostumePanel.Visibility == Visibility.Visible || ScriptPanel.Visibility == Visibility.Visible)
             {
                 StopAudio();
                 AudioPanel.Visibility = Visibility.Collapsed;
                 ScriptPanel.Visibility = Visibility.Collapsed;
                 CostumePanel.Visibility = Visibility.Collapsed;
-                RoomObjectPanel.Visibility = Visibility.Visible;
-                Grid.SetColumnSpan(ContentPanel, 1);
                 PreviewMessage.Visibility = Visibility.Visible;
                 PreviewTitle.Text = "Choose a room or sound";
                 PreviewDescription.Text = "Select a room, costume, or sound to inspect.";
             }
+            UpdateAdvancedMode();
             return;
         }
         StopRoomPan();
@@ -338,6 +448,8 @@ public partial class MainWindow : Window
         RoomPreview.Cursor = Cursors.Arrow;
         ScriptEventButtons.Children.Clear();
         _selectedResource = resource;
+        UpdateRoomCardSelection(resource);
+        UpdateAdvancedMode();
         StatusText.Visibility = Visibility.Visible;
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         UpdateConnectionsButton();
@@ -405,11 +517,13 @@ public partial class MainWindow : Window
         _previewCancellation?.Cancel();
         _previewCancellation = new CancellationTokenSource();
         var token = _previewCancellation.Token;
-        PageTitle.Text = resource.Name;
-        PageSubtitle.Text = "Explore the scene and its possible paths.";
+        PageTitle.Text = "Explore the scene";
+        PageTitle.ToolTip = resource.Name;
+        PageSubtitle.Text = "Original LOOM EGA artwork";
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         PageSubtitle.ToolTip = resource.FilePath;
-        PreviewTitle.Text = resource.Name;
+        PreviewTitle.Text = "Scene";
+        PreviewTitle.ToolTip = resource.Name;
         PreviewDescription.Text = "Reading the room background…";
         PreviewMessage.Visibility = Visibility.Visible;
         StatusText.Visibility = Visibility.Visible;
@@ -461,6 +575,7 @@ public partial class MainWindow : Window
                 if (token.IsCancellationRequested) return;
                 _currentRoom = room;
                 _currentRoomResource = resource;
+                _lastViewedRoomResource = resource;
                 _currentRoomObjectRecords = [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
@@ -480,11 +595,12 @@ public partial class MainWindow : Window
                 StatusText.HorizontalAlignment = HorizontalAlignment.Center;
                 StatusText.Visibility = Visibility.Collapsed;
                 RoomPreview.Visibility = Visibility.Visible;
-                RoomMaskToggle.Visibility = Visibility.Visible;
+                RoomMaskToggle.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
                 ShowWalkBoxToggle();
                 PreviewMessage.Visibility = Visibility.Collapsed;
+                UpdateAdvancedMode();
                 PageSubtitle.Text = "EGA background preview · object and script decoding is not yet verified.";
-                StatusText.Text = $"{resource.Name} ready · {room.Width} × {room.Height}";
+                StatusText.Text = "Background ready";
                 StatusText.ToolTip = "Room background decoded from its individual LFL resource.";
                 return;
             }
@@ -493,6 +609,7 @@ public partial class MainWindow : Window
             if (token.IsCancellationRequested) return;
             _currentRoom = room;
             _currentRoomResource = resource;
+            _lastViewedRoomResource = resource;
             _currentRoomObjectRecords = objectRecords;
             _roomVerbs = _verbReader.ReadAll(bytes, objectRecords);
             _roomObjectNames = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), objectRecords);
@@ -505,10 +622,11 @@ public partial class MainWindow : Window
             StatusText.HorizontalAlignment = HorizontalAlignment.Center;
             StatusText.Visibility = Visibility.Collapsed;
             RoomPreview.Visibility = Visibility.Visible;
-            RoomMaskToggle.Visibility = Visibility.Visible;
+            RoomMaskToggle.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
             ShowWalkBoxToggle();
             PreviewMessage.Visibility = Visibility.Collapsed;
-            StatusText.Text = $"{resource.Name} ready";
+            UpdateAdvancedMode();
+            StatusText.Text = "Scene ready";
             StatusText.ToolTip = $"{room.Width} × {room.Height} · {objectRecords.Count} object records · {objects.Count} images";
         }
         catch (OperationCanceledException) { }
@@ -560,9 +678,10 @@ public partial class MainWindow : Window
                 : string.Join(Environment.NewLine, snapshot.Uncertainties.TakeLast(8));
             AdvanceFrameButton.IsEnabled = snapshot.PendingScripts > 0;
             ObjectsNote.Text = _estimatedObjectIds.Count == 0
-                ? "Click a doorway box to move, or a room image to cycle its artwork. Hotspots run script interactions."
-                : $"{_estimatedObjectIds.Count} scene details use an artwork estimate because the entry state is unresolved{EstimateSummary()}.";
+                ? "Click the scene to explore it. Hover to discover objects and exits."
+                : $"Some scene details are previews; the game state remains unresolved ({_estimatedObjectIds.Count} details).";
             ShowLastObjectAction(resource.ResourceId);
+            UpdateAdvancedMode();
             return;
         }
 
@@ -574,8 +693,8 @@ public partial class MainWindow : Window
         _objectSelection = new RoomObjectSelection(images, _indexedStates, background: _currentRoom);
         _artworkEstimates = [];
         ObjectsNote.Text = images.Count == 0
-            ? $"{records.Count} local object records; no decoded images. The room opens at its pre-entry index state."
-            : $"{records.Count} local object records, {images.Count} stored images. The display uses pre-entry index states, not the first-visit game view. Click an image area to inspect its stored images.";
+            ? "This room has no decoded object art yet."
+            : "Click the artwork to browse stored scene details.";
         try
         {
             var entryScript = _scriptReader.DecodeRoomEntry(resource);
@@ -605,6 +724,7 @@ public partial class MainWindow : Window
             ObjectsNote.Text = $"{records.Count} local object records, {images.Count} stored images. The entry script is unavailable; {_estimatedObjectIds.Count} details use an artwork estimate.";
         }
         UpdateRoomMusicActions();
+        UpdateAdvancedMode();
     }
 
     /// <summary>
@@ -674,8 +794,8 @@ public partial class MainWindow : Window
         if (snapshot.RoomId is int reached && reached != room.ResourceId &&
             _game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } targetRoom)
         {
-            StatusText.Text = $"Entered Room {reached:00}";
-            StatusText.ToolTip = _session.LastAction?.Evidence;
+            StatusText.Text = "You step into another scene.";
+            StatusText.ToolTip = $"Room {reached:00} · " + (_session.LastAction?.Evidence ?? "");
             SelectResourceInTree(targetRoom);
             return;
         }
@@ -702,8 +822,8 @@ public partial class MainWindow : Window
         if (_session.Snapshot.RoomId is not int reached ||
             _game.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom || targetRoom == room)
             return false;
-        StatusText.Text = $"Entered Room {reached:00}";
-        StatusText.ToolTip = _session.LastAction?.Evidence;
+        StatusText.Text = "You step into another scene.";
+        StatusText.ToolTip = $"Room {reached:00} · " + (_session.LastAction?.Evidence ?? "");
         SelectResourceInTree(targetRoom);
         return true;
     }
@@ -719,19 +839,23 @@ public partial class MainWindow : Window
         }
         ObjectActionPanel.Visibility = Visibility.Visible;
         ObjectVerbButtons.Children.Clear();
+        var actionName = _currentRoomObjectRecords.FirstOrDefault(record => record.Id == action.ObjectId) is { } actionObject &&
+                         _roomObjectNames.TryGetValue(actionObject.Id, out var storedName)
+            ? storedName : "Something in the scene";
         ObjectActionNote.Text = action.DestinationRoomId is int target
             ? action.IsGameInput
-                ? $"Entered Room {target:00}: an assumed click went through the game's input scripts (005, 006, 007) to the reached room load. Walks end at once; exploration state remains incomplete."
-                : $"Entered Room {target:00} through the reached room load. This is an exploration action on a state preview; exploration state remains incomplete."
+                ? $"{actionName}: a new scene opened. The game walk remains a preview."
+                : $"{actionName}: a new scene opened in this state preview."
             : _session!.Snapshot.PendingScripts > 0
-                ? "No room load reached; the session has pending scripts. Exploration state remains incomplete."
-            : "Interaction completed without opening another room. Exploration state remains incomplete.";
-        ObjectActionNote.ToolTip = action.Evidence;
+                ? $"{actionName}: action tried; the result is still unresolved."
+            : $"{actionName}: action tried; no scene change was reached.";
+        ObjectActionNote.ToolTip = (action.DestinationRoomId is int destination ? $"Room {destination:00} · " : "") + action.Evidence;
         ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
             string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
             Environment.NewLine + (action.Script?.Format() ?? "Object bytecode unavailable.") +
             Environment.NewLine + (action.Run?.FormatSummary() ?? "No object bytecode was run.");
-        ObjectActionTraceExpander.Visibility = Visibility.Visible;
+        ObjectActionTraceExpander.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
+        UpdateAdvancedMode();
     }
 
     private void ShowObjectVerbChoices(IReadOnlyList<RoomVerbChoice> choices)
@@ -739,9 +863,11 @@ public partial class MainWindow : Window
         ObjectActionPanel.Visibility = Visibility.Visible;
         ObjectActionTraceExpander.Visibility = Visibility.Collapsed;
         ObjectVerbButtons.Children.Clear();
+        var objectName = choices.Count > 0 && _roomObjectNames.TryGetValue(choices[0].Object.Id, out var storedObjectName)
+            ? storedObjectName : "This detail";
         ObjectActionNote.Text = choices.Count == 0
-            ? "No decoded verb entry at this hotspot. Switch to inspection mode to view stored images."
-            : "Choose an interaction. Hover for technical details.";
+            ? "No action is available here yet."
+            : $"{objectName} is part of this scene. Choose an action to explore it.";
         for (var index = 0; index < choices.Count; index++)
         {
             var choice = choices[index];
@@ -877,7 +1003,7 @@ public partial class MainWindow : Window
 
     private void UpdateConnectionsButton()
     {
-        if (_selectedResource is null || _game is not { Id: GameId.Loom, Version: ScummVersion.V3 })
+        if (!IsAdvancedMode || _selectedResource is null || _game is not { Id: GameId.Loom, Version: ScummVersion.V3 })
         {
             ConnectionsButton.Visibility = Visibility.Collapsed;
             return;
@@ -1033,6 +1159,7 @@ public partial class MainWindow : Window
 
     private void SelectResourceInTree(GameResource resource)
     {
+        UpdateRoomCardSelection(resource);
         foreach (var group in ResourceTree.Items.OfType<TreeViewItem>())
         {
             foreach (var item in group.Items.OfType<TreeViewItem>())
@@ -1043,6 +1170,18 @@ public partial class MainWindow : Window
                 item.BringIntoView();
                 return;
             }
+        }
+    }
+
+    private void UpdateRoomCardSelection(GameResource? resource)
+    {
+        foreach (var card in RoomCardList.Children.OfType<Button>())
+        {
+            var selected = Equals(card.Tag, resource);
+            card.BorderBrush = selected
+                ? new SolidColorBrush(Color.FromRgb(183, 132, 66))
+                : new SolidColorBrush(Color.FromRgb(64, 82, 96));
+            card.BorderThickness = selected ? new Thickness(2) : new Thickness(1);
         }
     }
 
@@ -1887,7 +2026,7 @@ public partial class MainWindow : Window
     private void ShowObjectListSection(string heading)
     {
         ObjectListHeader.Text = $"{heading} · {ObjectList.Children.Count}";
-        ObjectListSection.Visibility = ObjectList.Children.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+        ObjectListSection.Visibility = IsAdvancedMode && ObjectList.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void ClearObjectList()
@@ -1928,7 +2067,7 @@ public partial class MainWindow : Window
 
     private void ShowWalkBoxToggle()
     {
-        WalkBoxToggle.Visibility = Visibility.Visible;
+        WalkBoxToggle.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.IsEnabled = _currentWalkBoxes is { Count: > 0 };
         RefreshWalkBoxOverlay();
     }
@@ -2704,7 +2843,7 @@ public partial class MainWindow : Window
         RoomNavigationHeader.Text = $"DOORWAYS · {RoomNavigationButtons.Children.Count}";
         RoomNavigationPanel.ToolTip = "Possible doorways: rooms that decoded hotspot code can load. " +
                                       "A button opens the room directly for exploration; clicking a doorway box on the room runs its script.";
-        RoomNavigationPanel.Visibility = _roomNavigationCandidates.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+        RoomNavigationPanel.Visibility = IsAdvancedMode && _roomNavigationCandidates.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         RoomNavigationToggle.Visibility = _roomNavigationCandidates.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && RoomNavigationToggle.IsChecked == true
             ? Visibility.Visible : Visibility.Collapsed;

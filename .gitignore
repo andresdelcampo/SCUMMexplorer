@@ -17,9 +17,20 @@ Exe/
 *.suo
 
 # Generated verification output
+.verification/**/*.png
+.verification/**/*.bmp
+.verification/**/*.txt
+.verification/**/*.log
+.verification/**/*.tsv
+.verification/**/*.csv
 .verification/verify.log
 .verification/room-audit/*.bmp
 .verification/fallback-evidence/code.tsv
+
+# UI refresh runs include extensionless reports as well as captures.
+# Keep the written summary; generated evidence stays available locally.
+.verification/ui-refresh-*/**
+!.verification/ui-refresh-complete/validation.md
 
 # Room presentation: keep the reproducible harness and final text evidence only.
 # Screenshots, interim reports and future rerun directories remain local.

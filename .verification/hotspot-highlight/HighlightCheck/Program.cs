@@ -41,6 +41,12 @@ internal static class Program
                 var tree = (TreeView)window.FindName("ResourceTree");
                 var overlay = (Canvas)window.FindName("HotspotHighlightOverlay");
                 var list = (Panel)window.FindName("ObjectList");
+                // Hotspot rows are an Advanced-mode catalog; normal-mode pointer discovery
+                // is covered separately by PointerInputCheck.
+                var advanced = (CheckBox)window.FindName("AdvancedModeToggle");
+                advanced.IsChecked = true;
+                Call("AdvancedModeToggle_Click", advanced, new RoutedEventArgs());
+                ((Expander)window.FindName("ObjectListSection")).IsExpanded = true;
                 foreach (var room in args.Skip(2).Select(int.Parse))
                 {
                     var item = tree.Items.OfType<TreeViewItem>().SelectMany(g => g.Items.OfType<TreeViewItem>())

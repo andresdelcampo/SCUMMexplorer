@@ -78,8 +78,9 @@ internal static class Program
                       Traced("Script 07 +0x002E: startObject runs object 153 verb 0x38"),
                     "on: the trace shows runInputScript → script 005 → script 006 → script 007 → object 153 verb 0x38");
                 var note = (TextBlock)window.FindName("ObjectActionNote");
-                Check(note.IsVisible && note.Text.Contains("assumed click went through the game's input scripts", StringComparison.Ordinal),
-                    $"on: the room's action note labels the arrival as an assumed click through the game's input: \"{note.Text}\" (status \"{status.Text}\")");
+                Check(note.IsVisible && note.Text.Contains("new scene", StringComparison.OrdinalIgnoreCase) &&
+                      note.Text.Contains("preview", StringComparison.OrdinalIgnoreCase),
+                    $"on: the contextual action card labels the scene change and preview limits: \"{note.Text}\" (status \"{status.Text}\")");
                 Save("room-03-after-click.png");
 
                 // The double-click timer: a queued single click is sent once the double-click time passes.
