@@ -1,4 +1,6 @@
-﻿namespace SCUMMexplorer.Core.Formats;
+﻿using SCUMMexplorer.Core.Rendering;
+
+namespace SCUMMexplorer.Core.Formats;
 
 /// <summary>
 /// What the session knows about one actor (ScummVM <c>Actor</c>, small-header
@@ -10,6 +12,26 @@ public sealed record LoomActorSnapshot(int Number, int? Room, int? X, int? Y, in
     bool? IgnoreBoxes, string? Unknown, string? Estimate)
 {
     public bool PositionKnown => Room is not null && X is not null && Y is not null && WalkBox is not null && Visible is not null;
+
+    /// <summary>How the actor looks: costume, elevation, facing, frame and limb state (M2b).</summary>
+    public LoomActorLook Look { get; init; } = LoomActorLook.Initial;
+}
+
+/// <summary>
+/// The actor's costume state (ScummVM <c>Actor</c> fields set by <c>actorOps</c>, <c>animateActor</c>,
+/// <c>faceActor</c> and the walk): costume number, elevation, walk speed, the init/walk/stand/talk frames,
+/// the 16-entry palette, the facing in degrees and the last started frame. <see cref="Animation"/> is a copy
+/// of the limb state. A null value is unknown; <see cref="Estimate"/> says why a known value may differ.
+/// </summary>
+public sealed record LoomActorLook(int? Costume, int? Elevation, int? Facing, int? Frame,
+    int InitFrame, int WalkFrame, int StandFrame, int TalkStartFrame, int TalkStopFrame,
+    int WalkSpeedX, int WalkSpeedY, IReadOnlyList<byte> Palette, LoomCostumeAnimationState Animation, string? Estimate)
+{
+    public static LoomActorLook Initial { get; } = new(0, 0, 180, 0, 1, 2, 3, 4, 5, 8, 2, new byte[16],
+        new LoomCostumeAnimationState(), null);
+
+    /// <summary>ScummVM <c>newDirToOldDir</c> of the facing: 0 left, 1 right, 2 down, 3 up.</summary>
+    public int? Direction => Facing is int facing ? LoomCostume.NewDirToOldDir(facing) : null;
 }
 
 /// <summary>
@@ -59,6 +81,10 @@ public sealed class LoomActorTable
         actor.LastValidX = actor.LastValidY = 0;
         actor.IgnoreBoxes = false;
         actor.TalkColor = DefaultTalkColor;
+        // Actor::initActor(0) for v3: elevation 0, walk speed (8, 2), frames 1-5; the facing and costume stay.
+        actor.Elevation = 0;
+        (actor.WalkSpeedX, actor.WalkSpeedY) = (8, 2);
+        (actor.InitFrame, actor.WalkFrame, actor.StandFrame, actor.TalkStartFrame, actor.TalkStopFrame) = (1, 2, 3, 4, 5);
     }
 
     /// <summary>ScummVM <c>initActor</c>: every mode sets <c>_talkColor</c> to 15.</summary>
@@ -92,7 +118,11 @@ public sealed class LoomActorTable
             actor.Unknown ??= "its room is unknown";
             return;
         }
-        if (room == place.CurrentRoom) AdjustPosition(actor, place, show: true);
+        if (room == place.CurrentRoom)
+        {
+            AdjustPosition(actor, place, show: true);
+            ShowCostume(actor, place);
+        }
         else actor.Visible = false;
     }
 
@@ -121,12 +151,18 @@ public sealed class LoomActorTable
     }
 
     /// <summary>
-    /// <c>setActorCostume</c> for old costumes: a visible actor is hidden and
-    /// shown again, which re-adjusts its position into the walk boxes.
+    /// <c>setActorCostume</c> for old costumes: the limb state is reset, the palette becomes 0-15 and the
+    /// costume needs its init frame. A visible actor is hidden and shown again, which re-adjusts its position
+    /// into the walk boxes and starts the init frame (<c>showActor</c>). A null costume is unknown.
     /// </summary>
-    public void CostumeChanged(int number, Placement place)
+    public void CostumeChanged(int number, int? costume, Placement place)
     {
         var actor = _actors[number];
+        actor.CostumeNeedsInit = true;
+        actor.Costume = costume;
+        actor.Animation.Reset();
+        actor.LookEstimate = costume is null ? "its costume is unknown" : null;
+        for (var i = 0; i < 16; i++) actor.Palette[i] = (byte)i;
         if (actor.Visible == false) return;
         if (actor.Visible is null)
         {
@@ -135,6 +171,195 @@ public sealed class LoomActorTable
             return;
         }
         AdjustPosition(actor, place, show: true);
+        ShowCostume(actor, place);
+    }
+
+    /// <summary>actorOps <c>elevation</c> (ScummVM <c>setElevation</c>); null is unknown.</summary>
+    public void SetElevation(int number, int? elevation) => _actors[number].Elevation = elevation;
+
+    /// <summary>actorOps <c>walkSpeed</c> (<c>setActorWalkSpeed</c>).</summary>
+    public void SetWalkSpeed(int number, int x, int y) => (_actors[number].WalkSpeedX, _actors[number].WalkSpeedY) = (x, y);
+
+    /// <summary>actorOps <c>palette i, c</c>: costume colour i draws EGA colour c.</summary>
+    public void SetPalette(int number, int index, int color)
+    {
+        if (index is >= 0 and < 16) _actors[number].Palette[index] = (byte)color;
+    }
+
+    /// <summary>actorOps <c>initAnimation</c>, <c>walkAnimation</c>, <c>standAnimation</c> and <c>talkAnimation</c> (start, stop).</summary>
+    public void SetFrame(int number, string kind, int frame)
+    {
+        var actor = _actors[number];
+        switch (kind)
+        {
+            case "init": actor.InitFrame = frame; break;
+            case "walk": actor.WalkFrame = frame; break;
+            case "stand": actor.StandFrame = frame; break;
+            case "talkStart": actor.TalkStartFrame = frame; break;
+            case "talkStop": actor.TalkStopFrame = frame; break;
+        }
+    }
+
+    /// <summary>Reads costume data for the limb state (the session supplies it; tests may leave it unset).</summary>
+    public Func<int, LoomCostume?>? CostumeSource { get; set; }
+
+    private readonly Dictionary<int, LoomCostume?> _costumes = [];
+
+    /// <summary>The costume data for an id, read once (null when it cannot be read).</summary>
+    public LoomCostume? CostumeData(int id)
+    {
+        if (_costumes.TryGetValue(id, out var costume)) return costume;
+        try
+        {
+            costume = CostumeSource?.Invoke(id);
+        }
+        catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException)
+        {
+            costume = null;
+        }
+        return _costumes[id] = costume;
+    }
+
+    private static bool InRoom(Actor actor, Placement place) => actor.Room is int room && room == place.CurrentRoom;
+
+    /// <summary>
+    /// ScummVM <c>Actor::startAnimActor</c> for v3: frames 56-60 redirect to the init, walk, stand, talk-start and
+    /// talk-stop frames. Only an actor in the current room with a costume changes: the init frame resets the limbs,
+    /// then <c>costumeDecodeData(frame)</c> starts the frame's animation for the actor's facing on every limb.
+    /// </summary>
+    public void StartAnimation(int number, int frame, Placement place) => StartAnimation(_actors[number], frame, place);
+
+    private void StartAnimation(Actor actor, int frame, Placement place)
+    {
+        frame = frame switch
+        {
+            56 => actor.InitFrame,
+            57 => actor.WalkFrame,
+            58 => actor.StandFrame,
+            59 => actor.TalkStartFrame,
+            60 => actor.TalkStopFrame,
+            _ => frame
+        };
+        if (!InRoom(actor, place) || actor.Costume == 0) return;
+        if (actor.Costume is not int costumeId || actor.Facing is not int facing)
+        {
+            actor.Frame = frame;
+            actor.LookEstimate ??= actor.Costume is null ? "its costume is unknown" : "its facing is unknown";
+            return;
+        }
+        actor.Animation.AnimationCounter = 0;
+        if (frame == actor.InitFrame) actor.Animation.Reset();
+        CostumeData(costumeId)?.DecodeAnimation(actor.Animation, frame, LoomCostume.NewDirToOldDir(facing));
+        actor.Frame = frame;
+    }
+
+    /// <summary>
+    /// ScummVM <c>Actor::animateActor</c> for v3: <c>chore = 0x3F - (n &gt;&gt; 2) + 2</c>, <c>dir = n &amp; 3</c>.
+    /// Chore 2 (0xFC-0xFF) starts the stand frame (in the current room); 3 (0xF8-0xFB) sets the direction;
+    /// 4 (0xF4-0xF7) turns to it; any other value starts frame n. Returns what it did, for the trace.
+    /// </summary>
+    public string Animate(int number, int value, Placement place)
+    {
+        var actor = _actors[number];
+        var chore = 0x3F - (value >> 2) + 2;
+        var direction = LoomCostume.OldDirToNewDir(value & 3);
+        switch (chore)
+        {
+            case 2:
+                if (InRoom(actor, place)) StartAnimation(actor, actor.StandFrame, place);
+                return "stop: stand frame";
+            case 3:
+                SetDirection(actor, direction, place);
+                return $"face {direction}";
+            case 4:
+                if (InRoom(actor, place)) TurnTo(actor, direction, place);
+                return $"turn to {direction}";
+            default:
+                StartAnimation(actor, value, place);
+                return $"frame {value}";
+        }
+    }
+
+    /// <summary>
+    /// ScummVM <c>Actor::setDirection</c>: the new facing, and for an actor in the current room with a costume,
+    /// each limb whose animation's direction differs restarts that animation's frame for the new direction.
+    /// </summary>
+    public void SetDirection(int number, int facing, Placement place) => SetDirection(_actors[number], facing, place);
+
+    private void SetDirection(Actor actor, int facing, Placement place)
+    {
+        facing = ((facing % 360) + 360) % 360;
+        if (actor.Facing == facing) return;
+        actor.Facing = facing;
+        if (actor.Costume == 0 || !InRoom(actor, place)) return;
+        if (actor.Costume is not int costumeId || CostumeData(costumeId) is not { } costume) return;
+        var direction = LoomCostume.NewDirToOldDir(facing);
+        for (var limb = 0; limb < 16; limb++)
+        {
+            var animation = actor.Animation.Animation[limb];
+            if (animation == LoomCostumeAnimationState.None || (animation & 3) == direction) continue;
+            costume.DecodeAnimation(actor.Animation, animation >> 2, direction, (uint)(0x8000 >> limb));
+        }
+    }
+
+    /// <summary>
+    /// <c>turnToDirection</c>: ScummVM turns over the next frames (<c>MF_TURN</c>); the preview sets the new
+    /// direction at once and says so.
+    /// </summary>
+    private void TurnTo(Actor actor, int facing, Placement place)
+    {
+        if (actor.Facing == facing) return;
+        SetDirection(actor, facing, place);
+        actor.LookEstimate = $"the turn to {facing} is taken to end at once (the turn's frames are not simulated)";
+    }
+
+    /// <summary>
+    /// ScummVM <c>Actor::faceToObject</c> for v3: right or left of the target, or down or up when the x distance
+    /// is under half the target's width; only for an actor in the current room.
+    /// </summary>
+    public void FaceTo(int number, int x, int y, int width, Placement place)
+    {
+        var actor = _actors[number];
+        if (!InRoom(actor, place) || actor.X is not int ax || actor.Y is not int ay) return;
+        var direction = ax < x ? 1 : 0;
+        if (Math.Abs(ax - x) < width / 2) direction = ay > y ? 3 : 2;
+        TurnTo(actor, LoomCostume.OldDirToNewDir(direction), place);
+    }
+
+    /// <summary>
+    /// <c>runActorTalkScript</c> without a talk script: the talk-start frame when a message starts for the actor,
+    /// the talk-stop frame at <c>stopTalk</c>; only in the current room and when the frame differs.
+    /// </summary>
+    public void TalkAnimation(int number, bool start, Placement place)
+    {
+        if (!IsValid(number)) return;
+        var actor = _actors[number];
+        var frame = start ? actor.TalkStartFrame : actor.TalkStopFrame;
+        if (!InRoom(actor, place) || actor.Frame == frame) return;
+        StartAnimation(actor, frame, place);
+    }
+
+    /// <summary>
+    /// The end of <c>processActors</c> for one frame: <c>animateCostume</c> (animation speed 0) steps the limbs of
+    /// every actor in the current room with a costume. Returns the actors whose drawn image changed.
+    /// </summary>
+    public IReadOnlyList<int> AnimateCostumes(Placement place)
+    {
+        var changed = new List<int>();
+        foreach (var actor in _actors.Skip(1))
+        {
+            if (!InRoom(actor, place) || actor.Costume is not int costumeId || costumeId == 0) continue;
+            if (CostumeData(costumeId)?.IncreaseAnimations(actor.Animation) == true) changed.Add(actor.Number);
+        }
+        return changed;
+    }
+
+    /// <summary><c>showActor</c> (v3): a costume that needs init starts its init frame.</summary>
+    private void ShowCostume(Actor actor, Placement place)
+    {
+        if (!actor.CostumeNeedsInit || actor.Costume == 0) return;
+        StartAnimation(actor, actor.InitFrame, place);
+        actor.CostumeNeedsInit = false;
     }
 
     /// <summary>
@@ -202,6 +427,16 @@ public sealed class LoomActorTable
         var fromAnywhere = actor.IgnoreBoxes == true || (place.Boxes is { } boxes &&
             Enumerable.Range(0, boxes.Count).All(box => box == endBox || boxes.GetNextBox(box, endBox) >= 0));
         if (actor.X == endX && actor.Y == endY && !(fromAnywhere && actor.Estimate is not null && !actor.EstimateIsWalk)) return;
+        if (actor.X is int startX && actor.Y is int startY && (startX != endX || startY != endY))
+        {
+            // The walk's last step faces along its last leg (calcMovementFactor, facing ratio 1), then
+            // walkActor starts the stand frame. The preview takes the whole walk as one leg.
+            var (dx, dy) = (endX - startX, endY - startY);
+            var direction = Math.Abs(dy) > Math.Abs(dx) ? dy >= 0 ? 2 : 3 : dx >= 0 ? 1 : 0;
+            SetDirection(actor, LoomCostume.OldDirToNewDir(direction), place);
+            StartAnimation(actor, actor.StandFrame, place);
+            actor.LookEstimate = $"after {label}, it faces {LoomCostume.OldDirToNewDir(direction)} along the whole walk (the path's last leg is not simulated)";
+        }
         actor.X = endX;
         actor.Y = endY;
         actor.WalkBox = endBox;
@@ -262,7 +497,11 @@ public sealed class LoomActorTable
                 actor.WalkBox = null;
                 continue;
             }
-            if (actor.Room == place.CurrentRoom && actor.Visible != true) AdjustPosition(actor, place, show: true);
+            if (actor.Room == place.CurrentRoom && actor.Visible != true)
+            {
+                AdjustPosition(actor, place, show: true);
+                ShowCostume(actor, place);
+            }
         }
         EgoPositioned = false;
     }
@@ -335,6 +574,22 @@ public sealed class LoomActorTable
         public int? LastValidX { get; set; } = 0;
         public int? LastValidY { get; set; } = 0;
         public string? Unknown { get; set; }
+        // Costume state (initActor(-1), Actor::initActor and setActorCostume for v3).
+        public int? Costume { get; set; } = 0;
+        public int? Elevation { get; set; } = 0;
+        public int? Facing { get; set; } = 180;
+        public int? Frame { get; set; } = 0;
+        public int InitFrame { get; set; } = 1;
+        public int WalkFrame { get; set; } = 2;
+        public int StandFrame { get; set; } = 3;
+        public int TalkStartFrame { get; set; } = 4;
+        public int TalkStopFrame { get; set; } = 5;
+        public int WalkSpeedX { get; set; } = 8;
+        public int WalkSpeedY { get; set; } = 2;
+        public byte[] Palette { get; } = new byte[16];
+        public bool CostumeNeedsInit { get; set; }
+        public LoomCostumeAnimationState Animation { get; } = new();
+        public string? LookEstimate { get; set; }
         public string? Estimate
         {
             get => _estimate;
@@ -359,6 +614,10 @@ public sealed class LoomActorTable
         public LoomActorSnapshot ToSnapshot() =>
             new(Number, Room, X, Y, WalkBox, Visible, IgnoreBoxes,
                 Room is null || X is null || Y is null || WalkBox is null || Visible is null ? Unknown ?? "not known" : null,
-                Estimate);
+                Estimate)
+            {
+                Look = new LoomActorLook(Costume, Elevation, Facing, Frame, InitFrame, WalkFrame, StandFrame,
+                    TalkStartFrame, TalkStopFrame, WalkSpeedX, WalkSpeedY, Palette.ToArray(), Animation.Clone(), LookEstimate)
+            };
     }
 }

@@ -110,6 +110,8 @@ public sealed class LoomExplorationSession
         _globalScriptCount = ReadGlobalScriptCount(game);
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.OverrideChanged = RecordOverride;
+        _runtime.Actors.CostumeSource = id => LoomCostume.Load(game, id);
+        _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
         {
@@ -1069,6 +1071,8 @@ public sealed class LoomExplorationSession
     {
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
+        // processActors ends the previous frame: animateCostume steps the limbs of the actors in the room.
+        _runtime.Actors.AnimateCostumes(CurrentPlacement());
         _runtime.Messages.StartFrame(FrameJiffies, _runtime);
         PlaceVirtualMouse();
         var beforeEvents = _visitEvents.Count;

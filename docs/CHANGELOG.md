@@ -64,6 +64,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | Room view checks fixed | The first room opened starts at the game's camera (it started at x 0); VerbAreaCheck's "off again" updated to the refreshed layout and the M1c verb screen. CameraPanCheck 2 → 0 failures, VerbAreaCheck 1 → 0 | [view checks](../.verification/view-checks/validation.md) |
 | Object names under their close-up | `drawBox` (script 008) now covers earlier names, so one name shows at a time; the verb screen draws the verb slots with its text, so the close-up is above the name. Tests 207/207; MessageAppCheck, VerbAreaCheck, ClickInputCheck 0 failures | [names](../.verification/messages-app/names/validation.md) |
 | M2a costume animation (Core) | `LoomCostume` starts, steps (loop or hold) and draws each limb as ScummVM's `ClassicCostumeLoader`; Bobbin's costume 1 stand, walk and talk frames rendered to PNG. Tests 212/212; no UI change yet | [costume animation](../.verification/costume-anim/validation.md) |
+| M2b actor state (Core) | The actor table keeps costume, elevation, walk speed, frames, palette, facing and limb state; `animateActor`, `faceActor`, talk frames and the per-frame limb step apply them; `getActorCostume`/`getActorElevation`/`getActorFacing` answer. After the boot the ego has costume 1 without the distaff (frames 8–15). Tests 216/216; Blockers: only `expression` (3) stops; RoomAudit 0 gaps, renders unchanged | [actor state](../.verification/actor-state/validation.md) |
 
 ## State at the end of 28 September
 

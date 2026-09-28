@@ -58,7 +58,8 @@ public sealed class LoomBootTests
         // Script 044 +0x01C8 and +0x0215: startScript local[0x001] with local[0x001] = 0xC8..0xD0
         // (getVarOrDirectByte). The second loop restarts each copy (runScript, not recursive).
         Assert.DoesNotContain(snapshot.Uncertainties, line => line.Contains("dynamic target", StringComparison.Ordinal));
-        Assert.Contains(snapshot.Uncertainties, line => line.StartsWith("Room 01 local script 208 +0x0000", StringComparison.Ordinal));
+        // Local 208's only limitation was its animateActor, which the actor table applies since M2b.
+        Assert.DoesNotContain(snapshot.Uncertainties, line => line.StartsWith("Room 01 local script 208 +0x0000", StringComparison.Ordinal));
         Assert.Contains("script 208 started again: runScript ended its running copy first", session.SessionTrace);
         Assert.Contains("stopScript 200 at Script 44 +0x041B: ended its pending run", session.SessionTrace);
     }

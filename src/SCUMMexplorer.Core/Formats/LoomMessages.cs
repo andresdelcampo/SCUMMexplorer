@@ -340,6 +340,14 @@ public sealed class LoomMessageTable
     /// </summary>
     public void SkipTalkDelay() => TalkDelay = 0;
 
+    /// <summary>
+    /// Runs an actor's talk frame (<c>runActorTalkScript</c>): true for the talk-start frame when a chunk of its
+    /// text starts, false for the talk-stop frame at <c>stopTalk</c>. The session connects it to the actor table.
+    /// </summary>
+    public Action<int, bool>? TalkAnimation { get; set; }
+
+    private bool _useTalkAnims;
+
     /// <summary><c>startScene</c>: <c>stopTalk</c>, and the room redraw erases drawn strings.</summary>
     public void RoomEntered(LoomScriptRuntimeState runtime)
     {
@@ -351,6 +359,9 @@ public sealed class LoomMessageTable
     /// <summary>ScummVM <c>stopTalk</c>: no message, no delay, no talking actor, and the text is erased.</summary>
     private void StopTalk()
     {
+        // stopTalk (v3): the talking actor in the current room goes back to its talk-stop frame.
+        if (_useTalkAnims && TalkingActor != NoActor) TalkAnimation?.Invoke(TalkingActor, false);
+        _useTalkAnims = false;
         HaveMsg = 0;
         TalkDelay = 0;
         TalkingActor = NoActor;
@@ -368,6 +379,12 @@ public sealed class LoomMessageTable
         {
             StopTalk();
             return;
+        }
+        // The talking actor starts its talk frame when text follows (LOOM DOS: not for an empty string).
+        if (TalkingActor != NoActor && _bufferPos < _buffer.Count && _buffer[_bufferPos] != 0)
+        {
+            TalkAnimation?.Invoke(TalkingActor, true);
+            _useTalkAnims = true;
         }
         TalkDelay = DefaultTalkDelay;
         if (!_keepText) _shown.Clear();

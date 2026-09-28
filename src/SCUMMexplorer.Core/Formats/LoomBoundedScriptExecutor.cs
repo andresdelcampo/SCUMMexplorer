@@ -186,7 +186,7 @@ public sealed class LoomBoundedScriptExecutor
                     {
                         var possibleEvent = LoomScriptEvent.FromInstruction(script, possible, LoomScriptEventCertainty.Conditional);
                         if (possibleEvent is not null) events.Add(possibleEvent);
-                        if (runtime is not null && IsActorPlacement(possible.Operation))
+                        if (runtime is not null && IsActorPlacement(possible.Operation) && possible.Operation is not ("animateActor" or "faceActor"))
                             ForgetPossiblePlacement(possible, runtime, knownVariables, instruction.Offset);
                     }
                     pc = join;
@@ -1027,11 +1027,12 @@ public sealed class LoomBoundedScriptExecutor
     }
 
     private static bool IsActorQuery(string operation) => operation is
-        "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom";
+        "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom" or
+        "getActorCostume" or "getActorElevation" or "getActorFacing";
 
     private static bool IsActorPlacement(string operation) => operation is
         "putActor" or "putActorAtObject" or "putActorInRoom" or "walkActorTo" or "walkActorToObject" or
-        "walkActorToActor" or "actorOps" or "setBoxFlags";
+        "walkActorToActor" or "actorOps" or "setBoxFlags" or "animateActor" or "faceActor";
 
     /// <summary>ScummVM <c>OF_OWNER_ROOM</c>: the object lies in a room, not in an inventory.</summary>
     private const int RoomOwner = 0x0F;
@@ -1142,6 +1143,11 @@ public sealed class LoomBoundedScriptExecutor
         var numberOperand = instruction.Operation == "actorOps" ? operands[..Math.Max(0, operands.IndexOf(", [", StringComparison.Ordinal))] : parts[0];
         if (!TryReadValue(numberOperand, variables, out var rawNumber, out _))
         {
+            if (instruction.Operation is "animateActor" or "faceActor")
+            {
+                trace.Add($"{label}: unknown actor number; no actor's frame or facing is changed");
+                return;
+            }
             actors.ForgetAll($"{label} names an actor the preview cannot read ({numberOperand})");
             trace.Add($"{label}: unknown actor number; every actor's position is now unknown");
             return;
@@ -1219,17 +1225,63 @@ public sealed class LoomBoundedScriptExecutor
                         else if (room == place.CurrentRoom) actors.Replace(number, place, ego);
                     }
                     else if (item.StartsWith("costume", StringComparison.Ordinal))
-                        actors.CostumeChanged(number, place);
+                        actors.CostumeChanged(number, ReadItem(item, 1), place);
                     else if (item.StartsWith("talkColor,", StringComparison.Ordinal) &&
                              TryReadValue(item["talkColor,".Length..].Trim(), variables, out var talkColor, out _))
                         actors.SetTalkColor(number, talkColor & 0xFF);
+                    else if (item.StartsWith("elevation,", StringComparison.Ordinal))
+                        actors.SetElevation(number, ReadItem(item, 1) is int elevation ? (short)elevation : null);
+                    else if (item.StartsWith("walkSpeed,", StringComparison.Ordinal) && ReadItem(item, 1) is int speedX && ReadItem(item, 2) is int speedY)
+                        actors.SetWalkSpeed(number, speedX & 0xFF, speedY & 0xFF);
+                    else if (item.StartsWith("palette,", StringComparison.Ordinal) && ReadItem(item, 1) is int index && ReadItem(item, 2) is int color)
+                        actors.SetPalette(number, index & 0xFF, color & 0xFF);
+                    else if (item.StartsWith("talkAnimation,", StringComparison.Ordinal))
+                    {
+                        if (ReadItem(item, 1) is int talkStart) actors.SetFrame(number, "talkStart", talkStart & 0xFF);
+                        if (ReadItem(item, 2) is int talkStop) actors.SetFrame(number, "talkStop", talkStop & 0xFF);
+                    }
+                    else if (item.Split(',')[0] is "initAnimation" or "walkAnimation" or "standAnimation" && ReadItem(item, 1) is int frame)
+                        actors.SetFrame(number, item.Split(',')[0][..^"Animation".Length], frame & 0xFF);
                 }
                 break;
+            case "animateActor":
+                if (Read(1) is not int animation)
+                {
+                    trace.Add($"{label}: actor {number}'s animation value is unknown; its frame is not changed");
+                    return;
+                }
+                trace.Add($"actor {number}: {label} 0x{animation & 0xFF:X2} ({actors.Animate(number, animation & 0xFF, place)})");
+                return;
+            case "faceActor":
+            {
+                // o5_faceActor: faceToObject(obj), with an actor's position and width (24) or the object's walk point and width.
+                if (Read(1) is not int target) break;
+                int? x = null, y = null, width = null;
+                if (LoomActorTable.IsValid(target))
+                {
+                    (x, y, width) = (actors[target].X, actors[target].Y, 24);
+                    if (actors[target].Room != place.CurrentRoom) break;
+                }
+                else
+                {
+                    var record = roomObjects.FirstOrDefault(item => item.Id == target);
+                    if (record is null) break;
+                    (x, y, width) = (record.WalkX, record.WalkY, record.Width);
+                }
+                if (x is int faceX && y is int faceY && width is int faceWidth) actors.FaceTo(number, faceX, faceY, faceWidth, place);
+                break;
+            }
         }
         if (estimate) actors.MarkEstimate(number, $"actor {number}'s {label} follows a seeded pick");
         var state = actors[number];
         trace.Add($"actor {number}: {label} → room {Show(state.Room)}, ({Show(state.X)}, {Show(state.Y)}), box {Show(state.WalkBox)}, " +
                   $"{(state.Visible is bool visible ? visible ? "visible" : "hidden" : "visibility unknown")}{(state.Estimate is null ? "" : " (estimate)")}");
+
+        int? ReadItem(string item, int index)
+        {
+            var itemParts = item.Split(',', StringSplitOptions.TrimEntries);
+            return itemParts.Length > index && TryReadValue(itemParts[index], variables, out var value, out _) ? value : null;
+        }
     }
 
     /// <summary>
@@ -1359,12 +1411,32 @@ public sealed class LoomBoundedScriptExecutor
             "getActorWalkBox" => actor.WalkBox,
             "getActorRoom" => actor.Room,
             "getActorX" => actor.X,
+            // o5_getActorCostume/Elevation; o5_getActorFacing gives newDirToOldDir(facing).
+            "getActorCostume" => actor.Look.Costume,
+            "getActorElevation" => actor.Look.Elevation,
+            "getActorFacing" => actor.Look.Direction,
             _ => actor.Y
         };
         if (value is null)
         {
-            detail = $"{operation} reads actor {number}, whose {(operation == "getActorWalkBox" ? "walk box" : operation == "getActorRoom" ? "room" : "position")} the preview does not know ({actor.Unknown ?? "not known"})";
+            var what = operation switch
+            {
+                "getActorWalkBox" => "walk box",
+                "getActorRoom" => "room",
+                "getActorCostume" => "costume",
+                "getActorElevation" => "elevation",
+                "getActorFacing" => "facing",
+                _ => "position"
+            };
+            detail = $"{operation} reads actor {number}, whose {what} the preview does not know ({actor.Look.Estimate ?? actor.Unknown ?? "not known"})";
             return false;
+        }
+        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing")
+        {
+            answer = value.Value;
+            if (operation == "getActorFacing" && actor.Look.Estimate is not null) estimate = $"actor {number}: {actor.Look.Estimate}";
+            detail = "known value";
+            return true;
         }
         answer = value.Value;
         if (actor.Estimate is not null) estimate = $"actor {number}: {actor.Estimate}";
