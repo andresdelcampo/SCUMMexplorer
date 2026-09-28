@@ -820,7 +820,9 @@ internal static class LoomScriptDisassembler
                 0x0A => "defaultAnimations",
                 0x0B => Join("palette", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
                 0x0C => Join("talkColor", ReadParam(cursor, 1, sub, 0x80)),
-                0x0D => "actorName",
+                // o5_actorOps loads an inline, zero-terminated resource string
+                // for SO_ACTOR_NAME (loadPtrToResource), even when it is empty.
+                0x0D => Join("actorName", ReadScummString(cursor)),
                 0x0E => Join("initAnimation", ReadParam(cursor, 1, sub, 0x80)),
                 0x10 => Join("width", ReadParam(cursor, 1, sub, 0x80)),
                 0x11 => Join("scale", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),

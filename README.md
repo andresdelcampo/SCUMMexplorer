@@ -26,6 +26,8 @@ The explorer is still partial. The text gallery decodes stored strings from inde
 
 Stored text extraction also covers Indiana Jones and the Last Crusade EGA, whose scripts use a slightly different opcode dialect (`wait`, `waitForActor` and `getActorX/Y` operands). Its multiple-choice dialogue labels are grouped as **Dialogue choices**, each followed by the replies spoken in its selection branch. This is a bounded text preview, not Indy gameplay execution.
 
+The standalone conversation map at `Games/indy3/indy3-conversations.html` expands the decoded choice menus into collapsible, source-linked branches and embeds the original EGA room backgrounds. Regenerate it from a supplied EGA folder with `rtk proxy dotnet run --project tools/Indy3ConversationExport/Indy3ConversationExport.csproj -- Games/indy3/EGA`; the tool also writes a `.graph.json` audit beside the HTML. Conditional state is left unevaluated, unresolved script activation is marked, and the map does not assign outcomes or a preferred path.
+
 ## Documentation
 
 | Document | Purpose |

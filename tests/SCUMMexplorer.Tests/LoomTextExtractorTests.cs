@@ -118,9 +118,15 @@ public sealed class LoomTextExtractorTests
         var entries = new LoomTextExtractor().Extract(game).Entries;
         var choices = entries.Where(entry => entry.Kind == "Verb label").ToArray();
 
-        Assert.Contains(choices, entry => entry.Text == "Excuse me, but I've got to be going.");
-        Assert.Contains(choices, entry => entry.Text == "Out of my way, kids!");
-        var excuse = choices.First(entry => entry.Text == "Excuse me, but I've got to be going.");
+        // The supplied fixture may be the English or Spanish EGA edition.
+        // Keep exact paired strings so a decoder regression cannot pass merely
+        // by finding arbitrary menu labels in either language.
+        var spanish = choices.Any(entry => entry.Text == "Perdon, pero tengo que irme.");
+        var excuseText = spanish ? "Perdon, pero tengo que irme." : "Excuse me, but I've got to be going.";
+        var kidsText = spanish ? "¡ Apartaros de mi camino, chicos !" : "Out of my way, kids!";
+        Assert.Contains(choices, entry => entry.Text == excuseText);
+        Assert.Contains(choices, entry => entry.Text == kidsText);
+        var excuse = choices.First(entry => entry.Text == excuseText);
         Assert.Equal(LoomTextExtractor.ChoiceConversationKind, excuse.ConversationKind);
         Assert.True(excuse.IsPlayerChoice);
 

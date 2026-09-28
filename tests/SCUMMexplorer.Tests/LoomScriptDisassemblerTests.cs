@@ -119,4 +119,29 @@ public sealed class LoomScriptDisassemblerTests
     }
 
 
+    [Theory]
+    [InlineData(ScummScriptDialect.Loom)]
+    [InlineData(ScummScriptDialect.Indy3)]
+    public void ActorNameConsumesInlineStringBeforeFollowingSubcommands(ScummScriptDialect dialect)
+    {
+        // Compact actor op 15 maps to SO_ACTOR_NAME; 14 sets talk colour.
+        byte[] code = [0x13, 0x01, 0x0F, (byte)'I', (byte)'n', (byte)'d', (byte)'y', 0,
+            0x0E, 0x0F, 0xFF, 0x00];
+        var result = LoomScriptDisassembler.Disassemble(code, dialect);
+
+        Assert.Empty(result.Issues);
+        Assert.Contains("actorName, \"Indy\"", result.Instructions[0].Operands);
+        Assert.Contains("talkColor, 0x0F", result.Instructions[0].Operands);
+        Assert.Equal("stopObjectCode", result.Instructions[1].Operation);
+        Assert.Equal(11, result.Instructions[1].Offset);
+    }
+
+    [Fact]
+    public void EmptyActorNameStillConsumesItsTerminator()
+    {
+        var result = LoomScriptDisassembler.Disassemble([0x13, 0x01, 0x0F, 0x00, 0xFF, 0x00], ScummScriptDialect.Indy3);
+        Assert.Empty(result.Issues);
+        Assert.Contains("actorName, \"\"", result.Instructions[0].Operands);
+        Assert.Equal(5, result.Instructions[1].Offset);
+    }
 }
