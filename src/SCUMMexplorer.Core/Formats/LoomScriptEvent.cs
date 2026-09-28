@@ -42,7 +42,8 @@ public sealed record LoomScriptEvent(
     LoomScriptEventCertainty Certainty,
     bool FreezeResistant = false,
     IReadOnlyList<int?>? ResolvedArguments = null,
-    bool Recursive = false)
+    bool Recursive = false,
+    IReadOnlyList<int>? EstimatedArgumentIndexes = null)
 {
     public string Format()
     {

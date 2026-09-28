@@ -1,0 +1,13 @@
+﻿Real MainWindow; synthetic tree selection and toggle changes. No physical input.
+FAIL Room 02 pan off: camera x 800, view starts at source x 0 (expected 640)
+PASS Room 02 pan on: starts at source x 0
+PASS Room 02 pan on: 80 steps, largest 8 source px
+PASS Room 02 pan on: ends at source x 640 (expected 640; scrollable 640, target 640; last samples 616, 624, 632, 640)
+PASS Room 02: a manual pan stops the entry pan
+PASS Room 03 pan off: camera x 160, view starts at source x 0 (expected 0)
+FAIL Room 04 pan off: camera x 480, view starts at source x 0 (expected 320)
+PASS Room 04 pan on: starts at source x 0
+PASS Room 04 pan on: 40 steps, largest 8 source px
+PASS Room 04 pan on: ends at source x 320 (expected 320; scrollable 320, target 320; last samples 296, 304, 312, 320)
+PASS Room 04: a manual pan stops the entry pan
+Failures: 2

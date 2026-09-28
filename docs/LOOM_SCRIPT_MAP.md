@@ -27,7 +27,8 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 
 | Name | Use |
 | --- | --- |
-| `var[0x052..0x055]` | Room 69's random draft (four notes) for the draft check |
+| `var[0x032..0x051]` | The draft table: 16 drafts, two words each (pattern, then a second word script 023 copies to `var[0x065]`). Room 01 local 211 (+0x02C8–0x04BC, boot route) sets it; drafts 0 and 15 are literal, each other draft is one of three patterns picked by `getRandomNr` (a seeded pick in the session, so the table is an estimate). Decoded 28 Sep. |
+| `var[0x052..0x055]` | The current draft's four notes (1–8). Script 023 fills them from the draft table; Room 69's entry and exit clear them, and Room 69 local 201 puts its random draft there for the draft check. Objects' verb 0x36 code plays them one by one through script 030. Decoded 28 Sep. |
 | `var[0x062]`, `var[0x063]` | Room 69: which note is expected next; the number of wrong tries |
 | `var[0x066]`, `var[0x067]`, `var[0x068]` | The object whose close-up is shown (script 008 +0x0019); the clicked object (script 006 +0x00AB, cleared by many scripts); the close-up image object, set by the object's verb 0x39 and shown by `verbOps 0x36` (script 008) |
 | `var[0x069]` | A click is recorded (script 006 +0x0077); the next click within the timer window at nearly the same point is a double click. The boot clears it (+0x023B). |
@@ -65,6 +66,8 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | 004 | Save screen (F5, script 005 area 4) | Cutscene; waits for `bit[0xD67]` and `bit[0xD66]` to clear; clears `var[0x02B]` and `var[0x018]` (pause and cutscene-exit keys), stops scripts 039/040 and the sound in `var[0x0A4]`, keeps the ego's box and position in `var[0x0AB..0x0AD]`, loads Room 70 and sets `var[0x020]` (the input script) to Room 70 local 200. Decoded; reading for the role (save/load screen). Reached by F5 in the session. |
 | 020 | Plays the draft back | `bit[0xD66]` = 1, the distaff animation, then each recorded note (`var[0x056..]`) through script 031, waiting while `bit[0xD67]` is set; after four notes `bit[0xD65]` = 1 and script 022; times the next note with `var[0x00B]` (0xB4 jiffies) and ends through 021 (028 first on a timeout). Decoded; reading for the timing. Started by script 010 on a draft's first note. |
 | 021 | Ends the draft playback | `stopScript` 020, `bit[0xD65]` = 0; while `bit[0xD66]` is set, the ego's distaff animation back and `bit[0xD66]` = 0; `var[0x062]` = 0. Decoded. |
+| 023 (0x17) | Loads draft N | `local[0]` = N: pattern `var[0x032+2N]`, second word `var[0x033+2N]` → `var[0x065]`. Notes = each 3-bit field (bits 0–2, 3–5, 6–8, 9–11) + 1 → `var[0x052..0x055]`; pattern bits 0x2000, 0x1000, 0x4000 → `bit[0xD69]`, `bit[0xD6A]`, `bit[0xD6B]`. Decoded 28 Sep; reading for the bits. |
+| 030 (0x1E) | Plays one note of a draft on an object | `bit[0xD6C]` = 1; with the distaff in hand (`var[0x064]` = 2) starts 027 with the note; chains to 031 with it. Script 031 sets `bit[0xD67]` while the note plays and, unless `bit[0xD70]` is set, starts 040 with the note (sound N for note N). Callers (verb 0x36 code in Rooms 04, 06, 13, 20, 24, 31, 62, and scripts 029, 046, 065, 095) wait on `bit[0xD67]` between notes. Decoded 28 Sep; run by the session with the notes as estimates ([validation](../.verification/estimated-arguments/validation.md)). |
 | 028 | Clears the draft buffer | In practice mode with the distaff on, script 036 and verb 0x35 off; `var[0x063]` = 0 and `var[0x05A..0x05D]` = 0. Decoded; reading for 036. |
 | 018 | Turns the distaff on | `var[0x064]` = `local[0]`; verbs 0x01–0x08 on at y 0x90 (0x98 in expert mode, `var[0x07B]` = 2), images from Room 01 objects 100–142; outside expert mode also 0x31 at (48, 168) and 0x32 at (24, 168); prints the note letters with `print 0xFE` (colours by `var[0x07A]`). Script 003 starts it with 1 unless `bit[0xD61]` is set. Decoded 28 Sep. |
 | 014 | After-entry hook | Room-dependent setup; starts script 18 in some rooms |
@@ -126,6 +129,7 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `freezeScripts` | Per-slot `ScriptFrame.FreezeCount`, freeze-resistant starts (opcode bit 0x20) | session |
 | `chainScript` | `StopAfterEvent`, then the target starts in the same place | session `RunScript` |
 | `startScript`/`chainScript`/`stopScript` read the script number with `getVarOrDirectByte` | A variable or local target takes its known value when the instruction runs; a target that reads a seeded pick makes the start a possible outcome; `stopScript` of a value 0 is left unresolved | executor (event target) |
+| Script arguments (`getWordVararg`): the values are copied to the child's locals | Known locals are passed by value; an argument that held an estimate (an estimated global or local) makes that local of the child an estimate (`EstimatedArgumentIndexes`) | executor `SubstituteLocalArguments`, session `EstimatedArguments` |
 | `isScriptRunning` | Executing, pending or frozen global/local scripts; estimate if the script ended at an unmodelled step | `IsScriptRunning` |
 | `isSoundRunning` | Sounds started on the route read as playing (estimate) | executor |
 | `delay`, `waitFor` actor/message/camera | Continue on the next frame (labelled timing) | executor |
@@ -150,4 +154,6 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 2. Input beyond a room click: room clicks go through scripts 005, 006 and 007 when sent ([validation](../.verification/click-input/validation.md)), and verb-area clicks (area 1: the distaff, the close-up icon) through scripts 005 and 010 ([validation](../.verification/verb-click/validation.md)), and keys (area 4, [validation](../.verification/key-input/validation.md)); the engine timers are not run. Escape's `abortCutscene` is modelled (28 Sep, [validation](../.verification/abort-cutscene/validation.md)).
 3. Inventory object code and `stopObjectScript`.
 4. ~~`startScript` with a dynamic target~~: resolved 28 Sep. All five sites have a local target with a known value; the executor reads it (getVarOrDirectByte) ([validation](../.verification/dynamic-scripts/validation.md)). A target that reads an unknown variable still stops with the same label.
-5. `expression` in some forms.
+5. `expression` in some forms (3 in Blockers).
+6. ~~Script arguments that hold an estimate~~: resolved 28 Sep. They are passed by value and the child's locals keep the estimate ([validation](../.verification/estimated-arguments/validation.md)).
+7. A room load requested outside the session's dispatch ("room transition awaits bounded session dispatch", 66 in Blockers after 28 Sep).

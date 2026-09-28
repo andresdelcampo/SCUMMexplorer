@@ -11,6 +11,9 @@ using SCUMMexplorer.Core.Rendering;
 Console.OutputEncoding = Encoding.UTF8;
 var folder = args[0];
 var output = args[1];
+// Optional: print every uncertainty containing this text, with where it came from.
+var trace = args.Length > 2 ? args[2] : null;
+var traced = new List<string>();
 var game = new GameFolderScanner().Scan(folder);
 var index = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
 var verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
@@ -27,6 +30,8 @@ var shape = new Regex(@"^.+? \+0x[0-9A-F]{4}: |\+0x[0-9A-F]{4}|\(.*\)|\d+", Rege
 void Collect(int room, string how, IEnumerable<string> uncertainties)
 {
     var list = uncertainties.ToArray();
+    if (trace is not null)
+        traced.AddRange(list.Where(l => l.Contains(trace, StringComparison.Ordinal)).Select(l => $"Room {room:00} {how}: {l}"));
     foreach (var reason in list.Select(l => shape.Replace(l, "#")).Distinct())
         reasons[reason] = reasons.GetValueOrDefault(reason) + 1;
     foreach (var line in list.Where(l => l.Contains("getRandomNr", StringComparison.Ordinal)))
@@ -95,6 +100,12 @@ foreach (var (reason, count) in reasons.OrderByDescending(pair => pair.Value)) r
 report.AppendLine();
 report.AppendLine("Every occurrence:");
 foreach (var row in rows) report.AppendLine($"  {row}");
+if (trace is not null)
+{
+    report.AppendLine();
+    report.AppendLine($"Uncertainties containing \"{trace}\":");
+    foreach (var line in traced) report.AppendLine($"  {line}");
+}
 Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
 File.WriteAllText(output, report.ToString());
 Console.Write(report.ToString().Split("Every occurrence:")[0]);

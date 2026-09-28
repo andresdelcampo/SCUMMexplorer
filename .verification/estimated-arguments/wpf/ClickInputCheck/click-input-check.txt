@@ -1,0 +1,13 @@
+﻿Real MainWindow; room points are given to the handler's own methods. No physical input.
+PASS Room 02 is the session's room after the boot (room 2)
+PASS the setting is off by default
+PASS on: a click at (450, 60) in Room 02 reaches Room 03 through the game's input: A click at (450, 60) in Room 02, sent to the game's input script as assumed input; loadRoomWithEgo at Room 02 Object 153 Verb 0x38 +0x002B → Room 03.
+PASS on: the trace shows runInputScript → script 005 → script 006 → script 007 → object 153 verb 0x38
+PASS on: the contextual action card labels the scene change and preview limits: "Something in the scene: a new scene opened. The game walk remains a preview." (status "Scene ready")
+PASS on: a queued click waits for the double-click time before it is sent
+PASS on: after the wait, the click at (24, 24) reaches Room 04 through object 162 and local 200: A click at (24, 24) in Room 03, sent to the game's input script as assumed input; loadRoomWithEgo at Room 03 local script 200 +0x0008 → Room 04.
+PASS on: a second press while the first click waits is sent as a double click
+PASS on: the double click on object 156 runs its verb 0x36 through script 007
+PASS on: the verb-area panel shows the close-up reached from the click: "Verb area close-up: object 159's image (verb 0x36, script 008 for object 156). Game state reached from an assumed click sent to the game's input script."
+PASS off: the doorway click runs object 153's verb directly: Room 02 object 153, verb 0x38, code 0x5CBC; loadRoomWithEgo at Room 02 Object 153 Verb 0x38 +0x002B → Room 03.
+Failures: 0

@@ -215,7 +215,12 @@ public sealed class LoomBoundedScriptExecutor
             if (scriptEvent is { TargetId: null, Kind: LoomScriptEventKind.MusicStarted or
                     LoomScriptEventKind.SoundStarted or LoomScriptEventKind.SoundStopped } &&
                 TryReadValue(instruction.Operands.Trim(), knownVariables, out var soundId, out _))
-                scriptEvent = scriptEvent with { TargetId = soundId };
+                scriptEvent = scriptEvent with
+                {
+                    TargetId = soundId,
+                    Certainty = OperandIsEstimated(instruction.Operands.Trim(), estimated, knownVariables)
+                        ? LoomScriptEventCertainty.Conditional : scriptEvent.Certainty
+                };
             // o5_startScript, o5_chainScript and o5_stopScript read the script
             // number with getVarOrDirectByte, so a variable or local target takes
             // its value now. A target that reads a seeded pick is a possible outcome.
@@ -240,10 +245,18 @@ public sealed class LoomBoundedScriptExecutor
             if (scriptEvent is { Operation: "loadRoomWithEgo" })
                 scriptEvent = scriptEvent with { ResolvedArguments = ResolveLoadRoomWithEgo(instruction.Operands, knownVariables) };
             // A started script receives its arguments' values; the session reads only
-            // globals and literals, so known, non-estimated locals are passed as literals.
+            // globals and literals, so known locals are passed as literals. An
+            // estimated local keeps its index, so the child runs with it as an estimate.
             if (scriptEvent is { Kind: LoomScriptEventKind.ScriptStarted or LoomScriptEventKind.ScriptChained or
-                    LoomScriptEventKind.ObjectScriptStarted })
-                scriptEvent = scriptEvent with { Operands = SubstituteLocalArguments(scriptEvent.Operands, knownVariables, estimated) };
+                    LoomScriptEventKind.ObjectScriptStarted or LoomScriptEventKind.CutsceneStarted })
+            {
+                var (operands, estimatedIndexes) = SubstituteLocalArguments(scriptEvent.Operands, knownVariables, estimated);
+                scriptEvent = scriptEvent with
+                {
+                    Operands = operands,
+                    EstimatedArgumentIndexes = estimatedIndexes.Count > 0 ? estimatedIndexes : null
+                };
+            }
             // o5_startObject: the object (word) and verb (byte) as they are now.
             if (scriptEvent is { Kind: LoomScriptEventKind.ObjectScriptStarted })
             {
@@ -1000,16 +1013,22 @@ public sealed class LoomBoundedScriptExecutor
         return -1;
     }
 
-    private static string SubstituteLocalArguments(string operands, IDictionary<string, ushort> variables, IReadOnlySet<string> estimated)
+    private static (string Operands, List<int> EstimatedIndexes) SubstituteLocalArguments(string operands,
+        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated)
     {
+        var estimatedIndexes = new List<int>();
         var open = ArgumentListStart(operands);
         var close = operands.LastIndexOf(']');
-        if (open < 0 || close <= open) return operands;
+        if (open < 0 || close <= open) return (operands, estimatedIndexes);
         var arguments = operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .Select(argument => argument.StartsWith("local[", StringComparison.Ordinal) &&
-                                variables.TryGetValue(argument, out var value) && !estimated.Contains(argument)
-                ? $"0x{value:X4}" : argument);
-        return $"{operands[..(open + 1)]}{string.Join(", ", arguments)}{operands[close..]}";
+            .Select((argument, index) =>
+            {
+                if (!argument.StartsWith("local[", StringComparison.Ordinal) || !variables.TryGetValue(argument, out var value))
+                    return argument;
+                if (estimated.Contains(argument)) estimatedIndexes.Add(index);
+                return $"0x{value:X4}";
+            }).ToArray();
+        return ($"{operands[..(open + 1)]}{string.Join(", ", arguments)}{operands[close..]}", estimatedIndexes);
     }
 
     /// <summary>loadRoomWithEgo's object, room and walk destination (x = -1: no walk), each null when unknown.</summary>

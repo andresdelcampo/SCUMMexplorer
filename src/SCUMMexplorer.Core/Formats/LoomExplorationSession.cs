@@ -1364,7 +1364,7 @@ public sealed class LoomExplorationSession
         var parent = _executing.Count > 0 ? _executing[^1] : null;
         _visitTrace.Add($"{source}: startObject runs object {objectId} verb 0x{verbId:X2}");
         RunScript(script, _currentObjects, 0, locals, depth + 1, null,
-            EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+            EstimatedArguments(scriptEvent),
             scriptEvent.Certainty != LoomScriptEventCertainty.Reached,
             new ScriptFrame { OriginRoom = parent?.OriginRoom });
     }
@@ -1458,14 +1458,14 @@ public sealed class LoomExplorationSession
                 }
                 if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var locals))
                 {
-                    _uncertainties.Add($"Started script {scriptId:00} has arguments depending on unknown variables; the parent continues without its effects.");
+                    _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: started script {scriptId:00} has arguments depending on unknown variables; the parent continues without its effects.");
                     return "";
                 }
                 // startScript launches a child. An unresolved child does not
                 // cancel instructions remaining in the caller. A child started
                 // behind a seeded pick, or given a picked value, runs as an estimate.
                 RunStartedScript(scriptId, 0, locals, depth + 1,
-                    EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+                    EstimatedArguments(scriptEvent),
                     scriptEvent.Certainty != LoomScriptEventCertainty.Reached, scriptEvent.FreezeResistant,
                     recursive: scriptEvent.Recursive);
                 return "";
@@ -1483,7 +1483,7 @@ public sealed class LoomExplorationSession
                 if (_executing.Count == 0 || !TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var chainArguments))
                     return "chained script arguments depend on unknown variables";
                 _chained = (_executing[^1], chained, chainArguments,
-                    EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+                    EstimatedArguments(scriptEvent),
                     scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
                 return LoomBoundedScriptExecutor.StopAfterEvent;
             case LoomScriptEventKind.ScriptStopped:
@@ -1504,7 +1504,9 @@ public sealed class LoomExplorationSession
             case LoomScriptEventKind.SoundStarted:
                 if (scriptEvent.TargetId is not int soundId) return "sound target depends on an unknown variable";
                 _runtime.ActiveSounds.Add(soundId);
-                _uncertainties.Add($"Sound {soundId:00} was started; its natural completion time is not simulated.");
+                _uncertainties.Add(scriptEvent.Certainty == LoomScriptEventCertainty.Reached
+                    ? $"Sound {soundId:00} was started; its natural completion time is not simulated."
+                    : $"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: sound {soundId:00} was started from a seeded pick, so it is a possible outcome; its natural completion time is not simulated.");
                 return "";
             case LoomScriptEventKind.MusicStopped:
                 _runtime.ActiveSounds.Clear();
@@ -1553,7 +1555,7 @@ public sealed class LoomExplorationSession
         try
         {
             RunStartedScript(startScript, 0, arguments, depth + 1,
-                EstimatedArguments(scriptEvent.Operands, _runtime.EstimatedVariables),
+                EstimatedArguments(scriptEvent),
                 scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
         }
         finally
@@ -1660,14 +1662,20 @@ public sealed class LoomExplorationSession
         return "";
     }
 
-    private static string[] EstimatedArguments(string operands, IReadOnlySet<string> estimatedGlobals)
+    /// <summary>
+    /// The child's locals that hold an estimate: an argument read from an
+    /// estimated global, or an estimated local the executor passed by value.
+    /// </summary>
+    private string[] EstimatedArguments(LoomScriptEvent scriptEvent)
     {
+        var operands = scriptEvent.Operands;
         var open = LoomBoundedScriptExecutor.ArgumentListStart(operands);
         var close = operands.LastIndexOf(']');
         if (open < 0 || close <= open) return [];
+        var passed = scriptEvent.EstimatedArgumentIndexes ?? [];
         return operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Select((argument, index) => (argument, index))
-            .Where(item => estimatedGlobals.Contains(item.argument))
+            .Where(item => _runtime.EstimatedVariables.Contains(item.argument) || passed.Contains(item.index))
             .Select(item => $"local[0x{item.index:X3}]").ToArray();
     }
 

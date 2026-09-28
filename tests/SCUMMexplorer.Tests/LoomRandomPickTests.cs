@@ -149,6 +149,33 @@ public sealed class LoomRandomPickTests
         Assert.Contains("bit[0xD7A]", runtime.EstimatedVariables);
     }
 
+    [Fact]
+    public void DraftFromTheSeededTablePlaysAsAnEstimate()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game,
+            new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 13));
+
+        // Verb 0x36 loads draft 4 (script 023 reads var[0x03A], which the boot's
+        // Room 01 local 211 sets from seeded picks) and plays each note through
+        // startScript 0x1E, [local[0x000]] with local[0x000] = var[0x052+local[0x001]].
+        session.ActivateObjectVerb(325, 0x36);
+        for (var frame = 0; frame < 16; frame++) session.AdvanceFrame();
+
+        Assert.DoesNotContain(session.Snapshot.Uncertainties,
+            item => item.Contains("arguments depending on unknown variables", StringComparison.Ordinal));
+        Assert.Contains("Script 30 chains to script 31", session.SessionTrace);
+        // Script 040 starts the note's sound from the estimated argument: a possible outcome.
+        var notes = session.SoundEvents.Where(item => item.Event is
+            { SourceLabel: "Script 40", Kind: LoomScriptEventKind.SoundStarted }).ToArray();
+        Assert.NotEmpty(notes);
+        Assert.All(notes, item => Assert.Equal(LoomScriptEventCertainty.Conditional, item.Event.Certainty));
+        Assert.DoesNotContain(session.ReachedSoundEvents,
+            item => item is { SourceLabel: "Script 40", Kind: LoomScriptEventKind.SoundStarted });
+    }
+
     private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
         new(1, 1, 0, 32, 32, instructions, null, null, [], []);
 }

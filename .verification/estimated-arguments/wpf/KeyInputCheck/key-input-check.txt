@@ -1,0 +1,13 @@
+﻿Real MainWindow; keys raised as synthetic PreviewKeyDown/PreviewTextInput events on the window. No physical input.
+PASS keys as game input is off by default
+PASS off: '>' and F6 are not sent (not handled)
+PASS on: '>' goes to script 005, which sets var[0x0A5] = 1 and VAR_CHARINC var[0x025] = 8: "Key '>' sent to the game (assumed input); no room load was reached"
+PASS on: F6 (0x140) cycles var[0x0A2] to 1 (music off)
+PASS on: F8 (restart) is the engine's and is not sent; the status says why: "Key F8 not sent to the game"
+PASS on: space (pause) is not sent, and is taken before a focused check box sees it: "Key space not sent to the game"
+INFO the room entry trace box could not take focus; the text-box check was not run
+PASS 'e' (note 3) is recorded in var[0x056] = 3 and script 020 plays it back (bit[0xD66] = 1)
+PASS Escape with a draft playing: script 005's cutscene runs scripts 028 and 021, and the aim is cleared (var[0x067] = 0)
+PASS F5 is handled
+PASS F5 (0x13F) runs script 004, which loads Room 70 (the save screen); the app shows it: "Scene ready"
+Failures: 0
