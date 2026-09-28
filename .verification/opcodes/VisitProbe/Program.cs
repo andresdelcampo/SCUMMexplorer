@@ -7,7 +7,9 @@ using SCUMMexplorer.Core.Formats;
 // continued as a doorway click does in the app. Prints the
 // session trace, reached events and uncertainties added by each step.
 // "@x,y" puts the pointer over the room (assumed hover input), "@off" takes it
-// off, and "verbs" prints the verb slots.
+// off, and "verbs" prints the verb slots. "v:x,y" clicks the verb area and
+// "k:0x65" or "k:e" presses a key (both assumed input); "s:12:2" starts global
+// script 0x12 with [2] through the test seam (not game input).
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 var folder = args[0];
 var game = new GameFolderScanner().Scan(folder);
@@ -66,6 +68,47 @@ foreach (var step in args.Skip(1))
         var clicked = session.Click(point[0], point[1], doubleClick);
         Console.WriteLine($"   click: {clicked.Evidence}");
         Show($"{(doubleClick ? "double click" : "click")} at ({point[0]}, {point[1]})");
+        continue;
+    }
+    if (step.StartsWith("v:", StringComparison.Ordinal))
+    {
+        // "v:x,y" clicks the verb area at a screen point (rows 144-199; assumed input).
+        var point = step[2..].Split(',').Select(int.Parse).ToArray();
+        var clicked = session.ClickVerbArea(point[0], point[1]);
+        Console.WriteLine($"   verb-area click: {clicked.Evidence}");
+        foreach (var line in clicked.Uncertainties.Where(line => line.Contains("not sent", StringComparison.Ordinal)))
+            Console.WriteLine("   refused: " + line);
+        Show($"verb-area click at ({point[0]}, {point[1]})");
+        continue;
+    }
+    if (step.StartsWith("k:", StringComparison.Ordinal))
+    {
+        // "k:0x65" presses a key by its code (hex), "k:e" by its character (assumed input).
+        var text = step[2..];
+        var key = text.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ? Convert.ToInt32(text[2..], 16) : text[0];
+        var pressed = session.PressKey(key);
+        Console.WriteLine($"   key {LoomExplorationSession.DescribeKey(key)}: {pressed.Evidence}");
+        foreach (var line in pressed.Uncertainties.Where(line => line.Contains("not sent", StringComparison.Ordinal)))
+            Console.WriteLine("   refused: " + line);
+        Show($"key {LoomExplorationSession.DescribeKey(key)}");
+        continue;
+    }
+    if (step.StartsWith("s:", StringComparison.Ordinal))
+    {
+        // "s:12:2" starts global script 0x12 with arguments [2] (decimal) through the
+        // session's test seam, as a synthetic startScript would. Not game input:
+        // it stands for a start the route did not reach (for example script 003 → 018).
+        var fields = step[2..].Split(':');
+        var number = Convert.ToInt32(fields[0], 16);
+        var arguments = fields.Length > 1 && fields[1].Length > 0 ? fields[1].Split(',').Select(int.Parse).ToArray() : [];
+        var operands = $"0x{number:X2}, [{string.Join(", ", arguments.Select(value => $"0x{value:X4}"))}]";
+        var bytes = string.Join(" ", new[] { "0A", $"{number:X2}" }.Concat(arguments.Select(value => $"{value & 0xFF:X2} {value >> 8:X2}")).Append("FF"));
+        var script = new LoomScriptDisassembly(250, 1, 0, 32, 16,
+            [new(0, 0x0A, "startScript", operands, bytes), new(5, 0, "stopObjectCode", "", "00")],
+            null, null, [], [], "Synthetic probe script");
+        typeof(LoomExplorationSession).GetMethod("RunTopLevelScript", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .Invoke(session, [script]);
+        Show($"started script {number:00} [{string.Join(", ", arguments)}] (probe seam, not game input)");
         continue;
     }
     if (step == "objects")
