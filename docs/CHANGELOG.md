@@ -66,6 +66,8 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | M2a costume animation (Core) | `LoomCostume` starts, steps (loop or hold) and draws each limb as ScummVM's `ClassicCostumeLoader`; Bobbin's costume 1 stand, walk and talk frames rendered to PNG. Tests 212/212; no UI change yet | [costume animation](../.verification/costume-anim/validation.md) |
 | M2b actor state (Core) | The actor table keeps costume, elevation, walk speed, frames, palette, facing and limb state; `animateActor`, `faceActor`, talk frames and the per-frame limb step apply them; `getActorCostume`/`getActorElevation`/`getActorFacing` answer. After the boot the ego has costume 1 without the distaff (frames 8–15). Tests 216/216; Blockers: only `expression` (3) stops; RoomAudit 0 gaps, renders unchanged | [actor state](../.verification/actor-state/validation.md) |
 
+| M2c actors drawn in the room (app) | `LoomActorRenderer` (ScummVM `processActors` y-sort, drawn at (x, y − elevation)) and the app's actor layer, redrawn on each playback frame; `setClass` class 22 sets an actor's ignoreBoxes; box direction flags remap a standing actor's turn. Compared with ScummVM by eye: Room 02 after the opening matches except Bobbin's facing (walk estimate, M3a). Tests 220/220; ActorDrawCheck 0 failures; audit and Blockers unchanged | [actor-draw](../.verification/actor-draw/validation.md) |
+
 ## State at the end of 28 September
 
 - `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 198/198 with `SCUMM_SOUND_TEST_ROOT=Games\loom` and `SCUMM_INDY3_EGA_TEST_ROOT=Games\IndyCru\EGA`.

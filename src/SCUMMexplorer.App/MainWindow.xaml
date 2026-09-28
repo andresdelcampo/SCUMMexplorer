@@ -147,6 +147,8 @@
                                             <Image x:Name="RoomPreview" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True"
                                                    RenderOptions.BitmapScalingMode="NearestNeighbor" MouseLeftButtonUp="RoomPreview_MouseLeftButtonUp" MouseLeftButtonDown="RoomPreview_MouseLeftButtonDown"
                                                    MouseMove="RoomPreview_MouseMove" MouseLeave="RoomPreview_MouseLeave"/>
+                                            <Image x:Name="RoomActorOverlay" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True"
+                                                   RenderOptions.BitmapScalingMode="NearestNeighbor" IsHitTestVisible="False"/>
                                             <Canvas x:Name="RoomNavigationOverlay" Visibility="Collapsed" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="RoomNavigationOverlay_SizeChanged"/>
                                             <Canvas x:Name="WalkBoxOverlay" Visibility="Collapsed" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="WalkBoxOverlay_SizeChanged"/>
                                             <Canvas x:Name="HotspotHighlightOverlay" Visibility="Collapsed" ClipToBounds="True" IsHitTestVisible="False" SizeChanged="HotspotHighlightOverlay_SizeChanged"/>

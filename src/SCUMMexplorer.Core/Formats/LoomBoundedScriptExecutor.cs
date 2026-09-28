@@ -435,10 +435,15 @@ public sealed class LoomBoundedScriptExecutor
 
             if (instruction.Operation == "setClass" && runtime is not null &&
                 TryReadClassOperands(instruction.Operands, knownVariables, out var classActor, out var actorClasses) &&
-                LoomActorTable.IsValid(classActor) && actorClasses.Contains(0))
+                LoomActorTable.IsValid(classActor))
             {
-                // o5_setClass, small header: class 0 on an actor also clears its ignoreBoxes.
-                runtime.Actors.SetIgnoreBoxes(classActor, false);
+                // o5_setClass, small header: class 0 on an actor also clears its ignoreBoxes; putClass (v4 and older)
+                // calls Actor::classChanged, so class 22 (kObjectClassIgnoreBoxes) sets or clears it.
+                foreach (var value in actorClasses)
+                {
+                    if (value == 0) runtime.Actors.SetIgnoreBoxes(classActor, false);
+                    else if ((value & 0x7F) == 22) runtime.Actors.SetIgnoreBoxes(classActor, (value & 0x80) != 0);
+                }
             }
 
             if (instruction.Operation == "setClass" && runtime is not null &&

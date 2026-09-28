@@ -62,6 +62,8 @@ public partial class MainWindow : Window
     private LoomExplorationSession? _session;
     // Charset 0 (99.LFL) for messages, or why it could not be read (then a labelled UI font is used).
     private LoomCharset? _charset;
+    // Costumes read for the actor layer (M2c), by id; null when a costume cannot be read.
+    private readonly Dictionary<int, LoomCostume?> _actorCostumes = [];
     private string? _charsetError;
     private int? _selectedObject;
     private string? _audioFile;
@@ -188,6 +190,7 @@ public partial class MainWindow : Window
         _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
+        _actorCostumes.Clear();
         ShowGame(game);
         StartRelationshipIndexBuild(game);
         try
@@ -2147,6 +2150,7 @@ public partial class MainWindow : Window
             : CreateBitmap(room.Width, room.Height, pixels, room.Palette);
         RefreshWalkBoxOverlay();
         UpdateVerbArea();
+        UpdateActorLayer();
         UpdateMessageLayer();
 
         var selected = _objects.FirstOrDefault(obj => obj.Id == _selectedObject);
@@ -2748,6 +2752,7 @@ public partial class MainWindow : Window
             playback.CameraX = session.CameraX;
             if (session.CameraX is int cameraX) ScrollToGameCamera(cameraX);
         }
+        UpdateActorLayer();
         UpdateMessageLayer();
         UpdateVerbArea();
     }
@@ -2812,6 +2817,47 @@ public partial class MainWindow : Window
         }
         if (playback.Doorways is { Count: > 0 } doorways && _currentRoomResource?.ResourceId == playback.SourceRoom.ResourceId)
             FollowDoorwayFallback(doorways);
+    }
+
+    // ---- Actors on screen (M2c) -----------------------------------------------
+
+    /// <summary>
+    /// Draws the session's actors in the shown room over the room image (ScummVM <c>processActors</c>: sorted by y,
+    /// each visible actor with a costume at (x, y − elevation) on its current limb frames), clipped to the room.
+    /// Priority masks are not applied, so an actor is never hidden behind a foreground object.
+    /// </summary>
+    private void UpdateActorLayer()
+    {
+        var room = _currentRoom;
+        if (!GameClickActive || room is null || _game is not { } game ||
+            _session!.Snapshot.RoomId is not int roomId || roomId != _currentRoomResource?.ResourceId)
+        {
+            RoomActorOverlay.Source = null;
+            RoomActorOverlay.Visibility = Visibility.Collapsed;
+            return;
+        }
+        var layer = LoomActorRenderer.Render(_session.Actors, roomId, room.Width, room.Height, id =>
+        {
+            if (_actorCostumes.TryGetValue(id, out var costume)) return costume;
+            try { costume = LoomCostume.Load(game, id); }
+            catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
+            return _actorCostumes[id] = costume;
+        });
+        if (layer.Actors.Count == 0)
+        {
+            RoomActorOverlay.Source = null;
+            RoomActorOverlay.Visibility = Visibility.Collapsed;
+            return;
+        }
+        var pixels = new byte[room.Width * room.Height * 4];
+        for (var i = 0; i < layer.Pixels.Length; i++)
+        {
+            var index = layer.Pixels[i];
+            if (index == LoomActorRenderer.Transparent) continue;
+            SetBgra(pixels, i * 4, index < room.Palette.Count ? room.Palette[index] : 0xFF000000u);
+        }
+        RoomActorOverlay.Source = FrozenBgra(room.Width, room.Height, pixels);
+        RoomActorOverlay.Visibility = Visibility.Visible;
     }
 
     // ---- Messages on screen (M1c) ---------------------------------------------

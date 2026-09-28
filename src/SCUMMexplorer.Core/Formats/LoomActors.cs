@@ -303,14 +303,47 @@ public sealed class LoomActorTable
     }
 
     /// <summary>
-    /// <c>turnToDirection</c>: ScummVM turns over the next frames (<c>MF_TURN</c>); the preview sets the new
-    /// direction at once and says so.
+    /// <c>turnToDirection</c>: ScummVM turns over the next frames (<c>MF_TURN</c>, <c>updateActorDirection</c>), one
+    /// step a frame towards <see cref="RemapDirection"/> of the target; the preview sets that end direction at once
+    /// and says so.
     /// </summary>
     private void TurnTo(Actor actor, int facing, Placement place)
     {
+        facing = RemapDirection(actor, ((facing % 360) + 360) % 360, place);
         if (actor.Facing == facing) return;
         SetDirection(actor, facing, place);
         actor.LookEstimate = $"the turn to {facing} is taken to end at once (the turn's frames are not simulated)";
+    }
+
+    /// <summary>ScummVM <c>kBoxXFlip</c>/<c>kBoxYFlip</c>, and the v3 class numbers of XFlip (19) and YFlip (18) after <c>putClass</c>'s translation.</summary>
+    private const byte BoxXFlip = 0x08, BoxYFlip = 0x10;
+    private const int ClassXFlip = 19, ClassYFlip = 18;
+
+    /// <summary>
+    /// ScummVM <c>Actor::remapDirection</c> for v3, for a standing or turning actor (<c>is_walking</c> false; walks end
+    /// at once here): the actor's box flags flip the direction (0x08 x, 0x10 y, or the actor's XFlip/YFlip class) and
+    /// the low 3 bits lock it: 1 left or right (90 stays, anything else is 270), 2 up or down (0 stays, else 180),
+    /// 3-6 a fixed 270, 90, 0, 180. v3 applies this with or without ignoreBoxes. <c>_extraBoxFlags</c> are not modelled
+    /// (no decoded <c>setBoxFlags</c> in LOOM sets 0xC000 values; see the script map).
+    /// </summary>
+    private static int RemapDirection(Actor actor, int direction, Placement place)
+    {
+        if (actor.WalkBox is not int box || place.Boxes is null || place.BoxesUnknown is not null) return direction;
+        var flags = place.Boxes.GetFlags(box);
+        var classes = place.Classes is not null && place.Classes.TryGetValue(actor.Number, out var bits) ? bits : 0u;
+        if ((flags & BoxXFlip) != 0 || LoomObjectClasses.Has(classes, ClassXFlip)) direction = 360 - direction;
+        if ((flags & BoxYFlip) != 0 || LoomObjectClasses.Has(classes, ClassYFlip)) direction = 180 - direction;
+        direction = ((direction % 360) + 360) % 360;
+        return (flags & 7) switch
+        {
+            1 => direction == 90 ? 90 : 270,
+            2 => direction == 0 ? 0 : 180,
+            3 => 270,
+            4 => 90,
+            5 => 0,
+            6 => 180,
+            _ => direction
+        };
     }
 
     /// <summary>
@@ -506,8 +539,19 @@ public sealed class LoomActorTable
         EgoPositioned = false;
     }
 
-    /// <summary><c>adjustActorPos</c> (via <c>showActor</c>): position and box from <c>adjustXYToBeInBox</c>.</summary>
-    private static void AdjustPosition(Actor actor, Placement place, bool show)
+    /// <summary>
+    /// <c>adjustActorPos</c> (via <c>showActor</c>): position and box from <c>adjustXYToBeInBox</c>; on a box whose flags
+    /// lock the direction (<c>flags &amp; 7</c>), the actor turns to its facing as <see cref="RemapDirection"/> gives it.
+    /// </summary>
+    private void AdjustPosition(Actor actor, Placement place, bool show)
+    {
+        AdjustXYAndBox(actor, place, show);
+        if (actor.WalkBox is int box && box != LoomWalkBoxSet.InvalidBox && place.Boxes is { } boxes &&
+            place.BoxesUnknown is null && (boxes.GetFlags(box) & 7) != 0 && actor.Facing is int facing && InRoom(actor, place))
+            TurnTo(actor, facing, place);
+    }
+
+    private static void AdjustXYAndBox(Actor actor, Placement place, bool show)
     {
         if (show) actor.Visible = true;
         if (actor.X is not int x || actor.Y is not int y || actor.IgnoreBoxes is null)
