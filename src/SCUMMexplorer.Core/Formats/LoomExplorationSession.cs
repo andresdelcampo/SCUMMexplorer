@@ -765,6 +765,97 @@ public sealed class LoomExplorationSession
         return FinishInput(beforeUncertainties, beforeEvents);
     }
 
+    /// <summary>ScummVM <c>kKeyClickArea</c>: a key press.</summary>
+    public const int KeyClickArea = 4;
+    /// <summary>ScummVM <c>VAR_CUTSCENEEXIT_KEY</c> (v3: var 24); the boot sets it to 0x1B (script 001 +0x012C).</summary>
+    private const string CutsceneExitKeyVariable = "var[0x018]";
+    /// <summary>ScummVM <c>VAR_RESTART_KEY</c> (v3: var 42); the boot sets it to 0x142, F8 (script 001 +0x0131).</summary>
+    private const string RestartKeyVariable = "var[0x02A]";
+    /// <summary>ScummVM <c>VAR_PAUSE_KEY</c> (v3: var 43); the boot sets it to 0x20, space (script 001 +0x0136).</summary>
+    private const string PauseKeyVariable = "var[0x02B]";
+
+    /// <summary>
+    /// A key as ScummVM's <c>processKeyboard</c> hands it to scripts: printable
+    /// characters as their ASCII code, Escape 0x1B, F1–F9 as 315–323 (0x13B–0x143),
+    /// Ctrl+A–Z as 1–26.
+    /// </summary>
+    public static string DescribeKey(int key) => key switch
+    {
+        0x1B => "Escape",
+        >= 0x13B and <= 0x143 => $"F{key - 0x13B + 1}",
+        >= 1 and <= 26 => $"Ctrl+{(char)('A' + key - 1)}",
+        0x20 => "space",
+        > 0x20 and < 0x7F => $"'{(char)key}'",
+        _ => $"key 0x{key:X2}"
+    };
+
+    /// <summary>
+    /// Sends a key press to the game, as ScummVM's <c>processKeyboard</c> and
+    /// <c>checkExecVerbs</c> do for v3: the restart key (<c>VAR_RESTART_KEY</c>) and
+    /// the pause key (<c>VAR_PAUSE_KEY</c>) and '.' (talk stop) are the engine's and are not sent;
+    /// Escape while a cutscene is open would first run <c>abortCutscene</c>, which is
+    /// not modelled, so it is not sent then; otherwise, with user input on,
+    /// <c>runInputScript(4, key, 1)</c> runs <c>VAR_VERB_SCRIPT</c> (script 005, area 4:
+    /// note letters, Escape, text speed, F5–F7, Ctrl+V). A verb whose key matches would
+    /// be clicked instead (<c>runInputScript(1, verb, 1)</c>), but no decoded
+    /// <c>verbOps</c> in the release sets a key, so the session does not keep keys.
+    /// The key is assumed input.
+    /// </summary>
+    public LoomObjectActionResult PressKey(int key)
+    {
+        if (_currentRoom?.ResourceId is not int sourceRoomId)
+            throw new InvalidOperationException("Visit a room before pressing a key.");
+        _uncertainties.StartStep();
+        var beforeUncertainties = _uncertainties.Count;
+        var beforeEvents = _visitEvents.Count;
+        var name = DescribeKey(key);
+        var input = $"The key {name} (0x{key:X2}) in Room {sourceRoomId:00}, sent to the game's input script as assumed input";
+        bool Is(string variable) => _runtime.GlobalVariables.TryGetValue(variable, out var value) && value != 0 && value == key;
+        string? refused = null;
+        ushort verbScript = 0;
+        if (key <= 0 || key > 0x1FF)
+            refused = "it is not a key code the engine sends";
+        else if (Is(RestartKeyVariable))
+            refused = $"it is the restart key ({RestartKeyVariable}, VAR_RESTART_KEY): the engine restarts the game, which the session does not model";
+        else if (Is(PauseKeyVariable))
+            refused = $"it is the pause key ({PauseKeyVariable}, VAR_PAUSE_KEY): the engine pauses the game and the scripts never see it";
+        else if (key == '.')
+            refused = "'.' is the engine's talk-stop key (v3 has no VAR_TALKSTOP_KEY, so it is always on): it ends the current message and the scripts never see it";
+        else if (Is(CutsceneExitKeyVariable) && InCutscene)
+            refused = $"a cutscene is open, and the cutscene exit key ({CutsceneExitKeyVariable}, VAR_CUTSCENEEXIT_KEY) would first run abortCutscene, which the session does not model";
+        else if (_runtime.UserPut <= 0)
+            refused = "user input is off (cursorCommand), and ScummVM's checkExecVerbs reads no key then";
+        else if (!_runtime.GlobalVariables.TryGetValue(VerbScriptVariable, out verbScript) || verbScript == 0)
+            refused = $"no input script is set ({VerbScriptVariable}, VAR_VERB_SCRIPT, is 0)";
+        if (refused is not null)
+        {
+            _uncertainties.Add($"{input}: not sent, because {refused}.");
+            LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
+                _uncertainties.Skip(beforeUncertainties).ToArray(), input);
+            return LastAction;
+        }
+        _uncertainties.Add($"{input}. ScummVM checkExecVerbs: runInputScript({KeyClickArea}, 0x{key:X2}, 1) runs script {verbScript} (var[0x020], VAR_VERB_SCRIPT); the key is the explorer's, not the game's.");
+        if (_runtime.UserPutEstimate is not null)
+            _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
+        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        _dispatchScope++;
+        try
+        {
+            _visitTrace.Add($"key: {name} runs script {verbScript} with [{KeyClickArea}, 0x{key:X2}, 1] (runInputScript)");
+            RunStartedScript(verbScript, 0, new Dictionary<string, ushort>(StringComparer.Ordinal)
+            {
+                ["local[0x000]"] = KeyClickArea,
+                ["local[0x001]"] = (ushort)key,
+                ["local[0x002]"] = 1
+            }, 0);
+        }
+        finally
+        {
+            _dispatchScope--;
+        }
+        return FinishInput(beforeUncertainties, beforeEvents);
+    }
+
     // After an input script ran: dispatch the loads it requested, or visit the room a reached load names.
     private LoomObjectActionResult FinishInput(int beforeUncertainties, int beforeEvents)
     {

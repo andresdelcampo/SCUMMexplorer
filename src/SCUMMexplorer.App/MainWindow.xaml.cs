@@ -89,6 +89,8 @@ public partial class MainWindow : Window
         Closed += (_, _) => { StopRoomPan(); StopAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
+        PreviewKeyDown += MainWindow_PreviewKeyDown;
+        PreviewTextInput += MainWindow_PreviewTextInput;
         _roomPanTimer.Tick += RoomPanTimer_Tick;
         _cameraPanTimer.Tick += CameraPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
@@ -1395,6 +1397,50 @@ public partial class MainWindow : Window
         StopRoomPan();
         e.Handled = true;
     }
+
+    // "Keys as game input": only in interactive mode, and never while typing in a text box.
+    private bool GameKeysActive => GameKeysToggle.IsChecked == true && SessionModeToggle.IsChecked == true &&
+                                   _session is not null && _currentRoomResource is not null && _game?.Id == GameId.Loom &&
+                                   Keyboard.FocusedElement is not (TextBox or ComboBox);
+
+    /// <summary>
+    /// The key code ScummVM's <c>processKeyboard</c> gives scripts for a key that is
+    /// not text: Escape 0x1B, F1–F9 as 315–323, Ctrl+A–Z as 1–26; null otherwise.
+    /// </summary>
+    private static int? GameKeyCode(Key key, ModifierKeys modifiers) => key switch
+    {
+        Key.Escape => 0x1B,
+        // Space here, not as text, so a focused check box does not toggle too.
+        Key.Space when modifiers == ModifierKeys.None => 0x20,
+        >= Key.F1 and <= Key.F9 => 315 + (key - Key.F1),
+        >= Key.A and <= Key.Z when modifiers == ModifierKeys.Control => 1 + (key - Key.A),
+        _ => null
+    };
+
+    private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!GameKeysActive) return;
+        // F10 arrives as a system key.
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (GameKeyCode(key, Keyboard.Modifiers) is not int code) return;
+        e.Handled = true;
+        SendKeyToGame(code);
+    }
+
+    private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        // Printable characters go as their ASCII code, as ScummVM passes lastKeyHit.ascii.
+        if (!GameKeysActive || e.Text is not { Length: 1 } text || text[0] is < ' ' or > '~') return;
+        e.Handled = true;
+        SendKeyToGame(text[0]);
+    }
+
+    /// <summary>
+    /// "Keys as game input": sends the key to the session as the game's own input
+    /// path would receive it (<see cref="LoomExplorationSession.PressKey"/>).
+    /// </summary>
+    private void SendKeyToGame(int key) =>
+        SendInputToGame(() => _session!.PressKey(key), $"Key {LoomExplorationSession.DescribeKey(key)}");
 
     private void RoomViewport_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
     {

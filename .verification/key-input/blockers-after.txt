@@ -1,0 +1,1638 @@
+blocked: 0 instruction sites in 0 scripts; rooms: 
+picked: 29 instruction sites in 13 scripts; rooms: 01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,79,81,82,83,84,85,86,87
+  Room 01 local script 211	+0x02D2
+  Room 01 local script 211	+0x02F5
+  Room 01 local script 211	+0x0322
+  Room 01 local script 211	+0x0345
+  Room 01 local script 211	+0x0368
+  Room 01 local script 211	+0x038B
+  Room 01 local script 211	+0x03AE
+  Room 01 local script 211	+0x03D1
+  Room 01 local script 211	+0x03F4
+  Room 01 local script 211	+0x0417
+  Room 01 local script 211	+0x043A
+  Room 01 local script 211	+0x045D
+  Room 01 local script 211	+0x0480
+  Room 01 local script 211	+0x04A3
+  Room 04 local script 203	+0x0000
+  Room 18 local script 204	+0x008A
+  Room 30 Object 511 Verb 0x38	+0x0006
+  Room 30 Object 512 Verb 0x38	+0x0006
+  Room 30 Object 513 Verb 0x38	+0x0006
+  Room 41 local script 209	+0x0001
+  Room 43 local script 205	+0x0030
+  Room 43 local script 205	+0x003C
+  Room 69 local script 202	+0x00B0
+  Script 113	+0x0037
+  Script 114	+0x0047
+  Script 31	+0x01E6
+  Script 31	+0x01EF
+  Script 42	+0x0026
+  Script 42	+0x004F
+
+Where scripts that picked stopped next (other uncertainties from the same script):
+  Room 18 local script 204	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+  Room 30 Object 511 Verb 0x38	+0x0000: presentation operation not applied: lights; timing not simulated: a delay of 60 jiffies continues on the next frame (+0x002F)
+  Room 30 Object 511 Verb 0x38	+0x0033: presentation operation not applied: lights; timing not simulated: waiting for actor 0x01 to stop walking continues on the next frame (+0x003D)
+  Room 30 Object 512 Verb 0x38	+0x0000: presentation operation not applied: lights; timing not simulated: a delay of 60 jiffies continues on the next frame (+0x0013)
+  Room 30 Object 512 Verb 0x38	+0x0017: presentation operation not applied: lights; timing not simulated: waiting for actor 0x01 to stop walking continues on the next frame (+0x0036)
+  Room 30 Object 513 Verb 0x38	+0x0000: presentation operation not applied: lights; timing not simulated: a delay of 60 jiffies continues on the next frame (+0x0013)
+  Room 30 Object 513 Verb 0x38	+0x0017: presentation operation not applied: lights; timing not simulated: waiting for actor 0x01 to stop walking continues on the next frame (+0x0036)
+  Room 41 local script 209	+0x0001: presentation operation not applied: animateActor
+  Room 43 local script 205	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; timing not simulated: a delay of local[0x001] jiffies continues on the next frame (+0x0039)
+  Room 43 local script 205	+0x003C: presentation operation not applied: animateActor
+  Room 43 local script 205	+0x004C: presentation operation not applied: animateActor; timing not simulated: a delay of local[0x001] jiffies continues on the next frame (+0x0039)
+  Room 69 local script 202	+0x0017: presentation operation not applied: print
+  Room 69 local script 202	+0x0053: presentation operation not applied: print
+  Room 69 local script 202	+0x00B0: presentation operation not applied: print
+  Script 113	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+  Script 113	+0x0068: presentation operation not applied: animateActor
+  Script 114	+0x0000: presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+  Script 114	+0x003D: presentation operation not applied: animateActor
+  Script 114	+0x0078: presentation operation not applied: animateActor
+  Script 31	+0x0000: presentation operation not applied: animateActor
+  Script 42	+0x0000: presentation operation not applied: animateActor
+  Script 42	+0x0021: presentation operation not applied: animateActor
+
+Uncertainty shapes (count of visits and actions that show each):
+    635  #isSoundRunning reads sound # as playing because this route started it; its length is not simulated, so what follows is an estimate #
+    513  Object # verb #x# was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+    428  #presentation operation not applied: print
+    417  #presentation operation not applied: animateActor
+    366  #findObject at # reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse #
+    348  Sound # was started; its natural completion time is not simulated.
+    231  #isSoundRunning reads sound # as silent because this route did not start it #
+    188  Object # is untouchable # in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.
+    163  #presentation operation not applied: lights
+    133  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+    132  #timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+    129  #getRandomNr at # picked # of #..# #; what follows from it is an estimate, not a reached game state.
+    113  #presentation operation not applied: print; timing not simulated: waiting for the message to finish continues on the next frame #
+    102  #timing not simulated: a delay of # jiffies continues on the next frame #
+     95  #timing not simulated: the camera pan reaches x = # at once #
+     92  Script # # reached loadRoom after a frame advance.
+     91  #timing not simulated: waiting for the message to finish continues on the next frame #
+     90  #presentation operation not applied: resourceRoutines
+     85  #presentation operation not applied: oldRoomEffect
+     83  #presentation operation not applied: animateActor; timing not simulated: a delay of # jiffies continues on the next frame #
+     82  #presentation operation not applied: faceActor
+     81  #presentation operation not applied: print; timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+     80  A started script has a dynamic target; the parent continues without its effects.
+     77  #presentation operation not applied: drawBox
+     76  #getActorWalkBox reads actor #: assumed arrival at Room # Object # Verb #x# # after a catalog visit, so what follows is an estimate #
+     76  #presentation operation not applied: oldRoomEffect; presentation operation not applied: print
+     76  #presentation operation not applied: roomOps; presentation operation not applied: stringOps
+     76  Player input assumed: script # # waits for bit[#xD#B], which only Room # local script # sets #, so the preview starts it as if the player had answered. Choices made on that screen were not simulated.
+     76  Room # entered by Script # # # after a frame advance.
+     76  Room # entered by Script # # # during the boot.
+     76  Script # # reached loadRoom during the boot.
+     66  #script requests Room #; room transition awaits bounded session dispatch at #
+     57  #camera x follows actor #, whose position is an estimate #
+     57  Camera x #.
+     38  Camera x #; the walk's end stays within the camera's triggers.
+     33  Room # selected from the catalog; the route to it was not executed from game input.
+     29  Room # selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Room # Object # Verb #x# # #. Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+     26  Object # verb #x#A was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     22  Object # verb #x#B was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     21  Object # verb #xFF was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     18  #getActorWalkBox reads actor #: assumed arrival at Script # # after a catalog visit, so what follows is an estimate #
+     15  #getActorX reads actor #: assumed arrival at Room # Object # Verb #x# # after a catalog visit, so what follows is an estimate #
+     15  #presentation operation not applied: animateActor; timing not simulated: a delay of local[#x#] jiffies continues on the next frame #
+     15  Room # object #, verb #x#, code #x#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+     14  #presentation operation not applied: animateActor; timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+     13  #getActorX reads actor #: actor #'s walkActorTo at # is taken to end at #
+     13  Started script # has arguments depending on unknown variables; the parent continues without its effects.
+     12  #presentation operation not applied: animateActor; getActorX reads actor #: actor #'s putActor at # follows a seeded pick, so what follows is an estimate #
+     12  Object # verb #x#C was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     12  Object # verb #x#D was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     10  Object # verb #x#E was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+     10  Object # verb #x#F was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+      9  #presentation operation not applied: lights; timing not simulated: waiting for actor #x# to stop walking continues on the next frame #
+      8  Camera x # = # is an estimate: setCameraAt in Script # #'s assumed arrival.
+      8  Room # selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Script # # #. Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+      8  Script # # reached loadRoom during the action.
+      7  #getActorWalkBox reads actor #: assumed arrival at Room # local script # # after a catalog visit, so what follows is an estimate #
+      7  #presentation operation not applied: lights; timing not simulated: a delay of # jiffies continues on the next frame #
+      7  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; presentation operation not applied: roomOps; presentation operation not applied: lights
+      7  Room # Object # Verb #x# # reached loadRoomWithEgo after a frame advance.
+      5  #presentation operation not applied: animateActor; getActorX reads actor #: assumed arrival at Script # # after a catalog visit, so what follows is an estimate #
+      5  #presentation operation not applied: lights; presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor
+      5  Room # object #, verb #x#, code #x#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      5  Room # object #, verb #x#, code #x#B#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      4  #presentation operation not applied: resourceRoutines; presentation operation not applied: setObjectName; presentation operation not applied: animateActor
+      4  Room # local script # # reached loadRoomWithEgo after a frame advance.
+      4  Room # object #, verb #x#, code #x#A#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      4  Room # object #, verb #x#, code #x#D#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  #getActorWalkBox reads actor #: actor #'s putActorAtObject at # follows a seeded pick, so what follows is an estimate #
+      3  #operation 'expression' is not modeled at #
+      3  #presentation operation not applied: animateActor; presentation operation not applied: oldRoomEffect
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; presentation operation not applied: setObjectName
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: animateActor; timing not simulated: a delay of local[#x#] jiffies continues on the next frame #
+      3  #presentation operation not applied: resourceRoutines; presentation operation not applied: oldRoomEffect; presentation operation not applied: animateActor
+      3  Room # object #, verb #x#, code #x#D; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  Room # object #, verb #x#, code #x#E#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      3  Room # object #, verb #x#, code #x#F#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  #getActorX reads actor #: actor #'s walkActorToObject at # is taken to end at #
+      2  #getActorX reads actor #: assumed arrival at Room # Object # Verb #x# # after a catalog visit, so what follows is an estimate #; presentation operation not applied: animateActor
+      2  #presentation operation not applied: animateActor; presentation operation not applied: resourceRoutines
+      2  #presentation operation not applied: animateActor; timing not simulated: waiting for the message to finish continues on the next frame #
+      2  #presentation operation not applied: lights; presentation operation not applied: animateActor; timing not simulated: a delay of # jiffies continues on the next frame #
+      2  #presentation operation not applied: roomOps
+      2  #presentation operation not applied: setObjectName
+      2  #timing not simulated: the camera moves # pixels a frame into its new limits and reaches x = # at once #
+      2  Room # object #, verb #x#, code #x#A#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#A; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#C#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#C#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#D#; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#E#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#F; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # object #, verb #x#, code #x#FC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      2  Room # selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Room # local script # # #. Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+      1  #camera x #
+      1  #getActorX reads actor #: assumed arrival at Script # # after a catalog visit, so what follows is an estimate #
+      1  #operation 'getActorCostume' is not modeled at #
+      1  #operation 'getActorElevation' is not modeled at #
+      1  #presentation operation not applied: animateActor; presentation operation not applied: lights
+      1  #presentation operation not applied: animateActor; timing not simulated: the camera pan reaches x = # at once #
+      1  #presentation operation not applied: resourceRoutines; timing not simulated: a delay of # jiffies continues on the next frame #
+      1  Room # object #, verb #x#, code #x#A#C; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#A#F; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#AE#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#AE; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#B#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#B; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#B; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#BB#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#C; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#C; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#CBC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#CF#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#CF; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#A; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#C; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D#D; loadRoomWithEgo at Room # local script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#D; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DD#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DE; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DF#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#DF; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#C; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#D; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#E; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E#F; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#E; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#EC; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#EF; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#F#; loadRoom at Script # # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FAD; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FCB; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # object #, verb #x#, code #x#FD#; loadRoomWithEgo at Room # Object # Verb #x# # → Room #. Actor walk and input dispatch were not simulated.
+      1  Room # selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Room # Object # Verb #x# # or Room # Object # Verb #x# # #. Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+      1  Room # selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Room # Object # Verb #x#/#x# # #. Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+      1  Room # selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Script # # or Room # Object # Verb #x# # #. Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+
+Every occurrence:
+  picked	Room 01 local script 211	+0x02D2	Room 01 visit
+  picked	Room 01 local script 211	+0x02D2	Room 02 visit
+  picked	Room 01 local script 211	+0x02D2	Room 03 visit
+  picked	Room 01 local script 211	+0x02D2	Room 04 visit
+  picked	Room 01 local script 211	+0x02D2	Room 05 visit
+  picked	Room 01 local script 211	+0x02D2	Room 06 visit
+  picked	Room 01 local script 211	+0x02D2	Room 07 visit
+  picked	Room 01 local script 211	+0x02D2	Room 08 visit
+  picked	Room 01 local script 211	+0x02D2	Room 09 visit
+  picked	Room 01 local script 211	+0x02D2	Room 10 visit
+  picked	Room 01 local script 211	+0x02D2	Room 11 visit
+  picked	Room 01 local script 211	+0x02D2	Room 12 visit
+  picked	Room 01 local script 211	+0x02D2	Room 13 visit
+  picked	Room 01 local script 211	+0x02D2	Room 14 visit
+  picked	Room 01 local script 211	+0x02D2	Room 15 visit
+  picked	Room 01 local script 211	+0x02D2	Room 16 visit
+  picked	Room 01 local script 211	+0x02D2	Room 17 visit
+  picked	Room 01 local script 211	+0x02D2	Room 18 visit
+  picked	Room 01 local script 211	+0x02D2	Room 19 visit
+  picked	Room 01 local script 211	+0x02D2	Room 20 visit
+  picked	Room 01 local script 211	+0x02D2	Room 22 visit
+  picked	Room 01 local script 211	+0x02D2	Room 23 visit
+  picked	Room 01 local script 211	+0x02D2	Room 24 visit
+  picked	Room 01 local script 211	+0x02D2	Room 25 visit
+  picked	Room 01 local script 211	+0x02D2	Room 26 visit
+  picked	Room 01 local script 211	+0x02D2	Room 27 visit
+  picked	Room 01 local script 211	+0x02D2	Room 28 visit
+  picked	Room 01 local script 211	+0x02D2	Room 29 visit
+  picked	Room 01 local script 211	+0x02D2	Room 30 visit
+  picked	Room 01 local script 211	+0x02D2	Room 31 visit
+  picked	Room 01 local script 211	+0x02D2	Room 32 visit
+  picked	Room 01 local script 211	+0x02D2	Room 33 visit
+  picked	Room 01 local script 211	+0x02D2	Room 34 visit
+  picked	Room 01 local script 211	+0x02D2	Room 35 visit
+  picked	Room 01 local script 211	+0x02D2	Room 36 visit
+  picked	Room 01 local script 211	+0x02D2	Room 37 visit
+  picked	Room 01 local script 211	+0x02D2	Room 38 visit
+  picked	Room 01 local script 211	+0x02D2	Room 39 visit
+  picked	Room 01 local script 211	+0x02D2	Room 40 visit
+  picked	Room 01 local script 211	+0x02D2	Room 41 visit
+  picked	Room 01 local script 211	+0x02D2	Room 42 visit
+  picked	Room 01 local script 211	+0x02D2	Room 43 visit
+  picked	Room 01 local script 211	+0x02D2	Room 44 visit
+  picked	Room 01 local script 211	+0x02D2	Room 45 visit
+  picked	Room 01 local script 211	+0x02D2	Room 46 visit
+  picked	Room 01 local script 211	+0x02D2	Room 47 visit
+  picked	Room 01 local script 211	+0x02D2	Room 49 visit
+  picked	Room 01 local script 211	+0x02D2	Room 50 visit
+  picked	Room 01 local script 211	+0x02D2	Room 51 visit
+  picked	Room 01 local script 211	+0x02D2	Room 52 visit
+  picked	Room 01 local script 211	+0x02D2	Room 53 visit
+  picked	Room 01 local script 211	+0x02D2	Room 54 visit
+  picked	Room 01 local script 211	+0x02D2	Room 55 visit
+  picked	Room 01 local script 211	+0x02D2	Room 56 visit
+  picked	Room 01 local script 211	+0x02D2	Room 57 visit
+  picked	Room 01 local script 211	+0x02D2	Room 58 visit
+  picked	Room 01 local script 211	+0x02D2	Room 59 visit
+  picked	Room 01 local script 211	+0x02D2	Room 60 visit
+  picked	Room 01 local script 211	+0x02D2	Room 61 visit
+  picked	Room 01 local script 211	+0x02D2	Room 62 visit
+  picked	Room 01 local script 211	+0x02D2	Room 63 visit
+  picked	Room 01 local script 211	+0x02D2	Room 64 visit
+  picked	Room 01 local script 211	+0x02D2	Room 65 visit
+  picked	Room 01 local script 211	+0x02D2	Room 66 visit
+  picked	Room 01 local script 211	+0x02D2	Room 67 visit
+  picked	Room 01 local script 211	+0x02D2	Room 68 visit
+  picked	Room 01 local script 211	+0x02D2	Room 69 visit
+  picked	Room 01 local script 211	+0x02D2	Room 70 visit
+  picked	Room 01 local script 211	+0x02D2	Room 79 visit
+  picked	Room 01 local script 211	+0x02D2	Room 81 visit
+  picked	Room 01 local script 211	+0x02D2	Room 82 visit
+  picked	Room 01 local script 211	+0x02D2	Room 83 visit
+  picked	Room 01 local script 211	+0x02D2	Room 84 visit
+  picked	Room 01 local script 211	+0x02D2	Room 85 visit
+  picked	Room 01 local script 211	+0x02D2	Room 86 visit
+  picked	Room 01 local script 211	+0x02D2	Room 87 visit
+  picked	Room 01 local script 211	+0x02F5	Room 01 visit
+  picked	Room 01 local script 211	+0x02F5	Room 02 visit
+  picked	Room 01 local script 211	+0x02F5	Room 03 visit
+  picked	Room 01 local script 211	+0x02F5	Room 04 visit
+  picked	Room 01 local script 211	+0x02F5	Room 05 visit
+  picked	Room 01 local script 211	+0x02F5	Room 06 visit
+  picked	Room 01 local script 211	+0x02F5	Room 07 visit
+  picked	Room 01 local script 211	+0x02F5	Room 08 visit
+  picked	Room 01 local script 211	+0x02F5	Room 09 visit
+  picked	Room 01 local script 211	+0x02F5	Room 10 visit
+  picked	Room 01 local script 211	+0x02F5	Room 11 visit
+  picked	Room 01 local script 211	+0x02F5	Room 12 visit
+  picked	Room 01 local script 211	+0x02F5	Room 13 visit
+  picked	Room 01 local script 211	+0x02F5	Room 14 visit
+  picked	Room 01 local script 211	+0x02F5	Room 15 visit
+  picked	Room 01 local script 211	+0x02F5	Room 16 visit
+  picked	Room 01 local script 211	+0x02F5	Room 17 visit
+  picked	Room 01 local script 211	+0x02F5	Room 18 visit
+  picked	Room 01 local script 211	+0x02F5	Room 19 visit
+  picked	Room 01 local script 211	+0x02F5	Room 20 visit
+  picked	Room 01 local script 211	+0x02F5	Room 22 visit
+  picked	Room 01 local script 211	+0x02F5	Room 23 visit
+  picked	Room 01 local script 211	+0x02F5	Room 24 visit
+  picked	Room 01 local script 211	+0x02F5	Room 25 visit
+  picked	Room 01 local script 211	+0x02F5	Room 26 visit
+  picked	Room 01 local script 211	+0x02F5	Room 27 visit
+  picked	Room 01 local script 211	+0x02F5	Room 28 visit
+  picked	Room 01 local script 211	+0x02F5	Room 29 visit
+  picked	Room 01 local script 211	+0x02F5	Room 30 visit
+  picked	Room 01 local script 211	+0x02F5	Room 31 visit
+  picked	Room 01 local script 211	+0x02F5	Room 32 visit
+  picked	Room 01 local script 211	+0x02F5	Room 33 visit
+  picked	Room 01 local script 211	+0x02F5	Room 34 visit
+  picked	Room 01 local script 211	+0x02F5	Room 35 visit
+  picked	Room 01 local script 211	+0x02F5	Room 36 visit
+  picked	Room 01 local script 211	+0x02F5	Room 37 visit
+  picked	Room 01 local script 211	+0x02F5	Room 38 visit
+  picked	Room 01 local script 211	+0x02F5	Room 39 visit
+  picked	Room 01 local script 211	+0x02F5	Room 40 visit
+  picked	Room 01 local script 211	+0x02F5	Room 41 visit
+  picked	Room 01 local script 211	+0x02F5	Room 42 visit
+  picked	Room 01 local script 211	+0x02F5	Room 43 visit
+  picked	Room 01 local script 211	+0x02F5	Room 44 visit
+  picked	Room 01 local script 211	+0x02F5	Room 45 visit
+  picked	Room 01 local script 211	+0x02F5	Room 46 visit
+  picked	Room 01 local script 211	+0x02F5	Room 47 visit
+  picked	Room 01 local script 211	+0x02F5	Room 49 visit
+  picked	Room 01 local script 211	+0x02F5	Room 50 visit
+  picked	Room 01 local script 211	+0x02F5	Room 51 visit
+  picked	Room 01 local script 211	+0x02F5	Room 52 visit
+  picked	Room 01 local script 211	+0x02F5	Room 53 visit
+  picked	Room 01 local script 211	+0x02F5	Room 54 visit
+  picked	Room 01 local script 211	+0x02F5	Room 55 visit
+  picked	Room 01 local script 211	+0x02F5	Room 56 visit
+  picked	Room 01 local script 211	+0x02F5	Room 57 visit
+  picked	Room 01 local script 211	+0x02F5	Room 58 visit
+  picked	Room 01 local script 211	+0x02F5	Room 59 visit
+  picked	Room 01 local script 211	+0x02F5	Room 60 visit
+  picked	Room 01 local script 211	+0x02F5	Room 61 visit
+  picked	Room 01 local script 211	+0x02F5	Room 62 visit
+  picked	Room 01 local script 211	+0x02F5	Room 63 visit
+  picked	Room 01 local script 211	+0x02F5	Room 64 visit
+  picked	Room 01 local script 211	+0x02F5	Room 65 visit
+  picked	Room 01 local script 211	+0x02F5	Room 66 visit
+  picked	Room 01 local script 211	+0x02F5	Room 67 visit
+  picked	Room 01 local script 211	+0x02F5	Room 68 visit
+  picked	Room 01 local script 211	+0x02F5	Room 69 visit
+  picked	Room 01 local script 211	+0x02F5	Room 70 visit
+  picked	Room 01 local script 211	+0x02F5	Room 79 visit
+  picked	Room 01 local script 211	+0x02F5	Room 81 visit
+  picked	Room 01 local script 211	+0x02F5	Room 82 visit
+  picked	Room 01 local script 211	+0x02F5	Room 83 visit
+  picked	Room 01 local script 211	+0x02F5	Room 84 visit
+  picked	Room 01 local script 211	+0x02F5	Room 85 visit
+  picked	Room 01 local script 211	+0x02F5	Room 86 visit
+  picked	Room 01 local script 211	+0x02F5	Room 87 visit
+  picked	Room 01 local script 211	+0x0322	Room 01 visit
+  picked	Room 01 local script 211	+0x0322	Room 02 visit
+  picked	Room 01 local script 211	+0x0322	Room 03 visit
+  picked	Room 01 local script 211	+0x0322	Room 04 visit
+  picked	Room 01 local script 211	+0x0322	Room 05 visit
+  picked	Room 01 local script 211	+0x0322	Room 06 visit
+  picked	Room 01 local script 211	+0x0322	Room 07 visit
+  picked	Room 01 local script 211	+0x0322	Room 08 visit
+  picked	Room 01 local script 211	+0x0322	Room 09 visit
+  picked	Room 01 local script 211	+0x0322	Room 10 visit
+  picked	Room 01 local script 211	+0x0322	Room 11 visit
+  picked	Room 01 local script 211	+0x0322	Room 12 visit
+  picked	Room 01 local script 211	+0x0322	Room 13 visit
+  picked	Room 01 local script 211	+0x0322	Room 14 visit
+  picked	Room 01 local script 211	+0x0322	Room 15 visit
+  picked	Room 01 local script 211	+0x0322	Room 16 visit
+  picked	Room 01 local script 211	+0x0322	Room 17 visit
+  picked	Room 01 local script 211	+0x0322	Room 18 visit
+  picked	Room 01 local script 211	+0x0322	Room 19 visit
+  picked	Room 01 local script 211	+0x0322	Room 20 visit
+  picked	Room 01 local script 211	+0x0322	Room 22 visit
+  picked	Room 01 local script 211	+0x0322	Room 23 visit
+  picked	Room 01 local script 211	+0x0322	Room 24 visit
+  picked	Room 01 local script 211	+0x0322	Room 25 visit
+  picked	Room 01 local script 211	+0x0322	Room 26 visit
+  picked	Room 01 local script 211	+0x0322	Room 27 visit
+  picked	Room 01 local script 211	+0x0322	Room 28 visit
+  picked	Room 01 local script 211	+0x0322	Room 29 visit
+  picked	Room 01 local script 211	+0x0322	Room 30 visit
+  picked	Room 01 local script 211	+0x0322	Room 31 visit
+  picked	Room 01 local script 211	+0x0322	Room 32 visit
+  picked	Room 01 local script 211	+0x0322	Room 33 visit
+  picked	Room 01 local script 211	+0x0322	Room 34 visit
+  picked	Room 01 local script 211	+0x0322	Room 35 visit
+  picked	Room 01 local script 211	+0x0322	Room 36 visit
+  picked	Room 01 local script 211	+0x0322	Room 37 visit
+  picked	Room 01 local script 211	+0x0322	Room 38 visit
+  picked	Room 01 local script 211	+0x0322	Room 39 visit
+  picked	Room 01 local script 211	+0x0322	Room 40 visit
+  picked	Room 01 local script 211	+0x0322	Room 41 visit
+  picked	Room 01 local script 211	+0x0322	Room 42 visit
+  picked	Room 01 local script 211	+0x0322	Room 43 visit
+  picked	Room 01 local script 211	+0x0322	Room 44 visit
+  picked	Room 01 local script 211	+0x0322	Room 45 visit
+  picked	Room 01 local script 211	+0x0322	Room 46 visit
+  picked	Room 01 local script 211	+0x0322	Room 47 visit
+  picked	Room 01 local script 211	+0x0322	Room 49 visit
+  picked	Room 01 local script 211	+0x0322	Room 50 visit
+  picked	Room 01 local script 211	+0x0322	Room 51 visit
+  picked	Room 01 local script 211	+0x0322	Room 52 visit
+  picked	Room 01 local script 211	+0x0322	Room 53 visit
+  picked	Room 01 local script 211	+0x0322	Room 54 visit
+  picked	Room 01 local script 211	+0x0322	Room 55 visit
+  picked	Room 01 local script 211	+0x0322	Room 56 visit
+  picked	Room 01 local script 211	+0x0322	Room 57 visit
+  picked	Room 01 local script 211	+0x0322	Room 58 visit
+  picked	Room 01 local script 211	+0x0322	Room 59 visit
+  picked	Room 01 local script 211	+0x0322	Room 60 visit
+  picked	Room 01 local script 211	+0x0322	Room 61 visit
+  picked	Room 01 local script 211	+0x0322	Room 62 visit
+  picked	Room 01 local script 211	+0x0322	Room 63 visit
+  picked	Room 01 local script 211	+0x0322	Room 64 visit
+  picked	Room 01 local script 211	+0x0322	Room 65 visit
+  picked	Room 01 local script 211	+0x0322	Room 66 visit
+  picked	Room 01 local script 211	+0x0322	Room 67 visit
+  picked	Room 01 local script 211	+0x0322	Room 68 visit
+  picked	Room 01 local script 211	+0x0322	Room 69 visit
+  picked	Room 01 local script 211	+0x0322	Room 70 visit
+  picked	Room 01 local script 211	+0x0322	Room 79 visit
+  picked	Room 01 local script 211	+0x0322	Room 81 visit
+  picked	Room 01 local script 211	+0x0322	Room 82 visit
+  picked	Room 01 local script 211	+0x0322	Room 83 visit
+  picked	Room 01 local script 211	+0x0322	Room 84 visit
+  picked	Room 01 local script 211	+0x0322	Room 85 visit
+  picked	Room 01 local script 211	+0x0322	Room 86 visit
+  picked	Room 01 local script 211	+0x0322	Room 87 visit
+  picked	Room 01 local script 211	+0x0345	Room 01 visit
+  picked	Room 01 local script 211	+0x0345	Room 02 visit
+  picked	Room 01 local script 211	+0x0345	Room 03 visit
+  picked	Room 01 local script 211	+0x0345	Room 04 visit
+  picked	Room 01 local script 211	+0x0345	Room 05 visit
+  picked	Room 01 local script 211	+0x0345	Room 06 visit
+  picked	Room 01 local script 211	+0x0345	Room 07 visit
+  picked	Room 01 local script 211	+0x0345	Room 08 visit
+  picked	Room 01 local script 211	+0x0345	Room 09 visit
+  picked	Room 01 local script 211	+0x0345	Room 10 visit
+  picked	Room 01 local script 211	+0x0345	Room 11 visit
+  picked	Room 01 local script 211	+0x0345	Room 12 visit
+  picked	Room 01 local script 211	+0x0345	Room 13 visit
+  picked	Room 01 local script 211	+0x0345	Room 14 visit
+  picked	Room 01 local script 211	+0x0345	Room 15 visit
+  picked	Room 01 local script 211	+0x0345	Room 16 visit
+  picked	Room 01 local script 211	+0x0345	Room 17 visit
+  picked	Room 01 local script 211	+0x0345	Room 18 visit
+  picked	Room 01 local script 211	+0x0345	Room 19 visit
+  picked	Room 01 local script 211	+0x0345	Room 20 visit
+  picked	Room 01 local script 211	+0x0345	Room 22 visit
+  picked	Room 01 local script 211	+0x0345	Room 23 visit
+  picked	Room 01 local script 211	+0x0345	Room 24 visit
+  picked	Room 01 local script 211	+0x0345	Room 25 visit
+  picked	Room 01 local script 211	+0x0345	Room 26 visit
+  picked	Room 01 local script 211	+0x0345	Room 27 visit
+  picked	Room 01 local script 211	+0x0345	Room 28 visit
+  picked	Room 01 local script 211	+0x0345	Room 29 visit
+  picked	Room 01 local script 211	+0x0345	Room 30 visit
+  picked	Room 01 local script 211	+0x0345	Room 31 visit
+  picked	Room 01 local script 211	+0x0345	Room 32 visit
+  picked	Room 01 local script 211	+0x0345	Room 33 visit
+  picked	Room 01 local script 211	+0x0345	Room 34 visit
+  picked	Room 01 local script 211	+0x0345	Room 35 visit
+  picked	Room 01 local script 211	+0x0345	Room 36 visit
+  picked	Room 01 local script 211	+0x0345	Room 37 visit
+  picked	Room 01 local script 211	+0x0345	Room 38 visit
+  picked	Room 01 local script 211	+0x0345	Room 39 visit
+  picked	Room 01 local script 211	+0x0345	Room 40 visit
+  picked	Room 01 local script 211	+0x0345	Room 41 visit
+  picked	Room 01 local script 211	+0x0345	Room 42 visit
+  picked	Room 01 local script 211	+0x0345	Room 43 visit
+  picked	Room 01 local script 211	+0x0345	Room 44 visit
+  picked	Room 01 local script 211	+0x0345	Room 45 visit
+  picked	Room 01 local script 211	+0x0345	Room 46 visit
+  picked	Room 01 local script 211	+0x0345	Room 47 visit
+  picked	Room 01 local script 211	+0x0345	Room 49 visit
+  picked	Room 01 local script 211	+0x0345	Room 50 visit
+  picked	Room 01 local script 211	+0x0345	Room 51 visit
+  picked	Room 01 local script 211	+0x0345	Room 52 visit
+  picked	Room 01 local script 211	+0x0345	Room 53 visit
+  picked	Room 01 local script 211	+0x0345	Room 54 visit
+  picked	Room 01 local script 211	+0x0345	Room 55 visit
+  picked	Room 01 local script 211	+0x0345	Room 56 visit
+  picked	Room 01 local script 211	+0x0345	Room 57 visit
+  picked	Room 01 local script 211	+0x0345	Room 58 visit
+  picked	Room 01 local script 211	+0x0345	Room 59 visit
+  picked	Room 01 local script 211	+0x0345	Room 60 visit
+  picked	Room 01 local script 211	+0x0345	Room 61 visit
+  picked	Room 01 local script 211	+0x0345	Room 62 visit
+  picked	Room 01 local script 211	+0x0345	Room 63 visit
+  picked	Room 01 local script 211	+0x0345	Room 64 visit
+  picked	Room 01 local script 211	+0x0345	Room 65 visit
+  picked	Room 01 local script 211	+0x0345	Room 66 visit
+  picked	Room 01 local script 211	+0x0345	Room 67 visit
+  picked	Room 01 local script 211	+0x0345	Room 68 visit
+  picked	Room 01 local script 211	+0x0345	Room 69 visit
+  picked	Room 01 local script 211	+0x0345	Room 70 visit
+  picked	Room 01 local script 211	+0x0345	Room 79 visit
+  picked	Room 01 local script 211	+0x0345	Room 81 visit
+  picked	Room 01 local script 211	+0x0345	Room 82 visit
+  picked	Room 01 local script 211	+0x0345	Room 83 visit
+  picked	Room 01 local script 211	+0x0345	Room 84 visit
+  picked	Room 01 local script 211	+0x0345	Room 85 visit
+  picked	Room 01 local script 211	+0x0345	Room 86 visit
+  picked	Room 01 local script 211	+0x0345	Room 87 visit
+  picked	Room 01 local script 211	+0x0368	Room 01 visit
+  picked	Room 01 local script 211	+0x0368	Room 02 visit
+  picked	Room 01 local script 211	+0x0368	Room 03 visit
+  picked	Room 01 local script 211	+0x0368	Room 04 visit
+  picked	Room 01 local script 211	+0x0368	Room 05 visit
+  picked	Room 01 local script 211	+0x0368	Room 06 visit
+  picked	Room 01 local script 211	+0x0368	Room 07 visit
+  picked	Room 01 local script 211	+0x0368	Room 08 visit
+  picked	Room 01 local script 211	+0x0368	Room 09 visit
+  picked	Room 01 local script 211	+0x0368	Room 10 visit
+  picked	Room 01 local script 211	+0x0368	Room 11 visit
+  picked	Room 01 local script 211	+0x0368	Room 12 visit
+  picked	Room 01 local script 211	+0x0368	Room 13 visit
+  picked	Room 01 local script 211	+0x0368	Room 14 visit
+  picked	Room 01 local script 211	+0x0368	Room 15 visit
+  picked	Room 01 local script 211	+0x0368	Room 16 visit
+  picked	Room 01 local script 211	+0x0368	Room 17 visit
+  picked	Room 01 local script 211	+0x0368	Room 18 visit
+  picked	Room 01 local script 211	+0x0368	Room 19 visit
+  picked	Room 01 local script 211	+0x0368	Room 20 visit
+  picked	Room 01 local script 211	+0x0368	Room 22 visit
+  picked	Room 01 local script 211	+0x0368	Room 23 visit
+  picked	Room 01 local script 211	+0x0368	Room 24 visit
+  picked	Room 01 local script 211	+0x0368	Room 25 visit
+  picked	Room 01 local script 211	+0x0368	Room 26 visit
+  picked	Room 01 local script 211	+0x0368	Room 27 visit
+  picked	Room 01 local script 211	+0x0368	Room 28 visit
+  picked	Room 01 local script 211	+0x0368	Room 29 visit
+  picked	Room 01 local script 211	+0x0368	Room 30 visit
+  picked	Room 01 local script 211	+0x0368	Room 31 visit
+  picked	Room 01 local script 211	+0x0368	Room 32 visit
+  picked	Room 01 local script 211	+0x0368	Room 33 visit
+  picked	Room 01 local script 211	+0x0368	Room 34 visit
+  picked	Room 01 local script 211	+0x0368	Room 35 visit
+  picked	Room 01 local script 211	+0x0368	Room 36 visit
+  picked	Room 01 local script 211	+0x0368	Room 37 visit
+  picked	Room 01 local script 211	+0x0368	Room 38 visit
+  picked	Room 01 local script 211	+0x0368	Room 39 visit
+  picked	Room 01 local script 211	+0x0368	Room 40 visit
+  picked	Room 01 local script 211	+0x0368	Room 41 visit
+  picked	Room 01 local script 211	+0x0368	Room 42 visit
+  picked	Room 01 local script 211	+0x0368	Room 43 visit
+  picked	Room 01 local script 211	+0x0368	Room 44 visit
+  picked	Room 01 local script 211	+0x0368	Room 45 visit
+  picked	Room 01 local script 211	+0x0368	Room 46 visit
+  picked	Room 01 local script 211	+0x0368	Room 47 visit
+  picked	Room 01 local script 211	+0x0368	Room 49 visit
+  picked	Room 01 local script 211	+0x0368	Room 50 visit
+  picked	Room 01 local script 211	+0x0368	Room 51 visit
+  picked	Room 01 local script 211	+0x0368	Room 52 visit
+  picked	Room 01 local script 211	+0x0368	Room 53 visit
+  picked	Room 01 local script 211	+0x0368	Room 54 visit
+  picked	Room 01 local script 211	+0x0368	Room 55 visit
+  picked	Room 01 local script 211	+0x0368	Room 56 visit
+  picked	Room 01 local script 211	+0x0368	Room 57 visit
+  picked	Room 01 local script 211	+0x0368	Room 58 visit
+  picked	Room 01 local script 211	+0x0368	Room 59 visit
+  picked	Room 01 local script 211	+0x0368	Room 60 visit
+  picked	Room 01 local script 211	+0x0368	Room 61 visit
+  picked	Room 01 local script 211	+0x0368	Room 62 visit
+  picked	Room 01 local script 211	+0x0368	Room 63 visit
+  picked	Room 01 local script 211	+0x0368	Room 64 visit
+  picked	Room 01 local script 211	+0x0368	Room 65 visit
+  picked	Room 01 local script 211	+0x0368	Room 66 visit
+  picked	Room 01 local script 211	+0x0368	Room 67 visit
+  picked	Room 01 local script 211	+0x0368	Room 68 visit
+  picked	Room 01 local script 211	+0x0368	Room 69 visit
+  picked	Room 01 local script 211	+0x0368	Room 70 visit
+  picked	Room 01 local script 211	+0x0368	Room 79 visit
+  picked	Room 01 local script 211	+0x0368	Room 81 visit
+  picked	Room 01 local script 211	+0x0368	Room 82 visit
+  picked	Room 01 local script 211	+0x0368	Room 83 visit
+  picked	Room 01 local script 211	+0x0368	Room 84 visit
+  picked	Room 01 local script 211	+0x0368	Room 85 visit
+  picked	Room 01 local script 211	+0x0368	Room 86 visit
+  picked	Room 01 local script 211	+0x0368	Room 87 visit
+  picked	Room 01 local script 211	+0x038B	Room 01 visit
+  picked	Room 01 local script 211	+0x038B	Room 02 visit
+  picked	Room 01 local script 211	+0x038B	Room 03 visit
+  picked	Room 01 local script 211	+0x038B	Room 04 visit
+  picked	Room 01 local script 211	+0x038B	Room 05 visit
+  picked	Room 01 local script 211	+0x038B	Room 06 visit
+  picked	Room 01 local script 211	+0x038B	Room 07 visit
+  picked	Room 01 local script 211	+0x038B	Room 08 visit
+  picked	Room 01 local script 211	+0x038B	Room 09 visit
+  picked	Room 01 local script 211	+0x038B	Room 10 visit
+  picked	Room 01 local script 211	+0x038B	Room 11 visit
+  picked	Room 01 local script 211	+0x038B	Room 12 visit
+  picked	Room 01 local script 211	+0x038B	Room 13 visit
+  picked	Room 01 local script 211	+0x038B	Room 14 visit
+  picked	Room 01 local script 211	+0x038B	Room 15 visit
+  picked	Room 01 local script 211	+0x038B	Room 16 visit
+  picked	Room 01 local script 211	+0x038B	Room 17 visit
+  picked	Room 01 local script 211	+0x038B	Room 18 visit
+  picked	Room 01 local script 211	+0x038B	Room 19 visit
+  picked	Room 01 local script 211	+0x038B	Room 20 visit
+  picked	Room 01 local script 211	+0x038B	Room 22 visit
+  picked	Room 01 local script 211	+0x038B	Room 23 visit
+  picked	Room 01 local script 211	+0x038B	Room 24 visit
+  picked	Room 01 local script 211	+0x038B	Room 25 visit
+  picked	Room 01 local script 211	+0x038B	Room 26 visit
+  picked	Room 01 local script 211	+0x038B	Room 27 visit
+  picked	Room 01 local script 211	+0x038B	Room 28 visit
+  picked	Room 01 local script 211	+0x038B	Room 29 visit
+  picked	Room 01 local script 211	+0x038B	Room 30 visit
+  picked	Room 01 local script 211	+0x038B	Room 31 visit
+  picked	Room 01 local script 211	+0x038B	Room 32 visit
+  picked	Room 01 local script 211	+0x038B	Room 33 visit
+  picked	Room 01 local script 211	+0x038B	Room 34 visit
+  picked	Room 01 local script 211	+0x038B	Room 35 visit
+  picked	Room 01 local script 211	+0x038B	Room 36 visit
+  picked	Room 01 local script 211	+0x038B	Room 37 visit
+  picked	Room 01 local script 211	+0x038B	Room 38 visit
+  picked	Room 01 local script 211	+0x038B	Room 39 visit
+  picked	Room 01 local script 211	+0x038B	Room 40 visit
+  picked	Room 01 local script 211	+0x038B	Room 41 visit
+  picked	Room 01 local script 211	+0x038B	Room 42 visit
+  picked	Room 01 local script 211	+0x038B	Room 43 visit
+  picked	Room 01 local script 211	+0x038B	Room 44 visit
+  picked	Room 01 local script 211	+0x038B	Room 45 visit
+  picked	Room 01 local script 211	+0x038B	Room 46 visit
+  picked	Room 01 local script 211	+0x038B	Room 47 visit
+  picked	Room 01 local script 211	+0x038B	Room 49 visit
+  picked	Room 01 local script 211	+0x038B	Room 50 visit
+  picked	Room 01 local script 211	+0x038B	Room 51 visit
+  picked	Room 01 local script 211	+0x038B	Room 52 visit
+  picked	Room 01 local script 211	+0x038B	Room 53 visit
+  picked	Room 01 local script 211	+0x038B	Room 54 visit
+  picked	Room 01 local script 211	+0x038B	Room 55 visit
+  picked	Room 01 local script 211	+0x038B	Room 56 visit
+  picked	Room 01 local script 211	+0x038B	Room 57 visit
+  picked	Room 01 local script 211	+0x038B	Room 58 visit
+  picked	Room 01 local script 211	+0x038B	Room 59 visit
+  picked	Room 01 local script 211	+0x038B	Room 60 visit
+  picked	Room 01 local script 211	+0x038B	Room 61 visit
+  picked	Room 01 local script 211	+0x038B	Room 62 visit
+  picked	Room 01 local script 211	+0x038B	Room 63 visit
+  picked	Room 01 local script 211	+0x038B	Room 64 visit
+  picked	Room 01 local script 211	+0x038B	Room 65 visit
+  picked	Room 01 local script 211	+0x038B	Room 66 visit
+  picked	Room 01 local script 211	+0x038B	Room 67 visit
+  picked	Room 01 local script 211	+0x038B	Room 68 visit
+  picked	Room 01 local script 211	+0x038B	Room 69 visit
+  picked	Room 01 local script 211	+0x038B	Room 70 visit
+  picked	Room 01 local script 211	+0x038B	Room 79 visit
+  picked	Room 01 local script 211	+0x038B	Room 81 visit
+  picked	Room 01 local script 211	+0x038B	Room 82 visit
+  picked	Room 01 local script 211	+0x038B	Room 83 visit
+  picked	Room 01 local script 211	+0x038B	Room 84 visit
+  picked	Room 01 local script 211	+0x038B	Room 85 visit
+  picked	Room 01 local script 211	+0x038B	Room 86 visit
+  picked	Room 01 local script 211	+0x038B	Room 87 visit
+  picked	Room 01 local script 211	+0x03AE	Room 01 visit
+  picked	Room 01 local script 211	+0x03AE	Room 02 visit
+  picked	Room 01 local script 211	+0x03AE	Room 03 visit
+  picked	Room 01 local script 211	+0x03AE	Room 04 visit
+  picked	Room 01 local script 211	+0x03AE	Room 05 visit
+  picked	Room 01 local script 211	+0x03AE	Room 06 visit
+  picked	Room 01 local script 211	+0x03AE	Room 07 visit
+  picked	Room 01 local script 211	+0x03AE	Room 08 visit
+  picked	Room 01 local script 211	+0x03AE	Room 09 visit
+  picked	Room 01 local script 211	+0x03AE	Room 10 visit
+  picked	Room 01 local script 211	+0x03AE	Room 11 visit
+  picked	Room 01 local script 211	+0x03AE	Room 12 visit
+  picked	Room 01 local script 211	+0x03AE	Room 13 visit
+  picked	Room 01 local script 211	+0x03AE	Room 14 visit
+  picked	Room 01 local script 211	+0x03AE	Room 15 visit
+  picked	Room 01 local script 211	+0x03AE	Room 16 visit
+  picked	Room 01 local script 211	+0x03AE	Room 17 visit
+  picked	Room 01 local script 211	+0x03AE	Room 18 visit
+  picked	Room 01 local script 211	+0x03AE	Room 19 visit
+  picked	Room 01 local script 211	+0x03AE	Room 20 visit
+  picked	Room 01 local script 211	+0x03AE	Room 22 visit
+  picked	Room 01 local script 211	+0x03AE	Room 23 visit
+  picked	Room 01 local script 211	+0x03AE	Room 24 visit
+  picked	Room 01 local script 211	+0x03AE	Room 25 visit
+  picked	Room 01 local script 211	+0x03AE	Room 26 visit
+  picked	Room 01 local script 211	+0x03AE	Room 27 visit
+  picked	Room 01 local script 211	+0x03AE	Room 28 visit
+  picked	Room 01 local script 211	+0x03AE	Room 29 visit
+  picked	Room 01 local script 211	+0x03AE	Room 30 visit
+  picked	Room 01 local script 211	+0x03AE	Room 31 visit
+  picked	Room 01 local script 211	+0x03AE	Room 32 visit
+  picked	Room 01 local script 211	+0x03AE	Room 33 visit
+  picked	Room 01 local script 211	+0x03AE	Room 34 visit
+  picked	Room 01 local script 211	+0x03AE	Room 35 visit
+  picked	Room 01 local script 211	+0x03AE	Room 36 visit
+  picked	Room 01 local script 211	+0x03AE	Room 37 visit
+  picked	Room 01 local script 211	+0x03AE	Room 38 visit
+  picked	Room 01 local script 211	+0x03AE	Room 39 visit
+  picked	Room 01 local script 211	+0x03AE	Room 40 visit
+  picked	Room 01 local script 211	+0x03AE	Room 41 visit
+  picked	Room 01 local script 211	+0x03AE	Room 42 visit
+  picked	Room 01 local script 211	+0x03AE	Room 43 visit
+  picked	Room 01 local script 211	+0x03AE	Room 44 visit
+  picked	Room 01 local script 211	+0x03AE	Room 45 visit
+  picked	Room 01 local script 211	+0x03AE	Room 46 visit
+  picked	Room 01 local script 211	+0x03AE	Room 47 visit
+  picked	Room 01 local script 211	+0x03AE	Room 49 visit
+  picked	Room 01 local script 211	+0x03AE	Room 50 visit
+  picked	Room 01 local script 211	+0x03AE	Room 51 visit
+  picked	Room 01 local script 211	+0x03AE	Room 52 visit
+  picked	Room 01 local script 211	+0x03AE	Room 53 visit
+  picked	Room 01 local script 211	+0x03AE	Room 54 visit
+  picked	Room 01 local script 211	+0x03AE	Room 55 visit
+  picked	Room 01 local script 211	+0x03AE	Room 56 visit
+  picked	Room 01 local script 211	+0x03AE	Room 57 visit
+  picked	Room 01 local script 211	+0x03AE	Room 58 visit
+  picked	Room 01 local script 211	+0x03AE	Room 59 visit
+  picked	Room 01 local script 211	+0x03AE	Room 60 visit
+  picked	Room 01 local script 211	+0x03AE	Room 61 visit
+  picked	Room 01 local script 211	+0x03AE	Room 62 visit
+  picked	Room 01 local script 211	+0x03AE	Room 63 visit
+  picked	Room 01 local script 211	+0x03AE	Room 64 visit
+  picked	Room 01 local script 211	+0x03AE	Room 65 visit
+  picked	Room 01 local script 211	+0x03AE	Room 66 visit
+  picked	Room 01 local script 211	+0x03AE	Room 67 visit
+  picked	Room 01 local script 211	+0x03AE	Room 68 visit
+  picked	Room 01 local script 211	+0x03AE	Room 69 visit
+  picked	Room 01 local script 211	+0x03AE	Room 70 visit
+  picked	Room 01 local script 211	+0x03AE	Room 79 visit
+  picked	Room 01 local script 211	+0x03AE	Room 81 visit
+  picked	Room 01 local script 211	+0x03AE	Room 82 visit
+  picked	Room 01 local script 211	+0x03AE	Room 83 visit
+  picked	Room 01 local script 211	+0x03AE	Room 84 visit
+  picked	Room 01 local script 211	+0x03AE	Room 85 visit
+  picked	Room 01 local script 211	+0x03AE	Room 86 visit
+  picked	Room 01 local script 211	+0x03AE	Room 87 visit
+  picked	Room 01 local script 211	+0x03D1	Room 01 visit
+  picked	Room 01 local script 211	+0x03D1	Room 02 visit
+  picked	Room 01 local script 211	+0x03D1	Room 03 visit
+  picked	Room 01 local script 211	+0x03D1	Room 04 visit
+  picked	Room 01 local script 211	+0x03D1	Room 05 visit
+  picked	Room 01 local script 211	+0x03D1	Room 06 visit
+  picked	Room 01 local script 211	+0x03D1	Room 07 visit
+  picked	Room 01 local script 211	+0x03D1	Room 08 visit
+  picked	Room 01 local script 211	+0x03D1	Room 09 visit
+  picked	Room 01 local script 211	+0x03D1	Room 10 visit
+  picked	Room 01 local script 211	+0x03D1	Room 11 visit
+  picked	Room 01 local script 211	+0x03D1	Room 12 visit
+  picked	Room 01 local script 211	+0x03D1	Room 13 visit
+  picked	Room 01 local script 211	+0x03D1	Room 14 visit
+  picked	Room 01 local script 211	+0x03D1	Room 15 visit
+  picked	Room 01 local script 211	+0x03D1	Room 16 visit
+  picked	Room 01 local script 211	+0x03D1	Room 17 visit
+  picked	Room 01 local script 211	+0x03D1	Room 18 visit
+  picked	Room 01 local script 211	+0x03D1	Room 19 visit
+  picked	Room 01 local script 211	+0x03D1	Room 20 visit
+  picked	Room 01 local script 211	+0x03D1	Room 22 visit
+  picked	Room 01 local script 211	+0x03D1	Room 23 visit
+  picked	Room 01 local script 211	+0x03D1	Room 24 visit
+  picked	Room 01 local script 211	+0x03D1	Room 25 visit
+  picked	Room 01 local script 211	+0x03D1	Room 26 visit
+  picked	Room 01 local script 211	+0x03D1	Room 27 visit
+  picked	Room 01 local script 211	+0x03D1	Room 28 visit
+  picked	Room 01 local script 211	+0x03D1	Room 29 visit
+  picked	Room 01 local script 211	+0x03D1	Room 30 visit
+  picked	Room 01 local script 211	+0x03D1	Room 31 visit
+  picked	Room 01 local script 211	+0x03D1	Room 32 visit
+  picked	Room 01 local script 211	+0x03D1	Room 33 visit
+  picked	Room 01 local script 211	+0x03D1	Room 34 visit
+  picked	Room 01 local script 211	+0x03D1	Room 35 visit
+  picked	Room 01 local script 211	+0x03D1	Room 36 visit
+  picked	Room 01 local script 211	+0x03D1	Room 37 visit
+  picked	Room 01 local script 211	+0x03D1	Room 38 visit
+  picked	Room 01 local script 211	+0x03D1	Room 39 visit
+  picked	Room 01 local script 211	+0x03D1	Room 40 visit
+  picked	Room 01 local script 211	+0x03D1	Room 41 visit
+  picked	Room 01 local script 211	+0x03D1	Room 42 visit
+  picked	Room 01 local script 211	+0x03D1	Room 43 visit
+  picked	Room 01 local script 211	+0x03D1	Room 44 visit
+  picked	Room 01 local script 211	+0x03D1	Room 45 visit
+  picked	Room 01 local script 211	+0x03D1	Room 46 visit
+  picked	Room 01 local script 211	+0x03D1	Room 47 visit
+  picked	Room 01 local script 211	+0x03D1	Room 49 visit
+  picked	Room 01 local script 211	+0x03D1	Room 50 visit
+  picked	Room 01 local script 211	+0x03D1	Room 51 visit
+  picked	Room 01 local script 211	+0x03D1	Room 52 visit
+  picked	Room 01 local script 211	+0x03D1	Room 53 visit
+  picked	Room 01 local script 211	+0x03D1	Room 54 visit
+  picked	Room 01 local script 211	+0x03D1	Room 55 visit
+  picked	Room 01 local script 211	+0x03D1	Room 56 visit
+  picked	Room 01 local script 211	+0x03D1	Room 57 visit
+  picked	Room 01 local script 211	+0x03D1	Room 58 visit
+  picked	Room 01 local script 211	+0x03D1	Room 59 visit
+  picked	Room 01 local script 211	+0x03D1	Room 60 visit
+  picked	Room 01 local script 211	+0x03D1	Room 61 visit
+  picked	Room 01 local script 211	+0x03D1	Room 62 visit
+  picked	Room 01 local script 211	+0x03D1	Room 63 visit
+  picked	Room 01 local script 211	+0x03D1	Room 64 visit
+  picked	Room 01 local script 211	+0x03D1	Room 65 visit
+  picked	Room 01 local script 211	+0x03D1	Room 66 visit
+  picked	Room 01 local script 211	+0x03D1	Room 67 visit
+  picked	Room 01 local script 211	+0x03D1	Room 68 visit
+  picked	Room 01 local script 211	+0x03D1	Room 69 visit
+  picked	Room 01 local script 211	+0x03D1	Room 70 visit
+  picked	Room 01 local script 211	+0x03D1	Room 79 visit
+  picked	Room 01 local script 211	+0x03D1	Room 81 visit
+  picked	Room 01 local script 211	+0x03D1	Room 82 visit
+  picked	Room 01 local script 211	+0x03D1	Room 83 visit
+  picked	Room 01 local script 211	+0x03D1	Room 84 visit
+  picked	Room 01 local script 211	+0x03D1	Room 85 visit
+  picked	Room 01 local script 211	+0x03D1	Room 86 visit
+  picked	Room 01 local script 211	+0x03D1	Room 87 visit
+  picked	Room 01 local script 211	+0x03F4	Room 01 visit
+  picked	Room 01 local script 211	+0x03F4	Room 02 visit
+  picked	Room 01 local script 211	+0x03F4	Room 03 visit
+  picked	Room 01 local script 211	+0x03F4	Room 04 visit
+  picked	Room 01 local script 211	+0x03F4	Room 05 visit
+  picked	Room 01 local script 211	+0x03F4	Room 06 visit
+  picked	Room 01 local script 211	+0x03F4	Room 07 visit
+  picked	Room 01 local script 211	+0x03F4	Room 08 visit
+  picked	Room 01 local script 211	+0x03F4	Room 09 visit
+  picked	Room 01 local script 211	+0x03F4	Room 10 visit
+  picked	Room 01 local script 211	+0x03F4	Room 11 visit
+  picked	Room 01 local script 211	+0x03F4	Room 12 visit
+  picked	Room 01 local script 211	+0x03F4	Room 13 visit
+  picked	Room 01 local script 211	+0x03F4	Room 14 visit
+  picked	Room 01 local script 211	+0x03F4	Room 15 visit
+  picked	Room 01 local script 211	+0x03F4	Room 16 visit
+  picked	Room 01 local script 211	+0x03F4	Room 17 visit
+  picked	Room 01 local script 211	+0x03F4	Room 18 visit
+  picked	Room 01 local script 211	+0x03F4	Room 19 visit
+  picked	Room 01 local script 211	+0x03F4	Room 20 visit
+  picked	Room 01 local script 211	+0x03F4	Room 22 visit
+  picked	Room 01 local script 211	+0x03F4	Room 23 visit
+  picked	Room 01 local script 211	+0x03F4	Room 24 visit
+  picked	Room 01 local script 211	+0x03F4	Room 25 visit
+  picked	Room 01 local script 211	+0x03F4	Room 26 visit
+  picked	Room 01 local script 211	+0x03F4	Room 27 visit
+  picked	Room 01 local script 211	+0x03F4	Room 28 visit
+  picked	Room 01 local script 211	+0x03F4	Room 29 visit
+  picked	Room 01 local script 211	+0x03F4	Room 30 visit
+  picked	Room 01 local script 211	+0x03F4	Room 31 visit
+  picked	Room 01 local script 211	+0x03F4	Room 32 visit
+  picked	Room 01 local script 211	+0x03F4	Room 33 visit
+  picked	Room 01 local script 211	+0x03F4	Room 34 visit
+  picked	Room 01 local script 211	+0x03F4	Room 35 visit
+  picked	Room 01 local script 211	+0x03F4	Room 36 visit
+  picked	Room 01 local script 211	+0x03F4	Room 37 visit
+  picked	Room 01 local script 211	+0x03F4	Room 38 visit
+  picked	Room 01 local script 211	+0x03F4	Room 39 visit
+  picked	Room 01 local script 211	+0x03F4	Room 40 visit
+  picked	Room 01 local script 211	+0x03F4	Room 41 visit
+  picked	Room 01 local script 211	+0x03F4	Room 42 visit
+  picked	Room 01 local script 211	+0x03F4	Room 43 visit
+  picked	Room 01 local script 211	+0x03F4	Room 44 visit
+  picked	Room 01 local script 211	+0x03F4	Room 45 visit
+  picked	Room 01 local script 211	+0x03F4	Room 46 visit
+  picked	Room 01 local script 211	+0x03F4	Room 47 visit
+  picked	Room 01 local script 211	+0x03F4	Room 49 visit
+  picked	Room 01 local script 211	+0x03F4	Room 50 visit
+  picked	Room 01 local script 211	+0x03F4	Room 51 visit
+  picked	Room 01 local script 211	+0x03F4	Room 52 visit
+  picked	Room 01 local script 211	+0x03F4	Room 53 visit
+  picked	Room 01 local script 211	+0x03F4	Room 54 visit
+  picked	Room 01 local script 211	+0x03F4	Room 55 visit
+  picked	Room 01 local script 211	+0x03F4	Room 56 visit
+  picked	Room 01 local script 211	+0x03F4	Room 57 visit
+  picked	Room 01 local script 211	+0x03F4	Room 58 visit
+  picked	Room 01 local script 211	+0x03F4	Room 59 visit
+  picked	Room 01 local script 211	+0x03F4	Room 60 visit
+  picked	Room 01 local script 211	+0x03F4	Room 61 visit
+  picked	Room 01 local script 211	+0x03F4	Room 62 visit
+  picked	Room 01 local script 211	+0x03F4	Room 63 visit
+  picked	Room 01 local script 211	+0x03F4	Room 64 visit
+  picked	Room 01 local script 211	+0x03F4	Room 65 visit
+  picked	Room 01 local script 211	+0x03F4	Room 66 visit
+  picked	Room 01 local script 211	+0x03F4	Room 67 visit
+  picked	Room 01 local script 211	+0x03F4	Room 68 visit
+  picked	Room 01 local script 211	+0x03F4	Room 69 visit
+  picked	Room 01 local script 211	+0x03F4	Room 70 visit
+  picked	Room 01 local script 211	+0x03F4	Room 79 visit
+  picked	Room 01 local script 211	+0x03F4	Room 81 visit
+  picked	Room 01 local script 211	+0x03F4	Room 82 visit
+  picked	Room 01 local script 211	+0x03F4	Room 83 visit
+  picked	Room 01 local script 211	+0x03F4	Room 84 visit
+  picked	Room 01 local script 211	+0x03F4	Room 85 visit
+  picked	Room 01 local script 211	+0x03F4	Room 86 visit
+  picked	Room 01 local script 211	+0x03F4	Room 87 visit
+  picked	Room 01 local script 211	+0x0417	Room 01 visit
+  picked	Room 01 local script 211	+0x0417	Room 02 visit
+  picked	Room 01 local script 211	+0x0417	Room 03 visit
+  picked	Room 01 local script 211	+0x0417	Room 04 visit
+  picked	Room 01 local script 211	+0x0417	Room 05 visit
+  picked	Room 01 local script 211	+0x0417	Room 06 visit
+  picked	Room 01 local script 211	+0x0417	Room 07 visit
+  picked	Room 01 local script 211	+0x0417	Room 08 visit
+  picked	Room 01 local script 211	+0x0417	Room 09 visit
+  picked	Room 01 local script 211	+0x0417	Room 10 visit
+  picked	Room 01 local script 211	+0x0417	Room 11 visit
+  picked	Room 01 local script 211	+0x0417	Room 12 visit
+  picked	Room 01 local script 211	+0x0417	Room 13 visit
+  picked	Room 01 local script 211	+0x0417	Room 14 visit
+  picked	Room 01 local script 211	+0x0417	Room 15 visit
+  picked	Room 01 local script 211	+0x0417	Room 16 visit
+  picked	Room 01 local script 211	+0x0417	Room 17 visit
+  picked	Room 01 local script 211	+0x0417	Room 18 visit
+  picked	Room 01 local script 211	+0x0417	Room 19 visit
+  picked	Room 01 local script 211	+0x0417	Room 20 visit
+  picked	Room 01 local script 211	+0x0417	Room 22 visit
+  picked	Room 01 local script 211	+0x0417	Room 23 visit
+  picked	Room 01 local script 211	+0x0417	Room 24 visit
+  picked	Room 01 local script 211	+0x0417	Room 25 visit
+  picked	Room 01 local script 211	+0x0417	Room 26 visit
+  picked	Room 01 local script 211	+0x0417	Room 27 visit
+  picked	Room 01 local script 211	+0x0417	Room 28 visit
+  picked	Room 01 local script 211	+0x0417	Room 29 visit
+  picked	Room 01 local script 211	+0x0417	Room 30 visit
+  picked	Room 01 local script 211	+0x0417	Room 31 visit
+  picked	Room 01 local script 211	+0x0417	Room 32 visit
+  picked	Room 01 local script 211	+0x0417	Room 33 visit
+  picked	Room 01 local script 211	+0x0417	Room 34 visit
+  picked	Room 01 local script 211	+0x0417	Room 35 visit
+  picked	Room 01 local script 211	+0x0417	Room 36 visit
+  picked	Room 01 local script 211	+0x0417	Room 37 visit
+  picked	Room 01 local script 211	+0x0417	Room 38 visit
+  picked	Room 01 local script 211	+0x0417	Room 39 visit
+  picked	Room 01 local script 211	+0x0417	Room 40 visit
+  picked	Room 01 local script 211	+0x0417	Room 41 visit
+  picked	Room 01 local script 211	+0x0417	Room 42 visit
+  picked	Room 01 local script 211	+0x0417	Room 43 visit
+  picked	Room 01 local script 211	+0x0417	Room 44 visit
+  picked	Room 01 local script 211	+0x0417	Room 45 visit
+  picked	Room 01 local script 211	+0x0417	Room 46 visit
+  picked	Room 01 local script 211	+0x0417	Room 47 visit
+  picked	Room 01 local script 211	+0x0417	Room 49 visit
+  picked	Room 01 local script 211	+0x0417	Room 50 visit
+  picked	Room 01 local script 211	+0x0417	Room 51 visit
+  picked	Room 01 local script 211	+0x0417	Room 52 visit
+  picked	Room 01 local script 211	+0x0417	Room 53 visit
+  picked	Room 01 local script 211	+0x0417	Room 54 visit
+  picked	Room 01 local script 211	+0x0417	Room 55 visit
+  picked	Room 01 local script 211	+0x0417	Room 56 visit
+  picked	Room 01 local script 211	+0x0417	Room 57 visit
+  picked	Room 01 local script 211	+0x0417	Room 58 visit
+  picked	Room 01 local script 211	+0x0417	Room 59 visit
+  picked	Room 01 local script 211	+0x0417	Room 60 visit
+  picked	Room 01 local script 211	+0x0417	Room 61 visit
+  picked	Room 01 local script 211	+0x0417	Room 62 visit
+  picked	Room 01 local script 211	+0x0417	Room 63 visit
+  picked	Room 01 local script 211	+0x0417	Room 64 visit
+  picked	Room 01 local script 211	+0x0417	Room 65 visit
+  picked	Room 01 local script 211	+0x0417	Room 66 visit
+  picked	Room 01 local script 211	+0x0417	Room 67 visit
+  picked	Room 01 local script 211	+0x0417	Room 68 visit
+  picked	Room 01 local script 211	+0x0417	Room 69 visit
+  picked	Room 01 local script 211	+0x0417	Room 70 visit
+  picked	Room 01 local script 211	+0x0417	Room 79 visit
+  picked	Room 01 local script 211	+0x0417	Room 81 visit
+  picked	Room 01 local script 211	+0x0417	Room 82 visit
+  picked	Room 01 local script 211	+0x0417	Room 83 visit
+  picked	Room 01 local script 211	+0x0417	Room 84 visit
+  picked	Room 01 local script 211	+0x0417	Room 85 visit
+  picked	Room 01 local script 211	+0x0417	Room 86 visit
+  picked	Room 01 local script 211	+0x0417	Room 87 visit
+  picked	Room 01 local script 211	+0x043A	Room 01 visit
+  picked	Room 01 local script 211	+0x043A	Room 02 visit
+  picked	Room 01 local script 211	+0x043A	Room 03 visit
+  picked	Room 01 local script 211	+0x043A	Room 04 visit
+  picked	Room 01 local script 211	+0x043A	Room 05 visit
+  picked	Room 01 local script 211	+0x043A	Room 06 visit
+  picked	Room 01 local script 211	+0x043A	Room 07 visit
+  picked	Room 01 local script 211	+0x043A	Room 08 visit
+  picked	Room 01 local script 211	+0x043A	Room 09 visit
+  picked	Room 01 local script 211	+0x043A	Room 10 visit
+  picked	Room 01 local script 211	+0x043A	Room 11 visit
+  picked	Room 01 local script 211	+0x043A	Room 12 visit
+  picked	Room 01 local script 211	+0x043A	Room 13 visit
+  picked	Room 01 local script 211	+0x043A	Room 14 visit
+  picked	Room 01 local script 211	+0x043A	Room 15 visit
+  picked	Room 01 local script 211	+0x043A	Room 16 visit
+  picked	Room 01 local script 211	+0x043A	Room 17 visit
+  picked	Room 01 local script 211	+0x043A	Room 18 visit
+  picked	Room 01 local script 211	+0x043A	Room 19 visit
+  picked	Room 01 local script 211	+0x043A	Room 20 visit
+  picked	Room 01 local script 211	+0x043A	Room 22 visit
+  picked	Room 01 local script 211	+0x043A	Room 23 visit
+  picked	Room 01 local script 211	+0x043A	Room 24 visit
+  picked	Room 01 local script 211	+0x043A	Room 25 visit
+  picked	Room 01 local script 211	+0x043A	Room 26 visit
+  picked	Room 01 local script 211	+0x043A	Room 27 visit
+  picked	Room 01 local script 211	+0x043A	Room 28 visit
+  picked	Room 01 local script 211	+0x043A	Room 29 visit
+  picked	Room 01 local script 211	+0x043A	Room 30 visit
+  picked	Room 01 local script 211	+0x043A	Room 31 visit
+  picked	Room 01 local script 211	+0x043A	Room 32 visit
+  picked	Room 01 local script 211	+0x043A	Room 33 visit
+  picked	Room 01 local script 211	+0x043A	Room 34 visit
+  picked	Room 01 local script 211	+0x043A	Room 35 visit
+  picked	Room 01 local script 211	+0x043A	Room 36 visit
+  picked	Room 01 local script 211	+0x043A	Room 37 visit
+  picked	Room 01 local script 211	+0x043A	Room 38 visit
+  picked	Room 01 local script 211	+0x043A	Room 39 visit
+  picked	Room 01 local script 211	+0x043A	Room 40 visit
+  picked	Room 01 local script 211	+0x043A	Room 41 visit
+  picked	Room 01 local script 211	+0x043A	Room 42 visit
+  picked	Room 01 local script 211	+0x043A	Room 43 visit
+  picked	Room 01 local script 211	+0x043A	Room 44 visit
+  picked	Room 01 local script 211	+0x043A	Room 45 visit
+  picked	Room 01 local script 211	+0x043A	Room 46 visit
+  picked	Room 01 local script 211	+0x043A	Room 47 visit
+  picked	Room 01 local script 211	+0x043A	Room 49 visit
+  picked	Room 01 local script 211	+0x043A	Room 50 visit
+  picked	Room 01 local script 211	+0x043A	Room 51 visit
+  picked	Room 01 local script 211	+0x043A	Room 52 visit
+  picked	Room 01 local script 211	+0x043A	Room 53 visit
+  picked	Room 01 local script 211	+0x043A	Room 54 visit
+  picked	Room 01 local script 211	+0x043A	Room 55 visit
+  picked	Room 01 local script 211	+0x043A	Room 56 visit
+  picked	Room 01 local script 211	+0x043A	Room 57 visit
+  picked	Room 01 local script 211	+0x043A	Room 58 visit
+  picked	Room 01 local script 211	+0x043A	Room 59 visit
+  picked	Room 01 local script 211	+0x043A	Room 60 visit
+  picked	Room 01 local script 211	+0x043A	Room 61 visit
+  picked	Room 01 local script 211	+0x043A	Room 62 visit
+  picked	Room 01 local script 211	+0x043A	Room 63 visit
+  picked	Room 01 local script 211	+0x043A	Room 64 visit
+  picked	Room 01 local script 211	+0x043A	Room 65 visit
+  picked	Room 01 local script 211	+0x043A	Room 66 visit
+  picked	Room 01 local script 211	+0x043A	Room 67 visit
+  picked	Room 01 local script 211	+0x043A	Room 68 visit
+  picked	Room 01 local script 211	+0x043A	Room 69 visit
+  picked	Room 01 local script 211	+0x043A	Room 70 visit
+  picked	Room 01 local script 211	+0x043A	Room 79 visit
+  picked	Room 01 local script 211	+0x043A	Room 81 visit
+  picked	Room 01 local script 211	+0x043A	Room 82 visit
+  picked	Room 01 local script 211	+0x043A	Room 83 visit
+  picked	Room 01 local script 211	+0x043A	Room 84 visit
+  picked	Room 01 local script 211	+0x043A	Room 85 visit
+  picked	Room 01 local script 211	+0x043A	Room 86 visit
+  picked	Room 01 local script 211	+0x043A	Room 87 visit
+  picked	Room 01 local script 211	+0x045D	Room 01 visit
+  picked	Room 01 local script 211	+0x045D	Room 02 visit
+  picked	Room 01 local script 211	+0x045D	Room 03 visit
+  picked	Room 01 local script 211	+0x045D	Room 04 visit
+  picked	Room 01 local script 211	+0x045D	Room 05 visit
+  picked	Room 01 local script 211	+0x045D	Room 06 visit
+  picked	Room 01 local script 211	+0x045D	Room 07 visit
+  picked	Room 01 local script 211	+0x045D	Room 08 visit
+  picked	Room 01 local script 211	+0x045D	Room 09 visit
+  picked	Room 01 local script 211	+0x045D	Room 10 visit
+  picked	Room 01 local script 211	+0x045D	Room 11 visit
+  picked	Room 01 local script 211	+0x045D	Room 12 visit
+  picked	Room 01 local script 211	+0x045D	Room 13 visit
+  picked	Room 01 local script 211	+0x045D	Room 14 visit
+  picked	Room 01 local script 211	+0x045D	Room 15 visit
+  picked	Room 01 local script 211	+0x045D	Room 16 visit
+  picked	Room 01 local script 211	+0x045D	Room 17 visit
+  picked	Room 01 local script 211	+0x045D	Room 18 visit
+  picked	Room 01 local script 211	+0x045D	Room 19 visit
+  picked	Room 01 local script 211	+0x045D	Room 20 visit
+  picked	Room 01 local script 211	+0x045D	Room 22 visit
+  picked	Room 01 local script 211	+0x045D	Room 23 visit
+  picked	Room 01 local script 211	+0x045D	Room 24 visit
+  picked	Room 01 local script 211	+0x045D	Room 25 visit
+  picked	Room 01 local script 211	+0x045D	Room 26 visit
+  picked	Room 01 local script 211	+0x045D	Room 27 visit
+  picked	Room 01 local script 211	+0x045D	Room 28 visit
+  picked	Room 01 local script 211	+0x045D	Room 29 visit
+  picked	Room 01 local script 211	+0x045D	Room 30 visit
+  picked	Room 01 local script 211	+0x045D	Room 31 visit
+  picked	Room 01 local script 211	+0x045D	Room 32 visit
+  picked	Room 01 local script 211	+0x045D	Room 33 visit
+  picked	Room 01 local script 211	+0x045D	Room 34 visit
+  picked	Room 01 local script 211	+0x045D	Room 35 visit
+  picked	Room 01 local script 211	+0x045D	Room 36 visit
+  picked	Room 01 local script 211	+0x045D	Room 37 visit
+  picked	Room 01 local script 211	+0x045D	Room 38 visit
+  picked	Room 01 local script 211	+0x045D	Room 39 visit
+  picked	Room 01 local script 211	+0x045D	Room 40 visit
+  picked	Room 01 local script 211	+0x045D	Room 41 visit
+  picked	Room 01 local script 211	+0x045D	Room 42 visit
+  picked	Room 01 local script 211	+0x045D	Room 43 visit
+  picked	Room 01 local script 211	+0x045D	Room 44 visit
+  picked	Room 01 local script 211	+0x045D	Room 45 visit
+  picked	Room 01 local script 211	+0x045D	Room 46 visit
+  picked	Room 01 local script 211	+0x045D	Room 47 visit
+  picked	Room 01 local script 211	+0x045D	Room 49 visit
+  picked	Room 01 local script 211	+0x045D	Room 50 visit
+  picked	Room 01 local script 211	+0x045D	Room 51 visit
+  picked	Room 01 local script 211	+0x045D	Room 52 visit
+  picked	Room 01 local script 211	+0x045D	Room 53 visit
+  picked	Room 01 local script 211	+0x045D	Room 54 visit
+  picked	Room 01 local script 211	+0x045D	Room 55 visit
+  picked	Room 01 local script 211	+0x045D	Room 56 visit
+  picked	Room 01 local script 211	+0x045D	Room 57 visit
+  picked	Room 01 local script 211	+0x045D	Room 58 visit
+  picked	Room 01 local script 211	+0x045D	Room 59 visit
+  picked	Room 01 local script 211	+0x045D	Room 60 visit
+  picked	Room 01 local script 211	+0x045D	Room 61 visit
+  picked	Room 01 local script 211	+0x045D	Room 62 visit
+  picked	Room 01 local script 211	+0x045D	Room 63 visit
+  picked	Room 01 local script 211	+0x045D	Room 64 visit
+  picked	Room 01 local script 211	+0x045D	Room 65 visit
+  picked	Room 01 local script 211	+0x045D	Room 66 visit
+  picked	Room 01 local script 211	+0x045D	Room 67 visit
+  picked	Room 01 local script 211	+0x045D	Room 68 visit
+  picked	Room 01 local script 211	+0x045D	Room 69 visit
+  picked	Room 01 local script 211	+0x045D	Room 70 visit
+  picked	Room 01 local script 211	+0x045D	Room 79 visit
+  picked	Room 01 local script 211	+0x045D	Room 81 visit
+  picked	Room 01 local script 211	+0x045D	Room 82 visit
+  picked	Room 01 local script 211	+0x045D	Room 83 visit
+  picked	Room 01 local script 211	+0x045D	Room 84 visit
+  picked	Room 01 local script 211	+0x045D	Room 85 visit
+  picked	Room 01 local script 211	+0x045D	Room 86 visit
+  picked	Room 01 local script 211	+0x045D	Room 87 visit
+  picked	Room 01 local script 211	+0x0480	Room 01 visit
+  picked	Room 01 local script 211	+0x0480	Room 02 visit
+  picked	Room 01 local script 211	+0x0480	Room 03 visit
+  picked	Room 01 local script 211	+0x0480	Room 04 visit
+  picked	Room 01 local script 211	+0x0480	Room 05 visit
+  picked	Room 01 local script 211	+0x0480	Room 06 visit
+  picked	Room 01 local script 211	+0x0480	Room 07 visit
+  picked	Room 01 local script 211	+0x0480	Room 08 visit
+  picked	Room 01 local script 211	+0x0480	Room 09 visit
+  picked	Room 01 local script 211	+0x0480	Room 10 visit
+  picked	Room 01 local script 211	+0x0480	Room 11 visit
+  picked	Room 01 local script 211	+0x0480	Room 12 visit
+  picked	Room 01 local script 211	+0x0480	Room 13 visit
+  picked	Room 01 local script 211	+0x0480	Room 14 visit
+  picked	Room 01 local script 211	+0x0480	Room 15 visit
+  picked	Room 01 local script 211	+0x0480	Room 16 visit
+  picked	Room 01 local script 211	+0x0480	Room 17 visit
+  picked	Room 01 local script 211	+0x0480	Room 18 visit
+  picked	Room 01 local script 211	+0x0480	Room 19 visit
+  picked	Room 01 local script 211	+0x0480	Room 20 visit
+  picked	Room 01 local script 211	+0x0480	Room 22 visit
+  picked	Room 01 local script 211	+0x0480	Room 23 visit
+  picked	Room 01 local script 211	+0x0480	Room 24 visit
+  picked	Room 01 local script 211	+0x0480	Room 25 visit
+  picked	Room 01 local script 211	+0x0480	Room 26 visit
+  picked	Room 01 local script 211	+0x0480	Room 27 visit
+  picked	Room 01 local script 211	+0x0480	Room 28 visit
+  picked	Room 01 local script 211	+0x0480	Room 29 visit
+  picked	Room 01 local script 211	+0x0480	Room 30 visit
+  picked	Room 01 local script 211	+0x0480	Room 31 visit
+  picked	Room 01 local script 211	+0x0480	Room 32 visit
+  picked	Room 01 local script 211	+0x0480	Room 33 visit
+  picked	Room 01 local script 211	+0x0480	Room 34 visit
+  picked	Room 01 local script 211	+0x0480	Room 35 visit
+  picked	Room 01 local script 211	+0x0480	Room 36 visit
+  picked	Room 01 local script 211	+0x0480	Room 37 visit
+  picked	Room 01 local script 211	+0x0480	Room 38 visit
+  picked	Room 01 local script 211	+0x0480	Room 39 visit
+  picked	Room 01 local script 211	+0x0480	Room 40 visit
+  picked	Room 01 local script 211	+0x0480	Room 41 visit
+  picked	Room 01 local script 211	+0x0480	Room 42 visit
+  picked	Room 01 local script 211	+0x0480	Room 43 visit
+  picked	Room 01 local script 211	+0x0480	Room 44 visit
+  picked	Room 01 local script 211	+0x0480	Room 45 visit
+  picked	Room 01 local script 211	+0x0480	Room 46 visit
+  picked	Room 01 local script 211	+0x0480	Room 47 visit
+  picked	Room 01 local script 211	+0x0480	Room 49 visit
+  picked	Room 01 local script 211	+0x0480	Room 50 visit
+  picked	Room 01 local script 211	+0x0480	Room 51 visit
+  picked	Room 01 local script 211	+0x0480	Room 52 visit
+  picked	Room 01 local script 211	+0x0480	Room 53 visit
+  picked	Room 01 local script 211	+0x0480	Room 54 visit
+  picked	Room 01 local script 211	+0x0480	Room 55 visit
+  picked	Room 01 local script 211	+0x0480	Room 56 visit
+  picked	Room 01 local script 211	+0x0480	Room 57 visit
+  picked	Room 01 local script 211	+0x0480	Room 58 visit
+  picked	Room 01 local script 211	+0x0480	Room 59 visit
+  picked	Room 01 local script 211	+0x0480	Room 60 visit
+  picked	Room 01 local script 211	+0x0480	Room 61 visit
+  picked	Room 01 local script 211	+0x0480	Room 62 visit
+  picked	Room 01 local script 211	+0x0480	Room 63 visit
+  picked	Room 01 local script 211	+0x0480	Room 64 visit
+  picked	Room 01 local script 211	+0x0480	Room 65 visit
+  picked	Room 01 local script 211	+0x0480	Room 66 visit
+  picked	Room 01 local script 211	+0x0480	Room 67 visit
+  picked	Room 01 local script 211	+0x0480	Room 68 visit
+  picked	Room 01 local script 211	+0x0480	Room 69 visit
+  picked	Room 01 local script 211	+0x0480	Room 70 visit
+  picked	Room 01 local script 211	+0x0480	Room 79 visit
+  picked	Room 01 local script 211	+0x0480	Room 81 visit
+  picked	Room 01 local script 211	+0x0480	Room 82 visit
+  picked	Room 01 local script 211	+0x0480	Room 83 visit
+  picked	Room 01 local script 211	+0x0480	Room 84 visit
+  picked	Room 01 local script 211	+0x0480	Room 85 visit
+  picked	Room 01 local script 211	+0x0480	Room 86 visit
+  picked	Room 01 local script 211	+0x0480	Room 87 visit
+  picked	Room 01 local script 211	+0x04A3	Room 01 visit
+  picked	Room 01 local script 211	+0x04A3	Room 02 visit
+  picked	Room 01 local script 211	+0x04A3	Room 03 visit
+  picked	Room 01 local script 211	+0x04A3	Room 04 visit
+  picked	Room 01 local script 211	+0x04A3	Room 05 visit
+  picked	Room 01 local script 211	+0x04A3	Room 06 visit
+  picked	Room 01 local script 211	+0x04A3	Room 07 visit
+  picked	Room 01 local script 211	+0x04A3	Room 08 visit
+  picked	Room 01 local script 211	+0x04A3	Room 09 visit
+  picked	Room 01 local script 211	+0x04A3	Room 10 visit
+  picked	Room 01 local script 211	+0x04A3	Room 11 visit
+  picked	Room 01 local script 211	+0x04A3	Room 12 visit
+  picked	Room 01 local script 211	+0x04A3	Room 13 visit
+  picked	Room 01 local script 211	+0x04A3	Room 14 visit
+  picked	Room 01 local script 211	+0x04A3	Room 15 visit
+  picked	Room 01 local script 211	+0x04A3	Room 16 visit
+  picked	Room 01 local script 211	+0x04A3	Room 17 visit
+  picked	Room 01 local script 211	+0x04A3	Room 18 visit
+  picked	Room 01 local script 211	+0x04A3	Room 19 visit
+  picked	Room 01 local script 211	+0x04A3	Room 20 visit
+  picked	Room 01 local script 211	+0x04A3	Room 22 visit
+  picked	Room 01 local script 211	+0x04A3	Room 23 visit
+  picked	Room 01 local script 211	+0x04A3	Room 24 visit
+  picked	Room 01 local script 211	+0x04A3	Room 25 visit
+  picked	Room 01 local script 211	+0x04A3	Room 26 visit
+  picked	Room 01 local script 211	+0x04A3	Room 27 visit
+  picked	Room 01 local script 211	+0x04A3	Room 28 visit
+  picked	Room 01 local script 211	+0x04A3	Room 29 visit
+  picked	Room 01 local script 211	+0x04A3	Room 30 visit
+  picked	Room 01 local script 211	+0x04A3	Room 31 visit
+  picked	Room 01 local script 211	+0x04A3	Room 32 visit
+  picked	Room 01 local script 211	+0x04A3	Room 33 visit
+  picked	Room 01 local script 211	+0x04A3	Room 34 visit
+  picked	Room 01 local script 211	+0x04A3	Room 35 visit
+  picked	Room 01 local script 211	+0x04A3	Room 36 visit
+  picked	Room 01 local script 211	+0x04A3	Room 37 visit
+  picked	Room 01 local script 211	+0x04A3	Room 38 visit
+  picked	Room 01 local script 211	+0x04A3	Room 39 visit
+  picked	Room 01 local script 211	+0x04A3	Room 40 visit
+  picked	Room 01 local script 211	+0x04A3	Room 41 visit
+  picked	Room 01 local script 211	+0x04A3	Room 42 visit
+  picked	Room 01 local script 211	+0x04A3	Room 43 visit
+  picked	Room 01 local script 211	+0x04A3	Room 44 visit
+  picked	Room 01 local script 211	+0x04A3	Room 45 visit
+  picked	Room 01 local script 211	+0x04A3	Room 46 visit
+  picked	Room 01 local script 211	+0x04A3	Room 47 visit
+  picked	Room 01 local script 211	+0x04A3	Room 49 visit
+  picked	Room 01 local script 211	+0x04A3	Room 50 visit
+  picked	Room 01 local script 211	+0x04A3	Room 51 visit
+  picked	Room 01 local script 211	+0x04A3	Room 52 visit
+  picked	Room 01 local script 211	+0x04A3	Room 53 visit
+  picked	Room 01 local script 211	+0x04A3	Room 54 visit
+  picked	Room 01 local script 211	+0x04A3	Room 55 visit
+  picked	Room 01 local script 211	+0x04A3	Room 56 visit
+  picked	Room 01 local script 211	+0x04A3	Room 57 visit
+  picked	Room 01 local script 211	+0x04A3	Room 58 visit
+  picked	Room 01 local script 211	+0x04A3	Room 59 visit
+  picked	Room 01 local script 211	+0x04A3	Room 60 visit
+  picked	Room 01 local script 211	+0x04A3	Room 61 visit
+  picked	Room 01 local script 211	+0x04A3	Room 62 visit
+  picked	Room 01 local script 211	+0x04A3	Room 63 visit
+  picked	Room 01 local script 211	+0x04A3	Room 64 visit
+  picked	Room 01 local script 211	+0x04A3	Room 65 visit
+  picked	Room 01 local script 211	+0x04A3	Room 66 visit
+  picked	Room 01 local script 211	+0x04A3	Room 67 visit
+  picked	Room 01 local script 211	+0x04A3	Room 68 visit
+  picked	Room 01 local script 211	+0x04A3	Room 69 visit
+  picked	Room 01 local script 211	+0x04A3	Room 70 visit
+  picked	Room 01 local script 211	+0x04A3	Room 79 visit
+  picked	Room 01 local script 211	+0x04A3	Room 81 visit
+  picked	Room 01 local script 211	+0x04A3	Room 82 visit
+  picked	Room 01 local script 211	+0x04A3	Room 83 visit
+  picked	Room 01 local script 211	+0x04A3	Room 84 visit
+  picked	Room 01 local script 211	+0x04A3	Room 85 visit
+  picked	Room 01 local script 211	+0x04A3	Room 86 visit
+  picked	Room 01 local script 211	+0x04A3	Room 87 visit
+  picked	Room 04 local script 203	+0x0000	Room 03 object 162 verb 0x36
+  picked	Room 04 local script 203	+0x0000	Room 04 visit
+  picked	Room 04 local script 203	+0x0000	Room 64 object 825 verb 0x36
+  picked	Room 18 local script 204	+0x008A	Room 16 object 346 verb 0x38
+  picked	Room 18 local script 204	+0x008A	Room 18 visit
+  picked	Room 18 local script 204	+0x008A	Room 22 object 402 verb 0x38
+  picked	Room 30 Object 511 Verb 0x38	+0x0006	Room 30 object 511 verb 0x38
+  picked	Room 30 Object 512 Verb 0x38	+0x0006	Room 30 object 512 verb 0x38
+  picked	Room 30 Object 513 Verb 0x38	+0x0006	Room 30 object 513 verb 0x38
+  picked	Room 41 local script 209	+0x0001	Room 41 object 631 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 631 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 object 632 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 632 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x41
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x42
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x4B
+  picked	Room 41 local script 209	+0x0001	Room 41 object 633 verb 0x56
+  picked	Room 41 local script 209	+0x0001	Room 41 object 634 verb 0x36
+  picked	Room 41 local script 209	+0x0001	Room 41 object 634 verb 0x39
+  picked	Room 41 local script 209	+0x0001	Room 41 visit
+  picked	Room 43 local script 205	+0x0030	Room 43 object 640 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 640 verb 0x56
+  picked	Room 43 local script 205	+0x0030	Room 43 object 641 verb 0x36
+  picked	Room 43 local script 205	+0x0030	Room 43 object 641 verb 0x38
+  picked	Room 43 local script 205	+0x0030	Room 43 object 641 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 642 verb 0x36
+  picked	Room 43 local script 205	+0x0030	Room 43 object 642 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x36
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x3A
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x3B
+  picked	Room 43 local script 205	+0x0030	Room 43 object 643 verb 0x56
+  picked	Room 43 local script 205	+0x0030	Room 43 object 650 verb 0x38
+  picked	Room 43 local script 205	+0x0030	Room 43 object 650 verb 0x39
+  picked	Room 43 local script 205	+0x0030	Room 43 visit
+  picked	Room 43 local script 205	+0x0030	Room 44 object 652 verb 0x38
+  picked	Room 43 local script 205	+0x0030	Room 45 object 655 verb 0x38
+  picked	Room 43 local script 205	+0x003C	Room 43 object 640 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 640 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 640 verb 0x56
+  picked	Room 43 local script 205	+0x003C	Room 43 object 641 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 641 verb 0x38
+  picked	Room 43 local script 205	+0x003C	Room 43 object 641 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 642 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 642 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x36
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x3A
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x3B
+  picked	Room 43 local script 205	+0x003C	Room 43 object 643 verb 0x56
+  picked	Room 43 local script 205	+0x003C	Room 43 object 650 verb 0x38
+  picked	Room 43 local script 205	+0x003C	Room 43 object 650 verb 0x39
+  picked	Room 43 local script 205	+0x003C	Room 43 visit
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 876 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 877 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 878 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 886 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 887 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 888 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 889 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 890 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 891 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 892 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 893 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 894 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 895 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 896 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 object 897 verb 0xFF
+  picked	Room 69 local script 202	+0x00B0	Room 69 visit
+  picked	Script 113	+0x0037	Room 01 visit
+  picked	Script 113	+0x0037	Room 02 visit
+  picked	Script 113	+0x0037	Room 03 visit
+  picked	Script 113	+0x0037	Room 04 visit
+  picked	Script 113	+0x0037	Room 05 visit
+  picked	Script 113	+0x0037	Room 06 visit
+  picked	Script 113	+0x0037	Room 07 visit
+  picked	Script 113	+0x0037	Room 08 visit
+  picked	Script 113	+0x0037	Room 09 visit
+  picked	Script 113	+0x0037	Room 10 visit
+  picked	Script 113	+0x0037	Room 11 visit
+  picked	Script 113	+0x0037	Room 12 visit
+  picked	Script 113	+0x0037	Room 13 visit
+  picked	Script 113	+0x0037	Room 14 visit
+  picked	Script 113	+0x0037	Room 15 visit
+  picked	Script 113	+0x0037	Room 16 visit
+  picked	Script 113	+0x0037	Room 17 visit
+  picked	Script 113	+0x0037	Room 18 visit
+  picked	Script 113	+0x0037	Room 19 visit
+  picked	Script 113	+0x0037	Room 20 visit
+  picked	Script 113	+0x0037	Room 22 visit
+  picked	Script 113	+0x0037	Room 23 visit
+  picked	Script 113	+0x0037	Room 24 visit
+  picked	Script 113	+0x0037	Room 25 visit
+  picked	Script 113	+0x0037	Room 26 visit
+  picked	Script 113	+0x0037	Room 27 visit
+  picked	Script 113	+0x0037	Room 28 visit
+  picked	Script 113	+0x0037	Room 29 visit
+  picked	Script 113	+0x0037	Room 30 visit
+  picked	Script 113	+0x0037	Room 31 visit
+  picked	Script 113	+0x0037	Room 32 visit
+  picked	Script 113	+0x0037	Room 33 visit
+  picked	Script 113	+0x0037	Room 34 visit
+  picked	Script 113	+0x0037	Room 35 visit
+  picked	Script 113	+0x0037	Room 36 visit
+  picked	Script 113	+0x0037	Room 37 visit
+  picked	Script 113	+0x0037	Room 38 visit
+  picked	Script 113	+0x0037	Room 39 visit
+  picked	Script 113	+0x0037	Room 40 visit
+  picked	Script 113	+0x0037	Room 41 visit
+  picked	Script 113	+0x0037	Room 42 visit
+  picked	Script 113	+0x0037	Room 43 visit
+  picked	Script 113	+0x0037	Room 44 visit
+  picked	Script 113	+0x0037	Room 45 visit
+  picked	Script 113	+0x0037	Room 46 visit
+  picked	Script 113	+0x0037	Room 47 visit
+  picked	Script 113	+0x0037	Room 49 visit
+  picked	Script 113	+0x0037	Room 50 visit
+  picked	Script 113	+0x0037	Room 51 visit
+  picked	Script 113	+0x0037	Room 52 visit
+  picked	Script 113	+0x0037	Room 53 visit
+  picked	Script 113	+0x0037	Room 54 visit
+  picked	Script 113	+0x0037	Room 55 visit
+  picked	Script 113	+0x0037	Room 56 visit
+  picked	Script 113	+0x0037	Room 57 visit
+  picked	Script 113	+0x0037	Room 58 visit
+  picked	Script 113	+0x0037	Room 59 visit
+  picked	Script 113	+0x0037	Room 60 visit
+  picked	Script 113	+0x0037	Room 61 visit
+  picked	Script 113	+0x0037	Room 62 visit
+  picked	Script 113	+0x0037	Room 63 visit
+  picked	Script 113	+0x0037	Room 64 visit
+  picked	Script 113	+0x0037	Room 65 visit
+  picked	Script 113	+0x0037	Room 66 visit
+  picked	Script 113	+0x0037	Room 67 visit
+  picked	Script 113	+0x0037	Room 68 visit
+  picked	Script 113	+0x0037	Room 69 visit
+  picked	Script 113	+0x0037	Room 70 visit
+  picked	Script 113	+0x0037	Room 79 visit
+  picked	Script 113	+0x0037	Room 81 visit
+  picked	Script 113	+0x0037	Room 82 visit
+  picked	Script 113	+0x0037	Room 83 visit
+  picked	Script 113	+0x0037	Room 84 visit
+  picked	Script 113	+0x0037	Room 85 visit
+  picked	Script 113	+0x0037	Room 86 visit
+  picked	Script 113	+0x0037	Room 87 visit
+  picked	Script 114	+0x0047	Room 01 visit
+  picked	Script 114	+0x0047	Room 02 visit
+  picked	Script 114	+0x0047	Room 03 visit
+  picked	Script 114	+0x0047	Room 04 visit
+  picked	Script 114	+0x0047	Room 05 visit
+  picked	Script 114	+0x0047	Room 06 visit
+  picked	Script 114	+0x0047	Room 07 visit
+  picked	Script 114	+0x0047	Room 08 visit
+  picked	Script 114	+0x0047	Room 09 visit
+  picked	Script 114	+0x0047	Room 10 visit
+  picked	Script 114	+0x0047	Room 11 visit
+  picked	Script 114	+0x0047	Room 12 visit
+  picked	Script 114	+0x0047	Room 13 visit
+  picked	Script 114	+0x0047	Room 14 visit
+  picked	Script 114	+0x0047	Room 15 visit
+  picked	Script 114	+0x0047	Room 16 visit
+  picked	Script 114	+0x0047	Room 17 visit
+  picked	Script 114	+0x0047	Room 18 visit
+  picked	Script 114	+0x0047	Room 19 visit
+  picked	Script 114	+0x0047	Room 20 visit
+  picked	Script 114	+0x0047	Room 22 visit
+  picked	Script 114	+0x0047	Room 23 visit
+  picked	Script 114	+0x0047	Room 24 visit
+  picked	Script 114	+0x0047	Room 25 visit
+  picked	Script 114	+0x0047	Room 26 visit
+  picked	Script 114	+0x0047	Room 27 visit
+  picked	Script 114	+0x0047	Room 28 visit
+  picked	Script 114	+0x0047	Room 29 visit
+  picked	Script 114	+0x0047	Room 30 visit
+  picked	Script 114	+0x0047	Room 31 visit
+  picked	Script 114	+0x0047	Room 32 visit
+  picked	Script 114	+0x0047	Room 33 visit
+  picked	Script 114	+0x0047	Room 34 visit
+  picked	Script 114	+0x0047	Room 35 visit
+  picked	Script 114	+0x0047	Room 36 visit
+  picked	Script 114	+0x0047	Room 37 visit
+  picked	Script 114	+0x0047	Room 38 visit
+  picked	Script 114	+0x0047	Room 39 visit
+  picked	Script 114	+0x0047	Room 40 visit
+  picked	Script 114	+0x0047	Room 41 visit
+  picked	Script 114	+0x0047	Room 42 visit
+  picked	Script 114	+0x0047	Room 43 visit
+  picked	Script 114	+0x0047	Room 44 visit
+  picked	Script 114	+0x0047	Room 45 visit
+  picked	Script 114	+0x0047	Room 46 visit
+  picked	Script 114	+0x0047	Room 47 visit
+  picked	Script 114	+0x0047	Room 49 visit
+  picked	Script 114	+0x0047	Room 50 visit
+  picked	Script 114	+0x0047	Room 51 visit
+  picked	Script 114	+0x0047	Room 52 visit
+  picked	Script 114	+0x0047	Room 53 visit
+  picked	Script 114	+0x0047	Room 54 visit
+  picked	Script 114	+0x0047	Room 55 visit
+  picked	Script 114	+0x0047	Room 56 visit
+  picked	Script 114	+0x0047	Room 57 visit
+  picked	Script 114	+0x0047	Room 58 visit
+  picked	Script 114	+0x0047	Room 59 visit
+  picked	Script 114	+0x0047	Room 60 visit
+  picked	Script 114	+0x0047	Room 61 visit
+  picked	Script 114	+0x0047	Room 62 visit
+  picked	Script 114	+0x0047	Room 63 visit
+  picked	Script 114	+0x0047	Room 64 visit
+  picked	Script 114	+0x0047	Room 65 visit
+  picked	Script 114	+0x0047	Room 66 visit
+  picked	Script 114	+0x0047	Room 67 visit
+  picked	Script 114	+0x0047	Room 68 visit
+  picked	Script 114	+0x0047	Room 69 visit
+  picked	Script 114	+0x0047	Room 70 visit
+  picked	Script 114	+0x0047	Room 79 visit
+  picked	Script 114	+0x0047	Room 81 visit
+  picked	Script 114	+0x0047	Room 82 visit
+  picked	Script 114	+0x0047	Room 83 visit
+  picked	Script 114	+0x0047	Room 84 visit
+  picked	Script 114	+0x0047	Room 85 visit
+  picked	Script 114	+0x0047	Room 86 visit
+  picked	Script 114	+0x0047	Room 87 visit
+  picked	Script 31	+0x01E6	Room 09 object 268 verb 0x37
+  picked	Script 31	+0x01E6	Room 09 object 270 verb 0x36
+  picked	Script 31	+0x01EF	Room 09 object 268 verb 0x37
+  picked	Script 31	+0x01EF	Room 09 object 270 verb 0x36
+  picked	Script 42	+0x0026	Room 01 visit
+  picked	Script 42	+0x0026	Room 02 visit
+  picked	Script 42	+0x0026	Room 03 visit
+  picked	Script 42	+0x0026	Room 04 visit
+  picked	Script 42	+0x0026	Room 05 visit
+  picked	Script 42	+0x0026	Room 06 visit
+  picked	Script 42	+0x0026	Room 07 visit
+  picked	Script 42	+0x0026	Room 08 visit
+  picked	Script 42	+0x0026	Room 09 visit
+  picked	Script 42	+0x0026	Room 10 visit
+  picked	Script 42	+0x0026	Room 11 visit
+  picked	Script 42	+0x0026	Room 12 visit
+  picked	Script 42	+0x0026	Room 13 visit
+  picked	Script 42	+0x0026	Room 14 visit
+  picked	Script 42	+0x0026	Room 15 visit
+  picked	Script 42	+0x0026	Room 16 visit
+  picked	Script 42	+0x0026	Room 17 visit
+  picked	Script 42	+0x0026	Room 18 visit
+  picked	Script 42	+0x0026	Room 19 visit
+  picked	Script 42	+0x0026	Room 20 visit
+  picked	Script 42	+0x0026	Room 22 visit
+  picked	Script 42	+0x0026	Room 23 visit
+  picked	Script 42	+0x0026	Room 24 visit
+  picked	Script 42	+0x0026	Room 25 visit
+  picked	Script 42	+0x0026	Room 26 visit
+  picked	Script 42	+0x0026	Room 27 visit
+  picked	Script 42	+0x0026	Room 28 visit
+  picked	Script 42	+0x0026	Room 29 visit
+  picked	Script 42	+0x0026	Room 30 visit
+  picked	Script 42	+0x0026	Room 31 visit
+  picked	Script 42	+0x0026	Room 32 visit
+  picked	Script 42	+0x0026	Room 33 visit
+  picked	Script 42	+0x0026	Room 34 visit
+  picked	Script 42	+0x0026	Room 35 visit
+  picked	Script 42	+0x0026	Room 36 visit
+  picked	Script 42	+0x0026	Room 37 visit
+  picked	Script 42	+0x0026	Room 38 visit
+  picked	Script 42	+0x0026	Room 39 visit
+  picked	Script 42	+0x0026	Room 40 visit
+  picked	Script 42	+0x0026	Room 41 visit
+  picked	Script 42	+0x0026	Room 42 visit
+  picked	Script 42	+0x0026	Room 43 visit
+  picked	Script 42	+0x0026	Room 44 visit
+  picked	Script 42	+0x0026	Room 45 visit
+  picked	Script 42	+0x0026	Room 46 visit
+  picked	Script 42	+0x0026	Room 47 visit
+  picked	Script 42	+0x0026	Room 49 visit
+  picked	Script 42	+0x0026	Room 50 visit
+  picked	Script 42	+0x0026	Room 51 visit
+  picked	Script 42	+0x0026	Room 52 visit
+  picked	Script 42	+0x0026	Room 53 visit
+  picked	Script 42	+0x0026	Room 54 visit
+  picked	Script 42	+0x0026	Room 55 visit
+  picked	Script 42	+0x0026	Room 56 visit
+  picked	Script 42	+0x0026	Room 57 visit
+  picked	Script 42	+0x0026	Room 58 visit
+  picked	Script 42	+0x0026	Room 59 visit
+  picked	Script 42	+0x0026	Room 60 visit
+  picked	Script 42	+0x0026	Room 61 visit
+  picked	Script 42	+0x0026	Room 62 visit
+  picked	Script 42	+0x0026	Room 63 visit
+  picked	Script 42	+0x0026	Room 64 visit
+  picked	Script 42	+0x0026	Room 65 visit
+  picked	Script 42	+0x0026	Room 66 visit
+  picked	Script 42	+0x0026	Room 67 visit
+  picked	Script 42	+0x0026	Room 68 visit
+  picked	Script 42	+0x0026	Room 69 visit
+  picked	Script 42	+0x0026	Room 70 visit
+  picked	Script 42	+0x0026	Room 79 visit
+  picked	Script 42	+0x0026	Room 81 visit
+  picked	Script 42	+0x0026	Room 82 visit
+  picked	Script 42	+0x0026	Room 83 visit
+  picked	Script 42	+0x0026	Room 84 visit
+  picked	Script 42	+0x0026	Room 85 visit
+  picked	Script 42	+0x0026	Room 86 visit
+  picked	Script 42	+0x0026	Room 87 visit
+  picked	Script 42	+0x004F	Room 01 visit
+  picked	Script 42	+0x004F	Room 02 visit
+  picked	Script 42	+0x004F	Room 03 visit
+  picked	Script 42	+0x004F	Room 04 visit
+  picked	Script 42	+0x004F	Room 05 visit
+  picked	Script 42	+0x004F	Room 06 visit
+  picked	Script 42	+0x004F	Room 07 visit
+  picked	Script 42	+0x004F	Room 08 visit
+  picked	Script 42	+0x004F	Room 09 visit
+  picked	Script 42	+0x004F	Room 10 visit
+  picked	Script 42	+0x004F	Room 11 visit
+  picked	Script 42	+0x004F	Room 12 visit
+  picked	Script 42	+0x004F	Room 13 visit
+  picked	Script 42	+0x004F	Room 14 visit
+  picked	Script 42	+0x004F	Room 15 visit
+  picked	Script 42	+0x004F	Room 16 visit
+  picked	Script 42	+0x004F	Room 17 visit
+  picked	Script 42	+0x004F	Room 18 visit
+  picked	Script 42	+0x004F	Room 19 visit
+  picked	Script 42	+0x004F	Room 20 visit
+  picked	Script 42	+0x004F	Room 22 visit
+  picked	Script 42	+0x004F	Room 23 visit
+  picked	Script 42	+0x004F	Room 24 visit
+  picked	Script 42	+0x004F	Room 25 visit
+  picked	Script 42	+0x004F	Room 26 visit
+  picked	Script 42	+0x004F	Room 27 visit
+  picked	Script 42	+0x004F	Room 28 visit
+  picked	Script 42	+0x004F	Room 29 visit
+  picked	Script 42	+0x004F	Room 30 visit
+  picked	Script 42	+0x004F	Room 31 visit
+  picked	Script 42	+0x004F	Room 32 visit
+  picked	Script 42	+0x004F	Room 33 visit
+  picked	Script 42	+0x004F	Room 34 visit
+  picked	Script 42	+0x004F	Room 35 visit
+  picked	Script 42	+0x004F	Room 36 visit
+  picked	Script 42	+0x004F	Room 37 visit
+  picked	Script 42	+0x004F	Room 38 visit
+  picked	Script 42	+0x004F	Room 39 visit
+  picked	Script 42	+0x004F	Room 40 visit
+  picked	Script 42	+0x004F	Room 41 visit
+  picked	Script 42	+0x004F	Room 42 visit
+  picked	Script 42	+0x004F	Room 43 visit
+  picked	Script 42	+0x004F	Room 44 visit
+  picked	Script 42	+0x004F	Room 45 visit
+  picked	Script 42	+0x004F	Room 46 visit
+  picked	Script 42	+0x004F	Room 47 visit
+  picked	Script 42	+0x004F	Room 49 visit
+  picked	Script 42	+0x004F	Room 50 visit
+  picked	Script 42	+0x004F	Room 51 visit
+  picked	Script 42	+0x004F	Room 52 visit
+  picked	Script 42	+0x004F	Room 53 visit
+  picked	Script 42	+0x004F	Room 54 visit
+  picked	Script 42	+0x004F	Room 55 visit
+  picked	Script 42	+0x004F	Room 56 visit
+  picked	Script 42	+0x004F	Room 57 visit
+  picked	Script 42	+0x004F	Room 58 visit
+  picked	Script 42	+0x004F	Room 59 visit
+  picked	Script 42	+0x004F	Room 60 visit
+  picked	Script 42	+0x004F	Room 61 visit
+  picked	Script 42	+0x004F	Room 62 visit
+  picked	Script 42	+0x004F	Room 63 visit
+  picked	Script 42	+0x004F	Room 64 visit
+  picked	Script 42	+0x004F	Room 65 visit
+  picked	Script 42	+0x004F	Room 66 visit
+  picked	Script 42	+0x004F	Room 67 visit
+  picked	Script 42	+0x004F	Room 68 visit
+  picked	Script 42	+0x004F	Room 69 visit
+  picked	Script 42	+0x004F	Room 70 visit
+  picked	Script 42	+0x004F	Room 79 visit
+  picked	Script 42	+0x004F	Room 81 visit
+  picked	Script 42	+0x004F	Room 82 visit
+  picked	Script 42	+0x004F	Room 83 visit
+  picked	Script 42	+0x004F	Room 84 visit
+  picked	Script 42	+0x004F	Room 85 visit
+  picked	Script 42	+0x004F	Room 86 visit
+  picked	Script 42	+0x004F	Room 87 visit
