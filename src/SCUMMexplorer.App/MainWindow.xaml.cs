@@ -1205,7 +1205,11 @@ public partial class MainWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
         var hasHorizontalScroll = normalSize && room.Width > visibleSourceWidth;
         var usableHeight = Math.Max(1, availableHeight - (hasHorizontalScroll ? 17 : 0));
-        _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth, usableHeight / room.Height);
+        // The optional verb strip shares the height: 56 screen rows at the room's scale, and its note.
+        var verbStrip = VerbStripShown();
+        if (verbStrip) usableHeight = Math.Max(1, usableHeight - VerbStripNoteHeight);
+        _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth,
+            usableHeight / (room.Height + (verbStrip ? LoomVerbArea.Height : 0)));
         _roomDisplayScale = Math.Max(0.1, _roomDisplayScale);
         RoomViewport.HorizontalScrollBarVisibility = normalSize
             ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
@@ -1215,6 +1219,9 @@ public partial class MainWindow : Window
         RoomSceneSurface.Width = room.Width * _roomDisplayScale;
         RoomSceneSurface.Height = room.Height * _roomDisplayScale;
         RoomViewport.Height = RoomSceneSurface.Height + (hasHorizontalScroll ? 17 : 0);
+        VerbStripImage.Width = LoomVerbArea.Width * _roomDisplayScale;
+        VerbStripImage.Height = LoomVerbArea.Height * _roomDisplayScale;
+        VerbStripNote.MaxWidth = Math.Max(160, RoomViewport.Width);
         RoomViewport.Dispatcher.BeginInvoke(() =>
         {
             ApplyPendingCamera();
@@ -2281,6 +2288,80 @@ public partial class MainWindow : Window
         UpdateVerbArea();
     }
 
+    // Height kept for the verb strip's note under the strip.
+    private const double VerbStripNoteHeight = 36;
+    // Object images of rooms that verbs take their images from, by room file.
+    private readonly Dictionary<string, IReadOnlyList<RoomObjectImage>> _verbImageRooms = new(StringComparer.OrdinalIgnoreCase);
+
+    private bool VerbStripShown() =>
+        VerbAreaToggle.IsChecked == true && _session is not null && _game?.Id == GameId.Loom && _currentRoom is not null;
+
+    private void VerbAreaToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        UpdateVerbStrip();
+        UpdateRoomViewportLayout();
+    }
+
+    /// <summary>
+    /// The optional verb strip: a presentation of the session's verb slots
+    /// (<see cref="LoomVerbArea.Compose"/>), drawn under the room at its scale.
+    /// It shows game state; the drawing itself is not the game's.
+    /// </summary>
+    private void UpdateVerbStrip()
+    {
+        if (!VerbStripShown())
+        {
+            VerbStripPanel.Visibility = Visibility.Collapsed;
+            VerbStripImage.Source = null;
+            return;
+        }
+        var picture = LoomVerbArea.Compose(_session!.Verbs, VerbImage);
+        VerbStripImage.Source = CreateBitmap(picture.Width, picture.Height, picture.Pixels, _currentRoom!.Palette);
+        var drawn = picture.Items.Count == 0
+            ? "no image verb is on in the session's state"
+            : "verbs " + VerbRanges(picture.Items.Where(item => item.Mode == 1).Select(item => item.VerbId)) + " on" +
+              (picture.Items.Any(item => item.Mode == 2)
+                  ? ", " + VerbRanges(picture.Items.Where(item => item.Mode == 2).Select(item => item.VerbId)) + " dim" : "");
+        var estimate = picture.Items.Any(item => item.Estimate is not null) ? " Some follow an estimate." : "";
+        var notes = picture.Notes.Count == 0 ? "" : $" {picture.Notes.Count} not drawn.";
+        VerbStripNote.Text = $"Verb area: presentation of the session's verb slots, not the game's drawing; {drawn}.{estimate}{notes}";
+        VerbStripNote.ToolTip = string.Join(Environment.NewLine, picture.Items.Select(item =>
+                $"verb 0x{item.VerbId:X2} (slot {item.Slot}): object {item.ImageObject}'s image from Room {item.ImageRoom:00} at ({item.X}, {item.Y})" +
+                (item.Mode == 2 ? ", dim" : "") + (item.Estimate is null ? "" : $"; estimate: {item.Estimate}"))
+            .Concat(picture.Notes.Select(line => $"not drawn: {line}"))
+            .Append("Text verbs, the note letters scripts print, highlight colours and redraw timing are not drawn."));
+        VerbStripPanel.Visibility = Visibility.Visible;
+    }
+
+    /// <summary>Verb numbers as hex ranges: 0x01–0x08, 0x31, 0x32.</summary>
+    private static string VerbRanges(IEnumerable<int> verbs)
+    {
+        var parts = new List<string>();
+        var sorted = verbs.Distinct().Order().ToArray();
+        for (var i = 0; i < sorted.Length;)
+        {
+            var end = i;
+            while (end + 1 < sorted.Length && sorted[end + 1] == sorted[end] + 1) end++;
+            parts.Add(end - i >= 2 ? $"0x{sorted[i]:X2}–0x{sorted[end]:X2}"
+                : string.Join(", ", sorted[i..(end + 1)].Select(verb => $"0x{verb:X2}")));
+            i = end + 1;
+        }
+        return string.Join(", ", parts);
+    }
+
+    private RoomObjectImage? VerbImage(int roomId, int objectId)
+    {
+        var resource = _game?.Rooms.FirstOrDefault(item => item.ResourceId == roomId);
+        if (resource is null) return null;
+        if (!_verbImageRooms.TryGetValue(resource.FilePath, out var images))
+        {
+            try { images = _objectDecoder.Decode(File.ReadAllBytes(resource.FilePath)); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { images = []; }
+            _verbImageRooms[resource.FilePath] = images;
+        }
+        return images.FirstOrDefault(item => item.Id == objectId);
+    }
+
     /// <summary>
     /// Shows the verb-area close-up (verb 0x36) while the game pointer is on and
     /// the verb is on: script 008 sets it from the hovered object's verb 0x39
@@ -2288,6 +2369,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateVerbArea()
     {
+        UpdateVerbStrip();
         var closeUp = GamePointerToggle.IsChecked == true || GameClickToggle.IsChecked == true
             ? _session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
         if (closeUp is not { Mode: 1, ImageObject: int image } || _session is null)

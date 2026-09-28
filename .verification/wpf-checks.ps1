@@ -11,6 +11,7 @@ $checks = @(
     @{ Name = 'HighlightCheck';     Proj = '.verification/hotspot-highlight/HighlightCheck/HighlightCheck.csproj'; Args = @('3','10','17') },
     @{ Name = 'MusicRowCheck';      Proj = '.verification/room-music/MusicRowCheck/MusicRowCheck.csproj'; Args = @('2:none','3:none','16','+:30','17:none','16:30*') },
     @{ Name = 'CameraPanCheck';     Proj = '.verification/camera-ego/CameraPanCheck/CameraPanCheck.csproj'; Args = @('2','3','4') },
+    @{ Name = 'VerbAreaCheck';      Proj = '.verification/verb-area/VerbAreaCheck/VerbAreaCheck.csproj'; Args = @() },
     @{ Name = 'PresentationCheck';  Proj = '.verification/room-viewport/PresentationCheck/PresentationCheck.csproj'; Args = @() }
 )
 foreach ($c in $checks) {

@@ -1,0 +1,15 @@
+﻿Real MainWindow; room points are given to the handler's own methods. No physical input.
+PASS Room 02 is the session's room after the boot (room 2)
+PASS the setting is off by default
+PASS off: hovering (700, 40) gives no pointer to the game (pointer none, var[0x066] 0, panel Collapsed)
+PASS on: the session's pointer is (700, 40) ((700, 40))
+PASS on: script 008 ran for object 156 (row under the pointer: 156): var[0x066] = 156, var[0x068] = 159 (object 156 verb 0x39 sets 159)
+PASS on: verb 0x36 is on with object 159's image from Room 02 at (248, 152): verb 0x36 (slot 53): image of object 159 (Room 02), at (248, 152), on
+PASS on: the verb-area panel shows a 48x40 close-up (48x40): "Verb area close-up: object 159's image (verb 0x36, script 008 for object 156). Game state reached from assumed hover input; no click was sent."
+PASS on: moving within object 156 updates the pointer ((702, 42)) without a new frame
+PASS leave: no pointer, var[0x066] = 0, verb 0x36 verb 0x36 (slot 53): image of object 159 (Room 02), at (248, 152), off, panel Collapsed
+PASS leave: the next frame reads the "no pointer over the room" assumption again
+PASS Room 03: hovering object 165 at (128, 16) (row 165) shows object 166's close-up: var[0x066] = 165, verb 0x36 (slot 53): image of object 166 (Room 03), at (248, 152), on
+PASS Room 03: hovering object 162 (a doorway) at (24, 24) (row 162) sends no click; the room stays 03; var[0x066] = 0, verb 0x36 (slot 53): image of object 166 (Room 03), at (248, 152), off
+PASS off again: pointer none, panel Collapsed
+Failures: 0
