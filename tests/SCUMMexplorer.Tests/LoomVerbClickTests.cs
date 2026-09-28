@@ -62,7 +62,8 @@ public sealed class LoomVerbClickTests
         TurnOnDistaff(session);
         // Room 02 object 156 (class 1): script 006 sets var[0x067] to it and walks the ego there.
         session.Click(700, 40);
-        for (var frame = 0; frame < 4; frame++) session.AdvanceFrame();
+        // The ego walks to object 156's walk point (5 frames); script 006 holds bit[0xD63] until it arrives.
+        for (var frame = 0; frame < 10; frame++) session.AdvanceFrame();
         Assert.Equal((ushort?)156, Var(session, 0x067));
         var note = session.VerbArea().Items.Single(item => item.VerbId == 0x03);
         var from = session.SessionTrace.Count;

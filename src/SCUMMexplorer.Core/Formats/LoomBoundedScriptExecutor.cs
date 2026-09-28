@@ -569,6 +569,40 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands.StartsWith("actor,", StringComparison.Ordinal) &&
+                TryReadValue(instruction.Operands[6..].Trim(), knownVariables, out var walkingActor, out _) &&
+                LoomActorTable.IsValid(walkingActor))
+            {
+                // o5_wait (SO_WAIT_FOR_ACTOR): while the actor's _moving is set (a walk or a
+                // turn), the script breaks here and tries again next frame; otherwise it goes on.
+                if (runtime.Actors.Moving(walkingActor) is var moving and not 0)
+                {
+                    trace.Add($"waiting for actor {walkingActor} to stop moving at +0x{instruction.Offset:X4} (_moving = 0x{moving:X2})");
+                    resumeOffset = instruction.Offset;
+                    break;
+                }
+                // A walk that could not be stepped was taken to end at once; the script
+                // goes on only after it has ended, so its end is no longer an estimate.
+                if (runtime.Actors.WalkWaited(walkingActor))
+                    trace.Add($"actor {walkingActor}'s walk has ended when the script goes on, so its position is no longer an estimate (the walk itself was not stepped)");
+                pc = next;
+                continue;
+            }
+
+            if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands == "camera" &&
+                knownVariables.TryGetValue("var[0x002]", out var cameraWaitX))
+            {
+                // o5_wait (SO_WAIT_FOR_CAMERA): breaks while the camera is not on its destination's strip.
+                if (cameraWaitX / 8 != runtime.Camera.DestX / 8)
+                {
+                    trace.Add($"waiting for the camera at +0x{instruction.Offset:X4} (x {cameraWaitX}, destination {runtime.Camera.DestX})");
+                    resumeOffset = instruction.Offset;
+                    break;
+                }
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation is "delay" or "delayVariable" ||
                 instruction.Operation == "waitFor" && (instruction.Operands is "message" or "camera" ||
                                                        instruction.Operands.StartsWith("actor,", StringComparison.Ordinal)))
@@ -587,12 +621,6 @@ public sealed class LoomBoundedScriptExecutor
                 };
                 trace.Add($"{waited} at +0x{instruction.Offset:X4} continues on the next frame");
                 limitations.Add($"timing not simulated: {waited} continues on the next frame (+0x{instruction.Offset:X4})");
-                // The script goes on only after the walk has ended, so the actor
-                // then stands where the walk was taken to end.
-                if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands.StartsWith("actor,", StringComparison.Ordinal) &&
-                    TryReadValue(instruction.Operands[6..].Trim(), knownVariables, out var waitedActor, out _) &&
-                    LoomActorTable.IsValid(waitedActor) && runtime.Actors.WalkWaited(waitedActor))
-                    trace.Add($"actor {waitedActor}'s walk has ended when the script goes on, so its position is no longer an estimate (only the walk's duration is not simulated)");
                 resumeOffset = next;
                 break;
             }
@@ -700,18 +728,27 @@ public sealed class LoomBoundedScriptExecutor
             if (instruction.Operation is "setCameraAt" or "panCameraTo" && runtime?.CameraRange is { } range &&
                 TryReadValue(instruction.Operands.Trim(), knownVariables, out var cameraX, out _))
             {
-                // setCameraAt places the camera; panCameraTo moves it 8 pixels a
-                // frame towards the destination. Both keep it half a screen from
-                // the room's edges and publish it in VAR_CAMERA_POS_X (var 2).
-                // The pan is not stepped: the camera arrives at once (labelled).
+                // setCameraAtEx: normal mode, the camera placed at once (kept inside
+                // VAR_CAMERA_MIN_X/MAX_X) and published in VAR_CAMERA_POS_X (var 2).
+                // panCameraTo only sets the destination and panning mode; moveCamera
+                // then moves the camera 8 pixels a frame (the session's frame end).
+                var cameraEstimated = onEstimatedPath || OperandIsEstimated(instruction.Operands.Trim(), estimated, knownVariables);
+                runtime.Camera.DestX = (short)cameraX;
+                runtime.Camera.MovingToActor = false;
+                if (instruction.Operation == "panCameraTo")
+                {
+                    runtime.Camera.Mode = LoomCamera.Panning;
+                    if (cameraEstimated) MarkEstimated(estimated, "var[0x002]", true);
+                    trace.Add($"camera pans to x = {(short)cameraX} ({instruction.Operation} {instruction.Operands})");
+                    pc = next;
+                    continue;
+                }
+                runtime.Camera.Mode = LoomCamera.Normal;
                 var clamped = (ushort)Math.Clamp(cameraX, range.Min, range.Max);
                 knownVariables["var[0x002]"] = clamped;
                 RefreshBitAliases("var[0x002]", knownVariables);
-                MarkEstimated(estimated, "var[0x002]", onEstimatedPath ||
-                    OperandIsEstimated(instruction.Operands.Trim(), estimated, knownVariables));
+                MarkEstimated(estimated, "var[0x002]", cameraEstimated);
                 trace.Add($"camera x = {clamped} ({instruction.Operation} {instruction.Operands})");
-                if (instruction.Operation == "panCameraTo")
-                    limitations.Add($"timing not simulated: the camera pan reaches x = {clamped} at once (+0x{instruction.Offset:X4})");
                 pc = next;
                 continue;
             }
@@ -800,14 +837,23 @@ public sealed class LoomBoundedScriptExecutor
                         cameraUnknown = "the camera's position before it was unknown";
                     else
                     {
-                        var strip = actorX / 8 - (cameraBefore / 8 - 20);
+                        var strip = actorX / 8 - LoomCamera.ScreenStartStrip(cameraBefore);
                         var wasEstimated = estimated.Contains("var[0x002]");
-                        if (strip is < 10 or > 30)
+                        runtime.Camera.Mode = LoomCamera.FollowActor;
+                        runtime.Camera.Follows = followed;
+                        if (strip is < LoomCamera.LeftTrigger or > LoomCamera.RightTrigger)
                         {
-                            var clamped = (ushort)Math.Clamp(actorX, followRange.Min, followRange.Max);
-                            knownVariables["var[0x002]"] = clamped;
-                            RefreshBitAliases("var[0x002]", knownVariables);
-                            trace.Add($"camera x = {clamped}: it follows actor {followed} at x = {actorX} (actorFollowCamera)");
+                            // setCameraAt in follow mode: the camera jumps only when the actor is more
+                            // than half a screen away; otherwise moveCamera pans to the destination.
+                            runtime.Camera.DestX = actorX;
+                            if (Math.Abs(actorX - cameraBefore) > 160)
+                            {
+                                var clamped = (ushort)Math.Clamp(actorX, followRange.Min, followRange.Max);
+                                knownVariables["var[0x002]"] = clamped;
+                                RefreshBitAliases("var[0x002]", knownVariables);
+                                trace.Add($"camera x = {clamped}: it follows actor {followed} at x = {actorX} (actorFollowCamera)");
+                            }
+                            else trace.Add($"camera pans from x = {cameraBefore} to actor {followed} at x = {actorX} (actorFollowCamera)");
                         }
                         else trace.Add($"camera x stays {cameraBefore}: actor {followed} at x = {actorX} is within its triggers (actorFollowCamera)");
                         MarkEstimated(estimated, "var[0x002]", onEstimatedPath || actor.Estimate is not null || wasEstimated ||
@@ -1033,7 +1079,7 @@ public sealed class LoomBoundedScriptExecutor
 
     private static bool IsActorQuery(string operation) => operation is
         "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom" or
-        "getActorCostume" or "getActorElevation" or "getActorFacing";
+        "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving";
 
     private static bool IsActorPlacement(string operation) => operation is
         "putActor" or "putActorAtObject" or "putActorInRoom" or "walkActorTo" or "walkActorToObject" or
@@ -1188,7 +1234,10 @@ public sealed class LoomBoundedScriptExecutor
                 // o5_walkActorToObject: walks only when the object is found.
                 var (found, point) = FindObjectWalkPoint(Read(1), roomObjects, runtime);
                 if (!found) break;
-                actors.Walk(number, point?.X, point?.Y, place, $"actor {number}'s {label}");
+                // getObjectXYPos gives the object's actor direction (oldDirToNewDir(actordir & 3)) as the walk's end direction.
+                var facing = roomObjects.FirstOrDefault(item => item.Id == Read(1)) is { } walkedTo
+                    ? LoomCostume.OldDirToNewDir(walkedTo.Direction & 3) : -1;
+                actors.Walk(number, point?.X, point?.Y, place, $"actor {number}'s {label}", facing);
                 break;
             }
             case "walkActorToActor":
@@ -1420,6 +1469,8 @@ public sealed class LoomBoundedScriptExecutor
             "getActorCostume" => actor.Look.Costume,
             "getActorElevation" => actor.Look.Elevation,
             "getActorFacing" => actor.Look.Direction,
+            // o5_getActorMoving: the actor's _moving flags.
+            "getActorMoving" => actor.Moving,
             _ => actor.Y
         };
         if (value is null)
@@ -1436,7 +1487,7 @@ public sealed class LoomBoundedScriptExecutor
             detail = $"{operation} reads actor {number}, whose {what} the preview does not know ({actor.Look.Estimate ?? actor.Unknown ?? "not known"})";
             return false;
         }
-        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing")
+        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving")
         {
             answer = value.Value;
             if (operation == "getActorFacing" && actor.Look.Estimate is not null) estimate = $"actor {number}: {actor.Look.Estimate}";

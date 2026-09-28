@@ -55,6 +55,9 @@ public sealed class LoomActorRendererTests
         // adjustActorPos on box 1 (flags 0x01): turnToDirection(180) is remapped to 270 (remapDirection, standing).
         table.PutInRoom(3, 2, place, ego: 1);
         table.Put(3, 860, 70, place, ego: 1);
+        Assert.Equal(LoomActorTable.MoveTurn, table[3].Moving);
+        // The locked box's direction is not interpolated: the next frame's walkActor takes it at once.
+        table.StepWalks(place);
         Assert.Equal((1, 270), (table[3].WalkBox, table[3].Look.Facing));
         // On box 0 (no flags) the facing is kept.
         table.Animate(3, 0xFA, place);

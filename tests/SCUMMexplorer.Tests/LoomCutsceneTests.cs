@@ -17,7 +17,6 @@ public sealed class LoomCutsceneTests
 
     [Theory]
     [InlineData("delay", "0x00003C", "a delay of 60 jiffies")]
-    [InlineData("waitFor", "actor, 0x03", "waiting for actor 0x03 to stop walking")]
     public void WaitsContinueOnTheNextFrameWithATimingLabel(string operation, string operands, string label)
     {
         var script = Script(
@@ -30,6 +29,30 @@ public sealed class LoomCutsceneTests
         Assert.Equal(4, run.ResumeOffset);
         Assert.False(run.ReachedStop);
         Assert.Contains($"timing not simulated: {label} continues on the next frame", run.UnresolvedReason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AWaitForActorBreaksWhileTheActorMovesAndGoesOnOnceItStops()
+    {
+        // o5_wait (SO_WAIT_FOR_ACTOR) breaks while the actor's _moving is set, and goes on at once otherwise.
+        var script = Script(
+            new(0, 0, "waitFor", "actor, 0x03", "AE 01 03"),
+            new(3, 0, "stopObjectCode", "", "00"));
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var still = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        Assert.Null(still.ResumeOffset);
+        Assert.True(still.ReachedStop);
+
+        var room = Path.Combine(Folder, "02.LFL");
+        if (!File.Exists(room)) return;
+        runtime.CurrentRoom = 2;
+        runtime.WalkBoxes = LoomWalkBoxReader.Read(File.ReadAllBytes(room));
+        var place = new LoomActorTable.Placement(2, runtime.WalkBoxes, null, null);
+        runtime.Actors.Put(3, 820, 60, 2, place, ego: 1);
+        runtime.Actors.Walk(3, 860, 125, place, "walk");
+        var walking = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        Assert.Equal(0, walking.ResumeOffset);
+        Assert.Contains(walking.Trace, line => line.StartsWith("waiting for actor 3 to stop moving", StringComparison.Ordinal));
     }
 
     [Fact]

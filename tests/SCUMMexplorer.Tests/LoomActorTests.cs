@@ -1,4 +1,4 @@
-using SCUMMexplorer.Core.Discovery;
+﻿using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
@@ -41,18 +41,30 @@ public sealed class LoomActorTests
     }
 
     [Fact]
-    public void AWalkInTheCurrentRoomEndsInItsBoxAsAnEstimate()
+    public void AWalkInTheCurrentRoomStepsAlongTheBoxPath()
     {
         if (!File.Exists(Path.Combine(Folder, "02.LFL"))) return;
         var table = new LoomActorTable();
         var place = new LoomActorTable.Placement(2, Room02Boxes(), null, null);
         table.Put(1, 820, 60, 2, place, ego: 1);
 
-        // Box 4 (837..888, y 118) is reached from box 0 along the chain.
+        // Box 4 (837..888, y 118) is reached from box 0 along the chain. startWalkActor only
+        // sets MF_NEW_LEG; each walkActor moves the actor by its walk speed (8, 2) at most.
         table.Walk(1, 860, 125, place, "walk");
+        Assert.Equal((820, 60, LoomActorTable.MoveNewLeg), (table[1].X, table[1].Y, table[1].Moving));
+        var points = new List<(int, int)>();
+        for (var frame = 0; frame < 200 && table[1].Moving != 0; frame++)
+        {
+            var (x, y) = (table[1].X!.Value, table[1].Y!.Value);
+            table.StepWalks(place);
+            Assert.True(Math.Abs(table[1].X!.Value - x) <= 8 && Math.Abs(table[1].Y!.Value - y) <= 2,
+                $"frame {frame}: ({x}, {y}) to ({table[1].X}, {table[1].Y})");
+            points.Add((table[1].X!.Value, table[1].Y!.Value));
+        }
         var walked = table[1];
-        Assert.Equal((860, 118, 4), (walked.X, walked.Y, walked.WalkBox));
-        Assert.NotNull(walked.Estimate);
+        Assert.Equal((860, 118, 4, 0), (walked.X, walked.Y, walked.WalkBox, walked.Moving));
+        Assert.True(points.Distinct().Count() > 20);
+        Assert.Null(walked.Estimate);
 
         // An unknown destination makes the actor unknown and drops the estimate.
         table.Walk(1, null, 125, place, "walk");
@@ -89,21 +101,25 @@ public sealed class LoomActorTests
         // arrival into Room 03 in Room 02's own code: object 160, walk to (250, 68).
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 3));
         var browsed = session.Actors.Single(actor => actor.Number == 1);
-        Assert.Equal((3, 250, true), (browsed.Room, browsed.X, browsed.Visible));
+        // A catalog visit shows the state after the assumed arrival: its walk to (250, 68) ends at once (estimate).
+        Assert.Equal((3, 250, true, 0), (browsed.Room, browsed.X, browsed.Visible, browsed.Moving));
         Assert.NotNull(browsed.WalkBox);
         Assert.Contains("assumed arrival at Room 02 Object 153 Verb 0x38 +0x002B", browsed.Estimate);
         Assert.True(session.CameraEstimated);
         Assert.Contains(session.Snapshot.Uncertainties, line =>
             line.Contains("Assumed arrival", StringComparison.Ordinal) && line.Contains("the only one in Room 02's own code", StringComparison.Ordinal));
 
-        // Local 200 +0x0008: loadRoomWithEgo with walkTo; the walk is an estimate.
+        // Local 200 +0x0008: loadRoomWithEgo with walkTo; the walk is stepped from object 170's walk point.
         session.ActivateObjectVerb(162, 0x36);
         Assert.True(session.ContinueUntilRoomChanges(8));
         Assert.Equal(4, session.Snapshot.RoomId);
         var arrived = session.Actors.Single(actor => actor.Number == 1);
         Assert.Equal((4, true), (arrived.Room, arrived.Visible));
-        Assert.NotNull(arrived.WalkBox);
-        Assert.Contains("taken to end", arrived.Estimate);
+        Assert.NotEqual(0, arrived.Moving);
+        for (var frame = 0; frame < 200 && session.ActorsMoving; frame++) session.AdvanceFrame();
+        arrived = session.Actors.Single(actor => actor.Number == 1);
+        Assert.Equal((580, 132, 0), (arrived.X, arrived.Y, arrived.WalkBox));
+        Assert.Null(arrived.Estimate);
     }
 
     [Fact]
@@ -157,6 +173,7 @@ public sealed class LoomActorTests
         var session = new LoomExplorationSession(game,
             new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 65));
+        for (var frame = 0; frame < 200 && session.ActorsMoving; frame++) session.AdvanceFrame();
         var ego = session.Actors.Single(actor => actor.Number == 1);
         Assert.Equal(65, ego.Room);
         Assert.Equal((228, 44), (ego.X, ego.Y));
@@ -192,13 +209,20 @@ public sealed class LoomActorTests
         Assert.Equal(160, session.CameraX);
 
         // o5_loadRoomWithEgo puts the camera on the ego, which then walks to (580, 132);
-        // Room 04 is 640 wide, so the camera stops at 480, an estimate like the walk.
+        // moveCamera follows it 8 pixels a frame once it passes the trigger strips, and
+        // Room 04 is 640 wide, so the camera stops at 480.
         session.ActivateObjectVerb(162, 0x36);
         Assert.True(session.ContinueUntilRoomChanges(8));
         Assert.Equal(4, session.Snapshot.RoomId);
+        var cameras = new List<int>();
+        for (var frame = 0; frame < 200 && (session.ActorsMoving || session.CameraMoving); frame++)
+        {
+            session.AdvanceFrame();
+            cameras.Add(session.CameraX!.Value);
+        }
         Assert.Equal(480, session.CameraX);
-        Assert.True(session.CameraEstimated);
-        Assert.Contains(session.Snapshot.Uncertainties, item => item.StartsWith("Camera x (var[0x002]) = 480 is an estimate", StringComparison.Ordinal));
+        Assert.All(cameras.Zip(cameras.Skip(1)), pair => Assert.True(Math.Abs(pair.Second - pair.First) <= 8));
+        Assert.All(cameras, x => Assert.Equal(0, x % 8));
     }
 
     [Fact]

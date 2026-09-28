@@ -38,7 +38,8 @@ public sealed class LoomKeyInputTests
             [new(0, 0x0A, "startScript", "0x12, [0x0002]", "0A 12 02 00 FF"), new(5, 0, "stopObjectCode", "", "00")],
             null, null, [], [], "Synthetic test script"));
         session.Click(700, 40);
-        Frames(session, 4);
+        // The ego walks to object 156's walk point (5 frames); script 006 holds bit[0xD63] until it arrives.
+        Frames(session, 10);
     }
 
     [Fact]

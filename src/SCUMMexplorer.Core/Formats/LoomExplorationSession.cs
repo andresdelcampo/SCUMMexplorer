@@ -443,6 +443,7 @@ public sealed class LoomExplorationSession
         _runtime.RoomCameraBounds = _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
         _runtime.GlobalVariables[CameraVariable] = 160;
         _runtime.EstimatedVariables.Remove(CameraVariable);
+        _runtime.Camera.Reset(160);
         // startScene resets VAR_CAMERA_MIN_X and VAR_CAMERA_MAX_X (v3: vars 17 and 18).
         _runtime.GlobalVariables["var[0x011]"] = 160;
         _runtime.GlobalVariables["var[0x012]"] = (ushort)Math.Max(160, roomWidth - 160);
@@ -501,15 +502,20 @@ public sealed class LoomExplorationSession
                          (placed.Unknown is null ? "" : $" ({placed.Unknown})"));
         else SetCamera(egoX, placed.Estimate is null ? null : $"the camera is put on the ego at {source}, whose position is an estimate ({placed.Estimate})",
             $"{source}: camera x = {{0}} (the ego's x)");
+        // setCameraFollows(ego): the camera is already on the ego, so it only enters follow mode.
+        _runtime.Camera.Mode = LoomCamera.FollowActor;
+        _runtime.Camera.Follows = ego;
         if (arguments[2] is int x && x != -1 && arguments[3] is int y)
         {
-            _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), $"the ego's walk from {source}");
+            // A catalog visit's assumed arrival shows the state after it, so its walk ends at once (estimate).
+            _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), $"the ego's walk from {source}", atOnce: assumedArrival is not null);
             // The walk's destination comes from the same assumed or picked arrival.
             if (assumedArrival is not null)
                 _runtime.Actors.MarkEstimate(ego, $"assumed arrival at {source} after a catalog visit");
             else if (_runtime.EstimatedVariables.Contains(EgoVariable) || load.Certainty != LoomScriptEventCertainty.Reached)
                 _runtime.Actors.MarkEstimate(ego, $"the ego's arrival at {source} follows a seeded pick");
-            FollowEgoWalk(_runtime.Actors[ego], source);
+            // A stepped walk moves the camera frame by frame (StepWalksAndCamera); one taken to end at once moves it at once.
+            if (_runtime.Actors.Moving(ego) == 0) FollowEgoWalk(_runtime.Actors[ego], source);
         }
         var state = _runtime.Actors[ego];
         _visitTrace.Add($"{source}: the ego (actor {ego}) stands at ({state.X?.ToString() ?? "?"}, {state.Y?.ToString() ?? "?"}), box {state.WalkBox?.ToString() ?? "?"}" +
@@ -547,13 +553,16 @@ public sealed class LoomExplorationSession
                     break;
                 }
                 case LoomEgoArrivalStepKind.Walk:
-                    _runtime.Actors.Walk(ego, step.A, step.B, CurrentPlacement(), $"the ego's walk at {arrival.Source} +0x{step.Offset:X4}");
+                    _runtime.Actors.Walk(ego, step.A, step.B, CurrentPlacement(), $"the ego's walk at {arrival.Source} +0x{step.Offset:X4}", atOnce: true);
                     break;
             }
             _runtime.Actors.MarkEstimate(ego, estimate);
         }
         if (arrival.CameraX is int cameraX)
+        {
+            _runtime.Camera.Mode = LoomCamera.Normal;
             SetCamera(cameraX, $"setCameraAt in {source}'s assumed arrival", $"{source}: setCameraAt, camera x = {{0}}");
+        }
         var state = _runtime.Actors[ego];
         _visitTrace.Add($"{source}: the ego (actor {ego}) stands at ({state.X?.ToString() ?? "?"}, {state.Y?.ToString() ?? "?"}), box {state.WalkBox?.ToString() ?? "?"}" +
                         (state.Estimate is null ? "" : $" (estimate: {state.Estimate})"));
@@ -962,6 +971,8 @@ public sealed class LoomExplorationSession
         var (min, max) = _runtime.CameraRange ?? (160, 160);
         var clamped = (ushort)Math.Clamp(x, min, max);
         _runtime.GlobalVariables[CameraVariable] = clamped;
+        _runtime.Camera.DestX = x;
+        _runtime.Camera.MovingToActor = false;
         if (estimate is null) _runtime.EstimatedVariables.Remove(CameraVariable);
         else
         {
@@ -1107,6 +1118,7 @@ public sealed class LoomExplorationSession
             _dispatchScope--;
             _entersRoomLoads--;
         }
+        StepWalksAndCamera();
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
             item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
             !_dispatchedLoads.Contains(item));
@@ -1119,6 +1131,59 @@ public sealed class LoomExplorationSession
         }
         EnterReachedLoad(roomLoad, target, null, "after a frame advance");
         return Snapshot;
+    }
+
+    /// <summary>
+    /// The end of ScummVM's <c>scummLoop</c> after the scripts: <c>walkActors</c> steps every walking or turning actor
+    /// in the room (<see cref="LoomActorTable.StepWalks"/>), then <c>moveCamera</c> moves the camera up to 8 pixels
+    /// (<see cref="LoomCamera.Move"/>); the next frame's <c>processActors</c> draws and animates them.
+    /// </summary>
+    private void StepWalksAndCamera()
+    {
+        if (_currentRoom is null) return;
+        var place = CurrentPlacement();
+        _runtime.Actors.StepWalks(place);
+        if (!_runtime.GlobalVariables.TryGetValue(CameraVariable, out var camera) || _runtime.RoomCameraBounds is not { } bounds) return;
+        var (min, max) = _runtime.CameraRange ?? bounds;
+        var cameraState = _runtime.Camera;
+        LoomActorSnapshot? followed = null;
+        if (cameraState.Mode == LoomCamera.FollowActor || cameraState.MovingToActor)
+            followed = LoomActorTable.IsValid(cameraState.Follows) ? _runtime.Actors[cameraState.Follows] : null;
+        var moved = cameraState.Move(camera, min, max, bounds, followed?.X);
+        if (moved == camera) return;
+        _runtime.GlobalVariables[CameraVariable] = (ushort)moved;
+        if (followed?.Estimate is not null && _runtime.EstimatedVariables.Add(CameraVariable))
+            _uncertainties.Add($"Camera x (var[0x002]) = {moved} is an estimate: it follows actor {followed.Number}, whose position is an estimate ({followed.Estimate}).");
+    }
+
+    /// <summary>True while an actor in the current room walks or turns (ScummVM <c>_moving</c>).</summary>
+    public bool ActorsMoving => _runtime.Actors.Snapshot().Any(actor => actor.Moving != 0 && actor.Room == _currentRoom?.ResourceId);
+
+    /// <summary>
+    /// True while the ego (<c>VAR_EGO</c>) walks or turns. Playback waits for this, not for every actor: ambient
+    /// actors (script 042's swan speck in Room 02) walk from point to point without end.
+    /// </summary>
+    public bool EgoMoving => _runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && LoomActorTable.IsValid(ego) &&
+                             _runtime.Actors[ego] is { Moving: not 0 } actor && actor.Room == _currentRoom?.ResourceId;
+
+    /// <summary>
+    /// True while <c>moveCamera</c> would still move the camera: it is not on the strip of its target (the followed
+    /// actor while moving to it, else its destination), with the target kept inside the camera's limits. A camera held
+    /// at a room edge short of its actor does not count, although ScummVM keeps <c>_movingToActor</c> set then.
+    /// </summary>
+    public bool CameraMoving
+    {
+        get
+        {
+            if (CameraX is not int x || _runtime.RoomCameraBounds is not { } bounds) return false;
+            var (min, max) = _runtime.CameraRange ?? bounds;
+            var camera = _runtime.Camera;
+            var target = camera.DestX;
+            if (camera.MovingToActor && LoomActorTable.IsValid(camera.Follows) && _runtime.Actors[camera.Follows].X is int actorX)
+                target = actorX;
+            target = Math.Clamp(Math.Clamp(target, min, Math.Max(min, max)), bounds.Min, bounds.Max);
+            return x / 8 != target / 8;
+        }
     }
 
     /// <summary>

@@ -12,8 +12,9 @@ using SCUMMexplorer.Core.Formats;
 // actor layer (RoomActorOverlay) over the room image, sorted by y and drawn at
 // (x, y − elevation). The check captures the room view, measures the ego's pixels,
 // then clicks empty floor (the game's click through HandleRoomPoint, assumed input)
-// and records the actor layer on every playback frame: the walk ends at once in the
-// session (labelled estimate), so what the frames show is recorded, not assumed.
+// and records the actor layer on every playback frame. Since M3a the walk is stepped
+// (walkActor): the frames show the ego's walk frame and its steps, and a second click
+// on the exit shows the camera following the ego 8 pixels a frame (moveCamera).
 // No physical input. Arguments: <Games\loom> <output folder>.
 internal static class Program
 {
@@ -97,6 +98,8 @@ internal static class Program
                 // The ego stands at (828, 60): its pixels lie around x 828 and end at row 60.
                 var egoPixels = CountIn(overlay, 810, 15, 846, 62);
                 Check(egoPixels > 100, $"the ego is drawn at its feet (828, 60): {egoPixels} pixels in (810, 15)–(846, 62)");
+                // M3a: Room 02 local 202 turns the ego towards the fairy on every frame while it flies off left.
+                Check(ego.Look.Facing == 270, $"after the boot the ego faces 270 (left profile, as in ScummVM): facing {ego.Look.Facing}");
                 Save("room02-after-boot-app.png");
 
                 // A single click on empty floor (Room 02 box 4 at (860, 118)): scripts 005–007 walk the ego there.
@@ -107,7 +110,8 @@ internal static class Program
                 var hashes = new HashSet<int>();
                 var lastHash = first.Hash;
                 var saved = 0;
-                while (clock.ElapsedMilliseconds < 20000)
+                var steps = new List<(int X, int Y, int? Frame, string Limbs)>();
+                while (clock.ElapsedMilliseconds < 30000)
                 {
                     await Task.Delay(15);
                     var layer = Layer();
@@ -115,7 +119,9 @@ internal static class Program
                     {
                         lastHash = layer.Hash;
                         hashes.Add(layer.Hash);
-                        frames.Add($"{clock.ElapsedMilliseconds,5} ms: {layer.Count} px, bounds {layer.Bounds}; {Actors()}");
+                        var walker = Session().Actors[0];
+                        steps.Add((walker.X ?? -1, walker.Y ?? -1, walker.Look.Frame, string.Join(",", walker.Look.Animation.Positions.Take(3))));
+                        frames.Add($"{clock.ElapsedMilliseconds,5} ms: {layer.Count} px, bounds {layer.Bounds}; moving {walker.Moving}; camera {Session().CameraX}; {Actors()}");
                         if (saved < 6) Save($"room02-click-frame{++saved}-app.png");
                     }
                     if (!Playing() && clock.ElapsedMilliseconds > 1500) break;
@@ -125,11 +131,49 @@ internal static class Program
                 ego = Session().Actors[0];
                 report.Add($"      after the click: {Actors()}; ego estimate: {ego.Estimate ?? "none"}; look estimate: {ego.Look.Estimate ?? "none"}");
                 Check(hashes.Count > 0, $"the actor layer was redrawn during the click's playback ({hashes.Count} distinct pictures)");
-                Check(ego.X != 828 || ego.Y != 60, $"the ego moved: now at ({ego.X}, {ego.Y}) (the walk ends at once: labelled estimate)");
+                Check(ego.X != 828 || ego.Y != 60, $"the ego moved: now at ({ego.X}, {ego.Y})");
+                // walkActor: each frame moves the ego by at most its walk speed; script 045's putActor is the one jump.
+                var moves = steps.Zip(steps.Skip(1)).Where(pair => (pair.First.X, pair.First.Y) != (pair.Second.X, pair.Second.Y)).ToArray();
+                var small = moves.Count(pair => Math.Abs(pair.Second.X - pair.First.X) <= 8 && Math.Abs(pair.Second.Y - pair.First.Y) <= 2);
+                Check(small >= 10 && moves.Length - small <= 2, $"the ego walks in steps: {small} frames move it by at most (8, 2), {moves.Length - small} jump (script 045's putActor)");
+                var walkFrames = steps.Where(step => step.Frame == 9).ToArray();
+                Check(walkFrames.Length >= 10 && walkFrames.Select(step => step.Limbs).Distinct().Count() >= 3,
+                    $"the walk frame (9, Bobbin without the distaff) plays while it walks: {walkFrames.Length} frames, {walkFrames.Select(step => step.Limbs).Distinct().Count()} limb poses");
                 var after = Layer();
                 Check(after.Bounds is { } b && ego.X is int ex && b.Item1 <= ex && b.Item3 >= ex,
                     $"the drawn ego follows the session's position: layer bounds {after.Bounds}, ego x {ego.X}");
                 Save("room02-after-click-app.png");
+
+                // A second click on the exit (object 153): the smaller ego walks left down the path and the camera follows it.
+                clock.Restart();
+                var viewport = Find<ScrollViewer>("RoomViewport");
+                Call("HandleRoomPoint", 450, 60, false);
+                for (var n = 0; n < 100 && !Playing(); n++) await Task.Delay(20);
+                var cameras = new List<int>();
+                var offsets = new List<double>();
+                var cameraLog = new List<string>();
+                while (clock.ElapsedMilliseconds < 40000)
+                {
+                    await Task.Delay(15);
+                    // Only Room 02: when the walk stops at a change of scene, the app's labelled doorway fallback may enter Room 03.
+                    if (Session().Snapshot.RoomId == 2 && Session().CameraX is int camera && (cameras.Count == 0 || cameras[^1] != camera))
+                    {
+                        cameras.Add(camera);
+                        offsets.Add(viewport.HorizontalOffset);
+                        var walker = Session().Actors[0];
+                        cameraLog.Add($"{clock.ElapsedMilliseconds,5} ms: camera {camera}, view offset {viewport.HorizontalOffset:0}, ego ({walker.X}, {walker.Y}) frame {walker.Look.Frame}");
+                        if (cameras.Count == 6) Save("room02-camera-follows-app.png");
+                    }
+                    if (!Playing() && clock.ElapsedMilliseconds > 1500) break;
+                }
+                report.Add("Camera changes during the second click (changes only):");
+                report.AddRange(cameraLog.Select(line => "      " + line));
+                var pans = cameras.Zip(cameras.Skip(1)).ToArray();
+                Check(pans.Length >= 5 && pans.All(pair => Math.Abs(pair.Second - pair.First) == 8),
+                    $"the camera follows the walk 8 pixels a frame: {pans.Length} moves, from {cameras.FirstOrDefault()} to {cameras.LastOrDefault()}");
+                Check(offsets.Distinct().Count() >= 5, $"the view scrolls with the camera: {offsets.Distinct().Count()} offsets");
+                ego = Session().Actors[0];
+                report.Add($"      after the second click: Room {Session().Snapshot.RoomId:00}; {Actors()}; status: {Find<TextBlock>("StatusText").Text}");
 
                 // Another room: the layer only shows actors in the shown room.
                 await Open(3);

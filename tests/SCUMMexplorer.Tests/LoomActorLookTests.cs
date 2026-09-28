@@ -67,10 +67,21 @@ public sealed class LoomActorLookTests
         Assert.Equal(3, table[3].Look.Frame);
         Assert.Equal(13, table[3].Look.Animation.Animation[0]);
 
-        // 0xF6: chore 4, turn to direction 2 (180): taken at once, labelled.
+        // 0xF6: chore 4, turn to direction 2 (180): turnToDirection sets MF_TURN, and walkActor turns
+        // one step a frame (actorTurnInterpolateTable: right to down is one step), then clears _moving.
         Assert.Equal("turn to 180", table.Animate(3, 0xF6, place));
-        Assert.Equal(180, table[3].Look.Facing);
-        Assert.Contains("at once", table[3].Look.Estimate);
+        Assert.Equal((90, LoomActorTable.MoveTurn), (table[3].Look.Facing, table[3].Moving));
+        table.StepWalks(place);
+        Assert.Equal((180, LoomActorTable.MoveTurn), (table[3].Look.Facing, table[3].Moving));
+        table.StepWalks(place);
+        Assert.Equal((180, 0), (table[3].Look.Facing, table[3].Moving));
+        // A turn to the opposite side goes through a side step: up (0) from down turns right first.
+        table.Animate(3, 0xF7, place);
+        table.StepWalks(place);
+        Assert.Equal(90, table[3].Look.Facing);
+        table.StepWalks(place);
+        Assert.Equal(0, table[3].Look.Facing);
+        table.Animate(3, 0xFA, place);
 
         // Frame 58 redirects to the stand frame; 57 to the walk frame.
         table.StartAnimation(3, 57, place);

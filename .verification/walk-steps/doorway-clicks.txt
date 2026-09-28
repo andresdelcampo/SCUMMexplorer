@@ -1,0 +1,15 @@
+Real MainWindow; in-process HandleRoomPoint calls. No physical mouse input.
+Doorway boxes: 13; navigated to one of their rooms: 13 (10 through the game's click, 3 through the direct-verb fallback); failed: 0
+PASS Room 02 object 153 box (376,8) 176x120 [var71=0x0] → targets 03; click (377,9) → Room 03 [direct verb, fallback: Click sent to the game (assumed input); no room load was reached: A click at (377, 9) in Room 02, sent to the game's input script as assumed input; no room load was reached.]
+PASS Room 03 object 160 box (256,0) 64x72 [var71=0x99] → targets 02; click (257,1) → Room 02 [game's click]
+PASS Room 03 object 161 box (168,88) 152x56 [var71=0xA0] → targets 05; click (169,89) → Room 05 [game's click]
+PASS Room 03 object 162 box (0,0) 72x72 [var71=0xA1] → targets 04; click (1,1) → Room 04 [game's click]
+PASS Room 03 object 163 box (48,88) 48x40 [var71=0xA2] → targets 10; click (72,108) [overlapped centre] → Room 10 [game's click]
+PASS Room 03 object 164 box (0,80) 128x56 [var71=0xA3] → targets 10; click (1,81) → Room 10 [game's click]
+PASS Room 04 object 167 box (616,0) 24x144 [var71=0xA3] → targets 03; click (617,1) → Room 03 [game's click]
+PASS Room 04 object 177 box (160,96) 32x32 [var71=0xA7] → targets 64; click (161,97) → Room 64 [direct verb, fallback: Click sent to the game (assumed input); no room load was reached: A click at (161, 97) in Room 04, sent to the game's input script as assumed input; no room load was reached.]
+PASS Room 08 object 253 box (0,0) 16x144 [var71=0xA7] → targets 07; click (1,1) → Room 07 [game's click]
+PASS Room 08 object 254 box (648,0) 264x144 (untouchable now) [var71=0xFD] → targets 09; click (649,1) → Room 09 [game's click]
+PASS Room 10 object 284 box (288,0) 32x72 [var71=0xFD] → targets 03; click (289,1) → Room 03 [game's click]
+PASS Room 10 object 285 box (304,72) 16x72 [var71=0x11C] → targets 05; click (305,73) → Room 05 [game's click]
+PASS Room 10 object 295 box (192,88) 104x40 (untouchable now) [var71=0x11D] → targets 13; click (193,89) → Room 13 [direct verb, fallback: Click sent to the game (assumed input); no room load was reached: A click at (193, 89) in Room 10, sent to the game's input script as assumed input; no room load was reached.]

@@ -266,7 +266,66 @@ public sealed class LoomWalkBoxSet
         return dx >= 0x1000 || dy >= 0x1000 ? 0xFFFFFF : dx * dx + dy * dy;
     }
 
-    private static bool CompareSlope(LoomBoxPoint p1, LoomBoxPoint p2, LoomBoxPoint p3) =>
+    /// <summary>ScummVM <c>getBoxCoordinates</c> for version 3 (with <c>getBoxBaseAddr</c>'s one-past-the-end rule), or null.</summary>
+    public LoomWalkBox? Coordinates(int box) => Resolve(box) is int index ? Boxes[index] : null;
+
+    /// <summary>
+    /// ScummVM <c>getGates</c>: the "corridor" between two boxes as two lines, each from a corner of one box
+    /// to the closest point on the other. Gate A's first point and gate B's first point lie on the first box.
+    /// </summary>
+    public static (LoomBoxPoint A0, LoomBoxPoint A1, LoomBoxPoint B0, LoomBoxPoint B1) GetGates(LoomWalkBox box1, LoomWalkBox box2)
+    {
+        var corners = new LoomBoxPoint[8];
+        var closest = new LoomBoxPoint[8];
+        var dist = new int[8];
+        LoomBoxPoint[] first = [box1.UpperLeft, box1.UpperRight, box1.LowerRight, box1.LowerLeft];
+        LoomBoxPoint[] second = [box2.UpperLeft, box2.UpperRight, box2.LowerRight, box2.LowerLeft];
+        for (var i = 0; i < 4; i++)
+        {
+            corners[i] = first[i];
+            var (d, x, y) = ClosestPointOnBox(box2, first[i].X, first[i].Y);
+            (dist[i], closest[i]) = (d, new LoomBoxPoint(x, y));
+        }
+        for (var i = 4; i < 8; i++)
+        {
+            corners[i] = second[i - 4];
+            var (d, x, y) = ClosestPointOnBox(box1, second[i - 4].X, second[i - 4].Y);
+            (dist[i], closest[i]) = (d, new LoomBoxPoint(x, y));
+        }
+        var minDist = new int[3];
+        var nearest = new int[3];
+        var onSecond = new bool[3];
+        for (var j = 0; j < 3; j++)
+        {
+            minDist[j] = 0xFFFF;
+            for (var i = 0; i < 8; i++)
+            {
+                if (dist[i] < minDist[j])
+                {
+                    minDist[j] = dist[i];
+                    nearest[j] = i;
+                }
+            }
+            dist[nearest[j]] = 0xFFFF;
+            minDist[j] = (int)Math.Sqrt(minDist[j]);
+            onSecond[j] = nearest[j] > 3;
+        }
+        int line1, line2;
+        if (onSecond[0] == onSecond[1] && Math.Abs(minDist[0] - minDist[1]) < 4) (line1, line2) = (nearest[0], nearest[1]);
+        else if (onSecond[0] == onSecond[1] && minDist[0] == minDist[1]) (line1, line2) = (nearest[0], nearest[1]);
+        else if (onSecond[0] == onSecond[2] && minDist[0] == minDist[2]) (line1, line2) = (nearest[0], nearest[2]);
+        else if (onSecond[1] == onSecond[2] && minDist[1] == minDist[2]) (line1, line2) = (nearest[1], nearest[2]);
+        else if (onSecond[0] == onSecond[2] && Math.Abs(minDist[0] - minDist[2]) < 4) (line1, line2) = (nearest[0], nearest[2]);
+        else if (Math.Abs(minDist[0] - minDist[2]) < 4) (line1, line2) = (nearest[1], nearest[2]);
+        else if (Math.Abs(minDist[0] - minDist[1]) < 4) (line1, line2) = (nearest[0], nearest[1]);
+        else (line1, line2) = (nearest[0], nearest[0]);
+        var (a0, a1) = line1 < 4 ? (corners[line1], closest[line1]) : (closest[line1], corners[line1]);
+        var (b0, b1) = line2 < 4 ? (corners[line2], closest[line2]) : (closest[line2], corners[line2]);
+        return (a0, a1, b0, b1);
+    }
+
+    /// <summary>ScummVM <c>compareSlope</c>.</summary>
+    public static bool CompareSlope(LoomBoxPoint p1, LoomBoxPoint p2, LoomBoxPoint p3) =>
         (p2.Y - p1.Y) * (p3.X - p1.X) <= (p3.Y - p1.Y) * (p2.X - p1.X);
 
     private static bool QuickReject(LoomWalkBox box, int x, int y, int threshold)

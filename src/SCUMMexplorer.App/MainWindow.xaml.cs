@@ -2612,8 +2612,8 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Plays the frames after an input on a timer at the game's frame rate,
-    /// redrawing each frame (object states, camera, messages), until no talk
-    /// message is on screen and the scripts wait for input: no script is
+    /// redrawing each frame (object states, camera, actors, messages), until no talk
+    /// message is on screen, the ego does not walk or turn, the camera is still, and the scripts wait for input: no script is
     /// pending, or <see cref="ExitContinuationFrames"/> frames outside a cutscene
     /// passed (or the session left the room). Frames inside a cutscene do not
     /// count, up to <see cref="LoomExplorationSession.CutsceneFrameLimit"/>. A room
@@ -2661,14 +2661,17 @@ public partial class MainWindow : Window
     {
         if (_session is not { } session || _playback is not { } playback) return false;
         var talking = session.Messages.HaveMsg != 0;
-        if (session.Snapshot.PendingScripts == 0 && !talking) return false;
+        // The ego's walk or turn, or a camera pan, still in progress plays on (M3a), even with no script left.
+        // Other actors are not waited for: ambient walkers (script 042's swan) never stop.
+        var moving = session.EgoMoving || session.CameraMoving;
+        if (session.Snapshot.PendingScripts == 0 && !talking && !moving) return false;
         if (session.InCutscene)
         {
             if (playback.CutsceneFrames < LoomExplorationSession.CutsceneFrameLimit) return true;
             playback.Note = $"A cutscene was still open after {LoomExplorationSession.CutsceneFrameLimit} frames; playback stopped following it.";
             return false;
         }
-        return talking || !playback.LeftRoom && playback.IdleFrames < ExitContinuationFrames;
+        return talking || moving || !playback.LeftRoom && playback.IdleFrames < ExitContinuationFrames;
     }
 
     /// <summary>Advances the session by one frame if playback goes on; returns whether it did.</summary>
@@ -2678,7 +2681,8 @@ public partial class MainWindow : Window
         var session = _session!;
         var playback = _playback!;
         if (session.InCutscene) playback.CutsceneFrames++;
-        else playback.IdleFrames++;
+        // Frames of a walk do not count as idle: the sentence that waits for it runs after it.
+        else if (!session.EgoMoving && !session.CameraMoving) playback.IdleFrames++;
         var room = session.Snapshot.RoomId;
         session.AdvanceFrame();
         if (session.Snapshot.RoomId != room) playback.LeftRoom = true;
