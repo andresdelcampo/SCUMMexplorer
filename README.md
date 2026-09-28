@@ -30,7 +30,9 @@ Stored text extraction also covers Indiana Jones and the Last Crusade EGA, whose
 
 | Document | Purpose |
 |---|---|
-| [LOOM EGA plan](docs/LOOM_EGA_PLAN.md) | Current product direction, progress and next step |
+| [LOOM EGA plan](docs/LOOM_EGA_PLAN.md) | Current product direction, priorities and milestones |
+| [Script map](docs/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, object verbs and rooms |
+| [Changelog](docs/CHANGELOG.md) | Finished work with links to its validation |
 | [Implementation audit](docs/EXPLORATION_AUDIT.md) | Existing capabilities, limitations and historical verification results |
 | [Object-state reference](docs/SCUMM_OBJECT_STATES.md) | Format evidence, rendering rules and preview semantics |
 | [Script coverage](docs/LOOM_SCRIPT_COVERAGE.md) | Measured decoder coverage; not gameplay coverage |

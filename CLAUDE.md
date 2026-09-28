@@ -7,7 +7,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 - `src/SCUMMexplorer.Core`: parsing, rendering and bounded script execution (net10.0). It covers LFL/index readers, the old-v3 disassembler (`Formats/LoomScriptReader.cs`), the bounded executor and session, object selection and painting (`Rendering/RoomObjectSelection.cs`), the text extractor, and audio (PC speaker, AdLib via NukedOPL3Sharp).
 - `src/SCUMMexplorer.App`: the WPF desktop UI (net10.0-windows). `MainWindow.xaml.cs` holds most of the UI logic; `TextGalleryWindow` is the Game Texts browser.
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
-- `docs/`: the plan, audits and references. Start with `docs/LOOM_EGA_PLAN.md` and `docs/AUDIT_2026-09-27.md`. `docs/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables and rooms do (boot, hooks, cutscenes).
+- `docs/`: the plan, audits and references. Start with `docs/LOOM_EGA_PLAN.md` (priorities and milestones). `docs/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do. `docs/CHANGELOG.md` lists finished work with links to its validation records. The other docs are historical.
 - `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
 - `Games/`: the local game data. Never commit it.
   - `Games/loom`: DOS LOOM EGA, Spanish.
@@ -55,12 +55,12 @@ dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 
 ## Workflow notes
 
-- This folder has no git repository yet. Run `git init` before large changes if you want diffs and easy rollback.
-- Record verification for each milestone under `.verification/<topic>/`, and update `docs/LOOM_EGA_PLAN.md` with its status and next task.
+- The repository is on git (`master`). Commit each finished task separately; `Games/` stays out of git.
+- Record verification for each milestone under `.verification/<topic>/`, and update `docs/LOOM_EGA_PLAN.md` with its status and next task, and add a row to `docs/CHANGELOG.md`.
 
 ## Current work
 
-The 27 September rendering, gap-filling and doorway work is applied and verified (`docs/WIP_2026-09-27.md`, `.verification/room-audit/validation.md`). Open items are listed at the end of the WIP note.
+Replanned on 28 September around what the user sees. The priorities are: (M1) object clicks run the game's interaction and its text appears on screen in the game's font, (M2) actors are drawn with costume animation, and (M3) cutscenes and animations play with the game's timing. The session already runs most of this logic, but the app does not draw it. Engine gaps that do not change the screen wait until a milestone route needs them. See the plan's "Ordered work".
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands

@@ -2,7 +2,7 @@
 
 A working reference for the Spanish DOS LOOM EGA data in `Games/loom`: what the decoded scripts do, which variables they use, and how the session models them. Offsets are into each script's code, as `CodeDump` prints them (`.verification/fallback-evidence/code.tsv`, regenerated with `dotnet Exe/CodeDump/.../CodeDump.dll Games\loom .verification\fallback-evidence`). Each entry says whether a claim is **decoded** (read straight from instructions), **ScummVM** (engine behaviour checked against `engines/scumm`), or **reading** (an interpretation that has not been verified in a run).
 
-Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot validation](../.verification/boot/validation.md) and the [cutscene continuation validation](../.verification/cutscene-continuation/validation.md).
+Last updated 28 September 2026 (replan: object verbs, messages and actor commands added for milestones M1–M3). See also [the plan](LOOM_EGA_PLAN.md), the [changelog](CHANGELOG.md), the [boot validation](../.verification/boot/validation.md) and the [cutscene continuation validation](../.verification/cutscene-continuation/validation.md).
 
 ## Engine variables (ScummVM v3 numbering)
 
@@ -54,6 +54,7 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 
 | Script | Role | Notes |
 | --- | --- | --- |
+| 000, 051, 055, 116 | Leftover index entries | Their offsets point inside Costume 01, Script 49, Room 18 and Script 114. No decoded code starts them (ScummVM reads the index the same way). [Validation](../.verification/global-script-index/validation.md). |
 | 001 | Boot | Loads Room 69, waits for `bit[0xD6B]`, sets the hooks, plays script 044, chains to 006. See the [boot validation](../.verification/boot/validation.md). |
 | 002 | Cutscene start hook | Cursor and input off, `freezeScripts 0x7F`, `bit[0xD6E] = 1`, `var[0x005] = 0`; with argument 1, starts script 19 |
 | 003 | Cutscene end hook | Cursor and input on, unfreeze, camera follows ego (+0x0018 `actorFollowCamera var[0x001]`), `bit[0xD6E] = 0`; with argument 1, starts script 18 unless `bit[0xD61]` is set |
@@ -90,6 +91,32 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 - Scripts 018 (turns verbs 0x01–0x08 on at `local[4]`'s y, and 0x31/0x32), 019 (turns them off), 027/028 (verb 0x35), 031 and 008 change them later.
 - ScummVM facts the session follows: `getVerbSlot` returns 0 for a verb with no slot, and `image` is ignored there; `setVerbObject` takes the image only when the object is one of the current room's objects.
 - The verb area is screen rows 144–199 (ScummVM `initScreens(16, 144)` for v3). `drawVerbBitmap` draws an image verb that is on or dim at `x / 8` strips, `height / 8` strips down, and sets its `curRect` to the verb's x, y and that size; `findVerbAtPos` takes the last slot in mode 1 whose `curRect` holds the point. After the boot every verb is off. The app's optional "Show verb area" draws the slots (presentation, [validation](../.verification/verb-area/validation.md)).
+
+## Object verbs (decoded counts, 28 September)
+
+626 object verbs in 76 rooms. What each verb number does, from its code (reading for the role unless noted):
+
+| Verb | Count | Typical content | Role |
+| --- | --- | --- | --- |
+| 0x36 | 125 | `print` of a description (Room 02 object 156: "Amanecer."), sometimes a walk, `animateActor` and a cutscene first (object 154) | Look. Script 006 runs it after a double click (decoded). |
+| 0x38 | 109 | `loadRoomWithEgo` (62), `startScript` (43), cutscenes (17), walks | Use or go. Script 007 runs it after a click, once the ego is near (decoded). |
+| 0x39 | 112 | `var[0x068]` = the close-up image object | Close-up. Script 008 shows it in the verb area (decoded). |
+| 0x37 | 12 | Cutscene, `bit[0xD64]`, `walkActorToObject` (Room 04 objects 169/170 pan) | On click, before the walk. Script 006 runs it first (decoded). |
+| 0x56 | 96 | `startScript 0x29 [actor, x, y, …]` then `print` "Ese hechizo no funcionará con …" | A draft that does nothing here. Script 041 (0x29) is started with a point; reading: the spell's visual at that point. |
+| 0x3A–0x4D | 3–26 each | `startScript` of a room local (0xCC–0xD4) or 0x29, `print` | Specific drafts. For example Room 02 object 156 verb 0x3B prints "Parece que se ha cerrado." or "Tendría que abrirlo primero." by `bit[0xDA5]`. Which verb is which draft is not decoded yet. |
+| Fallback | 21 | Room 69 difficulty and note objects | |
+
+97 object verbs are trivial (only `move`, `breakHere`, `stopObjectCode`). 156 print text and 394 start scripts. Only 68 load a room.
+
+## Messages, charset and actor commands (decoded counts; ScummVM references for milestones M1–M3)
+
+- **`print actor, [subops]`** (1,170 sites). Actor operand: 0x01 (the ego, 453), 0x02–0x0B (other actors), 0xFF (173; ScummVM: no actor, a system line), 0xFE (74; script 018's note letters). Subops: `text` (1,170), `center` (1,037), `position x, y` (439; y is often `var[0x0A6]`), `color` (154), `left` (6). Text control codes: `0xFF 0x01` is a new line (decoded in Room 02 object 156 verb 0x40); the others follow ScummVM `string.cpp`.
+- **Message timing** (ScummVM `string.cpp`, `scumm.cpp`): a message sets `_talkDelay` = `VAR_DEFAULT_TALK_DELAY` (or 60) plus `VAR_CHARINC` (`var[0x025]`) per character, and the engine subtracts the frame's jiffies each frame. `VAR_HAVE_MSG` (`var[0x003]`) is nonzero while a message is on screen. `waitFor message` waits for it. The session does not time messages yet (M1).
+- **Charset:** ScummVM `ScummEngine_v3::loadCharset(n)` reads `99 - n`.LFL, so charset 0 is `Games/loom/99.LFL` (2,168 bytes, not XOR-encoded). `CharsetRendererV3` draws it. Not read yet (M1).
+- **`actorOps`** (712 sites): `elevation` 414, `costume` 380, `palette` 380, `standAnimation` 198, `walkAnimation` 194, `walkSpeed` 193, `initAnimation` 180, `talkAnimation` 98, `talkColor` 85. The actor table models only costume, init and box flags (M2).
+- **`animateActor actor, n`** (1,853 sites). ScummVM `Actor::animateActor` for v3: `chore = 0x3F - (n >> 2) + 2`, `dir = n & 3`. 0xFC–0xFF stop moving and start the stand frame, 0xF8–0xFB set the direction at once, and 0xF4–0xF7 turn to it. Any other value starts frame `n` itself (`startAnimActor(n)`), and the costume animation used is `facing + n * 4` (`ClassicCostumeLoader::costumeDecodeData`). Most used: 0xFA (330), 0x06 (200), 0xFF (154), 0x03 (148), 0xF8 (122). Not modelled (M2).
+- **Costumes:** format 0x58 only in this release. `LoomCostumeRenderer` draws the first command of each limb, a static pose. ScummVM `ClassicCostumeLoader::costumeDecodeData` and `increaseAnim` step each limb's command index over its length (M2).
+- **Walking:** 488 `walkActorTo`, 34 `walkActorToObject`, 11 `walkActorToActor`. Walks end at once today (estimate). ScummVM `Actor::walkActor`, `calcMovementFactor`, `actorWalkStep` (M3).
 
 ## Walk boxes (decoded, ScummVM `room.cpp`/`boxes.cpp`)
 
@@ -149,12 +176,12 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | Walks | End at once (estimate); after `waitFor actor` the end is no longer an estimate; when every box routes to the end box, an estimate about the start does not carry to the end | `LoomActorTable.Walk`, `WalkWaited` |
 | Sound commands (music row) | Each command keeps the room whose code began its script chain (`ScriptFrame.OriginRoom`). The room view shows cues started since entry, or started by the room itself and not stopped. | session `SoundEvents`, `LoomSoundCueResolver.ResolveForRoom` |
 
-## Not modelled yet (by frequency in Blockers)
+## Not modelled yet (ordered by the plan's milestones)
 
-1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown. After a catalog visit the ego takes a source-backed assumed arrival (`loadRoomWithEgo`, else `loadRoom` and a put), so no visit stops on an unknown ego ([validation](../.verification/catalog-arrivals/validation.md), [loadRoom arrivals](../.verification/loadroom-arrivals/validation.md)). `getActorCostume`, `getActorElevation`, walk timing and paths, and step-by-step camera movement are not modelled.
-2. Input beyond a room click: room clicks go through scripts 005, 006 and 007 when sent ([validation](../.verification/click-input/validation.md)), and verb-area clicks (area 1: the distaff, the close-up icon) through scripts 005 and 010 ([validation](../.verification/verb-click/validation.md)), and keys (area 4, [validation](../.verification/key-input/validation.md)); the engine timers are not run. Escape's `abortCutscene` is modelled (28 Sep, [validation](../.verification/abort-cutscene/validation.md)).
-3. Inventory object code and `stopObjectScript`.
-4. ~~`startScript` with a dynamic target~~: resolved 28 Sep. All five sites have a local target with a known value; the executor reads it (getVarOrDirectByte) ([validation](../.verification/dynamic-scripts/validation.md)). A target that reads an unknown variable still stops with the same label.
-5. `expression` in some forms (3 in Blockers).
-6. ~~Script arguments that hold an estimate~~: resolved 28 Sep. They are passed by value and the child's locals keep the estimate ([validation](../.verification/estimated-arguments/validation.md)).
-7. ~~A room load left "awaiting bounded session dispatch"~~: resolved 28 Sep. All 66 were loads by object verbs or Room 03 locals that the session already entered; such a load now ends the room-owned script, as ScummVM `startScene` does ([validation](../.verification/room-owned-loads/validation.md)). `killScriptsAndResources` ending the other room-owned scripts in the same step is not modelled.
+1. **M1, messages:** `print` is run and dropped. There is no message state, no talk delay (`waitFor message` continues after one frame) and no charset. Actor talk positions and `talkColor` are not kept.
+2. **M2, actors:** costume animation, `animateActor`, `actorOps` beyond costume, init and box flags (so `getActorCostume` and `getActorElevation` stop, 1 each in Blockers), `faceActor`, and actor drawing.
+3. **M3, timing:** walks end at once (the camera jumps to the walk's end, without its 8-pixel strip rounding); `delay` and `delayVariable` (Room 43 local 205) continue on the next frame; the engine timers are not run.
+4. **As routes need them:** `stopObjectScript`, inventory object code, `killScriptsAndResources` ending the other room-owned scripts at a room load, `expression` in some forms (3 in Blockers).
+5. **Assumptions that stay labelled:** the Room 69 difficulty and draft answer, the boot's seeded draft table, `getRandomNr` picks (seed 0 in the app), a catalog visit's arrival, and the input state (pointer, click timing, keys). Rooms 19, 51 and 86 rest on seeded ties between priority-1 draw batches.
+
+Resolved on 28 September, kept here for reference: `startScript` with a dynamic target ([validation](../.verification/dynamic-scripts/validation.md)), script arguments that hold an estimate ([validation](../.verification/estimated-arguments/validation.md)), and room loads left "awaiting bounded session dispatch" ([validation](../.verification/room-owned-loads/validation.md)).
