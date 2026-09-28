@@ -72,7 +72,7 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | 016 | Prints a line at a variable y (`print` with an empty text) | |
 | 039 (0x27), 040 (0x28) | Sound players: stop the previous sound, start the argument's sound, loop while it plays | The session reads a started sound as playing (estimate), so these stay pending. Script 039 starts the sound after one `breakHere` (+0x0021, +0x0038). The intro's sound 25 comes from script 044 +0x02C3. |
 | 042 | Room 03's actor 2 (random position and time on screen, `bit[0xD7A]`) | |
-| 044 | **Opening cutscene** | Rooms 01, 02, 01, 02, 53, 02; waits on the camera (+0x0361) and on local scripts (`isScriptRunning` 0xD1/0xD2); two overrides |
+| 044 | **Opening cutscene** | Rooms 01, 02, 01, 02, 53, 02; waits on the camera (+0x0361) and on local scripts (`isScriptRunning` 0xD1/0xD2); two overrides. +0x01B0–0x01D9 and +0x01FD–0x0226: two loops `startScript local[0x001], [x, y]` with `local[0x001]` = 0xC8..0xD0 and the points from `var[0x08E..0x097]`/`var[0x098..0x0A1]` (set just before by `setVarRange`), one start per frame; the second loop restarts each copy. +0x041B and +0x0532/0x0534 stop 0xC8 and 0xC9. Decoded; run by the session since 28 Sep. |
 | 045 | Room 02 walk-box watcher | Starts a cutscene when ego enters box 4. After the boot the ego is in box 0 (the cliff top, (828, 60)), so it waits for a box change (decoded; actor model 27 Sep). |
 | 052 | Room 10 object 295 → Room 11 → Room 13 cutscene | |
 | 086 | Firewood scene; opens Room 58 on 792 (+0x018A) | Body behind `beginOverride` |
@@ -110,6 +110,10 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 - **Room 10.** Object 295 starts script 052 (a cutscene through Room 11 into Room 13).
 - **Room 04.** Two screens. Outside a cutscene, the entry (+0x0013–0x003F) picks a half by the previous room (`var[0x070]`; 0x46 also reads `var[0x0AC]`, 0x40 is Room 64). Local 204 does `roomScroll 152, 160` and `setCameraAt 160` (left half); local 205 does `roomScroll 480, 488` and `setCameraAt 480` (right half). The camera is locked to that half (decoded; `roomScroll` modelled 27 Sep). Objects 169/170 (verb 0x37) pan between the halves.
 - **Room 16.** Its entry starts script 039 with sound 30 on the first visit (`bit[0xDBE]`, decoded); the sound starts one frame later.
+- **Room 01: intro sky.** Locals 200–208 (started by script 044 through `local[0x001]`) each put one actor (1–9) in Room 01 at the argument point, `animateActor` 6, wait 11 frames and take it out of the room (`putActorInRoom n, 0`). Decoded; reading: the intro's flashing points of light. Actor 1 is the ego, which ends the boot in Room 02 at (828, 60) as before.
+- **Room 02 local 203: the ending.** Starts locals 0xCC and then 0xCD..0xDD in turn through `local[0x000]` (+0x0019), waiting on messages and `bit[0xD75]`, then prints "FIN" and fades the palette. Decoded; not on a session route.
+- **Room 10 local 205.** Objects 297–300 (verb 0x36) start it with 0xCE..0xD1; inside a cutscene it starts that local with the draft's first note (`var[0x052]`), waits for it, then starts each of the other three locals of 0xCE..0xD1 in order with the next notes (`var[0x053..]`), waiting for each; the `isNotEqual local[0x000], …` tests skip the one already played. Decoded; reading for the role (a draft played on one of four objects).
+- **Room 23 local 210.** Objects 422–425 (verb 0x49) start it with [2..5, 0xD7..0xDA]; +0x0107 starts `local[0x001]`, the object's own local. Decoded.
 - **Room 22.** Its entry picks local 210/211/212 by `var[0x071]`, which makes exit 400 or 402 untouchable (class 24).
 
 ## How the session maps ScummVM behaviour
@@ -121,6 +125,7 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `beginOverride` records the skip jump and steps over it | The disassembler decodes past the jump; the executor steps over it; the preview never skips | `LoomScriptReader.Disassemble`, executor |
 | `freezeScripts` | Per-slot `ScriptFrame.FreezeCount`, freeze-resistant starts (opcode bit 0x20) | session |
 | `chainScript` | `StopAfterEvent`, then the target starts in the same place | session `RunScript` |
+| `startScript`/`chainScript`/`stopScript` read the script number with `getVarOrDirectByte` | A variable or local target takes its known value when the instruction runs; a target that reads a seeded pick makes the start a possible outcome; `stopScript` of a value 0 is left unresolved | executor (event target) |
 | `isScriptRunning` | Executing, pending or frozen global/local scripts; estimate if the script ended at an unmodelled step | `IsScriptRunning` |
 | `isSoundRunning` | Sounds started on the route read as playing (estimate) | executor |
 | `delay`, `waitFor` actor/message/camera | Continue on the next frame (labelled timing) | executor |
@@ -144,5 +149,5 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown. After a catalog visit the ego takes a source-backed assumed arrival (`loadRoomWithEgo`, else `loadRoom` and a put), so no visit stops on an unknown ego ([validation](../.verification/catalog-arrivals/validation.md), [loadRoom arrivals](../.verification/loadroom-arrivals/validation.md)). `getActorCostume`, `getActorElevation`, walk timing and paths, and step-by-step camera movement are not modelled.
 2. Input beyond a room click: room clicks go through scripts 005, 006 and 007 when sent ([validation](../.verification/click-input/validation.md)), and verb-area clicks (area 1: the distaff, the close-up icon) through scripts 005 and 010 ([validation](../.verification/verb-click/validation.md)), and keys (area 4, [validation](../.verification/key-input/validation.md)); the engine timers are not run, and Escape's `abortCutscene` is not modelled.
 3. Inventory object code and `stopObjectScript`.
-4. `startScript` with a dynamic target (a variable that is not known).
+4. ~~`startScript` with a dynamic target~~: resolved 28 Sep. All five sites have a local target with a known value; the executor reads it (getVarOrDirectByte) ([validation](../.verification/dynamic-scripts/validation.md)). A target that reads an unknown variable still stops with the same label.
 5. `expression` in some forms.

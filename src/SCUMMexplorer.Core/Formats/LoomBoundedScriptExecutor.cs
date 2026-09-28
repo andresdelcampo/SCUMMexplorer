@@ -216,6 +216,25 @@ public sealed class LoomBoundedScriptExecutor
                     LoomScriptEventKind.SoundStarted or LoomScriptEventKind.SoundStopped } &&
                 TryReadValue(instruction.Operands.Trim(), knownVariables, out var soundId, out _))
                 scriptEvent = scriptEvent with { TargetId = soundId };
+            // o5_startScript, o5_chainScript and o5_stopScript read the script
+            // number with getVarOrDirectByte, so a variable or local target takes
+            // its value now. A target that reads a seeded pick is a possible outcome.
+            if (scriptEvent is { TargetId: null, Kind: LoomScriptEventKind.ScriptStarted or
+                    LoomScriptEventKind.ScriptChained or LoomScriptEventKind.ScriptStopped })
+            {
+                var listStart = ArgumentListStart(instruction.Operands);
+                var head = (listStart < 0 ? instruction.Operands : instruction.Operands[..listStart])
+                    .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                // stopScript 0 would end the current script; it is left unresolved.
+                if (head.Length > 0 && TryReadValue(head[0], knownVariables, out var scriptId, out _) &&
+                    !(scriptId == 0 && scriptEvent.Kind == LoomScriptEventKind.ScriptStopped))
+                    scriptEvent = scriptEvent with
+                    {
+                        TargetId = scriptId,
+                        Certainty = OperandIsEstimated(head[0], estimated, knownVariables)
+                            ? LoomScriptEventCertainty.Conditional : scriptEvent.Certainty
+                    };
+            }
             // The session applies loadRoomWithEgo's ego steps after the room entry,
             // so it needs the object and walk destination as they are now.
             if (scriptEvent is { Operation: "loadRoomWithEgo" })
