@@ -1,0 +1,4 @@
+after v:154:36: room 2, camera 800, talk "" Talk actor 1 at (160, 112) centred colour 0x8F line height 10 delay 60 from Script 44 +0x06AA
+after t:Room 02 Object 154 Verb 0x36 +0x0037: room 2, camera 800, talk "Ultima hoja del año." Talk actor 1 at (160, 112) centred colour 0x8F line height 10 delay 160 from Room 02 Object 154 Verb 0x36 +0x0037
+view: room x 640..959; text bounds (102, 112, 219, 121)
+on screen: "Ultima hoja del año." Talk actor 1 at (160, 112) centred colour 0x8F line height 10 delay 160 from Room 02 Object 154 Verb 0x36 +0x0037

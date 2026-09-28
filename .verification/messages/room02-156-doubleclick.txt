@@ -1,0 +1,6 @@
+after d:700,40: room 2, camera 800, talk "" Talk actor 1 at (160, 112) centred colour 0x8F line height 10 delay 60 from Script 44 +0x06AA
+after t:Room 02 Object 156 Verb 0x36 +0x0000: room 2, camera 800, talk "Amanecer." Talk actor 1 at (160, 112) centred colour 0x8F line height 10 delay 105 from Room 02 Object 156 Verb 0x36 +0x0000
+view: room x 640..959; text bounds (130, 112, 286, 189)
+on screen: "cielo" Drawn actor 254 at (272, 181) centred colour 0x8F line height 0 delay 0 from Script 07 +0x001E
+on screen: "cielo" Drawn actor 254 at (272, 181) centred colour 0x8F line height 0 delay 0 from Script 07 +0x001E
+on screen: "Amanecer." Talk actor 1 at (160, 112) centred colour 0x8F line height 10 delay 105 from Room 02 Object 156 Verb 0x36 +0x0000

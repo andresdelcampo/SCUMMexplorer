@@ -59,6 +59,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | Visual-first UI refresh | Room-art picker, larger scene, advanced details collapsed (commit 92c2e3c). CameraPanCheck 2 FAIL and VerbAreaCheck 1 FAIL since then | [ui-refresh-complete](../.verification/ui-refresh-complete/validation.md) |
 | Replan | Priorities moved to visible behaviour: interactions, on-screen text, actors, playback. Plan and changelog cleaned up; no code changed | [plan](LOOM_EGA_PLAN.md) |
 | M1e: the game's click by default | Explore-mode clicks go through scripts 005–007; double click adds verb 0x36; doorways fall back to their verb, labelled (75/75: 29 by the game's click); inspection mode cycles artwork | [game-click](../.verification/game-click/validation.md) |
+| M1a/M1b: messages and the game's font (Core) | `print` → text slots, talk message, talk delay, `VAR_HAVE_MSG`, `waitFor message`; object names in text (code 6); charset 0 from `99.LFL` drawn as `CharsetRendererV3`. Blockers 5839 → 4979; cutscene cap 1000 → 20,000 frames | [messages](../.verification/messages/validation.md) |
 
 ## State at the end of 28 September
 
