@@ -1,0 +1,17 @@
+﻿Real MainWindow; verb state changed through the session's test seam and the pointer handler. No physical input.
+PASS the verb area is off by default and not shown
+PASS on: the strip is shown under the room
+PASS on: the strip is 320 x 56 screen pixels at the room's scale (499 x 87,3; room view 499 wide)
+PASS on: the room shrinks so the strip and its note fit (strip bottom 364 of 364,9; room 364,9 → 241,5)
+PASS on, after the boot: nothing is on, and the note says it is a presentation: "Verb area: presentation of the session's verb slots, not the game's drawing; no image verb is on in the session's state. Clicks on verbs that are on go to the game as assumed input."
+PASS on, after the boot: the strip is empty
+PASS after script 018: the note lists the verbs that are on, the tooltip their images: "Verb area: presentation of the session's verb slots, not the game's drawing; verbs 0x01–0x08, 0x31, 0x32 on. Clicks on verbs that are on go to the game as assumed input."
+PASS after script 018: the first and last distaff notes (x 16 and 192, row 144) are drawn
+PASS hover on object 156: the close-up (verb 0x36, verb 0x36 (slot 53): image of object 159 (Room 02), at (248, 152), on) is drawn at (248, 152): "Verb area: presentation of the session's verb slots, not the game's drawing; verbs 0x01–0x08, 0x31, 0x32, 0x36 on. Clicks on verbs that are on go to the game as assumed input."
+PASS inspection mode: a click on note 0x03 in the strip sends nothing
+PASS explore mode: the note says verb clicks are assumed input: "Verb area: presentation of the session's verb slots, not the game's drawing; verbs 0x01–0x08, 0x31, 0x32, 0x36 on. Clicks on verbs that are on go to the game as assumed input."
+PASS explore mode: a click on the strip where no verb is on sends nothing
+PASS a click on note 0x03 with nothing aimed at reaches script 013 through scripts 005 and 010: "Click on verb 0x03 sent to the game (assumed input); no room load was reached"
+PASS after aiming at object 156, note 0x03 is recorded (var[0x056] = 3, var[0x062] = 1) and script 027 runs
+PASS off again: the verb screen stays for the game's text [, _, `, , _, `, , _, `, , _, `, , _, `, , _, `, , _, `, , <, =, cielo, ]: "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots)."; the room fills its space (room 460,6 x 224,3 in 862,3 x 340,9; first 364,9 high)
+Failures: 0

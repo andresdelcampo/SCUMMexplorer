@@ -522,6 +522,21 @@ public sealed class LoomBoundedScriptExecutor
                 break;
             }
 
+            if (runtime is not null && instruction.Operation == "drawBox")
+            {
+                // o5_drawBox: the box covers drawn strings under it (script 008 erases the close-up and name).
+                var corners = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                var values = new ushort[corners.Length];
+                var known = corners.Length == 5;
+                for (var i = 0; known && i < corners.Length; i++)
+                    known = TryReadValue(corners[i], knownVariables, out values[i], out _);
+                trace.Add(known
+                    ? runtime.Messages.DrawBox((short)values[0], (short)values[1], (short)values[2], (short)values[3], values[4])
+                    : $"drawBox {instruction.Operands} not applied: an operand is unknown");
+                pc = next;
+                continue;
+            }
+
             if (runtime is not null && instruction.Operation is "print" or "printEgo")
             {
                 if (!TryReadPrint(instruction, script, knownVariables, estimated, onEstimatedPath, runtime, out var request, out var printDetail))

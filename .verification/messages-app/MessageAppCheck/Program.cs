@@ -158,6 +158,29 @@ internal static class Program
                     Check(!(bool)Call("SkipTalkAt", 5, 5)!, "a click away from the text does not skip it");
                 }
                 for (var n = 0; n < 200 && Playing(); n++) await Task.Delay(20);
+
+                // Clicking one object after another: script 008 erases the name area with drawBox
+                // (232,152)–(312,192) before script 007 prints the next name, so one name shows at a time,
+                // under the close-up (verb 0x36) at (248, 152).
+                var records = ((IEnumerable<LoomRoomObjectRecord>)Field("_currentRoomObjectRecords")!).ToArray();
+                var verbImage = Find<Image>("VerbStripImage");
+                foreach (var id in new[] { 155, 157, 156 })
+                {
+                    var record = records.First(r => r.Id == id);
+                    Call("HandleRoomPoint", record.X + record.Width / 2, record.Y + Math.Min(record.Height / 2, 20), false);
+                    for (var n = 0; n < 300 && Playing(); n++) await Task.Delay(20);
+                    await Task.Delay(100);
+                    window.UpdateLayout();
+                    var names = Session().Messages.Drawn.Where(m => m.X == 272 && m.Y == 181).Select(m => m.Text).ToArray();
+                    var closeUp = Session().Verbs.FirstOrDefault(v => v.VerbId == 0x36);
+                    Check(names.Length <= 1,
+                        $"after a click on object {id}: {names.Length} name(s) at (272, 181) [{string.Join(", ", names)}]; " +
+                        $"close-up {(closeUp is { Mode: 1 } ? $"object {closeUp.ImageObject}'s image at ({closeUp.X}, {closeUp.Y})" : "off")}; verb screen {(verbImage.IsVisible ? "shown" : "hidden")}");
+                    if (names.Length == 1 && closeUp is { Mode: 1 })
+                        Check(verbImage.Source is BitmapSource { Format: var format } && format == PixelFormats.Indexed8,
+                            $"object {id}: the verb screen draws the verb slots, so the close-up is above the name");
+                    Save($"room02-click-{id}-name-app.png");
+                }
                 report.Add($"Failures: {failures}");
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }

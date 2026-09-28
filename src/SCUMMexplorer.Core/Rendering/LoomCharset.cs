@@ -139,8 +139,11 @@ public static class LoomMessageRenderer
         var layer = new Layer();
         foreach (var message in messages)
         {
+            // A box drawn after the string covers its pixels there (drawBox paints over it).
+            layer.ErasedBy = message.ErasedBy;
             if (message.Kind == LoomMessageKind.Talk) DrawTalk(layer, message, charset);
             else DrawDrawnString(layer, message, charset);
+            layer.ErasedBy = [];
         }
         return new LoomMessageLayer(layer.Pixels, ScreenWidth, ScreenHeight, layer.Bounds);
     }
@@ -277,10 +280,13 @@ public static class LoomMessageRenderer
     {
         public byte[] Pixels { get; } = Enumerable.Repeat(Transparent, ScreenWidth * ScreenHeight).ToArray();
         public (int Left, int Top, int Right, int Bottom)? Bounds { get; private set; }
+        public IReadOnlyList<LoomScreenBox> ErasedBy { get; set; } = [];
 
         public void Set(int x, int y, byte value, int screenTop, int screenBottom)
         {
             if (x < 0 || x >= ScreenWidth || y < screenTop || y >= screenBottom) return;
+            foreach (var box in ErasedBy)
+                if (box.Contains(x, y)) return;
             Pixels[y * ScreenWidth + x] = value;
             Bounds = Bounds is { } b
                 ? (Math.Min(b.Left, x), Math.Min(b.Top, y), Math.Max(b.Right, x + 1), Math.Max(b.Bottom, y + 1))

@@ -181,9 +181,10 @@ internal static class Program
                     (host.ActualHeight - scroll - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0)));
                 var roomFits = Math.Abs((double)Field("_roomDisplayScale")! - expectedScale) < 0.01 &&
                                Math.Abs(viewport.ActualHeight - (roomHeight * expectedScale + scroll)) < 1;
-                Check((verbText.Length == 0 ? strip.Visibility != Visibility.Visible : note.Text.StartsWith("Verb screen: text the game printed there", StringComparison.Ordinal)) &&
-                      !AnyPixelOfSlots() && roomFits,
-                    $"off again: the verb slots are gone{(verbText.Length == 0 ? " with the strip" : $"; the verb screen keeps the game's text [{string.Join(", ", verbText)}]: \"{note.Text}\"")}; " +
+                // With the game's text there, the verb screen stays and draws the slots that text goes with.
+                Check((verbText.Length == 0 ? strip.Visibility != Visibility.Visible && !AnyPixelOfSlots()
+                          : note.Text.StartsWith("Verb screen: the game's text there", StringComparison.Ordinal)) && roomFits,
+                    $"off again: {(verbText.Length == 0 ? "the strip is gone" : $"the verb screen stays for the game's text [{string.Join(", ", verbText)}]: \"{note.Text}\"")}; " +
                     $"the room fills its space (room {viewport.ActualWidth:0.#} x {viewport.ActualHeight:0.#} in {host.ActualWidth:0.#} x {host.ActualHeight:0.#}; first {roomHeightOff:0.#} high)");
                 Save("room-02-verb-area-off-again.png");
                 report.Add($"Failures: {failures}");

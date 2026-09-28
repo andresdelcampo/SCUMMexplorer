@@ -1,0 +1,27 @@
+﻿Real MainWindow; room points are given to HandleRoomPoint and the text-skip handler. No physical input.
+PASS charset 0 was read (D:\Documents\Personal\Code Projects\SCUMMexplorer\Games\loom\99.LFL)
+PASS Room 02 is open in the explore mode after the boot
+PASS before the click the layer shows only what the session has on screen: ["" Talk at (160, 112) from Script 44 +0x06AA]
+PASS after the click the playback clock runs (the frames are not played in one go)
+PASS "Amanecer." is drawn on the room's message layer
+      text pixels: 304, room rows 96–103, room columns 770–829; camera x 800; talk rectangle (770, 96, 830, 104); message at (160, 112), colour 0x8F, delay 105
+PASS the text's top row is room row 96 (screen y 112 − 16), shadow included: 96
+Frames as drawn (changes only):
+        119 ms: on screen [], overlay shown, verb text hidden
+        198 ms: on screen [cielo | cielo | Amanecer.], overlay shown, verb text shown
+       2198 ms: on screen [cielo | cielo], overlay shown, verb text shown
+PASS "Amanecer." appeared while the clock played
+      "Amanecer." shown at 198 ms, gone at 2198 ms (2000 ms); playback stopped at 3751 ms
+PASS "Amanecer." stays for about its talk delay (105 jiffies, 17–18 frames of 100 ms): 2000 ms
+PASS the clock stops once no talk is shown and the scripts wait for input
+PASS "cielo" (script 007 +0x001E, print 0xFE, text code 6) is drawn in the verb screen at (272, 181)
+PASS with the verb strip off, the verb screen shows for the text printed there
+PASS the talk text has a clickable rectangle: (770, 96, 830, 104)
+PASS a click on the text ends it on the next frame (123 ms); status "Text skipped (the game's talk-stop key '.', assumed input)"
+PASS a click away from the text does not skip it
+PASS after a click on object 155: 1 name(s) at (272, 181) [hoja]; close-up object 158's image at (248, 152); verb screen shown
+PASS object 155: the verb screen draws the verb slots, so the close-up is above the name
+PASS after a click on object 157: 0 name(s) at (272, 181) []; close-up off; verb screen hidden
+PASS after a click on object 156: 1 name(s) at (272, 181) [cielo]; close-up object 159's image at (248, 152); verb screen shown
+PASS object 156: the verb screen draws the verb slots, so the close-up is above the name
+Failures: 0

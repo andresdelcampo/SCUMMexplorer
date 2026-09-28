@@ -3123,10 +3123,11 @@ public partial class MainWindow : Window
         {
             if (VerbScreenShown())
             {
-                // Only the verb screen's text: on the screen's black, with the strip itself off.
-                VerbStripImage.Source = FrozenBgra(LoomVerbArea.Width, LoomVerbArea.Height,
-                    Enumerable.Range(0, LoomVerbArea.Width * LoomVerbArea.Height).SelectMany(_ => new byte[] { 0, 0, 0, 0xFF }).ToArray());
-                VerbStripNote.Text = "Verb screen: text the game printed there. The verb strip itself is off.";
+                // The verb screen holds the game's text: draw it with the verb slots it goes with,
+                // so the close-up (verb 0x36, script 008) shows above the object's name (script 007).
+                var slots = _session!.VerbArea();
+                VerbStripImage.Source = CreateBitmap(slots.Width, slots.Height, slots.Pixels, _currentRoom!.Palette);
+                VerbStripNote.Text = "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots).";
                 VerbStripNote.ToolTip = string.Join(Environment.NewLine, _session?.Messages.OnScreen
                     .Where(message => message.Y >= LoomVerbArea.Top)
                     .Select(message => $"\"{message.Text}\" at ({message.X}, {message.Y}) from {message.Source}") ?? []);

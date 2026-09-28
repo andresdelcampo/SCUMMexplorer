@@ -32,6 +32,29 @@ public sealed record LoomMessage(
 
     /// <summary>ScummVM's actor 0xFF: a line with no speaker.</summary>
     public bool IsSystemLine => Actor == LoomMessageTable.NoActor;
+
+    /// <summary>Boxes (<c>drawBox</c>) drawn over this string after it: its pixels inside them are covered.</summary>
+    public IReadOnlyList<LoomScreenBox> ErasedBy { get; init; } = [];
+}
+
+/// <summary>A <c>drawBox</c> rectangle in screen coordinates, corners inclusive.</summary>
+public sealed record LoomScreenBox(int Left, int Top, int Right, int Bottom, int Color)
+{
+    public bool Contains(int x, int y) => x >= Left && x <= Right && y >= Top && y <= Bottom;
+
+    /// <summary>
+    /// Whether the box covers the whole string for any glyph widths: LOOM's charset 0
+    /// glyphs are at most 8 pixels wide and 8 rows high (with the shadow, one more each).
+    /// </summary>
+    public bool SurelyCovers(LoomMessage message)
+    {
+        var width = message.LineGlyphs.Count == 0 ? 0 : message.LineGlyphs.Max(line => line.Length) * 8 + 1;
+        // drawString centres the first line on x, but later lines start a whole width left of it.
+        var left = message.Center ? message.X - (message.LineGlyphs.Count > 1 ? width : width / 2) : message.X;
+        var lineHeight = message.LineHeight != 0 ? message.LineHeight : 8;
+        var bottom = message.Y + Math.Max(0, message.LineGlyphs.Count - 1) * lineHeight + 8;
+        return left >= Left && left + width <= Right + 1 && message.Y >= Top && bottom <= Bottom + 1;
+    }
 }
 
 /// <summary>One subcommand of <c>print</c> (ScummVM <c>decodeParseString</c>) with its operands read now; a null value is unknown.</summary>
@@ -268,6 +291,32 @@ public sealed class LoomMessageTable
         if (_drawn.Count > MaxDrawn) _drawn.RemoveAt(0);
         _log.Add(message);
         return $"string drawn: \"{message.Text.Replace("\n", " / ", StringComparison.Ordinal)}\" at ({message.X}, {message.Y}), colour {message.Color}";
+    }
+
+    /// <summary>
+    /// ScummVM <c>o5_drawBox</c>/<c>drawBox</c>: fills the rectangle (corners inclusive, in
+    /// either order) on the screen it is in, so drawn strings under it are covered. Script 008
+    /// erases the close-up and the object's name this way (a box at 232,152–312,192 in colour 0)
+    /// before it shows the next object's. Each drawn string keeps the boxes drawn after it
+    /// (<see cref="LoomMessage.ErasedBy"/>); one a box surely covers is dropped. The fill itself
+    /// is not drawn: over the verb screen, colour 0 is its black.
+    /// </summary>
+    public string DrawBox(int x1, int y1, int x2, int y2, int color)
+    {
+        var box = new LoomScreenBox(Math.Min(x1, x2), Math.Min(y1, y2), Math.Max(x1, x2), Math.Max(y1, y2), color);
+        var covered = 0;
+        for (var i = _drawn.Count - 1; i >= 0; i--)
+        {
+            var drawn = _drawn[i];
+            if (box.SurelyCovers(drawn))
+            {
+                _drawn.RemoveAt(i);
+                covered++;
+            }
+            else _drawn[i] = drawn with { ErasedBy = [.. drawn.ErasedBy, box] };
+        }
+        return $"box drawn at ({box.Left}, {box.Top})–({box.Right}, {box.Bottom}), colour {color}: " +
+               (covered == 0 ? "no drawn string is under it" : $"{covered} drawn string(s) covered");
     }
 
     /// <summary>

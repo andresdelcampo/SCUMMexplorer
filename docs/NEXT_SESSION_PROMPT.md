@@ -3,11 +3,12 @@ Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md firs
 State at the start:
 
 * Git: master. The latest commits:
+  * the object-name fix (after the user's report): script 008's `drawBox` covers earlier names, so one name shows at a time, and the verb screen draws the verb slots with its text, so the close-up is above the name (.verification/messages-app/names/validation.md). Tests: 207/207;
   * 4153d47 "Open the first room at the camera; update the verb area check";
   * f90b453 "Draw messages over the room and play clicks forward (M1c/M1d)";
   * before them, 798d094, the room music selection (another agent's).
 * Another agent may be working on the room music player (`UpdateRoomMusicActions`, the audio code, `.verification/room-thumbnails/`, the music checks). Don't edit those. If `git status` shows their uncommitted changes, commit only your own files and check `git diff` hunk by hunk.
-* `dotnet build SCUMMexplorer.slnx`: 0 compiler warnings. Tests: 206/206 with SCUMM_SOUND_TEST_ROOT=Games\loom and SCUMM_INDY3_EGA_TEST_ROOT=Games\IndyCru\EGA.
+* `dotnet build SCUMMexplorer.slnx`: 0 compiler warnings. Tests: 207/207 with SCUMM_SOUND_TEST_ROOT=Games\loom and SCUMM_INDY3_EGA_TEST_ROOT=Games\IndyCru\EGA.
 * WPF checks:
   * MessageAppCheck (new): 0 failures;
   * DoorwayClickCheck: 75/75 (29 through the game's click), identical line for line to M1e;

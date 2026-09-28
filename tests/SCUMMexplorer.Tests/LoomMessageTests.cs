@@ -39,6 +39,31 @@ public sealed class LoomMessageTests
     }
 
     [Fact]
+    public void ADrawnBoxCoversTheNamesUnderIt()
+    {
+        // Script 008 +0x000E erases the close-up and name area (232,152)–(312,192) before
+        // script 007 +0x001E prints the next object's name centred at (272, 181).
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var table = runtime.Messages;
+        LoomPrintRequest Name(string text) => new(0xFE,
+            [new("center"), new("position", 0x110, 0xB5), new("color", 0x8F)],
+            System.Text.Encoding.ASCII.GetBytes(text), "Script 07", 0x1E, 2, null);
+        table.Print(Name("cielo"), runtime);
+        table.Print(Name("arbol"), runtime);
+        Assert.Equal(["cielo", "arbol"], table.Drawn.Select(message => message.Text));
+
+        var trace = table.DrawBox(0xE8, 0x98, 0x138, 0xC0, 0);
+        Assert.Empty(table.Drawn);
+        Assert.Contains("2 drawn string(s) covered", trace, StringComparison.Ordinal);
+
+        // A string the box only partly covers stays, with the box recorded over it.
+        table.Print(Name("cielo"), runtime);
+        table.DrawBox(0xE8, 0x98, 0x110, 0xC0, 0);
+        var partly = Assert.Single(table.Drawn);
+        Assert.Equal(new LoomScreenBox(0xE8, 0x98, 0x110, 0xC0, 0), Assert.Single(partly.ErasedBy));
+    }
+
+    [Fact]
     public void TheSkysDescriptionIsATalkMessageWithTheGamesDelay()
     {
         if (Start() is not { } started) return;
