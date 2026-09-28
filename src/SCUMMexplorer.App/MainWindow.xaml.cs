@@ -43,6 +43,8 @@ public partial class MainWindow : Window
     private GameResource? _selectedResource;
     private GameResource? _lastViewedRoomResource;
     private int _relationshipBuildGeneration;
+    private int _roomCardGeneration;
+    private CancellationTokenSource? _roomCardCancellation;
     private CancellationTokenSource? _previewCancellation;
     private RoomImage? _currentRoom;
     private GameResource? _currentRoomResource;
@@ -87,7 +89,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Loaded += (_, _) => ReopenLastFolder();
-        Closed += (_, _) => { StopRoomPan(); StopAudio(); };
+        Closed += (_, _) => { _roomCardCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         PreviewKeyDown += MainWindow_PreviewKeyDown;
@@ -309,63 +311,152 @@ public partial class MainWindow : Window
         FooterText.ToolTip = game.FolderPath;
     }
 
-    private async void PopulateRoomCards(GameLibrary game)
+    private void PopulateRoomCards(GameLibrary game)
     {
-        foreach (var roomResource in game.Rooms)
+        _roomCardCancellation?.Cancel();
+        var cancellation = new CancellationTokenSource();
+        _roomCardCancellation = cancellation;
+        var generation = ++_roomCardGeneration;
+        var rooms = game.Rooms.ToArray();
+        var indexedSnapshot = _indexedObjectSnapshot is null ? null : new LoomIndexedObjectSnapshot(
+            _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _indexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _indexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
+        var indexedStates = new Dictionary<int, byte>(_indexedStates);
+
+        // Create every card before starting any file reads or script execution.
+        foreach (var roomResource in rooms)
         {
-            if (!ReferenceEquals(_game, game)) return;
-            var preview = new Image
+            var placeholder = new TextBlock
             {
-                Stretch = System.Windows.Media.Stretch.Uniform,
-                SnapsToDevicePixels = true,
-                ToolTip = roomResource.Name
+                Text = roomResource.ResourceId?.ToString("00") ?? "?",
+                Foreground = new SolidColorBrush(Color.FromRgb(170, 180, 186)),
+                FontSize = 12,
+                FontWeight = FontWeights.SemiBold,
+                TextAlignment = TextAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
             };
-            RenderOptions.SetBitmapScalingMode(preview, BitmapScalingMode.NearestNeighbor);
             var button = new Button
             {
                 Width = 96,
-                Height = 72,
-                Padding = new Thickness(3),
+                Height = 42.7,
+                Padding = new Thickness(3, 0, 3, 0),
                 Margin = new Thickness(2),
                 Background = new SolidColorBrush(Color.FromRgb(11, 17, 23)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(64, 82, 96)),
-                BorderThickness = new Thickness(1),
-                Content = preview,
-                ToolTip = $"Open {roomResource.Name}",
+                BorderThickness = new Thickness(2),
+                Content = placeholder,
+                ToolTip = $"Room {roomResource.ResourceId:00} · loading preview",
                 Tag = roomResource
             };
-            System.Windows.Automation.AutomationProperties.SetName(button, $"Open {roomResource.Name} background");
+            System.Windows.Automation.AutomationProperties.SetName(button, $"Open room {roomResource.ResourceId:00}");
             button.Click += (_, _) => SelectResourceInTree(roomResource);
-            var selectedRoom = _selectedResource?.ResourceId == roomResource.ResourceId ||
-                               _lastViewedRoomResource?.ResourceId == roomResource.ResourceId;
-            if (selectedRoom)
-            {
+            if (_selectedResource?.ResourceId == roomResource.ResourceId ||
+                _lastViewedRoomResource?.ResourceId == roomResource.ResourceId)
                 button.BorderBrush = new SolidColorBrush(Color.FromRgb(183, 132, 66));
-                button.BorderThickness = new Thickness(2);
-            }
             RoomCardList.Children.Add(button);
+        }
 
+        _ = LoadRoomCardThumbnailsAsync(game, rooms, indexedSnapshot, indexedStates,
+            generation, cancellation.Token);
+    }
+
+    private async Task LoadRoomCardThumbnailsAsync(GameLibrary game, IReadOnlyList<GameResource> rooms,
+        LoomIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
+        int generation, CancellationToken cancellationToken)
+    {
+        var sceneBatches = LoomSceneDrawBatches.Empty;
+        if (game.Id == GameId.Loom && game.Version == ScummVersion.V3 && indexedSnapshot is not null)
+        {
             try
             {
-                var decoded = await _roomDecoder.DecodeAsync(roomResource.FilePath);
-                if (!ReferenceEquals(_game, game)) return;
-                preview.Source = CreateBitmap(decoded.Width, decoded.Height,
-                    decoded.Pixels.ToArray(), decoded.Palette);
+                sceneBatches = await Task.Run(() => LoomSceneDrawBatches.Build(game), cancellationToken);
             }
-            catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
+            catch (OperationCanceledException) { return; }
+            catch (Exception)
             {
-                preview.ToolTip = $"{roomResource.Name} background preview unavailable";
-                button.Content = new TextBlock
-                {
-                    Text = "Preview unavailable",
-                    Foreground = new SolidColorBrush(Color.FromRgb(170, 180, 186)),
-                    FontSize = 10,
-                    TextWrapping = TextWrapping.Wrap,
-                    TextAlignment = TextAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                sceneBatches = LoomSceneDrawBatches.Empty;
             }
         }
+
+        foreach (var roomResource in rooms)
+        {
+            if (cancellationToken.IsCancellationRequested) return;
+            BitmapSource? bitmap = null;
+            string? failure = null;
+            try
+            {
+                bitmap = await Task.Run(() => RenderRoomCardThumbnail(game, roomResource,
+                    indexedSnapshot, indexedStates, sceneBatches, cancellationToken), cancellationToken);
+            }
+            catch (OperationCanceledException) { return; }
+            catch (Exception ex)
+            {
+                failure = ex.Message;
+            }
+
+            if (cancellationToken.IsCancellationRequested) return;
+            try
+            {
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (cancellationToken.IsCancellationRequested || generation != _roomCardGeneration ||
+                        !ReferenceEquals(_game, game)) return;
+                    if (bitmap is not null) SetRoomCardThumbnail(roomResource, bitmap);
+                    else SetRoomCardFailure(roomResource, failure ?? "Room preview unavailable.");
+                }, DispatcherPriority.Background);
+            }
+            catch (Exception) when (cancellationToken.IsCancellationRequested || Dispatcher.HasShutdownStarted) { return; }
+            catch (Exception) { return; }
+        }
+    }
+
+    private static BitmapSource RenderRoomCardThumbnail(GameLibrary game, GameResource roomResource,
+        LoomIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
+        LoomSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var bytes = File.ReadAllBytes(roomResource.FilePath);
+        var decoder = new OldV3EgaRoomDecoder();
+        var room = decoder.Decode(bytes);
+        var pixels = room.Pixels.ToArray();
+        var cameraX = 0;
+        if (game.Id == GameId.Loom && game.Version == ScummVersion.V3 && indexedSnapshot is not null)
+        {
+            var records = new LoomRoomObjectDirectory().Decode(bytes);
+            var objects = new LoomRoomObjects().Decode(bytes);
+            var session = new LoomExplorationSession(game, indexedSnapshot);
+            var snapshot = session.VisitRoom(roomResource);
+            var initialized = CreateSessionRoomSelection(roomResource, room, records, objects,
+                snapshot, indexedStates, sceneBatches);
+            pixels = initialized.Selection.Compose(room);
+            cameraX = session.CameraX ?? 0;
+        }
+        cancellationToken.ThrowIfCancellationRequested();
+        return CreateRoomCardBitmap(room, pixels, cameraX);
+    }
+
+    private static Image CreateRoomCardImage(BitmapSource source, string name)
+    {
+        var preview = new Image
+        {
+            Stretch = System.Windows.Media.Stretch.Uniform,
+            Width = 86,
+            Height = 38.7,
+            SnapsToDevicePixels = true,
+            ToolTip = name,
+            Source = source
+        };
+        RenderOptions.SetBitmapScalingMode(preview, BitmapScalingMode.NearestNeighbor);
+        return preview;
+    }
+
+    private void SetRoomCardFailure(GameResource resource, string message)
+    {
+        var card = RoomCardList.Children.OfType<Button>().FirstOrDefault(item => Equals(item.Tag, resource));
+        if (card is not null && card.Content is not Image)
+            card.ToolTip = $"Room {resource.ResourceId:00} · preview unavailable: {message}";
     }
 
     private bool IsAdvancedMode => AdvancedModeToggle.IsChecked == true;
@@ -527,6 +618,7 @@ public partial class MainWindow : Window
         PreviewMessage.Visibility = Visibility.Visible;
         StatusText.Visibility = Visibility.Visible;
         StopCameraPan();
+        _pendingCameraX = null;
         RoomViewport.ScrollToHorizontalOffset(0);
         RoomPreview.Source = null;
         RoomPreview.Visibility = Visibility.Collapsed;
@@ -589,6 +681,7 @@ public partial class MainWindow : Window
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
                 UpdateRoomNavigationActions(resource);
                 RefreshRoomPreview();
+                UpdateCurrentRoomCardThumbnail();
                 RoomDisplayLayout.Visibility = Visibility.Visible;
                 UpdateRoomViewportLayout();
                 StatusText.HorizontalAlignment = HorizontalAlignment.Center;
@@ -616,6 +709,7 @@ public partial class MainWindow : Window
             ApplyRoomState(resource, objectRecords, objects, visit: true);
             UpdateRoomNavigationActions(resource);
             RefreshRoomPreview();
+            UpdateCurrentRoomCardThumbnail();
             RoomDisplayLayout.Visibility = Visibility.Visible;
             UpdateRoomViewportLayout();
             StatusText.HorizontalAlignment = HorizontalAlignment.Center;
@@ -649,9 +743,12 @@ public partial class MainWindow : Window
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             var snapshot = visit ? _session.VisitRoom(resource) : _session.Snapshot;
-            _objectSelection = new RoomObjectSelection(images, snapshot.ObjectStates,
-                snapshot.ObjectPositions, records, _currentRoom, _indexedStates, snapshot.DrawOrder);
-            if (!snapshot.IsFaithful) CloseArtworkGaps(resource, images, snapshot.StatesSetByCode);
+            var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
+            var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
+                _indexedStates, sceneBatches);
+            _objectSelection = initialized.Selection;
+            _artworkEstimates = initialized.Estimates;
+            _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
             var run = _session.LastEntryRun;
             var script = _session.LastEntryScript;
             RoomEntryTraceOutput.Text = (script?.Format() ?? "No embedded entry script.") +
@@ -738,21 +835,82 @@ public partial class MainWindow : Window
     private void CloseArtworkGaps(GameResource resource, IReadOnlyList<RoomObjectImage> images,
         IReadOnlyCollection<int>? statesSetByCode = null)
     {
-        if (_game is not null && _sceneBatches is null)
-        {
-            try { _sceneBatches = LoomSceneDrawBatches.Build(_game); }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
-            {
-                _sceneBatches = LoomSceneDrawBatches.Empty;
-            }
-        }
-        var roomId = resource.ResourceId ?? 0;
-        _objectSelection.ExcludeInterfaceImages((_sceneBatches ?? LoomSceneDrawBatches.Empty).InterfaceImages.Keys);
-        _artworkEstimates = _objectSelection.FillGaps(_sceneBatches?.ForRoom(roomId), seed: roomId);
-        if (!images.Any(_objectSelection.IsActive))
-            _artworkEstimates = [.. _artworkEstimates, .. _objectSelection.ShowUnresolvedArtwork(_sceneBatches?.ForRoom(roomId), seed: roomId, statesSetByCode,
-                _sceneBatches?.EntryStatesForRoom(roomId))];
+        EnsureSceneBatches();
+        _artworkEstimates = FillArtworkGaps(_objectSelection, resource, images, statesSetByCode,
+            _sceneBatches ?? LoomSceneDrawBatches.Empty);
         _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
+    }
+
+    private LoomSceneDrawBatches EnsureSceneBatches()
+    {
+        if (_sceneBatches is not null) return _sceneBatches;
+        try { _sceneBatches = _game is null ? LoomSceneDrawBatches.Empty : LoomSceneDrawBatches.Build(_game); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            _sceneBatches = LoomSceneDrawBatches.Empty;
+        }
+        return _sceneBatches;
+    }
+
+    private static (RoomObjectSelection Selection, IReadOnlyList<RoomArtworkEstimate> Estimates) CreateSessionRoomSelection(
+        GameResource resource, RoomImage room, IReadOnlyList<LoomRoomObjectRecord> records,
+        IReadOnlyList<RoomObjectImage> images, LoomSessionSnapshot snapshot,
+        IReadOnlyDictionary<int, byte> indexedStates, LoomSceneDrawBatches sceneBatches)
+    {
+        var selection = new RoomObjectSelection(images, snapshot.ObjectStates,
+            snapshot.ObjectPositions, records, room, indexedStates, snapshot.DrawOrder);
+        IReadOnlyList<RoomArtworkEstimate> estimates = snapshot.IsFaithful
+            ? Array.Empty<RoomArtworkEstimate>()
+            : FillArtworkGaps(selection, resource, images, snapshot.StatesSetByCode, sceneBatches);
+        return (selection, estimates);
+    }
+
+    private static IReadOnlyList<RoomArtworkEstimate> FillArtworkGaps(RoomObjectSelection selection,
+        GameResource resource, IReadOnlyList<RoomObjectImage> images,
+        IReadOnlyCollection<int>? statesSetByCode, LoomSceneDrawBatches sceneBatches)
+    {
+        var roomId = resource.ResourceId ?? 0;
+        selection.ExcludeInterfaceImages(sceneBatches.InterfaceImages.Keys);
+        var estimates = selection.FillGaps(sceneBatches.ForRoom(roomId), seed: roomId);
+        if (!images.Any(selection.IsActive))
+            estimates = [.. estimates, .. selection.ShowUnresolvedArtwork(sceneBatches.ForRoom(roomId), seed: roomId, statesSetByCode,
+                sceneBatches.EntryStatesForRoom(roomId))];
+        return estimates;
+    }
+
+    private static BitmapSource CreateRoomCardBitmap(RoomImage room, byte[] pixels, int cameraX)
+    {
+        var visibleWidth = Math.Min(320, room.Width);
+        var left = Math.Clamp(cameraX - visibleWidth / 2, 0, room.Width - visibleWidth);
+        var full = CreateBitmap(room.Width, room.Height, pixels, room.Palette);
+        var cropped = new CroppedBitmap(full, new Int32Rect(left, 0, visibleWidth, room.Height));
+        cropped.Freeze();
+        return cropped;
+    }
+
+    private void UpdateCurrentRoomCardThumbnail()
+    {
+        if (_currentRoom is not { } room || _currentRoomResource is not { } resource) return;
+        var cameraX = SessionModeToggle.IsChecked == true && _session is not null
+            ? _session.CameraX ?? 0
+            : _pendingCameraX ?? 0;
+        SetRoomCardThumbnail(resource, CreateRoomCardBitmap(room, _objectSelection.Compose(room), cameraX));
+    }
+
+    private void SetRoomCardThumbnail(GameResource resource, BitmapSource bitmap)
+    {
+        if (Equals(_currentRoomResource, resource) && _currentRoom is { } liveRoom)
+        {
+            var liveCameraX = SessionModeToggle.IsChecked == true && _session is not null
+                ? _session.CameraX ?? 0
+                : _pendingCameraX ?? 0;
+            bitmap = CreateRoomCardBitmap(liveRoom, _objectSelection.Compose(liveRoom), liveCameraX);
+        }
+        var card = RoomCardList.Children.OfType<Button>().FirstOrDefault(item => Equals(item.Tag, resource));
+        if (card is null) return;
+        if (card.Content is Image preview) preview.Source = bitmap;
+        else card.Content = CreateRoomCardImage(bitmap, resource.Name);
+        card.ToolTip = $"Open {resource.Name}";
     }
 
     private string EstimateSummary()
@@ -1180,7 +1338,7 @@ public partial class MainWindow : Window
             card.BorderBrush = selected
                 ? new SolidColorBrush(Color.FromRgb(183, 132, 66))
                 : new SolidColorBrush(Color.FromRgb(64, 82, 96));
-            card.BorderThickness = selected ? new Thickness(2) : new Thickness(1);
+            card.BorderThickness = new Thickness(2);
         }
     }
 
