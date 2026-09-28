@@ -78,17 +78,23 @@ public sealed class LoomActorTests
     }
 
     [Fact]
-    public void LoadRoomWithEgoPlacesTheEgoAndACatalogVisitLeavesItUnknown()
+    public void LoadRoomWithEgoPlacesTheEgoAndACatalogVisitAssumesASourceBackedArrival()
     {
         if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(Folder);
         var session = new LoomExplorationSession(game,
             new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
 
+        // From Room 02 (the boot), Room 02 object 153 verb 0x38 +0x002B is the only
+        // arrival into Room 03 in Room 02's own code: object 160, walk to (250, 68).
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 3));
         var browsed = session.Actors.Single(actor => actor.Number == 1);
-        Assert.Null(browsed.WalkBox);
-        Assert.Contains("selected from the catalog", browsed.Unknown);
+        Assert.Equal((3, 250, true), (browsed.Room, browsed.X, browsed.Visible));
+        Assert.NotNull(browsed.WalkBox);
+        Assert.Contains("assumed arrival at Room 02 Object 153 Verb 0x38 +0x002B", browsed.Estimate);
+        Assert.True(session.CameraEstimated);
+        Assert.Contains(session.Snapshot.Uncertainties, line =>
+            line.Contains("Assumed arrival", StringComparison.Ordinal) && line.Contains("the only one in Room 02's own code", StringComparison.Ordinal));
 
         // Local 200 +0x0008: loadRoomWithEgo with walkTo; the walk is an estimate.
         session.ActivateObjectVerb(162, 0x36);
@@ -98,6 +104,32 @@ public sealed class LoomActorTests
         Assert.Equal((4, true), (arrived.Room, arrived.Visible));
         Assert.NotNull(arrived.WalkBox);
         Assert.Contains("taken to end", arrived.Estimate);
+    }
+
+    [Fact]
+    public void CatalogArrivalsPreferThePreviousRoomAndPickAmongSeveral()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game,
+            new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
+
+        // Room 17's objects 352 and 356 both lead into Room 16, at different objects:
+        // a seeded pick between the two, with the other listed as the alternative.
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 17));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 16));
+        var ego = session.Actors.Single(actor => actor.Number == 1);
+        Assert.Equal(16, ego.Room);
+        Assert.Contains("assumed arrival at Room 17 Object", ego.Estimate);
+        var label = session.Snapshot.Uncertainties.Last(line => line.Contains("Assumed arrival", StringComparison.Ordinal));
+        Assert.Contains("seeded pick", label);
+        Assert.Contains("among those in Room 17's own code; alternatives: Room 17 Object", label);
+
+        // No decoded loadRoomWithEgo brings the ego into Room 01 (the intro), so it stays unknown.
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 1));
+        var unknown = session.Actors.Single(actor => actor.Number == 1);
+        Assert.Null(unknown.X);
+        Assert.Contains("no decoded loadRoomWithEgo", unknown.Unknown);
     }
 
     [Fact]

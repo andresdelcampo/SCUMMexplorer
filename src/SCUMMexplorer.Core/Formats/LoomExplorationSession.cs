@@ -279,11 +279,61 @@ public sealed class LoomExplorationSession
             throw new InvalidDataException("The session can only visit an indexed room.");
         if (_currentRoom?.ResourceId == room.ResourceId) return Snapshot;
         _uncertainties.StartStep();
-        if (reachedAction is null && _runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && LoomActorTable.IsValid(ego))
-            _runtime.Actors.Forget(ego, $"Room {room.ResourceId:00} was selected from the catalog, so where the ego would arrive was not executed");
-        return EnterRoom(room, reachedAction is null
-            ? $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input."
-            : $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction?.ReachedRoomLoad);
+        if (reachedAction is not null)
+            return EnterRoom(room, $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction.ReachedRoomLoad);
+        var arrival = $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input.";
+        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
+            return EnterRoom(room, arrival);
+        var (assumed, label) = PickCatalogArrival(room.ResourceId.Value);
+        // The ego's position before the arrival (where the route would have left it) is not known.
+        _runtime.Actors.Forget(ego, assumed is null
+            ? $"Room {room.ResourceId:00} was selected from the catalog, and no decoded loadRoomWithEgo with literal operands brings the ego into it, so where the ego would arrive is unknown"
+            : $"Room {room.ResourceId:00} was selected from the catalog, so where the ego stood before its assumed arrival is unknown");
+        return EnterRoom(room, label is null ? arrival : $"{arrival} {label}", assumed, label);
+    }
+
+    /// <summary>
+    /// A catalog visit does not run the route into the room. When decoded
+    /// <c>loadRoomWithEgo</c> instructions with literal operands bring the ego in,
+    /// one of them is taken as an assumed arrival: those in the previous room's
+    /// own code first, then a seeded pick among the distinct (object, walk) pairs.
+    /// Returns a synthetic load event for <see cref="PlaceEgoAfterEntry"/> and the
+    /// label that says so, or nulls when no arrival is source-backed.
+    /// </summary>
+    private (LoomScriptEvent? Load, string? Label) PickCatalogArrival(int roomId)
+    {
+        var all = LoomEgoArrivalIndex.For(_game, _globalScriptCount).Into(roomId);
+        if (all.Count == 0) return (null, null);
+        var previous = _currentRoom?.ResourceId;
+        var fromPrevious = all.Where(item => item.SourceRoom is int source && source == previous).ToArray();
+        var pool = fromPrevious.Length > 0 ? fromPrevious : all;
+        var choices = pool.GroupBy(item => (item.ObjectId, item.WalkX, item.WalkY)).Select(group => group.ToArray()).ToArray();
+        var index = 0;
+        string how;
+        if (choices.Length == 1)
+            how = fromPrevious.Length > 0
+                ? $"the only one in Room {previous:00}'s own code"
+                : $"the only source-backed arrival (Room {previous?.ToString("00", CultureInfo.InvariantCulture) ?? "none"} has none into it)";
+        else
+        {
+            var pick = _runtime.Random.Pick($"catalog arrival into Room {roomId:00}", 0, choices.Length - 1);
+            index = pick.Value;
+            how = $"seeded pick {index + 1} of {choices.Length} (seed {pick.Seed})" +
+                  (fromPrevious.Length > 0 ? $" among those in Room {previous:00}'s own code" : "") + "; alternatives: " +
+                  string.Join("; ", choices.Where((_, i) => i != index).Select(Sources));
+        }
+        var chosen = choices[index];
+        var first = chosen[0];
+        var label = $"Assumed arrival: the ego enters as {Sources(chosen)} would bring it in ({how}). " +
+                    "Which route led here was not executed; the arrival is a possible outcome, not a reached one.";
+        var load = new LoomScriptEvent(0, first.Source, first.Offset, LoomScriptEventKind.RoomLoaded, "loadRoomWithEgo",
+            $"assumed arrival into Room {roomId:00}", ResourceKind.Room, roomId, LoomScriptEventCertainty.Conditional,
+            ResolvedArguments: [first.ObjectId, roomId, first.WalkX, first.WalkY]);
+        return (load, label);
+
+        static string Sources(LoomEgoArrival[] group) =>
+            string.Join(" or ", group.Select(item => $"{item.Source} +0x{item.Offset:X4}")) +
+            $" (object {group[0].ObjectId}, " + (group[0].WalkX == -1 ? "no walk" : $"walk to ({group[0].WalkX}, {group[0].WalkY})") + ")";
     }
 
     /// <summary>ScummVM <c>VAR_EGO</c>.</summary>
@@ -295,7 +345,7 @@ public sealed class LoomExplorationSession
     private LoomActorTable.Placement CurrentPlacement() =>
         new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses);
 
-    private LoomSessionSnapshot EnterRoom(GameResource room, string arrival, LoomScriptEvent? load = null)
+    private LoomSessionSnapshot EnterRoom(GameResource room, string arrival, LoomScriptEvent? load = null, string? assumedArrival = null)
     {
         var eventsBeforeVisit = _visitEvents.Count;
         var withEgo = load is { Operation: "loadRoomWithEgo", ResolvedArguments: { Count: 4 } } ? load : null;
@@ -360,7 +410,7 @@ public sealed class LoomExplorationSession
         RunGlobalHook(28, "before room entry");
         RunEmbeddedRoomScript(room, exit: false);
         RunGlobalHook(29, "after room entry");
-        if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo);
+        if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (withEgo is not null) ForgetCamera($"{withEgo.SourceLabel} +0x{withEgo.Offset:X4} puts the camera on the ego, whose actor number is unknown");
         LastVisitEvents = _visitEvents.Skip(eventsBeforeVisit).ToArray();
         return Snapshot;
@@ -373,7 +423,7 @@ public sealed class LoomExplorationSession
     /// destination, the ego walks there. The walk is taken to end at once, an
     /// estimate (see <see cref="LoomActorTable.Walk"/>).
     /// </summary>
-    private void PlaceEgoAfterEntry(LoomScriptEvent load, int ego)
+    private void PlaceEgoAfterEntry(LoomScriptEvent load, int ego, string? assumedArrival = null)
     {
         var arguments = load.ResolvedArguments!;
         var source = $"{load.SourceLabel} +0x{load.Offset:X4}";
@@ -387,7 +437,9 @@ public sealed class LoomExplorationSession
             else
             {
                 _runtime.Actors.Put(ego, record.WalkX, record.WalkY, _currentRoom?.ResourceId, CurrentPlacement(), ego);
-                if (_runtime.EstimatedVariables.Contains(EgoVariable) || load.Certainty != LoomScriptEventCertainty.Reached)
+                if (assumedArrival is not null)
+                    _runtime.Actors.MarkEstimate(ego, $"assumed arrival at {source} after a catalog visit");
+                else if (_runtime.EstimatedVariables.Contains(EgoVariable) || load.Certainty != LoomScriptEventCertainty.Reached)
                     _runtime.Actors.MarkEstimate(ego, $"the ego's arrival at {source} follows a seeded pick");
             }
         }

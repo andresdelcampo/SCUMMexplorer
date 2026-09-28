@@ -131,6 +131,22 @@ public sealed class LoomScriptReader(ScummScriptDialect dialect = ScummScriptDia
     public LoomScriptDisassembly? DecodeRoomExit(GameResource room) =>
         DecodeRoomScript(room, RoomExitScriptPointerOffset, "exit");
 
+    /// <summary>The IDs in an old-v3 room's local-script directory, in directory order (empty when it cannot be read).</summary>
+    public static IReadOnlyList<int> ReadRoomLocalScriptIds(byte[] roomBytes, int globalScriptCount)
+    {
+        var data = LflEncoding.DecodeXorFF(roomBytes);
+        if (data.Length < 29) return [];
+        var roomEnd = Math.Min(ReadWord(data, 0), data.Length);
+        var cursor = 29 + data[20] * 4 + data[23] + data[24];
+        var ids = new List<int>();
+        while (cursor <= roomEnd - 3 && data[cursor] != 0)
+        {
+            if (data[cursor] >= globalScriptCount && !ids.Contains(data[cursor])) ids.Add(data[cursor]);
+            cursor += 3;
+        }
+        return ids;
+    }
+
     /// <summary>Decodes an old-v3 local script from the current room's local-script directory.</summary>
     public LoomScriptDisassembly? DecodeRoomLocalScript(GameResource room, int scriptId, int globalScriptCount)
     {

@@ -2,7 +2,7 @@
 
 A working reference for the Spanish DOS LOOM EGA data in `Games/loom`: what the decoded scripts do, which variables they use, and how the session models them. Offsets are into each script's code, as `CodeDump` prints them (`.verification/fallback-evidence/code.tsv`, regenerated with `dotnet Exe/CodeDump/.../CodeDump.dll Games\loom .verification\fallback-evidence`). Each entry says whether a claim is **decoded** (read straight from instructions), **ScummVM** (engine behaviour checked against `engines/scumm`), or **reading** (an interpretation that has not been verified in a run).
 
-Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot validation](../.verification/boot/validation.md) and the [cutscene continuation validation](../.verification/cutscene-continuation/validation.md).
+Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot validation](../.verification/boot/validation.md) and the [cutscene continuation validation](../.verification/cutscene-continuation/validation.md).
 
 ## Engine variables (ScummVM v3 numbering)
 
@@ -77,6 +77,7 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 - `loadRoomWithEgo obj, room, walkTo=(x, y)` (v3): the ego stands at the object's walk point unless the entry code put it, then walks to (x, y) when x ≠ −1 (ScummVM). Room 03 local 200 +0x0008 brings the ego into Room 04 and walks it to (580, 132), box 0 (decoded; the walk end is an estimate).
 - Script 001 +0x0233 `actorFollowCamera var[0x001]` ends the boot with the camera on the ego: x 800 in Room 02 (decoded run; ScummVM `setCameraFollows`).
 - `getActorX`/`getActorY` with a number of 13 or more read an object's walk point (ScummVM `getObjX`).
+- **Arrivals (decoded, 28 Sep):** 80 `loadRoomWithEgo` sites have literal object and room operands; they bring the ego into 35 rooms. Most are object verbs 0x38 in the neighbouring room (for example Room 02 object 153 → Room 03 at object 160, walk to (250, 68)); a few are local scripts (Room 03 locals 200–202, Room 25 local 208, Room 35 local 210) and global scripts (052 → Room 13, 089 → Room 07, 096 → Room 46). Rooms 32, 43 and 65 have none, so a catalog visit cannot place the ego there. A catalog visit takes one of them as a labelled assumed arrival: the previous room's own first, a seeded pick among several ([validation](../.verification/catalog-arrivals/validation.md)).
 
 ## Room notes
 
@@ -100,12 +101,13 @@ Last updated 27 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `isSoundRunning` | Sounds started on the route read as playing (estimate) | executor |
 | `delay`, `waitFor` actor/message/camera | Continue on the next frame (labelled timing) | executor |
 | Camera | `var[0x002]`, pans arrive at once; `loadRoomWithEgo` and `actorFollowCamera` follow `setCameraFollows`'s triggers; the camera follows a walk's end at once (estimate) | executor, session `PlaceEgoAfterEntry`, `CameraRange` |
+| The route into a room | A catalog visit does not run it; a decoded literal `loadRoomWithEgo` into the room (the previous room's first, else a seeded pick) is applied as an assumed arrival, an estimate | `LoomEgoArrivalIndex`, session `PickCatalogArrival` |
 | `getRandomNr` | Seeded pick, labelled; later steps are estimates | executor |
 | Sound commands (music row) | Each command keeps the room whose code began its script chain (`ScriptFrame.OriginRoom`). The room view shows cues started since entry, or started by the room itself and not stopped. | session `SoundEvents`, `LoomSoundCueResolver.ResolveForRoom` |
 
 ## Not modelled yet (by frequency in Blockers)
 
-1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown, mostly the ego after a catalog visit. `getActorCostume`, `getActorElevation`, walk timing and paths, and step-by-step camera movement are not modelled.
+1. Actor queries are answered from the actor table ([validation](../.verification/actor-positions/validation.md)); they stop only when the actor is unknown. After a catalog visit the ego takes a source-backed assumed arrival, so only Rooms 32, 43 and 65 (no literal arrival) still stop ([validation](../.verification/catalog-arrivals/validation.md)). `getActorCostume`, `getActorElevation`, walk timing and paths, and step-by-step camera movement are not modelled.
 2. `verbOps`: verb-bar setup (Room 01 local 211 on the boot route).
 3. A real pointer: `findObject` is modelled, but the session's pointer is an assumed rest position below the room, so hover and click paths in script 006 are not exercised.
 4. `startScript` with a dynamic target (a variable that is not known).
