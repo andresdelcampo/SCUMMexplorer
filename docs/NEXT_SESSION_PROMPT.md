@@ -28,7 +28,7 @@ Rules:
 * The WPF harnesses are slow (the user asked, 28 Sep). Do not run the full `wpf-checks.ps1`, or DoorwayClickCheck (all 75 doorways), unless the change touches what they test: the room-click path, doorway navigation or room loading. Otherwise run the unit tests and only the one or two related harnesses (build each and start its exe, as wpf-checks.ps1 does), and say in the validation which ones were skipped.
 * Commit each task separately once it builds and the tests pass.
 * Once the session has used more than 250K tokens, stop at the next reasonable point (a committed task) instead of starting a new task.
-* At the end of the session, write a prompt for the next session in this same format (state at start, what was done, ordered tasks, rules, tooling notes), and end it with this same request, including the 250K-token stopping rule.
+* At the end of the session, replace docs/NEXT_SESSION_PROMPT.md with a prompt for the next session in this same format (state at start, what was done, ordered tasks, rules, tooling notes), and end it with this same request, including the 250K-token stopping rule.
 
 Tooling notes:
 
