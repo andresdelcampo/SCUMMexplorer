@@ -46,7 +46,9 @@
 ## ScummVM comparison
 
 - **Room 02 after the opening:** ScummVM shows Bobbin in left profile (seen 28 Sep, M2c). The session now gives 270 as well (`LoomBootTests`, and ActorDrawCheck `room02-after-boot-app.png`). Match.
-- **A walk in progress, and Room 02's change of scene:** not compared this session. Synthetic input does not reach ScummVM's SDL window, so the user has to drive it. Still to check by eye: that clicking the exit from the cliff makes Bobbin walk down the path; that the scene change in box 4 stops him at (756, 107) in the smaller costume and waits for a new click; that the camera follows 8 pixels a frame.
+- **A walk in progress, and Room 02's change of scene (compared 28 Sep, second session):** the user drove ScummVM 2.2.0 (`--gfx-mode=2x`), skipped the opening with Escape and clicked the path exit once; screenshots were taken every 3–4 s. Bobbin walked **right** along the rock with his walk animation (the session's route also goes right and down, to box 4 at (860, 118)), went out of sight, and reappeared in the smaller costume on the path at about screen (125, 97), which is room (≈756, ≈113) with the camera near 790 (read by eye from a 2× window; an estimate). He then **stood and waited**: the user confirmed that he had stopped before the second click. After that click he walked left along the path and the camera followed him to the left in small steps. All three points match the session: the walk goes down the path, the box-4 scene change stops him in the smaller costume near (756, 107) and waits for a click, and the camera follows. The 8-pixel step size could not be measured from screenshots taken seconds apart.
+- **Skipping the opening:** with Escape, ScummVM shows Bobbin facing the screen under the tree (the user saw it). This matches the decoded code: script 044 +0x063E runs the +0x0678 reset `animateActor 1, 0xFA` (facing 180) only when the cutscene was aborted (`var[0x005]`); watched to the end, he stays in left profile.
+- ScummVM hung on a blank window when started from the session's shell (with and without audio and the joystick). The user started it from Explorer.
 
 ## Evidence
 
