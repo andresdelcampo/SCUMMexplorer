@@ -96,7 +96,25 @@ internal static class Program
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }
             finally
             {
-                File.WriteAllLines(Path.Combine(output, "reverse-hover-check.txt"), report, System.Text.Encoding.UTF8);
+                // A report that cannot be written (for example a sandbox denying the folder)
+                // must not crash the harness: fall back to the temp folder and say so.
+                try { File.WriteAllLines(Path.Combine(output, "reverse-hover-check.txt"), report, System.Text.Encoding.UTF8); }
+                catch (Exception writeError) when (writeError is System.IO.IOException or UnauthorizedAccessException)
+                {
+                    var fallback = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SCUMMexplorer-harness", System.IO.Path.GetFileName(Path.Combine(output, "reverse-hover-check.txt")));
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fallback)!);
+                        System.IO.File.WriteAllLines(fallback, report, System.Text.Encoding.UTF8);
+                        Console.Error.WriteLine($"Report not written ({writeError.Message}); wrote {fallback} instead.");
+                    }
+                    catch (Exception fallbackError) when (fallbackError is System.IO.IOException or UnauthorizedAccessException)
+                    {
+                        Console.Error.WriteLine($"Report not written ({writeError.Message}; {fallbackError.Message}):");
+                        foreach (var line in report) Console.Error.WriteLine(line);
+                    }
+                    Environment.ExitCode = 2;
+                }
                 window.Close(); app.Shutdown();
             }
         };

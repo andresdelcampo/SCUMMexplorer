@@ -105,7 +105,25 @@ internal static class Program
             finally
             {
                 report.Insert(1, $"Doorway boxes: {boxes}; navigated to one of their rooms: {passed}; failed: {boxes - passed}");
-                File.WriteAllLines(output, report);
+                // A report that cannot be written (for example a sandbox denying the folder)
+                // must not crash the harness: fall back to the temp folder and say so.
+                try { File.WriteAllLines(output, report); }
+                catch (Exception writeError) when (writeError is System.IO.IOException or UnauthorizedAccessException)
+                {
+                    var fallback = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SCUMMexplorer-harness", System.IO.Path.GetFileName(output));
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(fallback)!);
+                        System.IO.File.WriteAllLines(fallback, report);
+                        Console.Error.WriteLine($"Report not written ({writeError.Message}); wrote {fallback} instead.");
+                    }
+                    catch (Exception fallbackError) when (fallbackError is System.IO.IOException or UnauthorizedAccessException)
+                    {
+                        Console.Error.WriteLine($"Report not written ({writeError.Message}; {fallbackError.Message}):");
+                        foreach (var line in report) Console.Error.WriteLine(line);
+                    }
+                    Environment.ExitCode = 2;
+                }
                 window.Close();
                 app.Shutdown();
             }
