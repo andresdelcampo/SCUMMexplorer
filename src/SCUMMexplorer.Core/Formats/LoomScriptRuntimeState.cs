@@ -43,6 +43,12 @@ public sealed class LoomScriptRuntimeState
     /// </summary>
     public Func<int, (bool Running, string? Estimate)>? ScriptRunning { get; set; }
     /// <summary>
+    /// Told the offset of the skip jump when the running script reaches
+    /// <c>beginOverride</c>, and null at <c>endOverride</c> (ScummVM records
+    /// the point in <c>vm.cutScenePtr</c> for <c>abortCutscene</c>). Null outside a session.
+    /// </summary>
+    public Action<int?>? OverrideChanged { get; set; }
+    /// <summary>
     /// The camera's x limits in the current room, or null when no room is loaded:
     /// <c>VAR_CAMERA_MIN_X</c>/<c>MAX_X</c> (<c>var[0x011]</c>/<c>var[0x012]</c>), which
     /// room entry sets to half a screen from each edge and <c>roomOps roomScroll</c>

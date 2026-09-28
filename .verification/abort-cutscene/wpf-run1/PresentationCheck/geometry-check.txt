@@ -1,0 +1,40 @@
+PASS normal width enabled by default
+PASS viewport capped at 320 source pixels: 320
+PASS room enlarged to use available area: scale 1,679017857142857
+PASS normal viewport hugs scaled room height: 258,77857142857135/241,77857142857138
+PASS wide Room 04 scrolls
+PASS right button pans to 3,358035714285714
+PASS button tap is small in source pixels: 2
+PASS held pan accelerates from 2 to bounded cap 64
+PASS held pan accelerates from 2 to bounded cap 160
+PASS key hold starts active repeat timer
+PASS held keyboard repeats beyond tap
+PASS key release cancels repeat and movement
+PASS actual button mouse-down starts repeat timer
+PASS held button repeats beyond tap
+PASS button release cancels hold
+PASS pan clamps at room right edge
+PASS pan clamps at room left edge
+PASS panorama switch cancels hold
+PASS scrolled point maps to source x 25 at offset 3,358035714285714
+PASS doorway overlay and image share size after pan
+PASS music under viewport
+PASS music bottom aligned: gap 8
+PASS room ready status removed from bottom
+PASS bottom arrow group centered beneath viewport
+PASS music player centered beneath viewport
+PASS panorama all visible: 0
+PASS panorama fills available room area: scale 0,840/0,840
+PASS smaller window keeps source-pixel cap
+PASS depth preference survives room change
+INFO Room 69 has mask data; synthetic absent-mask presentation used for disabled-toggle branch
+PASS absent-mask room disables depth without clearing preference
+PASS return to mask room restores enabled depth preference
+PASS resource switch cancels active room pan
+PASS all-pose gallery contains 60 images
+PASS all costume poses share scale 2,4977142857142853
+PASS costume poses enlarged together for available space
+PASS costume raster stretches into enlarged image boxes
+PASS script hides room display
+PASS sound hides room display
+PASS room restores after costume/script/sound selection

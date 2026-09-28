@@ -105,6 +105,7 @@ public sealed class LoomExplorationSession
         };
         _globalScriptCount = ReadGlobalScriptCount(game);
         _runtime.ScriptRunning = IsScriptRunning;
+        _runtime.OverrideChanged = RecordOverride;
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
         {
@@ -285,7 +286,7 @@ public sealed class LoomExplorationSession
         if (_currentRoom?.ResourceId == room.ResourceId) return Snapshot;
         _uncertainties.StartStep();
         if (reachedAction is { IsGameInput: true })
-            return EnterRoom(room, $"{reachedAction.Evidence} The click went through the game's input scripts (005, 006, 007); walks were taken to end at once.", reachedAction.ReachedRoomLoad);
+            return EnterRoom(room, $"{reachedAction.Evidence} The explorer's input (assumed) went on through the game's own scripts; walks were taken to end at once.", reachedAction.ReachedRoomLoad);
         if (reachedAction is not null)
             return EnterRoom(room, $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction.ReachedRoomLoad);
         var arrival = $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input.";
@@ -793,8 +794,10 @@ public sealed class LoomExplorationSession
     /// Sends a key press to the game, as ScummVM's <c>processKeyboard</c> and
     /// <c>checkExecVerbs</c> do for v3: the restart key (<c>VAR_RESTART_KEY</c>) and
     /// the pause key (<c>VAR_PAUSE_KEY</c>) and '.' (talk stop) are the engine's and are not sent;
-    /// Escape while a cutscene is open would first run <c>abortCutscene</c>, which is
-    /// not modelled, so it is not sent then; otherwise, with user input on,
+    /// Escape, while <c>VAR_CUTSCENEEXIT_KEY</c> is nonzero, first runs <c>abortCutscene</c>
+    /// (the script that set the open cutscene's override continues at its skip jump
+    /// on the next frame, with <c>VAR_OVERRIDE</c> = 1) and then goes on as that
+    /// variable's key; otherwise, with user input on,
     /// <c>runInputScript(4, key, 1)</c> runs <c>VAR_VERB_SCRIPT</c> (script 005, area 4:
     /// note letters, Escape, text speed, F5–F7, Ctrl+V). A verb whose key matches would
     /// be clicked instead (<c>runInputScript(1, verb, 1)</c>), but no decoded
@@ -813,6 +816,15 @@ public sealed class LoomExplorationSession
         bool Is(string variable) => _runtime.GlobalVariables.TryGetValue(variable, out var value) && value != 0 && value == key;
         string? refused = null;
         ushort verbScript = 0;
+        // processKeyboard: Escape, while VAR_CUTSCENEEXIT_KEY is nonzero, runs
+        // abortCutscene, then passes VAR_CUTSCENEEXIT_KEY's value on as the key.
+        string? aborted = null;
+        if (key == 0x1B && _runtime.GlobalVariables.TryGetValue(CutsceneExitKeyVariable, out var exitKey) && exitKey != 0)
+        {
+            aborted = AbortCutscene();
+            _uncertainties.Add($"{input}: ScummVM processKeyboard runs abortCutscene first ({CutsceneExitKeyVariable}, VAR_CUTSCENEEXIT_KEY, is 0x{exitKey:X2}): {aborted}.");
+            key = exitKey;
+        }
         if (key <= 0 || key > 0x1FF)
             refused = "it is not a key code the engine sends";
         else if (Is(RestartKeyVariable))
@@ -821,15 +833,16 @@ public sealed class LoomExplorationSession
             refused = $"it is the pause key ({PauseKeyVariable}, VAR_PAUSE_KEY): the engine pauses the game and the scripts never see it";
         else if (key == '.')
             refused = "'.' is the engine's talk-stop key (v3 has no VAR_TALKSTOP_KEY, so it is always on): it ends the current message and the scripts never see it";
-        else if (Is(CutsceneExitKeyVariable) && InCutscene)
-            refused = $"a cutscene is open, and the cutscene exit key ({CutsceneExitKeyVariable}, VAR_CUTSCENEEXIT_KEY) would first run abortCutscene, which the session does not model";
         else if (_runtime.UserPut <= 0)
             refused = "user input is off (cursorCommand), and ScummVM's checkExecVerbs reads no key then";
         else if (!_runtime.GlobalVariables.TryGetValue(VerbScriptVariable, out verbScript) || verbScript == 0)
             refused = $"no input script is set ({VerbScriptVariable}, VAR_VERB_SCRIPT, is 0)";
         if (refused is not null)
         {
-            _uncertainties.Add($"{input}: not sent, because {refused}.");
+            // After abortCutscene the key was acted on, even when no script reads it.
+            _uncertainties.Add(aborted is null
+                ? $"{input}: not sent, because {refused}."
+                : $"{input}: the key did not reach the input script after abortCutscene, because {refused}.");
             LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
                 _uncertainties.Skip(beforeUncertainties).ToArray(), input);
             return LastAction;
@@ -1188,6 +1201,8 @@ public sealed class LoomExplorationSession
     // beginCutscene's vm.cutSceneData stack, and the script whose cutscene start
     // script is running (vm.cutSceneScriptIndex), which freezeScripts leaves running.
     private readonly Stack<(ushort Data, ScriptFrame? Owner)> _cutscenes = new();
+    // ScummVM vm.cutScenePtr/cutSceneScript per cutscene depth (0: no cutscene open).
+    private readonly Dictionary<int, (ScriptFrame Frame, int JumpOffset)> _overrides = new();
     private ScriptFrame? _cutsceneOwner;
     // Room loads by global scripts: the script pauses after the load, the session
     // enters the room, and the script resumes there (only inside an action or frame).
@@ -1525,6 +1540,7 @@ public sealed class LoomExplorationSession
         if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var arguments))
             return "cutscene arguments depend on unknown variables";
         _cutscenes.Push((arguments.GetValueOrDefault("local[0x000]"), _executing.Count > 0 ? _executing[^1] : null));
+        _overrides.Remove(_cutscenes.Count);
         if (!_runtime.GlobalVariables.TryGetValue(CutsceneStartScriptVariable, out var startScript))
         {
             _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: the cutscene start script ({CutsceneStartScriptVariable}) is unknown; its effects were not applied.");
@@ -1558,6 +1574,7 @@ public sealed class LoomExplorationSession
         if (estimate) _runtime.EstimatedVariables.Add(OverrideVariable);
         else _runtime.EstimatedVariables.Remove(OverrideVariable);
         ushort data = 0;
+        _overrides.Remove(_cutscenes.Count);
         if (_cutscenes.Count > 0) data = _cutscenes.Pop().Data;
         else _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: endCutscene without a cutscene begun on this route; its data is taken as 0.");
         if (!_runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var endScript))
@@ -1570,6 +1587,42 @@ public sealed class LoomExplorationSession
             RunStartedScript(endScript, 0, new Dictionary<string, ushort> { ["local[0x000]"] = data }, depth + 1,
                 [], estimate);
         return "";
+    }
+
+    /// <summary>
+    /// ScummEngine::beginOverride and endOverride: the running script's skip
+    /// jump is recorded for the open cutscene depth, or cleared.
+    /// </summary>
+    private void RecordOverride(int? jumpOffset)
+    {
+        if (_executing.Count == 0) return;
+        if (jumpOffset is int offset) _overrides[_cutscenes.Count] = (_executing[^1], offset);
+        else _overrides.Remove(_cutscenes.Count);
+    }
+
+    /// <summary>
+    /// ScummEngine::abortCutscene: the script that set the override at the open
+    /// cutscene depth continues at its skip jump, unfrozen, with
+    /// <c>VAR_OVERRIDE</c> = 1, and the override is cleared. With no override it
+    /// does nothing. Returns what happened, for the key's label.
+    /// </summary>
+    private string AbortCutscene()
+    {
+        var depth = _cutscenes.Count;
+        if (!_overrides.TryGetValue(depth, out var point))
+            return depth == 0
+                ? "no cutscene is open and no override is set, so it does nothing"
+                : "the open cutscene has no override set (beginOverride), so it does nothing";
+        var index = _pending.FindIndex(item => item.Frame == point.Frame);
+        if (index < 0)
+            return $"the override's script ({point.Frame.Label}) is not waiting for a later frame, so the session does not move it to its skip jump";
+        _overrides.Remove(depth);
+        _pending[index] = _pending[index] with { Offset = point.JumpOffset };
+        point.Frame.FreezeCount = 0;
+        _runtime.GlobalVariables[OverrideVariable] = 1;
+        _runtime.EstimatedVariables.Remove(OverrideVariable);
+        _visitTrace.Add($"abortCutscene: {point.Frame.Label} continues at its skip jump +0x{point.JumpOffset:X4}, {OverrideVariable} = 1");
+        return $"{point.Frame.Label} continues at its skip jump (+0x{point.JumpOffset:X4}) on the next frame, unfrozen, with {OverrideVariable} (VAR_OVERRIDE) = 1";
     }
 
     /// <summary>

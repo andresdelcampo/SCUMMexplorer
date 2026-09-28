@@ -121,4 +121,39 @@ public sealed class LoomKeyInputTests
             item.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && item.ResourceId == 2)));
         Assert.Contains(session.PressKey('e').Uncertainties, line => line.Contains("user input is off", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void EscapeSkipsScript052ToItsOverrideJump()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 10));
+        // Script 052 (Room 10 object 295's cutscene), started as that verb would.
+        session.RunTopLevelScript(new LoomScriptDisassembly(250, 1, 0, 32, 16,
+            [new(0, 0x0A, "startScript", "0x34, []", "0A 34 FF"), new(3, 0, "stopObjectCode", "", "00")],
+            null, null, [], [], "Synthetic test script"));
+        Assert.True(session.InCutscene);
+
+        // Before +0x00C6 beginOverride, abortCutscene has nothing to jump to.
+        var early = session.PressKey(0x1B);
+        Assert.Contains(early.Uncertainties, line => line.Contains("the open cutscene has no override set", StringComparison.Ordinal));
+        Assert.Contains(early.Uncertainties, line => line.Contains("did not reach the input script after abortCutscene, because user input is off", StringComparison.Ordinal));
+        Assert.Equal((ushort)0, Var(session, "var[0x005]"));
+
+        // In Room 11, past +0x00C6: the skip jump (+0x00C8) goes to +0x0157, which reads VAR_OVERRIDE.
+        for (var frame = 0; frame < 40 && session.Snapshot.RoomId != 11; frame++) session.AdvanceFrame();
+        Frames(session, 20);
+        Assert.Equal(11, session.Snapshot.RoomId);
+        var from = session.SessionTrace.Count;
+        session.PressKey(0x1B);
+        Assert.True(Traced(session, from, "abortCutscene: Script 52 continues at its skip jump +0x00C8, var[0x005] = 1"));
+        Assert.Equal((ushort)1, Var(session, "var[0x005]"));
+
+        for (var frame = 0; frame < 20 && session.Snapshot.RoomId != 13; frame++) session.AdvanceFrame();
+        Assert.Equal(13, session.Snapshot.RoomId);
+        Assert.True(Traced(session, from, "stopScript 210 at Script 52 +0x015C"));
+        Assert.True(Traced(session, from, "endCutscene at Script 52 +0x017C runs script 3"));
+        Assert.Equal((ushort)0, Var(session, "var[0x005]"));
+    }
 }

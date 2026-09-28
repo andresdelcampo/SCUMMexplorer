@@ -822,6 +822,7 @@ public sealed class LoomBoundedScriptExecutor
                 }
                 var jump = instructions[jumpIndex];
                 trace.Add($"override set at +0x{instruction.Offset:X4}; its skip jump (+0x{jump.Offset:X4}) runs only if the player skips the cutscene, which the preview does not");
+                runtime?.OverrideChanged?.Invoke(jump.Offset);
                 pc = jump.Offset + EncodedLength(jump.Bytes);
                 continue;
             }
@@ -829,6 +830,7 @@ public sealed class LoomBoundedScriptExecutor
             if (instruction.Operation == "endOverride")
             {
                 // o5_beginOverride with 0: clears the recorded skip point.
+                runtime?.OverrideChanged?.Invoke(null);
                 pc = next;
                 continue;
             }
