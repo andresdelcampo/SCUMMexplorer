@@ -7,10 +7,11 @@ using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Formats;
 
-// "Click as game input": in the real MainWindow, gives room points to the
-// handler's own paths (SendClickToGame, which the double-click timer calls;
-// QueueGameClick and the timer; the mouse-down pairing) and checks where the
-// session goes and what it says. WPF synthetic mouse events carry no position,
+// The game's click (the explore mode's default since 28 September): in the real
+// MainWindow, gives room points to the handler's own paths (HandleRoomPoint, which
+// the double-click timer calls; QueueGameClick and the timer; the mouse-down
+// pairing) and checks where the session goes and what it says. Inspection mode
+// cycles artwork instead. WPF synthetic mouse events carry no position,
 // so points are room pixels. No physical input. Arguments: <Games\loom> <output folder>.
 internal static class Program
 {
@@ -41,7 +42,7 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 var tree = (TreeView)window.FindName("ResourceTree");
-                var toggle = (CheckBox)window.FindName("GameClickToggle");
+                var explore = (CheckBox)window.FindName("SessionModeToggle");
                 var status = (TextBlock)window.FindName("StatusText");
                 var panel = (FrameworkElement)window.FindName("VerbAreaPanel");
                 var panelText = (TextBlock)window.FindName("VerbAreaText");
@@ -65,33 +66,33 @@ internal static class Program
 
                 await Open(2);
                 Check(Session().Snapshot.RoomId == 2, $"Room 02 is the session's room after the boot (room {Session().Snapshot.RoomId})");
-                Check(toggle.IsChecked == false, "the setting is off by default");
+                Check(explore.IsChecked == true && window.FindName("GameClickToggle") is null,
+                    "the explore mode is on by default and has no \"Click as game input\" setting: the game's click is the click");
 
-                // On: a click on object 153 goes through scripts 005, 006 and 007 to Room 03.
-                toggle.IsChecked = true;
-                Call("SendClickToGame", 450, 60, false);
+                // A click on object 153 goes through scripts 005, 006 and 007 to Room 03.
+                Call("HandleRoomPoint", 450, 60, false);
                 await Settle(3);
                 var action = Session().LastAction;
                 Check(Session().Snapshot.RoomId == 3 && action is { IsGameInput: true, DestinationRoomId: 3 },
-                    $"on: a click at (450, 60) in Room 02 reaches Room 03 through the game's input: {action?.Evidence}");
+                    $"a click at (450, 60) in Room 02 reaches Room 03 through the game's input: {action?.Evidence}");
                 Check(Traced("runs script 5 with [2, 0, 0]") && Traced("Script 05 chains to script 6") &&
                       Traced("Script 07 +0x002E: startObject runs object 153 verb 0x38"),
-                    "on: the trace shows runInputScript → script 005 → script 006 → script 007 → object 153 verb 0x38");
+                    "the trace shows runInputScript → script 005 → script 006 → script 007 → object 153 verb 0x38");
                 var note = (TextBlock)window.FindName("ObjectActionNote");
                 Check(note.IsVisible && note.Text.Contains("new scene", StringComparison.OrdinalIgnoreCase) &&
                       note.Text.Contains("preview", StringComparison.OrdinalIgnoreCase),
-                    $"on: the contextual action card labels the scene change and preview limits: \"{note.Text}\" (status \"{status.Text}\")");
+                    $"the contextual action card labels the scene change and preview limits: \"{note.Text}\" (status \"{status.Text}\")");
                 Save("room-03-after-click.png");
 
                 // The double-click timer: a queued single click is sent once the double-click time passes.
                 Call("QueueGameClick", 24, 24);
-                Check(Session().Snapshot.RoomId == 3, "on: a queued click waits for the double-click time before it is sent");
+                Check(Session().Snapshot.RoomId == 3, "a queued click waits for the double-click time before it is sent");
                 await Task.Delay(1500);
                 await Settle(4);
                 action = Session().LastAction;
                 Check(Session().Snapshot.RoomId == 4 && action is { IsGameInput: true } &&
                       action.Evidence.Contains("Room 03 local script 200", StringComparison.Ordinal),
-                    $"on: after the wait, the click at (24, 24) reaches Room 04 through object 162 and local 200: {action?.Evidence}");
+                    $"after the wait, the click at (24, 24) reaches Room 04 through object 162 and local 200: {action?.Evidence}");
                 Save("room-04-after-click.png");
 
                 // A second press while the first waits: a double click (the mouse-down pairing), here on Room 02 object 156.
@@ -101,21 +102,24 @@ internal static class Program
                 Call("RoomPreview_MouseLeftButtonUp", null, null);
                 window.UpdateLayout();
                 Check(Traced("the second click of a double click") || Session().Snapshot.Uncertainties.Any(line => line.Contains("the second click of a double click", StringComparison.Ordinal)),
-                    "on: a second press while the first click waits is sent as a double click");
+                    "a second press while the first click waits is sent as a double click");
                 Check(Traced("startObject runs object 156 verb 0x36"),
-                    "on: the double click on object 156 runs its verb 0x36 through script 007");
+                    "the double click on object 156 runs its verb 0x36 through script 007");
                 Check(panel.Visibility == Visibility.Visible && panelText.Text.Contains("assumed click", StringComparison.Ordinal),
-                    $"on: the verb-area panel shows the close-up reached from the click: \"{panelText.Text}\"");
+                    $"the verb-area panel shows the close-up reached from the click: \"{panelText.Text}\"");
                 Save("room-02-double-click-156.png");
 
-                // Off: a doorway click is the direct verb call again (an exploration action).
-                toggle.IsChecked = false;
-                Call("HandleRoomPoint", 450, 60);
-                await Settle(3);
-                action = Session().LastAction;
-                Check(Session().Snapshot.RoomId == 3 && action is { IsGameInput: false } &&
-                      action.Evidence.StartsWith("Room 02 object 153, verb 0x38", StringComparison.Ordinal),
-                    $"off: the doorway click runs object 153's verb directly: {action?.Evidence}");
+                // Inspection mode: a click cycles artwork and sends nothing to the game.
+                var before = Session().LastAction;
+                explore.IsChecked = false;
+                Call("HandleRoomPoint", 700, 40, false);
+                window.UpdateLayout();
+                var objectsNote = (TextBlock)window.FindName("SessionStatusText");
+                Check(Session().LastAction == before && Session().Snapshot.RoomId == 2,
+                    "inspection: a click sends nothing to the game and stays in Room 02");
+                Check(objectsNote.Text.StartsWith("Inspection mode: a click cycles an object's stored images", StringComparison.Ordinal),
+                    $"inspection: the mode's text says clicks cycle the stored artwork: \"{objectsNote.Text}\" (status \"{status.Text}\")");
+                explore.IsChecked = true;
                 report.Add($"Failures: {failures}");
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }

@@ -393,7 +393,6 @@ public partial class MainWindow : Window
         RoomCardScroll.Visibility = _game is null || advanced ? Visibility.Collapsed : Visibility.Visible;
         CameraPanToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GamePointerToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
-        GameClickToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GameKeysToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         VerbAreaToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
@@ -686,7 +685,7 @@ public partial class MainWindow : Window
         }
 
         ObjectActionPanel.Visibility = Visibility.Collapsed;
-        SessionStatusText.Text = "Asset inspection: each room starts from the index; changes are local to this view.";
+        SessionStatusText.Text = "Inspection mode: a click cycles an object's stored images; it is not the game's click and runs no script. Each room starts from the index; changes are local to this view.";
         SessionStatusText.ToolTip = null;
         RoomEntryTraceExpander.Header = "Advanced room details";
         AdvanceFrameButton.IsEnabled = false;
@@ -2231,15 +2230,19 @@ public partial class MainWindow : Window
         _gameClickTimer.Stop();
         _pendingGameClick = null;
         _gameClickPairSent = true;
-        SendClickToGame(first.X, first.Y, doubleClick: true);
+        HandleRoomPoint(first.X, first.Y, doubleClick: true);
     }
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern uint GetDoubleClickTime();
 
-    private bool GameClickActive => GameClickToggle.IsChecked == true && SessionModeToggle.IsChecked == true && _session is not null;
+    /// <summary>
+    /// In the explore mode every room click is the game's click (decided 28 September):
+    /// it goes through the input scripts (005–007). Inspection mode cycles artwork instead.
+    /// </summary>
+    private bool GameClickActive => SessionModeToggle.IsChecked == true && _session is not null;
 
-    // "Click as game input": a single click waits for the system double-click time before it is sent.
+    // The game's click: a single click waits for the system double-click time before it is sent.
     private DispatcherTimer? _gameClickTimer;
     private (int X, int Y, int? Room)? _pendingGameClick;
     private bool _gameClickPairSent;
@@ -2257,7 +2260,7 @@ public partial class MainWindow : Window
             {
                 _gameClickTimer.Stop();
                 if (_pendingGameClick is { } pending && GameClickActive && _session!.Snapshot.RoomId == pending.Room)
-                    SendClickToGame(pending.X, pending.Y, doubleClick: false);
+                    HandleRoomPoint(pending.X, pending.Y);
                 _pendingGameClick = null;
             };
         }
@@ -2265,27 +2268,19 @@ public partial class MainWindow : Window
         _gameClickTimer.Start();
     }
 
-    private void GameClickToggle_Changed(object sender, RoutedEventArgs e)
-    {
-        _gameClickTimer?.Stop();
-        _pendingGameClick = null;
-        _gameClickPairSent = false;
-        UpdateVerbArea();
-        UpdateVerbStrip();
-    }
-
     /// <summary>
-    /// "Click as game input": sends the click to the session as the game's own
+    /// The game's click: sends the click to the session as the game's own
     /// input path would receive it (<see cref="LoomExplorationSession.Click"/>), then
     /// continues frames as a doorway click does, so the ego's walk and script 007's
-    /// sentence run and a room load they reach opens the destination.
+    /// sentence run and a room load they reach opens the destination. Returns
+    /// whether another room was entered.
     /// </summary>
-    private void SendClickToGame(int x, int y, bool doubleClick) =>
+    private bool SendClickToGame(int x, int y, bool doubleClick) =>
         SendInputToGame(() => _session!.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click");
 
-    private void SendInputToGame(Func<LoomObjectActionResult> send, string what)
+    private bool SendInputToGame(Func<LoomObjectActionResult> send, string what)
     {
-        if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return;
+        if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         var action = send();
         if (action.DestinationRoomId is int destination &&
             _game.Rooms.FirstOrDefault(item => item.ResourceId == destination) is { } target && target != sourceRoom)
@@ -2293,12 +2288,12 @@ public partial class MainWindow : Window
             StatusText.Text = $"{what} sent to the game: entered Room {destination:00}";
             StatusText.ToolTip = action.Evidence;
             SelectResourceInTree(target);
-            return;
+            return true;
         }
         if (ContinueToReachedRoom())
         {
             StatusText.Text = $"{what} sent to the game: entered Room {_session.Snapshot.RoomId:00}";
-            return;
+            return true;
         }
         var sent = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
         StatusText.Text = sent is null ? $"{what} sent to the game (assumed input); no room load was reached" : $"{what} not sent to the game";
@@ -2309,39 +2304,42 @@ public partial class MainWindow : Window
         RefreshRoomPreview();
         UpdateVerbArea();
         UpdateVerbStrip();
+        return false;
     }
 
-    private void HandleRoomPoint(int x, int y)
+    /// <summary>
+    /// A click on the room. In the explore mode it is the game's click
+    /// (<see cref="SendClickToGame"/>): the ego walks to what is under the point
+    /// and verb 0x38 runs (a double click adds 0x36), as scripts 005–007 do.
+    /// Room hotspots navigate: when the game's click reaches no room load on a
+    /// doorway (refused input, or a route the preview cannot follow), the
+    /// doorway's verb runs directly, labelled as an exploration action. In the
+    /// inspection mode a click cycles the stored artwork.
+    /// </summary>
+    // Why the last room click fell back to a doorway's direct verb (for the harnesses and the tooltip).
+    private string? _lastDoorwayFallback;
+
+    private void HandleRoomPoint(int x, int y, bool doubleClick = false)
     {
+        _lastDoorwayFallback = null;
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
-            // Room hotspots navigate. Among doorways at this point, the first
-            // touchable one in directory order takes the click, as ScummVM's
-            // findObject picks it. Untouchable doorways stay reachable as
-            // labelled exploration actions.
+            var roomBefore = _currentRoomResource;
             var doorways = DoorwaysAt(x, y);
-            if (doorways.Count > 0)
-            {
-                var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
-                if (live.Length > 0) FollowDoorway(live[0]);
-                else if (doorways.Count == 1) FollowDoorway(doorways[0]);
-                else ShowDoorwayMenu(doorways.Select(record => (DoorwayLabel(record), DoorwayToolTip(record),
-                    (Action)(() => FollowDoorway(record)))).ToArray());
-                return;
-            }
-            var codeOnlyChoices = FindVerbChoicesAt(x, y)
-                .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
-            if (codeOnlyChoices.Length > 0)
-            {
-                if (codeOnlyChoices.Length == 1)
-                    ActivateObjectVerb(codeOnlyChoices[0].Object, codeOnlyChoices[0].Verb);
-                else ShowObjectVerbChoices(codeOnlyChoices);
-                return;
-            }
-            if (CycleArtworkAt(x, y)) return;
-            var choices = FindVerbChoicesAt(x, y);
-            if (choices.Count == 1) ActivateObjectVerb(choices[0].Object, choices[0].Verb);
-            else ShowObjectVerbChoices(choices);
+            if (SendClickToGame(x, y, doubleClick) || doorways.Count == 0 || _currentRoomResource != roomBefore) return;
+            var why = StatusText.Text;
+            var refused = _session.LastAction?.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
+            _lastDoorwayFallback = refused ?? $"{why}: {_session.LastAction?.Evidence}";
+            // Among doorways at this point, the first touchable one in directory
+            // order is the one ScummVM's findObject picks. Untouchable doorways
+            // stay reachable as labelled exploration actions.
+            var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
+            if (live.Length > 0) FollowDoorway(live[0]);
+            else if (doorways.Count == 1) FollowDoorway(doorways[0]);
+            else ShowDoorwayMenu(doorways.Select(record => (DoorwayLabel(record), DoorwayToolTip(record),
+                (Action)(() => FollowDoorway(record)))).ToArray());
+            StatusText.ToolTip = $"{why}. The doorway's verb then ran directly, an exploration action, not the game's click." +
+                                 (StatusText.ToolTip is string tip ? Environment.NewLine + tip : "");
             return;
         }
         CycleArtworkAt(x, y);
@@ -2352,9 +2350,7 @@ public partial class MainWindow : Window
         var obj = _objectSelection.HitTest(x, y);
         if (obj is null) return false;
         _estimatedObjectIds = new HashSet<int>();
-        ObjectsNote.Text = SessionModeToggle.IsChecked == true
-            ? "Room-image choices are local to this view. Hotspots run script interactions."
-            : "Asset inspection: click an image area to cycle its stored alternatives. The selection is local to this view.";
+        ObjectsNote.Text = "Asset inspection: click an image area to cycle its stored alternatives. The selection is local to this view.";
         var wasVisible = _objectSelection.IsActive(obj);
         var next = _objectSelection.Next(obj);
         _selectedObject = next?.Id ?? obj.Id;
@@ -2385,32 +2381,14 @@ public partial class MainWindow : Window
         SendPointerToGame((x, y), hoveredRow?.Id ?? 0);
         if (GameClickActive)
         {
-            RoomPreview.Cursor = Cursors.Hand;
-            RoomPreview.ToolTip = (hoveredRow is null ? "Nothing listed here. " : $"Object {hoveredRow.Id}. ") +
-                                  "Click as game input is on: a click is sent to the game's input script (assumed input), not run as a direct verb.";
-            return;
-        }
-        if (SessionModeToggle.IsChecked == true && _session is not null)
-        {
             var doorways = DoorwaysAt(x, y);
-            if (doorways.Count > 0)
-            {
-                var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
-                RoomPreview.Cursor = Cursors.Hand;
-                RoomPreview.ToolTip = live.Length > 0 || doorways.Count == 1
-                    ? $"Click to go to {DoorwayLabel(live.Length > 0 ? live[0] : doorways[0])}. {DoorwayToolTip(live.Length > 0 ? live[0] : doorways[0])}"
-                    : $"Click to choose: {string.Join(" or ", doorways.Select(DoorwayLabel))}. None of these hotspots is live in this preview.";
-                return;
-            }
-            var codeOnlyChoices = FindVerbChoicesAt(x, y)
-                .Where(choice => !_objects.Any(image => image.Id == choice.Object.Id)).ToArray();
-            if (codeOnlyChoices.Length > 0)
-            {
-                RoomPreview.Cursor = Cursors.Hand;
-                RoomPreview.ToolTip = $"Click to interact with Object {codeOnlyChoices[0].Object.Id}. " +
-                                      "This code-only hotspot takes priority over overlapping artwork; switch to inspection mode to cycle the image.";
-                return;
-            }
+            RoomPreview.Cursor = hoveredRow is null && doorways.Count == 0 ? Cursors.Arrow : Cursors.Hand;
+            var what = hoveredRow is null ? "Nothing listed here: a click walks Bobbin to this point." :
+                $"{(_roomObjectNames.TryGetValue(hoveredRow.Id, out var name) ? name : $"Object {hoveredRow.Id}")}: " +
+                "a click walks Bobbin over and uses it (verb 0x38); a double click also looks at it (verb 0x36).";
+            RoomPreview.ToolTip = what + " The click goes through the game's input scripts (005–007) as assumed input." +
+                                  (doorways.Count > 0 ? $" This doorway leads to {string.Join(" or ", doorways.Select(DoorwayLabel))}." : "");
+            return;
         }
         var artwork = _objectSelection.HitTest(x, y);
         if (artwork is not null)
@@ -2584,7 +2562,7 @@ public partial class MainWindow : Window
     private void UpdateVerbArea()
     {
         UpdateVerbStrip();
-        var closeUp = GamePointerToggle.IsChecked == true || GameClickToggle.IsChecked == true
+        var closeUp = GamePointerToggle.IsChecked == true || GameClickActive
             ? _session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
         if (closeUp is not { Mode: 1, ImageObject: int image } || _session is null)
         {

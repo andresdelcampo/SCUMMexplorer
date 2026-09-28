@@ -122,8 +122,11 @@ internal static class Program
                 Save("room-02-verb-area-close-up.png");
                 pointer.IsChecked = false;
 
-                // "Click as game input" on the strip: verbs that are on go to script 005 as runInputScript(1, verb, 0).
-                var clicks = (CheckBox)window.FindName("GameClickToggle");
+                // The game's click on the strip (the explore mode's click since 28 September): verbs that
+                // are on go to script 005 as runInputScript(1, verb, 0). The inspection mode sends nothing.
+                var clicks = (CheckBox)window.FindName("SessionModeToggle");
+                clicks.IsChecked = false;
+                await Settle();
                 var status = (TextBlock)window.FindName("StatusText");
                 Point StripPoint(int x, int y) => new((x + 0.5) * image.ActualWidth / 320, (y - 144 + 0.5) * image.ActualHeight / 56);
                 bool ClickStrip(int x, int y) => (bool)Call("ClickVerbStrip", StripPoint(x, y))!;
@@ -132,14 +135,14 @@ internal static class Program
                 var third = Session().VerbArea().Items.Single(item => item.VerbId == 0x03);
                 var before = Session().SessionTrace.Count;
                 Check(!ClickStrip(third.X + 1, third.Y + 1) && Session().SessionTrace.Count == before,
-                    "click input off: a click on note 0x03 in the strip sends nothing");
+                    "inspection mode: a click on note 0x03 in the strip sends nothing");
                 clicks.IsChecked = true;
                 await Settle();
                 Check(note.Text.Contains("Clicks on verbs that are on go to the game as assumed input", StringComparison.Ordinal),
-                    $"click input on: the note says verb clicks are assumed input: \"{note.Text}\"");
+                    $"explore mode: the note says verb clicks are assumed input: \"{note.Text}\"");
                 before = Session().SessionTrace.Count;
                 Check(!ClickStrip(100, 195) && Session().SessionTrace.Count == before,
-                    "click input on: a click on the strip where no verb is on sends nothing");
+                    "explore mode: a click on the strip where no verb is on sends nothing");
                 var sent = ClickStrip(third.X + 1, third.Y + 1);
                 await Settle();
                 Check(sent && TracedSince(before, "verb 0x03 (slot 3), runs script 5 with [1, 3, 0]") && TracedSince(before, "Script 10 chains to script 13") &&
@@ -154,7 +157,6 @@ internal static class Program
                 Check(sent && Var(0x067) == 156 && Var(0x056) == 3 && Var(0x062) == 1 && TracedSince(before, "Script 10 chains to script 27"),
                     $"after aiming at object 156, note 0x03 is recorded (var[0x056] = {Var(0x056)}, var[0x062] = {Var(0x062)}) and script 027 runs");
                 Save("room-02-verb-area-note-click.png");
-                clicks.IsChecked = false;
 
                 toggle.IsChecked = false;
                 await Settle();

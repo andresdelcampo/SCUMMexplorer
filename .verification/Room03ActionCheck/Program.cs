@@ -80,7 +80,7 @@ internal static class Program
         void CompleteChoice(bool keyboard, int room = 3, int? id = null, int verb = 0)
         {
             var target = id ?? objectId;
-            if (Session().LastAction is { } action && action.SourceRoomId == room && action.ObjectId == target) return;
+            if (Session().LastAction is { } action && action.SourceRoomId == room && (action.ObjectId == target || action.IsGameInput)) return;
             var choices = Named<StackPanel>("ObjectVerbButtons").Children.OfType<Button>()
                 .Where(b => b.ToolTip?.ToString()?.Contains($"Object {target} ") == true &&
                             (verb == 0 || b.ToolTip!.ToString()!.Contains($"0x{verb:X2}"))).ToArray();
@@ -128,7 +128,7 @@ internal static class Program
                 report.AddRange(Session().SessionTrace.TakeLast(4).Select(line => "Session: " + line));
                 report.AddRange(Session().Snapshot.Uncertainties.TakeLast(6).Select(line => "Session uncertainty: " + line));
             }
-            Check(action?.SourceRoomId == 3 && action.ObjectId == objectId && action.DestinationRoomId == expectedRoom,
+            Check(action?.SourceRoomId == 3 && (action.ObjectId == objectId || action.IsGameInput) && action.DestinationRoomId == expectedRoom,
                 $"{label}: object {objectId} execution reached Room {expectedRoom:00}");
             Check(action!.ReachedRoomLoad is not null, "Destination came from a reached room-load event");
             report.Add(action.Evidence);
@@ -154,7 +154,7 @@ internal static class Program
                 // The upper-left quarter also covers the stored image overlapping object 162.
                 int x = record.X + record.Width / 3, y = record.Y + record.Height / 3;
                 report.Add($"Coordinate dispatch at room pixel ({x},{y}) in decoded rectangle ({record.X},{record.Y},{record.Width},{record.Height}).");
-                Call("HandleRoomPoint", x, y);
+                Call("HandleRoomPoint", x, y, false);
                 CompleteChoice(keyboard: false);
                 await VerifyAction("coordinate-action");
 
@@ -178,7 +178,7 @@ internal static class Program
                 var inspectObjects = (IReadOnlyList<RoomObjectImage>)Field("_objects")!;
                 report.Add($"Inspection setup: {inspectObjects.Count} images; hit at ({x},{y}) = {inspectSelection.HitTest(x, y)?.Id.ToString() ?? "none"}; room {DisplayedRoom():00}; current room image {(Field("_currentRoom") is null ? "null" : "set")}.");
                 var beforeInspection = Session().LastAction;
-                Call("HandleRoomPoint", x, y);
+                Call("HandleRoomPoint", x, y, false);
                 Check(Session().LastAction == beforeInspection && DisplayedRoom() == 3,
                     "Inspection-mode click at the same overlap does not execute an action or navigate");
                 report.Add("Inspection StatusText: " + Named<TextBlock>("StatusText").Text);

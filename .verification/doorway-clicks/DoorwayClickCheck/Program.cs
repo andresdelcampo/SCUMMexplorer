@@ -8,7 +8,8 @@ using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.Core.Rendering;
 
 // For every room with doorway boxes on the real MainWindow: browse to the room,
-// click (in-process HandleRoomPoint) a point of each box that no other box
+// click (in-process HandleRoomPoint: the game's click, with the direct verb as a
+// labelled fallback) a point of each box that no other box
 // covers, and report whether the view entered one of that box's rooms.
 // Arguments: <Games\loom> <out.txt> [room numbers]. No physical input.
 internal static class Program
@@ -41,7 +42,7 @@ internal static class Program
 
         window.ContentRendered += async (_, _) =>
         {
-            int boxes = 0, passed = 0;
+            int boxes = 0, passed = 0, byGame = 0;
             try
             {
                 Call("OpenGameFolder", args[0]);
@@ -77,7 +78,7 @@ internal static class Program
                         var snapshot = ((LoomExplorationSession)Field("_session")!).Snapshot;
                         var live = (snapshot.IsUntouchable(record.Id) ? " (untouchable now)" : "") + $" [var71=0x{snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x071]"):X}]";
                         var menuBefore = Field("_doorwayMenu");
-                        Call("HandleRoomPoint", point.X, point.Y);
+                        Call("HandleRoomPoint", point.X, point.Y, false);
                         var via = "";
                         if (Field("_doorwayMenu") is ContextMenu menu && menu != menuBefore && Displayed() == room.ResourceId)
                         {
@@ -92,7 +93,22 @@ internal static class Program
                         await Task.Delay(100);
                         var now = Displayed();
                         var ok = now is int entered && targets.Contains(entered);
+                        // A box with no point of its own that is untouchable now: findObject picks the touchable
+                        // doorway over it (the game's rule), so that doorway's room is the expected one, labelled.
+                        var picked = own is null && snapshot.IsUntouchable(record.Id)
+                            ? present.FirstOrDefault(item => item.Id != record.Id && !snapshot.IsUntouchable(item.Id)) : null;
+                        if (!ok && picked is not null && now is int reachedRoom &&
+                            candidates.Where(c => Prop<LoomRoomObjectRecord>(c, "Object").Id == picked.Id).Any(c => Prop<int>(c, "TargetRoomId") == reachedRoom))
+                        {
+                            ok = true;
+                            via += $" [overlapped and untouchable now: findObject picks object {picked.Id}, which leads there]";
+                        }
                         if (ok) passed++;
+                        // Since 28 September the click is the game's (scripts 005–007); the doorway's verb runs directly only as a fallback.
+                        var gameClick = ((LoomExplorationSession)Field("_session")!).LastAction is { IsGameInput: true };
+                        if (ok && gameClick) byGame++;
+                        via += gameClick ? " [game's click]" : " [direct verb, fallback: " +
+                            Field("_lastDoorwayFallback") + "]";
                         var note = ((TextBlock)window.FindName("ObjectActionNote")).Text.Replace("\n", " ");
                         var choices = ((Panel)window.FindName("ObjectVerbButtons")).Children.OfType<Button>().Select(b => b.Content?.ToString()).ToArray();
                         report.Add($"{(ok ? "PASS" : "FAIL")} Room {room.ResourceId:00} object {record.Id} box ({record.X},{record.Y}) {record.Width}x{record.Height}" +
@@ -104,7 +120,7 @@ internal static class Program
             catch (Exception ex) { report.Add("ERROR " + ex); Environment.ExitCode = 1; }
             finally
             {
-                report.Insert(1, $"Doorway boxes: {boxes}; navigated to one of their rooms: {passed}; failed: {boxes - passed}");
+                report.Insert(1, $"Doorway boxes: {boxes}; navigated to one of their rooms: {passed} ({byGame} through the game's click, {passed - byGame} through the direct-verb fallback); failed: {boxes - passed}");
                 // A report that cannot be written (for example a sandbox denying the folder)
                 // must not crash the harness: fall back to the temp folder and say so.
                 try { File.WriteAllLines(output, report); }

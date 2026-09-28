@@ -58,6 +58,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | Room loads by room-owned scripts end the script | ScummVM `startScene`; Blockers 5905 → 5839 (commit 3b15611) | [room-owned-loads](../.verification/room-owned-loads/validation.md) |
 | Visual-first UI refresh | Room-art picker, larger scene, advanced details collapsed (commit 92c2e3c). CameraPanCheck 2 FAIL and VerbAreaCheck 1 FAIL since then | [ui-refresh-complete](../.verification/ui-refresh-complete/validation.md) |
 | Replan | Priorities moved to visible behaviour: interactions, on-screen text, actors, playback. Plan and changelog cleaned up; no code changed | [plan](LOOM_EGA_PLAN.md) |
+| M1e: the game's click by default | Explore-mode clicks go through scripts 005–007; double click adds verb 0x36; doorways fall back to their verb, labelled (75/75: 29 by the game's click); inspection mode cycles artwork | [game-click](../.verification/game-click/validation.md) |
 
 ## State at the end of 28 September
 
