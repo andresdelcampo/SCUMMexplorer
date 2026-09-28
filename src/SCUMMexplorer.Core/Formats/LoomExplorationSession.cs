@@ -643,6 +643,7 @@ public sealed class LoomExplorationSession
             _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
         LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
         _dispatchScope++;
+        _entersRoomLoads++;
         try
         {
             if (doubleClick) SendSceneClick(verbScript, x, y, SingleClickGap, "the first click of a double click");
@@ -652,6 +653,7 @@ public sealed class LoomExplorationSession
         finally
         {
             _dispatchScope--;
+            _entersRoomLoads--;
         }
         return FinishInput(beforeUncertainties, beforeEvents);
     }
@@ -741,6 +743,7 @@ public sealed class LoomExplorationSession
             _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
         LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
         _dispatchScope++;
+        _entersRoomLoads++;
         try
         {
             // The pointer is over the verb screen, below the room picture (VAR_VIRT_MOUSE_Y past the room).
@@ -762,6 +765,7 @@ public sealed class LoomExplorationSession
         finally
         {
             _dispatchScope--;
+            _entersRoomLoads--;
         }
         return FinishInput(beforeUncertainties, beforeEvents);
     }
@@ -852,6 +856,7 @@ public sealed class LoomExplorationSession
             _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
         LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
         _dispatchScope++;
+        _entersRoomLoads++;
         try
         {
             _visitTrace.Add($"key: {name} runs script {verbScript} with [{KeyClickArea}, 0x{key:X2}, 1] (runInputScript)");
@@ -865,6 +870,7 @@ public sealed class LoomExplorationSession
         finally
         {
             _dispatchScope--;
+            _entersRoomLoads--;
         }
         return FinishInput(beforeUncertainties, beforeEvents);
     }
@@ -984,6 +990,7 @@ public sealed class LoomExplorationSession
         LoomScriptDisassembly? script = null;
         LoomBoundedScriptResult? run = null;
         _dispatchScope++;
+        _entersRoomLoads++;
         try
         {
             script = _verbs.Decode(_currentRoom, record, verbId);
@@ -996,6 +1003,7 @@ public sealed class LoomExplorationSession
         finally
         {
             _dispatchScope--;
+            _entersRoomLoads--;
         }
         LastAction = new LoomObjectActionResult(sourceRoomId, objectId, verbId,
             script?.ResourceOffset ?? record.CodeOffset, script, run, null, null,
@@ -1040,6 +1048,7 @@ public sealed class LoomExplorationSession
         _pending.Clear();
         _stopped.Clear();
         _dispatchScope++;
+        _entersRoomLoads++;
         try
         {
             foreach (var item in runnable)
@@ -1064,6 +1073,7 @@ public sealed class LoomExplorationSession
         finally
         {
             _dispatchScope--;
+            _entersRoomLoads--;
         }
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
             item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
@@ -1207,6 +1217,9 @@ public sealed class LoomExplorationSession
     // Room loads by global scripts: the script pauses after the load, the session
     // enters the room, and the script resumes there (only inside an action or frame).
     private int _dispatchScope;
+    // Inside an action, input or frame advance, the session enters the first
+    // reached room load once the scripts have run (ActivateObjectVerb, FinishInput, AdvanceFrame).
+    private int _entersRoomLoads;
     // True while the constructor runs the boot; its loads are not player actions.
     private bool _booting;
     private (LoomScriptEvent Event, ScriptFrame Frame)? _requestedLoad;
@@ -1525,6 +1538,13 @@ public sealed class LoomExplorationSession
                 // room, then resume it there (DispatchRequestedLoads).
                 _requestedLoad = (scriptEvent, _executing[^1]);
                 return LoomBoundedScriptExecutor.PauseAfterEvent;
+            case LoomScriptEventKind.RoomLoaded when _entersRoomLoads > 0 && _executing.Count > 0 && !_executing[^1].Global &&
+                                                      scriptEvent.TargetId is int enteredRoom &&
+                                                      _game.Rooms.Any(room => room.ResourceId == enteredRoom):
+                // ScummVM startScene ends the room, object or local script that
+                // loads the room (_currentScript = 0xFF); the session enters the room next.
+                _visitTrace.Add($"{scriptEvent.Operation} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4} ends this room-owned script (startScene); the session enters Room {enteredRoom:00}");
+                return LoomBoundedScriptExecutor.StopAfterEvent;
             case LoomScriptEventKind.RoomLoaded:
                 return $"script requests Room {scriptEvent.TargetId?.ToString("00", CultureInfo.InvariantCulture) ?? "dynamic"}; room transition awaits bounded session dispatch";
             default:

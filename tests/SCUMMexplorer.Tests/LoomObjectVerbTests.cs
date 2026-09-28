@@ -39,6 +39,12 @@ public sealed class LoomObjectVerbTests
             Assert.Equal(5, session.Snapshot.RoomId);
             Assert.Contains("verb 0x38", action.Evidence, StringComparison.OrdinalIgnoreCase);
             Assert.False(session.Snapshot.IsFaithful);
+            // ScummVM startScene ends the object script at its load; the session
+            // enters the room, so the load is not left waiting for dispatch.
+            Assert.True(action.Run!.ReachedStop);
+            Assert.Null(action.Run.UnresolvedReason);
+            Assert.DoesNotContain(action.Uncertainties, item => item.Contains("awaits", StringComparison.Ordinal));
+            Assert.Contains(session.SessionTrace, item => item.EndsWith("ends this room-owned script (startScene); the session enters Room 05", StringComparison.Ordinal));
         });
     }
 

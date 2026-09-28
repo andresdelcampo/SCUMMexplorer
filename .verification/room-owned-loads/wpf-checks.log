@@ -1,0 +1,12 @@
+﻿ClickInputCheck: exit 0, PASS 11, FAIL 0
+DoorwayClickCheck: exit 0, PASS 75, FAIL 0
+Room03ActionCheck: exit 0, PASS 46, FAIL 0
+PointerInputCheck: exit 0, PASS 13, FAIL 0
+ReverseHoverCheck: exit 0, PASS 22, FAIL 0
+HighlightCheck: exit 0, PASS 19, FAIL 0
+MusicRowCheck: exit 0, PASS 5, FAIL 0
+CameraPanCheck: exit 0, PASS 9, FAIL 2
+VerbAreaCheck: exit 0, PASS 14, FAIL 1
+KeyInputCheck: exit 0, PASS 10, FAIL 0
+PresentationCheck: exit 0, PASS 40, FAIL 0
+

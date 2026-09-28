@@ -130,6 +130,7 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 | `chainScript` | `StopAfterEvent`, then the target starts in the same place | session `RunScript` |
 | `startScript`/`chainScript`/`stopScript` read the script number with `getVarOrDirectByte` | A variable or local target takes its known value when the instruction runs; a target that reads a seeded pick makes the start a possible outcome; `stopScript` of a value 0 is left unresolved | executor (event target) |
 | Script arguments (`getWordVararg`): the values are copied to the child's locals | Known locals are passed by value; an argument that held an estimate (an estimated global or local) makes that local of the child an estimate (`EstimatedArgumentIndexes`) | executor `SubstituteLocalArguments`, session `EstimatedArguments` |
+| `startScene` ends the current room, object or local script (`_currentScript = 0xFF`) | In an action, input or frame advance, a room-owned script's load into an indexed room ends it (`StopAfterEvent`); the session enters the room | session `HandleEvent` |
 | `isScriptRunning` | Executing, pending or frozen global/local scripts; estimate if the script ended at an unmodelled step | `IsScriptRunning` |
 | `isSoundRunning` | Sounds started on the route read as playing (estimate) | executor |
 | `delay`, `waitFor` actor/message/camera | Continue on the next frame (labelled timing) | executor |
@@ -156,4 +157,4 @@ Last updated 28 September 2026. See also [the plan](LOOM_EGA_PLAN.md), the [boot
 4. ~~`startScript` with a dynamic target~~: resolved 28 Sep. All five sites have a local target with a known value; the executor reads it (getVarOrDirectByte) ([validation](../.verification/dynamic-scripts/validation.md)). A target that reads an unknown variable still stops with the same label.
 5. `expression` in some forms (3 in Blockers).
 6. ~~Script arguments that hold an estimate~~: resolved 28 Sep. They are passed by value and the child's locals keep the estimate ([validation](../.verification/estimated-arguments/validation.md)).
-7. A room load requested outside the session's dispatch ("room transition awaits bounded session dispatch", 66 in Blockers after 28 Sep).
+7. ~~A room load left "awaiting bounded session dispatch"~~: resolved 28 Sep. All 66 were loads by object verbs or Room 03 locals that the session already entered; such a load now ends the room-owned script, as ScummVM `startScene` does ([validation](../.verification/room-owned-loads/validation.md)). `killScriptsAndResources` ending the other room-owned scripts in the same step is not modelled.
