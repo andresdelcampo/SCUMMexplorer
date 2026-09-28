@@ -30,3 +30,17 @@ The recorded final run used output directory .verification/room-viewport/followu
 These are synthetic WPF input and layout checks. Physical computer-use checks covered the earlier presentation, then stopped at the user's Escape input. The final layout and held-input changes were not physically retested.
 
 Application artifact: `D:\Documents\Personal\Code Projects\SCUMMexplorer\Exe\SCUMMexplorer.App\Debug\net10.0-windows\SCUMMexplorer.App.exe`.
+
+## Room controls follow-up — 28 September 2026
+
+The room view now places 24-pixel-high split pan controls with centered vector chevrons directly below the artwork; the scrollbar and its reserved space are removed; exploration status/actions and the music timer are Advanced-only. The presentation harness recorded **49 PASS assertions**. Room 04 verifies the wide pan controls; Room 02 verifies the centered music player. Screenshots and the complete report are in `.verification/room-viewport/short-arrows-direct/`.
+
+Working directory: `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer`.
+
+```powershell
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet restore SCUMMexplorer.slnx --verbosity quiet
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet build SCUMMexplorer.slnx --no-restore --verbosity quiet
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet run --project .verification\room-viewport\PresentationCheck\PresentationCheck.csproj -- 'D:\Documents\Personal\Code Projects\SCUMMexplorer\Games\loom' 'C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer\.verification\room-viewport\short-arrows-direct'
+```
+
+Application artifact: `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer\Exe\SCUMMexplorer.App\Debug\net10.0-windows\SCUMMexplorer.App.exe`.

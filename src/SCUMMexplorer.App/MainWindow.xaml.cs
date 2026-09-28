@@ -506,6 +506,11 @@ public partial class MainWindow : Window
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
             ? Visibility.Visible : Visibility.Collapsed;
+        SessionStatusText.Visibility = advanced && _session is not null
+            ? Visibility.Visible : Visibility.Collapsed;
+        SessionActions.Visibility = advanced && _session is not null
+            ? Visibility.Visible : Visibility.Collapsed;
+        RoomCueTime.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomEntryTraceExpander.Visibility = advanced && !string.IsNullOrWhiteSpace(RoomEntryTraceOutput.Text)
             ? Visibility.Visible : Visibility.Collapsed;
         ObjectActionTraceExpander.Visibility = advanced && !string.IsNullOrWhiteSpace(ObjectActionTraceOutput.Text)
@@ -1532,10 +1537,12 @@ public partial class MainWindow : Window
         var availableWidth = Math.Max(1, RoomViewportHost.ActualWidth);
         var availableHeight = Math.Max(1, RoomViewportHost.ActualHeight);
         var visibleSourceWidth = normalSize ? Math.Min(320, room.Width) : room.Width;
-        RoomScrollButtonsPanel.Visibility = normalSize && room.Width > visibleSourceWidth
+        var showPanButtons = normalSize && room.Width > visibleSourceWidth;
+        RoomScrollButtonsPanel.Visibility = showPanButtons
             ? Visibility.Visible : Visibility.Collapsed;
-        var hasHorizontalScroll = normalSize && room.Width > visibleSourceWidth;
-        var usableHeight = Math.Max(1, availableHeight - (hasHorizontalScroll ? 17 : 0));
+        var usableHeight = Math.Max(1, availableHeight);
+        if (showPanButtons)
+            usableHeight = Math.Max(1, usableHeight - RoomScrollButtonsPanel.Height - RoomScrollButtonsPanel.Margin.Top - RoomScrollButtonsPanel.Margin.Bottom);
         // The optional verb strip shares the height: 56 screen rows at the room's scale, and its note.
         var verbStrip = VerbScreenShown();
         if (verbStrip) usableHeight = Math.Max(1, usableHeight - VerbStripNoteHeight);
@@ -1543,13 +1550,13 @@ public partial class MainWindow : Window
             usableHeight / (room.Height + (verbStrip ? LoomVerbArea.Height : 0)));
         _roomDisplayScale = Math.Max(0.1, _roomDisplayScale);
         RoomViewport.HorizontalScrollBarVisibility = normalSize
-            ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
+            ? ScrollBarVisibility.Hidden : ScrollBarVisibility.Disabled;
         RoomViewport.VerticalAlignment = VerticalAlignment.Center;
 
         RoomViewport.Width = visibleSourceWidth * _roomDisplayScale;
         RoomSceneSurface.Width = room.Width * _roomDisplayScale;
         RoomSceneSurface.Height = room.Height * _roomDisplayScale;
-        RoomViewport.Height = RoomSceneSurface.Height + (hasHorizontalScroll ? 17 : 0);
+        RoomViewport.Height = RoomSceneSurface.Height;
         VerbStripImage.Width = LoomVerbArea.Width * _roomDisplayScale;
         VerbStripImage.Height = LoomVerbArea.Height * _roomDisplayScale;
         VerbMessageOverlay.Width = VerbStripImage.Width;

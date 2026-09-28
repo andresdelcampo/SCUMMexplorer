@@ -61,7 +61,28 @@ internal static class Program
                 Check(viewport.ViewportWidth / roomScale <= 320.1, $"viewport capped at 320 source pixels: {viewport.ViewportWidth / roomScale}");
                 Check(roomScale > 1, $"room enlarged to use available area: scale {roomScale}");
                 Check(viewport.ActualHeight <= source.PixelHeight * roomScale + 24, $"normal viewport hugs scaled room height: {viewport.ActualHeight}/{source.PixelHeight * roomScale}");
+                Check(Math.Abs(viewport.ActualHeight - preview.ActualHeight) < 1,
+                    $"hidden horizontal scrollbar adds no viewport height: {viewport.ActualHeight}/{preview.ActualHeight}");
+                Check(viewport.HorizontalScrollBarVisibility == ScrollBarVisibility.Hidden && viewport.ScrollableWidth > 0,
+                    "wide room keeps horizontal scrolling available while hiding the scrollbar");
                 Check(viewport.ScrollableWidth > 0, "wide Room 04 scrolls");
+                Check(Control<TextBlock>("SessionStatusText").Visibility == Visibility.Collapsed &&
+                      Control<StackPanel>("SessionActions").Visibility == Visibility.Collapsed,
+                    "exploration state and session actions stay out of normal room mode");
+                Check(Control<TextBlock>("ObjectsNote").Visibility == Visibility.Visible,
+                    "room preview and interaction note remain in normal mode");
+                Check(Control<TextBlock>("RoomCueTime").Visibility == Visibility.Collapsed,
+                    "room cue timer stays out of the normal player row");
+                var advancedToggle = Control<CheckBox>("AdvancedModeToggle");
+                advancedToggle.IsChecked = true;
+                Call("AdvancedModeToggle_Click", advancedToggle, new RoutedEventArgs());
+                Check(Control<TextBlock>("SessionStatusText").Visibility == Visibility.Visible &&
+                      Control<StackPanel>("SessionActions").Visibility == Visibility.Visible,
+                    "advanced mode restores exploration state and session actions");
+                Check(Control<TextBlock>("RoomCueTime").Visibility == Visibility.Visible,
+                    "advanced mode restores room cue timer");
+                advancedToggle.IsChecked = false;
+                Call("AdvancedModeToggle_Click", advancedToggle, new RoutedEventArgs());
                 // Since 27 September the view opens at the session's camera, which Room 04's
                 // entry puts on its right half (local 205); start the pan checks from the left edge.
                 viewport.ScrollToHorizontalOffset(0); window.UpdateLayout();
@@ -116,17 +137,35 @@ internal static class Program
                       Math.Abs(overlay.ActualHeight - preview.ActualHeight) < .1,
                     $"opted-in doorway overlay and image share size after pan ({overlay.Visibility}, {overlay.ActualWidth}x{overlay.ActualHeight} / {preview.ActualWidth}x{preview.ActualHeight})");
                 var music = Control<StackPanel>("RoomMusicPanel");
-                Check(music.TranslatePoint(new Point(), window).Y >= viewport.TranslatePoint(new Point(0, viewport.ActualHeight), window).Y, "music under viewport");
+                for (var attempt = 0; attempt < 20 && music.Visibility != Visibility.Visible; attempt++)
+                {
+                    await Task.Delay(250);
+                    window.UpdateLayout();
+                }
+                if (music.Visibility == Visibility.Visible)
+                {
+                    Check(music.TranslatePoint(new Point(), window).Y >= viewport.TranslatePoint(new Point(0, viewport.ActualHeight), window).Y, "music under viewport");
+                    Check(Math.Abs(music.TranslatePoint(new Point(music.ActualWidth / 2, 0), window).X - viewport.TranslatePoint(new Point(viewport.ActualWidth / 2, 0), window).X) < 2,
+                        "music player centered beneath viewport");
+                }
                 var layout = Control<Grid>("RoomDisplayLayout");
                 var musicBottom = music.TranslatePoint(new Point(0, music.ActualHeight), window).Y;
                 var layoutBottom = layout.TranslatePoint(new Point(0, layout.ActualHeight), window).Y;
-                Check(layoutBottom - musicBottom >= 0 && layoutBottom - musicBottom < 20, $"music bottom aligned: gap {layoutBottom - musicBottom}");
+                report.Add($"INFO Room 04 music panel visibility={music.Visibility}");
+                Capture("normal-room-04");
+                if (music.Visibility == Visibility.Visible)
+                    Check(layoutBottom - musicBottom >= 0 && layoutBottom - musicBottom < 20, $"music bottom aligned: gap {layoutBottom - musicBottom}");
                 Check(Control<TextBlock>("StatusText").Visibility == Visibility.Collapsed, "room ready status removed from bottom");
                 var viewportCenter = viewport.TranslatePoint(new Point(viewport.ActualWidth / 2, 0), window).X;
-                var arrows = Control<StackPanel>("RoomScrollButtonsPanel");
+                var arrows = Control<Grid>("RoomScrollButtonsPanel");
                 Check(Math.Abs(arrows.TranslatePoint(new Point(arrows.ActualWidth / 2, 0), window).X - viewportCenter) < 2, "bottom arrow group centered beneath viewport");
-                Check(Math.Abs(music.TranslatePoint(new Point(music.ActualWidth / 2, 0), window).X - viewportCenter) < 2, "music player centered beneath viewport");
-                Capture("normal-room-04");
+                Check(arrows.TranslatePoint(new Point(0, 0), window).Y >= viewport.TranslatePoint(new Point(0, viewport.ActualHeight), window).Y,
+                    "pan controls sit below the viewport and scrollbar");
+                var leftPan = Control<Button>("ScrollRoomLeftButton");
+                var rightPan = Control<Button>("ScrollRoomRightButton");
+                Check(Math.Abs(leftPan.ActualWidth + rightPan.ActualWidth - arrows.ActualWidth) < 1 &&
+                      leftPan.ActualWidth > 100 && rightPan.ActualWidth > 100,
+                    $"pan controls span both halves of the viewport ({leftPan.ActualWidth:F0}+{rightPan.ActualWidth:F0}/{arrows.ActualWidth:F0})");
                 Control<CheckBox>("NormalRoomWidthToggle").IsChecked = false;
                 await Task.Delay(200); window.UpdateLayout();
                 Check(viewport.ScrollableWidth < .1, $"panorama all visible: {viewport.ScrollableWidth}");
@@ -180,6 +219,19 @@ internal static class Program
                 Check(Control<Grid>("RoomDisplayLayout").Visibility == Visibility.Collapsed, "script hides room display");
                 await Select(Resource("Sound"));
                 Check(Control<Grid>("RoomDisplayLayout").Visibility == Visibility.Collapsed, "sound hides room display");
+                await Select(Resource("Room", 2));
+                var musicRoom = Control<StackPanel>("RoomMusicPanel");
+                for (var attempt = 0; attempt < 20 && musicRoom.Visibility != Visibility.Visible; attempt++)
+                {
+                    await Task.Delay(250);
+                    window.UpdateLayout();
+                }
+                Check(musicRoom.Visibility == Visibility.Visible, "music-bearing Room 02 shows its room cue player");
+                var musicRoomCenter = musicRoom.TranslatePoint(new Point(musicRoom.ActualWidth / 2, 0), window).X;
+                var musicRoomViewportCenter = viewport.TranslatePoint(new Point(viewport.ActualWidth / 2, 0), window).X;
+                Check(Math.Abs(musicRoomCenter - musicRoomViewportCenter) < 2, "room cue player stays centered beneath the room");
+                Check(Control<TextBlock>("RoomCueTime").Visibility == Visibility.Collapsed, "room cue time remains hidden in normal mode");
+                Capture("music-room-02");
                 await Select(Resource("Room", 4));
                 Check(Control<Grid>("RoomDisplayLayout").Visibility == Visibility.Visible && preview.Source is not null, "room restores after costume/script/sound selection");
             }

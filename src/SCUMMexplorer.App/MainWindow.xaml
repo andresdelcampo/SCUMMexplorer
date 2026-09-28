@@ -1,4 +1,4 @@
-﻿<Window x:Class="SCUMMexplorer.App.MainWindow"
+<Window x:Class="SCUMMexplorer.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -24,6 +24,40 @@
         <Style x:Key="PanelSection" TargetType="Expander">
             <Setter Property="Foreground" Value="#E7E0D2"/>
             <Setter Property="Margin" Value="0,8,0,0"/>
+        </Style>
+        <Style x:Key="RoomPanButton" TargetType="Button">
+            <Setter Property="Background" Value="#1B2934"/>
+            <Setter Property="Foreground" Value="#E7E0D2"/>
+            <Setter Property="BorderBrush" Value="#334452"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Light"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="PanButtonChrome" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <Path Width="5" Height="9" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.5"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PanButtonChrome" Property="Background" Value="#273A48"/>
+                                <Setter Property="Foreground" Value="#F0C47D"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="PanButtonChrome" Property="Background" Value="#B78442"/>
+                                <Setter Property="Foreground" Value="#111820"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="PanButtonChrome" Property="Background" Value="#151F29"/>
+                                <Setter Property="Foreground" Value="#53616B"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     <Grid>
@@ -120,6 +154,16 @@
                                                    RenderOptions.BitmapScalingMode="NearestNeighbor" IsHitTestVisible="False"/>
                                         </Grid>
                                     </ScrollViewer>
+                                    <Grid x:Name="RoomScrollButtonsPanel" Width="{Binding ActualWidth, ElementName=RoomViewport}" Height="24"
+                                          HorizontalAlignment="Center" Margin="0,0,0,4" Visibility="Collapsed">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <Button x:Name="ScrollRoomLeftButton" Grid.Column="0" Tag="M 5,0 L 0,4.5 L 5,9" ToolTip="Scroll room left" AutomationProperties.Name="Scroll room left"
+                                                Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                                LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,1,0" BorderBrush="#334452"/>
+                                        <Button x:Name="ScrollRoomRightButton" Grid.Column="1" Tag="M 0,0 L 5,4.5 L 0,9" ToolTip="Scroll room right" AutomationProperties.Name="Scroll room right"
+                                                Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                                LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,0,0" BorderBrush="#334452"/>
+                                    </Grid>
                                     <StackPanel x:Name="VerbStripPanel" Visibility="Collapsed" HorizontalAlignment="Center" Margin="0,2,0,0">
                                         <Border Background="#000000" BorderBrush="#334452" BorderThickness="0,1,0,0" HorizontalAlignment="Center">
                                             <Grid>
@@ -162,24 +206,14 @@
                                         </Expander>
                                     </StackPanel>
                                 </StackPanel>
-                                <StackPanel x:Name="RoomScrollButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6" Visibility="Collapsed">
-                                    <Button x:Name="ScrollRoomLeftButton" Content="←" ToolTip="Scroll room left" AutomationProperties.Name="Scroll room left"
-                                            Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
-                                            LostMouseCapture="PanButton_LostMouseCapture" Width="34" Height="27" Margin="0,0,5,0"
-                                            Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                    <Button x:Name="ScrollRoomRightButton" Content="→" ToolTip="Scroll room right" AutomationProperties.Name="Scroll room right"
-                                            Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
-                                            LostMouseCapture="PanButton_LostMouseCapture" Width="34" Height="27"
-                                            Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                </StackPanel>
                                 <StackPanel x:Name="RoomMusicPanel" Visibility="Collapsed" HorizontalAlignment="Center" MaxWidth="720">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <TextBlock Text="MUSIC" Style="{StaticResource PanelHeading}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                         <Button x:Name="RoomCuePlayButton" Content="▶" ToolTip="Play room cue" AutomationProperties.Name="Play room cue" Click="RoomCuePlay_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         <Button x:Name="RoomCuePauseButton" Content="Ⅱ" ToolTip="Pause room cue" AutomationProperties.Name="Pause room cue" Click="RoomCuePause_Click" Width="28" Height="24" Margin="0,0,3,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         <Button x:Name="RoomCueStopButton" Content="■" ToolTip="Stop room cue" AutomationProperties.Name="Stop room cue" Click="RoomCueStop_Click" Width="28" Height="24" Margin="0,0,7,0" Padding="0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                        <TextBlock x:Name="RoomCueTitle" Width="220" Foreground="#E7E0D2" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                                        <TextBlock x:Name="RoomCueTime" Text="0:00 / 0:00" Foreground="#B8AA8C" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock x:Name="RoomCueTitle" MaxWidth="220" Foreground="#E7E0D2" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="RoomCueTime" Text="0:00 / 0:00" Visibility="Collapsed" Foreground="#B8AA8C" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                         <TextBlock x:Name="RoomCueEvidence" Visibility="Collapsed" Foreground="#B8AA8C" FontSize="11"/>
                                         <TextBlock x:Name="RoomCueStatus" Visibility="Collapsed" Foreground="#B8AA8C" FontSize="11"/>
                                         <Button x:Name="RoomMusicMoreButton" Content="Other possible music" Visibility="Collapsed"
