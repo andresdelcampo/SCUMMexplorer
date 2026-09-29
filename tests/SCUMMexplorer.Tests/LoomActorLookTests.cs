@@ -144,4 +144,37 @@ public sealed class LoomActorLookTests
         Assert.Equal(9, flight.Length);
         Assert.All(flight, actor => Assert.Equal((11, 80), (actor.Room, actor.Look.Costume)));
     }
+
+    [Theory]
+    [InlineData(37)]
+    [InlineData(41)]
+    [InlineData(8)]
+    public void ACatalogVisitGivesTheEgoTheSizeOfItsAssumedRoute(int before)
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == before));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 2));
+
+        // Room 02's entry passes var[0x07C] to script 017; the assumed arrival (Room 03 object 160) came through
+        // Room 03, whose entry sets size 2 (+0x001E): costume var[0x079] = 3, whatever room was shown before.
+        Assert.Equal(3, session.Actors[0].Look.Costume);
+        Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("var[0x07C]") && line.Contains("Room 03 entry"));
+    }
+
+    [Fact]
+    public void LeavingTheTrialForRoom02EndsTheSceneBeforeTheEntry()
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 8));
+        session.ActivateObjectVerb(255, 0x38);
+        for (var frame = 0; frame < 1200; frame++) session.AdvanceFrame();
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 2));
+
+        // With the cutscene ended first (bit[0xD6E] = 0), Room 02's entry runs script 017 (+0x0052) and gives the small costume.
+        Assert.Equal(3, session.Actors[0].Look.Costume);
+    }
 }

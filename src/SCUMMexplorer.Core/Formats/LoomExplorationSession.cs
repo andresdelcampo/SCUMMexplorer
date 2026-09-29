@@ -413,11 +413,11 @@ public sealed class LoomExplorationSession
             return EnterRoom(room, $"{reachedAction.Evidence} The explorer's input (assumed) went on through the game's own scripts; walks were taken to end at once.", reachedAction.ReachedRoomLoad);
         if (reachedAction is not null)
             return EnterRoom(room, $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction.ReachedRoomLoad);
+        // The scenes end before the room is entered, so its entry runs outside a cutscene (bit[0xD6E] = 0): LOOM's
+        // entries skip the ego's costume size (script 017) and their walk-box watchers while a cutscene is open.
         var closedScenes = CloseScenesForCatalogVisit(room.ResourceId.Value);
-        var snapshot = CatalogEnter(room);
-        if (closedScenes.Count == 0) return snapshot;
-        EndClosedScenes(room.ResourceId.Value, closedScenes);
-        return Snapshot;
+        if (closedScenes.Count > 0) EndClosedScenes(room.ResourceId.Value, closedScenes);
+        return CatalogEnter(room);
     }
 
     private LoomSessionSnapshot CatalogEnter(GameResource room)
@@ -431,6 +431,7 @@ public sealed class LoomExplorationSession
         _runtime.Actors.Forget(ego, assumed is null
             ? $"Room {room.ResourceId:00} was selected from the catalog, and no decoded loadRoomWithEgo, or loadRoom followed by putting the ego in the room, with literal operands brings the ego into it, so where the ego would arrive is unknown"
             : $"Room {room.ResourceId:00} was selected from the catalog, so where the ego stood before its assumed arrival is unknown");
+        if (chosen is not null) EstimateEgoSize(room.ResourceId.Value, chosen);
         return EnterRoom(room, label is null ? arrival : $"{arrival} {label}", assumed, label,
             chosen is { IsLoadRoomWithEgo: false } ? chosen : null);
     }
@@ -440,7 +441,7 @@ public sealed class LoomExplorationSession
     /// go on loading their own rooms, and input (off since the cutscene start script, script 002's
     /// <c>cursorCommand userInputSoftOff</c>) would stay off in the chosen room, so no click would be read. The session
     /// stops the script that began each open cutscene (innermost first) before the room is entered, and
-    /// <see cref="EndClosedScenes"/> then ends them. Returns each closed cutscene's data and its script, or nothing
+    /// <see cref="EndClosedScenes"/> then ends them before the room is entered. Returns each closed cutscene's data and its script, or nothing
     /// when no cutscene is open.
     /// </summary>
     private List<(ushort Data, string Script)> CloseScenesForCatalogVisit(int roomId)
@@ -466,7 +467,7 @@ public sealed class LoomExplorationSession
 
     /// <summary>
     /// Ends the cutscenes a catalog visit closed as <c>endCutscene</c> would (ScummVM: <c>VAR_OVERRIDE</c> = 0, then the
-    /// script in <c>VAR_CUTSCENE_END_SCRIPT</c> with the cutscene's data), after the chosen room is entered: LOOM's
+    /// script in <c>VAR_CUTSCENE_END_SCRIPT</c> with the cutscene's data), before the chosen room is entered: LOOM's
     /// script 003 turns the cursor and input back on, unfreezes the scripts and makes the camera follow the ego.
     /// An explorer action, labelled as such.
     /// </summary>
@@ -542,6 +543,67 @@ public sealed class LoomExplorationSession
         static string Sources(LoomEgoArrival[] group) =>
             string.Join(" or ", group.Select(item => $"{item.Source} +0x{item.Offset:X4}")) + $" ({group[0].DescribePlacement()})";
     }
+
+    /// <summary>
+    /// LOOM's script 017 gives the ego one of three costume sizes: <c>startScript 0x11, [n]</c> sets
+    /// <c>var[0x07C]</c> = n and the costume from <c>var[0x077..0x079]</c> (decoded). Most room entries pass a
+    /// literal size; Rooms 02, 15, 17, 18, 22, 23, 24 and 36 pass <c>var[0x07C]</c>, the size the ego had in the room
+    /// it came from. A catalog visit skips that room, so the size left by the room shown before is not the route's.
+    /// The route the assumed arrival stands for passed through its source room, whose entry set the size: that
+    /// size (followed back through rooms that pass <c>var[0x07C]</c> on) is taken as an estimate. A global script's
+    /// arrival takes the size its own code set before the room load. With no literal size on the route, the kept
+    /// value is labelled as unknown.
+    /// </summary>
+    private void EstimateEgoSize(int roomId, LoomEgoArrival arrival)
+    {
+        if (_game.Id != GameId.Loom) return;
+        var index = LoomEgoArrivalIndex.For(_game, _globalScriptCount);
+        var starts = index.StartsOf(EgoSizeScript).ToArray();
+        // Only rooms whose entry keeps the size of the room before read it; the others set their own.
+        if (!starts.Any(item => item.IsRoomEntry && item.SourceRoom == roomId && item.FirstArgument == EgoSizeVariable)) return;
+        var (size, how) = SizeOnRoute(arrival);
+        _runtime.EstimatedVariables.Add(EgoSizeVariable);
+        if (size is int value)
+        {
+            _runtime.GlobalVariables[EgoSizeVariable] = (ushort)value;
+            _visitTrace.Add($"catalog visit to Room {roomId:00}: {EgoSizeVariable} = {value} (estimate, {how})");
+            _uncertainties.Add($"Room {roomId:00} was selected from the catalog: the ego's size ({EgoSizeVariable}, script {EgoSizeScript:000}) is estimated as {value} from the assumed arrival's route: {how}.");
+        }
+        else
+            _uncertainties.Add($"Room {roomId:00} was selected from the catalog: no literal size for the ego ({EgoSizeVariable}, script {EgoSizeScript:000}) is on the assumed arrival's route, so the size left by the room shown before is kept and is unknown.");
+
+        (int? Size, string How) SizeOnRoute(LoomEgoArrival first)
+        {
+            // The arrival's own code first (the size it set before the load), then the entries of the rooms it came through.
+            var own = starts.Where(item => item.Source == first.Source && item.Offset < first.Offset && Literal(item) is not null)
+                .OrderByDescending(item => item.Offset).FirstOrDefault();
+            if (own is not null) return (Literal(own), $"{own.Source} +0x{own.Offset:X4} startScript {EgoSizeScript:000}, [{own.FirstArgument}] before the load");
+            var queue = new Queue<(int Room, string Path)>();
+            var seen = new HashSet<int> { roomId };
+            if (first.SourceRoom is int source && seen.Add(source)) queue.Enqueue((source, $"the route came through Room {source:00}"));
+            while (queue.Count > 0)
+            {
+                var (room, path) = queue.Dequeue();
+                var entry = starts.FirstOrDefault(item => item.IsRoomEntry && item.SourceRoom == room);
+                if (entry is null) continue;
+                if (Literal(entry) is int literal)
+                    return (literal, $"{path}, whose entry sets it (Room {room:00} entry +0x{entry.Offset:X4} startScript {EgoSizeScript:000}, [{entry.FirstArgument}])");
+                if (entry.FirstArgument != EgoSizeVariable) continue;
+                foreach (var before in index.Into(room))
+                    if (before.SourceRoom is int earlier && seen.Add(earlier))
+                        queue.Enqueue((earlier, $"{path}, which keeps the size of the room before it; a route came through Room {earlier:00}"));
+            }
+            return (null, "");
+        }
+
+        static int? Literal(LoomScriptStart start) =>
+            start.FirstArgument is { } argument && argument.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
+            int.TryParse(argument.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value) ? value : null;
+    }
+
+    /// <summary>LOOM's script 017 (the ego's costume size) and the size it keeps (decoded).</summary>
+    private const int EgoSizeScript = 0x11;
+    private const string EgoSizeVariable = "var[0x07C]";
 
     /// <summary>ScummVM <c>VAR_EGO</c>.</summary>
     private const string EgoVariable = "var[0x001]";

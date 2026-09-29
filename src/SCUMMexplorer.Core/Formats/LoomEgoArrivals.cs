@@ -67,6 +67,9 @@ public sealed record LoomEgoArrival(int TargetRoom, int ObjectId, int WalkX, int
     public string Describe() => $"{Source} +0x{Offset:X4} ({DescribePlacement()})";
 }
 
+/// <summary>A decoded <c>startScript</c> with a literal script number and the text of its first argument.</summary>
+public sealed record LoomScriptStart(string Source, int? SourceRoom, bool IsRoomEntry, int Offset, int Script, string? FirstArgument);
+
 /// <summary>
 /// Every decoded <c>loadRoomWithEgo</c> with a literal object and room, and every
 /// literal <c>loadRoom</c> that straight-line code follows with
@@ -83,12 +86,19 @@ public sealed class LoomEgoArrivalIndex
         @"^0x(?<object>[0-9A-Fa-f]+), 0x(?<room>[0-9A-Fa-f]+), walkTo=\((?<x>-?\d+), (?<y>-?\d+)\)$",
         RegexOptions.CultureInvariant);
     private readonly Dictionary<int, List<LoomEgoArrival>> _byRoom = [];
+    private readonly List<LoomScriptStart> _starts = [];
 
     private LoomEgoArrivalIndex() { }
 
     /// <summary>The literal arrivals into <paramref name="room"/>, in source order.</summary>
     public IReadOnlyList<LoomEgoArrival> Into(int room) =>
         _byRoom.TryGetValue(room, out var list) ? list : [];
+
+    /// <summary>
+    /// The literal <c>startScript</c>s of <paramref name="script"/> in the same code as the arrivals: global scripts,
+    /// room entry, exit and local scripts, and object verbs, in source order.
+    /// </summary>
+    public IEnumerable<LoomScriptStart> StartsOf(int script) => _starts.Where(item => item.Script == script);
 
     public static LoomEgoArrivalIndex For(GameLibrary game, int globalScriptCount)
     {
@@ -116,6 +126,11 @@ public sealed class LoomEgoArrivalIndex
             for (var i = 0; i < instructions.Count; i++)
             {
                 var instruction = instructions[i];
+                if (instruction.Operation == "startScript" && StartOf(instruction, source, sourceRoom) is { } start)
+                {
+                    index._starts.Add(start);
+                    continue;
+                }
                 if (instruction.Operation == "loadRoom")
                 {
                     if (FollowLoadRoom(instructions, i, source, sourceRoom) is { } followed) found.Add(followed);
@@ -173,6 +188,19 @@ public sealed class LoomEgoArrivalIndex
             list.Add(arrival);
         }
         return index;
+    }
+
+    private static LoomScriptStart? StartOf(LoomScriptInstruction instruction, string source, int? sourceRoom)
+    {
+        var operands = instruction.Operands;
+        var open = LoomBoundedScriptExecutor.ArgumentListStart(operands);
+        var head = (open < 0 ? operands : operands[..open]).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (head.Length == 0 || LiteralValue(head[0]) is not int script) return null;
+        string? first = null;
+        var close = operands.LastIndexOf(']');
+        if (open >= 0 && close > open)
+            first = operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        return new LoomScriptStart(source, sourceRoom, source.EndsWith(" entry", StringComparison.Ordinal), instruction.Offset, script, first);
     }
 
     private static readonly Regex Literal = new(@"^0x(?<value>[0-9A-Fa-f]+)$", RegexOptions.CultureInvariant);
