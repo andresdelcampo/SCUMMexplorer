@@ -3,32 +3,32 @@ Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md firs
 State at the start:
 
 * Git: master. The latest commits:
-  * the next-session prompt after the text line;
-  * 56c4c51 "Show the game's text line above the room";
-  * d7a7716 "Play the sounds scripts start while a cutscene plays".
+  * the next-session prompt after the depth masks;
+  * fec9709 "Hide actors behind the room's depth mask";
+  * 0628511 "Draw whole the first line that starts on the text line".
 * Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code (the room music code in MainWindow: `UpdateRoomMusicActions`, `PlayRoomCueAsync`, `_audioPlayer` and the room cue handlers). If `git status` shows their uncommitted changes (on 29 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
-* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 230/230 (29 Sep; no Core change last session).
-* RoomAudit: 0 gaps in all 76 rooms (not rerun: no Core change). Blockers: the only real stops left are `expression` (3) (.verification/frame-timing/blockers-after.txt).
-* WPF checks (29 Sep): SceneSoundCheck 0 (new); TextLineCheck 0 (new); CutsceneLayoutCheck 0; VerbAreaCheck 0 (its expected scale now counts the text line); PresentationCheck 0; CameraPanCheck 0. Before the text line: FirewoodPlaybackCheck 0, GameTextsCutsceneCheck 0, OpeningPlaybackCheck 0, CutscenePlaybackCheck 0, DoorwayClickCheck 16/16. Not run since M3a: MessageAppCheck, ClickInputCheck.
-* Worktrees: `.claude/worktrees/awesome-jones-7f0c2d` was last session's (junctions to Games/ and scummvm/). The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
+* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 233/233 (29 Sep).
+* RoomAudit: 0 gaps in all 76 rooms (not rerun: the changes touched messages and actors only). Blockers: the only real stops left are `expression` (3) (.verification/frame-timing/blockers-after.txt).
+* WPF checks (29 Sep): ActorDrawCheck 0 (with depth masks); TextLineCheck 0 (new sword step); SceneSoundCheck 0; CutsceneLayoutCheck 0; VerbAreaCheck 0; PresentationCheck 0; CameraPanCheck 0. Earlier: FirewoodPlaybackCheck 0, GameTextsCutsceneCheck 0, OpeningPlaybackCheck 0, CutscenePlaybackCheck 0, DoorwayClickCheck 16/16. Not run since M3a: MessageAppCheck, ClickInputCheck.
+* Worktrees: `.claude/worktrees/quizzical-colden-676019` was last session's (junctions to Games/ and scummvm/). The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
 
 Done last session:
 
-* Sound in cutscenes (.verification/cutscene-sound/validation.md): a separate `SceneSoundPlayer` (src/SCUMMexplorer.App/SceneSoundPlayer.cs) follows the session's `SoundEvents` on the playback clock (`PlaybackStep` calls `Update()`; `FinishPlayback` flushes; `PlayOpening`/`PlayKnownCutscene` call `Attach` right after building their session; pause/resume; it stops on reset, game load, mode off and when the app's own `_audioPlayer` opens a sound). Music plays as the AdLib rendition; the game's AdLib sound effects (ScummVM `Player_AD` sfx) are not decoded, so effects play as the PC speaker rendition (presentation). The opening starts sound 25; the trial 31, the notes 8/4/5/1, the cues 23/16/17 and 25; Room 37's entry 27. The user was asked to listen; no answer yet.
-* The user picked "text position" next. Checked against ScummVM: messages go where their slot says; the trial's lines are at y 152 (script 046 +0x002F), in the verb screen as in the game. What was missing was the text line (rows 0–15), where Room 41's lines start (script 016 with y 12). The interactive mode now keeps the text line above the room (`TextLinePanel`, `TextLineMessageOverlay`, `TextLineShown()`), draws text there, and the text line, room and verb screen touch with no gap (.verification/text-line/validation.md). ScummVM clips a glyph at the text screen's row 15, so Room 41's line at y 12 shows its top 4 rows: worth checking in ScummVM.
+* The user's answers (29 Sep): the cutscene sound is fine (AdLib music; PC speaker effects accepted). The conversations at y 152 in the verb area are the game's position and look good (the distaff goes away and the text shows). Most rooms' descriptions at the top of the picture (y 16) are fine.
+* Whole first lines on the text line (.verification/text-line/validation.md, follow-up section): the sword in Room 41 (object 634 verb 0x36) showed only its second line, because ScummVM clips a line starting at y 12 at the text screen's row 15. `LoomMessageRenderer.PrintChar` now lets a text-screen line run on into the room (reading of the original, labelled; the user chose it).
+* Depth masks (.verification/depth-masks/validation.md): object images' masks are decoded (`RoomObjectImage.Mask`), `RoomObjectSelection.ComposeDepthMask` builds plane 1 (room mask, then each drawn object's mask in paint order), and `LoomActorRenderer.Render(…, depthMask, boxes)` hides actor pixels when the actor's walk box mask (`LoomWalkBoxSet.GetMask`, 1 for box 255) is 1. Bobbin walks behind Room 02's foliage. Not yet compared with the running ScummVM.
 
 The user's issue list (29 Sep):
 
-* (done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons; no music or sound in cutscenes; text position (the text line).
+* (done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons; no music or sound in cutscenes; text position (the text line); the forge's first lines; depth masks.
 * Hetchel flies as a human instead of a swan.
-* Bobbin floats on top of the background: no depth (priority masks, M2c).
 * After the distaff shows the open spell, the notes keep their shine and colour in the verb area.
 * Spells cannot be cast with keys.
 
 Tasks, in order:
 
-1. Ask the user how the cutscene sound sounds (the opening, the trial) and whether the text line looks right (Room 41; the trial's text under the picture). Fix what they report first. If they want the game's AdLib effects instead of the PC speaker ones, that is ScummVM `Player_AD`'s sfx path (`players/player_ad.cpp`): a separate task; ask before starting.
-2. Ask the user which of the remaining issues comes next (Hetchel as the swan, depth masks, distaff shine, keys for spells), with a recommendation (depth masks change the most rooms; Hetchel is likely one costume or actor setup). Check each against ScummVM before changing anything.
+1. Ask the user whether the depth masks look right in the app (Room 02's path, other rooms they visit) and whether the forge's two-line texts now read well. Fix what they report first. If they can, compare Room 02's path in ScummVM (see the tooling notes).
+2. Ask the user which of the remaining issues comes next (Hetchel as the swan, distaff shine, keys for spells), with a recommendation (Hetchel is likely one costume or actor setup; keys for spells changes how the user plays). Check each against ScummVM before changing anything.
 3. Why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit: trace script 006's walk and sentence (session probe); if the click can work, use it in the 086 entry.
 4. More known cutscenes with text, each verified by a harness like FirewoodPlaybackCheck.
 
@@ -88,4 +88,6 @@ Tooling notes:
 * The layout counts 16 text-line rows in the interactive LOOM mode (`UpdateRoomViewportLayout`): a harness that computes the expected room scale must add them when `TextLinePanel` is visible.
 * ScummVM text placement: `displayDialog` (string.cpp) sets `_charset->_top = ypos`; `CharsetRendererV3::printChar` (charset.cpp) draws into `findVirtScreen(_top)`, clipped at that screen's bottom for the one-buffer screens (text, verb).
 * Python edits of docs: a helper `edit(path, [(old, new)])` in %TEMP%\edit.py keeps line endings and BOM; put non-ASCII or backslash-heavy text in a file written with the Write tool and read it from python, rather than in a heredoc.
-* The session tokens were at 243K when the last session stopped (weekly limit 87%).
+* ActorDrawCheck (.verification/actor-draw): `<Games\loom> <output folder>`, about 60 s; its Room 02 click into box 4 shows the depth mask (Bobbin behind the foliage). The mask composition runs on every actor-layer update (`UpdateActorLayer` calls `_objectSelection.ComposeDepthMask`).
+* Box masks per room: `LoomWalkBoxReader.Read(roomBytes).Boxes[i].Mask`. Close-up rooms (53–87) have one box with mask 0.
+* The session tokens were at 218K when the last session stopped (5-hour limit 81%, weekly limit 89%).
