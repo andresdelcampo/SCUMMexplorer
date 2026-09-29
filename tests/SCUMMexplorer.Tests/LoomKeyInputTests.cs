@@ -137,6 +137,7 @@ public sealed class LoomKeyInputTests
         Assert.True(session.InCutscene);
 
         // Before +0x00C6 beginOverride, abortCutscene has nothing to jump to.
+        Assert.False(session.CutsceneSkippable);
         var early = session.PressKey(0x1B);
         Assert.Contains(early.Uncertainties, line => line.Contains("the open cutscene has no override set", StringComparison.Ordinal));
         Assert.Contains(early.Uncertainties, line => line.Contains("did not reach the input script after abortCutscene, because user input is off", StringComparison.Ordinal));
@@ -146,8 +147,10 @@ public sealed class LoomKeyInputTests
         for (var frame = 0; frame < 40 && session.Snapshot.RoomId != 11; frame++) session.AdvanceFrame();
         Frames(session, 20);
         Assert.Equal(11, session.Snapshot.RoomId);
+        Assert.True(session.CutsceneSkippable);
         var from = session.SessionTrace.Count;
         session.PressKey(0x1B);
+        Assert.False(session.CutsceneSkippable);
         Assert.True(Traced(session, from, "abortCutscene: Script 52 continues at its skip jump +0x00C8, var[0x005] = 1"));
         Assert.Equal((ushort)1, Var(session, "var[0x005]"));
 

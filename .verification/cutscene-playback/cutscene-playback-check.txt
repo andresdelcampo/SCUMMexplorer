@@ -1,0 +1,44 @@
+﻿Real MainWindow; the playback controls are called as the buttons and keys call them, on the playback clock. No physical input.
+PASS Room 02 after the boot: the playback bar is shown; pause and skip are off with nothing playing
+PASS Pause holds the frames: VAR_TIMER_TOTAL did not move in 1 s, and the button says Play
+PASS Continue ▸ while paused plays one frame: 4023 → 4029 jiffies (one frame is 6), still paused
+PASS Play goes on
+1. Script 052 from its stated start, played through:
+           0 ms: status "Playing Script 052: Room 10 → Room 11 → Room 13 from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+        1697 ms: session Room 10, view Room 10, cutscene True, skippable False, playing True
+        5872 ms: session Room 11, view Room 11, cutscene True, skippable False, playing True
+        7110 ms: session Room 11, view Room 11, cutscene True, skippable True, playing True
+       33353 ms: session Room 13, view Room 13, cutscene False, skippable False, playing True
+       33353 ms: text "Drawn Script 18 +0x00B7:  | Drawn Script 18 +0x00C4: _ | Drawn Script 18 +0x00D1: ` | Drawn Script 18 +0x00FE:  | Drawn Script 18 +0x010B: _ | Drawn Script 18 +0x0118: ` | Drawn Script 18 +0x0145:  | Drawn Script 18 +0x0152: _ | Drawn Script 18 +0x015F: ` | Drawn Script 18 +0x018C:  | Drawn Script 18 +0x0199: _ | Drawn Script 18 +0x01A6: ` | Drawn Script 18 +0x01D3:  | Drawn Script 18 +0x01E0: _ | Drawn Script 18 +0x01ED: ` | Drawn Script 18 +0x021A:  | Drawn Script 18 +0x0227: _ | Drawn Script 18 +0x0234: ` | Drawn Script 18 +0x0261:  | Drawn Script 18 +0x026E: _ | Drawn Script 18 +0x027B: ` | Drawn Script 18 +0x02A8:  | Drawn Script 18 +0x02B5: < | Drawn Script 18 +0x02C2: ="
+       37471 ms: playback ended; status "Object 295's verb 0x38 (run directly) sent to the game: entered Room 13"
+      paused: button "▶ Play", timer total 4023 → 4023 jiffies in 1 s, playing False
+PASS the view shows Room 10, then Room 11 at 5872 ms
+PASS the delay holds Room 10 for at least 1 s before Room 11 (5872 ms)
+PASS no talk text in Rooms 10 and 11, as script 052 prints none (1 text changes, listed above)
+PASS actors are drawn in Room 11 (rooms with actors drawn: 10, 11, 13)
+PASS the playback ends in Room 13 with the cutscene over (view Room 13) after 37471 ms
+2. Script 052 again, Escape once skippable:
+           0 ms: status "Playing Script 052: Room 10 → Room 11 → Room 13 from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+         804 ms: session Room 10, view Room 10, cutscene True, skippable False, playing True
+        4958 ms: session Room 11, view Room 11, cutscene True, skippable False, playing True
+        5296 ms: session Room 11, view Room 11, cutscene True, skippable True, playing True
+        6831 ms: session Room 11, view Room 11, cutscene True, skippable False, playing True
+        6978 ms: session Room 13, view Room 13, cutscene False, skippable False, playing True
+        6978 ms: text "Drawn Script 18 +0x00B7:  | Drawn Script 18 +0x00C4: _ | Drawn Script 18 +0x00D1: ` | Drawn Script 18 +0x00FE:  | Drawn Script 18 +0x010B: _ | Drawn Script 18 +0x0118: ` | Drawn Script 18 +0x0145:  | Drawn Script 18 +0x0152: _ | Drawn Script 18 +0x015F: ` | Drawn Script 18 +0x018C:  | Drawn Script 18 +0x0199: _ | Drawn Script 18 +0x01A6: ` | Drawn Script 18 +0x01D3:  | Drawn Script 18 +0x01E0: _ | Drawn Script 18 +0x01ED: ` | Drawn Script 18 +0x021A:  | Drawn Script 18 +0x0227: _ | Drawn Script 18 +0x0234: ` | Drawn Script 18 +0x0261:  | Drawn Script 18 +0x026E: _ | Drawn Script 18 +0x027B: ` | Drawn Script 18 +0x02A8:  | Drawn Script 18 +0x02B5: < | Drawn Script 18 +0x02C2: ="
+       11194 ms: playback ended; status "Object 295's verb 0x38 (run directly) sent to the game: entered Room 13"
+PASS Skip is off until the cutscene sets its override (+0x00C6 in Room 11)
+PASS Escape at 6796 ms skips to Room 13 at 6978 ms (played through: 33352 ms)
+PASS the session trace shows abortCutscene at script 052's skip jump
+PASS the skipped playback ends in Room 13: view Room 13
+3. Script 046 (the Elders' trial), Escape after its first talk text:
+           0 ms: status "Playing Script 046: the Elders' trial from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+         818 ms: session Room 08, view Room 08, cutscene True, skippable False, playing True
+         905 ms: session Room 08, view Room 08, cutscene True, skippable True, playing True
+        9206 ms: text "Talk Script 46 +0x002F: Parece que los Ancianos están ocupados."
+       10051 ms: session Room 08, view Room 08, cutscene True, skippable False, playing True
+       10191 ms: session Room 09, view Room 09, cutscene True, skippable False, playing True
+       10398 ms: session Room 09, view Room 09, cutscene False, skippable False, playing True
+       11956 ms: playback ended; status "Object 255's verb 0x38 (run directly) sent to the game: entered Room 09"
+PASS the trial shows talk text in the game's font before the skip
+PASS the trial skips at 10020 ms and its playback ends in Room 09 after 11956 ms
+Failures: 0

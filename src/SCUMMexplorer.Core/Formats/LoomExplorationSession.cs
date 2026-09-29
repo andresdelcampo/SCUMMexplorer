@@ -1784,6 +1784,15 @@ public sealed class LoomExplorationSession
     /// <c>VAR_OVERRIDE</c> = 1, and the override is cleared. With no override it
     /// does nothing. Returns what happened, for the key's label.
     /// </summary>
+    /// <summary>
+    /// True when Escape would skip now (ScummVM <c>processKeyboard</c> → <c>abortCutscene</c>): <c>VAR_CUTSCENEEXIT_KEY</c>
+    /// is set, and the open cutscene has an override (<c>beginOverride</c>) whose script waits for a later frame.
+    /// Before a cutscene reaches its <c>beginOverride</c> (script 052 sets it at +0x00C6, in Room 11), Escape does nothing.
+    /// </summary>
+    public bool CutsceneSkippable =>
+        _runtime.GlobalVariables.TryGetValue(CutsceneExitKeyVariable, out var exitKey) && exitKey != 0 &&
+        _overrides.TryGetValue(_cutscenes.Count, out var point) && _pending.Any(item => item.Frame == point.Frame);
+
     private string AbortCutscene()
     {
         var depth = _cutscenes.Count;

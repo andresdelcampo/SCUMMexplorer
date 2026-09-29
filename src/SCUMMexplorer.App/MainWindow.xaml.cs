@@ -800,6 +800,7 @@ public partial class MainWindow : Window
                 ? "A script may be waiting for the next frame."
                 : string.Join(Environment.NewLine, snapshot.Uncertainties.TakeLast(8));
             AdvanceFrameButton.IsEnabled = snapshot.PendingScripts > 0;
+            UpdatePlaybackControls();
             ObjectsNote.Text = _estimatedObjectIds.Count == 0
                 ? "Click the scene to explore it. Hover to discover objects and exits."
                 : $"Some scene details are previews; the game state remains unresolved ({_estimatedObjectIds.Count} details).";
@@ -813,6 +814,7 @@ public partial class MainWindow : Window
         SessionStatusText.ToolTip = null;
         RoomEntryTraceExpander.Header = "Advanced room details";
         AdvanceFrameButton.IsEnabled = false;
+        UpdatePlaybackControls();
         _objectSelection = new RoomObjectSelection(images, _indexedStates, background: _currentRoom);
         _artworkEstimates = [];
         ObjectsNote.Text = images.Count == 0
@@ -971,6 +973,11 @@ public partial class MainWindow : Window
 
     private void AdvanceFrame_Click(object sender, RoutedEventArgs e)
     {
+        if (_playbackPaused)
+        {
+            StepPausedPlayback();
+            return;
+        }
         StopScenePlayback();
         AdvanceOneFrame();
     }
@@ -1780,6 +1787,23 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // Playback controls in the explore mode, with or without "Keys as game input": Escape skips a cutscene
+        // (abortCutscene, as the game's key does) and space pauses or plays the scene (the game's pause key).
+        if (GameClickActive && Keyboard.FocusedElement is not (TextBox or ComboBox) && Keyboard.Modifiers == ModifierKeys.None)
+        {
+            if (e.Key == Key.Escape && _session!.InCutscene)
+            {
+                e.Handled = true;
+                SkipCutscene();
+                return;
+            }
+            if (e.Key == Key.Space && _playback is not null)
+            {
+                e.Handled = true;
+                PlaybackPause_Click(this, new RoutedEventArgs());
+                return;
+            }
+        }
         if (!GameKeysActive) return;
         // F10 arrives as a system key.
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
@@ -2516,6 +2540,12 @@ public partial class MainWindow : Window
         IReadOnlyList<LoomRoomObjectRecord>? doorways = null)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
+        if (_playbackPaused)
+        {
+            StatusText.Text = $"{what} not sent: the scene is paused. Play (or space) goes on.";
+            StatusText.ToolTip = null;
+            return false;
+        }
         var playing = PlaybackRunning;
         var sceneBefore = (_session.CutscenesBegun, _session.EgoPuts);
         var action = send();
@@ -2649,6 +2679,7 @@ public partial class MainWindow : Window
             SceneBefore = sceneBefore ?? (_session?.CutscenesBegun ?? 0, _session?.EgoPuts ?? 0)
         };
         _playbackRequestedRoom = null;
+        _playbackPaused = false;
         if (_playInstantly || instant)
         {
             _playbackTimer?.Stop();
@@ -2661,14 +2692,11 @@ public partial class MainWindow : Window
             FinishPlayback();
             return;
         }
-        if (_playbackTimer is null)
-        {
-            _playbackTimer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
-            _playbackTimer.Tick += PlaybackTimer_Tick;
-        }
+        _playbackTimer ??= CreatePlaybackTimer();
         _playbackTimer.Interval = PlaybackFrameInterval();
         if (!_playbackTimer.IsEnabled) _playbackTimer.Start();
         ShowPlaybackFrame();
+        UpdatePlaybackControls();
     }
 
     /// <summary>Stops the clock where it is (the user interrupted); nothing more is played.</summary>
@@ -2676,6 +2704,156 @@ public partial class MainWindow : Window
     {
         _playbackTimer?.Stop();
         _playback = null;
+        _playbackPaused = false;
+        UpdatePlaybackControls();
+    }
+
+    // ---- Playback controls (M3c) ----------------------------------------------
+
+    // True while the user paused a playback: its frames wait, and nothing else is sent to the game.
+    private bool _playbackPaused;
+
+    /// <summary>Pauses the playback clock where it is; <see cref="ResumeScenePlayback"/> goes on from the same frame.</summary>
+    private void PauseScenePlayback()
+    {
+        if (_playback is null || _playbackPaused) return;
+        _playbackTimer?.Stop();
+        _playbackPaused = true;
+        StatusText.Text = "Paused. Play (or space) goes on; Continue ▸ plays one frame.";
+        StatusText.ToolTip = "The scene's frames wait while paused. The game's own pause key (space, VAR_PAUSE_KEY) stops ScummVM's frame loop the same way.";
+        UpdatePlaybackControls();
+    }
+
+    private void ResumeScenePlayback()
+    {
+        if (_playback is null || !_playbackPaused) return;
+        _playbackPaused = false;
+        _playbackTimer ??= CreatePlaybackTimer();
+        _playbackTimer.Interval = PlaybackFrameInterval();
+        _playbackTimer.Start();
+        StatusText.Text = $"Playing: {_playback.What}";
+        UpdatePlaybackControls();
+    }
+
+    private DispatcherTimer CreatePlaybackTimer()
+    {
+        var timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+        timer.Tick += PlaybackTimer_Tick;
+        return timer;
+    }
+
+    /// <summary>While paused, plays one frame (Continue ▸); the playback stays paused.</summary>
+    private void StepPausedPlayback()
+    {
+        if (_playback is null || !ViewShowsSessionRoom()) return;
+        if (!PlaybackStep())
+        {
+            _playbackPaused = false;
+            FinishPlayback();
+            return;
+        }
+        ShowPlaybackFrame();
+        StatusText.Text = $"Paused after one frame (Room {_session?.Snapshot.RoomId:00}). Play goes on.";
+    }
+
+    private void PlaybackPause_Click(object sender, RoutedEventArgs e)
+    {
+        if (_playbackPaused) ResumeScenePlayback();
+        else PauseScenePlayback();
+    }
+
+    private void SkipCutscene_Click(object sender, RoutedEventArgs e) => SkipCutscene();
+
+    /// <summary>
+    /// Escape during a cutscene (ScummVM <c>processKeyboard</c>: <c>abortCutscene</c> while <c>VAR_CUTSCENEEXIT_KEY</c>
+    /// is set): the script that set the cutscene's override goes on at its skip jump on the next frame, and the
+    /// playback plays on from there. Assumed input, as every key the explorer sends.
+    /// </summary>
+    private void SkipCutscene()
+    {
+        if (_session is not { InCutscene: true } session || _currentRoomResource is not { } room) return;
+        var skippable = session.CutsceneSkippable;
+        var action = session.PressKey(0x1B);
+        StatusText.Text = skippable
+            ? "Escape sent: the cutscene skips to its end (assumed input)"
+            : "Escape sent, but this part of the cutscene cannot be skipped: no override is set yet";
+        StatusText.ToolTip = string.Join(Environment.NewLine, action.Uncertainties);
+        if (_playback is null) StartPlayback("Escape", action, room, doorways: null, leftRoom: false);
+        else if (_playbackPaused) ResumeScenePlayback();
+        UpdatePlaybackControls();
+    }
+
+    /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
+    private void UpdatePlaybackControls()
+    {
+        var active = GameClickActive && _game?.Id == GameId.Loom;
+        PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
+        if (!active) return;
+        PlaybackPauseButton.IsEnabled = _playback is not null;
+        PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
+        var inCutscene = _session?.InCutscene == true;
+        var skippable = _session?.CutsceneSkippable == true;
+        SkipCutsceneButton.IsEnabled = inCutscene && skippable;
+        SkipCutsceneButton.ToolTip = !inCutscene
+            ? "No cutscene is playing."
+            : skippable
+                ? "Skip the cutscene (Escape): ScummVM's abortCutscene sends the script that set the override to its skip jump. Assumed input."
+                : "The cutscene has not set its skip point (beginOverride) yet, so Escape would do nothing now, as in the game.";
+    }
+
+    /// <summary>A known cutscene and the object verb that starts it (decoded; see the script map).</summary>
+    private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, string Source);
+
+    private static readonly KnownCutscene[] KnownCutscenes =
+    [
+        new("Script 052: Room 10 → Room 11 → Room 13", 10, 295, 0x38, 52,
+            "Room 10 object 295 verb 0x38 starts script 052 (+0x0003): a cutscene that waits 60 jiffies (+0x0041), loads Room 11 " +
+            "(+0x0045), sets its skip point (+0x00C6) and ends with loadRoomWithEgo into Room 13 (+0x017D)."),
+        new("Script 046: the Elders' trial", 8, 255, 0x38, 46,
+            "Room 08 object 255 verb 0x38 (the sanctuary door) starts script 046 (+0x0000): a cutscene with its skip point at " +
+            "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x1421 in Room 09.")
+    ];
+
+    private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
+    {
+        var menu = new ContextMenu { PlacementTarget = CutsceneMenuButton, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        foreach (var cutscene in KnownCutscenes)
+        {
+            var item = new MenuItem { Header = cutscene.Title, ToolTip = cutscene.Source + " " + CutsceneStartNote(cutscene) };
+            item.Click += (_, _) => PlayKnownCutscene(cutscene);
+            menu.Items.Add(item);
+        }
+        menu.IsOpen = true;
+    }
+
+    private static string CutsceneStartNote(KnownCutscene cutscene) =>
+        $"Stated start: a fresh session after the boot (seed 0), Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
+        $"there is assumed), then object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} run directly: an exploration action, not " +
+        "the game's click (Bobbin does not walk there, and the object may be untouchable in this state). The frames after it play " +
+        "on the playback clock at the game's frame rate. The current exploration state is replaced.";
+
+    /// <summary>
+    /// Plays a known cutscene from its stated start (<see cref="CutsceneStartNote"/>): a fresh session after the boot,
+    /// a catalog visit to the room and the object's verb run directly, then the frames on the playback clock.
+    /// </summary>
+    private void PlayKnownCutscene(KnownCutscene cutscene)
+    {
+        if (_game is null || _indexedObjectSnapshot is null || !GameClickActive ||
+            _game.Rooms.FirstOrDefault(item => item.ResourceId == cutscene.RoomId) is not { } room) return;
+        StopScenePlayback();
+        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+        _session.VisitRoom(room);
+        var action = _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
+        if (_currentRoomResource?.ResourceId == cutscene.RoomId && _currentRoom is not null)
+        {
+            ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+            UpdateRoomNavigationActions(room);
+            RefreshRoomPreview();
+        }
+        StartPlayback($"Object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} (run directly)", action, room, doorways: null, leftRoom: false);
+        StatusText.Text = $"Playing {cutscene.Title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
+        StatusText.ToolTip = CutsceneStartNote(cutscene) + Environment.NewLine + cutscene.Source + Environment.NewLine +
+                             string.Join(Environment.NewLine, action.Uncertainties);
     }
 
     private bool PlaybackShouldContinue()
@@ -2780,6 +2958,7 @@ public partial class MainWindow : Window
         UpdateActorLayer();
         UpdateMessageLayer();
         UpdateVerbArea();
+        UpdatePlaybackControls();
     }
 
     private static string FrameSignature(LoomSessionSnapshot snapshot) =>
@@ -2804,12 +2983,15 @@ public partial class MainWindow : Window
     private void FinishPlayback()
     {
         _playbackTimer?.Stop();
+        _playbackPaused = false;
         if (_playback is not { } playback || _session is not { } session || _game is null)
         {
             _playback = null;
+            UpdatePlaybackControls();
             return;
         }
         _playback = null;
+        UpdatePlaybackControls();
         var snapshot = session.Snapshot;
         var note = playback.Note is null ? "" : Environment.NewLine + playback.Note;
         if (snapshot.RoomId is int reached && reached != playback.SourceRoom.ResourceId)

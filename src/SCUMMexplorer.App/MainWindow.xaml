@@ -195,6 +195,16 @@
                                                     Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         </StackPanel>
                                     </DockPanel>
+                                    <StackPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
+                                        <Button x:Name="PlaybackPauseButton" Content="⏸ Pause" Click="PlaybackPause_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
+                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
+                                                ToolTip="Pause or play the scene (space). While paused, Continue ▸ in the advanced session bar plays one frame."/>
+                                        <Button x:Name="SkipCutsceneButton" Content="⏭ Skip (Esc)" Click="SkipCutscene_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
+                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
+                                        <Button x:Name="CutsceneMenuButton" Content="Play a cutscene ▾" Click="CutsceneMenu_Click" Padding="8,4"
+                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
+                                                ToolTip="Play a known cutscene from a stated start: a fresh session after the boot, the room opened from the catalog, and the object's verb run directly (an exploration action, not the game's click)."/>
+                                    </StackPanel>
                                     <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center"/>
                                     <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,3,0,0">
                                         <TextBlock x:Name="ObjectActionNote" Foreground="#D2C7B5" TextWrapping="Wrap" TextAlignment="Center"/>
