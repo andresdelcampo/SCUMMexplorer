@@ -112,6 +112,9 @@ public sealed class LoomExplorationSession
         _runtime.OverrideChanged = RecordOverride;
         _runtime.Actors.CostumeSource = id => LoomCostume.Load(game, id);
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
+        // The engine starts with every variable at 0; the frame loop adds to the timers from there.
+        foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
+            _runtime.GlobalVariables[timer] = 0;
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
         {
@@ -184,6 +187,39 @@ public sealed class LoomExplorationSession
     public int FrameJiffies => Math.Max(1, _runtime.GlobalVariables.TryGetValue(TimerNextVariable, out var next) ? next : 0);
 
     private const string TimerNextVariable = "var[0x013]";
+
+    /// <summary>ScummVM v3 <c>VAR_TMR_1</c>..<c>VAR_TMR_3</c> (vars 11–13): jiffies the frame loop adds every frame.</summary>
+    private static readonly string[] EngineTimerVariables = ["var[0x00B]", "var[0x00C]", "var[0x00D]"];
+
+    /// <summary>ScummVM v3 <c>VAR_TIMER</c> (var 46): the jiffies of the last frame.</summary>
+    private const string TimerVariable = "var[0x02E]";
+
+    /// <summary>ScummVM v3 <c>VAR_TIMER_TOTAL</c> (var 47): jiffies since the start.</summary>
+    private const string TimerTotalVariable = "var[0x02F]";
+
+    /// <summary>ScummVM <c>scummLoop</c> clamps the jiffies it counts script delays and talk down by to 15.</summary>
+    private const int MaxFrameDelta = 15;
+
+    /// <summary>
+    /// The start of ScummVM's <c>scummLoop(delta)</c> for v3: <c>VAR_TIMER</c> = delta, <c>VAR_TIMER_TOTAL</c> and
+    /// <c>VAR_TMR_1..3</c> += delta, then <c>decreaseScriptDelay(min(delta, 15))</c>: each paused slot's delay goes down,
+    /// and a slot whose delay falls below 0 runs again this frame.
+    /// </summary>
+    private void UpdateTimersAndDelays(int delta)
+    {
+        _runtime.GlobalVariables[TimerVariable] = (ushort)delta;
+        foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
+            if (_runtime.GlobalVariables.TryGetValue(timer, out var value))
+                _runtime.GlobalVariables[timer] = (ushort)(value + delta);
+        var counted = Math.Min(delta, MaxFrameDelta);
+        foreach (var item in _pending)
+        {
+            if (item.Frame.Delay is not int delay) continue;
+            delay -= counted;
+            item.Frame.Delay = delay < 0 ? null : delay;
+            if (delay < 0) _visitTrace.Add($"{item.Frame.Label}'s delay ends; it runs again at +0x{item.Offset:X4}");
+        }
+    }
 
     /// <summary>Frames a continued cutscene may run (about 33 minutes at 10 frames a second) before the preview stops following it.</summary>
     public const int CutsceneFrameLimit = 20000;
@@ -943,7 +979,7 @@ public sealed class LoomExplorationSession
         _runtime.VirtualMouseAssumption = $"assumed input: {which} at ({x}, {y}), sent by the explorer";
         _runtime.GlobalVariables[ClickTimerVariable] = (ushort)gap;
         _runtime.EstimatedVariables.Remove(ClickTimerVariable);
-        _uncertainties.Add($"Assumed input timing for {which}: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = {gap}; the engine's timer is not simulated.");
+        _uncertainties.Add($"Assumed input timing for {which}: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = {gap}; the frame loop counts it on from there, but the player's time before the click is not known.");
         _visitTrace.Add($"click: {which} at ({x}, {y}) runs script {verbScript} with [{SceneClickArea}, 0, {InputMode}] (runInputScript)");
         RunStartedScript(verbScript, 0, new Dictionary<string, ushort>(StringComparer.Ordinal)
         {
@@ -1084,6 +1120,7 @@ public sealed class LoomExplorationSession
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
         // processActors ends the previous frame: animateCostume steps the limbs of the actors in the room.
         _runtime.Actors.AnimateCostumes(CurrentPlacement());
+        UpdateTimersAndDelays(FrameJiffies);
         _runtime.Messages.StartFrame(FrameJiffies, _runtime);
         PlaceVirtualMouse();
         var beforeEvents = _visitEvents.Count;
@@ -1100,8 +1137,8 @@ public sealed class LoomExplorationSession
                 if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
                 // An earlier script in this frame may have stopped this one.
                 if (item.ScriptNumber is int number && _stopped.Contains(number)) continue;
-                // runAllScripts skips frozen slots; they keep their place.
-                if (item.Frame.FreezeCount > 0)
+                // runAllScripts skips frozen and paused (delayed) slots; they keep their place.
+                if (item.Frame.FreezeCount > 0 || item.Frame.Delay is not null)
                 {
                     _pending.Add(item);
                     continue;
@@ -1524,6 +1561,10 @@ public sealed class LoomExplorationSession
             _executing.RemoveAt(_executing.Count - 1);
         }
         var label = script.Context ?? $"Script {script.ScriptId:00}";
+        // o5_delay leaves the slot ssPaused with its delay; any other pause or end clears it.
+        frame.Delay = result.ResumeOffset is null ? null : result.Delay;
+        if (frame.Delay is int delay) _visitTrace.Add($"{label} waits {delay} jiffies (delay) before +0x{result.ResumeOffset:X4}");
+        if (result.DelayEstimate is not null) _uncertainties.Add($"{label}: {result.DelayEstimate}; when it runs again is an estimate.");
         foreach (var pick in result.RandomPicks)
         {
             _picks.Add(pick);
@@ -1858,6 +1899,8 @@ public sealed class LoomExplorationSession
         public int? Number { get; set; }
         public bool Global { get; set; }
         public int FreezeCount { get; set; }
+        /// <summary>ScummVM <c>ScriptSlot.delay</c> while the slot is <c>ssPaused</c> by <c>delay</c>/<c>delayVariable</c>; null otherwise.</summary>
+        public int? Delay { get; set; }
         public string Label { get; set; } = "";
         /// <summary>
         /// The room whose entry, exit, local or verb code started this chain of

@@ -17,8 +17,16 @@ public sealed record LoomBoundedScriptResult(
     IReadOnlyList<int>? DrawQueue = null,
     IReadOnlyList<LoomRandomPick>? Picks = null,
     IReadOnlyCollection<string>? EstimatedLocalKeys = null,
-    bool PathEstimated = false)
+    bool PathEstimated = false,
+    int? DelayJiffies = null,
+    string? DelayEstimate = null)
 {
+    /// <summary>
+    /// ScummVM <c>o5_delay</c>/<c>o5_delayVariable</c>: the slot's delay in jiffies when the run paused
+    /// on one (<c>ssPaused</c>); the frame loop counts it down before the scripts run. Null otherwise.
+    /// </summary>
+    public int? Delay => DelayJiffies;
+
     /// <summary>Seeded stand-ins for <c>getRandomNr</c> taken during this run, in order.</summary>
     public IReadOnlyList<LoomRandomPick> RandomPicks => Picks ?? [];
 
@@ -128,6 +136,8 @@ public sealed class LoomBoundedScriptExecutor
         var visited = 0;
         var reachedStop = false;
         int? resumeOffset = null;
+        int? delayJiffies = null;
+        string? delayEstimate = null;
         string? unresolved = null;
 
         while (indexByOffset.TryGetValue(pc, out var instructionIndex))
@@ -603,6 +613,19 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (runtime is not null && instruction.Operation is "delay" or "delayVariable" &&
+                TryReadDelay(instruction, knownVariables, out var jiffies))
+            {
+                // o5_delay (a 24-bit literal) and o5_delayVariable (getVar) set the slot's delay,
+                // make it ssPaused and break; decreaseScriptDelay runs it again once the delay is below 0.
+                delayJiffies = jiffies;
+                if (instruction.Operation == "delayVariable" && OperandIsEstimated(instruction.Operands, estimated, knownVariables))
+                    delayEstimate = $"the delay at +0x{instruction.Offset:X4} reads {instruction.Operands} = {jiffies}, an estimate";
+                trace.Add($"a delay of {jiffies} jiffies at +0x{instruction.Offset:X4}{(delayEstimate is null ? "" : " (estimate)")}");
+                resumeOffset = next;
+                break;
+            }
+
             if (instruction.Operation is "delay" or "delayVariable" ||
                 instruction.Operation == "waitFor" && (instruction.Operands is "message" or "camera" ||
                                                        instruction.Operands.StartsWith("actor,", StringComparison.Ordinal)))
@@ -1042,7 +1065,7 @@ public sealed class LoomBoundedScriptExecutor
         return new LoomBoundedScriptResult(new Dictionary<int, byte>(states),
             new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
             trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray(),
-            picks, estimated.Where(key => !IsGlobalKey(key)).ToArray(), onEstimatedPath);
+            picks, estimated.Where(key => !IsGlobalKey(key)).ToArray(), onEstimatedPath, delayJiffies, delayEstimate);
     }
 
     /// <summary>
@@ -2070,6 +2093,18 @@ public sealed class LoomBoundedScriptExecutor
         keys = Enumerable.Range(start, count).Select(number => $"{kind}[0x{number:X3}]").ToArray();
         values = literals;
         return true;
+    }
+
+    private static bool TryReadDelay(LoomScriptInstruction instruction, IDictionary<string, ushort> variables, out int jiffies)
+    {
+        jiffies = 0;
+        if (instruction.Operation == "delayVariable")
+        {
+            if (!TryReadValue(instruction.Operands, variables, out var value, out _)) return false;
+            jiffies = value;
+            return true;
+        }
+        return int.TryParse(ReadDelay(instruction.Operands), NumberStyles.Integer, CultureInfo.InvariantCulture, out jiffies);
     }
 
     private static string ReadDelay(string operand) =>

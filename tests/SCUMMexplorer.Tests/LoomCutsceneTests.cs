@@ -16,19 +16,23 @@ public sealed class LoomCutsceneTests
         Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
 
     [Theory]
-    [InlineData("delay", "0x00003C", "a delay of 60 jiffies")]
-    public void WaitsContinueOnTheNextFrameWithATimingLabel(string operation, string operands, string label)
+    [InlineData("delay", "0x00003C", 60)]
+    [InlineData("delayVariable", "var[0x0F1]", 13)]
+    public void ADelayPausesTheScriptWithItsJiffies(string operation, string operands, int jiffies)
     {
+        // o5_delay/o5_delayVariable: the slot's delay is set and the script breaks; the frame loop counts it down.
         var script = Script(
-            new(0, 0, operation, operands, "AE 02 00 00"),
+            new(0, 0, operation, operands, "2E 3C 00 00"),
             new(4, 0, "stopObjectCode", "", "00"));
         var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        runtime.GlobalVariables["var[0x0F1]"] = 13;
 
         var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         Assert.Equal(4, run.ResumeOffset);
+        Assert.Equal(jiffies, run.Delay);
         Assert.False(run.ReachedStop);
-        Assert.Contains($"timing not simulated: {label} continues on the next frame", run.UnresolvedReason, StringComparison.Ordinal);
+        Assert.Null(run.UnresolvedReason);
     }
 
     [Fact]

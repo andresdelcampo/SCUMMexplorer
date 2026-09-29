@@ -14,7 +14,9 @@ using SCUMMexplorer.Core.Formats;
 // then clicks empty floor (the game's click through HandleRoomPoint, assumed input)
 // and records the actor layer on every playback frame. Since M3a the walk is stepped
 // (walkActor): the frames show the ego's walk frame and its steps, and a second click
-// on the exit shows the camera following the ego 8 pixels a frame (moveCamera).
+// on the path shows the camera following the ego 8 pixels a frame (moveCamera). Since M3b
+// a third click on the exit runs object 153's verb 0x38: its cutscene pans the camera and
+// waits `delay 60` jiffies (11 frames of 6 jiffies) on the playback clock before Room 03.
 // No physical input. Arguments: <Games\loom> <output folder>.
 internal static class Program
 {
@@ -144,10 +146,11 @@ internal static class Program
                     $"the drawn ego follows the session's position: layer bounds {after.Bounds}, ego x {ego.X}");
                 Save("room02-after-click-app.png");
 
-                // A second click on the exit (object 153): the smaller ego walks left down the path and the camera follows it.
+                // A second click on the path's floor (box 10 at (627, 124), no object): the smaller ego walks left down
+                // the path and the camera follows it, until script 045's box-10 change of scene stops it at (609, 110).
                 clock.Restart();
                 var viewport = Find<ScrollViewer>("RoomViewport");
-                Call("HandleRoomPoint", 450, 60, false);
+                Call("HandleRoomPoint", 627, 124, false);
                 for (var n = 0; n < 100 && !Playing(); n++) await Task.Delay(20);
                 var cameras = new List<int>();
                 var offsets = new List<double>();
@@ -174,6 +177,45 @@ internal static class Program
                 Check(offsets.Distinct().Count() >= 5, $"the view scrolls with the camera: {offsets.Distinct().Count()} offsets");
                 ego = Session().Actors[0];
                 report.Add($"      after the second click: Room {Session().Snapshot.RoomId:00}; {Actors()}; status: {Find<TextBlock>("StatusText").Text}");
+
+                // M3b: a third click on the exit (object 153). Script 007 runs its verb 0x38: a cutscene pans the camera
+                // to 440, then `delay 0x3C` (+0x0026) holds the view for 60 jiffies before loadRoomWithEgo 3.
+                // decreaseScriptDelay runs the script again once 60 − 6k < 0: 11 frames, 66 jiffies, 1.1 s at 10 frames a second.
+                clock.Restart();
+                var traceFrom = Session().SessionTrace.Count;
+                Call("HandleRoomPoint", 450, 60, false);
+                for (var n = 0; n < 100 && !Playing(); n++) await Task.Delay(20);
+                (long Ms, int Jiffies, int? Camera)? delayStart = null, delayEnd = null;
+                int? roomAfterDelay = null;
+                while (clock.ElapsedMilliseconds < 40000 && delayEnd is null)
+                {
+                    await Task.Delay(5);
+                    var trace = Session().SessionTrace;
+                    var total = (int)Session().Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x02F]");
+                    for (; traceFrom < trace.Count; traceFrom++)
+                    {
+                        if (delayStart is null && trace[traceFrom].StartsWith("Room 02 Object 153 Verb 0x38 waits 60 jiffies", StringComparison.Ordinal))
+                        {
+                            delayStart = (clock.ElapsedMilliseconds, total, Session().CameraX);
+                            Save("room02-exit-delay-app.png");
+                        }
+                        if (delayStart is not null && trace[traceFrom].StartsWith("Room 02 Object 153 Verb 0x38's delay ends", StringComparison.Ordinal))
+                        {
+                            delayEnd = (clock.ElapsedMilliseconds, total, Session().CameraX);
+                            roomAfterDelay = Session().Snapshot.RoomId;
+                        }
+                    }
+                    if (!Playing() && clock.ElapsedMilliseconds > 1500) break;
+                }
+                for (var n = 0; n < 100 && Shown() != Session().Snapshot.RoomId; n++) await Task.Delay(50);
+                report.Add($"      exit click: delay starts at {delayStart?.Ms} ms (VAR_TIMER_TOTAL {delayStart?.Jiffies}, camera {delayStart?.Camera}), " +
+                           $"ends at {delayEnd?.Ms} ms (VAR_TIMER_TOTAL {delayEnd?.Jiffies}); then Room {roomAfterDelay:00}; view shows Room {Shown():00}");
+                Check(delayStart?.Camera == 440, $"the exit's cutscene pans the camera to 440 before its delay: camera {delayStart?.Camera}");
+                Check(delayStart is { } ds && delayEnd is { } de && de.Jiffies - ds.Jiffies == 66,
+                    $"the delay of 60 jiffies lasts 11 frames of 6 jiffies on the session clock: {delayEnd?.Jiffies - delayStart?.Jiffies} jiffies");
+                Check(delayStart is { } ws && delayEnd is { } we && we.Ms - ws.Ms is >= 900 and <= 3000,
+                    $"the view holds for about 1.1 s on the playback clock: {delayEnd?.Ms - delayStart?.Ms} ms");
+                Check(roomAfterDelay == 3 && Shown() == 3, $"after the delay loadRoomWithEgo enters Room 03: session Room {roomAfterDelay:00}, view Room {Shown():00}");
 
                 // Another room: the layer only shows actors in the shown room.
                 await Open(3);
