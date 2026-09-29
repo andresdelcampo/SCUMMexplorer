@@ -181,6 +181,12 @@
                             </WrapPanel>
                             <Grid x:Name="RoomViewportHost" Grid.Row="1" SizeChanged="RoomViewportHost_SizeChanged">
                                 <StackPanel x:Name="RoomDisplayGroup" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <!-- The game's text line, screen rows 0-15 above the room (ScummVM initScreens(16, 144)):
+                                         shown in the interactive LOOM mode with the text scripts print there. -->
+                                    <Border x:Name="TextLinePanel" Visibility="Collapsed" Background="#000000" HorizontalAlignment="Center">
+                                        <Image x:Name="TextLineMessageOverlay" Stretch="Fill" SnapsToDevicePixels="True"
+                                               RenderOptions.BitmapScalingMode="NearestNeighbor" IsHitTestVisible="False"/>
+                                    </Border>
                                     <ScrollViewer x:Name="RoomViewport" HorizontalScrollBarVisibility="Auto"
                                                   VerticalScrollBarVisibility="Disabled" CanContentScroll="False"
                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -201,7 +207,7 @@
                                         </Grid>
                                     </ScrollViewer>
                                     <StackPanel x:Name="VerbStripPanel" Visibility="Collapsed" HorizontalAlignment="Center" Margin="0,2,0,0">
-                                        <Border Background="#000000" BorderBrush="#334452" BorderThickness="0,1,0,0" HorizontalAlignment="Center">
+                                        <Border x:Name="VerbStripBorder" Background="#000000" BorderBrush="#334452" BorderThickness="0,1,0,0" HorizontalAlignment="Center">
                                             <Grid>
                                                 <Image x:Name="VerbStripImage" Stretch="Fill" SnapsToDevicePixels="True"
                                                        RenderOptions.BitmapScalingMode="NearestNeighbor"

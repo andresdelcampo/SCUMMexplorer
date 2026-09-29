@@ -1,0 +1,22 @@
+﻿Real MainWindow; PlayOpening and PlayKnownCutscene are called as the menu calls them, on the playback clock. No physical input.
+The opening (script 044) (72526 ms, 2242 samples while the player had no control):
+         827 ms: Room 01: view 710,6x284,2 at y 37,5, verb strip at y 321,8, arrows hidden, controls 108 high
+        6131 ms: Room 02: view 710,6x284,2 at y 37,5, verb strip at y 321,8, arrows hidden, controls 108 high
+        7302 ms: Room 01: view 710,6x284,2 at y 37,5, verb strip at y 321,8, arrows hidden, controls 108 high
+       22146 ms: Room 02: view 710,6x284,2 at y 37,5, verb strip at y 321,8, arrows hidden, controls 108 high
+       33725 ms: Room 53: view 710,6x284,2 at y 37,5, verb strip at y 321,8, arrows hidden, controls 108 high
+       53610 ms: Room 02: view 710,6x284,2 at y 37,5, verb strip at y 321,8, arrows hidden, controls 108 high
+   Sizes: view 710,6x284,2 at y 37,5 (2242 samples)
+PASS The opening (script 044): the room view keeps one size and position (1 seen)
+PASS The opening (script 044): the verb strip is shown throughout (0 samples without it)
+PASS The opening (script 044): no scroll arrows while the player has no control (0 samples with them)
+PASS The opening (script 044): nothing below the room overlaps its bottom rows (0 samples)
+PASS disabled Pause and Skip are drawn dark: mean brightness 42 and 43 (visible True, enabled False, False; limit 110)
+Script 046, the Elders' trial (first 40 s) (40001 ms, 1253 samples while the player had no control):
+         823 ms: Room 08: view 710,6x284,2 at y 37,5, verb strip at y 321,8, arrows hidden, controls 108 high
+   Sizes: view 710,6x284,2 at y 37,5 (1253 samples)
+PASS Script 046, the Elders' trial (first 40 s): the room view keeps one size and position (1 seen)
+PASS Script 046, the Elders' trial (first 40 s): the verb strip is shown throughout (0 samples without it)
+PASS Script 046, the Elders' trial (first 40 s): no scroll arrows while the player has no control (0 samples with them)
+PASS Script 046, the Elders' trial (first 40 s): nothing below the room overlaps its bottom rows (0 samples)
+Failures: 0

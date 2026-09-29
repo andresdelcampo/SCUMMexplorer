@@ -181,8 +181,10 @@ internal static class Program
                 var panPanel = (FrameworkElement)window.FindName("RoomScrollButtonsPanel");
                 var pan = normal ? panPanel.Height + panPanel.Margin.Top + panPanel.Margin.Bottom : 0;
                 var shown = strip.Visibility == Visibility.Visible;
+                // Since 29 Sep the interactive mode also keeps the text line (rows 0-15) above the room.
+                var textLine = ((FrameworkElement)window.FindName("TextLinePanel")).Visibility == Visibility.Visible;
                 var expectedScale = Math.Min(host.ActualWidth / visibleWidth,
-                    (host.ActualHeight - pan - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0)));
+                    (host.ActualHeight - pan - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0) + (textLine ? 16 : 0)));
                 var roomFits = Math.Abs((double)Field("_roomDisplayScale")! - expectedScale) < 0.01 &&
                                Math.Abs(viewport.ActualHeight - roomHeight * expectedScale) < 1;
                 // With the game's text there, the verb screen stays and draws the slots that text goes with.

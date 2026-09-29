@@ -1,0 +1,11 @@
+﻿Real MainWindow; object 632's verb 0x36 run directly through the session (exploration action). No physical input.
+Room 41 before: view 710,6x284,2 at (185,9, 37,5); text line 710,6x35,5, visible True, bottom at y 37,5
+PASS the text line is shown directly above the room
+PASS the text line is 16 rows at the room's scale (35,5 px vs room 284,2 px for 128 rows)
+PASS the verb screen starts where the room ends (y 321,8 vs 321,8): one screen, no gap
+   on screen: "Es dificil enterarse de algo, con tanto jaleo." at (160, 12) from Room 41 Object 632 Verb 0x36 +0x0002
+PASS the look line printed at y 12 shows on the text line (509 lit pixels of 320 x 16)
+Room 41 with the text: view 710,6x284,2 at (185,9, 37,5)
+PASS the room keeps its size and position when the text appears
+PASS the verb screen is still under the room
+Failures: 0
