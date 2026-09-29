@@ -3,7 +3,8 @@ Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md firs
 State at the start:
 
 * Git: master. The latest commits:
-  * the next-session prompt after the scene-leave fix;
+  * the plan update with the user's new issue list (29 Sep);
+  * e343ba7 the next-session prompt after the scene-leave fix;
   * 5d4b5b8 "End a cutscene when a catalog visit leaves it";
   * d0933bf "Show all 144 rows of LOOM rooms and draw text over the room".
 * Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code (the room music code in MainWindow: `UpdateRoomMusicActions`, `PlayRoomCueAsync`, `_audioPlayer` and the room cue handlers). If `git status` shows their uncommitted changes (on 29 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
@@ -17,21 +18,33 @@ Done last session:
 * The user's answers (29 Sep): the trial's flight shows swans; Hetchel flies as a human nowhere else. The minor depth-mask issue (left for later, in Known issues): walking to the village in Room 02, Bobbin disappears a few pixels before reaching the mountain side.
 * LOOM's 144 room rows (user report: the room's bottom was cut, Room 09's egg hidden; .verification/room-rows). LOOM's boot runs `roomOps setScreen 0, 144` (script 001 +0x0000), ScummVM `initScreens(0, 144)`: the room screen is rows 0–143 from screen row 0, and there is no text screen. The app now shows all 144 rows and draws text over the room at its screen y. The 16-row text line is removed, and so are the 29 Sep 128-row crop and the 28 Sep 16-row text offset. Indy3 keeps 128 rows (not checked).
 * Leaving a scene from the catalog (user report: after leaving a conversation, clicks did nothing; .verification/scene-leave). A catalog visit during a cutscene now stops the script that began it and runs the cutscene end script (script 003: input on, scripts unfrozen), labelled as an explorer action. It fails at d0933bf and passes now (SceneLeaveCheck).
-* Not compared with the running ScummVM. The 144-row screen and text over the room follow the decoded boot and ScummVM's source; a ScummVM screenshot of a room with text (for example Room 02's "Amanecer." at y 112) would confirm it.
+* ScummVM comparison (the user's screenshot, 29 Sep): Room 02's "Amanecer." (y 112) is at screen row about 113 over the room, and the room's art reaches row about 137, directly above the verb screen: the 144-row screen and text over the room match the game.
 
-The user's issue list (29 Sep):
+The user's issue list (29 Sep, evening; they confirmed the 144-row and scene-leave fixes and sent a ScummVM screenshot, .verification/room-rows/scummvm-room02-amanecer.png):
 
 * (done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons; no music or sound in cutscenes; text position; the forge's first lines; depth masks; Hetchel flying as a human; the room's bottom rows; stuck after leaving a conversation.
-* After the distaff shows the open spell, the notes keep their shine and colour in the verb area.
-* Spells cannot be cast with keys.
+* A. Switching rooms to Room 02 can show big Bobbin instead of the small one, or actor 12 big instead of the boat.
+* B. Room 43: the sheep show partly hidden behind the background.
+* C. Room 41 can scroll left into black; it should not.
+* D. Remove the verb screen's explanatory text row under the verb screen.
+* E. After the distaff shows the open spell, the notes keep their shine and colour in the verb area.
+* F. Spells cannot be cast with keys.
+* G. A key to skip to the next text during a cutscene.
+* H. "Play a cutscene" should list only the cutscenes relevant to the current room.
+* I. Consider whether the room media player still makes sense now that cutscenes play the rooms' background music. This is another agent's code (the room music player): give the user an analysis and a recommendation, and change it only if they agree.
 * (minor, later) Room 02: Bobbin hidden a few pixels too early near the mountain side on the way to the village.
 
-Tasks, in order:
+Tasks, in order (the user asked for the plan to cover these; they will start the session):
 
-1. Ask the user whether the rooms now look right with 144 rows and text over the room (for example Room 09's egg, Room 41's forge texts), and whether leaving a conversation from the tree now leaves Bobbin free to walk. Fix what they report first. If they can, ask for a ScummVM screenshot of a room with text to confirm the screen layout.
-2. Ask the user which remaining issue comes next (distaff shine, keys for spells), with a recommendation (the distaff shine is likely the verb area's drawn strings or the notes' colours not being reset; keys for spells changes how the user plays). Check each against ScummVM before changing anything.
-3. Why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit: trace script 006's walk and sentence (session probe); if the click can work, use it in the 086 entry.
-4. More known cutscenes with text, each verified by a harness like FirewoodPlaybackCheck.
+1. A: Room 02's wrong-size actors after a room switch. Reproduce with a session probe: catalog visits into Room 02 from several rooms, and after cutscenes. Log `session.Actors` (`Look.Costume`, `Room`, `Visible`) and the costume each one draws with. Likely suspects are a costume or actor state left over from the room just left (Room 02's entry script, or a catalog arrival that skips the room's own `actorOps`), or `Actors.Forget`/`ForgetAll` leaving a stale costume. Compare with ScummVM's `startScene` (it hides all actors, and `putActor`/`actorOps` in the entry set them again). The boat is actor 12 in Room 02. Verify with ActorDrawCheck and a probe for each route.
+2. B: Room 43's sheep behind the background. Check the actors' walk boxes and masks (`LoomWalkBoxReader.Read(roomBytes).Boxes[i].Mask`) and `ComposeDepthMask` against ScummVM `drawActorCostume` (`getMaskFromBox`). A wrong or unknown walk box, or an actor placed with `putActor` outside any box, is the likely cause. Fix it generically; no room hacks. Check whether the same fix explains the minor Room 02 mountain-side issue.
+3. C: Room 41's left scroll. Compare the view's pan limits with the room's camera limits (`roomOps roomScroll`: Room 41's entry +0x0003 sets 0x00B0, 0x00B8) and ScummVM `VAR_CAMERA_MIN_X`/`MAX_X`. The manual pan should not go past what the game's camera can show. Rerun CameraPanCheck.
+4. D: remove the verb screen's explanatory note row (`VerbStripNote`, `VerbStripNoteHeight` in `UpdateRoomViewportLayout`). Keep the explanation in a tooltip. Update VerbAreaCheck (it reads the note's text) and PresentationCheck if needed.
+5. E, then F, then G: the distaff shine (likely the verb area's drawn strings or the notes' colours not being reset; check ScummVM's verb redraw and `drawString` erasing first), keys for spells (ScummVM `processKeyboard` and LOOM's input script for note keys c d e f g a b C: decode script 005/006's key handling), and a key to skip the text in cutscenes (ScummVM's talk-stop key '.', already used for a click on the text: `SkipTalkAt`). Ask the user about the keys before binding them.
+6. H: the cutscene menu (`CutsceneMenu_Click`) lists only the entries whose rooms include the current room (`KnownCutscene.RoomId` and the rooms the script passes through). Say what happens when none match.
+7. I: the media player analysis (see above).
+8. Room 36's exit click: why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit. Trace script 006's walk and sentence (session probe); if the click can work, use it in the 086 entry.
+9. More known cutscenes with text, each verified by a harness like FirewoodPlaybackCheck.
 
 Rules:
 

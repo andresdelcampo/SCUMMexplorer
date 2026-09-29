@@ -35,4 +35,4 @@
 - PresentationCheck: 0 failures ([presentation-check.txt](presentation-check.txt)): the viewport shows 144 rows.
 - Egg probe (temporary test, deleted): costume 0x34, frame 0x0C, directions 0–2: limbs 0 and 1 in rows 123–134, limb 2 in rows 101–127.
 - Not rerun: RoomAudit and the room PNGs (room images are unchanged; the crop was in the app only), DoorwayClickCheck (clicks are given as room points; the room-to-screen mapping for clicks was already row for row), CutsceneLayoutCheck, CameraPanCheck, the playback checks, Blockers (no session change).
-- Not compared with the running ScummVM.
+- ScummVM comparison (the user's screenshot, 29 Sep, [scummvm-room02-amanecer.png](scummvm-room02-amanecer.png)): Room 02's "Amanecer." (y 112) is drawn over the room at screen row about 113 (836 px for 200 rows), and the room's art reaches row about 137, directly above the verb screen. This matches the 144-row screen and text over the room.
