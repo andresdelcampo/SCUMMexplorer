@@ -1,33 +1,35 @@
-Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md first, then docs/LOOM_EGA_PLAN.md: "What the app shows today", milestone M3 and "Known issues". Then read docs/LOOM_SCRIPT_MAP.md, especially "Messages, charset and actor commands" (the `actorOps` row), the script 044, 046, 052 and 086 rows, "How the session maps ScummVM behaviour" (the boot, `scummLoop`, `o5_delay`, `beginOverride`/`abortCutscene` rows) and "Not modelled yet". docs/CHANGELOG.md lists the finished work.
+Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md first, then docs/LOOM_EGA_PLAN.md: "What the app shows today", milestone M3 and "Known issues". Then read docs/LOOM_SCRIPT_MAP.md, especially "Screen rows" and "The room screen is 144 rows", the script 044, 046, 052 and 086 rows, "How the session maps ScummVM behaviour" (the boot, `scummLoop`, `o5_delay`, `beginOverride`/`abortCutscene` rows and the new catalog-visit-during-a-cutscene row) and "Not modelled yet". docs/CHANGELOG.md lists the finished work.
 
 State at the start:
 
 * Git: master. The latest commits:
-  * the next-session prompt after the swan flight;
-  * 81b2cc2 "Apply actorOps' first item on a variable actor";
-  * 3320c62 "Write the next-session prompt after the depth masks".
-* Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code (the room music code in MainWindow: `UpdateRoomMusicActions`, `PlayRoomCueAsync`, `_audioPlayer` and the room cue handlers). If `git status` shows their uncommitted changes (on 30 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
-* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 234/234 (30 Sep).
-* RoomAudit: 0 gaps in all 76 rooms (30 Sep). Blockers (30 Sep, after the fix): identical to .verification/frame-timing/blockers-after.txt; the only real stops left are `expression` (3).
-* WPF checks: ActorDrawCheck 0 (30 Sep, with the fix). 29 Sep: TextLineCheck 0; SceneSoundCheck 0; CutsceneLayoutCheck 0; VerbAreaCheck 0; PresentationCheck 0; CameraPanCheck 0. Earlier: FirewoodPlaybackCheck 0, GameTextsCutsceneCheck 0, OpeningPlaybackCheck 0, CutscenePlaybackCheck 0, DoorwayClickCheck 16/16. Not run since M3a: MessageAppCheck, ClickInputCheck. The playback checks (Opening, Cutscene, Firewood) were not rerun after the actorOps fix; they should still pass (they check rooms, texts and timing, not costumes), but run one if a task touches them.
-* Worktrees: `.claude/worktrees/festive-moore-660bb6` was last session's (junctions to Games/ and scummvm/). The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
+  * the next-session prompt after the scene-leave fix;
+  * 5d4b5b8 "End a cutscene when a catalog visit leaves it";
+  * d0933bf "Show all 144 rows of LOOM rooms and draw text over the room".
+* Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code (the room music code in MainWindow: `UpdateRoomMusicActions`, `PlayRoomCueAsync`, `_audioPlayer` and the room cue handlers). If `git status` shows their uncommitted changes (on 29 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
+* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 235/235 (29 Sep).
+* RoomAudit: 0 gaps in all 76 rooms (not rerun: room images unchanged). Blockers (after the actorOps fix): identical to .verification/frame-timing/blockers-after.txt; the only real stops are `expression` (3). Not rerun after the scene-leave fix (it only changes catalog visits made while a cutscene is open).
+* WPF checks (29 Sep evening): TextLineCheck 0 (rewritten for the 144-row screen), VerbAreaCheck 0, PresentationCheck 0, SceneLeaveCheck 0 (new), DoorwayClickCheck 16/16 on Rooms 02 03 04 08 10 37. Earlier: ActorDrawCheck 0, SceneSoundCheck 0, CutsceneLayoutCheck 0, CameraPanCheck 0, FirewoodPlaybackCheck 0, GameTextsCutsceneCheck 0, OpeningPlaybackCheck 0, CutscenePlaybackCheck 0. Not rerun since the 144-row change: CutsceneLayoutCheck and CameraPanCheck (they measure the view; run them if a task touches the layout), ActorDrawCheck, the playback checks. Not run since M3a: MessageAppCheck, ClickInputCheck.
+* Worktrees: `.claude/worktrees/cool-lamarr-0ae6eb` was last session's (junctions to Games/ and scummvm/). The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
 
 Done last session:
 
-* The user's answers (30 Sep): the depth masks look right (they noticed something minor, not worth fixing yet); the forge's two-line texts read well. They picked "Hetchel as the swan" next.
-* Swans in the trial's flight (.verification/swan-flight/validation.md): a generic executor bug. `actorOps local[0x000], [costume, …]` cut its item list at the first `[`, which belongs to the variable, so the first item (nearly always the costume) was lost at all 41 variable-actor sites (30 with a costume first). The trial's Room 11 flight (script 046 +0x1153–0x1175, actors 2–10, costume 0x50) now shows small swans instead of Hetchel and the elders as people; Room 03's entry now gives actors 4–7 costume 9 (the campfires) instead of leaving Room 02's leaf and actor 4. The user asked whether this was a per-cutscene fix: it is not, it applies to every such instruction.
-* Not compared with the running ScummVM.
+* The user's answers (29 Sep): the trial's flight shows swans; Hetchel flies as a human nowhere else. The minor depth-mask issue (left for later, in Known issues): walking to the village in Room 02, Bobbin disappears a few pixels before reaching the mountain side.
+* LOOM's 144 room rows (user report: the room's bottom was cut, Room 09's egg hidden; .verification/room-rows). LOOM's boot runs `roomOps setScreen 0, 144` (script 001 +0x0000), ScummVM `initScreens(0, 144)`: the room screen is rows 0–143 from screen row 0, and there is no text screen. The app now shows all 144 rows and draws text over the room at its screen y. The 16-row text line is removed, and so are the 29 Sep 128-row crop and the 28 Sep 16-row text offset. Indy3 keeps 128 rows (not checked).
+* Leaving a scene from the catalog (user report: after leaving a conversation, clicks did nothing; .verification/scene-leave). A catalog visit during a cutscene now stops the script that began it and runs the cutscene end script (script 003: input on, scripts unfrozen), labelled as an explorer action. It fails at d0933bf and passes now (SceneLeaveCheck).
+* Not compared with the running ScummVM. The 144-row screen and text over the room follow the decoded boot and ScummVM's source; a ScummVM screenshot of a room with text (for example Room 02's "Amanecer." at y 112) would confirm it.
 
-The user's issue list (30 Sep):
+The user's issue list (29 Sep):
 
-* (done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons; no music or sound in cutscenes; text position (the text line); the forge's first lines; depth masks; Hetchel flying as a human (the trial's flight).
+* (done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons; no music or sound in cutscenes; text position; the forge's first lines; depth masks; Hetchel flying as a human; the room's bottom rows; stuck after leaving a conversation.
 * After the distaff shows the open spell, the notes keep their shine and colour in the verb area.
 * Spells cannot be cast with keys.
+* (minor, later) Room 02: Bobbin hidden a few pixels too early near the mountain side on the way to the village.
 
 Tasks, in order:
 
-1. Ask the user whether the trial's flight now shows swans in the app, and whether they saw Hetchel fly as a human anywhere else (Room 09's egg scenes, locals 223/224/227, use costume 0x34 and 0x8A for her: check those if they did). Ask what the minor depth-mask issue was, and whether it should be fixed now. Fix what they report first.
-2. Ask the user which of the remaining issues comes next (distaff shine, keys for spells), with a recommendation (the distaff shine is likely the verb area's drawn strings or the notes' colours not being reset; keys for spells changes how the user plays). Check each against ScummVM before changing anything.
+1. Ask the user whether the rooms now look right with 144 rows and text over the room (for example Room 09's egg, Room 41's forge texts), and whether leaving a conversation from the tree now leaves Bobbin free to walk. Fix what they report first. If they can, ask for a ScummVM screenshot of a room with text to confirm the screen layout.
+2. Ask the user which remaining issue comes next (distaff shine, keys for spells), with a recommendation (the distaff shine is likely the verb area's drawn strings or the notes' colours not being reset; keys for spells changes how the user plays). Check each against ScummVM before changing anything.
 3. Why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit: trace script 006's walk and sentence (session probe); if the click can work, use it in the 086 entry.
 4. More known cutscenes with text, each verified by a harness like FirewoodPlaybackCheck.
 
@@ -78,18 +80,19 @@ Tooling notes:
 * A full DoorwayClickCheck run browses Room 01 first, so Room 02 is then a catalog visit; run `… 2 3 4 8 10` to test the boot's Room 02.
 * Before blaming a WPF check failure on a change, run it twice and compare with HEAD.
 * Python has no PIL here. To read PNG pixels, use `System.Drawing.Bitmap` from PowerShell.
-* The `mcp__ccd_session_mgmt__get_usage` tool (load it with ToolSearch) reports the context's tokensUsed for the 250K rule. On 29 Sep the account's weekly limit was at 81%.
+* The `mcp__ccd_session_mgmt__get_usage` tool (load it with ToolSearch) reports the context's tokensUsed for the 250K rule. The weekly limit was at 93% on 29 Sep (evening).
 * CutsceneLayoutCheck (.verification/cutscene-layout): `<Games\loom> <output folder>`, about 2 minutes; plays the opening and 40 s of script 046 and samples the room view's size, the verb strip, the arrows and disabled-button brightness.
 * App-wide WPF styles go in MainWindow.xaml's resources, not App.xaml: the harnesses create `new Application()`, so App.xaml's resources never load there.
 * SceneSoundCheck (.verification/cutscene-sound): `<Games\loom> <output folder>`, about 70 s; the opening on the real clock for 20 s, then script 046 stepped through `PlaybackTimer_Tick` (with the timer stopped) for 2,500 frames, compared with a separate session's reached sound events. `SceneSoundPlayer.Log` lists what the player did (frame, action, sound, kind).
-* TextLineCheck (.verification/text-line): `<Games\loom> <output folder>`, about 20 s; Room 41, object 632 verb 0x36 run directly.
+* TextLineCheck (.verification/text-line): `<Games\loom> <output folder>`, about 20 s; Room 41: the view is 144 rows, and the sword's (634) and object 632's look lines (verb 0x36 run directly) are drawn over the room's top rows.
+* SceneLeaveCheck (.verification/scene-leave): `<Games\loom> <output folder>`, about 20 s; plays the trial from `KnownCutscenes` for 8 s, picks Room 02 in the tree, clicks 80 px left of Bobbin through `HandleRoomPoint`.
 * The playback clock plays sounds from `PlaybackStep`; `_playbackBatch` is true while an instant playback runs all its frames.
-* The layout counts 16 text-line rows in the interactive LOOM mode (`UpdateRoomViewportLayout`): a harness that computes the expected room scale must add them when `TextLinePanel` is visible.
+* The layout fits 144 room rows (LOOM; `RoomScreenRows`, 128 for other games) plus 56 verb rows when the verb strip is shown (`UpdateRoomViewportLayout`); there is no text line any more (`TextLinePanel` is gone, `LoomMessageRenderer.RoomScreenTop` is 0).
 * ScummVM text placement: `displayDialog` (string.cpp) sets `_charset->_top = ypos`; `CharsetRendererV3::printChar` (charset.cpp) draws into `findVirtScreen(_top)`, clipped at that screen's bottom for the one-buffer screens (text, verb).
 * Python edits of docs: a helper `edit(path, [(old, new)])` in %TEMP%\edit.py keeps line endings and BOM; put non-ASCII or backslash-heavy text in a file written with the Write tool and read it from python, rather than in a heredoc.
 * ActorDrawCheck (.verification/actor-draw): `<Games\loom> <output folder>`, about 60 s; its Room 02 click into box 4 shows the depth mask (Bobbin behind the foliage). The mask composition runs on every actor-layer update (`UpdateActorLayer` calls `_objectSelection.ComposeDepthMask`).
 * Box masks per room: `LoomWalkBoxReader.Read(roomBytes).Boxes[i].Mask`. Close-up rooms (53–87) have one box with mask 0.
-* The session tokens were at about 205K when the last session stopped (5-hour limit 93%, weekly limit 90%).
+* The session tokens were at about 230K when the last session stopped (5-hour limit 10%, weekly limit 93%).
 * `actorOps` operands are `<actor>, [item; item; ...]`: split the list after `, [`, never at the first `[` (a variable actor such as `local[0x000]` has its own brackets). LoomDoorwayFinder.ReadArguments and LoomRoomSoundCandidates.BindLiteralArguments still cut at the first `[` for startScript argument lists; that is only wrong if the script number is a variable (not checked).
 * A quick probe of a cutscene: `session.VisitRoom(Room 08)`, `session.ActivateObjectVerb(255, 0x38)` (the trial), then `AdvanceFrame()` in a loop and log `session.Actors` (`Look.Costume`, `Look.Frame`). For instruction-level detail, a temporary `File.AppendAllText` in `ApplyActorPlacement` filtered by offset is the fastest (revert it afterwards). The executor's `trace` is not exposed by the session. To look at an actor layer, `LoomActorRenderer.Render(...).Pixels` written as a 24-bit BMP with the EGA palette, then scaled to PNG with System.Drawing, works.
 * The trial reaches Room 11 about 2,470 frames after the verb; the flight runs to about frame 2,700.
