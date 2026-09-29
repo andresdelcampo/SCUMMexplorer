@@ -125,12 +125,12 @@ public static class LoomMessageRenderer
     public const int ScreenWidth = 320;
     public const int ScreenHeight = 200;
     /// <summary>
-    /// ScummVM <c>initScreens(16, 144)</c> for v3 (<c>gfx.cpp</c>): the text screen is rows 0–15,
-    /// the room (main) screen rows 16–143, so screen row y is room row y − 16, and the verb
-    /// screen rows 144–199. <c>printChar</c> draws at <c>_top - vs-&gt;topline</c> and clips at the screen's bottom
-    /// (the text screen's lines are the exception here: they run on into the room, see <c>PrintChar</c>).
+    /// LOOM's boot (script 001 +0x0000) runs <c>roomOps setScreen 0, 144</c>, ScummVM <c>initScreens(0, 144)</c>
+    /// (<c>o5_roomOps</c> case 3, <c>gfx.cpp</c>): the room (main) screen is rows 0–143, so screen row y is room row y,
+    /// the text screen has no rows (text is drawn over the room), and the verb screen is rows 144–199.
+    /// <c>printChar</c> draws at <c>_top - vs-&gt;topline</c> and clips at the screen's bottom.
     /// </summary>
-    public const int RoomScreenTop = 16;
+    public const int RoomScreenTop = 0;
     public const int VerbScreenTop = 144;
     public const byte Transparent = 0xFF;
     private const byte ShadowColor = 0;
@@ -214,11 +214,8 @@ public static class LoomMessageRenderer
         if (glyph == '@') return false;
         var width = charset.CharWidth(glyph);
         if (left + width > right + 1) return false;
-        // findVirtScreen(top): the text, room or verb screen, each clipped at its bottom. Exception (reading, not
-        // ScummVM): a line whose top is in the text screen runs on into the room's top rows. ScummVM clips it at
-        // row 15, which leaves the first line of Room 41's two-line messages (script 016 with y 12) at its top
-        // 4 rows; the original is read as drawing the whole line.
-        var screenTop = top >= VerbScreenTop ? VerbScreenTop : top >= RoomScreenTop ? RoomScreenTop : 0;
+        // findVirtScreen(top): the room or the verb screen, each clipped at its bottom.
+        var screenTop = top >= VerbScreenTop ? VerbScreenTop : RoomScreenTop;
         var screenBottom = top >= VerbScreenTop ? ScreenHeight : VerbScreenTop;
         if (top < 0 || top >= ScreenHeight) return false;
         DrawBits1(layer, charset.Glyph(glyph), left, top, width, LoomCharset.GlyphRows, color, shadow, screenTop, screenBottom);

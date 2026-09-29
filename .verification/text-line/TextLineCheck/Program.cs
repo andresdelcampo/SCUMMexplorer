@@ -51,8 +51,7 @@ internal static class Program
                 var tree = (TreeView)window.FindName("ResourceTree");
                 var viewport = (FrameworkElement)window.FindName("RoomViewport");
                 var host = (FrameworkElement)window.FindName("RoomViewportHost");
-                var strip = (FrameworkElement)window.FindName("TextLinePanel");
-                var overlay = (Image)window.FindName("TextLineMessageOverlay");
+                var overlay = (Image)window.FindName("RoomMessageOverlay");
                 var verbStrip = (FrameworkElement)window.FindName("VerbStripPanel");
                 ((CheckBox)window.FindName("SessionModeToggle")).IsChecked = true;
                 LoomExplorationSession Session() => (LoomExplorationSession)Field("_session")!;
@@ -71,34 +70,37 @@ internal static class Program
                     return $"view {viewport.ActualWidth:0.#}x{viewport.ActualHeight:0.#} at ({top.X:0.#}, {top.Y:0.#})";
                 }
                 var before = Geometry();
-                var stripBottom = strip.TranslatePoint(new Point(0, strip.ActualHeight), host).Y;
                 var viewTop = viewport.TranslatePoint(new Point(0, 0), host).Y;
-                report.Add($"Room 41 before: {before}; text line {strip.ActualWidth:0.#}x{strip.ActualHeight:0.#}, visible {strip.IsVisible}, bottom at y {stripBottom:0.#}");
-                Check(strip.IsVisible && Math.Abs(stripBottom - viewTop) < 0.6, "the text line is shown directly above the room");
-                Check(Math.Abs(strip.ActualHeight - viewport.ActualHeight * 16 / 128) < 1.5,
-                    $"the text line is 16 rows at the room's scale ({strip.ActualHeight:0.#} px vs room {viewport.ActualHeight:0.#} px for 128 rows)");
+                var scale = (double)Field("_roomDisplayScale")!;
+                report.Add($"Room 41 before: {before}; scale {scale:0.###}");
+                // The boot's initScreens(0, 144): the room screen is all 144 rows from screen row 0, with no text line above.
+                Check(Math.Abs(viewport.ActualHeight - 144 * scale) < 1,
+                    $"the room view shows all 144 rows ({viewport.ActualHeight:0.#} px = {viewport.ActualHeight / scale:0.#} rows)");
+                Check(window.FindName("TextLinePanel") is null, "no separate text line above the room");
                 var verbTop = verbStrip.TranslatePoint(new Point(0, 0), host).Y;
                 Check(verbStrip.IsVisible && Math.Abs(verbTop - (viewTop + viewport.ActualHeight)) < 0.6,
                     $"the verb screen starts where the room ends (y {verbTop:0.#} vs {viewTop + viewport.ActualHeight:0.#}): one screen, no gap");
                 Save((FrameworkElement)window.FindName("RoomDisplayGroup"), "room41-before.png");
 
-                // The sword (object 634 verb 0x36): two lines at y 12 and 20. Line 1 starts on the text line and is
-                // drawn whole (reading of the original; ScummVM clips it at row 15), so its lower rows reach room rows
-                // 0–3, which line 2 (from room row 4) cannot.
+                // The sword (object 634 verb 0x36): two lines at y 12 and 20, drawn over the room's rows 12-27.
                 Session().ActivateObjectVerb(634, 0x36);
                 Call("UpdateMessageLayer");
                 await Task.Delay(300);
                 window.UpdateLayout();
                 foreach (var message in Session().Messages.OnScreen) report.Add($"   on screen: \"{message.Text.Replace("\n", " / ")}\" at ({message.X}, {message.Y}) from {message.Source}");
                 var roomText = ((Image)window.FindName("RoomMessageOverlay")).Source as BitmapSource;
-                var topRowsLit = 0;
-                if (roomText is not null)
+                int LitRows(BitmapSource? text, int from, int count)
                 {
-                    var pixels = new byte[roomText.PixelWidth * 4 * 4];
-                    roomText.CopyPixels(new Int32Rect(0, 0, roomText.PixelWidth, 4), pixels, roomText.PixelWidth * 4, 0);
-                    for (var i = 3; i < pixels.Length; i += 4) if (pixels[i] != 0) topRowsLit++;
+                    if (text is null) return 0;
+                    var lit = 0;
+                    var pixels = new byte[text.PixelWidth * count * 4];
+                    text.CopyPixels(new Int32Rect(0, from, text.PixelWidth, count), pixels, text.PixelWidth * 4, 0);
+                    for (var i = 3; i < pixels.Length; i += 4) if (pixels[i] != 0) lit++;
+                    return lit;
                 }
-                Check(topRowsLit > 30, $"the sword's first line runs on into the room's rows 0–3 ({topRowsLit} lit pixels there)");
+                var firstLine = LitRows(roomText, 12, 8);
+                var secondLine = LitRows(roomText, 20, 8);
+                Check(firstLine > 30 && secondLine > 30, $"the sword's two lines are drawn whole over the room's rows 12-27 ({firstLine} and {secondLine} lit pixels)");
                 Save((FrameworkElement)window.FindName("RoomDisplayGroup"), "room41-look-634-sword.png");
 
                 Session().ActivateObjectVerb(632, 0x36);
@@ -107,16 +109,9 @@ internal static class Program
                 window.UpdateLayout();
                 var messages = Session().Messages.OnScreen;
                 foreach (var message in messages) report.Add($"   on screen: \"{message.Text.Replace("\n", " / ")}\" at ({message.X}, {message.Y}) from {message.Source}");
-                var source = overlay.Source as BitmapSource;
-                var lit = 0;
-                if (source is not null)
-                {
-                    var pixels = new byte[source.PixelWidth * source.PixelHeight * 4];
-                    source.CopyPixels(pixels, source.PixelWidth * 4, 0);
-                    for (var i = 3; i < pixels.Length; i += 4) if (pixels[i] != 0) lit++;
-                }
+                var lit = LitRows(overlay.Source as BitmapSource, 0, 24);
                 Check(messages.Any(message => message.Y < 16) && lit > 50,
-                    $"the look line printed at y 12 shows on the text line ({lit} lit pixels of 320 x 16)");
+                    $"the look line printed at y 12 shows over the room's top rows ({lit} lit pixels in rows 0-23)");
                 var after = Geometry();
                 report.Add($"Room 41 with the text: {after}");
                 Check(before == after, "the room keeps its size and position when the text appears");

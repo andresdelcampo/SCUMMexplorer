@@ -1550,13 +1550,14 @@ public partial class MainWindow : Window
     private bool _roomPanMouseGesture;
 
     /// <summary>
-    /// The room screen's height in the game: ScummVM <c>initScreens(16, 144)</c> gives the main virtual screen
-    /// 128 rows (versions 1–6 outside the C64/NES ports), and <c>redrawBGStrip</c> draws only that many rows of
-    /// the room image, so rows 128–143 of LOOM's 144-row rooms never appear, nor do actors standing there.
+    /// The room screen's height in the game. <c>redrawBGStrip</c> draws the main virtual screen's rows of the room
+    /// image. ScummVM's default <c>initScreens(16, 144)</c> gives it 128 rows (versions 1–6 outside the C64/NES
+    /// ports); LOOM's boot (script 001 +0x0000, <c>roomOps setScreen 0, 144</c>) calls <c>initScreens(0, 144)</c>,
+    /// so LOOM shows all 144 rows of its rooms from screen row 0. Indy3 keeps the default (not checked).
     /// </summary>
-    private const int RoomScreenRows = 128;
+    private int RoomScreenRows => _game?.Id == GameId.Loom ? LoomVerbArea.Top - LoomMessageRenderer.RoomScreenTop : 128;
 
-    private static int ShownRoomRows(RoomImage room) => Math.Min(room.Height, RoomScreenRows);
+    private int ShownRoomRows(RoomImage room) => Math.Min(room.Height, RoomScreenRows);
 
     private void UpdateRoomViewportLayout()
     {
@@ -1574,9 +1575,9 @@ public partial class MainWindow : Window
         var verbStrip = VerbScreenShown();
         if (verbStrip) usableHeight = Math.Max(1, usableHeight - VerbStripNoteHeight);
         var shownRows = ShownRoomRows(room);
-        var textLine = TextLineShown();
+        var oneScreen = OneGameScreen();
         _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth,
-            usableHeight / (shownRows + (verbStrip ? LoomVerbArea.Height : 0) + (textLine ? LoomMessageRenderer.RoomScreenTop : 0)));
+            usableHeight / (shownRows + (verbStrip ? LoomVerbArea.Height : 0)));
         _roomDisplayScale = Math.Max(0.1, _roomDisplayScale);
         RoomViewport.HorizontalScrollBarVisibility = normalSize
             ? ScrollBarVisibility.Hidden : ScrollBarVisibility.Disabled;
@@ -1592,14 +1593,9 @@ public partial class MainWindow : Window
         VerbStripImage.Height = LoomVerbArea.Height * _roomDisplayScale;
         VerbMessageOverlay.Width = VerbStripImage.Width;
         VerbMessageOverlay.Height = VerbStripImage.Height;
-        TextLinePanel.Visibility = textLine ? Visibility.Visible : Visibility.Collapsed;
-        // With the text line, the three screens read as the game's one 200-row screen: no gap or rule between them.
-        VerbStripPanel.Margin = new Thickness(0, textLine ? 0 : 2, 0, 0);
-        VerbStripBorder.BorderThickness = new Thickness(0, textLine ? 0 : 1, 0, 0);
-        TextLinePanel.Width = RoomViewport.Width;
-        TextLineMessageOverlay.Width = LoomMessageRenderer.ScreenWidth * _roomDisplayScale;
-        TextLineMessageOverlay.Height = LoomMessageRenderer.RoomScreenTop * _roomDisplayScale;
-        TextLineMessageOverlay.HorizontalAlignment = HorizontalAlignment.Left;
+        // In the interactive LOOM mode the room and verb screens read as the game's one 200-row screen: no gap or rule.
+        VerbStripPanel.Margin = new Thickness(0, oneScreen ? 0 : 2, 0, 0);
+        VerbStripBorder.BorderThickness = new Thickness(0, oneScreen ? 0 : 1, 0, 0);
         VerbStripNote.MaxWidth = Math.Max(160, RoomViewport.Width);
         RoomViewport.Dispatcher.BeginInvoke(() =>
         {
@@ -3212,11 +3208,8 @@ public partial class MainWindow : Window
     // Verb-screen text (screen rows 144–199) as a 320 × 56 layer, or null.
     private BitmapSource? _verbMessageBitmap;
 
-    /// <summary>
-    /// The text line (screen rows 0–15, ScummVM's text virtual screen above the room) is kept above the room in the
-    /// interactive LOOM mode, as the verb screen is below it, so the room keeps its size when a script prints there.
-    /// </summary>
-    private bool TextLineShown() => _currentRoom is not null && GameClickActive && _game?.Id == GameId.Loom;
+    /// <summary>The interactive LOOM mode, where the room and the verb screen are drawn as the game's one screen.</summary>
+    private bool OneGameScreen() => _currentRoom is not null && GameClickActive && _game?.Id == GameId.Loom;
 
     /// <summary>The game's camera left edge in room pixels (ScummVM <c>virtscr[0].xstart</c>).</summary>
     private int GameCameraLeft(RoomImage room)
@@ -3228,7 +3221,7 @@ public partial class MainWindow : Window
     /// <summary>
     /// Draws the session's messages over the room and in the verb screen, at their
     /// screen positions relative to the game's camera: screen row y is room row
-    /// y − 16 (ScummVM <c>initScreens(16, 144)</c>), rows 144–199 are the verb screen.
+    /// y (the boot's <c>initScreens(0, 144)</c>), rows 144–199 are the verb screen.
     /// Charset 0 draws them; if it cannot be read, a UI font does, labelled as not the game's.
     /// </summary>
     private void UpdateMessageLayer()
@@ -3245,7 +3238,6 @@ public partial class MainWindow : Window
             RoomMessageOverlay.Visibility = Visibility.Collapsed;
             RoomMessageOverlay.ToolTip = null;
             _verbMessageBitmap = null;
-            TextLineMessageOverlay.Source = null;
         }
         else
         {
@@ -3255,7 +3247,6 @@ public partial class MainWindow : Window
                 var layer = LoomMessageRenderer.Render(messages, charset);
                 RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
                 _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
-                TextLineMessageOverlay.Source = MessageTextLineBitmap(layer, room.Palette);
                 if (session!.Messages.Talk is { Y: < LoomMessageRenderer.VerbScreenTop } talk &&
                     LoomMessageRenderer.Render(talk, charset).Bounds is { } bounds)
                     _talkTextRect = (bounds.Left + left, bounds.Top - LoomMessageRenderer.RoomScreenTop,
@@ -3265,7 +3256,6 @@ public partial class MainWindow : Window
             {
                 (RoomMessageOverlay.Source, _verbMessageBitmap, _talkTextRect) =
                     FallbackMessageBitmaps(messages, session!.Messages.Talk, room, left);
-                TextLineMessageOverlay.Source = null;
                 ObjectsNote.Text = $"Messages use a UI font, not the game's ({_charsetError ?? "charset 0 is unavailable"}).";
             }
             RoomMessageOverlay.Visibility = Visibility.Visible;
@@ -3295,24 +3285,6 @@ public partial class MainWindow : Window
             }
         }
         return FrozenBgra(room.Width, room.Height, pixels);
-    }
-
-    // The text line's text (screen rows 0–15) on a transparent 320 × 16 layer, or null when there is none.
-    private static BitmapSource? MessageTextLineBitmap(LoomMessageLayer layer, IReadOnlyList<uint> palette)
-    {
-        var width = LoomMessageRenderer.ScreenWidth;
-        var height = LoomMessageRenderer.RoomScreenTop;
-        var pixels = new byte[width * height * 4];
-        var any = false;
-        for (var y = 0; y < height; y++)
-        for (var x = 0; x < Math.Min(width, layer.Width); x++)
-        {
-            var index = layer.Pixels[y * layer.Width + x];
-            if (index == LoomMessageRenderer.Transparent) continue;
-            SetBgra(pixels, (y * width + x) * 4, index < palette.Count ? palette[index] : 0xFF000000u);
-            any = true;
-        }
-        return any ? FrozenBgra(width, height, pixels) : null;
     }
 
     // The verb screen's text on a transparent 320 × 56 layer, or null when there is none.

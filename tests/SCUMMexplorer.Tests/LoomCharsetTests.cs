@@ -58,19 +58,19 @@ public sealed class LoomCharsetTests
     }
 
     [Fact]
-    public void RoomAndVerbScreensClipTextAtTheirBottomAndTextLineRunsOn()
+    public void RoomAndVerbScreensClipTextAtTheirBottom()
     {
         if (!File.Exists(Path.Combine(Folder, "99.LFL"))) return;
         var charset = LoomCharset.TryLoad(Folder, 0, out _)!;
-        // initScreens(16, 144): the text screen is rows 0–15 and the room screen rows 16–143.
-        // ScummVM clips a line whose top is in the text screen at row 15; the app draws it whole (reading of
-        // the original, Room 41's y 12), so its glyphs reach past row 15 into the room.
+        // The boot's initScreens(0, 144): the room screen is rows 0–143, with no text screen above it, so a line
+        // at y 12 (Room 41's two-line messages) is drawn whole into the room's top rows.
         var glyphs = "AAAA"u8.ToArray();
         LoomMessage At(int y) => new(LoomMessageKind.Drawn, LoomMessageTable.NoActor, 1, [glyphs],
             10, y, false, 0, LoomMessageTable.DefaultRight, 15, null, "test", 0, 0, null);
         var inText = LoomMessageRenderer.Render(At(12), charset).Bounds!.Value;
         Assert.Equal(12, inText.Top);
-        Assert.True(inText.Bottom > LoomMessageRenderer.RoomScreenTop);
+        Assert.Equal(0, LoomMessageRenderer.RoomScreenTop);
+        Assert.True(inText.Bottom > 16);
         var inRoom = LoomMessageRenderer.Render(At(140), charset).Bounds!.Value;
         Assert.Equal(LoomMessageRenderer.VerbScreenTop, inRoom.Bottom);
     }

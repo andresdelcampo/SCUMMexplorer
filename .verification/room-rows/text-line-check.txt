@@ -1,0 +1,13 @@
+﻿Real MainWindow; object 632's verb 0x36 run directly through the session (exploration action). No physical input.
+Room 41 before: view 710,6x319,8 at (185,9, 2); scale 2,221
+PASS the room view shows all 144 rows (319,8 px = 144 rows)
+PASS no separate text line above the room
+PASS the verb screen starts where the room ends (y 321,8 vs 321,8): one screen, no gap
+   on screen: "Cuando termine de darle golpes, menuda / espada va a tener." at (160, 12) from Room 41 Object 634 Verb 0x36 +0x0000
+PASS the sword's two lines are drawn whole over the room's rows 12-27 (1183 and 368 lit pixels)
+   on screen: "Es dificil enterarse de algo, con tanto jaleo." at (160, 12) from Room 41 Object 632 Verb 0x36 +0x0002
+PASS the look line printed at y 12 shows over the room's top rows (1292 lit pixels in rows 0-23)
+Room 41 with the text: view 710,6x319,8 at (185,9, 2)
+PASS the room keeps its size and position when the text appears
+PASS the verb screen is still under the room
+Failures: 0

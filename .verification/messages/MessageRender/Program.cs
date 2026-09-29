@@ -54,7 +54,7 @@ for (var y = 0; y < 200; y++)
     for (var x = 0; x < 320; x++)
     {
         uint color = 0;
-        // initScreens(16, 144): the room screen is rows 16–143, so screen row y shows room row y − 16.
+        // The boot's initScreens(0, 144): the room screen is rows 0–143, so screen row y shows room row y.
         var roomY = y - LoomMessageRenderer.RoomScreenTop;
         if (roomY >= 0 && y < LoomMessageRenderer.VerbScreenTop && roomY < background.Height && viewLeft + x < background.Width)
             color = background.Palette[roomPixels[roomY * background.Width + viewLeft + x]];

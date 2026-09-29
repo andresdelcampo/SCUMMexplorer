@@ -28,8 +28,8 @@ public sealed record LoomVerbAreaPicture(byte[] Pixels, IReadOnlyList<LoomVerbAr
 }
 
 /// <summary>
-/// LOOM EGA's verb area (ScummVM <c>initScreens(16, 144)</c> for v3: the room
-/// occupies screen rows 16–143, the verb screen rows 144–199). This is a
+/// LOOM EGA's verb area (the boot's <c>initScreens(0, 144)</c>: the room
+/// occupies screen rows 0–143, the verb screen rows 144–199). This is a
 /// presentation of verb state, not the game's own drawing: text verbs, the
 /// note letters scripts print there, highlight colours and redraw timing are
 /// not drawn.
