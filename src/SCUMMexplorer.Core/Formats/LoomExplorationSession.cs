@@ -431,7 +431,11 @@ public sealed class LoomExplorationSession
         _runtime.Actors.Forget(ego, assumed is null
             ? $"Room {room.ResourceId:00} was selected from the catalog, and no decoded loadRoomWithEgo, or loadRoom followed by putting the ego in the room, with literal operands brings the ego into it, so where the ego would arrive is unknown"
             : $"Room {room.ResourceId:00} was selected from the catalog, so where the ego stood before its assumed arrival is unknown");
-        if (chosen is not null) EstimateEgoSize(room.ResourceId.Value, chosen);
+        if (chosen is not null)
+        {
+            EstimateEgoSize(room.ResourceId.Value, chosen);
+            ApplyArrivalClasses(room.ResourceId.Value, chosen);
+        }
         return EnterRoom(room, label is null ? arrival : $"{arrival} {label}", assumed, label,
             chosen is { IsLoadRoomWithEgo: false } ? chosen : null);
     }
@@ -550,8 +554,8 @@ public sealed class LoomExplorationSession
     /// literal size; Rooms 02, 15, 17, 18, 22, 23, 24 and 36 pass <c>var[0x07C]</c>, the size the ego had in the room
     /// it came from. A catalog visit skips that room, so the size left by the room shown before is not the route's.
     /// The route the assumed arrival stands for passed through its source room, whose entry set the size: that
-    /// size (followed back through rooms that pass <c>var[0x07C]</c> on) is taken as an estimate. A global script's
-    /// arrival takes the size its own code set before the room load. With no literal size on the route, the kept
+    /// size (followed back through rooms that pass <c>var[0x07C]</c> on) is taken as an estimate, unless the arrival's
+    /// own code set it before the room load, as most doors do (<c>move var[0x07C] = n</c>) and some scripts do. With no literal size on the route, the kept
     /// value is labelled as unknown.
     /// </summary>
     private void EstimateEgoSize(int roomId, LoomEgoArrival arrival)
@@ -574,10 +578,14 @@ public sealed class LoomExplorationSession
 
         (int? Size, string How) SizeOnRoute(LoomEgoArrival first)
         {
-            // The arrival's own code first (the size it set before the load), then the entries of the rooms it came through.
+            // The arrival's own code first (the size it set before the load: most doors move a literal into var[0x07C],
+            // Room 16's six give 0, 1 or 2), then the entries of the rooms it came through.
             var own = starts.Where(item => item.Source == first.Source && item.Offset < first.Offset && Literal(item) is not null)
-                .OrderByDescending(item => item.Offset).FirstOrDefault();
-            if (own is not null) return (Literal(own), $"{own.Source} +0x{own.Offset:X4} startScript {EgoSizeScript:000}, [{own.FirstArgument}] before the load");
+                .Select(item => (item.Offset, Size: Literal(item)!.Value, How: $"{item.Source} +0x{item.Offset:X4} startScript {EgoSizeScript:000}, [{item.FirstArgument}] before the load"))
+                .Concat(index.MovesTo(EgoSizeVariable).Where(item => item.Source == first.Source && item.Offset < first.Offset)
+                    .Select(item => (item.Offset, Size: item.Value, How: $"{item.Source} +0x{item.Offset:X4} sets {EgoSizeVariable} = {item.Value} before the load")))
+                .OrderByDescending(item => item.Offset).ToArray();
+            if (own.Length > 0) return (own[0].Size, own[0].How);
             var queue = new Queue<(int Room, string Path)>();
             var seen = new HashSet<int> { roomId };
             if (first.SourceRoom is int source && seen.Add(source)) queue.Enqueue((source, $"the route came through Room {source:00}"));
@@ -599,6 +607,35 @@ public sealed class LoomExplorationSession
         static int? Literal(LoomScriptStart start) =>
             start.FirstArgument is { } argument && argument.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
             int.TryParse(argument.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value) ? value : null;
+    }
+
+    /// <summary>
+    /// A catalog visit skips the arrival's own code, which may change the classes of the room's objects before its
+    /// load; the room's entry then tests them. Room 12 is reached only through script 053, which clears object 322's
+    /// class 24 (+0x022C) before its <c>loadRoom</c> (+0x0242); Room 12's entry puts the boat (actor 9) and gives
+    /// Bobbin costume 17 only while that class is clear (+0x0013). The arrival's literal <c>setClass</c>es on the
+    /// target room's objects that come before its load in the same code are applied, labelled as an estimate: which
+    /// branch led to the load was not executed.
+    /// </summary>
+    private void ApplyArrivalClasses(int roomId, LoomEgoArrival arrival)
+    {
+        var index = LoomEgoArrivalIndex.For(_game, _globalScriptCount);
+        foreach (var setClass in index.SetClassesIn(arrival.Source)
+                     .Where(item => item.Offset < arrival.Offset && index.RoomHasObject(roomId, item.ObjectId)))
+        {
+            _runtime.ObjectClasses.TryGetValue(setClass.ObjectId, out var bits);
+            foreach (var value in setClass.Values)
+            {
+                var cls = value & 0x7F;
+                if (value == 0) bits = 0;
+                else if (cls is >= 1 and <= 32)
+                    bits = (value & 0x80) != 0 ? bits | (1u << (cls - 1)) : bits & ~(1u << (cls - 1));
+            }
+            _runtime.ObjectClasses[setClass.ObjectId] = bits;
+            _visitTrace.Add($"catalog visit to Room {roomId:00}: object {setClass.ObjectId} classes set to 0x{bits:X6} ({arrival.Source} +0x{setClass.Offset:X4}, estimate)");
+            _uncertainties.Add($"Room {roomId:00} was selected from the catalog: {arrival.Source} +0x{setClass.Offset:X4} sets object {setClass.ObjectId}'s classes " +
+                               $"before the assumed arrival's load (+0x{arrival.Offset:X4}), so they were applied (estimate: the branch that led to the load was not executed).");
+        }
     }
 
     /// <summary>LOOM's script 017 (the ego's costume size) and the size it keeps (decoded).</summary>

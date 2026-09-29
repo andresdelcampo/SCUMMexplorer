@@ -52,3 +52,12 @@ Actor 12: no route in the session puts actor 12 into Room 02 except script 029 a
 - SceneLeaveCheck: 0 failures. ActorDrawCheck: 0. DoorwayClickCheck on Rooms 02, 03, 04, 08, 10, 37: 16/16.
 - Blockers: started but stopped unfinished when the user parked the session (30 Sep); not rerun.
 - Skipped: RoomAudit (room images unchanged), the playback checks (the playback path is unchanged; only catalog visits changed).
+
+## Follow-up: the user's checks (30 September)
+
+The user confirmed the fix works, and reported two cases:
+
+- **Room 18 from Room 16 kept Bobbin far too small.** Most doors set the size themselves before their load (`move var[0x07C] = n`; 26 sites, for example Room 03 object 160, Room 37 object 601, and Room 16's six doors with 0, 1 or 2). Room 16 object 346 sets 1 (+0x0000) before its `loadRoomWithEgo` into Room 18 (+0x0005). The estimate looked only for script 017 calls and fell back to Room 16's entry (2, the smallest). The arrival index now also records literal `move`s into globals, and the arrival's own code (a door's `move`, or a `startScript 017`) comes first. Room 18 from 16: costume 2. Room 02 now reads Room 03 object 160's own `move var[0x07C] = 2` (same result).
+- **Room 12 showed the big Bobbin instead of the boat.** Room 12 is reached only through script 053. 053 clears object 322's class 24 (`setClass 0x142, [0x18]`, +0x022C) before its `loadRoom 0x0C` (+0x0242). Room 12's entry runs its body only while that class is clear (`ifClassOfIs 0x142, [0x18]`, +0x0013). The body puts the boat (actor 9, costume 19, at (64, 119)) and gives Bobbin costume 17. The class starts set, and a catalog visit skipped 053, so there was no boat and Bobbin kept the previous costume. A catalog visit now applies the assumed arrival's literal `setClass`es on the target room's objects that come before its load in the same code. It is labelled as an estimate, because the branch that led to the load was not executed. Room 12 now shows the boat and costume 17.
+
+Checks: unit tests 241/241 (new: `Room18FromRoom16TakesTheDoorsOwnSize`, `Room12ShowsTheBoatAfterACatalogVisit`). No WPF harnesses were run for this follow-up: the user asked for only the relevant tests. The new unit tests cover both rooms. Not rerun: SceneLeaveCheck, ActorDrawCheck, DoorwayClickCheck, Blockers and RoomAudit. Other rooms' catalog visits can also change where an arrival's `setClass` touches the room's objects; that is not audited yet.

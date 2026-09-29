@@ -70,6 +70,12 @@ public sealed record LoomEgoArrival(int TargetRoom, int ObjectId, int WalkX, int
 /// <summary>A decoded <c>startScript</c> with a literal script number and the text of its first argument.</summary>
 public sealed record LoomScriptStart(string Source, int? SourceRoom, bool IsRoomEntry, int Offset, int Script, string? FirstArgument);
 
+/// <summary>A decoded <c>move</c> of a literal value into a global variable.</summary>
+public sealed record LoomLiteralMove(string Source, int? SourceRoom, int Offset, string Variable, int Value);
+
+/// <summary>A decoded <c>setClass</c> with a literal object and literal class values (0: clear all; 0x80|n: set n; n: clear n).</summary>
+public sealed record LoomLiteralSetClass(string Source, int Offset, int ObjectId, IReadOnlyList<int> Values);
+
 /// <summary>
 /// Every decoded <c>loadRoomWithEgo</c> with a literal object and room, and every
 /// literal <c>loadRoom</c> that straight-line code follows with
@@ -87,6 +93,9 @@ public sealed class LoomEgoArrivalIndex
         RegexOptions.CultureInvariant);
     private readonly Dictionary<int, List<LoomEgoArrival>> _byRoom = [];
     private readonly List<LoomScriptStart> _starts = [];
+    private readonly List<LoomLiteralMove> _moves = [];
+    private readonly List<LoomLiteralSetClass> _classes = [];
+    private readonly Dictionary<int, HashSet<int>> _objects = [];
 
     private LoomEgoArrivalIndex() { }
 
@@ -99,6 +108,15 @@ public sealed class LoomEgoArrivalIndex
     /// room entry, exit and local scripts, and object verbs, in source order.
     /// </summary>
     public IEnumerable<LoomScriptStart> StartsOf(int script) => _starts.Where(item => item.Script == script);
+
+    /// <summary>The literal <c>move</c>s into <paramref name="variable"/> in the same code as the arrivals, in source order.</summary>
+    public IEnumerable<LoomLiteralMove> MovesTo(string variable) => _moves.Where(item => item.Variable == variable);
+
+    /// <summary>The literal <c>setClass</c>es in <paramref name="source"/>, in source order.</summary>
+    public IEnumerable<LoomLiteralSetClass> SetClassesIn(string source) => _classes.Where(item => item.Source == source);
+
+    /// <summary>Whether <paramref name="objectId"/> is in <paramref name="room"/>'s object directory.</summary>
+    public bool RoomHasObject(int room, int objectId) => _objects.TryGetValue(room, out var ids) && ids.Contains(objectId);
 
     public static LoomEgoArrivalIndex For(GameLibrary game, int globalScriptCount)
     {
@@ -129,6 +147,16 @@ public sealed class LoomEgoArrivalIndex
                 if (instruction.Operation == "startScript" && StartOf(instruction, source, sourceRoom) is { } start)
                 {
                     index._starts.Add(start);
+                    continue;
+                }
+                if (instruction.Operation == "setClass" && SetClassOf(instruction, source) is { } setClass)
+                {
+                    index._classes.Add(setClass);
+                    continue;
+                }
+                if (instruction.Operation == "move" && MoveOf(instruction, source, sourceRoom) is { } move)
+                {
+                    index._moves.Add(move);
                     continue;
                 }
                 if (instruction.Operation == "loadRoom")
@@ -179,6 +207,7 @@ public sealed class LoomEgoArrivalIndex
                     }
         }
 
+        foreach (var (room, ids) in objectsByRoom) index._objects[room] = ids;
         foreach (var arrival in found)
         {
             if (!objectsByRoom.TryGetValue(arrival.TargetRoom, out var objects)) continue;
@@ -201,6 +230,31 @@ public sealed class LoomEgoArrivalIndex
         if (open >= 0 && close > open)
             first = operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
         return new LoomScriptStart(source, sourceRoom, source.EndsWith(" entry", StringComparison.Ordinal), instruction.Offset, script, first);
+    }
+
+    private static readonly Regex LiteralMove = new(@"^(?<variable>var\[0x[0-9A-Fa-f]+\]) = (?<value>0x[0-9A-Fa-f]+)$", RegexOptions.CultureInvariant);
+
+    private static LoomLiteralMove? MoveOf(LoomScriptInstruction instruction, string source, int? sourceRoom)
+    {
+        var match = LiteralMove.Match(instruction.Operands.Trim());
+        return match.Success && LiteralValue(match.Groups["value"].Value) is int value
+            ? new LoomLiteralMove(source, sourceRoom, instruction.Offset, match.Groups["variable"].Value, value)
+            : null;
+    }
+
+    private static LoomLiteralSetClass? SetClassOf(LoomScriptInstruction instruction, string source)
+    {
+        var operands = instruction.Operands;
+        var open = LoomBoundedScriptExecutor.ArgumentListStart(operands);
+        var close = operands.LastIndexOf(']');
+        if (open < 0 || close <= open) return null;
+        var head = operands[..open].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (head.Length == 0 || LiteralValue(head[0]) is not int objectId) return null;
+        var values = operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(LiteralValue).ToArray();
+        return values.Length == 0 || values.Any(value => value is null)
+            ? null
+            : new LoomLiteralSetClass(source, instruction.Offset, objectId, values.Select(value => value!.Value).ToArray());
     }
 
     private static readonly Regex Literal = new(@"^0x(?<value>[0-9A-Fa-f]+)$", RegexOptions.CultureInvariant);

@@ -157,10 +157,10 @@ public sealed class LoomActorLookTests
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == before));
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 2));
 
-        // Room 02's entry passes var[0x07C] to script 017; the assumed arrival (Room 03 object 160) came through
-        // Room 03, whose entry sets size 2 (+0x001E): costume var[0x079] = 3, whatever room was shown before.
+        // Room 02's entry passes var[0x07C] to script 017; the assumed arrival (Room 03 object 160) sets it to 2 (+0x0000)
+        // before its load: costume var[0x079] = 3, whatever room was shown before.
         Assert.Equal(3, session.Actors[0].Look.Costume);
-        Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("var[0x07C]") && line.Contains("Room 03 entry"));
+        Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("var[0x07C]") && line.Contains("Room 03 Object 160"));
     }
 
     [Fact]
@@ -176,5 +176,34 @@ public sealed class LoomActorLookTests
 
         // With the cutscene ended first (bit[0xD6E] = 0), Room 02's entry runs script 017 (+0x0052) and gives the small costume.
         Assert.Equal(3, session.Actors[0].Look.Costume);
+    }
+
+    [Fact]
+    public void Room18FromRoom16TakesTheDoorsOwnSize()
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 16));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 18));
+
+        // Room 16 object 346 sets var[0x07C] = 1 (+0x0000) before its loadRoomWithEgo into Room 18 (+0x0005): costume 2,
+        // not Room 16's own size 2 (costume 3).
+        Assert.Equal(2, session.Actors[0].Look.Costume);
+    }
+
+    [Fact]
+    public void Room12ShowsTheBoatAfterACatalogVisit()
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 12));
+
+        // Script 053 clears object 322's class 24 (+0x022C) before its loadRoom (+0x0242); Room 12's entry then puts the
+        // boat (actor 9, costume 19, at (64, 119)) and gives Bobbin costume 17 (+0x0013..+0x0080).
+        var boat = session.Actors.Single(actor => actor.Number == 9);
+        Assert.Equal((12, 64, 119, true, 19), (boat.Room, boat.X, boat.Y, boat.Visible, boat.Look.Costume));
+        Assert.Equal(17, session.Actors[0].Look.Costume);
     }
 }
