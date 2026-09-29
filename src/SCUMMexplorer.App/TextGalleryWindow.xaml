@@ -65,6 +65,9 @@
                     </ScrollViewer>
                     <StackPanel Grid.Row="3">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button x:Name="PlayCutsceneButton" Content="Play this cutscene" Click="PlayCutscene_Click"
+                                    Visibility="Collapsed" Padding="13,7" Margin="0,0,8,0"
+                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#B78442" FontWeight="SemiBold"/>
                             <Button x:Name="VisitRoomButton" Content="Visit room" Click="VisitRoom_Click"
                                     Visibility="Collapsed" Padding="13,7" Margin="0,0,8,0"
                                     Background="#B78442" Foreground="#111820" BorderThickness="0" FontWeight="SemiBold"/>

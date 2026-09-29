@@ -1,0 +1,16 @@
+﻿Real MainWindow and TextGalleryWindow; the gallery's "Play this cutscene" button is clicked through its Click event. No physical input.
+Known cutscenes by script: 044 = The opening (script 044); 052 = Script 052: Room 10 → Room 11 → Room 13; 046 = Script 046: the Elders' trial
+Texts per known cutscene script: 044: 9, 046: 40; script 052: 0 (decoded: it prints none)
+PASS a line of script 044 (the fairy) offers "Play this cutscene": Plays The opening (script 044), which prints this text. Stated start: a fresh session (seed 0) whose boot stops on the frame script 001 starts script 044, after the intro screen's answer (Room 69: difficulty and draft assumed, not simulated). The rest of the boot plays on the playback clock at the game's frame rate and ends as the app's own boot does, in Room 02. The current exploration state is replaced.
+PASS a line of script 046 (the Elders' trial) offers it
+PASS an object name offers no cutscene
+PASS a line of another indexed script offers no cutscene
+PASS the trial's cutscene group (Conversations and cutscenes) offers it
+PASS the gallery closes on the click
+PASS the interactive mode is turned on
+PASS the trial plays: status "Playing Script 046: the Elders' trial from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+PASS its first line is on screen after 8474 ms: Room 08, Script 46 +0x002F: Parece que los Ancianos están ocupados.
+PASS Escape ends it in Room 09 after 1455 ms (view Room 09)
+PASS the opening plays: status "Playing The opening (script 044) from a stated start (see the tooltip). Escape skips once the cutscene allows it.", boot stopped after 3 frames
+PASS Room 01 is shown with its points of light after 469 ms
+Failures: 0

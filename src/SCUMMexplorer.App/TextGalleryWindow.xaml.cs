@@ -11,6 +11,9 @@ using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.App;
 
+/// <summary>A known cutscene that the texts of one script belong to, and how the main window plays it.</summary>
+public sealed record GalleryCutscene(string Title, string Note, Action Play);
+
 public partial class TextGalleryWindow : Window
 {
     private sealed record GalleryItem(LoomTextEntry Entry, int? ConversationLines = null)
@@ -32,15 +35,19 @@ public partial class TextGalleryWindow : Window
     private readonly GameLibrary _game;
     private readonly LoomTextExtraction _extraction;
     private readonly Action<int> _visitRoom;
+    private readonly IReadOnlyDictionary<int, GalleryCutscene> _cutscenes;
     private readonly LoomEgaRoomDecoder _roomDecoder = new();
     private LoomTextEntry? _selectedEntry;
 
-    public TextGalleryWindow(GameLibrary game, LoomTextExtraction extraction, Action<int> visitRoom)
+    /// <param name="cutscenes">Known cutscenes by the indexed script that prints their texts (044, 046…).</param>
+    public TextGalleryWindow(GameLibrary game, LoomTextExtraction extraction, Action<int> visitRoom,
+        IReadOnlyDictionary<int, GalleryCutscene>? cutscenes = null)
     {
         InitializeComponent();
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _extraction = extraction ?? throw new ArgumentNullException(nameof(extraction));
         _visitRoom = visitRoom ?? throw new ArgumentNullException(nameof(visitRoom));
+        _cutscenes = cutscenes ?? new Dictionary<int, GalleryCutscene>();
 
         CoverageText.Text = $"{extraction.Entries.Count:N0} texts found. Browse spoken lines, object names and other stored words.";
         ExtractionDetails.Text =
@@ -105,6 +112,7 @@ public partial class TextGalleryWindow : Window
             SelectedText.Text = "";
             SourceDetails.Text = "";
             VisitRoomButton.Visibility = Visibility.Collapsed;
+            PlayCutsceneButton.Visibility = Visibility.Collapsed;
             RoomArtworkPreview.Source = null;
             RoomArtworkPreview.Visibility = Visibility.Collapsed;
         }
@@ -150,6 +158,9 @@ public partial class TextGalleryWindow : Window
                 (item.Entry.SourceObjectName is string sourceName ? $" · {sourceName}" : "");
         SourceDetails.Text = $"{item.Entry.Source}\n{location} / byte offset +0x{item.Entry.CodeOffset:X4}";
         VisitRoomButton.Visibility = item.Entry.RoomId.HasValue ? Visibility.Visible : Visibility.Collapsed;
+        var cutscene = CutsceneFor(item.Entry);
+        PlayCutsceneButton.Visibility = cutscene is null ? Visibility.Collapsed : Visibility.Visible;
+        PlayCutsceneButton.ToolTip = cutscene is null ? null : $"Plays {cutscene.Title}, which prints this text. {cutscene.Note}";
 
         if (item.Entry.RoomId is not int roomId)
         {
@@ -178,6 +189,17 @@ public partial class TextGalleryWindow : Window
         if (_selectedEntry?.RoomId is not int roomId) return;
         _visitRoom(roomId);
         Close();
+    }
+
+    /// <summary>The known cutscene whose script prints this text, if any.</summary>
+    private GalleryCutscene? CutsceneFor(LoomTextEntry entry) =>
+        entry.ScriptId is int scriptId && _cutscenes.TryGetValue(scriptId, out var cutscene) ? cutscene : null;
+
+    private void PlayCutscene_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedEntry is null || CutsceneFor(_selectedEntry) is not { } cutscene) return;
+        Close();
+        cutscene.Play();
     }
 
     private void Export_Click(object sender, RoutedEventArgs e)

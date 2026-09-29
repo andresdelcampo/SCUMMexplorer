@@ -164,7 +164,7 @@ public partial class MainWindow : Window
             {
                 if (_game?.Rooms.FirstOrDefault(room => room.ResourceId == roomId) is { } room)
                     SelectResourceInTree(room);
-            }) { Owner = this };
+            }, GalleryCutscenes()) { Owner = this };
             gallery.ShowDialog();
         }
         catch (Exception ex)
@@ -2819,6 +2819,28 @@ public partial class MainWindow : Window
             "Room 08 object 255 verb 0x38 (the sanctuary door) starts script 046 (+0x0000): a cutscene with its skip point at " +
             "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x1421 in Room 09.")
     ];
+
+    /// <summary>
+    /// The known cutscenes by the indexed script that prints their texts, for Game Texts' "Play this cutscene".
+    /// Script 052 prints no text (decoded), so none of its texts can offer it. Empty outside a LOOM session.
+    /// </summary>
+    private Dictionary<int, GalleryCutscene> GalleryCutscenes()
+    {
+        var cutscenes = new Dictionary<int, GalleryCutscene>();
+        if (_game?.Id != GameId.Loom || _session is null || _indexedObjectSnapshot is null) return cutscenes;
+        cutscenes[LoomExplorationSession.OpeningScript] = new(OpeningTitle, OpeningStartNote, () => PlayFromGameTexts(PlayOpening));
+        foreach (var cutscene in KnownCutscenes)
+            cutscenes[cutscene.Script] = new(cutscene.Title, CutsceneStartNote(cutscene),
+                () => PlayFromGameTexts(() => PlayKnownCutscene(cutscene)));
+        return cutscenes;
+    }
+
+    /// <summary>Plays a cutscene chosen in Game Texts, turning the interactive mode on first (playback runs only there).</summary>
+    private void PlayFromGameTexts(Action play)
+    {
+        if (SessionModeToggle.IsChecked != true) SessionModeToggle.IsChecked = true;
+        play();
+    }
 
     private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
     {
