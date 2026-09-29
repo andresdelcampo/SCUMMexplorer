@@ -1533,6 +1533,15 @@ public partial class MainWindow : Window
     private Button? _roomPanMouseButton;
     private bool _roomPanMouseGesture;
 
+    /// <summary>
+    /// The room screen's height in the game: ScummVM <c>initScreens(16, 144)</c> gives the main virtual screen
+    /// 128 rows (versions 1–6 outside the C64/NES ports), and <c>redrawBGStrip</c> draws only that many rows of
+    /// the room image, so rows 128–143 of LOOM's 144-row rooms never appear, nor do actors standing there.
+    /// </summary>
+    private const int RoomScreenRows = 128;
+
+    private static int ShownRoomRows(RoomImage room) => Math.Min(room.Height, RoomScreenRows);
+
     private void UpdateRoomViewportLayout()
     {
         if (_currentRoom is not { } room || RoomViewport is null) return;
@@ -1549,8 +1558,9 @@ public partial class MainWindow : Window
         // The optional verb strip shares the height: 56 screen rows at the room's scale, and its note.
         var verbStrip = VerbScreenShown();
         if (verbStrip) usableHeight = Math.Max(1, usableHeight - VerbStripNoteHeight);
+        var shownRows = ShownRoomRows(room);
         _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth,
-            usableHeight / (room.Height + (verbStrip ? LoomVerbArea.Height : 0)));
+            usableHeight / (shownRows + (verbStrip ? LoomVerbArea.Height : 0)));
         _roomDisplayScale = Math.Max(0.1, _roomDisplayScale);
         RoomViewport.HorizontalScrollBarVisibility = normalSize
             ? ScrollBarVisibility.Hidden : ScrollBarVisibility.Disabled;
@@ -1559,7 +1569,9 @@ public partial class MainWindow : Window
         RoomViewport.Width = visibleSourceWidth * _roomDisplayScale;
         RoomSceneSurface.Width = room.Width * _roomDisplayScale;
         RoomSceneSurface.Height = room.Height * _roomDisplayScale;
-        RoomViewport.Height = RoomSceneSurface.Height;
+        // The viewport shows the rows the game shows; the surface keeps the whole image, so every overlay keeps
+        // the room's coordinates, and the viewport (no vertical scrolling) clips the rest.
+        RoomViewport.Height = shownRows * _roomDisplayScale;
         VerbStripImage.Width = LoomVerbArea.Width * _roomDisplayScale;
         VerbStripImage.Height = LoomVerbArea.Height * _roomDisplayScale;
         VerbMessageOverlay.Width = VerbStripImage.Width;

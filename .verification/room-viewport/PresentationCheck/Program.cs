@@ -61,8 +61,10 @@ internal static class Program
                 Check(viewport.ViewportWidth / roomScale <= 320.1, $"viewport capped at 320 source pixels: {viewport.ViewportWidth / roomScale}");
                 Check(roomScale > 1, $"room enlarged to use available area: scale {roomScale}");
                 Check(viewport.ActualHeight <= source.PixelHeight * roomScale + 24, $"normal viewport hugs scaled room height: {viewport.ActualHeight}/{source.PixelHeight * roomScale}");
-                Check(Math.Abs(viewport.ActualHeight - preview.ActualHeight) < 1,
-                    $"hidden horizontal scrollbar adds no viewport height: {viewport.ActualHeight}/{preview.ActualHeight}");
+                // Since 29 September the viewport shows the game's 128 room rows (ScummVM initScreens(16, 144)), not all 144.
+                var shownHeight = preview.ActualHeight * Math.Min(128, source.PixelHeight) / source.PixelHeight;
+                Check(Math.Abs(viewport.ActualHeight - shownHeight) < 1,
+                    $"hidden horizontal scrollbar adds no viewport height, and the viewport shows the game's 128 rows: {viewport.ActualHeight}/{shownHeight}");
                 Check(viewport.HorizontalScrollBarVisibility == ScrollBarVisibility.Hidden && viewport.ScrollableWidth > 0,
                     "wide room keeps horizontal scrolling available while hiding the scrollbar");
                 Check(viewport.ScrollableWidth > 0, "wide Room 04 scrolls");

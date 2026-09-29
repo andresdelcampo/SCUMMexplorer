@@ -1,0 +1,19 @@
+﻿Real MainWindow; room points are given to HandleRoomPoint on the playback clock. No physical input.
+PASS Room 02 after the boot, the ego on the cliff: (828, 60)
+First click on the exit (450, 60), costume and room changes:
+          75 ms: Room 02, ego (828, 60) costume 1, view Room 02, cutscene False
+        4797 ms: Room 02, ego (798, 118) costume 2, view Room 02, cutscene True
+      after 11712 ms: status "Click sent to the game: the scene changed; click again to go on"; held: 1 cutscene(s) begun, the ego put 1 time(s); fallback: no
+PASS the view stays in Room 02: view Room 02, session Room 02
+PASS the smaller Bobbin (costume 2) waits on the path after script 045's box-4 scene: (756, 107) costume 2
+PASS no doorway fallback ran: the click began a cutscene, and the game waits for another click
+PASS the status says to click again: "Click sent to the game: the scene changed; click again to go on"
+Second click on the same point:
+          59 ms: Room 02, ego (756, 107) costume 2, view Room 02, cutscene False
+        7810 ms: Room 02, ego (627, 123) costume 3, view Room 02, cutscene True
+PASS the second click stops at box 10's change of scene and waits again: (609, 110), view Room 02
+Third click on the same point:
+          54 ms: Room 02, ego (609, 110) costume 3, view Room 02, cutscene False
+        7117 ms: Room 03, ego (278, 62) costume 3, view Room 03, cutscene False
+PASS the third click reaches the walk point, runs verb 0x38 and enters Room 03 through the game's click: view Room 03; status "Click sent to the game: entered Room 03"
+Failures: 0
