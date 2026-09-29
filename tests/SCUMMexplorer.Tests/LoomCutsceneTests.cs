@@ -196,6 +196,31 @@ public sealed class LoomCutsceneTests
     }
 
     [Fact]
+    public void ACatalogVisitDuringACutsceneEndsItSoClicksAreRead()
+    {
+        if (Load() is not { } data) return;
+        var (game, index) = data;
+        var session = new LoomExplorationSession(game, index, completeBoot: true);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 8));
+        // The trial (script 046) is a cutscene: script 002 turns input off at its start.
+        session.ActivateObjectVerb(255, 0x38);
+        for (var frame = 0; frame < 300; frame++) session.AdvanceFrame();
+        Assert.True(session.InCutscene);
+        Assert.Contains("not sent, because user input is off", string.Join(" ", session.Click(160, 100).Uncertainties));
+
+        // Leaving from the catalog stops script 046 and ends its cutscene (script 003 turns input back on).
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 2));
+        Assert.False(session.InCutscene);
+        Assert.Contains("catalog visit to Room 02: stops script 046, which began a cutscene (data 1)", session.SessionTrace);
+        Assert.Contains("catalog visit to Room 02: endCutscene runs script 3 with data 1", session.SessionTrace);
+        Assert.Contains(session.Snapshot.Uncertainties, item => item.Contains("selected from the catalog while a cutscene played", StringComparison.Ordinal));
+        for (var frame = 0; frame < 30; frame++) session.AdvanceFrame();
+        Assert.Equal(2, session.Snapshot.RoomId);
+        var click = session.Click(160, 100);
+        Assert.DoesNotContain(click.Uncertainties, item => item.Contains("not sent", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void AWalkIntoRoom37sBox8PlaysTheFirewoodScene()
     {
         if (Load() is not { } data) return;

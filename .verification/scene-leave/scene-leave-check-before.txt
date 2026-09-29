@@ -1,0 +1,15 @@
+﻿Real MainWindow; the trial played from its known-cutscene entry, Room 02 picked in the tree mid-scene, then a click given to HandleRoomPoint (assumed input). No physical input.
+After 8 s of the trial: room 8, in cutscene True, playback True, talk ""
+PASS the trial's cutscene is playing when Room 02 is picked
+After the pick: room 2 (session 2), in cutscene True, in scene True, playback False
+PASS Room 02 is open in the view and in the session
+FAIL no cutscene is open in Room 02
+Ego before the click: (568, 114) in Room 2
+   click: A click at (488, 114) in Room 02, sent to the game's input script as assumed input: not sent, because user input is off (cursorCommand), and ScummVM's checkExecVerbs reads no click then.
+   click: Script 46 +0x0114 reached loadRoom after a frame advance.
+   click: A click at (488, 114) in Room 02, sent to the game's input script as assumed input; loadRoom at Script 46 +0x0114 → Room 09. The explorer's input (assumed) went on through the game's own scripts; walks were taken to end at once.
+   click: Room 09 entry script +0x0000: presentation operation not applied: resourceRoutines
+FAIL the click at (488, 114) is sent to the game's input script
+Ego after the click: (160, 132); status "Click sent to the game: entered Room 09"
+PASS Bobbin walks after the click
+Failures: 2

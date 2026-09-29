@@ -413,17 +413,79 @@ public sealed class LoomExplorationSession
             return EnterRoom(room, $"{reachedAction.Evidence} The explorer's input (assumed) went on through the game's own scripts; walks were taken to end at once.", reachedAction.ReachedRoomLoad);
         if (reachedAction is not null)
             return EnterRoom(room, $"{reachedAction.Evidence} Actor walk and input dispatch were not simulated.", reachedAction.ReachedRoomLoad);
+        var closedScenes = CloseScenesForCatalogVisit(room.ResourceId.Value);
+        var snapshot = CatalogEnter(room);
+        if (closedScenes.Count == 0) return snapshot;
+        EndClosedScenes(room.ResourceId.Value, closedScenes);
+        return Snapshot;
+    }
+
+    private LoomSessionSnapshot CatalogEnter(GameResource room)
+    {
         var arrival = $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input.";
         _runtime.Messages.RouteSkipped($"Room {room.ResourceId:00} was selected from the catalog, so prints on the route to it did not run");
         if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
             return EnterRoom(room, arrival);
-        var (assumed, label, chosen) = PickCatalogArrival(room.ResourceId.Value, ego);
+        var (assumed, label, chosen) = PickCatalogArrival(room.ResourceId!.Value, ego);
         // The ego's position before the arrival (where the route would have left it) is not known.
         _runtime.Actors.Forget(ego, assumed is null
             ? $"Room {room.ResourceId:00} was selected from the catalog, and no decoded loadRoomWithEgo, or loadRoom followed by putting the ego in the room, with literal operands brings the ego into it, so where the ego would arrive is unknown"
             : $"Room {room.ResourceId:00} was selected from the catalog, so where the ego stood before its assumed arrival is unknown");
         return EnterRoom(room, label is null ? arrival : $"{arrival} {label}", assumed, label,
             chosen is { IsLoadRoomWithEgo: false } ? chosen : null);
+    }
+
+    /// <summary>
+    /// A catalog visit while a cutscene plays leaves the scene, which the game never does: the scene's scripts would
+    /// go on loading their own rooms, and input (off since the cutscene start script, script 002's
+    /// <c>cursorCommand userInputSoftOff</c>) would stay off in the chosen room, so no click would be read. The session
+    /// stops the script that began each open cutscene (innermost first) before the room is entered, and
+    /// <see cref="EndClosedScenes"/> then ends them. Returns each closed cutscene's data and its script, or nothing
+    /// when no cutscene is open.
+    /// </summary>
+    private List<(ushort Data, string Script)> CloseScenesForCatalogVisit(int roomId)
+    {
+        var closed = new List<(ushort, string)>();
+        if (!InCutscene) return closed;
+        while (_cutscenes.Count > 0)
+        {
+            _overrides.Remove(_cutscenes.Count);
+            var (data, owner) = _cutscenes.Pop();
+            var ownerScripts = _pending.Where(item => item.Frame == owner).ToArray();
+            var script = ownerScripts.Length == 0
+                ? "its script (no longer running)"
+                : string.Join(", ", ownerScripts.Select(item => item.ScriptNumber is int number ? $"script {number:000}" : $"a Room {item.RoomId:00} script"));
+            foreach (var item in ownerScripts)
+                if (item.ScriptNumber is int number) _stopped.Add(number);
+            _pending.RemoveAll(item => item.Frame == owner);
+            _visitTrace.Add($"catalog visit to Room {roomId:00}: stops {script}, which began a cutscene (data {data})");
+            closed.Add((data, script));
+        }
+        return closed;
+    }
+
+    /// <summary>
+    /// Ends the cutscenes a catalog visit closed as <c>endCutscene</c> would (ScummVM: <c>VAR_OVERRIDE</c> = 0, then the
+    /// script in <c>VAR_CUTSCENE_END_SCRIPT</c> with the cutscene's data), after the chosen room is entered: LOOM's
+    /// script 003 turns the cursor and input back on, unfreezes the scripts and makes the camera follow the ego.
+    /// An explorer action, labelled as such.
+    /// </summary>
+    private void EndClosedScenes(int roomId, IReadOnlyList<(ushort Data, string Script)> closed)
+    {
+        _runtime.GlobalVariables[OverrideVariable] = 0;
+        _runtime.EstimatedVariables.Remove(OverrideVariable);
+        var known = _runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var endScript);
+        foreach (var (data, script) in closed)
+        {
+            _uncertainties.Add($"Room {roomId:00} was selected from the catalog while a cutscene played: the session stopped {script}, " +
+                               (known
+                                   ? $"and ran the cutscene end script ({CutsceneEndScriptVariable} = {endScript}) with data {data} as endCutscene would, so input is on again. "
+                                   : $"but the cutscene end script ({CutsceneEndScriptVariable}) is unknown, so its effects were not applied. ") +
+                               "An explorer action: the game never leaves a scene this way, and the scene's remaining room loads and texts did not run.");
+            if (!known || endScript == 0) continue;
+            _visitTrace.Add($"catalog visit to Room {roomId:00}: endCutscene runs script {endScript} with data {data}");
+            RunStartedScript(endScript, 0, new Dictionary<string, ushort> { ["local[0x000]"] = data }, 0, []);
+        }
     }
 
     /// <summary>

@@ -1,0 +1,16 @@
+﻿Real MainWindow; the trial played from its known-cutscene entry, Room 02 picked in the tree mid-scene, then a click given to HandleRoomPoint (assumed input). No physical input.
+After 8 s of the trial: room 8, in cutscene True, playback True, talk ""
+PASS the trial's cutscene is playing when Room 02 is picked
+After the pick: room 2 (session 2), in cutscene False, in scene False, playback False
+   trace: catalog visit to Room 02: stops script 046, which began a cutscene (data 1)
+   trace: catalog visit to Room 02: endCutscene runs script 3 with data 1
+PASS Room 02 is open in the view and in the session
+PASS no cutscene is open in Room 02
+Ego before the click: (568, 114) in Room 2
+   click: A click at (488, 114) in Room 02, sent to the game's input script as assumed input. ScummVM runInputScript(2, 0, 0) runs script 5 (var[0x020], VAR_VERB_SCRIPT, set by script 001 +0x016B); the click's point and timing are the explorer's, not the game's.
+   click: Assumed input timing for a single click: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = 60; the frame loop counts it on from there, but the player's time before the click is not known.
+   click: Script 06 +0x0000: findObject at +0x0096 reads the virtual mouse: assumed input: a single click at (488, 114), sent by the explorer
+PASS the click at (488, 114) is sent to the game's input script
+Ego after the click: (540, 108); status "Click sent to the game (assumed input)"
+PASS Bobbin walks after the click
+Failures: 0
