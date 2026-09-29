@@ -3,35 +3,32 @@ Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md firs
 State at the start:
 
 * Git: master. The latest commits:
-  * the next-session prompt after the cutscene layout;
-  * 53974e4 "Keep the room one size through cutscenes; dark disabled buttons";
-  * 9653eb8, the previous next-session prompt.
-* Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code. If `git status` shows their uncommitted changes (on 29 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
-* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 230/230 (not rerun on 29 Sep after the layout change: no Core change).
-* RoomAudit: 0 gaps in all 76 rooms. Blockers: the only real stops left are `expression` (3) (.verification/frame-timing/blockers-after.txt).
-* WPF checks (29 Sep): CutsceneLayoutCheck 0 (new); VerbAreaCheck 0 (two checks updated for the kept verb screen); PresentationCheck (room-viewport) 0; CameraPanCheck 0; FirewoodPlaybackCheck 0, GameTextsCutsceneCheck 0, OpeningPlaybackCheck 0, CutscenePlaybackCheck 0 and DoorwayClickCheck 16/16 (before the layout change). Not run since M3a: MessageAppCheck, ClickInputCheck.
-* Worktrees: `.claude/worktrees/xenodochial-grothendieck-b05ef4` was this session's (junctions to Games/ and scummvm/). The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
+  * the next-session prompt after the text line;
+  * 56c4c51 "Show the game's text line above the room";
+  * d7a7716 "Play the sounds scripts start while a cutscene plays".
+* Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code (the room music code in MainWindow: `UpdateRoomMusicActions`, `PlayRoomCueAsync`, `_audioPlayer` and the room cue handlers). If `git status` shows their uncommitted changes (on 29 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
+* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 230/230 (29 Sep; no Core change last session).
+* RoomAudit: 0 gaps in all 76 rooms (not rerun: no Core change). Blockers: the only real stops left are `expression` (3) (.verification/frame-timing/blockers-after.txt).
+* WPF checks (29 Sep): SceneSoundCheck 0 (new); TextLineCheck 0 (new); CutsceneLayoutCheck 0; VerbAreaCheck 0 (its expected scale now counts the text line); PresentationCheck 0; CameraPanCheck 0. Before the text line: FirewoodPlaybackCheck 0, GameTextsCutsceneCheck 0, OpeningPlaybackCheck 0, CutscenePlaybackCheck 0, DoorwayClickCheck 16/16. Not run since M3a: MessageAppCheck, ClickInputCheck.
+* Worktrees: `.claude/worktrees/awesome-jones-7f0c2d` was last session's (junctions to Games/ and scummvm/). The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
 
 Done last session:
 
-* The user decided that the app does **not** start with the opening (maybe an option later; not now). The opening plays correctly from "Play a cutscene"; it holds on the Lucasfilm and LOOM title screens for a while first, which made it look broken.
-* Cutscene layout (.verification/cutscene-layout/validation.md): in the interactive mode the verb screen is always kept under the room (`VerbScreenShown`), the pan row is always reserved in the 320-pixel view and its arrows are hidden while `SessionInScene` (`UpdateRoomScrollButtons`, called from `UpdatePlaybackControls`), the pan row sits under the verb strip, `RoomControlsPanel` has `MinHeight="108"`, and an implicit dark `Button` style in MainWindow.xaml draws disabled buttons dark. The room keeps one size through the opening and the trial.
-* Checked: the "bottom of the room is cut" report matches the game: ScummVM `initScreens(16, 144)` gives the room 128 rows between the text line (rows 0–15) and the verb screen.
+* Sound in cutscenes (.verification/cutscene-sound/validation.md): a separate `SceneSoundPlayer` (src/SCUMMexplorer.App/SceneSoundPlayer.cs) follows the session's `SoundEvents` on the playback clock (`PlaybackStep` calls `Update()`; `FinishPlayback` flushes; `PlayOpening`/`PlayKnownCutscene` call `Attach` right after building their session; pause/resume; it stops on reset, game load, mode off and when the app's own `_audioPlayer` opens a sound). Music plays as the AdLib rendition; the game's AdLib sound effects (ScummVM `Player_AD` sfx) are not decoded, so effects play as the PC speaker rendition (presentation). The opening starts sound 25; the trial 31, the notes 8/4/5/1, the cues 23/16/17 and 25; Room 37's entry 27. The user was asked to listen; no answer yet.
+* The user picked "text position" next. Checked against ScummVM: messages go where their slot says; the trial's lines are at y 152 (script 046 +0x002F), in the verb screen as in the game. What was missing was the text line (rows 0–15), where Room 41's lines start (script 016 with y 12). The interactive mode now keeps the text line above the room (`TextLinePanel`, `TextLineMessageOverlay`, `TextLineShown()`), draws text there, and the text line, room and verb screen touch with no gap (.verification/text-line/validation.md). ScummVM clips a glyph at the text screen's row 15, so Room 41's line at y 12 shows its top 4 rows: worth checking in ScummVM.
 
-The user's issue list (29 Sep), with their priority picks marked:
+The user's issue list (29 Sep):
 
-* (picked, done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons.
-* (picked, next) no music or sound in cutscenes.
+* (done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons; no music or sound in cutscenes; text position (the text line).
 * Hetchel flies as a human instead of a swan.
 * Bobbin floats on top of the background: no depth (priority masks, M2c).
-* Text could show where the game shows it: over the room / the text line above it (rows 0–15), not in the verb area.
 * After the distaff shows the open spell, the notes keep their shine and colour in the verb area.
 * Spells cannot be cast with keys.
 
 Tasks, in order:
 
-1. Sound in cutscenes: play the music and effects the scripts start while a cutscene plays (the opening, 046, 086). The session records them (`LoomExplorationSession.SoundEvents`, `LoomSessionSoundEvent`; `ReachedSoundEvents`); MainWindow reads them only in the room music code (around `SoundEvents.ToArray()`), which belongs to the other agent's music player. Find a way that plays the sounds from the playback clock (`PlaybackStep`/`ShowPlaybackFrame`) through the existing audio (AdLib via NukedOPL3Sharp, PC speaker) without editing their code; if that is impossible, ask the user first. Verify with a harness that the opening's sounds start on the frames the scripts reach (and say which ones are music vs effects), and ask the user to listen.
-2. Ask the user which of the remaining issues comes next (Hetchel as the swan, depth masks, text position, distaff shine, keys for spells), with a recommendation. Check each against ScummVM before changing anything.
+1. Ask the user how the cutscene sound sounds (the opening, the trial) and whether the text line looks right (Room 41; the trial's text under the picture). Fix what they report first. If they want the game's AdLib effects instead of the PC speaker ones, that is ScummVM `Player_AD`'s sfx path (`players/player_ad.cpp`): a separate task; ask before starting.
+2. Ask the user which of the remaining issues comes next (Hetchel as the swan, depth masks, distaff shine, keys for spells), with a recommendation (depth masks change the most rooms; Hetchel is likely one costume or actor setup). Check each against ScummVM before changing anything.
 3. Why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit: trace script 006's walk and sentence (session probe); if the click can work, use it in the 086 entry.
 4. More known cutscenes with text, each verified by a harness like FirewoodPlaybackCheck.
 
@@ -85,4 +82,10 @@ Tooling notes:
 * The `mcp__ccd_session_mgmt__get_usage` tool (load it with ToolSearch) reports the context's tokensUsed for the 250K rule. On 29 Sep the account's weekly limit was at 81%.
 * CutsceneLayoutCheck (.verification/cutscene-layout): `<Games\loom> <output folder>`, about 2 minutes; plays the opening and 40 s of script 046 and samples the room view's size, the verb strip, the arrows and disabled-button brightness.
 * App-wide WPF styles go in MainWindow.xaml's resources, not App.xaml: the harnesses create `new Application()`, so App.xaml's resources never load there.
-* The session tokens were at 206K when the last session stopped (weekly limit 85%).
+* SceneSoundCheck (.verification/cutscene-sound): `<Games\loom> <output folder>`, about 70 s; the opening on the real clock for 20 s, then script 046 stepped through `PlaybackTimer_Tick` (with the timer stopped) for 2,500 frames, compared with a separate session's reached sound events. `SceneSoundPlayer.Log` lists what the player did (frame, action, sound, kind).
+* TextLineCheck (.verification/text-line): `<Games\loom> <output folder>`, about 20 s; Room 41, object 632 verb 0x36 run directly.
+* The playback clock plays sounds from `PlaybackStep`; `_playbackBatch` is true while an instant playback runs all its frames.
+* The layout counts 16 text-line rows in the interactive LOOM mode (`UpdateRoomViewportLayout`): a harness that computes the expected room scale must add them when `TextLinePanel` is visible.
+* ScummVM text placement: `displayDialog` (string.cpp) sets `_charset->_top = ypos`; `CharsetRendererV3::printChar` (charset.cpp) draws into `findVirtScreen(_top)`, clipped at that screen's bottom for the one-buffer screens (text, verb).
+* Python edits of docs: a helper `edit(path, [(old, new)])` in %TEMP%\edit.py keeps line endings and BOM; put non-ASCII or backslash-heavy text in a file written with the Write tool and read it from python, rather than in a heredoc.
+* The session tokens were at 243K when the last session stopped (weekly limit 87%).
