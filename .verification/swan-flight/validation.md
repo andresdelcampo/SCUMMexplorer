@@ -32,6 +32,6 @@ In the game's code, 41 `actorOps` sites name the actor through a local (from `.v
 - New unit test `LoomActorLookTests.ActorOpsOnAVariableActorAppliesItsFirstItem`: plays the trial to Room 11 and expects actors 2–10 in Room 11 with costume 80. Tests 234/234; build 0 warnings.
 - ActorDrawCheck: 0 failures (twice, deterministic). It was also run at HEAD in a temporary worktree: the Room 03 line differs only in the costume-9 actors (layer 48 → 119 px). [actor-draw-check.txt](actor-draw-check.txt).
 - RoomAudit: 0 gaps in all 76 rooms ([room-audit.txt](room-audit.txt)). Object images are unaffected: the room-audit PNGs were not refreshed.
-- Blockers: see below.
+- Blockers: the output is identical to .verification/frame-timing/blockers-after.txt (the only real stops are `expression` (3)).
 - Skipped (not touched: click path, doorways, room loading, text, sound): DoorwayClickCheck, TextLineCheck, SceneSoundCheck, CutsceneLayoutCheck, VerbAreaCheck, PresentationCheck, CameraPanCheck, the playback checks.
 - Not compared with the running ScummVM. The fix follows `o5_actorOps` and the decoded script.
