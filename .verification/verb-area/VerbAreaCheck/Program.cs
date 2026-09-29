@@ -172,15 +172,18 @@ internal static class Program
                 // The layout's rule: the room and the verb screen (56 rows, and 36 px kept for its note) share the host's height.
                 var roomImage = Field("_currentRoom")!;
                 var roomWidth = (int)roomImage.GetType().GetProperty("Width")!.GetValue(roomImage)!;
-                var roomHeight = (int)roomImage.GetType().GetProperty("Height")!.GetValue(roomImage)!;
+                // Since the crop (29 Sep) the view shows the game's 128 room rows, and the pan buttons' panel, not a scroll bar,
+                // sits under a room wider than the view.
+                var roomHeight = Math.Min(128, (int)roomImage.GetType().GetProperty("Height")!.GetValue(roomImage)!);
                 var normal = ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("NormalRoomWidthToggle")).IsChecked == true;
                 var visibleWidth = normal ? Math.Min(320, roomWidth) : roomWidth;
-                var scroll = normal && roomWidth > visibleWidth ? 17 : 0;
+                var panPanel = (FrameworkElement)window.FindName("RoomScrollButtonsPanel");
+                var pan = panPanel.Visibility == Visibility.Visible ? panPanel.Height + panPanel.Margin.Top + panPanel.Margin.Bottom : 0;
                 var shown = strip.Visibility == Visibility.Visible;
                 var expectedScale = Math.Min(host.ActualWidth / visibleWidth,
-                    (host.ActualHeight - scroll - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0)));
+                    (host.ActualHeight - pan - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0)));
                 var roomFits = Math.Abs((double)Field("_roomDisplayScale")! - expectedScale) < 0.01 &&
-                               Math.Abs(viewport.ActualHeight - (roomHeight * expectedScale + scroll)) < 1;
+                               Math.Abs(viewport.ActualHeight - roomHeight * expectedScale) < 1;
                 // With the game's text there, the verb screen stays and draws the slots that text goes with.
                 Check((verbText.Length == 0 ? strip.Visibility != Visibility.Visible && !AnyPixelOfSlots()
                           : note.Text.StartsWith("Verb screen: the game's text there", StringComparison.Ordinal)) && roomFits,
