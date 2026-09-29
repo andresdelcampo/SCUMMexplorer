@@ -16,6 +16,50 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <!-- The dark theme's buttons. WPF's own template paints a disabled button light grey whatever its
+             Background (the playback bar's Pause and Skip, the sound player); this one keeps it dark and dims its
+             text. Colours set on a button still apply. -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#273642"/>
+            <Setter Property="Foreground" Value="#E7E0D2"/>
+            <Setter Property="BorderBrush" Value="#4A5962"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="Chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2"/>
+                            <Border x:Name="Shade" Background="#FFFFFF" Opacity="0" CornerRadius="2"/>
+                            <ContentPresenter x:Name="Content" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Shade" Property="Opacity" Value="0.10"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#B78442"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Shade" Property="Background" Value="#000000"/>
+                                <Setter TargetName="Shade" Property="Opacity" Value="0.25"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Chrome" Property="Background" Value="#18222B"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#2C3A45"/>
+                                <Setter TargetName="Content" Property="TextElement.Foreground" Value="#5F6B73"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="PanelHeading" TargetType="TextBlock">
             <Setter Property="Foreground" Value="#B78442"/>
             <Setter Property="FontSize" Value="11"/>
@@ -156,16 +200,6 @@
                                                    RenderOptions.BitmapScalingMode="NearestNeighbor" IsHitTestVisible="False"/>
                                         </Grid>
                                     </ScrollViewer>
-                                    <Grid x:Name="RoomScrollButtonsPanel" Width="{Binding ActualWidth, ElementName=RoomViewport}" Height="24"
-                                          HorizontalAlignment="Center" Margin="0,0,0,4" Visibility="Collapsed">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                        <Button x:Name="ScrollRoomLeftButton" Grid.Column="0" Tag="M 5,0 L 0,4.5 L 5,9" ToolTip="Scroll room left" AutomationProperties.Name="Scroll room left"
-                                                Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
-                                                LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,1,0" BorderBrush="#334452"/>
-                                        <Button x:Name="ScrollRoomRightButton" Grid.Column="1" Tag="M 0,0 L 5,4.5 L 0,9" ToolTip="Scroll room right" AutomationProperties.Name="Scroll room right"
-                                                Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
-                                                LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,0,0" BorderBrush="#334452"/>
-                                    </Grid>
                                     <StackPanel x:Name="VerbStripPanel" Visibility="Collapsed" HorizontalAlignment="Center" Margin="0,2,0,0">
                                         <Border Background="#000000" BorderBrush="#334452" BorderThickness="0,1,0,0" HorizontalAlignment="Center">
                                             <Grid>
@@ -177,12 +211,24 @@
                                             </Grid>
                                         </Border>
                                         <TextBlock x:Name="VerbStripNote" Foreground="#B8AA8C" FontSize="11" TextWrapping="Wrap"
-                                                   TextTrimming="CharacterEllipsis" MaxHeight="30"
+                                                   TextTrimming="CharacterEllipsis" Height="30"
                                                    TextAlignment="Center" Margin="0,2,0,0"/>
                                     </StackPanel>
+                                    <Grid x:Name="RoomScrollButtonsPanel" Width="{Binding ActualWidth, ElementName=RoomViewport}" Height="24"
+                                          HorizontalAlignment="Center" Margin="0,0,0,4" Visibility="Collapsed">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <Button x:Name="ScrollRoomLeftButton" Grid.Column="0" Tag="M 5,0 L 0,4.5 L 5,9" ToolTip="Scroll room left" AutomationProperties.Name="Scroll room left"
+                                                Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                                LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,1,0" BorderBrush="#334452"/>
+                                        <Button x:Name="ScrollRoomRightButton" Grid.Column="1" Tag="M 0,0 L 5,4.5 L 0,9" ToolTip="Scroll room right" AutomationProperties.Name="Scroll room right"
+                                                Click="PanButton_Click" PreviewMouseLeftButtonDown="PanButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="PanButton_PreviewMouseLeftButtonUp"
+                                                LostMouseCapture="PanButton_LostMouseCapture" Style="{StaticResource RoomPanButton}" BorderThickness="0,1,0,0" BorderBrush="#334452"/>
+                                    </Grid>
                                 </StackPanel>
                             </Grid>
-                            <StackPanel x:Name="RoomControlsPanel" Grid.Row="2" Margin="0,4,0,8"
+                            <!-- MinHeight: the controls' usual height with the music row and a two-line note, so the
+                                 room above keeps its size while they change (a cutscene's rooms, its notes). -->
+                            <StackPanel x:Name="RoomControlsPanel" Grid.Row="2" Margin="0,4,0,8" MinHeight="108"
                                         HorizontalAlignment="Center" VerticalAlignment="Bottom">
                                 <StackPanel x:Name="SceneInteractionCard" MaxWidth="520" HorizontalAlignment="Center" Margin="8,0,8,8">
                                     <DockPanel x:Name="SceneSessionBar" LastChildFill="False" HorizontalAlignment="Center" Margin="0,0,0,5">

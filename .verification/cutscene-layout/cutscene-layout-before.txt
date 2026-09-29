@@ -1,0 +1,36 @@
+﻿Real MainWindow; PlayOpening and PlayKnownCutscene are called as the menu calls them, on the playback clock. No physical input.
+PASS disabled Pause and Skip are drawn dark: mean brightness 0 and 0 (enabled: False, False; limit 110)
+The opening (script 044) (72604 ms, 2257 samples while the player had no control):
+         834 ms: Room 01: view 1082,3x432,9 at y 62, verb strip off, arrows collapsed, controls 59,3 high
+        6099 ms: Room 02: view 1082,3x432,9 at y 48, verb strip off, arrows shown, controls 59,3 high
+        6170 ms: Room 02: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,3 high
+        7288 ms: Room 01: view 1082,3x432,9 at y 62, verb strip off, arrows collapsed, controls 59,3 high
+       22244 ms: Room 02: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,3 high
+       34031 ms: Room 53: view 1082,3x432,9 at y 62, verb strip off, arrows collapsed, controls 59,3 high
+       53751 ms: Room 02: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,3 high
+       54743 ms: Room 02: view 815,4x326,2 at y 8,2, verb strip at y 364,3, arrows shown, controls 83,3 high
+       57631 ms: Room 02: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,3 high
+       57757 ms: Room 02: view 815,4x326,2 at y 8,2, verb strip at y 364,3, arrows shown, controls 83,3 high
+       62127 ms: Room 02: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,3 high
+       62247 ms: Room 02: view 815,4x326,2 at y 8,2, verb strip at y 364,3, arrows shown, controls 83,3 high
+       67301 ms: Room 02: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,3 high
+       67422 ms: Room 02: view 815,4x326,2 at y 8,2, verb strip at y 364,3, arrows shown, controls 83,3 high
+       71284 ms: Room 02: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,3 high
+   Sizes: view 1082,3x432,9 at y 62 (1274 samples); view 1082,3x432,9 at y 48 (1 samples); view 1082,3x432,9 at y 36 (463 samples); view 815,4x326,2 at y 8,2 (519 samples)
+FAIL The opening (script 044): the room view keeps one size and position (4 seen)
+FAIL The opening (script 044): the verb strip is shown throughout (1738 samples without it)
+FAIL The opening (script 044): no scroll arrows while the player has no control (983 samples with them)
+PASS The opening (script 044): nothing below the room overlaps its bottom rows (0 samples)
+Script 046, the Elders' trial (first 40 s) (40001 ms, 1244 samples while the player had no control):
+         844 ms: Room 08: view 1082,3x432,9 at y 36, verb strip off, arrows shown, controls 83,2 high
+         908 ms: Room 08: view 1082,3x432,9 at y 24, verb strip off, arrows shown, controls 107,2 high
+        9400 ms: Room 08: view 773,7x309,5 at y 8,2, verb strip at y 347,7, arrows shown, controls 107,2 high
+       14171 ms: Room 08: view 1082,3x432,9 at y 24, verb strip off, arrows shown, controls 107,2 high
+       14269 ms: Room 08: view 773,7x309,5 at y 8,2, verb strip at y 347,7, arrows shown, controls 107,2 high
+       17727 ms: Room 08: view 1082,3x432,9 at y 24, verb strip off, arrows shown, controls 107,2 high
+   Sizes: view 1082,3x432,9 at y 36 (1 samples); view 1082,3x432,9 at y 24 (979 samples); view 773,7x309,5 at y 8,2 (264 samples)
+FAIL Script 046, the Elders' trial (first 40 s): the room view keeps one size and position (3 seen)
+FAIL Script 046, the Elders' trial (first 40 s): the verb strip is shown throughout (980 samples without it)
+FAIL Script 046, the Elders' trial (first 40 s): no scroll arrows while the player has no control (1244 samples with them)
+PASS Script 046, the Elders' trial (first 40 s): nothing below the room overlaps its bottom rows (0 samples)
+Failures: 6

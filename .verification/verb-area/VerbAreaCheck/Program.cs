@@ -7,8 +7,8 @@ using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Formats;
 
-// "Show verb area" (presentation): in the real MainWindow, checks that the strip
-// is off by default, sits under the room at the room's scale without clipping,
+// "Show verb area" (presentation): in the real MainWindow, checks that the toggle
+// is off by default while the interactive mode keeps the verb screen, that the strip sits under the room at the room's scale without clipping,
 // draws the verbs the session's slots have on (after script 018, and the close-up
 // after a hover), sends clicks on verbs that are on to the game when "Click as
 // game input" is on (a note with nothing aimed at, then after aiming at an
@@ -85,7 +85,8 @@ internal static class Program
 
                 await Open(2);
                 var roomHeightOff = viewport.ActualHeight;
-                Check(toggle.IsChecked == false && strip.Visibility != Visibility.Visible, "the verb area is off by default and not shown");
+                Check(toggle.IsChecked == false && strip.Visibility == Visibility.Visible && note.Text.StartsWith("Verb screen", StringComparison.Ordinal),
+                    $"the toggle is off by default, and the interactive mode keeps the verb screen under the room: \"{note.Text}\"");
 
                 toggle.IsChecked = true;
                 await Settle();
@@ -94,8 +95,8 @@ internal static class Program
                       Math.Abs(image.ActualHeight - image.ActualWidth * 56 / 320) < 1.5,
                     $"on: the strip is 320 x 56 screen pixels at the room's scale ({image.ActualWidth:0.#} x {image.ActualHeight:0.#}; room view {viewport.ActualWidth:0.#} wide)");
                 var bottom = strip.TranslatePoint(new Point(0, strip.ActualHeight), host).Y;
-                Check(bottom <= host.ActualHeight + 0.5 && viewport.ActualHeight < roomHeightOff,
-                    $"on: the room shrinks so the strip and its note fit (strip bottom {bottom:0.#} of {host.ActualHeight:0.#}; room {roomHeightOff:0.#} → {viewport.ActualHeight:0.#})");
+                Check(bottom <= host.ActualHeight + 0.5 && Math.Abs(viewport.ActualHeight - roomHeightOff) < 0.5,
+                    $"on: the room keeps its size, the strip and its note already fit (strip bottom {bottom:0.#} of {host.ActualHeight:0.#}; room {roomHeightOff:0.#} → {viewport.ActualHeight:0.#})");
                 Check(note.Text.Contains("presentation", StringComparison.Ordinal) && note.Text.Contains("not the game's drawing", StringComparison.Ordinal) &&
                       note.Text.Contains("no image verb is on", StringComparison.Ordinal),
                     $"on, after the boot: nothing is on, and the note says it is a presentation: \"{note.Text}\"");
@@ -178,16 +179,16 @@ internal static class Program
                 var normal = ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("NormalRoomWidthToggle")).IsChecked == true;
                 var visibleWidth = normal ? Math.Min(320, roomWidth) : roomWidth;
                 var panPanel = (FrameworkElement)window.FindName("RoomScrollButtonsPanel");
-                var pan = panPanel.Visibility == Visibility.Visible ? panPanel.Height + panPanel.Margin.Top + panPanel.Margin.Bottom : 0;
+                var pan = normal ? panPanel.Height + panPanel.Margin.Top + panPanel.Margin.Bottom : 0;
                 var shown = strip.Visibility == Visibility.Visible;
                 var expectedScale = Math.Min(host.ActualWidth / visibleWidth,
                     (host.ActualHeight - pan - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0)));
                 var roomFits = Math.Abs((double)Field("_roomDisplayScale")! - expectedScale) < 0.01 &&
                                Math.Abs(viewport.ActualHeight - roomHeight * expectedScale) < 1;
                 // With the game's text there, the verb screen stays and draws the slots that text goes with.
-                Check((verbText.Length == 0 ? strip.Visibility != Visibility.Visible && !AnyPixelOfSlots()
+                Check((verbText.Length == 0 ? shown && note.Text.StartsWith("Verb screen (rows 144", StringComparison.Ordinal)
                           : note.Text.StartsWith("Verb screen: the game's text there", StringComparison.Ordinal)) && roomFits,
-                    $"off again: {(verbText.Length == 0 ? "the strip is gone" : $"the verb screen stays for the game's text [{string.Join(", ", verbText)}]: \"{note.Text}\"")}; " +
+                    $"off again: {(verbText.Length == 0 ? $"the verb screen stays, as the interactive mode keeps it: \"{note.Text}\"" : $"the verb screen stays for the game's text [{string.Join(", ", verbText)}]: \"{note.Text}\"")}; " +
                     $"the room fills its space (room {viewport.ActualWidth:0.#} x {viewport.ActualHeight:0.#} in {host.ActualWidth:0.#} x {host.ActualHeight:0.#}; first {roomHeightOff:0.#} high)");
                 Save("room-02-verb-area-off-again.png");
                 report.Add($"Failures: {failures}");

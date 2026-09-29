@@ -955,6 +955,9 @@ public partial class MainWindow : Window
         ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: SessionModeToggle.IsChecked == true);
         UpdateRoomNavigationActions(room);
         RefreshRoomPreview();
+        // The interactive mode keeps the verb screen under the room (VerbScreenShown).
+        UpdateVerbStrip();
+        UpdateRoomViewportLayout();
     }
 
     private void ResetSession_Click(object sender, RoutedEventArgs e)
@@ -1556,11 +1559,10 @@ public partial class MainWindow : Window
         var availableWidth = Math.Max(1, RoomViewportHost.ActualWidth);
         var availableHeight = Math.Max(1, RoomViewportHost.ActualHeight);
         var visibleSourceWidth = normalSize ? Math.Min(320, room.Width) : room.Width;
-        var showPanButtons = normalSize && room.Width > visibleSourceWidth;
-        RoomScrollButtonsPanel.Visibility = showPanButtons
-            ? Visibility.Visible : Visibility.Collapsed;
+        // The pan row keeps its height in the 320-pixel view even where the room fits or a cutscene hides the
+        // arrows, so the room keeps one size from room to room (UpdateRoomScrollButtons shows or hides them).
         var usableHeight = Math.Max(1, availableHeight);
-        if (showPanButtons)
+        if (normalSize)
             usableHeight = Math.Max(1, usableHeight - RoomScrollButtonsPanel.Height - RoomScrollButtonsPanel.Margin.Top - RoomScrollButtonsPanel.Margin.Bottom);
         // The optional verb strip shares the height: 56 screen rows at the room's scale, and its note.
         var verbStrip = VerbScreenShown();
@@ -1653,8 +1655,11 @@ public partial class MainWindow : Window
 
     private void UpdateRoomScrollButtons()
     {
-        var canScroll = NormalRoomWidthToggle.IsChecked == true && RoomViewport.ScrollableWidth > 0.5;
-        RoomScrollButtonsPanel.Visibility = canScroll ? Visibility.Visible : Visibility.Collapsed;
+        var normalSize = NormalRoomWidthToggle.IsChecked == true;
+        var canScroll = normalSize && RoomViewport.ScrollableWidth > 0.5;
+        // No arrows while the player has no control (a cutscene or the boot): the game offers no scrolling then.
+        RoomScrollButtonsPanel.Visibility = canScroll && !SessionInScene ? Visibility.Visible
+            : normalSize ? Visibility.Hidden : Visibility.Collapsed;
         ScrollRoomLeftButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset > 0.5;
         ScrollRoomRightButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset < RoomViewport.ScrollableWidth - 0.5;
     }
@@ -2795,6 +2800,7 @@ public partial class MainWindow : Window
         var active = GameClickActive && _game?.Id == GameId.Loom;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         if (!active) return;
+        UpdateRoomScrollButtons();
         PlaybackPauseButton.IsEnabled = _playback is not null;
         PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
         var inCutscene = SessionInScene;
@@ -3477,7 +3483,9 @@ public partial class MainWindow : Window
     /// It shows game state; the drawing itself is not the game's.
     /// </summary>
     // The verb screen is shown for the strip, or for text a script printed there (rows 144–199).
-    private bool VerbScreenShown() => VerbStripShown() || _verbMessageBitmap is not null && _currentRoom is not null;
+    // In the interactive LOOM mode it is always shown, so the room keeps its size when a script prints there or clears it.
+    private bool VerbScreenShown() => VerbStripShown() ||
+        _currentRoom is not null && (_verbMessageBitmap is not null || GameClickActive && _game?.Id == GameId.Loom);
 
     private void UpdateVerbStrip()
     {
@@ -3489,7 +3497,9 @@ public partial class MainWindow : Window
                 // so the close-up (verb 0x36, script 008) shows above the object's name (script 007).
                 var slots = _session!.VerbArea();
                 VerbStripImage.Source = CreateBitmap(slots.Width, slots.Height, slots.Pixels, _currentRoom!.Palette);
-                VerbStripNote.Text = "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots).";
+                VerbStripNote.Text = _verbMessageBitmap is not null
+                    ? "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots)."
+                    : "Verb screen (rows 144–199), kept under the room: the session's verb slots (presentation of the slots).";
                 VerbStripNote.ToolTip = string.Join(Environment.NewLine, _session?.Messages.OnScreen
                     .Where(message => message.Y >= LoomVerbArea.Top)
                     .Select(message => $"\"{message.Text}\" at ({message.X}, {message.Y}) from {message.Source}") ?? []);
