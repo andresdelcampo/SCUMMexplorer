@@ -32,6 +32,8 @@ public partial class MainWindow : Window
     private readonly LoomPcSpeakerAudio _audioDecoder = new();
     private readonly LoomAdlibAudio _adlibDecoder = new();
     private readonly MediaPlayer _audioPlayer = new();
+    // The sounds the scripts start while the playback clock runs (cutscenes); separate from the room music panel.
+    private readonly SceneSoundPlayer _sceneSound = new();
     private readonly DispatcherTimer _audioTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private readonly DispatcherTimer _roomPanTimer = new() { Interval = TimeSpan.FromMilliseconds(75) };
     private readonly DispatcherTimer _adlibGainDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
@@ -112,6 +114,7 @@ public partial class MainWindow : Window
             await ApplyAdlibGainAsync();
         };
         _audioPlayer.MediaOpened += AudioPlayer_MediaOpened;
+        _audioPlayer.MediaOpened += (_, _) => _sceneSound.StopAll("another sound was started in the app");
         _audioPlayer.MediaEnded += (_, _) => StopPlayback();
         _audioPlayer.MediaFailed += (_, args) =>
         {
@@ -187,6 +190,7 @@ public partial class MainWindow : Window
         _indexedObjectSnapshot = indexedSnapshot;
         _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
         StopScenePlayback();
+        _sceneSound.StopAll("another game was opened");
         _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
@@ -951,6 +955,7 @@ public partial class MainWindow : Window
     private void SessionMode_Changed(object sender, RoutedEventArgs e)
     {
         StopScenePlayback();
+        if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
         if (_currentRoomResource is not { } room || _currentRoom is null) return;
         ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: SessionModeToggle.IsChecked == true);
         UpdateRoomNavigationActions(room);
@@ -964,6 +969,7 @@ public partial class MainWindow : Window
     {
         if (_game is null || _indexedObjectSnapshot is null) return;
         StopScenePlayback();
+        _sceneSound.StopAll("the session was reset");
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
         if (_currentRoomResource is { } room && _currentRoom is not null)
         {
@@ -2654,6 +2660,8 @@ public partial class MainWindow : Window
     // Harnesses set this to run a playback's frames at once, as the synchronous
     // continuation did before M1d, so their results stay comparable.
     private bool _playInstantly = false;
+    // True while an instant playback runs all its frames at once: their sounds are sorted out when it finishes.
+    private bool _playbackBatch;
     // True while the playback itself opens the room the session entered.
     private bool _playbackEnteringRoom;
     // The room the playback last asked the view to open.
@@ -2685,10 +2693,13 @@ public partial class MainWindow : Window
         };
         _playbackRequestedRoom = null;
         _playbackPaused = false;
+        if (_game is not null && _session is not null && !_sceneSound.Follows(_session)) _sceneSound.Attach(_game, _session);
         if (_playInstantly || instant)
         {
             _playbackTimer?.Stop();
-            while (PlaybackStep()) { }
+            _playbackBatch = true;
+            try { while (PlaybackStep()) { } }
+            finally { _playbackBatch = false; }
             FinishPlayback();
             return;
         }
@@ -2709,6 +2720,8 @@ public partial class MainWindow : Window
     {
         _playbackTimer?.Stop();
         _playback = null;
+        // The game's sounds play on after the clock stops, as its music does between scenes.
+        if (_playbackPaused) _sceneSound.Resume();
         _playbackPaused = false;
         UpdatePlaybackControls();
     }
@@ -2724,6 +2737,7 @@ public partial class MainWindow : Window
         if (_playback is null || _playbackPaused) return;
         _playbackTimer?.Stop();
         _playbackPaused = true;
+        _sceneSound.Pause();
         StatusText.Text = "Paused. Play (or space) goes on; Continue ▸ plays one frame.";
         StatusText.ToolTip = "The scene's frames wait while paused. The game's own pause key (space, VAR_PAUSE_KEY) stops ScummVM's frame loop the same way.";
         UpdatePlaybackControls();
@@ -2733,6 +2747,7 @@ public partial class MainWindow : Window
     {
         if (_playback is null || !_playbackPaused) return;
         _playbackPaused = false;
+        _sceneSound.Resume();
         _playbackTimer ??= CreatePlaybackTimer();
         _playbackTimer.Interval = PlaybackFrameInterval();
         _playbackTimer.Start();
@@ -2895,6 +2910,7 @@ public partial class MainWindow : Window
         if (_game is null || _indexedObjectSnapshot is null || !GameClickActive) return;
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, stopAtOpening: true);
+        _sceneSound.Attach(_game, _session);
         if (_session.Snapshot.RoomId is not int roomId || _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } room)
             return;
         StartPlayback("The opening (script 044)", null, room, doorways: null, leftRoom: false);
@@ -2923,6 +2939,8 @@ public partial class MainWindow : Window
             _game.Rooms.FirstOrDefault(item => item.ResourceId == cutscene.RoomId) is not { } room) return;
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+        // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
+        _sceneSound.Attach(_game, _session);
         _session.VisitRoom(room);
         var action = _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
         var uncertainties = action.Uncertainties.ToList();
@@ -2977,6 +2995,8 @@ public partial class MainWindow : Window
         var room = session.Snapshot.RoomId;
         session.AdvanceFrame();
         if (session.Snapshot.RoomId != room) playback.LeftRoom = true;
+        // The sounds the frame's scripts started or stopped (instant playback has no frames to wait for).
+        if (!_playbackBatch) _sceneSound.Update();
         return true;
     }
 
@@ -3084,6 +3104,7 @@ public partial class MainWindow : Window
         }
         _playback = null;
         UpdatePlaybackControls();
+        _sceneSound.Update();
         var snapshot = session.Snapshot;
         var note = playback.Note is null ? "" : Environment.NewLine + playback.Note;
         if (snapshot.RoomId is int reached && reached != playback.SourceRoom.ResourceId)

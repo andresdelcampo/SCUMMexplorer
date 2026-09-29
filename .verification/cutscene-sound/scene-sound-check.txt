@@ -1,0 +1,45 @@
+﻿Real MainWindow; PlayOpening and PlayKnownCutscene are called as the menu calls them. No physical input.
+The opening, 20048 ms on the playback clock, 174 frames:
+      Entry { Frame = 2, Milliseconds = 15034, Action = start, SoundId = 25, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+The opening: expected (reached by the scripts): f2 start 25
+The opening: played by the app: f2 start 25
+PASS The opening: the app starts and stops each sound on the frame the scripts reach it (1 expected, 1 played)
+PASS the opening's music (sound 25, AdLib) is playing: position 00:18.9, audio True
+PASS sound 25 plays as music (AdLib)
+Script 046, 2500 frames stepped:
+      Entry { Frame = 174, Milliseconds = 35187, Action = stop all, SoundId = , Kind = , Source = session replaced }
+      Entry { Frame = 1, Milliseconds = 35274, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0005 stopSound var[0x0A4] }
+      Entry { Frame = 1, Milliseconds = 35274, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0012 stopSound var[0x0A3] }
+      Entry { Frame = 1, Milliseconds = 35274, Action = start, SoundId = 31, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+      Entry { Frame = 1788, Milliseconds = 63263, Action = stop, SoundId = 31, Kind = , Source = Script 40 +0x0005 stopSound var[0x0A4] }
+      Entry { Frame = 1788, Milliseconds = 63263, Action = stop, SoundId = 31, Kind = , Source = Script 40 +0x0012 stopSound var[0x0A3] }
+      Entry { Frame = 1789, Milliseconds = 63274, Action = start, SoundId = 8, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 1799, Milliseconds = 63429, Action = start, SoundId = 4, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 1809, Milliseconds = 63586, Action = start, SoundId = 5, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 1819, Milliseconds = 63744, Action = start, SoundId = 1, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 1830, Milliseconds = 63902, Action = start, SoundId = 23, Kind = music (AdLib), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2050, Milliseconds = 67387, Action = stop, SoundId = 23, Kind = , Source = Script 40 +0x0005 stopSound var[0x0A4] }
+      Entry { Frame = 2051, Milliseconds = 67400, Action = start, SoundId = 16, Kind = music (AdLib), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2177, Milliseconds = 69388, Action = stop, SoundId = 16, Kind = , Source = Script 40 +0x0005 stopSound var[0x0A4] }
+      Entry { Frame = 2178, Milliseconds = 69430, Action = start, SoundId = 17, Kind = music (AdLib), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2214, Milliseconds = 70035, Action = stop, SoundId = 17, Kind = , Source = Script 40 +0x0005 stopSound var[0x0A4] }
+      Entry { Frame = 2215, Milliseconds = 70090, Action = start, SoundId = 8, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2225, Milliseconds = 70244, Action = start, SoundId = 4, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2235, Milliseconds = 70401, Action = start, SoundId = 5, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2245, Milliseconds = 70557, Action = start, SoundId = 1, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2263, Milliseconds = 70840, Action = start, SoundId = 8, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2273, Milliseconds = 70995, Action = start, SoundId = 4, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2283, Milliseconds = 71150, Action = start, SoundId = 5, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2293, Milliseconds = 71306, Action = start, SoundId = 1, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2363, Milliseconds = 72368, Action = start, SoundId = 8, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2373, Milliseconds = 72522, Action = start, SoundId = 4, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2383, Milliseconds = 72679, Action = start, SoundId = 5, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2393, Milliseconds = 72833, Action = start, SoundId = 1, Kind = effect (PC speaker), Source = Script 40 +0x0038 startSound local[0x000] }
+      Entry { Frame = 2475, Milliseconds = 74114, Action = start, SoundId = 25, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+Script 046: expected (reached by the scripts): f1 start 31, f1 stop 25, f1 stop 25, f1788 stop 31, f1788 stop 31, f1789 start 8, f1799 start 4, f1809 start 5, f1819 start 1, f1830 start 23, f2050 stop 23, f2051 start 16, f2177 stop 16, f2178 start 17, f2214 stop 17, f2215 start 8, f2225 start 4, f2235 start 5, f2245 start 1, f2263 start 8, f2273 start 4, f2283 start 5, f2293 start 1, f2363 start 8, f2373 start 4, f2383 start 5, f2393 start 1, f2475 start 25
+Script 046: played by the app: f1 start 31, f1 stop 25, f1 stop 25, f1788 stop 31, f1788 stop 31, f1789 start 8, f1799 start 4, f1809 start 5, f1819 start 1, f1830 start 23, f2050 stop 23, f2051 start 16, f2177 stop 16, f2178 start 17, f2214 stop 17, f2215 start 8, f2225 start 4, f2235 start 5, f2245 start 1, f2263 start 8, f2273 start 4, f2283 start 5, f2293 start 1, f2363 start 8, f2373 start 4, f2383 start 5, f2393 start 1, f2475 start 25
+PASS Script 046: the app starts and stops each sound on the frame the scripts reach it (28 expected, 28 played)
+Kinds: 31: music (AdLib); 8: effect (PC speaker); 4: effect (PC speaker); 5: effect (PC speaker); 1: effect (PC speaker); 23: music (AdLib); 16: music (AdLib); 17: music (AdLib); 25: music (AdLib)
+PASS the trial's music (31) plays as AdLib and the notes (8, 4, 5, 1) as PC speaker effects
+PASS a new stated start stops the previous session's sounds
+Failures: 0
