@@ -1285,7 +1285,7 @@ public sealed class LoomBoundedScriptExecutor
                 break;
             }
             case "actorOps":
-                foreach (var item in operands[(operands.IndexOf('[') + 1)..operands.LastIndexOf(']')]
+                foreach (var item in operands[(operands.IndexOf(", [", StringComparison.Ordinal) + 3)..operands.LastIndexOf(']')]
                              .Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (item == "init")

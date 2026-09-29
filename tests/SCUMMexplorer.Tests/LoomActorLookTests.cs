@@ -128,4 +128,20 @@ public sealed class LoomActorLookTests
         Assert.Equal((0, 3), (table[1].Look.Elevation, table[1].Look.StandFrame));
         Assert.Equal((byte)15, table[1].Look.Palette[7]);
     }
+
+    [Fact]
+    public void ActorOpsOnAVariableActorAppliesItsFirstItem()
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        // The trial (script 046) flies the Guild off through Room 11: +0x1153-0x1175 loops local[0] over actors 2-10 with
+        // actorOps local[0x000], [costume, 0x50; ...]. The list's first item (the costume) must not be lost to local[0x000]'s bracket.
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 8));
+        session.ActivateObjectVerb(255, 0x38);
+        for (var frame = 0; frame < 4000 && session.AdvanceFrame().RoomId != 11; frame++) { }
+        var flight = session.Actors.Where(actor => actor.Number is >= 2 and <= 10).ToArray();
+        Assert.Equal(9, flight.Length);
+        Assert.All(flight, actor => Assert.Equal((11, 80), (actor.Room, actor.Look.Costume)));
+    }
 }
