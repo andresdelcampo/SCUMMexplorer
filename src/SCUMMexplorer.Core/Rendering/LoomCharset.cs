@@ -127,7 +127,8 @@ public static class LoomMessageRenderer
     /// <summary>
     /// ScummVM <c>initScreens(16, 144)</c> for v3 (<c>gfx.cpp</c>): the text screen is rows 0–15,
     /// the room (main) screen rows 16–143, so screen row y is room row y − 16, and the verb
-    /// screen rows 144–199. <c>printChar</c> draws at <c>_top - vs-&gt;topline</c> and clips at the screen's bottom.
+    /// screen rows 144–199. <c>printChar</c> draws at <c>_top - vs-&gt;topline</c> and clips at the screen's bottom
+    /// (the text screen's lines are the exception here: they run on into the room, see <c>PrintChar</c>).
     /// </summary>
     public const int RoomScreenTop = 16;
     public const int VerbScreenTop = 144;
@@ -213,9 +214,12 @@ public static class LoomMessageRenderer
         if (glyph == '@') return false;
         var width = charset.CharWidth(glyph);
         if (left + width > right + 1) return false;
-        // findVirtScreen(top): the text, room or verb screen, each clipped at its bottom.
+        // findVirtScreen(top): the text, room or verb screen, each clipped at its bottom. Exception (reading, not
+        // ScummVM): a line whose top is in the text screen runs on into the room's top rows. ScummVM clips it at
+        // row 15, which leaves the first line of Room 41's two-line messages (script 016 with y 12) at its top
+        // 4 rows; the original is read as drawing the whole line.
         var screenTop = top >= VerbScreenTop ? VerbScreenTop : top >= RoomScreenTop ? RoomScreenTop : 0;
-        var screenBottom = top >= VerbScreenTop ? ScreenHeight : top >= RoomScreenTop ? VerbScreenTop : RoomScreenTop;
+        var screenBottom = top >= VerbScreenTop ? ScreenHeight : VerbScreenTop;
         if (top < 0 || top >= ScreenHeight) return false;
         DrawBits1(layer, charset.Glyph(glyph), left, top, width, LoomCharset.GlyphRows, color, shadow, screenTop, screenBottom);
         left += width;

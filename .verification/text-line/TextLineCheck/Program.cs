@@ -82,6 +82,25 @@ internal static class Program
                     $"the verb screen starts where the room ends (y {verbTop:0.#} vs {viewTop + viewport.ActualHeight:0.#}): one screen, no gap");
                 Save((FrameworkElement)window.FindName("RoomDisplayGroup"), "room41-before.png");
 
+                // The sword (object 634 verb 0x36): two lines at y 12 and 20. Line 1 starts on the text line and is
+                // drawn whole (reading of the original; ScummVM clips it at row 15), so its lower rows reach room rows
+                // 0–3, which line 2 (from room row 4) cannot.
+                Session().ActivateObjectVerb(634, 0x36);
+                Call("UpdateMessageLayer");
+                await Task.Delay(300);
+                window.UpdateLayout();
+                foreach (var message in Session().Messages.OnScreen) report.Add($"   on screen: \"{message.Text.Replace("\n", " / ")}\" at ({message.X}, {message.Y}) from {message.Source}");
+                var roomText = ((Image)window.FindName("RoomMessageOverlay")).Source as BitmapSource;
+                var topRowsLit = 0;
+                if (roomText is not null)
+                {
+                    var pixels = new byte[roomText.PixelWidth * 4 * 4];
+                    roomText.CopyPixels(new Int32Rect(0, 0, roomText.PixelWidth, 4), pixels, roomText.PixelWidth * 4, 0);
+                    for (var i = 3; i < pixels.Length; i += 4) if (pixels[i] != 0) topRowsLit++;
+                }
+                Check(topRowsLit > 30, $"the sword's first line runs on into the room's rows 0–3 ({topRowsLit} lit pixels there)");
+                Save((FrameworkElement)window.FindName("RoomDisplayGroup"), "room41-look-634-sword.png");
+
                 Session().ActivateObjectVerb(632, 0x36);
                 Call("UpdateMessageLayer");
                 await Task.Delay(300);

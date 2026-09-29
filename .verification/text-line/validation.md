@@ -54,3 +54,44 @@ The user's report (29 Sep): text could show where the game shows it, over the ro
 - PresentationCheck and CameraPanCheck: 0 failures.
 - `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 230/230.
 - Skipped (no change to clicks, room loads or playback): DoorwayClickCheck, the audit, Blockers, the playback checks.
+
+## Follow-up: whole first lines (29 September)
+
+The user's report: "when I select the sword, I only see a line of text that seems to be a continuation of another".
+The user also confirmed the cutscene sound (AdLib music; the sword's effect is the PC speaker rendition, as labelled)
+and that the conversations in the verb area (y 152, the game's position) look right.
+
+### What the evidence says
+
+- The sword is Room 41's object 634; verb 0x36 prints `print 0x01, [center; text, "Cuando termine de darle golpes,
+  menuda\xFF\x01espada va a tener."]` with no position, so it takes text slot 0's default: y 12 (Room 41's entry,
+  `startScript 0x10, [0x000C]`). Line 1 is at y 12 (text line), line 2 at y 20 (the room's row 4).
+- ScummVM draws each glyph in the screen that holds `_top` and clips at that screen's bottom
+  (`CharsetRendererV3::printChar`, `CharsetRendererPC::drawBits1`: `y + drawTop < dest.h`; the text screen is 16
+  rows, `initScreens(16, 144)`). No LOOM-specific adjustment exists in `string.cpp`, `charset.cpp` or `gfx.cpp`. So
+  in ScummVM line 1 keeps its top 4 rows, which the app copied: the user saw only line 2.
+- Reading (not verified in the original interpreter): the designers set y 12 for the forge and would not ship
+  half-hidden first lines, so the original likely drew line 1 whole across the boundary. The user chose to draw it
+  whole.
+
+### What the user now sees
+
+- In Room 41 (and Room 08, the other room whose default y is below 16), a line that starts on the text line is drawn
+  whole: its lower rows cover the room's top rows. The sword now reads "Cuando termine de darle golpes, menuda" /
+  "espada va a tener." ([picture](room41-look-634-sword.png)).
+- Unchanged: the room and verb screens still clip at their own bottoms, as in ScummVM; message positions.
+
+### Changes
+
+- `LoomCharset.cs` (`LoomMessageRenderer.PrintChar`): a glyph whose top is in the text screen is clipped at the
+  room screen's bottom (row 143) instead of row 15. Labelled a reading in the code.
+- `LoomCharsetTests`: the text-screen case now expects the line to reach past row 15.
+- TextLineCheck: a new sword step (object 634 verb 0x36 run directly, an exploration action).
+
+### Verification
+
+- TextLineCheck: 0 failures ([text-line-check.txt](text-line-check.txt)); the sword's first line lights 742 pixels in
+  the room's rows 0–3, where line 2 cannot reach.
+- `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 230/230.
+- Skipped: the audit (room gaps do not depend on messages), DoorwayClickCheck, Blockers, the playback and layout
+  checks (no change to clicks, room loads, playback or layout).
