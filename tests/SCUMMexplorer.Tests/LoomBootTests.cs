@@ -65,6 +65,75 @@ public sealed class LoomBootTests
     }
 
     [Fact]
+    public void OpeningPlayedFrameByFrameEndsAsTheBootDoes()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var objects = new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL"));
+        var booted = new LoomExplorationSession(game, objects);
+        var played = new LoomExplorationSession(game, objects, stopAtOpening: true);
+
+        // Script 001 +0x0222 has just started script 044; the intro screen's answer is already assumed.
+        Assert.True(played.BootRunning);
+        // Script 044 opens no cutscene (no beginCutscene): script 001 +0x021D sets the in-a-cutscene bit itself.
+        Assert.False(played.InCutscene);
+        Assert.Equal((ushort)1, played.Snapshot.KnownGlobalVariables["bit[0xD6E]"]);
+        Assert.InRange(played.BootFramesBeforeOpening, 1, booted.BootFrames - 1);
+        Assert.Contains(played.Snapshot.Uncertainties, line => line.StartsWith("Player input assumed: script 001 +0x0166", StringComparison.Ordinal));
+
+        var rooms = new List<int>();
+        var lightsInRoom01 = new HashSet<int>();
+        var frames = 0;
+        while (played.BootRunning && frames++ < LoomExplorationSession.BootFrameLimit)
+        {
+            played.AdvanceFrame();
+            if (played.Snapshot.RoomId is int room && (rooms.Count == 0 || rooms[^1] != room)) rooms.Add(room);
+            if (played.Snapshot.RoomId == 1)
+                foreach (var actor in played.Actors.Where(item => item.Room == 1 && item.Visible == true && item.Number is >= 1 and <= 9))
+                    lightsInRoom01.Add(actor.Number);
+        }
+
+        Assert.False(played.BootRunning);
+        Assert.Equal(booted.BootFrames, played.BootFrames);
+        // Script 044's rooms (decoded): 01, 02, 01, 02, 53, 02. Rooms 69's screen came before the stop.
+        Assert.Equal([1, 2, 1, 2, 53, 2], rooms);
+        // Room 01 locals 200–208 each put one of actors 1–9 in the sky (their points of light).
+        Assert.True(lightsInRoom01.Count >= 5, $"points of light seen: {string.Join(", ", lightsInRoom01)}");
+
+        var egoBooted = booted.Actors.Single(item => item.Number == 1);
+        var egoPlayed = played.Actors.Single(item => item.Number == 1);
+        Assert.Equal((egoBooted.Room, egoBooted.X, egoBooted.Y, egoBooted.Look.Facing),
+            (egoPlayed.Room, egoPlayed.X, egoPlayed.Y, egoPlayed.Look.Facing));
+        Assert.Equal<(int?, int?, int?, int?)>((2, 828, 60, 270), (egoPlayed.Room, egoPlayed.X, egoPlayed.Y, egoPlayed.Look.Facing));
+        Assert.Equal(booted.Snapshot.KnownGlobalVariables["var[0x071]"], played.Snapshot.KnownGlobalVariables["var[0x071]"]);
+        Assert.Equal(booted.CameraX, played.CameraX);
+        Assert.Equal(booted.Snapshot.Uncertainties, played.Snapshot.Uncertainties);
+    }
+
+    [Fact]
+    public void EscapeSkipsTheOpeningAndBobbinFacesTheScreen()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")),
+            stopAtOpening: true);
+
+        var frames = 0;
+        while (session.BootRunning && !session.CutsceneSkippable && frames++ < LoomExplorationSession.BootFrameLimit)
+            session.AdvanceFrame();
+        Assert.True(session.CutsceneSkippable);
+        session.PressKey(0x1B);
+        while (session.BootRunning && frames++ < LoomExplorationSession.BootFrameLimit)
+            session.AdvanceFrame();
+
+        Assert.False(session.BootRunning);
+        Assert.Equal(2, session.Snapshot.RoomId);
+        // Script 044 +0x063E: after an abort (var[0x005]) +0x0678 turns Bobbin to the screen (animateActor 1, 0xFA).
+        var ego = session.Actors.Single(item => item.Number == 1);
+        Assert.Equal<(int?, int?, int?, int?)>((2, 828, 60, 180), (ego.Room, ego.X, ego.Y, ego.Look.Facing));
+    }
+
+    [Fact]
     public void BootCanStopAtTheIntroScreenLoad()
     {
         if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;

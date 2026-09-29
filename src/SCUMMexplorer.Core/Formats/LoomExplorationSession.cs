@@ -93,8 +93,13 @@ public sealed class LoomExplorationSession
     /// <see cref="CompleteBoot"/>. When false, it stops at script 001's first
     /// room load, as before 27 September.
     /// </param>
+    /// <param name="stopAtOpening">
+    /// With <paramref name="completeBoot"/>, stops the boot on the frame script 001 starts the opening cutscene
+    /// (script 044, +0x0222), after the intro screen's assumed answer. <see cref="BootRunning"/> stays true, and
+    /// <see cref="AdvanceFrame"/> plays the rest of the boot frame by frame, exactly as the constructor would.
+    /// </param>
     public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
-        bool completeBoot = true)
+        bool completeBoot = true, bool stopAtOpening = false)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -132,9 +137,34 @@ public sealed class LoomExplorationSession
             _dispatchScope--;
         }
         DispatchRequestedLoads("during the boot");
-        CompleteBoot();
-        _booting = false;
+        CompleteBoot(stopAtOpening);
         LastAction = null;
+    }
+
+    /// <summary>
+    /// The opening cutscene: script 001 +0x0222 starts script 044 and waits while it runs (+0x0225–0x022A). Decoded.
+    /// </summary>
+    public const int OpeningScript = 44;
+
+    /// <summary>
+    /// True while the boot is still running: only after a session built with <c>stopAtOpening</c>, until the frames
+    /// played since reach the point where the constructor would have stopped (script 001 has ended or chained on and no
+    /// cutscene is open).
+    /// </summary>
+    public bool BootRunning => _booting;
+
+    /// <summary>Frames the boot ran before it stopped at the opening (0 when it ran to the end).</summary>
+    public int BootFramesBeforeOpening { get; private set; }
+
+    private bool BootGoesOn => (_pending.Any(item => item.ScriptNumber == 1) || InCutscene) && _pending.Count > 0;
+
+    private void FinishBoot(int frames)
+    {
+        _booting = false;
+        BootFrames = frames;
+        if (_pending.Any(item => item.ScriptNumber == 1))
+            _uncertainties.Add($"The boot (script 001) was still running after {frames} frames; the preview stopped following it.");
+        _visitTrace.Add($"boot: {frames} frames after script 001's first room load; now in Room {_currentRoom?.ResourceId:00}");
     }
 
     /// <summary>Frames the boot may run after script 001's first room load.</summary>
@@ -150,9 +180,13 @@ public sealed class LoomExplorationSession
     /// answered, and labels it. Frames then run until script 001 has ended or
     /// chained on and no cutscene is open, at most <see cref="BootFrameLimit"/>.
     /// </summary>
-    private void CompleteBoot()
+    private void CompleteBoot(bool stopAtOpening)
     {
-        if (_currentRoom is null) return;
+        if (_currentRoom is null)
+        {
+            _booting = false;
+            return;
+        }
         if (FindAwaitedInput() is { } input)
         {
             _uncertainties.Add(input.Note);
@@ -169,15 +203,35 @@ public sealed class LoomExplorationSession
             DispatchRequestedLoads("during the boot");
         }
         var frames = 0;
-        while (frames < BootFrameLimit && (_pending.Any(item => item.ScriptNumber == 1) || InCutscene) && _pending.Count > 0)
+        while (frames < BootFrameLimit && BootGoesOn)
         {
+            if (stopAtOpening && _pending.Any(item => item.ScriptNumber == OpeningScript))
+            {
+                // The rest of the boot is played by AdvanceFrame, which counts on from here.
+                _bootFramesPlayed = BootFramesBeforeOpening = frames;
+                _playingBoot = true;
+                _visitTrace.Add($"boot: stopped after {frames} frames, where script 001 started the opening (script {OpeningScript:000}); " +
+                                "the rest plays frame by frame");
+                return;
+            }
             AdvanceFrame();
             frames++;
         }
-        BootFrames = frames;
-        if (_pending.Any(item => item.ScriptNumber == 1))
-            _uncertainties.Add($"The boot (script 001) was still running after {frames} frames; the preview stopped following it.");
-        _visitTrace.Add($"boot: {frames} frames after script 001's first room load; now in Room {_currentRoom?.ResourceId:00}");
+        FinishBoot(frames);
+    }
+
+    // True while a boot stopped at the opening is played frame by frame; the frames of the boot so far.
+    private bool _playingBoot;
+    private int _bootFramesPlayed;
+
+    /// <summary>After a frame of a boot stopped at the opening: ends the boot where the constructor would have.</summary>
+    private void ContinuePlayedBoot()
+    {
+        if (!_playingBoot) return;
+        _bootFramesPlayed++;
+        if (_bootFramesPlayed < BootFrameLimit && BootGoesOn) return;
+        _playingBoot = false;
+        FinishBoot(_bootFramesPlayed);
     }
 
     /// <summary>
@@ -1128,6 +1182,14 @@ public sealed class LoomExplorationSession
     /// the last action records the continued load as its outcome.
     /// </summary>
     public LoomSessionSnapshot AdvanceFrame()
+    {
+        var snapshot = AdvanceOneFrame();
+        if (!_playingBoot) return snapshot;
+        ContinuePlayedBoot();
+        return Snapshot;
+    }
+
+    private LoomSessionSnapshot AdvanceOneFrame()
     {
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.

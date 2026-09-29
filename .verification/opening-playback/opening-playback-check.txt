@@ -1,0 +1,40 @@
+﻿Real MainWindow; PlayOpening and SkipCutscene are called as the menu and Escape call them, on the playback clock. No physical input.
+The app's boot (constructor): Room 02, ego (828, 60) in Room 02 facing 270, var[0x071] = 0, camera 800, boot frames 775
+1. The opening from its stated start, played through:
+           0 ms: status "Playing The opening (script 044) from a stated start (see the tooltip). Escape skips once the cutscene allows it."; stopped after 3 boot frames in Room 69
+         830 ms: session Room 01, view Room 01, boot running True, skippable False, skip button False
+        1040 ms: session Room 01, view Room 01, boot running True, skippable True, skip button True
+        6077 ms: session Room 02, view Room 02, boot running True, skippable True, skip button True
+        7245 ms: session Room 01, view Room 01, boot running True, skippable True, skip button True
+       22077 ms: session Room 02, view Room 02, boot running True, skippable True, skip button True
+       33689 ms: session Room 53, view Room 53, boot running True, skippable True, skip button True
+       33816 ms: text "Talk Script 44 +0x03F0: Levántate, Hijo de Cygna."
+       37389 ms: text "Talk Script 44 +0x0423: Es el amanecer de tu / decimoséptimo año."
+       42526 ms: text "Talk Script 44 +0x049C: Me envían los Ancianos  / para buscarte."
+       47615 ms: text "Talk Script 44 +0x04F0: El Gran Consejo espera tu / presencia en el Santuario."
+       53554 ms: session Room 02, view Room 02, boot running True, skippable True, skip button True
+       54531 ms: text "Talk Script 44 +0x0587: ¡Un hada mensajera!"
+       57498 ms: text "Talk Script 44 +0x05AA: Nunca había visto una tan brillante."
+       61993 ms: text "Talk Script 44 +0x05D6: Debe de haberla tejido uno de los Ancianos."
+       67202 ms: text "Talk Script 44 +0x0609: Será mejor que baje al pueblo."
+       71231 ms: session Room 02, view Room 02, boot running False, skippable False, skip button False
+       72755 ms: playback ended; status "The opening (script 044) sent to the game: entered Room 02"
+   End: Room 02, ego (828, 60) in Room 02 facing 270, var[0x071] = 0, camera 800, boot frames 775
+PASS the view shows script 044's rooms in order: 1, 2, 1, 2, 53, 2
+PASS Room 01's points of light are drawn (at most 9 of actors 1–9 at once)
+PASS text is shown in Room 53 (the fairy) and Room 02 (Bobbin)
+PASS Skip is off until script 044 sets its skip point
+PASS the playback ends as the app's boot does, after 72755 ms: Room 02, ego (828, 60) in Room 02 facing 270, var[0x071] = 0, camera 800, boot frames 775
+2. The opening again, Escape one second after the first skip point:
+           0 ms: status "Playing The opening (script 044) from a stated start (see the tooltip). Escape skips once the cutscene allows it."; stopped after 3 boot frames in Room 69
+          55 ms: session Room 69, view Room 69, boot running True, skippable False, skip button False
+         152 ms: session Room 01, view Room 01, boot running True, skippable False, skip button False
+         370 ms: session Room 01, view Room 01, boot running True, skippable True, skip button True
+        1417 ms: session Room 01, view Room 01, boot running True, skippable False, skip button False
+        1495 ms: session Room 02, view Room 02, boot running True, skippable False, skip button False
+        1717 ms: session Room 02, view Room 02, boot running False, skippable False, skip button False
+        3246 ms: playback ended; status "The opening (script 044) sent to the game: entered Room 02"
+   End: Room 02, ego (828, 60) in Room 02 facing 180, var[0x071] = 0, camera 800, boot frames 18
+PASS the session trace shows abortCutscene at script 044's skip jump
+PASS Escape at 1370 ms ends the opening in Room 02 after 3246 ms (played through: 72755 ms), Bobbin facing the screen: Room 02, ego (828, 60) in Room 02 facing 180, var[0x071] = 0, camera 800, boot frames 18
+Failures: 0

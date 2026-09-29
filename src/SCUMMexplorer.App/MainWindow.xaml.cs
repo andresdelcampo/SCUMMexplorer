@@ -1791,7 +1791,7 @@ public partial class MainWindow : Window
         // (abortCutscene, as the game's key does) and space pauses or plays the scene (the game's pause key).
         if (GameClickActive && Keyboard.FocusedElement is not (TextBox or ComboBox) && Keyboard.Modifiers == ModifierKeys.None)
         {
-            if (e.Key == Key.Escape && _session!.InCutscene)
+            if (e.Key == Key.Escape && SessionInScene)
             {
                 e.Handled = true;
                 SkipCutscene();
@@ -2771,7 +2771,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void SkipCutscene()
     {
-        if (_session is not { InCutscene: true } session || _currentRoomResource is not { } room) return;
+        if (!SessionInScene || _session is not { } session || _currentRoomResource is not { } room) return;
         var skippable = session.CutsceneSkippable;
         var action = session.PressKey(0x1B);
         StatusText.Text = skippable
@@ -2783,6 +2783,12 @@ public partial class MainWindow : Window
         UpdatePlaybackControls();
     }
 
+    /// <summary>
+    /// The player has no control: a cutscene is open, or the boot still plays its opening (script 044 opens no
+    /// cutscene of its own; script 001 turns input off and sets <c>bit[0xD6E]</c> around it).
+    /// </summary>
+    private bool SessionInScene => _session is { } session && (session.InCutscene || session.BootRunning);
+
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
     {
@@ -2791,7 +2797,7 @@ public partial class MainWindow : Window
         if (!active) return;
         PlaybackPauseButton.IsEnabled = _playback is not null;
         PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
-        var inCutscene = _session?.InCutscene == true;
+        var inCutscene = SessionInScene;
         var skippable = _session?.CutsceneSkippable == true;
         SkipCutsceneButton.IsEnabled = inCutscene && skippable;
         SkipCutsceneButton.ToolTip = !inCutscene
@@ -2817,6 +2823,9 @@ public partial class MainWindow : Window
     private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
     {
         var menu = new ContextMenu { PlacementTarget = CutsceneMenuButton, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        var opening = new MenuItem { Header = OpeningTitle, ToolTip = OpeningSource + " " + OpeningStartNote };
+        opening.Click += (_, _) => PlayOpening();
+        menu.Items.Add(opening);
         foreach (var cutscene in KnownCutscenes)
         {
             var item = new MenuItem { Header = cutscene.Title, ToolTip = cutscene.Source + " " + CutsceneStartNote(cutscene) };
@@ -2824,6 +2833,36 @@ public partial class MainWindow : Window
             menu.Items.Add(item);
         }
         menu.IsOpen = true;
+    }
+
+    private const string OpeningTitle = "The opening (script 044)";
+
+    private const string OpeningSource =
+        "Script 001 +0x0222 starts script 044 and waits for it (+0x0225): Rooms 01, 02, 01, 02, 53 and 02, with the copyright " +
+        "line, Room 01's points of light (locals 200–208), the fairy's message in Room 53 and Bobbin's lines on the cliff. " +
+        "Two skip points (beginOverride +0x005A, +0x0124); after a skip Bobbin faces the screen (+0x063E).";
+
+    private const string OpeningStartNote =
+        "Stated start: a fresh session (seed 0) whose boot stops on the frame script 001 starts script 044, after the intro " +
+        "screen's answer (Room 69: difficulty and draft assumed, not simulated). The rest of the boot plays on the playback " +
+        "clock at the game's frame rate and ends as the app's own boot does, in Room 02. The current exploration state is replaced.";
+
+    /// <summary>
+    /// Plays the boot's opening cutscene (script 044): a fresh session stopped where script 001 starts it
+    /// (<see cref="LoomExplorationSession.BootRunning"/>), then the rest of the boot on the playback clock.
+    /// Escape skips it once script 044 has set its skip point.
+    /// </summary>
+    private void PlayOpening()
+    {
+        if (_game is null || _indexedObjectSnapshot is null || !GameClickActive) return;
+        StopScenePlayback();
+        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, stopAtOpening: true);
+        if (_session.Snapshot.RoomId is not int roomId || _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } room)
+            return;
+        StartPlayback("The opening (script 044)", null, room, doorways: null, leftRoom: false);
+        StatusText.Text = $"Playing {OpeningTitle} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
+        StatusText.ToolTip = OpeningStartNote + Environment.NewLine + OpeningSource + Environment.NewLine +
+                             string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
     }
 
     private static string CutsceneStartNote(KnownCutscene cutscene) =>
@@ -2864,7 +2903,7 @@ public partial class MainWindow : Window
         // Other actors are not waited for: ambient walkers (script 042's swan) never stop.
         var moving = session.EgoMoving || session.CameraMoving;
         if (session.Snapshot.PendingScripts == 0 && !talking && !moving) return false;
-        if (session.InCutscene)
+        if (SessionInScene)
         {
             if (playback.CutsceneFrames < LoomExplorationSession.CutsceneFrameLimit) return true;
             playback.Note = $"A cutscene was still open after {LoomExplorationSession.CutsceneFrameLimit} frames; playback stopped following it.";
@@ -2879,7 +2918,7 @@ public partial class MainWindow : Window
         if (!PlaybackShouldContinue()) return false;
         var session = _session!;
         var playback = _playback!;
-        if (session.InCutscene) playback.CutsceneFrames++;
+        if (SessionInScene) playback.CutsceneFrames++;
         // Frames of a walk do not count as idle: the sentence that waits for it runs after it.
         else if (!session.EgoMoving && !session.CameraMoving) playback.IdleFrames++;
         var room = session.Snapshot.RoomId;
