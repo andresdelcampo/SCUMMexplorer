@@ -2807,8 +2807,12 @@ public partial class MainWindow : Window
                 : "The cutscene has not set its skip point (beginOverride) yet, so Escape would do nothing now, as in the game.";
     }
 
-    /// <summary>A known cutscene and the object verb that starts it (decoded; see the script map).</summary>
-    private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, string Source);
+    /// <summary>
+    /// A known cutscene and the object verb that starts it (decoded; see the script map). With <see cref="Click"/>,
+    /// the verb only leads into the room, and the game's click at that point starts the cutscene.
+    /// </summary>
+    private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, string Source,
+        (int X, int Y)? Click = null);
 
     private static readonly KnownCutscene[] KnownCutscenes =
     [
@@ -2817,7 +2821,13 @@ public partial class MainWindow : Window
             "(+0x0045), sets its skip point (+0x00C6) and ends with loadRoomWithEgo into Room 13 (+0x017D)."),
         new("Script 046: the Elders' trial", 8, 255, 0x38, 46,
             "Room 08 object 255 verb 0x38 (the sanctuary door) starts script 046 (+0x0000): a cutscene with its skip point at " +
-            "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x1421 in Room 09.")
+            "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x1421 in Room 09."),
+        new("Script 086: the firewood scene (Room 37)", 36, 599, 0x38, 86,
+            "Room 36 object 599 verb 0x38 leads into Room 37 (loadRoomWithEgo, walk to (24, 101)). On a first visit " +
+            "(bit[0xD9A] is 0) Room 37's entry starts local 200 (+0x0097), which chains to script 086 once Bobbin's walk box " +
+            "becomes 8 (+0x0016–0x001D). Script 086: Stoke mistakes Bobbin for Rusty; Rooms 37, 58, 37 and 38; skip point " +
+            "+0x0023; endCutscene +0x055C in Room 38.",
+            (109, 102))
     ];
 
     /// <summary>
@@ -2890,8 +2900,12 @@ public partial class MainWindow : Window
     private static string CutsceneStartNote(KnownCutscene cutscene) =>
         $"Stated start: a fresh session after the boot (seed 0), Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
         $"there is assumed), then object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} run directly: an exploration action, not " +
-        "the game's click (Bobbin does not walk there, and the object may be untouchable in this state). The frames after it play " +
-        "on the playback clock at the game's frame rate. The current exploration state is replaced.";
+        "the game's click (Bobbin does not walk there, and the object may be untouchable in this state). " +
+        (cutscene.Click is { } click
+            ? $"The verb leads into the next room; once Bobbin's arrival walk ends (run before the view shows it), the game's click at " +
+              $"({click.X}, {click.Y}) (assumed input) walks him on, and the room's own code starts the cutscene. "
+            : "") +
+        "The frames after it play on the playback clock at the game's frame rate. The current exploration state is replaced.";
 
     /// <summary>
     /// Plays a known cutscene from its stated start (<see cref="CutsceneStartNote"/>): a fresh session after the boot,
@@ -2905,16 +2919,27 @@ public partial class MainWindow : Window
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
         _session.VisitRoom(room);
         var action = _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
+        var uncertainties = action.Uncertainties.ToList();
+        if (cutscene.Click is { } click)
+        {
+            // The verb's loadRoomWithEgo walks Bobbin in; the click is sent once he stands, as a player's would be.
+            for (var frame = 0; frame < LoomExplorationSession.CutsceneFrameLimit && _session.EgoMoving; frame++) _session.AdvanceFrame();
+            action = _session.Click(click.X, click.Y);
+            uncertainties.AddRange(action.Uncertainties);
+        }
         if (_currentRoomResource?.ResourceId == cutscene.RoomId && _currentRoom is not null)
         {
             ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview();
         }
-        StartPlayback($"Object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} (run directly)", action, room, doorways: null, leftRoom: false);
+        StartPlayback(cutscene.Click is { } sent
+                ? $"Object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} (run directly), then a click at ({sent.X}, {sent.Y})"
+                : $"Object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} (run directly)",
+            action, room, doorways: null, leftRoom: false);
         StatusText.Text = $"Playing {cutscene.Title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
         StatusText.ToolTip = CutsceneStartNote(cutscene) + Environment.NewLine + cutscene.Source + Environment.NewLine +
-                             string.Join(Environment.NewLine, action.Uncertainties);
+                             string.Join(Environment.NewLine, uncertainties);
     }
 
     private bool PlaybackShouldContinue()

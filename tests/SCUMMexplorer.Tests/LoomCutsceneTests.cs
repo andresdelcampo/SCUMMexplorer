@@ -196,6 +196,45 @@ public sealed class LoomCutsceneTests
     }
 
     [Fact]
+    public void AWalkIntoRoom37sBox8PlaysTheFirewoodScene()
+    {
+        if (Load() is not { } data) return;
+        var (game, index) = data;
+        var session = new LoomExplorationSession(game, index);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 36));
+        // Room 36 object 599's doorway: loadRoomWithEgo into Room 37, walk to (24, 101) in box 0. A first visit
+        // (bit[0xD9A] is 0) starts local 200, which watches the ego's walk box.
+        session.ActivateObjectVerb(599, 0x38);
+        Assert.Equal(37, session.Snapshot.RoomId);
+        for (var frame = 0; frame < 100 && session.EgoMoving; frame++) session.AdvanceFrame();
+        var ego = session.Actors.Single(actor => actor.Number == 1);
+        Assert.Equal((37, 24, 101, 0), (ego.Room, ego.X, ego.Y, ego.WalkBox));
+        Assert.Null(ego.Estimate);
+
+        // The game's click in box 8: the walk enters box 8, local 200 chains to script 086.
+        session.Click(109, 102);
+        var rooms = new List<int>();
+        var lines = new List<string>();
+        for (var frame = 0; frame < 2000 && (frame < 20 || session.InCutscene); frame++)
+        {
+            session.AdvanceFrame();
+            if (session.Snapshot.RoomId is int room && (rooms.Count == 0 || rooms[^1] != room)) rooms.Add(room);
+            if (session.Messages.Talk is { } talk && talk.Lines.Any(line => line.Trim().Length > 0) &&
+                (lines.Count == 0 || lines[^1] != talk.Lines[0])) lines.Add(talk.Lines[0]);
+        }
+
+        Assert.Contains("Room 37 local script 200 chains to script 86", session.SessionTrace);
+        Assert.Contains("endCutscene at Script 86 +0x055C runs script 3", session.SessionTrace);
+        Assert.Equal([37, 58, 37, 38], rooms);
+        // All 13 of script 086's printed lines (the last print, +0x0551, is empty).
+        Assert.Equal(13, lines.Count);
+        Assert.Equal("Vaya, vaya, vaya.", lines[0]);
+        Assert.Equal("Y no vendré sólo.", lines[^1]);
+        Assert.False(session.InCutscene);
+        Assert.Equal((ushort)1, session.Snapshot.KnownGlobalVariables["bit[0xD9A]"]);
+    }
+
+    [Fact]
     public void CutsceneRunsTheScriptsInItsHooksAndFreezesTheRest()
     {
         if (Load() is not { } data) return;

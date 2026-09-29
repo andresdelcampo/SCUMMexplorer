@@ -1,0 +1,46 @@
+﻿Real MainWindow; PlayKnownCutscene and SkipCutscene are called as the menu and Escape call them, on the playback clock. No physical input.
+Known cutscene: KnownCutscene { Title = Script 086: the firewood scene (Room 37), RoomId = 36, ObjectId = 599, VerbId = 56, Script = 86, Source = Room 36 object 599 verb 0x38 leads into Room 37 (loadRoomWithEgo, walk to (24, 101)). On a first visit (bit[0xD9A] is 0) Room 37's entry starts local 200 (+0x0097), which chains to script 086 once Bobbin's walk box becomes 8 (+0x0016–0x001D). Script 086: Stoke mistakes Bobbin for Rusty; Rooms 37, 58, 37 and 38; skip point +0x0023; endCutscene +0x055C in Room 38., Click = (109, 102) }
+1. Script 086 from its stated start, played through:
+           0 ms: status "Playing Script 086: the firewood scene (Room 37) from a stated start (see the tooltip). Escape skips once the cutscene allows it."; Room 37, ego (24, 101) in Room 37 facing 90, in cutscene False, bit[0xD9A] = 0
+        2302 ms: session Room 37, view Room 37, in cutscene False, skippable False, skip button False
+        3080 ms: session Room 37, view Room 37, in cutscene True, skippable False, skip button False
+        3636 ms: session Room 37, view Room 37, in cutscene True, skippable True, skip button True
+        3636 ms: text in Room 37 "Script 86 +0x0028: Vaya, vaya, vaya."
+        6647 ms: text in Room 37 "Script 86 +0x0064: Vaya si no es mi querido aprendiz, / Rusty Nailbender, el que no se cansa NUNCA."
+       15012 ms: text in Room 37 "Script 86 +0x00CE: Hola, esto... Sr. Stoke."
+       18408 ms: text in Room 37 "Script 86 +0x00EE: ¡Hombre! ¡Me ha traido un palo de madera!"
+       23492 ms: text in Room 37 "Script 86 +0x011F: ¡Exactamente UN trozo de leña para mi / pobre y hambrienta hoguera!"
+       30623 ms: text in Room 37 "Script 86 +0x0169: ¿Leña para el fuego?"
+       33728 ms: session Room 58, view Room 58, in cutscene True, skippable True, skip button True
+       33950 ms: text in Room 58 "Script 86 +0x0193: ¡Serás idiota! /  / Te fuiste hace CUATRO / HORAS a buscar leña, / ¿y te ATREVES a volver / con UN SOLO PALO / tras ese tiempo?"
+       45930 ms: text in Room 58 "Script 86 +0x0253: Si tu padre no fuera / el capataz, te metería a / TI en la caldera. /  / Tienes suerte de que / esté abajo con el / Obispo."
+       57509 ms: text in Room 58 "Script 86 +0x0304: Si se apaga el fuego, / las espadas de los  / Clérigos se retrasarán. /  / ¿A lo mejor quieres / pedir perdón al Obispo / personalmente?  / Estaré encantado de  / concertarte una cita."
+       73437 ms: session Room 37, view Room 37, in cutscene True, skippable True, skip button True
+       73661 ms: text in Room 37 "Script 86 +0x03C7: Dame ese palo."
+       78279 ms: text in Room 37 "Script 86 +0x042E: Ya se lo que voy a hacer contigo."
+       82698 ms: session Room 38, view Room 38, in cutscene True, skippable True, skip button True
+       82925 ms: text in Room 38 "Script 86 +0x0494: Ya volveré, Nailbender."
+       87175 ms: text in Room 38 "Script 86 +0x04DC: Y no vendré sólo."
+       93492 ms: session Room 38, view Room 38, in cutscene False, skippable False, skip button False
+       95043 ms: playback ended; status "Object 599's verb 0x38 (run directly), then a click at (109, 102) sent to the game: entered Room 38"
+   End: Room 38, ego (196, 132) in Room 38 facing 270, in cutscene False, bit[0xD9A] = 1
+PASS the status names the cutscene: "Playing Script 086: the firewood scene (Room 37) from a stated start (see the tooltip). Escape skips once the cutscene allows it."
+PASS Room 37's local 200 chains to script 086 (the walk into box 8), not the explorer
+PASS the view shows script 086's rooms in order: 37, 58, 37, 38
+PASS all 13 lines of script 086 are shown, in Rooms 37, 58 and 38 (13 distinct)
+PASS the playback ends in Room 38 after 95043 ms with Bobbin at (196, 132): Room 38, ego (196, 132) in Room 38 facing 270, in cutscene False, bit[0xD9A] = 1
+PASS screenshots: firewood-room37-stoke-app.png, firewood-room58-closeup-app.png, firewood-room37-stick-app.png, firewood-room38-app.png
+2. Script 086 again, Escape one second after the skip point:
+           0 ms: status "Playing Script 086: the firewood scene (Room 37) from a stated start (see the tooltip). Escape skips once the cutscene allows it."; Room 37, ego (24, 101) in Room 37 facing 90, in cutscene False, bit[0xD9A] = 0
+         993 ms: session Room 37, view Room 37, in cutscene False, skippable False, skip button False
+        1876 ms: session Room 37, view Room 37, in cutscene True, skippable False, skip button False
+        2460 ms: session Room 37, view Room 37, in cutscene True, skippable True, skip button True
+        2460 ms: text in Room 37 "Script 86 +0x0028: Vaya, vaya, vaya."
+        3491 ms: session Room 37, view Room 37, in cutscene True, skippable False, skip button False
+        3631 ms: session Room 38, view Room 38, in cutscene True, skippable False, skip button False
+        3848 ms: session Room 38, view Room 38, in cutscene False, skippable False, skip button False
+        5363 ms: playback ended; status "Object 599's verb 0x38 (run directly), then a click at (109, 102) sent to the game: entered Room 38"
+   End: Room 38, ego (196, 132) in Room 38 facing 270, in cutscene False, bit[0xD9A] = 1
+PASS the session trace shows abortCutscene at script 086's skip jump
+PASS Escape at 3460 ms ends it in Room 38 after 5363 ms (played through: 95043 ms): Room 38, ego (196, 132) in Room 38 facing 270, in cutscene False, bit[0xD9A] = 1
+Failures: 0
