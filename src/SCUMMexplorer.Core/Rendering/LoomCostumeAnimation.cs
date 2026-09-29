@@ -274,8 +274,10 @@ public sealed class LoomCostume
     /// (costume colour 0) are skipped. Returns the number of pixels written.
     /// </summary>
     public int Compose(IReadOnlyList<LoomCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
-        int x, int y, IReadOnlyList<byte>? actorPalette = null)
+        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null)
     {
+        // mask: the z-plane the actor is drawn behind (same size as the target); a set pixel hides the actor's pixel
+        // (ScummVM byleRLEDecode: masked when mask[0] & maskbit).
         var written = 0;
         foreach (var cel in cels)
         for (var row = 0; row < cel.Height; row++)
@@ -288,6 +290,7 @@ public sealed class LoomCostume
                 if (tx < 0 || tx >= targetWidth) continue;
                 var color = cel.Pixels[row * cel.Width + column];
                 if (color == 0) continue;
+                if (mask is not null && mask[ty * targetWidth + tx] != 0) continue;
                 target[ty * targetWidth + tx] = MapColor(color, actorPalette);
                 written++;
             }

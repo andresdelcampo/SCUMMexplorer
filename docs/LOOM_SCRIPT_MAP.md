@@ -209,7 +209,7 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 ## Not modelled yet (ordered by the plan's milestones)
 
 1. **M1, messages:** modelled on 28 Sep, except `overhead` text (0 sites), text codes 5–7 and 9–14 (labelled when met), talk animations (`talkAnimation`, code 9) and `putActor`/`putActorInRoom` stopping the talk of an actor that leaves the room.
-2. **M2, actors:** priority masks (actors behind objects); `_extraBoxFlags` in `remapDirection`; `animationSpeed`; walk scripts (`_walkScript`).
+2. **M2, actors:** (priority masks done 29 Sep: box masks per room are 0 or 1, close-ups 0; LOOM never uses the z-clip `actorOps`, decoded); `_extraBoxFlags` in `remapDirection`; `animationSpeed`; walk scripts (`_walkScript`).
 3. **M3, timing:** `delay`, `delayVariable` and the engine timers are modelled since 29 Sep (M3b); walks, turns and camera moves since M3a. Not modelled: `VAR_MUSIC_TIMER` (`var[0x00E]`, read by script 044 +0x00B2 on code the session's route jumps over).
 4. **As routes need them:** `stopObjectScript`, inventory object code, `killScriptsAndResources` ending the other room-owned scripts at a room load, `expression` in some forms (3 in Blockers).
 5. **Assumptions that stay labelled:** the Room 69 difficulty and draft answer, the boot's seeded draft table, `getRandomNr` picks (seed 0 in the app), a catalog visit's arrival, and the input state (pointer, click timing, keys). Rooms 19, 51 and 86 rest on seeded ties between priority-1 draw batches.

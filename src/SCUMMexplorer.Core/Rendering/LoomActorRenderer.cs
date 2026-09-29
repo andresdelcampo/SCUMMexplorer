@@ -4,7 +4,11 @@ namespace SCUMMexplorer.Core.Rendering;
 
 /// <summary>One actor drawn into the layer: where its pixels are in room coordinates, and why it may differ from the game.</summary>
 public sealed record LoomDrawnActor(int Number, int Costume, int X, int Y, int Elevation, int Frame, int Direction,
-    (int Left, int Top, int Right, int Bottom)? Bounds, int Pixels, string? Estimate);
+    (int Left, int Top, int Right, int Bottom)? Bounds, int Pixels, string? Estimate)
+{
+    /// <summary>The z-plane the actor was drawn behind (0: in front of everything; 1: behind the room's depth mask).</summary>
+    public int ZPlane { get; init; }
+}
 
 /// <summary>The actors of the current room as an indexed layer the size of the room (<see cref="LoomActorRenderer.Transparent"/> where no actor is).</summary>
 public sealed record LoomActorLayer(byte[] Pixels, int Width, int Height, IReadOnlyList<LoomDrawnActor> Actors, IReadOnlyList<string> Skipped);
@@ -14,7 +18,9 @@ public sealed record LoomActorLayer(byte[] Pixels, int Width, int Height, IReadO
 /// sorted by y with the engine's own exchange sort (for each j, for each i, swap when y[j] &lt; y[i]; ScummVM notes that
 /// this unstable order is the original's), and each one with a costume is drawn (<c>drawActorCostume</c>) at
 /// (x, y − elevation) in that order, so a lower actor ends up on top. Only visible actors are drawn. Pixels are clipped
-/// to the room. Priority masks (actors behind foreground objects) are not applied.
+/// to the room. With a depth mask, an actor whose walk box has a nonzero mask is hidden where the mask is set
+/// (<c>drawActorCostume</c>: <c>_zbuf = getMaskFromBox(_walkbox)</c>, at most <c>_numZBuffer - 1</c> = 1 in v3; LOOM
+/// never sets <c>forceClip</c>, as no script uses the z-clip <c>actorOps</c>).
 /// </summary>
 public static class LoomActorRenderer
 {
@@ -32,7 +38,7 @@ public static class LoomActorRenderer
     }
 
     public static LoomActorLayer Render(IEnumerable<LoomActorSnapshot> actors, int currentRoom, int width, int height,
-        Func<int, LoomCostume?> costumes)
+        Func<int, LoomCostume?> costumes, byte[]? depthMask = null, LoomWalkBoxSet? boxes = null)
     {
         var pixels = new byte[width * height];
         Array.Fill(pixels, Transparent);
@@ -60,13 +66,16 @@ public static class LoomActorRenderer
             }
             var cels = costume.Draw(look.Animation, direction);
             var top = y - elevation;
-            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette);
+            // Plane 1 is the only mask plane in v3; an unknown box draws the actor in front (noted as an estimate).
+            var zPlane = depthMask is null ? 0 : actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1) : 0;
+            var boxNote = depthMask is not null && actor.WalkBox is null ? "walk box unknown: drawn in front of the depth mask" : null;
+            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 0 ? depthMask : null);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
                 x + cels.Min(cel => cel.Left), top + cels.Min(cel => cel.Top),
                 x + cels.Max(cel => cel.Left + cel.Width), top + cels.Max(cel => cel.Top + cel.Height));
-            var estimate = string.Join("; ", new[] { actor.Estimate, look.Estimate }.Where(text => text is not null));
+            var estimate = string.Join("; ", new[] { actor.Estimate, look.Estimate, boxNote }.Where(text => text is not null));
             drawn.Add(new LoomDrawnActor(actor.Number, costumeId, x, y, elevation, look.Frame ?? -1, direction, bounds,
-                written, estimate.Length == 0 ? null : estimate));
+                written, estimate.Length == 0 ? null : estimate) { ZPlane = zPlane });
         }
         return new LoomActorLayer(pixels, width, height, drawn, skipped);
     }

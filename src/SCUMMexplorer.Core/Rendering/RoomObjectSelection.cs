@@ -183,6 +183,23 @@ public sealed class RoomObjectSelection
         return pixels;
     }
 
+    /// <summary>
+    /// The depth mask (z-plane 1) as the room redraw leaves it: the room's mask, then each active image's own mask
+    /// over its rectangle in paint order (ScummVM <c>drawBitmap</c> → <c>decodeMask</c>; EGA strips are never
+    /// transparent, so an object's mask replaces the room's there). Null when the room has no mask. An image whose
+    /// mask could not be read leaves the mask under it as it was.
+    /// </summary>
+    public byte[]? ComposeDepthMask(RoomImage room)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        if (room.DepthMask is not { } depth) return null;
+        var mask = depth.Pixels.ToArray();
+        foreach (var obj in PaintOrder())
+            if (obj.Mask is { } objectMask)
+                Paint(obj with { Pixels = objectMask }, mask, room.Width, room.Height, GetPosition(obj));
+        return mask;
+    }
+
     public const string FirstStoredImageReason = "first stored image for this position; no decoded script draws it";
 
     /// <summary>

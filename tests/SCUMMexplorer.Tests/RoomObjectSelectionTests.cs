@@ -132,6 +132,29 @@ public sealed class RoomObjectSelectionTests
     }
 
     [Fact]
+    public void DrawnObjectsReplaceTheRoomDepthMaskUnderThemInPaintOrder()
+    {
+        // decodeMask: each drawn image writes its own mask over its rectangle; an EGA strip is never transparent.
+        var roomMask = Enumerable.Repeat((byte)1, 16 * 8).ToArray();
+        var background = new RoomImage(16, 8, new byte[16 * 8], Palette) { DepthMask = new RoomDepthMask(16, 8, roomMask) };
+        var clear = Filled(1, 0, 0, 8, 8, 3) with { Mask = new byte[64] };
+        var unread = Filled(2, 8, 0, 8, 8, 4);
+        var covering = Filled(3, 0, 0, 8, 4, 5) with { Mask = Enumerable.Repeat((byte)1, 32).ToArray() };
+        var states = new Dictionary<int, byte> { [1] = 1, [2] = 1, [3] = 1 };
+        var selection = new RoomObjectSelection([clear, unread], states, background: background);
+        var mask = selection.ComposeDepthMask(background)!;
+        Assert.All(Enumerable.Range(0, 8).SelectMany(y => Enumerable.Range(0, 8).Select(x => mask[y * 16 + x])), value => Assert.Equal(0, value));
+        // An image whose mask could not be read leaves the room's mask.
+        Assert.All(Enumerable.Range(0, 8).SelectMany(y => Enumerable.Range(8, 8).Select(x => mask[y * 16 + x])), value => Assert.Equal(1, value));
+        // A later image in paint order (the first directory entry) writes last.
+        var layered = new RoomObjectSelection([covering, clear], states, background: background).ComposeDepthMask(background)!;
+        Assert.Equal(1, layered[2 * 16 + 2]);
+        Assert.Equal(0, layered[6 * 16 + 2]);
+        Assert.Null(new RoomObjectSelection([clear], states, background: background)
+            .ComposeDepthMask(background with { DepthMask = null }));
+    }
+
+    [Fact]
     public void ScriptDrawQueueKeepsInsertAboveItsCutoutContainer()
     {
         // Room 56 pattern: a face whose eye area is colour 0, drawn before the eyes.

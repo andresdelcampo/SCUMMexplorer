@@ -93,6 +93,24 @@ public sealed class LoomEgaRoomDecoderTests
         Assert.Equal(6_388, CountMaskPixels(decodedByName["41.LFL"]));
     }
 
+    [Fact]
+    public void EveryLoomObjectImageCarriesAReadableDepthMask()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var counts = new Dictionary<(int Room, int Object), int>();
+        foreach (var resource in game.Rooms.Where(room => File.Exists(room.FilePath)))
+        foreach (var image in new LoomRoomObjects().Decode(File.ReadAllBytes(resource.FilePath)))
+        {
+            Assert.NotNull(image.Mask);
+            Assert.Equal(image.Width * image.Height, image.Mask.Length);
+            counts[(resource.ResourceId ?? -1, image.Id)] = image.Mask.Count(value => value != 0);
+        }
+        // Room 02's objects 155 and 157, Room 19's 380 (checked 29 Sep).
+        Assert.Equal((1450, 512, 7328), (counts[(2, 155)], counts[(2, 157)], counts[(19, 380)]));
+    }
+
     private static int CountMaskPixels(RoomImage image) =>
         image.DepthMask!.Pixels.ToArray().Count(value => value != 0);
 }

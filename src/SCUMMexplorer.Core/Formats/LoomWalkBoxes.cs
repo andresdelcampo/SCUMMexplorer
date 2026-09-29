@@ -76,6 +76,12 @@ public sealed class LoomWalkBoxSet
 
     public byte GetFlags(int box) => Resolve(box) is int index ? _flags[index] : (byte)0;
 
+    /// <summary>
+    /// ScummVM <c>getMaskFromBox</c> for version 3: the box's mask byte, the z-plane an actor standing in it is
+    /// masked by. No box (255) gives 1 (ScummVM's workaround for bugs #791 and #897); an unknown box gives 0.
+    /// </summary>
+    public byte GetMask(int box) => box == InvalidBox ? (byte)1 : Resolve(box) is int index ? Boxes[index].Mask : (byte)0;
+
     /// <summary>ScummVM <c>setBoxFlags</c> (<c>o3_setBoxFlags</c>) for the current room; false when the box does not exist.</summary>
     public bool SetFlags(int box, byte value)
     {

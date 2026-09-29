@@ -77,6 +77,31 @@ public sealed class LoomActorRendererTests
     }
 
     [Fact]
+    public void AnActorInAMaskedWalkBoxIsHiddenWhereTheDepthMaskIsSet()
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        var boxes = session.CurrentWalkBoxes!;
+        // Room 02's boxes 3 and up have mask 1, box 0 (where the boot leaves the ego) has 0; no box (255) reads as 1.
+        Assert.Equal((0, 1, 1), (boxes.GetMask(0), boxes.GetMask(4), boxes.GetMask(LoomWalkBoxSet.InvalidBox)));
+        var ego = session.Actors.Single(actor => actor.Number == 1);
+        var full = Enumerable.Repeat((byte)1, 960 * 144).ToArray();
+        LoomDrawnActor Draw(LoomActorSnapshot actor, byte[]? mask) =>
+            LoomActorRenderer.Render([actor], 2, 960, 144, id => LoomCostume.Load(game, id), mask, boxes).Actors.Single();
+        var front = Draw(ego, full);
+        Assert.Equal(0, front.ZPlane);
+        Assert.True(front.Pixels > 100);
+        var behind = Draw(ego with { WalkBox = 4 }, full);
+        Assert.Equal((1, 0), (behind.ZPlane, behind.Pixels));
+        // Without a mask nothing is hidden; an unknown box draws the actor in front and says so.
+        Assert.Equal(front.Pixels, Draw(ego with { WalkBox = 4 }, null).Pixels);
+        var unknown = Draw(ego with { WalkBox = null }, full);
+        Assert.Equal(front.Pixels, unknown.Pixels);
+        Assert.Contains("walk box unknown", unknown.Estimate);
+    }
+
+    [Fact]
     public void HiddenActorsAndActorsWithoutACostumeAreNotDrawn()
     {
         var hidden = new LoomActorSnapshot(1, 5, 10, 20, 0, false, false, null, null) { Look = LoomActorLook.Initial with { Costume = 1 } };

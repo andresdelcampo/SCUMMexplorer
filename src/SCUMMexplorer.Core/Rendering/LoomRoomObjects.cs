@@ -2,7 +2,16 @@ using System.Buffers.Binary;
 
 namespace SCUMMexplorer.Core.Rendering;
 
-public sealed record RoomObjectImage(int Id, int X, int Y, int Width, int Height, byte[] Pixels);
+public sealed record RoomObjectImage(int Id, int X, int Y, int Width, int Height, byte[] Pixels)
+{
+    /// <summary>
+    /// The image's depth mask (z-plane 1), one byte per pixel (0 or 1): ScummVM's <c>getZPlanes</c> finds it at the
+    /// image's start plus its first word, and <c>decodeMask</c> writes it over the room's mask under the object's strips
+    /// when the object is drawn (EGA strips are never transparent). A strip with offset 0 clears the mask there.
+    /// Null when the mask table cannot be read.
+    /// </summary>
+    public byte[]? Mask { get; init; }
+}
 
 /// <summary>Reads placed object images from the supplied DOS EGA old-v3 LOOM rooms.</summary>
 public sealed class LoomRoomObjects
@@ -34,7 +43,10 @@ public sealed class LoomRoomObjects
             try
             {
                 objects.Add(new RoomObjectImage(record.Id, x, y, width, height,
-                    DecodeImage(data, image, image + length, width, height)));
+                    DecodeImage(data, image, image + length, width, height))
+                {
+                    Mask = DecodeMask(data, image + length, roomEnd, width, height)
+                });
             }
             catch (InvalidDataException)
             {
@@ -84,6 +96,43 @@ public sealed class LoomRoomObjects
             }
         }
         return pixels;
+    }
+
+    // ScummVM decompressMaskImg per strip (old bundle: the offsets table starts at the mask's first byte).
+    private static byte[]? DecodeMask(byte[] data, int start, int end, int width, int height)
+    {
+        var strips = width / 8;
+        if (start + strips * 2 > end) return null;
+        var mask = new byte[width * height];
+        for (var strip = 0; strip < strips; strip++)
+        {
+            var offset = Word(data, start + strip * 2);
+            if (offset == 0) continue;
+            var pos = start + offset;
+            if (offset < strips * 2 || pos >= end) return null;
+            var row = 0;
+            while (row < height)
+            {
+                if (pos >= end) return null;
+                var command = data[pos++];
+                var run = command & 0x7F;
+                if (run == 0) run = 256;
+                var repeated = (command & 0x80) != 0;
+                if (repeated && pos >= end) return null;
+                var value = repeated ? data[pos++] : (byte)0;
+                for (var index = 0; index < run && row < height; index++, row++)
+                {
+                    if (!repeated)
+                    {
+                        if (pos >= end) return null;
+                        value = data[pos++];
+                    }
+                    for (var x = 0; x < 8; x++)
+                        mask[row * width + strip * 8 + x] = (byte)((value & (0x80 >> x)) != 0 ? 1 : 0);
+                }
+            }
+        }
+        return mask;
     }
 
     private static ushort Word(byte[] data, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(offset, 2));
