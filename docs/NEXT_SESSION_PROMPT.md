@@ -1,30 +1,39 @@
-Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md first, then docs/LOOM_EGA_PLAN.md: "What the app shows today", milestone M3 and "Known issues". Then read docs/LOOM_SCRIPT_MAP.md, especially "Messages, charset and actor commands" (the Walking, Room 02's and other rooms' changes of scene, room screen and Camera bullets), the Room 01 and "Bobbin's facing after the opening" notes, the script 044, 046, 052 and 086 rows, "How the session maps ScummVM behaviour" (the boot, `scummLoop`, `o5_delay`, `beginOverride`/`abortCutscene` and `processKeyboard` rows) and "Not modelled yet". docs/CHANGELOG.md lists the finished work.
+Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md first, then docs/LOOM_EGA_PLAN.md: "What the app shows today", milestone M3 and "Known issues". Then read docs/LOOM_SCRIPT_MAP.md, especially "Messages, charset and actor commands", the script 044, 046, 052 and 086 rows, "How the session maps ScummVM behaviour" (the boot, `scummLoop`, `o5_delay`, `beginOverride`/`abortCutscene` rows) and "Not modelled yet". docs/CHANGELOG.md lists the finished work.
 
 State at the start:
 
 * Git: master. The latest commits:
-  * the next-session prompt after the firewood scene;
-  * 10df6e4 "Play script 086, the firewood scene, as a known cutscene";
-  * 2ffc6ac "Play a known cutscene from Game Texts (M3c)";
-  * 5695d62, the previous next-session prompt.
+  * the next-session prompt after the cutscene layout;
+  * 53974e4 "Keep the room one size through cutscenes; dark disabled buttons";
+  * 9653eb8, the previous next-session prompt.
 * Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code. If `git status` shows their uncommitted changes (on 29 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
-* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 230/230 with SCUMM_SOUND_TEST_ROOT=Games\loom and SCUMM_INDY3_EGA_TEST_ROOT=Games\IndyCru\EGA.
-* RoomAudit: 0 gaps in all 76 rooms; `compare-png.ps1`: 0 changed renders (not rerun on 29 Sep: no Core change since).
-* Blockers (.verification/frame-timing/blockers-after.txt, 1,381 lines): the only real stops left are `expression` (3).
-* WPF checks (29 Sep): FirewoodPlaybackCheck 0 failures (new); GameTextsCutsceneCheck 0 (new); DoorwayClickCheck 16/16 on Rooms 02, 03, 04, 08, 10 and 37 (11 by the game's click) and 75/75 on all doorways (before M3c); OpeningPlaybackCheck 0; CutscenePlaybackCheck 0; Room02ExitClickCheck 0; ActorDrawCheck 0; VerbAreaCheck 0; PresentationCheck 0 and CameraPanCheck 0 (before the opening work). Not run since M3a: MessageAppCheck, ClickInputCheck.
-* Worktrees: `.claude/worktrees/focused-pasteur-76af82`, `.claude/worktrees/jovial-sutherland-74247e`, the Codex worktree `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer`, `.claude/worktrees/affectionate-tharp-697cdd`, `.claude/worktrees/sweet-faraday-0c1780`, `.claude/worktrees/admiring-kare-468fd5`, `.claude/worktrees/recursing-thompson-a4c58f` and `.claude/worktrees/nifty-cohen-6ff64f` belong to the user or other sessions. `.claude/worktrees/upbeat-mayer-d71aed` was this session's (it has junctions to Games/ and scummvm/). Don't remove worktrees unless the user asks.
+* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 230/230 (not rerun on 29 Sep after the layout change: no Core change).
+* RoomAudit: 0 gaps in all 76 rooms. Blockers: the only real stops left are `expression` (3) (.verification/frame-timing/blockers-after.txt).
+* WPF checks (29 Sep): CutsceneLayoutCheck 0 (new); VerbAreaCheck 0 (two checks updated for the kept verb screen); PresentationCheck (room-viewport) 0; CameraPanCheck 0; FirewoodPlaybackCheck 0, GameTextsCutsceneCheck 0, OpeningPlaybackCheck 0, CutscenePlaybackCheck 0 and DoorwayClickCheck 16/16 (before the layout change). Not run since M3a: MessageAppCheck, ClickInputCheck.
+* Worktrees: `.claude/worktrees/xenodochial-grothendieck-b05ef4` was this session's (junctions to Games/ and scummvm/). The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
 
 Done last session:
 
-* Game Texts' "Play this cutscene" (.verification/game-texts-cutscene/validation.md): a text whose `ScriptId` is a known cutscene's script (044: 9 texts, 046: 40, 086: 13; 052 prints none) shows the button; the click closes Game Texts, turns the interactive mode on if needed and calls `PlayOpening`/`PlayKnownCutscene` (`GalleryCutscenes()`, `TextGalleryWindow`'s `GalleryCutscene` record).
-* Script 086, the firewood scene (.verification/firewood-scene/validation.md): `KnownCutscene` has an optional `Click`; the 086 entry opens Room 36 from the catalog, runs object 599's verb 0x38 directly (the doorway into Room 37, a reached arrival at (24, 101), box 0), advances the arrival walk without drawing it, then sends the game's click at (109, 102) in box 8. Room 37's local 200 chains to 086: Rooms 37, 58, 37, 38 with 13 lines, about 90 s; Escape ends it in Room 38 at (196, 132). New Core test `AWalkIntoRoom37sBox8PlaysTheFirewoodScene`.
-* Findings: local 200 and Stoke's local 203 run only while `bit[0xD9A]` is 0 (086 sets it); 086 checks no costume; a catalog visit to Room 37 picks an assumed arrival (Room 38's door), which makes the ego's box an estimate, and the session then refuses 086's Room 58 load as following a seeded pick. Open: the game's click on Room 36's exit (object 599) after a catalog visit to Room 36 did not leave the room in a probe (the ego stopped at (472, 126)).
+* The user decided that the app does **not** start with the opening (maybe an option later; not now). The opening plays correctly from "Play a cutscene"; it holds on the Lucasfilm and LOOM title screens for a while first, which made it look broken.
+* Cutscene layout (.verification/cutscene-layout/validation.md): in the interactive mode the verb screen is always kept under the room (`VerbScreenShown`), the pan row is always reserved in the 320-pixel view and its arrows are hidden while `SessionInScene` (`UpdateRoomScrollButtons`, called from `UpdatePlaybackControls`), the pan row sits under the verb strip, `RoomControlsPanel` has `MinHeight="108"`, and an implicit dark `Button` style in MainWindow.xaml draws disabled buttons dark. The room keeps one size through the opening and the trial.
+* Checked: the "bottom of the room is cut" report matches the game: ScummVM `initScreens(16, 144)` gives the room 128 rows between the text line (rows 0–15) and the verb screen.
+
+The user's issue list (29 Sep), with their priority picks marked:
+
+* (picked, done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons.
+* (picked, next) no music or sound in cutscenes.
+* Hetchel flies as a human instead of a swan.
+* Bobbin floats on top of the background: no depth (priority masks, M2c).
+* Text could show where the game shows it: over the room / the text line above it (rows 0–15), not in the verb area.
+* After the distaff shows the open spell, the notes keep their shine and colour in the verb area.
+* Spells cannot be cast with keys.
 
 Tasks, in order:
 
-1. Ask the user (AskUserQuestion) whether the app should start with the opening (the game's own first minute, script 044) instead of after it. It changes the first thing they see, so do nothing until they answer. If yes: open the game folder into the `stopAtOpening` session and play it (`PlayOpening`), keeping the current start one click away; verify with OpeningPlaybackCheck and a check that the first view is Room 01 playing.
-2. Why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit to Room 36: trace script 006's walk and sentence for that click (session probe), and compare with ScummVM if needed (the user starts it). If the click can work, make the 086 entry use it instead of the direct verb. State the finding in the script map.
-3. More known cutscenes, picked by what they show: find object verbs or walks that start a `cutscene` with text (code.tsv: owners whose first instructions include `cutscene`, callers through `startScript`), add them to `KnownCutscenes` with their evidence, and verify each with a harness like FirewoodPlaybackCheck.
+1. Sound in cutscenes: play the music and effects the scripts start while a cutscene plays (the opening, 046, 086). The session records them (`LoomExplorationSession.SoundEvents`, `LoomSessionSoundEvent`; `ReachedSoundEvents`); MainWindow reads them only in the room music code (around `SoundEvents.ToArray()`), which belongs to the other agent's music player. Find a way that plays the sounds from the playback clock (`PlaybackStep`/`ShowPlaybackFrame`) through the existing audio (AdLib via NukedOPL3Sharp, PC speaker) without editing their code; if that is impossible, ask the user first. Verify with a harness that the opening's sounds start on the frames the scripts reach (and say which ones are music vs effects), and ask the user to listen.
+2. Ask the user which of the remaining issues comes next (Hetchel as the swan, depth masks, text position, distaff shine, keys for spells), with a recommendation. Check each against ScummVM before changing anything.
+3. Why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit: trace script 006's walk and sentence (session probe); if the click can work, use it in the 086 entry.
+4. More known cutscenes with text, each verified by a harness like FirewoodPlaybackCheck.
 
 Rules:
 
@@ -55,7 +64,7 @@ Tooling notes:
 * ActorDrawCheck: `<Games\loom> <output folder>`. OpeningPlaybackCheck (.verification/opening-playback): `<Games\loom> <output folder>`, about 80 s on the real clock; it calls `PlayOpening` and `SkipCutscene` through reflection and compares with a fresh booted session. CutscenePlaybackCheck: same arguments, about 70 s; `KnownCutscenes` is a private static array. Room02ExitClickCheck: same arguments, about 30 s. VerbAreaCheck: same arguments.
 * WPF harness exes return at once when started directly from PowerShell (GUI subsystem). Use `Start-Process -FilePath <exe> -ArgumentList … -WorkingDirectory <repo root> -Wait -PassThru` and then read the output file. Build harnesses into the scratchpad (`dotnet build <harness>.csproj -o <scratch dir>`), and rebuild after changing src (each has its own copy of Core).
 * In PowerShell, .NET file APIs (`[IO.File]::ReadAllText`) resolve relative paths against the process directory. Use absolute paths.
-* Line endings: git normalizes (autocrlf); most working files are CRLF, `LoomActors.cs` is LF. MainWindow.xaml, LoomActors.cs and LoomBoundedScriptExecutor.cs have a BOM.
+* Line endings: git normalizes (autocrlf); most working files are CRLF, `LoomActors.cs` is LF. LoomActors.cs and LoomBoundedScriptExecutor.cs have a BOM; MainWindow.xaml and MainWindow.xaml.cs do not (checked 29 Sep). PowerShell's WriteAllText with UTF8Encoding(true) adds one: write with UTF8Encoding(false) for those.
 * MainWindow: the audio stop is `StopPlayback()`; the scene clock's stop is `StopScenePlayback()`; `StartPlayback` starts it; `PlaybackShouldContinue`/`PlaybackStep`/`ShowPlaybackFrame` run it; `SessionInScene` is "no player control" (cutscene or boot running). The doorway fallback is `FollowDoorway` → `ActivateObjectVerb` → `ContinueToReachedRoom`. The actor layer is `UpdateActorLayer()`.
 * If `SCUMMexplorer.App.exe` is running, building the App fails to copy the exe (MSB3026). Build harnesses into the scratchpad. Don't stop the user's app.
 * The harness output argument is a file path for DoorwayClickCheck and a folder for the others. Always write to a fresh path.
@@ -74,3 +83,6 @@ Tooling notes:
 * Before blaming a WPF check failure on a change, run it twice and compare with HEAD.
 * Python has no PIL here. To read PNG pixels, use `System.Drawing.Bitmap` from PowerShell.
 * The `mcp__ccd_session_mgmt__get_usage` tool (load it with ToolSearch) reports the context's tokensUsed for the 250K rule. On 29 Sep the account's weekly limit was at 81%.
+* CutsceneLayoutCheck (.verification/cutscene-layout): `<Games\loom> <output folder>`, about 2 minutes; plays the opening and 40 s of script 046 and samples the room view's size, the verb strip, the arrows and disabled-button brightness.
+* App-wide WPF styles go in MainWindow.xaml's resources, not App.xaml: the harnesses create `new Application()`, so App.xaml's resources never load there.
+* The session tokens were at 206K when the last session stopped (weekly limit 85%).
