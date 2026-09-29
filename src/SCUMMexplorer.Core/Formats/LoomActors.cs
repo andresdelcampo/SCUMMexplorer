@@ -57,6 +57,12 @@ public sealed class LoomActorTable
     /// <summary>ScummVM <c>_egoPositioned</c>: set by <c>putActor</c> on the ego, cleared by <c>startScene</c>.</summary>
     public bool EgoPositioned { get; set; }
 
+    /// <summary>
+    /// How many times a script has put the ego at a point (<c>putActor</c>, <c>putActorAtObject</c>, a room entry),
+    /// not counting <c>putActor()</c> re-placing it where it is. The app reads it to tell a change of scene.
+    /// </summary>
+    public int EgoPuts { get; private set; }
+
     public static bool IsValid(int number) => number is >= 1 and < Count;
 
     public IReadOnlyList<LoomActorSnapshot> Snapshot() => _actors.Skip(1).Select(actor => actor.ToSnapshot()).ToArray();
@@ -109,14 +115,21 @@ public sealed class LoomActorTable
     /// (or stays shown) at its position adjusted into the walk boxes; elsewhere it
     /// is hidden and keeps the raw position. Putting the ego sets <see cref="EgoPositioned"/>.
     /// </summary>
-    public void Put(int number, int? x, int? y, int? room, Placement place, int? ego)
+    public void Put(int number, int? x, int? y, int? room, Placement place, int? ego) =>
+        Put(number, x, y, room, place, ego, replace: false);
+
+    private void Put(int number, int? x, int? y, int? room, Placement place, int? ego, bool replace)
     {
         var actor = _actors[number];
         actor.X = x;
         actor.Y = y;
         actor.Room = room;
         actor.Estimate = null;
-        if (ego == number) EgoPositioned = true;
+        if (ego == number)
+        {
+            EgoPositioned = true;
+            if (!replace) EgoPuts++;
+        }
         if (room is null)
         {
             actor.Visible = null;
@@ -145,7 +158,7 @@ public sealed class LoomActorTable
 
     /// <summary><c>putActor()</c>: re-places the actor where it is (actorOps ignoreBoxes/followBoxes).</summary>
     public void Replace(int number, Placement place, int? ego) =>
-        Put(number, _actors[number].X, _actors[number].Y, _actors[number].Room, place, ego);
+        Put(number, _actors[number].X, _actors[number].Y, _actors[number].Room, place, ego, replace: true);
 
     /// <summary>
     /// <c>o5_putActorInRoom</c>: sets the room only. Room 0 also runs

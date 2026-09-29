@@ -2496,7 +2496,7 @@ public partial class MainWindow : Window
     /// <summary>
     /// Sends input to the session, shows its first result, and plays the frames
     /// that follow on the playback clock (<see cref="StartPlayback"/>). A click on
-    /// <paramref name="doorways"/> that reaches no room load falls back to the
+    /// <paramref name="doorways"/> that reaches no room load and changes no scene (a cutscene that puts the ego) falls back to the
     /// doorway's direct verb when playback ends. Returns whether the session is
     /// in another room so far (with the clock running, a later frame may still get there).
     /// </summary>
@@ -2505,6 +2505,7 @@ public partial class MainWindow : Window
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         var playing = PlaybackRunning;
+        var sceneBefore = (_session.CutscenesBegun, _session.EgoPuts);
         var action = send();
         var refused = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
         if (playing && refused is not null)
@@ -2527,7 +2528,7 @@ public partial class MainWindow : Window
         RefreshRoomPreview();
         // Refused input changes nothing on screen, so the frames that follow run at once
         // and a doorway's fallback is not delayed.
-        StartPlayback(what, action, sourceRoom, doorways, leftRoom: false, instant: refused is not null);
+        StartPlayback(what, action, sourceRoom, doorways, leftRoom: false, instant: refused is not null, sceneBefore);
         return _session.Snapshot.RoomId != sourceRoom.ResourceId;
     }
 
@@ -2536,16 +2537,20 @@ public partial class MainWindow : Window
     /// (<see cref="SendClickToGame"/>): the ego walks to what is under the point
     /// and verb 0x38 runs (a double click adds 0x36), as scripts 005–007 do.
     /// Room hotspots navigate: when the game's click reaches no room load on a
-    /// doorway (refused input, or a route the preview cannot follow), the
-    /// doorway's verb runs directly, labelled as an exploration action. In the
+    /// doorway (refused input, or a route the preview cannot follow) and changed no
+    /// scene, the doorway's verb runs directly, labelled as an exploration action.
+    /// A click whose cutscene put the ego somewhere else is the game's answer: it waits for the next click. In the
     /// inspection mode a click cycles the stored artwork.
     /// </summary>
     // Why the last room click fell back to a doorway's direct verb (for the harnesses and the tooltip).
     private string? _lastDoorwayFallback;
+    // Why the last doorway click did not fall back: the game answered it with a scene.
+    private string? _lastDoorwayHeld;
 
     private void HandleRoomPoint(int x, int y, bool doubleClick = false)
     {
         _lastDoorwayFallback = null;
+        _lastDoorwayHeld = null;
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             SendInputToGame(() => _session.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click", DoorwaysAt(x, y));
@@ -2592,6 +2597,9 @@ public partial class MainWindow : Window
         public string? Note { get; set; }
         public string? FrameSignature { get; set; }
         public int? CameraX { get; set; }
+        // The session's cutscene and ego-put counts before the input: a cutscene that put the ego
+        // somewhere since then is a change of scene, the game's answer to the input.
+        public (int Cutscenes, int EgoPuts) SceneBefore { get; init; }
     }
 
     private Playback? _playback;
@@ -2620,12 +2628,13 @@ public partial class MainWindow : Window
     /// load reached while playing opens that room, and playback goes on there.
     /// </summary>
     private void StartPlayback(string what, LoomObjectActionResult? action, GameResource sourceRoom,
-        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false)
+        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null)
     {
         _playback = new Playback
         {
             What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom,
-            CameraX = _session?.CameraX
+            CameraX = _session?.CameraX,
+            SceneBefore = sceneBefore ?? (_session?.CutscenesBegun ?? 0, _session?.EgoPuts ?? 0)
         };
         _playbackRequestedRoom = null;
         if (_playInstantly || instant)
@@ -2819,8 +2828,24 @@ public partial class MainWindow : Window
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview();
         }
-        if (playback.Doorways is { Count: > 0 } doorways && _currentRoomResource?.ResourceId == playback.SourceRoom.ResourceId)
-            FollowDoorwayFallback(doorways);
+        if (playback.Doorways is not { Count: > 0 } doorways || _currentRoomResource?.ResourceId != playback.SourceRoom.ResourceId)
+            return;
+        var cutscenes = session.CutscenesBegun - playback.SceneBefore.Cutscenes;
+        var egoPuts = session.EgoPuts - playback.SceneBefore.EgoPuts;
+        if (cutscenes > 0 && egoPuts > 0)
+        {
+            // The game answered the click with a change of scene: a cutscene put the ego somewhere else (Room 02's
+            // script 045 puts the smaller Bobbin on the next stretch of the path, which ends the click's walk). The
+            // game waits there for the player's next click, so the doorway's direct verb does not run. A cutscene
+            // that leaves the ego where it is (a refusal, such as Room 37 object 601's verb 0x37) still falls back.
+            _lastDoorwayHeld = $"{cutscenes} cutscene(s) begun, the ego put {egoPuts} time(s)";
+            StatusText.Text = $"{playback.What} sent to the game: the scene changed; click again to go on";
+            StatusText.ToolTip = "The click began a cutscene that put Bobbin somewhere else, and reached no room load. As in the game, " +
+                                 "the next click goes on from there. The doorway's direct verb (an exploration action) runs only when " +
+                                 "the game's click changes no scene." + (StatusText.ToolTip is string tip ? Environment.NewLine + tip : "");
+            return;
+        }
+        FollowDoorwayFallback(doorways);
     }
 
     // ---- Actors on screen (M2c) -----------------------------------------------

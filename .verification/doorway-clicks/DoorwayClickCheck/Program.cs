@@ -10,7 +10,8 @@ using SCUMMexplorer.Core.Rendering;
 // For every room with doorway boxes on the real MainWindow: browse to the room,
 // click (in-process HandleRoomPoint: the game's click, with the direct verb as a
 // labelled fallback) a point of each box that no other box
-// covers, and report whether the view entered one of that box's rooms.
+// covers, and report whether the view entered one of that box's rooms. A click
+// the game answers with a change of scene (a cutscene that puts the ego) gets no fallback, so the point is clicked again (up to 5 clicks).
 // Arguments: <Games\loom> <out.txt> [room numbers]. No physical input.
 internal static class Program
 {
@@ -93,6 +94,19 @@ internal static class Program
                         }
                         for (var n = 0; n < 60 && Displayed() == room.ResourceId; n++) await Task.Delay(50);
                         await Task.Delay(100);
+                        // A click the game answered with a change of scene (no room load) runs no fallback:
+                        // the game waits for another click, so the harness clicks the same point again, up to 5 clicks.
+                        var clicks = 1;
+                        var held = new List<string>();
+                        while (clicks < 5 && Displayed() == room.ResourceId && Field("_lastDoorwayHeld") is string why)
+                        {
+                            held.Add(why);
+                            clicks++;
+                            Call("HandleRoomPoint", point.X, point.Y, false);
+                            for (var n = 0; n < 60 && Displayed() == room.ResourceId; n++) await Task.Delay(50);
+                            await Task.Delay(100);
+                        }
+                        if (clicks > 1) via += $" [{clicks} clicks; earlier clicks held by the game: {string.Join("; ", held)}]";
                         var now = Displayed();
                         var ok = now is int entered && targets.Contains(entered);
                         // A box with no point of its own that is untouchable now: findObject picks the touchable

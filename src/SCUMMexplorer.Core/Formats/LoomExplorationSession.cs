@@ -271,6 +271,19 @@ public sealed class LoomExplorationSession
     public bool InCutscene => _cutscenes.Any(item => IsAlive(item.Owner));
 
     /// <summary>
+    /// How many cutscenes this session has begun (<c>beginCutscene</c> reached). The app compares it
+    /// before and after an input, with <see cref="EgoPuts"/>, to tell whether the game answered it with a change of scene.
+    /// </summary>
+    public int CutscenesBegun { get; private set; }
+
+    /// <summary>
+    /// How many times a script has put the ego at a point (<see cref="LoomActorTable.EgoPuts"/>). With
+    /// <see cref="CutscenesBegun"/> it marks a change of scene: Room 02's script 045 begins a cutscene and
+    /// <c>putActor</c>s the ego on the next stretch of the path, which ends the click's walk.
+    /// </summary>
+    public int EgoPuts => _runtime.Actors.EgoPuts;
+
+    /// <summary>
     /// Test seam: gives a global word a value, as reached code would, so tests
     /// can exercise hooks the boot has not set. Never used by the app.
     /// </summary>
@@ -1704,6 +1717,7 @@ public sealed class LoomExplorationSession
         if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var arguments))
             return "cutscene arguments depend on unknown variables";
         _cutscenes.Push((arguments.GetValueOrDefault("local[0x000]"), _executing.Count > 0 ? _executing[^1] : null));
+        CutscenesBegun++;
         _overrides.Remove(_cutscenes.Count);
         if (!_runtime.GlobalVariables.TryGetValue(CutsceneStartScriptVariable, out var startScript))
         {

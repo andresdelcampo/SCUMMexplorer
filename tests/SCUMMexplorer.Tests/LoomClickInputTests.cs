@@ -57,6 +57,7 @@ public sealed class LoomClickInputTests
         Assert.Equal((ushort?)5, Var(session, 0x020));
 
         // Room 02 object 153 (class 2, box (376, 8) 176x120, walk point (540, 108)).
+        var (cutscenes, egoPuts) = (session.CutscenesBegun, session.EgoPuts);
         var click = session.Click(450, 60);
         Assert.True(click.IsGameInput);
         Assert.Contains(session.SessionTrace, line => line.Contains("runs script 5 with [2, 0, 0]", StringComparison.Ordinal));
@@ -74,6 +75,10 @@ public sealed class LoomClickInputTests
         Settle(session);
         Assert.Equal((756, 107), Ego(session));
         Assert.Equal(2, session.Snapshot.RoomId);
+        // The app reads this: the click began a cutscene that put the ego (a change of scene), so it runs no
+        // doorway fallback and waits for the next click.
+        Assert.Equal(cutscenes + 1, session.CutscenesBegun);
+        Assert.True(session.EgoPuts > egoPuts);
         // A second click stops at box 10's change of scene ((627, 124), walk to (609, 110)).
         session.Click(450, 60);
         Settle(session);
