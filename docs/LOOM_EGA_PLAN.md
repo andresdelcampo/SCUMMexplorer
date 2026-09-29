@@ -54,7 +54,7 @@ Each milestone ends with something the user can see in the running app, verified
 
 - **3a. Walking in steps. Done 28 September ([validation](../.verification/walk-steps/validation.md)).** Actors move along the walk-box path at their `walkSpeed` (ScummVM `Actor_v3::walkActor`, `calcMovementFactor`, `actorWalkStep`, `findPathTowardsOld`), with the walk animation; turns go one step a frame (`updateActorDirection`); the camera follows 8 pixels a frame (`moveCamera`), and `panCameraTo` pans. `waitFor actor`/`camera` wait for the real arrival and `getActorMoving` answers. Bobbin now ends the boot in left profile, as in ScummVM. Room 02's changes of scene (script 045) now interrupt a click's walk down the path, as the decoded code says; compared with ScummVM by eye on 28 September: the walk, the stop in the smaller costume and the camera match.
 - **3b. Frame timing. Done 29 September ([validation](../.verification/frame-timing/validation.md)).** `delay` and `delayVariable` pause their slot for their jiffies, counted down at the start of each frame as ScummVM's `decreaseScriptDelay` does (a slot runs again once its delay is below 0: 60 jiffies = 11 frames at 6 a frame). The engine timers (`VAR_TIMER`, `VAR_TIMER_TOTAL`, `VAR_TMR_1..3`) count every frame from 0. Boot 725 → 775 frames, script 052 267 → 277, the Elders' trial 2,784 → 2,824. The talk delay (M1) and `VAR_TIMER_NEXT` were already modelled. Not checked in M3b: whether sounds start on the frame they are reached (the audio code exists).
-- **Next: 3c.**
+- **Next:** the Room 02 exit fallback (Known issues), then 3c.
 - **3c. Playback controls.** Play, pause and Escape (skip; `abortCutscene` is already modelled). A "play this cutscene" entry reaches known cutscenes from Game Texts or a room. Each one starts from a stated, labelled state.
 - **Verification:** Room 10 object 295 plays script 052 through Room 11 into Room 13, with actors and text. Escape skips to Room 13 as today. The boot's opening cutscene (script 044) plays in Rooms 01, 02, 53 and 02.
 
@@ -74,6 +74,7 @@ Build a discoverable, spoiler-aware index of secrets from verified triggers and 
 
 ### Known issues
 
+- A click on Room 02's exit from the cliff stops at script 045's box-4 change of scene, as in the game and in ScummVM (seen 28 Sep). But the app's doorway fallback then opens Room 03 at once (labelled), where the game waits for another click. The route through the game's click works when the first clicks go on the path's floor (ActorDrawCheck since M3b).
 - The app shows all 144 rows of a room image, but LOOM's room screen is 128 rows (ScummVM `initScreens(16, 144)`, not resized in v3), so the game never shows the last 16. In Room 02 they are black. Check other rooms before cropping ([view checks](../.verification/view-checks/validation.md)).
 - Actors are drawn in all 144 rows, so Room 02's actor 4 (costume 141 at (433, 129)) shows in rows the game never shows. The 128-row crop would hide it.
 - Actors are never hidden behind foreground objects: priority masks are not applied (M2c).
