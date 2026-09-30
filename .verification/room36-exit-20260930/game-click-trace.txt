@@ -1,0 +1,258 @@
+﻿== boot (775 frames): room 02, pending 4, camera x 800
+   trace: Script 01 continues at +0x0162 in Room 69 after loadRoom
+   trace: boot: starts Room 69 local script 205 as the player's answer would
+   trace: stopScript 202 at Room 69 local script 205 +0x002C: ended its pending run
+   trace: stopScript 204 at Room 69 local script 205 +0x002E: script 204 was not running
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: stopScript 202 at Room 69 exit script +0x0000: script 202 was not running
+   trace: Script 44 continues at +0x00C4 in Room 01 after loadRoom
+   trace: script 200 started again: runScript ended its running copy first
+   trace: script 201 started again: runScript ended its running copy first
+   trace: script 202 started again: runScript ended its running copy first
+   trace: script 203 started again: runScript ended its running copy first
+   trace: script 204 started again: runScript ended its running copy first
+   trace: script 205 started again: runScript ended its running copy first
+   trace: script 206 started again: runScript ended its running copy first
+   trace: script 207 started again: runScript ended its running copy first
+   trace: script 208 started again: runScript ended its running copy first
+   trace: script 209 started again: runScript ended its running copy first
+   trace: Script 44 waits 60 jiffies (delay) before +0x023F
+   trace: Script 44's delay ends; it runs again at +0x023F
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: Script 44 continues at +0x0241 in Room 02 after loadRoom
+   trace: Script 44 waits 60 jiffies (delay) before +0x0248
+   trace: Script 44's delay ends; it runs again at +0x0248
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: stopScript 45 at Room 02 exit script +0x0000: script 45 was not running
+   trace: Script 44 continues at +0x024A in Room 01 after loadRoom
+   trace: Script 44 waits 60 jiffies (delay) before +0x025C
+   trace: Script 44's delay ends; it runs again at +0x025C
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: Script 44 continues at +0x027F in Room 02 after loadRoom
+   trace: Script 44 waits 60 jiffies (delay) before +0x02B7
+   trace: Script 44's delay ends; it runs again at +0x02B7
+   trace: Script 44 waits 60 jiffies (delay) before +0x02D3
+   trace: Script 44's delay ends; it runs again at +0x02D3
+   trace: stopScript 113 at Script 44 +0x03B6: ended its pending run
+   trace: stopScript 114 at Script 44 +0x03B8: ended its pending run
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: stopScript 45 at Room 02 exit script +0x0000: script 45 was not running
+   trace: Script 44 continues at +0x03BC in Room 53 after loadRoom
+   trace: stopScript 200 at Script 44 +0x041B: ended its pending run
+   trace: stopScript 201 at Script 44 +0x0532: script 201 was not running
+   trace: stopScript 200 at Script 44 +0x0534: ended its pending run
+   trace: stopScript 42 at Script 15 +0x000A: script 42 was not running
+   trace: Script 44 continues at +0x0538 in Room 02 after loadRoom
+   trace: stopScript 113 at Script 44 +0x062F: script 113 was not running
+   trace: stopScript 114 at Script 44 +0x0631: script 114 was not running
+   trace: freezeScripts 0x00 at Script 01 +0x0231: no script is frozen
+   trace: Script 01 chains to script 6
+   trace: boot: 775 frames after script 001's first room load; now in Room 02
+   uncertain: Script 01 +0x0000: presentation operation not applied: roomOps; presentation operation not applied: stringOps
+   uncertain: Script 01 +0x0160 reached loadRoom during the boot.
+   uncertain: Room 69 entered by Script 01 +0x0160 (loadRoom) during the boot.
+   uncertain: Room 69 entry script +0x0000: presentation operation not applied: resourceRoutines
+   uncertain: Player input assumed: script 001 +0x0166 waits for bit[0xD6B], which only Room 69 local script 205 sets (+0x0048). The room's own code starts it after the player's input (local 203 +0x01D8, local 203 +0x0241), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.
+   uncertain: Script 44 +0x0000: presentation operation not applied: resourceRoutines
+   uncertain: Script 01 +0x0166: presentation operation not applied: resourceRoutines
+   uncertain: Script 44 +0x002B: presentation operation not applied: oldRoomEffect
+   uncertain: Script 44 +0x00C2 reached loadRoom after a frame advance.
+   uncertain: Room 01 entered by Script 44 +0x00C2 (loadRoom) after a frame advance.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x02D2 picked 2 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x02F5 picked 1 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x0322 picked 1 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x0345 picked 0 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x0368 picked 0 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x038B picked 0 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x03AE picked 2 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x03D1 picked 1 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x03F4 picked 0 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x0417 picked 2 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x043A picked 0 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x045D picked 2 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x0480 picked 2 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Room 01 local script 211 +0x0000: getRandomNr at +0x04A3 picked 2 of 0..2 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Sound 25 was started; its natural completion time is not simulated.
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 25 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 44 +0x023F reached loadRoom after a frame advance.
+   uncertain: Room 02 entered by Script 44 +0x023F (loadRoom) after a frame advance.
+   uncertain: Room 02 entry script +0x0000: presentation operation not applied: resourceRoutines
+   uncertain: Script 44 +0x0248 reached loadRoom after a frame advance.
+   uncertain: Room 01 entered by Script 44 +0x0248 (loadRoom) after a frame advance.
+   uncertain: Script 113 +0x0000: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0000: presentation operation not applied: resourceRoutines
+   uncertain: Script 114 +0x0000: presentation operation not applied: resourceRoutines
+   uncertain: Script 114 +0x003D: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 1); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 1); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 2); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 3); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 4); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 2); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 5); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 3); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 6); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 4); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 7); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 3 of 0..4 (seeded pick, seed 0, draw 5); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 8); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 6); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 9); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 3 of 0..4 (seeded pick, seed 0, draw 7); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 3 of 0..4 (seeded pick, seed 0, draw 10); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 8); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 11); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 4 of 0..4 (seeded pick, seed 0, draw 9); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 12); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 10); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 3 of 0..4 (seeded pick, seed 0, draw 13); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 44 +0x027D reached loadRoom after a frame advance.
+   uncertain: Room 02 entered by Script 44 +0x027D (loadRoom) after a frame advance.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 11); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 12); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 14); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 3 of 0..4 (seeded pick, seed 0, draw 13); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 2 of 0..4 (seeded pick, seed 0, draw 15); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 3 of 0..4 (seeded pick, seed 0, draw 14); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 3 of 0..4 (seeded pick, seed 0, draw 15); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 16); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 2 of 0..4 (seeded pick, seed 0, draw 16); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 17); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 17); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 4 of 0..4 (seeded pick, seed 0, draw 18); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 18); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 19); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 20); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 19); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 21); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 4 of 0..4 (seeded pick, seed 0, draw 20); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 22); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 23); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 4 of 0..4 (seeded pick, seed 0, draw 21); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 4 of 0..4 (seeded pick, seed 0, draw 22); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 23); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 24); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 25); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 26); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 24); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 27); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 25); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 2 of 0..4 (seeded pick, seed 0, draw 28); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 26); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 29); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 27); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 30); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 28); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 31); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 32); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 2 of 0..4 (seeded pick, seed 0, draw 33); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 29); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 30); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 2 of 0..4 (seeded pick, seed 0, draw 34); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 0 of 0..4 (seeded pick, seed 0, draw 35); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 31); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 2 of 0..4 (seeded pick, seed 0, draw 36); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 32); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 37); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 33); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 0 of 0..4 (seeded pick, seed 0, draw 34); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 3 of 0..4 (seeded pick, seed 0, draw 38); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 1 of 0..4 (seeded pick, seed 0, draw 35); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 4 of 0..4 (seeded pick, seed 0, draw 39); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 4 of 0..4 (seeded pick, seed 0, draw 36); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 1 of 0..4 (seeded pick, seed 0, draw 40); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 3 of 0..4 (seeded pick, seed 0, draw 37); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 113 +0x0068: getRandomNr at +0x0037 picked 3 of 0..4 (seeded pick, seed 0, draw 41); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 114 +0x0078: getRandomNr at +0x0047 picked 2 of 0..4 (seeded pick, seed 0, draw 38); what follows from it is an estimate, not a reached game state.
+   uncertain: Script 44 +0x03BA reached loadRoom after a frame advance.
+   uncertain: Room 53 entered by Script 44 +0x03BA (loadRoom) after a frame advance.
+   uncertain: Script 44 +0x0536 reached loadRoom after a frame advance.
+   uncertain: Room 02 entered by Script 44 +0x0536 (loadRoom) after a frame advance.
+   uncertain: Script 44 +0x062F: presentation operation not applied: oldRoomEffect
+   uncertain: Script 06 +0x0000: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (800, 144)
+   actor 1: room 2, (828, 60), box 0, visible
+   actor 4: room 2, (433, 129), box 255, visible
+   actor 5: room 2, (807, 25), box 255, visible
+   actor 10: room 2, (290, 48), box 255, visible estimate: actor 10's putActor at +0x0059 follows a seeded pick
+   actor 11: room 2, (309, 28), box 255, visible estimate: actor 11's putActor at +0x0069 follows a seeded pick
+== visit Room 36: room 36, pending 4, camera x 320 (estimate)
+   trace: catalog visit to Room 36: var[0x07C] = 0 (estimate, Room 37 Object 601 Verb 0x38 +0x0000 sets var[0x07C] = 0 before the load)
+   trace: stopScript 42 at Script 15 +0x000A: ended its pending run
+   trace: stopScript 45 at Room 02 exit script +0x0000: ended its pending run
+   trace: script 39 started again: runScript ended its running copy first
+   trace: Room 37 Object 601 Verb 0x38 +0x0005: camera x = 320 (the ego's x) (estimate)
+   trace: Room 37 Object 601 Verb 0x38 +0x0005: the camera follows the ego's walk to x = 320 (estimate)
+   trace: Room 37 Object 601 Verb 0x38 +0x0005: the ego (actor 1) stands at (438, 126), box 12 (estimate: assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit)
+   uncertain: Room 36 was selected from the catalog: the ego's size (var[0x07C], script 017) is estimated as 0 from the assumed arrival's route: Room 37 Object 601 Verb 0x38 +0x0000 sets var[0x07C] = 0 before the load.
+   uncertain: Room 36 selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Room 37 Object 601 Verb 0x38 +0x0005 (object 599, walk to (438, 126)) would bring it in (seeded pick 2 of 2 (seed 0); alternatives: Room 35 local script 210 +0x000F (object 598, walk to (32, 128))). Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+   uncertain: Room 36 local script 203 +0x0000: presentation operation not applied: resourceRoutines
+   uncertain: Room 36 entry script +0x0000: presentation operation not applied: resourceRoutines
+   uncertain: Script 14 +0x0000: presentation operation not applied: lights
+   uncertain: Camera x (var[0x002]) = 320 is an estimate: the camera is put on the ego at Room 37 Object 601 Verb 0x38 +0x0005, whose position is an estimate (assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit).
+   uncertain: Camera x (var[0x002]) = 320 is an estimate: it follows the ego's walk from Room 37 Object 601 Verb 0x38 +0x0005, which is taken to end at once (assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit).
+   actor 1: room 36, (438, 126), box 12, visible estimate: assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit
+   actor 2: room 36, (165, 135), box 255, visible
+   actor 3: room 36, (186, 35), box 255, visible
+   actor 4: room 36, (266, 77), box 255, visible
+   actor 5: room 36, (434, 124), box 255, visible
+== after +32 frames: room 36, pending 4, camera x 320 (estimate)
+   uncertain: Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (320, 144)
+   uncertain: Room 36 local script 200 +0x0001: getActorWalkBox reads actor 1: assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit, so what follows is an estimate (+0x0001)
+   uncertain: Sound 27 was started; its natural completion time is not simulated.
+   uncertain: Room 36 local script 200 +0x0006: getActorWalkBox reads actor 1: assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit, so what follows is an estimate (+0x0006)
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 27 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   actor 1: room 36, (438, 126), box 12, visible estimate: assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit
+   actor 2: room 36, (165, 135), box 255, visible
+   actor 3: room 36, (186, 35), box 255, visible
+   actor 4: room 36, (266, 77), box 255, visible
+   actor 5: room 36, (434, 124), box 255, visible
+   click: A click at (465, 1) in Room 36, sent to the game's input script as assumed input; no room load was reached.
+== click at (465, 1): room 36, pending 4, camera x 320 (estimate)
+   trace: click: a single click at (465, 1) runs script 5 with [2, 0, 0] (runInputScript)
+   trace: Script 05 chains to script 6
+   trace: script 6 started again: runScript ended its running copy first
+   uncertain: A click at (465, 1) in Room 36, sent to the game's input script as assumed input. ScummVM runInputScript(2, 0, 0) runs script 5 (var[0x020], VAR_VERB_SCRIPT, set by script 001 +0x016B); the click's point and timing are the explorer's, not the game's.
+   uncertain: Assumed input timing for a single click: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = 60; the frame loop counts it on from there, but the player's time before the click is not known.
+   uncertain: Script 06 +0x0000: findObject at +0x0096 reads the virtual mouse: assumed input: a single click at (465, 1), sent by the explorer
+   actor 1: room 36, (438, 126), box 12, visible estimate: assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit
+   actor 2: room 36, (165, 135), box 255, visible
+   actor 3: room 36, (186, 35), box 255, visible
+   actor 4: room 36, (266, 77), box 255, visible
+   actor 5: room 36, (434, 124), box 255, visible
+== after +250 frames: room 36, pending 4, camera x 320 (estimate)
+   uncertain: Room 36 local script 200 +0x0006: getActorWalkBox reads actor 1: assumed arrival at Room 37 Object 601 Verb 0x38 +0x0005 after a catalog visit, so what follows is an estimate (+0x0006)
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 27 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: the pointer rests over the room at (465, 1), where the explorer clicked; it stays there after the click
+   actor 1: room 36, (465, 126), box 12, visible
+   actor 2: room 36, (165, 135), box 255, visible
+   actor 3: room 36, (186, 35), box 255, visible
+   actor 4: room 36, (266, 77), box 255, visible
+   actor 5: room 36, (434, 124), box 255, visible
+   click: A click at (109, 102) in Room 36, sent to the game's input script as assumed input; no room load was reached.
+== click at (109, 102): room 36, pending 4, camera x 320 (estimate)
+   trace: click: a single click at (109, 102) runs script 5 with [2, 0, 0] (runInputScript)
+   trace: Script 05 chains to script 6
+   trace: script 6 started again: runScript ended its running copy first
+   uncertain: A click at (109, 102) in Room 36, sent to the game's input script as assumed input. ScummVM runInputScript(2, 0, 0) runs script 5 (var[0x020], VAR_VERB_SCRIPT, set by script 001 +0x016B); the click's point and timing are the explorer's, not the game's.
+   uncertain: Assumed input timing for a single click: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = 60; the frame loop counts it on from there, but the player's time before the click is not known.
+   uncertain: Script 06 +0x0000: findObject at +0x0096 reads the virtual mouse: assumed input: a single click at (109, 102), sent by the explorer
+   actor 1: room 36, (465, 126), box 12, visible
+   actor 2: room 36, (165, 135), box 255, visible
+   actor 3: room 36, (186, 35), box 255, visible
+   actor 4: room 36, (266, 77), box 255, visible
+   actor 5: room 36, (434, 124), box 255, visible
+== after +300 frames: room 36, pending 4, camera x 320 (estimate)
+   trace: cutscene at Room 36 local script 200 +0x00A6 runs script 2
+   trace: freezeScripts 0x7F at Script 02 +0x0004: no script is frozen
+   trace: endCutscene at Room 36 local script 200 +0x00CA runs script 3
+   trace: freezeScripts 0x00 at Script 03 +0x0016: no script is frozen
+   uncertain: Script 39 +0x003D: isSoundRunning reads sound 27 as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x003D)
+   uncertain: Script 03 +0x0000: camera x follows actor 1, whose position is an estimate (actor 1's putActor at +0x00B4 follows a seeded pick) (+0x0018)
+   uncertain: Room 36 local script 200 +0x0006: getActorWalkBox reads actor 1: actor 1's putActor at +0x00B4 follows a seeded pick, so what follows is an estimate (+0x0006)
+   uncertain: Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: the pointer rests over the room at (109, 102), where the explorer clicked; it stays there after the click
+   actor 1: room 36, (322, 79), box 7, visible estimate: actor 1's putActor at +0x00B4 follows a seeded pick
+   actor 2: room 36, (165, 135), box 255, visible
+   actor 3: room 36, (186, 35), box 255, visible
+   actor 4: room 36, (266, 77), box 255, visible
+   actor 5: room 36, (434, 124), box 255, visible
