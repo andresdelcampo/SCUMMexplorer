@@ -1,0 +1,12 @@
+Real MainWindow; synthetic button events and catalog visits. No physical input.
+PASS Room 20: no cutscene control or placeholder menu
+PASS Room 41: no cutscene control or placeholder menu
+PASS Room 11: dropdown for two scenes
+PASS dropdown uses plain scene titles
+PASS Room 08: ordinary button without dropdown marker
+PASS single-scene button directly starts the trial
+PASS Skip line enabled for live text: Parece que los Ancianos están ocupados.
+PASS Skip line sets the same zero talk delay as '.'
+PASS next line/frame follows without skipping the whole cutscene
+PASS inspection mode hides cutscene controls
+Failures: 0

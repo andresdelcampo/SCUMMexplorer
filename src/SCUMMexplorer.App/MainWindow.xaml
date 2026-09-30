@@ -241,6 +241,9 @@
                                                 ToolTip="Pause or play the scene (space). While paused, Continue ▸ in the advanced session bar plays one frame."/>
                                         <Button x:Name="SkipCutsceneButton" Content="⏭ Skip (Esc)" Click="SkipCutscene_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
+                                        <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
+                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
+                                                ToolTip="Skip the current line, as with the '.' key."/>
                                         <Button x:Name="CutsceneMenuButton" Content="Play a cutscene ▾" Click="CutsceneMenu_Click" Padding="8,4"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Play a known cutscene that starts in the room shown or passes through it, from a stated start: a fresh session after the boot, the room opened from the catalog, and the object's verb run directly (an exploration action, not the game's click)."/>

@@ -2828,6 +2828,8 @@ public partial class MainWindow : Window
 
     private void SkipCutscene_Click(object sender, RoutedEventArgs e) => SkipCutscene();
 
+    private void SkipLine_Click(object sender, RoutedEventArgs e) => SkipTalk("the Skip line button, same as '.'");
+
     /// <summary>
     /// Escape during a cutscene (ScummVM <c>processKeyboard</c>: <c>abortCutscene</c> while <c>VAR_CUTSCENEEXIT_KEY</c>
     /// is set): the script that set the cutscene's override goes on at its skip jump on the next frame, and the
@@ -2859,6 +2861,10 @@ public partial class MainWindow : Window
         var active = GameClickActive && _game?.Id == GameId.Loom;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         if (!active) return;
+        var choices = CutsceneChoices();
+        CutsceneMenuButton.Visibility = choices.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+        CutsceneMenuButton.Content = choices.Count > 1 ? "Play a cutscene ▾" : "Play a cutscene";
+        SkipLineButton.IsEnabled = !string.IsNullOrWhiteSpace(_session?.Messages.Talk?.Text);
         UpdateRoomScrollButtons();
         PlaybackPauseButton.IsEnabled = _playback is not null;
         PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
@@ -2922,32 +2928,39 @@ public partial class MainWindow : Window
         play();
     }
 
-    private void CutsceneMenu_Click(object sender, RoutedEventArgs e) => BuildCutsceneMenu().IsOpen = true;
+    private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
+    {
+        var choices = CutsceneChoices();
+        if (choices.Count == 1) choices[0].Play();
+        else if (choices.Count > 1) BuildCutsceneMenu().IsOpen = true;
+    }
+
+    private List<(string Title, string Source, Action Play)> CutsceneChoices()
+    {
+        var choices = new List<(string Title, string Source, Action Play)>();
+        var roomId = _game?.Id == GameId.Loom ? _currentRoomResource?.ResourceId : null;
+        if (roomId is int shown && OpeningRooms.Contains(shown))
+            choices.Add(("The opening", OpeningSource + " " + OpeningStartNote, PlayOpening));
+        foreach (var cutscene in KnownCutscenes.Where(item => roomId is int id && item.Shows(id)))
+            choices.Add((cutscene.Script switch
+            {
+                52 => "Room 10 to Room 13",
+                46 => "The Elders' trial",
+                86 => "The firewood scene",
+                _ => cutscene.Title
+            }, cutscene.Source + " " + CutsceneStartNote(cutscene), () => PlayKnownCutscene(cutscene)));
+        return choices;
+    }
 
     private ContextMenu BuildCutsceneMenu()
     {
         var menu = new ContextMenu { PlacementTarget = CutsceneMenuButton, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
-        // Only the cutscenes that start in the room shown or load it (the user's choice, 30 Sep).
-        var roomId = _game?.Id == GameId.Loom ? _currentRoomResource?.ResourceId : null;
-        if (roomId is int shown && OpeningRooms.Contains(shown))
+        foreach (var choice in CutsceneChoices())
         {
-            var opening = new MenuItem { Header = OpeningTitle, ToolTip = OpeningSource + " " + OpeningStartNote };
-            opening.Click += (_, _) => PlayOpening();
-            menu.Items.Add(opening);
-        }
-        foreach (var cutscene in KnownCutscenes.Where(item => roomId is int id && item.Shows(id)))
-        {
-            var item = new MenuItem { Header = cutscene.Title, ToolTip = cutscene.Source + " " + CutsceneStartNote(cutscene) };
-            item.Click += (_, _) => PlayKnownCutscene(cutscene);
+            var item = new MenuItem { Header = choice.Title, ToolTip = choice.Source };
+            item.Click += (_, _) => choice.Play();
             menu.Items.Add(item);
         }
-        if (menu.Items.Count == 0)
-            menu.Items.Add(new MenuItem
-            {
-                Header = (roomId is int id ? $"No known cutscene plays in Room {id:00}." : "No room is shown.") +
-                         " Known cutscenes: " + KnownCutsceneRoomsText(),
-                IsEnabled = false
-            });
         return menu;
     }
 
