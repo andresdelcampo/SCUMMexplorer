@@ -210,9 +210,6 @@
                                                        RenderOptions.BitmapScalingMode="NearestNeighbor" IsHitTestVisible="False"/>
                                             </Grid>
                                         </Border>
-                                        <TextBlock x:Name="VerbStripNote" Foreground="#B8AA8C" FontSize="11" TextWrapping="Wrap"
-                                                   TextTrimming="CharacterEllipsis" Height="30"
-                                                   TextAlignment="Center" Margin="0,2,0,0"/>
                                     </StackPanel>
                                     <Grid x:Name="RoomScrollButtonsPanel" Width="{Binding ActualWidth, ElementName=RoomViewport}" Height="24"
                                           HorizontalAlignment="Center" Margin="0,0,0,4" Visibility="Collapsed">

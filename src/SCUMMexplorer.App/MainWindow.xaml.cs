@@ -1578,9 +1578,8 @@ public partial class MainWindow : Window
         var usableHeight = Math.Max(1, availableHeight);
         if (normalSize)
             usableHeight = Math.Max(1, usableHeight - RoomScrollButtonsPanel.Height - RoomScrollButtonsPanel.Margin.Top - RoomScrollButtonsPanel.Margin.Bottom);
-        // The optional verb strip shares the height: 56 screen rows at the room's scale, and its note.
+        // The optional verb strip shares the height: 56 screen rows at the room's scale (its explanation is a tooltip).
         var verbStrip = VerbScreenShown();
-        if (verbStrip) usableHeight = Math.Max(1, usableHeight - VerbStripNoteHeight);
         var shownRows = ShownRoomRows(room);
         var oneScreen = OneGameScreen();
         _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth,
@@ -1603,7 +1602,6 @@ public partial class MainWindow : Window
         // In the interactive LOOM mode the room and verb screens read as the game's one 200-row screen: no gap or rule.
         VerbStripPanel.Margin = new Thickness(0, oneScreen ? 0 : 2, 0, 0);
         VerbStripBorder.BorderThickness = new Thickness(0, oneScreen ? 0 : 1, 0, 0);
-        VerbStripNote.MaxWidth = Math.Max(160, RoomViewport.Width);
         RoomViewport.Dispatcher.BeginInvoke(() =>
         {
             ApplyPendingCamera();
@@ -3523,9 +3521,6 @@ public partial class MainWindow : Window
         UpdateVerbArea();
     }
 
-    // Height kept for the verb strip's note under the strip.
-    private const double VerbStripNoteHeight = 36;
-
     private bool VerbStripShown() =>
         VerbAreaToggle.IsChecked == true && _session is not null && _game?.Id == GameId.Loom && _currentRoom is not null;
 
@@ -3555,12 +3550,12 @@ public partial class MainWindow : Window
                 // so the close-up (verb 0x36, script 008) shows above the object's name (script 007).
                 var slots = _session!.VerbArea();
                 VerbStripImage.Source = CreateBitmap(slots.Width, slots.Height, slots.Pixels, _currentRoom!.Palette);
-                VerbStripNote.Text = _verbMessageBitmap is not null
-                    ? "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots)."
-                    : "Verb screen (rows 144–199), kept under the room: the session's verb slots (presentation of the slots).";
-                VerbStripNote.ToolTip = string.Join(Environment.NewLine, _session?.Messages.OnScreen
-                    .Where(message => message.Y >= LoomVerbArea.Top)
-                    .Select(message => $"\"{message.Text}\" at ({message.X}, {message.Y}) from {message.Source}") ?? []);
+                SetVerbScreenNote(_verbMessageBitmap is not null
+                        ? "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots)."
+                        : "Verb screen (rows 144–199), kept under the room: the session's verb slots (presentation of the slots).",
+                    _session?.Messages.OnScreen
+                        .Where(message => message.Y >= LoomVerbArea.Top)
+                        .Select(message => $"\"{message.Text}\" at ({message.X}, {message.Y}) from {message.Source}") ?? []);
                 VerbStripPanel.Visibility = Visibility.Visible;
                 return;
             }
@@ -3578,13 +3573,22 @@ public partial class MainWindow : Window
         var estimate = picture.Items.Any(item => item.Estimate is not null) ? " Some follow an estimate." : "";
         var notes = picture.Notes.Count == 0 ? "" : $" {picture.Notes.Count} not drawn.";
         var clicks = GameClickActive ? " Clicks on verbs that are on go to the game as assumed input." : "";
-        VerbStripNote.Text = $"Verb area: presentation of the session's verb slots, not the game's drawing; {drawn}.{estimate}{notes}{clicks}";
-        VerbStripNote.ToolTip = string.Join(Environment.NewLine, picture.Items.Select(item =>
+        SetVerbScreenNote($"Verb area: presentation of the session's verb slots, not the game's drawing; {drawn}.{estimate}{notes}{clicks}",
+            picture.Items.Select(item =>
                 $"verb 0x{item.VerbId:X2} (slot {item.Slot}): object {item.ImageObject}'s image from Room {item.ImageRoom:00} at ({item.X}, {item.Y})" +
                 (item.Mode == 2 ? ", dim" : "") + (item.Estimate is null ? "" : $"; estimate: {item.Estimate}"))
             .Concat(picture.Notes.Select(line => $"not drawn: {line}"))
             .Append("Text verbs, the note letters scripts print, highlight colours and redraw timing are not drawn."));
         VerbStripPanel.Visibility = Visibility.Visible;
+    }
+
+    // The verb screen's explanation: a tooltip on the strip (its first line the summary), not a row under it, so the
+    // screen shows only the game's 56 rows. A verb's own tooltip (VerbStripImage_MouseMove) wins over it.
+    private void SetVerbScreenNote(string summary, IEnumerable<string> details)
+    {
+        var lines = details.ToArray();
+        VerbStripBorder.ToolTip = lines.Length == 0 ? summary
+            : summary + Environment.NewLine + Environment.NewLine + string.Join(Environment.NewLine, lines);
     }
 
     /// <summary>Verb numbers as hex ranges: 0x01–0x08, 0x31, 0x32.</summary>

@@ -50,7 +50,10 @@ internal static class Program
                 var pointer = (CheckBox)window.FindName("GamePointerToggle");
                 var strip = (FrameworkElement)window.FindName("VerbStripPanel");
                 var image = (Image)window.FindName("VerbStripImage");
-                var note = (TextBlock)window.FindName("VerbStripNote");
+                // Since task D (30 Sep) the explanation is the verb screen's tooltip, not a row under it: its first line is the summary.
+                var border = (FrameworkElement)window.FindName("VerbStripBorder");
+                string NoteText() => ((border.ToolTip as string) ?? "").Split(Environment.NewLine)[0];
+                Check(window.FindName("VerbStripNote") is null, "the verb screen has no note row under it (task D)");
                 var viewport = (FrameworkElement)window.FindName("RoomViewport");
                 var host = (FrameworkElement)window.FindName("RoomViewportHost");
                 LoomExplorationSession Session() => (LoomExplorationSession)Field("_session")!;
@@ -85,8 +88,8 @@ internal static class Program
 
                 await Open(2);
                 var roomHeightOff = viewport.ActualHeight;
-                Check(toggle.IsChecked == false && strip.Visibility == Visibility.Visible && note.Text.StartsWith("Verb screen", StringComparison.Ordinal),
-                    $"the toggle is off by default, and the interactive mode keeps the verb screen under the room: \"{note.Text}\"");
+                Check(toggle.IsChecked == false && strip.Visibility == Visibility.Visible && NoteText().StartsWith("Verb screen", StringComparison.Ordinal),
+                    $"the toggle is off by default, and the interactive mode keeps the verb screen under the room: \"{NoteText()}\"");
 
                 toggle.IsChecked = true;
                 await Settle();
@@ -96,10 +99,10 @@ internal static class Program
                     $"on: the strip is 320 x 56 screen pixels at the room's scale ({image.ActualWidth:0.#} x {image.ActualHeight:0.#}; room view {viewport.ActualWidth:0.#} wide)");
                 var bottom = strip.TranslatePoint(new Point(0, strip.ActualHeight), host).Y;
                 Check(bottom <= host.ActualHeight + 0.5 && Math.Abs(viewport.ActualHeight - roomHeightOff) < 0.5,
-                    $"on: the room keeps its size, the strip and its note already fit (strip bottom {bottom:0.#} of {host.ActualHeight:0.#}; room {roomHeightOff:0.#} → {viewport.ActualHeight:0.#})");
-                Check(note.Text.Contains("presentation", StringComparison.Ordinal) && note.Text.Contains("not the game's drawing", StringComparison.Ordinal) &&
-                      note.Text.Contains("no image verb is on", StringComparison.Ordinal),
-                    $"on, after the boot: nothing is on, and the note says it is a presentation: \"{note.Text}\"");
+                    $"on: the room keeps its size, the strip already fits (strip bottom {bottom:0.#} of {host.ActualHeight:0.#}; room {roomHeightOff:0.#} → {viewport.ActualHeight:0.#})");
+                Check(NoteText().Contains("presentation", StringComparison.Ordinal) && NoteText().Contains("not the game's drawing", StringComparison.Ordinal) &&
+                      NoteText().Contains("no image verb is on", StringComparison.Ordinal),
+                    $"on, after the boot: nothing is on, and the note says it is a presentation: \"{NoteText()}\"");
                 Check(!AnyPixel(0, 0, 320, 56), "on, after the boot: the strip is empty");
                 Save("room-02-verb-area-boot.png");
 
@@ -110,9 +113,9 @@ internal static class Program
                 typeof(LoomExplorationSession).GetMethod("RunTopLevelScript", Private)!.Invoke(Session(), [script]);
                 Call("UpdateVerbArea");
                 await Settle();
-                Check(note.Text.Contains("verbs 0x01–0x08, 0x31, 0x32 on", StringComparison.Ordinal) &&
-                      (note.ToolTip as string ?? "").Contains("verb 0x01 (slot 1): object 100's image from Room 01 at (16, 144)", StringComparison.Ordinal),
-                    $"after script 018: the note lists the verbs that are on, the tooltip their images: \"{note.Text}\"");
+                Check(NoteText().Contains("verbs 0x01–0x08, 0x31, 0x32 on", StringComparison.Ordinal) &&
+                      (border.ToolTip as string ?? "").Contains("verb 0x01 (slot 1): object 100's image from Room 01 at (16, 144)", StringComparison.Ordinal),
+                    $"after script 018: the note lists the verbs that are on, the tooltip their images: \"{NoteText()}\"");
                 Check(AnyPixel(16, 0, 24, 16) && AnyPixel(192, 0, 24, 16),
                     "after script 018: the first and last distaff notes (x 16 and 192, row 144) are drawn");
                 Save("room-02-verb-area-distaff.png");
@@ -122,9 +125,9 @@ internal static class Program
                 Call("SendPointerToGame", (ValueTuple<int, int>?)(700, 40), (int?)156);
                 await Settle();
                 var closeUp = Session().Verbs.FirstOrDefault(verb => verb.VerbId == 0x36);
-                Check(closeUp is { Mode: 1, X: 248, Y: 152 } && note.Text.Contains("0x36", StringComparison.Ordinal) &&
+                Check(closeUp is { Mode: 1, X: 248, Y: 152 } && NoteText().Contains("0x36", StringComparison.Ordinal) &&
                       AnyPixel(248, 8, 16, 8),
-                    $"hover on object 156: the close-up (verb 0x36, {closeUp?.Describe()}) is drawn at (248, 152): \"{note.Text}\"");
+                    $"hover on object 156: the close-up (verb 0x36, {closeUp?.Describe()}) is drawn at (248, 152): \"{NoteText()}\"");
                 Save("room-02-verb-area-close-up.png");
                 pointer.IsChecked = false;
 
@@ -144,8 +147,8 @@ internal static class Program
                     "inspection mode: a click on note 0x03 in the strip sends nothing");
                 clicks.IsChecked = true;
                 await Settle();
-                Check(note.Text.Contains("Clicks on verbs that are on go to the game as assumed input", StringComparison.Ordinal),
-                    $"explore mode: the note says verb clicks are assumed input: \"{note.Text}\"");
+                Check(NoteText().Contains("Clicks on verbs that are on go to the game as assumed input", StringComparison.Ordinal),
+                    $"explore mode: the note says verb clicks are assumed input: \"{NoteText()}\"");
                 before = Session().SessionTrace.Count;
                 Check(!ClickStrip(100, 195) && Session().SessionTrace.Count == before,
                     "explore mode: a click on the strip where no verb is on sends nothing");
@@ -170,7 +173,7 @@ internal static class Program
                 // object 156 drew its name, "cielo"); then only that text is shown. The room fits the space it has
                 // (the controls under it may have grown since the first check, so its height is not compared with it).
                 var verbText = Session().Messages.OnScreen.Where(m => m.Y >= 144).Select(m => m.Text).ToArray();
-                // The layout's rule: the room and the verb screen (56 rows, and 36 px kept for its note) share the host's height.
+                // The layout's rule: the room and the verb screen (56 rows; no note row since task D) share the host's height.
                 var roomImage = Field("_currentRoom")!;
                 var roomWidth = (int)roomImage.GetType().GetProperty("Width")!.GetValue(roomImage)!;
                 // The view shows LOOM's 144 room rows (the boot's initScreens(0, 144)), and the pan buttons' panel, not a scroll bar,
@@ -182,13 +185,13 @@ internal static class Program
                 var pan = normal ? panPanel.Height + panPanel.Margin.Top + panPanel.Margin.Bottom : 0;
                 var shown = strip.Visibility == Visibility.Visible;
                 var expectedScale = Math.Min(host.ActualWidth / visibleWidth,
-                    (host.ActualHeight - pan - (shown ? 36 : 0)) / (roomHeight + (shown ? 56 : 0)));
+                    (host.ActualHeight - pan) / (roomHeight + (shown ? 56 : 0)));
                 var roomFits = Math.Abs((double)Field("_roomDisplayScale")! - expectedScale) < 0.01 &&
                                Math.Abs(viewport.ActualHeight - roomHeight * expectedScale) < 1;
                 // With the game's text there, the verb screen stays and draws the slots that text goes with.
-                Check((verbText.Length == 0 ? shown && note.Text.StartsWith("Verb screen (rows 144", StringComparison.Ordinal)
-                          : note.Text.StartsWith("Verb screen: the game's text there", StringComparison.Ordinal)) && roomFits,
-                    $"off again: {(verbText.Length == 0 ? $"the verb screen stays, as the interactive mode keeps it: \"{note.Text}\"" : $"the verb screen stays for the game's text [{string.Join(", ", verbText)}]: \"{note.Text}\"")}; " +
+                Check((verbText.Length == 0 ? shown && NoteText().StartsWith("Verb screen (rows 144", StringComparison.Ordinal)
+                          : NoteText().StartsWith("Verb screen: the game's text there", StringComparison.Ordinal)) && roomFits,
+                    $"off again: {(verbText.Length == 0 ? $"the verb screen stays, as the interactive mode keeps it: \"{NoteText()}\"" : $"the verb screen stays for the game's text [{string.Join(", ", verbText)}]: \"{NoteText()}\"")}; " +
                     $"the room fills its space (room {viewport.ActualWidth:0.#} x {viewport.ActualHeight:0.#} in {host.ActualWidth:0.#} x {host.ActualHeight:0.#}; first {roomHeightOff:0.#} high)");
                 Save("room-02-verb-area-off-again.png");
                 report.Add($"Failures: {failures}");

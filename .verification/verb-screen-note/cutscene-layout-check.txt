@@ -1,0 +1,22 @@
+﻿Real MainWindow; PlayOpening and PlayKnownCutscene are called as the menu calls them, on the playback clock. No physical input.
+The opening (script 044) (72526 ms, 2249 samples while the player had no control):
+         829 ms: Room 01: view 768,2x345,7 at y 0, verb strip at y 345,7, arrows hidden, controls 108 high
+        6088 ms: Room 02: view 768,2x345,7 at y 0, verb strip at y 345,7, arrows hidden, controls 108 high
+        7293 ms: Room 01: view 768,2x345,7 at y 0, verb strip at y 345,7, arrows hidden, controls 108 high
+       22155 ms: Room 02: view 768,2x345,7 at y 0, verb strip at y 345,7, arrows hidden, controls 108 high
+       33804 ms: Room 53: view 768,2x345,7 at y 0, verb strip at y 345,7, arrows hidden, controls 108 high
+       53700 ms: Room 02: view 768,2x345,7 at y 0, verb strip at y 345,7, arrows hidden, controls 108 high
+   Sizes: view 768,2x345,7 at y 0 (2249 samples)
+PASS The opening (script 044): the room view keeps one size and position (1 seen)
+PASS The opening (script 044): the verb strip is shown throughout (0 samples without it)
+PASS The opening (script 044): no scroll arrows while the player has no control (0 samples with them)
+PASS The opening (script 044): nothing below the room overlaps its bottom rows (0 samples)
+PASS disabled Pause and Skip are drawn dark: mean brightness 42 and 43 (visible True, enabled False, False; limit 110)
+Script 046, the Elders' trial (first 40 s) (40027 ms, 1252 samples while the player had no control):
+         823 ms: Room 08: view 768,2x345,7 at y 0, verb strip at y 345,7, arrows hidden, controls 108 high
+   Sizes: view 768,2x345,7 at y 0 (1252 samples)
+PASS Script 046, the Elders' trial (first 40 s): the room view keeps one size and position (1 seen)
+PASS Script 046, the Elders' trial (first 40 s): the verb strip is shown throughout (0 samples without it)
+PASS Script 046, the Elders' trial (first 40 s): no scroll arrows while the player has no control (0 samples with them)
+PASS Script 046, the Elders' trial (first 40 s): nothing below the room overlaps its bottom rows (0 samples)
+Failures: 0
