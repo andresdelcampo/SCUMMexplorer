@@ -112,6 +112,13 @@
                     <TextBlock Text="SCUMMexplorer" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     <TextBlock Grid.Column="1" Text="Step into the game world" Foreground="#B8AA8C" FontSize="13" VerticalAlignment="Center" Margin="12,2,0,0"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <ComboBox x:Name="SoundModeCombo" Width="110" VerticalAlignment="Center" Margin="0,0,12,0"
+                              SelectionChanged="SoundModeCombo_SelectionChanged"
+                              ToolTip="Music and effects. Changing device stops current audio; the next sound command uses the selected device.">
+                        <ComboBoxItem Content="No Sound"/>
+                        <ComboBoxItem Content="PC Speaker"/>
+                        <ComboBoxItem Content="AdLib" IsSelected="True"/>
+                    </ComboBox>
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click"
                               VerticalAlignment="Center" Margin="0,0,12,0" Foreground="#D2C7B5"
                               ToolTip="Show SCUMM resource lists, script state, and diagnostic controls."/>
@@ -299,10 +306,6 @@
                             <TextBlock Text="SOUND PLAYER" Foreground="#B78442" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <TextBlock x:Name="AudioTitle" FontSize="24" FontWeight="SemiBold" TextAlignment="Center" Margin="0,12,0,3"/>
                             <TextBlock x:Name="AudioDescription" Foreground="#AAB4BA" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,20"/>
-                            <ComboBox x:Name="AudioFormatCombo" Width="160" HorizontalAlignment="Center" Margin="0,0,0,14" SelectionChanged="AudioFormatCombo_SelectionChanged" Visibility="Collapsed">
-                                <ComboBoxItem Content="PC speaker"/>
-                                <ComboBoxItem Content="AdLib FM"/>
-                            </ComboBox>
                             <StackPanel x:Name="AdlibGainPanel" Visibility="Collapsed" Margin="12,0,12,12">
                                 <DockPanel LastChildFill="True">
                                     <TextBlock Text="AdLib level" Foreground="#E7E0D2" VerticalAlignment="Center"/>

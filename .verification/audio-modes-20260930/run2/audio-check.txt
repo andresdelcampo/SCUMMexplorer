@@ -1,0 +1,62 @@
+Sound 1: offset 27636, speaker 146, next header 21000000500001AB0A08
+Sound 2: offset 27815, speaker 146, next header 21000000500001000B08
+Sound 3: offset 27994, speaker 146, next header 210000005000015E0B08
+Sound 4: offset 28173, speaker 146, next header 21000000500001900B08
+Sound 5: offset 28352, speaker 146, next header 21000000500001000E08
+Sound 6: offset 28531, speaker 146, next header 210000005000013F0E08
+Sound 7: offset 28710, speaker 146, next header 21000000500001850E08
+Sound 8: offset 28889, speaker 146, next header 21000000500001AB0E08
+Sound 9: offset 5420, speaker 74, next header 21000000500001131B0E
+Sound 10: offset 5527, speaker 86, next header 21000000500001D83100
+Sound 11: offset 10485, speaker 118, next header 3C0000007800014E0200
+Sound 12: offset 10663, speaker 126, next header 3C000000780001760E06
+Sound 13: offset 5646, speaker 436, next header 160200007F0080C00100
+Sound 14: offset 10421, speaker 616, next header EA0300007F0080C00100
+Sound 15: offset 12039, speaker 796, next header 660500007F0080C00100
+Sound 16: offset 6382, speaker 451, next header 2E0200007F0080C00100
+Sound 17: offset 6616, speaker 742, next header E60200007F0080C00100
+Sound 18: offset 8100, speaker 547, next header EE0200007F0080C00100
+Sound 19: offset 18822, speaker 923, next header 360600007F0080C00100
+Sound 20: offset 14217, speaker 738, next header 4A0300007F00806A0100
+Sound 21: offset 20651, speaker 971, next header 170500007F0080FF0100
+Sound 22: offset 7391, speaker 436, next header 390100007F0080BA0100
+Sound 23: offset 9397, speaker 616, next header D80100007F0080BA0100
+Sound 24: offset 6324, speaker 29447, next header 9103B10011910331F131
+Sound 25: offset 15797, speaker 8198, next header 373700007F0080BA0100
+Sound 26: offset 14798, speaker 7290, next header A53600007F0080AA0100
+Sound 27: offset 17417, speaker 4028, next header E12100007F0080CA0100
+Sound 28: offset 14301, speaker 4230, next header 921F00007F0080BA0100
+Sound 29: offset 26613, speaker 2280, next header AC1200007F0080F50100
+Sound 30: offset 31742, speaker 5248, next header 172900007F0080C80100
+Sound 31: offset 10328, speaker 13844, next header CC4000007F0080C80100
+Sound 32: offset 8140, speaker 8859, next header 5A4600007F0080FF0100
+Sound 33: offset 95, speaker 77, next header 4D000066C800A0B5076F
+PASS AdLib is the visible default
+PASS native music and effect both opened
+FAIL music and effect overlap
+PASS mute stops every voice
+PASS new commands remain silent while muted
+PASS speaker mode applies to music and effects
+PASS muting a pending render prevents late playback
+PASS Advanced sound preview uses native AdLib effects
+PASS mute closes the manual sound preview
+Entry { Frame = 0, Milliseconds = 4368, Action = start, SoundId = 1, Kind = effect (AdLib), Source = Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 4877, Action = opened, SoundId = 1, Kind = effect (AdLib), Source = audio True, duration 2,837 s; Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 4366, Action = start, SoundId = 25, Kind = music (AdLib), Source = Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 8847, Action = opened, SoundId = 25, Kind = music (AdLib), Source = audio True, duration 143,788 s; Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 8882, Action = stop all, SoundId = , Kind = , Source = sound mode changed }
+Entry { Frame = 0, Milliseconds = 8882, Action = mode, SoundId = , Kind = None, Source =  }
+Entry { Frame = 0, Milliseconds = 8882, Action = muted, SoundId = 2, Kind = No Sound, Source = Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 9087, Action = mode, SoundId = , Kind = PcSpeaker, Source =  }
+Entry { Frame = 0, Milliseconds = 9087, Action = start, SoundId = 1, Kind = effect (PC speaker), Source = Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 9087, Action = start, SoundId = 25, Kind = music (PC speaker), Source = Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 9287, Action = opened, SoundId = 1, Kind = effect (PC speaker), Source = audio True, duration 1,023 s; Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 9338, Action = opened, SoundId = 25, Kind = music (PC speaker), Source = audio True, duration 141,256 s; Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 9399, Action = stop all, SoundId = , Kind = , Source = sound mode changed }
+Entry { Frame = 0, Milliseconds = 9399, Action = mode, SoundId = , Kind = Adlib, Source =  }
+Entry { Frame = 0, Milliseconds = 9399, Action = stop all, SoundId = , Kind = , Source = sound mode changed }
+Entry { Frame = 0, Milliseconds = 9399, Action = mode, SoundId = , Kind = None, Source =  }
+Entry { Frame = 0, Milliseconds = 9399, Action = start, SoundId = 2, Kind = effect (AdLib), Source = Synthetic audio verification command }
+Entry { Frame = 0, Milliseconds = 10398, Action = mode, SoundId = , Kind = Adlib, Source =  }
+Entry { Frame = 0, Milliseconds = 10435, Action = mode, SoundId = , Kind = None, Source =  }
+Failures: 1

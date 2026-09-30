@@ -12,13 +12,24 @@ namespace SCUMMexplorer.App;
 /// commands collected from unexecuted possible branches stay silent. Each executed <c>startSound</c> starts
 /// its track on the frame that reached it; <c>stopSound</c> stops that track and <c>stopMusic</c> stops them all, as
 /// ScummVM's <c>stopAllSounds</c> does. Tracks overlap, as the game's sound channels do.
-/// Music tracks play as the AdLib rendition. The game's AdLib sound effects are not decoded yet, so effects play as the
-/// PC speaker rendition of the same resource (presentation). A track that is still being rendered when its frame comes
+/// Music and effects use the selected device's native rendition, without a fallback. Each rendition has its own chip;
+/// overlap does not emulate shared OPL channel allocation. A track that is still being rendered when its frame comes
 /// starts late, at the position the game would have reached.
 /// This player has its own outputs: the room music panel's player is separate, and starting it stops these sounds.
 /// </summary>
 public sealed class SceneSoundPlayer
 {
+    public enum SoundMode { None, PcSpeaker, Adlib }
+    public SoundMode Mode { get; private set; } = SoundMode.Adlib;
+
+    /// <summary>Changing device stops current voices; subsequent script commands use the new device.</summary>
+    public void SetMode(SoundMode mode)
+    {
+        if (Mode == mode) return;
+        StopAll("sound mode changed");
+        Mode = mode;
+        Log.Add(new(_frames, _clock.ElapsedMilliseconds, "mode", null, mode.ToString(), ""));
+    }
     /// <summary>One line of what the player did, for the harness: the frame count, the time and the sound.</summary>
     public sealed record Entry(int Frame, long Milliseconds, string Action, int? SoundId, string Kind, string Source);
 
@@ -32,7 +43,7 @@ public sealed class SceneSoundPlayer
 
     private readonly LoomAdlibAudio _adlib = new();
     private readonly LoomPcSpeakerAudio _speaker = new();
-    private readonly Dictionary<int, Task<(string? Path, bool Music)>> _renders = [];
+    private readonly Dictionary<(SoundMode Mode, int Id), Task<(string? Path, bool Music)>> _renders = [];
     private readonly List<Voice> _voices = [];
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private GameLibrary? _game;
@@ -134,12 +145,19 @@ public sealed class SceneSoundPlayer
 
     private async void Start(int id, string source, bool estimated)
     {
+        if (Mode == SoundMode.None)
+        {
+            Log.Add(new(_frames, _clock.ElapsedMilliseconds, "muted", id, "No Sound", source));
+            return;
+        }
+        var mode = Mode;
         var voice = new Voice { SoundId = id, StartedAt = _clock.ElapsedMilliseconds };
         _voices.Add(voice);
         var frame = _frames;
-        var render = Render(id);
+        var render = Render(id, mode);
         var (path, music) = render.IsCompleted ? render.Result : await render;
-        var kind = path is null ? "unavailable" : music ? "music (AdLib)" : "effect (PC speaker)";
+        var device = mode == SoundMode.Adlib ? "AdLib" : "PC speaker";
+        var kind = path is null ? $"unavailable ({device})" : $"{(music ? "music" : "effect")} ({device})";
         Log.Add(new(frame, voice.StartedAt, estimated ? "preview start" : "start", id, kind, source));
         if (voice.Stopped || path is null)
         {
@@ -169,9 +187,9 @@ public sealed class SceneSoundPlayer
         player.Open(new Uri(path));
     }
 
-    private Task<(string? Path, bool Music)> Render(int id)
+    private Task<(string? Path, bool Music)> Render(int id, SoundMode mode)
     {
-        if (_renders.TryGetValue(id, out var cached)) return cached;
+        if (_renders.TryGetValue((mode, id), out var cached)) return cached;
         var resource = _game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == id);
         var task = resource is null
             ? Task.FromResult<(string?, bool)>((null, false))
@@ -180,7 +198,7 @@ public sealed class SceneSoundPlayer
                 try
                 {
                     var music = _adlib.HasMusic(resource);
-                    var wave = music
+                    var wave = mode == SoundMode.Adlib
                         ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), 6)
                         : _speaker.RenderWave(resource);
                     var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");
@@ -192,7 +210,7 @@ public sealed class SceneSoundPlayer
                     return (null, false);
                 }
             });
-        _renders[id] = task;
+        _renders[(mode, id)] = task;
         return task;
     }
 }

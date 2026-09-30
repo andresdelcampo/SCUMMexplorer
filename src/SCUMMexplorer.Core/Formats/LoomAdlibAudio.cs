@@ -4,8 +4,8 @@ using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Formats;
 
-/// <summary>Renders old-bundle LOOM AdLib music through an OPL chip emulator.</summary>
-public sealed class LoomAdlibAudio
+/// <summary>Renders old-bundle LOOM AdLib music and effects through an OPL chip emulator.</summary>
+public sealed partial class LoomAdlibAudio
 {
     private const int SampleRate = 49716;
     private const int CallbackRate = 472;
@@ -44,8 +44,8 @@ public sealed class LoomAdlibAudio
     public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
     {
         var data = ReadTrack(resource);
-        if (data.Length < 0x94 || data[2] != 0x80)
-            throw new NotSupportedException("This AdLib resource is a sound effect; AdLib music playback is available for music tracks.");
+        if (data[2] != 0x80) return RenderEffectWave(data, cancellationToken);
+        if (data.Length < 0x94) throw new InvalidDataException("AdLib music header is incomplete.");
         var player = new MusicPlayer(data);
         var samples = new List<short>();
         var frameRemainder = 0;
@@ -143,6 +143,9 @@ public sealed class LoomAdlibAudio
         var offset = resource.Offset.Value;
         if (offset < 0 || offset > file.Length - 4) throw new InvalidDataException("Invalid sound offset.");
         var speakerLength = BinaryPrimitives.ReadUInt16LittleEndian(file.AsSpan(offset, 2));
+        if (speakerLength < 22 || speakerLength > file.Length - offset ||
+            BinaryPrimitives.ReadUInt16LittleEndian(file.AsSpan(offset + 6, 2)) != 22)
+            throw new NotSupportedException("No DOS PC speaker / AdLib bundle at this sound index.");
         var adlibOffset = offset + speakerLength;
         if (speakerLength < 4 || adlibOffset < 0 || adlibOffset > file.Length - 4)
             throw new InvalidDataException("No AdLib resource follows the PC speaker resource.");

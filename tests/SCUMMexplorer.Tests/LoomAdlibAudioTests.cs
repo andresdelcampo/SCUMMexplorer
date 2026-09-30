@@ -55,14 +55,17 @@ public sealed class LoomAdlibAudioTests
         instrument.CopyTo(track, 19);
         events.CopyTo(track, 0x93);
 
-        var encodedFile = new byte[8 + track.Length];
-        BinaryPrimitives.WriteUInt16LittleEndian(encodedFile, 4);
-        encodedFile[2] = (byte)'W';
-        encodedFile[3] = (byte)'A';
-        BinaryPrimitives.WriteUInt16LittleEndian(encodedFile.AsSpan(4), checked((ushort)(4 + track.Length)));
-        encodedFile[6] = (byte)'A';
-        encodedFile[7] = (byte)'D';
-        track.CopyTo(encodedFile, 8);
+        return RenderTrack(track);
+    }
+
+    private static byte[] RenderTrack(byte[] track)
+    {
+
+        var encodedFile = new byte[26 + track.Length];
+        BinaryPrimitives.WriteUInt16LittleEndian(encodedFile, 22);
+        BinaryPrimitives.WriteUInt16LittleEndian(encodedFile.AsSpan(6), 22);
+        BinaryPrimitives.WriteUInt16LittleEndian(encodedFile.AsSpan(22), checked((ushort)(4 + track.Length)));
+        track.CopyTo(encodedFile, 26);
         for (var i = 0; i < encodedFile.Length; i++) encodedFile[i] ^= 0xFF;
 
         var path = Path.GetTempFileName();
@@ -77,6 +80,44 @@ public sealed class LoomAdlibAudioTests
         {
             File.Delete(path);
         }
+    }
+
+    [Fact]
+    public void NativeEffectEnvelopeEndsAndMalformedCommandsAreRejected()
+    {
+        // One instrument, a carrier-level envelope, an inactive second descriptor, end.
+        byte[] track = [0, 0, 1, 0x57, 0x11, 1, 1, 0x3F, 0xF0, 0x77, 0,
+            1, 0, 0xF0, 0x77, 0, 0,
+            2, 0x82, 0x2F, 0x2C, 0x20, 0, 0, 0, 0, 0, 0, 0xFF];
+        var wave = RenderTrack(track);
+        Assert.Equal(2, BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(22, 2)));
+        Assert.InRange((wave.Length - 44) / (49716.0 * 4), 0.25, 2.5);
+        Assert.Contains(wave.AsSpan(44).ToArray(), value => value != 0);
+        Assert.Equal(wave, RenderTrack(track));
+        Assert.Throws<InvalidDataException>(() => RenderTrack([0, 0, 1, 0xFF]));
+        Assert.Throws<InvalidDataException>(() => RenderTrack([0, 0, 0x80, 0xFF]));
+    }
+
+    [Fact]
+    public void RendersSuppliedNativeAdlibEffectsWhenAvailable()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_SOUND_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        var sounds = new GameFolderScanner().Scan(folder).Resources
+            .Where(resource => resource.Kind == ResourceKind.Sound && resource.ResourceId.HasValue)
+            .ToDictionary(resource => resource.ResourceId!.Value);
+        var renderer = new LoomAdlibAudio();
+        foreach (var sound in Enumerable.Range(1, 12).Select(id => sounds[id]))
+        {
+            byte[] wave;
+            try { wave = renderer.RenderWave(sound); }
+            catch (Exception ex) { throw new Xunit.Sdk.XunitException($"Sound {sound.ResourceId}: {ex}"); }
+            Assert.Contains(wave.AsSpan(44).ToArray(), value => value != 0);
+            Assert.Equal(2, BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(22, 2)));
+            Assert.False(wave.SequenceEqual(new LoomPcSpeakerAudio().RenderWave(sound)), $"Sound {sound.ResourceId} used speaker PCM.");
+        }
+        Assert.Throws<NotSupportedException>(() => renderer.RenderWave(sounds[24]));
+        Assert.Throws<NotSupportedException>(() => renderer.RenderWave(sounds[33]));
     }
 
     [Fact]

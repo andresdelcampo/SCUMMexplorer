@@ -224,6 +224,10 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 - **Session probe:** a four-note cast of the boot's literal draft 0 (3,1,3,2) at Room 02 object 156 dispatched verb 0x3A and script 049. Script 040 +0x0038 started sound 19 for the result; its route remained conditional/estimated. WPF opened that audio after all four reached note tracks. See [spell-audio-20260930](../.verification/spell-audio-20260930/validation.md).
 - **Executor provenance:** `LoomScriptEvent.Executed` is true only for instructions visited on the chosen route. Conditional events collected from an unresolved presentation branch keep it false. This flag does not change certainty or establish gameplay reachability. Audio follows executed estimated commands as explicitly labelled preview audio; unexecuted possible commands stay silent.
 
+## Native AdLib effects (30 September)
+
+Decoded + ScummVM Player_AD: supplied DOS effects 1-12 use instrument commands, two envelope descriptors per note and up to three OPL channels. Music has payload byte 2 = 0x80. All 12 effects render nonzero stereo PCM. Sound 24's indexed bytes do not contain a valid DOS bundle; later indices have a different layout. Structural bundle validation rejects these without ID exceptions. The app's shared selector controls rendition for executed events and manual previews, without speaker fallback. Separate resource chips do not model shared-channel allocation, priorities or hardware competition; the selector does not rewrite VAR_SOUNDCARD. [Evidence and source](../.verification/audio-modes-20260930/validation.md).
+
 ## Not modelled yet (ordered by the plan's milestones)
 
 **Explorer presentation (30 Sep, reading/verified WPF):** normal browsing restores Interactive when leaving Advanced inspection; it rebuilds the room from the same session snapshot, without running another assumed catalog arrival. This is a UI mode policy, not a game script input. [Verification](../.verification/mode-roundtrip-20260930/validation.md).

@@ -77,7 +77,6 @@ public partial class MainWindow : Window
     private bool _resumeAudioAfterGainChange;
     private TimeSpan _audioPositionAfterGainChange;
     private GameResource? _selectedSound;
-    private bool _changingAudioFormat;
     private bool _playWhenReady;
     private AudioSurface _audioSurface;
     private GameResource? _roomSelectedCue;
@@ -1888,13 +1887,7 @@ public partial class MainWindow : Window
         RoomObjectPanel.Visibility = Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, 2);
         _selectedSound = resource;
-        var hasAdlibMusic = _adlibDecoder.HasMusic(resource);
-        _changingAudioFormat = true;
-        AudioFormatCombo.Visibility = hasAdlibMusic ? Visibility.Visible : Visibility.Collapsed;
-        if (!preserveFormat || !hasAdlibMusic)
-            AudioFormatCombo.SelectedIndex = hasAdlibMusic ? 1 : 0;
-        _changingAudioFormat = false;
-        var adlib = hasAdlibMusic && AudioFormatCombo.SelectedIndex == 1;
+        var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
         var format = adlib ? "AdLib FM" : "PC speaker";
         AdlibGainPanel.Visibility = adlib ? Visibility.Visible : Visibility.Collapsed;
         _previewCancellation?.Cancel();
@@ -1920,6 +1913,12 @@ public partial class MainWindow : Window
         PauseButton.IsEnabled = false;
         StopButton.IsEnabled = false;
         AdlibGainSlider.IsEnabled = false;
+        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.None)
+        {
+            AudioDescription.Text = "No Sound selected";
+            StatusText.Text = $"{resource.Name} · muted";
+            return;
+        }
         StatusText.Text = $"{resource.Name} · reading sound";
         _audioCancellation = new CancellationTokenSource();
         var token = _audioCancellation.Token;
@@ -1968,6 +1967,7 @@ public partial class MainWindow : Window
 
     private async Task PlayRoomCueAsync()
     {
+        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.None) return;
         if (_roomSelectedCue is not { } sound) return;
         if (_audioSurface == AudioSurface.Room && _audioReady && _roomRenderedCue == sound)
         {
@@ -1988,7 +1988,7 @@ public partial class MainWindow : Window
         var token = _audioCancellation.Token;
         try
         {
-            var adlib = _adlibDecoder.HasMusic(sound);
+            var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
             var wave = await RenderAudioWaveAsync(sound, adlib, token);
             if (token.IsCancellationRequested) return;
             if (adlib) wave = LoomAdlibAudio.ApplyOutputGain(wave, 6);
@@ -2042,11 +2042,17 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void AudioFormatCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_changingAudioFormat || _selectedSound is null || !IsLoaded ||
-            _audioSurface != AudioSurface.Resource) return;
-        await ShowAudio(_selectedSound, preserveFormat: true);
+        if (!IsLoaded || SoundModeCombo.SelectedIndex < 0) return;
+        var surface = _audioSurface;
+        var selected = _selectedSound;
+        StopAudio();
+        _sceneSound.SetMode((SceneSoundPlayer.SoundMode)SoundModeCombo.SelectedIndex);
+        if (surface == AudioSurface.Resource && selected is not null)
+            await ShowAudio(selected, preserveFormat: true);
+        else if (surface == AudioSurface.Room)
+            RoomCueStatus.Text = _sceneSound.Mode == SceneSoundPlayer.SoundMode.None ? "No Sound selected" : "Select Play to listen";
     }
 
     private void AdlibGainSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
