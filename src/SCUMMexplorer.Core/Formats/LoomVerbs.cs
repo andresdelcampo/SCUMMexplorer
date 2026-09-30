@@ -4,10 +4,11 @@ namespace SCUMMexplorer.Core.Formats;
 /// One verb slot as <c>o5_verbOps</c> leaves it. Mode: 0 off, 1 on, 2 dim. An
 /// image verb shows <see cref="ImageObject"/>'s image, grabbed from
 /// <see cref="ImageRoom"/>. Null fields are unknown; <see cref="Estimate"/> says
-/// why a value follows an estimate.
+/// why a value follows an estimate. <see cref="DrawOrder"/> is when the verb was
+/// last drawn (see <see cref="LoomVerbTable"/>), 0 if never.
 /// </summary>
 public sealed record LoomVerbSnapshot(int Slot, int VerbId, int? Mode, int? X, int? Y,
-    int? ImageObject, int? ImageRoom, string? Name, string? Unknown, string? Estimate)
+    int? ImageObject, int? ImageRoom, string? Name, string? Unknown, string? Estimate, int DrawOrder = 0)
 {
     public string Describe()
     {
@@ -18,6 +19,9 @@ public sealed record LoomVerbSnapshot(int Slot, int VerbId, int? Mode, int? X, i
     }
 }
 
+/// <summary>A verb's rectangle cleared to its back colour (black) by <c>restoreVerbBG</c>, at <see cref="Order"/>.</summary>
+public sealed record LoomVerbErase(int Order, LoomScreenBox Box);
+
 /// <summary>
 /// The verb slots of ScummVM's <c>_verbs</c> for v3 (<c>_numVerbs</c> = 100), as
 /// <c>o5_verbOps</c> changes them: <c>getVerbSlot</c> finds a verb's slot or
@@ -26,11 +30,27 @@ public sealed record LoomVerbSnapshot(int Slot, int VerbId, int? Mode, int? X, i
 /// real slot and only when the object is in the current room
 /// (<c>setVerbObject</c>, old bundle); <c>delete</c> is <c>killVerb</c>. All
 /// slots are empty when the engine starts, which is where the session starts.
+/// Every <c>verbOps</c> ends with <c>drawVerb(slot)</c>: a verb that is on is drawn
+/// over what the verb screen shows, one that is off clears the rectangle it was
+/// last drawn in (<c>restoreVerbBG</c>). The table numbers those draws, so the
+/// screen can be composed in the order the game drew it (<c>redrawVerbs</c>,
+/// in slot order, runs only on a complete screen redraw such as a restart).
 /// </summary>
 public sealed class LoomVerbTable
 {
     public const int Count = 100;
     private readonly Slot[] _slots = Enumerable.Range(0, Count).Select(index => new Slot(index)).ToArray();
+    private readonly List<LoomVerbErase> _erases = [];
+    private int _drawOrder;
+
+    /// <summary>An image's width and height (an object of a room), for the rectangle a drawn verb covers.</summary>
+    public Func<int, int, (int Width, int Height)?>? ImageSize { get; set; }
+
+    /// <summary>What the last <see cref="Apply"/> drew or cleared on the verb screen (screen coordinates), or null.</summary>
+    public LoomScreenBox? LastCover { get; private set; }
+
+    /// <summary>Clears drawn after the oldest verb that is on now: only those can show.</summary>
+    public IReadOnlyList<LoomVerbErase> Erases() => _erases.ToArray();
 
     /// <summary>Set when a verb number could not be read: any slot may have changed.</summary>
     public string? Unknown { get; private set; }
@@ -126,8 +146,50 @@ public sealed class LoomVerbTable
             }
             if (estimate is not null) slot.Estimate ??= estimate;
         }
+        LastCover = null;
+        if (index != 0) notes.Add(Draw(slot));
         var target = index == 0 ? "scratch slot 0 (never drawn)" : $"slot {index}";
         return $"verbOps 0x{verbId:X2} → {target}: {string.Join(", ", notes)}";
+    }
+
+    // ScummVM drawVerb(slot, 0) at the end of o5_verbOps (and killVerb): an image verb that is on or dim
+    // is drawn at once (drawVerbBitmap: whole 8-pixel strips from x / 8, opaque); otherwise the rectangle
+    // it was last drawn in is cleared with its back colour (0: every LOOM verb keeps the default).
+    private string Draw(Slot slot)
+    {
+        if (slot.Mode is null) return "not drawn (mode unknown)";
+        if (slot.Mode != 0 && slot.VerbId != 0)
+        {
+            if (slot.Name is not null) EraseDrawn(slot); // a text verb clears its old rectangle before it prints
+            slot.DrawOrder = ++_drawOrder;
+            if (slot.ImageObject is int image && slot.ImageRoom is int room && slot.X is int x && slot.Y is int y &&
+                ImageSize?.Invoke(room, image) is { } size)
+            {
+                var left = x / 8 * 8;
+                slot.DrawnBox = LastCover = new LoomScreenBox(left, y, left + size.Width / 8 * 8 - 1, y + size.Height / 8 * 8 - 1, 0);
+            }
+            PruneErases();
+            return "drawn";
+        }
+        return EraseDrawn(slot) ? "its rectangle cleared" : "not drawn";
+    }
+
+    private bool EraseDrawn(Slot slot)
+    {
+        if (slot.DrawnBox is not { } box) return false;
+        _erases.Add(new LoomVerbErase(++_drawOrder, box));
+        slot.DrawnBox = null;
+        LastCover = box;
+        PruneErases();
+        return true;
+    }
+
+    // A clear older than every verb that is on is under all of them: it can no longer show.
+    private void PruneErases()
+    {
+        var oldest = _slots.Skip(1).Where(item => item.VerbId != 0 && item.Mode is not 0 && item.DrawOrder > 0)
+            .Select(item => item.DrawOrder).DefaultIfEmpty(int.MaxValue).Min();
+        _erases.RemoveAll(erase => erase.Order < oldest);
     }
 
     private int FindSlot(int verbId)
@@ -148,6 +210,9 @@ public sealed class LoomVerbTable
         public string? Name { get; set; }
         public string? Unknown { get; set; }
         public string? Estimate { get; set; }
+        public int DrawOrder { get; set; }
+        // curRect when the verb was last drawn (ScummVM oldRect): new and delete keep it, so a deleted verb clears it.
+        public LoomScreenBox? DrawnBox { get; set; }
 
         public void Reset(int verbId)
         {
@@ -166,6 +231,6 @@ public sealed class LoomVerbTable
         }
 
         public LoomVerbSnapshot ToSnapshot() =>
-            new(index, VerbId, Mode, X, Y, ImageObject, ImageRoom, Name, Unknown, Estimate);
+            new(index, VerbId, Mode, X, Y, ImageObject, ImageRoom, Name, Unknown, Estimate, DrawOrder);
     }
 }

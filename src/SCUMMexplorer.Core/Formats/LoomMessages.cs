@@ -55,6 +55,17 @@ public sealed record LoomScreenBox(int Left, int Top, int Right, int Bottom, int
         var bottom = message.Y + Math.Max(0, message.LineGlyphs.Count - 1) * lineHeight + 8;
         return left >= Left && left + width <= Right + 1 && message.Y >= Top && bottom <= Bottom + 1;
     }
+
+    /// <summary>Whether the box may touch any of the string's pixels (a generous bound on its lines' extent).</summary>
+    public bool MayTouch(LoomMessage message)
+    {
+        var width = message.LineGlyphs.Count == 0 ? 0 : message.LineGlyphs.Max(line => line.Length) * 8 + 1;
+        var left = message.Center ? message.X - width : message.X;
+        var right = message.X + width;
+        var lineHeight = message.LineHeight != 0 ? message.LineHeight : 8;
+        var bottom = message.Y + Math.Max(0, message.LineGlyphs.Count - 1) * lineHeight + 9;
+        return Left <= right && Right >= left && Top <= bottom && Bottom >= message.Y;
+    }
 }
 
 /// <summary>One subcommand of <c>print</c> (ScummVM <c>decodeParseString</c>) with its operands read now; a null value is unknown.</summary>
@@ -304,6 +315,25 @@ public sealed class LoomMessageTable
     public string DrawBox(int x1, int y1, int x2, int y2, int color)
     {
         var box = new LoomScreenBox(Math.Min(x1, x2), Math.Min(y1, y2), Math.Max(x1, x2), Math.Max(y1, y2), color);
+        var covered = Cover(box);
+        return $"box drawn at ({box.Left}, {box.Top})–({box.Right}, {box.Bottom}), colour {color}: " +
+               (covered == 0 ? "no drawn string is under it" : $"{covered} drawn string(s) covered");
+    }
+
+    /// <summary>
+    /// A verb drawn or cleared on the verb screen (<see cref="LoomVerbTable.LastCover"/>): its
+    /// opaque image, or its back colour, covers the drawn strings under it, as a box does.
+    /// Script 027 prints the draft's note letters at y 188 and turns verb 0x35 on over them
+    /// (96, 184) when a new draft starts; script 028 turns it off, which clears them.
+    /// </summary>
+    public string VerbDrawn(LoomScreenBox box)
+    {
+        var covered = Cover(box);
+        return covered == 0 ? "" : $"; {covered} drawn string(s) covered";
+    }
+
+    private int Cover(LoomScreenBox box)
+    {
         var covered = 0;
         for (var i = _drawn.Count - 1; i >= 0; i--)
         {
@@ -313,10 +343,9 @@ public sealed class LoomMessageTable
                 _drawn.RemoveAt(i);
                 covered++;
             }
-            else _drawn[i] = drawn with { ErasedBy = [.. drawn.ErasedBy, box] };
+            else if (box.MayTouch(drawn)) _drawn[i] = drawn with { ErasedBy = [.. drawn.ErasedBy, box] };
         }
-        return $"box drawn at ({box.Left}, {box.Top})–({box.Right}, {box.Bottom}), colour {color}: " +
-               (covered == 0 ? "no drawn string is under it" : $"{covered} drawn string(s) covered");
+        return covered;
     }
 
     /// <summary>

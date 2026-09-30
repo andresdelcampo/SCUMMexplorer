@@ -934,6 +934,7 @@ public sealed class LoomBoundedScriptExecutor
                 var applied = runtime.Verbs.Apply(verbId, operations,
                     objectId => roomObjects.Any(record => record.Id == objectId), runtime.CurrentRoom,
                     verbEstimated ? $"verbOps at +0x{instruction.Offset:X4} reads an estimate" : null);
+                if (runtime.Verbs.LastCover is { } cover) applied += runtime.Messages.VerbDrawn(cover);
                 trace.Add(applied + (verbEstimated ? " (estimate)" : ""));
                 pc = next;
                 continue;

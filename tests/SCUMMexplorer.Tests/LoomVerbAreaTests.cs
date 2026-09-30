@@ -63,4 +63,54 @@ public sealed class LoomVerbAreaTests
         Assert.Equal(0x01, LoomVerbArea.FindVerbAt([Item(1, 0x01, 1), Item(9, 0x09, 2)], 20, 150)?.VerbId);
         Assert.Null(LoomVerbArea.FindVerbAt([Item(1, 0x01, 1)], 40, 150));
     }
+
+    [Fact]
+    public void ANotesAnimationEndsOnThePlainNoteItDrewLast()
+    {
+        if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game,
+            new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
+        session.RunTopLevelScript(Script(
+            new(0, 0x0A, "startScript", "0x12, [0x0002]", "0A 12 02 00 FF"),
+            new(5, 0, "stopObjectCode", "", "00")));
+        // Script 030 [3] plays note 3 on the distaff: script 031 draws verbs 0x13-0x17 and back over the
+        // note (images 113-117-113), one a frame, and last verb 0x03 with its own image 112.
+        session.RunTopLevelScript(Script(
+            new(0, 0x0A, "startScript", "0x1E, [0x0003]", "0A 1E 03 00 FF"),
+            new(5, 0, "stopObjectCode", "", "00")));
+        for (var frame = 0; frame < 40; frame++) session.AdvanceFrame();
+        var onAtNote = session.Verbs.Where(verb => verb is { Mode: 1, X: 72, Y: 144 }).ToArray();
+        Assert.Equal([0x03, 0x13, 0x14, 0x15, 0x16, 0x17], onAtNote.Select(verb => verb.VerbId));
+        Assert.Equal(0x03, onAtNote.MaxBy(verb => verb.DrawOrder)!.VerbId);
+
+        // The verb screen shows what was drawn last (image 112), not the highest slot (verb 0x17, image 117).
+        var area = session.VerbArea();
+        var plain = Image(game, 1, 112)!;
+        var glow = Image(game, 1, 117)!;
+        byte At(byte[] pixels, int x, int y) => pixels[y * LoomVerbArea.Width + x];
+        var matchesPlain = Enumerable.Range(0, plain.Height / 8 * 8).All(row =>
+            Enumerable.Range(0, plain.Width / 8 * 8).All(column => At(area.Pixels, 72 + column, row) == plain.Pixels[row * plain.Width + column]));
+        Assert.True(matchesPlain);
+        Assert.NotEqual(plain.Pixels, glow.Pixels);
+        var slotOrder = LoomVerbArea.Compose(session.Verbs.Select(verb => verb with { DrawOrder = 0 }), (room, obj) => Image(game, room, obj));
+        Assert.NotEqual(area.Pixels, slotOrder.Pixels);
+    }
+
+    [Fact]
+    public void AVerbTurnedOffClearsWhereItWasDrawn()
+    {
+        var table = new LoomVerbTable { ImageSize = (_, _) => (32, 24) };
+        (string, int?[], string?) Op(string name, params int?[] values) => (name, values, null);
+        table.Apply(0x01, [Op("new"), Op("at", 16, 144), Op("image", 100), Op("on")], _ => true, 1, null);
+        Assert.Equal(new LoomScreenBox(16, 144, 47, 167, 0), table.LastCover);
+        table.Apply(0x35, [Op("new"), Op("at", 96, 184), Op("image", 151), Op("on")], _ => true, 1, null);
+        table.Apply(0x35, [Op("off")], _ => true, 1, null);
+        // restoreVerbBG clears verb 0x35's rectangle; verb 0x01, drawn before, is under it only where they overlap.
+        Assert.Equal([new LoomVerbErase(3, new LoomScreenBox(96, 184, 127, 207, 0))], table.Erases());
+        Assert.Equal(new LoomScreenBox(96, 184, 127, 207, 0), table.LastCover);
+        var area = LoomVerbArea.Compose(table.Snapshot(), (_, _) => new RoomObjectImage(0, 0, 0, 32, 24, Enumerable.Repeat((byte)5, 32 * 24).ToArray()), table.Erases());
+        Assert.Equal(5, area.Pixels[0 * LoomVerbArea.Width + 16]);
+        Assert.Equal(0, area.Pixels[40 * LoomVerbArea.Width + 96]);
+    }
 }

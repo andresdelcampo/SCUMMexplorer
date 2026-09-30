@@ -29,10 +29,10 @@ public sealed record LoomVerbAreaPicture(byte[] Pixels, IReadOnlyList<LoomVerbAr
 
 /// <summary>
 /// LOOM EGA's verb area (the boot's <c>initScreens(0, 144)</c>: the room
-/// occupies screen rows 0–143, the verb screen rows 144–199). This is a
-/// presentation of verb state, not the game's own drawing: text verbs, the
-/// note letters scripts print there, highlight colours and redraw timing are
-/// not drawn.
+/// occupies screen rows 0–143, the verb screen rows 144–199). Image verbs are
+/// drawn in the order the game drew them; text verbs and highlight colours are
+/// not drawn, and the note letters scripts print there are drawn by the message
+/// layer.
 /// </summary>
 public static class LoomVerbArea
 {
@@ -42,17 +42,26 @@ public static class LoomVerbArea
 
     /// <summary>
     /// Draws every image verb that is on or dim (ScummVM <c>drawVerb</c> draws a
-    /// slot whose mode is not 0) in slot order, so a later slot covers an earlier
-    /// one, as the verb loop redraws them. <paramref name="image"/> returns an
-    /// object's image from a room (the room the verb's image was taken from).
+    /// slot whose mode is not 0) in the order the game last drew each one
+    /// (<see cref="LoomVerbSnapshot.DrawOrder"/>, then slot order), with the
+    /// rectangles cleared since (<paramref name="erases"/>) in between. Several
+    /// verbs can be on at one place: script 031's note animation turns on nine
+    /// verbs over a distaff note and the last one drawn is what the game shows.
+    /// <paramref name="image"/> returns an object's image from a room (the room
+    /// the verb's image was taken from). <see cref="LoomVerbAreaPicture.Items"/>
+    /// stay in slot order.
     /// </summary>
-    public static LoomVerbAreaPicture Compose(IEnumerable<LoomVerbSnapshot> verbs, Func<int, int, RoomObjectImage?> image)
+    public static LoomVerbAreaPicture Compose(IEnumerable<LoomVerbSnapshot> verbs, Func<int, int, RoomObjectImage?> image,
+        IEnumerable<LoomVerbErase>? erases = null)
     {
         ArgumentNullException.ThrowIfNull(verbs);
         ArgumentNullException.ThrowIfNull(image);
         var pixels = new byte[Width * Height];
         var items = new List<LoomVerbAreaItem>();
         var notes = new List<string>();
+        var paints = new List<(int Order, int Slot, Action Paint)>();
+        foreach (var erase in erases ?? [])
+            paints.Add((erase.Order, 0, () => Clear(pixels, erase.Box)));
         foreach (var verb in verbs.OrderBy(item => item.Slot))
         {
             if (verb.Mode is 0) continue;
@@ -85,21 +94,33 @@ public static class LoomVerbArea
             var drawnHeight = picture.Height / 8 * 8;
             var left = x / 8 * 8;
             var top = y - Top;
-            for (var row = 0; row < drawnHeight; row++)
+            paints.Add((verb.DrawOrder, verb.Slot, () =>
             {
-                var targetY = top + row;
-                if (targetY is < 0 or >= Height) continue;
-                for (var column = 0; column < drawnWidth; column++)
+                for (var row = 0; row < drawnHeight; row++)
                 {
-                    var targetX = left + column;
-                    if (targetX is < 0 or >= Width) continue;
-                    pixels[targetY * Width + targetX] = picture.Pixels[row * picture.Width + column];
+                    var targetY = top + row;
+                    if (targetY is < 0 or >= Height) continue;
+                    for (var column = 0; column < drawnWidth; column++)
+                    {
+                        var targetX = left + column;
+                        if (targetX is < 0 or >= Width) continue;
+                        pixels[targetY * Width + targetX] = picture.Pixels[row * picture.Width + column];
+                    }
                 }
-            }
+            }));
             items.Add(new LoomVerbAreaItem(verb.Slot, verb.VerbId, verb.Mode.Value, x, y,
                 drawnWidth, drawnHeight, objectId, room, verb.Estimate));
         }
+        foreach (var paint in paints.OrderBy(item => item.Order).ThenBy(item => item.Slot)) paint.Paint();
         return new LoomVerbAreaPicture(pixels, items, notes);
+    }
+
+    // restoreVerbBG: the rectangle (screen coordinates, corners inclusive) back to colour 0.
+    private static void Clear(byte[] pixels, LoomScreenBox box)
+    {
+        for (var y = Math.Max(box.Top, Top); y <= Math.Min(box.Bottom, Top + Height - 1); y++)
+            for (var x = Math.Max(box.Left, 0); x <= Math.Min(box.Right, Width - 1); x++)
+                pixels[(y - Top) * Width + x] = 0;
     }
 
     /// <summary>

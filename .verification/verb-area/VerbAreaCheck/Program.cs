@@ -120,6 +120,28 @@ internal static class Program
                     "after script 018: the first and last distaff notes (x 16 and 192, row 144) are drawn");
                 Save("room-02-verb-area-distaff.png");
 
+                // Task E (30 Sep): script 030 [3] plays note 3 on the distaff; script 031 draws verbs 0x13–0x17 over it
+                // (the shine) and last verb 0x03 with its plain image (Room 01 object 112). The strip shows the plain note.
+                var play = new LoomScriptDisassembly(250, 1, 0, 32, 16,
+                    [new(0, 0x0A, "startScript", "0x1E, [0x0003]", "0A 1E 03 00 FF"), new(5, 0, "stopObjectCode", "", "00")],
+                    null, null, [], [], "Synthetic test script");
+                typeof(LoomExplorationSession).GetMethod("RunTopLevelScript", Private)!.Invoke(Session(), [play]);
+                for (var frame = 0; frame < 40; frame++) Session().AdvanceFrame();
+                Call("UpdateVerbArea");
+                await Settle();
+                var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(args[0]);
+                var plain = new SCUMMexplorer.Core.Rendering.LoomRoomObjects()
+                    .Decode(File.ReadAllBytes(game.Rooms.Single(room => room.ResourceId == 1).FilePath)).Single(item => item.Id == 112);
+                var differing = 0;
+                for (var y = 0; y < plain.Height / 8 * 8; y++)
+                    for (var x = 0; x < plain.Width / 8 * 8; x++)
+                        if (PixelAt(72 + x, y) != plain.Pixels[y * plain.Width + x]) differing++;
+                var onThere = Session().Verbs.Where(verb => verb is { Mode: 1, X: 72, Y: 144 }).Select(verb => $"0x{verb.VerbId:X2}");
+                Check(differing == 0,
+                    $"after note 3 played (script 030 [3], 40 frames): the strip shows the plain note (object 112) at x 72, " +
+                    $"not the shine; {differing} pixels differ; verbs on there: {string.Join(", ", onThere)}");
+                Save("room-02-verb-area-note-played.png");
+
                 // The pointer over object 156 (class 1): script 008 turns the close-up (verb 0x36) on at (248, 152).
                 pointer.IsChecked = true;
                 Call("SendPointerToGame", (ValueTuple<int, int>?)(700, 40), (int?)156);
@@ -154,9 +176,11 @@ internal static class Program
                     "explore mode: a click on the strip where no verb is on sends nothing");
                 var sent = ClickStrip(third.X + 1, third.Y + 1);
                 await Settle();
-                Check(sent && TracedSince(before, "verb 0x03 (slot 3), runs script 5 with [1, 3, 0]") && TracedSince(before, "Script 10 chains to script 13") &&
-                      status.Text.Contains("Click on verb 0x03 sent to the game (assumed input)", StringComparison.Ordinal),
-                    $"a click on note 0x03 with nothing aimed at reaches script 013 through scripts 005 and 010: \"{status.Text}\"");
+                // Since the note was played (task E), verbs 0x13-0x17 are on over it too: findVerbAtPos takes the highest
+                // slot, verb 0x17 (slot 23), and script 005 maps it back to note 3 ((0x17 - 9) / 5 + 1).
+                Check(sent && TracedSince(before, "verb 0x17 (slot 23), runs script 5 with [1, 23, 0]") && TracedSince(before, "Script 10 chains to script 13") &&
+                      status.Text.Contains("Click on verb 0x17 sent to the game (assumed input)", StringComparison.Ordinal),
+                    $"a click on note 3 with nothing aimed at finds verb 0x17 (the last glow verb, highest slot) and reaches script 013 through scripts 005 and 010: \"{status.Text}\"");
                 // Aim at object 156 (class 1) with a room click, then play the note: script 010 records it.
                 Call("SendClickToGame", 700, 40, false);
                 await Settle();

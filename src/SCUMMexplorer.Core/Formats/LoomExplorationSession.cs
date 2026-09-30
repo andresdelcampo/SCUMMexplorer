@@ -116,6 +116,7 @@ public sealed class LoomExplorationSession
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.OverrideChanged = RecordOverride;
         _runtime.Actors.CostumeSource = id => LoomCostume.Load(game, id);
+        _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
@@ -978,7 +979,7 @@ public sealed class LoomExplorationSession
     /// verb's rectangle from its object's image in the room it was taken from
     /// (<see cref="LoomVerbArea.Compose"/>).
     /// </summary>
-    public LoomVerbAreaPicture VerbArea() => LoomVerbArea.Compose(_runtime.Verbs.Snapshot(), VerbImage);
+    public LoomVerbAreaPicture VerbArea() => LoomVerbArea.Compose(_runtime.Verbs.Snapshot(), VerbImage, _runtime.Verbs.Erases());
 
     private readonly Dictionary<int, IReadOnlyList<RoomObjectImage>> _verbImageRooms = [];
 
