@@ -30,6 +30,12 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 **Consequence for the old task list:** the remaining "Blockers" stops (`expression` ×3, `getActorCostume` ×1, `getActorElevation` ×1), the refused-input label wording and the KeyInputCheck extension do not change what the user sees. They are dropped as separate tasks. The actor work below models `actorOps costume/elevation`, which removes two of those stops as a side effect.
 
+## Current follow-up (30 September)
+
+Checkout/build and construction review completed: [cleanup review](CLEANUP_REVIEW.md), [verification](../.verification/cleanup-review-20260930/validation.md). No files deleted; all 16 historical worktrees are clean ancestors of master. Main Release builds without warnings/errors; committed suite 246/246.
+
+Earlier completion claims below do not resolve the new reports. Next: reproduce notes disappearing from the score during playback; then normal → Advanced → normal clicks; investigate unified No Sound / PC Speaker / AdLib before settling its UI; assess cutscene-start disabling and source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
+
 ## Ordered work
 
 Each milestone ends with something the user can see in the running app, verified by a WPF harness and screenshots under `.verification/<topic>/`.
@@ -83,7 +89,7 @@ Each milestone ends with something the user can see in the running app, verified
 - **Cutscene controls revised and J done (30 September).** One applicable cutscene uses a normal button; several use simple-text menu choices; none hides the control. Skip line shares the '.' talk-skip path and advances the current line without ending the scene. ControlsCheck 10 PASS, zero failures; tests 244/244. [Validation](../.verification/cutscene-controls-20260930/validation.md).
 - **Obsolete Advanced controls removed (30 September).** Removed Show verb area (the interactive strip already always showed) and enabled visible note clicking without that toggle. Removed Pan to the camera on entry, its presentation timer and CameraPanCheck. VerbAreaCheck and the six required doorway rooms pass. [Validation](../.verification/advanced-controls-20260930/validation.md).
 - **Spell/result audio fixed, K done (30 September).** The clock follows script 020's draft until script 021 clears bit[0xD66], instead of cutting it off after 32 idle frames. Sound attaches before input and follows direct actions/Advanced Continue too. Executed estimated-route sounds now play as labelled preview audio; unexecuted possibilities stay silent. Four-note cast and result sound 19 verified with actual WPF audio, SceneSoundCheck 0; tests 246/246. [Validation](../.verification/spell-audio-20260930/validation.md).
-- **Next:** run the arrival's frames after a catalog visit, so the room's music starts on arrival; then why the game's click on Room 36's exit does not leave the room after a catalog visit, then more known cutscenes. A–K and the two requested Advanced-control removals are done.
+- **Next:** follow the current follow-up above. A–K were implemented, but the new score-loss and mode-round-trip reports remain unresolved; the earlier harnesses did not cover them.
 - **Verification:** Room 10 object 295 plays script 052 through Room 11 into Room 13, with actors (done, M3c). Escape skips to Room 13 (done, M3c). The boot's opening cutscene (script 044) plays in Rooms 01, 02, 53 and 02 (done, 29 Sep: Rooms 01, 02, 01, 02, 53, 02).
 
 ### M4. Drafts

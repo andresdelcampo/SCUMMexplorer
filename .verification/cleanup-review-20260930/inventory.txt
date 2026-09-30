@@ -1,0 +1,123 @@
+﻿Checkout inventory, 30 September 2026
+45fedaf800e8057a7589d35b2a485ad4253eb477
+?? .verification/cleanup-review-20260930/
+?? .verification/object-click-room17/
+?? .verification/room-object-interaction/
+?? tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer
+HEAD 45fedaf800e8057a7589d35b2a485ad4253eb477
+branch refs/heads/master
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/admiring-kare-468fd5
+HEAD a2b331e80c2e793920600ede36d0a071d75501e2
+branch refs/heads/claude/admiring-kare-468fd5
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/affectionate-tharp-697cdd
+HEAD 9ca1d2cd979308548e9921f0509d4e9c3e16c68a
+branch refs/heads/claude/affectionate-tharp-697cdd
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/awesome-jones-7f0c2d
+HEAD 695f847c3592217df06946b8bcd0fcd1f83ca5a8
+branch refs/heads/claude/awesome-jones-7f0c2d
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/cool-lamarr-0ae6eb
+HEAD 880a89279b700bd7e778dc891b760cb0dd5ff8fa
+branch refs/heads/claude/cool-lamarr-0ae6eb
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/cranky-shannon-53b908
+HEAD e18f13659559d7581f3f328b1562c3f0539c09df
+branch refs/heads/claude/cranky-shannon-53b908
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/elegant-lewin-40adb3
+HEAD 77174e97f796e87da641dfc56affbb81e128a1ec
+branch refs/heads/claude/elegant-lewin-40adb3
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/festive-moore-660bb6
+HEAD 6fe70c2007feecc16bbd8a480a8f14e82dee5386
+branch refs/heads/claude/festive-moore-660bb6
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/jovial-sutherland-74247e
+HEAD 6637cda2c29e6cf0b1de1ddf3190496ed23b9b6f
+branch refs/heads/claude/jovial-sutherland-74247e
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/nifty-cohen-6ff64f
+HEAD 5695d620a60eb4617c308f2bde2e11dbfa860461
+branch refs/heads/claude/nifty-cohen-6ff64f
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/optimistic-cray-556aec
+HEAD ca1ee4afea2a4ed8125e2a777e09dfb71ff524b5
+branch refs/heads/claude/optimistic-cray-556aec
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/quizzical-colden-676019
+HEAD 3320c624e0e04fc106ba7f4536417893687e0019
+branch refs/heads/claude/quizzical-colden-676019
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/recursing-thompson-a4c58f
+HEAD a5ff416bec5ac021bcc52a32379dc5d8ca3caff6
+branch refs/heads/claude/recursing-thompson-a4c58f
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/stoic-kare-7cca65
+HEAD 9bf185d8c3e9ffc003b51cde4a51defe2f91eacc
+branch refs/heads/claude/stoic-kare-7cca65
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/sweet-faraday-0c1780
+HEAD 8080a0347174efbaa65bafc7a25a0e7442b74935
+branch refs/heads/claude/sweet-faraday-0c1780
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/upbeat-mayer-d71aed
+HEAD 9653eb8500cd5ce451bd645d6aaea59f344d4832
+branch refs/heads/claude/upbeat-mayer-d71aed
+
+worktree D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/xenodochial-grothendieck-b05ef4
+HEAD 1ba66c01665713b5c65a709ef8d22b8ecf648425
+branch refs/heads/claude/xenodochial-grothendieck-b05ef4
+
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer
+?? .verification/cleanup-review-20260930/
+?? .verification/object-click-room17/
+?? .verification/room-object-interaction/
+?? tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/admiring-kare-468fd5
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/affectionate-tharp-697cdd
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/awesome-jones-7f0c2d
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/cool-lamarr-0ae6eb
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/cranky-shannon-53b908
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/elegant-lewin-40adb3
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/festive-moore-660bb6
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/jovial-sutherland-74247e
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/nifty-cohen-6ff64f
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/optimistic-cray-556aec
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/quizzical-colden-676019
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/recursing-thompson-a4c58f
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/stoic-kare-7cca65
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/sweet-faraday-0c1780
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/upbeat-mayer-d71aed
+COMMITS NOT ON MASTER
+STATUS D:/Documents/Personal/Code Projects/SCUMMexplorer/.claude/worktrees/xenodochial-grothendieck-b05ef4
+COMMITS NOT ON MASTER
+ALL BRANCH COMMITS NOT ON MASTER
+
+
+FullName      : D:\Documents\Personal\Code 
+                Projects\SCUMMexplorer\Exe\SCUMMexplorer.App\Release\net10.0-windows\SCUMMexplorer.App.exe
+LastWriteTime : 9/30/2026 8:29:43 PM
+Length        : 162304
+
+
+
+
