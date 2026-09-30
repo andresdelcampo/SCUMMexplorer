@@ -361,6 +361,9 @@ public sealed class LoomExplorationSession
     /// when no room is loaded or its box table could not be read.
     /// </summary>
     public LoomWalkBoxSet? CurrentWalkBoxes => _runtime.WalkBoxes;
+
+    /// <summary>The current class bits per object or actor number (a live view; the snapshot holds a copy).</summary>
+    public IReadOnlyDictionary<int, uint> ObjectClasses => _runtime.ObjectClasses;
     public LoomBoundedScriptResult? LastEntryRun { get; private set; }
     public LoomObjectActionResult? LastAction { get; private set; }
     public IReadOnlyList<LoomScriptEvent> LastVisitEvents { get; private set; } = [];

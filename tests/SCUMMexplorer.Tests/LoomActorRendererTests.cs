@@ -102,6 +102,35 @@ public sealed class LoomActorRendererTests
     }
 
     [Fact]
+    public void NeverClipActorsSuchAsRoom43sSheepAreDrawnInFrontOfTheDepthMask()
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 43));
+        // Room 43's entry gives the sheep setClass [0x0000, 0x0096, 0x0094]: ignore boxes (so box 255, whose mask
+        // reads as 1) and class 20, NeverClip, which drawActorCostume honours before the box's mask.
+        var sheep = session.Actors.Where(actor => actor.Room == 43 && actor.Visible == true && actor.IgnoreBoxes == true &&
+            session.ObjectClasses.TryGetValue(actor.Number, out var bits) &&
+            LoomObjectClasses.Has(bits, LoomActorRenderer.NeverClipClass)).ToArray();
+        Assert.True(sheep.Length >= 2, $"{sheep.Length} never-clip actors in Room 43");
+        const int width = 2048;
+        var full = Enumerable.Repeat((byte)1, width * 144).ToArray();
+        var classed = LoomActorRenderer.Render(sheep, 43, width, 144, id => LoomCostume.Load(game, id), full,
+            session.CurrentWalkBoxes, session.ObjectClasses);
+        Assert.All(classed.Actors, actor => Assert.Equal(0, actor.ZPlane));
+        Assert.All(classed.Actors, actor => Assert.True(actor.Pixels > 0));
+        // Without the classes, box 255 would hide them behind the whole mask.
+        var unclassed = LoomActorRenderer.Render(sheep, 43, width, 144, id => LoomCostume.Load(game, id), full, session.CurrentWalkBoxes);
+        Assert.All(unclassed.Actors, actor => Assert.Equal((1, 0), (actor.ZPlane, actor.Pixels)));
+        // Class 21 (AlwaysClip) wins over NeverClip and over an unmasked box, as _forceClip does.
+        var forced = new Dictionary<int, uint>(session.ObjectClasses) { [sheep[0].Number] = 1u << (LoomActorRenderer.AlwaysClipClass - 1) };
+        var clipped = LoomActorRenderer.Render([sheep[0] with { WalkBox = 0 }], 43, width, 144, id => LoomCostume.Load(game, id), full,
+            session.CurrentWalkBoxes, forced).Actors.Single();
+        Assert.Equal((1, 0), (clipped.ZPlane, clipped.Pixels));
+    }
+
+    [Fact]
     public void HiddenActorsAndActorsWithoutACostumeAreNotDrawn()
     {
         var hidden = new LoomActorSnapshot(1, 5, 10, 20, 0, false, false, null, null) { Look = LoomActorLook.Initial with { Costume = 1 } };

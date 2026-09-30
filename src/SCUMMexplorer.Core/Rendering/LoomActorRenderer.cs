@@ -19,12 +19,21 @@ public sealed record LoomActorLayer(byte[] Pixels, int Width, int Height, IReadO
 /// this unstable order is the original's), and each one with a costume is drawn (<c>drawActorCostume</c>) at
 /// (x, y − elevation) in that order, so a lower actor ends up on top. Only visible actors are drawn. Pixels are clipped
 /// to the room. With a depth mask, an actor whose walk box has a nonzero mask is hidden where the mask is set
-/// (<c>drawActorCostume</c>: <c>_zbuf = getMaskFromBox(_walkbox)</c>, at most <c>_numZBuffer - 1</c> = 1 in v3; LOOM
-/// never sets <c>forceClip</c>, as no script uses the z-clip <c>actorOps</c>).
+/// (<c>drawActorCostume</c>: <c>_zbuf = getMaskFromBox(_walkbox)</c>, at most <c>_numZBuffer - 1</c> = 1 in v3). The
+/// actor's classes come first, as in <c>drawActorCostume</c> before v7: class 21 (AlwaysClip, which <c>putClass</c> turns
+/// into <c>_forceClip</c> through <c>classChanged</c>) draws it behind plane 1 whatever its box, and class 20 (NeverClip)
+/// draws it in front of every mask. LOOM's scripts set one of the two on most actors they place (for example Room 43's
+/// sheep: <c>setClass [0x0000, 0x0096, 0x0094]</c>, ignore boxes and never clip).
 /// </summary>
 public static class LoomActorRenderer
 {
     public const byte Transparent = 0xFF;
+
+    /// <summary><c>kObjectClassNeverClip</c>: the actor is drawn in front of every mask.</summary>
+    public const int NeverClipClass = 20;
+
+    /// <summary><c>kObjectClassAlwaysClip</c>: <c>classChanged</c> sets <c>_forceClip</c>, so the actor is drawn behind plane 1.</summary>
+    public const int AlwaysClipClass = 21;
 
     /// <summary>ScummVM's order for the actors in the room (all of them, visible or not, as the engine sorts them).</summary>
     public static IReadOnlyList<LoomActorSnapshot> SortForDrawing(IEnumerable<LoomActorSnapshot> actors, int currentRoom)
@@ -38,7 +47,8 @@ public static class LoomActorRenderer
     }
 
     public static LoomActorLayer Render(IEnumerable<LoomActorSnapshot> actors, int currentRoom, int width, int height,
-        Func<int, LoomCostume?> costumes, byte[]? depthMask = null, LoomWalkBoxSet? boxes = null)
+        Func<int, LoomCostume?> costumes, byte[]? depthMask = null, LoomWalkBoxSet? boxes = null,
+        IReadOnlyDictionary<int, uint>? classes = null)
     {
         var pixels = new byte[width * height];
         Array.Fill(pixels, Transparent);
@@ -67,8 +77,13 @@ public static class LoomActorRenderer
             var cels = costume.Draw(look.Animation, direction);
             var top = y - elevation;
             // Plane 1 is the only mask plane in v3; an unknown box draws the actor in front (noted as an estimate).
-            var zPlane = depthMask is null ? 0 : actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1) : 0;
-            var boxNote = depthMask is not null && actor.WalkBox is null ? "walk box unknown: drawn in front of the depth mask" : null;
+            var actorClasses = classes is not null && classes.TryGetValue(actor.Number, out var bits) ? bits : 0u;
+            var forceClip = LoomObjectClasses.Has(actorClasses, AlwaysClipClass);
+            var neverClip = !forceClip && LoomObjectClasses.Has(actorClasses, NeverClipClass);
+            var zPlane = depthMask is null || neverClip ? 0 : forceClip ? 1 :
+                actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1) : 0;
+            var boxNote = depthMask is not null && !forceClip && !neverClip && actor.WalkBox is null
+                ? "walk box unknown: drawn in front of the depth mask" : null;
             var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 0 ? depthMask : null);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
                 x + cels.Min(cel => cel.Left), top + cels.Min(cel => cel.Top),

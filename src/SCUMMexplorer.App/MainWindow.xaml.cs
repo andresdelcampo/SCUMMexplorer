@@ -3165,7 +3165,8 @@ public partial class MainWindow : Window
     /// <summary>
     /// Draws the session's actors in the shown room over the room image (ScummVM <c>processActors</c>: sorted by y,
     /// each visible actor with a costume at (x, y − elevation) on its current limb frames), clipped to the room.
-    /// An actor whose walk box has a mask is hidden where the room's depth mask (with the drawn objects' masks) is set.
+    /// An actor whose walk box has a mask is hidden where the room's depth mask (with the drawn objects' masks) is set,
+    /// unless its classes say otherwise (class 20 never clips, class 21 always does).
     /// </summary>
     private void UpdateActorLayer()
     {
@@ -3183,7 +3184,7 @@ public partial class MainWindow : Window
             try { costume = LoomCostume.Load(game, id); }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
             return _actorCostumes[id] = costume;
-        }, _objectSelection.ComposeDepthMask(room), _session.CurrentWalkBoxes);
+        }, _objectSelection.ComposeDepthMask(room), _session.CurrentWalkBoxes, _session.ObjectClasses);
         if (layer.Actors.Count == 0)
         {
             RoomActorOverlay.Source = null;
