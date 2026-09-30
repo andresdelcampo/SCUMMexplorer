@@ -761,6 +761,10 @@ public partial class MainWindow : Window
             UpdateAdvancedMode();
             StatusText.Text = "Scene ready";
             StatusText.ToolTip = $"{room.Width} × {room.Height} · {objectRecords.Count} object records · {objects.Count} images";
+            // A catalog visit can start scripts which yield before their music/arrival work.
+            // Use the ordinary bounded clock once the room is visible, without inventing input.
+            if (GameClickActive && !_playbackEnteringRoom && _playback is null && _session?.Snapshot.PendingScripts > 0)
+                StartPlayback("Catalog arrival frames (arrival assumed)", null, resource, doorways: null, leftRoom: false);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
@@ -782,6 +786,7 @@ public partial class MainWindow : Window
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
+            if (visit) FollowSessionSound();
             var snapshot = visit ? _session.VisitRoom(resource) : _session.Snapshot;
             var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,

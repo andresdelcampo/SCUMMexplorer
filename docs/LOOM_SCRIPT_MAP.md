@@ -226,6 +226,8 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 
 ## Native AdLib effects (30 September)
 
+Decoded + session run (30 Sep): Room entries 16 +0x009A, 24 +0x010C, 30 +0x0091 and 36 +0x00F0 start script 039 with sounds 30,28,28,27. Script 039 yields at +0x0021 before starting its resolved sound at +0x0038. The App now runs catalog arrival frames after showing the room, so those sounds start on its first frame without an input action. Catalog arrival remains assumed; no room-specific music shortcut or fabricated command. [Evidence](../.verification/arrival-music-20260930/validation.md).
+
 Decoded + reading (30 Sep): [cutscene discovery](LOOM_CUTSCENE_DISCOVERY.md) indexes 235 cutscene sites across 216 owners, keeping literal callers, possible room commands, state reads and unresolved scope/targets separate from validated replay starts. Current manual catalog remains 044/046/052/086; the session can naturally execute other scenes. No additional starting state or room membership assumed.
 
 Reading (App, 30 Sep): manual cutscene entry points now refuse starts while playback or a scene is active. This prevents replacing the session, including from a previously opened menu. Skip line/whole-scene skip keep their existing source conditions. No decoded scene behavior was changed.

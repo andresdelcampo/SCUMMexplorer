@@ -44,7 +44,9 @@ Cutscene starts are disabled during active playback (including pause), with entr
 
 Catalog discovery investigated: [design and trigger evidence](LOOM_CUTSCENE_DISCOVERY.md), reproducible index of 235 cutscene sites across 216 owners. Runtime execution and manual replay descriptors are independent; no unverified entries promoted.
 
-Next: arrival music and Room 36's exit. CameraPanCheck is removed; historical mentions below are dated evidence only.
+Arrival music fixed: visible catalog loads start their pending scripts on the ordinary bounded clock. Rooms 16,24,30,36 open cues 30,28,28,27 without a click. [Verification](../.verification/arrival-music-20260930/validation.md): ArrivalCheck 8/8, required doorways 16/16, RoomAudit zero gaps and all 76 PNG hashes unchanged.
+
+Next: Room 36's exit. CameraPanCheck is removed; historical mentions below are dated evidence only.
 
 ## Ordered work
 

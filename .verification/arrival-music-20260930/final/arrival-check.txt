@@ -1,0 +1,26 @@
+PASS Room 16: music opens on arrival without game input
+PASS Room 16: arrival keeps the catalog room and does not send a click
+Entry { Frame = 1, Milliseconds = 5254, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0005 stopSound var[0x0A4] }
+Entry { Frame = 1, Milliseconds = 5254, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0012 stopSound var[0x0A3] }
+Entry { Frame = 1, Milliseconds = 5255, Action = start, SoundId = 30, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+Entry { Frame = 1, Milliseconds = 9279, Action = opened, SoundId = 30, Kind = music (AdLib), Source = audio True, duration 92,144 s; Script 39 +0x0038 startSound local[0x000] }
+PASS Room 24: music opens on arrival without game input
+PASS Room 24: arrival keeps the catalog room and does not send a click
+Entry { Frame = 34, Milliseconds = 9465, Action = stop, SoundId = 30, Kind = , Source = Script 39 +0x0005 stopSound var[0x0A4] }
+Entry { Frame = 34, Milliseconds = 9465, Action = stop, SoundId = 30, Kind = , Source = Script 39 +0x0012 stopSound var[0x0A3] }
+Entry { Frame = 34, Milliseconds = 9465, Action = start, SoundId = 28, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+Entry { Frame = 34, Milliseconds = 10807, Action = opened, SoundId = 28, Kind = music (AdLib), Source = audio True, duration 143,532 s; Script 39 +0x0038 startSound local[0x000] }
+PASS Room 30: music opens on arrival without game input
+PASS Room 30: arrival keeps the catalog room and does not send a click
+Entry { Frame = 47, Milliseconds = 10982, Action = stop, SoundId = 28, Kind = , Source = Script 39 +0x0005 stopSound var[0x0A4] }
+Entry { Frame = 47, Milliseconds = 10982, Action = stop, SoundId = 28, Kind = , Source = Script 39 +0x0012 stopSound var[0x0A3] }
+Entry { Frame = 47, Milliseconds = 10982, Action = start, SoundId = 28, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+Entry { Frame = 47, Milliseconds = 11369, Action = opened, SoundId = 28, Kind = music (AdLib), Source = audio True, duration 143,532 s; Script 39 +0x0038 startSound local[0x000] }
+PASS Room 36: music opens on arrival without game input
+PASS Room 36: arrival keeps the catalog room and does not send a click
+Entry { Frame = 51, Milliseconds = 11504, Action = stop, SoundId = 28, Kind = , Source = Script 39 +0x0005 stopSound var[0x0A4] }
+Entry { Frame = 51, Milliseconds = 11504, Action = stop, SoundId = 28, Kind = , Source = Script 39 +0x0012 stopSound var[0x0A3] }
+Entry { Frame = 51, Milliseconds = 11504, Action = start, SoundId = 27, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+Entry { Frame = 51, Milliseconds = 12311, Action = opened, SoundId = 27, Kind = music (AdLib), Source = audio True, duration 73,754 s; Script 39 +0x0038 startSound local[0x000] }
+Real WPF catalog selections and playback clock; no game click or manufactured sound event. Catalog arrival remains estimated.
+Failures: 0
