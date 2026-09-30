@@ -40,7 +40,9 @@ Advanced inspection round trip fixed: normal browsing restores interactive room/
 
 Native AdLib effects and the approved top-level No Sound / PC Speaker / AdLib selector are implemented. Music and effects, including manual previews, follow it without fallback. Switching stops current voices; subsequent commands use the new device. [Verification](../.verification/audio-modes-20260930/validation.md): 249 tests, all 12 supplied DOS effects and 19 music tracks, AudioCheck 10/10. Separate rendered chips do not reproduce shared OPL channel priority allocation.
 
-Next: cutscene-start disabling and source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
+Cutscene starts are disabled during active playback (including pause), with entry-point guards against repeated button, menu and gallery calls. Completion, skip, a different catalog room and interactive return restore the control. [Verification](../.verification/cutscene-busy-20260930/validation.md): BusyCheck 11/11.
+
+Next: source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
 
 ## Ordered work
 

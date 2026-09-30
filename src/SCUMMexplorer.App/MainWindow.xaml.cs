@@ -2844,6 +2844,8 @@ public partial class MainWindow : Window
     /// </summary>
     private bool SessionInScene => _session is { } session && (session.InCutscene || session.BootRunning);
 
+    private bool CanStartCutscene => GameClickActive && _playback is null && !SessionInScene;
+
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
     {
@@ -2853,6 +2855,8 @@ public partial class MainWindow : Window
         var choices = CutsceneChoices();
         CutsceneMenuButton.Visibility = choices.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         CutsceneMenuButton.Content = choices.Count > 1 ? "Play a cutscene ▾" : "Play a cutscene";
+        CutsceneMenuButton.IsEnabled = CanStartCutscene;
+        CutsceneMenuButton.ToolTip = CanStartCutscene ? "Play from a stated start." : "Playback is active. Finish or skip it before starting another scene.";
         SkipLineButton.IsEnabled = !string.IsNullOrWhiteSpace(_session?.Messages.Talk?.Text);
         UpdateRoomScrollButtons();
         PlaybackPauseButton.IsEnabled = _playback is not null;
@@ -2919,6 +2923,7 @@ public partial class MainWindow : Window
 
     private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
     {
+        if (!CanStartCutscene) return;
         var choices = CutsceneChoices();
         if (choices.Count == 1) choices[0].Play();
         else if (choices.Count > 1) BuildCutsceneMenu().IsOpen = true;
@@ -2946,7 +2951,7 @@ public partial class MainWindow : Window
         var menu = new ContextMenu { PlacementTarget = CutsceneMenuButton, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
         foreach (var choice in CutsceneChoices())
         {
-            var item = new MenuItem { Header = choice.Title, ToolTip = choice.Source };
+            var item = new MenuItem { Header = choice.Title, ToolTip = choice.Source, IsEnabled = CanStartCutscene };
             item.Click += (_, _) => choice.Play();
             menu.Items.Add(item);
         }
@@ -2989,7 +2994,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void PlayOpening()
     {
-        if (_game is null || _indexedObjectSnapshot is null || !GameClickActive) return;
+        if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene) return;
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, stopAtOpening: true);
         _sceneSound.Attach(_game, _session);
@@ -3017,7 +3022,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void PlayKnownCutscene(KnownCutscene cutscene)
     {
-        if (_game is null || _indexedObjectSnapshot is null || !GameClickActive ||
+        if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene ||
             _game.Rooms.FirstOrDefault(item => item.ResourceId == cutscene.RoomId) is not { } room) return;
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);

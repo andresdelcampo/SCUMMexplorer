@@ -1,0 +1,13 @@
+PASS single-scene control enabled while idle
+PASS playing/paused scene disables starts and keeps pause usable
+PASS single, stale dropdown and opening starts cannot replace an active session
+PASS new dropdown items disabled during playback
+PASS whole-scene skip remains enabled at a source skip point
+PASS start control restored after skipping and remaining frames
+PASS start control restored after natural scene completion
+PASS multiple-scene dropdown prevents repeated starts
+PASS room change restores idle control
+PASS inspection hides playback controls
+PASS interactive return restores idle scene control
+Real WPF window with synthetic handlers/menu actions and accelerated source frames; no physical input. No executor or scene state fabricated.
+Failures: 0

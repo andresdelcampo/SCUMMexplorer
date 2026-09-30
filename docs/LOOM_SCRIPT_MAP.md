@@ -226,6 +226,8 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 
 ## Native AdLib effects (30 September)
 
+Reading (App, 30 Sep): manual cutscene entry points now refuse starts while playback or a scene is active. This prevents replacing the session, including from a previously opened menu. Skip line/whole-scene skip keep their existing source conditions. No decoded scene behavior was changed.
+
 Decoded + ScummVM Player_AD: supplied DOS effects 1-12 use instrument commands, two envelope descriptors per note and up to three OPL channels. Music has payload byte 2 = 0x80. All 12 effects render nonzero stereo PCM. Sound 24's indexed bytes do not contain a valid DOS bundle; later indices have a different layout. Structural bundle validation rejects these without ID exceptions. The app's shared selector controls rendition for executed events and manual previews, without speaker fallback. Separate resource chips do not model shared-channel allocation, priorities or hardware competition; the selector does not rewrite VAR_SOUNDCARD. [Evidence and source](../.verification/audio-modes-20260930/validation.md).
 
 ## Not modelled yet (ordered by the plan's milestones)
