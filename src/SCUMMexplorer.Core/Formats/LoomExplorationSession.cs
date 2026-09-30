@@ -1232,6 +1232,12 @@ public sealed class LoomExplorationSession
     /// <summary>True when <see cref="CameraX"/> comes from an estimate (a walk end, a seeded pick, an instant pan).</summary>
     public bool CameraEstimated => _runtime.EstimatedVariables.Contains(CameraVariable);
 
+    /// <summary>
+    /// The camera's limits in the current room (<c>VAR_CAMERA_MIN_X</c>/<c>MAX_X</c>): half a screen from each edge,
+    /// narrowed by <c>roomOps roomScroll</c> (Room 41's entry: 176..184); null when no room is loaded.
+    /// </summary>
+    public (int Min, int Max)? CameraRange => _runtime.CameraRange;
+
     /// <summary>Puts the camera at <paramref name="x"/>, kept half a screen from the room's edges (<c>cameraMoved</c>).</summary>
     private void SetCamera(int x, string? estimate, string trace)
     {

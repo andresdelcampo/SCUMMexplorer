@@ -1,0 +1,24 @@
+LoomRoomObjectRecord { Id = 169, LocalIndex = 3, X = 304, Y = 0, Width = 16, Height = 144, ParentLocalIndex = 0, ParentRequiredState = 0, WalkX = 352, WalkY = 132, Direction = 1, CodeOffset = 26238, ImageOffset =  }
+LoomRoomObjectRecord { Id = 170, LocalIndex = 4, X = 320, Y = 0, Width = 16, Height = 144, ParentLocalIndex = 0, ParentRequiredState = 0, WalkX = 288, WalkY = 132, Direction = 0, CodeOffset = 26155, ImageOffset =  }
+camera 480 range (480, 480)
+click (328,72): LoomObjectActionResult { SourceRoomId = 4, ObjectId = 0, VerbId = 0, ScriptOffset = 0, Script = , Run = , ReachedRoomLoad = , DestinationRoomId = , Uncertainties = System.String[], Input = A click at (328, 72) in Room 04, sent to the game's input script as assumed input, IsGameInput = True, Evidence = A click at (328, 72) in Room 04, sent to the game's input script as assumed input; no room load was reached. }
+f0 camera 480 range (480, 480) room 4
+f20 camera 480 range (480, 480) room 4
+f40 camera 480 range (480, 480) room 4
+f60 camera 368 range (160, 480) room 4
+f80 camera 208 range (160, 480) room 4
+f100 camera 160 range (160, 160) room 4
+f120 camera 160 range (160, 160) room 4
+f140 camera 160 range (160, 160) room 4
+f160 camera 160 range (160, 160) room 4
+f180 camera 160 range (160, 160) room 4
+f200 camera 160 range (160, 160) room 4
+f220 camera 160 range (160, 160) room 4
+f240 camera 160 range (160, 160) room 4
+f260 camera 160 range (160, 160) room 4
+f280 camera 160 range (160, 160) room 4
+f300 camera 160 range (160, 160) room 4
+f320 camera 160 range (160, 160) room 4
+f340 camera 160 range (160, 160) room 4
+f360 camera 160 range (160, 160) room 4
+f380 camera 160 range (160, 160) room 4

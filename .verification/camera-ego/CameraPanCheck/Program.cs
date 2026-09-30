@@ -11,7 +11,9 @@ using SCUMMexplorer.App;
 // For each room given (entered from the tree; the first after the boot is Room 02):
 // with "Pan to the camera on entry" off, the view opens at the camera at once; with it on,
 // it opens at the left edge, moves in steps of 8 source pixels and stops at the camera;
-// a manual pan stops it. Arguments: <Games\loom> <output folder> <rooms>. No physical input.
+// a manual pan stops it. The manual pan, the scroll bar and the arrows stay inside the game's
+// camera limits (Room 41: roomScroll 176, so the view starts at x 16 and cannot move).
+// Arguments: <Games\loom> <output folder> <rooms>. No physical input.
 internal static class Program
 {
     const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
@@ -65,7 +67,30 @@ internal static class Program
                     var left = viewport.HorizontalOffset / Scale();
                     Check(Math.Abs(left - expected) < 0.6, $"Room {room:00} pan off: camera x {camera?.ToString() ?? "unknown"}, view starts at source x {left:0.#} (expected {expected:0.#})");
                     Save($"room-{room:00}-pan-off.png");
-                    if (expected <= 0) continue;
+
+                    // The manual pan and the scroll bar stay inside the camera limits (VAR_CAMERA_MIN_X/MAX_X).
+                    var range = ((int Min, int Max)?)session.GetType().GetProperty("CameraRange")!.GetValue(session);
+                    var half = Math.Min(320, width) / 2.0;
+                    var leftmost = range is { } r1 ? Math.Clamp(r1.Min - half, 0, viewport.ScrollableWidth / Scale()) : 0;
+                    var rightmost = range is { } r2 ? Math.Clamp(r2.Max - half, leftmost, viewport.ScrollableWidth / Scale()) : viewport.ScrollableWidth / Scale();
+                    Call("PanRoomBySourcePixels", -2000.0);
+                    window.UpdateLayout();
+                    var panLeft = viewport.HorizontalOffset / Scale();
+                    Call("PanRoomBySourcePixels", 2000.0);
+                    window.UpdateLayout();
+                    var panRight = viewport.HorizontalOffset / Scale();
+                    viewport.ScrollToHorizontalOffset(0);
+                    window.UpdateLayout();
+                    await Task.Delay(100);
+                    var bar = viewport.HorizontalOffset / Scale();
+                    var leftButton = ((Button)window.FindName("ScrollRoomLeftButton")).IsEnabled;
+                    var arrows = ((FrameworkElement)window.FindName("RoomScrollButtonsPanel")).Visibility;
+                    Check(Math.Abs(panLeft - leftmost) < 0.6 && Math.Abs(panRight - rightmost) < 0.6 && Math.Abs(bar - leftmost) < 0.6 && !leftButton,
+                        $"Room {room:00} manual pan: limits {range} give source x {leftmost:0.#}..{rightmost:0.#}; pan left {panLeft:0.#}, right {panRight:0.#}, scroll bar to 0 → {bar:0.#}; left arrow enabled {leftButton}; arrows {arrows} (room {width} px)");
+                    Save($"room-{room:00}-pan-limits.png");
+                    viewport.ScrollToHorizontalOffset(expected * Scale());
+                    window.UpdateLayout();
+                    if (expected <= leftmost + 0.5) continue;
 
                     // Pan on: leave and enter again through the tree. A catalog visit resets the
                     // camera to 160, so this only holds for the boot room, which the session is in.
@@ -87,7 +112,7 @@ internal static class Program
                     for (var n = 0; n < 400 && timer.IsEnabled; n++) await Task.Delay(50);
                     timer.Tick -= sample;
                     var steps = samples.Zip(samples.Skip(1), (a, b) => b - a).Where(d => d > 0.01).ToArray();
-                    Check(start < 8.5, $"Room {room:00} pan on: starts at source x {start:0.#}");
+                    Check(start < leftmost + 8.5, $"Room {room:00} pan on: starts at source x {start:0.#} (leftmost {leftmost:0.#})");
                     Check(steps.Length > 3 && steps.All(d => d <= 8.01), $"Room {room:00} pan on: {steps.Length} steps, largest {(steps.Length == 0 ? 0 : steps.Max()):0.##} source px");
                     Check(Math.Abs(samples[^1] - expected) < 0.6, $"Room {room:00} pan on: ends at source x {samples[^1]:0.#} (expected {expected:0.#}; scrollable {viewport.ScrollableWidth / Scale():0.##}, target {(double)Field("_cameraPanTargetSourceX")!:0.##}; last samples {string.Join(", ", samples.TakeLast(4).Select(v => v.ToString("0.##")))})");
                     Save($"room-{room:00}-pan-end.png");

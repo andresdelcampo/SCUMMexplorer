@@ -1,0 +1,16 @@
+﻿Real MainWindow; synthetic tree selection and toggle changes. No physical input.
+PASS Room 02 pan off: camera x 800, view starts at source x 640 (expected 640)
+PASS Room 02 manual pan: limits (160, 800) give source x 0..640; pan left 0, right 640, scroll bar to 0 → 0; left arrow enabled False; arrows Visible (room 960 px)
+PASS Room 02 pan on: starts at source x 0 (leftmost 0)
+PASS Room 02 pan on: 80 steps, largest 8 source px
+PASS Room 02 pan on: ends at source x 640 (expected 640; scrollable 640, target 640; last samples 616, 624, 632, 640)
+PASS Room 02: a manual pan stops the entry pan
+PASS Room 03 pan off: camera x 160, view starts at source x 0 (expected 0)
+PASS Room 03 manual pan: limits (160, 160) give source x 0..0; pan left 0, right 0, scroll bar to 0 → 0; left arrow enabled False; arrows Hidden (room 320 px)
+PASS Room 41 pan off: camera x 176, view starts at source x 16 (expected 16)
+PASS Room 41 manual pan: limits (176, 176) give source x 16..16; pan left 16, right 16, scroll bar to 0 → 16; left arrow enabled False; arrows Hidden (room 336 px)
+PASS Room 04 pan off: camera x 480, view starts at source x 320 (expected 320)
+PASS Room 04 manual pan: limits (480, 480) give source x 320..320; pan left 320, right 320, scroll bar to 0 → 320; left arrow enabled False; arrows Hidden (room 640 px)
+PASS Room 08 pan off: camera x 160, view starts at source x 0 (expected 0)
+PASS Room 08 manual pan: limits (160, 752) give source x 0..592; pan left 0, right 592, scroll bar to 0 → 0; left arrow enabled False; arrows Visible (room 912 px)
+Failures: 0

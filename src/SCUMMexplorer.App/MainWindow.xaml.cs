@@ -1537,6 +1537,13 @@ public partial class MainWindow : Window
         // A camera kept while the view could not scroll is applied once it can.
         if (_pendingCameraX is not null && (e.ExtentWidthChange != 0 || e.ViewportWidthChange != 0) && RoomViewport.ScrollableWidth > 0.5)
             ApplyPendingCamera();
+        // The scroll bar and the wheel stay inside the game's camera limits too.
+        else if (_pendingCameraX is null && !_cameraPanTimer.IsEnabled && RoomViewport.ScrollableWidth > 0.5)
+        {
+            var (low, high) = RoomViewScrollRange();
+            var inside = Math.Clamp(RoomViewport.HorizontalOffset, low, high);
+            if (Math.Abs(inside - RoomViewport.HorizontalOffset) > 0.01) RoomViewport.ScrollToHorizontalOffset(inside);
+        }
         UpdateRoomScrollButtons();
     }
 
@@ -1631,10 +1638,11 @@ public partial class MainWindow : Window
         StopCameraPan();
         var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
             RoomViewport.ScrollableWidth / _roomDisplayScale);
-        if (CameraPanToggle.IsChecked == true && left > 0)
+        var leftmost = RoomViewScrollRange().Min;
+        if (CameraPanToggle.IsChecked == true && left * _roomDisplayScale > leftmost + 0.01)
         {
-            // Presentation only: slide from the left edge to the camera.
-            RoomViewport.ScrollToHorizontalOffset(0);
+            // Presentation only: slide from the leftmost view the game's camera allows to the camera.
+            RoomViewport.ScrollToHorizontalOffset(leftmost);
             _cameraPanTargetSourceX = left;
             _cameraPanTimer.Start();
             return;
@@ -1664,15 +1672,33 @@ public partial class MainWindow : Window
 
     private void StopCameraPan() => _cameraPanTimer.Stop();
 
+    /// <summary>
+    /// The view's horizontal offsets the manual pan may reach. In the interactive mode, with the session in the shown
+    /// room, the game's camera limits (<c>VAR_CAMERA_MIN_X</c>/<c>MAX_X</c>, the camera being the screen's centre):
+    /// Room 41's entry narrows them to 176, so its first 16 columns, which the game never shows, stay out of view.
+    /// Otherwise the whole room.
+    /// </summary>
+    private (double Min, double Max) RoomViewScrollRange()
+    {
+        var max = RoomViewport.ScrollableWidth;
+        if (!GameClickActive || _currentRoom is null || _session!.CameraRange is not { } range ||
+            _session.Snapshot.RoomId is not int roomId || roomId != _currentRoomResource?.ResourceId)
+            return (0, max);
+        var half = Math.Min(320, _currentRoom.Width) / 2.0;
+        var low = Math.Clamp((range.Min - half) * _roomDisplayScale, 0, max);
+        return (low, Math.Clamp((range.Max - half) * _roomDisplayScale, low, max));
+    }
+
     private void UpdateRoomScrollButtons()
     {
         var normalSize = NormalRoomWidthToggle.IsChecked == true;
-        var canScroll = normalSize && RoomViewport.ScrollableWidth > 0.5;
+        var (low, high) = RoomViewScrollRange();
+        var canScroll = normalSize && high - low > 0.5;
         // No arrows while the player has no control (a cutscene or the boot): the game offers no scrolling then.
         RoomScrollButtonsPanel.Visibility = canScroll && !SessionInScene ? Visibility.Visible
             : normalSize ? Visibility.Hidden : Visibility.Collapsed;
-        ScrollRoomLeftButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset > 0.5;
-        ScrollRoomRightButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset < RoomViewport.ScrollableWidth - 0.5;
+        ScrollRoomLeftButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset > low + 0.5;
+        ScrollRoomRightButton.IsEnabled = canScroll && RoomViewport.HorizontalOffset < high - 0.5;
     }
 
     internal static double GetRoomPanStep(TimeSpan elapsed, double maximumStep)
@@ -1722,9 +1748,10 @@ public partial class MainWindow : Window
     {
         StopRoomPan();
         StopCameraPan();
-        if (NormalRoomWidthToggle.IsChecked != true || RoomViewport.ScrollableWidth <= 0.5 ||
-            (direction < 0 && RoomViewport.HorizontalOffset <= 0.5) ||
-            (direction > 0 && RoomViewport.HorizontalOffset >= RoomViewport.ScrollableWidth - 0.5)) return;
+        var (low, high) = RoomViewScrollRange();
+        if (NormalRoomWidthToggle.IsChecked != true || high - low <= 0.5 ||
+            (direction < 0 && RoomViewport.HorizontalOffset <= low + 0.5) ||
+            (direction > 0 && RoomViewport.HorizontalOffset >= high - 0.5)) return;
 
         RoomViewport.Focus();
         _roomPanActive = true;
@@ -1757,7 +1784,8 @@ public partial class MainWindow : Window
     {
         var previous = RoomViewport.HorizontalOffset;
         var requested = previous + sourcePixels * _roomDisplayScale;
-        var target = Math.Clamp(requested, 0, RoomViewport.ScrollableWidth);
+        var (low, high) = RoomViewScrollRange();
+        var target = Math.Clamp(requested, low, high);
         RoomViewport.ScrollToHorizontalOffset(target);
         UpdateRoomScrollButtons();
         if (Math.Abs(target - previous) < 0.01) StopRoomPan();
