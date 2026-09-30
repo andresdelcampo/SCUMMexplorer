@@ -45,6 +45,10 @@ public sealed record LoomScriptEvent(
     bool Recursive = false,
     IReadOnlyList<int>? EstimatedArgumentIndexes = null)
 {
+    /// <summary>The executor visited this instruction on its chosen route. Certainty still records estimates;
+    /// false also covers commands collected from branches that were not executed.</summary>
+    public bool Executed { get; init; }
+
     public string Format()
     {
         var certainty = Certainty switch

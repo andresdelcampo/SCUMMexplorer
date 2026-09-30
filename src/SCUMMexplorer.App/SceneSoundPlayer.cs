@@ -7,8 +7,9 @@ using SCUMMexplorer.Core.Formats;
 namespace SCUMMexplorer.App;
 
 /// <summary>
-/// Plays the sounds a session's scripts start and stop while the playback clock runs (cutscenes, the opening and the
-/// frames after an input), from <see cref="LoomExplorationSession.SoundEvents"/>. Each reached <c>startSound</c> starts
+/// Plays the sound commands actually executed by a session's scripts, on playback frames and interactive actions,
+/// from <see cref="LoomExplorationSession.SoundEvents"/>. Commands on an estimated preview route retain that label;
+/// commands collected from unexecuted possible branches stay silent. Each executed <c>startSound</c> starts
 /// its track on the frame that reached it; <c>stopSound</c> stops that track and <c>stopMusic</c> stops them all, as
 /// ScummVM's <c>stopAllSounds</c> does. Tracks overlap, as the game's sound channels do.
 /// Music tracks play as the AdLib rendition. The game's AdLib sound effects are not decoded yet, so effects play as the
@@ -45,6 +46,9 @@ public sealed class SceneSoundPlayer
     /// <summary>Raised when a reached <c>startSound</c> is about to play, so the app's other player can stop.</summary>
     public event Action? Starting;
 
+    /// <summary>A sound on an executed estimated route, for the UI's evidence tooltip.</summary>
+    public event Action<string>? PreviewStarting;
+
     /// <summary>Follows <paramref name="session"/> from its next sound event on; a new session stops the old one's sounds.</summary>
     public void Attach(GameLibrary game, LoomExplorationSession session)
     {
@@ -70,13 +74,17 @@ public sealed class SceneSoundPlayer
         for (; _seen < events.Count; _seen++)
         {
             var item = events[_seen].Event;
-            if (item.Certainty != LoomScriptEventCertainty.Reached) continue;
+            // Follow commands actually executed in the state preview, including its labelled estimated route.
+            // Commands merely collected from an unresolved branch (Executed false) must stay silent.
+            if (item.Certainty != LoomScriptEventCertainty.Reached && !item.Executed) continue;
             var source = $"{item.SourceLabel} +0x{item.Offset:X4} {item.Operation} {item.Operands}".TrimEnd();
+            var estimated = item.Certainty != LoomScriptEventCertainty.Reached;
+            if (estimated) source = "Estimated preview route: " + source;
             switch (item.Kind)
             {
                 case LoomScriptEventKind.SoundStarted or LoomScriptEventKind.MusicStarted when item.TargetId is int id:
                     Stop(id);
-                    Start(id, source);
+                    Start(id, source, estimated);
                     break;
                 case LoomScriptEventKind.SoundStopped when item.TargetId is int id:
                     Stop(id);
@@ -124,7 +132,7 @@ public sealed class SceneSoundPlayer
         _voices.Remove(voice);
     }
 
-    private async void Start(int id, string source)
+    private async void Start(int id, string source, bool estimated)
     {
         var voice = new Voice { SoundId = id, StartedAt = _clock.ElapsedMilliseconds };
         _voices.Add(voice);
@@ -132,25 +140,32 @@ public sealed class SceneSoundPlayer
         var render = Render(id);
         var (path, music) = render.IsCompleted ? render.Result : await render;
         var kind = path is null ? "unavailable" : music ? "music (AdLib)" : "effect (PC speaker)";
-        Log.Add(new(frame, voice.StartedAt, "start", id, kind, source));
+        Log.Add(new(frame, voice.StartedAt, estimated ? "preview start" : "start", id, kind, source));
         if (voice.Stopped || path is null)
         {
             _voices.Remove(voice);
             return;
         }
         Starting?.Invoke();
+        if (estimated) PreviewStarting?.Invoke(source);
         var player = new MediaPlayer();
         voice.Player = player;
         var late = TimeSpan.FromMilliseconds(_clock.ElapsedMilliseconds - voice.StartedAt);
         player.MediaOpened += (_, _) =>
         {
             if (voice.Stopped) return;
+            Log.Add(new(frame, _clock.ElapsedMilliseconds, "opened", id, kind,
+                $"audio {player.HasAudio}, duration {(player.NaturalDuration.HasTimeSpan ? player.NaturalDuration.TimeSpan.TotalSeconds : 0):0.###} s; {source}"));
             // A track rendered after its frame starts where the game's would be by now.
             if (late > TimeSpan.FromMilliseconds(100)) player.Position = late;
             if (!_paused) player.Play();
         };
         player.MediaEnded += (_, _) => End(voice);
-        player.MediaFailed += (_, _) => End(voice);
+        player.MediaFailed += (_, error) =>
+        {
+            Log.Add(new(frame, _clock.ElapsedMilliseconds, "failed", id, kind, error.ErrorException.Message));
+            End(voice);
+        };
         player.Open(new Uri(path));
     }
 

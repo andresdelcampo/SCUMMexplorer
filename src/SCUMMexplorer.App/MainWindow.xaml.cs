@@ -116,6 +116,8 @@ public partial class MainWindow : Window
         _audioPlayer.MediaOpened += (_, _) => _sceneSound.StopAll("another sound was started in the app");
         // And the other way round: a sound the game starts stops the app's other player, so two copies never overlap.
         _sceneSound.Starting += () => { if (_audioSurface != AudioSurface.None) StopAudio(); };
+        _sceneSound.PreviewStarting += source => StatusText.ToolTip = source + Environment.NewLine +
+            "This audio follows the executed state preview; its estimated route is not confirmed gameplay.";
         _audioPlayer.MediaEnded += (_, _) => StopPlayback();
         _audioPlayer.MediaFailed += (_, args) =>
         {
@@ -193,6 +195,7 @@ public partial class MainWindow : Window
         StopScenePlayback();
         _sceneSound.StopAll("another game was opened");
         _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot);
+        if (_session is not null) _sceneSound.Attach(game, _session);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
         _actorCostumes.Clear();
@@ -968,6 +971,7 @@ public partial class MainWindow : Window
         StopScenePlayback();
         _sceneSound.StopAll("the session was reset");
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+        _sceneSound.Attach(_game, _session);
         if (_currentRoomResource is { } room && _currentRoom is not null)
         {
             ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: SessionModeToggle.IsChecked == true);
@@ -991,7 +995,9 @@ public partial class MainWindow : Window
     private void AdvanceOneFrame()
     {
         if (_session is null || _currentRoomResource is not { } room || _currentRoom is null) return;
+        FollowSessionSound();
         var snapshot = _session.AdvanceFrame();
+        UpdateSessionSound();
         // A continued script can reach a room load; the session has already
         // entered that room, so show it as ActivateObjectVerb does.
         if (snapshot.RoomId is int reached && reached != room.ResourceId &&
@@ -1096,7 +1102,9 @@ public partial class MainWindow : Window
     private bool ActivateObjectVerb(LoomRoomObjectRecord record, LoomObjectVerbEntry verb)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
+        FollowSessionSound();
         var action = _session.ActivateObjectVerb(record.Id, verb.VerbId);
+        UpdateSessionSound();
         StatusText.Text = action.DestinationRoomId is int destination
             ? $"Entered Room {destination:00}"
             : _session.Snapshot.PendingScripts > 0
@@ -2564,8 +2572,10 @@ public partial class MainWindow : Window
             return false;
         }
         var playing = PlaybackRunning;
+        FollowSessionSound();
         var sceneBefore = (_session.CutscenesBegun, _session.EgoPuts);
         var action = send();
+        if (!_playInstantly) UpdateSessionSound();
         var refused = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
         if (playing && refused is not null)
         {
@@ -3029,10 +3039,13 @@ public partial class MainWindow : Window
         // Other actors are not waited for: ambient walkers (script 042's swan) never stop.
         var moving = session.EgoMoving || session.CameraMoving;
         if (session.Snapshot.PendingScripts == 0 && !talking && !moving) return false;
-        if (SessionInScene)
+        // Script 020 keeps bit[0xD66] set until script 021 finishes the draft. Its notes and spell result
+        // can take longer than the ordinary 32-frame idle window; keep their clock running as for a scene.
+        var draftPlaying = session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]") != 0;
+        if (SessionInScene || draftPlaying)
         {
             if (playback.CutsceneFrames < LoomExplorationSession.CutsceneFrameLimit) return true;
-            playback.Note = $"A cutscene was still open after {LoomExplorationSession.CutsceneFrameLimit} frames; playback stopped following it.";
+            playback.Note = $"A scene or draft was still running after {LoomExplorationSession.CutsceneFrameLimit} frames; playback stopped following it.";
             return false;
         }
         return talking || moving || !playback.LeftRoom && playback.IdleFrames < ExitContinuationFrames;
@@ -3044,7 +3057,7 @@ public partial class MainWindow : Window
         if (!PlaybackShouldContinue()) return false;
         var session = _session!;
         var playback = _playback!;
-        if (SessionInScene) playback.CutsceneFrames++;
+        if (SessionInScene || session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]") != 0) playback.CutsceneFrames++;
         // Frames of a walk do not count as idle: the sentence that waits for it runs after it.
         else if (!session.EgoMoving && !session.CameraMoving) playback.IdleFrames++;
         var room = session.Snapshot.RoomId;
@@ -3053,6 +3066,17 @@ public partial class MainWindow : Window
         // The sounds the frame's scripts started or stopped (instant playback has no frames to wait for).
         if (!_playbackBatch) _sceneSound.Update();
         return true;
+    }
+
+    private void FollowSessionSound()
+    {
+        if (GameClickActive && _game is not null && _session is not null && !_sceneSound.Follows(_session))
+            _sceneSound.Attach(_game, _session);
+    }
+
+    private void UpdateSessionSound()
+    {
+        if (GameClickActive && !_playbackBatch) _sceneSound.Update();
     }
 
     private void PlaybackTimer_Tick(object? sender, EventArgs e)

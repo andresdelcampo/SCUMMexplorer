@@ -5,6 +5,30 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class LoomBoundedScriptExecutorTests
 {
+    [Fact]
+    public void ExecutedEstimatedSoundKeepsConditionalCertainty()
+    {
+        var script = Script(new(0, 0, "startSound", "0x13", "1C 13"), new(2, 0, "stopObjectCode", "", "00"));
+        var run = new LoomBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), [], pathEstimated: true);
+        var sound = Assert.Single(run.Events, e => e.Kind == LoomScriptEventKind.SoundStarted);
+        Assert.True(sound.Executed);
+        Assert.Equal(LoomScriptEventCertainty.Conditional, sound.Certainty);
+        Assert.Equal(19, sound.TargetId);
+    }
+
+    [Fact]
+    public void SoundCollectedFromUnknownBranchIsNotExecuted()
+    {
+        var script = Script(
+            new(0, 0, "isEqual", "var[0x123], 0x0001, branch +0x0003 -> 0x0008", "00 00 00 00 00"),
+            new(5, 0, "startSound", "0x13", "1C 13 00"),
+            new(8, 0, "stopObjectCode", "", "00"));
+        var run = new LoomBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), []);
+        var sound = Assert.Single(run.Events, e => e.Kind == LoomScriptEventKind.SoundStarted);
+        Assert.False(sound.Executed);
+        Assert.Equal(LoomScriptEventCertainty.Conditional, sound.Certainty);
+    }
+
     [Theory]
     [InlineData("isEqual", "local[0x000], 0x0000", true)]
     [InlineData("isEqual", "local[0x000], 0x0001", false)]

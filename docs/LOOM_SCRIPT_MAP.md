@@ -212,6 +212,12 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 | Walks | Stepped frame by frame (M3a); when every box routes to the end box, arriving at the end clears an estimate about the start (an assumed catalog arrival) unless a new estimate was marked after the walk started. A walk from an unknown start point, box or facing, and a catalog visit's assumed arrival walk, still end at once (estimate); `waitFor actor` then clears that estimate | `LoomActorTable.Walk`, `StepWalks`, `WalkAtOnce`, `WalkWaited` |
 | Sound commands (music row) | Each command keeps the room whose code began its script chain (`ScriptFrame.OriginRoom`). The room view shows cues started since entry, or started by the room itself and not stopped. | session `SoundEvents`, `LoomSoundCueResolver.ResolveForRoom` |
 
+## Sound during draft playback (30 September)
+
+- **Decoded:** script 020 +0x001A/+0x0021 plays each recorded note through 031; +0x003C starts 022 after the draft, and 021 clears bit[0xD66]. The App's former 32-frame idle cap could stop before completion. The clock now follows that flag with its existing bounded scene limit.
+- **Session probe:** a four-note cast of the boot's literal draft 0 (3,1,3,2) at Room 02 object 156 dispatched verb 0x3A and script 049. Script 040 +0x0038 started sound 19 for the result; its route remained conditional/estimated. WPF opened that audio after all four reached note tracks. See [spell-audio-20260930](../.verification/spell-audio-20260930/validation.md).
+- **Executor provenance:** `LoomScriptEvent.Executed` is true only for instructions visited on the chosen route. Conditional events collected from an unresolved presentation branch keep it false. This flag does not change certainty or establish gameplay reachability. Audio follows executed estimated commands as explicitly labelled preview audio; unexecuted possible commands stay silent.
+
 ## Not modelled yet (ordered by the plan's milestones)
 
 1. **M1, messages:** modelled on 28 Sep, except `overhead` text (0 sites), text codes 5–7 and 9–14 (labelled when met), talk animations (`talkAnimation`, code 9) and `putActor`/`putActorInRoom` stopping the talk of an actor that leaves the room.

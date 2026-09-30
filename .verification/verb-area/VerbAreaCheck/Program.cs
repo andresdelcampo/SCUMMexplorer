@@ -184,8 +184,8 @@ internal static class Program
                 before = Session().SessionTrace.Count;
                 sent = ClickStrip(third.X + 1, third.Y + 1);
                 await Settle();
-                Check(sent && Var(0x067) == 156 && Var(0x056) == 3 && Var(0x062) == 1 && TracedSince(before, "Script 10 chains to script 27"),
-                    $"after aiming at object 156, note 0x03 is recorded (var[0x056] = {Var(0x056)}, var[0x062] = {Var(0x062)}) and script 027 runs");
+                Check(sent && Var(0x067) == 156 && Var(0x056) == 3 && Var(0x062) == 0 && TracedSince(before, "Script 10 chains to script 27"),
+                    $"after aiming at object 156, note 0x03 is recorded (var[0x056] = {Var(0x056)}), script 027 runs and instant playback completes the draft (var[0x062] = {Var(0x062)})");
                 Save("room-02-verb-area-note-click.png");
 
                 await Settle();

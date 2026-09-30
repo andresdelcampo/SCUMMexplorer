@@ -96,6 +96,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | Discard obsolete room-controls work | With the user's instruction, removed the clean detached worktree without integrating its old UI commit 8878cd9; updated the handoff so it is no longer pending | [drop-room-controls-20260930](../.verification/drop-room-controls-20260930/validation.md) |
 | Room cutscene buttons and Skip line | One scene plays directly; several use simple menu titles; no scene hides the control. Skip line shares '.' and continues the current scene. ControlsCheck 10 PASS; tests 244/244 | [cutscene-controls-20260930](../.verification/cutscene-controls-20260930/validation.md) |
 | Remove obsolete Advanced controls | Visible verb notes accept clicks without Show verb area. Removed the entry-pan option, timer and CameraPanCheck; source-driven camera remains. VerbAreaCheck and six required doorway rooms pass | [advanced-controls-20260930](../.verification/advanced-controls-20260930/validation.md) |
+| Spell notes and result audio | Draft playback runs through its completion; audio follows interactive and Advanced actions. Executed estimated sounds remain labelled previews, unexecuted possibilities stay silent. Four note tracks and result sound 19 open; SceneSoundCheck 0; tests 246/246 | [spell-audio-20260930](../.verification/spell-audio-20260930/validation.md) |
 
 ## State at the end of 28 September
 

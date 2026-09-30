@@ -222,6 +222,7 @@ public sealed class LoomBoundedScriptExecutor
             // An event behind a branch on a seeded pick is a possible outcome, not a reached one.
             var scriptEvent = LoomScriptEvent.FromInstruction(script, instruction,
                 onEstimatedPath ? LoomScriptEventCertainty.Conditional : LoomScriptEventCertainty.Reached);
+            if (scriptEvent is not null) scriptEvent = scriptEvent with { Executed = true };
             if (scriptEvent is { TargetId: null, Kind: LoomScriptEventKind.MusicStarted or
                     LoomScriptEventKind.SoundStarted or LoomScriptEventKind.SoundStopped } &&
                 TryReadValue(instruction.Operands.Trim(), knownVariables, out var soundId, out _))
