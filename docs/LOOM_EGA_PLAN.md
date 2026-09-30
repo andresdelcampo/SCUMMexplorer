@@ -32,6 +32,12 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (30 September)
 
+**Requested for next session (planning only):**
+
+- Replace the normal-view Game Texts button with **Play Cutscene**, giving access to any cutscene in the game rather than only the current room's small replay list. Show **Game Texts only in Advanced**.
+- Investigate why many scenes already execute when game triggers reach them but are absent from Play Cutscene. The executor and manual replay catalog are separate today. Use the existing source-derived discovery inventory to design broad catalog coverage; determine which entries/start recipes can be derived automatically and which need individual validation. Do not assume each cutscene needs a separate engine implementation, or that every cutscene opcode is a distinct replayable scene. Resolve source-backed prerequisites and expose unresolved coverage honestly rather than inventing state.
+- Explain what **Pointer as game input** does in Advanced and whether it is still useful; consider removing the redundant control. The user accepts Advanced behaving interactively, so preserve that behavior while clarifying the control's purpose. Regression-check that switching to Advanced and back never disables normal interactive room/note clicking, including after toggling any retained input controls. Preserve the existing same-session round-trip fix.
+
 Room departure/control state fixed: selecting a catalog room stops playing or paused cutscenes and their voices; leaving the suspended opening uses ordinary post-boot exploration state. Idle arrival polling leaves Pause disabled and allows manual cutscene starts. Sound mode and AdLib gain are locked during scenes, including pause. This is explorer cancellation policy, not a game skip. [Verification](../.verification/scene-room-controls-20260930/validation.md): 19 focused WPF checks, 249 tests, required doorways 16/16; main Release rebuilt with zero warnings/errors.
 
 Checkout/build and construction review completed: [cleanup review](CLEANUP_REVIEW.md), [verification](../.verification/cleanup-review-20260930/validation.md). No files deleted; all 16 historical worktrees are clean ancestors of master. Main Release builds without warnings/errors; committed suite 246/246.
