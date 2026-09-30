@@ -42,7 +42,9 @@ Native AdLib effects and the approved top-level No Sound / PC Speaker / AdLib se
 
 Cutscene starts are disabled during active playback (including pause), with entry-point guards against repeated button, menu and gallery calls. Completion, skip, a different catalog room and interactive return restore the control. [Verification](../.verification/cutscene-busy-20260930/validation.md): BusyCheck 11/11.
 
-Next: source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
+Catalog discovery investigated: [design and trigger evidence](LOOM_CUTSCENE_DISCOVERY.md), reproducible index of 235 cutscene sites across 216 owners. Runtime execution and manual replay descriptors are independent; no unverified entries promoted.
+
+Next: arrival music and Room 36's exit. CameraPanCheck is removed; historical mentions below are dated evidence only.
 
 ## Ordered work
 
