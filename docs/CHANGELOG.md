@@ -95,6 +95,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | Integrate the interrupted H/I worktree onto master | Reviewed and fast-forwarded the three completed commits; rebuilt the main Release app with zero warnings. Tests 244/244; fresh CutsceneMenuCheck and MusicPanelCheck 0 failures. Separate room-controls commit left untouched | [integration-hi-20260930](../.verification/integration-hi-20260930/validation.md) |
 | Discard obsolete room-controls work | With the user's instruction, removed the clean detached worktree without integrating its old UI commit 8878cd9; updated the handoff so it is no longer pending | [drop-room-controls-20260930](../.verification/drop-room-controls-20260930/validation.md) |
 | Room cutscene buttons and Skip line | One scene plays directly; several use simple menu titles; no scene hides the control. Skip line shares '.' and continues the current scene. ControlsCheck 10 PASS; tests 244/244 | [cutscene-controls-20260930](../.verification/cutscene-controls-20260930/validation.md) |
+| Remove obsolete Advanced controls | Visible verb notes accept clicks without Show verb area. Removed the entry-pan option, timer and CameraPanCheck; source-driven camera remains. VerbAreaCheck and six required doorway rooms pass | [advanced-controls-20260930](../.verification/advanced-controls-20260930/validation.md) |
 
 ## State at the end of 28 September
 

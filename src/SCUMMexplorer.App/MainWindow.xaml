@@ -155,17 +155,10 @@
                                           Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
                                           ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
                                           Checked="NormalRoomWidthToggle_Changed" Unchecked="NormalRoomWidthToggle_Changed"/>
-                                <CheckBox x:Name="CameraPanToggle" Content="Pan to the camera on entry" IsChecked="False" Visibility="Collapsed"
-                                          Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
-                                          ToolTip="Presentation only: a room entered in the session slides from its left edge to where its camera is, 8 source pixels a step (ScummVM's scroll step; not the game's timing). In the game, a room load or loadRoomWithEgo puts the camera there at once; only script pans and walks scroll."/>
                                 <CheckBox x:Name="GamePointerToggle" Content="Pointer as game input" IsChecked="False" Visibility="Collapsed"
                                           Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
                                           Checked="GamePointerToggle_Changed" Unchecked="GamePointerToggle_Changed"
                                           ToolTip="Assumed input, off by default. While on, in interactive mode, the pointer's room position is given to the game as its virtual mouse, and moving onto a different object advances one frame, so the input loop (script 006) reacts to the hover as it would in the game: for example, script 008 shows the object's close-up in the verb area. No click is sent. With the pointer off the room, the game is taken to have no pointer over it."/>
-                                <CheckBox x:Name="VerbAreaToggle" Content="Show verb area" IsChecked="False" Visibility="Collapsed"
-                                          Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
-                                          Checked="VerbAreaToggle_Changed" Unchecked="VerbAreaToggle_Changed"
-                                          ToolTip="Presentation only, off by default. Draws the verb area below the room (screen rows 144-199) from the session's verb slots (verbOps state): every image verb that is on or dim, at its position, with the image it was given (the distaff notes come from Room 01's objects 100-151). It shows game state, but the drawing is not the game's: text verbs, the note letters scripts print there, highlight colours and redraw timing are not drawn."/>
                                 <CheckBox x:Name="RoomNavigationToggle" Content="Show exits" Visibility="Collapsed" IsChecked="False"
                                           Margin="0,0,14,0" Foreground="#E7E0D2"
                                           Checked="RoomNavigationToggle_Changed" Unchecked="RoomNavigationToggle_Changed"/>

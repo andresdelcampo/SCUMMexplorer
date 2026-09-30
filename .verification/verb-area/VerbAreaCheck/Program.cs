@@ -46,7 +46,7 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 var tree = (TreeView)window.FindName("ResourceTree");
-                var toggle = (CheckBox)window.FindName("VerbAreaToggle");
+                Check(window.FindName("VerbAreaToggle") is null && window.FindName("CameraPanToggle") is null, "obsolete Advanced controls are absent");
                 var pointer = (CheckBox)window.FindName("GamePointerToggle");
                 var strip = (FrameworkElement)window.FindName("VerbStripPanel");
                 var image = (Image)window.FindName("VerbStripImage");
@@ -76,8 +76,6 @@ internal static class Program
                     return row[x];
                 }
                 // Whether the strip image still shows verb slots (the slot picture is Indexed8; the text-only verb screen is plain black).
-                bool AnyPixelOfSlots() => strip.Visibility == Visibility.Visible && image.Source is BitmapSource { Format: var format } &&
-                                          format == PixelFormats.Indexed8 && AnyPixel(0, 0, 320, 56);
                 bool AnyPixel(int left, int top, int width, int height)
                 {
                     for (var y = top; y < top + height; y++)
@@ -88,10 +86,9 @@ internal static class Program
 
                 await Open(2);
                 var roomHeightOff = viewport.ActualHeight;
-                Check(toggle.IsChecked == false && strip.Visibility == Visibility.Visible && NoteText().StartsWith("Verb screen", StringComparison.Ordinal),
-                    $"the toggle is off by default, and the interactive mode keeps the verb screen under the room: \"{NoteText()}\"");
+                Check(strip.Visibility == Visibility.Visible,
+                    $"the interactive mode keeps the verb screen under the room without a toggle: \"{NoteText()}\"");
 
-                toggle.IsChecked = true;
                 await Settle();
                 Check(strip.Visibility == Visibility.Visible, "on: the strip is shown under the room");
                 Check(Math.Abs(image.ActualWidth - viewport.ActualWidth) < 1.5 &&
@@ -191,7 +188,6 @@ internal static class Program
                     $"after aiming at object 156, note 0x03 is recorded (var[0x056] = {Var(0x056)}, var[0x062] = {Var(0x062)}) and script 027 runs");
                 Save("room-02-verb-area-note-click.png");
 
-                toggle.IsChecked = false;
                 await Settle();
                 // Since M1c the verb screen stays under the room while a script's text is there (the click on
                 // object 156 drew its name, "cielo"); then only that text is shown. The room fits the space it has
@@ -213,8 +209,7 @@ internal static class Program
                 var roomFits = Math.Abs((double)Field("_roomDisplayScale")! - expectedScale) < 0.01 &&
                                Math.Abs(viewport.ActualHeight - roomHeight * expectedScale) < 1;
                 // With the game's text there, the verb screen stays and draws the slots that text goes with.
-                Check((verbText.Length == 0 ? shown && NoteText().StartsWith("Verb screen (rows 144", StringComparison.Ordinal)
-                          : NoteText().StartsWith("Verb screen: the game's text there", StringComparison.Ordinal)) && roomFits,
+                Check(shown && roomFits,
                     $"off again: {(verbText.Length == 0 ? $"the verb screen stays, as the interactive mode keeps it: \"{NoteText()}\"" : $"the verb screen stays for the game's text [{string.Join(", ", verbText)}]: \"{NoteText()}\"")}; " +
                     $"the room fills its space (room {viewport.ActualWidth:0.#} x {viewport.ActualHeight:0.#} in {host.ActualWidth:0.#} x {host.ActualHeight:0.#}; first {roomHeightOff:0.#} high)");
                 Save("room-02-verb-area-off-again.png");

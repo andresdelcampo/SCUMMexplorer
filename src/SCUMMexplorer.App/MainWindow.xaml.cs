@@ -106,7 +106,6 @@ public partial class MainWindow : Window
         PreviewKeyDown += MainWindow_PreviewKeyDown;
         PreviewTextInput += MainWindow_PreviewTextInput;
         _roomPanTimer.Tick += RoomPanTimer_Tick;
-        _cameraPanTimer.Tick += CameraPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
         _adlibGainDebounceTimer.Tick += async (_, _) =>
         {
@@ -508,9 +507,7 @@ public partial class MainWindow : Window
         Grid.SetColumnSpan(ContentPanel, showRoomDetails ? 1 : 2);
         ResourceTree.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomCardScroll.Visibility = _game is null || advanced ? Visibility.Collapsed : Visibility.Visible;
-        CameraPanToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GamePointerToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
-        VerbAreaToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
             ? Visibility.Visible : Visibility.Collapsed;
@@ -649,7 +646,6 @@ public partial class MainWindow : Window
         PreviewDescription.Text = "Reading the room background…";
         PreviewMessage.Visibility = Visibility.Visible;
         StatusText.Visibility = Visibility.Visible;
-        StopCameraPan();
         _pendingCameraX = null;
         RoomViewport.ScrollToHorizontalOffset(0);
         RoomPreview.Source = null;
@@ -1539,7 +1535,7 @@ public partial class MainWindow : Window
         if (_pendingCameraX is not null && (e.ExtentWidthChange != 0 || e.ViewportWidthChange != 0) && RoomViewport.ScrollableWidth > 0.5)
             ApplyPendingCamera();
         // The scroll bar and the wheel stay inside the game's camera limits too.
-        else if (_pendingCameraX is null && !_cameraPanTimer.IsEnabled && RoomViewport.ScrollableWidth > 0.5)
+        else if (_pendingCameraX is null && RoomViewport.ScrollableWidth > 0.5)
         {
             var (low, high) = RoomViewScrollRange();
             var inside = Math.Clamp(RoomViewport.HorizontalOffset, low, high);
@@ -1626,7 +1622,6 @@ public partial class MainWindow : Window
         if (NormalRoomWidthToggle.IsChecked != true)
         {
             _pendingCameraX = null;
-            StopCameraPan();
             return;
         }
         RoomViewport.UpdateLayout();
@@ -1634,42 +1629,10 @@ public partial class MainWindow : Window
         // the view can scroll (RoomViewport_ScrollChanged applies it then).
         if (_currentRoom.Width > 320 && RoomViewport.ScrollableWidth < 0.5) return;
         _pendingCameraX = null;
-        StopCameraPan();
         var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
             RoomViewport.ScrollableWidth / _roomDisplayScale);
-        var leftmost = RoomViewScrollRange().Min;
-        if (CameraPanToggle.IsChecked == true && left * _roomDisplayScale > leftmost + 0.01)
-        {
-            // Presentation only: slide from the leftmost view the game's camera allows to the camera.
-            RoomViewport.ScrollToHorizontalOffset(leftmost);
-            _cameraPanTargetSourceX = left;
-            _cameraPanTimer.Start();
-            return;
-        }
         RoomViewport.ScrollToHorizontalOffset(left * _roomDisplayScale);
     }
-
-    // The optional entry pan: ScummVM moveCamera's 8-pixel step, one per tick.
-    private readonly DispatcherTimer _cameraPanTimer = new() { Interval = TimeSpan.FromMilliseconds(75) };
-    private double _cameraPanTargetSourceX;
-
-    private void CameraPanTimer_Tick(object? sender, EventArgs e)
-    {
-        if (_currentRoom is null || NormalRoomWidthToggle.IsChecked != true)
-        {
-            StopCameraPan();
-            return;
-        }
-        var target = _cameraPanTargetSourceX * _roomDisplayScale;
-        var next = Math.Min(target, RoomViewport.HorizontalOffset + 8 * _roomDisplayScale);
-        RoomViewport.ScrollToHorizontalOffset(next);
-        // ScrollViewer applies the offset on its next layout pass; make it now.
-        RoomViewport.UpdateLayout();
-        UpdateRoomScrollButtons();
-        if (next >= target - 0.01) StopCameraPan();
-    }
-
-    private void StopCameraPan() => _cameraPanTimer.Stop();
 
     /// <summary>
     /// The view's horizontal offsets the manual pan may reach. In the interactive mode, with the session in the shown
@@ -1746,7 +1709,6 @@ public partial class MainWindow : Window
     private void BeginRoomPan(int direction, double maximumStep, Button? button = null, Key? key = null)
     {
         StopRoomPan();
-        StopCameraPan();
         var (low, high) = RoomViewScrollRange();
         if (NormalRoomWidthToggle.IsChecked != true || high - low <= 0.5 ||
             (direction < 0 && RoomViewport.HorizontalOffset <= low + 0.5) ||
@@ -3175,7 +3137,6 @@ public partial class MainWindow : Window
     private void ScrollToGameCamera(int cameraX)
     {
         if (_currentRoom is null || NormalRoomWidthToggle.IsChecked != true) return;
-        StopCameraPan();
         var left = Math.Clamp(cameraX - Math.Min(320, _currentRoom.Width) / 2.0, 0,
             RoomViewport.ScrollableWidth / _roomDisplayScale);
         RoomViewport.ScrollToHorizontalOffset(left * _roomDisplayScale);
@@ -3594,16 +3555,10 @@ public partial class MainWindow : Window
     }
 
     private bool VerbStripShown() =>
-        VerbAreaToggle.IsChecked == true && _session is not null && _game?.Id == GameId.Loom && _currentRoom is not null;
-
-    private void VerbAreaToggle_Changed(object sender, RoutedEventArgs e)
-    {
-        UpdateVerbStrip();
-        UpdateRoomViewportLayout();
-    }
+        GameClickActive && _game?.Id == GameId.Loom && _currentRoom is not null;
 
     /// <summary>
-    /// The optional verb strip: a presentation of the session's verb slots
+    /// The interactive verb strip: a presentation of the session's verb slots
     /// (<see cref="LoomVerbArea.Compose"/>), drawn under the room at its scale.
     /// It shows game state; the drawing itself is not the game's.
     /// </summary>
