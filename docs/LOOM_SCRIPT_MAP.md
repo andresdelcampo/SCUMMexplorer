@@ -226,6 +226,8 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 
 ## Follow-up findings (30 September)
 
+Reading + WPF verification (30 Sep): catalog room departure stops scene voices and the frame clock and resets pause controls. The suspended opening is cancelled by returning to the ordinary post-boot exploration session; this is an explorer policy, not decoded gameplay or an `abortCutscene` outcome. Idle arrival frames do not enable Pause or block manual starts. Sound settings are locked throughout playing/paused scenes. Core execution is unchanged. [Evidence](../.verification/scene-room-controls-20260930/validation.md).
+
 Decoded + reading (30 Sep): Room 02 masks are 0 on boxes 0-2, 1 on boxes 3-14. Mountain probe's costume-3 box-14 walk removes 1/4/7/23/24 pixels at x554/552/550/548/546 respectively, through room/object mask bits at the costume's coordinates. No source-independent X cutoff found or changed. Matching ScummVM frames are still needed to decide the reported few-pixel difference. [Evidence](../.verification/room02-mountain-mask-20260930/validation.md).
 
 Decoded + session run (30 Sep): Room 36 entry +0x0011..+0x003C gates object 599's class 24 (Untouchable) on previous-room var070 and var0AB. Local 200 clears it after a box-9 change at +0x0094 and sets it after box 10 at +0x00C3. Fresh seed-0 catalog Room 36 has mask 0x00800002; input at (465,1) finds no object, walks to (465,126) and never runs script 006's object sentence to (494,126). Existing 086 direct-verb start retained; no class override. [Evidence](../.verification/room36-exit-20260930/validation.md).
@@ -234,7 +236,7 @@ Decoded + session run (30 Sep): Room entries 16 +0x009A, 24 +0x010C, 30 +0x0091 
 
 Decoded + reading (30 Sep): [cutscene discovery](LOOM_CUTSCENE_DISCOVERY.md) indexes 235 cutscene sites across 216 owners, keeping literal callers, possible room commands, state reads and unresolved scope/targets separate from validated replay starts. Current manual catalog remains 044/046/052/086; the session can naturally execute other scenes. No additional starting state or room membership assumed.
 
-Reading (App, 30 Sep): manual cutscene entry points now refuse starts while playback or a scene is active. This prevents replacing the session, including from a previously opened menu. Skip line/whole-scene skip keep their existing source conditions. No decoded scene behavior was changed.
+Reading (App, 30 Sep): manual cutscene entry points refuse starts while meaningful playback or a scene is active, including pause; idle catalog arrival polling permits starts. This prevents replacing an active session, including from a previously opened menu. Skip line/whole-scene skip keep their existing source conditions. No decoded scene behavior was changed.
 
 Decoded + ScummVM Player_AD: supplied DOS effects 1-12 use instrument commands, two envelope descriptors per note and up to three OPL channels. Music has payload byte 2 = 0x80. All 12 effects render nonzero stereo PCM. Sound 24's indexed bytes do not contain a valid DOS bundle; later indices have a different layout. Structural bundle validation rejects these without ID exceptions. The app's shared selector controls rendition for executed events and manual previews, without speaker fallback. Separate resource chips do not model shared-channel allocation, priorities or hardware competition; the selector does not rewrite VAR_SOUNDCARD. [Evidence and source](../.verification/audio-modes-20260930/validation.md).
 

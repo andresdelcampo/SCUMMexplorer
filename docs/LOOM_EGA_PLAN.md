@@ -32,6 +32,8 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (30 September)
 
+Room departure/control state fixed: selecting a catalog room stops playing or paused cutscenes and their voices; leaving the suspended opening uses ordinary post-boot exploration state. Idle arrival polling leaves Pause disabled and allows manual cutscene starts. Sound mode and AdLib gain are locked during scenes, including pause. This is explorer cancellation policy, not a game skip. [Verification](../.verification/scene-room-controls-20260930/validation.md): 19 focused WPF checks, 249 tests, required doorways 16/16; main Release rebuilt with zero warnings/errors.
+
 Checkout/build and construction review completed: [cleanup review](CLEANUP_REVIEW.md), [verification](../.verification/cleanup-review-20260930/validation.md). No files deleted; all 16 historical worktrees are clean ancestors of master. Main Release builds without warnings/errors; committed suite 246/246.
 
 Score loss reproduced and fixed: persistent score/staff strings no longer disappear when subsequent notes exceed the old 32-string queue. Note glow and source-driven erases preserved. [Verification](../.verification/score-preservation-20260930/validation.md): 247 tests pass, focused score/verb checks pass, RoomAudit has zero gaps and unchanged room PNGs.

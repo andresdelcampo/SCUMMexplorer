@@ -543,7 +543,20 @@ public partial class MainWindow : Window
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         // Opening another view stops the playback clock, unless the playback itself entered the room.
-        if (!_playbackEnteringRoom) StopScenePlayback();
+        if (!_playbackEnteringRoom)
+        {
+            if (SessionInScene) _sceneSound.StopAll("the cutscene was left from the catalog");
+            StopScenePlayback();
+            // The opening is suspended boot code, rather than an open cutscene. A catalog
+            // departure uses the ordinary post-boot exploration state so it cannot resume later.
+            if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } &&
+                _session?.BootRunning == true && _game is not null && _indexedObjectSnapshot is not null)
+            {
+                _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+                _sceneSound.Attach(_game, _session);
+                UpdatePlaybackControls();
+            }
+        }
         if (e.NewValue is not TreeViewItem { Tag: GameResource resource })
         {
             _selectedResource = null;
@@ -2050,6 +2063,11 @@ public partial class MainWindow : Window
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || SoundModeCombo.SelectedIndex < 0) return;
+        if (SessionInScene)
+        {
+            SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
+            return;
+        }
         var surface = _audioSurface;
         var selected = _selectedSound;
         StopAudio();
@@ -2772,7 +2790,7 @@ public partial class MainWindow : Window
     /// <summary>Pauses the playback clock where it is; <see cref="ResumeScenePlayback"/> goes on from the same frame.</summary>
     private void PauseScenePlayback()
     {
-        if (_playback is null || _playbackPaused) return;
+        if (_playback is null || _playbackPaused || !PlaybackHasActivity) return;
         _playbackTimer?.Stop();
         _playbackPaused = true;
         _sceneSound.Pause();
@@ -2849,23 +2867,32 @@ public partial class MainWindow : Window
     /// </summary>
     private bool SessionInScene => _session is { } session && (session.InCutscene || session.BootRunning);
 
-    private bool CanStartCutscene => GameClickActive && _playback is null && !SessionInScene;
+    private bool PlaybackHasActivity => SessionInScene || _session is { } session &&
+        (session.EgoMoving || session.CameraMoving || !string.IsNullOrWhiteSpace(session.Messages.Talk?.Text) ||
+         session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]") != 0);
+
+    private bool CanStartCutscene => GameClickActive && !SessionInScene &&
+        (_playback is null || !PlaybackHasActivity && !_playbackPaused);
 
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
     {
         var active = GameClickActive && _game?.Id == GameId.Loom;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
+        SoundModeCombo.IsEnabled = !SessionInScene;
+        AdlibGainPanel.IsEnabled = !SessionInScene;
+        PlaybackPauseButton.IsEnabled = active && _playback is not null && (_playbackPaused || PlaybackHasActivity);
+        PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
+        SkipLineButton.IsEnabled = active && !string.IsNullOrWhiteSpace(_session?.Messages.Talk?.Text);
+        SkipCutsceneButton.IsEnabled = active && SessionInScene && _session?.CutsceneSkippable == true;
+        CutsceneMenuButton.IsEnabled = active && CanStartCutscene;
         if (!active) return;
         var choices = CutsceneChoices();
         CutsceneMenuButton.Visibility = choices.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         CutsceneMenuButton.Content = choices.Count > 1 ? "Play a cutscene ▾" : "Play a cutscene";
         CutsceneMenuButton.IsEnabled = CanStartCutscene;
         CutsceneMenuButton.ToolTip = CanStartCutscene ? "Play from a stated start." : "Playback is active. Finish or skip it before starting another scene.";
-        SkipLineButton.IsEnabled = !string.IsNullOrWhiteSpace(_session?.Messages.Talk?.Text);
         UpdateRoomScrollButtons();
-        PlaybackPauseButton.IsEnabled = _playback is not null;
-        PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
         var inCutscene = SessionInScene;
         var skippable = _session?.CutsceneSkippable == true;
         SkipCutsceneButton.IsEnabled = inCutscene && skippable;

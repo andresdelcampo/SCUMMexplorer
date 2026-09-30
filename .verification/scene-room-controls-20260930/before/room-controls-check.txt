@@ -1,0 +1,21 @@
+FAIL arrival background clock does not enable Pause
+FAIL idle arrival cannot be paused by keyboard/handler either
+FAIL idle arrival does not block starting a cutscene
+FAIL trial playing: Pause/Play usable, sound configuration locked
+FAIL disabled sound selection cannot bypass scene guard
+PASS room change ends scene and clears paused state
+FAIL new room restores idle buttons and sound configuration
+FAIL departed cutscene voices stopped
+PASS old scene does not resume during arrival frames
+FAIL trial paused: Pause/Play usable, sound configuration locked
+PASS disabled sound selection cannot bypass scene guard
+PASS room change ends scene and clears paused state
+FAIL new room restores idle buttons and sound configuration
+FAIL departed cutscene voices stopped
+PASS old scene does not resume during arrival frames
+FAIL opening locks sound configuration while paused
+FAIL leaving opening cancels boot playback and restores idle controls
+FAIL opening cannot restart or load another room after departure
+PASS sound configuration works again after departure
+Real WPF controls, source sessions and real arrival clock; synthetic selection/calls, no physical input.
+Failures: 13
