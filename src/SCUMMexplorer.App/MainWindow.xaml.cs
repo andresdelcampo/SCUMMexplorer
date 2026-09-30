@@ -115,6 +115,8 @@ public partial class MainWindow : Window
         };
         _audioPlayer.MediaOpened += AudioPlayer_MediaOpened;
         _audioPlayer.MediaOpened += (_, _) => _sceneSound.StopAll("another sound was started in the app");
+        // And the other way round: a sound the game starts stops the app's other player, so two copies never overlap.
+        _sceneSound.Starting += () => { if (_audioSurface != AudioSurface.None) StopAudio(); };
         _audioPlayer.MediaEnded += (_, _) => StopPlayback();
         _audioPlayer.MediaFailed += (_, args) =>
         {
@@ -4094,6 +4096,13 @@ public partial class MainWindow : Window
         RoomMusicPanel.Visibility = Visibility.Collapsed;
         RoomMusicMoreButton.Visibility = Visibility.Collapsed;
         if (_game is null || _currentRoomResource is not { } room) return;
+        // The interactive LOOM mode plays the music the game's scripts start (SceneSoundPlayer), so the panel's own
+        // player would only duplicate it (the user's choice, 30 Sep; .verification/room-music-analysis). Inspection mode keeps it.
+        if (_game.Id == GameId.Loom && SessionModeToggle.IsChecked == true)
+        {
+            if (_audioSurface == AudioSurface.Room) StopAudio();
+            return;
+        }
         var game = _game;
         var soundById = game.Resources.Where(item => item.Kind == ResourceKind.Sound && item.ResourceId.HasValue)
             .GroupBy(item => item.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());

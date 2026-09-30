@@ -1,0 +1,17 @@
+﻿Real MainWindow, interactive mode. Measurements for the room media player analysis; no physical input.
+Room 16 catalog visit; session sound events in Room 16: SoundStopped 25 (Reached), SoundStopped 25 (Reached)
+After the catalog visit to Room 16 (2.5 s): scene sound player log since the step:
+      (nothing)
+   MUSIC panel: "Possible: Sound 30" / "from room script data" / status "Select Play to listen." / note "Possible room music from static script paths; those paths have not been reached."; panel visible Visible
+After a click 40 px left of Bobbin (76, 51) in Room 16: scene sound player log since the step:
+      Entry { Frame = 1, Milliseconds = 17458, Action = start, SoundId = 30, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+   MUSIC panel: "No cue established" / "" / status "" / note "Possible room music from static script paths; those paths have not been reached."; panel visible Collapsed
+Room 08, the MUSIC panel's Play (3 s): scene sound player log since the step:
+      Entry { Frame = 21, Milliseconds = 26175, Action = stop all, SoundId = , Kind = , Source = another sound was started in the app }
+   MUSIC panel: "Possible: Sound 31" / "from room script data" / status "Playing" / note "Possible room music from static script paths; those paths have not been reached."; panel visible Visible
+Room panel's player after 25 s of the trial: position 00:28, source set
+The trial, 25 s: scene sound player log since the step:
+      Entry { Frame = 1, Milliseconds = 30032, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0005 stopSound var[0x0A4] }
+      Entry { Frame = 1, Milliseconds = 30032, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0012 stopSound var[0x0A3] }
+      Entry { Frame = 1, Milliseconds = 30032, Action = start, SoundId = 31, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+   MUSIC panel: "Possible: Sound 31" / "from room script data" / status "Playing" / note "Possible room music from static script paths; those paths have not been reached."; panel visible Visible

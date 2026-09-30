@@ -1,0 +1,25 @@
+﻿Real MainWindow, interactive mode. Measurements for the room media player analysis; no physical input.
+Room 16 catalog visit; session sound events in Room 16: SoundStopped 25 (Reached), SoundStopped 25 (Reached)
+After the catalog visit to Room 16 (2.5 s): scene sound player log since the step:
+      (nothing)
+   MUSIC panel: "" / "" / status "" / note ""; panel visible Collapsed
+After a click 40 px left of Bobbin (76, 51) in Room 16: scene sound player log since the step:
+      Entry { Frame = 1, Milliseconds = 17891, Action = start, SoundId = 30, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+   MUSIC panel: "" / "" / status "" / note ""; panel visible Collapsed
+PASS after the change: the MUSIC panel is hidden in the interactive mode (Room 16)
+PASS the MUSIC panel is shown in the inspection mode (Room 08)
+Room 08, inspection mode, the MUSIC panel's Play (3 s): scene sound player log since the step:
+      Entry { Frame = 21, Milliseconds = 23766, Action = stop all, SoundId = , Kind = , Source = the interactive mode was turned off }
+   MUSIC panel: "Possible: Sound 31" / "from room script data" / status "Playing" / note "Possible room music from static script paths; those paths have not been reached."; panel visible Visible
+   panel player: surface Room, source set, position 00:02
+After turning the interactive mode on: surface None, source none, panel Collapsed
+PASS turning the interactive mode on hides the panel and stops its music
+The app's other player started in the interactive mode: surface Room, source set, position 00:02
+The other player after 25 s of the trial: surface None, source none
+The trial, 25 s: scene sound player log since the step:
+      Entry { Frame = 1, Milliseconds = 41542, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0005 stopSound var[0x0A4] }
+      Entry { Frame = 1, Milliseconds = 41542, Action = stop, SoundId = 25, Kind = , Source = Script 39 +0x0012 stopSound var[0x0A3] }
+      Entry { Frame = 1, Milliseconds = 41542, Action = start, SoundId = 31, Kind = music (AdLib), Source = Script 39 +0x0038 startSound local[0x000] }
+   MUSIC panel: "Possible: Sound 31" / "from room script data" / status "Playing" / note "Possible room music from static script paths; those paths have not been reached."; panel visible Collapsed
+PASS the trial's own sound 31 plays and the other player was stopped (no double music)
+Failures: 0

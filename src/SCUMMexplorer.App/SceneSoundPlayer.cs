@@ -42,6 +42,9 @@ public sealed class SceneSoundPlayer
 
     public List<Entry> Log { get; } = [];
 
+    /// <summary>Raised when a reached <c>startSound</c> is about to play, so the app's other player can stop.</summary>
+    public event Action? Starting;
+
     /// <summary>Follows <paramref name="session"/> from its next sound event on; a new session stops the old one's sounds.</summary>
     public void Attach(GameLibrary game, LoomExplorationSession session)
     {
@@ -135,6 +138,7 @@ public sealed class SceneSoundPlayer
             _voices.Remove(voice);
             return;
         }
+        Starting?.Invoke();
         var player = new MediaPlayer();
         voice.Player = player;
         var late = TimeSpan.FromMilliseconds(_clock.ElapsedMilliseconds - voice.StartedAt);
