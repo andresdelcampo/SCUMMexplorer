@@ -95,9 +95,6 @@ public sealed class LoomMessageTable
     public const int MaxFrameDelta = 15;
     /// <summary>ScummVM <c>_screenWidth - 1</c>, the slots' default right edge.</summary>
     public const int DefaultRight = 319;
-    /// <summary>Drawn strings kept for the screen; older ones are dropped (a redraw would erase them anyway).</summary>
-    private const int MaxDrawn = 32;
-
     private readonly Slot[] _slots = Enumerable.Range(0, 4).Select(_ => new Slot()).ToArray();
     private readonly List<byte> _buffer = [];
     private readonly List<List<byte>> _shown = [];
@@ -298,8 +295,12 @@ public sealed class LoomMessageTable
             lines.Select(line => line.ToArray()).ToArray(), slot.X, slot.Y, slot.Center, slot.Height, slot.Right, slot.Color,
             request.RoomId, request.SourceLabel, request.Offset, 0,
             estimates.Count == 0 ? null : string.Join("; ", estimates.Distinct()));
+        // drawString paints into the persistent screen, not a bounded message queue.
+        // A new print cannot evict an unrelated score/staff glyph. Coalesce only
+        // identical glyph geometry that this print completely paints again; different
+        // strings may overlap only partly and must retain their uncovered pixels.
+        _drawn.RemoveAll(previous => SameDrawnGlyphs(previous, message));
         _drawn.Add(message);
-        if (_drawn.Count > MaxDrawn) _drawn.RemoveAt(0);
         _log.Add(message);
         return $"string drawn: \"{message.Text.Replace("\n", " / ", StringComparison.Ordinal)}\" at ({message.X}, {message.Y}), colour {message.Color}";
     }
@@ -319,6 +320,13 @@ public sealed class LoomMessageTable
         return $"box drawn at ({box.Left}, {box.Top})–({box.Right}, {box.Bottom}), colour {color}: " +
                (covered == 0 ? "no drawn string is under it" : $"{covered} drawn string(s) covered");
     }
+
+    private static bool SameDrawnGlyphs(LoomMessage previous, LoomMessage next) =>
+        previous.X == next.X && previous.Y == next.Y && previous.Center == next.Center &&
+        previous.LineHeight == next.LineHeight && previous.Right == next.Right &&
+        (previous.Color & 0xC0) == (next.Color & 0xC0) &&
+        previous.LineGlyphs.Count == next.LineGlyphs.Count &&
+        previous.LineGlyphs.Zip(next.LineGlyphs).All(pair => pair.First.AsSpan().SequenceEqual(pair.Second));
 
     /// <summary>
     /// A verb drawn or cleared on the verb screen (<see cref="LoomVerbTable.LastCover"/>): its

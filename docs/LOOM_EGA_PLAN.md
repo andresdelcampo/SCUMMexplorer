@@ -34,7 +34,9 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 Checkout/build and construction review completed: [cleanup review](CLEANUP_REVIEW.md), [verification](../.verification/cleanup-review-20260930/validation.md). No files deleted; all 16 historical worktrees are clean ancestors of master. Main Release builds without warnings/errors; committed suite 246/246.
 
-Earlier completion claims below do not resolve the new reports. Next: reproduce notes disappearing from the score during playback; then normal → Advanced → normal clicks; investigate unified No Sound / PC Speaker / AdLib before settling its UI; assess cutscene-start disabling and source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
+Score loss reproduced and fixed: persistent score/staff strings no longer disappear when subsequent notes exceed the old 32-string queue. Note glow and source-driven erases preserved. [Verification](../.verification/score-preservation-20260930/validation.md): 247 tests pass, focused score/verb checks pass, RoomAudit has zero gaps and unchanged room PNGs.
+
+Earlier completion claims below do not resolve the remaining new reports. Next: normal → Advanced → normal clicks; investigate unified No Sound / PC Speaker / AdLib before settling its UI; assess cutscene-start disabling and source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
 
 ## Ordered work
 

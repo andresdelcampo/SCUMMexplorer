@@ -214,6 +214,12 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 
 ## Sound during draft playback (30 September)
 
+### Score persistence (30 September)
+
+- **Decoded:** script 018 prints 24 note/staff glyphs below the distaff; script 027 marks a standard note with `print 0xFE` at y169 (note 3: +0x0068, x75). Its practice marks are separate prints at y188. Script 028 resets the draft buffer and, in practice mode, turns verb 0x35 off. Script 031's note images are 24 rows at y144 (standard), ending at y167; its glow redraw does not erase the score below it.
+- **ScummVM:** `drawString` paints into the virtual screen; unrelated later prints do not evict visible pixels. `drawVerbBitmap` paints the image's strip-rounded dimensions; `restoreVerbBG` and `drawBox` clear their rectangles.
+- **Session/WPF verification:** a 32-entry FIFO in the explorer's drawn-string table caused visible score loss during repeated drafts (137 missing staff pixels). Removed that eviction; identical repainted glyph geometry is coalesced, actual erases/redraws still apply. [Verification](../.verification/score-preservation-20260930/validation.md). Standard score preserved; practice-mode clearing remains source-driven.
+
 - **Decoded:** script 020 +0x001A/+0x0021 plays each recorded note through 031; +0x003C starts 022 after the draft, and 021 clears bit[0xD66]. The App's former 32-frame idle cap could stop before completion. The clock now follows that flag with its existing bounded scene limit.
 - **Session probe:** a four-note cast of the boot's literal draft 0 (3,1,3,2) at Room 02 object 156 dispatched verb 0x3A and script 049. Script 040 +0x0038 started sound 19 for the result; its route remained conditional/estimated. WPF opened that audio after all four reached note tracks. See [spell-audio-20260930](../.verification/spell-audio-20260930/validation.md).
 - **Executor provenance:** `LoomScriptEvent.Executed` is true only for instructions visited on the chosen route. Conditional events collected from an unresolved presentation branch keep it false. This flag does not change certainty or establish gameplay reachability. Audio follows executed estimated commands as explicitly labelled preview audio; unexecuted possible commands stay silent.

@@ -39,6 +39,26 @@ public sealed class LoomMessageTests
     }
 
     [Fact]
+    public void LaterDrawnStringsDoNotEvictTheScoreAndRepeatedGlyphsReplaceTheirColour()
+    {
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        LoomPrintRequest Glyph(int x, int color) => new(0xFE,
+            [new("position", x, 169), new("color", color)], [0x12], "Score", 0, 2, null);
+        // More than the old 32-entry cap, at distinct screen locations.
+        for (var i = 0; i < 40; i++) runtime.Messages.Print(Glyph(i * 8, 7), runtime);
+        Assert.Equal(40, runtime.Messages.Drawn.Count);
+        Assert.Contains(runtime.Messages.Drawn, message => message.X == 0 && message.Color == 7);
+        // A note recolours the same glyph; retaining the old gray paint is unnecessary.
+        runtime.Messages.Print(Glyph(0, 15), runtime);
+        Assert.Equal(40, runtime.Messages.Drawn.Count);
+        Assert.Equal(15, Assert.Single(runtime.Messages.Drawn, message => message.X == 0).Color);
+        runtime.Messages.DrawBox(0, 169, 8, 177, 0);
+        Assert.DoesNotContain(runtime.Messages.Drawn, message => message.X == 0);
+        runtime.Messages.RoomEntered(runtime);
+        Assert.Empty(runtime.Messages.Drawn);
+    }
+
+    [Fact]
     public void ADrawnBoxCoversTheNamesUnderIt()
     {
         // Script 008 +0x000E erases the close-up and name area (232,152)–(312,192) before
