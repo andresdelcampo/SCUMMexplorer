@@ -1,0 +1,49 @@
+﻿Real MainWindow; rooms picked in the tree, the menu built by BuildCutsceneMenu (as its button does), the Room 37 entry clicked by raising MenuItem.Click. No physical input.
+Room 01 (view 01):
+   entry The opening (script 044)
+PASS Room 01 lists The opening (script 044)
+Room 02 (view 02):
+   entry The opening (script 044)
+PASS Room 02 lists The opening (script 044)
+Room 53 (view 53):
+   entry The opening (script 044)
+PASS Room 53 lists The opening (script 044)
+Room 08 (view 08):
+   entry Script 046: the Elders' trial
+PASS Room 08 lists Script 046: the Elders' trial
+Room 09 (view 09):
+   entry Script 046: the Elders' trial
+PASS Room 09 lists Script 046: the Elders' trial
+Room 03 (view 03):
+   entry Script 046: the Elders' trial
+PASS Room 03 lists Script 046: the Elders' trial
+Room 10 (view 10):
+   entry Script 052: Room 10 → Room 11 → Room 13
+PASS Room 10 lists Script 052: Room 10 → Room 11 → Room 13
+Room 11 (view 11):
+   entry Script 052: Room 10 → Room 11 → Room 13
+   entry Script 046: the Elders' trial
+PASS Room 11 lists Script 052: Room 10 → Room 11 → Room 13 + Script 046: the Elders' trial
+Room 13 (view 13):
+   entry Script 052: Room 10 → Room 11 → Room 13
+PASS Room 13 lists Script 052: Room 10 → Room 11 → Room 13
+Room 36 (view 36):
+   entry Script 086: the firewood scene (Room 37)
+PASS Room 36 lists Script 086: the firewood scene (Room 37)
+Room 37 (view 37):
+   entry Script 086: the firewood scene (Room 37)
+PASS Room 37 lists Script 086: the firewood scene (Room 37)
+Room 38 (view 38):
+   entry Script 086: the firewood scene (Room 37)
+PASS Room 38 lists Script 086: the firewood scene (Room 37)
+Room 20 (view 20):
+   note  No known cutscene plays in Room 20. Known cutscenes: the opening (Rooms 01, 02, 53); script 052 (Rooms 10, 11, 13); script 046 (Rooms 03, 08, 09, 11, 54, 67); script 086 (Rooms 36, 37, 38, 58).
+PASS Room 20 lists no cutscene
+PASS Room 20 shows one disabled note instead
+Room 41 (view 41):
+   note  No known cutscene plays in Room 41. Known cutscenes: the opening (Rooms 01, 02, 53); script 052 (Rooms 10, 11, 13); script 046 (Rooms 03, 08, 09, 11, 54, 67); script 086 (Rooms 36, 37, 38, 58).
+PASS Room 41 lists no cutscene
+PASS Room 41 shows one disabled note instead
+After the Room 37 entry: status "Playing Script 086: the firewood scene (Room 37) from a stated start (see the tooltip). Escape skips once the cutscene allows it."; 3 s later view room 37, session room 37, in scene True, playback True
+PASS the entry plays the firewood scene
+Failures: 0

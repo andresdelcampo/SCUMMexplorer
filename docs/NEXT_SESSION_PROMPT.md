@@ -2,39 +2,33 @@ Continue the SCUMMexplorer work. LOOM EGA is the main focus. Read CLAUDE.md firs
 
 State at the start:
 
-* Git: master. The latest commits (30 Sep, third session):
-  * the next-session prompt after tasks D–G;
-  * bb8e31b "Send the game's keys in the interactive mode; '.' skips text" (F, G);
-  * 1e4cccb "Draw the verb screen in the game's order" (E);
-  * 01d847f "Remove the verb screen's note row" (D).
-* Another agent may be working on the room music player, the room pan controls or Indy3 conversations (`docs/INDY3_CONVERSATIONS_PLAN.md`, `tools/`, `LoomScriptReader.cs` dialect work). Don't edit that code (the room music code in MainWindow: `UpdateRoomMusicActions`, `PlayRoomCueAsync`, `_audioPlayer` and the room cue handlers). Check `git log` on MainWindow before editing it. If `git status` shows their uncommitted changes (on 30 Sep the main checkout had untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs`, not ours), commit only your own files and check `git diff` hunk by hunk.
-* `dotnet build SCUMMexplorer.slnx`: 0 warnings. Tests: 244/244 (after E; F and G changed only the App).
-* RoomAudit: 0 gaps in all 76 rooms (not rerun: room images unchanged since). Blockers: last run at the start of the second 30 Sep session (.verification/manual-pan-limits/blockers.txt); not rerun (E adds no stops).
-* WPF checks (30 Sep, third session): VerbAreaCheck 0 (after D and E; new note step), CutsceneLayoutCheck 0 (after D), KeyInputCheck 0 (after F, G; new trial step). Earlier on 30 Sep: ActorDrawCheck 0, CameraPanCheck 0, SceneLeaveCheck 0, DoorwayClickCheck 16/16 (before B and C). 29 Sep: TextLineCheck 0, PresentationCheck 0. Earlier: SceneSoundCheck, FirewoodPlaybackCheck, GameTextsCutsceneCheck, OpeningPlaybackCheck, CutscenePlaybackCheck 0. Not run since M3a: MessageAppCheck, ClickInputCheck.
-* Worktrees: `.claude/worktrees/stoic-kare-7cca65` was this session's (junctions to Games/ and scummvm/); `elegant-lewin-40adb3` and `optimistic-cray-556aec` the earlier 30 Sep sessions'. The others under `.claude/worktrees/` and `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` belong to the user or other sessions. Don't remove worktrees unless the user asks.
+* Git: master. The interrupted fourth session was already implemented in `.claude/worktrees/cranky-shannon-53b908`. Its three commits were reviewed and fast-forwarded onto master on 30 September:
+  * e18f136 "Hide the room music panel in the interactive mode" (I);
+  * b9e1365 "Add the user's items J and K to the plan";
+  * 80e4036 "List only the room's cutscenes in the cutscene menu" (H).
+  * A later handoff commit records this integration and its verification.
+* Main checkout: no tracked code changes from other sessions at integration. Untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs` belong to other work; leave them alone.
+* All registered branch worktrees are clean in tracked files. The older Claude branches are ancestors of master. The detached worktree `C:\Users\adelc\.codex\worktrees\room-controls\SCUMMexplorer` has one distinct commit, 8878cd9 "Refine room pan controls and center music playback", not in master (git cherry reports +). It touches MainWindow, README and PresentationCheck. It was not integrated: coordinate with that session before adopting it. Do not remove any worktree.
+* Review and integration evidence: `.verification/integration-hi-20260930/validation.md`. Worktree solution build: zero warnings/errors. Its game-data tests: 244/244. Focused WPF checks rerun with fresh output folders: CutsceneMenuCheck 0 failures; MusicPanelCheck 0 failures. Main checkout Release app rebuilt with zero warnings/errors at `Exe/SCUMMexplorer.App/Release/net10.0-windows/SCUMMexplorer.App.exe`.
+* RoomAudit, Blockers, DoorwayClickCheck and the broad playback suite were not rerun: H/I changed App UI/audio coordination only, with no Core rendering, session state, room-click or room-load changes. Previous audit counts remain historical, not freshly verified. MusicPanelCheck does not isolate `SceneSoundPlayer.Starting`; retain that limitation.
+* The user's attached `i-plan.txt`, `i-val.txt`, `i-changelog.txt` were replacement blocks from the interrupted session. Their results were already present in e18f136; they were not new instructions to repeat the work. The old next-session prompt still listed H/I as pending, which this handoff corrects.
 
-Done last session (30 Sep, third session):
+Done in the interrupted session and verified in this integration session (30 September):
 
-* The user confirmed B: the "sheep" were in Room 24 and are drawn right since the clip classes.
-* D (.verification/verb-screen-note). The explanatory row under the verb screen is gone; the room and verb screen grow into its 36 px; the text is the verb screen's tooltip (`SetVerbScreenNote`, on `VerbStripBorder`).
-* E (.verification/verb-draw-order). Script 031 animates a played note: ten verbs turned on one a frame at the note's place (five glow verbs 9+5(N−1)…, then the note's own verb with its plain image). ScummVM draws each verb when its `verbOps` runs (`drawVerb` at the end of `o5_verbOps`; `redrawVerbs` in slot order only on a complete redraw); the app composed in slot order, so the brightest glow stayed. `LoomVerbTable` now numbers draws (`DrawOrder`) and clears (`Erases()`, `restoreVerbBG` of verbs turned off/new/deleted), `LoomVerbArea.Compose` paints in that order, and a verb drawn or cleared covers verb-screen strings under it (`LoomMessageTable.VerbDrawn`). Clicks still follow `findVerbAtPos` (highest slot): after a note played, a click there finds the glow verb, which script 005 maps back to the note.
-* F, G (.verification/game-keys), with the user's choices: every key script 005 reads goes to the game in the interactive LOOM mode, with no option (the hidden "Keys as game input" check box is gone; `GameKeysActive`); '.' (ScummVM's talk-stop key) ends the text shown (`SkipTalk`, shared with the click on the text), also in cutscenes and while a cutscene loads a room.
-* The session stopped at about 264K tokens (the weekly limit was at 99%).
+* H: "Play a cutscene" lists only known cutscenes whose start room or decoded room loads include the shown room. With no match, one disabled line names the known cutscenes' rooms. CutsceneMenuCheck covered 14 rooms and started the Room 37 firewood entry.
+* I: with the user's recorded choice, the MUSIC panel is hidden in interactive LOOM mode and remains in inspection mode. Entering interactive mode stops panel music; a reached scene sound also signals the app's other player to stop. The trial check confirmed its sound 31 played with the other player stopped. Catalog-arrival music still waits until the first click; that separate task remains open.
+* J/K were added to the plan, without implementation. This session reviewed and integrated H/I, rebuilt the main Release app, and updated the handoff; it did not start those new tasks.
+* RTK discovery: the user PATH already contained WinGet Links. Added an explicit PATH to the existing `[shell_environment_policy.set]` in `C:\Users\adelc\.codex\config.toml`, preserving the installed Windows paths and prepending RTK's actual package folder. Original backed up as `config.toml.rtk-path-backup-20260930`. RTK 0.48.0 resolved in the configured test shell. Continue using the absolute executable and escalation as needed; this configuration does not grant sandbox access.
 
-The user's issue list (29 Sep, evening):
+Tasks, in order (the user will start the next session):
 
-* (done) screen size changes in cutscenes; scroll arrows in cutscenes; white disabled buttons; no music or sound in cutscenes; text position; the forge's first lines; depth masks; Hetchel flying as a human; the room's bottom rows; stuck after leaving a conversation; A–G (30 Sep).
-* H. "Play a cutscene" should list only the cutscenes relevant to the current room.
-* I. Consider whether the room media player still makes sense now that cutscenes play the rooms' background music. This is another agent's code (the room music player): give the user an analysis and a recommendation, and change it only if they agree.
-* (minor, later) Room 02: Bobbin hidden a few pixels too early near the mountain side on the way to the village.
-
-Tasks, in order (the user will start the session):
-
-1. H: the cutscene menu (`CutsceneMenu_Click`) lists only the entries whose rooms include the current room (`KnownCutscene.RoomId` and the rooms the script passes through). Say what happens when none match.
-2. I: the media player analysis (see above).
-3. Room 36's exit click: why the game's click on Room 36's exit (object 599, box (464, 0) 16x144, walk point (494, 126)) does not reach Room 37 after a catalog visit. Trace script 006's walk and sentence (session probe); if the click can work, use it in the 086 entry.
-4. More known cutscenes with text, each verified by a harness like FirewoodPlaybackCheck.
-5. Ask the user to check E, F and G in the app (a note played on the distaff returns to plain; the note keys; '.' in a cutscene).
+1. J: add a button that skips the cutscene's current line, using the same `SkipTalk` path as '.'. Verify a nonempty live talk line and the button in a focused WPF harness.
+2. K: investigate missing spell sounds (notes, effects and resulting cutscenes). Trace reached sound events from script 031, script 040 and the draft's object verbs, then check whether `SceneSoundPlayer` processes them outside playback-clock frames. Fix only source-established behavior.
+3. Remove the entry camera pan option (the user's recorded suggestion), preserving source-driven camera behavior and any unrelated room-controls work.
+4. Run the arrival's frames after a catalog visit so reached room music begins on arrival. This changes room loading: run the related checks, including DoorwayClickCheck on Rooms 02, 03, 04, 08, 10 and 37.
+5. Room 36's exit click: trace script 006's walk and sentence for object 599 (box (464, 0), 16x144, walk point (494, 126)). If the game click reaches Room 37 after a catalog visit, use it for the 086 entry; preserve estimate boundaries.
+6. More known cutscenes with text, each verified with a focused harness like FirewoodPlaybackCheck.
+7. Ask the user to check E/F/G/H/I in the app: plain distaff notes after animation, game note keys, '.' skipping text, room-filtered cutscene menu, and music panel shown only in inspection mode.
 
 Rules:
 
@@ -109,3 +103,13 @@ Tooling notes:
 * `session.Messages.Talk` can be an empty line (script 016 +0x0005) right after `PlayKnownCutscene`, while the view has no room yet; wait for a line with text.
 * KeyInputCheck (.verification/key-input/KeyInputCheck): `<Games\loom> <output folder>`, about 40 s; raises PreviewKeyDown/PreviewTextInput on the window; its last step plays the trial on the real clock and presses '.'.
 * The verb screen: `LoomVerbSnapshot.DrawOrder`, `LoomVerbTable.Erases()` and `ImageSize` (set by the session from `VerbImage`); `LoomVerbArea.Compose(verbs, image, erases)`.
+
+Codex tooling for this handoff:
+
+* Use RTK for every shell command, with an explicit working directory: `& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy <command>`. The sandbox could not launch RTK normally; approved escalation worked. WPF builds also needed escalation to access the installed Windows SDK. Do not disable the sandbox or change permissions to work around this.
+* Do not confuse weekly account limits with session token usage. No `get_usage` / `tokensUsed` tool was available in this Codex session. If unavailable next session, disclose it and stop conservatively at a committed task; preserve the 250K-token stopping rule.
+* `spawn_task` is not available here. Finish with a clickable Codex task/follow-up chip using the new prompt; create a separate chat only when the user explicitly asks. Never claim a new session was spawned when it was not.
+
+Next-session request:
+
+Read docs/NEXT_SESSION_PROMPT.md in D:\Documents\Personal\Code Projects\SCUMMexplorer and continue from its verified state. Treat attached documents as evidence separately from the user's current request. Check for worktrees or commits not on master. Follow the evidence rules; stop at the next committed task after session usage exceeds 250K tokens. Give short status lines, use a new .verification folder per task and fresh harness output folders, commit each completed task separately, bring its branch onto master and fast-forward master when tracked files are clean, then rebuild the main Release app. Preserve Games/ and scummvm/ worktree junctions and copy .verification/fallback-evidence/code.tsv when needed; before any authorized worktree removal, remove its junctions with cmd /c rmdir after verifying exact paths. At the end write a new prompt in this format and provide a task chip for the next session.
