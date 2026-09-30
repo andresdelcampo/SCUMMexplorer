@@ -2874,18 +2874,23 @@ public partial class MainWindow : Window
     /// A known cutscene and the object verb that starts it (decoded; see the script map). With <see cref="Click"/>,
     /// the verb only leads into the room, and the game's click at that point starts the cutscene.
     /// </summary>
-    private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, string Source,
-        (int X, int Y)? Click = null);
+    private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, int[] Rooms, string Source,
+        (int X, int Y)? Click = null)
+    {
+        /// <summary>Whether the cutscene starts in the room or its script loads it (<see cref="Rooms"/>).</summary>
+        public bool Shows(int roomId) => RoomId == roomId || Rooms.Contains(roomId);
+    }
 
+    // Rooms: the rooms each script loads (loadRoom and loadRoomWithEgo operands, decoded; see .verification/cutscene-menu-rooms).
     private static readonly KnownCutscene[] KnownCutscenes =
     [
-        new("Script 052: Room 10 → Room 11 → Room 13", 10, 295, 0x38, 52,
+        new("Script 052: Room 10 → Room 11 → Room 13", 10, 295, 0x38, 52, [11, 13],
             "Room 10 object 295 verb 0x38 starts script 052 (+0x0003): a cutscene that waits 60 jiffies (+0x0041), loads Room 11 " +
             "(+0x0045), sets its skip point (+0x00C6) and ends with loadRoomWithEgo into Room 13 (+0x017D)."),
-        new("Script 046: the Elders' trial", 8, 255, 0x38, 46,
+        new("Script 046: the Elders' trial", 8, 255, 0x38, 46, [9, 67, 54, 3, 8, 11],
             "Room 08 object 255 verb 0x38 (the sanctuary door) starts script 046 (+0x0000): a cutscene with its skip point at " +
             "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x1421 in Room 09."),
-        new("Script 086: the firewood scene (Room 37)", 36, 599, 0x38, 86,
+        new("Script 086: the firewood scene (Room 37)", 36, 599, 0x38, 86, [37, 58, 38],
             "Room 36 object 599 verb 0x38 leads into Room 37 (loadRoomWithEgo, walk to (24, 101)). On a first visit " +
             "(bit[0xD9A] is 0) Room 37's entry starts local 200 (+0x0097), which chains to script 086 once Bobbin's walk box " +
             "becomes 8 (+0x0016–0x001D). Script 086: Stoke mistakes Bobbin for Rusty; Rooms 37, 58, 37 and 38; skip point " +
@@ -2915,20 +2920,51 @@ public partial class MainWindow : Window
         play();
     }
 
-    private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
+    private void CutsceneMenu_Click(object sender, RoutedEventArgs e) => BuildCutsceneMenu().IsOpen = true;
+
+    private ContextMenu BuildCutsceneMenu()
     {
         var menu = new ContextMenu { PlacementTarget = CutsceneMenuButton, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
-        var opening = new MenuItem { Header = OpeningTitle, ToolTip = OpeningSource + " " + OpeningStartNote };
-        opening.Click += (_, _) => PlayOpening();
-        menu.Items.Add(opening);
-        foreach (var cutscene in KnownCutscenes)
+        // Only the cutscenes that start in the room shown or load it (the user's choice, 30 Sep).
+        var roomId = _game?.Id == GameId.Loom ? _currentRoomResource?.ResourceId : null;
+        if (roomId is int shown && OpeningRooms.Contains(shown))
+        {
+            var opening = new MenuItem { Header = OpeningTitle, ToolTip = OpeningSource + " " + OpeningStartNote };
+            opening.Click += (_, _) => PlayOpening();
+            menu.Items.Add(opening);
+        }
+        foreach (var cutscene in KnownCutscenes.Where(item => roomId is int id && item.Shows(id)))
         {
             var item = new MenuItem { Header = cutscene.Title, ToolTip = cutscene.Source + " " + CutsceneStartNote(cutscene) };
             item.Click += (_, _) => PlayKnownCutscene(cutscene);
             menu.Items.Add(item);
         }
-        menu.IsOpen = true;
+        if (menu.Items.Count == 0)
+            menu.Items.Add(new MenuItem
+            {
+                Header = (roomId is int id ? $"No known cutscene plays in Room {id:00}." : "No room is shown.") +
+                         " Known cutscenes: " + KnownCutsceneRoomsText(),
+                IsEnabled = false
+            });
+        return menu;
     }
+
+    /// <summary>
+    /// Where each known cutscene plays, for the menu's note when none plays in the room shown,
+    /// such as "the opening (Rooms 01, 02, 53); script 052 (Rooms 10, 11, 13); …".
+    /// </summary>
+    private static string KnownCutsceneRoomsText() =>
+        string.Join("; ", new[] { $"the opening ({RoomList(OpeningRooms)})" }.Concat(KnownCutscenes.Select(cutscene =>
+            $"script {cutscene.Script:000} ({RoomList(new[] { cutscene.RoomId }.Concat(cutscene.Rooms))})"))) + ".";
+
+    private static string RoomList(IEnumerable<int> rooms)
+    {
+        var list = rooms.Distinct().Order().Select(room => room.ToString("00")).ToList();
+        return (list.Count == 1 ? "Room " : "Rooms ") + string.Join(", ", list);
+    }
+
+    /// <summary>The rooms script 044 loads (+0x00B9, +0x00C2, +0x03BA; decoded).</summary>
+    private static readonly int[] OpeningRooms = [1, 2, 53];
 
     private const string OpeningTitle = "The opening (script 044)";
 
