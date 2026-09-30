@@ -226,6 +226,8 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 
 ## Not modelled yet (ordered by the plan's milestones)
 
+**Explorer presentation (30 Sep, reading/verified WPF):** normal browsing restores Interactive when leaving Advanced inspection; it rebuilds the room from the same session snapshot, without running another assumed catalog arrival. This is a UI mode policy, not a game script input. [Verification](../.verification/mode-roundtrip-20260930/validation.md).
+
 1. **M1, messages:** modelled on 28 Sep, except `overhead` text (0 sites), text codes 5–7 and 9–14 (labelled when met), talk animations (`talkAnimation`, code 9) and `putActor`/`putActorInRoom` stopping the talk of an actor that leaves the room.
 2. **M2, actors:** (priority masks done 29 Sep: box masks per room are 0 or 1, close-ups 0; LOOM never uses the z-clip `actorOps`, decoded; clip classes 20 and 21 done 30 Sep); `_extraBoxFlags` in `remapDirection`; `animationSpeed`; walk scripts (`_walkScript`).
 3. **M3, timing:** `delay`, `delayVariable` and the engine timers are modelled since 29 Sep (M3b); walks, turns and camera moves since M3a. Not modelled: `VAR_MUSIC_TIMER` (`var[0x00E]`, read by script 044 +0x00B2 on code the session's route jumps over).

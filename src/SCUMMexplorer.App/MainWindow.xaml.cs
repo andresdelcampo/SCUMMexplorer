@@ -489,8 +489,18 @@ public partial class MainWindow : Window
 
     private bool IsAdvancedMode => AdvancedModeToggle.IsChecked == true;
 
+    private bool _restoringInteractiveView;
+
     private void AdvancedModeToggle_Click(object sender, RoutedEventArgs e)
     {
+        // Normal browsing has no inspection-mode control: restore game input when
+        // returning from Advanced, where the user can inspect stored artwork.
+        if (!IsAdvancedMode && SessionModeToggle.IsChecked != true)
+        {
+            _restoringInteractiveView = true;
+            try { SessionModeToggle.IsChecked = true; }
+            finally { _restoringInteractiveView = false; }
+        }
         if (!IsAdvancedMode && _selectedResource is { Kind: not ResourceKind.Room })
         {
             var returnRoom = _lastViewedRoomResource ?? _game?.Rooms.FirstOrDefault();
@@ -957,7 +967,8 @@ public partial class MainWindow : Window
         StopScenePlayback();
         if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
         if (_currentRoomResource is not { } room || _currentRoom is null) return;
-        ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: SessionModeToggle.IsChecked == true);
+        ApplyRoomState(room, _currentRoomObjectRecords, _objects,
+            visit: SessionModeToggle.IsChecked == true && !_restoringInteractiveView);
         UpdateRoomNavigationActions(room);
         RefreshRoomPreview();
         // The interactive mode keeps the verb screen under the room (VerbScreenShown).

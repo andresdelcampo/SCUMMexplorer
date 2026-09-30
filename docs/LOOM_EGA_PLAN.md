@@ -36,7 +36,9 @@ Checkout/build and construction review completed: [cleanup review](CLEANUP_REVIE
 
 Score loss reproduced and fixed: persistent score/staff strings no longer disappear when subsequent notes exceed the old 32-string queue. Note glow and source-driven erases preserved. [Verification](../.verification/score-preservation-20260930/validation.md): 247 tests pass, focused score/verb checks pass, RoomAudit has zero gaps and unchanged room PNGs.
 
-Earlier completion claims below do not resolve the remaining new reports. Next: normal → Advanced → normal clicks; investigate unified No Sound / PC Speaker / AdLib before settling its UI; assess cutscene-start disabling and source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
+Advanced inspection round trip fixed: normal browsing restores interactive room/note clicks from the same session, without a catalog revisit. [Verification](../.verification/mode-roundtrip-20260930/validation.md): ModeCheck 9/9; six required doorway rooms 16/16.
+
+Next: native AdLib effects followed by a unified No Sound / PC Speaker / AdLib selector (user approved this order); assess cutscene-start disabling and source-derived catalog discovery. Arrival music and Room 36's exit remain pending. CameraPanCheck is removed; historical mentions below are dated evidence only.
 
 ## Ordered work
 

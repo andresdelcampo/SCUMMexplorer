@@ -1,0 +1,10 @@
+PASS Advanced round trip: interactive state enabled
+FAIL Advanced round trip: room hit test reaches RoomPreview (ScrollViewer)
+PASS Advanced round trip: room/object click reaches input script
+PASS Advanced round trip: visible note click is sent
+FAIL Inspection in Advanced then normal: interactive state enabled
+PASS Inspection in Advanced then normal: room hit test reaches RoomPreview (Image)
+FAIL Inspection in Advanced then normal: room/object click reaches input script
+FAIL Inspection in Advanced then normal: visible note click is sent
+Real WPF layout/hit testing and synthetic routed toggle/input handlers; no physical input. No room reload by the harness during the round trips.
+Failures: 4
