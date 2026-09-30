@@ -224,7 +224,7 @@ Last updated 28 September 2026 (M1a: messages, talk delay and `waitFor message` 
 - **Session probe:** a four-note cast of the boot's literal draft 0 (3,1,3,2) at Room 02 object 156 dispatched verb 0x3A and script 049. Script 040 +0x0038 started sound 19 for the result; its route remained conditional/estimated. WPF opened that audio after all four reached note tracks. See [spell-audio-20260930](../.verification/spell-audio-20260930/validation.md).
 - **Executor provenance:** `LoomScriptEvent.Executed` is true only for instructions visited on the chosen route. Conditional events collected from an unresolved presentation branch keep it false. This flag does not change certainty or establish gameplay reachability. Audio follows executed estimated commands as explicitly labelled preview audio; unexecuted possible commands stay silent.
 
-## Native AdLib effects (30 September)
+## Follow-up findings (30 September)
 
 Decoded + reading (30 Sep): Room 02 masks are 0 on boxes 0-2, 1 on boxes 3-14. Mountain probe's costume-3 box-14 walk removes 1/4/7/23/24 pixels at x554/552/550/548/546 respectively, through room/object mask bits at the costume's coordinates. No source-independent X cutoff found or changed. Matching ScummVM frames are still needed to decide the reported few-pixel difference. [Evidence](../.verification/room02-mountain-mask-20260930/validation.md).
 

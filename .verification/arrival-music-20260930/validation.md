@@ -9,3 +9,5 @@ ArrivalCheck final/arrival-check.txt: 8 PASS, zero failures. Actual WPF MediaOpe
 DoorwayClickCheck required rooms 02,03,04,08,10,37: 16/16, zero failures (11 game clicks, five labelled direct-verb fallbacks). RoomAudit 76 rooms, zero remaining gaps (three before filling, zero after); all 76 room PNG pixel hashes unchanged, so no refresh. Audit verifies static first-visit state, while ArrivalCheck verifies App arrival frames. Blockers skipped because executor and state rules unchanged.
 
 Core suite 249 passes from the prior task; no Core changes since that run. Main Release build zero warnings/errors. Cwd D:\Documents\Personal\Code Projects\SCUMMexplorer, command dotnet build src/SCUMMexplorer.App/SCUMMexplorer.App.csproj -c Release, executable Exe/SCUMMexplorer.App/Release/net10.0-windows/SCUMMexplorer.App.exe.
+
+Final integration: BusyCheck rerun after adding arrival playback, waiting for those real arrival frames before expecting an idle scene start: busy-final/busy-check.txt 11/11. Final full committed suite with supplied LOOM audio and Indy data configured: 249/249. No broader checks needed.

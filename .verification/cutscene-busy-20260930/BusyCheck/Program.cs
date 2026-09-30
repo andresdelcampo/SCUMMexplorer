@@ -26,6 +26,8 @@ internal static class Program
                 var item = Find<TreeView>("ResourceTree").Items.OfType<TreeViewItem>().SelectMany(g => g.Items.OfType<TreeViewItem>()).Single(i => i.Tag?.GetType().GetProperty("Kind")?.GetValue(i.Tag)?.ToString() == "Room" && (int?)i.Tag?.GetType().GetProperty("ResourceId")?.GetValue(i.Tag) == id);
                 Call("SelectResourceInTree", item.Tag);
                 for (int n = 0; n < 100 && (int?)Field("_currentRoomResource")?.GetType().GetProperty("ResourceId")?.GetValue(Field("_currentRoomResource")) != id; n++) await Task.Delay(100);
+                // Catalog visits now play their arrival frames. Wait for that playback before testing an idle start.
+                for (int n = 0; n < 150 && Field("_playback") is not null; n++) await Task.Delay(100);
                 Call("UpdatePlaybackControls");
             }
             async Task Drain()
