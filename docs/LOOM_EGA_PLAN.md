@@ -46,7 +46,9 @@ Catalog discovery investigated: [design and trigger evidence](LOOM_CUTSCENE_DISC
 
 Arrival music fixed: visible catalog loads start their pending scripts on the ordinary bounded clock. Rooms 16,24,30,36 open cues 30,28,28,27 without a click. [Verification](../.verification/arrival-music-20260930/validation.md): ArrivalCheck 8/8, required doorways 16/16, RoomAudit zero gaps and all 76 PNG hashes unchanged.
 
-Room 36's exit investigated: fresh catalog state marks object 599 Untouchable; click selects no object, walks to (465,126), and stays in Room 36. [Trace and source gate](../.verification/room36-exit-20260930/validation.md). Condition for replacing 086's labelled direct-verb start not met; no state invented. Minor Room 02 mountain mask remains for source comparison. CameraPanCheck is removed; historical mentions below are dated evidence only.
+Room 36's exit investigated: fresh catalog state marks object 599 Untouchable; click selects no object, walks to (465,126), and stays in Room 36. [Trace and source gate](../.verification/room36-exit-20260930/validation.md). Condition for replacing 086's labelled direct-verb start not met; no state invented.
+
+Minor Room 02 mountain mask investigated: [source mask/frame trace](../.verification/room02-mountain-mask-20260930/validation.md), no speculative adjustment. Next: matching ScummVM pose/coordinate comparison if this minor issue is pursued; promote discovered cutscenes only after validating their state/entry recipes. CameraPanCheck is removed; historical mentions below are dated evidence only.
 
 ## Ordered work
 
