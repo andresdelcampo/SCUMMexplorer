@@ -508,7 +508,6 @@ public partial class MainWindow : Window
         RoomCardScroll.Visibility = _game is null || advanced ? Visibility.Collapsed : Visibility.Visible;
         CameraPanToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GamePointerToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
-        GameKeysToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         VerbAreaToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
@@ -1808,8 +1807,10 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    // "Keys as game input": only in interactive mode, and never while typing in a text box.
-    private bool GameKeysActive => GameKeysToggle.IsChecked == true && SessionModeToggle.IsChecked == true &&
+    // Keys go to the game in the interactive LOOM mode (the user's choice, 30 Sep: all the game's keys, as in
+    // ScummVM), never while typing in a text box. Script 005 reads the note rows q-i and c-C, < and > (text speed),
+    // F5 (save screen), F6 (music and effects), F7 (animation), Ctrl+V (version) and Escape.
+    private bool GameKeysActive => SessionModeToggle.IsChecked == true &&
                                    _session is not null && _currentRoomResource is not null && _game?.Id == GameId.Loom &&
                                    Keyboard.FocusedElement is not (TextBox or ComboBox);
 
@@ -1829,7 +1830,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        // Playback controls in the explore mode, with or without "Keys as game input": Escape skips a cutscene
+        // Playback controls in the explore mode: Escape skips a cutscene
         // (abortCutscene, as the game's key does) and space pauses or plays the scene (the game's pause key).
         if (GameClickActive && Keyboard.FocusedElement is not (TextBox or ComboBox) && Keyboard.Modifiers == ModifierKeys.None)
         {
@@ -1856,6 +1857,16 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
+        // '.' is the engine's talk-stop key (processKeyboard; v3 has no VAR_TALKSTOP_KEY, so it is always on):
+        // it ends the current text's delay and never reaches the scripts. It works whenever the interactive
+        // session runs, also while a cutscene changes rooms.
+        if (e.Text == "." && GameClickActive && _game?.Id == GameId.Loom && Keyboard.FocusedElement is not (TextBox or ComboBox))
+        {
+            e.Handled = true;
+            if (!SkipTalk("the game's talk-stop key '.'"))
+                StatusText.Text = "'.' (the game's talk-stop key): no text is shown.";
+            return;
+        }
         // Printable characters go as their ASCII code, as ScummVM passes lastKeyHit.ascii.
         if (!GameKeysActive || e.Text is not { Length: 1 } text || text[0] is < ' ' or > '~') return;
         e.Handled = true;
@@ -1863,7 +1874,7 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// "Keys as game input": sends the key to the session as the game's own input
+    /// Keys as game input: sends the key to the session as the game's own input
     /// path would receive it (<see cref="LoomExplorationSession.PressKey"/>).
     /// </summary>
     private void SendKeyToGame(int key) =>
@@ -3401,8 +3412,18 @@ public partial class MainWindow : Window
     {
         if (!GameClickActive || _talkTextRect is not { } rect || _session!.Messages.Talk is null ||
             x < rect.Left - 2 || x >= rect.Right + 2 || y < rect.Top - 2 || y >= rect.Bottom + 2) return false;
+        return SkipTalk("a click on the text: the game's talk-stop key '.'");
+    }
+
+    /// <summary>
+    /// ScummVM's talk-stop key ('.'): the talk delay goes to 0, so the next frame ends the message or shows
+    /// its next part. Returns false when no talk text is shown.
+    /// </summary>
+    private bool SkipTalk(string how)
+    {
+        if (!GameClickActive || _session!.Messages.Talk is null) return false;
         _session.Messages.SkipTalkDelay();
-        StatusText.Text = "Text skipped (the game's talk-stop key '.', assumed input)";
+        StatusText.Text = $"Text skipped ({how}, assumed input)";
         StatusText.ToolTip = "ScummVM's '.' key sets the talk delay to 0, so the next frame ends the message or shows its next part.";
         if (!PlaybackRunning && _currentRoomResource is { } room)
             StartPlayback("Text skip", null, room, doorways: null, leftRoom: false);

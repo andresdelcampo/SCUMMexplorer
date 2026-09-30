@@ -6,9 +6,11 @@ using System.Windows.Input;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Formats;
 
-// "Keys as game input": in the real MainWindow, raises the window's own
+// Keys as game input: in the real MainWindow, raises the window's own
 // PreviewKeyDown and PreviewTextInput events (synthetic events, no physical
-// keyboard) and checks that keys reach script 005 only while the option is on,
+// keyboard) and checks that keys reach script 005 in the interactive mode (since
+// 30 Sep always, with no option; not in the inspection mode), that '.' skips the
+// text shown (the engine's talk-stop key),
 // that the engine's own keys are refused with a label, that note letters are
 // recorded after the distaff is on and an object is aimed at, that Escape
 // cancels the draft being played, and that F5 opens Room 70 (the save screen).
@@ -37,7 +39,7 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 var tree = (TreeView)window.FindName("ResourceTree");
-                var keys = (CheckBox)window.FindName("GameKeysToggle");
+                var interactive = (System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle");
                 var status = (TextBlock)window.FindName("StatusText");
                 var viewport = (ScrollViewer)window.FindName("RoomViewport");
                 LoomExplorationSession Session() => (LoomExplorationSession)Field("_session")!;
@@ -70,23 +72,44 @@ internal static class Program
 
                 await Open(2);
                 viewport.Focus();
-                Check(keys.IsChecked == false, "keys as game input is off by default");
+                Check(window.FindName("GameKeysToggle") is null && interactive.IsChecked == true,
+                    "there is no \"Keys as game input\" option; the interactive mode is on after opening the game");
+                interactive.IsChecked = false;
+                await Settle();
+                viewport.Focus();
                 var before = Session().SessionTrace.Count;
-                Check(!Text(">") && !Press(Key.F6) && Session().SessionTrace.Count == before, "off: '>' and F6 are not sent (not handled)");
+                Check(!Text(">") && !Press(Key.F6) && Session().SessionTrace.Count == before, "inspection mode: '>' and F6 are not sent (not handled)");
 
-                keys.IsChecked = true;
+                interactive.IsChecked = true;
+                await Settle();
                 viewport.Focus();
                 before = Session().SessionTrace.Count;
                 Check(Text(">") && TracedSince(before, "key: '>' runs script 5 with [4, 0x3E, 1]") && Var("var[0x0A5]") == 1 && Var("var[0x025]") == 8 &&
                       status.Text.Contains("Key '>' sent to the game (assumed input)", StringComparison.Ordinal),
                     $"on: '>' goes to script 005, which sets var[0x0A5] = {Var("var[0x0A5]")} and VAR_CHARINC var[0x025] = {Var("var[0x025]")}: \"{status.Text}\"");
+                // Script 005 +0x0211 prints the text speed as a system line (print 0xFF): '.' ends its delay.
+                // This step runs on the real playback clock, so the text is still shown when '.' is pressed.
+                typeof(MainWindow).GetField("_playInstantly", Private)!.SetValue(window, false);
+                Check(Text("<") && Session().Messages.Talk is not null, $"'<' prints the text speed as talk: \"{Session().Messages.Talk?.Text}\"");
+                var talk = Session().Messages.Talk;
+                var delay = Session().Messages.TalkDelay;
+                before = Session().SessionTrace.Count;
+                Check(talk is not null && delay > 0 && Text(".") && Session().Messages.TalkDelay == 0 && !TracedSince(before, "runs script 5") &&
+                      status.Text.Contains("Text skipped (the game's talk-stop key '.'", StringComparison.Ordinal),
+                    $"'.' (the engine's talk-stop key) ends the delay of \"{talk?.Text}\" ({delay} → {Session().Messages.TalkDelay} jiffies) and is not sent to script 005: \"{status.Text}\"");
+                for (int n = 0; n < 50 && Session().Messages.Talk is not null; n++) await Task.Delay(100);
+                Check(Session().Messages.Talk is null, "after '.', the next frames end the text");
+                for (int n = 0; n < 100 && (bool)typeof(MainWindow).GetProperty("PlaybackRunning", Private)!.GetValue(window)!; n++) await Task.Delay(100);
+                typeof(MainWindow).GetField("_playInstantly", Private)!.SetValue(window, true);
+                Check(Text(".") && status.Text.Contains("no text is shown", StringComparison.Ordinal),
+                    $"'.' with no text shown does nothing and says so: \"{status.Text}\"");
                 Check(Press(Key.F6) && Var("var[0x0A2]") == 1, $"on: F6 (0x140) cycles var[0x0A2] to {Var("var[0x0A2]")} (music off)");
                 before = Session().SessionTrace.Count;
                 Check(Press(Key.F8) && status.Text.Contains("Key F8 not sent to the game", StringComparison.Ordinal) &&
                       (status.ToolTip as string ?? "").Contains("restart key", StringComparison.Ordinal) && !TracedSince(before, "runs script 5"),
                     $"on: F8 (restart) is the engine's and is not sent; the status says why: \"{status.Text}\"");
-                Check(Press(Key.Space) && status.Text.Contains("Key space not sent to the game", StringComparison.Ordinal) && keys.IsChecked == true,
-                    $"on: space (pause) is not sent, and is taken before a focused check box sees it: \"{status.Text}\"");
+                Check(Press(Key.Space) && status.Text.Contains("Key space not sent to the game", StringComparison.Ordinal),
+                    $"on: space (pause) is not sent: \"{status.Text}\"");
 
                 var textBox = (TextBox)window.FindName("RoomEntryTraceOutput");
                 if (textBox.Focus())
@@ -116,7 +139,30 @@ internal static class Program
                 Check(CurrentRoom() == 70 && Session().Snapshot.RoomId == 70 && TracedSince(before, "key: F5 runs script 5 with [4, 0x13F, 1]") &&
                       TracedSince(before, "cutscene at Script 04 +0x0000"),
                     $"F5 (0x13F) runs script 004, which loads Room 70 (the save screen); the app shows it: \"{status.Text}\"");
-                keys.IsChecked = false;
+
+                // Task G (30 Sep): '.' during a cutscene. The trial (script 046) from its known-cutscene entry, on the real clock.
+                typeof(MainWindow).GetField("_playInstantly", Private)!.SetValue(window, false);
+                var known = (Array)typeof(MainWindow).GetField("KnownCutscenes", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+                var trial = known.Cast<object>().Single(item => (int)item.GetType().GetProperty("Script")!.GetValue(item)! == 46);
+                Call("PlayKnownCutscene", trial);
+                for (int n = 0; n < 300 && string.IsNullOrWhiteSpace(Session().Messages.Talk?.Text); n++) await Task.Delay(100);
+                viewport.Focus();
+                var line = Session().Messages.Talk;
+                var lineDelay = Session().Messages.TalkDelay;
+                var inCutscene = Session().InCutscene;
+                report.Add($"   before '.': keys active {typeof(MainWindow).GetProperty("GameKeysActive", Private)!.GetValue(window)}, focus {Keyboard.FocusedElement?.GetType().Name}, playback {typeof(MainWindow).GetProperty("PlaybackRunning", Private)!.GetValue(window)}");
+                var skipped = Text(".");
+                var afterDelay = Session().Messages.TalkDelay;
+                var nextSeen = false;
+                for (int n = 0; n < 30 && !nextSeen; n++)
+                {
+                    await Task.Delay(100);
+                    nextSeen = !ReferenceEquals(Session().Messages.Talk, line);
+                }
+                Check(line is not null && inCutscene && skipped && lineDelay > 0 && afterDelay == 0 && nextSeen && Session().InCutscene,
+                    $"in the trial's cutscene, '.' ends the delay of \"{line?.Text}\" ({lineDelay} → {afterDelay} jiffies) and within 3 s the text moves on " +
+                    $"(now \"{Session().Messages.Talk?.Text}\"); the cutscene goes on: \"{status.Text}\" (handled {skipped}, keys active {typeof(MainWindow).GetProperty("GameKeysActive", Private)!.GetValue(window)}, focus {Keyboard.FocusedElement?.GetType().Name}, room {CurrentRoom()}, talk from {line?.Source})");
+                Call("StopScenePlayback");
                 report.Add($"Failures: {failures}");
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }

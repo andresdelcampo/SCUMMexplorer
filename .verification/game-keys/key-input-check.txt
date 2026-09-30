@@ -1,0 +1,19 @@
+﻿Real MainWindow; keys raised as synthetic PreviewKeyDown/PreviewTextInput events on the window. No physical input.
+PASS there is no "Keys as game input" option; the interactive mode is on after opening the game
+PASS inspection mode: '>' and F6 are not sent (not handled)
+PASS on: '>' goes to script 005, which sets var[0x0A5] = 1 and VAR_CHARINC var[0x025] = 8: "Key '>' sent to the game (assumed input); no room load was reached"
+PASS '<' prints the text speed as talk: "(Velocidad texto 0.)"
+PASS '.' (the engine's talk-stop key) ends the delay of "(Velocidad texto 0.)" (240 → 0 jiffies) and is not sent to script 005: "Text skipped (the game's talk-stop key '.', assumed input)"
+PASS after '.', the next frames end the text
+PASS '.' with no text shown does nothing and says so: "'.' (the game's talk-stop key): no text is shown."
+PASS on: F6 (0x140) cycles var[0x0A2] to 1 (music off)
+PASS on: F8 (restart) is the engine's and is not sent; the status says why: "Key F8 not sent to the game"
+PASS on: space (pause) is not sent: "Key space not sent to the game"
+INFO the room entry trace box could not take focus; the text-box check was not run
+PASS 'e' (note 3) is recorded in var[0x056] = 3 and script 020 plays it back (bit[0xD66] = 1)
+PASS Escape with a draft playing: script 005's cutscene runs scripts 028 and 021, and the aim is cleared (var[0x067] = 0)
+PASS F5 is handled
+PASS F5 (0x13F) runs script 004, which loads Room 70 (the save screen); the app shows it: "Scene ready"
+   before '.': keys active True, focus ScrollViewer, playback True
+PASS in the trial's cutscene, '.' ends the delay of "Parece que los Ancianos están ocupados." (255 → 0 jiffies) and within 3 s the text moves on (now ""); the cutscene goes on: "Text skipped (the game's talk-stop key '.', assumed input)" (handled True, keys active True, focus ScrollViewer, room 8, talk from Script 46 +0x002F)
+Failures: 0
