@@ -1,0 +1,74 @@
+{
+  "core": 277,
+  "wpf": 62,
+  "doorways": 16,
+  "controls": 19,
+  "rootCount": 363,
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "rootResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "blockedRandomSites": 0,
+  "rooms": {
+    "rooms": 76,
+    "changed": [
+      "room-20.bmp"
+    ],
+    "before20": "b126efe17fa4f8de21b1f64258ebd488a8169a7eb0ec374d8a057db84a42736d",
+    "after20": "a12e534860f2c3c777e02b79f77631c67a23f8adac134b0ad308bc8427cebee6"
+  },
+  "remainingGaps": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "reports": [
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/tests-final.txt",
+      "sha256": "3b1787f897d4cc90e706aeeb8baf1f6c427fe380acb88f3be9ba4e1fffa0dcce"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/release-final.txt",
+      "sha256": "09d341f15475ba9c9c7877b31f0153f04cadcd419196db9737ee819861e6bc5c"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/ui-2/staff-check.txt",
+      "sha256": "bd27d62b883180629f066f39d56bc4f2fe8f7bd1526e8f0fc19dbbe252643eef"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/navigation-1/doorways.txt",
+      "sha256": "a37eec5fe084a1160156f5cd717ad28c8268ab9f01d0f99e009eb3989fe6fa50"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/navigation-1/controls/room-controls-check.txt",
+      "sha256": "f18da500138440ef05bd8cd0141abe021a8b66ac694df6ef1bd7c3cf90c2d871"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/audits-1/blockers.txt",
+      "sha256": "1e60078f05d76492757e3fc476a5126cde1ae1fb68613033339afb0ca2c1b3aa"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/room-after-1/room-audit.txt",
+      "sha256": "aeac15510f6cc0a337b64d890862534d5629d6d0362b96d3aa637f1828fa57cf"
+    },
+    {
+      "path": "Exe/StatusRefinementsSession-20261001/png-comparison.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    }
+  ]
+}

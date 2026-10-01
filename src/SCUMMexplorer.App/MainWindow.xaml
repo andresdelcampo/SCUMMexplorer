@@ -121,10 +121,10 @@
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click"
                               VerticalAlignment="Center" Margin="0,0,12,0" Foreground="#D2C7B5"
                               ToolTip="Show SCUMM resource lists, script state, and diagnostic controls."/>
-                    <Button x:Name="GameStatusButton" Content="Game Status" Visibility="Collapsed" Click="GameStatus_Click"
-                            Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
                     <Button x:Name="CutsceneMenuButton" Content="Play Cutscene ▾" Visibility="Collapsed" Click="CutsceneMenu_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" IsEnabled="False"/>
                     <Button x:Name="GameTextsButton" Content="Game Texts" Click="GameTexts_Click" Visibility="Collapsed" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                    <Button x:Name="GameStatusButton" Content="Game Status" Visibility="Collapsed" Click="GameStatus_Click"
+                            Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
                     <Button Content="Open Game Folder…" Click="OpenFolder_Click" Padding="16,8" Margin="0,9,0,9" Background="#B78442" Foreground="#111820" BorderThickness="0" FontWeight="SemiBold"/>
                 </WrapPanel>
             </Grid>
@@ -138,10 +138,17 @@
                         <TextBlock Text="EXPLORE" Foreground="#9B927F" FontSize="11" FontWeight="Bold"/>
                         <TextBlock x:Name="GameTitle" Text="No game open" FontSize="20" FontWeight="SemiBold" Margin="0,8,0,2"/>
                         <TextBlock x:Name="GameInfo" Text="Choose a game folder to begin." Foreground="#AAB4BA" TextWrapping="Wrap"/>
+                        <StackPanel x:Name="NormalCatalogTabs" Orientation="Horizontal" Margin="0,12,0,0" Visibility="Collapsed">
+                            <RadioButton x:Name="RoomsTab" Content="Rooms" GroupName="Catalog" IsChecked="True" Click="NormalCatalogTab_Click" Foreground="#E7E0D2" Margin="0,0,16,0"/>
+                            <RadioButton x:Name="CostumesTab" Content="Costumes" GroupName="Catalog" Click="NormalCatalogTab_Click" Foreground="#E7E0D2"/>
+                        </StackPanel>
                     </StackPanel>
                     <ScrollViewer x:Name="RoomCardScroll" Grid.Row="1" Visibility="Collapsed"
                                   VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="-5,0,-3,8">
                         <WrapPanel x:Name="RoomCardList"/>
+                    </ScrollViewer>
+                    <ScrollViewer x:Name="CostumeCardScroll" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="-5,0,-3,8">
+                        <WrapPanel x:Name="CostumeCardList"/>
                     </ScrollViewer>
                     <TreeView x:Name="ResourceTree" Grid.Row="1" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="#E7E0D2" SelectedItemChanged="ResourceTree_SelectedItemChanged"/>
                 </Grid>

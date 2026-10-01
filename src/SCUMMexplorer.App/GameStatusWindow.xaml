@@ -30,11 +30,25 @@
         <Style x:Key="SpellNoteEditor" TargetType="ComboBox" BasedOn="{x:Static DataGridComboBoxColumn.DefaultEditingElementStyle}">
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        <Style x:Key="SpellCheck" TargetType="CheckBox" BasedOn="{x:Static DataGridCheckBoxColumn.DefaultElementStyle}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <Style x:Key="SpellCheckEditor" TargetType="CheckBox" BasedOn="{x:Static DataGridCheckBoxColumn.DefaultEditingElementStyle}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
+        <Style x:Key="LearnedCheck" TargetType="CheckBox">
+            <Setter Property="VerticalAlignment" Value="Center"/><Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template"><Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border x:Name="Box" Width="18" Height="18" Background="#101821" BorderBrush="#9FABAE" BorderThickness="1" CornerRadius="2">
+                        <Path x:Name="Tick" Data="M 3,8 L 7,12 L 14,4" Stroke="#E7E0D2" StrokeThickness="2" Visibility="Collapsed"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True"><Setter TargetName="Tick" Property="Visibility" Value="Visible"/><Setter TargetName="Box" Property="Background" Value="#685132"/></Trigger>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Box" Property="BorderBrush" Value="#E7E0D2"/></Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Box" Property="BorderBrush" Value="#B78442"/></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Box" Property="Opacity" Value="0.4"/></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True"><Setter Property="IsEnabled" Value="False"/></DataTrigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
     <Grid Margin="20">
@@ -45,7 +59,7 @@
         </StackPanel>
         <Grid Grid.Row="1" Margin="0,0,0,4">
             <Grid.ColumnDefinitions><ColumnDefinition Width="160"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-            <Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="64"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="Auto" MinHeight="40"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <StackPanel>
                 <TextBlock Text="Staff / distaff" FontWeight="SemiBold" Margin="0,0,0,6"/>
                 <TextBlock x:Name="StaffLabel" Text="Unresolved"/>
@@ -58,7 +72,7 @@
                 <TextBlock Text="Available notes" FontWeight="SemiBold" Margin="0,0,0,6"/>
                 <TextBlock x:Name="NoteIdentities" Foreground="#C6B99F" FontSize="11" TextWrapping="Wrap" Margin="0,0,8,0"/>
             </StackPanel>
-            <Canvas x:Name="NoteButtons" Grid.Row="1" Grid.Column="1" Width="448" Height="64" HorizontalAlignment="Left"/>
+            <Canvas x:Name="NoteButtons" Grid.Row="1" Grid.Column="1" Width="448" Height="40" HorizontalAlignment="Left"/>
             <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,2,0,0">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <TextBlock x:Name="StaffOrigin" Foreground="#9FABAE" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" Visibility="Collapsed"/>
@@ -83,8 +97,18 @@
                     <DataGridComboBoxColumn x:Name="Note2Column" Header="2" SelectedValueBinding="{Binding Note2, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48" ElementStyle="{StaticResource SpellNote}" EditingElementStyle="{StaticResource SpellNoteEditor}"/>
                     <DataGridComboBoxColumn x:Name="Note3Column" Header="3" SelectedValueBinding="{Binding Note3, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48" ElementStyle="{StaticResource SpellNote}" EditingElementStyle="{StaticResource SpellNoteEditor}"/>
                     <DataGridComboBoxColumn x:Name="Note4Column" Header="4" SelectedValueBinding="{Binding Note4, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48" ElementStyle="{StaticResource SpellNote}" EditingElementStyle="{StaticResource SpellNoteEditor}"/>
-                    <DataGridCheckBoxColumn Header="Learned" Binding="{Binding Learned, UpdateSourceTrigger=PropertyChanged}" Width="68" ElementStyle="{StaticResource SpellCheck}" EditingElementStyle="{StaticResource SpellCheckEditor}"/>
-                    <DataGridCheckBoxColumn Header="Can reverse" Binding="{Binding Reversible, Mode=OneWay}" IsReadOnly="True" Width="88" ElementStyle="{StaticResource SpellCheck}"/>
+                    <DataGridTemplateColumn Header="Learned" Width="68">
+                        <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                            <CheckBox IsChecked="{Binding Learned, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource LearnedCheck}" ToolTip="Toggle whether this draft is learned" AutomationProperties.Name="Learned"/>
+                        </DataTemplate></DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Can reverse" IsReadOnly="True" Width="88">
+                        <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9FABAE" ToolTip="Read only: this draft's source reverse capability" AutomationProperties.Name="Can reverse (read only)">
+                                <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Text" Value="—"/><Style.Triggers><DataTrigger Binding="{Binding Reversible}" Value="True"><Setter Property="Text" Value="✓"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate></DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn x:Name="StateSourceColumn" Header="State source" Binding="{Binding Origin}" IsReadOnly="True" Width="190" Visibility="Collapsed">
                         <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock" BasedOn="{StaticResource SpellText}"><Setter Property="TextTrimming" Value="CharacterEllipsis"/><Setter Property="ToolTip" Value="{Binding Origin}"/></Style></DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>

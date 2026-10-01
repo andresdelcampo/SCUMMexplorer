@@ -59,19 +59,21 @@ public partial class GameStatusWindow : Window
     {
         InitializeComponent(); _session = session; _canEdit = canEdit; _refreshRoom = refreshRoom; _advanced = advanced ?? (() => false);
         _artwork = game is null ? null : LoomStatusArtwork.TryLoad(game, out _artworkError);
+        double noteHeight = (_artwork?.Notes[0].PixelHeight ?? 20) * 2;
+        NoteButtons.Height = noteHeight;
         foreach (var column in new[] { Note1Column, Note2Column, Note3Column, Note4Column }) column.ItemsSource = LoomNoteNames.Choices;
         for (int i = 1; i <= 8; i++)
         {
             int count = i;
             var button = new Button { Style = (Style)FindResource("ArtworkChoice"), Tag = count,
-                Width = 48, Height = 64, ToolTip = $"Available through {LoomNoteNames.Label(count)}" };
+                Width = 48, Height = noteHeight, ToolTip = $"Available through {LoomNoteNames.Label(Math.Max(3, count))}" + (count < 3 ? " (minimum C, D, E)" : "") };
             System.Windows.Automation.AutomationProperties.SetName(button, button.ToolTip.ToString());
             var content = new StackPanel();
-            content.Children.Add(new Image { Width = 48, Height = 64, Stretch = Stretch.Fill, SnapsToDevicePixels = true });
+            content.Children.Add(new Image { Width = 48, Height = noteHeight, Stretch = Stretch.Fill, SnapsToDevicePixels = true });
             RenderOptions.SetBitmapScalingMode(content.Children[0], BitmapScalingMode.NearestNeighbor);
             if (_artwork is null) content.Children.Add(new TextBlock { Text = LoomNoteNames.Label(count), HorizontalAlignment = HorizontalAlignment.Center });
             button.Content = content;
-            button.Click += (_, _) => { if (!_canEdit() || _staffHeld != true) return; _noteCount = count; UpdateSelectors(); UpdateControls(); };
+            button.Click += (_, _) => { if (!_canEdit()) return; _staffHeld = true; _noteCount = Math.Max(3, count); UpdateSelectors(); UpdateControls(); };
             Canvas.SetLeft(button, 16 + (count - 1) * 48);
             NoteButtons.Children.Add(button);
         }
@@ -122,7 +124,7 @@ public partial class GameStatusWindow : Window
         bool editable = _session()?.GameStatus.Supported == true && _canEdit();
         bool stale = _baseline is not null && _session() is { } s && !SameState(s.GameStatus, _baseline);
         StaffButton.IsEnabled = editable && _staffHeld.HasValue;
-        NoteButtons.IsEnabled = editable && _noteCount.HasValue && _staffHeld == true;
+        NoteButtons.IsEnabled = editable && _noteCount.HasValue && _staffHeld.HasValue;
         DraftGrid.IsReadOnly = !editable;
         ApplyButton.IsEnabled = editable && PendingChanges && !stale;
         if (PendingChanges) EditMessage.Text = stale ? "Game status changed. Close and reopen to inspect the new values before applying." :
@@ -149,7 +151,12 @@ public partial class GameStatusWindow : Window
     }
 
     private void Staff_Click(object sender, RoutedEventArgs e)
-    { if (!_canEdit() || !_staffHeld.HasValue) return; _staffHeld = !_staffHeld.Value; UpdateSelectors(); UpdateControls(); }
+    {
+        if (!_canEdit() || !_staffHeld.HasValue) return;
+        _staffHeld = !_staffHeld.Value;
+        _noteCount = _staffHeld == true ? Math.Max(3, _noteCount ?? 0) : 0;
+        UpdateSelectors(); UpdateControls();
+    }
 
     private void Apply_Click(object sender, RoutedEventArgs e)
     {

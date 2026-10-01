@@ -100,7 +100,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Loaded += (_, _) => ReopenLastFolder();
-        Closed += (_, _) => { _roomCardCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
+        Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         PreviewKeyDown += MainWindow_PreviewKeyDown;
@@ -335,6 +335,7 @@ public partial class MainWindow : Window
         }
 
         PopulateRoomCards(game);
+        PopulateCostumeCards(game);
         UpdateAdvancedMode();
 
         PageTitle.Text = game.Title;
@@ -520,7 +521,7 @@ public partial class MainWindow : Window
             try { SessionModeToggle.IsChecked = true; }
             finally { _restoringInteractiveView = false; }
         }
-        if (!IsAdvancedMode && _selectedResource is { Kind: not ResourceKind.Room })
+        if (!IsAdvancedMode && _selectedResource is { Kind: not (ResourceKind.Room or ResourceKind.Costume) })
         {
             var returnRoom = _lastViewedRoomResource ?? _game?.Rooms.FirstOrDefault();
             if (returnRoom is not null) SelectResourceInTree(returnRoom);
@@ -540,7 +541,7 @@ public partial class MainWindow : Window
         RoomObjectPanel.Visibility = showRoomDetails ? Visibility.Visible : Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, showRoomDetails ? 1 : 2);
         ResourceTree.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
-        RoomCardScroll.Visibility = _game is null || advanced ? Visibility.Collapsed : Visibility.Visible;
+        UpdateNormalCatalog(advanced);
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
             ? Visibility.Visible : Visibility.Collapsed;
@@ -613,6 +614,8 @@ public partial class MainWindow : Window
         RoomPreview.Cursor = Cursors.Arrow;
         ScriptEventButtons.Children.Clear();
         _selectedResource = resource;
+        if (resource.Kind is ResourceKind.Room or ResourceKind.Costume)
+            _showCostumeCards = resource.Kind == ResourceKind.Costume;
         UpdateRoomCardSelection(resource);
         UpdateAdvancedMode();
         StatusText.Visibility = Visibility.Visible;
@@ -1439,7 +1442,7 @@ public partial class MainWindow : Window
 
     private void UpdateRoomCardSelection(GameResource? resource)
     {
-        foreach (var card in RoomCardList.Children.OfType<Button>())
+        foreach (var card in RoomCardList.Children.OfType<Button>().Concat(CostumeCardList.Children.OfType<Button>()))
         {
             var selected = Equals(card.Tag, resource);
             card.BorderBrush = selected

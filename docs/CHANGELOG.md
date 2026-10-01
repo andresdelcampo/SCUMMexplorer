@@ -6,6 +6,8 @@ Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/h
 
 | Change | Result | Record |
 | --- | --- | --- |
+| Status controls and normal costumes | Single-click Learned, read-only reverse,38px native notes, staff/note coupling with C/D/E edit minimum,16 source-associated names, stable toolbar position and graphical costume cards; WPF62/62, Core277/277, doorways16/16 and controls19/19 | [validation](../.verification/status-refinements-20261001/validation.md) |
+| Scythe background preservation | Generic fallback avoids index-hidden later erasing overlays; polishing scene indexed20 restored; only20 of76 room renders changes, zero gaps; source/replay results unchanged | [source and validation](../.verification/status-refinements-20261001/scythe-validation.md) |
 | Native draft progression and source-route correction | Native325 learning, source levels5/6, delayed active633 and native633/41 casting established;090/096 certainty and four fresh failures retained; transient20 entry corrected; Core275/275, main Release clean, no production/catalog changes | [validation](../.verification/source-progression-20261001/validation.md) |
 | Compact spell rows | Height reduced from32 to26; spell text, note selectors, checkboxes and Advanced provenance vertically centered; visible WPF47/47, final Release build clean | [validation](../.verification/spell-row-layout-20261001/validation.md) |
 | Staff bound, native score and Transcend | Inclusive levels1..8/no None, native combined artwork, sixteen loaded drafts, catalog-only higher-level preservation and verified limited floors; Core275/275, WPF47/47, all363 roots/sequences/pixels unchanged | [validation](../.verification/staff-correction-20261001/validation.md) |

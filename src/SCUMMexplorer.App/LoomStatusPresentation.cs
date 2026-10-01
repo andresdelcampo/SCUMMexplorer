@@ -21,7 +21,20 @@ internal static class LoomDraftNames
     public static string Title(LoomDraftStatus draft) => (draft.Slot, draft.ForwardVerb, draft.ReverseVerb) switch
     {
         (0, 0x3A, 0x3B) => "Opening / Closing",
+        (1, 0x3C, 0x3D) => "Straw into Gold",
         (2, 0x3E, 0x3F) => "Dyeing / Bleaching",
+        (3, 0x40, 0) => "Night Vision",
+        (4, 0x41, 0x42) => "Twisting",
+        (5, 0x43, 0x44) => "Invisibility",
+        (6, 0x45, 0x46) => "Emptying",
+        (7, 0x47, 0x48) => "Sleep",
+        (8, 0x49, 0) => "Terror",
+        (9, 0x4A, 0x4B) => "Sharpening",
+        (10, 0x4C, 0) => "Healing",
+        (11, 0x4D, 0) => "Reflection",
+        (12, 0x4E, 0x4F) => "Silence",
+        (13, 0x50, 0x51) => "Shaping",
+        (14, 0x52, 0x53) => "Unmaking",
         (15, 0x54, 0) => "Transcend",
         _ => $"Draft {draft.Slot + 1}"
     };
@@ -107,10 +120,12 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                 if (p != LoomMessageRenderer.Transparent) scorePixels[y * 224 + x] = p;
             }
             // Native score starts at x24, eight contiguous24-pixel choices; no relocated glyphs.
+            // Crop only the shared empty rows below every glyph; preserve native note positions and 2x scale.
+            int scoreHeight = Enumerable.Range(0, 32).Last(y => scorePixels.AsSpan(y * 224, 224).ContainsAnyExcept((byte)0)) + 1;
             for (int i = 0; i < 8; i++)
             {
-                var pixels = new byte[24 * 32]; var empty = new byte[24 * 32];
-                for (int y = 0; y < 32; y++) for (int x = 0; x < 24; x++)
+                var pixels = new byte[24 * scoreHeight]; var empty = new byte[24 * scoreHeight];
+                for (int y = 0; y < scoreHeight; y++) for (int x = 0; x < 24; x++)
                 {
                     int at = y * 224 + 8 + i * 24 + x;
                     pixels[y * 24 + x] = scorePixels[at];
@@ -119,7 +134,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                         notePixels[at-1] != 0 && notePixels[at+1] != 0 && notePixels[at-224] != 0 && notePixels[at+224] != 0)
                         empty[y * 24 + x] = 0;
                 }
-                notes.Add(Bitmap(pixels, 24, 32, palette)); emptyNotes.Add(Bitmap(empty, 24, 32, palette));
+                notes.Add(Bitmap(pixels, 24, scoreHeight, palette)); emptyNotes.Add(Bitmap(empty, 24, scoreHeight, palette));
             }
             if (note != 8 || notes.Count != 8) { error = $"Native artwork contract unresolved: {note} staff segments, {notes.Count} note glyphs."; return null; }
             return new(Bitmap(staffPixels, 224, 24, palette), Bitmap(staffPixels, 224, 24, palette, outline: true), notes.ToArray(), emptyNotes.ToArray());
