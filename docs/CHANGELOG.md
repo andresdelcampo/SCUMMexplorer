@@ -1,5 +1,11 @@
 # Changelog
 
+## 1 October: global cutscene access
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Top-level Play Cutscene | Existing replay starts available from every room; playback/pause/departure guards preserved | [picker](../.verification/global-cutscene-picker-20261001/validation.md) |
+
 Finished work, oldest first. Each entry links to the validation record that holds the details, the commands and the counts. Reverse-engineering findings live in the [script map](LOOM_SCRIPT_MAP.md); priorities live in the [plan](LOOM_EGA_PLAN.md). This file replaces `WIP_2026-09-27.md` and the history table that was in the plan (28 September 2026).
 
 Unless noted, "no physical input" applies: the WPF harnesses drive the real window's handlers with synthetic events.

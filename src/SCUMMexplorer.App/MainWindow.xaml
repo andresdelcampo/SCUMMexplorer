@@ -122,7 +122,8 @@
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click"
                               VerticalAlignment="Center" Margin="0,0,12,0" Foreground="#D2C7B5"
                               ToolTip="Show SCUMM resource lists, script state, and diagnostic controls."/>
-                    <Button Content="Game Texts" Click="GameTexts_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                    <Button x:Name="CutsceneMenuButton" Content="Play Cutscene ▾" Click="CutsceneMenu_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" IsEnabled="False"/>
+                    <Button x:Name="GameTextsButton" Content="Game Texts" Click="GameTexts_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                     <Button Content="Open Game Folder…" Click="OpenFolder_Click" Padding="16,8" Margin="0,9,0,9" Background="#B78442" Foreground="#111820" BorderThickness="0" FontWeight="SemiBold"/>
                 </StackPanel>
             </Grid>
@@ -244,9 +245,6 @@
                                         <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Skip the current line, as with the '.' key."/>
-                                        <Button x:Name="CutsceneMenuButton" Content="Play a cutscene ▾" Click="CutsceneMenu_Click" Padding="8,4"
-                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
-                                                ToolTip="Play a known cutscene that starts in the room shown or passes through it, from a stated start: a fresh session after the boot, the room opened from the catalog, and the object's verb run directly (an exploration action, not the game's click)."/>
                                     </StackPanel>
                                     <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center"/>
                                     <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,3,0,0">

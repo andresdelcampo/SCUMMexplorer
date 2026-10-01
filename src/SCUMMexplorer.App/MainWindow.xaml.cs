@@ -2888,10 +2888,10 @@ public partial class MainWindow : Window
         CutsceneMenuButton.IsEnabled = active && CanStartCutscene;
         if (!active) return;
         var choices = CutsceneChoices();
-        CutsceneMenuButton.Visibility = choices.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
-        CutsceneMenuButton.Content = choices.Count > 1 ? "Play a cutscene ▾" : "Play a cutscene";
+        CutsceneMenuButton.Visibility = Visibility.Visible;
+        CutsceneMenuButton.Content = "Play Cutscene ▾";
         CutsceneMenuButton.IsEnabled = CanStartCutscene;
-        CutsceneMenuButton.ToolTip = CanStartCutscene ? "Play from a stated start." : "Playback is active. Finish or skip it before starting another scene.";
+        CutsceneMenuButton.ToolTip = CanStartCutscene ? "Choose a cutscene from anywhere in the game. Each replay replaces exploration with its stated start." : "Playback is active. Finish or skip it before starting another scene.";
         UpdateRoomScrollButtons();
         var inCutscene = SessionInScene;
         var skippable = _session?.CutsceneSkippable == true;
@@ -2964,10 +2964,9 @@ public partial class MainWindow : Window
     private List<(string Title, string Source, Action Play)> CutsceneChoices()
     {
         var choices = new List<(string Title, string Source, Action Play)>();
-        var roomId = _game?.Id == GameId.Loom ? _currentRoomResource?.ResourceId : null;
-        if (roomId is int shown && OpeningRooms.Contains(shown))
-            choices.Add(("The opening", OpeningSource + " " + OpeningStartNote, PlayOpening));
-        foreach (var cutscene in KnownCutscenes.Where(item => roomId is int id && item.Shows(id)))
+        if (_game?.Id != GameId.Loom || _session is null) return choices;
+        choices.Add(("The opening", OpeningSource + " " + OpeningStartNote, PlayOpening));
+        foreach (var cutscene in KnownCutscenes)
             choices.Add((cutscene.Script switch
             {
                 52 => "Room 10 to Room 13",

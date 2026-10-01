@@ -32,6 +32,8 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (30 September)
 
+1 October task 1: Play Cutscene moved to the top bar with global access to existing replay starts from any room. Broad discovery/promotion is the next task. [Validation](../.verification/global-cutscene-picker-20261001/validation.md): 6/6 WPF checks; Release zero warnings/errors.
+
 **Requested for next session (planning only):**
 
 - Replace the normal-view Game Texts button with **Play Cutscene**, giving access to any cutscene in the game rather than only the current room's small replay list. Show **Game Texts only in Advanced**.
