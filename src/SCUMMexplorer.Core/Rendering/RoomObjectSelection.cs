@@ -1,3 +1,5 @@
+using SCUMMexplorer.Core.Formats;
+
 namespace SCUMMexplorer.Core.Rendering;
 
 public readonly record struct RoomObjectPosition(int X, int Y);
@@ -44,6 +46,7 @@ public sealed class RoomObjectSelection
     private readonly HashSet<int> _knownStates = [];
     private readonly Dictionary<int, RoomObjectPosition> _positions;
     private readonly HashSet<int> _backgroundPossible = [];
+    private readonly HashSet<int> _indexedBackground = [];
     private readonly IReadOnlyDictionary<int, LoomRoomObjectRecord>? _recordsById;
     private readonly IReadOnlyDictionary<int, LoomRoomObjectRecord>? _recordsByLocalIndex;
     private readonly RoomImage? _background;
@@ -97,7 +100,11 @@ public sealed class RoomObjectSelection
             RememberBackgroundIfEmpty(obj);
             if (indexedStates is not null && Peers(obj).All(peer =>
                     indexedStates.TryGetValue(peer.Id, out var state) && (state & 0x0F) == 0))
-                foreach (var peer in Peers(obj)) _backgroundPossible.Add(peer.Id);
+                foreach (var peer in Peers(obj))
+                {
+                    _backgroundPossible.Add(peer.Id);
+                    _indexedBackground.Add(peer.Id);
+                }
         }
     }
 
@@ -202,6 +209,19 @@ public sealed class RoomObjectSelection
 
     public const string FirstStoredImageReason = "first stored image for this position; no decoded script draws it";
 
+    private bool RemovesBackgroundColours(RoomObjectImage obj)
+    {
+        if (_background is null) return false;
+        var position = GetPosition(obj);
+        if (position.X < 0 || position.Y < 0 || position.X + obj.Width > _background.Width ||
+            position.Y + obj.Height > _background.Height) return false;
+        var backgroundColours = new HashSet<byte>();
+        for (var y = 0; y < obj.Height; y++)
+            for (var x = 0; x < obj.Width; x++)
+                backgroundColours.Add(_background.Pixels.Span[(position.Y + y) * _background.Width + position.X + x]);
+        return obj.Pixels.ToHashSet().IsProperSubsetOf(backgroundColours);
+    }
+
     /// <summary>
     /// Supplies a reproducible artwork estimate where a partial script run
     /// leaves no image. Existing script-visible images always take precedence.
@@ -221,6 +241,9 @@ public sealed class RoomObjectSelection
     /// path (<paramref name="entryStates"/>): a nonzero state shows that image,
     /// a zero state leaves the position empty. Only then does the first stored
     /// image apply.
+    /// An intact background can already contain the artwork: index-hidden
+    /// colour-removal overlays are not guessed without positive entry state
+    /// or an entry/opening draw batch. Reached draws remain authoritative.
     /// </summary>
     public IReadOnlyList<RoomArtworkEstimate> ShowUnresolvedArtwork(IReadOnlyList<RoomDrawBatch>? batches = null,
         int seed = 0, IReadOnlyCollection<int>? statesSetByCode = null,
@@ -231,7 +254,16 @@ public sealed class RoomObjectSelection
         var estimates = new List<RoomArtworkEstimate>();
         var random = new Random(seed);
 
-        bool Open(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) &&
+        // Some stored overlays erase details already drawn into the background.
+        // Do not guess these index-hidden removal images from a later reaction.
+        // Entry/opening evidence and actual source draws still take precedence.
+        bool KeepIndexedBackground(RoomObjectImage obj) => _background is not null &&
+            _indexedBackground.Contains(obj.Id) && !IsBackgroundGap(obj) && RemovesBackgroundColours(obj) &&
+            !Peers(obj).Any(peer => entryStates?.TryGetValue(peer.Id, out var state) == true && (state.State & 0x0F) != 0) &&
+            !_batches.Any(batch => batch.Priority >= LoomSceneDrawBatches.EntryScriptPriority &&
+                batch.Steps.Any(step => Peers(obj).Any(peer => peer.Id == step.ObjectId)));
+
+        bool Open(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) && !KeepIndexedBackground(obj) &&
                                           !Peers(obj).Any(IsActive) &&
                                           !_objects.Any(other => IsActive(other) && Intersects(obj, other));
 

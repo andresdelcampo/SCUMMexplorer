@@ -6,6 +6,39 @@ namespace SCUMMexplorer.Tests;
 public sealed class RoomObjectSelectionTests
 {
     [Fact]
+    public void IntactIndexedBackgroundSurvivesLaterReactionOverlayGuess()
+    {
+        var original = Enumerable.Repeat((byte)2, 16 * 16).ToArray();
+        original[5 * 16 + 5] = 14; // Detail drawn in the background, erased by a later overlay.
+        var background = new RoomImage(16, 16, original, Palette);
+        var overlay = Filled(10, 4, 4, 8, 8, 2);
+        var hidden = new Dictionary<int, byte> { [10] = 0 };
+        var selection = new RoomObjectSelection([overlay], hidden, background: background, indexedStates: hidden);
+        RoomDrawBatch[] later = [new([new(10)], LoomSceneDrawBatches.OtherScriptPriority, "later reaction")];
+
+        Assert.Empty(selection.ShowUnresolvedArtwork(later));
+        Assert.Equal(original, selection.Compose(background));
+        Assert.True(selection.DrawObject(10)); // A reached source draw still applies the erasure.
+        Assert.Equal(2, selection.Compose(background)[5 * 16 + 5]);
+    }
+
+    [Fact]
+    public void EntryEvidenceCanReplaceIntactIndexedBackground()
+    {
+        var original = Enumerable.Repeat((byte)2, 256).ToArray();
+        original[5 * 16 + 5] = 14;
+        var background = new RoomImage(16, 16, original, Palette);
+        var overlay = Filled(10, 4, 4, 8, 8, 2);
+        var hidden = new Dictionary<int, byte> { [10] = 0 };
+        var selection = new RoomObjectSelection([overlay], hidden, background: background, indexedStates: hidden);
+        RoomDrawBatch[] entry = [new([new(10)], LoomSceneDrawBatches.EntryScriptPriority, "entry")];
+
+        Assert.Single(selection.ShowUnresolvedArtwork(entry));
+        Assert.True(selection.IsActive(overlay));
+        Assert.Equal(2, selection.Compose(background)[5 * 16 + 5]);
+    }
+
+    [Fact]
     public void IndexStateControlsStartingVisibility()
     {
         var first = Image(10, 8, 0, 8, 8);

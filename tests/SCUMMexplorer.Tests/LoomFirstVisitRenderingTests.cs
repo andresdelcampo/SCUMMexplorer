@@ -54,10 +54,14 @@ public sealed class LoomFirstVisitRenderingTests
         if (Data.Value is not { } data) return;
         // Script 90 flashes 637 and 638 in Room 42 (drawObject, breakHere, setState 0).
         Assert.DoesNotContain(data.Batches.ForRoom(42), batch => batch.Source.StartsWith("script 90 ", StringComparison.Ordinal));
-        // Script 99 draws Room 20's images and leaves them; they were the stored-image guess before.
-        var (selection, estimates, _) = data.FirstVisit(20);
-        Assert.Equal([392, 393, 394, 395, 396], estimates.Select(item => item.ObjectId).Order());
-        Assert.All(estimates, item => Assert.Equal("script 99 +0x02BB", item.Reason));
+        // Script 99 later removes the scythe using these background repair images.
+        // Its batch remains decoded, but first-visit fallback must retain the scythe.
+        Assert.Contains(data.Batches.ForRoom(20), batch => batch.Source == "script 99 +0x02BB" &&
+            batch.Steps.Select(step => step.ObjectId).Order().SequenceEqual(new[] {392, 393, 394, 395, 396}));
+        var (selection, estimates, background) = data.FirstVisit(20);
+        Assert.Empty(estimates);
+        Assert.Empty(selection.PaintOrder());
+        Assert.Equal(background.Pixels.ToArray(), selection.Compose(background));
         Assert.Empty(selection.VisibleGaps());
     }
 
