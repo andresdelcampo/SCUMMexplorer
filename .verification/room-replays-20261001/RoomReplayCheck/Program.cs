@@ -15,6 +15,7 @@ internal static class Program
     [STAThread] static void Main(string[] args)
     {
         Directory.CreateDirectory(args[1]);var app=new Application();var w=new MainWindow();var report=new List<string>();int failures=0;
+        int total=args.Length>2?int.Parse(args[2]):291;
         object? Field(string n)=>typeof(MainWindow).GetField(n,Private)!.GetValue(w);
         object? Call(string n,params object?[] v)=>typeof(MainWindow).GetMethod(n,Private)!.Invoke(w,v);
         T Prop<T>(object o,string n)=>(T)o.GetType().GetProperty(n)!.GetValue(o)!;
@@ -31,7 +32,7 @@ internal static class Program
                 Call("OpenGameFolder",args[0]);await Pick(2);
                 var rooms=((GameLibrary)Field("_game")!).Rooms.Select(r=>r.ResourceId!.Value).ToArray();
                 var memberships=((IEnumerable)Prop<object>(Field("_replayCatalog")!,"Membership")).Cast<object>().ToArray();
-                Check(memberships.Length==291,"all 291 starts share generated validated membership");
+                Check(memberships.Length==total,$"all {total} starts share generated validated membership");
                 Check(rooms.All(id=>Items(id).Length==memberships.Count(m=>Prop<int>(m,"StartRoom")==id||Prop<int[]>(m,"Rooms").Contains(id))),"every room count follows shared metadata, including newly generated entries");
                 foreach(var pair in new[]{("opening",new[]{1,2,53,69}),("Room 08 object 255 Verb 0x38",new[]{3,8,9,11,54,67}),("Room 10 object 295 Verb 0x38",new[]{10,11,13}),("Room 36 object 599 Verb 0x38",new[]{36,37,38,58})})
                     Check(memberships.Any(m=>Prop<string>(m,"Id")==pair.Item1 && Prop<int[]>(m,"Rooms").SequenceEqual(pair.Item2)),pair.Item1+": fresh executed multi-room evidence loaded");

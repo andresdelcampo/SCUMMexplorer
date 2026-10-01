@@ -1,7 +1,7 @@
 """Export only completed preview recipes, exact data fingerprints and honest gaps.
 Usage: export_catalog.py roots.json audit.json Games/loom catalog.json report.md code.tsv established-membership.json
 """
-import collections, json, re, sys
+import collections, json, pathlib, re, sys
 from replay_names import ReplayNames
 roots=json.load(open(sys.argv[1],encoding='utf-8'))
 audit=json.load(open(sys.argv[2],encoding='utf-8'))
@@ -56,7 +56,7 @@ with open(sys.argv[4],'w',encoding='utf-8') as f: json.dump(out,f,indent=2,ensur
 with open(sys.argv[5],'w',encoding='utf-8') as f:
     f.write('# Broad replay audit\n\n'+summary+'\n\n')
     f.write(f"Decoded input SHA256: `{roots['inputSha256']}`. {len(audit['results'])} roots tested; {len(roots['candidateOwners'])} candidate owners, {sum(len(c['sites']) for c in roots['candidateOwners'])} cutscene sites; {len(reached)} distinct sites reached by completed previews; {len(roots['unresolved'])} unresolved static call edges. These are starts/sites, not a count of unique narrative scenes.\n\n")
-    f.write('Fresh boot seed 0; catalog visit; direct source verb or entry; no variable, inventory, class or position writes. Probe limit 3000 frames; missing starts excluded after the same ordinary 32-frame arrival/input window used by the app. A successful preview must open a scene, execute matching end boundaries, settle without an open scene/movement/talk and report no unsupported execution. Completion proves this explorer preview, not full original-game prerequisites or ScummVM parity. Full source traces and uncertainties remain in ignored Exe/VerificationSession-20261001/replay-audit.\n\n')
+    f.write('Fresh boot seed 0; catalog visit; direct source verb or entry; no variable, inventory, class or position writes. Probe limit 3000 frames; missing starts excluded after the same ordinary 32-frame arrival/input window used by the app. A successful preview must open a scene, execute matching end boundaries, settle without an open scene/movement/talk and report no unsupported execution. Completion proves this explorer preview, not full original-game prerequisites or ScummVM parity. Full source traces and uncertainties remain in '+str(pathlib.Path(sys.argv[2]).parent).replace('\\','/')+'.\n\n')
     f.write('| Status | Recipes |\n|---|---|\n')
     for k,v in collections.Counter(r['status'] for r in audit['results']).items(): f.write(f'| {k} | {v} |\n')
     f.write('\n| Trigger | Result | Frames | Reached scene boundaries |\n|---|---|---|---|\n')

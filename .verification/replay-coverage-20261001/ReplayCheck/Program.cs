@@ -15,6 +15,8 @@ internal static class Program
     [STAThread] static void Main(string[] args)
     {
         Directory.CreateDirectory(args[1]); var app=new Application(); var w=new MainWindow(); var report=new List<string>(); int failures=0;
+        int total=args.Length>2?int.Parse(args[2]):291, scenes=args.Length>3?int.Parse(args[3]):75,
+            reactions=args.Length>4?int.Parse(args[4]):216, gaps=args.Length>5?int.Parse(args[5]):79;
         object? Field(string n)=>typeof(MainWindow).GetField(n,Private)!.GetValue(w);
         object? Call(string n,params object?[] v)=>typeof(MainWindow).GetMethod(n,Private)!.Invoke(w,v);
         T Prop<T>(object o,string n)=>(T)o.GetType().GetProperty(n)!.GetValue(o)!;
@@ -29,16 +31,16 @@ internal static class Program
             {
                 Call("OpenGameFolder",args[0]);await Pick(16);
                 var all=((IEnumerable)Call("AllCutscenes")!).Cast<object>().ToArray();
-                Check(all.Length+1==291,"expanded catalog has 291 starts including opening");
+                Check(all.Length+1==total,$"expanded catalog has {total} starts including opening");
                 var picker=(Window)Call("BuildCutscenePicker")!;
                 picker.ContentRendered+=(_,_)=>
                 {
                     try
                     {
                         var filter=(ComboBox)picker.FindName("CategoryFilter");var search=(TextBox)picker.FindName("SearchBox");var list=(ListBox)picker.FindName("SceneList");var play=(Button)picker.FindName("PlayButton");
-                        Check(list.Items.Count==75,"Scenes lists 75 starts globally");Capture(picker,"picker-scenes");
-                        filter.SelectedIndex=1;Check(list.Items.Count==216,"dialogue/reactions separated from scenes");
-                        filter.SelectedIndex=3;Check(list.Items.Count==79&&!play.IsEnabled,"79 owners with outstanding sites are visible and cannot replay an invented start");Capture(picker,"picker-gaps");
+                        Check(list.Items.Count==scenes,$"Scenes lists {scenes} starts globally");Capture(picker,"picker-scenes");
+                        filter.SelectedIndex=1;Check(list.Items.Count==reactions,"dialogue/reactions separated from scenes");
+                        filter.SelectedIndex=3;Check(list.Items.Count==gaps&&!play.IsEnabled,$"{gaps} owners with outstanding sites are visible and cannot replay an invented start");Capture(picker,"picker-gaps");
                         filter.SelectedIndex=2;search.Text="Room 02 · Draft response 1 at cielo";
                         Check(list.Items.Count==1&&play.IsEnabled,"search finds sky response whose script 049 was absent from manual menu");
                         play.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));

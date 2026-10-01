@@ -32,7 +32,7 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
-Resumed from 7e91c35. Generic native sound completion is implemented and visibly validated: 38 former failures now complete; seven remain unresolved, all with cleared sound flags. Full audit: 327 completed automatic previews with no regressions. Catalog promotion and the watcher/late-game investigation follow separately. [Sound validation](../.verification/sound-lifetimes-20261001/validation.md). No fabricated prerequisites; main Release rebuild awaits closure of the running app.
+Resumed from 7e91c35. Generic native sound completion is implemented and visibly validated; 38 additional completed previews are promoted through shared catalog metadata. **329 starts (80 scenes/249 reactions), 163/235 automatic sites reached, 55 owners with gaps**, seven incomplete roots and 123 unresolved static edges. All 38 new entries verified in WPF; original names/controls retained. [Sound](../.verification/sound-lifetimes-20261001/validation.md), [promotion](../.verification/native-replay-coverage-20261001/validation.md). Next: watcher/actor-box, unmatched scope and late-game routes; main Release rebuild awaits closure of the running app.
 
 Replay naming completed: all views consume shared descriptors. Stored source names retained; 39 unnamed targets use decoded action/reached-room labels with explicit naming gaps. [Validation](../.verification/replay-names-20261001/validation.md): 9/9 WPF checks, recipes and coverage unchanged.
 

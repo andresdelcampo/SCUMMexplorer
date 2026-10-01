@@ -777,6 +777,20 @@
       "source": "Room 04 object 177 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 112 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 04 Object 177 Verb 0x36 +0x0017 runs script 2\nendCutscene at Room 04 Object 177 Verb 0x36 +0x0083 runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 04 object 177 Verb 0x3A",
+      "title": "Room 04 · Draft response 1 at tumba",
+      "category": "Dialogue and reactions",
+      "room": 4,
+      "objectId": 177,
+      "verb": 58,
+      "scriptIds": [],
+      "rooms": [
+        4
+      ],
+      "frames": 129,
+      "source": "Room 04 object 177 Verb 0x3A. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 129 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 04 local script 209 +0x0000 runs script 2\nendCutscene at Room 04 local script 209 +0x00D7 runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 04 object 177 Verb 0x3B",
       "title": "Room 04 · Draft response 2 at tumba",
       "category": "Dialogue and reactions",
@@ -1353,6 +1367,27 @@
       "source": "Room 09 object 272 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 86 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 09 local script 209 +0x0000 runs script 2\nendCutscene at Room 09 local script 209 +0x0190 runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 09 object 272 Verb 0x52",
+      "title": "Room 09 · Draft response 25 at telar",
+      "category": "Scenes",
+      "room": 9,
+      "objectId": 272,
+      "verb": 82,
+      "scriptIds": [
+        29,
+        104
+      ],
+      "rooms": [
+        9,
+        14,
+        51,
+        59,
+        61
+      ],
+      "frames": 1003,
+      "source": "Room 09 object 272 Verb 0x52. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 1003 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 104 +0x0000 runs script 2\nendCutscene at Script 104 +0x06FC runs script 3\ncutscene at Script 29 +0x0000 runs script 2\nendCutscene at Script 29 +0x00E2 runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 09 object 272 Verb 0x56",
       "title": "Room 09 · Other draft response at telar",
       "category": "Dialogue and reactions",
@@ -1636,6 +1671,23 @@
       "source": "Room 12 object 322 Verb 0x38. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 158 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 12 Object 322 Verb 0x38 +0x0000 runs script 2\nendCutscene at Room 12 Object 322 Verb 0x38 +0x0077 runs script 3\nNaming gap: no useful stored name in any supplied room definition; no validated naming instruction supplies one. Label uses the decoded action and validated reached rooms."
     },
     {
+      "id": "Room 13 object 323 Verb 0x38",
+      "title": "Room 13 · Use response · Reached Room 15",
+      "category": "Scenes",
+      "room": 13,
+      "objectId": 323,
+      "verb": 56,
+      "scriptIds": [
+        29,
+        54
+      ],
+      "rooms": [
+        15
+      ],
+      "frames": 105,
+      "source": "Room 13 object 323 Verb 0x38. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 105 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 54 +0x0000 runs script 2\nendCutscene at Script 54 +0x00C4 runs script 3\ncutscene at Script 29 +0x0000 runs script 2\nendCutscene at Script 29 +0x00E2 runs script 3\nNaming gap: no useful stored name in any supplied room definition; no validated naming instruction supplies one. Label uses the decoded action and validated reached rooms."
+    },
+    {
       "id": "Room 13 object 324 Verb 0x36",
       "title": "Room 13 · Look response · Reached Room 10",
       "category": "Scenes",
@@ -1789,6 +1841,20 @@
       "source": "Room 16 object 350 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 76 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 17 object 357 Verb 0x3A",
+      "title": "Room 17 · Draft response 1 at tumba",
+      "category": "Dialogue and reactions",
+      "room": 17,
+      "objectId": 357,
+      "verb": 58,
+      "scriptIds": [],
+      "rooms": [
+        17
+      ],
+      "frames": 128,
+      "source": "Room 17 object 357 Verb 0x3A. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 128 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 17 local script 206 +0x0000 runs script 2\nendCutscene at Room 17 local script 206 +0x00C1 runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 17 object 357 Verb 0x3B",
       "title": "Room 17 · Draft response 2 at tumba",
       "category": "Dialogue and reactions",
@@ -1819,6 +1885,20 @@
       ],
       "frames": 72,
       "source": "Room 17 object 357 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 72 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 17 object 358 Verb 0x3A",
+      "title": "Room 17 · Draft response 1 at tumba",
+      "category": "Dialogue and reactions",
+      "room": 17,
+      "objectId": 358,
+      "verb": 58,
+      "scriptIds": [],
+      "rooms": [
+        17
+      ],
+      "frames": 128,
+      "source": "Room 17 object 358 Verb 0x3A. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 128 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 17 local script 206 +0x0000 runs script 2\nendCutscene at Room 17 local script 206 +0x00C1 runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 17 object 358 Verb 0x3B",
@@ -2155,6 +2235,104 @@
       "source": "Room 20 object 389 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 76 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 20 object 390 Verb 0x47",
+      "title": "Room 20 · Draft response 14 at obreros",
+      "category": "Dialogue and reactions",
+      "room": 20,
+      "objectId": 390,
+      "verb": 71,
+      "scriptIds": [],
+      "rooms": [
+        20
+      ],
+      "frames": 92,
+      "source": "Room 20 object 390 Verb 0x47. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 92 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 20 local script 212 +0x0000 runs script 2\nendCutscene at Room 20 local script 212 +0x0035 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 20 object 390 Verb 0x49",
+      "title": "Room 20 · Draft response 16 at obreros",
+      "category": "Dialogue and reactions",
+      "room": 20,
+      "objectId": 390,
+      "verb": 73,
+      "scriptIds": [],
+      "rooms": [
+        20
+      ],
+      "frames": 114,
+      "source": "Room 20 object 390 Verb 0x49. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 114 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 20 local script 211 +0x0000 runs script 2\nendCutscene at Room 20 local script 211 +0x0051 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 20 object 390 Verb 0x56",
+      "title": "Room 20 · Other draft response at obreros",
+      "category": "Dialogue and reactions",
+      "room": 20,
+      "objectId": 390,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        20
+      ],
+      "frames": 100,
+      "source": "Room 20 object 390 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 100 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 20 local script 213 +0x0000 runs script 2\nendCutscene at Room 20 local script 213 +0x003F runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 20 object 391 Verb 0x47",
+      "title": "Room 20 · Draft response 14 at obreros",
+      "category": "Dialogue and reactions",
+      "room": 20,
+      "objectId": 391,
+      "verb": 71,
+      "scriptIds": [],
+      "rooms": [
+        20
+      ],
+      "frames": 92,
+      "source": "Room 20 object 391 Verb 0x47. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 92 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 20 local script 212 +0x0000 runs script 2\nendCutscene at Room 20 local script 212 +0x0035 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 20 object 391 Verb 0x49",
+      "title": "Room 20 · Draft response 16 at obreros",
+      "category": "Dialogue and reactions",
+      "room": 20,
+      "objectId": 391,
+      "verb": 73,
+      "scriptIds": [],
+      "rooms": [
+        20
+      ],
+      "frames": 114,
+      "source": "Room 20 object 391 Verb 0x49. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 114 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 20 local script 211 +0x0000 runs script 2\nendCutscene at Room 20 local script 211 +0x0051 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 20 object 391 Verb 0x56",
+      "title": "Room 20 · Other draft response at obreros",
+      "category": "Dialogue and reactions",
+      "room": 20,
+      "objectId": 391,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        20
+      ],
+      "frames": 100,
+      "source": "Room 20 object 391 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 100 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 20 local script 213 +0x0000 runs script 2\nendCutscene at Room 20 local script 213 +0x003F runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 22 object 403 Verb 0x36",
+      "title": "Room 22 · Look at campana",
+      "category": "Dialogue and reactions",
+      "room": 22,
+      "objectId": 403,
+      "verb": 54,
+      "scriptIds": [],
+      "rooms": [
+        22
+      ],
+      "frames": 177,
+      "source": "Room 22 object 403 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 177 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 22 local script 205 +0x0000 runs script 2\nendCutscene at Room 22 local script 205 +0x0093 runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 22 object 403 Verb 0x56",
       "title": "Room 22 · Other draft response at campana",
       "category": "Dialogue and reactions",
@@ -2169,6 +2347,23 @@
       ],
       "frames": 76,
       "source": "Room 22 object 403 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 76 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 22 object 404 Verb 0x36",
+      "title": "Room 22 · Look at cristal",
+      "category": "Scenes",
+      "room": 22,
+      "objectId": 404,
+      "verb": 54,
+      "scriptIds": [
+        67
+      ],
+      "rooms": [
+        22,
+        56
+      ],
+      "frames": 878,
+      "source": "Room 22 object 404 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 878 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 22 local script 204 +0x0000 runs script 2\nendCutscene at Room 22 local script 204 +0x0093 runs script 3\ncutscene at Script 67 +0x0000 runs script 2\nendCutscene at Script 67 +0x00FE runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 22 object 404 Verb 0x56",
@@ -2434,6 +2629,20 @@
       "source": "Room 23 object 425 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 76 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 23 local script 229 +0x0000 runs script 2\nendCutscene at Room 23 local script 229 +0x002C runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 24 object 431 Verb 0x3A",
+      "title": "Room 24 · Draft response 1 at tumbas",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 431,
+      "verb": 58,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 129,
+      "source": "Room 24 object 431 Verb 0x3A. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 129 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 local script 214 +0x0000 runs script 2\nendCutscene at Room 24 local script 214 +0x00C2 runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 24 object 431 Verb 0x3B",
       "title": "Room 24 · Draft response 2 at tumbas",
       "category": "Dialogue and reactions",
@@ -2464,6 +2673,76 @@
       ],
       "frames": 76,
       "source": "Room 24 object 431 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 76 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x3E",
+      "title": "Room 24 · Draft response 5 at ovejas",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 432,
+      "verb": 62,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 78,
+      "source": "Room 24 object 432 Verb 0x3E. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 78 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 local script 213 +0x0000 runs script 2\nendCutscene at Room 24 local script 213 +0x0043 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x3F",
+      "title": "Room 24 · Draft response 6 at ovejas",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 432,
+      "verb": 63,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 110,
+      "source": "Room 24 object 432 Verb 0x3F. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 110 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 local script 212 +0x0018 runs script 2\nendCutscene at Room 24 local script 212 +0x0064 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x47",
+      "title": "Room 24 · Draft response 14 at ovejas",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 432,
+      "verb": 71,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 106,
+      "source": "Room 24 object 432 Verb 0x47. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 106 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 Object 432 Verb 0x47 +0x0000 runs script 2\nendCutscene at Room 24 Object 432 Verb 0x47 +0x0048 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x49",
+      "title": "Room 24 · Draft response 16 at ovejas",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 432,
+      "verb": 73,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 113,
+      "source": "Room 24 object 432 Verb 0x49. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 113 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 Object 432 Verb 0x49 +0x0000 runs script 2\nendCutscene at Room 24 Object 432 Verb 0x49 +0x004E runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x56",
+      "title": "Room 24 · Other draft response at ovejas",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 432,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 105,
+      "source": "Room 24 object 432 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 105 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 Object 432 Verb 0x56 +0x0000 runs script 2\nendCutscene at Room 24 Object 432 Verb 0x56 +0x0044 runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 24 object 433 Verb 0x38",
@@ -2560,6 +2839,34 @@
       ],
       "frames": 76,
       "source": "Room 24 object 433 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 76 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 24 object 434 Verb 0x47",
+      "title": "Room 24 · Draft response 14 at durmiente",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 434,
+      "verb": 71,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 67,
+      "source": "Room 24 object 434 Verb 0x47. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 67 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 local script 215 +0x0000 runs script 2\nendCutscene at Room 24 local script 215 +0x00BC runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 24 object 434 Verb 0x56",
+      "title": "Room 24 · Other draft response at durmiente",
+      "category": "Dialogue and reactions",
+      "room": 24,
+      "objectId": 434,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        24
+      ],
+      "frames": 70,
+      "source": "Room 24 object 434 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 70 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 24 local script 215 +0x0000 runs script 2\nendCutscene at Room 24 local script 215 +0x00BC runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 25 object 447 Verb 0x3C",
@@ -2882,6 +3189,34 @@
       "source": "Room 28 object 470 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 642 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 109 +0x0016 runs script 2\nendCutscene at Script 109 +0x03C4 runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 28 object 470 Verb 0x3D",
+      "title": "Room 28 · Draft response 4 at oro",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 470,
+      "verb": 61,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Room 28 object 470 Verb 0x3D. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 78 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 470 Verb 0x56",
+      "title": "Room 28 · Other draft response at oro",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 470,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 72,
+      "source": "Room 28 object 470 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 72 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 28 object 471 Verb 0x36",
       "title": "Room 28 · Look at oro",
       "category": "Scenes",
@@ -2899,6 +3234,34 @@
       "source": "Room 28 object 471 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 642 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 109 +0x0016 runs script 2\nendCutscene at Script 109 +0x03C4 runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 28 object 471 Verb 0x3D",
+      "title": "Room 28 · Draft response 4 at oro",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 471,
+      "verb": 61,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Room 28 object 471 Verb 0x3D. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 78 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 471 Verb 0x56",
+      "title": "Room 28 · Other draft response at oro",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 471,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 72,
+      "source": "Room 28 object 471 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 72 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 28 object 472 Verb 0x36",
       "title": "Room 28 · Look at oro",
       "category": "Scenes",
@@ -2914,6 +3277,118 @@
       ],
       "frames": 642,
       "source": "Room 28 object 472 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 642 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 109 +0x0016 runs script 2\nendCutscene at Script 109 +0x03C4 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 472 Verb 0x3D",
+      "title": "Room 28 · Draft response 4 at oro",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 472,
+      "verb": 61,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Room 28 object 472 Verb 0x3D. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 78 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 472 Verb 0x56",
+      "title": "Room 28 · Other draft response at oro",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 472,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 72,
+      "source": "Room 28 object 472 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 72 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 473 Verb 0x3C",
+      "title": "Room 28 · Draft response 3 at paja",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 473,
+      "verb": 60,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Room 28 object 473 Verb 0x3C. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 78 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 473 Verb 0x56",
+      "title": "Room 28 · Other draft response at paja",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 473,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 73,
+      "source": "Room 28 object 473 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 73 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 474 Verb 0x3C",
+      "title": "Room 28 · Draft response 3 at paja",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 474,
+      "verb": 60,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Room 28 object 474 Verb 0x3C. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 78 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 474 Verb 0x56",
+      "title": "Room 28 · Other draft response at paja",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 474,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 73,
+      "source": "Room 28 object 474 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 73 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 475 Verb 0x3C",
+      "title": "Room 28 · Draft response 3 at paja",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 475,
+      "verb": 60,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Room 28 object 475 Verb 0x3C. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 78 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 28 object 475 Verb 0x56",
+      "title": "Room 28 · Other draft response at paja",
+      "category": "Dialogue and reactions",
+      "room": 28,
+      "objectId": 475,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        28
+      ],
+      "frames": 73,
+      "source": "Room 28 object 475 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 73 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 28 local script 218 +0x0000 runs script 2\nendCutscene at Room 28 local script 218 +0x00AF runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 30 object 503 Verb 0x38",
@@ -3282,6 +3757,20 @@
       "source": "Room 31 object 525 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 129 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 111 +0x0000 runs script 2\nendCutscene at Script 111 +0x00FA runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 31 object 525 Verb 0x56",
+      "title": "Room 31 · Other draft response at esfera",
+      "category": "Dialogue and reactions",
+      "room": 31,
+      "objectId": 525,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        31
+      ],
+      "frames": 75,
+      "source": "Room 31 object 525 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 75 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 31 local script 204 +0x0000 runs script 2\nendCutscene at Room 31 local script 204 +0x008E runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 32 object 537 Verb 0x38",
       "title": "Room 32 · Use response · Reached Room 30",
       "category": "Scenes",
@@ -3487,6 +3976,20 @@
       ],
       "frames": 1019,
       "source": "Room 34 object 561 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 1019 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 85 +0x0000 runs script 2\nendCutscene at Script 85 +0x05CE runs script 3\nStored name in the trigger room. Conditional naming operands (not validated live names): Rusty, chico."
+    },
+    {
+      "id": "Room 34 object 562 Verb 0x3A",
+      "title": "Room 34 · Draft response 1 at tumba",
+      "category": "Dialogue and reactions",
+      "room": 34,
+      "objectId": 562,
+      "verb": 58,
+      "scriptIds": [],
+      "rooms": [
+        34
+      ],
+      "frames": 139,
+      "source": "Room 34 object 562 Verb 0x3A. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 139 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 34 local script 218 +0x0000 runs script 2\nendCutscene at Room 34 local script 218 +0x00CE runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 34 object 562 Verb 0x3B",
@@ -3950,6 +4453,23 @@
       ],
       "frames": 75,
       "source": "Room 41 object 633 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 75 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 41 local script 213 +0x0000 runs script 2\nendCutscene at Room 41 local script 213 +0x00A9 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 43 object 640 Verb 0x36",
+      "title": "Room 43 · Look at esfera",
+      "category": "Scenes",
+      "room": 43,
+      "objectId": 640,
+      "verb": 54,
+      "scriptIds": [
+        94
+      ],
+      "rooms": [
+        19,
+        43
+      ],
+      "frames": 148,
+      "source": "Room 43 object 640 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 148 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 94 +0x0000 runs script 2\nendCutscene at Script 94 +0x0132 runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 43 object 640 Verb 0x56",
@@ -4668,6 +5188,23 @@
       "source": "Room 65 object 827 Verb 0x38. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 62 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 77 +0x0000 runs script 2\nendCutscene at Script 77 +0x0043 runs script 3\nNaming gap: no useful stored name in any supplied room definition; no validated naming instruction supplies one. Label uses the decoded action and validated reached rooms."
     },
     {
+      "id": "Room 65 object 828 Verb 0x40",
+      "title": "Room 65 · Draft response 7 at oscuridad",
+      "category": "Scenes",
+      "room": 65,
+      "objectId": 828,
+      "verb": 64,
+      "scriptIds": [
+        78
+      ],
+      "rooms": [
+        30,
+        65
+      ],
+      "frames": 94,
+      "source": "Room 65 object 828 Verb 0x40. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 94 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 78 +0x0000 runs script 2\nendCutscene at Script 78 +0x00BD runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 65 object 828 Verb 0x56",
       "title": "Room 65 · Other draft response at oscuridad",
       "category": "Dialogue and reactions",
@@ -4682,6 +5219,20 @@
       ],
       "frames": 76,
       "source": "Room 65 object 828 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 76 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "Room 66 object 833 Verb 0x56",
+      "title": "Room 66 · Other draft response at Bobbin",
+      "category": "Dialogue and reactions",
+      "room": 66,
+      "objectId": 833,
+      "verb": 86,
+      "scriptIds": [],
+      "rooms": [
+        66
+      ],
+      "frames": 100,
+      "source": "Room 66 object 833 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 100 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 66 Object 833 Verb 0x56 +0x0000 runs script 2\nendCutscene at Room 66 Object 833 Verb 0x56 +0x0053 runs script 3\nStored name in the trigger room."
     }
   ],
   "coverage": [
@@ -4703,7 +5254,7 @@
     {
       "title": "script 011",
       "status": "Shared input/draft helper; not a standalone story scene",
-      "source": "script 011; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 48; Incomplete: prerequisites, waits or executor require review: 7; No cutscene reached from this start: 3.\nPossible roots (not proof of reachability): Room 02 object 156 Verb 0x3A, Room 04 object 171 Verb 0x36, Room 04 object 172 Verb 0x36, Room 04 object 173 Verb 0x36, Room 04 object 174 Verb 0x36, Room 06 object 205 Verb 0x36, Room 06 object 206 Verb 0x3E, Room 06 object 206 Verb 0x3F, Room 06 object 207 Verb 0x3E, Room 06 object 207 Verb 0x3F, Room 06 object 210 Verb 0x3E, Room 06 object 210 Verb 0x3F, Room 06 object 211 Verb 0x3E, Room 06 object 211 Verb 0x3F, Room 06 object 214 Verb 0x36, Room 08 object 255 Verb 0x38, Room 08 object 256 Verb 0x3E, Room 08 object 256 Verb 0x3F, Room 08 object 257 Verb 0x3E, Room 08 object 257 Verb 0x3F, Room 08 object 258 Verb 0x3E, Room 08 object 258 Verb 0x3F, Room 09 object 268 Verb 0x37, Room 09 object 270 Verb 0x36, Room 09 object 270 Verb 0x3A, Room 09 object 272 Verb 0x36, Room 09 object 272 Verb 0x52, Room 09 object 273 Verb 0x4F, Room 09 object 273 Verb 0x51, Room 10 object 296 Verb 0x3A, Room 10 object 297 Verb 0x36, Room 10 object 298 Verb 0x36, Room 10 object 299 Verb 0x36, Room 10 object 300 Verb 0x36, Room 13 object 323 Verb 0x38, Room 13 object 325 Verb 0x36, Room 18 object 370 Verb 0x36, Room 20 object 386 Verb 0x36, Room 20 object 387 Verb 0x36, Room 23 entry, Room 24 object 432 Verb 0x36, Room 25 entry, Room 25 object 447 Verb 0x36, Room 28 object 470 Verb 0x3D, Room 28 object 471 Verb 0x3D, Room 28 object 472 Verb 0x3D, Room 31 object 523 Verb 0x36, Room 44 object 653 Verb 0x36, Room 46 object 682 Verb 0x3B, Room 46 object 683 Verb 0x3B, Room 46 object 684 Verb 0x3B, Room 46 object 685 Verb 0x3B, Room 62 object 808 Verb 0x3C, Room 62 object 808 Verb 0x3D, Room 62 object 809 Verb 0x3C, Room 62 object 809 Verb 0x3D, Room 62 object 810 Verb 0x36, Room 62 object 811 Verb 0x36"
+      "source": "script 011; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 53; Incomplete: prerequisites, waits or executor require review: 2; No cutscene reached from this start: 3.\nPossible roots (not proof of reachability): Room 02 object 156 Verb 0x3A, Room 04 object 171 Verb 0x36, Room 04 object 172 Verb 0x36, Room 04 object 173 Verb 0x36, Room 04 object 174 Verb 0x36, Room 06 object 205 Verb 0x36, Room 06 object 206 Verb 0x3E, Room 06 object 206 Verb 0x3F, Room 06 object 207 Verb 0x3E, Room 06 object 207 Verb 0x3F, Room 06 object 210 Verb 0x3E, Room 06 object 210 Verb 0x3F, Room 06 object 211 Verb 0x3E, Room 06 object 211 Verb 0x3F, Room 06 object 214 Verb 0x36, Room 08 object 255 Verb 0x38, Room 08 object 256 Verb 0x3E, Room 08 object 256 Verb 0x3F, Room 08 object 257 Verb 0x3E, Room 08 object 257 Verb 0x3F, Room 08 object 258 Verb 0x3E, Room 08 object 258 Verb 0x3F, Room 09 object 268 Verb 0x37, Room 09 object 270 Verb 0x36, Room 09 object 270 Verb 0x3A, Room 09 object 272 Verb 0x36, Room 09 object 272 Verb 0x52, Room 09 object 273 Verb 0x4F, Room 09 object 273 Verb 0x51, Room 10 object 296 Verb 0x3A, Room 10 object 297 Verb 0x36, Room 10 object 298 Verb 0x36, Room 10 object 299 Verb 0x36, Room 10 object 300 Verb 0x36, Room 13 object 323 Verb 0x38, Room 13 object 325 Verb 0x36, Room 18 object 370 Verb 0x36, Room 20 object 386 Verb 0x36, Room 20 object 387 Verb 0x36, Room 23 entry, Room 24 object 432 Verb 0x36, Room 25 entry, Room 25 object 447 Verb 0x36, Room 28 object 470 Verb 0x3D, Room 28 object 471 Verb 0x3D, Room 28 object 472 Verb 0x3D, Room 31 object 523 Verb 0x36, Room 44 object 653 Verb 0x36, Room 46 object 682 Verb 0x3B, Room 46 object 683 Verb 0x3B, Room 46 object 684 Verb 0x3B, Room 46 object 685 Verb 0x3B, Room 62 object 808 Verb 0x3C, Room 62 object 808 Verb 0x3D, Room 62 object 809 Verb 0x3C, Room 62 object 809 Verb 0x3D, Room 62 object 810 Verb 0x36, Room 62 object 811 Verb 0x36"
     },
     {
       "title": "script 012",
@@ -4721,11 +5272,6 @@
       "source": "script 022; unvalidated cutscene sites: +0x0005, +0x0138.\nLiteral trigger probes: none resolved; boot/watcher, dynamic calls or earlier state require individual review.\nPossible roots (not proof of reachability): "
     },
     {
-      "title": "script 029",
-      "status": "Shared input/draft helper; not a standalone story scene",
-      "source": "script 029; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 25; Incomplete: prerequisites, waits or executor require review: 5.\nPossible roots (not proof of reachability): Room 02 object 156 Verb 0x3A, Room 06 object 206 Verb 0x3E, Room 06 object 206 Verb 0x3F, Room 06 object 207 Verb 0x3E, Room 06 object 207 Verb 0x3F, Room 06 object 210 Verb 0x3E, Room 06 object 210 Verb 0x3F, Room 06 object 211 Verb 0x3E, Room 06 object 211 Verb 0x3F, Room 08 object 256 Verb 0x3E, Room 08 object 256 Verb 0x3F, Room 08 object 257 Verb 0x3E, Room 08 object 257 Verb 0x3F, Room 08 object 258 Verb 0x3E, Room 08 object 258 Verb 0x3F, Room 09 object 270 Verb 0x3A, Room 09 object 272 Verb 0x52, Room 10 object 296 Verb 0x3A, Room 13 object 323 Verb 0x38, Room 28 object 470 Verb 0x3D, Room 28 object 471 Verb 0x3D, Room 28 object 472 Verb 0x3D, Room 46 object 682 Verb 0x3B, Room 46 object 683 Verb 0x3B, Room 46 object 684 Verb 0x3B, Room 46 object 685 Verb 0x3B, Room 62 object 808 Verb 0x3C, Room 62 object 808 Verb 0x3D, Room 62 object 809 Verb 0x3C, Room 62 object 809 Verb 0x3D"
-    },
-    {
       "title": "script 045",
       "status": "Start needs validation",
       "source": "script 045; unvalidated cutscene sites: +0x001D, +0x0049, +0x0075, +0x009D.\nLiteral trigger probes: No cutscene reached from this start: 1; Validated state preview: 1.\nPossible roots (not proof of reachability): Room 02 entry, Room 02 object 156 Verb 0x3A"
@@ -4734,11 +5280,6 @@
       "title": "script 053",
       "status": "Start needs validation",
       "source": "script 053; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 13 entry"
-    },
-    {
-      "title": "script 054",
-      "status": "Start needs validation",
-      "source": "script 054; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 13 object 323 Verb 0x38"
     },
     {
       "title": "script 065",
@@ -4751,11 +5292,6 @@
       "source": "script 066; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 17 entry"
     },
     {
-      "title": "script 067",
-      "status": "Start needs validation",
-      "source": "script 067; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: No cutscene reached from this start: 1; Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 22 entry, Room 22 object 403 Verb 0x36, Room 22 object 404 Verb 0x36"
-    },
-    {
       "title": "script 069",
       "status": "Start needs validation",
       "source": "script 069; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: No cutscene reached from this start: 2.\nPossible roots (not proof of reachability): Room 25 entry, Room 25 object 447 Verb 0x36"
@@ -4764,11 +5300,6 @@
       "title": "script 076",
       "status": "Start needs validation",
       "source": "script 076; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: No cutscene reached from this start: 1; Validated state preview: 4.\nPossible roots (not proof of reachability): Room 28 entry, Room 28 object 466 Verb 0x43, Room 28 object 466 Verb 0x49, Room 28 object 467 Verb 0x43, Room 28 object 467 Verb 0x49"
-    },
-    {
-      "title": "script 078",
-      "status": "Start needs validation",
-      "source": "script 078; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 65 object 828 Verb 0x40"
     },
     {
       "title": "script 086",
@@ -4786,11 +5317,6 @@
       "source": "script 090; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 41 object 633 Verb 0x41, Room 41 object 633 Verb 0x4B"
     },
     {
-      "title": "script 094",
-      "status": "Start needs validation",
-      "source": "script 094; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 43 object 640 Verb 0x36"
-    },
-    {
       "title": "script 096",
       "status": "Start needs validation",
       "source": "script 096; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 43 object 639 Verb 0x38"
@@ -4799,16 +5325,6 @@
       "title": "script 101",
       "status": "Start needs validation",
       "source": "script 101; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 2.\nPossible roots (not proof of reachability): Room 09 object 268 Verb 0x37, Room 09 object 272 Verb 0x36"
-    },
-    {
-      "title": "script 104",
-      "status": "Start needs validation",
-      "source": "script 104; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 09 object 272 Verb 0x52"
-    },
-    {
-      "title": "Room 04 local 209",
-      "status": "Start needs validation",
-      "source": "Room 04 local 209; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 04 object 177 Verb 0x3A"
     },
     {
       "title": "Room 08 local 211",
@@ -4861,44 +5377,14 @@
       "source": "Room 17 local 200; unvalidated cutscene sites: +0x0022, +0x004D.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 17 entry"
     },
     {
-      "title": "Room 17 local 206",
-      "status": "Start needs validation",
-      "source": "Room 17 local 206; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 17 object 357 Verb 0x3A, Room 17 object 358 Verb 0x3A"
-    },
-    {
       "title": "Room 20 local 206",
       "status": "Start needs validation",
       "source": "Room 20 local 206; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 20 object 390 Verb 0x48, Room 20 object 391 Verb 0x48"
     },
     {
-      "title": "Room 20 local 211",
-      "status": "Start needs validation",
-      "source": "Room 20 local 211; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 20 object 390 Verb 0x49, Room 20 object 391 Verb 0x49"
-    },
-    {
-      "title": "Room 20 local 212",
-      "status": "Start needs validation",
-      "source": "Room 20 local 212; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 20 object 390 Verb 0x47, Room 20 object 391 Verb 0x47"
-    },
-    {
-      "title": "Room 20 local 213",
-      "status": "Start needs validation",
-      "source": "Room 20 local 213; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 20 object 390 Verb 0x56, Room 20 object 391 Verb 0x56"
-    },
-    {
       "title": "Room 22 local 200",
       "status": "Start needs validation",
-      "source": "Room 22 local 200; unvalidated cutscene sites: +0x002F, +0x0083.\nLiteral trigger probes: No cutscene reached from this start: 1; Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 22 entry, Room 22 object 403 Verb 0x36, Room 22 object 404 Verb 0x36"
-    },
-    {
-      "title": "Room 22 local 204",
-      "status": "Start needs validation",
-      "source": "Room 22 local 204; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 22 object 404 Verb 0x36"
-    },
-    {
-      "title": "Room 22 local 205",
-      "status": "Start needs validation",
-      "source": "Room 22 local 205; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 22 object 403 Verb 0x36"
+      "source": "Room 22 local 200; unvalidated cutscene sites: +0x002F, +0x0083.\nLiteral trigger probes: No cutscene reached from this start: 1; Validated state preview: 2.\nPossible roots (not proof of reachability): Room 22 entry, Room 22 object 403 Verb 0x36, Room 22 object 404 Verb 0x36"
     },
     {
       "title": "Room 23 local 200",
@@ -4928,42 +5414,7 @@
     {
       "title": "Room 24 local 211",
       "status": "Start needs validation",
-      "source": "Room 24 local 211; unvalidated cutscene sites: +0x0018.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x3E"
-    },
-    {
-      "title": "Room 24 local 212",
-      "status": "Start needs validation",
-      "source": "Room 24 local 212; unvalidated cutscene sites: +0x0018.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x3F"
-    },
-    {
-      "title": "Room 24 local 213",
-      "status": "Start needs validation",
-      "source": "Room 24 local 213; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 2.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x3E, Room 24 object 432 Verb 0x3F"
-    },
-    {
-      "title": "Room 24 local 214",
-      "status": "Start needs validation",
-      "source": "Room 24 local 214; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 24 object 431 Verb 0x3A"
-    },
-    {
-      "title": "Room 24 local 215",
-      "status": "Start needs validation",
-      "source": "Room 24 local 215; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 3.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x36, Room 24 object 434 Verb 0x47, Room 24 object 434 Verb 0x56"
-    },
-    {
-      "title": "Room 24 object 432 Verb 0x47",
-      "status": "Start needs validation",
-      "source": "Room 24 object 432 Verb 0x47; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x47"
-    },
-    {
-      "title": "Room 24 object 432 Verb 0x49",
-      "status": "Start needs validation",
-      "source": "Room 24 object 432 Verb 0x49; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x49"
-    },
-    {
-      "title": "Room 24 object 432 Verb 0x56",
-      "status": "Start needs validation",
-      "source": "Room 24 object 432 Verb 0x56; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x56"
+      "source": "Room 24 local 211; unvalidated cutscene sites: +0x0018.\nLiteral trigger probes: Validated state preview: 1.\nPossible roots (not proof of reachability): Room 24 object 432 Verb 0x3E"
     },
     {
       "title": "Room 25 local 200",
@@ -4993,12 +5444,12 @@
     {
       "title": "Room 28 local 200",
       "status": "Start needs validation",
-      "source": "Room 28 local 200; unvalidated cutscene sites: +0x0010.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 3.\nPossible roots (not proof of reachability): Room 28 object 470 Verb 0x3D, Room 28 object 471 Verb 0x3D, Room 28 object 472 Verb 0x3D"
+      "source": "Room 28 local 200; unvalidated cutscene sites: +0x0010.\nLiteral trigger probes: Validated state preview: 3.\nPossible roots (not proof of reachability): Room 28 object 470 Verb 0x3D, Room 28 object 471 Verb 0x3D, Room 28 object 472 Verb 0x3D"
     },
     {
       "title": "Room 28 local 201",
       "status": "Start needs validation",
-      "source": "Room 28 local 201; unvalidated cutscene sites: +0x0010.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 3.\nPossible roots (not proof of reachability): Room 28 object 473 Verb 0x3C, Room 28 object 474 Verb 0x3C, Room 28 object 475 Verb 0x3C"
+      "source": "Room 28 local 201; unvalidated cutscene sites: +0x0010.\nLiteral trigger probes: Validated state preview: 3.\nPossible roots (not proof of reachability): Room 28 object 473 Verb 0x3C, Room 28 object 474 Verb 0x3C, Room 28 object 475 Verb 0x3C"
     },
     {
       "title": "Room 28 local 203",
@@ -5009,16 +5460,6 @@
       "title": "Room 28 local 212",
       "status": "Start needs validation",
       "source": "Room 28 local 212; unvalidated cutscene sites: +0x0064.\nLiteral trigger probes: No cutscene reached from this start: 1; Validated state preview: 2.\nPossible roots (not proof of reachability): Room 28 entry, Room 28 object 466 Verb 0x43, Room 28 object 467 Verb 0x43"
-    },
-    {
-      "title": "Room 28 local 218",
-      "status": "Start needs validation",
-      "source": "Room 28 local 218; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 12.\nPossible roots (not proof of reachability): Room 28 object 470 Verb 0x3D, Room 28 object 470 Verb 0x56, Room 28 object 471 Verb 0x3D, Room 28 object 471 Verb 0x56, Room 28 object 472 Verb 0x3D, Room 28 object 472 Verb 0x56, Room 28 object 473 Verb 0x3C, Room 28 object 473 Verb 0x56, Room 28 object 474 Verb 0x3C, Room 28 object 474 Verb 0x56, Room 28 object 475 Verb 0x3C, Room 28 object 475 Verb 0x56"
-    },
-    {
-      "title": "Room 31 local 204",
-      "status": "Start needs validation",
-      "source": "Room 31 local 204; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 31 object 525 Verb 0x56"
     },
     {
       "title": "Room 33 local 202",
@@ -5046,11 +5487,6 @@
       "source": "Room 34 local 207; unvalidated cutscene sites: +0x0079.\nLiteral trigger probes: Validated state preview: 1.\nPossible roots (not proof of reachability): Room 34 object 559 Verb 0x37"
     },
     {
-      "title": "Room 34 local 218",
-      "status": "Start needs validation",
-      "source": "Room 34 local 218; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 34 object 562 Verb 0x3A"
-    },
-    {
       "title": "Room 36 local 200",
       "status": "Start needs validation",
       "source": "Room 36 local 200; unvalidated cutscene sites: +0x001D, +0x0048, +0x0077, +0x00A6.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 36 entry"
@@ -5074,14 +5510,9 @@
       "title": "Room 62 local 204",
       "status": "Start needs validation",
       "source": "Room 62 local 204; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 1.\nPossible roots (not proof of reachability): Room 62 object 809 Verb 0x3D"
-    },
-    {
-      "title": "Room 66 object 833 Verb 0x56",
-      "status": "Start needs validation",
-      "source": "Room 66 object 833 Verb 0x56; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 66 object 833 Verb 0x56"
     }
   ],
-  "summary": "75 scene starts and 216 dialogue/reaction previews. Coverage remains incomplete; Needs validation lists unresolved scene branches and shared helpers.",
+  "summary": "80 scene starts and 249 dialogue/reaction previews. Coverage remains incomplete; Needs validation lists unresolved scene branches and shared helpers.",
   "membership": [
     {
       "id": "Room 02 object 153 Verb 0x38",
@@ -5355,6 +5786,15 @@
         4
       ],
       "frames": 112,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 177 Verb 0x3A",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 129,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -5711,6 +6151,19 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 09 object 272 Verb 0x52",
+      "startRoom": 9,
+      "rooms": [
+        9,
+        14,
+        51,
+        59,
+        61
+      ],
+      "frames": 1003,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 09 object 272 Verb 0x56",
       "startRoom": 9,
       "rooms": [
@@ -5883,6 +6336,16 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 13 object 323 Verb 0x38",
+      "startRoom": 13,
+      "rooms": [
+        13,
+        15
+      ],
+      "frames": 105,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 13 object 324 Verb 0x36",
       "startRoom": 13,
       "rooms": [
@@ -5975,6 +6438,15 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 17 object 357 Verb 0x3A",
+      "startRoom": 17,
+      "rooms": [
+        17
+      ],
+      "frames": 128,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 17 object 357 Verb 0x3B",
       "startRoom": 17,
       "rooms": [
@@ -5990,6 +6462,15 @@
         17
       ],
       "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 17 object 358 Verb 0x3A",
+      "startRoom": 17,
+      "rooms": [
+        17
+      ],
+      "frames": 128,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -6186,12 +6667,85 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 20 object 390 Verb 0x47",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 92,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 390 Verb 0x49",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 114,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 390 Verb 0x56",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 100,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 391 Verb 0x47",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 92,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 391 Verb 0x49",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 114,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 391 Verb 0x56",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 100,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 403 Verb 0x36",
+      "startRoom": 22,
+      "rooms": [
+        22
+      ],
+      "frames": 177,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 22 object 403 Verb 0x56",
       "startRoom": 22,
       "rooms": [
         22
       ],
       "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 404 Verb 0x36",
+      "startRoom": 22,
+      "rooms": [
+        22,
+        56
+      ],
+      "frames": 878,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -6358,6 +6912,15 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 24 object 431 Verb 0x3A",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 129,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 24 object 431 Verb 0x3B",
       "startRoom": 24,
       "rooms": [
@@ -6373,6 +6936,51 @@
         24
       ],
       "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x3E",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x3F",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 110,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x47",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 106,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x49",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 113,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 432 Verb 0x56",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 105,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -6429,6 +7037,24 @@
         24
       ],
       "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 434 Verb 0x47",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 67,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 434 Verb 0x56",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 70,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -6634,6 +7260,24 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 28 object 470 Verb 0x3D",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 470 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 28 object 471 Verb 0x36",
       "startRoom": 28,
       "rooms": [
@@ -6644,6 +7288,24 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 28 object 471 Verb 0x3D",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 471 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 28 object 472 Verb 0x36",
       "startRoom": 28,
       "rooms": [
@@ -6651,6 +7313,78 @@
         79
       ],
       "frames": 642,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 472 Verb 0x3D",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 472 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 473 Verb 0x3C",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 473 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 474 Verb 0x3C",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 474 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 475 Verb 0x3C",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 475 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 73,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -6878,6 +7612,15 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 31 object 525 Verb 0x56",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 32 object 537 Verb 0x38",
       "startRoom": 32,
       "rooms": [
@@ -7002,6 +7745,15 @@
         52
       ],
       "frames": 1019,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 562 Verb 0x3A",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 139,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -7282,6 +8034,16 @@
         41
       ],
       "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 43 object 640 Verb 0x36",
+      "startRoom": 43,
+      "rooms": [
+        19,
+        43
+      ],
+      "frames": 148,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -7717,12 +8479,31 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
+      "id": "Room 65 object 828 Verb 0x40",
+      "startRoom": 65,
+      "rooms": [
+        30,
+        65
+      ],
+      "frames": 94,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
       "id": "Room 65 object 828 Verb 0x56",
       "startRoom": 65,
       "rooms": [
         65
       ],
       "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 66 object 833 Verb 0x56",
+      "startRoom": 66,
+      "rooms": [
+        66
+      ],
+      "frames": 100,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
