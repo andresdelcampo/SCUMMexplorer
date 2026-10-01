@@ -40,11 +40,11 @@ Resumed from 7e91c35. Generic native sound completion is implemented and visibly
 
 [Earlier route checkpoint](../.verification/coverage-routes-20261001/validation.md): same-session052/input/053 and086/look/087 established before sequence promotion. Its Room41 unmatched-scope finding led to the generic scheduler correction above. The late096 actor4/input uncertainty remains. Six owners without literal roots are shared helpers; outstanding story owners have candidates without complete fresh routes.
 
-Additional requested work (planned, not implemented):
+Additional requested work completed:
 
 * Game status view to update the game status (have or not the staff, how many notes available, which are the spells notes, etc)
 
-Show and allow explicit updates to the current exploration session's staff/distaff status, available notes (count and identity), and each spell/draft's note sequence. Derive the fields, valid values and dependencies from the loaded SCUMM data and scripts. Reflect changes made by the game; distinguish known, estimated and unresolved state. Label user edits as explicit exploration choices, keeping them separate from source-established replay prerequisites. Preserve the existing replay/input/audio guards and visibly validate that status changes and subsequent interactions stay consistent.
+Game status provides live inspection and explicit edits for source-validated staff possession, available notes0..8 with native-position identities, and fifteen four-note draft sequences. Loaded source contract verified before editing; learned/reverse flags and response targets retained. Edits carry explicit provenance, fresh replay replaces them, busy/paused guards and stale-Apply protection preserve consistency. Core260/260, visible WPF16/16 including subsequent native note input and minimum-size layout. [Validation](../.verification/game-status-20261001/validation.md). Remaining work is source-backed input/actor certainty.
 
 Replay naming completed: all views consume shared descriptors. Stored source names retained; 39 unnamed targets use decoded action/reached-room labels with explicit naming gaps. [Validation](../.verification/replay-names-20261001/validation.md): 9/9 WPF checks, recipes and coverage unchanged.
 

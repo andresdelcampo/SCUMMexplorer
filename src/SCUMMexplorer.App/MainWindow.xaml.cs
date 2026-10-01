@@ -179,6 +179,24 @@ public partial class MainWindow : Window
         }
     }
 
+    private bool CanEditGameStatus => _session?.GameStatus.CanEdit == true && _replaySequence is null &&
+        !_playbackPaused && (_playback is null || !PlaybackHasActivity);
+
+    private GameStatusWindow BuildGameStatusWindow() => new(() => _session, () => CanEditGameStatus, () =>
+    {
+        if (_currentRoomResource is { } room && _currentRoom is not null && room.ResourceId == _session?.Snapshot.RoomId)
+        {
+            ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+            UpdateRoomNavigationActions(room);
+            RefreshRoomPreview(); UpdateActorLayer(); UpdateVerbArea(); UpdatePlaybackControls();
+        }
+    }) { Owner = this, Resources = Resources };
+
+    private void GameStatus_Click(object sender, RoutedEventArgs e)
+    {
+        if (_game?.Id == GameId.Loom && _session is not null) BuildGameStatusWindow().ShowDialog();
+    }
+
     private void OpenGameFolder(string folder)
     {
         var game = _scanner.Scan(folder);
@@ -2884,6 +2902,8 @@ public partial class MainWindow : Window
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
     {
+        GameStatusButton.Visibility = _game?.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
+        GameStatusButton.IsEnabled = _session is not null; // Inspection is available during playback too; editing stays guarded.
         var active = GameClickActive && _game?.Id == GameId.Loom;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         SoundModeCombo.IsEnabled = !SessionInScene;
