@@ -129,3 +129,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 
 Stored names resolved across source room definitions; 39 genuinely unnamed targets use decoded action/reached-room descriptors with explicit gaps. Shared picker/Game Texts titles, 9/9 WPF checks; replay actions and coverage unchanged. [Validation](../.verification/replay-names-20261001/validation.md).
 
+# 1 October 2026: requested replay/status control placement
+
+Top-right Game Status, Advanced-only global Play Cutscene and room replay beside Skip line; shared memberships and playback guards retained. [WPF11/11 and screenshots](../.verification/ui-refinements-20261001/validation.md).
+

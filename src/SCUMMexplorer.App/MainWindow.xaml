@@ -105,13 +105,12 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions><RowDefinition Height="58"/><RowDefinition Height="*"/><RowDefinition Height="30"/></Grid.RowDefinitions>
-        <Border Grid.Row="0" Background="#192632" BorderBrush="#334452" BorderThickness="0,0,0,1">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+        <Border Grid.Row="0" MinHeight="58" Background="#192632" BorderBrush="#334452" BorderThickness="0,0,0,1">
             <Grid Margin="18,0">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <TextBlock Text="SCUMMexplorer" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Text="Step into the game world" Foreground="#B8AA8C" FontSize="13" VerticalAlignment="Center" Margin="12,2,0,0"/>
-                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="16,0,0,0">
                     <ComboBox x:Name="SoundModeCombo" Width="110" VerticalAlignment="Center" Margin="0,0,12,0"
                               SelectionChanged="SoundModeCombo_SelectionChanged"
                               ToolTip="Music and effects. Changing device stops current audio; the next sound command uses the selected device.">
@@ -122,10 +121,12 @@
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click"
                               VerticalAlignment="Center" Margin="0,0,12,0" Foreground="#D2C7B5"
                               ToolTip="Show SCUMM resource lists, script state, and diagnostic controls."/>
-                    <Button x:Name="CutsceneMenuButton" Content="Play Cutscene ▾" Click="CutsceneMenu_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" IsEnabled="False"/>
+                    <Button x:Name="GameStatusButton" Content="Game Status" Visibility="Collapsed" Click="GameStatus_Click"
+                            Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
+                    <Button x:Name="CutsceneMenuButton" Content="Play Cutscene ▾" Visibility="Collapsed" Click="CutsceneMenu_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" IsEnabled="False"/>
                     <Button x:Name="GameTextsButton" Content="Game Texts" Click="GameTexts_Click" Visibility="Collapsed" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                     <Button Content="Open Game Folder…" Click="OpenFolder_Click" Padding="16,8" Margin="0,9,0,9" Background="#B78442" Foreground="#111820" BorderThickness="0" FontWeight="SemiBold"/>
-                </StackPanel>
+                </WrapPanel>
             </Grid>
         </Border>
         <Grid Grid.Row="1">
@@ -159,11 +160,6 @@
                         <Grid x:Name="RoomDisplayLayout" Visibility="Collapsed" SizeChanged="RoomDisplayLayout_SizeChanged">
                             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                             <WrapPanel Grid.Row="0" Margin="10,8,10,6" VerticalAlignment="Center">
-                                <Button x:Name="RoomCutsceneButton" Content="Play Cutscene" Visibility="Collapsed"
-                                        Click="RoomCutscene_Click" Padding="10,5" Margin="0,0,14,0"
-                                        Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
-                                <Button x:Name="GameStatusButton" Content="Game status" Visibility="Collapsed" Click="GameStatus_Click"
-                                        Padding="10,5" Margin="0,0,14,0" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
                                 <CheckBox x:Name="NormalRoomWidthToggle" Content="Original framing" IsChecked="True"
                                           Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
                                           ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
@@ -237,7 +233,7 @@
                                                     Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         </StackPanel>
                                     </DockPanel>
-                                    <StackPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
+                                    <WrapPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
                                         <Button x:Name="PlaybackPauseButton" Content="⏸ Pause" Click="PlaybackPause_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Pause or play the scene (space). While paused, Continue ▸ in the advanced session bar plays one frame."/>
@@ -246,7 +242,10 @@
                                         <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Skip the current line, as with the '.' key."/>
-                                    </StackPanel>
+                                        <Button x:Name="RoomCutsceneButton" Content="Play Cutscene" Visibility="Collapsed"
+                                                Click="RoomCutscene_Click" Padding="8,4" MinWidth="104" Height="27"
+                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
+                                    </WrapPanel>
                                     <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center"/>
                                     <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,3,0,0">
                                         <TextBlock x:Name="ObjectActionNote" Foreground="#D2C7B5" TextWrapping="Wrap" TextAlignment="Center"/>

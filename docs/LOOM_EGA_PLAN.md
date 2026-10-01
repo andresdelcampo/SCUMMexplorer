@@ -32,7 +32,9 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
-### Next UI refinements requested (planned, not implemented)
+### Next UI refinements requested (in progress)
+
+Control placement completed: top-right Game Status beside Advanced-only global Play Cutscene; room Play Cutscene follows Skip line. Normal/Advanced and minimum-width WPF11/11, screenshots inspected. [Validation](../.verification/ui-refinements-20261001/validation.md). Remaining refinements below retain priority.
 
 Implement these before resuming unresolved source-route work. They supersede the earlier button placement, original-scene title exceptions and inspect/edit toggle in the completed status milestone.
 

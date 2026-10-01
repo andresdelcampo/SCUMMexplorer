@@ -531,6 +531,7 @@ public partial class MainWindow : Window
     private void UpdateAdvancedMode()
     {
         var advanced = IsAdvancedMode;
+        CutsceneMenuButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GameTextsButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         var rootGrid = ContentPanel.Parent as Grid;
         var showRoomDetails = advanced && _selectedResource?.Kind == ResourceKind.Room;
@@ -2904,6 +2905,7 @@ public partial class MainWindow : Window
     {
         GameStatusButton.Visibility = _game?.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         GameStatusButton.IsEnabled = _session is not null; // Inspection is available during playback too; editing stays guarded.
+        CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         var active = GameClickActive && _game?.Id == GameId.Loom;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         SoundModeCombo.IsEnabled = !SessionInScene;
@@ -2921,7 +2923,6 @@ public partial class MainWindow : Window
             roomChoices.Count == 1 ? $"Replay {roomChoices[0].Title} from its validated fresh-session start. The current exploration state is replaced." :
             "Choose a replay associated with this room by its validated start or reached rooms. Each replay starts a fresh session and replaces the current exploration state.";
         if (!active) return;
-        CutsceneMenuButton.Visibility = Visibility.Visible;
         CutsceneMenuButton.Content = "Play Cutscene ▾";
         CutsceneMenuButton.IsEnabled = CanStartCutscene;
         CutsceneMenuButton.ToolTip = CanStartCutscene ? "Choose a cutscene from anywhere in the game. Each replay replaces exploration with its stated start." : "Playback is active. Finish or skip it before starting another scene.";
