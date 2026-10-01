@@ -3001,13 +3001,7 @@ public partial class MainWindow : Window
         if (_game?.Id != GameId.Loom || _session is null) return choices;
         choices.Add(("The opening", OpeningSource + " " + OpeningStartNote, PlayOpening));
         foreach (var cutscene in AllCutscenes())
-            choices.Add((cutscene.Script switch
-            {
-                52 => "Room 10 to Room 13",
-                46 => "The Elders' trial",
-                86 => "The firewood scene",
-                _ => cutscene.Title
-            }, cutscene.Source + " " + CutsceneStartNote(cutscene), () => PlayKnownCutscene(cutscene)));
+            choices.Add((cutscene.Title, cutscene.Source + " " + CutsceneStartNote(cutscene), () => PlayKnownCutscene(cutscene)));
         return choices;
     }
 

@@ -32,6 +32,8 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
+Replay naming completed: all views consume shared descriptors. Stored source names retained; 39 unnamed targets use decoded action/reached-room labels with explicit naming gaps. [Validation](../.verification/replay-names-20261001/validation.md): 9/9 WPF checks, recipes and coverage unchanged. Room access is next.
+
 **Next-session priorities requested after the completed work (planning only):**
 
 1. Replace `Object ###` in global cutscene titles with the object's source-established name. Investigate names across the room object definitions, shared references and executed naming instructions; use the same resolved title in the global picker, room picker and Game Texts. Keep numeric IDs in Advanced/source details. If an object genuinely has no source name, use a concise descriptor supported by its decoded action/reached scene rather than inventing a name, and record that naming gap.

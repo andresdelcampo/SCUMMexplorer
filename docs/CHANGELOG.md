@@ -114,3 +114,7 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 - RoomAudit: 0 gaps in all 76 rooms.
 - WPF checks: all pass except CameraPanCheck (2) and VerbAreaCheck (1), see above.
 - Blockers baseline: `.verification/room-owned-loads/blockers-after.txt` (5839 over 134 reasons). The real stops left are `expression` (3), `getActorCostume` (1) and `getActorElevation` (1). The rest are labels.
+# 1 October: source-backed replay titles
+
+Stored names resolved across source room definitions; 39 genuinely unnamed targets use decoded action/reached-room descriptors with explicit gaps. Shared picker/Game Texts titles, 9/9 WPF checks; replay actions and coverage unchanged. [Validation](../.verification/replay-names-20261001/validation.md).
+

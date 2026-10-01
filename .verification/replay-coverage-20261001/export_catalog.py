@@ -1,22 +1,11 @@
 """Export only completed preview recipes, exact data fingerprints and honest gaps.
-Usage: export_catalog.py roots.json audit.json Games/loom catalog.json report.md
+Usage: export_catalog.py roots.json audit.json Games/loom catalog.json report.md code.tsv
 """
-import collections, json, re, struct, sys
+import collections, json, re, sys
+from replay_names import ReplayNames
 roots=json.load(open(sys.argv[1],encoding='utf-8'))
 audit=json.load(open(sys.argv[2],encoding='utf-8'))
-names={}
-for room in sorted({r['room'] for r in audit['results']}):
-    data=bytes(b^255 for b in open(f'{sys.argv[3]}/{room:02d}.LFL','rb').read())
-    count=data[20]
-    for i in range(count):
-        code=struct.unpack_from('<H',data,29+2*count+2*i)[0]
-        if code+17>len(data): continue
-        obj=struct.unpack_from('<H',data,code+4)[0]
-        start=code+data[code+16]
-        end=data.find(b'\0',start,code+struct.unpack_from('<H',data,code)[0])
-        if end>start and data[code+16]>=17:
-            name=data[start:end].decode('cp437')
-            if any(c.isalnum() for c in name): names[room,obj]=name
+names=ReplayNames(sys.argv[3], sys.argv[6])
 
 def site(trace):
     m=re.match(r'cutscene at (.*?) (\+0x[\dA-Fa-f]+) runs script',trace)
@@ -26,12 +15,6 @@ def site(trace):
     owner=owner.replace(' Object ',' object ').replace(' local script ',' local ').replace(' entry script',' entry')
     return owner,m[2].upper().replace('+0X','+0x')
 
-def title(r):
-    if not r['objectId']: return f"Arrival in Room {r['room']:02d}"
-    what=names.get((r['room'],r['objectId']),f"Object {r['objectId']}")
-    action={0x36:'Look at',0x37:'Walk to',0x38:'Use',0x56:'Other draft response at'}.get(r['verb'],f"Draft response {r['verb']-0x39} at")
-    return f"Room {r['room']:02d} · {action} {what}"
-
 replays=[]; reached=set()
 for r in audit['results']:
     if r['status']!='Validated state preview': continue
@@ -40,7 +23,8 @@ for r in audit['results']:
     scripts=sorted({int(s[0].split()[1]) for s in actual if s[0].startswith('script ')})
     category='Scenes' if r['verb']==0x38 or r['objectId']==0 or len(r['rooms'])>1 or any(44<=s<112 for s in scripts) else 'Dialogue and reactions'
     source=f"{r['owner']}. Fresh post-boot seed-0 session; catalog arrival assumed; " + ('room entry' if not r['objectId'] else 'direct object verb, not game input') + f". Completed in {r['frames']} audit frames, including the final 32 idle frames. Reached scene boundaries:\n"+'\n'.join(r['sceneTrace'])
-    replays.append(dict(id=r['owner'],title=title(r),category=category,room=r['room'],objectId=r['objectId'],verb=r['verb'],scriptIds=scripts,rooms=r['rooms'],frames=r['frames'],source=source))
+    title, name_evidence=names.describe(r)
+    replays.append(dict(id=r['owner'],title=title,category=category,room=r['room'],objectId=r['objectId'],verb=r['verb'],scriptIds=scripts,rooms=r['rooms'],frames=r['frames'],source=source+'\n'+name_evidence))
 
 # Existing hand-validated starts keep their descriptors in the app, and are counted once.
 manual={(8,255,0x38),(10,295,0x38)}
