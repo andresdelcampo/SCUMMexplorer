@@ -163,10 +163,6 @@
                                           Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
                                           ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
                                           Checked="NormalRoomWidthToggle_Changed" Unchecked="NormalRoomWidthToggle_Changed"/>
-                                <CheckBox x:Name="GamePointerToggle" Content="Pointer as game input" IsChecked="False" Visibility="Collapsed"
-                                          Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
-                                          Checked="GamePointerToggle_Changed" Unchecked="GamePointerToggle_Changed"
-                                          ToolTip="Assumed input, off by default. While on, in interactive mode, the pointer's room position is given to the game as its virtual mouse, and moving onto a different object advances one frame, so the input loop (script 006) reacts to the hover as it would in the game: for example, script 008 shows the object's close-up in the verb area. No click is sent. With the pointer off the room, the game is taken to have no pointer over it."/>
                                 <CheckBox x:Name="RoomNavigationToggle" Content="Show exits" Visibility="Collapsed" IsChecked="False"
                                           Margin="0,0,14,0" Foreground="#E7E0D2"
                                           Checked="RoomNavigationToggle_Changed" Unchecked="RoomNavigationToggle_Changed"/>
@@ -354,7 +350,7 @@
                     <StackPanel Margin="0,4,8,8">
                         <DockPanel>
                             <CheckBox x:Name="SessionModeToggle" DockPanel.Dock="Right" Content="Interactive" IsChecked="True"
-                                      ToolTip="Interactive mode: a click on the room is the game's click (scripts 005–007, assumed input): Bobbin walks over and uses what is there (verb 0x38; doorways lead on), and a double click also looks at it (verb 0x36). Keys go to the game as in ScummVM: q-w-e-r-t-y-u-i and c-d-e-f-g-a-b-C play the distaff's notes, '.' skips the text shown, Escape skips a cutscene, space pauses it. Uncheck for inspection mode, where a click cycles an object's stored images and no script runs."
+                                      ToolTip="Interactive mode: hover automatically sends the pointer's room position to script 006, so script 008 can show the object's close-up; it sends no click. A click is the game's click (scripts 005–007, assumed input): Bobbin walks over and uses what is there (verb 0x38; doorways lead on), and a double click also looks at it (verb 0x36). Keys go to the game as in ScummVM: q-w-e-r-t-y-u-i and c-d-e-f-g-a-b-C play the distaff's notes, '.' skips the text shown, Escape skips a cutscene, space pauses it. Uncheck for inspection mode, where a click cycles an object's stored images and no script runs. Returning to normal view restores Interactive."
                                       Checked="SessionMode_Changed" Unchecked="SessionMode_Changed"
                                       Foreground="#E7E0D2" VerticalAlignment="Center" Visibility="Collapsed"/>
                             <TextBlock Text="IN THIS ROOM" Foreground="#B78442" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>

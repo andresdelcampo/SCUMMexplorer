@@ -522,7 +522,6 @@ public partial class MainWindow : Window
         Grid.SetColumnSpan(ContentPanel, showRoomDetails ? 1 : 2);
         ResourceTree.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomCardScroll.Visibility = _game is null || advanced ? Visibility.Collapsed : Visibility.Visible;
-        GamePointerToggle.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
             ? Visibility.Visible : Visibility.Collapsed;
@@ -984,6 +983,8 @@ public partial class MainWindow : Window
 
     private void SessionMode_Changed(object sender, RoutedEventArgs e)
     {
+        _gamePointerTarget = null;
+        _session?.SetPointer(null);
         StopScenePlayback();
         if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
         if (_currentRoomResource is not { } room || _currentRoom is null) return;
@@ -3640,29 +3641,24 @@ public partial class MainWindow : Window
 
     // The room and the object under the pointer (0: none) when a frame last ran for the game pointer.
     private (int? Room, int? Target)? _gamePointerTarget;
+    private LoomExplorationSession? _pointerSession;
 
     /// <summary>
-    /// "Pointer as game input": gives the pointer's room position to the session
+    /// Interactive hover gives the pointer's room position to the session
     /// as the virtual mouse (assumed input, no click). A frame runs only when the
     /// object under the pointer changes, so the input loop sees the new hover once.
     /// </summary>
     private void SendPointerToGame((int X, int Y)? point, int? target)
     {
-        if (GamePointerToggle.IsChecked != true || SessionModeToggle.IsChecked != true || _session is null ||
+        if (!GameClickActive || _session is null ||
             _currentRoomResource is not { } room || _session.Snapshot.RoomId != room.ResourceId) return;
+        if (!ReferenceEquals(_pointerSession, _session)) { _gamePointerTarget = null; _pointerSession = _session; }
         _session.SetPointer(point);
         // While the playback clock runs, its frames see the pointer.
-        if (PlaybackRunning) return;
+        if (PlaybackRunning || _playbackPaused) return;
         if (_gamePointerTarget == (room.ResourceId, target)) return;
         _gamePointerTarget = (room.ResourceId, target);
         AdvanceOneFrame();
-    }
-
-    private void GamePointerToggle_Changed(object sender, RoutedEventArgs e)
-    {
-        _gamePointerTarget = null;
-        if (GamePointerToggle.IsChecked != true) _session?.SetPointer(null);
-        UpdateVerbArea();
     }
 
     private bool VerbStripShown() =>
@@ -3792,7 +3788,7 @@ public partial class MainWindow : Window
     private void UpdateVerbArea()
     {
         UpdateVerbStrip();
-        var closeUp = GamePointerToggle.IsChecked == true || GameClickActive
+        var closeUp = GameClickActive
             ? _session?.Verbs.FirstOrDefault(verb => verb.VerbId == 0x36) : null;
         if (closeUp is not { Mode: 1, ImageObject: int image } || _session is null)
         {

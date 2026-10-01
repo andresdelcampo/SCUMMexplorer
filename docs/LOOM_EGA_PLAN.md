@@ -30,7 +30,7 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 **Consequence for the old task list:** the remaining "Blockers" stops (`expression` ×3, `getActorCostume` ×1, `getActorElevation` ×1), the refused-input label wording and the KeyInputCheck extension do not change what the user sees. They are dropped as separate tasks. The actor work below models `actorOps costume/elevation`, which removes two of those stops as a side effect.
 
-## Current follow-up (30 September)
+## Current follow-up (1 October)
 
 1 October task 1: Play Cutscene moved to the top bar with global access to existing replay starts from any room. Broad discovery/promotion is the next task. [Validation](../.verification/global-cutscene-picker-20261001/validation.md): 6/6 WPF checks; Release zero warnings/errors.
 
@@ -38,7 +38,11 @@ Task 2: Game Texts appears only in Advanced; normal mode return preserves Intera
 
 Task 3: global searchable replay picker, 75 scene starts + 216 dialogue/reaction previews, exact loaded-data validation, shared plain descriptors for unambiguous Game Texts links. 363 source-derived start probes; 139/235 cutscene sites reached by completed previews. 79 owners have outstanding sites shown in Needs validation; full-game coverage remains incomplete. [Discovery and remaining work](LOOM_CUTSCENE_DISCOVERY.md), [audit](../.verification/replay-coverage-20261001/audit.md), [WPF validation](../.verification/replay-coverage-20261001/validation.md): 21/21, existing tests 249/249. No executor/state hacks.
 
-**Requested for next session (planning only):**
+Task 4: removed the separate Pointer as game input checkbox; native hover is automatic in Interactive, in normal and Advanced. Inspection remains available in Advanced; normal return preserves the session and restores room/note clicks. Hover never advances paused playback. [Validation](../.verification/automatic-pointer-20261001/validation.md): 18/18 visible WPF assertions.
+
+User follow-up: all rebuilt verification executables log fatal exceptions and exit 1 without Windows crash/debug/close UI. [Failure probes](../.verification/harness-failures-20261001/validation.md): 4/4. Session token-usage tool is unavailable; account usage is not session usage. Work stops at the completed committed tasks with replay gaps handed off explicitly.
+
+**Original next-session request (30 September; implementation status above):**
 
 - Replace the normal-view Game Texts button with **Play Cutscene**, giving access to any cutscene in the game rather than only the current room's small replay list. Show **Game Texts only in Advanced**.
 - Investigate why many scenes already execute when game triggers reach them but are absent from Play Cutscene. The executor and manual replay catalog are separate today. Use the existing source-derived discovery inventory to design broad catalog coverage; determine which entries/start recipes can be derived automatically and which need individual validation. Do not assume each cutscene needs a separate engine implementation, or that every cutscene opcode is a distinct replayable scene. Resolve source-backed prerequisites and expose unresolved coverage honestly rather than inventing state.

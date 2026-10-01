@@ -8,6 +8,7 @@
 | Advanced Game Texts | Game Texts appears only in Advanced; normal view returns to interactive input | [visibility](../.verification/global-cutscene-picker-20261001/validation.md) |
 | Source-derived replay coverage | 291 global replay starts, grouped/searchable; 139/235 sites reached, 79 owners with explicit unresolved coverage | [replay audit](../.verification/replay-coverage-20261001/validation.md) |
 | Unattended harness crashes | All rebuilt verification executables log fatal failures and exit 1; four deliberate crash probes pass without user input | [failure policy](../.verification/harness-failures-20261001/validation.md) |
+| Automatic interactive hover | Pointer checkbox removed; native hover in normal/Advanced, inspection preserved, room/note clicks survive both round trips, paused scenes do not advance | [input checks](../.verification/automatic-pointer-20261001/validation.md) |
 
 Finished work, oldest first. Each entry links to the validation record that holds the details, the commands and the counts. Reverse-engineering findings live in the [script map](LOOM_SCRIPT_MAP.md); priorities live in the [plan](LOOM_EGA_PLAN.md). This file replaces `WIP_2026-09-27.md` and the history table that was in the plan (28 September 2026).
 

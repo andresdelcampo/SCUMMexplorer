@@ -47,6 +47,8 @@ internal static class Program
                 };
                 if(picker.ShowDialog()==true)((Action?)picker.GetType().GetProperty("SelectedPlay",Private)!.GetValue(picker))?.Invoke();
                 await Wait(()=>((LoomExplorationSession)Field("_session")!).InCutscene);
+                await Wait(()=>((FrameworkElement)w.FindName("RoomPreview")).IsVisible &&
+                    ((GameResource?)Field("_currentRoomResource"))?.ResourceId == ((LoomExplorationSession)Field("_session")!).Snapshot.RoomId);
                 Check(!Find<Button>("CutsceneMenuButton").IsEnabled&&!Find<ComboBox>("SoundModeCombo").IsEnabled,"new replay starts lock picker and sound during the real clock");
                 Call("PauseScenePlayback");Capture(w,"sky-replay-paused");Check(!Find<ComboBox>("SoundModeCombo").IsEnabled,"new replay pause keeps sound locked");await Pick(16);
                 Check(!((LoomExplorationSession)Field("_session")!).InCutscene&&!Find<Button>("PlaybackPauseButton").IsEnabled,"new replay departure cancels the scene and keeps idle Pause disabled");
