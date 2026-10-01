@@ -1,0 +1,5 @@
+[
+  {"id":"late-096-fresh43","actions":[{"kind":"visit","room":43},{"kind":"verb","objectId":639,"verb":56},{"kind":"frames","stage":"fresh43-use","count":3000,"settle":true}]},
+  {"id":"late-096-after095-staff","actions":[{"kind":"visit","room":44},{"kind":"verb","objectId":653,"verb":54},{"kind":"frames","stage":"095","count":3000,"settle":true},{"kind":"verb","objectId":656,"verb":54},{"kind":"frames","stage":"staff","count":3000,"settle":true},{"kind":"verb","objectId":655,"verb":56},{"kind":"frames","stage":"return43","count":3000,"settle":true},{"kind":"verb","objectId":639,"verb":56},{"kind":"frames","stage":"096","count":3000,"settle":true}]},
+  {"id":"late-096-staff-without095","actions":[{"kind":"visit","room":45},{"kind":"verb","objectId":656,"verb":54},{"kind":"frames","stage":"staff","count":3000,"settle":true},{"kind":"verb","objectId":655,"verb":56},{"kind":"frames","stage":"return43","count":3000,"settle":true},{"kind":"verb","objectId":639,"verb":56},{"kind":"frames","stage":"without095","count":3000,"settle":true}]}
+]

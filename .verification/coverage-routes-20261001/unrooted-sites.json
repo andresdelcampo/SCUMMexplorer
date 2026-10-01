@@ -1,0 +1,839 @@
+{
+  "noLiteralRoots": [
+    {
+      "owner": "script 004",
+      "coverage": {
+        "title": "script 004",
+        "status": "Shared input/draft helper; not a standalone story scene",
+        "source": "script 004; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: none resolved; boot/watcher, dynamic calls or earlier state require individual review.\nPossible roots (not proof of reachability): "
+      },
+      "sites": [
+        {
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    },
+    {
+      "owner": "script 005",
+      "coverage": {
+        "title": "script 005",
+        "status": "Shared input/draft helper; not a standalone story scene",
+        "source": "script 005; unvalidated cutscene sites: +0x01C0.\nLiteral trigger probes: none resolved; boot/watcher, dynamic calls or earlier state require individual review.\nPossible roots (not proof of reachability): "
+      },
+      "sites": [
+        {
+          "offset": "+0x01C0",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    },
+    {
+      "owner": "script 009",
+      "coverage": {
+        "title": "script 009",
+        "status": "Shared input/draft helper; not a standalone story scene",
+        "source": "script 009; unvalidated cutscene sites: +0x002C.\nLiteral trigger probes: none resolved; boot/watcher, dynamic calls or earlier state require individual review.\nPossible roots (not proof of reachability): "
+      },
+      "sites": [
+        {
+          "offset": "+0x002C",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    },
+    {
+      "owner": "script 012",
+      "coverage": {
+        "title": "script 012",
+        "status": "Shared input/draft helper; not a standalone story scene",
+        "source": "script 012; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: none resolved; boot/watcher, dynamic calls or earlier state require individual review.\nPossible roots (not proof of reachability): "
+      },
+      "sites": [
+        {
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    },
+    {
+      "owner": "script 013",
+      "coverage": {
+        "title": "script 013",
+        "status": "Shared input/draft helper; not a standalone story scene",
+        "source": "script 013; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: none resolved; boot/watcher, dynamic calls or earlier state require individual review.\nPossible roots (not proof of reachability): "
+      },
+      "sites": [
+        {
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    },
+    {
+      "owner": "script 022",
+      "coverage": {
+        "title": "script 022",
+        "status": "Shared input/draft helper; not a standalone story scene",
+        "source": "script 022; unvalidated cutscene sites: +0x0005, +0x0138.\nLiteral trigger probes: none resolved; boot/watcher, dynamic calls or earlier state require individual review.\nPossible roots (not proof of reachability): "
+      },
+      "sites": [
+        {
+          "offset": "+0x0005",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        },
+        {
+          "offset": "+0x0138",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "owner": "script 004",
+      "offset": "+0x0094",
+      "operation": "startScript",
+      "operands": "0xD0, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x0097",
+      "operation": "startScript",
+      "operands": "0xCE, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00AB",
+      "operation": "startScript",
+      "operands": "0xCA, [0x0004]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00B6",
+      "operation": "startScript",
+      "operands": "0xCE, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00B9",
+      "operation": "startScript",
+      "operands": "0xD0, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00BC",
+      "operation": "startScript",
+      "operands": "0xD1, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00D3",
+      "operation": "startScript",
+      "operands": "0xCA, [0x00FF]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00EA",
+      "operation": "startScript",
+      "operands": "0xCA, [0x000D]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00F3",
+      "operation": "startScript",
+      "operands": "0xCA, [0x000E]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00F9",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00FC",
+      "operation": "startScript",
+      "operands": "0xD1, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x00FF",
+      "operation": "startScript",
+      "operands": "0xC9, [var[0x0AA]]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x0145",
+      "operation": "startScript",
+      "operands": "0xCA, [0x000B]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x014E",
+      "operation": "startScript",
+      "operands": "0xCA, [0x0011, local[0x005]]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x0168",
+      "operation": "startScript",
+      "operands": "0xCA, [local[0x003]]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x016E",
+      "operation": "startScript",
+      "operands": "0xCC, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x0189",
+      "operation": "startScript",
+      "operands": "0xCA, [0x000C]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x0192",
+      "operation": "startScript",
+      "operands": "0xCA, [0x0010, local[0x005]]"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x019C",
+      "operation": "startScript",
+      "operands": "0xCC, []"
+    },
+    {
+      "owner": "script 004",
+      "offset": "+0x01D5",
+      "operation": "startScript",
+      "operands": "0xCA, [local[0x003]]"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x01C8",
+      "operation": "startScript",
+      "operands": "local[0x001], [local[0x002], local[0x003]]"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x0215",
+      "operation": "startScript",
+      "operands": "local[0x001], [local[0x002], local[0x003]]"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x025C",
+      "operation": "startScript",
+      "operands": "0xD2, []"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x03EC",
+      "operation": "startScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x0473",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x0476",
+      "operation": "startScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x0584",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 044",
+      "offset": "+0x05A6",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x0DDC",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x0DDF",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x0DE2",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x0EFE",
+      "operation": "startScript",
+      "operands": "0xD0, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x0F25",
+      "operation": "startScript",
+      "operands": "0xCF, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x0F92",
+      "operation": "startScript",
+      "operands": "0xCE, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x0F95",
+      "operation": "startScript",
+      "operands": "0xCF, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x102B",
+      "operation": "startScript",
+      "operands": "0xCD, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x103E",
+      "operation": "startScript",
+      "operands": "0xCF, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x11DD",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x11E7",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x11ED",
+      "operation": "startScript",
+      "operands": "0xCE, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x11F4",
+      "operation": "startScript",
+      "operands": "0xD0, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x11FC",
+      "operation": "startScript",
+      "operands": "0xCC, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x1203",
+      "operation": "startScript",
+      "operands": "0xCF, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x1209",
+      "operation": "startScript",
+      "operands": "0xD1, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x1210",
+      "operation": "startScript",
+      "operands": "0xCD, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x1216",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 046",
+      "offset": "+0x1412",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 047",
+      "offset": "+0x0C32",
+      "operation": "startScript",
+      "operands": "0xE9, []"
+    },
+    {
+      "owner": "script 047",
+      "offset": "+0x0C5E",
+      "operation": "startScript",
+      "operands": "0xD2, []"
+    },
+    {
+      "owner": "script 050",
+      "offset": "+0x0044",
+      "operation": "startScript",
+      "operands": "0xCA, [0x0186, 0x0078]"
+    },
+    {
+      "owner": "script 052",
+      "offset": "+0x00E1",
+      "operation": "startScript",
+      "operands": "0xD2, []"
+    },
+    {
+      "owner": "script 052",
+      "offset": "+0x00F5",
+      "operation": "startScript",
+      "operands": "0xD3, []"
+    },
+    {
+      "owner": "script 052",
+      "offset": "+0x0108",
+      "operation": "startScript",
+      "operands": "0xD5, []"
+    },
+    {
+      "owner": "script 052",
+      "offset": "+0x011B",
+      "operation": "startScript",
+      "operands": "0xD4, []"
+    },
+    {
+      "owner": "script 054",
+      "offset": "+0x00CE",
+      "operation": "chainScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 056",
+      "offset": "+0x000F",
+      "operation": "startScript",
+      "operands": "0xCA, [0x0001, 0x0168, 0x0078]"
+    },
+    {
+      "owner": "script 057",
+      "offset": "+0x0006",
+      "operation": "startScript",
+      "operands": "0xC8, [0x0001, 0x0124, 0x0080]"
+    },
+    {
+      "owner": "script 057",
+      "offset": "+0x002A",
+      "operation": "chainScript",
+      "operands": "0xCF, []"
+    },
+    {
+      "owner": "script 058",
+      "offset": "+0x0002",
+      "operation": "startScript",
+      "operands": "0xC8, [0x0001, 0x0168, 0x0078]"
+    },
+    {
+      "owner": "script 059",
+      "offset": "+0x0016",
+      "operation": "startScript",
+      "operands": "0xCA, [0x0001, 0x0096, 0x0067]"
+    },
+    {
+      "owner": "script 060",
+      "offset": "+0x0002",
+      "operation": "startScript",
+      "operands": "0xC9, [0x0001, 0x0168, 0x0078]"
+    },
+    {
+      "owner": "script 061",
+      "offset": "+0x0016",
+      "operation": "startScript",
+      "operands": "0xCB, [0x0001, 0x0028, 0x0086]"
+    },
+    {
+      "owner": "script 062",
+      "offset": "+0x0002",
+      "operation": "startScript",
+      "operands": "0xCB, [0x0001, 0x0168, 0x0078]"
+    },
+    {
+      "owner": "script 063",
+      "offset": "+0x0006",
+      "operation": "startScript",
+      "operands": "0xC9, [0x0001, 0x001C, 0x0080]"
+    },
+    {
+      "owner": "script 063",
+      "offset": "+0x001D",
+      "operation": "chainScript",
+      "operands": "0xCF, []"
+    },
+    {
+      "owner": "script 065",
+      "offset": "+0x006B",
+      "operation": "startScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 065",
+      "offset": "+0x02CC",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 066",
+      "offset": "+0x0153",
+      "operation": "chainScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 067",
+      "offset": "+0x0018",
+      "operation": "startScript",
+      "operands": "0xD5, []"
+    },
+    {
+      "owner": "script 067",
+      "offset": "+0x00FF",
+      "operation": "chainScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 069",
+      "offset": "+0x04A7",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 069",
+      "offset": "+0x07C8",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 085",
+      "offset": "+0x002D",
+      "operation": "startScript",
+      "operands": "0xD9, []"
+    },
+    {
+      "owner": "script 085",
+      "offset": "+0x02EF",
+      "operation": "startScript",
+      "operands": "0xD2, []"
+    },
+    {
+      "owner": "script 085",
+      "offset": "+0x044C",
+      "operation": "startScript",
+      "operands": "0xD3, []"
+    },
+    {
+      "owner": "script 085",
+      "offset": "+0x054D",
+      "operation": "startScript",
+      "operands": "0xD8, []"
+    },
+    {
+      "owner": "script 086",
+      "offset": "+0x0012",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 086",
+      "offset": "+0x0413",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 086",
+      "offset": "+0x0421",
+      "operation": "startScript",
+      "operands": "0xCC, []"
+    },
+    {
+      "owner": "script 088",
+      "offset": "+0x0123",
+      "operation": "startScript",
+      "operands": "0xD6, []"
+    },
+    {
+      "owner": "script 088",
+      "offset": "+0x0219",
+      "operation": "startScript",
+      "operands": "0xD7, []"
+    },
+    {
+      "owner": "script 088",
+      "offset": "+0x0419",
+      "operation": "startScript",
+      "operands": "0xD4, []"
+    },
+    {
+      "owner": "script 090",
+      "offset": "+0x06C9",
+      "operation": "startScript",
+      "operands": "0xD2, []"
+    },
+    {
+      "owner": "script 091",
+      "offset": "+0x00CF",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 091",
+      "offset": "+0x0266",
+      "operation": "startScript",
+      "operands": "0xD6, []"
+    },
+    {
+      "owner": "script 091",
+      "offset": "+0x0B2D",
+      "operation": "startScript",
+      "operands": "0xD7, []"
+    },
+    {
+      "owner": "script 091",
+      "offset": "+0x0B33",
+      "operation": "startScript",
+      "operands": "0xD8, []"
+    },
+    {
+      "owner": "script 091",
+      "offset": "+0x0DF8",
+      "operation": "startScript",
+      "operands": "0xD4, []"
+    },
+    {
+      "owner": "script 091",
+      "offset": "+0x0E74",
+      "operation": "startScript",
+      "operands": "0xD4, []"
+    },
+    {
+      "owner": "script 091",
+      "offset": "+0x0E84",
+      "operation": "chainScript",
+      "operands": "0xCC, []"
+    },
+    {
+      "owner": "script 094",
+      "offset": "+0x006B",
+      "operation": "startScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 094",
+      "offset": "+0x0078",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 095",
+      "offset": "+0x04E4",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 096",
+      "offset": "+0x0065",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 096",
+      "offset": "+0x00CD",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 098",
+      "offset": "+0x0407",
+      "operation": "startScript",
+      "operands": "0xD5, []"
+    },
+    {
+      "owner": "script 098",
+      "offset": "+0x040A",
+      "operation": "startScript",
+      "operands": "0xCE, []"
+    },
+    {
+      "owner": "script 098",
+      "offset": "+0x056E",
+      "operation": "startScript",
+      "operands": "0xD3, []"
+    },
+    {
+      "owner": "script 100",
+      "offset": "+0x05B8",
+      "operation": "startScript",
+      "operands": "0xCE, []"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x006E",
+      "operation": "startScript",
+      "operands": "0xD7, []"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x010B",
+      "operation": "startScript",
+      "operands": "0xD7, []"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x05E9",
+      "operation": "startScript",
+      "operands": "0xD4, [0x000C]"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x0673",
+      "operation": "startScript",
+      "operands": "0xE6, []"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x0701",
+      "operation": "startScript",
+      "operands": "0xD8, []"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x089B",
+      "operation": "startScript",
+      "operands": "0xD9, []"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x089E",
+      "operation": "startScript",
+      "operands": "0xDA, []"
+    },
+    {
+      "owner": "script 102",
+      "offset": "+0x0008",
+      "operation": "startScript",
+      "operands": "0xCC, []"
+    },
+    {
+      "owner": "script 102",
+      "offset": "+0x0064",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "script 104",
+      "offset": "+0x01BB",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 104",
+      "offset": "+0x0580",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 104",
+      "offset": "+0x05FA",
+      "operation": "startScript",
+      "operands": "0xCD, []"
+    },
+    {
+      "owner": "script 104",
+      "offset": "+0x06EE",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 106",
+      "offset": "+0x001C",
+      "operation": "startScript",
+      "operands": "0xCE, []"
+    },
+    {
+      "owner": "script 106",
+      "offset": "+0x0118",
+      "operation": "startScript",
+      "operands": "0xCF, []"
+    },
+    {
+      "owner": "script 106",
+      "offset": "+0x0511",
+      "operation": "startScript",
+      "operands": "0xCB, []"
+    },
+    {
+      "owner": "script 107",
+      "offset": "+0x00D7",
+      "operation": "chainScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 108",
+      "offset": "+0x0052",
+      "operation": "startScript",
+      "operands": "0xD5, []"
+    },
+    {
+      "owner": "script 111",
+      "offset": "+0x006B",
+      "operation": "startScript",
+      "operands": "0xC8, []"
+    },
+    {
+      "owner": "script 111",
+      "offset": "+0x007F",
+      "operation": "startScript",
+      "operands": "0xCA, []"
+    },
+    {
+      "owner": "script 111",
+      "offset": "+0x009D",
+      "operation": "startScript",
+      "operands": "0xC9, []"
+    },
+    {
+      "owner": "Room 02 local 203",
+      "offset": "+0x0019",
+      "operation": "startScript",
+      "operands": "local[0x000], []"
+    },
+    {
+      "owner": "Room 10 local 205",
+      "offset": "+0x0015",
+      "operation": "startScript",
+      "operands": "local[0x000], [local[0x002]]"
+    },
+    {
+      "owner": "Room 23 local 210",
+      "offset": "+0x0107",
+      "operation": "startScript",
+      "operands": "local[0x001], []"
+    }
+  ]
+}

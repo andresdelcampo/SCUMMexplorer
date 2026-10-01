@@ -1,0 +1,513 @@
+[
+  {
+    "id": "late-096-after095-staff",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "stages": {
+      "095": {
+        "frame": 858,
+        "room": 45,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 0,
+          "bit[0xD66]": 0,
+          "bit[0xD67]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          }
+        ]
+      },
+      "staff": {
+        "frame": 75,
+        "room": 45,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD67]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          }
+        ]
+      },
+      "return43": {
+        "frame": 49,
+        "room": 43,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD67]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 1,
+              "local[0x001]": 1
+            }
+          }
+        ]
+      },
+      "096": {
+        "frame": 61,
+        "room": 43,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD67]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1,
+            "delay": null,
+            "locals": {}
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 1,
+              "local[0x001]": 1
+            }
+          }
+        ]
+      },
+      "final": {
+        "frame": 0,
+        "room": 43,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD67]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1,
+            "delay": null,
+            "locals": {}
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 1,
+              "local[0x001]": 1
+            }
+          }
+        ]
+      }
+    },
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2"
+    ],
+    "loads": [
+      "Script 95 continues at +0x0271 in Room 42 after loadRoom",
+      "Script 95 continues at +0x02DA in Room 45 after loadRoom",
+      "Script 92 continues at +0x0007 in Room 43 after loadRoom"
+    ],
+    "focusedUncertainties": [
+      "Player input assumed: script 001 +0x0166 waits for bit[0xD6B], which only Room 69 local script 205 sets (+0x0048). The room's own code starts it after the player's input (local 203 +0x01D8, local 203 +0x0241), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.",
+      "Script 06 +0x0000: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (800, 144)",
+      "Object 653 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Script 03 +0x0000: camera x follows actor 1, whose position is an estimate (actor 1's walkActorToObject at +0x05AE follows a seeded pick) (+0x0018)",
+      "Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (160, 144)",
+      "Object 656 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Object 655 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Room 43 local script 204 +0x000B: getActorWalkBox reads actor 1: actor 1's actorOps at +0x0005 follows a seeded pick, so what follows is an estimate (+0x000B)",
+      "Object 639 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Object 639 is untouchable (class 24) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.",
+      "Script 96 +0x0046: possible Room 45 load follows a seeded pick, so the session does not enter it at +0x0049"
+    ],
+    "totalUncertaintyCount": 160,
+    "uniqueUncertaintyCount": 153,
+    "fullPacket": "Exe/VerificationSession-20261001/late-routes-1/late-096-after095-staff.json",
+    "fullPacketSha256": "44c7ddb0b31597963c1815bc77a98fdc2e5b331352c9ca00cc5377e82274e447"
+  },
+  {
+    "id": "late-096-fresh43",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "fresh43-use",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "stages": {
+      "fresh43-use": {
+        "frame": 42,
+        "room": 44,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 0,
+          "bit[0xD66]": 0
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 25
+            }
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          }
+        ]
+      },
+      "final": {
+        "frame": 0,
+        "room": 44,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 0,
+          "bit[0xD66]": 0
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 25
+            }
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          }
+        ]
+      }
+    },
+    "boundaries": [],
+    "loads": [
+      "loadRoomWithEgo at Room 43 Object 639 Verb 0x38 +0x0030 ends this room-owned script (startScene); the session enters Room 44"
+    ],
+    "focusedUncertainties": [
+      "Player input assumed: script 001 +0x0166 waits for bit[0xD6B], which only Room 69 local script 205 sets (+0x0048). The room's own code starts it after the player's input (local 203 +0x01D8, local 203 +0x0241), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.",
+      "Script 06 +0x0000: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (800, 144)",
+      "Object 639 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Object 639 is untouchable (class 24) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.",
+      "Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (160, 144)"
+    ],
+    "totalUncertaintyCount": 134,
+    "uniqueUncertaintyCount": 132,
+    "fullPacket": "Exe/VerificationSession-20261001/late-routes-1/late-096-fresh43.json",
+    "fullPacketSha256": "221d4ec526395e045cce346775fae160bc3af7a887c4370422429da38c73913a"
+  },
+  {
+    "id": "late-096-staff-without095",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 45
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "without095",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "stages": {
+      "staff": {
+        "frame": 75,
+        "room": 45,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD7B]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 25
+            }
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          }
+        ]
+      },
+      "return43": {
+        "frame": 49,
+        "room": 43,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD7B]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 25
+            }
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          },
+          {
+            "label": "Room 43 local script 205",
+            "offset": 60,
+            "freeze": 0,
+            "delay": 93,
+            "locals": {
+              "local[0x001]": 99
+            }
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 1,
+              "local[0x001]": 1
+            }
+          }
+        ]
+      },
+      "without095": {
+        "frame": 42,
+        "room": 45,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD7B]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 25
+            }
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          }
+        ]
+      },
+      "final": {
+        "frame": 0,
+        "room": 45,
+        "inCutscene": false,
+        "knownBits": {
+          "bit[0xD61]": 1,
+          "bit[0xD66]": 0,
+          "bit[0xD7B]": 1
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0,
+            "delay": null,
+            "locals": {
+              "local[0x000]": 25
+            }
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0,
+            "delay": null,
+            "locals": {}
+          }
+        ]
+      }
+    },
+    "boundaries": [
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3"
+    ],
+    "loads": [
+      "Script 92 continues at +0x0007 in Room 43 after loadRoom",
+      "loadRoomWithEgo at Room 43 Object 639 Verb 0x38 +0x0025 ends this room-owned script (startScene); the session enters Room 45"
+    ],
+    "focusedUncertainties": [
+      "Player input assumed: script 001 +0x0166 waits for bit[0xD6B], which only Room 69 local script 205 sets (+0x0048). The room's own code starts it after the player's input (local 203 +0x01D8, local 203 +0x0241), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.",
+      "Script 06 +0x0000: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (800, 144)",
+      "Object 656 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Object 656 is untouchable (class 24) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.",
+      "Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (160, 144)",
+      "Object 655 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Object 639 verb 0x38 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.",
+      "Object 639 is untouchable (class 24) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action."
+    ],
+    "totalUncertaintyCount": 149,
+    "uniqueUncertaintyCount": 143,
+    "fullPacket": "Exe/VerificationSession-20261001/late-routes-1/late-096-staff-without095.json",
+    "fullPacketSha256": "e11296b4d973c16c2c5070531a0e3d2240a63c1a3066bb079ced37908d845012"
+  }
+]

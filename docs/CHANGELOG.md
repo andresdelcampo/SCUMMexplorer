@@ -6,6 +6,7 @@ Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/h
 
 | Change | Result | Record |
 | --- | --- | --- |
+| Continued source routes | 052/input completes053 and086/look completes087, normal WPF8/8; Room41/096 remain unmatched, all site gaps retained; main Release rebuilt | [route investigation](../.verification/coverage-routes-20261001/validation.md) |
 | Sound-unblocked catalog promotion | 38 additional validated previews: 329 starts, 163/235 sites, 55 unresolved owners; all 38 WPF replays verified, global21/21 and room20/20 | [promotion](../.verification/native-replay-coverage-20261001/validation.md) |
 | Native sound completion waits | Finite AdLib clocks release script040 naturally; loops/unknowns retain status; 38 former failures now complete, seven unresolved; 253 Core tests and normal-clock WPF8/8 | [sound lifetimes](../.verification/sound-lifetimes-20261001/validation.md) |
 | Top-level Play Cutscene | Existing replay starts available from every room; playback/pause/departure guards preserved | [picker](../.verification/global-cutscene-picker-20261001/validation.md) |

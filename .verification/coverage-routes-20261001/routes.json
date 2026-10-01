@@ -1,0 +1,8 @@
+[
+  {"id":"watcher-catalog","actions":[{"kind":"visit","room":13},{"kind":"frames","stage":"arrival","count":32,"settle":false},{"kind":"click","x":112,"y":131},{"kind":"frames","stage":"watcher","count":3000,"settle":true}]},
+  {"id":"watcher-after-transition","actions":[{"kind":"visit","room":10},{"kind":"verb","objectId":295,"verb":56},{"kind":"frames","stage":"transition","count":3000,"settle":true},{"kind":"click","x":112,"y":131},{"kind":"frames","stage":"watcher","count":3000,"settle":true}]},
+  {"id":"actor-box-087","actions":[{"kind":"visit","room":38},{"kind":"verb","objectId":610,"verb":54},{"kind":"frames","stage":"actor-box","count":3000,"settle":true}]},
+  {"id":"actor-box-after-firewood","actions":[{"kind":"visit","room":36},{"kind":"verb","objectId":599,"verb":56},{"kind":"frames","stage":"arrival37","count":32,"settle":false},{"kind":"click","x":109,"y":102},{"kind":"frames","stage":"firewood086","count":3000,"settle":true},{"kind":"verb","objectId":610,"verb":54},{"kind":"frames","stage":"actor-box087","count":3000,"settle":true}]},
+  {"id":"room41-response41","actions":[{"kind":"visit","room":41},{"kind":"verb","objectId":633,"verb":65},{"kind":"frames","stage":"response41","count":3000,"settle":true}]},
+  {"id":"room41-response4b","actions":[{"kind":"visit","room":41},{"kind":"verb","objectId":633,"verb":75},{"kind":"frames","stage":"response4b","count":3000,"settle":true}]}
+]
