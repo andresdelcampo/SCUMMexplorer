@@ -36,6 +36,8 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 Control placement completed: top-right Game Status beside Advanced-only global Play Cutscene; room Play Cutscene follows Skip line. Normal/Advanced and minimum-width WPF11/11, screenshots inspected. [Validation](../.verification/ui-refinements-20261001/validation.md). Remaining refinements below retain priority.
 
+Original scene naming completed through the same formatter as generated recipes: Room01 Opening, Room08 The Elders' trial, Room10 Walk to Room13, Room36 The firewood scene. Opening's stopped boot69 and first scene01 verified. Shared global/room/Game Texts labels,334 IDs/actions/memberships retained; WPF15/15. [Validation](../.verification/ui-refinements-20261001/validation.md).
+
 Implement these before resuming unresolved source-route work. They supersede the earlier button placement, original-scene title exceptions and inspect/edit toggle in the completed status milestone.
 
 1. Move **Game Status** to the top right, immediately next to global **Play Cutscene**. Game Status remains available in normal and Advanced LOOM exploration. Show the global Play Cutscene button **only in Advanced**; retain its shared picker and active/paused guards.

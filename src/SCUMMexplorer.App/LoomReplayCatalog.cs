@@ -35,3 +35,12 @@ internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayR
 }
 
 internal sealed record CutscenePickerItem(string Title, string Category, string Note, Action? Play, string Status = "Validated state preview");
+
+internal static class LoomReplayTitle
+{
+    public static string Format(int room, string description)
+    {
+        var prefix = $"Room {room:00} · ";
+        return description.StartsWith(prefix, StringComparison.Ordinal) ? description : prefix + description;
+    }
+}

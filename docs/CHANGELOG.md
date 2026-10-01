@@ -133,3 +133,7 @@ Stored names resolved across source room definitions; 39 genuinely unnamed targe
 
 Top-right Game Status, Advanced-only global Play Cutscene and room replay beside Skip line; shared memberships and playback guards retained. [WPF11/11 and screenshots](../.verification/ui-refinements-20261001/validation.md).
 
+# 1 October 2026: uniform original replay names
+
+Original opening/trial/transition/firewood use the shared room-and-description formatter in all replay views and Game Texts. Opening label01 verified against stopped boot69; recipes/memberships retained. [WPF15/15](../.verification/ui-refinements-20261001/validation.md).
+

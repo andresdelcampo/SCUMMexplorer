@@ -2941,17 +2941,18 @@ public partial class MainWindow : Window
     /// A known cutscene and the object verb that starts it (decoded; see the script map). With <see cref="Click"/>,
     /// the verb only leads into the room, and the game's click at that point starts the cutscene.
     /// </summary>
-    private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, string Source,
+    private sealed record KnownCutscene(string Description, int RoomId, int ObjectId, int VerbId, int Script, string Source,
         (int X, int Y)? Click = null, string Category = "Scenes", int[]? TextScripts = null,
         LoomReplayStep[]? Steps = null, string? SequenceId = null)
     {
+        public string Title => LoomReplayTitle.Format(RoomId, Description);
         public string Id => SequenceId ?? (ObjectId == 0 ? $"Room {RoomId:00} entry" : $"Room {RoomId:00} object {ObjectId} Verb 0x{VerbId:X2}");
     }
 
     // Established start actions. Room linking uses only generated validation metadata.
     private static readonly KnownCutscene[] KnownCutscenes =
     [
-        new("Room 10 to Room 13", 10, 295, 0x38, 52,
+        new("Walk to Room 13", 10, 295, 0x38, 52,
             "Room 10 object 295 verb 0x38 starts script 052 (+0x0003): a cutscene that waits 60 jiffies (+0x0041), loads Room 11 " +
             "(+0x0045), sets its skip point (+0x00C6) and ends with loadRoomWithEgo into Room 13 (+0x017D)."),
         new("The Elders' trial", 8, 255, 0x38, 46,
@@ -3065,7 +3066,7 @@ public partial class MainWindow : Window
     {
         var choices = new List<(string Title, string Source, Action Play)>();
         if (_game?.Id != GameId.Loom || _session is null) return choices;
-        choices.Add(("The opening", OpeningSource + " " + OpeningStartNote, PlayOpening));
+        choices.Add((OpeningTitle, OpeningSource + " " + OpeningStartNote, PlayOpening));
         foreach (var cutscene in AllCutscenes())
             choices.Add((cutscene.Title, cutscene.Source + " " + CutsceneStartNote(cutscene), () => PlayKnownCutscene(cutscene)));
         return choices;
@@ -3089,7 +3090,7 @@ public partial class MainWindow : Window
         return (list.Count == 1 ? "Room " : "Rooms ") + string.Join(", ", list);
     }
 
-    private const string OpeningTitle = "The opening";
+    private static readonly string OpeningTitle = LoomReplayTitle.Format(1, "Opening");
 
     private const string OpeningSource =
         "Script 001 +0x0222 starts script 044 and waits for it (+0x0225): Rooms 01, 02, 01, 02, 53 and 02, with the copyright " +

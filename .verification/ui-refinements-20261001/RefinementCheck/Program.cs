@@ -62,6 +62,17 @@ internal static class Program
                 Check(!room.IsEnabled && !global.IsEnabled && status.IsEnabled, "paused replay locks starts and retains Game Status inspection");
                 await Pick(2); Check(!Find<Button>("PlaybackPauseButton").IsEnabled && room.IsEnabled, "departure restores idle playback controls");
                 Capture(w, "normal-minimum-placement");
+                var all = ((IEnumerable)Call("PlayableCutsceneItems")!).Cast<object>().ToArray();
+                var titles = all.Select(v => { var item = v.GetType().GetField("Item2")!.GetValue(v)!; return (string)item.GetType().GetProperty("Title")!.GetValue(item)!; }).ToArray();
+                Check(titles.Length == 334 && titles.All(t => t.StartsWith("Room ") && t.Contains(" · ")), "all 334 starts use shared room/descriptor title format");
+                Check(titles.Contains("Room 01 · Opening") && titles.Contains("Room 08 · The Elders' trial") && titles.Contains("Room 10 · Walk to Room 13") && titles.Contains("Room 36 · The firewood scene"), "original four have uniform scene names");
+                var gallery = ((IDictionary)Call("GalleryCutscenes")!);
+                Check(new[] { 44, 46, 52, 86 }.All(id => titles.Contains((string)gallery[id]!.GetType().GetProperty("Title")!.GetValue(gallery[id])!)), "Game Texts uses the same original scene titles");
+                var boot = new LoomExplorationSession((GameLibrary)Field("_game")!, (LoomIndexedObjectSnapshot)Field("_indexedObjectSnapshot")!, stopAtOpening: true);
+                var before = boot.Snapshot.RoomId;
+                var observed = new List<int>();
+                for (int i = 0; i < 80; i++) { boot.AdvanceFrame(); if (boot.Snapshot.RoomId is int id && id != before) observed.Add(id); }
+                Check(before == 69 && observed.FirstOrDefault() == 1, "opening boot setup stops in69; first actual scene room is01");
             }
             catch (Exception ex) { report.Add(ex.ToString()); failures++; }
             finally
