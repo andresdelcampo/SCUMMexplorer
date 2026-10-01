@@ -1,66 +1,87 @@
 <Window x:Class="SCUMMexplorer.App.GameStatusWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Game status" Width="900" Height="650" MinWidth="820" MinHeight="520"
+        Title="Game Status" Width="900" Height="650" MinWidth="820" MinHeight="520"
         WindowStartupLocation="CenterOwner" Background="#101821" Foreground="#E7E0D2">
-    <Grid Margin="22">
+    <Window.Resources>
+        <Style x:Key="ArtworkChoice" TargetType="Button">
+            <Setter Property="Background" Value="#101821"/><Setter Property="Foreground" Value="#E7E0D2"/>
+            <Setter Property="BorderBrush" Value="#334452"/><Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4"/><Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Template"><Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background" Value="#273642"/></Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="#B78442"/></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chrome" Property="Opacity" Value="0.45"/></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value></Setter>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="20">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <StackPanel>
-            <TextBlock Text="Game status" FontSize="24" FontWeight="SemiBold"/>
-            <TextBlock x:Name="SessionSummary" Foreground="#C6B99F" Margin="0,6,0,12" TextWrapping="Wrap"/>
-            <TextBlock Text="Edits are explicit exploration choices. They do not establish pickups, learning or replay prerequisites."
-                       Foreground="#C6B99F" TextWrapping="Wrap" Margin="0,0,0,16"/>
+            <TextBlock Text="Game Status" FontSize="24" FontWeight="SemiBold"/>
+            <TextBlock x:Name="SessionSummary" Foreground="#C6B99F" Margin="0,6,0,14" TextWrapping="Wrap"/>
         </StackPanel>
-        <Grid Grid.Row="1" Margin="0,0,0,18">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <StackPanel>
-                <TextBlock Text="Staff / distaff" FontWeight="SemiBold"/>
-                <ComboBox x:Name="StaffChoice" Width="150" HorizontalAlignment="Left" Margin="0,6,0,4" IsEnabled="False">
-                    <ComboBoxItem Content="Not held"/><ComboBoxItem Content="Held"/>
-                </ComboBox>
-                <TextBlock x:Name="StaffOrigin" Foreground="#9FABAE" FontSize="11" TextWrapping="Wrap"/>
+                <TextBlock Text="Staff / distaff" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <Button x:Name="StaffButton" Style="{StaticResource ArtworkChoice}" Click="Staff_Click" Width="204" Height="60" HorizontalAlignment="Left"
+                        AutomationProperties.Name="Staff possession" ToolTip="Toggle staff possession">
+                    <StackPanel><Image x:Name="StaffImage" Width="184" Height="24" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                        <TextBlock x:Name="StaffLabel" Text="Unresolved" HorizontalAlignment="Center" Margin="0,4,0,0"/></StackPanel>
+                </Button>
+                <TextBlock x:Name="StaffOrigin" Foreground="#9FABAE" FontSize="11" TextWrapping="Wrap" Margin="0,6,10,0" Visibility="Collapsed"/>
             </StackPanel>
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Available notes" FontWeight="SemiBold"/>
-                <ComboBox x:Name="NoteCountChoice" Width="150" HorizontalAlignment="Left" Margin="0,6,0,4" IsEnabled="False" SelectionChanged="NoteCount_Changed"/>
-                <TextBlock x:Name="NoteIdentities" Foreground="#C6B99F" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,4"/>
-                <TextBlock x:Name="NotesOrigin" Foreground="#9FABAE" FontSize="11" TextWrapping="Wrap"/>
+                <TextBlock Text="Available notes" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <UniformGrid x:Name="NoteButtons" Rows="1" Columns="9" Height="60"/>
+                <TextBlock x:Name="NoteIdentities" Foreground="#C6B99F" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                <TextBlock x:Name="NotesOrigin" Foreground="#9FABAE" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0" Visibility="Collapsed"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
             <TextBlock Text="Spell / draft sequences" FontSize="17" Margin="0,0,0,8"/>
             <DataGrid x:Name="DraftGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
-                      CanUserSortColumns="False" IsReadOnly="True" Background="#151F29" Foreground="#E7E0D2" RowBackground="#151F29"
+                      CanUserSortColumns="False" Background="#151F29" Foreground="#E7E0D2" RowBackground="#151F29"
                       AlternatingRowBackground="#192632" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#334452"
-                      HeadersVisibility="Column" BorderBrush="#334452" SelectionMode="Single" SelectionUnit="Cell">
+                      HeadersVisibility="Column" BorderBrush="#334452" SelectionMode="Single" SelectionUnit="Cell" RowHeight="32">
                 <DataGrid.Resources>
-                    <Style TargetType="DataGridColumnHeader"><Setter Property="Background" Value="#273642"/><Setter Property="Foreground" Value="#E7E0D2"/><Setter Property="Padding" Value="9,7"/></Style>
-                    <Style TargetType="DataGridCell"><Setter Property="Padding" Value="7,5"/><Setter Property="BorderThickness" Value="0"/></Style>
+                    <Style TargetType="DataGridColumnHeader"><Setter Property="Background" Value="#273642"/><Setter Property="Foreground" Value="#E7E0D2"/><Setter Property="Padding" Value="7,7"/></Style>
+                    <Style TargetType="DataGridCell"><Setter Property="Padding" Value="5,4"/><Setter Property="BorderThickness" Value="0"/></Style>
+                    <Style TargetType="DataGridRow"><Setter Property="IsEnabled" Value="{Binding Resolved}"/></Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Draft" Binding="{Binding Title}" IsReadOnly="True" Width="74"/>
-                    <DataGridComboBoxColumn x:Name="Note1Column" Header="Note 1" SelectedItemBinding="{Binding Note1}" Width="67"/>
-                    <DataGridComboBoxColumn x:Name="Note2Column" Header="Note 2" SelectedItemBinding="{Binding Note2}" Width="67"/>
-                    <DataGridComboBoxColumn x:Name="Note3Column" Header="Note 3" SelectedItemBinding="{Binding Note3}" Width="67"/>
-                    <DataGridComboBoxColumn x:Name="Note4Column" Header="Note 4" SelectedItemBinding="{Binding Note4}" Width="67"/>
-                    <DataGridTextColumn Header="Learning / reverse" Binding="{Binding Flags}" IsReadOnly="True" Width="142"/>
-                    <DataGridTextColumn Header="Current value" Binding="{Binding Origin}" IsReadOnly="True" Width="*"/>
+                    <DataGridTextColumn Header="Spell / draft" Binding="{Binding Title}" IsReadOnly="True" Width="*" MinWidth="145"/>
+                    <DataGridComboBoxColumn x:Name="Note1Column" Header="1" SelectedValueBinding="{Binding Note1, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48"/>
+                    <DataGridComboBoxColumn x:Name="Note2Column" Header="2" SelectedValueBinding="{Binding Note2, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48"/>
+                    <DataGridComboBoxColumn x:Name="Note3Column" Header="3" SelectedValueBinding="{Binding Note3, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48"/>
+                    <DataGridComboBoxColumn x:Name="Note4Column" Header="4" SelectedValueBinding="{Binding Note4, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48"/>
+                    <DataGridCheckBoxColumn Header="Learned" Binding="{Binding Learned, UpdateSourceTrigger=PropertyChanged}" Width="68"/>
+                    <DataGridCheckBoxColumn Header="Can reverse" Binding="{Binding Reversible, Mode=OneWay}" IsReadOnly="True" Width="88"/>
+                    <DataGridTextColumn x:Name="StateSourceColumn" Header="State source" Binding="{Binding Origin}" IsReadOnly="True" Width="190" Visibility="Collapsed">
+                        <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextTrimming" Value="CharacterEllipsis"/><Setter Property="ToolTip" Value="{Binding Origin}"/></Style></DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
-        <StackPanel Grid.Row="3" Margin="0,14,0,0">
-            <TextBlock x:Name="EditMessage" Foreground="#C6B99F" TextWrapping="Wrap" Margin="0,0,0,10"/>
-            <DockPanel>
-                <Expander Header="Source and dependencies" Foreground="#9FABAE" MaxWidth="550" DockPanel.Dock="Left">
-                    <ScrollViewer MaxHeight="110" VerticalScrollBarVisibility="Auto"><TextBlock x:Name="SourceEvidence" TextWrapping="Wrap" FontSize="11"/></ScrollViewer>
-                </Expander>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button x:Name="EditButton" Content="Edit exploration state" Click="Edit_Click" Padding="12,6" Margin="0,0,8,0"/>
-                    <Button x:Name="ApplyButton" Content="Apply changes" Click="Apply_Click" Padding="12,6" Margin="0,0,8,0" Visibility="Collapsed"/>
-                    <Button x:Name="CancelButton" Content="Cancel edits" Click="Cancel_Click" Padding="12,6" Margin="0,0,8,0" Visibility="Collapsed"/>
-                    <Button Content="Close" Click="Close_Click" Padding="12,6"/>
+        <StackPanel Grid.Row="3" Margin="0,12,0,0">
+            <TextBlock x:Name="EditMessage" Foreground="#C6B99F" TextWrapping="Wrap" Margin="0,0,0,8"/>
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Button x:Name="ApplyButton" Content="Apply Changes" Click="Apply_Click" Padding="12,6" Margin="0,0,8,0"/>
+                    <Button x:Name="CloseButton" Content="Close" Click="Close_Click" Padding="12,6"/>
                 </StackPanel>
+                <Expander x:Name="SourceExpander" DockPanel.Dock="Left" Header="Source and dependencies" Foreground="#9FABAE" Visibility="Collapsed" MaxWidth="500" Margin="0,0,12,0">
+                    <ScrollViewer MaxHeight="48" VerticalScrollBarVisibility="Auto"><TextBlock x:Name="SourceEvidence" TextWrapping="Wrap" FontSize="11"/></ScrollViewer>
+                </Expander>
             </DockPanel>
         </StackPanel>
     </Grid>

@@ -32,13 +32,15 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
-### Next UI refinements requested (in progress)
+### Requested UI refinements (completed)
+
+Requested refinements completed: ready-to-edit Apply Changes/Close status, Advanced-only evidence/provenance, C through upper C labels, editable Learned separate from Can reverse, two verified spell-name pairs with neutral fallbacks, and decoded native staff/contiguous note selectors including zero. WPF42/42 includes actual combo conversion, minimum expanded-source layout and subsequent native refused/accepted casting; Core265/265. All363 roots and both sequence packets unchanged;76 renders identical. [Source and validation](../.verification/ui-refinements-20261001/validation.md). Resume actual Room41 input/late096 and the four fresh bounded failures; explicit status edits do not establish their prerequisites.
 
 Control placement completed: top-right Game Status beside Advanced-only global Play Cutscene; room Play Cutscene follows Skip line. Normal/Advanced and minimum-width WPF11/11, screenshots inspected. [Validation](../.verification/ui-refinements-20261001/validation.md). Remaining refinements below retain priority.
 
 Original scene naming completed through the same formatter as generated recipes: Room01 Opening, Room08 The Elders' trial, Room10 Walk to Room13, Room36 The firewood scene. Opening's stopped boot69 and first scene01 verified. Shared global/room/Game Texts labels,334 IDs/actions/memberships retained; WPF15/15. [Validation](../.verification/ui-refinements-20261001/validation.md).
 
-Implement these before resuming unresolved source-route work. They supersede the earlier button placement, original-scene title exceptions and inspect/edit toggle in the completed status milestone.
+Retained specification for the completed UI work below. It supersedes the earlier button placement, original-scene title exceptions and inspect/edit toggle in the initial status milestone.
 
 1. Move **Game Status** to the top right, immediately next to global **Play Cutscene**. Game Status remains available in normal and Advanced LOOM exploration. Show the global Play Cutscene button **only in Advanced**; retain its shared picker and active/paused guards.
 2. Move the **room Play Cutscene** button back to the playback controls, next to **Skip line**. Preserve generic room membership and zero/one/multiple behavior (hidden/direct/shared filtered picker), normal/Advanced availability, stable layout and playback guards.

@@ -190,7 +190,7 @@ public partial class MainWindow : Window
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview(); UpdateActorLayer(); UpdateVerbArea(); UpdatePlaybackControls();
         }
-    }) { Owner = this, Resources = Resources };
+    }, _game, () => IsAdvancedMode) { Owner = this, Resources = Resources };
 
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {

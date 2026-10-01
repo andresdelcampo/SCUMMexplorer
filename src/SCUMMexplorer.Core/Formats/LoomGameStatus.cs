@@ -39,6 +39,10 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
         At(23, 0x8E, "and", "local[0x001] &= 0x0E00");
         At(23, 0x1B, "and", "local[0x001] &= 0x2000");
         At(23, 0x2A, "and", "local[0x001] &= 0x1000");
+        At(23, 0x20, "move", "bit[0xD69] = local[0x001]");
+        At(23, 0x2F, "move", "bit[0xD6A] = local[0x001]");
+        At(26, 0, "equalZero", "bit[0xD69], branch +0x004B -> 0x0050");
+        At(22, 0xCC, "notEqualZero", "bit[0xD6A], branch +0x005D -> 0x012E");
         At(25, 0x16, "or", "local[0x002] |= 0x2000");
         At(34, 0x16, "or", "local[0x002] |= 0x4000");
         At(22, 0x131, "isLess", "local[0x000], 0x000F, branch +0xFF31 -> 0x0069");
@@ -46,7 +50,8 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
         return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 15,
             $"Loaded scripts017 +0x007D/+0x0082: {staff}=1 means held;010 +0x0020/+0x0027: note IDs1..8 below {noteLimit} are available. " +
             "023: two words per draft, four 3-bit notes +1; flags0x2000 learned/0x1000 reverse/0x4000 last-note knowledge. " +
-            "022 searches slots0..14; the intro's slot15 is outside ordinary casting. Sequence edits preserve flags and response verbs. " +
+            "022 searches slots0..14; the intro's slot15 is outside ordinary casting.026 refuses matched unlearned drafts before target dispatch;022 skips reverse matching without0x1000. " +
+            "Sequence edits preserve flags and response verbs; Learned edits change only0x2000. " +
             "Staff edits refresh the existing normal Bobbin appearance through017 and note controls through018/019; special room costumes remain under room code. " +
             "These explicit edits are exploration choices, not source-established pickups, learning or replay prerequisites.");
     }
@@ -117,6 +122,7 @@ public sealed partial class LoomExplorationSession
         int word = int.Parse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
         for (int bit = 0; bit < 16; bit++) _runtime.GlobalVariables[$"bit[0x{word * 16 + bit:X3}]"] = (ushort)((value >> bit) & 1);
         if (mask == 0xFFFF) _runtime.EstimatedVariables.Remove(key);
+        if (_statusEdits.TryGetValue(key, out var earlier)) mask |= earlier.Mask;
         _statusEdits[key] = (value, mask);
         var note = $"Explicit user status edit: {key}=0x{value:X4}; exploration choice, not a source-established prerequisite.";
         _visitTrace.Add(note); _uncertainties.Add(note);
@@ -163,5 +169,14 @@ public sealed partial class LoomExplorationSession
         int updated = packed & 0xF000;
         for (int i = 0; i < 4; i++) updated |= (notes[i] - 1) << (i * 3);
         SetStatusWord(key, (ushort)updated, 0x0FFF);
+    }
+
+    public void UpdateDraftLearned(int slot, bool learned)
+    {
+        var schema = RequireStatusEdit();
+        if (slot < 0 || slot >= schema.DraftCount) throw new ArgumentOutOfRangeException(nameof(slot));
+        var key = $"var[0x{schema.DraftBase + 2 * slot:X3}]";
+        if (!_runtime.GlobalVariables.TryGetValue(key, out var packed)) throw new InvalidOperationException("Draft state unresolved.");
+        SetStatusWord(key, learned ? (ushort)(packed | 0x2000) : (ushort)(packed & ~0x2000), 0x2000);
     }
 }

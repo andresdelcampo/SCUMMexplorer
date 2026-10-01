@@ -1,6 +1,10 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
+using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.App;
@@ -9,112 +13,162 @@ public partial class GameStatusWindow : Window
 {
     private readonly Func<LoomExplorationSession?> _session;
     private readonly Func<bool> _canEdit;
+    private readonly Func<bool> _advanced;
     private readonly Action _refreshRoom;
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(250) };
+    private readonly LoomStatusArtwork? _artwork;
+    private readonly string? _artworkError;
     private LoomExplorationSession? _editedSession;
     private LoomGameStatus? _baseline;
-    private bool _editing;
-    private string? _displayedDrafts;
-    private List<DraftRow> _rows = [];
+    private bool? _staffHeld;
+    private int? _noteCount;
+    private bool _loadingRows;
+    private readonly List<DraftRow> _rows = [];
 
-    public sealed class DraftRow
+    public sealed class DraftRow : INotifyPropertyChanged
     {
         public required int Slot { get; init; }
-        public string Title => $"Draft {Slot + 1}";
-        public int Note1 { get; set; }
-        public int Note2 { get; set; }
-        public int Note3 { get; set; }
-        public int Note4 { get; set; }
-        public required string Flags { get; init; }
-        public required string Origin { get; init; }
+        public string Title { get; private set; } = "";
+        private int _note1, _note2, _note3, _note4;
+        private bool? _learned, _reversible;
+        private string _origin = "";
+        public int Note1 { get => _note1; set => Set(ref _note1, value); }
+        public int Note2 { get => _note2; set => Set(ref _note2, value); }
+        public int Note3 { get => _note3; set => Set(ref _note3, value); }
+        public int Note4 { get => _note4; set => Set(ref _note4, value); }
+        public bool? Learned { get => _learned; set => Set(ref _learned, value); }
+        public bool? Reversible { get => _reversible; private set => Set(ref _reversible, value); }
+        public string Origin { get => _origin; private set => Set(ref _origin, value); }
+        public bool Resolved => Learned.HasValue && Notes.All(n => n is >= 1 and <= 8);
         public int[] Notes => [Note1, Note2, Note3, Note4];
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void Set<T>(ref T field, T value, [CallerMemberName] string? name = null)
+        { if (EqualityComparer<T>.Default.Equals(field, value)) return; field = value; PropertyChanged?.Invoke(this, new(name)); }
+        public void Load(LoomDraftStatus draft)
+        {
+            Title = LoomDraftNames.Title(draft); PropertyChanged?.Invoke(this, new(nameof(Title)));
+            Note1 = draft.Notes.ElementAtOrDefault(0); Note2 = draft.Notes.ElementAtOrDefault(1);
+            Note3 = draft.Notes.ElementAtOrDefault(2); Note4 = draft.Notes.ElementAtOrDefault(3);
+            Learned = draft.Learned; Reversible = draft.Reversible; Origin = draft.Origin;
+            PropertyChanged?.Invoke(this, new(nameof(Resolved)));
+        }
     }
 
-    public GameStatusWindow(Func<LoomExplorationSession?> session, Func<bool> canEdit, Action refreshRoom)
+    public GameStatusWindow(Func<LoomExplorationSession?> session, Func<bool> canEdit, Action refreshRoom,
+        GameLibrary? game = null, Func<bool>? advanced = null)
     {
-        InitializeComponent(); _session = session; _canEdit = canEdit; _refreshRoom = refreshRoom;
-        foreach (var column in new[] { Note1Column, Note2Column, Note3Column, Note4Column }) column.ItemsSource = Enumerable.Range(1, 8).ToArray();
-        NoteCountChoice.ItemsSource = Enumerable.Range(0, 9).Select(n => n == 1 ? "1 available note" : $"{n} available notes").ToArray();
+        InitializeComponent(); _session = session; _canEdit = canEdit; _refreshRoom = refreshRoom; _advanced = advanced ?? (() => false);
+        _artwork = game is null ? null : LoomStatusArtwork.TryLoad(game, out _artworkError);
+        foreach (var column in new[] { Note1Column, Note2Column, Note3Column, Note4Column }) column.ItemsSource = LoomNoteNames.Choices;
+        for (int i = 0; i <= 8; i++)
+        {
+            int count = i;
+            var button = new Button { Style = (Style)FindResource("ArtworkChoice"), Tag = count,
+                ToolTip = count == 0 ? "No notes available" : $"Available through {LoomNoteNames.Label(count)}" };
+            System.Windows.Automation.AutomationProperties.SetName(button, button.ToolTip.ToString());
+            var content = new StackPanel();
+            content.Children.Add(new Image { Height = 30, Stretch = Stretch.Uniform, SnapsToDevicePixels = true });
+            RenderOptions.SetBitmapScalingMode(content.Children[0], BitmapScalingMode.NearestNeighbor);
+            content.Children.Add(new TextBlock { Text = count == 0 ? "None" : LoomNoteNames.Label(count), HorizontalAlignment = HorizontalAlignment.Center });
+            button.Content = content;
+            button.Click += (_, _) => { if (!_canEdit()) return; _noteCount = count; UpdateSelectors(); UpdateControls(); };
+            NoteButtons.Children.Add(button);
+        }
         _timer.Tick += (_, _) => Refresh();
         Loaded += (_, _) => { Refresh(); _timer.Start(); };
         Closed += (_, _) => _timer.Stop();
         Refresh();
     }
 
+    private bool PendingChanges => _baseline is not null && (_staffHeld != _baseline.StaffHeld || _noteCount != _baseline.AvailableNoteCount ||
+        _rows.Any(r => _baseline.Drafts.FirstOrDefault(d => d.Slot == r.Slot) is { } d && (!r.Notes.SequenceEqual(d.Notes) || r.Learned != d.Learned)));
+
+    private static bool SameState(LoomGameStatus a, LoomGameStatus b) => a.StaffHeld == b.StaffHeld && a.AvailableNoteCount == b.AvailableNoteCount &&
+        a.Drafts.Select(d => (d.Packed, d.ForwardVerb, d.ReverseVerb)).SequenceEqual(b.Drafts.Select(d => (d.Packed, d.ForwardVerb, d.ReverseVerb)));
+
     private void Refresh()
     {
         var session = _session(); var status = session?.GameStatus;
-        if (_editing && !ReferenceEquals(session, _editedSession))
+        if (!ReferenceEquals(session, _editedSession))
         {
-            _editing = false; _baseline = null;
-            EditMessage.Text = "The exploration session was replaced. Unsaved edits were discarded.";
+            if (_editedSession is not null) EditMessage.Text = "The exploration session was replaced. Unapplied changes were discarded.";
+            _baseline = null; _editedSession = session;
         }
-        SourceEvidence.Text = status?.Evidence ?? "No exploration session.";
-        SessionSummary.Text = status is null ? "Open a LOOM room first." : !status.Supported ? "Status fields are unresolved for this game edition." :
-            $"Current exploration · Room {session!.Snapshot.RoomId:00}. Values update as game scripts run.";
-        EditButton.IsEnabled = status?.Supported == true && _canEdit();
-        ApplyButton.IsEnabled = _editing && _canEdit();
-        StaffChoice.IsEnabled = NoteCountChoice.IsEnabled = _editing && _canEdit();
-        DraftGrid.IsReadOnly = !_editing || !_canEdit();
-        EditButton.Visibility = _editing ? Visibility.Collapsed : Visibility.Visible;
-        ApplyButton.Visibility = CancelButton.Visibility = _editing ? Visibility.Visible : Visibility.Collapsed;
-        if (_editing) return;
-        StaffChoice.SelectedIndex = status?.StaffHeld is bool held ? held ? 1 : 0 : -1;
-        StaffOrigin.Text = status?.StaffOrigin ?? "Unresolved";
-        NoteCountChoice.SelectedIndex = status?.AvailableNoteCount ?? -1;
-        NotesOrigin.Text = status?.NotesOrigin ?? "Unresolved";
-        var draftSignature = string.Join(";", (status?.Drafts ?? []).Select(d => $"{d.Slot}:{d.Packed}:{d.Origin}"));
-        if (_displayedDrafts != draftSignature)
+        SourceEvidence.Text = (status?.Evidence ?? "No exploration session.") + (_artworkError is null ? "" : "\n" + _artworkError);
+        SessionSummary.Text = status is null ? "Open a LOOM room first." : !status.Supported ? "Status fields are unresolved for this game edition." : $"Room {session!.Snapshot.RoomId:00}";
+        var visibility = _advanced() ? Visibility.Visible : Visibility.Collapsed;
+        SourceExpander.Visibility = StaffOrigin.Visibility = NotesOrigin.Visibility = StateSourceColumn.Visibility = visibility;
+        if (!PendingChanges && status is not null)
         {
-        _rows = (status?.Drafts ?? []).Select(d => new DraftRow { Slot = d.Slot, Note1 = d.Notes.ElementAtOrDefault(0), Note2 = d.Notes.ElementAtOrDefault(1),
-            Note3 = d.Notes.ElementAtOrDefault(2), Note4 = d.Notes.ElementAtOrDefault(3),
-            Flags = (d.Learned is true ? "Learned" : d.Learned is false ? "Unlearnt" : "Unresolved") + (d.Reversible is true ? " · reverse" : ""), Origin = d.Origin }).ToList();
-        DraftGrid.ItemsSource = _rows;
-        _displayedDrafts = draftSignature;
+            _baseline = status; _staffHeld = status.StaffHeld; _noteCount = status.AvailableNoteCount;
+            if (_rows.Count != status.Drafts.Count)
+            {
+                _rows.Clear(); _rows.AddRange(status.Drafts.Select(d => new DraftRow { Slot = d.Slot }));
+                foreach (var row in _rows) row.PropertyChanged += (_, _) => { if (!_loadingRows) UpdateControls(); };
+                DraftGrid.ItemsSource = _rows;
+            }
+            _loadingRows = true;
+            foreach (var row in _rows) row.Load(status.Drafts.Single(d => d.Slot == row.Slot));
+            _loadingRows = false;
         }
-        if (string.IsNullOrEmpty(EditMessage.Text)) EditMessage.Text = _canEdit()
-            ? "Note IDs match the eight positions on the game's distaff. Only contiguous available-note counts are stored by SCUMM. Draft flags and response targets are preserved."
-            : "Inspection stays live. Finish the scene, draft, movement or dialogue to edit; paused playback remains locked.";
+        StaffOrigin.Text = status?.StaffOrigin ?? "Unresolved"; NotesOrigin.Text = status?.NotesOrigin ?? "Unresolved";
+        UpdateSelectors(); UpdateControls();
     }
 
-    private void NoteCount_Changed(object sender, SelectionChangedEventArgs e)
+    private void UpdateControls()
     {
-        var count = NoteCountChoice.SelectedIndex;
-        if (NoteIdentities is not null) NoteIdentities.Text = count < 0 ? "Unresolved note identities" : count == 0 ? "No notes available" :
-            "Available: " + string.Join(", ", Enumerable.Range(1, count).Select(i => $"Note {i}"));
+        bool editable = _session()?.GameStatus.Supported == true && _canEdit();
+        bool stale = _baseline is not null && _session() is { } s && !SameState(s.GameStatus, _baseline);
+        StaffButton.IsEnabled = editable && _staffHeld.HasValue;
+        NoteButtons.IsEnabled = editable && _noteCount.HasValue;
+        DraftGrid.IsReadOnly = !editable;
+        ApplyButton.IsEnabled = editable && PendingChanges && !stale;
+        if (PendingChanges) EditMessage.Text = stale ? "Game status changed. Close and reopen to inspect the new values before applying." :
+            editable ? "Unapplied changes" : "Unapplied changes. Finish playback, dialogue or movement to apply.";
+        else if (!editable) EditMessage.Text = "Finish playback, dialogue or movement to edit.";
+        else if (EditMessage.Text.StartsWith("Finish ", StringComparison.Ordinal) || EditMessage.Text.StartsWith("Unapplied", StringComparison.Ordinal)) EditMessage.Text = "";
     }
 
-    private void Edit_Click(object sender, RoutedEventArgs e)
+    private void UpdateSelectors()
     {
-        if (!_canEdit() || _session() is not { } session) return;
-        _displayedDrafts = null;
-        Refresh(); _editedSession = session; _baseline = session.GameStatus; _editing = true;
-        EditMessage.Text = "Unsaved exploration choices. Apply preserves each draft's learning/reverse flags. Staff/note changes clear partial note input through the game's scripts.";
-        Refresh();
+        StaffImage.Source = _staffHeld == true ? _artwork?.Staff : _artwork?.EmptyStaff;
+        StaffLabel.Text = _staffHeld is true ? "Held" : _staffHeld is false ? "Not held" : "Unresolved";
+        System.Windows.Automation.AutomationProperties.SetItemStatus(StaffButton, StaffLabel.Text);
+        StaffButton.BorderBrush = new SolidColorBrush(_staffHeld == true ? Color.FromRgb(183, 132, 66) : Color.FromRgb(51, 68, 82));
+        foreach (Button button in NoteButtons.Children)
+        {
+            int count = (int)button.Tag; bool selected = _noteCount == count; bool known = count > 0 && count <= _noteCount;
+            var img = (Image)((StackPanel)button.Content).Children[0];
+            img.Source = count == 0 ? _artwork?.EmptyStaff : known ? _artwork?.Notes[count - 1] : _artwork?.EmptyNotes[count - 1];
+            button.BorderBrush = new SolidColorBrush(selected ? Color.FromRgb(183, 132, 66) : Color.FromRgb(51, 68, 82));
+            System.Windows.Automation.AutomationProperties.SetItemStatus(button, selected ? "Selected limit" : known ? "Available" : "Unavailable");
+        }
+        NoteIdentities.Text = _noteCount is null ? "Unresolved" : _noteCount == 0 ? "No notes available" : "Available: " + string.Join(", ", Enumerable.Range(1, _noteCount.Value).Select(LoomNoteNames.Label));
     }
+
+    private void Staff_Click(object sender, RoutedEventArgs e)
+    { if (!_canEdit() || !_staffHeld.HasValue) return; _staffHeld = !_staffHeld.Value; UpdateSelectors(); UpdateControls(); }
 
     private void Apply_Click(object sender, RoutedEventArgs e)
     {
         DraftGrid.CommitEdit(DataGridEditingUnit.Cell, true); DraftGrid.CommitEdit(DataGridEditingUnit.Row, true);
-        if (!_editing || !_canEdit() || _session() is not { } session || !ReferenceEquals(session, _editedSession) || _baseline is null) return;
-        var current = session.GameStatus;
-        if (current.StaffHeld != _baseline.StaffHeld || current.AvailableNoteCount != _baseline.AvailableNoteCount ||
-            !current.Drafts.Select(d => d.Packed).SequenceEqual(_baseline.Drafts.Select(d => d.Packed)))
-        { EditMessage.Text = "Game status changed while editing. Cancel edits and inspect the new values before applying."; return; }
-        if (StaffChoice.SelectedIndex < 0 || NoteCountChoice.SelectedIndex < 0 || _rows.Any(r => r.Notes.Any(n => n is < 1 or > 8)))
-        { EditMessage.Text = "Choose staff possession, a note count and exactly four note IDs 1–8 for each draft."; return; }
+        if (!_canEdit() || _session() is not { } session || !ReferenceEquals(session, _editedSession) || _baseline is null) { Refresh(); return; }
+        if (!SameState(session.GameStatus, _baseline)) { EditMessage.Text = "Game status changed. Close and reopen before applying."; UpdateControls(); return; }
+        if (_staffHeld is not bool held || _noteCount is not int count || _rows.Any(r => !r.Resolved)) return;
         try
         {
             foreach (var row in _rows)
-                if (!row.Notes.SequenceEqual(_baseline.Drafts.Single(d => d.Slot == row.Slot).Notes)) session.UpdateDraftSequence(row.Slot, row.Notes);
-            if ((StaffChoice.SelectedIndex == 1) != _baseline.StaffHeld) session.UpdateStaffPossession(StaffChoice.SelectedIndex == 1);
-            if (NoteCountChoice.SelectedIndex != _baseline.AvailableNoteCount) session.UpdateAvailableNotes(NoteCountChoice.SelectedIndex);
-            _editing = false; _baseline = null; EditMessage.Text = "Applied explicit exploration choices to this session. Fresh replay starts replace these choices with their audited state.";
-            _refreshRoom(); Refresh();
+            {
+                var old = _baseline.Drafts.Single(d => d.Slot == row.Slot);
+                if (!row.Notes.SequenceEqual(old.Notes)) session.UpdateDraftSequence(row.Slot, row.Notes);
+                if (row.Learned != old.Learned) session.UpdateDraftLearned(row.Slot, row.Learned!.Value);
+            }
+            if (held != _baseline.StaffHeld) session.UpdateStaffPossession(held);
+            if (count != _baseline.AvailableNoteCount) session.UpdateAvailableNotes(count);
+            _baseline = null; EditMessage.Text = "Changes applied"; _refreshRoom(); Refresh();
         }
         catch (InvalidOperationException ex) { EditMessage.Text = ex.Message; }
     }
 
-    private void Cancel_Click(object sender, RoutedEventArgs e) { _editing = false; _baseline = null; _displayedDrafts = null; EditMessage.Text = "Unsaved edits discarded."; Refresh(); }
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 }

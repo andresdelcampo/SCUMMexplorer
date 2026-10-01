@@ -6,7 +6,7 @@ Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/h
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Next UI refinement plan | User's toolbar/Advanced visibility, uniform scene names, simpler editable status, musical labels, separate learned/reverse fields, permitted spell-name map and native graphical selectors queued before route research; implementation pending | [plan](LOOM_EGA_PLAN.md), [next prompt](NEXT_SESSION_PROMPT.md) |
+| Requested UI refinements | Completed toolbar/Advanced visibility, uniform original names, ready-to-edit Apply/Close, musical labels, separate Learned/Can reverse, two verified name pairs and native graphical staff/contiguous notes; Core265/265, WPF42/42, all363 roots/sequences/pixels unchanged | [validation](../.verification/ui-refinements-20261001/validation.md), [next prompt](NEXT_SESSION_PROMPT.md) |
 | Game status | Live source-validated staff, available-note identities/count and fifteen draft sequences; explicit edits preserve flags/targets, busy/paused/stale guards; Core260/260, WPF16/16 | [status validation](../.verification/game-status-20261001/validation.md) |
 | Nested scope scheduling and three promotions | Frozen callers suspend; upcoming slots stay accessible; Room24/432 and Room41/63341/4B complete;334 starts,168/235 literal sites; late096/native Room41 input retained unresolved | [scope validation](../.verification/draft-scopes-20261001/validation.md) |
 | Generic sequence replays | 052/input/053 and086/look/087 promoted with audited per-stage waits, actual memberships and pause/cancellation guards;331 starts; literal-root gaps retained | [sequence validation](../.verification/sequence-replays-20261001/validation.md) |

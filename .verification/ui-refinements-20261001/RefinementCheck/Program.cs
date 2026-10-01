@@ -29,6 +29,7 @@ internal static class Program
         }
         w.ContentRendered += async (_, _) =>
         {
+            GameStatusWindow? statusWindow = null;
             async Task Wait(Func<bool> c) { for (int i = 0; i < 600 && !c(); i++) await Task.Delay(50); if (!c()) throw new TimeoutException(); }
             async Task Pick(int id)
             {
@@ -73,10 +74,91 @@ internal static class Program
                 var observed = new List<int>();
                 for (int i = 0; i < 80; i++) { boot.AdvanceFrame(); if (boot.Snapshot.RoomId is int id && id != before) observed.Add(id); }
                 Check(before == 69 && observed.FirstOrDefault() == 1, "opening boot setup stops in69; first actual scene room is01");
+                await Wait(() => (bool)typeof(MainWindow).GetProperty("CanEditGameStatus", Private)!.GetValue(w)!);
+                object? StatusCall(string name) => typeof(GameStatusWindow).GetMethod(name, Private)!.Invoke(statusWindow, [statusWindow, new RoutedEventArgs()]);
+                T S<T>(string name) => (T)statusWindow!.FindName(name);
+                void Note(int count) => ((Button)S<System.Windows.Controls.Primitives.UniformGrid>("NoteButtons").Children[count]).RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                void Staff() => S<Button>("StaffButton").RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                statusWindow = (GameStatusWindow)Call("BuildGameStatusWindow")!; statusWindow.Show(); await Task.Delay(300);
+                var grid = S<DataGrid>("DraftGrid"); var row = (GameStatusWindow.DraftRow)grid.Items[0];
+                Check(S<Button>("StaffButton").IsEnabled && !grid.IsReadOnly && grid.Items.Count == 15, "status opens ready to edit fifteen source drafts");
+                Check(((Panel)S<Button>("ApplyButton").Parent).Children.OfType<Button>().Select(b => (string)b.Content).SequenceEqual(new[] { "Apply Changes", "Close" }), "exactly Apply Changes and Close footer buttons");
+                Check(!S<Expander>("SourceExpander").IsVisible && grid.Columns.Single(c => (string)c.Header == "State source").Visibility == Visibility.Collapsed, "normal status hides sources/provenance");
+                bool Nonblank(Image image) { if (image.Source is not BitmapSource b) return false; var pixels = new byte[b.PixelWidth * b.PixelHeight * 4]; b.CopyPixels(pixels, b.PixelWidth * 4, 0); return pixels.Where((_, i) => i % 4 == 3).Count(p => p > 0) > 2; }
+                Check(Nonblank(S<Image>("StaffImage")) && S<System.Windows.Controls.Primitives.UniformGrid>("NoteButtons").Children.OfType<Button>().All(b => Nonblank((Image)((Panel)b.Content).Children[0])), "decoded native staff and all eight note images are nonblank");
+                report.Add("Artwork diagnostics: " + typeof(GameStatusWindow).GetField("_artworkError", Private)!.GetValue(statusWindow));
+                Capture(statusWindow, "status-normal");
+                var initial = Session().GameStatus; var originalRow = grid.Items[0]; var originalStaffImage = S<Image>("StaffImage").Source;
+                Staff(); Note(8);
+                grid.CurrentCell = new DataGridCellInfo(row, grid.Columns[1]); grid.BeginEdit(); grid.UpdateLayout();
+                var combo = (ComboBox)grid.Columns[1].GetCellContent(row);
+                combo.SelectedValue = 8; grid.CommitEdit(DataGridEditingUnit.Cell, true); grid.CommitEdit(DataGridEditingUnit.Row, true);
+                Check(row.Note1 == 8, "actual sequence combo converts upper C selection to stored ID8");
+                var upperButton = (Button)S<System.Windows.Controls.Primitives.UniformGrid>("NoteButtons").Children[8];
+                Check(upperButton.Focusable && upperButton.IsTabStop && System.Windows.Automation.AutomationProperties.GetName(upperButton).Contains("C′"), "graphical note selector exposes keyboard focus and an accessible upper C label");
+                Check(Session().GameStatus.StaffHeld == initial.StaffHeld && Session().GameStatus.AvailableNoteCount == initial.AvailableNoteCount && S<Button>("ApplyButton").IsEnabled, "selector and sequence choices stay pending until Apply");
+                Check(!ReferenceEquals(originalStaffImage, S<Image>("StaffImage").Source) && S<TextBlock>("NoteIdentities").Text.EndsWith("C′"), "staff and contiguous C through upper C preview immediately");
+                Note(0); Check(S<TextBlock>("NoteIdentities").Text == "No notes available" && S<TextBlock>("StaffLabel").Text == "Held", "graphical zero notes remains independent of staff possession");
+                Note(8); row.Note1 = initial.Drafts[0].Notes[0]; row.Learned = false;
+                var noteColumn = (DataGridComboBoxColumn)grid.Columns[1];
+                Check(noteColumn.SelectedValuePath == "Id" && noteColumn.DisplayMemberPath == "Label" && ((IEnumerable)noteColumn.ItemsSource).Cast<object>().Last().GetType().GetProperty("Label")!.GetValue(((IEnumerable)noteColumn.ItemsSource).Cast<object>().Last())!.Equals("C′"), "sequence editors display letters and retain numeric IDs");
+                StatusCall("Apply_Click");
+                Check(statusWindow.IsVisible && Session().GameStatus.StaffHeld == true && Session().GameStatus.AvailableNoteCount == 8 && Session().GameStatus.Drafts[0].Learned == false, "Apply stays open and updates staff/eight notes/Learned");
+                Check(Session().GameStatus.Drafts[0].Reversible == initial.Drafts[0].Reversible && Session().GameStatus.Drafts[0].ForwardVerb == initial.Drafts[0].ForwardVerb, "Learned edit preserves reverse capability and response");
+                Check(grid.Columns.Any(c => (string)c.Header == "Learned" && !c.IsReadOnly) && grid.Columns.Any(c => (string)c.Header == "Can reverse" && c.IsReadOnly), "Learned editable and Can reverse separately read-only");
+                Check(row.Title == "Opening / Closing" && ((GameStatusWindow.DraftRow)grid.Items[2]).Title == "Dyeing / Bleaching" && ((GameStatusWindow.DraftRow)grid.Items[14]).Title == "Draft 15", "verified display names and neutral unresolved fallback");
+                await Task.Delay(300); Check(ReferenceEquals(originalRow, grid.Items[0]), "live refresh retains draft row identity");
+                Capture(statusWindow, "status-applied");
+                row.Learned = true; StatusCall("Apply_Click");
+                Check(Session().GameStatus.Drafts[0].Learned == true, "Learned can be explicitly restored through Apply");
+                Note(3); StatusCall("Close_Click"); statusWindow = null;
+                Check(Session().GameStatus.AvailableNoteCount == 8, "Close discards unapplied note selection");
+                Advanced(true); statusWindow = (GameStatusWindow)Call("BuildGameStatusWindow")!; statusWindow.Show(); await Task.Delay(300);
+                grid = S<DataGrid>("DraftGrid");
+                Check(S<Expander>("SourceExpander").IsVisible && grid.Columns.Single(c => (string)c.Header == "State source").Visibility == Visibility.Visible && S<TextBlock>("StaffOrigin").Text.Contains("Explicit user"), "Advanced reveals sources and explicit-edit provenance");
+                statusWindow.Width = 820; statusWindow.Height = 520; await Task.Delay(250); Capture(statusWindow, "status-advanced-minimum");
+                Check(grid.ActualHeight > 100 && S<Button>("CloseButton").TranslatePoint(new Point(), statusWindow).Y + S<Button>("CloseButton").ActualHeight < statusWindow.ActualHeight, "minimum status retains usable grid and visible footer");
+                S<Expander>("SourceExpander").IsExpanded = true; await Task.Delay(250); Capture(statusWindow, "status-advanced-minimum-sources");
+                Check(grid.ActualHeight > 90 && S<Button>("CloseButton").TranslatePoint(new Point(), statusWindow).Y + S<Button>("CloseButton").ActualHeight < statusWindow.ActualHeight, "expanded sources at minimum size retain grid and footer");
+                S<Expander>("SourceExpander").IsExpanded = false;
+                Session().UpdateAvailableNotes(4); await Task.Delay(350);
+                Check(S<TextBlock>("NoteIdentities").Text == "Available: C, D, E, F", "clean status tracks live session changes");
+                Note(8); Session().UpdateAvailableNotes(3); StatusCall("Apply_Click");
+                Check(Session().GameStatus.AvailableNoteCount == 3 && !S<Button>("ApplyButton").IsEnabled && S<TextBlock>("EditMessage").Text.Contains("changed"), "stale baseline blocks Apply without overwriting game changes");
+                Call("PlayOpening"); await Task.Delay(300);
+                Check(!S<Button>("StaffButton").IsEnabled && S<DataGrid>("DraftGrid").IsReadOnly && S<TextBlock>("EditMessage").Text.Contains("Finish"), "session replacement discards pending changes and boot locks editing");
+                Call("PauseScenePlayback"); var paused = Session().GameStatus; Staff(); Note(8); StatusCall("Apply_Click");
+                Check(Session().GameStatus.StaffHeld == paused.StaffHeld && Session().GameStatus.AvailableNoteCount == paused.AvailableNoteCount && !S<Button>("ApplyButton").IsEnabled, "paused handlers refuse changes");
+                statusWindow.Close(); statusWindow = null; await Pick(2); Advanced(false);
+                await Wait(() => (bool)typeof(MainWindow).GetProperty("CanEditGameStatus", Private)!.GetValue(w)!);
+                statusWindow = (GameStatusWindow)Call("BuildGameStatusWindow")!; statusWindow.Show(); await Task.Delay(300);
+                Staff(); Note(8); ((GameStatusWindow.DraftRow)S<DataGrid>("DraftGrid").Items[0]).Learned = false;
+                StatusCall("Apply_Click"); statusWindow.Close(); statusWindow = null;
+                async Task<int> Cast()
+                {
+                    if (Session().Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x067]") != 156)
+                    { Call("HandleRoomPoint", 700, 40, false); await Wait(() => Field("_playback") is null); }
+                    int from = Session().SessionTrace.Count;
+                    foreach (int id in Session().GameStatus.Drafts[0].Notes)
+                        Call("SendInputToGame", (Func<LoomObjectActionResult>)(() => { var n = Session().VerbArea().Items.Single(i => i.VerbId == id); return Session().ClickVerbArea(n.X + 1, n.Y + 1); }), "Native status cast", null);
+                    return from;
+                }
+                int castFrom = await Cast();
+                await Wait(() => Session().SessionTrace.Skip(castFrom).Any(l => l.Contains("Script 22 chains to script 26")));
+                await Wait(() => Field("_playback") is null);
+                await Wait(() => (bool)typeof(MainWindow).GetProperty("CanEditGameStatus", Private)!.GetValue(w)!);
+                Check(!Session().SessionTrace.Skip(castFrom).Any(l => l.Contains("cutscene at Script 49")), "unlearned status choice reaches native refusal without target dispatch on the WPF clock");
+                statusWindow = (GameStatusWindow)Call("BuildGameStatusWindow")!; statusWindow.Show(); await Task.Delay(300);
+                ((GameStatusWindow.DraftRow)S<DataGrid>("DraftGrid").Items[0]).Learned = true; StatusCall("Apply_Click"); statusWindow.Close(); statusWindow = null;
+                Check(Session().GameStatus.Drafts[0].Learned == true, "status Apply restores learned bit before subsequent input");
+                castFrom = await Cast(); await Wait(() => Session().SessionTrace.Skip(castFrom).Any(l => l.Contains("cutscene at Script 49")));
+                Check(Session().SessionTrace.Skip(castFrom).Any(l => l.Contains("startObject runs object 156 verb 0x3A")), "Learned restored through Apply lets native notes reach the actual target response on the WPF clock");
+                Call("PauseScenePlayback"); Capture(w, "status-native-cast");
             }
-            catch (Exception ex) { report.Add(ex.ToString()); failures++; }
+            catch (Exception ex) { report.Add(ex.ToString()); if (Field("_session") is LoomExplorationSession s) report.AddRange(s.SessionTrace.TakeLast(25)); failures++; }
             finally
             {
+                statusWindow?.Close();
                 report.Add("Synthetic visible WPF controls, normal clock, no physical input/listening claim."); report.Add($"Failures: {failures}");
                 File.WriteAllLines(Path.Combine(args[1], "refinement-check.txt"), report); w.Close(); app.Shutdown(); Environment.ExitCode = failures == 0 ? 0 : 1;
             }

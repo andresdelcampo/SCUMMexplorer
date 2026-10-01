@@ -56,4 +56,65 @@ public sealed class LoomGameStatusTests
         var session = Start(); session.Click(377, 9);
         Assert.Throws<InvalidOperationException>(() => session.UpdateStaffPossession(true));
     }
+
+    [Fact]
+    public void LearnedEditPreservesSequenceReverseKnowledgeAndResponses()
+    {
+        var session = Start(); var original = session.GameStatus.Drafts[0];
+        session.UpdateDraftLearned(0, false);
+        var edited = session.GameStatus.Drafts[0];
+        Assert.False(edited.Learned); Assert.Equal(original.Packed!.Value & ~0x2000, edited.Packed!.Value);
+        Assert.Equal(original.Reversible, edited.Reversible); Assert.Equal(original.ForwardVerb, edited.ForwardVerb); Assert.Equal(original.ReverseVerb, edited.ReverseVerb);
+        session.UpdateDraftSequence(0, [1, 2, 1, 2]);
+        Assert.False(session.GameStatus.Drafts[0].Learned);
+        session.UpdateDraftLearned(0, true); Assert.True(session.GameStatus.Drafts[0].Learned);
+        Assert.Equal([1, 2, 1, 2], session.GameStatus.Drafts[0].Notes);
+        Assert.Throws<ArgumentOutOfRangeException>(() => session.UpdateDraftLearned(15, true));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void NativeCastingRespectsExplicitLearnedChoice(bool learned)
+    {
+        var session = Start(); session.UpdateStaffPossession(true); session.UpdateAvailableNotes(8);
+        session.UpdateDraftLearned(0, learned);
+        session.Click(700, 40);
+        for (int frame = 0; frame < 100 && !session.GameStatus.CanEdit; frame++) session.AdvanceFrame();
+        Assert.Equal((ushort)156, session.Snapshot.KnownGlobalVariables["var[0x067]"]);
+        var from = session.SessionTrace.Count;
+        foreach (int id in session.GameStatus.Drafts[0].Notes)
+        {
+            var note = session.VerbArea().Items.Single(i => i.VerbId == id);
+            session.ClickVerbArea(note.X + 1, note.Y + 1);
+        }
+        int idle = 0;
+        for (int frame = 0; frame < 3000 && idle < 32; frame++) { session.AdvanceFrame(); idle = session.GameStatus.CanEdit ? idle + 1 : 0; }
+        var trace = session.SessionTrace.Skip(from).ToArray();
+        Assert.Contains(trace, line => line.Contains("Script 22 chains to script 26"));
+        Assert.Equal(learned, trace.Any(line => line.Contains("startObject runs object 156 verb 0x3A")));
+        Assert.Equal(learned, trace.Any(line => line.Contains("cutscene at Script 49")));
+        if (!learned) Assert.True(session.GameStatus.CanEdit);
+    }
+
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(3, false)]
+    public void NativeReverseMatchingRespectsSeparateCapability(int slot, bool reversible)
+    {
+        var session = Start(); Assert.Equal(reversible, session.GameStatus.Drafts[slot].Reversible);
+        session.UpdateStaffPossession(true); session.UpdateAvailableNotes(8);
+        session.UpdateDraftSequence(slot, [8, 7, 1, 2]); session.UpdateDraftLearned(slot, true);
+        session.Click(700, 40);
+        for (int i = 0; i < 32; i++) session.AdvanceFrame();
+        var from = session.SessionTrace.Count;
+        foreach (int id in session.GameStatus.Drafts[slot].Notes.Reverse())
+        {
+            var note = session.VerbArea().Items.Single(i => i.VerbId == id);
+            session.ClickVerbArea(note.X + 1, note.Y + 1);
+        }
+        for (int i = 0; i < 500; i++) session.AdvanceFrame();
+        Assert.Equal(reversible, session.SessionTrace.Skip(from).Any(l => l.Contains("Script 22 chains to script 26")));
+        Assert.Equal(reversible, session.GameStatus.Drafts[slot].Reversible);
+    }
 }
