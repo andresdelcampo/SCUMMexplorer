@@ -32,6 +32,14 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
+**Next-session priorities requested after the completed work (planning only):**
+
+1. Replace `Object ###` in global cutscene titles with the object's source-established name. Investigate names across the room object definitions, shared references and executed naming instructions; use the same resolved title in the global picker, room picker and Game Texts. Keep numeric IDs in Advanced/source details. If an object genuinely has no source name, use a concise descriptor supported by its decoded action/reached scene rather than inventing a name, and record that naming gap.
+2. Add **Play Cutscene** in the room itself for the global catalog's validated replay entries associated with that room. Keep the global button. One matching entry plays directly; several open the same picker filtered to the room; no matching entries means no room button. Preserve categories/search, shared titles, fresh-session start notes and active/paused replay guards. Explain that this replays the established fresh-session recipe, rather than continuing the room's current game state.
+3. **Room-to-cutscene linking must be generic and source-derived, not hardcoded.** Generate room membership from each recipe's validated start room and rooms actually reached during its playback, consuming the shared catalog metadata at runtime. Use this uniformly for discovered recipes and the original opening/trial/transition/firewood starts. Special validated start recipes may remain where necessary, but they must not require a separate manually maintained room-to-scene table, per-room switch, or scene-name exception. Static room-load possibilities alone do not establish membership; leave unresolved links explicit until validated. Regenerating discovery/validation metadata should update both global and room access automatically.
+
+Validate title parity and room membership in visible WPF behavior, including rooms with zero/one/multiple matching replays, a scene passing through several rooms, newly generated entries without UI code changes, and busy/paused/room-departure controls. Use fresh evidence, commit each completed task separately, and rebuild the main Release executable. Continue outstanding replay coverage afterwards.
+
 1 October task 1: Play Cutscene moved to the top bar with global access to existing replay starts from any room. Broad discovery/promotion is the next task. [Validation](../.verification/global-cutscene-picker-20261001/validation.md): 6/6 WPF checks; Release zero warnings/errors.
 
 Task 2: Game Texts appears only in Advanced; normal mode return preserves Interactive. PickerCheck 9/9 with visibility and round-trip checks; Release zero warnings/errors.
