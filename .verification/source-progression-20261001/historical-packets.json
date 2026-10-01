@@ -1,0 +1,1230 @@
+[
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-1/level5-direct632.json",
+    "sha256": "2633420167f2957056dfd5fb09fa52d8d113892b45048e2a0327fd830b975ca4",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "632-direct",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-1/level5-native41.json",
+    "sha256": "d659467f27547ec0074840b2b87ee34dc32cc85b342606ad1e9d15bdeb9fc708",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "632-look",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-1/level6-native41.json",
+    "sha256": "8ebc61cfa4bf777d55a20d3344d74c3971fc75a942123a1bdb0da1e1cbc693d5",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "632-look",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-1/native41-delayed632.json",
+    "sha256": "fc731fdf0eca6e57043603f8333026008753d913093fa0c2e9432f48a08b290f",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "632-look",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 3000,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-2/level5-direct632.json",
+    "sha256": "2ea178c93e07af5bc570e125994f6c2dfe4d00e66b3fc661c222408c4f3498f6",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "633-ready",
+        "frames": 420,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 771,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-2/level5-native41.json",
+    "sha256": "3b64a0d2e740169b4287b8159a785b647e96694c7345f50cc706ff7d0f8b450d",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 771,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 238,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-2/level6-native41.json",
+    "sha256": "fc4ea4b6b1c873aceaac0ee472da2b49ed8c6fefb2921c4dc5ede9cf3373b9c3",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 771,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 238,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-2/native41-delayed632.json",
+    "sha256": "70e453852cafe8907abeb68b7249dca5246b157ed74eb8f7460a857677f3e34a",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 771,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-3/level5-direct632.json",
+    "sha256": "2ea178c93e07af5bc570e125994f6c2dfe4d00e66b3fc661c222408c4f3498f6",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "633-ready",
+        "frames": 420,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 771,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-3/level5-native41.json",
+    "sha256": "1ec2b7f90c273c8d76be711997f0d8c5190c39749abb21768e51c25a95556564",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 755,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-3/level6-native41.json",
+    "sha256": "b948d2c6c519e0015bcca3d61bc1a722a6fccee76004d94163845d599231e502",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 755,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-3/native41-delayed632.json",
+    "sha256": "fa2c3a123530d08c6e150f61635e7a082c509d42cf63a494498ba93f55347861",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-4/level6-native-lesson-cast41.json",
+    "sha256": "3ac6b739e1766d7b6c6e803c8918911d3513ac9b42c29b87c861efd7981dd1c1",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "052",
+        "frames": 334,
+        "room": 13
+      },
+      {
+        "stage": "native-learn4",
+        "frames": 182,
+        "room": 13
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "approach",
+        "frames": 41,
+        "room": 41
+      },
+      {
+        "stage": "632-ready",
+        "frames": 47,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 752,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-4/level6-walk-native41.json",
+    "sha256": "750309da4f91cd6694aa50a1be094c077cc004ac9583c1a7614b11e8c503ace7",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "approach",
+        "frames": 41,
+        "room": 41
+      },
+      {
+        "stage": "632-ready",
+        "frames": 47,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 752,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-4/native13-lesson-after052.json",
+    "sha256": "95524a470daccc8967b7ea46b7337da714057c4abf1e8b11613a5c2fa1666efc",
+    "room": 13,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "052",
+        "frames": 334,
+        "room": 13
+      },
+      {
+        "stage": "native-learn4",
+        "frames": 182,
+        "room": 13
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 13
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-5/level6-native-lesson-cast41.json",
+    "sha256": "55fe6b815cfee173a110125ba9cf1265a0f90f47131352d2507f264a26b51f93",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "052",
+        "frames": 334,
+        "room": 13
+      },
+      {
+        "stage": "native-learn4",
+        "frames": 182,
+        "room": 13
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "approach",
+        "frames": 16,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 755,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-5/level6-walk-native41.json",
+    "sha256": "2ff565ce46f4bbb03b25c8b160511fec7033a3a9b729d74d1d93174a441393e4",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Script 12 +0x0000 runs script 2",
+      "endCutscene at Script 12 +0x004A runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "approach",
+        "frames": 16,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 755,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-5/native13-lesson-after052.json",
+    "sha256": "95524a470daccc8967b7ea46b7337da714057c4abf1e8b11613a5c2fa1666efc",
+    "room": 13,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "052",
+        "frames": 334,
+        "room": 13
+      },
+      {
+        "stage": "native-learn4",
+        "frames": 182,
+        "room": 13
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 13
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-6/level6-native-lesson-cast41.json",
+    "sha256": "7c253a6b961a6ffc509488f0e0eaa4f193f01bd813bea4066b51c343d12f99a3",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "052",
+        "frames": 334,
+        "room": 13
+      },
+      {
+        "stage": "native-learn4",
+        "frames": 182,
+        "room": 13
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "approach",
+        "frames": 40,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 553,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-6/level6-walk-native41.json",
+    "sha256": "bdec8ee140c90ce0f098fe0ed3022d9399e91b8c9a29466ce2c93328c50baa7f",
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "level5",
+        "frames": 105,
+        "room": 15
+      },
+      {
+        "stage": "level6",
+        "frames": 258,
+        "room": 28
+      },
+      {
+        "stage": "632-ready",
+        "frames": 88,
+        "room": 41
+      },
+      {
+        "stage": "633-ready",
+        "frames": 451,
+        "room": 41
+      },
+      {
+        "stage": "approach",
+        "frames": 40,
+        "room": 41
+      },
+      {
+        "stage": "633-aim",
+        "frames": 1,
+        "room": 41
+      },
+      {
+        "stage": "cast",
+        "frames": 731,
+        "room": 41
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 41
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/routes-6/native13-lesson-after052.json",
+    "sha256": "95524a470daccc8967b7ea46b7337da714057c4abf1e8b11613a5c2fa1666efc",
+    "room": 13,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3"
+    ],
+    "stages": [
+      {
+        "stage": "staff",
+        "frames": 73,
+        "room": 9
+      },
+      {
+        "stage": "052",
+        "frames": 334,
+        "room": 13
+      },
+      {
+        "stage": "native-learn4",
+        "frames": 182,
+        "room": 13
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 13
+      }
+    ],
+    "failure": null
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261001/boot-4/native-boot-check-failure.json",
+    "sha256": "0e238bd5d6c21909dd04d9898beb18eabc919b2dc292f09d162b71af6154b308",
+    "room": 69,
+    "boundaries": [],
+    "stages": [
+      {
+        "stage": "intro",
+        "frames": 4,
+        "room": 69
+      },
+      {
+        "stage": "challenge",
+        "frames": 32,
+        "room": 69
+      },
+      {
+        "stage": "failure",
+        "frames": 0,
+        "room": 69
+      }
+    ],
+    "failure": "System.IO.InvalidDataException: Source boot answer has not been generated.\r\n   at Program.<Main>$(String[] args) in D:\\Documents\\Personal\\Code Projects\\SCUMMexplorer\\.verification\\source-progression-20261001\\ProgressionProbe\\Program.cs:line 77"
+  }
+]

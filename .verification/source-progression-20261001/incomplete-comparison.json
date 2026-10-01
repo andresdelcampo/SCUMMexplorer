@@ -1,0 +1,77 @@
+{
+  "baseline": "Exe/DraftScopeSession-20261001/final-audits-1/literal/audit.json",
+  "current": "Exe/SourceProgressionSession-20261001/incomplete-1/audit.json",
+  "currentSha256": "f7ac157d2d4cff37b97bb53312db6cc7000e5bd5774f080bec15581f502248a8",
+  "sourceFilesMatch": true,
+  "allComparedFieldsMatch": true,
+  "results": [
+    {
+      "owner": "Room 18 object 370 Verb 0x36",
+      "status": "Incomplete: prerequisites, waits or executor require review",
+      "frames": 218,
+      "first": 0,
+      "last": 218,
+      "everOpen": true,
+      "begun": 1,
+      "ended": 0,
+      "rooms": [
+        18,
+        19
+      ],
+      "sceneTrace": [
+        "cutscene at Script 65 +0x0000 runs script 2"
+      ]
+    },
+    {
+      "owner": "Room 20 object 390 Verb 0x48",
+      "status": "Incomplete: prerequisites, waits or executor require review",
+      "frames": 78,
+      "first": 0,
+      "last": 78,
+      "everOpen": true,
+      "begun": 1,
+      "ended": 0,
+      "rooms": [
+        20
+      ],
+      "sceneTrace": [
+        "cutscene at Room 20 local script 206 +0x0000 runs script 2"
+      ]
+    },
+    {
+      "owner": "Room 20 object 391 Verb 0x48",
+      "status": "Incomplete: prerequisites, waits or executor require review",
+      "frames": 78,
+      "first": 0,
+      "last": 78,
+      "everOpen": true,
+      "begun": 1,
+      "ended": 0,
+      "rooms": [
+        20
+      ],
+      "sceneTrace": [
+        "cutscene at Room 20 local script 206 +0x0000 runs script 2"
+      ]
+    },
+    {
+      "owner": "Room 38 object 610 Verb 0x36",
+      "status": "Incomplete: prerequisites, waits or executor require review",
+      "frames": 3000,
+      "first": 0,
+      "last": -1,
+      "everOpen": true,
+      "begun": 1,
+      "ended": 0,
+      "rooms": [
+        34,
+        37,
+        38,
+        68
+      ],
+      "sceneTrace": [
+        "cutscene at Script 87 +0x0000 runs script 2"
+      ]
+    }
+  ]
+}

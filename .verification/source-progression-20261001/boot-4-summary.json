@@ -1,0 +1,219 @@
+[
+  {
+    "id": "native-boot-check-failure",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 69
+      },
+      {
+        "kind": "frames",
+        "stage": "intro",
+        "count": 4,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 876
+      },
+      {
+        "kind": "frames",
+        "stage": "challenge",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "boot-answer"
+      },
+      {
+        "kind": "frames",
+        "stage": "opening",
+        "count": 5000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "intro",
+        "frames": 4,
+        "room": 69,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 0,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": null,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": null,
+          "StaffOrigin": "Unresolved",
+          "AvailableNoteCount": 0,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Room 69 local script 202",
+            "offset": 176,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "challenge",
+        "frames": 32,
+        "room": 69,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 0,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": null,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": null,
+          "StaffOrigin": "Unresolved",
+          "AvailableNoteCount": 0,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          }
+        ],
+        "pending": []
+      },
+      {
+        "stage": "failure",
+        "frames": 0,
+        "room": 69,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 0,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": null,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": null,
+          "StaffOrigin": "Unresolved",
+          "AvailableNoteCount": 0,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "prerequisiteStops": [],
+    "boundaries": [],
+    "balancedScopes": true,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 69
+      }
+    ],
+    "failure": "System.IO.InvalidDataException: Source boot answer has not been generated.\r\n   at Program.<Main>$(String[] args) in D:\\Documents\\Personal\\Code Projects\\SCUMMexplorer\\.verification\\source-progression-20261001\\ProgressionProbe\\Program.cs:line 77",
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/boot-4/native-boot-check-failure.json",
+    "sha256": "0e238bd5d6c21909dd04d9898beb18eabc919b2dc292f09d162b71af6154b308"
+  }
+]

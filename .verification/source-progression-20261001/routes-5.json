@@ -1,0 +1,291 @@
+[
+  {
+    "id": "level6-native-lesson-cast41",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 10
+      },
+      {
+        "kind": "verb",
+        "objectId": 295,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "052",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 13
+      },
+      {
+        "kind": "look",
+        "objectId": 325
+      },
+      {
+        "kind": "frames",
+        "stage": "native-learn4",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 13
+      },
+      {
+        "kind": "verb",
+        "objectId": 323,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "level5",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 28
+      },
+      {
+        "kind": "verb",
+        "objectId": 470,
+        "verb": 61
+      },
+      {
+        "kind": "frames",
+        "stage": "level6",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "until-touchable",
+        "objectId": 632,
+        "stage": "632-ready",
+        "count": 3000
+      },
+      {
+        "kind": "look",
+        "objectId": 632
+      },
+      {
+        "kind": "until-touchable",
+        "objectId": 633,
+        "stage": "633-ready",
+        "count": 3000
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 633
+      },
+      {
+        "kind": "frames",
+        "stage": "approach",
+        "count": 16,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 633
+      },
+      {
+        "kind": "frames",
+        "stage": "633-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 8
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "level6-walk-native41",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 13
+      },
+      {
+        "kind": "verb",
+        "objectId": 323,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "level5",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 28
+      },
+      {
+        "kind": "verb",
+        "objectId": 470,
+        "verb": 61
+      },
+      {
+        "kind": "frames",
+        "stage": "level6",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "until-touchable",
+        "objectId": 632,
+        "stage": "632-ready",
+        "count": 3000
+      },
+      {
+        "kind": "look",
+        "objectId": 632
+      },
+      {
+        "kind": "until-touchable",
+        "objectId": 633,
+        "stage": "633-ready",
+        "count": 3000
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 633
+      },
+      {
+        "kind": "frames",
+        "stage": "approach",
+        "count": 16,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 633
+      },
+      {
+        "kind": "frames",
+        "stage": "633-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 8
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "native13-lesson-after052",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 10
+      },
+      {
+        "kind": "verb",
+        "objectId": 295,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "052",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 13
+      },
+      {
+        "kind": "look",
+        "objectId": 325
+      },
+      {
+        "kind": "frames",
+        "stage": "native-learn4",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  }
+]

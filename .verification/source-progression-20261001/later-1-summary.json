@@ -1,0 +1,2018 @@
+[
+  {
+    "id": "fresh18-return-certainty",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 370,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "065",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "065",
+        "frames": 3000,
+        "room": 19,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 19,
+            "X": 104,
+            "Y": 97,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 1's walkActorTo at +0x020E follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActorInRoom at +0x01F7 follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 19,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 19,
+            "X": 104,
+            "Y": 97,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 1's walkActorTo at +0x020E follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActorInRoom at +0x01F7 follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [],
+    "boundaries": [
+      "cutscene at Script 65 +0x0000 runs script 2"
+    ],
+    "balancedScopes": false,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 19
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/fresh18-return-certainty.json",
+    "sha256": "45c61fcc38be406c61a018d0cebf9af3036d3d1bc64e76371eb2595298734944"
+  },
+  {
+    "id": "fresh38-087",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 38
+      },
+      {
+        "kind": "verb",
+        "objectId": 610,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "087",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "087",
+        "frames": 3000,
+        "room": 37,
+        "inCutscene": true,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 37,
+            "X": 125,
+            "Y": 72,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 2,
+            "X": 433,
+            "Y": 129,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 37 local script 203",
+            "offset": 43,
+            "freeze": 0
+          },
+          {
+            "label": "Room 37 local script 200",
+            "offset": 6,
+            "freeze": 0
+          },
+          {
+            "label": "Script 87",
+            "offset": 1148,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 37,
+        "inCutscene": true,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 37,
+            "X": 125,
+            "Y": 72,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 2,
+            "X": 433,
+            "Y": 129,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 37 local script 203",
+            "offset": 43,
+            "freeze": 0
+          },
+          {
+            "label": "Room 37 local script 200",
+            "offset": 6,
+            "freeze": 0
+          },
+          {
+            "label": "Script 87",
+            "offset": 1148,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [],
+    "boundaries": [
+      "cutscene at Script 87 +0x0000 runs script 2"
+    ],
+    "balancedScopes": false,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 38
+      },
+      {
+        "elapsed": 200,
+        "room": 34
+      },
+      {
+        "elapsed": 320,
+        "room": 68
+      },
+      {
+        "elapsed": 540,
+        "room": 38
+      },
+      {
+        "elapsed": 701,
+        "room": 37
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/fresh38-087.json",
+    "sha256": "a95ec1c57272a779da3995c69ca8b3a1edeed2857d120e92a26d098ef0843c16"
+  },
+  {
+    "id": "late096-revisit43",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff45",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "095",
+        "frames": 858,
+        "room": 45,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 45,
+            "X": 264,
+            "Y": 132,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x05AE follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 2,
+            "X": 433,
+            "Y": 129,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "staff45",
+        "frames": 75,
+        "room": 45,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 45,
+            "X": 256,
+            "Y": 132,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 2,
+            "X": 433,
+            "Y": 129,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "return43",
+        "frames": 49,
+        "room": 43,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 43,
+            "X": 170,
+            "Y": 108,
+            "Moving": 0,
+            "WalkBox": 1,
+            "Estimate": "actor 1's actorOps at +0x0005 follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActorInRoom at +0x01A3 follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "096",
+        "frames": 3000,
+        "room": 43,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 43,
+            "X": 170,
+            "Y": 108,
+            "Moving": 0,
+            "WalkBox": 1,
+            "Estimate": "actor 1's actorOps at +0x0005 follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 43,
+            "X": 110,
+            "Y": 93,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActor at +0x003A follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 Object 639 Verb 0x38",
+            "offset": 34,
+            "freeze": 1
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 43,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 43,
+            "X": 170,
+            "Y": 108,
+            "Moving": 0,
+            "WalkBox": 1,
+            "Estimate": "actor 1's actorOps at +0x0005 follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 43,
+            "X": 110,
+            "Y": 93,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActor at +0x003A follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 Object 639 Verb 0x38",
+            "offset": 34,
+            "freeze": 1
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [],
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2"
+    ],
+    "balancedScopes": false,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 44
+      },
+      {
+        "elapsed": 193,
+        "room": 42
+      },
+      {
+        "elapsed": 199,
+        "room": 45
+      },
+      {
+        "elapsed": 934,
+        "room": 43
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/late096-revisit43.json",
+    "sha256": "7ee8350424e0c7b5a2a64277542b80c01e97018904f218ff692fa3546cbf70ea"
+  },
+  {
+    "id": "late096-source-recheck",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff45",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "095",
+        "frames": 858,
+        "room": 45,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 45,
+            "X": 264,
+            "Y": 132,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x05AE follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 2,
+            "X": 433,
+            "Y": 129,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "staff45",
+        "frames": 75,
+        "room": 45,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 45,
+            "X": 256,
+            "Y": 132,
+            "Moving": 0,
+            "WalkBox": 0,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 2,
+            "X": 433,
+            "Y": 129,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "return43",
+        "frames": 49,
+        "room": 43,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 43,
+            "X": 170,
+            "Y": 108,
+            "Moving": 0,
+            "WalkBox": 1,
+            "Estimate": "actor 1's actorOps at +0x0005 follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActorInRoom at +0x01A3 follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "096",
+        "frames": 3000,
+        "room": 43,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 43,
+            "X": 170,
+            "Y": 108,
+            "Moving": 0,
+            "WalkBox": 1,
+            "Estimate": "actor 1's actorOps at +0x0005 follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 43,
+            "X": 110,
+            "Y": 93,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActor at +0x003A follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 Object 639 Verb 0x38",
+            "offset": 34,
+            "freeze": 1
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 43,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 0,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": 1,
+          "bit[0xDA3]": 1,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [
+          "bit[0xD7B]",
+          "bit[0xDA3]"
+        ],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": true,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 43,
+            "X": 170,
+            "Y": 108,
+            "Moving": 0,
+            "WalkBox": 1,
+            "Estimate": "actor 1's actorOps at +0x0005 follows a seeded pick"
+          },
+          {
+            "Number": 4,
+            "Room": 43,
+            "X": 110,
+            "Y": 93,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": "actor 4's putActor at +0x003A follows a seeded pick"
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 Object 639 Verb 0x38",
+            "offset": 34,
+            "freeze": 1
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [],
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2"
+    ],
+    "balancedScopes": false,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 44
+      },
+      {
+        "elapsed": 193,
+        "room": 42
+      },
+      {
+        "elapsed": 199,
+        "room": 45
+      },
+      {
+        "elapsed": 934,
+        "room": 43
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/late096-source-recheck.json",
+    "sha256": "afaede41ab46d8d367b5610baa7a9a0b8ae1d686f9ab6c296d20ffd97d69768a"
+  },
+  {
+    "id": "transient20-source369-response390",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 369,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 390,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "arrival",
+        "frames": 570,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [
+      {
+        "prerequisiteNotReached": 20,
+        "actualRoom": 18
+      }
+    ],
+    "boundaries": [
+      "cutscene at Script 62 +0x0000 runs script 2",
+      "endCutscene at Script 62 +0x0018 runs script 3",
+      "cutscene at Script 63 +0x0000 runs script 2",
+      "endCutscene at Script 63 +0x001C runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "balancedScopes": true,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 18
+      },
+      {
+        "elapsed": 37,
+        "room": 20
+      },
+      {
+        "elapsed": 431,
+        "room": 18
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/transient20-source369-response390.json",
+    "sha256": "8d9aba441018f5cf5967b0a78484f5b567b1cef57f5c6fb0ffa836e179ec1b36"
+  },
+  {
+    "id": "transient20-source369-response391",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 369,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 391,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "arrival",
+        "frames": 570,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [
+      {
+        "prerequisiteNotReached": 20,
+        "actualRoom": 18
+      }
+    ],
+    "boundaries": [
+      "cutscene at Script 62 +0x0000 runs script 2",
+      "endCutscene at Script 62 +0x0018 runs script 3",
+      "cutscene at Script 63 +0x0000 runs script 2",
+      "endCutscene at Script 63 +0x001C runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "balancedScopes": true,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 18
+      },
+      {
+        "elapsed": 37,
+        "room": 20
+      },
+      {
+        "elapsed": 431,
+        "room": 18
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/transient20-source369-response391.json",
+    "sha256": "282b2c700527c817afb836dd29053a262002287b6cc394cd4039eb247595dd6e"
+  },
+  {
+    "id": "transient20-source371-response390",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 371,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 390,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "arrival",
+        "frames": 607,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [
+      {
+        "prerequisiteNotReached": 20,
+        "actualRoom": 18
+      }
+    ],
+    "boundaries": [
+      "cutscene at Script 56 +0x0000 runs script 2",
+      "endCutscene at Script 56 +0x0025 runs script 3",
+      "cutscene at Script 57 +0x0000 runs script 2",
+      "endCutscene at Script 57 +0x0029 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "balancedScopes": true,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 18
+      },
+      {
+        "elapsed": 84,
+        "room": 20
+      },
+      {
+        "elapsed": 468,
+        "room": 18
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/transient20-source371-response390.json",
+    "sha256": "6942a128e0160904af104c17373f2c4f6aaae107151443cd3f280d663438dd86"
+  },
+  {
+    "id": "transient20-source371-response391",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 371,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 391,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "stages": [
+      {
+        "stage": "arrival",
+        "frames": 607,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frames": 0,
+        "room": 18,
+        "inCutscene": false,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xD6B]": 1,
+          "bit[0xD6F]": 0,
+          "bit[0xD7B]": null,
+          "bit[0xDA3]": null,
+          "bit[0xDD5]": null,
+          "bit[0xDD7]": null,
+          "bit[0xD66]": 0,
+          "bit[0xDB4]": null
+        },
+        "estimatedVariables": [],
+        "classes": {
+          "632": 8388609,
+          "633": 8388609,
+          "634": 1
+        },
+        "status": {
+          "StaffHeld": false,
+          "StaffOrigin": "Known in this exploration session",
+          "AvailableNoteCount": 3,
+          "NotesOrigin": "Known in this exploration session"
+        },
+        "actors": [
+          {
+            "Number": 1,
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "WalkBox": 8,
+            "Estimate": null
+          },
+          {
+            "Number": 4,
+            "Room": 0,
+            "X": 0,
+            "Y": 0,
+            "Moving": 0,
+            "WalkBox": 255,
+            "Estimate": null
+          }
+        ],
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 18 local script 204",
+            "offset": 202,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "prerequisiteStops": [
+      {
+        "prerequisiteNotReached": 20,
+        "actualRoom": 18
+      }
+    ],
+    "boundaries": [
+      "cutscene at Script 56 +0x0000 runs script 2",
+      "endCutscene at Script 56 +0x0025 runs script 3",
+      "cutscene at Script 57 +0x0000 runs script 2",
+      "endCutscene at Script 57 +0x0029 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "balancedScopes": true,
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 18
+      },
+      {
+        "elapsed": 84,
+        "room": 20
+      },
+      {
+        "elapsed": 468,
+        "room": 18
+      }
+    ],
+    "failure": null,
+    "focusedTrace": [],
+    "packet": "Exe/SourceProgressionSession-20261001/later-1/transient20-source371-response391.json",
+    "sha256": "b6bda4b832966677975f3c5feb84d468750c0978d123a096f60204b42aed8473"
+  }
+]

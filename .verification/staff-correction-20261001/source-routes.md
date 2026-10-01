@@ -1,5 +1,7 @@
 # Continued source routes and retained gaps (1 October 2026)
 
+Superseding source-input research: [native progression validation](../source-progression-20261001/validation.md) establishes delayed632/633 access and native13/325 learning after052. Early aim misses below describe their sampled state, not permanent inaccessibility. It also corrects the old20 claim:369/371 **do enter20 transiently**, then207/058 return18 before settled response input. The original guarded-response conclusion remains unchanged.
+
 Bounded investigation from the prior handoff. No recipe/catalog promotion or executor certainty change. Probes invoke only visits, direct source verbs, native clicks/double clicks, decoded native draft notes and frames. They use default `preserveStaffLevel:false`, no status edits, injected positions/classes/flags, forced loads or forced scene ends.
 
 Authoritative disassembly: `Exe/VerificationSession-20261001/native-code-1/code.tsv`, SHA256 `0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569`. Full packets remain ignored in `Exe/StaffCorrectionSession-20261001/routes-1/` and `routes-3/`. [First routes/digests](routes-1-summary.json), [additional routes/digests](routes-3-summary.json) record the last actual snapshot for every stage. Native hit selection remains consistent with ScummVM [findObject](https://raw.githubusercontent.com/scummvm/scummvm/master/engines/scumm/object.cpp), which excludes untouchable objects.
@@ -32,7 +34,7 @@ Fresh all363 audit reproduces each result exactly:
 |20/391response48|Same independent failure as390|Retain both owners/sites|
 |38/610look36|3000 frames, rooms34/37/38/68,087 begins/no end|Source actor setup from086; established longer recipe remains distinct|
 
-Fresh18/369look starts062 and18/371look starts056, both potential20 arrivals. These packets settle in18 with five balanced scopes, without entering20. Guarded probes record prerequisiteNotReached20 and **do not call390/391**. These attempts do not establish completed20 responses. Its possible transitions use056/062/099; placement continues through dynamic/local scripts rather than the literal arrival index.
+Fresh18/369look starts062 and18/371look starts056, both20 arrivals. These packets settle in18 with five balanced scopes. Their final-stage snapshots did not record transient20; the later per-frame probe confirms that entry and207/058's return18. Guarded probes record prerequisiteNotReached20 and **do not call390/391**. These attempts do not establish completed20 responses. Transitions use056/062/099; placement continues through dynamic/local scripts rather than the literal arrival index.
 
 `routes-2` initially tried390 after a merely possible20 arrival and caught the wrong-room exception via shared failure policy; not a successful packet. `routes-3` records the prerequisite guard and runs all four combinations plus the unaffected wind-learning case. An early diagnostic accessed a nonexistent EstimatedVariables snapshot field; corrected to public fields, with no production consequence.
 

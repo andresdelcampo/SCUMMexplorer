@@ -1,0 +1,43 @@
+[
+  {
+    "id": "native-boot-check",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 69
+      },
+      {
+        "kind": "frames",
+        "stage": "intro",
+        "count": 4,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 876
+      },
+      {
+        "kind": "frames",
+        "stage": "challenge",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "boot-answer"
+      },
+      {
+        "kind": "frames",
+        "stage": "opening",
+        "count": 5000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "nativeBoot": true
+  }
+]

@@ -1,0 +1,122 @@
+{
+  "inputSha256": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+  "roots": [
+    {
+      "owner": "Room 18 object 370 Verb 0x36",
+      "room": 18,
+      "objectId": 370,
+      "verb": 54,
+      "candidates": [
+        "script 011",
+        "script 065"
+      ],
+      "source": [
+        {
+          "owner": "script 011",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        },
+        {
+          "owner": "script 065",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    },
+    {
+      "owner": "Room 20 object 390 Verb 0x48",
+      "room": 20,
+      "objectId": 390,
+      "verb": 72,
+      "candidates": [
+        "Room 20 local 206",
+        "Room 20 local 207",
+        "script 058",
+        "script 059"
+      ],
+      "source": [
+        {
+          "owner": "Room 20 local 206",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        },
+        {
+          "owner": "Room 20 local 207",
+          "offset": "+0x000B",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        },
+        {
+          "owner": "script 058",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[]"
+        },
+        {
+          "owner": "script 059",
+          "offset": "+0x0010",
+          "operation": "cutscene",
+          "operands": "[]"
+        }
+      ]
+    },
+    {
+      "owner": "Room 20 object 391 Verb 0x48",
+      "room": 20,
+      "objectId": 391,
+      "verb": 72,
+      "candidates": [
+        "Room 20 local 206",
+        "Room 20 local 207",
+        "script 058",
+        "script 059"
+      ],
+      "source": [
+        {
+          "owner": "Room 20 local 206",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        },
+        {
+          "owner": "Room 20 local 207",
+          "offset": "+0x000B",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        },
+        {
+          "owner": "script 058",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[]"
+        },
+        {
+          "owner": "script 059",
+          "offset": "+0x0010",
+          "operation": "cutscene",
+          "operands": "[]"
+        }
+      ]
+    },
+    {
+      "owner": "Room 38 object 610 Verb 0x36",
+      "room": 38,
+      "objectId": 610,
+      "verb": 54,
+      "candidates": [
+        "script 087"
+      ],
+      "source": [
+        {
+          "owner": "script 087",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    }
+  ]
+}

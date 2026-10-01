@@ -1,0 +1,316 @@
+[
+  {
+    "id": "late096-source-recheck",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff45",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "late096-revisit43",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff45",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "fresh18-return-certainty",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 370,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "065",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "fresh38-087",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 38
+      },
+      {
+        "kind": "verb",
+        "objectId": 610,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "087",
+        "count": 3000,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "transient20-source369-response390",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 369,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 390,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "transient20-source369-response391",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 369,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 391,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "transient20-source371-response390",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 371,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 390,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "transient20-source371-response391",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 18
+      },
+      {
+        "kind": "verb",
+        "objectId": 371,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 20
+      },
+      {
+        "kind": "verb",
+        "objectId": 391,
+        "verb": 72
+      },
+      {
+        "kind": "frames",
+        "stage": "response",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  }
+]
