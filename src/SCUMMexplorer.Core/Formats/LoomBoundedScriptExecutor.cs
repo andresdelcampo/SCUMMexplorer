@@ -708,19 +708,20 @@ public sealed class LoomBoundedScriptExecutor
                     unresolved = $"isSoundRunning needs a session and a known sound ({instruction.Operands}) at +0x{instruction.Offset:X4}";
                     break;
                 }
-                // A sound started on this route is read as still playing, because its
-                // length is not simulated: that value, and what follows from it, is an
-                // estimate. A sound this route never started is silent in this preview.
-                var running = sound != 0 && runtime.ActiveSounds.Contains(sound);
+                var (running, soundEstimate) = runtime.SoundRunning is { } status ? status(sound) :
+                    (sound != 0 && runtime.ActiveSounds.Contains(sound),
+                        sound != 0 && runtime.ActiveSounds.Contains(sound) ? "its native completion clock is unavailable" : null);
                 knownVariables[resultKey] = running ? (ushort)1 : (ushort)0;
                 RefreshBitAliases(resultKey, knownVariables);
-                MarkEstimated(estimated, resultKey, onEstimatedPath || running ||
+                MarkEstimated(estimated, resultKey, onEstimatedPath || soundEstimate is not null ||
                     OperandIsEstimated(parts[1], estimated, knownVariables));
-                if (sound != 0)
+                if (soundEstimate is not null)
+                    limitations.Add($"isSoundRunning reads sound {sound} as {(running ? "playing" : "silent")} with an estimate: {soundEstimate} (+0x{instruction.Offset:X4})");
+                else if (sound != 0 && runtime.SoundRunning is null)
                     limitations.Add(running
                         ? $"isSoundRunning reads sound {sound} as playing because this route started it; its length is not simulated, so what follows is an estimate (+0x{instruction.Offset:X4})"
                         : $"isSoundRunning reads sound {sound} as silent because this route did not start it (+0x{instruction.Offset:X4})");
-                trace.Add($"{resultKey} = {(running ? 1 : 0)}: sound {sound} {(running ? "started on this route (estimate)" : "not started on this route")}");
+                trace.Add($"{resultKey} = {(running ? 1 : 0)}: sound {sound} {(running ? "playing" : "silent")}{(soundEstimate is null ? "" : " (estimate)")}");
                 pc = next;
                 continue;
             }

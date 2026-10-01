@@ -10,6 +10,7 @@ public sealed partial class LoomAdlibAudio
     private const int SampleRate = 49716;
     private const int CallbackRate = 472;
     private const int MaxSeconds = 180;
+    private const int MaxLifetimeSeconds = 1800;
     private const int MaxReleaseSeconds = 2;
     private const int QuietSampleLevel = 8;
     private static readonly int[] OperatorOffsets = [0, 3, 1, 4, 2, 5, 8, 11, 9, 12, 10, 13, 16, 19, 17, 20, 18, 21];
@@ -32,13 +33,52 @@ public sealed partial class LoomAdlibAudio
             throw new NotSupportedException("This AdLib resource is not a music track.");
         var player = new MusicPlayer(data);
         var callbacks = 0;
-        while (player.Active && !player.LoopBoundaryReached && callbacks < CallbackRate * MaxSeconds)
+        while (player.Active && !player.LoopBoundaryReached && callbacks < CallbackRate * MaxLifetimeSeconds)
         {
             player.Tick();
             callbacks++;
         }
-        if (callbacks == 0) throw new InvalidDataException("AdLib music has no duration.");
+        if (callbacks == 0 || player.Active && !player.LoopBoundaryReached || !player.Active && !player.EndedNormally)
+            throw new InvalidDataException("AdLib music has no established first-pass duration.");
         return TimeSpan.FromSeconds((double)callbacks / CallbackRate);
+    }
+
+    /// <summary>Native driver status lifetime, excluding PCM envelope release and preview truncation.</summary>
+    public LoomSoundLifetime ReadLifetime(GameResource resource)
+    {
+        try
+        {
+            var data = ReadTrack(resource);
+            if (data[2] == 0x80)
+            {
+                var player = new MusicPlayer(data);
+                for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds; callbacks++)
+                {
+                    player.Tick();
+                    if (!player.Active)
+                        return player.EndedNormally
+                            ? new(LoomSoundLifetimeKind.Finite, callbacks, true)
+                            : new(LoomSoundLifetimeKind.Unknown, null, true, "music has no native end marker");
+                    // Validate one full repeated pass, including the loop target's commands.
+                    if (player.LoopBoundaries >= 2)
+                        return new(LoomSoundLifetimeKind.Looping, null, true);
+                }
+                return new(LoomSoundLifetimeKind.Unknown, null, true, "music exceeds the bounded lifetime analysis");
+            }
+            var effect = new EffectPlayer(data);
+            for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds; callbacks++)
+            {
+                effect.Tick();
+                // Player_AD stops the resource on the next 118 Hz update after all channels go off.
+                if (!effect.Active) return new(LoomSoundLifetimeKind.Finite, callbacks + 4, false);
+                if (effect.LoopBoundaryReached) return new(LoomSoundLifetimeKind.Looping, null, false);
+            }
+            return new(LoomSoundLifetimeKind.Unknown, null, false, "effect repeats or exceeds the bounded lifetime analysis");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+        {
+            return new(LoomSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
     }
 
     public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
@@ -47,9 +87,11 @@ public sealed partial class LoomAdlibAudio
         if (data[2] != 0x80) return RenderEffectWave(data, cancellationToken);
         if (data.Length < 0x94) throw new InvalidDataException("AdLib music header is incomplete.");
         var player = new MusicPlayer(data);
+        var lifetime = ReadLifetime(resource);
+        var maxCallbacks = lifetime.Kind == LoomSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxSeconds;
         var samples = new List<short>();
         var frameRemainder = 0;
-        for (var callback = 0; callback < CallbackRate * MaxSeconds && player.Active; callback++)
+        for (var callback = 0; callback < maxCallbacks && player.Active; callback++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             player.Tick();
@@ -192,7 +234,8 @@ public sealed partial class LoomAdlibAudio
         public Opl3Chip Chip { get; } = new();
         public bool Active { get; private set; } = true;
         public bool EndedNormally { get; private set; }
-        public bool LoopBoundaryReached { get; private set; }
+        public int LoopBoundaries { get; private set; }
+        public bool LoopBoundaryReached => LoopBoundaries != 0;
 
         public MusicPlayer(byte[] data)
         {
@@ -233,8 +276,10 @@ public sealed partial class LoomAdlibAudio
                     var meta = Read(_position++);
                     if (meta == 0x2f)
                     {
-                        if (!_loop || _loopStart < 0x93 || _loopStart >= _data.Length) { End(true); return; }
-                        LoopBoundaryReached = true;
+                        if (!_loop) { End(true); return; }
+                        if (_loopStart < 0x93 || _loopStart >= _data.Length)
+                            throw new InvalidDataException("AdLib music loop target is outside the event stream.");
+                        LoopBoundaries++;
                         _position = _loopStart;
                         continue;
                     }

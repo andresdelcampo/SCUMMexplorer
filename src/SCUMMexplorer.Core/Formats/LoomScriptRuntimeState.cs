@@ -26,6 +26,8 @@ public sealed class LoomScriptRuntimeState
     public Dictionary<string, ushort> GlobalVariables { get; } = new(StringComparer.Ordinal);
     public HashSet<int> Inventory { get; } = [];
     public HashSet<int> ActiveSounds { get; } = [];
+    /// <summary>Native resource-clock status, with unresolved/seeded route certainty; null outside a session.</summary>
+    public Func<int, (bool Running, string? Estimate)>? SoundRunning { get; set; }
     /// <summary>drawObject calls since the last room entry or setState, in call order.</summary>
     public List<int> DrawQueue { get; } = [];
     /// <summary>Objects whose state reached <c>setState</c> calls set since the last room entry.</summary>

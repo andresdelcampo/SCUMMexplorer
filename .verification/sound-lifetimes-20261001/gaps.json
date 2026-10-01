@@ -1,0 +1,1256 @@
+[
+  {
+    "owner": "Room 04 object 177 Verb 0x3A",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 4,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 04 local script 203",
+        "offset": "+0x0017",
+        "number": 203,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 04 local script 209 +0x0000 runs script 2",
+      "endCutscene at Room 04 local script 209 +0x00D7 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 09 object 272 Verb 0x52",
+    "completeBoundaries": true,
+    "begun": 2,
+    "ended": 2,
+    "room": 51,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 51 local script 203",
+        "offset": "+0x001F",
+        "number": 203,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 104 +0x0000 runs script 2",
+      "endCutscene at Script 104 +0x06FC runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 13 object 323 Verb 0x38",
+    "completeBoundaries": true,
+    "begun": 2,
+    "ended": 2,
+    "room": 15,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 15 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 17 object 357 Verb 0x3A",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 17,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 17 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 17 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 17 local script 206 +0x00C1 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 17 object 358 Verb 0x3A",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 17,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 17 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 17 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 17 local script 206 +0x00C1 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 18 object 370 Verb 0x36",
+    "completeBoundaries": false,
+    "begun": 1,
+    "ended": 0,
+    "room": 19,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 65 +0x0000 runs script 2"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x47",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 212 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 212 +0x0035 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x48",
+    "completeBoundaries": false,
+    "begun": 1,
+    "ended": 0,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x49",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 211 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 211 +0x0051 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 213 +0x003F runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x47",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 212 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 212 +0x0035 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x48",
+    "completeBoundaries": false,
+    "begun": 1,
+    "ended": 0,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x49",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 211 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 211 +0x0051 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 20,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 213 +0x003F runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 22 object 403 Verb 0x36",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 22,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 22 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 22 local script 205 +0x0000 runs script 2",
+      "endCutscene at Room 22 local script 205 +0x0093 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 22 object 404 Verb 0x36",
+    "completeBoundaries": true,
+    "begun": 2,
+    "ended": 2,
+    "room": 56,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 22 local script 204 +0x0000 runs script 2",
+      "endCutscene at Room 22 local script 204 +0x0093 runs script 3",
+      "cutscene at Script 67 +0x0000 runs script 2",
+      "endCutscene at Script 67 +0x00FE runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 431 Verb 0x3A",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 214 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 214 +0x00C2 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x36",
+    "completeBoundaries": false,
+    "begun": 2,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": true,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 1
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0001",
+        "number": 200,
+        "freeze": 1
+      },
+      {
+        "label": "Room 24 local script 207",
+        "offset": "+0x0063",
+        "number": 207,
+        "freeze": 1
+      },
+      {
+        "label": "Room 24 local script 204",
+        "offset": "+0x0075",
+        "number": 204,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 204 +0x0000 runs script 2",
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 215 +0x00BC runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x3E",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 213 +0x0043 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x3F",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 212 +0x0018 runs script 2",
+      "endCutscene at Room 24 local script 212 +0x0064 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x47",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x47 +0x0000 runs script 2",
+      "endCutscene at Room 24 Object 432 Verb 0x47 +0x0048 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x49",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x49 +0x0000 runs script 2",
+      "endCutscene at Room 24 Object 432 Verb 0x49 +0x004E runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x56 +0x0000 runs script 2",
+      "endCutscene at Room 24 Object 432 Verb 0x56 +0x0044 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 434 Verb 0x47",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 215 +0x00BC runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 24 object 434 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 24,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 24 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 215 +0x00BC runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 470 Verb 0x3D",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 28 local script 200",
+        "offset": "+0x0007",
+        "number": 200,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 470 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 471 Verb 0x3D",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 28 local script 200",
+        "offset": "+0x0007",
+        "number": 200,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 471 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 472 Verb 0x3D",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 28 local script 200",
+        "offset": "+0x0007",
+        "number": 200,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 472 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 473 Verb 0x3C",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 28 local script 201",
+        "offset": "+0x0007",
+        "number": 201,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 473 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 474 Verb 0x3C",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 28 local script 201",
+        "offset": "+0x0007",
+        "number": 201,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 474 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 475 Verb 0x3C",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 28 local script 201",
+        "offset": "+0x0007",
+        "number": 201,
+        "freeze": 1
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 28 object 475 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 28,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 31 object 525 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 31,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 31 local script 204 +0x0000 runs script 2",
+      "endCutscene at Room 31 local script 204 +0x008E runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 34 object 562 Verb 0x3A",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 34,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 34 local script 200",
+        "offset": "+0x000B",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 34 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 34 local script 218 +0x00CE runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 38 object 610 Verb 0x36",
+    "completeBoundaries": false,
+    "begun": 1,
+    "ended": 0,
+    "room": 37,
+    "inCutscene": true,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 1
+      },
+      {
+        "label": "Room 37 local script 203",
+        "offset": "+0x002B",
+        "number": 203,
+        "freeze": 0
+      },
+      {
+        "label": "Room 37 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      },
+      {
+        "label": "Script 87",
+        "offset": "+0x047C",
+        "number": 87,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 87 +0x0000 runs script 2"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 41 object 633 Verb 0x41",
+    "completeBoundaries": false,
+    "begun": 3,
+    "ended": 2,
+    "room": 43,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 1
+      },
+      {
+        "label": "Room 43 local script 205",
+        "offset": "+0x003C",
+        "number": 205,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2",
+      "endCutscene at Script 90 +0x0730 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 41 object 633 Verb 0x4B",
+    "completeBoundaries": false,
+    "begun": 3,
+    "ended": 2,
+    "room": 43,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 1
+      },
+      {
+        "label": "Room 43 local script 205",
+        "offset": "+0x0053",
+        "number": 205,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2",
+      "endCutscene at Script 90 +0x0730 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 43 object 640 Verb 0x36",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 43,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 43 local script 205",
+        "offset": "+0x003C",
+        "number": 205,
+        "freeze": 0
+      },
+      {
+        "label": "Room 43 local script 204",
+        "offset": "+0x000B",
+        "number": 204,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 94 +0x0000 runs script 2",
+      "endCutscene at Script 94 +0x0132 runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 65 object 828 Verb 0x40",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 30,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 30 local script 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 78 +0x0000 runs script 2",
+      "endCutscene at Script 78 +0x00BD runs script 3"
+    ],
+    "unsupported": []
+  },
+  {
+    "owner": "Room 66 object 833 Verb 0x56",
+    "completeBoundaries": true,
+    "begun": 1,
+    "ended": 1,
+    "room": 66,
+    "inCutscene": false,
+    "sounds": [],
+    "flag": 0,
+    "pending": [
+      {
+        "label": "Script 06",
+        "offset": "+0x01BB",
+        "number": 6,
+        "freeze": 0
+      },
+      {
+        "label": "Room 66 local script 203",
+        "offset": "+0x0022",
+        "number": 203,
+        "freeze": 0
+      },
+      {
+        "label": "Room 66 local script 204",
+        "offset": "+0x0022",
+        "number": 204,
+        "freeze": 0
+      },
+      {
+        "label": "Room 66 local script 205",
+        "offset": "+0x0022",
+        "number": 205,
+        "freeze": 0
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 66 Object 833 Verb 0x56 +0x0000 runs script 2",
+      "endCutscene at Room 66 Object 833 Verb 0x56 +0x0053 runs script 3"
+    ],
+    "unsupported": []
+  }
+]

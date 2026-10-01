@@ -1,0 +1,388 @@
+[
+  {
+    "owner": "Room 04 object 177 Verb 0x3A",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 129,
+    "sceneTrace": [
+      "cutscene at Room 04 local script 209 +0x0000 runs script 2",
+      "endCutscene at Room 04 local script 209 +0x00D7 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 09 object 272 Verb 0x52",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 1003,
+    "sceneTrace": [
+      "cutscene at Script 104 +0x0000 runs script 2",
+      "endCutscene at Script 104 +0x06FC runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 13 object 323 Verb 0x38",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 105,
+    "sceneTrace": [
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 17 object 357 Verb 0x3A",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 128,
+    "sceneTrace": [
+      "cutscene at Room 17 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 17 local script 206 +0x00C1 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 17 object 358 Verb 0x3A",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 128,
+    "sceneTrace": [
+      "cutscene at Room 17 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 17 local script 206 +0x00C1 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x47",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 92,
+    "sceneTrace": [
+      "cutscene at Room 20 local script 212 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 212 +0x0035 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x49",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 114,
+    "sceneTrace": [
+      "cutscene at Room 20 local script 211 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 211 +0x0051 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 100,
+    "sceneTrace": [
+      "cutscene at Room 20 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 213 +0x003F runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x47",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 92,
+    "sceneTrace": [
+      "cutscene at Room 20 local script 212 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 212 +0x0035 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x49",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 114,
+    "sceneTrace": [
+      "cutscene at Room 20 local script 211 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 211 +0x0051 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 100,
+    "sceneTrace": [
+      "cutscene at Room 20 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 213 +0x003F runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 22 object 403 Verb 0x36",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 177,
+    "sceneTrace": [
+      "cutscene at Room 22 local script 205 +0x0000 runs script 2",
+      "endCutscene at Room 22 local script 205 +0x0093 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 22 object 404 Verb 0x36",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 878,
+    "sceneTrace": [
+      "cutscene at Room 22 local script 204 +0x0000 runs script 2",
+      "endCutscene at Room 22 local script 204 +0x0093 runs script 3",
+      "cutscene at Script 67 +0x0000 runs script 2",
+      "endCutscene at Script 67 +0x00FE runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 431 Verb 0x3A",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 129,
+    "sceneTrace": [
+      "cutscene at Room 24 local script 214 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 214 +0x00C2 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x3E",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 78,
+    "sceneTrace": [
+      "cutscene at Room 24 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 213 +0x0043 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x3F",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 110,
+    "sceneTrace": [
+      "cutscene at Room 24 local script 212 +0x0018 runs script 2",
+      "endCutscene at Room 24 local script 212 +0x0064 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x47",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 106,
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x47 +0x0000 runs script 2",
+      "endCutscene at Room 24 Object 432 Verb 0x47 +0x0048 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x49",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 113,
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x49 +0x0000 runs script 2",
+      "endCutscene at Room 24 Object 432 Verb 0x49 +0x004E runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 105,
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x56 +0x0000 runs script 2",
+      "endCutscene at Room 24 Object 432 Verb 0x56 +0x0044 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 434 Verb 0x47",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 67,
+    "sceneTrace": [
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 215 +0x00BC runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 24 object 434 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 70,
+    "sceneTrace": [
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2",
+      "endCutscene at Room 24 local script 215 +0x00BC runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 470 Verb 0x3D",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 78,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 470 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 72,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 471 Verb 0x3D",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 78,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 471 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 72,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 472 Verb 0x3D",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 78,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 472 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 72,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 473 Verb 0x3C",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 78,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 473 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 73,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 474 Verb 0x3C",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 78,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 474 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 73,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 475 Verb 0x3C",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 78,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 28 object 475 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 73,
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 31 object 525 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 75,
+    "sceneTrace": [
+      "cutscene at Room 31 local script 204 +0x0000 runs script 2",
+      "endCutscene at Room 31 local script 204 +0x008E runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 34 object 562 Verb 0x3A",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 139,
+    "sceneTrace": [
+      "cutscene at Room 34 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 34 local script 218 +0x00CE runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 43 object 640 Verb 0x36",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 148,
+    "sceneTrace": [
+      "cutscene at Script 94 +0x0000 runs script 2",
+      "endCutscene at Script 94 +0x0132 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 65 object 828 Verb 0x40",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 94,
+    "sceneTrace": [
+      "cutscene at Script 78 +0x0000 runs script 2",
+      "endCutscene at Script 78 +0x00BD runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 66 object 833 Verb 0x56",
+    "before": "Incomplete: prerequisites, waits or executor require review",
+    "after": "Validated state preview",
+    "frames": 100,
+    "sceneTrace": [
+      "cutscene at Room 66 Object 833 Verb 0x56 +0x0000 runs script 2",
+      "endCutscene at Room 66 Object 833 Verb 0x56 +0x0053 runs script 3"
+    ]
+  }
+]

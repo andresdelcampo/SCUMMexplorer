@@ -1,0 +1,587 @@
+[
+  {
+    "id": 1,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 2,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 3,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 4,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 5,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 6,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 7,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 8,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 400,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 9,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 92,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 10,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 168,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 11,
+    "lifetime": {
+      "Kind": 1,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 12,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 996,
+      "Music": false,
+      "Reason": null
+    }
+  },
+  {
+    "id": 13,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 1221,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 14,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 2342,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 15,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 3514,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 16,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 1239,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 17,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 1356,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 18,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 1318,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 19,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 4498,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 20,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 5818,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 21,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 3853,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 22,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 1047,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 23,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 2043,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 24,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 25,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 67733,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 26,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 91040,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 27,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 34701,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 28,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 67498,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 29,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 11660,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 30,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 43265,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 31,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 106911,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 32,
+    "lifetime": {
+      "Kind": 0,
+      "Callbacks": 50821,
+      "Music": true,
+      "Reason": null
+    }
+  },
+  {
+    "id": 33,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 34,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 35,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 36,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 37,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 38,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 39,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 40,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 41,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 42,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 43,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 44,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 45,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 46,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 47,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 48,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 49,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 50,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 51,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 52,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 53,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 54,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 55,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 56,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 57,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 58,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 59,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 60,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 61,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 62,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 63,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 64,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "No DOS PC speaker / AdLib bundle at this sound index."
+    }
+  },
+  {
+    "id": 79,
+    "lifetime": {
+      "Kind": 2,
+      "Callbacks": null,
+      "Music": false,
+      "Reason": "Invalid sound offset."
+    }
+  }
+]

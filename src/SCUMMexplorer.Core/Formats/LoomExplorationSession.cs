@@ -76,6 +76,7 @@ public sealed class LoomExplorationSession
 {
     private const int MaxNestedScripts = 8;
     private readonly GameLibrary _game;
+    private readonly LoomSoundClock _soundClock;
     private readonly LoomScriptReader _reader;
     private readonly LoomBoundedScriptExecutor _executor = new();
     private readonly LoomRoomObjectDirectory _objects = new();
@@ -106,6 +107,18 @@ public sealed class LoomExplorationSession
         if (game.Version != ScummVersion.V3)
             throw new InvalidDataException("Only old-v3 LOOM has a session interpreter.");
         _game = game;
+        var soundResources = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue)
+            .GroupBy(r => r.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
+        var soundLifetimes = new Dictionary<int, LoomSoundLifetime>();
+        _soundClock = new LoomSoundClock(id =>
+        {
+            if (!soundLifetimes.TryGetValue(id, out var lifetime))
+                soundLifetimes[id] = lifetime = soundResources.TryGetValue(id, out var resource)
+                    ? game.Id == GameId.Loom ? new LoomAdlibAudio().ReadLifetime(resource)
+                        : new(LoomSoundLifetimeKind.Unknown, null, false, "native LOOM AdLib clock does not establish this game's sound lifetime")
+                    : new(LoomSoundLifetimeKind.Unknown, null, false, "no indexed native sound resource");
+            return lifetime;
+        });
         _reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
         _verbs = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
         _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes)
@@ -114,6 +127,7 @@ public sealed class LoomExplorationSession
         };
         _globalScriptCount = ReadGlobalScriptCount(game);
         _runtime.ScriptRunning = IsScriptRunning;
+        _runtime.SoundRunning = _soundClock.Status;
         _runtime.OverrideChanged = RecordOverride;
         _runtime.Actors.CostumeSource = id => LoomCostume.Load(game, id);
         _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
@@ -1367,6 +1381,11 @@ public sealed class LoomExplorationSession
         // processActors ends the previous frame: animateCostume steps the limbs of the actors in the room.
         _runtime.Actors.AnimateCostumes(CurrentPlacement());
         UpdateTimersAndDelays(FrameJiffies);
+        foreach (var sound in _soundClock.Advance(FrameJiffies))
+        {
+            _runtime.ActiveSounds.Remove(sound);
+            _visitTrace.Add($"Sound {sound:00} completed on its native AdLib resource clock.");
+        }
         _runtime.Messages.StartFrame(FrameJiffies, _runtime);
         PlaceVirtualMouse();
         var beforeEvents = _visitEvents.Count;
@@ -1905,16 +1924,19 @@ public sealed class LoomExplorationSession
             case LoomScriptEventKind.SoundStarted:
                 if (scriptEvent.TargetId is not int soundId) return "sound target depends on an unknown variable";
                 _runtime.ActiveSounds.Add(soundId);
-                _uncertainties.Add(scriptEvent.Certainty == LoomScriptEventCertainty.Reached
-                    ? $"Sound {soundId:00} was started; its natural completion time is not simulated."
-                    : $"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: sound {soundId:00} was started from a seeded pick, so it is a possible outcome; its natural completion time is not simulated.");
+                _soundClock.Start(soundId, scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
+                var soundStatus = _soundClock.Status(soundId);
+                if (soundStatus.Estimate is not null)
+                    _uncertainties.Add($"Sound {soundId:00} status is an estimate: {soundStatus.Estimate}.");
                 return "";
             case LoomScriptEventKind.MusicStopped:
                 _runtime.ActiveSounds.Clear();
+                _soundClock.StopAll();
                 return "";
             case LoomScriptEventKind.SoundStopped:
                 if (scriptEvent.TargetId is not int stoppedId) return "stopped sound target depends on an unknown variable";
                 _runtime.ActiveSounds.Remove(stoppedId);
+                _soundClock.Stop(stoppedId, scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
                 return "";
             case LoomScriptEventKind.RoomLoaded when scriptEvent.Certainty != LoomScriptEventCertainty.Reached:
                 return $"possible Room {scriptEvent.TargetId?.ToString("00", CultureInfo.InvariantCulture) ?? "dynamic"} load follows a seeded pick, so the session does not enter it";

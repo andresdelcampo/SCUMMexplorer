@@ -6,6 +6,7 @@ Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/h
 
 | Change | Result | Record |
 | --- | --- | --- |
+| Native sound completion waits | Finite AdLib clocks release script040 naturally; loops/unknowns retain status; 38 former failures now complete, seven unresolved; 253 Core tests and normal-clock WPF8/8 | [sound lifetimes](../.verification/sound-lifetimes-20261001/validation.md) |
 | Top-level Play Cutscene | Existing replay starts available from every room; playback/pause/departure guards preserved | [picker](../.verification/global-cutscene-picker-20261001/validation.md) |
 | Advanced Game Texts | Game Texts appears only in Advanced; normal view returns to interactive input | [visibility](../.verification/global-cutscene-picker-20261001/validation.md) |
 | Source-derived replay coverage | 291 global replay starts, grouped/searchable; 139/235 sites reached, 79 owners with explicit unresolved coverage | [replay audit](../.verification/replay-coverage-20261001/validation.md) |

@@ -45,6 +45,7 @@ public sealed partial class LoomAdlibAudio
         private int _timer = 4, _random = 1;
         public Opl3Chip Chip { get; } = new();
         public bool Active => _channels.Any(channel => channel.State != 0);
+        public bool LoopBoundaryReached { get; private set; }
 
         public EffectPlayer(byte[] data)
         {
@@ -109,7 +110,7 @@ public sealed partial class LoomAdlibAudio
                     }
                     return;
                 }
-                else if (command == 128) channel.Position = channel.Start;
+                else if (command == 128) { LoopBoundaryReached = true; channel.Position = channel.Start; }
                 else { Write(0xA0 + channel.Number, 0); Write(0xB0 + channel.Number, 0); channel.State = 0; return; }
             }
             throw new InvalidDataException("AdLib effect loops without a timed note.");
@@ -135,6 +136,9 @@ public sealed partial class LoomAdlibAudio
                 if (finished && NextStage(channel, note, p))
                 {
                     if ((flags & 8) == 0) { channel.Position += 11; channel.State = 1; continue; }
+                    // No descriptor can advance this note if every enabled envelope repeats without a play-time.
+                    var descriptors = new[] { Read(position), Read(position + 5) }.Where(value => (value & 128) != 0);
+                    if (descriptors.All(value => (value & 40) == 8)) LoopBoundaryReached = true;
                     if ((flags & 16) != 0) Retrigger(channel);
                     note.State = -1; NextStage(channel, note, p);
                 }

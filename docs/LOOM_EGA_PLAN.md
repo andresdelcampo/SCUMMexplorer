@@ -32,7 +32,7 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
-Paused at user request after completed naming/room-access commits and the [45-root coverage diagnosis](../.verification/replay-gaps-20261001/validation.md). Next: generic sound lifetimes (42 stalls), reached but incomplete 053, actor-box 087, unmatched Room41 scopes and late-game routes. No promotions or fabricated prerequisites.
+Resumed from 7e91c35. Generic native sound completion is implemented and visibly validated: 38 former failures now complete; seven remain unresolved, all with cleared sound flags. Full audit: 327 completed automatic previews with no regressions. Catalog promotion and the watcher/late-game investigation follow separately. [Sound validation](../.verification/sound-lifetimes-20261001/validation.md). No fabricated prerequisites; main Release rebuild awaits closure of the running app.
 
 Replay naming completed: all views consume shared descriptors. Stored source names retained; 39 unnamed targets use decoded action/reached-room labels with explicit naming gaps. [Validation](../.verification/replay-names-20261001/validation.md): 9/9 WPF checks, recipes and coverage unchanged.
 
