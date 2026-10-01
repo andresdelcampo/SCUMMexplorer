@@ -36,6 +36,12 @@ Resumed from 7e91c35. Generic native sound completion is implemented and visibly
 
 [Continued route investigation](../.verification/coverage-routes-20261001/validation.md): same-session052 then floor input completes053;086 then direct look completes087. Both verified on the normal WPF clock (8/8); not yet expressed/promoted as generic catalog sequences. Room41 responses remain3/2 scopes. Source095/staff/092 actions reach096, but actor4's seeded movement leaves its Room45 load possible and the scope unmatched. Only six outstanding owners lack literal roots, all shared helpers; story owners have candidate roots without completed fresh previews. All site gaps retained. Next: generic audited sequence support for053/087, actual Room41 draft scheduling, then096 actor certainty and the remaining123 edges.
 
+Additional requested work (planned, not implemented):
+
+* Game status view to update the game status (have or not the staff, how many notes available, which are the spells notes, etc)
+
+Show and allow explicit updates to the current exploration session's staff/distaff status, available notes (count and identity), and each spell/draft's note sequence. Derive the fields, valid values and dependencies from the loaded SCUMM data and scripts. Reflect changes made by the game; distinguish known, estimated and unresolved state. Label user edits as explicit exploration choices, keeping them separate from source-established replay prerequisites. Preserve the existing replay/input/audio guards and visibly validate that status changes and subsequent interactions stay consistent.
+
 Replay naming completed: all views consume shared descriptors. Stored source names retained; 39 unnamed targets use decoded action/reached-room labels with explicit naming gaps. [Validation](../.verification/replay-names-20261001/validation.md): 9/9 WPF checks, recipes and coverage unchanged.
 
 Room access completed: one associated start plays directly, several open the shared filtered picker, none hides the room button; global access retained. All 291 memberships generated from validated start/observed rooms, including the original four, with no UI room tables. [Validation](../.verification/room-replays-20261001/validation.md): 20/20 WPF checks, 249 Core tests, 16 doorway checks, 19 room/audio checks and 18 input checks. Next: unresolved replay coverage.
