@@ -1,0 +1,11 @@
+<Project>
+  <!-- Verification executables share crash handling. The shipped App/Core/tests
+       retain their normal exception behavior. -->
+  <PropertyGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Contains('\.verification\'))">
+    <IsVerificationHarness>true</IsVerificationHarness>
+    <DefineConstants Condition="'$(UseWPF)' == 'true'">$(DefineConstants);SCUMM_WPF_HARNESS</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IsVerificationHarness)' == 'true'">
+    <Compile Include="$(MSBuildThisFileDirectory).verification\HarnessFailurePolicy.cs" Link="HarnessFailurePolicy.cs" />
+  </ItemGroup>
+</Project>
