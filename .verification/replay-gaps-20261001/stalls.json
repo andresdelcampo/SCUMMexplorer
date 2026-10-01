@@ -1,0 +1,5415 @@
+[
+  {
+    "owner": "Room 04 object 177 Verb 0x3A",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 4,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "Room 04 local 203",
+        "offset": "+0x0017",
+        "number": 203,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x000D",
+            "operation": "equalZero",
+            "operands": "local[0x000], branch +0xFFF7 -> 0x0009"
+          },
+          {
+            "offset": "+0x0012",
+            "operation": "animateActor",
+            "operands": "0x04, 0x06"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0016",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0017",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0018",
+            "operation": "jumpRelative",
+            "operands": "-27  ->  0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 04 local 209",
+        "offset": "+0x0096",
+        "number": 209,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x008A",
+            "operation": "isLess",
+            "operands": "local[0x000], 0x0006, branch +0xFFF5 -> 0x0086"
+          },
+          {
+            "offset": "+0x0091",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x0094",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0095",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0096",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0095"
+          },
+          {
+            "offset": "+0x009B",
+            "operation": "startScript",
+            "operands": "0x28, [0x000B]"
+          },
+          {
+            "offset": "+0x00A1",
+            "operation": "roomOps",
+            "operands": "shakeOn, 0x0000, 0x0000"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 04 local script 209 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 09 object 272 Verb 0x52",
+    "classification": "Following helper waits for script040 sound completion",
+    "room": 51,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      18
+    ],
+    "completionFlag": 18,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "script 029",
+        "offset": "+0x00BE",
+        "number": 29,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00B8",
+            "operation": "putActorInRoom",
+            "operands": "local[0x001], 0x00"
+          },
+          {
+            "offset": "+0x00BC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00BD",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00BE",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0x28"
+          },
+          {
+            "offset": "+0x00C2",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x00BD"
+          },
+          {
+            "offset": "+0x00C7",
+            "operation": "startScript",
+            "operands": "0x1E, [local[0x000]]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 104 +0x0000 runs script 2",
+      "endCutscene at Script 104 +0x06FC runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 13 object 323 Verb 0x38",
+    "classification": "Following helper waits for script040 sound completion",
+    "room": 15,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      18
+    ],
+    "completionFlag": 18,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "script 029",
+        "offset": "+0x00BE",
+        "number": 29,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00B8",
+            "operation": "putActorInRoom",
+            "operands": "local[0x001], 0x00"
+          },
+          {
+            "offset": "+0x00BC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00BD",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00BE",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0x28"
+          },
+          {
+            "offset": "+0x00C2",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x00BD"
+          },
+          {
+            "offset": "+0x00C7",
+            "operation": "startScript",
+            "operands": "0x1E, [local[0x000]]"
+          }
+        ]
+      },
+      {
+        "owner": "Room 15 local 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0001",
+            "operation": "getActorWalkBox",
+            "operands": "local[0x000], 0x01"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0006",
+            "operation": "getActorWalkBox",
+            "operands": "local[0x001], 0x01"
+          },
+          {
+            "offset": "+0x000A",
+            "operation": "isNotEqual",
+            "operands": "local[0x001], local[0x000], branch +0xFFF4 -> 0x0005"
+          },
+          {
+            "offset": "+0x0011",
+            "operation": "move",
+            "operands": "local[0x000] = local[0x001]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 17 object 357 Verb 0x3A",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 17,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 17 local 206",
+        "offset": "+0x0080",
+        "number": 206,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0074",
+            "operation": "isLess",
+            "operands": "local[0x002], 0x0006, branch +0xFFF5 -> 0x0070"
+          },
+          {
+            "offset": "+0x007B",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x007E",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x007F",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0080",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x007F"
+          },
+          {
+            "offset": "+0x0085",
+            "operation": "startScript",
+            "operands": "0x28, [0x000B]"
+          },
+          {
+            "offset": "+0x008B",
+            "operation": "roomOps",
+            "operands": "shakeOn, 0x0000, 0x0000"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 17 local script 206 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 17 object 358 Verb 0x3A",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 17,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 17 local 206",
+        "offset": "+0x0080",
+        "number": 206,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0074",
+            "operation": "isLess",
+            "operands": "local[0x002], 0x0006, branch +0xFFF5 -> 0x0070"
+          },
+          {
+            "offset": "+0x007B",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x007E",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x007F",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0080",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x007F"
+          },
+          {
+            "offset": "+0x0085",
+            "operation": "startScript",
+            "operands": "0x28, [0x000B]"
+          },
+          {
+            "offset": "+0x008B",
+            "operation": "roomOps",
+            "operands": "shakeOn, 0x0000, 0x0000"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 17 local script 206 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 18 object 370 Verb 0x36",
+    "classification": "Following helper waits for script040 sound completion",
+    "room": 19,
+    "inCutscene": false,
+    "egoMoving": false,
+    "sounds": [
+      3,
+      4
+    ],
+    "completionFlag": 0,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 65 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x47",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 212",
+        "offset": "+0x000C",
+        "number": 212,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Creo que ya soy invisible.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 212 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x48",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 206",
+        "offset": "+0x000C",
+        "number": 206,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0000]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "setClass",
+            "operands": "0x0004, [0x0000, 0x0096, 0x0094]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x49",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 211",
+        "offset": "+0x000C",
+        "number": 211,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ese hechizo va a servir de poco \\xFF\\x01si no me pueden ver.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 211 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 390 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 213",
+        "offset": "+0x000C",
+        "number": 213,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ese hechizo no funcionar\\xA0 con ellos.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 213 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x47",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 212",
+        "offset": "+0x000C",
+        "number": 212,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Creo que ya soy invisible.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 212 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x48",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 206",
+        "offset": "+0x000C",
+        "number": 206,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0000]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "setClass",
+            "operands": "0x0004, [0x0000, 0x0096, 0x0094]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x49",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 211",
+        "offset": "+0x000C",
+        "number": 211,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ese hechizo va a servir de poco \\xFF\\x01si no me pueden ver.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 211 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 20 object 391 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 20,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 204",
+        "offset": "+0x00FD",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00F5",
+            "operation": "putActorInRoom",
+            "operands": "0x04, 0x00"
+          },
+          {
+            "offset": "+0x00F8",
+            "operation": "putActorInRoom",
+            "operands": "0x05, 0x00"
+          },
+          {
+            "offset": "+0x00FB",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FC",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00FD",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00FC"
+          },
+          {
+            "offset": "+0x0102",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 20 local 213",
+        "offset": "+0x000C",
+        "number": 213,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xCC, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCC"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ese hechizo no funcionar\\xA0 con ellos.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 20 local script 213 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 22 object 403 Verb 0x36",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 22,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      17
+    ],
+    "completionFlag": 17,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 22 local 205",
+        "offset": "+0x0038",
+        "number": 205,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x002D",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x002E",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xD1"
+          },
+          {
+            "offset": "+0x0032",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x002D"
+          },
+          {
+            "offset": "+0x0037",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0037"
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003E",
+            "operation": "startScript",
+            "operands": "0x28, [0x0011]"
+          },
+          {
+            "offset": "+0x0044",
+            "operation": "startScript",
+            "operands": "0xCE, []"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 22 local script 205 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 22 object 404 Verb 0x36",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 22,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      17
+    ],
+    "completionFlag": 17,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 22 local 204",
+        "offset": "+0x0038",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x002D",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x002E",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xCF"
+          },
+          {
+            "offset": "+0x0032",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x002D"
+          },
+          {
+            "offset": "+0x0037",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0037"
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003E",
+            "operation": "startScript",
+            "operands": "0x28, [0x0011]"
+          },
+          {
+            "offset": "+0x0044",
+            "operation": "startScript",
+            "operands": "0xD0, []"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 22 local script 204 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 431 Verb 0x3A",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 214",
+        "offset": "+0x0080",
+        "number": 214,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0074",
+            "operation": "isLess",
+            "operands": "local[0x000], 0x0006, branch +0xFFF5 -> 0x0070"
+          },
+          {
+            "offset": "+0x007B",
+            "operation": "putActorInRoom",
+            "operands": "0x08, 0x00"
+          },
+          {
+            "offset": "+0x007E",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x007F",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0080",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x007F"
+          },
+          {
+            "offset": "+0x0085",
+            "operation": "startScript",
+            "operands": "0x28, [0x000B]"
+          },
+          {
+            "offset": "+0x008B",
+            "operation": "roomOps",
+            "operands": "shakeOn, 0x0000, 0x0000"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 214 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x36",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      1,
+      2,
+      3,
+      6,
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 215",
+        "offset": "+0x00B7",
+        "number": 215,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00AB",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x00A7"
+          },
+          {
+            "offset": "+0x00B2",
+            "operation": "putActorInRoom",
+            "operands": "0x08, 0x00"
+          },
+          {
+            "offset": "+0x00B5",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B6",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B7",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00B6"
+          },
+          {
+            "offset": "+0x00BC",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00BD",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 204",
+        "offset": "+0x0075",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0069",
+            "operation": "actorOps",
+            "operands": "0x03, [standAnimation, 0x03]"
+          },
+          {
+            "offset": "+0x006E",
+            "operation": "waitFor",
+            "operands": "actor, 0x03"
+          },
+          {
+            "offset": "+0x0071",
+            "operation": "animateActor",
+            "operands": "0x03, 0xF6"
+          },
+          {
+            "offset": "+0x0074",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0075",
+            "operation": "equalZero",
+            "operands": "bit[0xD8D], branch +0xFFFA -> 0x0074"
+          },
+          {
+            "offset": "+0x007A",
+            "operation": "startScript",
+            "operands": "0x19, [0x0005]"
+          },
+          {
+            "offset": "+0x0080",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0081",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 204 +0x0000 runs script 2",
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x3E",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 216",
+        "offset": "+0x0146",
+        "number": 216,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x013A",
+            "operation": "increment",
+            "operands": "local[0x006]"
+          },
+          {
+            "offset": "+0x013D",
+            "operation": "isLess",
+            "operands": "local[0x006], 0x000B, branch +0xFFF2 -> 0x0136"
+          },
+          {
+            "offset": "+0x0144",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0145",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0146",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0145"
+          },
+          {
+            "offset": "+0x014B",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 213",
+        "offset": "+0x0034",
+        "number": 213,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0029",
+            "operation": "increment",
+            "operands": "local[0x002]"
+          },
+          {
+            "offset": "+0x002C",
+            "operation": "isLess",
+            "operands": "local[0x002], 0x0006, branch +0xFFEA -> 0x001D"
+          },
+          {
+            "offset": "+0x0033",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0034",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xD8"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x0033"
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "startScript",
+            "operands": "0x08, [var[0x066]]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 213 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x3F",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 216",
+        "offset": "+0x0146",
+        "number": 216,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x013A",
+            "operation": "increment",
+            "operands": "local[0x006]"
+          },
+          {
+            "offset": "+0x013D",
+            "operation": "isLess",
+            "operands": "local[0x006], 0x000B, branch +0xFFF2 -> 0x0136"
+          },
+          {
+            "offset": "+0x0144",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0145",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0146",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0145"
+          },
+          {
+            "offset": "+0x014B",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 212",
+        "offset": "+0x0024",
+        "number": 212,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0018",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x001D",
+            "operation": "startScript",
+            "operands": "0xD8, [0x0001]"
+          },
+          {
+            "offset": "+0x0023",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0024",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xD8"
+          },
+          {
+            "offset": "+0x0028",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x0023"
+          },
+          {
+            "offset": "+0x002D",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ya est\\xA0n todo lo p\\xA0lidas que\\xFF\\x01conviene que est\\x82n.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 212 +0x0018 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x47",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 216",
+        "offset": "+0x0146",
+        "number": 216,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x013A",
+            "operation": "increment",
+            "operands": "local[0x006]"
+          },
+          {
+            "offset": "+0x013D",
+            "operation": "isLess",
+            "operands": "local[0x006], 0x000B, branch +0xFFF2 -> 0x0136"
+          },
+          {
+            "offset": "+0x0144",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0145",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0146",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0145"
+          },
+          {
+            "offset": "+0x014B",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 object 432 Verb 0x47",
+        "offset": "+0x000C",
+        "number": null,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xD8, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xD8"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ni caso. Supongo que no me\\xFF\\x01querr\\xA0n ni mirar.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x47 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x49",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 216",
+        "offset": "+0x0146",
+        "number": 216,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x013A",
+            "operation": "increment",
+            "operands": "local[0x006]"
+          },
+          {
+            "offset": "+0x013D",
+            "operation": "isLess",
+            "operands": "local[0x006], 0x000B, branch +0xFFF2 -> 0x0136"
+          },
+          {
+            "offset": "+0x0144",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0145",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0146",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0145"
+          },
+          {
+            "offset": "+0x014B",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 object 432 Verb 0x49",
+        "offset": "+0x000C",
+        "number": null,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xD8, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xD8"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Son demasiado listas para asustarse tan facilmente.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x49 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 432 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 216",
+        "offset": "+0x0146",
+        "number": 216,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x013A",
+            "operation": "increment",
+            "operands": "local[0x006]"
+          },
+          {
+            "offset": "+0x013D",
+            "operation": "isLess",
+            "operands": "local[0x006], 0x000B, branch +0xFFF2 -> 0x0136"
+          },
+          {
+            "offset": "+0x0144",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0145",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0146",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0145"
+          },
+          {
+            "offset": "+0x014B",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 object 432 Verb 0x56",
+        "offset": "+0x000C",
+        "number": null,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "cutscene",
+            "operands": "[0x0000]"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "startScript",
+            "operands": "0xD8, [0x0001]"
+          },
+          {
+            "offset": "+0x000B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xD8"
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000B"
+          },
+          {
+            "offset": "+0x0015",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ese hechizo no funcionar\\xA0 con las ovejas.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 Object 432 Verb 0x56 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 434 Verb 0x47",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 215",
+        "offset": "+0x00B7",
+        "number": 215,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00AB",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x00A7"
+          },
+          {
+            "offset": "+0x00B2",
+            "operation": "putActorInRoom",
+            "operands": "0x08, 0x00"
+          },
+          {
+            "offset": "+0x00B5",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B6",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B7",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00B6"
+          },
+          {
+            "offset": "+0x00BC",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00BD",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 24 object 434 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 24,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 24 local 215",
+        "offset": "+0x00B7",
+        "number": 215,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x00AB",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x00A7"
+          },
+          {
+            "offset": "+0x00B2",
+            "operation": "putActorInRoom",
+            "operands": "0x08, 0x00"
+          },
+          {
+            "offset": "+0x00B5",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B6",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B7",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00B6"
+          },
+          {
+            "offset": "+0x00BC",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00BD",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 24 local script 215 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 470 Verb 0x3D",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 470 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 471 Verb 0x3D",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 471 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 472 Verb 0x3D",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 472 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 473 Verb 0x3C",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 473 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 474 Verb 0x3C",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 474 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 475 Verb 0x3C",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 28 object 475 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 28,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 28 local 218",
+        "offset": "+0x00AA",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x009E",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x009A"
+          },
+          {
+            "offset": "+0x00A5",
+            "operation": "putActorInRoom",
+            "operands": "0x03, 0x00"
+          },
+          {
+            "offset": "+0x00A8",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A9",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00AA",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x00A9"
+          },
+          {
+            "offset": "+0x00AF",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00B0",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 31 object 525 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 31,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 31 local 204",
+        "offset": "+0x0089",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x007D",
+            "operation": "isLess",
+            "operands": "local[0x000], 0x0006, branch +0xFFF5 -> 0x0079"
+          },
+          {
+            "offset": "+0x0084",
+            "operation": "putActorInRoom",
+            "operands": "0x08, 0x00"
+          },
+          {
+            "offset": "+0x0087",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0088",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0089",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0088"
+          },
+          {
+            "offset": "+0x008E",
+            "operation": "endCutscene",
+            "operands": ""
+          },
+          {
+            "offset": "+0x008F",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 31 local script 204 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 34 object 562 Verb 0x3A",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 34,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 34 local 218",
+        "offset": "+0x0080",
+        "number": 218,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0074",
+            "operation": "isLess",
+            "operands": "local[0x000], 0x0006, branch +0xFFF5 -> 0x0070"
+          },
+          {
+            "offset": "+0x007B",
+            "operation": "putActorInRoom",
+            "operands": "0x06, 0x00"
+          },
+          {
+            "offset": "+0x007E",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x007F",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0080",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x007F"
+          },
+          {
+            "offset": "+0x0085",
+            "operation": "startScript",
+            "operands": "0x28, [0x000B]"
+          },
+          {
+            "offset": "+0x008B",
+            "operation": "roomOps",
+            "operands": "shakeOn, 0x0000, 0x0000"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 34 local script 218 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 38 object 610 Verb 0x36",
+    "classification": "Walk-box/script polling; source route or executor review required",
+    "room": 37,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      25
+    ],
+    "completionFlag": 25,
+    "pending": [
+      {
+        "owner": "script 039",
+        "offset": "+0x003D",
+        "number": 39,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = local[0x000]"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 37 local 203",
+        "offset": "+0x002B",
+        "number": 203,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x001F",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0020",
+            "operation": "move",
+            "operands": "bit[0xD99] = 0x0001"
+          },
+          {
+            "offset": "+0x0025",
+            "operation": "move",
+            "operands": "local[0x000] = 0x0001"
+          },
+          {
+            "offset": "+0x002A",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x002B",
+            "operation": "increment",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x002E",
+            "operation": "isLess",
+            "operands": "local[0x000], 0x0012, branch +0xFFF5 -> 0x002A"
+          },
+          {
+            "offset": "+0x0035",
+            "operation": "jumpRelative",
+            "operands": "-31  ->  0x0019"
+          }
+        ]
+      },
+      {
+        "owner": "Room 37 local 200",
+        "offset": "+0x0006",
+        "number": 200,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0000",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0001",
+            "operation": "getActorWalkBox",
+            "operands": "local[0x000], 0x01"
+          },
+          {
+            "offset": "+0x0005",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0006",
+            "operation": "getActorWalkBox",
+            "operands": "local[0x001], 0x01"
+          },
+          {
+            "offset": "+0x000A",
+            "operation": "isNotEqual",
+            "operands": "local[0x000], local[0x001], branch +0xFFF4 -> 0x0005"
+          },
+          {
+            "offset": "+0x0011",
+            "operation": "move",
+            "operands": "local[0x000] = local[0x001]"
+          }
+        ]
+      },
+      {
+        "owner": "script 087",
+        "offset": "+0x047C",
+        "number": 87,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0470",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0471",
+            "operation": "increment",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x0474",
+            "operation": "isLess",
+            "operands": "local[0x000], 0x000A, branch +0xFFF5 -> 0x0470"
+          },
+          {
+            "offset": "+0x047B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x047C",
+            "operation": "getActorWalkBox",
+            "operands": "local[0x003], 0x05"
+          },
+          {
+            "offset": "+0x0480",
+            "operation": "isEqual",
+            "operands": "local[0x003], 0x0002, branch +0xFFF4 -> 0x047B"
+          },
+          {
+            "offset": "+0x0487",
+            "operation": "print",
+            "operands": "0x05, [center; position, 0x00A0, 0x0098; text, \"Mira esto.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 87 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 41 object 633 Verb 0x41",
+    "classification": "Scope ended/stopped without all matching end boundaries; review required",
+    "room": 43,
+    "inCutscene": false,
+    "egoMoving": false,
+    "sounds": [
+      12,
+      25,
+      26
+    ],
+    "completionFlag": 26,
+    "pending": [
+      {
+        "owner": "script 039",
+        "offset": "+0x003D",
+        "number": 39,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = local[0x000]"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 43 local 205",
+        "offset": "+0x003C",
+        "number": 205,
+        "delay": 30,
+        "context": [
+          {
+            "offset": "+0x0030",
+            "operation": "getRandomNr",
+            "operands": "local[0x001], 0x78"
+          },
+          {
+            "offset": "+0x0034",
+            "operation": "add",
+            "operands": "local[0x001] += 0x003C"
+          },
+          {
+            "offset": "+0x0039",
+            "operation": "delayVariable",
+            "operands": "local[0x001]"
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "getRandomNr",
+            "operands": "local[0x001], 0x03"
+          },
+          {
+            "offset": "+0x0040",
+            "operation": "notEqualZero",
+            "operands": "local[0x001], branch +0x000A -> 0x004F"
+          },
+          {
+            "offset": "+0x0045",
+            "operation": "animateActor",
+            "operands": "0x04, 0x07"
+          },
+          {
+            "offset": "+0x0048",
+            "operation": "breakHere",
+            "operands": ""
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2",
+      "endCutscene at Script 90 +0x0730 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 41 object 633 Verb 0x4B",
+    "classification": "Scope ended/stopped without all matching end boundaries; review required",
+    "room": 43,
+    "inCutscene": false,
+    "egoMoving": false,
+    "sounds": [
+      12,
+      25,
+      26
+    ],
+    "completionFlag": 26,
+    "pending": [
+      {
+        "owner": "script 039",
+        "offset": "+0x003D",
+        "number": 39,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = local[0x000]"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 43 local 205",
+        "offset": "+0x0053",
+        "number": 205,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0048",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0049",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x004A",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x004B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x004C",
+            "operation": "jumpRelative",
+            "operands": "+6  ->  0x0055"
+          },
+          {
+            "offset": "+0x004F",
+            "operation": "animateActor",
+            "operands": "0x04, 0x08"
+          },
+          {
+            "offset": "+0x0052",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0053",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0054",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0055",
+            "operation": "jumpRelative",
+            "operands": "-43  ->  0x002D"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2",
+      "endCutscene at Script 90 +0x0730 runs script 3"
+    ]
+  },
+  {
+    "owner": "Room 43 object 640 Verb 0x36",
+    "classification": "Following helper waits for script040 sound completion",
+    "room": 19,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 19 local 201",
+        "offset": "+0x001A",
+        "number": 201,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x000E",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x000F",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0010",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xC8"
+          },
+          {
+            "offset": "+0x0014",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x000F"
+          },
+          {
+            "offset": "+0x0019",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x001A",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0x28"
+          },
+          {
+            "offset": "+0x001E",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x0019"
+          },
+          {
+            "offset": "+0x0023",
+            "operation": "drawObject",
+            "operands": "0x017F, at, 0x00FF, 0x00FF"
+          }
+        ]
+      },
+      {
+        "owner": "script 094",
+        "offset": "+0x007C",
+        "number": 94,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0075",
+            "operation": "increment",
+            "operands": "var[0x0C6]"
+          },
+          {
+            "offset": "+0x0078",
+            "operation": "startScript",
+            "operands": "0xC9, []"
+          },
+          {
+            "offset": "+0x007B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x007C",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xC9"
+          },
+          {
+            "offset": "+0x0080",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x007B"
+          },
+          {
+            "offset": "+0x0085",
+            "operation": "jumpRelative",
+            "operands": "+157  ->  0x0125"
+          },
+          {
+            "offset": "+0x0088",
+            "operation": "isEqual",
+            "operands": "var[0x0C6], 0x0001, branch +0x003F -> 0x00CE"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 94 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 65 object 828 Verb 0x40",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 65,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      23
+    ],
+    "completionFlag": 23,
+    "pending": [
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "script 078",
+        "offset": "+0x0092",
+        "number": 78,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0086",
+            "operation": "isLess",
+            "operands": "local[0x002], 0x0006, branch +0xFFF5 -> 0x0082"
+          },
+          {
+            "offset": "+0x008D",
+            "operation": "putActorInRoom",
+            "operands": "0x02, 0x00"
+          },
+          {
+            "offset": "+0x0090",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0091",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0092",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x0091"
+          },
+          {
+            "offset": "+0x0097",
+            "operation": "setClass",
+            "operands": "0x033C, [0x0098]"
+          },
+          {
+            "offset": "+0x009E",
+            "operation": "putActorInRoom",
+            "operands": "0x01, 0x1E"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Script 78 +0x0000 runs script 2"
+    ]
+  },
+  {
+    "owner": "Room 66 object 833 Verb 0x56",
+    "classification": "Sound completion flag var0A4 remains nonzero",
+    "room": 66,
+    "inCutscene": true,
+    "egoMoving": false,
+    "sounds": [
+      13
+    ],
+    "completionFlag": 13,
+    "pending": [
+      {
+        "owner": "Room 66 local 203",
+        "offset": "+0x0022",
+        "number": 203,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0016",
+            "operation": "move",
+            "operands": "local[0x000] = 0x0007"
+          },
+          {
+            "offset": "+0x001B",
+            "operation": "actorOps",
+            "operands": "0x03, [elevation, local[0x000]]"
+          },
+          {
+            "offset": "+0x0021",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0022",
+            "operation": "decrement",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x0025",
+            "operation": "isGreater",
+            "operands": "local[0x000], 0x0000, branch +0xFFEF -> 0x001B"
+          },
+          {
+            "offset": "+0x002C",
+            "operation": "jumpRelative",
+            "operands": "-42  ->  0x0005"
+          }
+        ]
+      },
+      {
+        "owner": "Room 66 local 204",
+        "offset": "+0x0022",
+        "number": 204,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0016",
+            "operation": "move",
+            "operands": "local[0x000] = 0x0007"
+          },
+          {
+            "offset": "+0x001B",
+            "operation": "actorOps",
+            "operands": "0x06, [elevation, local[0x000]]"
+          },
+          {
+            "offset": "+0x0021",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0022",
+            "operation": "decrement",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x0025",
+            "operation": "isGreater",
+            "operands": "local[0x000], 0x0000, branch +0xFFEF -> 0x001B"
+          },
+          {
+            "offset": "+0x002C",
+            "operation": "jumpRelative",
+            "operands": "-42  ->  0x0005"
+          }
+        ]
+      },
+      {
+        "owner": "Room 66 local 205",
+        "offset": "+0x0022",
+        "number": 205,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0016",
+            "operation": "move",
+            "operands": "local[0x000] = 0x0007"
+          },
+          {
+            "offset": "+0x001B",
+            "operation": "actorOps",
+            "operands": "0x07, [elevation, local[0x000]]"
+          },
+          {
+            "offset": "+0x0021",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0022",
+            "operation": "decrement",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x0025",
+            "operation": "isGreater",
+            "operands": "local[0x000], 0x0000, branch +0xFFEF -> 0x001B"
+          },
+          {
+            "offset": "+0x002C",
+            "operation": "jumpRelative",
+            "operands": "-42  ->  0x0005"
+          }
+        ]
+      },
+      {
+        "owner": "script 040",
+        "offset": "+0x003D",
+        "number": 40,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0033",
+            "operation": "move",
+            "operands": "var[0x0A3] = 0x0000"
+          },
+          {
+            "offset": "+0x0038",
+            "operation": "startSound",
+            "operands": "local[0x000]"
+          },
+          {
+            "offset": "+0x003B",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003C",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x003D",
+            "operation": "isSoundRunning",
+            "operands": "var[0x000], local[0x000]"
+          },
+          {
+            "offset": "+0x0042",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF5 -> 0x003C"
+          },
+          {
+            "offset": "+0x0047",
+            "operation": "move",
+            "operands": "var[0x0A4] = 0x0000"
+          }
+        ]
+      },
+      {
+        "owner": "Room 66 local 208",
+        "offset": "+0x009B",
+        "number": 208,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0090",
+            "operation": "isLess",
+            "operands": "local[0x001], 0x0006, branch +0xFFF5 -> 0x008C"
+          },
+          {
+            "offset": "+0x0097",
+            "operation": "putActorInRoom",
+            "operands": "0x0C, 0x00"
+          },
+          {
+            "offset": "+0x009A",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x009B",
+            "operation": "equalZero",
+            "operands": "var[0x0A4], branch +0xFFFA -> 0x009A"
+          },
+          {
+            "offset": "+0x00A0",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x00A1",
+            "operation": "stopObjectCode",
+            "operands": ""
+          }
+        ]
+      },
+      {
+        "owner": "Room 66 object 833 Verb 0x56",
+        "offset": "+0x0022",
+        "number": null,
+        "delay": null,
+        "context": [
+          {
+            "offset": "+0x0016",
+            "operation": "equalZero",
+            "operands": "bit[0xD66], branch +0xFFFA -> 0x0015"
+          },
+          {
+            "offset": "+0x001B",
+            "operation": "startScript",
+            "operands": "0xD0, [0x0001]"
+          },
+          {
+            "offset": "+0x0021",
+            "operation": "breakHere",
+            "operands": ""
+          },
+          {
+            "offset": "+0x0022",
+            "operation": "isScriptRunning",
+            "operands": "var[0x000], 0xD0"
+          },
+          {
+            "offset": "+0x0026",
+            "operation": "equalZero",
+            "operands": "var[0x000], branch +0xFFF6 -> 0x0021"
+          },
+          {
+            "offset": "+0x002B",
+            "operation": "print",
+            "operands": "0x01, [center; text, \"Ese hechizo no funcionar\\xA0 conmigo.\"]"
+          }
+        ]
+      }
+    ],
+    "sceneTrace": [
+      "cutscene at Room 66 Object 833 Verb 0x56 +0x0000 runs script 2"
+    ]
+  }
+]

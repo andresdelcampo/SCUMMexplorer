@@ -1,5 +1,7 @@
 # Changelog
 
+Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
+
 ## 1 October: global cutscene access
 
 | Change | Result | Record |

@@ -4,6 +4,8 @@ The session executes reached script/object/room instructions independently of re
 
 ## Current replay coverage (1 October)
 
+Continuation checkpoint: [all 45 incomplete roots individually diagnosed](../.verification/replay-gaps-20261001/validation.md). 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher053 remains incomplete. No promotions; 291 starts remain partial coverage.
+
 Play Cutscene now opens a global searchable picker: **75 scene starts and 216 dialogue/reaction previews, 291 starts total**. These are explorer start recipes, not 291 distinct narrative scenes. The original four starts retain their validated setup. Another 287 use the same generic fresh-session catalog/direct-verb playback path. A direct draft response does not simulate casting that draft or establish its original-game prerequisites. The same plain descriptor links uniquely reached story scripts in Advanced Game Texts; shared helpers and ambiguous multi-start scripts do not inherit an arbitrary replay.
 
 The [audit](../.verification/replay-coverage-20261001/audit.md) probes 363 source-derived object/entry roots: 289 completed previews (two already in the old catalog), 19 without a cutscene reached, 45 incomplete and 10 brief input-suppression scopes. Completed previews reach **139/235 cutscene sites**. **79 candidate owners have outstanding sites**, shown in Needs validation with disabled Play. The original manually validated firewood start requires its subsequent click and remains available separately; the automatic verb-only probe does not replace it. Full-game replay is not complete.
