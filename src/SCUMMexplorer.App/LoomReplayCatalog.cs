@@ -2,6 +2,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
 using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.App;
 
@@ -9,7 +10,7 @@ namespace SCUMMexplorer.App;
 // a cutscene opcode alone. The fingerprint prevents applying a recipe to other data.
 internal sealed record ReplaySourceFile(string Name, string Sha256);
 internal sealed record ReplayRecipe(string Id, string Title, string Category, int Room, int ObjectId,
-    int Verb, int[] ScriptIds, int[] Rooms, int Frames, string Source);
+    int Verb, int[] ScriptIds, int[] Rooms, int Frames, string Source, LoomReplayStep[]? Steps = null);
 internal sealed record ReplayCoverage(string Title, string Status, string Source);
 internal sealed record ReplayMembership(string Id, int StartRoom, int[] Rooms, int Frames, string Source);
 internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayRecipe[] Replays,

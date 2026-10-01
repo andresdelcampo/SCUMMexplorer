@@ -2716,6 +2716,7 @@ public partial class MainWindow : Window
     }
 
     private Playback? _playback;
+    private LoomReplaySequence? _replaySequence;
     private DispatcherTimer? _playbackTimer;
     // Harnesses set this to run a playback's frames at once, as the synchronous
     // continuation did before M1d, so their results stay comparable.
@@ -2780,6 +2781,7 @@ public partial class MainWindow : Window
     {
         _playbackTimer?.Stop();
         _playback = null;
+        _replaySequence = null;
         // The game's sounds play on after the clock stops, as its music does between scenes.
         if (_playbackPaused) _sceneSound.Resume();
         _playbackPaused = false;
@@ -2856,6 +2858,7 @@ public partial class MainWindow : Window
         if (!SessionInScene || _session is not { } session || _currentRoomResource is not { } room) return;
         var skippable = session.CutsceneSkippable;
         var action = session.PressKey(0x1B);
+        if (skippable) _replaySequence = null; // A skipped prelude no longer establishes the audited next stage.
         StatusText.Text = skippable
             ? "Escape sent: the cutscene skips to its end (assumed input)"
             : "Escape sent, but this part of the cutscene cannot be skipped: no override is set yet";
@@ -2871,7 +2874,7 @@ public partial class MainWindow : Window
     /// </summary>
     private bool SessionInScene => _session is { } session && (session.InCutscene || session.BootRunning);
 
-    private bool PlaybackHasActivity => SessionInScene || _session is { } session &&
+    private bool PlaybackHasActivity => _replaySequence is { Complete: false, Failure: null } || SessionInScene || _session is { } session &&
         (session.EgoMoving || session.CameraMoving || !string.IsNullOrWhiteSpace(session.Messages.Talk?.Text) ||
          session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]") != 0);
 
@@ -2918,9 +2921,10 @@ public partial class MainWindow : Window
     /// the verb only leads into the room, and the game's click at that point starts the cutscene.
     /// </summary>
     private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, string Source,
-        (int X, int Y)? Click = null, string Category = "Scenes", int[]? TextScripts = null)
+        (int X, int Y)? Click = null, string Category = "Scenes", int[]? TextScripts = null,
+        LoomReplayStep[]? Steps = null, string? SequenceId = null)
     {
-        public string Id => ObjectId == 0 ? $"Room {RoomId:00} entry" : $"Room {RoomId:00} object {ObjectId} Verb 0x{VerbId:X2}";
+        public string Id => SequenceId ?? (ObjectId == 0 ? $"Room {RoomId:00} entry" : $"Room {RoomId:00} object {ObjectId} Verb 0x{VerbId:X2}");
     }
 
     // Established start actions. Room linking uses only generated validation metadata.
@@ -2945,9 +2949,9 @@ public partial class MainWindow : Window
         foreach (var scene in KnownCutscenes) yield return scene;
         foreach (var recipe in _replayCatalog?.Replays ?? [])
         {
-            if (KnownCutscenes.Any(k => k.RoomId == recipe.Room && k.ObjectId == recipe.ObjectId && k.VerbId == recipe.Verb)) continue;
+            if (recipe.Steps is null && KnownCutscenes.Any(k => k.RoomId == recipe.Room && k.ObjectId == recipe.ObjectId && k.VerbId == recipe.Verb)) continue;
             yield return new(recipe.Title, recipe.Room, recipe.ObjectId, recipe.Verb, recipe.ScriptIds.FirstOrDefault(),
-                recipe.Source, Category: recipe.Category, TextScripts: recipe.ScriptIds);
+                recipe.Source, Category: recipe.Category, TextScripts: recipe.ScriptIds, Steps: recipe.Steps, SequenceId: recipe.Id);
         }
     }
 
@@ -3096,6 +3100,9 @@ public partial class MainWindow : Window
     }
 
     private static string CutsceneStartNote(KnownCutscene cutscene) =>
+        cutscene.Steps is not null ? "Stated sequence: a fresh post-boot seed-0 session and assumed catalog arrival. " +
+        "Explicit direct verbs and clicks run in the same session, waiting for each audited scene boundary, balanced scopes and settled state before the next input. " +
+        "These exploration choices do not establish original-game prerequisites. Failed or skipped stages cancel later inputs. " + cutscene.Source :
         $"Stated start: a fresh session after the boot (seed 0), Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
         "there is assumed), " + (cutscene.ObjectId == 0 ? "then the room's entry scripts play on the clock. " :
         $"then object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} run directly: an exploration action, not " +
@@ -3119,7 +3126,14 @@ public partial class MainWindow : Window
         // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
         _sceneSound.Attach(_game, _session);
         _session.VisitRoom(room);
-        var action = cutscene.ObjectId == 0 ? null : _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
+        LoomObjectActionResult? action;
+        if (cutscene.Steps is { } steps)
+        {
+            _replaySequence = new LoomReplaySequence(_session, steps);
+            _replaySequence.Continue();
+            action = _replaySequence.LastAction;
+        }
+        else action = cutscene.ObjectId == 0 ? null : _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
         var uncertainties = (action?.Uncertainties ?? _session.Snapshot.Uncertainties).ToList();
         if (cutscene.Click is { } click)
         {
@@ -3146,6 +3160,12 @@ public partial class MainWindow : Window
     private bool PlaybackShouldContinue()
     {
         if (_session is not { } session || _playback is not { } playback) return false;
+        if (_replaySequence is { } sequence)
+        {
+            var continuing = sequence.Continue();
+            playback.Note = sequence.Failure;
+            return continuing;
+        }
         var talking = session.Messages.HaveMsg != 0;
         // The ego's walk or turn, or a camera pan, still in progress plays on (M3a), even with no script left.
         // Other actors are not waited for: ambient walkers (script 042's swan) never stop.
@@ -3174,6 +3194,7 @@ public partial class MainWindow : Window
         else if (!session.EgoMoving && !session.CameraMoving) playback.IdleFrames++;
         var room = session.Snapshot.RoomId;
         session.AdvanceFrame();
+        _replaySequence?.FrameAdvanced();
         if (session.Snapshot.RoomId != room) playback.LeftRoom = true;
         // The sounds the frame's scripts started or stopped (instant playback has no frames to wait for).
         if (!_playbackBatch) _sceneSound.Update();
@@ -3293,10 +3314,23 @@ public partial class MainWindow : Window
             return;
         }
         _playback = null;
+        var sequenceFailure = _replaySequence?.Failure;
+        _replaySequence = null;
         UpdatePlaybackControls();
         _sceneSound.Update();
         var snapshot = session.Snapshot;
         var note = playback.Note is null ? "" : Environment.NewLine + playback.Note;
+        if (sequenceFailure is not null)
+        {
+            StatusText.Text = "Replay sequence stopped; later inputs were cancelled.";
+            StatusText.ToolTip = sequenceFailure;
+            if (_currentRoomResource is { } current && current.ResourceId == snapshot.RoomId)
+            {
+                ApplyRoomState(current, _currentRoomObjectRecords, _objects, visit: false);
+                RefreshRoomPreview();
+            }
+            return;
+        }
         if (snapshot.RoomId is int reached && reached != playback.SourceRoom.ResourceId)
         {
             if (_currentRoomResource?.ResourceId != reached && _playbackRequestedRoom != reached &&

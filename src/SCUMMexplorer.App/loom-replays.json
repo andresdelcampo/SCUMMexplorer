@@ -5233,6 +5233,104 @@
       ],
       "frames": 100,
       "source": "Room 66 object 833 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 100 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 66 Object 833 Verb 0x56 +0x0000 runs script 2\nendCutscene at Room 66 Object 833 Verb 0x56 +0x0053 runs script 3\nStored name in the trigger room."
+    },
+    {
+      "id": "sequence-052-053",
+      "title": "Room 10 through the watcher in Room 13",
+      "category": "Scenes",
+      "room": 10,
+      "objectId": 295,
+      "verb": 56,
+      "steps": [
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 52 +0x017C",
+          "expectedRoom": 13
+        },
+        {
+          "kind": "click",
+          "x": 112,
+          "y": 131
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 53 +0x02AC",
+          "expectedRoom": 12
+        }
+      ],
+      "scriptIds": [
+        52,
+        53
+      ],
+      "rooms": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "frames": 701,
+      "source": "Fresh post-boot seed-0 sequence. Catalog arrival, direct verbs and click timing are explicit exploration assumptions. No prerequisite writes. Title describes only audited start and watcher rooms.\nSteps: [{\"kind\": \"verb\", \"objectId\": 295, \"verb\": 56}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 52 +0x017C\", \"expectedRoom\": 13}, {\"kind\": \"click\", \"x\": 112, \"y\": 131}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 53 +0x02AC\", \"expectedRoom\": 12}]\nReached scene boundaries:\ncutscene at Script 52 +0x0000 runs script 2\nendCutscene at Script 52 +0x017C runs script 3\ncutscene at Script 53 +0x0000 runs script 2\nendCutscene at Script 53 +0x02AC runs script 3"
+    },
+    {
+      "id": "sequence-086-087",
+      "title": "The firewood scene, then room 38 · Look at paja",
+      "category": "Scenes",
+      "room": 36,
+      "objectId": 599,
+      "verb": 56,
+      "steps": [
+        {
+          "kind": "verb",
+          "objectId": 599,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "frames": 32
+        },
+        {
+          "kind": "click",
+          "x": 109,
+          "y": 102
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 86 +0x055C",
+          "expectedRoom": 38
+        },
+        {
+          "kind": "verb",
+          "objectId": 610,
+          "verb": 54
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 87 +0x09B9",
+          "expectedRoom": 38
+        }
+      ],
+      "scriptIds": [
+        86,
+        87
+      ],
+      "rooms": [
+        34,
+        36,
+        37,
+        38,
+        39,
+        40,
+        58,
+        68
+      ],
+      "frames": 2237,
+      "source": "Fresh post-boot seed-0 sequence. Catalog arrival, direct verbs and click timing are explicit exploration assumptions. No prerequisite writes. Stored name in the trigger room. Conditional naming operands (not validated live names): oro, paja.\nSteps: [{\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}]\nReached scene boundaries:\ncutscene at Script 86 +0x0000 runs script 2\nendCutscene at Script 86 +0x055C runs script 3\ncutscene at Script 87 +0x0000 runs script 2\nendCutscene at Script 87 +0x09B9 runs script 3"
     }
   ],
   "coverage": [
@@ -5512,7 +5610,7 @@
       "source": "Room 62 local 204; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 1.\nPossible roots (not proof of reachability): Room 62 object 809 Verb 0x3D"
     }
   ],
-  "summary": "80 scene starts and 249 dialogue/reaction previews. Coverage remains incomplete; Needs validation lists unresolved scene branches and shared helpers.",
+  "summary": "82 scene starts and 249 dialogue/reaction previews, including two audited sequences. Literal-root coverage remains 163/235 sites with 55 owners requiring validation; sequence completion does not resolve fresh-entry roots or static edges.",
   "membership": [
     {
       "id": "Room 02 object 153 Verb 0x38",
@@ -8554,6 +8652,35 @@
       ],
       "frames": 866,
       "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands."
+    },
+    {
+      "id": "sequence-052-053",
+      "startRoom": 10,
+      "rooms": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "frames": 701,
+      "source": "Start plus rooms observed with the shared sequence runner."
+    },
+    {
+      "id": "sequence-086-087",
+      "startRoom": 36,
+      "rooms": [
+        34,
+        36,
+        37,
+        38,
+        39,
+        40,
+        58,
+        68
+      ],
+      "frames": 2237,
+      "source": "Start plus rooms observed with the shared sequence runner."
     }
   ]
 }

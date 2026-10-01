@@ -1,0 +1,75 @@
+{
+  "auditSha256": "e32460bead31927942d8e7fc573956eb7ef4db8a914559269dd545dd3b9a927d",
+  "results": [
+    {
+      "id": "sequence-052-053",
+      "startRoom": 10,
+      "rooms": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "frames": 701,
+      "stages": [
+        {
+          "stage": 1,
+          "frames": 0,
+          "room": 10
+        },
+        {
+          "stage": 3,
+          "frames": 334,
+          "room": 13
+        }
+      ],
+      "boundaries": [
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3",
+        "cutscene at Script 53 +0x0000 runs script 2",
+        "endCutscene at Script 53 +0x02AC runs script 3"
+      ],
+      "uncertaintyCount": 153
+    },
+    {
+      "id": "sequence-086-087",
+      "startRoom": 36,
+      "rooms": [
+        34,
+        36,
+        37,
+        38,
+        39,
+        40,
+        58,
+        68
+      ],
+      "frames": 2237,
+      "stages": [
+        {
+          "stage": 1,
+          "frames": 0,
+          "room": 37
+        },
+        {
+          "stage": 3,
+          "frames": 32,
+          "room": 37
+        },
+        {
+          "stage": 5,
+          "frames": 898,
+          "room": 38
+        }
+      ],
+      "boundaries": [
+        "cutscene at Script 86 +0x0000 runs script 2",
+        "endCutscene at Script 86 +0x055C runs script 3",
+        "cutscene at Script 87 +0x0000 runs script 2",
+        "endCutscene at Script 87 +0x09B9 runs script 3"
+      ],
+      "uncertaintyCount": 216
+    }
+  ]
+}

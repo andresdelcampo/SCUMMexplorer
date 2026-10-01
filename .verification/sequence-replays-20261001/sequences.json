@@ -1,0 +1,16 @@
+[
+  {"id":"sequence-052-053","title":"Room 10 through the watcher in Room 13","category":"Scenes","room":10,"objectId":295,"verb":56,"steps":[
+    {"kind":"verb","objectId":295,"verb":56},
+    {"kind":"scene","endBoundary":"endCutscene at Script 52 +0x017C","expectedRoom":13},
+    {"kind":"click","x":112,"y":131},
+    {"kind":"scene","endBoundary":"endCutscene at Script 53 +0x02AC","expectedRoom":12}
+  ]},
+  {"id":"sequence-086-087","title":"The firewood scene, then look at the source object","category":"Scenes","room":36,"objectId":599,"verb":56,"steps":[
+    {"kind":"verb","objectId":599,"verb":56},
+    {"kind":"frames","frames":32},
+    {"kind":"click","x":109,"y":102},
+    {"kind":"scene","endBoundary":"endCutscene at Script 86 +0x055C","expectedRoom":38},
+    {"kind":"verb","objectId":610,"verb":54},
+    {"kind":"scene","endBoundary":"endCutscene at Script 87 +0x09B9","expectedRoom":38}
+  ]}
+]
