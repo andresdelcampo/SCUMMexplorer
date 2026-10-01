@@ -1,0 +1,85 @@
+[
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/audits-1/comparison.txt",
+    "sha256": "91ec12f33afed88a8dbf3cc8bc406a323197e6e8d1df7cddb56fe3e04d2186b3",
+    "passes": 0,
+    "failures": 0,
+    "summary": [
+      "363 literal roots: statuses, frame counts, reached rooms and scope boundaries unchanged.",
+      "Four established memberships and both complete sequence packets unchanged.",
+      "Compared 76 room renders; changed: 0 "
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/regressions-1/audio/audio-check.txt",
+    "sha256": "d304f1ae2fd488a96e09686f3fad7d1a841993f74300becacafbe6a07eb7c485",
+    "passes": 10,
+    "failures": 0,
+    "summary": [
+      "Failures: 0"
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/regressions-1/blockers.txt",
+    "sha256": "1e60078f05d76492757e3fc476a5126cde1ae1fb68613033339afb0ca2c1b3aa",
+    "passes": 0,
+    "failures": 0,
+    "summary": [
+      "blocked: 0 instruction sites in 0 scripts; rooms: "
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/regressions-1/controls/controls/room-controls-check.txt",
+    "sha256": "f18da500138440ef05bd8cd0141abe021a8b66ac694df6ef1bd7c3cf90c2d871",
+    "passes": 19,
+    "failures": 0,
+    "summary": [
+      "Failures: 0"
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/regressions-1/input/input-check.txt",
+    "sha256": "6943b93cb97931e86159dee7ada75ce29b0409f3bcf6eb44281982b2678152f6",
+    "passes": 18,
+    "failures": 0,
+    "summary": [
+      "Failures: 0"
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/regressions-1/ReplayCheck/replay-check.txt",
+    "sha256": "ff6ef1ddd416bdaedf9ee9eeb35401ae95092dfb0da2cdc5aca5d8fcbde25b84",
+    "passes": 21,
+    "failures": 0,
+    "summary": [
+      "Failures: 0"
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/regressions-1/RoomReplayCheck/room-replays-check.txt",
+    "sha256": "e4e09b42bb0c38f02e0900a8f854fc8f6af6f6c52f5ce67297142b2e2f631edf",
+    "passes": 20,
+    "failures": 0,
+    "summary": [
+      "Failures: 0"
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/tests-final-2.txt",
+    "sha256": "5a6c2435c4a38db7c6b28de77753ce3d3546e5b47c1b64e9c197068e33b6481b",
+    "passes": 0,
+    "failures": 0,
+    "summary": [
+      "Passed!  - Failed:     0, Passed:   275, Skipped:     0, Total:   275, Duration: 28 s - SCUMMexplorer.Tests.dll (net10.0)"
+    ]
+  },
+  {
+    "path": "Exe/StaffCorrectionSession-20261001/ui-3/staff-check.txt",
+    "sha256": "8f880e68f3ae1b7932562184bacca43668c4a72d5d602d8cf7992613c657fed1",
+    "passes": 47,
+    "failures": 0,
+    "summary": [
+      "Failures: 0"
+    ]
+  }
+]

@@ -420,12 +420,14 @@ public sealed partial class LoomExplorationSession
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
         : [];
 
-    public LoomSessionSnapshot VisitRoom(GameResource room, LoomObjectActionResult? reachedAction = null)
+    public LoomSessionSnapshot VisitRoom(GameResource room, LoomObjectActionResult? reachedAction = null, bool preserveStaffLevel = false)
     {
         ArgumentNullException.ThrowIfNull(room);
         if (room.Kind != ResourceKind.Room || room.ResourceId is null)
             throw new InvalidDataException("The session can only visit an indexed room.");
         if (_currentRoom?.ResourceId == room.ResourceId) return Snapshot;
+        _browsingStaffFloor = null;
+        if (preserveStaffLevel && reachedAction is null) BeginBrowsingStaffFloor();
         _uncertainties.StartStep();
         if (reachedAction is { IsGameInput: true })
             return EnterRoom(room, $"{reachedAction.Evidence} The explorer's input (assumed) went on through the game's own scripts; walks were taken to end at once.", reachedAction.ReachedRoomLoad);
@@ -435,7 +437,9 @@ public sealed partial class LoomExplorationSession
         // entries skip the ego's costume size (script 017) and their walk-box watchers while a cutscene is open.
         var closedScenes = CloseScenesForCatalogVisit(room.ResourceId.Value);
         if (closedScenes.Count > 0) EndClosedScenes(room.ResourceId.Value, closedScenes);
-        return CatalogEnter(room);
+        CatalogEnter(room);
+        ApplyBrowsingStaffFloor();
+        return Snapshot;
     }
 
     private LoomSessionSnapshot CatalogEnter(GameResource room)
@@ -935,6 +939,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomObjectActionResult Click(int x, int y, bool doubleClick = false)
     {
+        _browsingStaffFloor = null; // Subsequent input belongs to gameplay, beyond catalog arrival.
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before clicking in it.");
         _uncertainties.StartStep();
@@ -1025,6 +1030,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomObjectActionResult ClickVerbArea(int x, int y)
     {
+        _browsingStaffFloor = null;
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before clicking in the verb area.");
         _uncertainties.StartStep();
@@ -1128,6 +1134,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomObjectActionResult PressKey(int key)
     {
+        _browsingStaffFloor = null;
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before pressing a key.");
         _uncertainties.StartStep();
@@ -1303,6 +1310,7 @@ public sealed partial class LoomExplorationSession
 
     public LoomObjectActionResult ActivateObjectVerb(int objectId, int verbId)
     {
+        _browsingStaffFloor = null;
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before activating an object verb.");
         var record = _currentObjects.FirstOrDefault(item => item.Id == objectId) ??
@@ -1369,6 +1377,7 @@ public sealed partial class LoomExplorationSession
     public LoomSessionSnapshot AdvanceFrame()
     {
         var snapshot = AdvanceOneFrame();
+        if (_browsingStaffFloor.HasValue) { ApplyBrowsingStaffFloor(); snapshot = Snapshot; }
         if (!_playingBoot) return snapshot;
         ContinuePlayedBoot();
         return Snapshot;

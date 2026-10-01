@@ -6,8 +6,8 @@
     <Window.Resources>
         <Style x:Key="ArtworkChoice" TargetType="Button">
             <Setter Property="Background" Value="#101821"/><Setter Property="Foreground" Value="#E7E0D2"/>
-            <Setter Property="BorderBrush" Value="#334452"/><Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="4"/><Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="BorderBrush" Value="#E7E0D2"/><Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0"/>
             <Setter Property="Template"><Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
@@ -28,23 +28,27 @@
             <TextBlock Text="Game Status" FontSize="24" FontWeight="SemiBold"/>
             <TextBlock x:Name="SessionSummary" Foreground="#C6B99F" Margin="0,6,0,14" TextWrapping="Wrap"/>
         </StackPanel>
-        <Grid Grid.Row="1" Margin="0,0,0,16">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Margin="0,0,0,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="160"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="64"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <StackPanel>
                 <TextBlock Text="Staff / distaff" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                <Button x:Name="StaffButton" Style="{StaticResource ArtworkChoice}" Click="Staff_Click" Width="204" Height="60" HorizontalAlignment="Left"
+                <TextBlock x:Name="StaffLabel" Text="Unresolved"/>
+            </StackPanel>
+                <Button x:Name="StaffButton" Grid.Column="1" Style="{StaticResource ArtworkChoice}" Click="Staff_Click" Width="448" Height="48" HorizontalAlignment="Left"
                         AutomationProperties.Name="Staff possession" ToolTip="Toggle staff possession">
-                    <StackPanel><Image x:Name="StaffImage" Width="184" Height="24" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-                        <TextBlock x:Name="StaffLabel" Text="Unresolved" HorizontalAlignment="Center" Margin="0,4,0,0"/></StackPanel>
+                    <Image x:Name="StaffImage" Width="448" Height="48" Stretch="Fill" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                 </Button>
-                <TextBlock x:Name="StaffOrigin" Foreground="#9FABAE" FontSize="11" TextWrapping="Wrap" Margin="0,6,10,0" Visibility="Collapsed"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1">
+            <StackPanel Grid.Row="1">
                 <TextBlock Text="Available notes" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                <UniformGrid x:Name="NoteButtons" Rows="1" Columns="9" Height="60"/>
-                <TextBlock x:Name="NoteIdentities" Foreground="#C6B99F" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
-                <TextBlock x:Name="NotesOrigin" Foreground="#9FABAE" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0" Visibility="Collapsed"/>
+                <TextBlock x:Name="NoteIdentities" Foreground="#C6B99F" FontSize="11" TextWrapping="Wrap" Margin="0,0,8,0"/>
             </StackPanel>
+            <Canvas x:Name="NoteButtons" Grid.Row="1" Grid.Column="1" Width="448" Height="64" HorizontalAlignment="Left"/>
+            <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,2,0,0">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <TextBlock x:Name="StaffOrigin" Foreground="#9FABAE" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" Visibility="Collapsed"/>
+                <TextBlock x:Name="NotesOrigin" Grid.Column="1" Foreground="#9FABAE" FontSize="11" TextTrimming="CharacterEllipsis" Visibility="Collapsed"/>
+            </Grid>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>

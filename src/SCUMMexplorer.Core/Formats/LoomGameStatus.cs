@@ -10,7 +10,7 @@ public sealed record LoomGameStatus(bool Supported, string Evidence, bool CanEdi
     string StaffOrigin, int? AvailableNoteCount, string NotesOrigin, IReadOnlyList<LoomDraftStatus> Drafts);
 
 /// <summary>Verify the loaded LOOM script contract before interpreting or editing its fields.</summary>
-internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, int DraftBase, int DraftCount, string Evidence)
+internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, int DraftBase, int DraftCount, int InitialNotes, string CheckpointKey, int CheckpointNotes, string Evidence)
 {
     public static LoomStatusSchema Read(GameLibrary game)
     {
@@ -29,7 +29,7 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
         var staff = Key(At(17, 0x7D, "equalZero").Operands, @"bit\[0x[0-9A-F]+\]");
         At(17, 0x82, "move", "var[0x072] = 0x0008"); // Zero selects the without-staff animations.
         var noteLimit = Key(At(10, 0x20, "isLess").Operands, @"var\[0x[0-9A-F]+\]");
-        At(10, 0x27, "chainScript", "0x0B, []"); // IDs >= the limit are refused by 011.
+        At(10, 0x27, "chainScript", "0x0B, []"); // Old-v3 tests limit < ID; IDs above the limit are refused.
         var table = Regex.Match(At(23, 5, "move").Operands, @"var\[0x([0-9A-F]+)\+local\[0x000\]\]");
         if (!table.Success) throw new InvalidDataException("Draft table base is unresolved.");
         At(23, 0, "multiply", "local[0x000] *= 0x0002");
@@ -47,10 +47,16 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
         At(34, 0x16, "or", "local[0x002] |= 0x4000");
         At(22, 0x131, "isLess", "local[0x000], 0x000F, branch +0xFF31 -> 0x0069");
         At(18, 0x6A, "verbOps", "0x08, [at, 0x00C0, local[0x004]; image, 0x008E; on]");
-        return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 15,
-            $"Loaded scripts017 +0x007D/+0x0082: {staff}=1 means held;010 +0x0020/+0x0027: note IDs1..8 below {noteLimit} are available. " +
+        var init = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 1), 211, game.Resources.Count(r => r.Kind == ResourceKind.Script));
+        var checkpoint = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 46), 204, game.Resources.Count(r => r.Kind == ResourceKind.Script));
+        if (init?.Instructions.SingleOrDefault(i => i.Offset == 0x2C3) is not { Operation: "move", Operands: "var[0x07A] = 0x0003" } ||
+            checkpoint?.Instructions.SingleOrDefault(i => i.Offset == 0x24) is not { Operation: "move", Operands: "bit[0xDC5] = 0x0001" } ||
+            checkpoint.Instructions.SingleOrDefault(i => i.Offset == 0x29) is not { Operation: "startScript", Operands: "0x1D, [0x0007, 0x000C]" })
+            throw new InvalidDataException("Loaded staff progression checkpoints are unresolved.");
+        return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 3, "bit[0xDC5]", 7,
+            $"Loaded scripts017 +0x007D/+0x0082: {staff}=1 means held;010 +0x0020/+0x0027: note IDs1..8 up to and including {noteLimit} are available. " +
             "023: two words per draft, four 3-bit notes +1; flags0x2000 learned/0x1000 reverse/0x4000 last-note knowledge. " +
-            "022 searches slots0..14; the intro's slot15 is outside ordinary casting.026 refuses matched unlearned drafts before target dispatch;022 skips reverse matching without0x1000. " +
+            "022 searches slots0..15 inclusively, including Transcend.026 refuses matched unlearned drafts before target dispatch;022 skips reverse matching without0x1000. " +
             "Sequence edits preserve flags and response verbs; Learned edits change only0x2000. " +
             "Staff edits refresh the existing normal Bobbin appearance through017 and note controls through018/019; special room costumes remain under room code. " +
             "These explicit edits are exploration choices, not source-established pickups, learning or replay prerequisites.");
@@ -61,7 +67,9 @@ public sealed partial class LoomExplorationSession
 {
     private LoomStatusSchema? _statusSchema;
     private string? _statusSchemaFailure;
-    private readonly Dictionary<string, (ushort Value, ushort Mask)> _statusEdits = [];
+    private readonly Dictionary<string, (ushort Value, ushort Mask, string Origin)> _statusEdits = [];
+    private int? _browsingStaffFloor;
+    private int _browsingStaffQuietFrames;
 
     private LoomStatusSchema? StatusSchema
     {
@@ -94,7 +102,7 @@ public sealed partial class LoomExplorationSession
                     response is ushort forward ? forward & 0xFF : null, response is ushort reverse ? reverse >> 8 : null, StatusOrigin(key));
             }).ToArray();
             return new(true, schema.Evidence, StatusEditable, staff is 0 or 1 ? staff == 1 : null, StatusOrigin(schema.StaffKey),
-                limit is >= 1 and <= 9 ? limit - 1 : null, StatusOrigin(schema.NoteLimitKey), drafts);
+                limit is >= 0 and <= 8 ? limit : null, StatusOrigin(schema.NoteLimitKey), drafts);
         }
     }
 
@@ -105,8 +113,8 @@ public sealed partial class LoomExplorationSession
             _runtime.EstimatedVariables.Contains($"var[0x{int.Parse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber) >> 4:X3}]");
         if (_statusEdits.TryGetValue(key, out var edit))
             return (value & edit.Mask) == (edit.Value & edit.Mask)
-                ? "Explicit user edit; current choice unchanged" + (estimated ? "; retained flags estimated" : "")
-                : "Game-driven change after explicit edit" + (estimated ? " (estimated)" : "");
+                ? edit.Origin + "; current choice unchanged" + (estimated ? "; retained flags estimated" : "")
+                : "Game-driven change after " + edit.Origin.ToLowerInvariant() + (estimated ? " (estimated)" : "");
         return estimated ? "Estimated from seeded source execution" : "Known in this exploration session";
     }
 
@@ -116,15 +124,15 @@ public sealed partial class LoomExplorationSession
         if (!StatusEditable) throw new InvalidOperationException("Finish the current scene, draft, movement or dialogue before editing game status.");
         return schema;
     }
-    private void SetStatusWord(string key, ushort value, ushort mask = 0xFFFF)
+    private void SetStatusWord(string key, ushort value, ushort mask = 0xFFFF, string origin = "Explicit user edit")
     {
         _runtime.GlobalVariables[key] = value;
         int word = int.Parse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
         for (int bit = 0; bit < 16; bit++) _runtime.GlobalVariables[$"bit[0x{word * 16 + bit:X3}]"] = (ushort)((value >> bit) & 1);
         if (mask == 0xFFFF) _runtime.EstimatedVariables.Remove(key);
         if (_statusEdits.TryGetValue(key, out var earlier)) mask |= earlier.Mask;
-        _statusEdits[key] = (value, mask);
-        var note = $"Explicit user status edit: {key}=0x{value:X4}; exploration choice, not a source-established prerequisite.";
+        _statusEdits[key] = (value, mask, origin);
+        var note = $"{origin}: {key}=0x{value:X4}; exploration choice, not a source-established prerequisite.";
         _visitTrace.Add(note); _uncertainties.Add(note);
     }
 
@@ -136,7 +144,7 @@ public sealed partial class LoomExplorationSession
         ushort mask = (ushort)(1 << (bit & 15));
         var value = _runtime.GlobalVariables[key];
         SetStatusWord(key, held ? (ushort)(value | mask) : (ushort)(value & ~mask), mask);
-        _statusEdits[schema.StaffKey] = ((ushort)(held ? 1 : 0), 1);
+        _statusEdits[schema.StaffKey] = ((ushort)(held ? 1 : 0), 1, "Explicit user edit");
         // Only the normal appearance managed by017 can be refreshed through017.
         // A boat/disguise/close-up costume is left to its source room scripts.
         var ego = Actors.FirstOrDefault(a => a.Number == 1);
@@ -155,8 +163,31 @@ public sealed partial class LoomExplorationSession
     {
         var schema = RequireStatusEdit();
         if (count is < 0 or > 8) throw new ArgumentOutOfRangeException(nameof(count));
-        SetStatusWord(schema.NoteLimitKey, (ushort)(count + 1));
+        _browsingStaffFloor = null; // A later explicit choice supersedes the catalog adjustment.
+        SetStatusWord(schema.NoteLimitKey, (ushort)count);
         RefreshStatusNotes(_runtime.GlobalVariables[schema.StaffKey] != 0);
+    }
+
+    private void BeginBrowsingStaffFloor()
+    {
+        _browsingStaffFloor = GameStatus.AvailableNoteCount;
+        _browsingStaffQuietFrames = 0;
+    }
+
+    private void ApplyBrowsingStaffFloor()
+    {
+        if (_browsingStaffFloor is not int previous || StatusSchema is not { } schema) return;
+        if (!StatusEditable) { _browsingStaffQuietFrames = 0; return; }
+        var current = GameStatus;
+        int floor = Math.Max(previous, current.StaffHeld == true ? schema.InitialNotes : 0);
+        // This flag records the native seven-note checkpoint, not a guessed room-number range.
+        if (current.StaffHeld == true && _runtime.GlobalVariables.GetValueOrDefault(schema.CheckpointKey) == 1 &&
+            !_runtime.EstimatedVariables.Contains(schema.CheckpointKey) && !_runtime.EstimatedVariables.Contains("var[0x0DC]"))
+            floor = Math.Max(floor, schema.CheckpointNotes);
+        if (++_browsingStaffQuietFrames >= 32) _browsingStaffFloor = null;
+        if (current.AvailableNoteCount is not int count || count >= floor) return;
+        SetStatusWord(schema.NoteLimitKey, (ushort)floor, origin: "Explorer room browsing adjustment");
+        RefreshStatusNotes(current.StaffHeld == true);
     }
 
     public void UpdateDraftSequence(int slot, IReadOnlyList<int> notes)

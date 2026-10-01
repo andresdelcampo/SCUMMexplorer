@@ -22,6 +22,7 @@ internal static class LoomDraftNames
     {
         (0, 0x3A, 0x3B) => "Opening / Closing",
         (2, 0x3E, 0x3F) => "Dyeing / Bleaching",
+        (15, 0x54, 0) => "Transcend",
         _ => $"Draft {draft.Slot + 1}"
     };
 }
@@ -42,7 +43,10 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
             int note = 0, color = 8;
             var notes = new List<BitmapSource>();
             var emptyNotes = new List<BitmapSource>();
-            var glyphs = new List<(byte Glyph, int Y, int Color)>();
+            var scorePixels = new byte[224 * 32];
+            var notePixels = new byte[224 * 32];
+            int scoreX = 0, letterColor = 7;
+            var scoreMessages = new List<LoomMessage>();
             var charset = LoomCharset.TryLoad(game.FolderPath, 0, out _);
             if (charset is null) { error = "Native charset unavailable."; return null; }
             foreach (var instruction in script.Instructions)
@@ -62,20 +66,60 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                     var m = Regex.Match(instruction.Operands, @"^local\[0x002\] = 0x([0-9A-F]+)$");
                     // The alternate source assignment8 dims unavailable notes; retain the full-color assignment.
                     if (m.Success && Hex(m.Groups[1].Value) != 8) color = Hex(m.Groups[1].Value);
+                    m = Regex.Match(instruction.Operands, @"^local\[0x001\] = 0x([0-9A-F]+)$");
+                    if (m.Success && Hex(m.Groups[1].Value) != 8) letterColor = Hex(m.Groups[1].Value);
+                    m = Regex.Match(instruction.Operands, @"^local\[0x003\] = 0x([0-9A-F]+)$");
+                    if (m.Success) scoreX = Hex(m.Groups[1].Value);
+                }
+                var scoreImage = Regex.Match(instruction.Operands, @"^0x(?:31|32), \[at, 0x([0-9A-F]+), 0x00A8; image, 0x([0-9A-F]+); on\]$");
+                if (instruction.Operation == "verbOps" && scoreImage.Success)
+                {
+                    var picture = objects.Single(p => p.Id == Hex(scoreImage.Groups[2].Value));
+                    int left = Hex(scoreImage.Groups[1].Value) / 8 * 8 - 16;
+                    for (int y = 0; y < Math.Min(picture.Height, 32); y++)
+                        for (int x = 0; x < picture.Width && left + x < 224; x++)
+                            scorePixels[y * 224 + left + x] = picture.Pixels[y * picture.Width + x];
                 }
                 if (instruction.Operation != "print") continue;
-                var print = Regex.Match(instruction.Operands, "position, local\\[0x003\\], 0x([0-9A-F]+); color, local\\[0x002\\]; text, \"([_`<=])\"");
+                var print = Regex.Match(instruction.Operands, "position, (local\\[0x003\\]|0x[0-9A-F]+), 0x([0-9A-F]+); color, local\\[0x00([12])\\]; text, \"(.*?)\"");
                 if (!print.Success) continue;
-                glyphs.Add(((byte)print.Groups[2].Value[0], Hex(print.Groups[1].Value), color));
-                if (glyphs.Count != 2) continue;
-                int top = glyphs.Min(g => g.Y);
-                var messages = glyphs.Select(g => new LoomMessage(LoomMessageKind.Drawn, 254, 1, [new[] { g.Glyph }],
-                    4, 146 + g.Y - top, false, 0, 319, g.Color, 1, "script018", instruction.Offset, 0, null));
-                var layer = LoomMessageRenderer.Render(messages, charset);
-                var pixels = new byte[16 * 24];
-                for (int y = 0; y < 24; y++) for (int x = 0; x < 16; x++)
-                { byte p = layer.Pixels[(144 + y) * 320 + x]; pixels[y * 16 + x] = p == LoomMessageRenderer.Transparent ? (byte)0 : p; }
-                notes.Add(Bitmap(pixels, 16, 24, palette)); emptyNotes.Add(Bitmap(pixels, 16, 24, palette, outline: true)); glyphs.Clear();
+                var glyphText = print.Groups[4].Value;
+                byte glyph = glyphText.StartsWith("\\x", StringComparison.Ordinal) ? (byte)Hex(glyphText[2..]) : (byte)glyphText[0];
+                bool musical = print.Groups[3].Value == "2";
+                var message = new LoomMessage(LoomMessageKind.Drawn, 254, 1, [new[] { glyph }],
+                    print.Groups[1].Value.StartsWith("0x", StringComparison.Ordinal) ? Hex(print.Groups[1].Value[2..]) : scoreX,
+                    Hex(print.Groups[2].Value), false, 0, 319, musical ? color : letterColor, 1, "script018", instruction.Offset, 0, null);
+                scoreMessages.Add(message);
+                if (musical)
+                {
+                    var layer = LoomMessageRenderer.Render([message], charset);
+                    for (int y = 0; y < 32; y++) for (int x = 0; x < 224; x++)
+                    {
+                        byte p = layer.Pixels[(168 + y) * 320 + 16 + x];
+                        if (p != LoomMessageRenderer.Transparent) notePixels[y * 224 + x] = p;
+                    }
+                }
+            }
+            var scoreLayer = LoomMessageRenderer.Render(scoreMessages, charset);
+            for (int y = 0; y < 32; y++) for (int x = 0; x < 224; x++)
+            {
+                byte p = scoreLayer.Pixels[(168 + y) * 320 + 16 + x];
+                if (p != LoomMessageRenderer.Transparent) scorePixels[y * 224 + x] = p;
+            }
+            // Native score starts at x24, eight contiguous24-pixel choices; no relocated glyphs.
+            for (int i = 0; i < 8; i++)
+            {
+                var pixels = new byte[24 * 32]; var empty = new byte[24 * 32];
+                for (int y = 0; y < 32; y++) for (int x = 0; x < 24; x++)
+                {
+                    int at = y * 224 + 8 + i * 24 + x;
+                    pixels[y * 24 + x] = scorePixels[at];
+                    empty[y * 24 + x] = notePixels[at] == 0 ? scorePixels[at] : (byte)7;
+                    if (notePixels[at] != 0 && x > 0 && x < 23 && y > 0 && y < 31 &&
+                        notePixels[at-1] != 0 && notePixels[at+1] != 0 && notePixels[at-224] != 0 && notePixels[at+224] != 0)
+                        empty[y * 24 + x] = 0;
+                }
+                notes.Add(Bitmap(pixels, 24, 32, palette)); emptyNotes.Add(Bitmap(empty, 24, 32, palette));
             }
             if (note != 8 || notes.Count != 8) { error = $"Native artwork contract unresolved: {note} staff segments, {notes.Count} note glyphs."; return null; }
             return new(Bitmap(staffPixels, 224, 24, palette), Bitmap(staffPixels, 224, 24, palette, outline: true), notes.ToArray(), emptyNotes.ToArray());

@@ -20,8 +20,10 @@ public sealed class LoomGameStatusTests
         Assert.True(status.Supported, status.Evidence);
         Assert.True(status.CanEdit);
         Assert.False(status.StaffHeld);
-        Assert.Equal(2, status.AvailableNoteCount);
-        Assert.Equal(15, status.Drafts.Count);
+        Assert.Equal(3, status.AvailableNoteCount);
+        Assert.Equal(16, status.Drafts.Count);
+        Assert.Equal([8, 4, 5, 1], status.Drafts[15].Notes);
+        Assert.Equal(0x54, status.Drafts[15].ForwardVerb);
         Assert.Equal([3, 1, 3, 2], status.Drafts[0].Notes);
         Assert.True(status.Drafts[0].Learned);
     }
@@ -50,6 +52,62 @@ public sealed class LoomGameStatusTests
         Assert.Equal(0, session.Snapshot.KnownGlobalVariables["var[0x064]"]);
         Assert.Throws<ArgumentOutOfRangeException>(() => session.UpdateAvailableNotes(9));
     }
+
+    [Theory]
+    [InlineData(1)] [InlineData(2)] [InlineData(3)] [InlineData(4)]
+    [InlineData(5)] [InlineData(6)] [InlineData(7)] [InlineData(8)]
+    public void NativeInputAcceptsTheDisplayedLimitAndRefusesTheNextNote(int limit)
+    {
+        var session = Start(); session.UpdateStaffPossession(true); session.UpdateAvailableNotes(limit);
+        Assert.Equal(limit, session.Snapshot.KnownGlobalVariables["var[0x07A]"]);
+        session.Click(700, 40);
+        for (int i = 0; i < 100 && !session.GameStatus.CanEdit; i++) session.AdvanceFrame();
+        var from = session.SessionTrace.Count;
+        var note = session.VerbArea().Items.Single(i => i.VerbId == limit);
+        session.ClickVerbArea(note.X + 1, note.Y + 1);
+        Assert.Equal(limit, session.Snapshot.KnownGlobalVariables["var[0x056]"]);
+        Assert.DoesNotContain(session.SessionTrace.Skip(from), l => l.Contains("Script 10 chains to script 11"));
+        if (limit == 8) return;
+        note = session.VerbArea().Items.Single(i => i.VerbId == limit + 1);
+        session.ClickVerbArea(note.X + 1, note.Y + 1);
+        Assert.Contains(session.SessionTrace.Skip(from), l => l.Contains("Script 10 chains to script 11"));
+    }
+
+    [Fact]
+    public void NativeMatcherIncludesTheLoadedTranscendSlot()
+    {
+        var session = Start(); session.UpdateStaffPossession(true); session.UpdateAvailableNotes(8);
+        session.Click(700, 40);
+        for (int i = 0; i < 32; i++) session.AdvanceFrame();
+        var from = session.SessionTrace.Count;
+        foreach (int id in session.GameStatus.Drafts[15].Notes)
+        {
+            var note = session.VerbArea().Items.Single(i => i.VerbId == id);
+            session.ClickVerbArea(note.X + 1, note.Y + 1);
+        }
+        for (int i = 0; i < 1500; i++) session.AdvanceFrame();
+        Assert.Contains(session.SessionTrace.Skip(from), l => l.Contains("Script 22 chains to script 26"));
+        Assert.Equal(0x54, session.Snapshot.KnownGlobalVariables["var[0x065]"]);
+    }
+
+    [Fact]
+    public void BrowsingRaisesHeldStaffToInitialLevelAndKeepsHigherExplicitChoices()
+    {
+        var session = Start(); var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom")));
+        session.UpdateAvailableNotes(1);
+        session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 26), preserveStaffLevel: true);
+        for (int i = 0; i < 1000 && !session.GameStatus.CanEdit; i++) session.AdvanceFrame();
+        Assert.True(session.GameStatus.StaffHeld);
+        Assert.Equal(3, session.GameStatus.AvailableNoteCount);
+        Assert.Contains("browsing adjustment", session.GameStatus.NotesOrigin);
+        session.UpdateAvailableNotes(8);
+        session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 13), preserveStaffLevel: true);
+        for (int i = 0; i < 1000 && !session.GameStatus.CanEdit; i++) session.AdvanceFrame();
+        Assert.Equal(8, session.GameStatus.AvailableNoteCount);
+        session.UpdateAvailableNotes(4);
+        for (int i = 0; i < 32; i++) session.AdvanceFrame();
+        Assert.Equal(4, session.GameStatus.AvailableNoteCount);
+    }
     [Fact]
     public void StatusCannotRewritePrerequisitesDuringAStartedScene()
     {
@@ -69,7 +127,7 @@ public sealed class LoomGameStatusTests
         Assert.False(session.GameStatus.Drafts[0].Learned);
         session.UpdateDraftLearned(0, true); Assert.True(session.GameStatus.Drafts[0].Learned);
         Assert.Equal([1, 2, 1, 2], session.GameStatus.Drafts[0].Notes);
-        Assert.Throws<ArgumentOutOfRangeException>(() => session.UpdateDraftLearned(15, true));
+        Assert.Throws<ArgumentOutOfRangeException>(() => session.UpdateDraftLearned(16, true));
     }
 
     [Theory]

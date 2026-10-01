@@ -821,7 +821,7 @@ public partial class MainWindow : Window
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             if (visit) FollowSessionSound();
-            var snapshot = visit ? _session.VisitRoom(resource) : _session.Snapshot;
+            var snapshot = visit ? _session.VisitRoom(resource, preserveStaffLevel: !_playbackEnteringRoom && _replaySequence is null) : _session.Snapshot;
             var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
                 _indexedStates, sceneBatches);

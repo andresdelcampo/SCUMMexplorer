@@ -60,18 +60,19 @@ public partial class GameStatusWindow : Window
         InitializeComponent(); _session = session; _canEdit = canEdit; _refreshRoom = refreshRoom; _advanced = advanced ?? (() => false);
         _artwork = game is null ? null : LoomStatusArtwork.TryLoad(game, out _artworkError);
         foreach (var column in new[] { Note1Column, Note2Column, Note3Column, Note4Column }) column.ItemsSource = LoomNoteNames.Choices;
-        for (int i = 0; i <= 8; i++)
+        for (int i = 1; i <= 8; i++)
         {
             int count = i;
             var button = new Button { Style = (Style)FindResource("ArtworkChoice"), Tag = count,
-                ToolTip = count == 0 ? "No notes available" : $"Available through {LoomNoteNames.Label(count)}" };
+                Width = 48, Height = 64, ToolTip = $"Available through {LoomNoteNames.Label(count)}" };
             System.Windows.Automation.AutomationProperties.SetName(button, button.ToolTip.ToString());
             var content = new StackPanel();
-            content.Children.Add(new Image { Height = 30, Stretch = Stretch.Uniform, SnapsToDevicePixels = true });
+            content.Children.Add(new Image { Width = 48, Height = 64, Stretch = Stretch.Fill, SnapsToDevicePixels = true });
             RenderOptions.SetBitmapScalingMode(content.Children[0], BitmapScalingMode.NearestNeighbor);
-            content.Children.Add(new TextBlock { Text = count == 0 ? "None" : LoomNoteNames.Label(count), HorizontalAlignment = HorizontalAlignment.Center });
+            if (_artwork is null) content.Children.Add(new TextBlock { Text = LoomNoteNames.Label(count), HorizontalAlignment = HorizontalAlignment.Center });
             button.Content = content;
-            button.Click += (_, _) => { if (!_canEdit()) return; _noteCount = count; UpdateSelectors(); UpdateControls(); };
+            button.Click += (_, _) => { if (!_canEdit() || _staffHeld != true) return; _noteCount = count; UpdateSelectors(); UpdateControls(); };
+            Canvas.SetLeft(button, 16 + (count - 1) * 48);
             NoteButtons.Children.Add(button);
         }
         _timer.Tick += (_, _) => Refresh();
@@ -112,6 +113,7 @@ public partial class GameStatusWindow : Window
             _loadingRows = false;
         }
         StaffOrigin.Text = status?.StaffOrigin ?? "Unresolved"; NotesOrigin.Text = status?.NotesOrigin ?? "Unresolved";
+        StaffOrigin.ToolTip = StaffOrigin.Text; NotesOrigin.ToolTip = NotesOrigin.Text;
         UpdateSelectors(); UpdateControls();
     }
 
@@ -120,7 +122,7 @@ public partial class GameStatusWindow : Window
         bool editable = _session()?.GameStatus.Supported == true && _canEdit();
         bool stale = _baseline is not null && _session() is { } s && !SameState(s.GameStatus, _baseline);
         StaffButton.IsEnabled = editable && _staffHeld.HasValue;
-        NoteButtons.IsEnabled = editable && _noteCount.HasValue;
+        NoteButtons.IsEnabled = editable && _noteCount.HasValue && _staffHeld == true;
         DraftGrid.IsReadOnly = !editable;
         ApplyButton.IsEnabled = editable && PendingChanges && !stale;
         if (PendingChanges) EditMessage.Text = stale ? "Game status changed. Close and reopen to inspect the new values before applying." :
@@ -134,16 +136,16 @@ public partial class GameStatusWindow : Window
         StaffImage.Source = _staffHeld == true ? _artwork?.Staff : _artwork?.EmptyStaff;
         StaffLabel.Text = _staffHeld is true ? "Held" : _staffHeld is false ? "Not held" : "Unresolved";
         System.Windows.Automation.AutomationProperties.SetItemStatus(StaffButton, StaffLabel.Text);
-        StaffButton.BorderBrush = new SolidColorBrush(_staffHeld == true ? Color.FromRgb(183, 132, 66) : Color.FromRgb(51, 68, 82));
+        StaffButton.BorderThickness = new Thickness(_staffHeld == true ? 0 : 1);
         foreach (Button button in NoteButtons.Children)
         {
-            int count = (int)button.Tag; bool selected = _noteCount == count; bool known = count > 0 && count <= _noteCount;
+            int count = (int)button.Tag; bool selected = _staffHeld == true && _noteCount == count; bool known = _staffHeld == true && count <= _noteCount;
             var img = (Image)((StackPanel)button.Content).Children[0];
-            img.Source = count == 0 ? _artwork?.EmptyStaff : known ? _artwork?.Notes[count - 1] : _artwork?.EmptyNotes[count - 1];
-            button.BorderBrush = new SolidColorBrush(selected ? Color.FromRgb(183, 132, 66) : Color.FromRgb(51, 68, 82));
+            img.Source = known ? _artwork?.Notes[count - 1] : _artwork?.EmptyNotes[count - 1];
+            button.BorderThickness = new Thickness(known ? 0 : 1);
             System.Windows.Automation.AutomationProperties.SetItemStatus(button, selected ? "Selected limit" : known ? "Available" : "Unavailable");
         }
-        NoteIdentities.Text = _noteCount is null ? "Unresolved" : _noteCount == 0 ? "No notes available" : "Available: " + string.Join(", ", Enumerable.Range(1, _noteCount.Value).Select(LoomNoteNames.Label));
+        NoteIdentities.Text = _noteCount is null ? "Unresolved" : _staffHeld != true ? "Staff required" : _noteCount == 0 ? "No notes available" : "Available: " + string.Join(", ", Enumerable.Range(1, _noteCount.Value).Select(LoomNoteNames.Label));
     }
 
     private void Staff_Click(object sender, RoutedEventArgs e)
