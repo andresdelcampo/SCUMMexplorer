@@ -1,0 +1,468 @@
+[
+  {
+    "id": "room41-target632-slot4",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 632
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ]
+  },
+  {
+    "id": "room41-target634-slot4",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ]
+  },
+  {
+    "id": "room41-target632-slot9",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 632
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 9,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ]
+  },
+  {
+    "id": "room41-target634-slot9",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 9,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ]
+  },
+  {
+    "id": "room41-native-look632-then634",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "look",
+        "objectId": 632
+      },
+      {
+        "kind": "frames",
+        "stage": "look632",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim634",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ]
+  },
+  {
+    "id": "room41-source-level4",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 270,
+        "verb": 58
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-open",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "late-096-after095-staff-fresh",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "late-096-fresh43-fresh",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "fresh43-use",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "late-096-staff-without095-fresh",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 45
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "without095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  }
+]

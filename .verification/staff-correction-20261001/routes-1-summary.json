@@ -1,0 +1,1995 @@
+[
+  {
+    "id": "late-096-after095-staff-fresh",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "095",
+        "frame": 858,
+        "room": 45,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "staff",
+        "frame": 75,
+        "room": 45,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "return43",
+        "frame": 49,
+        "room": 43,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "096",
+        "frame": 61,
+        "room": 43,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 Object 639 Verb 0x38",
+            "offset": 34,
+            "freeze": 1
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 43,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 1
+          },
+          {
+            "label": "Room 43 Object 639 Verb 0x38",
+            "offset": 34,
+            "freeze": 1
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2"
+    ],
+    "inputTrace": [
+      "cutscene at Script 96 +0x0000 runs script 2"
+    ],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/late-096-after095-staff-fresh.json",
+    "sha256": "50435ec0ad108846ec3db37983142ed0fcb6c1f1473c6645917a3ec87c216971"
+  },
+  {
+    "id": "late-096-fresh43-fresh",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "fresh43-use",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "fresh43-use",
+        "frame": 42,
+        "room": 44,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 44,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [],
+    "inputTrace": [],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/late-096-fresh43-fresh.json",
+    "sha256": "78b819f0d127b8b61fa4ca36e6f62ddc21da0f7600da9539af62d825c9068264"
+  },
+  {
+    "id": "late-096-staff-without095-fresh",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 45
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "without095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "staff",
+        "frame": 75,
+        "room": 45,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "return43",
+        "frame": 49,
+        "room": 43,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 43 local script 205",
+            "offset": 60,
+            "freeze": 0
+          },
+          {
+            "label": "Room 43 local script 204",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "without095",
+        "frame": 42,
+        "room": 45,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 45,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3"
+    ],
+    "inputTrace": [],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/late-096-staff-without095-fresh.json",
+    "sha256": "29911cb3345d7f74a8986276834ab0b91af17e46c0f1b50d6dbcdb080de899aa"
+  },
+  {
+    "id": "room41-native-look632-then634",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "look",
+        "objectId": 632
+      },
+      {
+        "kind": "frames",
+        "stage": "look632",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim634",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "staff",
+        "frame": 73,
+        "room": 9,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "arrival",
+        "frame": 32,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 7,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 84,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "look632",
+        "frame": 33,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 32,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 82,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "aim634",
+        "frame": 31,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 19,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 110,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "cast",
+        "frame": 95,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 11 +0x0000 runs script 2",
+      "endCutscene at Script 11 +0x0071 runs script 3"
+    ],
+    "inputTrace": [
+      "Script 08 +0x0023: startObject runs object 634 verb 0x39",
+      "Script 10 chains to script 11"
+    ],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/room41-native-look632-then634.json",
+    "sha256": "8fdfe97bc1fa58c395bd7abebf61ca10804e71f9bb38dec1464cdd71f5995e42"
+  },
+  {
+    "id": "room41-source-level4",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 270,
+        "verb": 58
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-open",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "staff",
+        "frame": 73,
+        "room": 9,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "egg-open",
+        "frame": 1933,
+        "room": 9,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "arrival",
+        "frame": 32,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 7,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 84,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "aim",
+        "frame": 31,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Room 41 local script 208",
+            "offset": 32,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 70,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "cast",
+        "frame": 95,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 76,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 76,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3",
+      "cutscene at Script 11 +0x0000 runs script 2",
+      "endCutscene at Script 11 +0x0071 runs script 3"
+    ],
+    "inputTrace": [
+      "Script 08 +0x0023: startObject runs object 634 verb 0x39",
+      "Script 10 chains to script 11"
+    ],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/room41-source-level4.json",
+    "sha256": "15c571e65ec4b65da7c65c8fe8f8dd89c3d6ae65a20f5f06dbf7617b6559a180"
+  },
+  {
+    "id": "room41-target632-slot4",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 632
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "staff",
+        "frame": 73,
+        "room": 9,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "arrival",
+        "frame": 32,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 7,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 84,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "aim",
+        "frame": 33,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 32,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 82,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "cast",
+        "frame": 77,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "inputTrace": [
+      "Script 10 chains to script 13",
+      "Script 10 chains to script 13"
+    ],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/room41-target632-slot4.json",
+    "sha256": "f05a5b1c432de785b58edab9a05f1f74897814306a1b2be13b7e4eaa6f26f158"
+  },
+  {
+    "id": "room41-target632-slot9",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 632
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 9,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "staff",
+        "frame": 73,
+        "room": 9,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "arrival",
+        "frame": 32,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 7,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 84,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "aim",
+        "frame": 33,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 32,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 82,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "cast",
+        "frame": 77,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "inputTrace": [
+      "Script 10 chains to script 13",
+      "Script 10 chains to script 13"
+    ],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/room41-target632-slot9.json",
+    "sha256": "b63fb8dfb365204135255f42c9882ccf44c190e3fa0e85705ebebc1533087c5e"
+  },
+  {
+    "id": "room41-target634-slot4",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 4,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "staff",
+        "frame": 73,
+        "room": 9,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "arrival",
+        "frame": 32,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 7,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 84,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "aim",
+        "frame": 31,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 32,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 70,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "cast",
+        "frame": 95,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 76,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 76,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 11 +0x0000 runs script 2",
+      "endCutscene at Script 11 +0x0071 runs script 3"
+    ],
+    "inputTrace": [
+      "Script 08 +0x0023: startObject runs object 634 verb 0x39",
+      "Script 10 chains to script 11"
+    ],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/room41-target634-slot4.json",
+    "sha256": "4843fc3833becd497142334d5f4bb94f8f2f8e092253d33d675ca1b4a0179d85"
+  },
+  {
+    "id": "room41-target634-slot9",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 41
+      },
+      {
+        "kind": "frames",
+        "stage": "arrival",
+        "count": 32,
+        "settle": false
+      },
+      {
+        "kind": "inspect"
+      },
+      {
+        "kind": "target",
+        "objectId": 634
+      },
+      {
+        "kind": "frames",
+        "stage": "aim",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "draft",
+        "slot": 9,
+        "gap": 1
+      },
+      {
+        "kind": "frames",
+        "stage": "cast",
+        "count": 3000,
+        "settle": true
+      }
+    ],
+    "prerequisiteStops": [],
+    "stages": [
+      {
+        "stage": "staff",
+        "frame": 73,
+        "room": 9,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "arrival",
+        "frame": 32,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 0,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 7,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 84,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "aim",
+        "frame": 31,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 208",
+            "offset": 32,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 70,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "cast",
+        "frame": 93,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      },
+      {
+        "stage": "final",
+        "frame": 0,
+        "room": 41,
+        "variables": {
+          "var[0x07A]": 3,
+          "var[0x067]": 634,
+          "var[0x0CF]": 0,
+          "bit[0xDD6]": null,
+          "bit[0xDB4]": null
+        },
+        "pending": [
+          {
+            "label": "Script 39",
+            "offset": 61,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 209",
+            "offset": 51,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 206",
+            "offset": 116,
+            "freeze": 0
+          },
+          {
+            "label": "Room 41 local script 212",
+            "offset": 11,
+            "freeze": 0
+          },
+          {
+            "label": "Script 06",
+            "offset": 443,
+            "freeze": 0
+          }
+        ]
+      }
+    ],
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 11 +0x0000 runs script 2",
+      "endCutscene at Script 11 +0x0071 runs script 3",
+      "cutscene at Script 11 +0x0000 runs script 2",
+      "endCutscene at Script 11 +0x0071 runs script 3"
+    ],
+    "inputTrace": [
+      "Script 08 +0x0023: startObject runs object 634 verb 0x39",
+      "Script 10 chains to script 11",
+      "Script 10 chains to script 11"
+    ],
+    "packet": "Exe/StaffCorrectionSession-20261001/routes-1/room41-target634-slot9.json",
+    "sha256": "ab32a84f6dec979dcd431c377209235614eeede107d98a4633af390599a43236"
+  }
+]
