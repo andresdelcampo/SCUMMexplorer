@@ -11,8 +11,9 @@ internal sealed record ReplaySourceFile(string Name, string Sha256);
 internal sealed record ReplayRecipe(string Id, string Title, string Category, int Room, int ObjectId,
     int Verb, int[] ScriptIds, int[] Rooms, int Frames, string Source);
 internal sealed record ReplayCoverage(string Title, string Status, string Source);
+internal sealed record ReplayMembership(string Id, int StartRoom, int[] Rooms, int Frames, string Source);
 internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayRecipe[] Replays,
-    ReplayCoverage[] Coverage, string Summary)
+    ReplayCoverage[] Coverage, string Summary, ReplayMembership[] Membership)
 {
     public static LoomReplayCatalog Load(GameLibrary game)
     {
@@ -29,7 +30,7 @@ internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayR
         }
         return catalog;
     }
-    private static LoomReplayCatalog Empty(string note) => new([], [], [], note);
+    private static LoomReplayCatalog Empty(string note) => new([], [], [], note, []);
 }
 
 internal sealed record CutscenePickerItem(string Title, string Category, string Note, Action? Play, string Status = "Validated state preview");

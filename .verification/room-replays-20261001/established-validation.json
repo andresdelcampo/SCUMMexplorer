@@ -1,0 +1,64 @@
+[
+  {
+    "id": "opening",
+    "startRoom": 69,
+    "rooms": [
+      1,
+      2,
+      53,
+      69
+    ],
+    "frames": 812,
+    "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+    "sceneTrace": []
+  },
+  {
+    "id": "Room 08 object 255 Verb 0x38",
+    "startRoom": 8,
+    "rooms": [
+      3,
+      8,
+      9,
+      11,
+      54,
+      67
+    ],
+    "frames": 2864,
+    "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+    "sceneTrace": [
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3"
+    ]
+  },
+  {
+    "id": "Room 10 object 295 Verb 0x38",
+    "startRoom": 10,
+    "rooms": [
+      10,
+      11,
+      13
+    ],
+    "frames": 334,
+    "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+    "sceneTrace": [
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3"
+    ]
+  },
+  {
+    "id": "Room 36 object 599 Verb 0x38",
+    "startRoom": 36,
+    "rooms": [
+      36,
+      37,
+      38,
+      58
+    ],
+    "frames": 866,
+    "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+    "sceneTrace": [
+      "cutscene at Script 86 +0x0000 runs script 2",
+      "endCutscene at Script 86 +0x055C runs script 3"
+    ]
+  }
+]

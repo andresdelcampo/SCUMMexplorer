@@ -32,9 +32,11 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
-Replay naming completed: all views consume shared descriptors. Stored source names retained; 39 unnamed targets use decoded action/reached-room labels with explicit naming gaps. [Validation](../.verification/replay-names-20261001/validation.md): 9/9 WPF checks, recipes and coverage unchanged. Room access is next.
+Replay naming completed: all views consume shared descriptors. Stored source names retained; 39 unnamed targets use decoded action/reached-room labels with explicit naming gaps. [Validation](../.verification/replay-names-20261001/validation.md): 9/9 WPF checks, recipes and coverage unchanged.
 
-**Next-session priorities requested after the completed work (planning only):**
+Room access completed: one associated start plays directly, several open the shared filtered picker, none hides the room button; global access retained. All 291 memberships generated from validated start/observed rooms, including the original four, with no UI room tables. [Validation](../.verification/room-replays-20261001/validation.md): 20/20 WPF checks, 249 Core tests, 16 doorway checks, 19 room/audio checks and 18 input checks. Next: unresolved replay coverage.
+
+**Requested naming and room access priorities (completed above; retained specification):**
 
 1. Replace `Object ###` in global cutscene titles with the object's source-established name. Investigate names across the room object definitions, shared references and executed naming instructions; use the same resolved title in the global picker, room picker and Game Texts. Keep numeric IDs in Advanced/source details. If an object genuinely has no source name, use a concise descriptor supported by its decoded action/reached scene rather than inventing a name, and record that naming gap.
 2. Add **Play Cutscene** in the room itself for the global catalog's validated replay entries associated with that room. Keep the global button. One matching entry plays directly; several open the same picker filtered to the room; no matching entries means no room button. Preserve categories/search, shared titles, fresh-session start notes and active/paused replay guards. Explain that this replays the established fresh-session recipe, rather than continuing the room's current game state.

@@ -7,7 +7,7 @@
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <StackPanel>
             <TextBlock Text="Play Cutscene" FontSize="24" FontWeight="SemiBold"/>
-            <TextBlock Text="Choose a scene from anywhere in the game. Replay starts a fresh exploration session." TextWrapping="Wrap" Foreground="#AAB4BA" Margin="0,6,0,12"/>
+            <TextBlock x:Name="PickerScope" Text="Choose a scene from anywhere in the game. Replay starts a fresh exploration session." TextWrapping="Wrap" Foreground="#AAB4BA" Margin="0,6,0,12"/>
             <TextBlock x:Name="CoverageSummary" TextWrapping="Wrap" Foreground="#B8AA8C" Margin="0,0,0,12"/>
         </StackPanel>
         <DockPanel Grid.Row="1" Margin="0,0,0,12">

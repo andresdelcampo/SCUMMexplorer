@@ -159,6 +159,9 @@
                         <Grid x:Name="RoomDisplayLayout" Visibility="Collapsed" SizeChanged="RoomDisplayLayout_SizeChanged">
                             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                             <WrapPanel Grid.Row="0" Margin="10,8,10,6" VerticalAlignment="Center">
+                                <Button x:Name="RoomCutsceneButton" Content="Play Cutscene" Visibility="Collapsed"
+                                        Click="RoomCutscene_Click" Padding="10,5" Margin="0,0,14,0"
+                                        Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
                                 <CheckBox x:Name="NormalRoomWidthToggle" Content="Original framing" IsChecked="True"
                                           Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
                                           ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."

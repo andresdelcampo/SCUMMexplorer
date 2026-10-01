@@ -5081,5 +5081,2698 @@
       "source": "Room 66 object 833 Verb 0x56; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 66 object 833 Verb 0x56"
     }
   ],
-  "summary": "75 scene starts and 216 dialogue/reaction previews. Coverage remains incomplete; Needs validation lists unresolved scene branches and shared helpers."
+  "summary": "75 scene starts and 216 dialogue/reaction previews. Coverage remains incomplete; Needs validation lists unresolved scene branches and shared helpers.",
+  "membership": [
+    {
+      "id": "Room 02 object 153 Verb 0x38",
+      "startRoom": 2,
+      "rooms": [
+        2,
+        3
+      ],
+      "frames": 103,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 02 object 154 Verb 0x36",
+      "startRoom": 2,
+      "rooms": [
+        2
+      ],
+      "frames": 68,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 02 object 154 Verb 0x56",
+      "startRoom": 2,
+      "rooms": [
+        2
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 02 object 156 Verb 0x3A",
+      "startRoom": 2,
+      "rooms": [
+        2,
+        3,
+        10,
+        11
+      ],
+      "frames": 228,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 02 object 156 Verb 0x56",
+      "startRoom": 2,
+      "rooms": [
+        2
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 03 object 165 Verb 0x56",
+      "startRoom": 3,
+      "rooms": [
+        3
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 169 Verb 0x37",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 93,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 170 Verb 0x37",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 119,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 171 Verb 0x36",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 61,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 171 Verb 0x3A",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 171 Verb 0x3B",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 87,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 171 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 172 Verb 0x36",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 61,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 172 Verb 0x3A",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 172 Verb 0x3B",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 87,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 172 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 173 Verb 0x36",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 61,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 173 Verb 0x3A",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 173 Verb 0x3B",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 87,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 173 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 174 Verb 0x36",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 61,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 174 Verb 0x3A",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 174 Verb 0x3B",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 87,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 174 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 175 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 176 Verb 0x36",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 200,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 176 Verb 0x3A",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 176 Verb 0x3B",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 176 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 177 Verb 0x36",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 112,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 177 Verb 0x3B",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 177 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 04 object 197 Verb 0x56",
+      "startRoom": 4,
+      "rooms": [
+        4
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 205 Verb 0x36",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 205 Verb 0x56",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 206 Verb 0x3E",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 67,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 206 Verb 0x3F",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 95,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 206 Verb 0x56",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 207 Verb 0x3E",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 95,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 207 Verb 0x3F",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 207 Verb 0x56",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 209 Verb 0x36",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 118,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 209 Verb 0x56",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 210 Verb 0x3E",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 95,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 210 Verb 0x3F",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 210 Verb 0x56",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 211 Verb 0x3E",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 67,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 211 Verb 0x3F",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 95,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 211 Verb 0x56",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 214 Verb 0x36",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 06 object 214 Verb 0x56",
+      "startRoom": 6,
+      "rooms": [
+        6
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 256 Verb 0x36",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 139,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 256 Verb 0x3E",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 80,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 256 Verb 0x3F",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 101,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 256 Verb 0x56",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 257 Verb 0x36",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 150,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 257 Verb 0x3E",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 101,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 257 Verb 0x3F",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 80,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 257 Verb 0x56",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 258 Verb 0x36",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 208,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 258 Verb 0x3E",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 101,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 258 Verb 0x3F",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 121,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 08 object 258 Verb 0x56",
+      "startRoom": 8,
+      "rooms": [
+        8
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 268 Verb 0x37",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 146,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 270 Verb 0x36",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 100,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 270 Verb 0x3A",
+      "startRoom": 9,
+      "rooms": [
+        8,
+        9,
+        81
+      ],
+      "frames": 1936,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 270 Verb 0x56",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 271 Verb 0x38",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 272 Verb 0x36",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 86,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 272 Verb 0x56",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 273 Verb 0x4D",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 96,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 273 Verb 0x4F",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 96,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 273 Verb 0x51",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 96,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 273 Verb 0x56",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 96,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 274 Verb 0x36",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 171,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 09 object 275 Verb 0x56",
+      "startRoom": 9,
+      "rooms": [
+        9
+      ],
+      "frames": 60,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 296 Verb 0x3A",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 97,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 296 Verb 0x3B",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 66,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 296 Verb 0x56",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 297 Verb 0x36",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 297 Verb 0x56",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 298 Verb 0x36",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 298 Verb 0x56",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 299 Verb 0x36",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 299 Verb 0x56",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 300 Verb 0x36",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 10 object 300 Verb 0x56",
+      "startRoom": 10,
+      "rooms": [
+        10
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 12 object 322 Verb 0x38",
+      "startRoom": 12,
+      "rooms": [
+        12,
+        13
+      ],
+      "frames": 158,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 13 object 324 Verb 0x36",
+      "startRoom": 13,
+      "rooms": [
+        10,
+        13
+      ],
+      "frames": 51,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 13 object 325 Verb 0x36",
+      "startRoom": 13,
+      "rooms": [
+        13
+      ],
+      "frames": 107,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 13 object 325 Verb 0x3A",
+      "startRoom": 13,
+      "rooms": [
+        13
+      ],
+      "frames": 111,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 13 object 325 Verb 0x41",
+      "startRoom": 13,
+      "rooms": [
+        13
+      ],
+      "frames": 106,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 13 object 325 Verb 0x42",
+      "startRoom": 13,
+      "rooms": [
+        13
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 13 object 325 Verb 0x56",
+      "startRoom": 13,
+      "rooms": [
+        13
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 15 object 338 Verb 0x38",
+      "startRoom": 15,
+      "rooms": [
+        15,
+        23
+      ],
+      "frames": 82,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 16 object 350 Verb 0x47",
+      "startRoom": 16,
+      "rooms": [
+        16
+      ],
+      "frames": 117,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 16 object 350 Verb 0x48",
+      "startRoom": 16,
+      "rooms": [
+        16
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 16 object 350 Verb 0x56",
+      "startRoom": 16,
+      "rooms": [
+        16
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 17 object 357 Verb 0x3B",
+      "startRoom": 17,
+      "rooms": [
+        17
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 17 object 357 Verb 0x56",
+      "startRoom": 17,
+      "rooms": [
+        17
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 17 object 358 Verb 0x3B",
+      "startRoom": 17,
+      "rooms": [
+        17
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 17 object 358 Verb 0x56",
+      "startRoom": 17,
+      "rooms": [
+        17
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 367 Verb 0x36",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 757,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 368 Verb 0x38",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 757,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 369 Verb 0x36",
+      "startRoom": 18,
+      "rooms": [
+        18,
+        20
+      ],
+      "frames": 570,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 369 Verb 0x56",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 370 Verb 0x56",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 371 Verb 0x36",
+      "startRoom": 18,
+      "rooms": [
+        18,
+        20
+      ],
+      "frames": 607,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 371 Verb 0x3A",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 371 Verb 0x56",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 372 Verb 0x36",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 655,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 372 Verb 0x56",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 757,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 374 Verb 0x36",
+      "startRoom": 18,
+      "rooms": [
+        18
+      ],
+      "frames": 757,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 386 Verb 0x36",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 99,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 386 Verb 0x56",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 387 Verb 0x36",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 99,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 387 Verb 0x56",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 388 Verb 0x36",
+      "startRoom": 20,
+      "rooms": [
+        18,
+        20
+      ],
+      "frames": 116,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 388 Verb 0x56",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 389 Verb 0x36",
+      "startRoom": 20,
+      "rooms": [
+        18,
+        20
+      ],
+      "frames": 114,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 20 object 389 Verb 0x56",
+      "startRoom": 20,
+      "rooms": [
+        20
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 403 Verb 0x56",
+      "startRoom": 22,
+      "rooms": [
+        22
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 404 Verb 0x56",
+      "startRoom": 22,
+      "rooms": [
+        22
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 405 Verb 0x36",
+      "startRoom": 22,
+      "rooms": [
+        22,
+        56
+      ],
+      "frames": 816,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 405 Verb 0x3A",
+      "startRoom": 22,
+      "rooms": [
+        22
+      ],
+      "frames": 61,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 405 Verb 0x45",
+      "startRoom": 22,
+      "rooms": [
+        22
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 405 Verb 0x46",
+      "startRoom": 22,
+      "rooms": [
+        22
+      ],
+      "frames": 70,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 22 object 405 Verb 0x56",
+      "startRoom": 22,
+      "rooms": [
+        22
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 422 Verb 0x47",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 422 Verb 0x49",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 160,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 422 Verb 0x56",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 423 Verb 0x47",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 423 Verb 0x49",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 160,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 423 Verb 0x56",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 424 Verb 0x47",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 424 Verb 0x49",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 160,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 424 Verb 0x56",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 425 Verb 0x47",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 425 Verb 0x49",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 160,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 23 object 425 Verb 0x56",
+      "startRoom": 23,
+      "rooms": [
+        23
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 431 Verb 0x3B",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 431 Verb 0x56",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 433 Verb 0x38",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 64,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 433 Verb 0x3E",
+      "startRoom": 24,
+      "rooms": [
+        24,
+        27,
+        28
+      ],
+      "frames": 310,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 433 Verb 0x3F",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 433 Verb 0x47",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 433 Verb 0x49",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 84,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 24 object 433 Verb 0x56",
+      "startRoom": 24,
+      "rooms": [
+        24
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 25 object 447 Verb 0x3C",
+      "startRoom": 25,
+      "rooms": [
+        25
+      ],
+      "frames": 124,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 25 object 447 Verb 0x56",
+      "startRoom": 25,
+      "rooms": [
+        25
+      ],
+      "frames": 101,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 26 object 464 Verb 0x36",
+      "startRoom": 26,
+      "rooms": [
+        26
+      ],
+      "frames": 311,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 26 object 464 Verb 0x3E",
+      "startRoom": 26,
+      "rooms": [
+        26
+      ],
+      "frames": 66,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 26 object 464 Verb 0x4D",
+      "startRoom": 26,
+      "rooms": [
+        26
+      ],
+      "frames": 398,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 26 object 464 Verb 0x56",
+      "startRoom": 26,
+      "rooms": [
+        26
+      ],
+      "frames": 77,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 465 Verb 0x38",
+      "startRoom": 28,
+      "rooms": [
+        28,
+        65
+      ],
+      "frames": 65,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 466 Verb 0x36",
+      "startRoom": 28,
+      "rooms": [
+        28,
+        79
+      ],
+      "frames": 739,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 466 Verb 0x43",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 94,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 466 Verb 0x49",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 234,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 466 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 467 Verb 0x36",
+      "startRoom": 28,
+      "rooms": [
+        28,
+        79
+      ],
+      "frames": 739,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 467 Verb 0x43",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 94,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 467 Verb 0x49",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 234,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 467 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 468 Verb 0x44",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 126,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 468 Verb 0x49",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 77,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 468 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 469 Verb 0x44",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 126,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 469 Verb 0x49",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 77,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 469 Verb 0x56",
+      "startRoom": 28,
+      "rooms": [
+        28
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 470 Verb 0x36",
+      "startRoom": 28,
+      "rooms": [
+        28,
+        79
+      ],
+      "frames": 642,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 471 Verb 0x36",
+      "startRoom": 28,
+      "rooms": [
+        28,
+        79
+      ],
+      "frames": 642,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 28 object 472 Verb 0x36",
+      "startRoom": 28,
+      "rooms": [
+        28,
+        79
+      ],
+      "frames": 642,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 503 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 67,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 504 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 53,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 505 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 63,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 507 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        28,
+        30
+      ],
+      "frames": 62,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 508 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30,
+        31
+      ],
+      "frames": 105,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 509 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30,
+        32
+      ],
+      "frames": 101,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 510 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30,
+        32
+      ],
+      "frames": 110,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 511 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 65,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 512 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 51,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 513 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 51,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 514 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 54,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 515 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 57,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 516 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30
+      ],
+      "frames": 57,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 517 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30,
+        31
+      ],
+      "frames": 49,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 30 object 518 Verb 0x38",
+      "startRoom": 30,
+      "rooms": [
+        30,
+        31
+      ],
+      "frames": 49,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 521 Verb 0x38",
+      "startRoom": 31,
+      "rooms": [
+        30,
+        31
+      ],
+      "frames": 45,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 523 Verb 0x36",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 118,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 523 Verb 0x45",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 523 Verb 0x46",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 69,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 523 Verb 0x56",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 524 Verb 0x45",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 524 Verb 0x46",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 524 Verb 0x56",
+      "startRoom": 31,
+      "rooms": [
+        31
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 31 object 525 Verb 0x36",
+      "startRoom": 31,
+      "rooms": [
+        31,
+        86
+      ],
+      "frames": 129,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 32 object 537 Verb 0x38",
+      "startRoom": 32,
+      "rooms": [
+        30,
+        32
+      ],
+      "frames": 108,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 32 object 538 Verb 0x38",
+      "startRoom": 32,
+      "rooms": [
+        30,
+        32
+      ],
+      "frames": 107,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 33 object 543 Verb 0x38",
+      "startRoom": 33,
+      "rooms": [
+        33,
+        34
+      ],
+      "frames": 107,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 33 object 544 Verb 0x41",
+      "startRoom": 33,
+      "rooms": [
+        33
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 33 object 544 Verb 0x42",
+      "startRoom": 33,
+      "rooms": [
+        33
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 33 object 544 Verb 0x56",
+      "startRoom": 33,
+      "rooms": [
+        33
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 559 Verb 0x37",
+      "startRoom": 34,
+      "rooms": [
+        34,
+        57
+      ],
+      "frames": 1158,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 560 Verb 0x37",
+      "startRoom": 34,
+      "rooms": [
+        34,
+        57
+      ],
+      "frames": 1158,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 561 Verb 0x36",
+      "startRoom": 34,
+      "rooms": [
+        29,
+        34
+      ],
+      "frames": 126,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 561 Verb 0x43",
+      "startRoom": 34,
+      "rooms": [
+        34,
+        52
+      ],
+      "frames": 1019,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 561 Verb 0x44",
+      "startRoom": 34,
+      "rooms": [
+        34,
+        52
+      ],
+      "frames": 1044,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 561 Verb 0x4C",
+      "startRoom": 34,
+      "rooms": [
+        34,
+        52
+      ],
+      "frames": 1019,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 561 Verb 0x56",
+      "startRoom": 34,
+      "rooms": [
+        34,
+        52
+      ],
+      "frames": 1019,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 562 Verb 0x3B",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 562 Verb 0x56",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 586 Verb 0x37",
+      "startRoom": 34,
+      "rooms": [
+        34,
+        57
+      ],
+      "frames": 1158,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 586 Verb 0x43",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 66,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 586 Verb 0x44",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 66,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 586 Verb 0x4C",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 586 Verb 0x4D",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 619,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 34 object 586 Verb 0x56",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 69,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 35 object 588 Verb 0x38",
+      "startRoom": 35,
+      "rooms": [
+        35
+      ],
+      "frames": 66,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 35 object 589 Verb 0x3A",
+      "startRoom": 35,
+      "rooms": [
+        35
+      ],
+      "frames": 363,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 35 object 589 Verb 0x3B",
+      "startRoom": 35,
+      "rooms": [
+        35
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 35 object 589 Verb 0x56",
+      "startRoom": 35,
+      "rooms": [
+        35
+      ],
+      "frames": 346,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 35 object 596 Verb 0x38",
+      "startRoom": 35,
+      "rooms": [
+        35
+      ],
+      "frames": 66,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 35 object 596 Verb 0x56",
+      "startRoom": 35,
+      "rooms": [
+        35
+      ],
+      "frames": 346,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 37 object 601 Verb 0x37",
+      "startRoom": 37,
+      "rooms": [
+        37
+      ],
+      "frames": 80,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 37 object 604 Verb 0x45",
+      "startRoom": 37,
+      "rooms": [
+        37
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 37 object 604 Verb 0x46",
+      "startRoom": 37,
+      "rooms": [
+        37
+      ],
+      "frames": 59,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 37 object 604 Verb 0x56",
+      "startRoom": 37,
+      "rooms": [
+        37
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 610 Verb 0x3C",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 70,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 610 Verb 0x3D",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 65,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 610 Verb 0x56",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 611 Verb 0x36",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 69,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 616 Verb 0x3A",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 62,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 616 Verb 0x3B",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 616 Verb 0x56",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 617 Verb 0x3A",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 617 Verb 0x3B",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 38 object 617 Verb 0x56",
+      "startRoom": 38,
+      "rooms": [
+        38
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 41 object 632 Verb 0x36",
+      "startRoom": 41,
+      "rooms": [
+        41
+      ],
+      "frames": 1191,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 41 object 633 Verb 0x42",
+      "startRoom": 41,
+      "rooms": [
+        41
+      ],
+      "frames": 68,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 41 object 633 Verb 0x56",
+      "startRoom": 41,
+      "rooms": [
+        41
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 43 object 640 Verb 0x56",
+      "startRoom": 43,
+      "rooms": [
+        43
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 43 object 643 Verb 0x3A",
+      "startRoom": 43,
+      "rooms": [
+        43
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 43 object 643 Verb 0x3B",
+      "startRoom": 43,
+      "rooms": [
+        43
+      ],
+      "frames": 66,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 43 object 643 Verb 0x56",
+      "startRoom": 43,
+      "rooms": [
+        43
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 43 object 650 Verb 0x38",
+      "startRoom": 43,
+      "rooms": [
+        43,
+        44,
+        87
+      ],
+      "frames": 923,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 44 object 652 Verb 0x38",
+      "startRoom": 44,
+      "rooms": [
+        43,
+        44
+      ],
+      "frames": 48,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 44 object 653 Verb 0x36",
+      "startRoom": 44,
+      "rooms": [
+        42,
+        44,
+        45
+      ],
+      "frames": 858,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 45 object 655 Verb 0x38",
+      "startRoom": 45,
+      "rooms": [
+        43,
+        45
+      ],
+      "frames": 49,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 45 object 656 Verb 0x36",
+      "startRoom": 45,
+      "rooms": [
+        45
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 682 Verb 0x36",
+      "startRoom": 46,
+      "rooms": [
+        46,
+        49
+      ],
+      "frames": 44,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 682 Verb 0x3A",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 682 Verb 0x3B",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 79,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 682 Verb 0x56",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 683 Verb 0x3A",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 683 Verb 0x3B",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 79,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 683 Verb 0x56",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 684 Verb 0x36",
+      "startRoom": 46,
+      "rooms": [
+        34,
+        46
+      ],
+      "frames": 42,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 684 Verb 0x3A",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 684 Verb 0x3B",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 79,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 684 Verb 0x56",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 685 Verb 0x3A",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 685 Verb 0x3B",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 71,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 46 object 685 Verb 0x56",
+      "startRoom": 46,
+      "rooms": [
+        46
+      ],
+      "frames": 74,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 47 entry",
+      "startRoom": 47,
+      "rooms": [
+        47
+      ],
+      "frames": 348,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 47 object 697 Verb 0x36",
+      "startRoom": 47,
+      "rooms": [
+        47,
+        61
+      ],
+      "frames": 1801,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 47 object 697 Verb 0x56",
+      "startRoom": 47,
+      "rooms": [
+        47
+      ],
+      "frames": 375,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 49 object 704 Verb 0x38",
+      "startRoom": 49,
+      "rooms": [
+        46,
+        49
+      ],
+      "frames": 57,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 49 object 707 Verb 0x36",
+      "startRoom": 49,
+      "rooms": [
+        20,
+        49
+      ],
+      "frames": 805,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 49 object 707 Verb 0x56",
+      "startRoom": 49,
+      "rooms": [
+        20,
+        49
+      ],
+      "frames": 795,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 50 object 721 Verb 0x38",
+      "startRoom": 50,
+      "rooms": [
+        7,
+        11,
+        50
+      ],
+      "frames": 130,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 51 object 741 Verb 0x38",
+      "startRoom": 51,
+      "rooms": [
+        51,
+        66
+      ],
+      "frames": 157,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 51 object 742 Verb 0x56",
+      "startRoom": 51,
+      "rooms": [
+        51
+      ],
+      "frames": 41,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 51 object 743 Verb 0x36",
+      "startRoom": 51,
+      "rooms": [
+        51
+      ],
+      "frames": 281,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 808 Verb 0x3C",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 808 Verb 0x3D",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 808 Verb 0x56",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 81,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 809 Verb 0x3C",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 58,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 809 Verb 0x3D",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 78,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 809 Verb 0x56",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 81,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 810 Verb 0x36",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 810 Verb 0x56",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 75,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 62 object 811 Verb 0x36",
+      "startRoom": 62,
+      "rooms": [
+        62
+      ],
+      "frames": 73,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 63 object 820 Verb 0x56",
+      "startRoom": 63,
+      "rooms": [
+        63
+      ],
+      "frames": 72,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 63 object 821 Verb 0x40",
+      "startRoom": 63,
+      "rooms": [
+        62,
+        63
+      ],
+      "frames": 82,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 63 object 822 Verb 0x40",
+      "startRoom": 63,
+      "rooms": [
+        62,
+        63
+      ],
+      "frames": 82,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 65 object 827 Verb 0x38",
+      "startRoom": 65,
+      "rooms": [
+        28,
+        65
+      ],
+      "frames": 62,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 65 object 828 Verb 0x56",
+      "startRoom": 65,
+      "rooms": [
+        65
+      ],
+      "frames": 76,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "opening",
+      "startRoom": 69,
+      "rooms": [
+        1,
+        2,
+        53,
+        69
+      ],
+      "frames": 812,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands."
+    },
+    {
+      "id": "Room 08 object 255 Verb 0x38",
+      "startRoom": 8,
+      "rooms": [
+        3,
+        8,
+        9,
+        11,
+        54,
+        67
+      ],
+      "frames": 2864,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands."
+    },
+    {
+      "id": "Room 10 object 295 Verb 0x38",
+      "startRoom": 10,
+      "rooms": [
+        10,
+        11,
+        13
+      ],
+      "frames": 334,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands."
+    },
+    {
+      "id": "Room 36 object 599 Verb 0x38",
+      "startRoom": 36,
+      "rooms": [
+        36,
+        37,
+        38,
+        58
+      ],
+      "frames": 866,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands."
+    }
+  ]
 }

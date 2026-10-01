@@ -1,5 +1,5 @@
 """Export only completed preview recipes, exact data fingerprints and honest gaps.
-Usage: export_catalog.py roots.json audit.json Games/loom catalog.json report.md code.tsv
+Usage: export_catalog.py roots.json audit.json Games/loom catalog.json report.md code.tsv established-membership.json
 """
 import collections, json, re, sys
 from replay_names import ReplayNames
@@ -45,7 +45,13 @@ for c in roots['candidateOwners']:
 
 counts=collections.Counter(r['category'] for r in replays)
 summary=f"{counts['Scenes']+4} scene starts and {counts['Dialogue and reactions']} dialogue/reaction previews. Coverage remains incomplete; Needs validation lists unresolved scene branches and shared helpers."
-out=dict(sourceFiles=audit['sourceFiles'],replays=replays,coverage=coverage,summary=summary)
+established=json.load(open(sys.argv[7],encoding='utf-8'))
+assert established['sourceFiles']==audit['sourceFiles'], 'Membership must validate the same exact game files'
+memberships=[dict(id=r['id'],startRoom=r['room'],rooms=sorted(set(r['rooms'])|{r['room']}),frames=r['frames'],source='Validated start room plus rooms observed during completed playback.') for r in replays]
+for r in established['results']:
+    memberships.append({k:r[k] for k in ('id','startRoom','rooms','frames','source')})
+assert len({r['id'] for r in memberships})==len(memberships), 'Duplicate membership ID'
+out=dict(sourceFiles=audit['sourceFiles'],replays=replays,coverage=coverage,summary=summary,membership=memberships)
 with open(sys.argv[4],'w',encoding='utf-8') as f: json.dump(out,f,indent=2,ensure_ascii=False)
 with open(sys.argv[5],'w',encoding='utf-8') as f:
     f.write('# Broad replay audit\n\n'+summary+'\n\n')

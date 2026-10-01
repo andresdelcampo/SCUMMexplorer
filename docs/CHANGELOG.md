@@ -9,6 +9,8 @@
 | Source-derived replay coverage | 291 global replay starts, grouped/searchable; 139/235 sites reached, 79 owners with explicit unresolved coverage | [replay audit](../.verification/replay-coverage-20261001/validation.md) |
 | Unattended harness crashes | All rebuilt verification executables log fatal failures and exit 1; four deliberate crash probes pass without user input | [failure policy](../.verification/harness-failures-20261001/validation.md) |
 | Automatic interactive hover | Pointer checkbox removed; native hover in normal/Advanced, inspection preserved, room/note clicks survive both round trips, paused scenes do not advance | [input checks](../.verification/automatic-pointer-20261001/validation.md) |
+| Shared source-backed replay titles | Stored object names retained; 39 unnamed targets have action/reached-room descriptors and explicit naming gaps; 9/9 WPF checks | [names](../.verification/replay-names-20261001/validation.md) |
+| Room Play Cutscene | One match plays, multiple use shared filtered picker, none hides button; all 291 memberships from validated start/observed rooms including original four; 20/20 WPF checks | [room access](../.verification/room-replays-20261001/validation.md) |
 
 Finished work, oldest first. Each entry links to the validation record that holds the details, the commands and the counts. Reverse-engineering findings live in the [script map](LOOM_SCRIPT_MAP.md); priorities live in the [plan](LOOM_EGA_PLAN.md). This file replaces `WIP_2026-09-27.md` and the history table that was in the plan (28 September 2026).
 
