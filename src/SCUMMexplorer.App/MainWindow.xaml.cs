@@ -511,6 +511,7 @@ public partial class MainWindow : Window
     private void UpdateAdvancedMode()
     {
         var advanced = IsAdvancedMode;
+        GameTextsButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         var rootGrid = ContentPanel.Parent as Grid;
         var showRoomDetails = advanced && _selectedResource?.Kind == ResourceKind.Room;
         if (rootGrid is not null && rootGrid.ColumnDefinitions.Count > 2)
