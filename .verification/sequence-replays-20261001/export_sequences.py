@@ -1,5 +1,5 @@
 """Merge audited generic sequences, retaining literal-root gaps and previous titles."""
-import json, pathlib, re, sys, hashlib
+import collections, json, pathlib, re, sys, hashlib
 sys.path.insert(0, str(pathlib.Path('.verification/replay-coverage-20261001').resolve()))
 from replay_names import ReplayNames
 catalog_path, recipes_path, audit_path, game_path, code_path, report_path = sys.argv[1:]
@@ -25,7 +25,8 @@ for recipe,result in zip(recipes,audit['results'],strict=True):
     source+='Steps: '+json.dumps(recipe['steps'])+'\nReached scene boundaries:\n'+'\n'.join(boundaries)
     catalog['replays'].append(dict(**recipe,scriptIds=scripts,rooms=result['rooms'],frames=result['frames'],source=source))
     catalog['membership'].append(dict(id=recipe['id'],startRoom=result['startRoom'],rooms=result['rooms'],frames=result['frames'],source='Start plus rooms observed with the shared sequence runner.'))
-catalog['summary']='82 scene starts and 249 dialogue/reaction previews, including two audited sequences. Literal-root coverage remains 163/235 sites with 55 owners requiring validation; sequence completion does not resolve fresh-entry roots or static edges.'
+counts=collections.Counter(r['category'] for r in catalog['replays'])
+catalog['summary']=f"{counts['Scenes']+4} scene starts and {counts['Dialogue and reactions']} dialogue/reaction previews, including {len(recipes)} audited sequences. Literal-root gaps are retained; sequence completion does not resolve failed fresh-entry roots or static edges."
 pathlib.Path(catalog_path).write_text(json.dumps(catalog,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
 compact=dict(auditSha256=hashlib.sha256(pathlib.Path(audit_path).read_bytes()).hexdigest(),results=[{k:v for k,v in r.items() if k not in ('trace','uncertainties')}|dict(uncertaintyCount=len(r['uncertainties'])) for r in audit['results']])
 pathlib.Path(report_path).write_text(json.dumps(compact,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')

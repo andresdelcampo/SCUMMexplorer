@@ -1,0 +1,54 @@
+{
+  "global": {
+    "report": "regressions-1/ReplayCheck/replay-check.txt",
+    "passed": 21,
+    "sha256": "ff6ef1ddd416bdaedf9ee9eeb35401ae95092dfb0da2cdc5aca5d8fcbde25b84"
+  },
+  "room": {
+    "report": "regressions-1/RoomReplayCheck/room-replays-check.txt",
+    "passed": 20,
+    "sha256": "e4e09b42bb0c38f02e0900a8f854fc8f6af6f6c52f5ce67297142b2e2f631edf"
+  },
+  "doorways": {
+    "report": "regressions-1/controls/doorways.txt",
+    "passed": 16,
+    "sha256": "a37eec5fe084a1160156f5cd717ad28c8268ab9f01d0f99e009eb3989fe6fa50"
+  },
+  "controls": {
+    "report": "regressions-1/controls/controls/room-controls-check.txt",
+    "passed": 19,
+    "sha256": "f18da500138440ef05bd8cd0141abe021a8b66ac694df6ef1bd7c3cf90c2d871"
+  },
+  "input": {
+    "report": "regressions-1/input/input-check.txt",
+    "passed": 18,
+    "sha256": "6943b93cb97931e86159dee7ada75ce29b0409f3bcf6eb44281982b2678152f6"
+  },
+  "audio": {
+    "report": "regressions-1/audio/audio-check.txt",
+    "passed": 10,
+    "sha256": "06bb4cb4e49b28f9f59392e60ac055aaeeb3213e1bd1c8d257875dc2d7b0e58a"
+  },
+  "sequences_normal_clock": {
+    "report": "sequence-ui-1/sequence-ui-check.txt",
+    "passed": 12,
+    "sha256": "66b68055ea87f7755b1a0639d5141974b5fe91666fc49be6aa9b80915b0e7bf3"
+  },
+  "room24": {
+    "report": "ui-5/scope-ui-check.txt",
+    "passed": 2,
+    "sha256": "49ff229a2c149e66616233d0b084159b7b1b9f7c7c0b0c37346c89a89fec29ec"
+  },
+  "room41_partial_report": {
+    "report": "ui-1/scope-ui-check.txt",
+    "passed": 7,
+    "sha256": "6fc5c503b2f29712a162151906e17fa3d28d3b6aab390aa0087b07496ae33f63",
+    "note": "Both Room41 responses and normal-clock/final43 checks passed; subsequent Room24 instant view wait failed. Room24 validated separately after start-room harness correction."
+  },
+  "roomAudit": {
+    "rooms": 76,
+    "gaps": 0,
+    "changedPixels": 0,
+    "refreshedPngs": 0
+  }
+}

@@ -1,0 +1,1673 @@
+{
+  "counts": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "regressed": [],
+  "added": [
+    {
+      "owner": "Room 24 object 432 Verb 0x36",
+      "status": "Validated state preview",
+      "frames": 421,
+      "rooms": [
+        24
+      ],
+      "sceneTrace": [
+        "cutscene at Room 24 local script 204 +0x0000 runs script 2",
+        "cutscene at Room 24 local script 215 +0x0000 runs script 2",
+        "endCutscene at Room 24 local script 215 +0x00BC runs script 3",
+        "cutscene at Room 24 local script 215 +0x0000 runs script 2",
+        "endCutscene at Room 24 local script 215 +0x00BC runs script 3",
+        "endCutscene at Room 24 local script 204 +0x0080 runs script 3"
+      ]
+    },
+    {
+      "owner": "Room 41 object 633 Verb 0x41",
+      "status": "Validated state preview",
+      "frames": 1729,
+      "rooms": [
+        41,
+        42,
+        43,
+        60
+      ],
+      "sceneTrace": [
+        "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+        "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+        "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+        "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+        "cutscene at Script 90 +0x0000 runs script 2",
+        "endCutscene at Script 90 +0x0730 runs script 3"
+      ]
+    },
+    {
+      "owner": "Room 41 object 633 Verb 0x4B",
+      "status": "Validated state preview",
+      "frames": 1723,
+      "rooms": [
+        41,
+        42,
+        43,
+        60
+      ],
+      "sceneTrace": [
+        "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+        "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+        "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+        "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+        "cutscene at Script 90 +0x0000 runs script 2",
+        "endCutscene at Script 90 +0x0730 runs script 3"
+      ]
+    }
+  ],
+  "changed": [
+    {
+      "owner": "Room 02 object 154 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        2
+      ],
+      "rooms": [
+        2
+      ]
+    },
+    {
+      "owner": "Room 02 object 156 Verb 0x3A",
+      "oldFrames": 228,
+      "frames": 485,
+      "oldRooms": [
+        2,
+        3,
+        10,
+        11
+      ],
+      "rooms": [
+        2,
+        3,
+        10,
+        11
+      ]
+    },
+    {
+      "owner": "Room 02 object 156 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        2
+      ],
+      "rooms": [
+        2
+      ]
+    },
+    {
+      "owner": "Room 04 object 171 Verb 0x3A",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 171 Verb 0x3B",
+      "oldFrames": 87,
+      "frames": 114,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 171 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 172 Verb 0x3A",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 172 Verb 0x3B",
+      "oldFrames": 87,
+      "frames": 114,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 172 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 173 Verb 0x3A",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 173 Verb 0x3B",
+      "oldFrames": 87,
+      "frames": 114,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 173 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 174 Verb 0x3A",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 174 Verb 0x3B",
+      "oldFrames": 87,
+      "frames": 114,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 174 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 175 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 176 Verb 0x3A",
+      "oldFrames": 72,
+      "frames": 99,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 176 Verb 0x3B",
+      "oldFrames": 72,
+      "frames": 99,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 176 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 177 Verb 0x3B",
+      "oldFrames": 58,
+      "frames": 83,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 04 object 177 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        4
+      ],
+      "rooms": [
+        4
+      ]
+    },
+    {
+      "owner": "Room 06 object 205 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        6
+      ],
+      "rooms": [
+        6
+      ]
+    },
+    {
+      "owner": "Room 06 object 206 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        6
+      ],
+      "rooms": [
+        6
+      ]
+    },
+    {
+      "owner": "Room 06 object 207 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        6
+      ],
+      "rooms": [
+        6
+      ]
+    },
+    {
+      "owner": "Room 06 object 209 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        6
+      ],
+      "rooms": [
+        6
+      ]
+    },
+    {
+      "owner": "Room 06 object 210 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        6
+      ],
+      "rooms": [
+        6
+      ]
+    },
+    {
+      "owner": "Room 06 object 211 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        6
+      ],
+      "rooms": [
+        6
+      ]
+    },
+    {
+      "owner": "Room 06 object 214 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        6
+      ],
+      "rooms": [
+        6
+      ]
+    },
+    {
+      "owner": "Room 08 object 256 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        8
+      ],
+      "rooms": [
+        8
+      ]
+    },
+    {
+      "owner": "Room 08 object 257 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        8
+      ],
+      "rooms": [
+        8
+      ]
+    },
+    {
+      "owner": "Room 08 object 258 Verb 0x3F",
+      "oldFrames": 121,
+      "frames": 104,
+      "oldRooms": [
+        8
+      ],
+      "rooms": [
+        8
+      ]
+    },
+    {
+      "owner": "Room 08 object 258 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        8
+      ],
+      "rooms": [
+        8
+      ]
+    },
+    {
+      "owner": "Room 09 object 270 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        9
+      ],
+      "rooms": [
+        9
+      ]
+    },
+    {
+      "owner": "Room 09 object 272 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        9
+      ],
+      "rooms": [
+        9
+      ]
+    },
+    {
+      "owner": "Room 10 object 296 Verb 0x3B",
+      "oldFrames": 66,
+      "frames": 93,
+      "oldRooms": [
+        10
+      ],
+      "rooms": [
+        10
+      ]
+    },
+    {
+      "owner": "Room 10 object 296 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        10
+      ],
+      "rooms": [
+        10
+      ]
+    },
+    {
+      "owner": "Room 10 object 297 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        10
+      ],
+      "rooms": [
+        10
+      ]
+    },
+    {
+      "owner": "Room 10 object 298 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        10
+      ],
+      "rooms": [
+        10
+      ]
+    },
+    {
+      "owner": "Room 10 object 299 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        10
+      ],
+      "rooms": [
+        10
+      ]
+    },
+    {
+      "owner": "Room 10 object 300 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        10
+      ],
+      "rooms": [
+        10
+      ]
+    },
+    {
+      "owner": "Room 13 object 325 Verb 0x3A",
+      "oldFrames": 111,
+      "frames": 138,
+      "oldRooms": [
+        13
+      ],
+      "rooms": [
+        13
+      ]
+    },
+    {
+      "owner": "Room 13 object 325 Verb 0x41",
+      "oldFrames": 106,
+      "frames": 133,
+      "oldRooms": [
+        13
+      ],
+      "rooms": [
+        13
+      ]
+    },
+    {
+      "owner": "Room 13 object 325 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        13
+      ],
+      "rooms": [
+        13
+      ]
+    },
+    {
+      "owner": "Room 16 object 350 Verb 0x48",
+      "oldFrames": 71,
+      "frames": 98,
+      "oldRooms": [
+        16
+      ],
+      "rooms": [
+        16
+      ]
+    },
+    {
+      "owner": "Room 16 object 350 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        16
+      ],
+      "rooms": [
+        16
+      ]
+    },
+    {
+      "owner": "Room 17 object 357 Verb 0x3B",
+      "oldFrames": 58,
+      "frames": 75,
+      "oldRooms": [
+        17
+      ],
+      "rooms": [
+        17
+      ]
+    },
+    {
+      "owner": "Room 17 object 357 Verb 0x56",
+      "oldFrames": 72,
+      "frames": 99,
+      "oldRooms": [
+        17
+      ],
+      "rooms": [
+        17
+      ]
+    },
+    {
+      "owner": "Room 17 object 358 Verb 0x3B",
+      "oldFrames": 58,
+      "frames": 75,
+      "oldRooms": [
+        17
+      ],
+      "rooms": [
+        17
+      ]
+    },
+    {
+      "owner": "Room 17 object 358 Verb 0x56",
+      "oldFrames": 72,
+      "frames": 99,
+      "oldRooms": [
+        17
+      ],
+      "rooms": [
+        17
+      ]
+    },
+    {
+      "owner": "Room 18 object 369 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        18
+      ],
+      "rooms": [
+        18
+      ]
+    },
+    {
+      "owner": "Room 18 object 370 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        18
+      ],
+      "rooms": [
+        18
+      ]
+    },
+    {
+      "owner": "Room 18 object 371 Verb 0x3A",
+      "oldFrames": 58,
+      "frames": 82,
+      "oldRooms": [
+        18
+      ],
+      "rooms": [
+        18
+      ]
+    },
+    {
+      "owner": "Room 18 object 371 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        18
+      ],
+      "rooms": [
+        18
+      ]
+    },
+    {
+      "owner": "Room 20 object 386 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        20
+      ],
+      "rooms": [
+        20
+      ]
+    },
+    {
+      "owner": "Room 20 object 387 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        20
+      ],
+      "rooms": [
+        20
+      ]
+    },
+    {
+      "owner": "Room 20 object 388 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        20
+      ],
+      "rooms": [
+        20
+      ]
+    },
+    {
+      "owner": "Room 20 object 389 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        20
+      ],
+      "rooms": [
+        20
+      ]
+    },
+    {
+      "owner": "Room 22 object 403 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        22
+      ],
+      "rooms": [
+        22
+      ]
+    },
+    {
+      "owner": "Room 22 object 404 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        22
+      ],
+      "rooms": [
+        22
+      ]
+    },
+    {
+      "owner": "Room 22 object 405 Verb 0x3A",
+      "oldFrames": 61,
+      "frames": 88,
+      "oldRooms": [
+        22
+      ],
+      "rooms": [
+        22
+      ]
+    },
+    {
+      "owner": "Room 22 object 405 Verb 0x45",
+      "oldFrames": 58,
+      "frames": 80,
+      "oldRooms": [
+        22
+      ],
+      "rooms": [
+        22
+      ]
+    },
+    {
+      "owner": "Room 22 object 405 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        22
+      ],
+      "rooms": [
+        22
+      ]
+    },
+    {
+      "owner": "Room 23 object 422 Verb 0x47",
+      "oldFrames": 72,
+      "frames": 62,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 23 object 422 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 104,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 23 object 423 Verb 0x47",
+      "oldFrames": 72,
+      "frames": 62,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 23 object 423 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 104,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 23 object 424 Verb 0x47",
+      "oldFrames": 72,
+      "frames": 62,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 23 object 424 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 104,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 23 object 425 Verb 0x47",
+      "oldFrames": 72,
+      "frames": 62,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 23 object 425 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 104,
+      "oldRooms": [
+        23
+      ],
+      "rooms": [
+        23
+      ]
+    },
+    {
+      "owner": "Room 24 object 431 Verb 0x3B",
+      "oldFrames": 58,
+      "frames": 80,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 24 object 431 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 24 object 433 Verb 0x3F",
+      "oldFrames": 71,
+      "frames": 98,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 24 object 433 Verb 0x47",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 24 object 433 Verb 0x49",
+      "oldFrames": 84,
+      "frames": 111,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 24 object 433 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 24 object 434 Verb 0x47",
+      "oldFrames": 67,
+      "frames": 96,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 24 object 434 Verb 0x56",
+      "oldFrames": 70,
+      "frames": 99,
+      "oldRooms": [
+        24
+      ],
+      "rooms": [
+        24
+      ]
+    },
+    {
+      "owner": "Room 26 object 464 Verb 0x56",
+      "oldFrames": 77,
+      "frames": 104,
+      "oldRooms": [
+        26
+      ],
+      "rooms": [
+        26
+      ]
+    },
+    {
+      "owner": "Room 28 object 466 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 467 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 468 Verb 0x49",
+      "oldFrames": 77,
+      "frames": 104,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 468 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 469 Verb 0x49",
+      "oldFrames": 77,
+      "frames": 104,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 469 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 470 Verb 0x3D",
+      "oldFrames": 78,
+      "frames": 258,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 470 Verb 0x56",
+      "oldFrames": 72,
+      "frames": 101,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 471 Verb 0x3D",
+      "oldFrames": 78,
+      "frames": 258,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 471 Verb 0x56",
+      "oldFrames": 72,
+      "frames": 101,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 472 Verb 0x3D",
+      "oldFrames": 78,
+      "frames": 258,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 472 Verb 0x56",
+      "oldFrames": 72,
+      "frames": 101,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 473 Verb 0x3C",
+      "oldFrames": 78,
+      "frames": 210,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 473 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 102,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 474 Verb 0x3C",
+      "oldFrames": 78,
+      "frames": 210,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 474 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 102,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 475 Verb 0x3C",
+      "oldFrames": 78,
+      "frames": 210,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 28 object 475 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 102,
+      "oldRooms": [
+        28
+      ],
+      "rooms": [
+        28
+      ]
+    },
+    {
+      "owner": "Room 31 object 523 Verb 0x46",
+      "oldFrames": 69,
+      "frames": 96,
+      "oldRooms": [
+        31
+      ],
+      "rooms": [
+        31
+      ]
+    },
+    {
+      "owner": "Room 31 object 523 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        31
+      ],
+      "rooms": [
+        31
+      ]
+    },
+    {
+      "owner": "Room 31 object 524 Verb 0x45",
+      "oldFrames": 58,
+      "frames": 83,
+      "oldRooms": [
+        31
+      ],
+      "rooms": [
+        31
+      ]
+    },
+    {
+      "owner": "Room 31 object 524 Verb 0x56",
+      "oldFrames": 73,
+      "frames": 100,
+      "oldRooms": [
+        31
+      ],
+      "rooms": [
+        31
+      ]
+    },
+    {
+      "owner": "Room 31 object 525 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 104,
+      "oldRooms": [
+        31
+      ],
+      "rooms": [
+        31
+      ]
+    },
+    {
+      "owner": "Room 33 object 544 Verb 0x41",
+      "oldFrames": 72,
+      "frames": 99,
+      "oldRooms": [
+        33
+      ],
+      "rooms": [
+        33
+      ]
+    },
+    {
+      "owner": "Room 33 object 544 Verb 0x56",
+      "oldFrames": 78,
+      "frames": 105,
+      "oldRooms": [
+        33
+      ],
+      "rooms": [
+        33
+      ]
+    },
+    {
+      "owner": "Room 34 object 562 Verb 0x3B",
+      "oldFrames": 58,
+      "frames": 80,
+      "oldRooms": [
+        34
+      ],
+      "rooms": [
+        34
+      ]
+    },
+    {
+      "owner": "Room 34 object 562 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        34
+      ],
+      "rooms": [
+        34
+      ]
+    },
+    {
+      "owner": "Room 34 object 586 Verb 0x43",
+      "oldFrames": 66,
+      "frames": 93,
+      "oldRooms": [
+        34
+      ],
+      "rooms": [
+        34
+      ]
+    },
+    {
+      "owner": "Room 34 object 586 Verb 0x44",
+      "oldFrames": 66,
+      "frames": 93,
+      "oldRooms": [
+        34
+      ],
+      "rooms": [
+        34
+      ]
+    },
+    {
+      "owner": "Room 34 object 586 Verb 0x56",
+      "oldFrames": 69,
+      "frames": 96,
+      "oldRooms": [
+        34
+      ],
+      "rooms": [
+        34
+      ]
+    },
+    {
+      "owner": "Room 35 object 589 Verb 0x3B",
+      "oldFrames": 58,
+      "frames": 346,
+      "oldRooms": [
+        35
+      ],
+      "rooms": [
+        35
+      ]
+    },
+    {
+      "owner": "Room 35 object 589 Verb 0x56",
+      "oldFrames": 346,
+      "frames": 347,
+      "oldRooms": [
+        35
+      ],
+      "rooms": [
+        35
+      ]
+    },
+    {
+      "owner": "Room 35 object 596 Verb 0x56",
+      "oldFrames": 346,
+      "frames": 347,
+      "oldRooms": [
+        35
+      ],
+      "rooms": [
+        35
+      ]
+    },
+    {
+      "owner": "Room 37 object 604 Verb 0x46",
+      "oldFrames": 59,
+      "frames": 86,
+      "oldRooms": [
+        37
+      ],
+      "rooms": [
+        37
+      ]
+    },
+    {
+      "owner": "Room 37 object 604 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        37
+      ],
+      "rooms": [
+        37
+      ]
+    },
+    {
+      "owner": "Room 38 object 610 Verb 0x3D",
+      "oldFrames": 65,
+      "frames": 92,
+      "oldRooms": [
+        38
+      ],
+      "rooms": [
+        38
+      ]
+    },
+    {
+      "owner": "Room 38 object 610 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        38
+      ],
+      "rooms": [
+        38
+      ]
+    },
+    {
+      "owner": "Room 38 object 616 Verb 0x3A",
+      "oldFrames": 62,
+      "frames": 89,
+      "oldRooms": [
+        38
+      ],
+      "rooms": [
+        38
+      ]
+    },
+    {
+      "owner": "Room 38 object 616 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        38
+      ],
+      "rooms": [
+        38
+      ]
+    },
+    {
+      "owner": "Room 38 object 617 Verb 0x3B",
+      "oldFrames": 58,
+      "frames": 82,
+      "oldRooms": [
+        38
+      ],
+      "rooms": [
+        38
+      ]
+    },
+    {
+      "owner": "Room 38 object 617 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        38
+      ],
+      "rooms": [
+        38
+      ]
+    },
+    {
+      "owner": "Room 41 object 633 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        41
+      ],
+      "rooms": [
+        41
+      ]
+    },
+    {
+      "owner": "Room 43 object 640 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        43
+      ],
+      "rooms": [
+        43
+      ]
+    },
+    {
+      "owner": "Room 43 object 643 Verb 0x3B",
+      "oldFrames": 66,
+      "frames": 93,
+      "oldRooms": [
+        43
+      ],
+      "rooms": [
+        43
+      ]
+    },
+    {
+      "owner": "Room 43 object 643 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        43
+      ],
+      "rooms": [
+        43
+      ]
+    },
+    {
+      "owner": "Room 46 object 682 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        46
+      ],
+      "rooms": [
+        46
+      ]
+    },
+    {
+      "owner": "Room 46 object 683 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        46
+      ],
+      "rooms": [
+        46
+      ]
+    },
+    {
+      "owner": "Room 46 object 684 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        46
+      ],
+      "rooms": [
+        46
+      ]
+    },
+    {
+      "owner": "Room 46 object 685 Verb 0x56",
+      "oldFrames": 74,
+      "frames": 101,
+      "oldRooms": [
+        46
+      ],
+      "rooms": [
+        46
+      ]
+    },
+    {
+      "owner": "Room 62 object 808 Verb 0x56",
+      "oldFrames": 81,
+      "frames": 108,
+      "oldRooms": [
+        62
+      ],
+      "rooms": [
+        62
+      ]
+    },
+    {
+      "owner": "Room 62 object 809 Verb 0x56",
+      "oldFrames": 81,
+      "frames": 108,
+      "oldRooms": [
+        62
+      ],
+      "rooms": [
+        62
+      ]
+    },
+    {
+      "owner": "Room 62 object 810 Verb 0x56",
+      "oldFrames": 75,
+      "frames": 102,
+      "oldRooms": [
+        62
+      ],
+      "rooms": [
+        62
+      ]
+    },
+    {
+      "owner": "Room 63 object 820 Verb 0x56",
+      "oldFrames": 72,
+      "frames": 99,
+      "oldRooms": [
+        63
+      ],
+      "rooms": [
+        63
+      ]
+    },
+    {
+      "owner": "Room 65 object 828 Verb 0x56",
+      "oldFrames": 76,
+      "frames": 103,
+      "oldRooms": [
+        65
+      ],
+      "rooms": [
+        65
+      ]
+    }
+  ],
+  "membershipMismatches": [],
+  "auditSha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353",
+  "sourceFilesMatch": true,
+  "established": [
+    {
+      "id": "opening",
+      "startRoom": 69,
+      "rooms": [
+        1,
+        2,
+        53,
+        69
+      ],
+      "frames": 812,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+      "sceneTrace": []
+    },
+    {
+      "id": "Room 08 object 255 Verb 0x38",
+      "startRoom": 8,
+      "rooms": [
+        3,
+        8,
+        9,
+        11,
+        54,
+        67
+      ],
+      "frames": 2864,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+      "sceneTrace": [
+        "cutscene at Script 46 +0x0000 runs script 2",
+        "endCutscene at Script 46 +0x1421 runs script 3"
+      ]
+    },
+    {
+      "id": "Room 10 object 295 Verb 0x38",
+      "startRoom": 10,
+      "rooms": [
+        10,
+        11,
+        13
+      ],
+      "frames": 334,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+      "sceneTrace": [
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3"
+      ]
+    },
+    {
+      "id": "Room 36 object 599 Verb 0x38",
+      "startRoom": 36,
+      "rooms": [
+        36,
+        37,
+        38,
+        58
+      ],
+      "frames": 866,
+      "source": "Validated fresh seed-0 established recipe, identical setup to App replay. Catalog arrival/direct verb/click timing and opening answer remain assumed. Membership from the start room and observed session rooms, not static load operands.",
+      "sceneTrace": [
+        "cutscene at Script 86 +0x0000 runs script 2",
+        "endCutscene at Script 86 +0x055C runs script 3"
+      ]
+    }
+  ],
+  "sequences": [
+    {
+      "id": "sequence-052-053",
+      "startRoom": 10,
+      "rooms": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "frames": 701,
+      "stages": [
+        {
+          "stage": 1,
+          "frames": 0,
+          "room": 10
+        },
+        {
+          "stage": 3,
+          "frames": 334,
+          "room": 13
+        }
+      ],
+      "boundaries": [
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3",
+        "cutscene at Script 53 +0x0000 runs script 2",
+        "endCutscene at Script 53 +0x02AC runs script 3"
+      ]
+    },
+    {
+      "id": "sequence-086-087",
+      "startRoom": 36,
+      "rooms": [
+        34,
+        36,
+        37,
+        38,
+        39,
+        40,
+        58,
+        68
+      ],
+      "frames": 2930,
+      "stages": [
+        {
+          "stage": 1,
+          "frames": 0,
+          "room": 37
+        },
+        {
+          "stage": 3,
+          "frames": 32,
+          "room": 37
+        },
+        {
+          "stage": 5,
+          "frames": 898,
+          "room": 38
+        }
+      ],
+      "boundaries": [
+        "cutscene at Script 86 +0x0000 runs script 2",
+        "endCutscene at Script 86 +0x055C runs script 3",
+        "cutscene at Script 87 +0x0000 runs script 2",
+        "endCutscene at Script 87 +0x09B9 runs script 3"
+      ]
+    }
+  ]
+}

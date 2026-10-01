@@ -72,7 +72,7 @@ public sealed record LoomObjectActionResult(
 /// bounded execution change the snapshot. Unsupported state or timing is
 /// recorded and prevents the snapshot from being labelled faithful.
 /// </summary>
-public sealed class LoomExplorationSession
+public sealed partial class LoomExplorationSession
 {
     private const int MaxNestedScripts = 8;
     private readonly GameLibrary _game;
@@ -1391,6 +1391,7 @@ public sealed class LoomExplorationSession
         var beforeEvents = _visitEvents.Count;
         var runnable = _pending.ToArray();
         _pending.Clear();
+        _frameScripts.AddRange(runnable);
         _stopped.Clear();
         _dispatchScope++;
         _entersRoomLoads++;
@@ -1398,6 +1399,7 @@ public sealed class LoomExplorationSession
         {
             foreach (var item in runnable)
             {
+                _frameScripts.Remove(item);
                 // A room load earlier in this frame ended the room's scripts.
                 if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
                 // An earlier script in this frame may have stopped this one.
@@ -1419,6 +1421,7 @@ public sealed class LoomExplorationSession
         {
             _dispatchScope--;
             _entersRoomLoads--;
+            _frameScripts.Clear();
         }
         StepWalksAndCamera();
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
@@ -1598,7 +1601,8 @@ public sealed class LoomExplorationSession
     private (bool Running, string? Estimate) IsScriptRunning(int number)
     {
         var running = _executing.Any(frame => frame.Number == number) ||
-                      _pending.Any(item => item.ScriptNumber == number);
+                      _pending.Any(item => item.ScriptNumber == number) ||
+                      _frameScripts.Any(item => item.ScriptNumber == number && !_stopped.Contains(number));
         return running || !_endedUnmodelled.Contains(number)
             ? (running, null)
             : (false, $"script {number} ended at a step the preview does not model, so it may still run in the game");
@@ -1611,6 +1615,9 @@ public sealed class LoomExplorationSession
     private readonly List<LoomRandomPick> _picks = [];
     // Scripts running now, outermost first; the last one is the current script.
     private readonly List<ScriptFrame> _executing = [];
+    // Slots still awaiting their turn this frame remain visible to nested
+    // freeze/unfreeze and isScriptRunning, as vm.slot does in runAllScripts.
+    private readonly List<PendingScript> _frameScripts = [];
     // beginCutscene's vm.cutSceneData stack, and the script whose cutscene start
     // script is running (vm.cutSceneScriptIndex), which freezeScripts leaves running.
     private readonly Stack<(ushort Data, ScriptFrame? Owner)> _cutscenes = new();
@@ -1818,7 +1825,19 @@ public sealed class LoomExplorationSession
         {
             result = _executor.Execute(script, _runtime.ObjectStates, objects,
                 runtime: _runtime, startOffset: startOffset, initialLocals: locals,
-                onEvent: (scriptEvent, _) => HandleEvent(scriptEvent, depth),
+                onEvent: (scriptEvent, _) =>
+                {
+                    var handling = HandleEvent(scriptEvent, depth);
+                    // runScriptNested restores a caller only when its freezeCount is zero.
+                    // A child may freeze its still-executing parent; save the parent's next
+                    // instruction instead of letting it open another scope while frozen.
+                    if (string.IsNullOrEmpty(handling) && frame.FreezeCount > 0)
+                    {
+                        _visitTrace.Add($"{frame.Label} pauses after {scriptEvent.Operation} +0x{scriptEvent.Offset:X4}: nested execution froze its caller");
+                        return LoomBoundedScriptExecutor.PauseAfterEvent;
+                    }
+                    return handling;
+                },
                 estimatedLocals: estimatedLocals, pathEstimated: pathEstimated);
         }
         finally
@@ -2084,7 +2103,9 @@ public sealed class LoomExplorationSession
             return "freezeScripts flag depends on an unknown variable";
         var current = _executing.Count > 0 ? _executing[^1] : null;
         var slots = _executing.Where(frame => frame != current)
-            .Concat(_pending.Select(item => item.Frame)).Distinct().ToArray();
+            .Concat(_pending.Select(item => item.Frame))
+            .Concat(_frameScripts.Where(item => item.ScriptNumber is not int number || !_stopped.Contains(number)).Select(item => item.Frame))
+            .Distinct().ToArray();
         if (flag != 0)
         {
             foreach (var slot in slots.Where(slot => !slot.FreezeResistant || flag >= 0x80))

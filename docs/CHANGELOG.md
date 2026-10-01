@@ -6,6 +6,7 @@ Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/h
 
 | Change | Result | Record |
 | --- | --- | --- |
+| Nested scope scheduling and three promotions | Frozen callers suspend; upcoming slots stay accessible; Room24/432 and Room41/63341/4B complete;334 starts,168/235 literal sites; late096/native Room41 input retained unresolved | [scope validation](../.verification/draft-scopes-20261001/validation.md) |
 | Generic sequence replays | 052/input/053 and086/look/087 promoted with audited per-stage waits, actual memberships and pause/cancellation guards;331 starts; literal-root gaps retained | [sequence validation](../.verification/sequence-replays-20261001/validation.md) |
 | Continued source routes | 052/input completes053 and086/look completes087, normal WPF8/8; Room41/096 remain unmatched, all site gaps retained; main Release rebuilt | [route investigation](../.verification/coverage-routes-20261001/validation.md) |
 | Sound-unblocked catalog promotion | 38 additional validated previews: 329 starts, 163/235 sites, 55 unresolved owners; all 38 WPF replays verified, global21/21 and room20/20 | [promotion](../.verification/native-replay-coverage-20261001/validation.md) |
