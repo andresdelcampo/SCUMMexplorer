@@ -32,6 +32,8 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (1 October)
 
+Spell-row layout refinement completed: 26-pixel rows with vertically centered text, note selectors, checkboxes and Advanced provenance. Visible WPF47/47 and minimum-size screenshots inspected; main Release rebuilt. [Validation](../.verification/spell-row-layout-20261001/validation.md).
+
 Latest staff correction completed: inclusive native note levels (boot3=C,D,E), eight choices/no None, staff-required note controls, native staff/score positions with white outlined unavailable notes, and sixteen drafts including loaded Transcend C′ F G C. Ordinary catalog browsing preserves higher user levels and raises only the verified held-staff3/known DC5 seven-note floor; unknown per-room minima remain unresolved. Replay/source-route setup opts out. Final Core275/275 and visible WPF47/47; all363 roots, sequences and76 pixels unchanged. [Current validation](../.verification/staff-correction-20261001/validation.md). Earlier fifteen-slot/exclusive-limit statements below are superseded.
 
 Bounded source-route investigation completed without new promotions: native Room41 targeting reaches634, but draft input still refuses high notes at level3; late096's actor4 has finished moving and retains inherited uncertainty. Fresh18/369 and18/371 routes never establish Room20, so guarded probes retain both incomplete206 responses. The four fresh incomplete roots and123 unresolved edges remain. Next: native staff progression/active633, late096 certainty, and source arrivals for the incomplete roots. [Source findings and reproduction](../.verification/staff-correction-20261001/source-routes.md).

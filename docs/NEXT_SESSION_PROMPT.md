@@ -2,6 +2,7 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOO
 
 State at checkpoint (1 October 2026):
 
+* Latest layout refinement: Game Status spell rows reduced from32 to26 pixels, all text/notes/checkboxes vertically centered, including editing controls and Advanced provenance. Existing visible WPF47/47 passes; normal/Advanced minimum screenshots inspected. Record .verification/spell-row-layout-20261001/validation.md. Source-route checkpoint8e3411e remains unchanged.
 * Main checkout D:\Documents\Personal\Code Projects\SCUMMexplorer, master. Previous UI checkpoint eb69a36/handoff88797e1. Latest completed staff/status correction committed a438ffd; subsequent source findings and this handoff are a separate completed task. No source-route/catalog promotion.
 * Final main Release rebuilt with zero warnings/errors. Exact cwd main checkout; command rtk proxy dotnet build SCUMMexplorer.slnx -c Release. User executable Exe/SCUMMexplorer.App/Release/net10.0-windows/SCUMMexplorer.App.exe. No user app stopped; WPF harnesses close themselves.
 * Unrelated untracked .verification/object-click-room17/, .verification/room-object-interaction/ and tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs preserved. Games/scummvm untouched. No worktree operations, no push/publication. Never revive obsolete detached8878cd9.

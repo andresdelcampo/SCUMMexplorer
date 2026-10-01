@@ -6,6 +6,7 @@ Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/h
 
 | Change | Result | Record |
 | --- | --- | --- |
+| Compact spell rows | Height reduced from32 to26; spell text, note selectors, checkboxes and Advanced provenance vertically centered; visible WPF47/47, final Release build clean | [validation](../.verification/spell-row-layout-20261001/validation.md) |
 | Staff bound, native score and Transcend | Inclusive levels1..8/no None, native combined artwork, sixteen loaded drafts, catalog-only higher-level preservation and verified limited floors; Core275/275, WPF47/47, all363 roots/sequences/pixels unchanged | [validation](../.verification/staff-correction-20261001/validation.md) |
 | Continued source dependency audit | Native634 is a valid Room41 aim target but high-note refusal remains; late096 actor movement finishes but certainty blocks load45; both fresh20 arrivals remain unestablished; all four fresh incomplete owners retained | [source findings](../.verification/staff-correction-20261001/source-routes.md) |
 | Requested UI refinements | Completed toolbar/Advanced visibility, uniform original names, ready-to-edit Apply/Close, musical labels, separate Learned/Can reverse, two verified name pairs and native graphical staff/contiguous notes; Core265/265, WPF42/42, all363 roots/sequences/pixels unchanged | [validation](../.verification/ui-refinements-20261001/validation.md), [next prompt](NEXT_SESSION_PROMPT.md) |
