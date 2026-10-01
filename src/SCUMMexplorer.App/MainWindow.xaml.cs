@@ -41,6 +41,7 @@ public partial class MainWindow : Window
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "SCUMMexplorer", "last-folder.txt");
     private GameLibrary? _game;
+    private LoomReplayCatalog? _replayCatalog;
     private LoomRelationshipIndex? _relationshipIndex;
     private GameResource? _selectedResource;
     private GameResource? _lastViewedRoomResource;
@@ -185,6 +186,7 @@ public partial class MainWindow : Window
             ? _stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
             : null;
         _game = game;
+        _replayCatalog = LoomReplayCatalog.Load(game);
         _scriptReader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
         _verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
         _sceneBatches = null;
@@ -2909,7 +2911,7 @@ public partial class MainWindow : Window
     /// the verb only leads into the room, and the game's click at that point starts the cutscene.
     /// </summary>
     private sealed record KnownCutscene(string Title, int RoomId, int ObjectId, int VerbId, int Script, int[] Rooms, string Source,
-        (int X, int Y)? Click = null)
+        (int X, int Y)? Click = null, string Category = "Scenes", int[]? TextScripts = null)
     {
         /// <summary>Whether the cutscene starts in the room or its script loads it (<see cref="Rooms"/>).</summary>
         public bool Shows(int roomId) => RoomId == roomId || Rooms.Contains(roomId);
@@ -2918,19 +2920,30 @@ public partial class MainWindow : Window
     // Rooms: the rooms each script loads (loadRoom and loadRoomWithEgo operands, decoded; see .verification/cutscene-menu-rooms).
     private static readonly KnownCutscene[] KnownCutscenes =
     [
-        new("Script 052: Room 10 → Room 11 → Room 13", 10, 295, 0x38, 52, [11, 13],
+        new("Room 10 to Room 13", 10, 295, 0x38, 52, [11, 13],
             "Room 10 object 295 verb 0x38 starts script 052 (+0x0003): a cutscene that waits 60 jiffies (+0x0041), loads Room 11 " +
             "(+0x0045), sets its skip point (+0x00C6) and ends with loadRoomWithEgo into Room 13 (+0x017D)."),
-        new("Script 046: the Elders' trial", 8, 255, 0x38, 46, [9, 67, 54, 3, 8, 11],
+        new("The Elders' trial", 8, 255, 0x38, 46, [9, 67, 54, 3, 8, 11],
             "Room 08 object 255 verb 0x38 (the sanctuary door) starts script 046 (+0x0000): a cutscene with its skip point at " +
             "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x1421 in Room 09."),
-        new("Script 086: the firewood scene (Room 37)", 36, 599, 0x38, 86, [37, 58, 38],
+        new("The firewood scene", 36, 599, 0x38, 86, [37, 58, 38],
             "Room 36 object 599 verb 0x38 leads into Room 37 (loadRoomWithEgo, walk to (24, 101)). On a first visit " +
             "(bit[0xD9A] is 0) Room 37's entry starts local 200 (+0x0097), which chains to script 086 once Bobbin's walk box " +
             "becomes 8 (+0x0016–0x001D). Script 086: Stoke mistakes Bobbin for Rusty; Rooms 37, 58, 37 and 38; skip point " +
             "+0x0023; endCutscene +0x055C in Room 38.",
             (109, 102))
     ];
+
+    private IEnumerable<KnownCutscene> AllCutscenes()
+    {
+        foreach (var scene in KnownCutscenes) yield return scene;
+        foreach (var recipe in _replayCatalog?.Replays ?? [])
+        {
+            if (KnownCutscenes.Any(k => k.RoomId == recipe.Room && k.ObjectId == recipe.ObjectId && k.VerbId == recipe.Verb)) continue;
+            yield return new(recipe.Title, recipe.Room, recipe.ObjectId, recipe.Verb, recipe.ScriptIds.FirstOrDefault(),
+                recipe.Rooms, recipe.Source, Category: recipe.Category, TextScripts: recipe.ScriptIds);
+        }
+    }
 
     /// <summary>
     /// The known cutscenes by the indexed script that prints their texts, for Game Texts' "Play this cutscene".
@@ -2944,6 +2957,16 @@ public partial class MainWindow : Window
         foreach (var cutscene in KnownCutscenes)
             cutscenes[cutscene.Script] = new(cutscene.Title, CutsceneStartNote(cutscene),
                 () => PlayFromGameTexts(() => PlayKnownCutscene(cutscene)));
+        // A unique reached story script has an unambiguous replay descriptor. Shared
+        // helpers and scripts with multiple starts do not inherit an arbitrary replay.
+        foreach (var group in AllCutscenes().Where(c => c.TextScripts is not null)
+                     .SelectMany(c => c.TextScripts!.Where(id => id >= 44).Select(id => (id, scene: c))).GroupBy(x => x.id))
+            if (group.Count() == 1 && !cutscenes.ContainsKey(group.Key))
+            {
+                var cutscene = group.Single().scene;
+                cutscenes[group.Key] = new(cutscene.Title, CutsceneStartNote(cutscene),
+                    () => PlayFromGameTexts(() => PlayKnownCutscene(cutscene)));
+            }
         return cutscenes;
     }
 
@@ -2957,9 +2980,18 @@ public partial class MainWindow : Window
     private void CutsceneMenu_Click(object sender, RoutedEventArgs e)
     {
         if (!CanStartCutscene) return;
-        var choices = CutsceneChoices();
-        if (choices.Count == 1) choices[0].Play();
-        else if (choices.Count > 1) BuildCutsceneMenu().IsOpen = true;
+        var picker = BuildCutscenePicker();
+        if (picker.ShowDialog() == true) picker.SelectedPlay?.Invoke();
+    }
+
+    private CutscenePickerWindow BuildCutscenePicker()
+    {
+        var items = new List<CutscenePickerItem> { new("The opening", "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening) };
+        foreach (var scene in AllCutscenes())
+            items.Add(new(scene.Title, scene.Category, scene.Source + " " + CutsceneStartNote(scene), () => PlayKnownCutscene(scene)));
+        foreach (var gap in _replayCatalog?.Coverage ?? [])
+            items.Add(new(gap.Title, "Needs validation", gap.Source, null, gap.Status));
+        return new(items, _replayCatalog?.Summary ?? "Four established replay starts.") { Owner = this };
     }
 
     private List<(string Title, string Source, Action Play)> CutsceneChoices()
@@ -2967,7 +2999,7 @@ public partial class MainWindow : Window
         var choices = new List<(string Title, string Source, Action Play)>();
         if (_game?.Id != GameId.Loom || _session is null) return choices;
         choices.Add(("The opening", OpeningSource + " " + OpeningStartNote, PlayOpening));
-        foreach (var cutscene in KnownCutscenes)
+        foreach (var cutscene in AllCutscenes())
             choices.Add((cutscene.Script switch
             {
                 52 => "Room 10 to Room 13",
@@ -3007,7 +3039,7 @@ public partial class MainWindow : Window
     /// <summary>The rooms script 044 loads (+0x00B9, +0x00C2, +0x03BA; decoded).</summary>
     private static readonly int[] OpeningRooms = [1, 2, 53];
 
-    private const string OpeningTitle = "The opening (script 044)";
+    private const string OpeningTitle = "The opening";
 
     private const string OpeningSource =
         "Script 001 +0x0222 starts script 044 and waits for it (+0x0225): Rooms 01, 02, 01, 02, 53 and 02, with the copyright " +
@@ -3040,8 +3072,9 @@ public partial class MainWindow : Window
 
     private static string CutsceneStartNote(KnownCutscene cutscene) =>
         $"Stated start: a fresh session after the boot (seed 0), Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
-        $"there is assumed), then object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} run directly: an exploration action, not " +
-        "the game's click (Bobbin does not walk there, and the object may be untouchable in this state). " +
+        "there is assumed), " + (cutscene.ObjectId == 0 ? "then the room's entry scripts play on the clock. " :
+        $"then object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} run directly: an exploration action, not " +
+        "the game's click (Bobbin does not walk there, and the object may be untouchable in this state). Draft response verbs do not simulate casting a draft. ") +
         (cutscene.Click is { } click
             ? $"The verb leads into the next room; once Bobbin's arrival walk ends (run before the view shows it), the game's click at " +
               $"({click.X}, {click.Y}) (assumed input) walks him on, and the room's own code starts the cutscene. "
@@ -3061,8 +3094,8 @@ public partial class MainWindow : Window
         // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
         _sceneSound.Attach(_game, _session);
         _session.VisitRoom(room);
-        var action = _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
-        var uncertainties = action.Uncertainties.ToList();
+        var action = cutscene.ObjectId == 0 ? null : _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
+        var uncertainties = (action?.Uncertainties ?? _session.Snapshot.Uncertainties).ToList();
         if (cutscene.Click is { } click)
         {
             // The verb's loadRoomWithEgo walks Bobbin in; the click is sent once he stands, as a player's would be.
@@ -3078,7 +3111,7 @@ public partial class MainWindow : Window
         }
         StartPlayback(cutscene.Click is { } sent
                 ? $"Object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} (run directly), then a click at ({sent.X}, {sent.Y})"
-                : $"Object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} (run directly)",
+                : cutscene.ObjectId == 0 ? $"Room {cutscene.RoomId:00}'s entry scripts" : $"Object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} (run directly)",
             action, room, doorways: null, leftRoom: false);
         StatusText.Text = $"Playing {cutscene.Title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
         StatusText.ToolTip = CutsceneStartNote(cutscene) + Environment.NewLine + cutscene.Source + Environment.NewLine +

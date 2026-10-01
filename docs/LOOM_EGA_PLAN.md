@@ -36,6 +36,8 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 Task 2: Game Texts appears only in Advanced; normal mode return preserves Interactive. PickerCheck 9/9 with visibility and round-trip checks; Release zero warnings/errors.
 
+Task 3: global searchable replay picker, 75 scene starts + 216 dialogue/reaction previews, exact loaded-data validation, shared plain descriptors for unambiguous Game Texts links. 363 source-derived start probes; 139/235 cutscene sites reached by completed previews. 79 owners have outstanding sites shown in Needs validation; full-game coverage remains incomplete. [Discovery and remaining work](LOOM_CUTSCENE_DISCOVERY.md), [audit](../.verification/replay-coverage-20261001/audit.md), [WPF validation](../.verification/replay-coverage-20261001/validation.md): 21/21, existing tests 249/249. No executor/state hacks.
+
 **Requested for next session (planning only):**
 
 - Replace the normal-view Game Texts button with **Play Cutscene**, giving access to any cutscene in the game rather than only the current room's small replay list. Show **Game Texts only in Advanced**.
