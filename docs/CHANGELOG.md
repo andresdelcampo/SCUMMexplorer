@@ -1,5 +1,13 @@
 # Changelog
 
+## 2 October: bounded actual callee/caller correspondence and native fields
+
+| Change | Result | Record |
+| --- | --- | --- |
+| `00f01a8` | Actual callee assignments and independent child/host/caller/restoration correspondence;no numeric origins or successful-return/completion proof | [calls](../.verification/runtime-correspondence-20261002/call-validation.md) |
+| `8110900` | Copied drawObject/stored drawing positions/native signed _userPut;explicit identical/absent position/input notifications;native/effect barriers retained | [native](../.verification/runtime-correspondence-20261002/native-validation.md) |
+| Final preservation | Core535/focused209;13 exact packets/legacy/call/completion streams;76 original writer terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/native challenge exact;clean final main Release;App0/no launch/no push;57 protected files unchanged;71.49% literal-site coverage unchanged | [validation](../.verification/runtime-correspondence-20261002/validation.md) |
+
 ## 2 October: actual callee/caller boundaries and notified native mutations
 
 | Change | Result | Record |

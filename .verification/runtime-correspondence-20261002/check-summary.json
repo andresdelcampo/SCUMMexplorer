@@ -1,0 +1,174 @@
+{
+  "core": 535,
+  "focused": 209,
+  "newActualCallCases": 13,
+  "newRemainingAccessCases": 12,
+  "newNativeMutationCases": 16,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "fullRecipePacketsUnchanged": 13,
+  "latestLegacyChronologiesAndCompletionRecordsExact": true,
+  "independentOwnInvocationTerminals": 76,
+  "actualRecipeWriterResumedTerminalChains": 0,
+  "numericSourceReportUnchanged": true,
+  "numericWorlds": 162,
+  "flagCases": 52,
+  "comparisons": 51,
+  "overlaps": 14,
+  "fabricatedMatches": 4,
+  "practiceArgumentCases": 12,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "sourceChallengeExpressions": 3,
+  "sourceChallengeSteps": 17,
+  "sourceChallengeEveryFrameTransparent": true,
+  "observedInitializationAndDispatchBoundaries": true,
+  "argumentEqualitySuppliesNoLocalOrigins": true,
+  "generalCalleeReturnAndEffectsRemainUnresolved": true,
+  "rawNativeSameValueMutationsStillRequireNotification": true,
+  "replayCoverage": {
+    "validatedLiteralSites": 168,
+    "totalLiteralSites": 235,
+    "coveredPercent": 71.49,
+    "scope": "validated literal cutscene sites only; unchanged, not an overall project-completion percentage"
+  },
+  "callBoundaries": 304620,
+  "dispatches": 884,
+  "reports": [
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/checks-final/core-tests.txt",
+      "sha256": "616bf25cfd93595536c37afa35b26e151a8c3dbf8b94ae5423914e7d1d1ff4f9"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/checks-final/release-build.txt",
+      "sha256": "6d7cc1f376ad7bbec8469f563ccf71ee1fbb768d4a9e0896c2a415df074f87b3"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/focused-final/tests.txt",
+      "sha256": "344238dc0bbcf8e51976d50dd5936c7e2663e8da6e3a0b861d1351c438477ed2"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/final-release-build.txt",
+      "sha256": "c1d53b0846d03c27209b50e121bd9f0f9aedb756f6ce0fc429b9d18cd9af832c"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/app-state.txt",
+      "sha256": "b38816ef20f01225a399b68fa8554b75dc646c0c4e4b2bd4d7340914a74b0372"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/final-evidence/observer-build.txt",
+      "sha256": "47c5957bf429458ea5c50aa5ea9849aed260cd8a14b39968ffb1739329d24b86"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/final-evidence/expanded-build.txt",
+      "sha256": "c7e1cb6f63035b4b70450044430417dd172ea175d11ea4a069b53a0dd0af3e0f"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/room-audit-2/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/room-audit-2/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/png-comparison-2.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/final-evidence/numeric-fresh.json",
+      "sha256": "975698a5dddda7ac7e3ba00f019dc5a8cddf3ab2f34aaf6cb6b9bad626cb3fab"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/passive-final/passive-expressions.json",
+      "sha256": "221792c63fd738ebeb780bf64b94faaff0d5203323b9a64e71a8cc0d1a960836"
+    },
+    {
+      "path": "D:/Documents/Personal/Code Projects/SCUMMexplorer/.verification/runtime-correspondence-20261002/correspondence-summary.json",
+      "sha256": "eb220855ee265cff95cd0938f3fe9f30a66ba27a23f6f3eb24030cea082c33e6"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/native-fields/fields.json",
+      "sha256": "2d56c644e6085394f535c2ddcdf57e898e11e73b7b0dfd7cbc7e6eea600c4459"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/native-fields/build.txt",
+      "sha256": "3b29ccc285dc249888094e04d33db3e1bd77ad9ee7292d459a6b73dc5cc51aef"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/native-fields/run.txt",
+      "sha256": "38b20e154daedc01fca0294626fd27998a2f55acc8505798be45cb2aed38b21a"
+    },
+    {
+      "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/native-fields/field-audit/source-manifest.json",
+      "sha256": "04c689ab586652f99e70f4f7a68b6511030e29d7eaf34fcfd39a7dead5a4457c"
+    },
+    {
+      "path": "D:/Documents/Personal/Code Projects/SCUMMexplorer/.verification/runtime-correspondence-20261002/native-field-summary.json",
+      "sha256": "41c16afaabaf5d06a0a6b5bebada00e39479bb3164f8572d6f6c9f0ed323aa6a"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/RuntimeCorrespondenceFinalSession-20261002/final-evidence/observer-1/source-manifest.json",
+    "sha256": "ad53e89daa6424c34e5e1ef520a39d258415b4293a62ebea6c9e42a612ab7428"
+  },
+  "newCorrespondenceCases": 20,
+  "newNativeFieldCases": 14,
+  "actualCalleeAssignmentsAndStructuralCorrespondence": true,
+  "bindings": 366,
+  "immediateStopCorrespondences": 55,
+  "observedCallerResumptions": 0,
+  "additionalCopiedNativeFields": 0,
+  "sourceChallengeNativeFieldReads": 11,
+  "sourceChallengeNativeFieldDomains": {
+    "user-input": 1,
+    "object-position-x": 5,
+    "object-position-y": 5
+  },
+  "sourceChallengeExplicitNotificationInvalidations": 11,
+  "protectedFilesUnchanged": 57
+}
