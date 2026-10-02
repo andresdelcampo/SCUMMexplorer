@@ -1,0 +1,435 @@
+{
+  "scope": "Separate unchanged loaded raw4 recipe with camera-only copied observations; native provenance stays unknown, no loaded lifetime or completion claim.",
+  "recipe": "room41-raw4-click",
+  "recipeAndWholePacketExact": true,
+  "entirePreviousCameraChronologyExact": true,
+  "cameraWaits": 55,
+  "copiedFields": 220,
+  "loadedCameraLifetimeClaim": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "selected": [
+    {
+      "frame": 0,
+      "observation": {
+        "Sequence": 12,
+        "Slot": 5,
+        "ParentSlot": 1,
+        "Invocation": 1299,
+        "Site": {
+          "Script": 44,
+          "Context": null,
+          "Container": 2,
+          "ResourceOffset": 26451,
+          "Stage": "instruction",
+          "Offset": 717,
+          "Operation": "waitFor",
+          "Operands": "camera"
+        },
+        "PathEstimated": false,
+        "SourceAccess": {
+          "Bindings": [
+            {
+              "Role": "implicit-camera",
+              "Operand": "var[0x002]",
+              "Key": "var[0x002]",
+              "Value": 160,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            }
+          ],
+          "Barrier": "unmodelled instruction access",
+          "Limits": [
+            "numeric storage operands only; native actor/object/message effects remain independent",
+            "selected stream only; raw external writes, concurrency, scheduling and callee return remain limits"
+          ],
+          "NativeDependencies": [
+            {
+              "Domain": "camera-wait",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 160,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": null,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "native wait/timing dependencies not exhaustively captured"
+            },
+            {
+              "Domain": "camera-destination-x",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 160,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 472,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-mode",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 160,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 3,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-follows",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 160,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 0,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-moving-to-actor",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 160,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 0,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "observation": {
+        "Sequence": 13,
+        "Slot": 5,
+        "ParentSlot": 1,
+        "Invocation": 1304,
+        "Site": {
+          "Script": 44,
+          "Context": null,
+          "Container": 2,
+          "ResourceOffset": 26451,
+          "Stage": "instruction",
+          "Offset": 717,
+          "Operation": "waitFor",
+          "Operands": "camera"
+        },
+        "PathEstimated": false,
+        "SourceAccess": {
+          "Bindings": [
+            {
+              "Role": "implicit-camera",
+              "Operand": "var[0x002]",
+              "Key": "var[0x002]",
+              "Value": 168,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            }
+          ],
+          "Barrier": "unmodelled instruction access",
+          "Limits": [
+            "numeric storage operands only; native actor/object/message effects remain independent",
+            "selected stream only; raw external writes, concurrency, scheduling and callee return remain limits"
+          ],
+          "NativeDependencies": [
+            {
+              "Domain": "camera-wait",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 168,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": null,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "native wait/timing dependencies not exhaustively captured"
+            },
+            {
+              "Domain": "camera-destination-x",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 168,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 472,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-mode",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 168,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 3,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-follows",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 168,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 0,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-moving-to-actor",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 168,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 0,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "observation": {
+        "Sequence": 14,
+        "Slot": 5,
+        "ParentSlot": 1,
+        "Invocation": 1309,
+        "Site": {
+          "Script": 44,
+          "Context": null,
+          "Container": 2,
+          "ResourceOffset": 26451,
+          "Stage": "instruction",
+          "Offset": 717,
+          "Operation": "waitFor",
+          "Operands": "camera"
+        },
+        "PathEstimated": false,
+        "SourceAccess": {
+          "Bindings": [
+            {
+              "Role": "implicit-camera",
+              "Operand": "var[0x002]",
+              "Key": "var[0x002]",
+              "Value": 176,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            }
+          ],
+          "Barrier": "unmodelled instruction access",
+          "Limits": [
+            "numeric storage operands only; native actor/object/message effects remain independent",
+            "selected stream only; raw external writes, concurrency, scheduling and callee return remain limits"
+          ],
+          "NativeDependencies": [
+            {
+              "Domain": "camera-wait",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 176,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": null,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "native wait/timing dependencies not exhaustively captured"
+            },
+            {
+              "Domain": "camera-destination-x",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 176,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 472,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-mode",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 176,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 3,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-follows",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 176,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 0,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            },
+            {
+              "Domain": "camera-moving-to-actor",
+              "Selector": {
+                "Role": "implicit-camera",
+                "Operand": "var[0x002]",
+                "Key": "var[0x002]",
+                "Value": 176,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              "Value": 0,
+              "ValueEstimated": null,
+              "Estimate": null,
+              "UnresolvedReason": "independent native camera field provenance/timing/effects not established"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "reports": [
+    {
+      "path": "Exe/RuntimeBoundariesFinalSession4-20261002/camera/recipe.json",
+      "sha256": "a09e57c29c81cff8e1e82cd8f4876a8a1662c9ceb16186fb47291f7a8a9e6c62"
+    },
+    {
+      "path": "Exe/RuntimeBoundariesFinalSession4-20261002/camera/build.txt",
+      "sha256": "ab4c08f06109a70452fbb911c7681d6c8e4f62c9307091332d1d73826d0017dd"
+    },
+    {
+      "path": "Exe/RuntimeBoundariesFinalSession4-20261002/camera/run.txt",
+      "sha256": "96fa80302ca99daacf05aa13d3c051adac8ecb1d38f2889a4dbcc36d164ff2cb"
+    },
+    {
+      "path": "Exe/RuntimeBoundariesFinalSession4-20261002/camera/observer-1/source-manifest.json",
+      "sha256": "f69d0581c35906547ff5862accc6f3f2b8fcf80852a0ff90ce9eb9f9b2938d6c"
+    },
+    {
+      "path": "Exe/RuntimeBoundariesFinalSession4-20261002/camera/route-1/room41-raw4-click.json",
+      "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+    },
+    {
+      "path": "Exe/RuntimeBoundariesFinalSession4-20261002/camera/route-1/room41-raw4-click-camera.jsonl",
+      "sha256": "6811f59ce6869d619b195b6ac67b12bdb999567f2b2795d4d334eb4ad11216e4"
+    }
+  ]
+}

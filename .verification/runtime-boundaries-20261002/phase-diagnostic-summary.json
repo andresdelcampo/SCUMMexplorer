@@ -1,0 +1,43 @@
+{
+  "scope": "Tracker-only diagnostic on one unchanged actual raw4 stream; no execution or recipe patch.",
+  "firstDivergenceFrame": 3323,
+  "dispatch": 405,
+  "callerRejectionRetained": "partial caller end",
+  "oldUpdates": 10794,
+  "overconstrainedUpdates": 10786,
+  "independentAssignmentRestored": true,
+  "entireCorrectedLoadedPacketAndStreamsExact": true,
+  "chronologyRenumbered": false,
+  "assertionRelaxed": false,
+  "completionClaim": false,
+  "reports": [
+    {
+      "path": "Exe/RuntimeBoundaryDiagnostic-20261002/route-2/old.jsonl",
+      "sha256": "0ab882b7a1c416c109fa0da69a7e2a255c14f051c4cfe936305c0697738da022"
+    },
+    {
+      "path": "Exe/RuntimeBoundaryDiagnostic-20261002/route-2/new.jsonl",
+      "sha256": "6a2d7999f6e0fa9e1262696abf3c3a05519b444d5f115b6ed7422f0f1fe9a091"
+    },
+    {
+      "path": "Exe/RuntimeBoundaryDiagnostic-20261002/route-2/room41-raw4-click.json",
+      "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+    },
+    {
+      "path": "Exe/RuntimeBoundaryDiagnostic-20261002/loaded-fixed/route-1/room41-raw4-click.json",
+      "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+    },
+    {
+      "path": "Exe/RuntimeBoundaryDiagnostic-20261002/loaded-fixed/route-1/room41-raw4-click-calls.jsonl",
+      "sha256": "03a19b7f8e6851596232286c42429700668f63c9ad3e74dde24aab5d8ad44232"
+    },
+    {
+      "path": "Exe/RuntimeBoundaryDiagnostic-20261002/loaded-fixed/route-1/room41-raw4-click-object-selections.jsonl",
+      "sha256": "8e034ad8c6a1db257b83f157222ac65206ec193ed58d0af018b6068e22df11a2"
+    },
+    {
+      "path": "Exe/RuntimeBoundaryDiagnostic-20261002/loaded-fixed/route-1/room41-raw4-click-correspondence.jsonl",
+      "sha256": "ecb464a5a94434781fb466ebbee6de7fff34e94b38c3a265c629f97ebd3a9877"
+    }
+  ]
+}
