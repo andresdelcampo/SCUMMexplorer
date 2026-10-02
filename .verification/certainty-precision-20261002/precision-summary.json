@@ -1,0 +1,4548 @@
+{
+  "source": {
+    "path": "Exe/VerificationSession-20261001/native-code-1/code.tsv",
+    "sha256": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569"
+  },
+  "sourceDomains": {
+    "path": ".verification/room41-certainty-20261002/source-domains.json",
+    "sha256": "ccb91156982909ecd6919f9333b9dbbd4eacca347d0205b37a3600181afa3401"
+  },
+  "practice": {
+    "writers": [
+      {
+        "owner": "script 030",
+        "offset": "+0x0000",
+        "operation": "move",
+        "operands": "bit[0xD6C] = 0x0001"
+      },
+      {
+        "owner": "script 031",
+        "offset": "+0x0227",
+        "operation": "move",
+        "operands": "bit[0xD6C] = 0x0000"
+      }
+    ],
+    "instructionOnlyExits": [
+      {
+        "initial": 0,
+        "visitedStates": 97,
+        "exits": [
+          {
+            "offset": "+0x0019",
+            "operation": "stopScript",
+            "value": 0
+          },
+          {
+            "offset": "+0x0322",
+            "operation": "stopObjectCode",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "initial": 1,
+        "visitedStates": 117,
+        "exits": [
+          {
+            "offset": "+0x024D",
+            "operation": "stopScript",
+            "value": 0
+          },
+          {
+            "offset": "+0x0322",
+            "operation": "stopObjectCode",
+            "value": 0
+          }
+        ]
+      }
+    ],
+    "scope": "Script031 instruction CFG including resumed frames; only D6C branch semantics. No callee, scheduler, cancellation or native-completion proof.",
+    "consequence": "All completed instruction-only paths leave D6C0; suspended/stopped/concurrent paths and inherited path estimates still require provenance."
+  },
+  "handshake": {
+    "packet": {
+      "path": "Exe/CertaintyPrecisionSession-20261002/gaps-1/room41-raw4-click.json",
+      "sha256": "c1897713c36164b9d31052f485e2fab89dcd140848cb7e6de4dce5d8af4c8c03"
+    },
+    "isolated": {
+      "path": "Exe/CertaintyPrecisionSession-20261002/handshake-gaps-1/traces.json",
+      "sha256": "608472da6556979c7fa2d05bedeca38f047bc1de0eed13fcd93968ae747847ef"
+    },
+    "firstRecordedTransition": {
+      "before": {
+        "stage": "draft-2-gap-2-5",
+        "eventCount": 2489,
+        "variables": {
+          "bit[0xD6C]": {
+            "value": 0,
+            "estimated": true
+          },
+          "bit[0xD70]": {
+            "value": null,
+            "estimated": false
+          },
+          "var[0x064]": {
+            "value": 2,
+            "estimated": false
+          },
+          "var[0x067]": {
+            "value": 207,
+            "estimated": false
+          },
+          "var[0x062]": {
+            "value": 2,
+            "estimated": false
+          },
+          "var[0x07A]": {
+            "value": 3,
+            "estimated": false
+          },
+          "bit[0xD67]": {
+            "value": 1,
+            "estimated": false
+          },
+          "var[0x056]": {
+            "value": 1,
+            "estimated": false
+          },
+          "var[0x057]": {
+            "value": 1,
+            "estimated": false
+          },
+          "var[0x058]": {
+            "value": 3,
+            "estimated": false
+          },
+          "var[0x059]": {
+            "value": 2,
+            "estimated": false
+          }
+        },
+        "actorPlacement": null,
+        "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+      },
+      "after": {
+        "stage": "draft-2-gap-2-6",
+        "eventCount": 2490,
+        "variables": {
+          "bit[0xD6C]": {
+            "value": 0,
+            "estimated": true
+          },
+          "bit[0xD70]": {
+            "value": null,
+            "estimated": false
+          },
+          "var[0x064]": {
+            "value": 2,
+            "estimated": false
+          },
+          "var[0x067]": {
+            "value": 207,
+            "estimated": false
+          },
+          "var[0x062]": {
+            "value": 2,
+            "estimated": false
+          },
+          "var[0x07A]": {
+            "value": 3,
+            "estimated": false
+          },
+          "bit[0xD67]": {
+            "value": 0,
+            "estimated": true
+          },
+          "var[0x056]": {
+            "value": 1,
+            "estimated": false
+          },
+          "var[0x057]": {
+            "value": 1,
+            "estimated": false
+          },
+          "var[0x058]": {
+            "value": 3,
+            "estimated": false
+          },
+          "var[0x059]": {
+            "value": 2,
+            "estimated": false
+          }
+        },
+        "actorPlacement": null,
+        "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+      },
+      "pendingBefore": {
+        "label": "Script 20",
+        "number": 20,
+        "room": null,
+        "offset": 40,
+        "freeze": 0,
+        "delay": null,
+        "locals": {
+          "local[0x000]": 0,
+          "local[0x001]": 1,
+          "local[0x002]": 0,
+          "local[0x003]": 0,
+          "local[0x004]": 0,
+          "local[0x005]": 0,
+          "local[0x006]": 0,
+          "local[0x007]": 0,
+          "local[0x008]": 0,
+          "local[0x009]": 0,
+          "local[0x00A]": 0,
+          "local[0x00B]": 0,
+          "local[0x00C]": 0,
+          "local[0x00D]": 0,
+          "local[0x00E]": 0,
+          "local[0x00F]": 0,
+          "local[0x010]": 0,
+          "local[0x011]": 0,
+          "local[0x012]": 0,
+          "local[0x013]": 0,
+          "local[0x014]": 0,
+          "local[0x015]": 0,
+          "local[0x016]": 0,
+          "local[0x017]": 0,
+          "local[0x018]": 0,
+          "local[0x019]": 0
+        },
+        "pathEstimated": false,
+        "estimatedLocals": []
+      },
+      "pendingAfter": {
+        "label": "Script 20",
+        "number": 20,
+        "room": null,
+        "offset": 96,
+        "freeze": 0,
+        "delay": null,
+        "locals": {
+          "local[0x000]": 1,
+          "local[0x001]": 1,
+          "local[0x002]": 0,
+          "local[0x003]": 0,
+          "local[0x004]": 0,
+          "local[0x005]": 0,
+          "local[0x006]": 0,
+          "local[0x007]": 0,
+          "local[0x008]": 0,
+          "local[0x009]": 0,
+          "local[0x00A]": 0,
+          "local[0x00B]": 0,
+          "local[0x00C]": 0,
+          "local[0x00D]": 0,
+          "local[0x00E]": 0,
+          "local[0x00F]": 0,
+          "local[0x010]": 0,
+          "local[0x011]": 0,
+          "local[0x012]": 0,
+          "local[0x013]": 0,
+          "local[0x014]": 0,
+          "local[0x015]": 0,
+          "local[0x016]": 0,
+          "local[0x017]": 0,
+          "local[0x018]": 0,
+          "local[0x019]": 0
+        },
+        "pathEstimated": true,
+        "estimatedLocals": [
+          "local[0x000]"
+        ]
+      },
+      "inference": "Source020 +0028 reads D67 before increment002D; the first recorded path transition follows031 completion. Snapshots bound the frame, not the intermediate instruction."
+    },
+    "instructionOnlyExits": {
+      "initial": 0,
+      "visitedStates": 120,
+      "exits": [
+        {
+          "offset": "+0x0019",
+          "operation": "stopScript",
+          "value": 1
+        },
+        {
+          "offset": "+0x024D",
+          "operation": "stopScript",
+          "value": 0
+        },
+        {
+          "offset": "+0x0322",
+          "operation": "stopObjectCode",
+          "value": 0
+        }
+      ]
+    },
+    "consequence": "D67 completion-wait branch taints020 despite known entered notes. Script031 early stop0019 can leave D671; blanket completion clearing is unsound."
+  },
+  "packedMasks": [
+    {
+      "slot": 0,
+      "bootWords": [
+        12930
+      ],
+      "masks": [
+        {
+          "source": "+0x001B",
+          "mask": 8192,
+          "possibleMaskedValues": [
+            8192
+          ]
+        },
+        {
+          "source": "+0x002A",
+          "mask": 4096,
+          "possibleMaskedValues": [
+            4096
+          ]
+        },
+        {
+          "source": "+0x0039",
+          "mask": 16384,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x0048",
+          "mask": 7,
+          "possibleMaskedValues": [
+            2
+          ]
+        },
+        {
+          "source": "+0x005C",
+          "mask": 56,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x0075",
+          "mask": 448,
+          "possibleMaskedValues": [
+            128
+          ]
+        },
+        {
+          "source": "+0x008E",
+          "mask": 3584,
+          "possibleMaskedValues": [
+            512
+          ]
+        }
+      ],
+      "optionalLearnedWrite": [
+        1
+      ],
+      "optionalUsedWrite": [
+        0,
+        1
+      ]
+    },
+    {
+      "slot": 1,
+      "bootWords": [
+        5193,
+        5120,
+        4177
+      ],
+      "masks": [
+        {
+          "source": "+0x001B",
+          "mask": 8192,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x002A",
+          "mask": 4096,
+          "possibleMaskedValues": [
+            4096
+          ]
+        },
+        {
+          "source": "+0x0039",
+          "mask": 16384,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x0048",
+          "mask": 7,
+          "possibleMaskedValues": [
+            0,
+            1
+          ]
+        },
+        {
+          "source": "+0x005C",
+          "mask": 56,
+          "possibleMaskedValues": [
+            0,
+            8,
+            16
+          ]
+        },
+        {
+          "source": "+0x0075",
+          "mask": 448,
+          "possibleMaskedValues": [
+            0,
+            64
+          ]
+        },
+        {
+          "source": "+0x008E",
+          "mask": 3584,
+          "possibleMaskedValues": [
+            0,
+            1024
+          ]
+        }
+      ],
+      "optionalLearnedWrite": [
+        0,
+        1
+      ],
+      "optionalUsedWrite": [
+        0,
+        1
+      ]
+    },
+    {
+      "slot": 2,
+      "bootWords": [
+        4616,
+        4608,
+        4617
+      ],
+      "masks": [
+        {
+          "source": "+0x001B",
+          "mask": 8192,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x002A",
+          "mask": 4096,
+          "possibleMaskedValues": [
+            4096
+          ]
+        },
+        {
+          "source": "+0x0039",
+          "mask": 16384,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x0048",
+          "mask": 7,
+          "possibleMaskedValues": [
+            0,
+            1
+          ]
+        },
+        {
+          "source": "+0x005C",
+          "mask": 56,
+          "possibleMaskedValues": [
+            0,
+            8
+          ]
+        },
+        {
+          "source": "+0x0075",
+          "mask": 448,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x008E",
+          "mask": 3584,
+          "possibleMaskedValues": [
+            512
+          ]
+        }
+      ],
+      "optionalLearnedWrite": [
+        0,
+        1
+      ],
+      "optionalUsedWrite": [
+        0,
+        1
+      ]
+    },
+    {
+      "slot": 3,
+      "bootWords": [
+        72,
+        513,
+        0
+      ],
+      "masks": [
+        {
+          "source": "+0x001B",
+          "mask": 8192,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x002A",
+          "mask": 4096,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x0039",
+          "mask": 16384,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x0048",
+          "mask": 7,
+          "possibleMaskedValues": [
+            0,
+            1
+          ]
+        },
+        {
+          "source": "+0x005C",
+          "mask": 56,
+          "possibleMaskedValues": [
+            0,
+            8
+          ]
+        },
+        {
+          "source": "+0x0075",
+          "mask": 448,
+          "possibleMaskedValues": [
+            0,
+            64
+          ]
+        },
+        {
+          "source": "+0x008E",
+          "mask": 3584,
+          "possibleMaskedValues": [
+            0,
+            512
+          ]
+        }
+      ],
+      "optionalLearnedWrite": [
+        0,
+        1
+      ],
+      "optionalUsedWrite": [
+        0,
+        1
+      ]
+    },
+    {
+      "slot": 4,
+      "bootWords": [
+        4120,
+        5195,
+        4305
+      ],
+      "masks": [
+        {
+          "source": "+0x001B",
+          "mask": 8192,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x002A",
+          "mask": 4096,
+          "possibleMaskedValues": [
+            4096
+          ]
+        },
+        {
+          "source": "+0x0039",
+          "mask": 16384,
+          "possibleMaskedValues": [
+            0
+          ]
+        },
+        {
+          "source": "+0x0048",
+          "mask": 7,
+          "possibleMaskedValues": [
+            0,
+            1,
+            3
+          ]
+        },
+        {
+          "source": "+0x005C",
+          "mask": 56,
+          "possibleMaskedValues": [
+            8,
+            16,
+            24
+          ]
+        },
+        {
+          "source": "+0x0075",
+          "mask": 448,
+          "possibleMaskedValues": [
+            0,
+            64,
+            192
+          ]
+        },
+        {
+          "source": "+0x008E",
+          "mask": 3584,
+          "possibleMaskedValues": [
+            0,
+            1024
+          ]
+        }
+      ],
+      "optionalLearnedWrite": [
+        0,
+        1
+      ],
+      "optionalUsedWrite": [
+        0,
+        1
+      ]
+    }
+  ],
+  "comparisons": 51,
+  "collisions": 0,
+  "firstComponentOverlaps": 14,
+  "finiteDomainConsequence": "Retain tuple correlations across the whole rejection predicate. Do not infer selected notes or path certainty from disjointness.",
+  "isolatedTraces": {
+    "path": "Exe/CertaintyPrecisionSession-20261002/certainty-2/traces.json",
+    "sha256": "23d9db9f3727e5416ff3e731bc555148097cfb211f1be125a3a4fd3b8e0d8ee2"
+  },
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/room41-1/direct41-source-level4-skip204.json",
+        "sha256": "58453eec817e345003c93d5106cd0363fabe3537d2f1c6f50bad3d8515f77937"
+      },
+      "elapsed": 5835,
+      "room": 43,
+      "begun": 15,
+      "ended": 15,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "draft-2-key-note-1",
+          "eventCount": 2479,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "eventCount": 2489,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "eventCount": 2498,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "eventCount": 2501,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 4,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "final",
+          "eventCount": 4088,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 4,
+              "estimated": true
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 3,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": true
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "draft-2-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 3,
+                "estimated": true
+              },
+              "after": {
+                "value": 3,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 4,
+                "estimated": true
+              },
+              "after": {
+                "value": 4,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-before",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-1",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-2",
+          "variables": {
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-3",
+          "variables": {
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-click",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/room41-1/room41-raw4-click.json",
+        "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+      },
+      "elapsed": 7659,
+      "room": 41,
+      "begun": 15,
+      "ended": 14,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "draft-2-key-note-1",
+          "eventCount": 2479,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "eventCount": 2489,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "eventCount": 2498,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "eventCount": 2501,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 4,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-4-before",
+          "eventCount": 3702,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 633,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 4,
+              "estimated": true
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 3,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": true
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "final",
+          "eventCount": 3800,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 4,
+              "estimated": true
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 4,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": true
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "draft-2-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 3,
+                "estimated": true
+              },
+              "after": {
+                "value": 3,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 4,
+                "estimated": true
+              },
+              "after": {
+                "value": 4,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-before",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-1",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-2",
+          "variables": {
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-3",
+          "variables": {
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-2",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-3",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-key",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/room41-1/room41-raw4-key.json",
+        "sha256": "d0a7e60717b2b0a7a4b5c58499f153ec3a19b80f50e67183e5c5cbc2eaf1e2de"
+      },
+      "elapsed": 7659,
+      "room": 41,
+      "begun": 15,
+      "ended": 14,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "draft-2-key-note-1",
+          "eventCount": 2479,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "eventCount": 2489,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "eventCount": 2498,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "eventCount": 2501,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 4,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-4-before",
+          "eventCount": 3702,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 633,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 4,
+              "estimated": true
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 3,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": true
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "final",
+          "eventCount": 3800,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 4,
+              "estimated": true
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 4,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": true
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "draft-2-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 3,
+                "estimated": true
+              },
+              "after": {
+                "value": 3,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 4,
+                "estimated": true
+              },
+              "after": {
+                "value": 4,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-before",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-1",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-2",
+          "variables": {
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-3",
+          "variables": {
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-2",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-3",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-click",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/room41-1/room41-raw6-click.json",
+        "sha256": "f90c09c5ec5bcd60476417d0558e5a47bca9c9163c33a58d55db9c676207c31f"
+      },
+      "elapsed": 4623,
+      "room": 41,
+      "begun": 12,
+      "ended": 11,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "draft-4-before",
+          "eventCount": 2089,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 633,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 6,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "final",
+          "eventCount": 2187,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 6,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 4,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": false
+            }
+          },
+          "actorPlacement": "actor 1's actorOps at +0x0017 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "draft-4-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-2",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-3",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-click-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-key",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/room41-1/room41-raw6-key.json",
+        "sha256": "34e64d6340a93f6912b9bcb93d748f07a179d34b0bbeba081f4c68ec3015bc64"
+      },
+      "elapsed": 4623,
+      "room": 41,
+      "begun": 12,
+      "ended": 11,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "draft-4-before",
+          "eventCount": 2089,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 633,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 6,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "final",
+          "eventCount": 2187,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 6,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 4,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": false
+            }
+          },
+          "actorPlacement": "actor 1's actorOps at +0x0017 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "draft-4-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-2",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-3",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-4-key-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/egg-first-1/native-level4-egg-dye-wheel.json",
+        "sha256": "dd2815c1717a023bfc047a99a68b871160fbd59a4609eb63f8cf30d0ce76d24a"
+      },
+      "elapsed": 3472,
+      "room": 62,
+      "begun": 9,
+      "ended": 9,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "draft-2-key-note-1",
+          "eventCount": 2479,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "eventCount": 2489,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "eventCount": 2498,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "eventCount": 2501,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 4,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "final",
+          "eventCount": 2803,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 808,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 4,
+              "estimated": true
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 3,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": true
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "draft-2-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 3,
+                "estimated": true
+              },
+              "after": {
+                "value": 3,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 4,
+                "estimated": true
+              },
+              "after": {
+                "value": 4,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-before",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-1",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-2",
+          "variables": {
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-3",
+          "variables": {
+            "var[0x059]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/dye-last-1/native-level4-egg-wheel-dye.json",
+        "sha256": "39705828a5c46a4ddcdc4d96b5467f38b8cdc16ef0e8460365e56b0bbf8ae0ad"
+      },
+      "elapsed": 3447,
+      "room": 6,
+      "begun": 9,
+      "ended": 9,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "draft-2-key-note-1",
+          "eventCount": 2666,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": false
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "eventCount": 2676,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 2,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": false
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "eventCount": 2685,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 3,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 1,
+              "estimated": false
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "eventCount": 2688,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 4,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": true
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        },
+        {
+          "stage": "final",
+          "eventCount": 2803,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": true
+            },
+            "var[0x067]": {
+              "value": 207,
+              "estimated": true
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x07A]": {
+              "value": 4,
+              "estimated": true
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x058]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": true
+            }
+          },
+          "actorPlacement": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick",
+          "actorPalette": "actor 1's actorOps at +0x0254 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "draft-1-before",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-1",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-2",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 2,
+                "estimated": true
+              },
+              "after": {
+                "value": 2,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-3",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 3,
+                "estimated": true
+              },
+              "after": {
+                "value": 3,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-1-key-note-4",
+          "variables": {
+            "var[0x062]": {
+              "before": {
+                "value": 4,
+                "estimated": true
+              },
+              "after": {
+                "value": 4,
+                "estimated": false
+              }
+            },
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0254 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-before",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-1",
+          "variables": {
+            "var[0x057]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "variables": {
+            "var[0x058]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            },
+            "var[0x059]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-3",
+          "variables": {
+            "var[0x059]": {
+              "before": {
+                "value": 1,
+                "estimated": true
+              },
+              "after": {
+                "value": 1,
+                "estimated": false
+              }
+            }
+          },
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "draft-2-key-note-4",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        },
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0254 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "late096-reached44",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/preserved-1/late096-reached44.json",
+        "sha256": "f72baaabd02edcbf9d446aacbb47f3088114d38f04cbff66cbcc6c9e38e8a8ba"
+      },
+      "elapsed": 4017,
+      "room": 43,
+      "begun": 4,
+      "ended": 3,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "final",
+          "eventCount": 1312,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": 0,
+              "estimated": true
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": "actor 1's actorOps at +0x0005 follows a seeded pick"
+        }
+      ],
+      "changes": [
+        {
+          "stage": "final",
+          "variables": {},
+          "actor": {
+            "actorPlacement": {
+              "before": "actor 1's actorOps at +0x0005 follows a seeded pick",
+              "after": null
+            },
+            "actorPalette": {
+              "before": null,
+              "after": "actor 1's actorOps at +0x0005 follows a seeded pick"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "late096-source-skip095",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/preserved-1/late096-source-skip095.json",
+        "sha256": "3f3ccbf796262d2812d755288d59975567d305ab43894ac43f94cc07c0e320cb"
+      },
+      "elapsed": 357,
+      "room": 46,
+      "begun": 4,
+      "ended": 4,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "final",
+          "eventCount": 1213,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": null,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": null
+        }
+      ],
+      "changes": []
+    },
+    {
+      "id": "sleep-source369-response390",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/preserved-1/sleep-source369-response390.json",
+        "sha256": "87bfae3c6891ad7ecefe4038c6fab2c0091b2de5fd237688235700a2c59f601c"
+      },
+      "elapsed": 1575,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "final",
+          "eventCount": 1177,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": null,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": null
+        }
+      ],
+      "changes": []
+    },
+    {
+      "id": "sleep-source369-response391",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/preserved-1/sleep-source369-response391.json",
+        "sha256": "8e4d149d0806d5d473f8984feedb60aa199b608b0c9cb1231580ea66c98bef1a"
+      },
+      "elapsed": 1575,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "final",
+          "eventCount": 1177,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": null,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": null
+        }
+      ],
+      "changes": []
+    },
+    {
+      "id": "sleep-source371-response390",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/preserved-1/sleep-source371-response390.json",
+        "sha256": "560fd93d78a6701c784b2b5f38db4130b7208b8365f049bdef43757e80ef76e3"
+      },
+      "elapsed": 1612,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "final",
+          "eventCount": 1181,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": null,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": null
+        }
+      ],
+      "changes": []
+    },
+    {
+      "id": "sleep-source371-response391",
+      "packet": {
+        "path": "Exe/CertaintyPrecisionSession-20261002/preserved-1/sleep-source371-response391.json",
+        "sha256": "c264750aa4d1c5e93d616909a9b713ca0cab77531ae07545bcd3b0a1b63bb665"
+      },
+      "elapsed": 1612,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "timingRoomsAndScopesUnchanged": true,
+      "observations": [
+        {
+          "stage": "final",
+          "eventCount": 1181,
+          "variables": {
+            "bit[0xD6C]": {
+              "value": null,
+              "estimated": false
+            },
+            "bit[0xD70]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x067]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x062]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": null,
+              "estimated": false
+            },
+            "var[0x056]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 0,
+              "estimated": false
+            }
+          },
+          "actorPlacement": null,
+          "actorPalette": null
+        }
+      ],
+      "changes": []
+    }
+  ],
+  "native090Completed": false
+}

@@ -104,7 +104,11 @@ foreach(var route in cases.EnumerateArray())
                     int noteId=((keyPacked>>(3*noteIndex))&7)+1;
                     actions.Add(session.PressKey("qwertyui"[noteId-1]));
                     Record($"draft-{keySlot}-key-note-{i+1}",0);
-                    for(int f=0;f<step.GetProperty("gap").GetInt32();f++)Advance();
+                    for(int f=0;f<step.GetProperty("gap").GetInt32();f++) {
+                        Advance();
+                        if(keySlot==2 && route.TryGetProperty("recordDraftGaps",out var recordGaps)&&recordGaps.GetBoolean())
+                            Record($"draft-{keySlot}-gap-{i+1}-{f+1}",0);
+                    }
                 } break;
             case "until-override":
                 string owner=step.GetProperty("owner").GetString()!;

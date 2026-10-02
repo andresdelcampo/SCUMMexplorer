@@ -2,6 +2,13 @@
 
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
+## 2 October: Room41 completion protocol and correlated-domain research
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Source completion/input audit | Four dye notes now known; gap snapshots bound020 D67 path taint; D6C terminal projection and D67 early-stop counterexample recorded without production resets | [evidence](../.verification/certainty-precision-20261002/validation.md) |
+| Packed-domain precision | Seven loaded023 masks,51 disjoint tuple comparisons and14 first-component overlaps; no native090 completion/promotion | [summary](../.verification/certainty-precision-20261002/precision-summary.json) |
+
 ## 2 October: generic palette certainty precision
 
 | Change | Result | Record |
