@@ -1,0 +1,61 @@
+{
+  "outcome": "Room24 three remaining sites complete through walking and repeated dye note keys.",
+  "inputFrames": 792,
+  "directFrames": 690,
+  "completedScopes": 4,
+  "conditionalExecutedBodyEvents": 115,
+  "pairedDifferences": {
+    "certainty": 93,
+    "estimatedArgumentIndexes": 2
+  },
+  "newSites": [
+    {
+      "owner": "Room 24 local 200",
+      "offset": "+0x001D"
+    },
+    {
+      "owner": "Room 24 local 200",
+      "offset": "+0x0089"
+    },
+    {
+      "owner": "Room 24 local 211",
+      "offset": "+0x0018"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 196,
+    "after": 199,
+    "total": 235,
+    "percent": 84.68,
+    "remaining": 36
+  },
+  "diagnosticCycles": 1,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 127,
+  "productionAndCatalogUnchanged": true,
+  "limitations": [
+    "Catalog arrival/default preview are exploration assumptions.",
+    "Supported staff/two notes/learned2 edits are labelled exploration setup.",
+    "Core API only; no WPF/physical input/native full-game proof.",
+    "Recorded body events are not exhaustive; all estimates retained.",
+    "No fresh single-action promotion."
+  ],
+  "evidence": {
+    "Exe\\Room24Input-20261003\\cycle-1\\input.json": "62d21cd625075fda73fcc45c086386571250a4cc3298ecfe638c7f5ca66b641c",
+    "Exe\\Room24Input-20261003\\cycle-1\\direct.json": "9cde18698914817ad51bac11086317af784375da370a1b5b78c78ea13ca2f7ed",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\Room10Input-20261003\\cycle-2\\input.json": "45bc809447e4695a970ef18efa5ef6f40766b08ec4903ceaadb3bb2c855aa0e6",
+    "Exe\\Room36Input-20261003\\cycle-2\\input.json": "64d54010713e91af16458a3ccfe8a73a94999a69cd12350a2b8c3921d2e9075f"
+  }
+}

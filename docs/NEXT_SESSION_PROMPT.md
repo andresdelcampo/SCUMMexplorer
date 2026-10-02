@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room24 three-site input cluster complete — 3 October
+
+After86a7501. Room24 box3/4 clicks and two dye keyboard casts complete all three remaining sites:200 +001D/+0089 and211 +0018. Source first dye changesC5=444→445 through211/213; repeat completes the refusal. Four balanced scopes,792 input/690 direct frames;115 recorded body events equal except93 retained certainty fields and two argument-estimate fields. Audited union196→199/235 (84.68%),36 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/prior evidence exact. [Validation](../.verification/room24-input-20261003/validation.md).
+
+Continue successive bounded audit tasks toward200K context per user; exact telemetry unavailable. Next candidate: Room15 watcher200 starts001D/006D via boxes3/5. Inspect source incoming gates then actual clicks. Keep Room24/36/10/23/25/34, sphere and Sharpening complete. Supported labelled spell setup authorized; notes/reverse flags unchanged. At most two diagnostic cycles per route without a route-relevant decision. Commit each task separately. No App launch, close, interaction, rebuild or push; main Release/Core662/broad remain dated.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from the Room24 checkpoint using docs/NEXT_SESSION_PROMPT.md. Audited union199/235 versus fresh single-action169/235. Start Room15 two watcher sites, then continue bounded audits toward200K context, commit each and preserve all constraints/history/protected57 and the running App.
+
 ## Latest: Room36 four watcher sites complete — 3 October
 
 Continues84da7df. Room36 accepted box10→4→3→9 clicks complete all four watcher200 sites001D/0048/0077/00A6,547frames,4/4 scopes,29 Executed/Conditional body events. Audited union192→196/235 (83.40%),39 remaining; separate fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two bounded cycles; failed first long walk retained/excluded. No production/catalog change. Protected57 and prior evidence exact; running App untouched. [Validation](../.verification/room36-input-20261003/validation.md).
