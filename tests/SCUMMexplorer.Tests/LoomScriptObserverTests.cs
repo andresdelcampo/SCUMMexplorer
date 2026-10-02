@@ -7,6 +7,113 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomScriptObserverTests
 {
     [Fact]
+    public void IndexedBindingsSeparateSelectedValueIndexAndInheritedPath()
+    {
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        runtime.GlobalVariables["var[0x060]"] = 0x1002; // Resolver masks the index to 12 bits.
+        runtime.GlobalVariables["var[0x034]"] = 17;
+        runtime.EstimatedVariables.Add("var[0x060]");
+        var records = ObserveOperands(runtime, "move", "local[0x001] = var[0x032+var[0x060]]", path: true);
+        var read = records[1].OperandBindings!.Single(b => b.Role == "source");
+        Assert.Equal("var[0x034]", read.Key);
+        Assert.Equal((ushort)17, read.Value);
+        Assert.False(read.ValueEstimated);
+        Assert.Equal((ushort)0x1002, read.Index!.Value);
+        Assert.True(read.Index.ValueEstimated);
+        Assert.True(records[1].PathEstimated);
+        Assert.Contains("local[0x001]", records[^1].Estimated);
+        Assert.Throws<NotSupportedException>(() => ((IList<LoomScriptOperandBinding>)records[1].OperandBindings!).Clear());
+        runtime.GlobalVariables["var[0x060]"] = 4;
+        Assert.Equal((ushort)0x1002, read.Index.Value);
+    }
+
+    [Fact]
+    public void UnknownAndFilteredIndexesNeverBindACellOrFabricateZero()
+    {
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        runtime.GlobalVariables.Remove("var[0x060]"); // Runtime initializes ordinary globals to zero.
+        runtime.GlobalVariables["var[0x032]"] = 9;
+        var unknown = ObserveOperands(runtime, "move", "local[0x001] = var[0x032+var[0x060]]")[1]
+            .OperandBindings!.Single(b => b.Role == "source");
+        Assert.Null(unknown.Key);
+        Assert.Null(unknown.Value);
+        Assert.Equal("unresolved index", unknown.UnresolvedReason);
+        runtime.GlobalVariables["var[0x060]"] = 0;
+        var filtered = ObserveOperands(runtime, "move", "local[0x001] = var[0x032+var[0x060]]",
+            include: key => key != "var[0x060]")[1].OperandBindings!.Single(b => b.Role == "source");
+        Assert.Null(filtered.Key);
+        Assert.Null(filtered.Value);
+        Assert.Equal("filtered operand", filtered.Index!.UnresolvedReason);
+    }
+
+    [Fact]
+    public void BitBindingsKeepBackingWordAndItsEstimateWithoutClaimingAWriter()
+    {
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        runtime.GlobalVariables["var[0x0D6]"] = 0x80;
+        runtime.EstimatedVariables.Add("var[0x0D6]");
+        var binding = ObserveOperands(runtime, "move", "local[0x001] = bit[0xD67]")[1]
+            .OperandBindings!.Single(b => b.Role == "source");
+        Assert.Equal("var[0x0D6]", binding.BackingWord);
+        Assert.Equal((ushort)1, binding.Value);
+        Assert.True(binding.ValueEstimated);
+        var filtered = ObserveOperands(runtime, "move", "local[0x001] = bit[0xD67]",
+            include: key => key != "var[0x0D6]")[1].OperandBindings!.Single(b => b.Role == "source");
+        Assert.Null(filtered.Value);
+        Assert.Null(filtered.ValueEstimated);
+    }
+
+    [Fact]
+    public void CallBindingsPreserveWholeArgumentOrderAndNestedIndexSelection()
+    {
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        runtime.GlobalVariables["var[0x060]"] = 2;
+        runtime.GlobalVariables["var[0x034]"] = 3;
+        runtime.GlobalVariables["var[0x055]"] = 8;
+        runtime.EstimatedVariables.Add("var[0x055]");
+        var bindings = ObserveOperands(runtime, "startScript",
+            "0x03, [var[0x052+var[0x032+var[0x060]]], 0x0000, local[0x000]]")[1].OperandBindings!;
+        Assert.Equal(new int?[] { 0, 1, 2 }, bindings.Where(b => b.Role == "argument").Select(b => b.ArgumentIndex));
+        var first = bindings[1];
+        Assert.Equal("var[0x055]", first.Key);
+        Assert.Equal((ushort)8, first.Value);
+        Assert.True(first.ValueEstimated);
+        Assert.Equal("var[0x034]", first.Index!.Key);
+        Assert.Equal("var[0x060]", first.Index.Index!.Key);
+        Assert.Null(bindings[2].Key); // Literal zero is distinct from missing input.
+        Assert.Equal((ushort)0, bindings[2].Value);
+        Assert.Equal("local[0x000]", bindings[3].Key);
+    }
+
+    [Fact]
+    public void BindingCapturePreservesWritesResultsAndDefaultObservationSequence()
+    {
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        runtime.GlobalVariables["var[0x060]"] = 0;
+        var defaults = ObserveOperands(runtime, "move", "var[0x060] = 0x0002", capture: false);
+        runtime.GlobalVariables["var[0x060]"] = 0;
+        var bound = ObserveOperands(runtime, "move", "var[0x060] = 0x0002");
+        Assert.Equal(defaults.Select(r => r.Sequence), bound.Select(r => r.Sequence));
+        Assert.Equal(defaults.Select(r => r.Values["var[0x060]"]), bound.Select(r => r.Values["var[0x060]"]));
+        Assert.All(defaults, r => Assert.Null(r.OperandBindings));
+        Assert.Equal((ushort)0, bound[1].OperandBindings![0].Value); // Pre-write destination.
+        Assert.Equal((ushort)2, bound[^1].Values["var[0x060]"]);
+        Assert.Null(bound[0].OperandBindings); // Begin/end do not imply an instruction access.
+        Assert.Null(bound[^1].OperandBindings);
+    }
+
+    private static List<LoomScriptObservation> ObserveOperands(LoomScriptRuntimeState runtime, string op,
+        string operands, bool path = false, Func<string, bool>? include = null, bool capture = true)
+    {
+        var records = new List<LoomScriptObservation>();
+        var code = new LoomScriptDisassembly(2, 1, 0, 2, 2,
+            [new(0, 0, op, operands, "00"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []);
+        new LoomBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
+            pathEstimated: path, observation: new(new(records.Add, includeKey: include, captureOperandBindings: capture), 1));
+        return records;
+    }
+
+    [Fact]
     public void SameTurnWriterAndReaderUseSequenceAndCausalSlotIdentity()
     {
         var observations = new List<LoomScriptObservation>();

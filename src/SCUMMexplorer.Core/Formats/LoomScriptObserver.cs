@@ -6,6 +6,16 @@ public sealed record LoomScriptObservationSite(int Script, string? Context, int 
     string Stage, int Offset, string? Operation = null, string? Operands = null);
 
 /// <summary>
+/// One decoded operand bound against the copied pre-instruction values. A selected cell and
+/// its index retain separate estimates; neither establishes a reached effect or source domain.
+/// Destinations describe their value before the instruction, never an inferred write. Missing
+/// or filtered values stay unresolved. BackingWord identifies a bit alias, not its writer.
+/// </summary>
+public sealed record LoomScriptOperandBinding(string Role, string Operand, string? Key, ushort? Value,
+    bool? ValueEstimated, LoomScriptOperandBinding? Index = null, string? BackingWord = null,
+    int? ArgumentIndex = null, string? UnresolvedReason = null);
+
+/// <summary>
 /// A copied observation of selected explorer execution. Sequence orders instructions within a
 /// frame too; Slot persists across resumptions, while Invocation identifies one executor run.
 /// Values/estimates and cancellation targets are immutable copies, never runtime references.
@@ -14,7 +24,8 @@ public sealed record LoomScriptObservationSite(int Script, string? Context, int 
 public sealed record LoomScriptObservation(long Sequence, long Slot, long? ParentSlot, long Invocation,
     LoomScriptObservationSite? Site, IReadOnlyDictionary<string, ushort> Values, IReadOnlyList<string> Estimated,
     bool PathEstimated, int? ResumeOffset = null, bool? ReachedStop = null, string? UnresolvedReason = null,
-    int? CancelledNumber = null, IReadOnlyList<long>? CancelledSlots = null);
+    int? CancelledNumber = null, IReadOnlyList<long>? CancelledSlots = null,
+    IReadOnlyList<LoomScriptOperandBinding>? OperandBindings = null);
 
 /// <summary>
 /// Optional source-observation sink. Give each session its own observer. Filters limit captured
@@ -22,7 +33,8 @@ public sealed record LoomScriptObservation(long Sequence, long Slot, long? Paren
 /// The callback receives copies only and should record them without reentering the session.
 /// </summary>
 public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
-    Func<LoomScriptObservationSite, bool>? includeSite = null, Func<string, bool>? includeKey = null)
+    Func<LoomScriptObservationSite, bool>? includeSite = null, Func<string, bool>? includeKey = null,
+    bool captureOperandBindings = false)
 {
     private long sequence;
     private long slots;
@@ -34,7 +46,8 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     internal void Observe(long slot, long? parentSlot, long invocation, LoomScriptDisassembly script,
         string stage, int offset, string? operation, string? operands,
         IReadOnlyDictionary<string, ushort> values, IEnumerable<string> estimated, bool path,
-        int? resume = null, bool? stop = null, string? unresolved = null)
+        int? resume = null, bool? stop = null, string? unresolved = null,
+        Func<Func<string, bool>, IReadOnlyList<LoomScriptOperandBinding>>? bindOperands = null)
     {
         var site = new LoomScriptObservationSite(script.ScriptId, script.Context, script.ContainerFileNumber,
             script.ResourceOffset, stage, offset, operation, operands);
@@ -42,7 +55,9 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
         var copy = new ReadOnlyDictionary<string, ushort>(values.Where(p => includeKey?.Invoke(p.Key) != false)
             .ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal));
         receive(new(++sequence, slot, parentSlot, invocation, site, copy,
-            Array.AsReadOnly(estimated.Order(StringComparer.Ordinal).ToArray()), path, resume, stop, unresolved));
+            Array.AsReadOnly(estimated.Order(StringComparer.Ordinal).ToArray()), path, resume, stop, unresolved,
+            OperandBindings: captureOperandBindings && bindOperands is not null
+                ? Array.AsReadOnly(bindOperands(key => includeKey?.Invoke(key) != false).ToArray()) : null));
     }
 
     internal void Cancel(int number, long caller, IEnumerable<long> targets)

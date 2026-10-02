@@ -1,5 +1,12 @@
 # Changelog
 
+## 2 October: optional operand binding observations
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Core operand snapshots | Exact selected cells, separate value/index/path estimates, bit aliases and ordered arguments; unknown/filtered indexes unresolved; no execution policy change | [API validation](../.verification/runtime-bindings-20261002/api-validation.md) |
+| Fresh preservation | Five new cases/Core326;13 exact packets/prior sequences;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean main Release;App0/no push | [checks](../.verification/runtime-bindings-20261002/check-summary.json) |
+
 ## 2 October: production source/slot completion observations
 
 | Change | Result | Record |

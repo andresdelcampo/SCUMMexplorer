@@ -1,0 +1,108 @@
+{
+  "core": 326,
+  "newOperandBindingCases": 5,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "fullRecipePacketsUnchanged": 13,
+  "priorObservationsUnchanged": true,
+  "observedZeroWaits": 76,
+  "numericSourceReportUnchanged": true,
+  "numericWorlds": 162,
+  "flagCases": 52,
+  "comparisons": 51,
+  "overlaps": 14,
+  "fabricatedMatches": 4,
+  "practiceArgumentCases": 12,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "reports": [
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/checks-1/core-tests.txt",
+      "sha256": "34a3aa7fa70df8dac2b8d31a8f182a8d16ee31023890a108bf6bc720fa4854cf"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/checks-1/release-build.txt",
+      "sha256": "234d150a469e4324144b29922b0474a5c39de80d859b0344afbafbbc254e2cda"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/final-release-build.txt",
+      "sha256": "f6369084c88c1ac66b399c17af3553d9cde26b5108c0fa620e9ec7b72de83d5f"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/app-state.txt",
+      "sha256": "b38816ef20f01225a399b68fa8554b75dc646c0c4e4b2bd4d7340914a74b0372"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/observer-build.txt",
+      "sha256": "4d8f23db34c47294c202ef71e723520de7ad947c0184cfb09c8412c6db555b46"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/expanded-build.txt",
+      "sha256": "c88938a332f4731b27def6ef3a15eafa4bc2248950f3080693330bcef72d1693"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/room-audit-2/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/room-audit-2/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/png-comparison-2.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    },
+    {
+      "path": "Exe/RuntimeBindingsSession-20261002/numeric-fresh.json",
+      "sha256": "975698a5dddda7ac7e3ba00f019dc5a8cddf3ab2f34aaf6cb6b9bad626cb3fab"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/RuntimeBindingsSession-20261002/observer-1/source-manifest.json",
+    "sha256": "7748f141022d10df05980ee51163e3f4fa3d43a753a5aa4b64f573965555e28f"
+  }
+}

@@ -157,7 +157,8 @@ public sealed class LoomBoundedScriptExecutor
             var next = instruction.Offset + EncodedLength(instruction.Bytes);
             observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
                 "instruction", instruction.Offset, instruction.Operation, instruction.Operands,
-                knownVariables, estimated, onEstimatedPath);
+                knownVariables, estimated, onEstimatedPath,
+                bindOperands: include => BindObservationOperands(instruction, knownVariables, estimated, include));
 
             if (instruction.Operation == "stopObjectCode")
             {
@@ -1782,6 +1783,65 @@ public sealed class LoomBoundedScriptExecutor
         var globals = source.Where(IsGlobalKey).ToArray();
         destination.Clear();
         destination.UnionWith(globals);
+    }
+
+    // Observations use the executor's operand resolver without changing a value, path or decision.
+    // Only these decoded numeric/call forms are described; all other operations have no bindings.
+    private static IReadOnlyList<LoomScriptOperandBinding> BindObservationOperands(LoomScriptInstruction instruction,
+        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include)
+    {
+        LoomScriptOperandBinding Bind(string role, string operand, int? argument = null, int depth = 0)
+        {
+            operand = operand.Trim();
+            if (depth >= 32) return new(role, operand, null, null, null, ArgumentIndex: argument,
+                UnresolvedReason: "operand index depth exceeded");
+            var indexed = IndexedPattern.Match(operand);
+            var index = indexed.Success ? Bind("index", indexed.Groups[3].Value, depth: depth + 1) : null;
+            if (index is { Value: null }) return new(role, operand, null, null, null, index,
+                ArgumentIndex: argument, UnresolvedReason: "unresolved index");
+            string? key = TryNormalizeKey(operand, variables, out var normalized) ? normalized : null;
+            var backing = key is not null && key.StartsWith("bit[", StringComparison.Ordinal)
+                ? $"var[0x{int.Parse(VariablePattern.Match(key).Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >> 4:X3}]" : null;
+            // Filtering applies to bindings too, including an omitted index/backing word.
+            if (key is not null && (!include(key) || backing is not null && !include(backing)))
+                return new(role, operand, key, null, null, index, backing, argument, "filtered operand");
+            var available = TryReadValue(operand, variables, out var value, out var detail);
+            return new(role, operand, key, available ? value : null,
+                available ? key is not null && IsEstimated(key, estimated) : null,
+                index, backing, argument, available ? null : detail);
+        }
+
+        var op = instruction.Operation;
+        var text = instruction.Operands;
+        if (op is "move" or "add" or "subtract" or "multiply" or "divide" or "and" or "or")
+        {
+            var parts = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length == 3 ? [Bind("destination-before", parts[0]), Bind("source", parts[2])] : [];
+        }
+        if (op is "increment" or "decrement") return [Bind("destination-before", text)];
+        if (op is "equalZero" or "notEqualZero" or "isEqual" or "isNotEqual" or
+            "isLess" or "isLessEqual" or "isGreater" or "isGreaterEqual")
+            return text.Split(", branch ", StringSplitOptions.None)[0]
+                .Split(',', StringSplitOptions.TrimEntries).Select(value => Bind("condition", value)).ToArray();
+        if (op is "startScript" or "chainScript")
+        {
+            var open = ArgumentListStart(text);
+            if (open < 0 || !text.EndsWith(']')) return [];
+            return new[] { Bind("target", text[..open].Split(',')[0]) }
+                .Concat(text[(open + 1)..^1].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                    .Select((value, index) => Bind("argument", value, index))).ToArray();
+        }
+        if (op == "getRandomNr")
+        {
+            var parts = text.Split(',', StringSplitOptions.TrimEntries);
+            return parts.Length == 2 ? [Bind("destination-before", parts[0]), Bind("bound", parts[1])] : [];
+        }
+        if (op == "setVarRange")
+        {
+            var count = text.IndexOf(", count=", StringComparison.Ordinal);
+            return count >= 0 ? [Bind("destination-before", text[..count])] : [];
+        }
+        return [];
     }
 
     private static bool TryNormalizeKey(string operand, IDictionary<string, ushort> variables, out string key)
