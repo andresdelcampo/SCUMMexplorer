@@ -1,0 +1,11 @@
+from pathlib import Path
+text='Room22 box11→10 clicks complete200 +0083/end00D3 then002F/end0078,235frames,2/2 scopes,23 Executed/Conditional body events. Audited union203→205/235 (87.23%),30 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First wrong-order capture retained/excluded, second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room22-input-20261003/validation.md).'
+updates={
+'docs/NEXT_SESSION_PROMPT.md':('## Latest:', '## Latest: Room22 watcher pair complete — 3 October\n\nAfter59fbe94. '+text+'\n\nNext candidate: Room09 local223/224 +0000 and273/4D +000D. Inspect source late-game prerequisites before input; use existing source routes and labelled supported staff/notes/learned setup, never inject story flags or notes/reverse flags. Compare spell keys with direct controls; at most two cycles without a route-relevant decision. Continue successive bounded audits toward200K context per user; exact telemetry unavailable. Commit each; preserve history/protected57/estimates. No App launch/close/interaction/rebuild or push. Core662/broad/main Release dated. Completed Room22/17/15/24/36/10/23/25/34, sphere and Sharpening stay complete.\n\nReady-to-copy continuation: Continue SCUMMexplorer from Room22 using docs/NEXT_SESSION_PROMPT.md. Audited union205/235 versus fresh single-action169/235. Inspect Room09 three-site source prerequisites, then continue bounded input audits toward200K context, commit each and preserve every constraint and the running App.\n\n'),
+'docs/LOOM_EGA_PLAN.md':('**Latest Room17','**Latest Room22 input,3 October:** '+text+' Next: Room09 three-site source/input cluster.\n\n'),
+'docs/LOOM_SCRIPT_MAP.md':('Latest Room17','Latest Room22 input,3 October: entry0101 starts200; box10/11 gates0028/007C. '+text+'\n\n'),
+'docs/LOOM_CUTSCENE_DISCOVERY.md':('**Latest Room17','**Latest Room22 supplement,3 October:** '+text+'\n\n'),
+'docs/CHANGELOG.md':('## 3 October:','## 3 October: verify Room22 watcher input\n\n'+text+'\n\n')}
+for name,(marker,addition) in updates.items():
+ p=Path(name); old=p.read_text(encoding='utf-8'); assert marker in old and addition not in old
+ p.write_text(old.replace(marker,addition+marker,1),encoding='utf-8')

@@ -4,6 +4,8 @@ The session executes reached script/object/room instructions independently of re
 
 ## Current replay coverage (2 October)
 
+**Latest Room22 supplement,3 October:** Room22 box11→10 clicks complete200 +0083/end00D3 then002F/end0078,235frames,2/2 scopes,23 Executed/Conditional body events. Audited union203→205/235 (87.23%),30 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First wrong-order capture retained/excluded, second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room22-input-20261003/validation.md).
+
 **Latest Room17 supplement,3 October:** Room17 visible exit353 center312,72 then upper-path300,90 clicks complete200 +0022/end0042 and004D/end006D.241frames,2/2 scopes,15 Executed/Conditional body events. Audited union201→203/235 (86.38%),32 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First off-picture click rejected/excluded; second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room17-input-20261003/validation.md).
 
 **Latest Room15 supplement,3 October:** Room15 actual box3/5 clicks complete200 +001D/end0062 and006D/end00C4 in249frames,2/2 scopes,23 Executed/Conditional body events. Audited union199→201/235 (85.53%),34 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change. Protected57/prior evidence and running App untouched. [Validation](../.verification/room15-input-20261003/validation.md).
