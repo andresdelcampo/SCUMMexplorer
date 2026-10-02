@@ -1,0 +1,93 @@
+{
+  "implementationHead": "b65cb4e019749025a5b2c966c108dc05132e7002",
+  "historicalCheckpointAncestors": [
+    "00f01a8",
+    "02c9fc1",
+    "0518da4",
+    "0fda17b",
+    "133b4d4",
+    "17450ff",
+    "18247d3",
+    "213ea06",
+    "2b91e50",
+    "2cb62e4",
+    "30f4e17",
+    "32f1ecb",
+    "3ed2da7",
+    "3f32e5f",
+    "4a11fbc",
+    "4b7c646",
+    "56ffa35",
+    "5e2c0c4",
+    "5e86a68",
+    "5fcc2a0",
+    "6442e4e",
+    "6ad392d",
+    "6c06692",
+    "729cbb9",
+    "75d9cd7",
+    "8110900",
+    "82679ae",
+    "8a224a7",
+    "8bad888",
+    "8d12d0f",
+    "9593435",
+    "96b79f6",
+    "995e97e",
+    "a22ff2a",
+    "a3a90ec",
+    "a850740",
+    "aaaa755",
+    "b1381ff",
+    "b17c53d",
+    "b20dc4e",
+    "b3ee09e",
+    "b65cb4e",
+    "c91f860",
+    "cee1bf9",
+    "e285e08",
+    "e2d1729",
+    "e523f8a",
+    "e8c1c75",
+    "ec9a525",
+    "f18a18f",
+    "f649ff1",
+    "f84460f"
+  ],
+  "all57ProtectedFilesExactAndUnstaged": true,
+  "previousVerificationPacketsUntouched": true,
+  "previousHandoffGuidanceExact": true,
+  "earlierPlanMapDiscoveryChangelogTextExact": true,
+  "reportHashesExact": true,
+  "appRunning": 0,
+  "appLaunched": false,
+  "pushPerformed": false,
+  "replayCoverage": {
+    "validatedLiteralSites": 168,
+    "totalLiteralSites": 235,
+    "coveredPercent": 71.49,
+    "scope": "validated literal cutscene sites only; unchanged, not an overall project-completion percentage"
+  },
+  "reports": [
+    {
+      "path": "docs/LOOM_EGA_PLAN.md",
+      "sha256": "81305105fcc9a70f8cc6e95e9af0db2071a4536aa6730f8478d550d783cd7aa7"
+    },
+    {
+      "path": "docs/LOOM_SCRIPT_MAP.md",
+      "sha256": "a6993a48e4ce82cdddbae8f1fa0de730db35a5b1018994c3a16b7b9509c1a948"
+    },
+    {
+      "path": "docs/LOOM_CUTSCENE_DISCOVERY.md",
+      "sha256": "4836969cd2a7dd8b821af9504c3deee263f88ca4b857a39d588ff0eb44d8a9fe"
+    },
+    {
+      "path": "docs/CHANGELOG.md",
+      "sha256": "624e621a42457322243fd4bb04655ff81421c05ea3b5d0f401cc535f153b9e30"
+    },
+    {
+      "path": "docs/NEXT_SESSION_PROMPT.md",
+      "sha256": "d8bf5bf9ccd8441bb95f6d46af15ce9b358ac9c57fd706a2a14b2091d4b219d4"
+    }
+  ]
+}
