@@ -1,5 +1,12 @@
 # Changelog
 
+## 2 October: optional runtime relation lifetimes
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Runtime source relations | Historical read/move/argument lineage separated from live correspondence; writes/indexes/aliases/omissions/external effects/cancellation invalidate without changing estimates | [API validation](../.verification/runtime-relations-20261002/api-validation.md) |
+| Focused validation | Twelve lifetime cases; unchanged executor decisions and observation sequence; numeric domains remain source-only | [Core tests](../tests/SCUMMexplorer.Tests/LoomRuntimeRelationTests.cs) |
+
 ## 2 October: selected Room41 input/index provenance audit
 
 | Change | Result | Record |
