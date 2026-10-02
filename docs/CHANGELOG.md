@@ -1,5 +1,13 @@
 # Changelog
 
+## 2 October: selected Room41 input/index provenance audit
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Selected operand chain | Boot1018/live3018 →whole native input[1,4,1,1] →056..059/indexes0..3 →actual023 slot4/index8,response/index9 →026(4,0); practice index0/estimated note1 bound; estimates intact | [validation](../.verification/runtime-bindings-20261002/validation.md) |
+| Completion/preservation | 13 exact whole packets/prior records; original3036/4552→4553→4556→4557 ordering and76 own-child literal zero waits retained; native090 unresolved; numeric source report unchanged | [bindings](../.verification/runtime-bindings-20261002/binding-summary.json) |
+| Fresh checks | Core326;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean final main Release;App0/no push/promotion | [checks](../.verification/runtime-bindings-20261002/check-summary.json) |
+
 ## 2 October: optional operand binding observations
 
 | Change | Result | Record |
