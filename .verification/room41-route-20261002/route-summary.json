@@ -1,0 +1,300 @@
+{
+  "checkpoint": "55cb5ec",
+  "freshOutput": "Exe/Room41RouteSession-20261002",
+  "diagnosticCycles": 2,
+  "productionChanged": false,
+  "newWorkingRoutes": 0,
+  "recipeUnchanged": true,
+  "fullPacketByteExact": true,
+  "before": {
+    "room": 41,
+    "begun": 15,
+    "ended": 14,
+    "elapsed": 7659,
+    "script090End": false
+  },
+  "after": {
+    "room": 41,
+    "begun": 15,
+    "ended": 14,
+    "elapsed": 7659,
+    "script090End": false
+  },
+  "historicalDirectControl": {
+    "room": 43,
+    "begun": 15,
+    "ended": 15,
+    "elapsed": 5835,
+    "script090End": true
+  },
+  "historicalControlRerun": false,
+  "nativeSelectedEvents": [
+    {
+      "eventIndex": 3755,
+      "source": "Script 22",
+      "offset": "00C3",
+      "operation": "chainScript",
+      "certainty": 1,
+      "estimatedArgumentIndexes": [
+        0
+      ]
+    },
+    {
+      "eventIndex": 3759,
+      "source": "Script 26",
+      "offset": "007F",
+      "operation": "startScript",
+      "certainty": 1,
+      "estimatedArgumentIndexes": [
+        1
+      ]
+    },
+    {
+      "eventIndex": 3762,
+      "source": "Room 41 Object 633 Verb 0x41",
+      "offset": "0000",
+      "operation": "startScript",
+      "certainty": 1,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3792,
+      "source": "Room 41 local script 204",
+      "offset": "031E",
+      "operation": "endCutscene",
+      "certainty": 1,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3795,
+      "source": "Room 41 local script 204",
+      "offset": "031F",
+      "operation": "chainScript",
+      "certainty": 1,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3796,
+      "source": "Script 90",
+      "offset": "0000",
+      "operation": "cutscene",
+      "certainty": 1,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3799,
+      "source": "Script 90",
+      "offset": "0005",
+      "operation": "loadRoom",
+      "certainty": 1,
+      "estimatedArgumentIndexes": null
+    }
+  ],
+  "historicalControlSelectedEvents": [
+    {
+      "eventIndex": 2300,
+      "source": "Script 22",
+      "offset": "00C3",
+      "operation": "chainScript",
+      "certainty": 0,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 2304,
+      "source": "Script 26",
+      "offset": "007F",
+      "operation": "startScript",
+      "certainty": 0,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 2518,
+      "source": "Script 22",
+      "offset": "00C3",
+      "operation": "chainScript",
+      "certainty": 1,
+      "estimatedArgumentIndexes": [
+        0
+      ]
+    },
+    {
+      "eventIndex": 2522,
+      "source": "Script 26",
+      "offset": "007F",
+      "operation": "startScript",
+      "certainty": 1,
+      "estimatedArgumentIndexes": [
+        1
+      ]
+    },
+    {
+      "eventIndex": 2714,
+      "source": "Script 26",
+      "offset": "007F",
+      "operation": "startScript",
+      "certainty": 1,
+      "estimatedArgumentIndexes": [
+        1
+      ]
+    },
+    {
+      "eventIndex": 3702,
+      "source": "Room 41 Object 633 Verb 0x41",
+      "offset": "0000",
+      "operation": "startScript",
+      "certainty": 0,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3727,
+      "source": "Room 41 local script 204",
+      "offset": "031E",
+      "operation": "endCutscene",
+      "certainty": 0,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3730,
+      "source": "Room 41 local script 204",
+      "offset": "031F",
+      "operation": "chainScript",
+      "certainty": 0,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3731,
+      "source": "Script 90",
+      "offset": "0000",
+      "operation": "cutscene",
+      "certainty": 0,
+      "estimatedArgumentIndexes": null
+    },
+    {
+      "eventIndex": 3734,
+      "source": "Script 90",
+      "offset": "0005",
+      "operation": "loadRoom",
+      "certainty": 0,
+      "estimatedArgumentIndexes": null
+    }
+  ],
+  "finalCastState": {
+    "bit[0xD6C]": {
+      "value": 0,
+      "estimated": true
+    },
+    "bit[0xD67]": {
+      "value": 0,
+      "estimated": true
+    },
+    "bit[0xD70]": {
+      "value": 0,
+      "estimated": true
+    },
+    "var[0x064]": {
+      "value": 2,
+      "estimated": true
+    },
+    "var[0x067]": {
+      "value": 633,
+      "estimated": true
+    },
+    "var[0x062]": {
+      "value": 0,
+      "estimated": true
+    },
+    "var[0x07A]": {
+      "value": 4,
+      "estimated": true
+    },
+    "var[0x03A]": {
+      "value": 12312,
+      "estimated": true
+    },
+    "var[0x03B]": {
+      "value": 16961,
+      "estimated": false
+    }
+  },
+  "finalPending": [
+    {
+      "label": "Room 41 local script 212",
+      "number": 212,
+      "offset": 11,
+      "freeze": 1,
+      "pathEstimated": true
+    },
+    {
+      "label": "Room 41 local script 207",
+      "number": 207,
+      "offset": 86,
+      "freeze": 0,
+      "pathEstimated": true
+    },
+    {
+      "label": "Script 06",
+      "number": 6,
+      "offset": 443,
+      "freeze": 1,
+      "pathEstimated": true
+    },
+    {
+      "label": "Room 41 Object 633 Verb 0x41",
+      "number": null,
+      "offset": 6,
+      "freeze": 1,
+      "pathEstimated": true
+    },
+    {
+      "label": "Script 07",
+      "number": 7,
+      "offset": 52,
+      "freeze": 1,
+      "pathEstimated": true
+    },
+    {
+      "label": "Script 26",
+      "number": 26,
+      "offset": 136,
+      "freeze": 1,
+      "pathEstimated": true
+    }
+  ],
+  "observationLimit": "Event path and packet equality; no new call/return/completion or lifetime proof.",
+  "all57ProtectedFilesExactAndUnstaged": true,
+  "previousVerificationPacketsUnchanged": true,
+  "userRequestedAppLeftOpen": true,
+  "appPidsAtCheck": [
+    86048
+  ],
+  "appLaunched": false,
+  "pushPerformed": false,
+  "runtimeBaseline": "Prior Core654/focused328 and broad regressions are dated; not rerun.",
+  "literalCoverage": {
+    "validated": 168,
+    "total": 235,
+    "unvalidated": 67
+  },
+  "reports": [
+    {
+      "path": ".verification/room41-certainty-20261002/room41.json",
+      "sha256": "07e57af48af458a62821c9f5f5570e5544df473c85731f407c528def51e45abd"
+    },
+    {
+      "path": "Exe/RuntimePhasePayloadFinalSession2-20261002/final-evidence/room41-1/room41-raw4-click.json",
+      "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+    },
+    {
+      "path": "Exe/Room41RouteSession-20261002/raw4-1/room41-raw4-click.json",
+      "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+    },
+    {
+      "path": "Exe/RuntimePhasePayloadFinalSession2-20261002/final-evidence/room41-1/direct41-source-level4-skip204.json",
+      "sha256": "58453eec817e345003c93d5106cd0363fabe3537d2f1c6f50bad3d8515f77937"
+    },
+    {
+      "path": "Exe/VerificationSession-20261001/native-code-1/code.tsv",
+      "sha256": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569"
+    }
+  ]
+}

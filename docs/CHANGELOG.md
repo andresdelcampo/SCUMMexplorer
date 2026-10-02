@@ -1,5 +1,9 @@
 # Changelog
 
+## 2 October: bound the raw4 failure and separate the reported cage issue
+
+Continued `55cb5ec`; no route improved. Rebuilt the existing Core probe and replayed only the unchanged Room41 raw4 recipe: whole packet byte-exact, Room41,15/14,7659frames. Two diagnostic cycles confirm the conditional Room42 rejection leaves no090 resumption and that uncertainty predates204-to090; no execution, observer, catalog or recipe change. The user clarified that Play Cutscene reaches the cage but shows it open rather than expected closed; preserve this separate report for a bounded source state/image check of the exact selected entry. All57 protected files remain exact/unstaged, prior runtime suite/build remain dated, no App launch or push. A stray App was stopped before the user opened another and explicitly requested it be left open. [Validation, limits and reproduction](../.verification/room41-route-20261002/validation.md).
+
 ## 2 October: prioritize a concrete blocked route
 
 After `9b5fdc3`, the user requested a new continuation prompt and working rules focused on route results. Room41 native090 with the unchanged raw4 recipe is the first target. The plan now bounds diagnostic detours to two focused cycles without a route-relevant implementation decision, defers general observer expansion, and requires plain-language before/after results. Existing evidence and constraints remain; genuine execution fixes must explain fresh differences without rewriting historical packets. CLAUDE.md and the handoff carry the same priority. Documentation-only change: no new runtime validation, route completion or coverage increase;168/235=71.49% remains. See [current plan](LOOM_EGA_PLAN.md#current-priority-make-one-blocked-route-work) and [next-session prompt](NEXT_SESSION_PROMPT.md).

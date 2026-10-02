@@ -32,6 +32,10 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (2 October)
 
+**Latest bounded outcome, after `55cb5ec`:** no route improved. One fresh unchanged raw4 replay is byte-exact to the phase-payload baseline: Room41,15/14 scopes,7659 total frames. Script090 stops at conditional Room42 load0005 with no queued090 continuation. The second source/event check rejects a new204-to090 propagation defect: uncertainty already precedes the sword response. Two diagnostic cycles used; production/observers/recipes unchanged. [Route record](../.verification/room41-route-20261002/validation.md).
+
+**User clarification:** the capture scene reaches the cage through **Play Cutscene**, but the cage appears open when the user expects closed. This is a separate reported state/rendering issue, not a newly verified native route or a fully correct replay. Raw4 uses Twisting/slot4/response41 and actual204 Escape; Sharpening is slot9, with a different sword response into the same capture script. Next bounded comparison: identify the exact picker entry and inspect its source-established Room43 cage state/image at the reported point; do not force a closed image or assume a common cause. No further raw4 investigation this session. Coverage remains168/235; prior Core654/broad runtime checks remain dated. The user explicitly requested their newly opened App be left open; no agent launch or UI interaction, no push, all57 protected files unchanged/unstaged.
+
 ### Current priority: make one blocked route work
 
 User decision after `9b5fdc3`: redirect effort from general observer hardening to a concrete blocked route. This priority supersedes the historical "next" instructions below; all source, estimate, safety and route/UI constraints remain. The previous five sessions improved diagnostics and rejection of false conclusions but validated no additional literal entry site. Coverage remains **168/235 = 71.49%**, with **67 sites not yet validated**. Test counts and diagnostic coverage are not route completion; the broader plan has no fixed percentage denominator.
