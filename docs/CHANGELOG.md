@@ -2,6 +2,15 @@
 
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
+## 2 October: source progression
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Generic expressions/native intro input | Signed integer postfix stack and nested seeded random scratch semantics; native201 challenge now executes; optional input-awaiting boot preserves default UI; Core289/WPF62, all roots/sequences/pixels unchanged | [implementation](../.verification/source-progression-20261002/expression-validation.md) |
+| Source096 completion | Actual095 Escape override writes known flags; staff/092/639 route completes096 in46,4/4; ordinary full095 control remains incomplete | [recipe](../.verification/source-progression-20261002/late096-validation.md) |
+| Usable20 arrivals/both responses | Actual16 sleep writes D8F, both18 arrivals settle20 with source ego,390/391 finish in all four combinations,7/7; fresh catalog20 gaps retained | [recipes](../.verification/source-progression-20261002/room20-validation.md) |
+| Room41/native level4 audit | Actual37 arrival/native633 still inherits Conditional090; direct633+204 override completes43 separately; correct D6F=0 and used-slot gates recorded; native challenge and egg input advance without native opening/raw4 claims | [source evidence](../.verification/source-progression-20261002/validation.md) |
+
 ## 1 October: global cutscene access
 
 | Change | Result | Record |

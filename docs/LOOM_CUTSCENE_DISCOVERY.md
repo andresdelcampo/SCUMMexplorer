@@ -2,7 +2,11 @@
 
 The session executes reached script/object/room instructions independently of replay discovery. Until 1 October, replay used only `KnownCutscenes` (046, 052, 086) plus the opening (044), further filtered to the current room. This explains why a triggered scene could work yet be absent from Play Cutscene: it needed no new executor implementation, but had no catalog recipe.
 
-## Current replay coverage (1 October)
+## Current replay coverage (2 October)
+
+2 October source progression: generic old-v3 expressions and an opt-in native intro input mode are implemented (`8d12d0f`), without changing default UI/boot behavior. Actual37/603 arrival, delayed native633 and loaded slot4 input still reach090 Conditional; source204 Escape does not cure native12/11. A separate direct633/41 + actual204 override completes090 in43,12/12. Source095 Escape establishes known D7B/DA3 and completes096 in46 (146 frames,4/4; `b17c53d`). Actual16/350 sleep establishes D8F; both18/369 and371 arrivals settle20 and both390/391 responses finish,7/7 (`f18a18f`). Native challenge expressions/glyph input execute203/205, but opening certainty remains unresolved. D6F is the failed-answer flag and level4 requires0, plus used slots0/2/1; native egg input/047 skip establishes slot0 use but not1/2 or raw4. No explicit edits/browsing floors/known-state injections or catalog promotion. Fresh Core289/WPF62/doorways16/controls19/input18;363 roots, memberships, sequences and all76 current pixels unchanged; zero gaps, Release clean. [Evidence and reproduction](../.verification/source-progression-20261002/validation.md).
+
+These longer source recipes do not change fresh-entry coverage. Earlier dated checkpoints follow.
 
 Latest requested UI/artwork follow-up: normal costume cards,16 named drafts and staff/note page coupling are presentation/explorer edits only. The scythe background correction changes Room20 artwork fallback, not script execution. Fresh363-root statuses/frame counts/reached rooms/scope boundaries, four established memberships and both sequence packets match the scope baseline.334 starts/168 of235 sites/50 outstanding owners/123 unresolved edges remain.76 room renders have zero gaps; only20 pixels changed. [Validation](../.verification/status-refinements-20261001/validation.md).
 

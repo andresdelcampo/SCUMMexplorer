@@ -1,0 +1,2486 @@
+[
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/boot-1/native-boot-challenge-failure.json",
+    "sha256": "bca4a8d64455aacab3c19dcbfc61409a62ea6531244ff28ec584ffcd4928946a",
+    "route": {
+      "id": "native-boot-challenge",
+      "actions": [
+        {
+          "kind": "frames",
+          "stage": "intro",
+          "count": 4,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        },
+        {
+          "kind": "target",
+          "objectId": 876
+        },
+        {
+          "kind": "frames",
+          "stage": "challenge",
+          "count": 32,
+          "settle": false
+        },
+        {
+          "kind": "boot-answer"
+        },
+        {
+          "kind": "frames",
+          "stage": "opening",
+          "count": 5000,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        }
+      ],
+      "nativeBoot": true
+    },
+    "room": null,
+    "boundaries": [],
+    "failure": "System.InvalidOperationException: Sequence contains no matching element\r\n   at System.Linq.ThrowHelper.ThrowNoMatchException()\r\n   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)\r\n   at Program.<Main>$(String[] args) in D:\\Documents\\Personal\\Code Projects\\SCUMMexplorer\\.verification\\source-progression-20261002\\ProgressionProbe\\Program.cs:line 61",
+    "elapsed": 4
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/boot-2/native-boot-challenge-failure.json",
+    "sha256": "c55d66922373e283921a6af86e463c607981f713665d23dcebd0a71f9eaf6ffb",
+    "route": {
+      "id": "native-boot-challenge",
+      "actions": [
+        {
+          "kind": "frames",
+          "stage": "intro",
+          "count": 4,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        },
+        {
+          "kind": "target",
+          "objectId": 876
+        },
+        {
+          "kind": "frames",
+          "stage": "challenge",
+          "count": 32,
+          "settle": false
+        },
+        {
+          "kind": "boot-answer"
+        },
+        {
+          "kind": "frames",
+          "stage": "opening",
+          "count": 5000,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        }
+      ],
+      "nativeBoot": true
+    },
+    "room": 69,
+    "boundaries": [],
+    "failure": "System.IO.InvalidDataException: Source boot answer has not been generated.\r\n   at Program.<Main>$(String[] args) in D:\\Documents\\Personal\\Code Projects\\SCUMMexplorer\\.verification\\source-progression-20261002\\ProgressionProbe\\Program.cs:line 77",
+    "elapsed": 36
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/boot-3/native-boot-challenge.json",
+    "sha256": "41d7bcda047b12159a3dc45c427943eeb548d29718dfed04a223fa034ef91060",
+    "route": {
+      "id": "native-boot-challenge",
+      "actions": [
+        {
+          "kind": "frames",
+          "stage": "intro",
+          "count": 4,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        },
+        {
+          "kind": "target",
+          "objectId": 876
+        },
+        {
+          "kind": "frames",
+          "stage": "challenge",
+          "count": 32,
+          "settle": false
+        },
+        {
+          "kind": "boot-answer"
+        },
+        {
+          "kind": "frames",
+          "stage": "opening",
+          "count": 5000,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        }
+      ],
+      "nativeBoot": true
+    },
+    "room": 69,
+    "boundaries": [],
+    "failure": null,
+    "elapsed": 5076
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/boot-4/native-boot-challenge.json",
+    "sha256": "0cdeed355024abfb6b202e41605601ead5af3a0065363233221af746ddd6a196",
+    "route": {
+      "id": "native-boot-challenge",
+      "actions": [
+        {
+          "kind": "frames",
+          "stage": "intro",
+          "count": 4,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        },
+        {
+          "kind": "target",
+          "objectId": 876
+        },
+        {
+          "kind": "frames",
+          "stage": "challenge",
+          "count": 32,
+          "settle": false
+        },
+        {
+          "kind": "boot-answer"
+        },
+        {
+          "kind": "frames",
+          "stage": "opening",
+          "count": 5000,
+          "settle": false
+        },
+        {
+          "kind": "inspect"
+        }
+      ],
+      "nativeBoot": true
+    },
+    "room": 69,
+    "boundaries": [],
+    "failure": null,
+    "elapsed": 5076
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/direct41-skip-1/direct41-source-skip204.json",
+    "sha256": "94c051a03dcf444e00abf738ac79b353178f10a6815a72c95dbf96c900430af2",
+    "route": {
+      "id": "direct41-source-skip204",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 10
+        },
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "052",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 13
+        },
+        {
+          "kind": "look",
+          "objectId": 325
+        },
+        {
+          "kind": "frames",
+          "stage": "native-learn4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 13
+        },
+        {
+          "kind": "verb",
+          "objectId": 323,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "level5",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 28
+        },
+        {
+          "kind": "verb",
+          "objectId": 470,
+          "verb": 61
+        },
+        {
+          "kind": "frames",
+          "stage": "level6",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 37
+        },
+        {
+          "kind": "verb",
+          "objectId": 603,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-arrival41",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 41
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 632,
+          "stage": "632-ready",
+          "count": 3000
+        },
+        {
+          "kind": "look",
+          "objectId": 632
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 633,
+          "stage": "633-ready",
+          "count": 3000
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "approach",
+          "count": 40,
+          "settle": false
+        },
+        {
+          "kind": "target",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "633-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "verb",
+          "objectId": 633,
+          "verb": 65
+        },
+        {
+          "kind": "until-override",
+          "owner": "Room 41 local script 204",
+          "stage": "204-override",
+          "count": 1000
+        },
+        {
+          "kind": "key",
+          "key": 27
+        },
+        {
+          "kind": "frames",
+          "stage": "source090",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 43,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2",
+      "endCutscene at Script 90 +0x0730 runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 2799
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/late-1/late096-reached44.json",
+    "sha256": "f4078293f0590307fe0de2979469462921664952699ca781f42fe895f2166ac6",
+    "route": {
+      "id": "late096-reached44",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 43
+        },
+        {
+          "kind": "verb",
+          "objectId": 639,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-arrival44",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 44
+        },
+        {
+          "kind": "verb",
+          "objectId": 653,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "095",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 45
+        },
+        {
+          "kind": "verb",
+          "objectId": 656,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "staff45",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "verb",
+          "objectId": 655,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "return43",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 43
+        },
+        {
+          "kind": "verb",
+          "objectId": 639,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "096",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 43,
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2"
+    ],
+    "failure": null,
+    "elapsed": 4017
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/late-1/late096-source-skip095.json",
+    "sha256": "1665d6f45cab6e0146213ff0c0360bd03c9263fc1f733ba6e0494b8033ee03f4",
+    "route": {
+      "id": "late096-source-skip095",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 43
+        },
+        {
+          "kind": "verb",
+          "objectId": 639,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-arrival44",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 44
+        },
+        {
+          "kind": "verb",
+          "objectId": 653,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "095-override",
+          "count": 2,
+          "settle": false
+        },
+        {
+          "kind": "key",
+          "key": 27
+        },
+        {
+          "kind": "frames",
+          "stage": "095",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 45
+        },
+        {
+          "kind": "verb",
+          "objectId": 656,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "staff45",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "verb",
+          "objectId": 655,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "return43",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 43
+        },
+        {
+          "kind": "verb",
+          "objectId": 639,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "096",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 46,
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2",
+      "endCutscene at Script 96 +0x00E7 runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 357
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/level4-1/native-egg-level4.json",
+    "sha256": "aaabf009708623f2060f2ea4e0303160884bdac94bb263fe8cd01d8002b80c08",
+    "route": {
+      "id": "native-egg-level4",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-approach",
+          "count": 80,
+          "settle": false
+        },
+        {
+          "kind": "look",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-lesson",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "target",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 0,
+          "gap": 8
+        },
+        {
+          "kind": "frames",
+          "stage": "native-level4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 9,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3",
+      "cutscene at Script 13 +0x0000 runs script 2",
+      "endCutscene at Script 13 +0x0052 runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 290
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/level4-keys-1/native-egg-after-trial-keys.json",
+    "sha256": "c01eb932918e02e1021b6efdcfc0c76cfa5d7a6e2597236bc808b5c811399617",
+    "route": {
+      "id": "native-egg-after-trial-keys",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 8
+        },
+        {
+          "kind": "verb",
+          "objectId": 255,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-trial",
+          "count": 5000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 9
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-approach",
+          "count": 80,
+          "settle": false
+        },
+        {
+          "kind": "look",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-lesson",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "target",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft-key",
+          "slot": 0,
+          "gap": 8
+        },
+        {
+          "kind": "frames",
+          "stage": "native-level4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 9,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3",
+      "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 5003
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/level4-keys-2/native-egg-after-trial-keys.json",
+    "sha256": "90c32e3f9f855585ed7e70296d5d63dedd44d55efef3ad7fa41f845a78502dd6",
+    "route": {
+      "id": "native-egg-after-trial-keys",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 8
+        },
+        {
+          "kind": "verb",
+          "objectId": 255,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-trial",
+          "count": 5000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 9
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-approach",
+          "count": 80,
+          "settle": false
+        },
+        {
+          "kind": "look",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-lesson",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "target",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft-key",
+          "slot": 0,
+          "gap": 8
+        },
+        {
+          "kind": "frames",
+          "stage": "native-level4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 9,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3",
+      "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 5003
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/level4-skip-1/native-egg-source-skip047.json",
+    "sha256": "cd2b207434a23666589c811fefb4f13d847065496481039befc77d0e10cffcd1",
+    "route": {
+      "id": "native-egg-source-skip047",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 8
+        },
+        {
+          "kind": "verb",
+          "objectId": 255,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-trial",
+          "count": 5000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 9
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-approach",
+          "count": 80,
+          "settle": false
+        },
+        {
+          "kind": "look",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-lesson",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "target",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft-key",
+          "slot": 0,
+          "gap": 8
+        },
+        {
+          "kind": "until-override",
+          "owner": "Script 47",
+          "stage": "047-override",
+          "count": 1000
+        },
+        {
+          "kind": "key",
+          "key": 27
+        },
+        {
+          "kind": "frames",
+          "stage": "native-level4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 9,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3",
+      "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 2870
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/level4-trial-1/native-egg-after-trial.json",
+    "sha256": "f40bbe9ed6fa5bc53483e9b032b546ab45cda62896c127475ec61e50ff33382c",
+    "route": {
+      "id": "native-egg-after-trial",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 8
+        },
+        {
+          "kind": "verb",
+          "objectId": 255,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-trial",
+          "count": 5000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 9
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-approach",
+          "count": 80,
+          "settle": false
+        },
+        {
+          "kind": "look",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-lesson",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "target",
+          "objectId": 270
+        },
+        {
+          "kind": "frames",
+          "stage": "egg-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 0,
+          "gap": 8
+        },
+        {
+          "kind": "frames",
+          "stage": "native-level4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 9,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3",
+      "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 5003
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/native41-baseline/level6-native-lesson-cast41.json",
+    "sha256": "1a58fed4c8e81b262f471e0680ca7cf27278c9634e0633af45a418765de09b5c",
+    "route": {
+      "id": "level6-native-lesson-cast41",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 10
+        },
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "052",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 13
+        },
+        {
+          "kind": "look",
+          "objectId": 325
+        },
+        {
+          "kind": "frames",
+          "stage": "native-learn4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 13
+        },
+        {
+          "kind": "verb",
+          "objectId": 323,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "level5",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 28
+        },
+        {
+          "kind": "verb",
+          "objectId": 470,
+          "verb": 61
+        },
+        {
+          "kind": "frames",
+          "stage": "level6",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 41
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 632,
+          "stage": "632-ready",
+          "count": 3000
+        },
+        {
+          "kind": "look",
+          "objectId": 632
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 633,
+          "stage": "633-ready",
+          "count": 3000
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "approach",
+          "count": 40,
+          "settle": false
+        },
+        {
+          "kind": "target",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "633-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 4,
+          "gap": 8
+        },
+        {
+          "kind": "frames",
+          "stage": "cast",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "failure": null,
+    "elapsed": 4564
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/native41-baseline/level6-walk-native41.json",
+    "sha256": "1f2cf4d94fce3467d5164bd419c32543dc130852f7ec531fee616ad35a2a7130",
+    "route": {
+      "id": "level6-walk-native41",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 13
+        },
+        {
+          "kind": "verb",
+          "objectId": 323,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "level5",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 28
+        },
+        {
+          "kind": "verb",
+          "objectId": 470,
+          "verb": 61
+        },
+        {
+          "kind": "frames",
+          "stage": "level6",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 41
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 632,
+          "stage": "632-ready",
+          "count": 3000
+        },
+        {
+          "kind": "look",
+          "objectId": 632
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 633,
+          "stage": "633-ready",
+          "count": 3000
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "approach",
+          "count": 40,
+          "settle": false
+        },
+        {
+          "kind": "target",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "633-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 4,
+          "gap": 8
+        },
+        {
+          "kind": "frames",
+          "stage": "cast",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 1779
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/native41-baseline/native13-lesson-after052.json",
+    "sha256": "2454ae64963abe3710d9d92e30708626631ff76f4857f6f07fc22059284887b3",
+    "route": {
+      "id": "native13-lesson-after052",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 10
+        },
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "052",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 13
+        },
+        {
+          "kind": "look",
+          "objectId": 325
+        },
+        {
+          "kind": "frames",
+          "stage": "native-learn4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 13,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 589
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/native41-skip-1/native41-source-skip204.json",
+    "sha256": "fedc5bf997e0c30bb3f75375605fa2999c907ed314aebb4d66de202f260b5add",
+    "route": {
+      "id": "native41-source-skip204",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 10
+        },
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "052",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 13
+        },
+        {
+          "kind": "look",
+          "objectId": 325
+        },
+        {
+          "kind": "frames",
+          "stage": "native-learn4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 13
+        },
+        {
+          "kind": "verb",
+          "objectId": 323,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "level5",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 28
+        },
+        {
+          "kind": "verb",
+          "objectId": 470,
+          "verb": 61
+        },
+        {
+          "kind": "frames",
+          "stage": "level6",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 37
+        },
+        {
+          "kind": "verb",
+          "objectId": 603,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-arrival41",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 41
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 632,
+          "stage": "632-ready",
+          "count": 3000
+        },
+        {
+          "kind": "look",
+          "objectId": 632
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 633,
+          "stage": "633-ready",
+          "count": 3000
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "approach",
+          "count": 40,
+          "settle": false
+        },
+        {
+          "kind": "target",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "633-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 4,
+          "gap": 8
+        },
+        {
+          "kind": "until-script",
+          "script": 204,
+          "stage": "204-started",
+          "count": 1000
+        },
+        {
+          "kind": "frames",
+          "stage": "204-override",
+          "count": 2,
+          "settle": false
+        },
+        {
+          "kind": "key",
+          "key": 27
+        },
+        {
+          "kind": "frames",
+          "stage": "source090",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "failure": null,
+    "elapsed": 4581
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/native41-skip-2/native41-source-skip204.json",
+    "sha256": "6e5a11d8204441ad382d04bb9e3265e3444f2a8f5f6120b7d62992fccffce780",
+    "route": {
+      "id": "native41-source-skip204",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 10
+        },
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "052",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 13
+        },
+        {
+          "kind": "look",
+          "objectId": 325
+        },
+        {
+          "kind": "frames",
+          "stage": "native-learn4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 13
+        },
+        {
+          "kind": "verb",
+          "objectId": 323,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "level5",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 28
+        },
+        {
+          "kind": "verb",
+          "objectId": 470,
+          "verb": 61
+        },
+        {
+          "kind": "frames",
+          "stage": "level6",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 37
+        },
+        {
+          "kind": "verb",
+          "objectId": 603,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-arrival41",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 41
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 632,
+          "stage": "632-ready",
+          "count": 3000
+        },
+        {
+          "kind": "look",
+          "objectId": 632
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 633,
+          "stage": "633-ready",
+          "count": 3000
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "approach",
+          "count": 40,
+          "settle": false
+        },
+        {
+          "kind": "target",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "633-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 4,
+          "gap": 8
+        },
+        {
+          "kind": "until-override",
+          "owner": "Room 41 local script 204",
+          "stage": "204-override",
+          "count": 1000
+        },
+        {
+          "kind": "key",
+          "key": 27
+        },
+        {
+          "kind": "frames",
+          "stage": "source090",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "failure": null,
+    "elapsed": 4623
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/native41-skip-3/native41-source-skip204.json",
+    "sha256": "aa56de132a272b7642247bbde11c906ddcc603b84088da1fa0f9cd5273af31c0",
+    "route": {
+      "id": "native41-source-skip204",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 10
+        },
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "052",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 13
+        },
+        {
+          "kind": "look",
+          "objectId": 325
+        },
+        {
+          "kind": "frames",
+          "stage": "native-learn4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 13
+        },
+        {
+          "kind": "verb",
+          "objectId": 323,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "level5",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 28
+        },
+        {
+          "kind": "verb",
+          "objectId": 470,
+          "verb": 61
+        },
+        {
+          "kind": "frames",
+          "stage": "level6",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 37
+        },
+        {
+          "kind": "verb",
+          "objectId": 603,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-arrival41",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 41
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 632,
+          "stage": "632-ready",
+          "count": 3000
+        },
+        {
+          "kind": "look",
+          "objectId": 632
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 633,
+          "stage": "633-ready",
+          "count": 3000
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "approach",
+          "count": 40,
+          "settle": false
+        },
+        {
+          "kind": "target",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "633-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 4,
+          "gap": 8
+        },
+        {
+          "kind": "until-override",
+          "owner": "Room 41 local script 204",
+          "stage": "204-override",
+          "count": 1000
+        },
+        {
+          "kind": "key",
+          "key": 27
+        },
+        {
+          "kind": "frames",
+          "stage": "source090",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "failure": null,
+    "elapsed": 4623
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/native41-source-1/native41-source37-arrival.json",
+    "sha256": "31f7ba5575881cc6c7f6b9977aad285806c886f345c68de0bd1a4e3d5126cce2",
+    "route": {
+      "id": "native41-source37-arrival",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 9
+        },
+        {
+          "kind": "verb",
+          "objectId": 271,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "staff",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 10
+        },
+        {
+          "kind": "verb",
+          "objectId": 295,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "052",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 13
+        },
+        {
+          "kind": "look",
+          "objectId": 325
+        },
+        {
+          "kind": "frames",
+          "stage": "native-learn4",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 13
+        },
+        {
+          "kind": "verb",
+          "objectId": 323,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "level5",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 28
+        },
+        {
+          "kind": "verb",
+          "objectId": 470,
+          "verb": 61
+        },
+        {
+          "kind": "frames",
+          "stage": "level6",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 37
+        },
+        {
+          "kind": "verb",
+          "objectId": 603,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "stage": "source-arrival41",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 41
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 632,
+          "stage": "632-ready",
+          "count": 3000
+        },
+        {
+          "kind": "look",
+          "objectId": 632
+        },
+        {
+          "kind": "until-touchable",
+          "objectId": 633,
+          "stage": "633-ready",
+          "count": 3000
+        },
+        {
+          "kind": "walk-point",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "approach",
+          "count": 40,
+          "settle": false
+        },
+        {
+          "kind": "target",
+          "objectId": 633
+        },
+        {
+          "kind": "frames",
+          "stage": "633-aim",
+          "count": 1,
+          "settle": false
+        },
+        {
+          "kind": "draft",
+          "slot": 4,
+          "gap": 8
+        },
+        {
+          "kind": "frames",
+          "stage": "cast",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 41,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "failure": null,
+    "elapsed": 4564
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/room20-1/sleep-source369-response390.json",
+    "sha256": "c23192848625e5d7c9851733644c7d3af169e81a34a7bd85b3aaf01134dfa5ee",
+    "route": {
+      "id": "sleep-source369-response390",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 16
+        },
+        {
+          "kind": "verb",
+          "objectId": 350,
+          "verb": 71
+        },
+        {
+          "kind": "frames",
+          "stage": "source-sleep",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 18
+        },
+        {
+          "kind": "verb",
+          "objectId": 369,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "arrival20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 20
+        },
+        {
+          "kind": "verb",
+          "objectId": 390,
+          "verb": 72
+        },
+        {
+          "kind": "frames",
+          "stage": "response20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 18,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 62 +0x0000 runs script 2",
+      "endCutscene at Script 62 +0x0018 runs script 3",
+      "cutscene at Script 63 +0x0000 runs script 2",
+      "endCutscene at Script 63 +0x001C runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 1575
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/room20-1/sleep-source369-response391.json",
+    "sha256": "856c5a0ba1b2b61d38e56482ee9e5b980219302591ed210463692ec2149ec70c",
+    "route": {
+      "id": "sleep-source369-response391",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 16
+        },
+        {
+          "kind": "verb",
+          "objectId": 350,
+          "verb": 71
+        },
+        {
+          "kind": "frames",
+          "stage": "source-sleep",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 18
+        },
+        {
+          "kind": "verb",
+          "objectId": 369,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "arrival20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 20
+        },
+        {
+          "kind": "verb",
+          "objectId": 391,
+          "verb": 72
+        },
+        {
+          "kind": "frames",
+          "stage": "response20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 18,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 62 +0x0000 runs script 2",
+      "endCutscene at Script 62 +0x0018 runs script 3",
+      "cutscene at Script 63 +0x0000 runs script 2",
+      "endCutscene at Script 63 +0x001C runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 1575
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/room20-1/sleep-source371-response390.json",
+    "sha256": "de1bb8b4e2000d70701660c2630547ec7604268d34d07e03287d9e65a245d775",
+    "route": {
+      "id": "sleep-source371-response390",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 16
+        },
+        {
+          "kind": "verb",
+          "objectId": 350,
+          "verb": 71
+        },
+        {
+          "kind": "frames",
+          "stage": "source-sleep",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 18
+        },
+        {
+          "kind": "verb",
+          "objectId": 371,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "arrival20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 20
+        },
+        {
+          "kind": "verb",
+          "objectId": 390,
+          "verb": 72
+        },
+        {
+          "kind": "frames",
+          "stage": "response20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 18,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 56 +0x0000 runs script 2",
+      "endCutscene at Script 56 +0x0025 runs script 3",
+      "cutscene at Script 57 +0x0000 runs script 2",
+      "endCutscene at Script 57 +0x0029 runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 1612
+  },
+  {
+    "packet": "Exe/SourceProgressionSession-20261002/room20-1/sleep-source371-response391.json",
+    "sha256": "a79cd0cb3b8da707ff9792841cdb51aa1c76ed3cab2f4b17ab9f8f407c475071",
+    "route": {
+      "id": "sleep-source371-response391",
+      "actions": [
+        {
+          "kind": "visit",
+          "room": 16
+        },
+        {
+          "kind": "verb",
+          "objectId": 350,
+          "verb": 71
+        },
+        {
+          "kind": "frames",
+          "stage": "source-sleep",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "visit",
+          "room": 18
+        },
+        {
+          "kind": "verb",
+          "objectId": 371,
+          "verb": 54
+        },
+        {
+          "kind": "frames",
+          "stage": "arrival20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "require-room",
+          "room": 20
+        },
+        {
+          "kind": "verb",
+          "objectId": 391,
+          "verb": 72
+        },
+        {
+          "kind": "frames",
+          "stage": "response20",
+          "count": 3000,
+          "settle": true
+        },
+        {
+          "kind": "inspect"
+        }
+      ]
+    },
+    "room": 18,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 56 +0x0000 runs script 2",
+      "endCutscene at Script 56 +0x0025 runs script 3",
+      "cutscene at Script 57 +0x0000 runs script 2",
+      "endCutscene at Script 57 +0x0029 runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "failure": null,
+    "elapsed": 1612
+  }
+]

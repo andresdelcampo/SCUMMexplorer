@@ -1,0 +1,66 @@
+[
+  {
+    "id": "native-egg-level4",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 270
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-approach",
+        "count": 80,
+        "settle": false
+      },
+      {
+        "kind": "look",
+        "objectId": 270
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-lesson",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "target",
+        "objectId": 270
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft",
+        "slot": 0,
+        "gap": 8
+      },
+      {
+        "kind": "frames",
+        "stage": "native-level4",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  }
+]
