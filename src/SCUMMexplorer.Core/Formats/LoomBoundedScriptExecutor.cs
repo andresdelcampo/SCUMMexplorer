@@ -574,8 +574,8 @@ public sealed class LoomBoundedScriptExecutor
                 runtime.SetObjectOwner(objectId, (byte)owner);
                 if (knownVariables.TryGetValue("var[0x001]", out var ego))
                 {
-                    if (owner == ego) runtime.Inventory.Add(objectId);
-                    else runtime.Inventory.Remove(objectId);
+                    if (owner == ego) runtime.AddInventoryObject(objectId);
+                    else runtime.RemoveInventoryObject(objectId);
                 }
                 trace.Add($"object {objectId} owner set to {owner}");
                 pc = next;
@@ -1932,6 +1932,14 @@ public sealed class LoomBoundedScriptExecutor
             if (parts.Length == 3 && parts[1] == "state") return [Bind("target", parts[0]), Bind("draw-state", parts[2])];
             return parts.Length == 2 && parts[1] == "default state and position" ? [Bind("target", parts[0])] : [];
         }
+        if (extended && op == "setOwnerOf")
+        {
+            var parts = text.Split(',', StringSplitOptions.TrimEntries);
+            // Keep the original explicit roles/order. The ego read drives the separate
+            // inventory membership update; it supplies no owner or inventory provenance.
+            return parts.Length == 2 ? [Bind("target", parts[0]), Bind("source", parts[1]),
+                Bind("implicit-ego", "var[0x001]")] : [];
+        }
         if (extended && (IsActorQuery(op) || op is "getDist" or "findObject" or "isSoundRunning" or "isScriptRunning" or "getObjectOwner"))
         {
             var parts = text.Split(',', StringSplitOptions.TrimEntries);
@@ -2167,6 +2175,18 @@ public sealed class LoomBoundedScriptExecutor
             long? owner = ownerSelector.Value is { } id && runtime?.ObjectOwners.TryGetValue(id, out var value) == true ? value : null;
             return Array.AsReadOnly(new[] { new LoomScriptNativeDependency("object-owner", ownerSelector, owner, null,
                 UnresolvedReason: "owner estimate/inventory/effect lifetime not captured") });
+        }
+        if (op == "setOwnerOf" && bindings.Count == 3)
+        {
+            var target = bindings[0];
+            var selected = target.Value is not null && target.UnresolvedReason is null && runtime is not null;
+            long? owner = selected && runtime!.ObjectOwners.TryGetValue(target.Value!.Value, out var value) ? value : null;
+            long? member = selected ? runtime!.Inventory.Contains(target.Value!.Value) ? 1 : 0 : null;
+            return Array.AsReadOnly(new[] {
+                new LoomScriptNativeDependency("object-owner", target, owner, null,
+                    UnresolvedReason: "independent owner provenance/effects not established"),
+                new LoomScriptNativeDependency("inventory-membership", target, member, null,
+                    UnresolvedReason: "independent inventory provenance/effects not established") });
         }
         if (op == "waitFor" && bindings.Count == 1)
         {

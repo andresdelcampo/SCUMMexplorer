@@ -116,6 +116,11 @@ public sealed class LoomScriptRuntimeState
         }
     }
     public HashSet<int> Inventory { get; } = [];
+    /// <summary>Executed membership attempts notify even when unchanged; raw set edits still need notification.</summary>
+    public bool AddInventoryObject(int subject)
+    { var added = Inventory.Add(subject); NotifyNativeMutation("inventory-membership", subject); return added; }
+    public bool RemoveInventoryObject(int subject)
+    { var removed = Inventory.Remove(subject); NotifyNativeMutation("inventory-membership", subject); return removed; }
     public HashSet<int> ActiveSounds { get; } = [];
     /// <summary>Native resource-clock status, with unresolved/seeded route certainty; null outside a session.</summary>
     public Func<int, (bool Running, string? Estimate)>? SoundRunning { get; set; }
