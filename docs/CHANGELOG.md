@@ -1,5 +1,11 @@
 # Changelog
 
+## 2 October: preserve the source-closed cage and name all draft responses
+
+From627b682: both catalog capture previews retain the closed Room43 background instead of borrowing the open-door image from later091. Generic fallback respects source-selected hidden regions, including overlapping images, while preserving the established entry/opening/unconditional-reset and gap policies. Room08's equivalent future-overlay guess is also corrected; other74 renders exact, all76 zero-gap. No native route improved; raw4 and all execution barriers stay unchanged. Core657,363 exact roots/fingerprints/four memberships/two sequences,Blockers0, clean normal main Release. No App launch/close/interaction or push;57 protected files exact. [Validation](../.verification/room43-cage-20261002/validation.md).
+
+All132 numbered draft-response titles now use the existing Game Status spell associations in the shared catalog, including reverse directions. Global picker, room picker and Game Texts agree; original recipes, IDs, generated JSON and evidence are untouched. [Naming validation](../.verification/room43-cage-20261002/names-validation.md). The user clarifies that Play Cutscene works, while manual18 remains blocked before42; its exact native setup is separate from unchanged raw4.
+
 ## 2 October: bound the raw4 failure and separate the reported cage issue
 
 Continued `55cb5ec`; no route improved. Rebuilt the existing Core probe and replayed only the unchanged Room41 raw4 recipe: whole packet byte-exact, Room41,15/14,7659frames. Two diagnostic cycles confirm the conditional Room42 rejection leaves no090 resumption and that uncertainty predates204-to090; no execution, observer, catalog or recipe change. The user clarified that Play Cutscene reaches the cage but shows it open rather than expected closed; preserve this separate report for a bounded source state/image check of the exact selected entry. All57 protected files remain exact/unstaged, prior runtime suite/build remain dated, no App launch or push. A stray App was stopped before the user opened another and explicitly requested it be left open. [Validation, limits and reproduction](../.verification/room41-route-20261002/validation.md).

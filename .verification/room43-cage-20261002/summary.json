@@ -1,0 +1,100 @@
+{
+  "checkpoint": "627b682",
+  "routes": [
+    {
+      "verb": "41",
+      "frames": 1729,
+      "room": 43,
+      "roomChanges": [
+        {
+          "frame": 0,
+          "RoomId": 41
+        },
+        {
+          "frame": 503,
+          "RoomId": 42
+        },
+        {
+          "frame": 584,
+          "RoomId": 43
+        },
+        {
+          "frame": 816,
+          "RoomId": 60
+        },
+        {
+          "frame": 1067,
+          "RoomId": 43
+        }
+      ],
+      "sourceAndExecutionExact": true,
+      "beforePaint": [
+        645
+      ],
+      "afterPaint": [],
+      "imageSha256": "a3221c3e9a97a2a27fc24aacc56415ad44294d0d584067a61bea3d9d76756453"
+    },
+    {
+      "verb": "4B",
+      "frames": 1723,
+      "room": 43,
+      "roomChanges": [
+        {
+          "frame": 0,
+          "RoomId": 41
+        },
+        {
+          "frame": 497,
+          "RoomId": 42
+        },
+        {
+          "frame": 578,
+          "RoomId": 43
+        },
+        {
+          "frame": 810,
+          "RoomId": 60
+        },
+        {
+          "frame": 1061,
+          "RoomId": 43
+        }
+      ],
+      "sourceAndExecutionExact": true,
+      "beforePaint": [
+        645
+      ],
+      "afterPaint": [],
+      "imageSha256": "a3221c3e9a97a2a27fc24aacc56415ad44294d0d584067a61bea3d9d76756453"
+    }
+  ],
+  "diagnosticCycles": 1,
+  "renderingCorrection": true,
+  "nativeRoutesImproved": 0,
+  "raw4Unchanged": true,
+  "literalSitesValidated": 168,
+  "literalSitesTotal": 235,
+  "corePassed": 657,
+  "literalRootsExact": 363,
+  "membershipsExact": 4,
+  "sequencesExact": 2,
+  "blockers": 0,
+  "roomRenders": 76,
+  "changedRooms": [
+    8,
+    43
+  ],
+  "other74RendersByteExact": true,
+  "gaps": 0,
+  "namedResponses": 132,
+  "protected57ExactAndUnstaged": true,
+  "historicalRouteReportsExact": true,
+  "appPids": [
+    64792
+  ],
+  "appLaunched": false,
+  "appInteractedWith": false,
+  "pushed": false,
+  "build": "Isolated App Release and final normal main-solution Release succeeded, zero warnings/errors. User App disappeared independently before normal build; no agent launch/close or WPF check.",
+  "userClarification": "Play Cutscene works (user names 18 and 9); manual18 fails before Room42. This is not the unchanged raw4 slot4 recipe."
+}

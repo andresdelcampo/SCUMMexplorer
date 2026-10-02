@@ -263,6 +263,14 @@ public sealed class RoomObjectSelection
             !_batches.Any(batch => batch.Priority >= LoomSceneDrawBatches.EntryScriptPriority &&
                 batch.Steps.Any(step => Peers(obj).Any(peer => peer.Id == step.ObjectId)));
 
+        // A later-reaction guess cannot overwrite a source-selected hidden region
+        // on intact background. Keep the existing entry/opening-frame estimates
+        // and unconditional entry-reset policy; neither proves a played branch.
+        bool KeepReachedBackground(RoomObjectImage obj, int priority = LoomSceneDrawBatches.OtherScriptPriority) =>
+            priority < LoomSceneDrawBatches.EntryScriptPriority && _background is not null &&
+            _objects.Any(other => statesSetByCode?.Contains(other.Id) == true &&
+                entryStates?.ContainsKey(other.Id) != true && Intersects(obj, other) && !IsBackgroundGap(other));
+
         bool Open(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) && !KeepIndexedBackground(obj) &&
                                           !Peers(obj).Any(IsActive) &&
                                           !_objects.Any(other => IsActive(other) && Intersects(obj, other));
@@ -280,7 +288,8 @@ public sealed class RoomObjectSelection
             {
                 if (skipped.Contains(Rect(obj)) || !Open(obj)) continue;
                 var members = Peers(obj).Where(IsRoomArtwork).Select(peer => peer.Id).ToHashSet();
-                var group = _batches.Where(item => item.Steps.Any(step => members.Contains(step.ObjectId)))
+                var group = _batches.Where(item => !KeepReachedBackground(obj, item.Priority) &&
+                        item.Steps.Any(step => members.Contains(step.ObjectId)))
                     .GroupBy(item => item.Priority).OrderByDescending(items => items.Key)
                     .Select(items => items.OrderBy(item => item.Source, StringComparer.Ordinal).ToArray())
                     .FirstOrDefault();
@@ -296,7 +305,7 @@ public sealed class RoomObjectSelection
             foreach (var step in chosen.Steps)
             {
                 var obj = _objects.FirstOrDefault(item => item.Id == step.ObjectId);
-                if (obj is null || !IsRoomArtwork(obj)) continue;
+                if (obj is null || !IsRoomArtwork(obj) || KeepReachedBackground(obj, chosen.Priority)) continue;
                 // As in FillGaps: keep what is already visible elsewhere.
                 if (!bestMembers.Contains(obj.Id) && Peers(obj).Any(IsActive)) continue;
                 if (!DrawObject(obj.Id, step.X, step.Y)) continue;
@@ -310,7 +319,7 @@ public sealed class RoomObjectSelection
 
         foreach (var obj in _objects)
         {
-            if (!Open(obj) || Peers(obj).Any(peer => statesSetByCode?.Contains(peer.Id) == true)) continue;
+            if (!Open(obj) || KeepReachedBackground(obj) || Peers(obj).Any(peer => statesSetByCode?.Contains(peer.Id) == true)) continue;
             var evidence = entryStates is null ? [] : Peers(obj).Where(peer => entryStates.ContainsKey(peer.Id)).ToArray();
             if (evidence.Length > 0)
             {

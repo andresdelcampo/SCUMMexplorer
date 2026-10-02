@@ -6,6 +6,43 @@ namespace SCUMMexplorer.Tests;
 public sealed class RoomObjectSelectionTests
 {
     [Fact]
+    public void LargerFutureOverlayCannotReopenSourceHiddenRegion()
+    {
+        var background = new RoomImage(32, 16, Enumerable.Repeat((byte)2, 512).ToArray(), Palette);
+        var hidden = Filled(1, 8, 4, 8, 8, 3);
+        var larger = Filled(2, 4, 0, 24, 16, 4);
+        var selection = new RoomObjectSelection([hidden, larger], new Dictionary<int, byte> { [1] = 0, [2] = 0 },
+            background: background);
+
+        Assert.Empty(selection.ShowUnresolvedArtwork(
+            [new([new(2)], LoomSceneDrawBatches.OtherScriptPriority, "later larger overlay")], statesSetByCode: [1]));
+        Assert.Equal(background.Pixels.ToArray(), selection.Compose(background));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ReachedHiddenStateOnIntactBackgroundSurvivesBatchGuess(bool secondaryStep)
+    {
+        var background = new RoomImage(32, 16, Enumerable.Repeat((byte)2, 512).ToArray(), Palette);
+        var closed = Filled(1, 0, 0, 8, 8, 3);
+        var unresolved = Filled(2, 16, 0, 8, 8, 4);
+        var selection = new RoomObjectSelection([closed, unresolved], new Dictionary<int, byte> { [1] = 0, [2] = 0 },
+            background: background);
+        RoomDrawStep[] steps = secondaryStep ? [new(2), new(1)] : [new(1)];
+
+        var estimates = selection.ShowUnresolvedArtwork(
+            [new(steps, LoomSceneDrawBatches.OtherScriptPriority, "static future draw")], statesSetByCode: [1]);
+
+        Assert.DoesNotContain(estimates, e => e.ObjectId == 1);
+        Assert.False(selection.IsActive(closed));
+        Assert.Equal(2, selection.Compose(background)[0]);
+        Assert.True(selection.IsActive(unresolved)); // Unresolved positions retain their fallback.
+        Assert.True(selection.DrawObject(1)); // An actual later source draw remains authoritative.
+        Assert.Equal(3, selection.Compose(background)[0]);
+    }
+
+    [Fact]
     public void IntactIndexedBackgroundSurvivesLaterReactionOverlayGuess()
     {
         var original = Enumerable.Repeat((byte)2, 16 * 16).ToArray();

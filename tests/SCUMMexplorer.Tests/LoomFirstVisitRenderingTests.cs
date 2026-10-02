@@ -107,7 +107,6 @@ public sealed class LoomFirstVisitRenderingTests
     [Theory]
     [InlineData(2, 157, "opening frame of Room 02 in script 106 +0x03A0")]
     [InlineData(65, 830, "opening frame of Room 65 in script 72 +0x0029")]
-    [InlineData(43, 645, "script 91 +0x009C")]
     [InlineData(4, 178, "Room 04 local script 201 +0x0082, last frame from the table set at +0x000C")]
     public void NothingVisibleFallbackOpensOnTheStrongestScriptBatch(int roomId, int objectId, string source)
     {
@@ -128,6 +127,17 @@ public sealed class LoomFirstVisitRenderingTests
         }
         Assert.Equal(images.Where(selection.IsActive).Select(obj => obj.Id).Order(),
             estimates.Select(item => item.ObjectId).Distinct().Order());
+        Assert.Empty(selection.VisibleGaps());
+    }
+
+    [Fact]
+    public void Room43ReachedClosedCageDoesNotBorrowLaterOpeningArtwork()
+    {
+        if (Data.Value is not { } data) return;
+        var (selection, estimates, background) = data.FirstVisit(43);
+        Assert.DoesNotContain(estimates, item => item.ObjectId is 645 or 646);
+        Assert.Empty(selection.PaintOrder());
+        Assert.Equal(background.Pixels.ToArray(), selection.Compose(background));
         Assert.Empty(selection.VisibleGaps());
     }
 
