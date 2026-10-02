@@ -1,5 +1,6 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Formats;
+using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -144,5 +145,26 @@ public sealed class LoomBootTests
         Assert.Null(session.Snapshot.RoomId);
         Assert.Equal((ushort)0, session.Snapshot.KnownGlobalVariables["var[0x023]"]);
         Assert.Contains(session.Snapshot.Uncertainties, line => line.Contains("room transition awaits", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void NativeIntroAwaitsInputAndExecutesChallengeExpressions()
+    {
+        string folder = Environment.GetEnvironmentVariable("SCUMM_SOUND_TEST_ROOT") ?? Folder;
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")),
+            stopAtBootInput: true);
+        Assert.Equal(69, session.Snapshot.RoomId);
+        Assert.Equal(200, session.Snapshot.KnownGlobalVariables["var[0x020]"]);
+        Assert.Equal(0, session.Snapshot.KnownGlobalVariables["bit[0xD6B]"]);
+        Assert.DoesNotContain(session.Snapshot.Uncertainties, line => line.Contains("as if the player", StringComparison.Ordinal));
+        var target = new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 69).FilePath)).Single(o => o.Id == 876);
+        session.Click(target.X + target.Width / 2, target.Y + target.Height / 2);
+        for (int i = 0; i < 32; i++) session.AdvanceFrame();
+        Assert.All(Enumerable.Range(0, 4), i => Assert.InRange(session.Snapshot.KnownGlobalVariables[$"var[0x{0x52+i:X3}]"], (ushort)0, (ushort)11));
+        Assert.Contains(session.Snapshot.RandomPicks, pick => pick.Offset == 0x0049 && pick.Max == 5);
+        Assert.Equal(69, session.Snapshot.RoomId);
+        Assert.Equal(0, session.Snapshot.KnownGlobalVariables["bit[0xD6B]"]);
     }
 }

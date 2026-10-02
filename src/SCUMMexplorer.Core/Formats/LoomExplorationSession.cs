@@ -99,8 +99,10 @@ public sealed partial class LoomExplorationSession
     /// (script 044, +0x0222), after the intro screen's assumed answer. <see cref="BootRunning"/> stays true, and
     /// <see cref="AdvanceFrame"/> plays the rest of the boot frame by frame, exactly as the constructor would.
     /// </param>
+    /// <param name="stopAtBootInput">With completeBoot, enters the native intro and awaits actual input,
+    /// before the explorer's assumed challenge answer. Frames continue the waiting boot after input.</param>
     public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
-        bool completeBoot = true, bool stopAtOpening = false)
+        bool completeBoot = true, bool stopAtOpening = false, bool stopAtBootInput = false)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -152,6 +154,14 @@ public sealed partial class LoomExplorationSession
             _dispatchScope--;
         }
         DispatchRequestedLoads("during the boot");
+        if (stopAtBootInput)
+        {
+            // Keep script 001 waiting on the intro's source-owned D6B gate.
+            // Room 69 input must run local 203/205; CompleteBoot's assumed answer is omitted.
+            _booting = false;
+            LastAction = null;
+            return;
+        }
         CompleteBoot(stopAtOpening);
         LastAction = null;
     }

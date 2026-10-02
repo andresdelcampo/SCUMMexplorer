@@ -1,0 +1,86 @@
+{
+  "core": 289,
+  "wpf": 62,
+  "doorways": 16,
+  "controls": 19,
+  "input": 18,
+  "rootCount": 363,
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "sourceFingerprintsUnchanged": true,
+  "rootResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "blockedRandomSites": 0,
+  "rooms": 76,
+  "remainingGaps": 0,
+  "pixelsUnchanged": 76,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "reports": [
+    {
+      "path": "Exe/SourceProgressionSession-20261002/checks-2/core-tests.txt",
+      "sha256": "132a8a2a3f4b6e15953091405d6f959a30cef40edbc4ac85d771c4e0171bd29f"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/release-final.txt",
+      "sha256": "fd8e987f5bef311d24ee909e43cdeab7927ce6b09b769f73e732c4a5c57157c7"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/ui-1/staff-check.txt",
+      "sha256": "bd27d62b883180629f066f39d56bc4f2fe8f7bd1526e8f0fc19dbbe252643eef"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/navigation-1/doorways.txt",
+      "sha256": "a37eec5fe084a1160156f5cd717ad28c8268ab9f01d0f99e009eb3989fe6fa50"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/navigation-1/controls/room-controls-check.txt",
+      "sha256": "f18da500138440ef05bd8cd0141abe021a8b66ac694df6ef1bd7c3cf90c2d871"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/input-1/input-check.txt",
+      "sha256": "6943b93cb97931e86159dee7ada75ce29b0409f3bcf6eb44281982b2678152f6"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/room-audit-1/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/SourceProgressionSession-20261002/png-comparison.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    }
+  ]
+}

@@ -327,6 +327,18 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "expression")
+            {
+                if (!TryApplyExpression(instruction, script, knownVariables, estimated, runtime,
+                        onEstimatedPath, picks, trace, out var expressionDetail))
+                {
+                    unresolved = $"{expressionDetail} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "getRandomNr")
             {
                 // o5_getRandomNr: result = getRandomNumber(max), 0..max inclusive.
@@ -1624,6 +1636,82 @@ public sealed class LoomBoundedScriptExecutor
         inBox = runtime.WalkBoxes.Contains(box, x, y);
         if (actor.Estimate is not null) estimate = $"actor {number}: {actor.Estimate}";
         detail = "known value";
+        return true;
+    }
+
+    // o5_expression uses a separate integer stack, writes the final word to the
+    // saved result variable, and pushes var 0 after a nested normal opcode.
+    // Only the nested getRandomNr form is supported here; other opcodes remain unresolved.
+    private static bool TryApplyExpression(LoomScriptInstruction instruction, LoomScriptDisassembly script,
+        Dictionary<string, ushort> variables, HashSet<string> estimated, LoomScriptRuntimeState? runtime,
+        bool pathEstimated, List<LoomRandomPick> picks, List<string> trace, out string detail)
+    {
+        detail = "expression operands are unsupported";
+        int separator = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
+        if (separator < 0 || !instruction.Operands.EndsWith(']') ||
+            !TryGetVariableKey(instruction.Operands[..separator], variables, out var destination)) return false;
+        string body = instruction.Operands[(separator + 3)..^1];
+        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+        if (tokens.Count is 0 or > 4096) return false;
+        int end = 0;
+        foreach (Match token in tokens)
+        {
+            if (!string.IsNullOrWhiteSpace(body[end..token.Index])) return false;
+            end = token.Index + token.Length;
+        }
+        if (!string.IsNullOrWhiteSpace(body[end..])) return false;
+
+        var stack = new Stack<(int Value, bool Estimated)>();
+        foreach (Match token in tokens)
+        {
+            string term = token.Value;
+            if (term is "+" or "-" or "*" or "/")
+            {
+                if (stack.Count < 2) { detail = "expression stack underflow"; return false; }
+                var right = stack.Pop();
+                var left = stack.Pop();
+                if (term == "/" && right.Value == 0) { detail = "expression divides by zero"; return false; }
+                int value = term switch
+                {
+                    "+" => unchecked(left.Value + right.Value),
+                    "-" => unchecked(left.Value - right.Value),
+                    "*" => unchecked(left.Value * right.Value),
+                    _ => left.Value == int.MinValue && right.Value == -1 ? int.MinValue : left.Value / right.Value
+                };
+                stack.Push((value, left.Estimated || right.Estimated));
+            }
+            else if (term.StartsWith("getRandomNr(", StringComparison.Ordinal))
+            {
+                var parts = term[12..^1].Split(',', StringSplitOptions.TrimEntries);
+                if (runtime is null || parts.Length != 2 ||
+                    !TryGetVariableKey(parts[0], variables, out var randomDestination) ||
+                    !TryReadValue(parts[1], variables, out var max, out _))
+                { detail = "nested getRandomNr operands are unknown"; return false; }
+                var pick = runtime.Random.Pick(script.Context ?? $"Script {script.ScriptId:00}", instruction.Offset, max);
+                variables[randomDestination] = (ushort)pick.Value;
+                RefreshBitAliases(randomDestination, variables);
+                MarkEstimated(estimated, randomDestination, true);
+                picks.Add(pick);
+                trace.Add($"{randomDestination} = {pick.Value}: nested seeded pick of 0..{max} (seed {pick.Seed}, draw {pick.Draw})");
+                if (!TryReadValue("var[0x000]", variables, out var scratch, out _))
+                { detail = "nested expression opcode leaves var[0x000] unknown"; return false; }
+                stack.Push((unchecked((short)scratch), IsEstimated("var[0x000]", estimated)));
+            }
+            else
+            {
+                if (!TryReadValue(term, variables, out var value, out var unknown))
+                { detail = $"expression reads {unknown}"; return false; }
+                stack.Push((unchecked((short)value), OperandIsEstimated(term, estimated, variables)));
+            }
+        }
+        if (stack.Count != 1) { detail = "expression does not leave one result"; return false; }
+        var result = stack.Pop();
+        variables[destination] = unchecked((ushort)result.Value);
+        RefreshBitAliases(destination, variables);
+        MarkEstimated(estimated, destination, pathEstimated || result.Estimated ||
+            OperandIsEstimated(instruction.Operands[..separator], estimated, variables, indexOnly: true));
+        trace.Add($"{destination} = {unchecked((short)result.Value)}: expression");
+        detail = "known expression";
         return true;
     }
 
