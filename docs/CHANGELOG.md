@@ -1,5 +1,12 @@
 # Changelog
 
+## 2 October: generic Core correlated numeric analysis
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Bounded source-analysis API | Whole correlated worlds, masks/indexes/arguments, opaque responses and explicit effect/callee boundaries; no runtime estimates changed | [validation](../.verification/correlated-core-20261002/validation.md) |
+| Fresh loaded-source reproduction | 162 worlds,52 flags,51 comparisons/14 overlaps,four Cartesian witnesses,12 practice argument cases; Core316 and clean main Release | [summary](../.verification/correlated-core-20261002/numeric-summary.json) |
+
 ## 2 October: per-slot cancellation and completion writer identity
 
 | Change | Result | Record |
