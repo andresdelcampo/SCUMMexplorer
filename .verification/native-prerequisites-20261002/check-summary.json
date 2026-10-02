@@ -1,0 +1,59 @@
+{
+  "core": 289,
+  "rootCount": 363,
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "sourceFingerprintsUnchanged": true,
+  "rootResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "blockedRandomSites": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "sourceCode": {
+    "path": "Exe/VerificationSession-20261001/native-code-1/code.tsv",
+    "sha256": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569"
+  },
+  "reports": [
+    {
+      "path": "Exe/NativePrerequisitesSession-20261002/checks-1/core-tests.txt",
+      "sha256": "132a8a2a3f4b6e15953091405d6f959a30cef40edbc4ac85d771c4e0171bd29f"
+    },
+    {
+      "path": "Exe/NativePrerequisitesSession-20261002/checks-1/release-build.txt",
+      "sha256": "5aae65b5be9d07b7f7b25a6f9174aeb8e568dfe78c13b9d2d27f38cd9a2c9f42"
+    },
+    {
+      "path": "Exe/NativePrerequisitesSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/NativePrerequisitesSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/NativePrerequisitesSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/NativePrerequisitesSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    }
+  ]
+}

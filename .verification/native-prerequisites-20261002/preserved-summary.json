@@ -1,0 +1,1397 @@
+[
+  {
+    "id": "late096-reached44",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/preserved-1/late096-reached44.json",
+      "sha256": "99a7c30285d0bde6f939e15c86e8244efd7bb826fa458d17b348347cdf6fe0bb"
+    },
+    "elapsed": 4017,
+    "stages": {
+      "source-arrival44": {
+        "frame": 42,
+        "room": 44,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "095": {
+        "frame": 851,
+        "room": 45,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 21330,
+        "responseScratchEstimated": false
+      },
+      "staff45": {
+        "frame": 75,
+        "room": 45,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 21330,
+        "responseScratchEstimated": false
+      },
+      "return43": {
+        "frame": 49,
+        "room": 43,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 21330,
+        "responseScratchEstimated": false
+      },
+      "096": {
+        "frame": 3000,
+        "room": 43,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 21330,
+        "responseScratchEstimated": false
+      },
+      "final": {
+        "frame": 0,
+        "room": 43,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 21330,
+        "responseScratchEstimated": false
+      }
+    },
+    "begun": 4,
+    "ended": 3,
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 44
+      },
+      {
+        "elapsed": 228,
+        "room": 42
+      },
+      {
+        "elapsed": 234,
+        "room": 45
+      },
+      {
+        "elapsed": 969,
+        "room": 43
+      }
+    ],
+    "stops": [],
+    "events": [],
+    "uncertainties": [
+      "Script 96 +0x0046: possible Room 45 load follows a seeded pick, so the session does not enter it at +0x0049"
+    ],
+    "failure": null
+  },
+  {
+    "id": "late096-source-skip095",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/preserved-1/late096-source-skip095.json",
+      "sha256": "b67dd99ecb57184e08151f19b0c42e629133d4174debc3468b53df503701342d"
+    },
+    "elapsed": 357,
+    "stages": {
+      "source-arrival44": {
+        "frame": 42,
+        "room": 44,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "095-override": {
+        "frame": 2,
+        "room": 44,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "095": {
+        "frame": 43,
+        "room": 45,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "staff45": {
+        "frame": 75,
+        "room": 45,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "return43": {
+        "frame": 49,
+        "room": 43,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "096": {
+        "frame": 146,
+        "room": 46,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "final": {
+        "frame": 0,
+        "room": 46,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      }
+    },
+    "begun": 4,
+    "ended": 4,
+    "boundaries": [
+      "cutscene at Script 95 +0x0000 runs script 2",
+      "endCutscene at Script 95 +0x079D runs script 3",
+      "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+      "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+      "cutscene at Script 92 +0x0000 runs script 2",
+      "endCutscene at Script 92 +0x0039 runs script 3",
+      "cutscene at Script 96 +0x0000 runs script 2",
+      "endCutscene at Script 96 +0x00E7 runs script 3"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 44
+      },
+      {
+        "elapsed": 45,
+        "room": 45
+      },
+      {
+        "elapsed": 163,
+        "room": 43
+      },
+      {
+        "elapsed": 241,
+        "room": 45
+      },
+      {
+        "elapsed": 304,
+        "room": 46
+      }
+    ],
+    "stops": [],
+    "events": [],
+    "uncertainties": [],
+    "failure": null
+  },
+  {
+    "id": "sleep-source369-response390",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/preserved-1/sleep-source369-response390.json",
+      "sha256": "12167d3b30a064a92a4356f51c247acbf16dd87171f7cbf758134651ae8db281"
+    },
+    "elapsed": 1575,
+    "stages": {
+      "source-sleep": {
+        "frame": 117,
+        "room": 16,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "arrival20": {
+        "frame": 888,
+        "room": 20,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "response20": {
+        "frame": 570,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "final": {
+        "frame": 0,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      }
+    },
+    "begun": 7,
+    "ended": 7,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 62 +0x0000 runs script 2",
+      "endCutscene at Script 62 +0x0018 runs script 3",
+      "cutscene at Script 63 +0x0000 runs script 2",
+      "endCutscene at Script 63 +0x001C runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 16
+      },
+      {
+        "elapsed": 118,
+        "room": 18
+      },
+      {
+        "elapsed": 154,
+        "room": 20
+      },
+      {
+        "elapsed": 1436,
+        "room": 18
+      }
+    ],
+    "stops": [],
+    "events": [],
+    "uncertainties": [],
+    "failure": null
+  },
+  {
+    "id": "sleep-source369-response391",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/preserved-1/sleep-source369-response391.json",
+      "sha256": "2bcf6afe087ba694c3c000a99e4f7c857212f84e9b11438669de3b4a2f432513"
+    },
+    "elapsed": 1575,
+    "stages": {
+      "source-sleep": {
+        "frame": 117,
+        "room": 16,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "arrival20": {
+        "frame": 888,
+        "room": 20,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "response20": {
+        "frame": 570,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "final": {
+        "frame": 0,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      }
+    },
+    "begun": 7,
+    "ended": 7,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 62 +0x0000 runs script 2",
+      "endCutscene at Script 62 +0x0018 runs script 3",
+      "cutscene at Script 63 +0x0000 runs script 2",
+      "endCutscene at Script 63 +0x001C runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 16
+      },
+      {
+        "elapsed": 118,
+        "room": 18
+      },
+      {
+        "elapsed": 154,
+        "room": 20
+      },
+      {
+        "elapsed": 1436,
+        "room": 18
+      }
+    ],
+    "stops": [],
+    "events": [],
+    "uncertainties": [],
+    "failure": null
+  },
+  {
+    "id": "sleep-source371-response390",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/preserved-1/sleep-source371-response390.json",
+      "sha256": "5757065157bd463bfae7abeaa89c77f776f6b167bd2647af38a405ab8f977526"
+    },
+    "elapsed": 1612,
+    "stages": {
+      "source-sleep": {
+        "frame": 117,
+        "room": 16,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "arrival20": {
+        "frame": 967,
+        "room": 20,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "response20": {
+        "frame": 528,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "final": {
+        "frame": 0,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      }
+    },
+    "begun": 7,
+    "ended": 7,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 56 +0x0000 runs script 2",
+      "endCutscene at Script 56 +0x0025 runs script 3",
+      "cutscene at Script 57 +0x0000 runs script 2",
+      "endCutscene at Script 57 +0x0029 runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 16
+      },
+      {
+        "elapsed": 118,
+        "room": 18
+      },
+      {
+        "elapsed": 201,
+        "room": 20
+      },
+      {
+        "elapsed": 1473,
+        "room": 18
+      }
+    ],
+    "stops": [],
+    "events": [],
+    "uncertainties": [],
+    "failure": null
+  },
+  {
+    "id": "sleep-source371-response391",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/preserved-1/sleep-source371-response391.json",
+      "sha256": "4729db9f3a161b866d7ceae8fa24c4defe7f53e457fff2387d422b31fd198476"
+    },
+    "elapsed": 1612,
+    "stages": {
+      "source-sleep": {
+        "frame": 117,
+        "room": 16,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "arrival20": {
+        "frame": 967,
+        "room": 20,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "response20": {
+        "frame": 528,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "final": {
+        "frame": 0,
+        "room": 18,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      }
+    },
+    "begun": 7,
+    "ended": 7,
+    "boundaries": [
+      "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+      "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+      "cutscene at Script 56 +0x0000 runs script 2",
+      "endCutscene at Script 56 +0x0025 runs script 3",
+      "cutscene at Script 57 +0x0000 runs script 2",
+      "endCutscene at Script 57 +0x0029 runs script 3",
+      "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+      "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+      "cutscene at Room 20 local script 207 +0x000B runs script 2",
+      "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+      "cutscene at Script 58 +0x0000 runs script 2",
+      "endCutscene at Script 58 +0x0018 runs script 3",
+      "cutscene at Script 59 +0x0010 runs script 2",
+      "endCutscene at Script 59 +0x003F runs script 3"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 16
+      },
+      {
+        "elapsed": 118,
+        "room": 18
+      },
+      {
+        "elapsed": 201,
+        "room": 20
+      },
+      {
+        "elapsed": 1473,
+        "room": 18
+      }
+    ],
+    "stops": [],
+    "events": [],
+    "uncertainties": [],
+    "failure": null
+  }
+]

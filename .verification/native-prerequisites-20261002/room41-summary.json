@@ -1,0 +1,6445 @@
+[
+  {
+    "id": "direct41-source-skip204",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/room41-controls-1/direct41-source-skip204.json",
+      "sha256": "5fc68fdacdde6bb7c895281655dd88c86253eacd436ff3f89a3e5843e88f92fd"
+    },
+    "elapsed": 2799,
+    "stages": {
+      "staff": {
+        "frame": 73,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "052": {
+        "frame": 334,
+        "room": 13,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "native-learn4": {
+        "frame": 182,
+        "room": 13,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": false
+      },
+      "level5": {
+        "frame": 105,
+        "room": 15,
+        "level": 5,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "level6": {
+        "frame": 258,
+        "room": 28,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "source-arrival41": {
+        "frame": 46,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "632-ready": {
+        "frame": 42,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "633-ready": {
+        "frame": 451,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "approach": {
+        "frame": 40,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "633-aim": {
+        "frame": 1,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "204-override": {
+        "frame": 40,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "source090": {
+        "frame": 1227,
+        "room": 43,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "final": {
+        "frame": 0,
+        "room": 43,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      }
+    },
+    "begun": 12,
+    "ended": 12,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2",
+      "endCutscene at Script 90 +0x0730 runs script 3"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 9
+      },
+      {
+        "elapsed": 74,
+        "room": 10
+      },
+      {
+        "elapsed": 111,
+        "room": 11
+      },
+      {
+        "elapsed": 350,
+        "room": 13
+      },
+      {
+        "elapsed": 590,
+        "room": 15
+      },
+      {
+        "elapsed": 695,
+        "room": 28
+      },
+      {
+        "elapsed": 953,
+        "room": 41
+      },
+      {
+        "elapsed": 1573,
+        "room": 42
+      },
+      {
+        "elapsed": 1654,
+        "room": 43
+      },
+      {
+        "elapsed": 1886,
+        "room": 60
+      },
+      {
+        "elapsed": 2137,
+        "room": 43
+      }
+    ],
+    "stops": [],
+    "events": [
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 0,
+        "Operands": "[0x0001]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 5,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x2A",
+        "TargetId": 42,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 10,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x27, [0x001A]",
+        "TargetId": 39,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 207,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x2B",
+        "TargetId": 43,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 501,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x3C",
+        "TargetId": 60,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 889,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x2B",
+        "TargetId": 43,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 1737,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0xD2, []",
+        "TargetId": 210,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 1840,
+        "Operation": "endCutscene",
+        "Certainty": 0,
+        "Operands": "",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      }
+    ],
+    "uncertainties": [],
+    "failure": null
+  },
+  {
+    "id": "native41-source-skip204",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/room41-controls-1/native41-source-skip204.json",
+      "sha256": "aa56de132a272b7642247bbde11c906ddcc603b84088da1fa0f9cd5273af31c0"
+    },
+    "elapsed": 4623,
+    "stages": {
+      "staff": {
+        "frame": 73,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "052": {
+        "frame": 334,
+        "room": 13,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "native-learn4": {
+        "frame": 182,
+        "room": 13,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": false
+      },
+      "level5": {
+        "frame": 105,
+        "room": 15,
+        "level": 5,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "level6": {
+        "frame": 258,
+        "room": 28,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "source-arrival41": {
+        "frame": 46,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "632-ready": {
+        "frame": 42,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "633-ready": {
+        "frame": 451,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "approach": {
+        "frame": 40,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "633-aim": {
+        "frame": 1,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "204-override": {
+        "frame": 59,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "source090": {
+        "frame": 3000,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "final": {
+        "frame": 0,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      }
+    },
+    "begun": 12,
+    "ended": 11,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 9
+      },
+      {
+        "elapsed": 74,
+        "room": 10
+      },
+      {
+        "elapsed": 111,
+        "room": 11
+      },
+      {
+        "elapsed": 350,
+        "room": 13
+      },
+      {
+        "elapsed": 590,
+        "room": 15
+      },
+      {
+        "elapsed": 695,
+        "room": 28
+      },
+      {
+        "elapsed": 953,
+        "room": 41
+      }
+    ],
+    "stops": [],
+    "events": [
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0003]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0004]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0004, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0041]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 1,
+        "Operands": "[0x0001]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 5,
+        "Operation": "loadRoom",
+        "Certainty": 1,
+        "Operands": "0x2A",
+        "TargetId": 42,
+        "EstimatedArgumentIndexes": null
+      }
+    ],
+    "uncertainties": [
+      "Script 90 +0x0000: possible Room 42 load follows a seeded pick, so the session does not enter it at +0x0005"
+    ],
+    "failure": null
+  },
+  {
+    "id": "native41-source37-arrival",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/room41-controls-1/native41-source37-arrival.json",
+      "sha256": "fe73cae18a65d610e37425de3aae544aaa78461c7596a52d31be6f7d92010c86"
+    },
+    "elapsed": 4564,
+    "stages": {
+      "staff": {
+        "frame": 73,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "052": {
+        "frame": 334,
+        "room": 13,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "native-learn4": {
+        "frame": 182,
+        "room": 13,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": false
+      },
+      "level5": {
+        "frame": 105,
+        "room": 15,
+        "level": 5,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "level6": {
+        "frame": 258,
+        "room": 28,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "source-arrival41": {
+        "frame": 46,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "632-ready": {
+        "frame": 42,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "633-ready": {
+        "frame": 451,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "approach": {
+        "frame": 40,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "633-aim": {
+        "frame": 1,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "cast": {
+        "frame": 3000,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "final": {
+        "frame": 0,
+        "room": 41,
+        "level": 6,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 21504,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      }
+    },
+    "begun": 12,
+    "ended": 11,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Script 54 +0x0000 runs script 2",
+      "endCutscene at Script 54 +0x00C4 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+      "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+      "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+      "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 9
+      },
+      {
+        "elapsed": 74,
+        "room": 10
+      },
+      {
+        "elapsed": 111,
+        "room": 11
+      },
+      {
+        "elapsed": 350,
+        "room": 13
+      },
+      {
+        "elapsed": 590,
+        "room": 15
+      },
+      {
+        "elapsed": 695,
+        "room": 28
+      },
+      {
+        "elapsed": 953,
+        "room": 41
+      }
+    ],
+    "stops": [],
+    "events": [
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0003]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0004]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0004, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0041]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 1,
+        "Operands": "[0x0001]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 5,
+        "Operation": "loadRoom",
+        "Certainty": 1,
+        "Operands": "0x2A",
+        "TargetId": 42,
+        "EstimatedArgumentIndexes": null
+      }
+    ],
+    "uncertainties": [
+      "Script 90 +0x0000: possible Room 42 load follows a seeded pick, so the session does not enter it at +0x0005"
+    ],
+    "failure": null
+  },
+  {
+    "id": "native41-source-level4",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/room41-level4-1/native41-source-level4.json",
+      "sha256": "d21298b5599a81c88d273b7dc60c2912c3c0bcf739555ad3f30373065f095d30"
+    },
+    "elapsed": 7600,
+    "stages": {
+      "staff": {
+        "frame": 73,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "source-trial": {
+        "frame": 2519,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "egg-approach": {
+        "frame": 80,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "egg-lesson": {
+        "frame": 100,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "egg-aim": {
+        "frame": 1,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "047-override": {
+        "frame": 22,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "native-level4": {
+        "frame": 43,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-lesson": {
+        "frame": 72,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-approach": {
+        "frame": 80,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-aim": {
+        "frame": 1,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-cast": {
+        "frame": 114,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": true
+      },
+      "wheel-lesson": {
+        "frame": 73,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-approach": {
+        "frame": 80,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-aim": {
+        "frame": 1,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-cast": {
+        "frame": 117,
+        "room": 62,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": true
+      },
+      "052": {
+        "frame": 334,
+        "room": 13,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": true
+      },
+      "native-learn4": {
+        "frame": 182,
+        "room": 13,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "source-arrival41": {
+        "frame": 46,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "632-ready": {
+        "frame": 42,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "633-ready": {
+        "frame": 451,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "approach": {
+        "frame": 40,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "633-aim": {
+        "frame": 1,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "cast": {
+        "frame": 3000,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "final": {
+        "frame": 0,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      }
+    },
+    "begun": 15,
+    "ended": 14,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3",
+      "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3",
+      "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+      "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+      "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+      "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+      "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+      "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+      "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+      "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 9
+      },
+      {
+        "elapsed": 74,
+        "room": 8
+      },
+      {
+        "elapsed": 258,
+        "room": 9
+      },
+      {
+        "elapsed": 578,
+        "room": 67
+      },
+      {
+        "elapsed": 772,
+        "room": 9
+      },
+      {
+        "elapsed": 1053,
+        "room": 54
+      },
+      {
+        "elapsed": 1341,
+        "room": 9
+      },
+      {
+        "elapsed": 1767,
+        "room": 3
+      },
+      {
+        "elapsed": 1893,
+        "room": 8
+      },
+      {
+        "elapsed": 1941,
+        "room": 9
+      },
+      {
+        "elapsed": 2201,
+        "room": 11
+      },
+      {
+        "elapsed": 2390,
+        "room": 8
+      },
+      {
+        "elapsed": 2469,
+        "room": 9
+      },
+      {
+        "elapsed": 2871,
+        "room": 6
+      },
+      {
+        "elapsed": 3170,
+        "room": 62
+      },
+      {
+        "elapsed": 3473,
+        "room": 10
+      },
+      {
+        "elapsed": 3510,
+        "room": 11
+      },
+      {
+        "elapsed": 3749,
+        "room": 13
+      },
+      {
+        "elapsed": 3989,
+        "room": 41
+      }
+    ],
+    "stops": [],
+    "events": [
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 0,
+        "Operands": "0x1A, [0x0000, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x07, [var[0x067], 0x003A]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 0,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x2F, [0x0000]",
+        "TargetId": 47,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 6,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 17,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x22, [0x0000]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 23,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0002, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x003E]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 1,
+        "Operands": "[0x0000]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 64,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x28, [0x0017]",
+        "TargetId": 40,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 199,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x08, [var[0x066]]",
+        "TargetId": 8,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 206,
+        "Operation": "endCutscene",
+        "Certainty": 1,
+        "Operands": "",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 207,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 218,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x22, [0x0002]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 246,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 257,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 293,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0001, 0x0001]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x003D]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 0,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 11,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x22, [0x0001]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 17,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 28,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 44,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1D, [0x0004, 0x0005]",
+        "TargetId": 29,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0003]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0004]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0004, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0041]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 1,
+        "Operands": "[0x0001]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 5,
+        "Operation": "loadRoom",
+        "Certainty": 1,
+        "Operands": "0x2A",
+        "TargetId": 42,
+        "EstimatedArgumentIndexes": null
+      }
+    ],
+    "uncertainties": [
+      "Script 90 +0x0000: possible Room 42 load follows a seeded pick, so the session does not enter it at +0x0005"
+    ],
+    "failure": null
+  },
+  {
+    "id": "direct41-source-level4-skip204",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/room41-level4-direct-1/direct41-source-level4-skip204.json",
+      "sha256": "3fbaa7606c3ed8bb21e73dbe92a7c2384c4696e5d70929700c0aa2c021af89df"
+    },
+    "elapsed": 5835,
+    "stages": {
+      "staff": {
+        "frame": 73,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "source-trial": {
+        "frame": 2519,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "egg-approach": {
+        "frame": 80,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "egg-lesson": {
+        "frame": 100,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "egg-aim": {
+        "frame": 1,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "047-override": {
+        "frame": 22,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "native-level4": {
+        "frame": 43,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-lesson": {
+        "frame": 72,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-approach": {
+        "frame": 80,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-aim": {
+        "frame": 1,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-cast": {
+        "frame": 114,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": true
+      },
+      "wheel-lesson": {
+        "frame": 73,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-approach": {
+        "frame": 80,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-aim": {
+        "frame": 1,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-cast": {
+        "frame": 117,
+        "room": 62,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": true
+      },
+      "052": {
+        "frame": 334,
+        "room": 13,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": true
+      },
+      "native-learn4": {
+        "frame": 182,
+        "room": 13,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "source-arrival41": {
+        "frame": 46,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "632-ready": {
+        "frame": 42,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "633-ready": {
+        "frame": 451,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "approach": {
+        "frame": 40,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "633-aim": {
+        "frame": 1,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "204-override": {
+        "frame": 40,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "source090": {
+        "frame": 1227,
+        "room": 43,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "final": {
+        "frame": 0,
+        "room": 43,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      }
+    },
+    "begun": 15,
+    "ended": 15,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3",
+      "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3",
+      "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+      "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+      "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+      "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+      "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+      "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+      "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+      "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2",
+      "endCutscene at Script 90 +0x0730 runs script 3"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 9
+      },
+      {
+        "elapsed": 74,
+        "room": 8
+      },
+      {
+        "elapsed": 258,
+        "room": 9
+      },
+      {
+        "elapsed": 578,
+        "room": 67
+      },
+      {
+        "elapsed": 772,
+        "room": 9
+      },
+      {
+        "elapsed": 1053,
+        "room": 54
+      },
+      {
+        "elapsed": 1341,
+        "room": 9
+      },
+      {
+        "elapsed": 1767,
+        "room": 3
+      },
+      {
+        "elapsed": 1893,
+        "room": 8
+      },
+      {
+        "elapsed": 1941,
+        "room": 9
+      },
+      {
+        "elapsed": 2201,
+        "room": 11
+      },
+      {
+        "elapsed": 2390,
+        "room": 8
+      },
+      {
+        "elapsed": 2469,
+        "room": 9
+      },
+      {
+        "elapsed": 2871,
+        "room": 6
+      },
+      {
+        "elapsed": 3170,
+        "room": 62
+      },
+      {
+        "elapsed": 3473,
+        "room": 10
+      },
+      {
+        "elapsed": 3510,
+        "room": 11
+      },
+      {
+        "elapsed": 3749,
+        "room": 13
+      },
+      {
+        "elapsed": 3989,
+        "room": 41
+      },
+      {
+        "elapsed": 4609,
+        "room": 42
+      },
+      {
+        "elapsed": 4690,
+        "room": 43
+      },
+      {
+        "elapsed": 4922,
+        "room": 60
+      },
+      {
+        "elapsed": 5173,
+        "room": 43
+      }
+    ],
+    "stops": [],
+    "events": [
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 0,
+        "Operands": "0x1A, [0x0000, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x07, [var[0x067], 0x003A]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 0,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x2F, [0x0000]",
+        "TargetId": 47,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 6,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 17,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x22, [0x0000]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 23,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0002, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x003E]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 1,
+        "Operands": "[0x0000]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 64,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x28, [0x0017]",
+        "TargetId": 40,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 199,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x08, [var[0x066]]",
+        "TargetId": 8,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 206,
+        "Operation": "endCutscene",
+        "Certainty": 1,
+        "Operands": "",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 207,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 218,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x22, [0x0002]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 246,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 257,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 293,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0001, 0x0001]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x003D]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 0,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 11,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x22, [0x0001]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 17,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 28,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 44,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1D, [0x0004, 0x0005]",
+        "TargetId": 29,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 0,
+        "Operands": "[0x0001]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 5,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x2A",
+        "TargetId": 42,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 10,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x27, [0x001A]",
+        "TargetId": 39,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 207,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x2B",
+        "TargetId": 43,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 501,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x3C",
+        "TargetId": 60,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 889,
+        "Operation": "loadRoom",
+        "Certainty": 0,
+        "Operands": "0x2B",
+        "TargetId": 43,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 1737,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0xD2, []",
+        "TargetId": 210,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 1840,
+        "Operation": "endCutscene",
+        "Certainty": 0,
+        "Operands": "",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      }
+    ],
+    "uncertainties": [],
+    "failure": null
+  },
+  {
+    "id": "native41-source-level4-skip204",
+    "packet": {
+      "path": "Exe/NativePrerequisitesSession-20261002/room41-level4-skip-1/native41-source-level4-skip204.json",
+      "sha256": "6bf2a712fdb8e6ea2abbc0e08520327748e59414d78ef5b13a0be42996f35939"
+    },
+    "elapsed": 7659,
+    "stages": {
+      "staff": {
+        "frame": 73,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 0,
+        "responseScratchEstimated": false
+      },
+      "source-trial": {
+        "frame": 2519,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "egg-approach": {
+        "frame": 80,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": false
+      },
+      "egg-lesson": {
+        "frame": 100,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "egg-aim": {
+        "frame": 1,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "047-override": {
+        "frame": 22,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 12930,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15162,
+        "responseScratchEstimated": false
+      },
+      "native-level4": {
+        "frame": 43,
+        "room": 9,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 4608,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-lesson": {
+        "frame": 72,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-approach": {
+        "frame": 80,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-aim": {
+        "frame": 1,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 12800,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16190,
+        "responseScratchEstimated": false
+      },
+      "dye-cast": {
+        "frame": 114,
+        "room": 6,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 5120,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": true
+      },
+      "wheel-lesson": {
+        "frame": 73,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-approach": {
+        "frame": 80,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-aim": {
+        "frame": 1,
+        "room": 62,
+        "level": 3,
+        "levelEstimated": false,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 13312,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 15676,
+        "responseScratchEstimated": false
+      },
+      "wheel-cast": {
+        "frame": 117,
+        "room": 62,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": true
+      },
+      "052": {
+        "frame": 334,
+        "room": 13,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 4120,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 84,
+        "responseScratchEstimated": true
+      },
+      "native-learn4": {
+        "frame": 182,
+        "room": 13,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "source-arrival41": {
+        "frame": 46,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "632-ready": {
+        "frame": 42,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "633-ready": {
+        "frame": 451,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "approach": {
+        "frame": 40,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "633-aim": {
+        "frame": 1,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "204-override": {
+        "frame": 59,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "source090": {
+        "frame": 3000,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      },
+      "final": {
+        "frame": 0,
+        "room": 41,
+        "level": 4,
+        "levelEstimated": true,
+        "failedChallenge": 0,
+        "draftWords": [
+          {
+            "slot": 0,
+            "packed": 29314,
+            "estimated": false
+          },
+          {
+            "slot": 1,
+            "packed": 29696,
+            "estimated": true
+          },
+          {
+            "slot": 2,
+            "packed": 29184,
+            "estimated": true
+          },
+          {
+            "slot": 3,
+            "packed": 0,
+            "estimated": true
+          },
+          {
+            "slot": 4,
+            "packed": 12312,
+            "estimated": true
+          }
+        ],
+        "responseWord": 16961,
+        "responseWordEstimated": false,
+        "responseScratch": 16961,
+        "responseScratchEstimated": true
+      }
+    },
+    "begun": 15,
+    "ended": 14,
+    "boundaries": [
+      "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+      "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+      "cutscene at Script 46 +0x0000 runs script 2",
+      "endCutscene at Script 46 +0x1421 runs script 3",
+      "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+      "cutscene at Script 47 +0x0000 runs script 2",
+      "endCutscene at Script 47 +0x0D19 runs script 3",
+      "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+      "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+      "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+      "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+      "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+      "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+      "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+      "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+      "cutscene at Script 29 +0x0000 runs script 2",
+      "endCutscene at Script 29 +0x00E2 runs script 3",
+      "cutscene at Script 52 +0x0000 runs script 2",
+      "endCutscene at Script 52 +0x017C runs script 3",
+      "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+      "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+      "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+      "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+      "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+      "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+      "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+      "cutscene at Script 90 +0x0000 runs script 2"
+    ],
+    "roomChanges": [
+      {
+        "elapsed": 1,
+        "room": 9
+      },
+      {
+        "elapsed": 74,
+        "room": 8
+      },
+      {
+        "elapsed": 258,
+        "room": 9
+      },
+      {
+        "elapsed": 578,
+        "room": 67
+      },
+      {
+        "elapsed": 772,
+        "room": 9
+      },
+      {
+        "elapsed": 1053,
+        "room": 54
+      },
+      {
+        "elapsed": 1341,
+        "room": 9
+      },
+      {
+        "elapsed": 1767,
+        "room": 3
+      },
+      {
+        "elapsed": 1893,
+        "room": 8
+      },
+      {
+        "elapsed": 1941,
+        "room": 9
+      },
+      {
+        "elapsed": 2201,
+        "room": 11
+      },
+      {
+        "elapsed": 2390,
+        "room": 8
+      },
+      {
+        "elapsed": 2469,
+        "room": 9
+      },
+      {
+        "elapsed": 2871,
+        "room": 6
+      },
+      {
+        "elapsed": 3170,
+        "room": 62
+      },
+      {
+        "elapsed": 3473,
+        "room": 10
+      },
+      {
+        "elapsed": 3510,
+        "room": 11
+      },
+      {
+        "elapsed": 3749,
+        "room": 13
+      },
+      {
+        "elapsed": 3989,
+        "room": 41
+      }
+    ],
+    "stops": [],
+    "events": [
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 0,
+        "Operands": "0x1A, [0x0000, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x07, [var[0x067], 0x003A]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 0,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x2F, [0x0000]",
+        "TargetId": 47,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 6,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 17,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x22, [0x0000]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 09 Object 270 Verb 0x3A",
+        "Offset": 23,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 0,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0002, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x003E]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 1,
+        "Operands": "[0x0000]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 64,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x28, [0x0017]",
+        "TargetId": 40,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 199,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x08, [var[0x066]]",
+        "TargetId": 8,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 206,
+        "Operation": "endCutscene",
+        "Certainty": 1,
+        "Operands": "",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 207,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 218,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x22, [0x0002]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 246,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 06 local script 200",
+        "Offset": 257,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 293,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0001, 0x0001]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x003D]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 0,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 11,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x22, [0x0001]",
+        "TargetId": 34,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 17,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 28,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Room 62 local script 205",
+        "Offset": 44,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1D, [0x0004, 0x0005]",
+        "TargetId": 29,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 157,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x24, []",
+        "TargetId": 36,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0000]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0001]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0002]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0003]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 105,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x17, [0x0004]",
+        "TargetId": 23,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 22",
+        "Offset": 195,
+        "Operation": "chainScript",
+        "Certainty": 1,
+        "Operands": "0x1A, [0x0004, 0x0000]",
+        "TargetId": 26,
+        "EstimatedArgumentIndexes": [
+          0
+        ]
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 113,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0055]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 26",
+        "Offset": 127,
+        "Operation": "startScript",
+        "Certainty": 1,
+        "Operands": "0x07, [var[0x067], 0x0041]",
+        "TargetId": 7,
+        "EstimatedArgumentIndexes": [
+          1
+        ]
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 0,
+        "Operation": "cutscene",
+        "Certainty": 1,
+        "Operands": "[0x0001]",
+        "TargetId": null,
+        "EstimatedArgumentIndexes": null
+      },
+      {
+        "SourceLabel": "Script 90",
+        "Offset": 5,
+        "Operation": "loadRoom",
+        "Certainty": 1,
+        "Operands": "0x2A",
+        "TargetId": 42,
+        "EstimatedArgumentIndexes": null
+      }
+    ],
+    "uncertainties": [
+      "Script 90 +0x0000: possible Room 42 load follows a seeded pick, so the session does not enter it at +0x0005"
+    ],
+    "failure": null
+  }
+]

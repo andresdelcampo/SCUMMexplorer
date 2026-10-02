@@ -2,6 +2,14 @@
 
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
+## 2 October: native level4 prerequisites and Room41 certainty continuation
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Native slot-use/level4 source recipes | Loaded native egg, dye and reverse-gold actions execute034 for slots0/2/1; both final gates execute029(4),9/9; randomized/source-path estimates retained | [recipes](../.verification/native-prerequisites-20261002/level4-validation.md) |
+| Room41 certainty localization | Raw4 source route replaces direct5/6 shortcuts; native15/14 remains unresolved, same-setup direct633/204 override15/15 completes43;022 is Conditional before slot4 selection; no code exception/catalog promotion | [evidence](../.verification/native-prerequisites-20261002/validation.md) |
+| Preserved recipes/fresh regressions | 096 source override and all four20 combinations unchanged; Core289;363 roots/fingerprints/memberships/sequences unchanged; Blockers0; Release clean | [checks](../.verification/native-prerequisites-20261002/check-summary.json) |
+
 ## 2 October: source progression
 
 | Change | Result | Record |
