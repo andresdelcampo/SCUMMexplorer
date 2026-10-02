@@ -1,0 +1,105 @@
+{
+  "outcome": "Four Room10 sites complete through actual walking, spell keys and source exit/return; no production fix.",
+  "directFrames": 1113,
+  "inputFrames": 1266,
+  "completedScopes": 5,
+  "conditionalExecutedBodyEvents": 86,
+  "bodyDifferences": {
+    "count": 30,
+    "only": "Certainty: direct Reached; input Conditional"
+  },
+  "dispatch": [
+    "Script 07 +0x002E: startObject runs object 296 verb 0x3A",
+    "Script 07 +0x002E: startObject runs object 296 verb 0x3B",
+    "Script 07 +0x002E: startObject runs object 285 verb 0x38",
+    "Script 07 +0x002E: startObject runs object 202 verb 0x38",
+    "Script 07 +0x002E: startObject runs object 296 verb 0x3B"
+  ],
+  "sourceStateStages": {
+    "arrival": {
+      "var[0x0D5]": 307,
+      "bit[0xDD2]": null,
+      "bit[0xDD3]": null
+    },
+    "open": {
+      "var[0x0D5]": 308,
+      "bit[0xDD2]": null,
+      "bit[0xDD3]": 1
+    },
+    "feeding-close": {
+      "var[0x0D5]": 308,
+      "bit[0xDD2]": null,
+      "bit[0xDD3]": 1
+    },
+    "leave-for-room5": {
+      "var[0x0D5]": 309,
+      "bit[0xDD2]": 1,
+      "bit[0xDD3]": 0
+    },
+    "return-from-room5": {
+      "var[0x0D5]": 309,
+      "bit[0xDD2]": 1,
+      "bit[0xDD3]": 0
+    },
+    "close": {
+      "var[0x0D5]": 307,
+      "bit[0xDD2]": 1,
+      "bit[0xDD3]": 0
+    }
+  },
+  "newSites": [
+    {
+      "owner": "Room 10 local 200",
+      "offset": "+0x0039"
+    },
+    {
+      "owner": "Room 10 local 200",
+      "offset": "+0x0110"
+    },
+    {
+      "owner": "Room 10 local 213",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 10 object 296 Verb 0x3B",
+      "offset": "+0x000C"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 188,
+    "after": 192,
+    "total": 235,
+    "percent": 81.7,
+    "remaining": 43
+  },
+  "diagnosticCycles": 2,
+  "firstCycle": "Wrong expected close branch: feeding response completed; local213 absent. Retained failed pair contributes no coverage.",
+  "protectedExactUnstaged": 57,
+  "productionAndCatalogUnchanged": true,
+  "limitations": [
+    "Default preview boot and initial catalog Room10 arrival are assumptions.",
+    "Supported status API staff/three notes/learned slot0 are labelled exploration choices.",
+    "Core input API only; no WPF, physical input, visual, audio or native full-game proof.",
+    "All input body events retain Conditional provenance; direct control differs in 30 certainty fields.",
+    "Recorded body events are not exhaustive instruction or writer observations.",
+    "Multi-action completion does not qualify fresh single-action gaps."
+  ],
+  "evidence": {
+    "Exe\\Room10Input-20261003\\cycle-1\\direct.json": "1058f9b8dc0a307062b77887fd67809b4f76f6ff68834dcfe0ac6bd36936cb9c",
+    "Exe\\Room10Input-20261003\\cycle-1\\input.json": "84685126fc30da91b1fe1facef9bf05cf40467382293f9dc740b8346379b0ce8",
+    "Exe\\Room10Input-20261003\\cycle-2\\direct.json": "1b3736e0ed5699262c3db06e347866443d3766a3bca791eb76dde277b4be1922",
+    "Exe\\Room10Input-20261003\\cycle-2\\input.json": "45bc809447e4695a970ef18efa5ef6f40766b08ec4903ceaadb3bb2c855aa0e6",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

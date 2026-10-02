@@ -1,0 +1,332 @@
+[
+  {
+    "index": 37,
+    "source": "Room 10 Object 296 Verb 0x3A",
+    "offset": 7,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 38,
+    "source": "Room 10 local script 212",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 39,
+    "source": "Room 10 local script 212",
+    "offset": 5,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 40,
+    "source": "Room 10 local script 211",
+    "offset": 22,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 41,
+    "source": "Room 10 local script 211",
+    "offset": 35,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 42,
+    "source": "Room 10 local script 211",
+    "offset": 43,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 43,
+    "source": "Room 10 local script 211",
+    "offset": 56,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 44,
+    "source": "Room 10 local script 211",
+    "offset": 59,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 45,
+    "source": "Room 10 local script 211",
+    "offset": 65,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 46,
+    "source": "Room 10 local script 211",
+    "offset": 71,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 47,
+    "source": "Room 10 local script 211",
+    "offset": 90,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 48,
+    "source": "Room 10 local script 211",
+    "offset": 109,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 49,
+    "source": "Room 10 local script 211",
+    "offset": 128,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 50,
+    "source": "Room 10 local script 212",
+    "offset": 42,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 51,
+    "source": "Room 10 local script 212",
+    "offset": 58,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 52,
+    "source": "Room 10 local script 212",
+    "offset": 65,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 53,
+    "source": "Room 10 local script 212",
+    "offset": 69,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 54,
+    "source": "Room 10 local script 212",
+    "offset": 78,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 55,
+    "source": "Room 10 local script 212",
+    "offset": 84,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 56,
+    "source": "Room 10 local script 212",
+    "offset": 87,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 57,
+    "source": "Room 10 local script 212",
+    "offset": 106,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 58,
+    "source": "Room 10 local script 212",
+    "offset": 113,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 59,
+    "source": "Room 10 local script 212",
+    "offset": 117,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 60,
+    "source": "Room 10 local script 212",
+    "offset": 124,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 61,
+    "source": "Room 10 local script 212",
+    "offset": 125,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 62,
+    "source": "Room 10 local script 212",
+    "offset": 136,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 63,
+    "source": "Room 10 local script 212",
+    "offset": 142,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 64,
+    "source": "Room 10 Object 296 Verb 0x3B",
+    "offset": 12,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 65,
+    "source": "Room 10 Object 296 Verb 0x3B",
+    "offset": 39,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 66,
+    "source": "Room 10 Object 296 Verb 0x3B",
+    "offset": 93,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  }
+]

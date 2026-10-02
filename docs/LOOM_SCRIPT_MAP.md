@@ -1,5 +1,7 @@
 # LOOM EGA script map
 
+Latest Room10 input,3 October: actual box3/7 clicks complete200 +0039/end0102 and0110/end01AB.296/3A starts212/end007C, source D5=308/DD3=1; reverse296/3B completes refusal000C/end005D. Actual285/38 starts214 and loads5;214 writesDD3=0/DD2=1/D5=309. Actual202/38 returns10; reverse296/3B +0061 starts213/end002F/D5=307. Five scopes,86 Conditional/Executed body events;30 certainty-only differences against direct control. All four remaining Room10 sites qualified; no source-state injection or execution change. [Validation](../.verification/room10-input-20261003/validation.md).
+
 Latest Room23 input,2 October:201 +000D chains202 for x<125/end01BD;213 +0022 chains214 for x>242/end018A. Actual box6/9/10/7 input completes200 starts0020/0084/00B3/0058, ends004D/00A8/00EE/0079. Six scopes,139 Conditional/Executed body events,1393frames; no status/placement injection or direct-control equivalence. [Validation](../.verification/room23-input-20261002/validation.md).
 
 Latest Room25 input,2 October: box4 watcher200 +0058/007E writesD92; box3 watcher +0046 starts069/end07ED. Actual447/36 dispatches at007 +002E start204(0)/205/206 through object offsets0053/0061/006C; ends03C5/00B0/010C. Exit446/37 dispatch at006 +015B starts208/end0060/load24 +0066. Six completed sites;208 recorded body events equal direct control, all estimates retained. [Validation](../.verification/room25-input-20261002/validation.md).

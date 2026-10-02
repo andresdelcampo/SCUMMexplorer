@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify all four remaining Room10 sites through game input
+
+Two terrain transitions, the clam's gull-feeding refusal and its later closing scene complete through clicks and note keys, with an actual Room5 exit/return supplying source state. Five balanced scopes,1266 input/1113 direct frames;86 recorded body events differ only in30 retained certainty fields. Audited union188→192/235 (81.70%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room10-input-20261003/validation.md).
+
 ## 2 October: verify Room23 shepherd and terrain watcher input
 
 Six actual walking inputs complete202/214 and four200 sites,6/6 scopes in1393frames;139 recorded body events remain Conditional/Executed. Audited union182→188/235 (80.00%), session+12; fresh single-action169/235 unchanged. Two bounded cycles, failed centroid route retained. No production change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room23-input-20261002/validation.md).
