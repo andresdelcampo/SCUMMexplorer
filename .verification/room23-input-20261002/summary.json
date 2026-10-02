@@ -1,0 +1,129 @@
+{
+  "outcome": "Six Room23 watcher sites complete through actual walking input; no production fix.",
+  "frames": 1393,
+  "completedScopes": 6,
+  "conditionalExecutedBodyEvents": 139,
+  "watcherCalls": [
+    {
+      "SourceScriptId": 201,
+      "SourceLabel": "Room 23 local script 201",
+      "Offset": 13,
+      "Kind": 1,
+      "Operation": "chainScript",
+      "Operands": "0xCA, []",
+      "TargetKind": 6,
+      "TargetId": 202,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 213,
+      "SourceLabel": "Room 23 local script 213",
+      "Offset": 34,
+      "Kind": 1,
+      "Operation": "chainScript",
+      "Operands": "0xD6, []",
+      "TargetKind": 6,
+      "TargetId": 214,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    }
+  ],
+  "inputPoints": [
+    {
+      "box": 3,
+      "x": 121,
+      "y": 121
+    },
+    {
+      "box": 2,
+      "x": 293,
+      "y": 129
+    },
+    {
+      "box": 6,
+      "x": 216,
+      "y": 94
+    },
+    {
+      "box": 9,
+      "x": 348,
+      "y": 116
+    },
+    {
+      "box": 10,
+      "x": 351,
+      "y": 112
+    },
+    {
+      "box": 7,
+      "x": 218,
+      "y": 95
+    }
+  ],
+  "newSites": [
+    {
+      "owner": "Room 23 local 200",
+      "offset": "+0x0020"
+    },
+    {
+      "owner": "Room 23 local 200",
+      "offset": "+0x0058"
+    },
+    {
+      "owner": "Room 23 local 200",
+      "offset": "+0x0084"
+    },
+    {
+      "owner": "Room 23 local 200",
+      "offset": "+0x00B3"
+    },
+    {
+      "owner": "Room 23 local 202",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 23 local 214",
+      "offset": "+0x0000"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 182,
+    "after": 188,
+    "total": 235,
+    "percent": 80.0,
+    "remaining": 47
+  },
+  "diagnosticCycles": 2,
+  "firstCycle": "Box3 centroid181,123 does not meet source x<125; zero scene starts, retained failure.",
+  "protectedExactUnstaged": 57,
+  "productionAndCatalogUnchanged": true,
+  "limitations": [
+    "Default preview boot and catalog Room23 arrival are assumptions.",
+    "Core input API, not WPF or physical input.",
+    "These watcher sites have no direct object-verb trigger; no direct-control equivalence claimed.",
+    "All recorded body events retain Conditional provenance; no native full-game proof.",
+    "Multi-action completion does not qualify fresh single-action gaps."
+  ],
+  "evidence": {
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\Room23Input-20261002\\cycle-1\\input.json": "d4340d2df4359ff62e5787e1a5306a0869744f132061cf6456a4001f7e8dfbfd",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

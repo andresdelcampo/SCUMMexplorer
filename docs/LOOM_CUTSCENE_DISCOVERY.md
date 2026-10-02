@@ -4,6 +4,8 @@ The session executes reached script/object/room instructions independently of re
 
 ## Current replay coverage (2 October)
 
+**Latest Room23 input supplement:** six completed watcher sites raise audited union188/235=80.00%,47 remaining. Session gain12 with Room25. Fresh single-action169/235=71.91%,66 gaps/49 owners/335 starts unchanged. No catalog promotion or execution fix. Failed first cycle retained; second source-point route6/6. [Validation](../.verification/room23-input-20261002/validation.md).
+
 **Latest input supplement:** Room25 adds six sites with completed walking/double-click/exit evidence. Audited union182/235=77.45%,53 remaining; fresh single-action169/235=71.91%,66 gaps/49 owners/335 starts unchanged. Six scopes/208 exact recorded body events against direct-object control, no production/catalog change. [Validation](../.verification/room25-input-20261002/validation.md).
 
 **Interactive evidence supplement (2 October):** Room34 adds four completed source sites through actual note-key dispatch with supported staff/notes/learned setup. Qualified literal+existing-sequence+new-input site union is176/235=74.89% (previous172);59 remain. The fresh single-action metric remains169/235=71.91%,66 literal gaps/49 owners and335 catalog starts, all unchanged. Input completion is not a new fresh replay recipe or native progression proof. [Definition, full comparison and remaining-site ledger](../.verification/room34-sequences-20261002/validation.md).

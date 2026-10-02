@@ -32,6 +32,8 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (2 October)
 
+**Latest Room23 input:** two shepherd scenes and four terrain transitions complete through actual walking,6/6 scopes,139 Conditional/Executed body events. Audited union188/235=80.00% (session+12); fresh single-action169/235 unchanged. Two bounded cycles, no production change. Next candidate: Room10 four-site cluster by source gates and actual input. Running App/history/protected57 untouched. [Validation](../.verification/room23-input-20261002/validation.md).
+
 **Latest Room25 input:** six source sites complete through box4→box3 walking, three lamb double-clicks and exit click. Six scopes/208 identical body events against the direct-object control; no execution change. Audited union182/235=77.45%, fresh single-action169/235 unchanged. Next candidate: Room23 six-site cluster with source walking/input. All constraints and protected57 preserved; running App untouched. [Validation](../.verification/room25-input-20261002/validation.md).
 
 **Current priority: verify interactive triggers by legitimate coverage gain (user delegation).** Room34 complete: five note-key casts with supported staff/notes/learned setup match direct scene boundaries and recorded body events except retained certainty. Four new sites; audited union176/235=74.89%, fresh literal169/235 unchanged. No execution fix. Next: Room25's six-site cluster through actual clicks/source walking; do not repeat successful direct scene playback as a substitute. Existing bounds, estimates, protected57, no App interaction/push remain. [Validation](../.verification/room34-sequences-20261002/validation.md).

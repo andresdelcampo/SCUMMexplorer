@@ -1,5 +1,9 @@
 # Changelog
 
+## 2 October: verify Room23 shepherd and terrain watcher input
+
+Six actual walking inputs complete202/214 and four200 sites,6/6 scopes in1393frames;139 recorded body events remain Conditional/Executed. Audited union182→188/235 (80.00%), session+12; fresh single-action169/235 unchanged. Two bounded cycles, failed centroid route retained. No production change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room23-input-20261002/validation.md).
+
 ## 2 October: verify Room25 walking and repeated lamb input
 
 Actual box4/box3 clicks, three lamb double-clicks and an exit click complete six previously unvalidated sites, returning24.208 recorded scene-body events exactly match the direct-object control; estimates preserved. Audited union176→182/235 (77.45%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room25-input-20261002/validation.md).

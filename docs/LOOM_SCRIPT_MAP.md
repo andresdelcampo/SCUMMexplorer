@@ -1,5 +1,7 @@
 # LOOM EGA script map
 
+Latest Room23 input,2 October:201 +000D chains202 for x<125/end01BD;213 +0022 chains214 for x>242/end018A. Actual box6/9/10/7 input completes200 starts0020/0084/00B3/0058, ends004D/00A8/00EE/0079. Six scopes,139 Conditional/Executed body events,1393frames; no status/placement injection or direct-control equivalence. [Validation](../.verification/room23-input-20261002/validation.md).
+
 Latest Room25 input,2 October: box4 watcher200 +0058/007E writesD92; box3 watcher +0046 starts069/end07ED. Actual447/36 dispatches at007 +002E start204(0)/205/206 through object offsets0053/0061/006C; ends03C5/00B0/010C. Exit446/37 dispatch at006 +015B starts208/end0060/load24 +0066. Six completed sites;208 recorded body events equal direct control, all estimates retained. [Validation](../.verification/room25-input-20261002/validation.md).
 
 Latest Room34 input evidence,2 October: supported staff/six notes/learned5+10, source notes/reverse flags retained. Note keys actually dispatch561/44,4C,44,44,44 at007 +002E. Local201 +0046/+0134/+0197 and202 +0000 complete;9/9 scopes, final34, D1/D98/DCC=2/1/1.127 recorded scene-body events match direct responses except retained Reached/Conditional provenance. No source certainty or full-game claim. [Paired evidence](../.verification/room34-sequences-20261002/validation.md).
