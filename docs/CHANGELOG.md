@@ -1,5 +1,13 @@
 # Changelog
 
+## 2 October: observed caller incoming identity and independent camera access
+
+| Change | Result | Record |
+| --- | --- | --- |
+| `3f32e5f` | Actual incoming dispatch initialization/continuity required for caller restoration;8 cases,5 prior false resumptions reproduced;all omitted/native/cancellation/replacement barriers retained | [identity](../.verification/runtime-restoration-20261002/identity-validation.md) |
+| `32f1ecb` | Four unknown-provenance native camera wait fields retain global/opaque barriers;independent same-value/no-op camera mutation notifications;12 cases | [camera](../.verification/runtime-restoration-20261002/camera-validation.md) |
+| Final preservation | Core588/focused262;13 entire latest streams exact;primary366/55/0;separate raw4 object16/terminal14/triple9/resumption3/restoration195/rejection1 exact;separate camera55 waits/220 unknown-provenance fields;363 roots/fingerprints/memberships/sequences;Blockers0;76 exact zero-gap Core renders;numeric/challenge exact;clean final main Release;App0;57 protected files unchanged;168/235=71.49% unchanged | [validation](../.verification/runtime-restoration-20261002/validation.md) |
+
 ## 2 October: object/message preservation and separate loaded caller resumption
 
 | Change | Result | Record |

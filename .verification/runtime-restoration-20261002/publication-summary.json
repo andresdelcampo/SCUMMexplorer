@@ -1,0 +1,83 @@
+{
+  "implementationHead": "32f1ecb978ad54a3d611e7e93108c0c9924e6008",
+  "historicalCheckpointAncestors": [
+    "00f01a8",
+    "0518da4",
+    "0fda17b",
+    "133b4d4",
+    "17450ff",
+    "18247d3",
+    "213ea06",
+    "2b91e50",
+    "2cb62e4",
+    "30f4e17",
+    "4a11fbc",
+    "56ffa35",
+    "5e2c0c4",
+    "5e86a68",
+    "5fcc2a0",
+    "6442e4e",
+    "729cbb9",
+    "75d9cd7",
+    "8110900",
+    "82679ae",
+    "8a224a7",
+    "8bad888",
+    "8d12d0f",
+    "9593435",
+    "96b79f6",
+    "995e97e",
+    "a22ff2a",
+    "a3a90ec",
+    "a850740",
+    "aaaa755",
+    "b1381ff",
+    "b17c53d",
+    "b20dc4e",
+    "b3ee09e",
+    "c91f860",
+    "cee1bf9",
+    "e285e08",
+    "e2d1729",
+    "e523f8a",
+    "e8c1c75",
+    "ec9a525",
+    "f18a18f"
+  ],
+  "all57ProtectedFilesExactAndUnstaged": true,
+  "previousVerificationPacketsUntouched": true,
+  "previousHandoffGuidanceExact": true,
+  "earlierPlanMapDiscoveryChangelogTextExact": true,
+  "reportHashesExact": true,
+  "appRunning": 0,
+  "appLaunched": false,
+  "pushPerformed": false,
+  "replayCoverage": {
+    "validatedLiteralSites": 168,
+    "totalLiteralSites": 235,
+    "coveredPercent": 71.49,
+    "scope": "validated literal cutscene sites only; unchanged, not an overall project-completion percentage"
+  },
+  "reports": [
+    {
+      "path": "docs/LOOM_EGA_PLAN.md",
+      "sha256": "6065142fcd03fecae66957b1f5dd098bf717f48fe9278c43d0912601a05a3848"
+    },
+    {
+      "path": "docs/LOOM_SCRIPT_MAP.md",
+      "sha256": "354201042181a08ab8cfcdfa9bbba3cd84a3a42a988fb5c38c56806e48c1df9f"
+    },
+    {
+      "path": "docs/LOOM_CUTSCENE_DISCOVERY.md",
+      "sha256": "875e965c92a52e4fdc544e0eae5f4d33637cb0d3125286a52b68854092c94e88"
+    },
+    {
+      "path": "docs/CHANGELOG.md",
+      "sha256": "62fa576a603bf98d682256a0806f47751b0c232dc79051a020db7662208945c7"
+    },
+    {
+      "path": "docs/NEXT_SESSION_PROMPT.md",
+      "sha256": "56d9c8eeb14045a9da9fb40b028fef8937b41b6547f8a3bcb88f7e888789c92d"
+    }
+  ]
+}

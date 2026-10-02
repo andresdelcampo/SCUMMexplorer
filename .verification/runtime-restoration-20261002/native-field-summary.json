@@ -1,0 +1,398 @@
+{
+  "scope": "Separate unchanged native challenge actions through36 frames; copied native field accesses only. Stored drawing coordinates are not walk points/query results; no origins, effects, estimate clearing, prerequisites or opening completion.",
+  "everyInputAndFrameTransparent": true,
+  "finalPacketExact": true,
+  "frames": 36,
+  "expressions": 3,
+  "expressionSteps": 17,
+  "nativeFieldReads": 11,
+  "domains": {
+    "user-input": 1,
+    "object-position-x": 5,
+    "object-position-y": 5
+  },
+  "explicitNotificationInvalidations": 11,
+  "selected": [
+    {
+      "site": {
+        "Script": 69,
+        "Context": "Room 69 entry script",
+        "Container": 69,
+        "ResourceOffset": 4482,
+        "Stage": "instruction",
+        "Offset": 81,
+        "Operation": "cursorCommand",
+        "Operands": "userInputOn"
+      },
+      "slot": 2,
+      "invocation": 2,
+      "pathEstimated": false,
+      "dependency": {
+        "Domain": "user-input",
+        "Selector": {
+          "Role": "implicit-user-input",
+          "Operand": "_userPut",
+          "Key": null,
+          "Value": 0,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 0,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 202,
+        "Context": "Room 69 local script 202",
+        "Container": 69,
+        "ResourceOffset": 5398,
+        "Stage": "instruction",
+        "Offset": 1,
+        "Operation": "drawObject",
+        "Operands": "0x036C, at, 0x00FF, 0x00FF"
+      },
+      "slot": 3,
+      "invocation": 5,
+      "pathEstimated": false,
+      "dependency": {
+        "Domain": "object-position-x",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x036C",
+          "Key": null,
+          "Value": 876,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 120,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 202,
+        "Context": "Room 69 local script 202",
+        "Container": 69,
+        "ResourceOffset": 5398,
+        "Stage": "instruction",
+        "Offset": 1,
+        "Operation": "drawObject",
+        "Operands": "0x036C, at, 0x00FF, 0x00FF"
+      },
+      "slot": 3,
+      "invocation": 5,
+      "pathEstimated": false,
+      "dependency": {
+        "Domain": "object-position-y",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x036C",
+          "Key": null,
+          "Value": 876,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 88,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 202,
+        "Context": "Room 69 local script 202",
+        "Container": 69,
+        "ResourceOffset": 5398,
+        "Stage": "instruction",
+        "Offset": 8,
+        "Operation": "drawObject",
+        "Operands": "0x036D, at, 0x00FF, 0x00FF"
+      },
+      "slot": 3,
+      "invocation": 5,
+      "pathEstimated": false,
+      "dependency": {
+        "Domain": "object-position-x",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x036D",
+          "Key": null,
+          "Value": 877,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 120,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 202,
+        "Context": "Room 69 local script 202",
+        "Container": 69,
+        "ResourceOffset": 5398,
+        "Stage": "instruction",
+        "Offset": 8,
+        "Operation": "drawObject",
+        "Operands": "0x036D, at, 0x00FF, 0x00FF"
+      },
+      "slot": 3,
+      "invocation": 5,
+      "pathEstimated": false,
+      "dependency": {
+        "Domain": "object-position-y",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x036D",
+          "Key": null,
+          "Value": 877,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 64,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 202,
+        "Context": "Room 69 local script 202",
+        "Container": 69,
+        "ResourceOffset": 5398,
+        "Stage": "instruction",
+        "Offset": 15,
+        "Operation": "drawObject",
+        "Operands": "0x036E, at, 0x00FF, 0x00FF"
+      },
+      "slot": 3,
+      "invocation": 5,
+      "pathEstimated": false,
+      "dependency": {
+        "Domain": "object-position-x",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x036E",
+          "Key": null,
+          "Value": 878,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 120,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 202,
+        "Context": "Room 69 local script 202",
+        "Container": 69,
+        "ResourceOffset": 5398,
+        "Stage": "instruction",
+        "Offset": 15,
+        "Operation": "drawObject",
+        "Operands": "0x036E, at, 0x00FF, 0x00FF"
+      },
+      "slot": 3,
+      "invocation": 5,
+      "pathEstimated": false,
+      "dependency": {
+        "Domain": "object-position-y",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x036E",
+          "Key": null,
+          "Value": 878,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 112,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 201,
+        "Context": "Room 69 local script 201",
+        "Container": 69,
+        "ResourceOffset": 4600,
+        "Stage": "instruction",
+        "Offset": 486,
+        "Operation": "drawObject",
+        "Operands": "0x0375, at, 0x00FF, 0x00FF"
+      },
+      "slot": 7,
+      "invocation": 31,
+      "pathEstimated": true,
+      "dependency": {
+        "Domain": "object-position-x",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x0375",
+          "Key": null,
+          "Value": 885,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 64,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 201,
+        "Context": "Room 69 local script 201",
+        "Container": 69,
+        "ResourceOffset": 4600,
+        "Stage": "instruction",
+        "Offset": 486,
+        "Operation": "drawObject",
+        "Operands": "0x0375, at, 0x00FF, 0x00FF"
+      },
+      "slot": 7,
+      "invocation": 31,
+      "pathEstimated": true,
+      "dependency": {
+        "Domain": "object-position-y",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x0375",
+          "Key": null,
+          "Value": 885,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 88,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 201,
+        "Context": "Room 69 local script 201",
+        "Container": 69,
+        "ResourceOffset": 4600,
+        "Stage": "instruction",
+        "Offset": 653,
+        "Operation": "drawObject",
+        "Operands": "0x0370, at, 0x00FF, 0x00FF"
+      },
+      "slot": 7,
+      "invocation": 33,
+      "pathEstimated": true,
+      "dependency": {
+        "Domain": "object-position-x",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x0370",
+          "Key": null,
+          "Value": 880,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 136,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    },
+    {
+      "site": {
+        "Script": 201,
+        "Context": "Room 69 local script 201",
+        "Container": 69,
+        "ResourceOffset": 4600,
+        "Stage": "instruction",
+        "Offset": 653,
+        "Operation": "drawObject",
+        "Operands": "0x0370, at, 0x00FF, 0x00FF"
+      },
+      "slot": 7,
+      "invocation": 33,
+      "pathEstimated": true,
+      "dependency": {
+        "Domain": "object-position-y",
+        "Selector": {
+          "Role": "target",
+          "Operand": "0x0370",
+          "Key": null,
+          "Value": 880,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        "Value": 32,
+        "ValueEstimated": false,
+        "Estimate": null,
+        "UnresolvedReason": null
+      }
+    }
+  ],
+  "reports": [
+    {
+      "path": "Exe/RuntimeRestorationFinalSession-20261002/native-fields/fields.json",
+      "sha256": "e22b9682de301b59b49148c47a92e1ee635a42fe4d40addd08d3aeb9fd7467dc"
+    },
+    {
+      "path": "Exe/RuntimeRestorationFinalSession-20261002/native-fields/build.txt",
+      "sha256": "1e67ec2758ab52197c62ee277d6b3bf2cbd6d82d878d465aa561f14d14109c12"
+    },
+    {
+      "path": "Exe/RuntimeRestorationFinalSession-20261002/native-fields/run.txt",
+      "sha256": "38b20e154daedc01fca0294626fd27998a2f55acc8505798be45cb2aed38b21a"
+    },
+    {
+      "path": "Exe/RuntimeRestorationFinalSession-20261002/native-fields/field-audit/source-manifest.json",
+      "sha256": "9ff86e85c1f9a7ae22ef1fd041ab87525c23f2072fbb7644290d321103f3a071"
+    }
+  ]
+}
