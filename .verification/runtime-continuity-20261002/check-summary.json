@@ -1,0 +1,172 @@
+{
+  "core": 460,
+  "newOperandBindingCases": 5,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "fullRecipePacketsUnchanged": 13,
+  "priorObservationsUnchanged": true,
+  "observedZeroWaits": 76,
+  "numericSourceReportUnchanged": true,
+  "numericWorlds": 162,
+  "flagCases": 52,
+  "comparisons": 51,
+  "overlaps": 14,
+  "fabricatedMatches": 4,
+  "practiceArgumentCases": 12,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "reports": [
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/checks-final/core-tests.txt",
+      "sha256": "f35161e7d584ae8fb9ef528a30dd15dd88d15ad449f247e144277c42aec8cb7b"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/checks-final/release-build.txt",
+      "sha256": "e7c51ea0dbdfc8a37989317dacf60024b3cde71c26a50d7a7fc26d05b8b4898f"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/final-release-build.txt",
+      "sha256": "9bd8abf5c57c11b1c2626d1d0dca09a40e60914a1aa7d9a719b111e386a384bd"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/app-state.txt",
+      "sha256": "b38816ef20f01225a399b68fa8554b75dc646c0c4e4b2bd4d7340914a74b0372"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/observer-build.txt",
+      "sha256": "cfd72bf1b2c6c11274a4754de09311fc2b9f68a6366e2d1274f3e0b6bdab2588"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/expanded-build.txt",
+      "sha256": "9d2b95cb5d03e4f85b9ae89af1ce77f7e4460d79dd1db04320ef1caff493da4e"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/room-audit-2/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/room-audit-2/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/png-comparison-2.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/numeric-fresh.json",
+      "sha256": "975698a5dddda7ac7e3ba00f019dc5a8cddf3ab2f34aaf6cb6b9bad626cb3fab"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expressions.json",
+      "sha256": "221792c63fd738ebeb780bf64b94faaff0d5203323b9a64e71a8cc0d1a960836"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expression-source-manifest.json",
+      "sha256": "a33aa965f9cb7396053717aaacc863d492ff8e881561de0937951e22ad712f69"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expressions-build.txt",
+      "sha256": "efe102bf4cace8f48811b6f77a6609f3e860c11ed0541efb0a4b35c65c217744"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expressions-run.txt",
+      "sha256": "38b20e154daedc01fca0294626fd27998a2f55acc8505798be45cb2aed38b21a"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/focused-final/tests.txt",
+      "sha256": "8e09421abc4bf00b544f8b874cb16d98b84b8d96ece1ed09afaa0056e242ca79"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/observer-1/source-manifest.json",
+    "sha256": "e2aab4996887e4957830a468aa6602cb7556769e51392eaccd8b961fb0586363"
+  },
+  "newSourceAccessCases": 9,
+  "newObservedLineageCases": 12,
+  "newIndependentTerminalCases": 5,
+  "exactBindingChronologyUnchanged": true,
+  "expandedChronologyUnchanged": true,
+  "genericOwnLiteralChildMatches": 76,
+  "independentWriterTerminations": 76,
+  "notifiedSessionMutations": true,
+  "recursiveObservedIndexLineage": true,
+  "rawDictionaryExternalWritesStillRequireNotification": true,
+  "relationLimitsRetained": true,
+  "expandedSourceManifest": {
+    "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/expanded-1/source-manifest.json",
+    "sha256": "e2aab4996887e4957830a468aa6602cb7556769e51392eaccd8b961fb0586363"
+  },
+  "newSelectedAccessCases": 17,
+  "newSourceCausalBoundaryCases": 10,
+  "selectedNativeDependencies": 377,
+  "newEventOperandRecords": 2117,
+  "callbackQueriesNotInvokedByObservation": true,
+  "nativeRelationsNotInferred": true,
+  "writerConfirmationsRequireSourceAndParent": true,
+  "terminalRequiresOwnInvocationAndParent": true,
+  "resumedTerminalContinuityUnresolved": true,
+  "calleeArgumentBindingAndReturnUnresolved": true,
+  "newImplicitAccessCases": 22,
+  "newExpressionChronologyCases": 7,
+  "newNativeLifetimeCases": 15,
+  "newResumedTerminalCases": 15,
+  "actualExpressionChronologyOptional": true,
+  "nativeDependencyTrackerIndependent": true,
+  "rawNativeSameValueWritesStillRequireNotification": true,
+  "boundedObservedResumeChainsAvailable": true,
+  "fullyObservedResumeChainCanEstablishSelectedTerminal": true,
+  "missingResumeContinuityStillUnresolved": true,
+  "latestCompletionChronologyExact": true,
+  "actualRecipeResumedTerminalChains": 0,
+  "additionalAccessRecords": 1696,
+  "independentNativeReads": 377,
+  "actualSelectedExpressionSteps": 0,
+  "sourceChallengeExpressions": 3,
+  "sourceChallengeExpressionSteps": 17,
+  "sourceChallengeEveryFrameTransparent": true,
+  "focused": 134
+}

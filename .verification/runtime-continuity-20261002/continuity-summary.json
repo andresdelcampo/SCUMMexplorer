@@ -1,0 +1,292 @@
+{
+  "scope": "Copied implicit/subcommand access, actual expression chronology, independent native lifetimes and bounded observed resumed terminals only; no numeric domain/effect transport or callee binding/return/protocol090 proof.",
+  "recipeCount": 13,
+  "latestWholePacketsChronologiesAndCompletionExact": true,
+  "expandedChronologyExact": true,
+  "ownLiteralChildMatches": 76,
+  "independentOwnInvocationTerminations": 76,
+  "actualRecipeResumedTerminalChains": 0,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "verbOps": 290,
+        "waitFor": 1,
+        "resourceRoutines": 5
+      },
+      "independentNativeReads": 69,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 25,
+      "nativeInvalidations": 44,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-native.jsonl",
+          "sha256": "81e99431fa4fd50e23a0b0f6749e917c546f09bdb7f036336cd1252d551f58af"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-click",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "verbOps": 330,
+        "waitFor": 1,
+        "resourceRoutines": 5
+      },
+      "independentNativeReads": 77,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 33,
+      "nativeInvalidations": 44,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-native.jsonl",
+          "sha256": "df4e6864c2b92a86a4e67be70c2e53892095403e69616577aa6739e82109b917"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-key",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "verbOps": 330,
+        "waitFor": 1,
+        "resourceRoutines": 5
+      },
+      "independentNativeReads": 77,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 33,
+      "nativeInvalidations": 44,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-native.jsonl",
+          "sha256": "cfad2c7586b4f074b6a66a77ceff2f2761bf9dbb20fe902a83804d03e522ae2e"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-click",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "resourceRoutines": 5,
+        "verbOps": 100
+      },
+      "independentNativeReads": 9,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 9,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-native.jsonl",
+          "sha256": "c9b47574f34bb6d0883736d739c8f4f4df8b9da2215c7b69b617e64c97abd37d"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-key",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "resourceRoutines": 5,
+        "verbOps": 100
+      },
+      "independentNativeReads": 9,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 9,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-native.jsonl",
+          "sha256": "78e37a2d813e5f5e3bafd40a6cbe2bc4275449ccff243d4a5a5c1e48f0b09a4c"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "verbOps": 250,
+        "waitFor": 1
+      },
+      "independentNativeReads": 68,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 24,
+      "nativeInvalidations": 44,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-native.jsonl",
+          "sha256": "abfa639e7793e22e0c2aa1b64c469898590e0b703c08a9f9cfcacfa79f01c424"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "verbOps": 250,
+        "waitFor": 1
+      },
+      "independentNativeReads": 68,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 24,
+      "nativeInvalidations": 44,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-native.jsonl",
+          "sha256": "f8865f33131a33a5a2d7bfb1d95db193cde66f6376c417118f21965d3c1de623"
+        }
+      ]
+    },
+    {
+      "id": "late096-reached44",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {},
+      "independentNativeReads": 0,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 0,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/late096-reached44-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/late096-reached44-native.jsonl",
+          "sha256": "16343fd3e4d6cd2c9b918f0fa4871f0b74fe98b5fba18c95665a9fb3dbde9769"
+        }
+      ]
+    },
+    {
+      "id": "late096-source-skip095",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {},
+      "independentNativeReads": 0,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 0,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-native.jsonl",
+          "sha256": "c0719a4a84d1e261353f0fc6c851347b8eb84d00ccaceb444b12c259d5bc48e6"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response390",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "resourceRoutines": 4
+      },
+      "independentNativeReads": 0,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 0,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-native.jsonl",
+          "sha256": "18f83aeb3c9f58d717f6b4aa4770f21cc1d883d87d36f46570a5eb30c76161ff"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response391",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "resourceRoutines": 4
+      },
+      "independentNativeReads": 0,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 0,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-native.jsonl",
+          "sha256": "34dd800dbe43196fc3802e7f52e8e8d0ce0af5192d0443153676f6453d8bdf6d"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response390",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "resourceRoutines": 4
+      },
+      "independentNativeReads": 0,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 0,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-native.jsonl",
+          "sha256": "4084d59e902c57c88c79e1b87ca61bb2a197406e1532b95ea5bbac5114536344"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response391",
+      "latestWholePacketChronologyAndCompletionExact": true,
+      "additionalAccessRecords": {
+        "resourceRoutines": 4
+      },
+      "independentNativeReads": 0,
+      "expressionSteps": 0,
+      "unresolvedNativeReads": 0,
+      "nativeInvalidations": 0,
+      "reports": [
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-expressions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeContinuityFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-native.jsonl",
+          "sha256": "22b3f8c07ca14b9c10f9dd9d36706334921002cf0ab92b7c5918cc8d382978f6"
+        }
+      ]
+    }
+  ]
+}

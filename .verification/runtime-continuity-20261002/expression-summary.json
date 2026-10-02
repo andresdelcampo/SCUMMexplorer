@@ -1,0 +1,34 @@
+{
+  "scope": "Existing source-progression native challenge actions through 36 frames, stopping before boot-answer; no state/prerequisite writes or native opening completion claim.",
+  "sourceRecipe": ".verification/source-progression-20261002/boot.json",
+  "transparentAtEveryFrameAndInput": true,
+  "frames": 36,
+  "loadedExpressions": 3,
+  "actualSteps": 17,
+  "sourceOffsets": [
+    34,
+    73,
+    86
+  ],
+  "room": 69,
+  "inheritedEstimatesRetained": true,
+  "numericWriteOriginsNotInferred": true,
+  "reports": [
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expressions.json",
+      "sha256": "221792c63fd738ebeb780bf64b94faaff0d5203323b9a64e71a8cc0d1a960836"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expression-source-manifest.json",
+      "sha256": "a33aa965f9cb7396053717aaacc863d492ff8e881561de0937951e22ad712f69"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expressions-build.txt",
+      "sha256": "efe102bf4cace8f48811b6f77a6609f3e860c11ed0541efb0a4b35c65c217744"
+    },
+    {
+      "path": "Exe/RuntimeContinuityFinalSession-20261002/passive-final/passive-expressions-run.txt",
+      "sha256": "38b20e154daedc01fca0294626fd27998a2f55acc8505798be45cb2aed38b21a"
+    }
+  ]
+}

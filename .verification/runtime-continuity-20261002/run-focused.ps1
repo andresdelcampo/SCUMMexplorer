@@ -1,4 +1,4 @@
-param([string]$Output, [string]$Filter='FullyQualifiedName~LoomImplicitAccessTests|FullyQualifiedName~LoomExpressionObservationTests|FullyQualifiedName~LoomSourceAccessTests|FullyQualifiedName~LoomExtendedSourceAccessTests|FullyQualifiedName~LoomObservationBoundaryTests|FullyQualifiedName~LoomCompletionObserverTests|FullyQualifiedName~LoomRuntimeRelationTests|FullyQualifiedName~LoomObservedLineageTests')
+param([string]$Output, [string]$Filter='FullyQualifiedName~LoomImplicitAccessTests|FullyQualifiedName~LoomExpressionObservationTests|FullyQualifiedName~LoomNativeDependencyTrackerTests|FullyQualifiedName~LoomWriterContinuityTests|FullyQualifiedName~LoomSourceAccessTests|FullyQualifiedName~LoomExtendedSourceAccessTests|FullyQualifiedName~LoomObservationBoundaryTests|FullyQualifiedName~LoomCompletionObserverTests|FullyQualifiedName~LoomRuntimeRelationTests|FullyQualifiedName~LoomObservedLineageTests')
 $ErrorActionPreference='Stop'
 if (!$Output -or (Test-Path -LiteralPath $Output)) { throw 'Use a fresh output folder.' }
 $rtkPath='C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe'

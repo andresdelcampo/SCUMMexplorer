@@ -1,5 +1,15 @@
 # Changelog
 
+## 2 October: implicit chronology, native lifetimes and observed resumption chains
+
+| Change | Result | Record |
+| --- | --- | --- |
+| `ec9a525` | Additional copied subcommand/implicit access and actual separate expression reads/writes/scratch chronology; barriers/estimates intact | [access](../.verification/runtime-continuity-20261002/access-validation.md) |
+| `75d9cd7` | Independent copied native field/selector lifetimes and explicit raw native same-value notification | [native](../.verification/runtime-continuity-20261002/native-validation.md) |
+| `9593435` | Fully observed bounded yield/begin/end continuity for resumed terminals; original invocation checks and completion limits intact | [terminal](../.verification/runtime-continuity-20261002/terminal-validation.md) |
+| Final preservation | Core460;13 exact packets/chronologies/completion records;76 own-child matches/separate own-invocation terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;3 source challenge expressions/17 actual steps;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/runtime-continuity-20261002/validation.md) |
+
+
 ## 2 October: selected native dependencies and observation boundaries
 
 | Change | Result | Record |
