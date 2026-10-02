@@ -1,0 +1,84 @@
+{
+  "core": 298,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "productionSourcesUnchanged": true,
+  "reports": [
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/checks-1/core-tests.txt",
+      "sha256": "7c1f25a2246b617e34cb347632db5ae9df6537e5a46e904ac1156e2b9b22027c"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/checks-1/release-build.txt",
+      "sha256": "4a680ce80fb131bc40a084d0ac1f3f1cc0b24db4a369d2f1338b9a5d2a54015f"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/final-release-build.txt",
+      "sha256": "292ffd36ce48cdeb26e58388143c4df6325f68c10c9bbeb254811d38660b2eba"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/app-state.txt",
+      "sha256": "ac06ae4a5bc9f70a1ac8a1e716c7ec44ecdcd6851efa24161ab44fcc7f1797cf"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/room-audit-1/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/room-audit-1/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/CertaintyProvenanceSession-20261002/png-comparison.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/CertaintyProvenanceSession-20261002/observer-2/source-manifest.json",
+    "sha256": "0172876c8260889c7f483ab060e3d341380938fa1cf73a562c0b5ff727b6022e"
+  }
+}

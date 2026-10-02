@@ -1,0 +1,1449 @@
+{
+  "scope": "Read-only observer copy of the same Core sources; copied instruction values/estimates; no runtime reference or state writes. Native input recipes unchanged.",
+  "recipeCount": 13,
+  "productionSourcesUnchanged": true,
+  "manifest": {
+    "path": "Exe/CertaintyProvenanceSession-20261002/observer-2/source-manifest.json",
+    "sha256": "0172876c8260889c7f483ab060e3d341380938fa1cf73a562c0b5ff727b6022e"
+  },
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/direct41-source-level4-skip204.json",
+        "sha256": "58453eec817e345003c93d5106cd0363fabe3537d2f1c6f50bad3d8515f77937"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/direct41-source-level4-skip204-instructions.jsonl",
+        "sha256": "c7d446d6d1ab2c704f600ab9b7e677dd4af21cf2d2b58c70b4ca1d4e0f88d9ed"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 5835,
+      "room": 43,
+      "instructionTransitions": 9,
+      "practiceStarts": 33,
+      "practiceZeroWrites": 33,
+      "completionWrites": 45,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 24
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 21
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": [
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "TargetKind": 0,
+          "TargetId": 42,
+          "Certainty": 0,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        },
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 207,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x2B",
+          "TargetKind": 0,
+          "TargetId": 43,
+          "Certainty": 0,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        },
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 501,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x3C",
+          "TargetKind": 0,
+          "TargetId": 60,
+          "Certainty": 0,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        },
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 889,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x2B",
+          "TargetKind": 0,
+          "TargetId": 43,
+          "Certainty": 0,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-click",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw4-click.json",
+        "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw4-click-instructions.jsonl",
+        "sha256": "0e766058f099fdb66efa38c417a04cdd3929c46045850ab64d3c193753949202"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 7659,
+      "room": 41,
+      "instructionTransitions": 13,
+      "practiceStarts": 33,
+      "practiceZeroWrites": 33,
+      "completionWrites": 49,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 24
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 25
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {
+        "firstEstimatedPractice": {
+          "before": {
+            "Run": 11824,
+            "Parent": 11819,
+            "Stage": "instruction",
+            "Script": 30,
+            "Context": null,
+            "Offset": 0,
+            "Operation": "move",
+            "Operands": "bit[0xD6C] = 0x0001",
+            "PathEstimated": false,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2870,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": false
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "after": {
+            "Run": 11824,
+            "Parent": 11819,
+            "Stage": "instruction",
+            "Script": 30,
+            "Context": null,
+            "Offset": 5,
+            "Operation": "isEqual",
+            "Operands": "var[0x064], 0x0002, branch +0x0006 -> 0x0012",
+            "PathEstimated": false,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2870,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "caller": {
+            "SourceScriptId": 201,
+            "SourceLabel": "Room 06 local script 201",
+            "Offset": 40,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x1E, [0x0001]",
+            "TargetKind": 6,
+            "TargetId": 30,
+            "Certainty": 0,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          }
+        },
+        "firstPracticeNoteBranch": {
+          "before": {
+            "Run": 11828,
+            "Parent": 11819,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 38,
+            "Operation": "isEqual",
+            "Operands": "local[0x000], 0x0001, branch +0x002D -> 0x005A",
+            "PathEstimated": false,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2870,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "after": {
+            "Run": 11828,
+            "Parent": 11819,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 45,
+            "Operation": "setVarRange",
+            "Operands": "local[0x006], count=3, [0x0D, 0x05, 0x04]",
+            "PathEstimated": true,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2870,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          }
+        },
+        "firstEstimatedPracticeZero": {
+          "before": {
+            "Run": 11828,
+            "Parent": 11819,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 551,
+            "Operation": "move",
+            "Operands": "bit[0xD6C] = 0x0000",
+            "PathEstimated": true,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2870,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "after": {
+            "Run": 11828,
+            "Parent": 11819,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 556,
+            "Operation": "isEqual",
+            "Operands": "var[0x07B], 0x0002, branch +0x001C -> 0x024F",
+            "PathEstimated": true,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2870,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          }
+        },
+        "firstKnownNotePracticeBranch": {
+          "before": {
+            "Run": 12100,
+            "Parent": 12099,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 10,
+            "Operation": "equalZero",
+            "Operands": "bit[0xD6C], branch +0x000C -> 0x001B",
+            "PathEstimated": false,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 3026,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x062]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "after": {
+            "Run": 12100,
+            "Parent": 12099,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 15,
+            "Operation": "isLess",
+            "Operands": "local[0x000], var[0x07A], branch +0x0005 -> 0x001B",
+            "PathEstimated": true,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 3026,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x062]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          }
+        },
+        "completionBeforeWait": {
+          "before": {
+            "Run": 11960,
+            "Parent": null,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 797,
+            "Operation": "move",
+            "Operands": "bit[0xD67] = 0x0000",
+            "PathEstimated": true,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2909,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": true
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "after": {
+            "Run": 11960,
+            "Parent": null,
+            "Stage": "instruction",
+            "Script": 31,
+            "Context": null,
+            "Offset": 802,
+            "Operation": "stopObjectCode",
+            "Operands": "",
+            "PathEstimated": true,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 2909,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x062]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          }
+        },
+        "firstWaitBranch": {
+          "before": {
+            "Run": 12144,
+            "Parent": null,
+            "Stage": "instruction",
+            "Script": 20,
+            "Context": null,
+            "Offset": 40,
+            "Operation": "equalZero",
+            "Operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "PathEstimated": false,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 3036,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x062]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "after": {
+            "Run": 12144,
+            "Parent": null,
+            "Stage": "instruction",
+            "Script": 20,
+            "Context": null,
+            "Offset": 45,
+            "Operation": "increment",
+            "Operands": "local[0x000]",
+            "PathEstimated": true,
+            "Resume": null,
+            "Stopped": null,
+            "Unresolved": null,
+            "frame": 3036,
+            "variables": {
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD70]": {
+                "value": null,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "local[0x000]": {
+                "value": 0,
+                "estimated": false
+              },
+              "var[0x062]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          }
+        },
+        "otherTransitions": [
+          {
+            "before": {
+              "Run": 12477,
+              "Parent": 12469,
+              "Stage": "instruction",
+              "Script": 31,
+              "Context": null,
+              "Offset": 38,
+              "Operation": "isEqual",
+              "Operands": "local[0x000], 0x0001, branch +0x002D -> 0x005A",
+              "PathEstimated": false,
+              "Resume": null,
+              "Stopped": null,
+              "Unresolved": null,
+              "frame": 3169,
+              "variables": {
+                "bit[0xD6C]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "bit[0xD67]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "bit[0xD70]": {
+                  "value": null,
+                  "estimated": false
+                },
+                "var[0x064]": {
+                  "value": 2,
+                  "estimated": false
+                },
+                "var[0x07A]": {
+                  "value": 3,
+                  "estimated": false
+                },
+                "local[0x000]": {
+                  "value": 1,
+                  "estimated": true
+                },
+                "var[0x062]": {
+                  "value": 0,
+                  "estimated": true
+                },
+                "var[0x056]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "var[0x057]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "var[0x058]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "var[0x059]": {
+                  "value": 2,
+                  "estimated": false
+                }
+              }
+            },
+            "after": {
+              "Run": 12477,
+              "Parent": 12469,
+              "Stage": "instruction",
+              "Script": 31,
+              "Context": null,
+              "Offset": 45,
+              "Operation": "setVarRange",
+              "Operands": "local[0x006], count=3, [0x0D, 0x05, 0x04]",
+              "PathEstimated": true,
+              "Resume": null,
+              "Stopped": null,
+              "Unresolved": null,
+              "frame": 3169,
+              "variables": {
+                "bit[0xD6C]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "bit[0xD67]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "bit[0xD70]": {
+                  "value": null,
+                  "estimated": false
+                },
+                "var[0x064]": {
+                  "value": 2,
+                  "estimated": false
+                },
+                "var[0x07A]": {
+                  "value": 3,
+                  "estimated": false
+                },
+                "local[0x000]": {
+                  "value": 1,
+                  "estimated": true
+                },
+                "var[0x062]": {
+                  "value": 0,
+                  "estimated": true
+                },
+                "var[0x056]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "var[0x057]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "var[0x058]": {
+                  "value": 1,
+                  "estimated": false
+                },
+                "var[0x059]": {
+                  "value": 2,
+                  "estimated": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      "final090": [
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "TargetKind": 0,
+          "TargetId": 42,
+          "Certainty": 1,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-key",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw4-key.json",
+        "sha256": "d0a7e60717b2b0a7a4b5c58499f153ec3a19b80f50e67183e5c5cbc2eaf1e2de"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw4-key-instructions.jsonl",
+        "sha256": "ee732e56a82a8d3a62cc57ef8748bc4f7f9c15afdb633031f3047e1fa54c9b23"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 7659,
+      "room": 41,
+      "instructionTransitions": 13,
+      "practiceStarts": 33,
+      "practiceZeroWrites": 33,
+      "completionWrites": 49,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 24
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 25
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": [
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "TargetKind": 0,
+          "TargetId": 42,
+          "Certainty": 1,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-click",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw6-click.json",
+        "sha256": "f90c09c5ec5bcd60476417d0558e5a47bca9c9163c33a58d55db9c676207c31f"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw6-click-instructions.jsonl",
+        "sha256": "692430dc5ba0369406a9c82a7a5364609afdc89380255e211eff156d8987da2e"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 4623,
+      "room": 41,
+      "instructionTransitions": 3,
+      "practiceStarts": 6,
+      "practiceZeroWrites": 6,
+      "completionWrites": 10,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 6
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 4
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": [
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "TargetKind": 0,
+          "TargetId": 42,
+          "Certainty": 1,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-key",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw6-key.json",
+        "sha256": "34e64d6340a93f6912b9bcb93d748f07a179d34b0bbeba081f4c68ec3015bc64"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/room41-1/room41-raw6-key-instructions.jsonl",
+        "sha256": "374e62f969fabc6d35bf1ded266475d3121cb684d484c7bebefbf2a57e2b2016"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 4623,
+      "room": 41,
+      "instructionTransitions": 3,
+      "practiceStarts": 6,
+      "practiceZeroWrites": 6,
+      "completionWrites": 10,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 6
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 4
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": [
+        {
+          "SourceScriptId": 90,
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Kind": 12,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "TargetKind": 0,
+          "TargetId": 42,
+          "Certainty": 1,
+          "FreezeResistant": false,
+          "ResolvedArguments": null,
+          "Recursive": false,
+          "EstimatedArgumentIndexes": null,
+          "Executed": true
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/egg-first-1/native-level4-egg-dye-wheel.json",
+        "sha256": "dd2815c1717a023bfc047a99a68b871160fbd59a4609eb63f8cf30d0ce76d24a"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/egg-first-1/native-level4-egg-dye-wheel-instructions.jsonl",
+        "sha256": "61b3061dd3541db508dea3c59be7461c9277994e5ce03ef6417b9e2b0b5420b0"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 3472,
+      "room": 62,
+      "instructionTransitions": 8,
+      "practiceStarts": 29,
+      "practiceZeroWrites": 29,
+      "completionWrites": 41,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 24
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 17
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/dye-last-1/native-level4-egg-wheel-dye.json",
+        "sha256": "39705828a5c46a4ddcdc4d96b5467f38b8cdc16ef0e8460365e56b0bbf8ae0ad"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/dye-last-1/native-level4-egg-wheel-dye-instructions.jsonl",
+        "sha256": "bbc3937503955aa736bd56bd6c587c611e31d5e28a9e856cc7da6fe80ab3bdba"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 3447,
+      "room": 6,
+      "instructionTransitions": 8,
+      "practiceStarts": 29,
+      "practiceZeroWrites": 29,
+      "completionWrites": 41,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 24
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 17
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    },
+    {
+      "id": "late096-reached44",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/late096-reached44.json",
+        "sha256": "f72baaabd02edcbf9d446aacbb47f3088114d38f04cbff66cbcc6c9e38e8a8ba"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/late096-reached44-instructions.jsonl",
+        "sha256": "b18c35899f0be62cc4a93d46deddec23d8133ca9504f8d6a47a949e895d7d98d"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 4017,
+      "room": 43,
+      "instructionTransitions": 0,
+      "practiceStarts": 8,
+      "practiceZeroWrites": 8,
+      "completionWrites": 8,
+      "completionGroups": [
+        {
+          "offset": 797,
+          "pathEstimated": false,
+          "value": 0,
+          "estimated": false,
+          "count": 4
+        },
+        {
+          "offset": 797,
+          "pathEstimated": true,
+          "value": 0,
+          "estimated": true,
+          "count": 4
+        }
+      ],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    },
+    {
+      "id": "late096-source-skip095",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/late096-source-skip095.json",
+        "sha256": "3f3ccbf796262d2812d755288d59975567d305ab43894ac43f94cc07c0e320cb"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/late096-source-skip095-instructions.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 357,
+      "room": 46,
+      "instructionTransitions": 0,
+      "practiceStarts": 0,
+      "practiceZeroWrites": 0,
+      "completionWrites": 0,
+      "completionGroups": [],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    },
+    {
+      "id": "sleep-source369-response390",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source369-response390.json",
+        "sha256": "87bfae3c6891ad7ecefe4038c6fab2c0091b2de5fd237688235700a2c59f601c"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source369-response390-instructions.jsonl",
+        "sha256": "3966ac9455fb71ee3738dd7550746c8c60d67b7edbc2494c6bd58852a0243c6f"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 1575,
+      "room": 18,
+      "instructionTransitions": 0,
+      "practiceStarts": 0,
+      "practiceZeroWrites": 0,
+      "completionWrites": 0,
+      "completionGroups": [],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    },
+    {
+      "id": "sleep-source369-response391",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source369-response391.json",
+        "sha256": "8e4d149d0806d5d473f8984feedb60aa199b608b0c9cb1231580ea66c98bef1a"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source369-response391-instructions.jsonl",
+        "sha256": "b46a542320f3559feb0b5f9ccc46b7afd2f52c350184c2eac604361568956c88"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 1575,
+      "room": 18,
+      "instructionTransitions": 0,
+      "practiceStarts": 0,
+      "practiceZeroWrites": 0,
+      "completionWrites": 0,
+      "completionGroups": [],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    },
+    {
+      "id": "sleep-source371-response390",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source371-response390.json",
+        "sha256": "560fd93d78a6701c784b2b5f38db4130b7208b8365f049bdef43757e80ef76e3"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source371-response390-instructions.jsonl",
+        "sha256": "acc048dd5457a56b3099c2509ee6a817b8677c507b8de57081b138aff0d7f215"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 1612,
+      "room": 18,
+      "instructionTransitions": 0,
+      "practiceStarts": 0,
+      "practiceZeroWrites": 0,
+      "completionWrites": 0,
+      "completionGroups": [],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    },
+    {
+      "id": "sleep-source371-response391",
+      "packet": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source371-response391.json",
+        "sha256": "c264750aa4d1c5e93d616909a9b713ca0cab77531ae07545bcd3b0a1b63bb665"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProvenanceSession-20261002/preserved-1/sleep-source371-response391-instructions.jsonl",
+        "sha256": "c399a695247960ac2eb1c1dd770ff9f357cd0e9915719069b41422fc6b6a93ad"
+      },
+      "observerPacketIdentical": true,
+      "elapsed": 1612,
+      "room": 18,
+      "instructionTransitions": 0,
+      "practiceStarts": 0,
+      "practiceZeroWrites": 0,
+      "completionWrites": 0,
+      "completionGroups": [],
+      "earlyStops": 0,
+      "observations": {},
+      "final090": []
+    }
+  ],
+  "sourceEarlyStopProtocol": {
+    "condition": "D6C0 and note > raw07A (old-v3 reversed operands); not observed on these13 recipes.",
+    "edges": [
+      "031 +0016 starts011;031 +0019 stops itself with D671.",
+      "011 +0013 starts021;021 +0000 stops020.",
+      "The source cancellation edge is different from031 +0243/+031D completion writes."
+    ],
+    "limit": "Decoded edges alone do not prove reached scheduling, callee completion, lack of recursive/dynamic restarts or cancellation safety."
+  },
+  "native090Completed": false
+}

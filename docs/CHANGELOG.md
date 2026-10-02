@@ -2,6 +2,13 @@
 
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
+## 2 October: Room41 instruction-level completion provenance
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Isolated source observer | Direct031 practice-note +0026 →D6C0 →031 completion +031D →020 wait +0028 provenance; all13 recipe packets identical, production unchanged | [evidence](../.verification/certainty-provenance-20261002/validation.md) |
+| Fresh Core preservation checks | Core298;363 exact roots/fingerprints; memberships/sequences unchanged; Blockers0;76 unchanged zero-gap renders; clean main Release; no App or push | [checks](../.verification/certainty-provenance-20261002/check-summary.json) |
+
 ## 2 October: Room41 completion protocol and correlated-domain research
 
 | Change | Result | Record |
