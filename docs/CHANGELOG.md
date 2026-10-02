@@ -2,6 +2,13 @@
 
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
+## 2 October: complete correlated draft predicate
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Source-only022/023 numeric interpretation | All162 forward/reverse worlds select slot4 before026;52 flag projections;51 previous comparisons/14 overlaps reproduced; four Cartesian input artifacts exposed | [research](../.verification/correlated-drafts-20261002/validation.md) |
+| Certainty limits retained | No selected runtime input/index, path, scheduler/cancellation, movement, dispatch or native090 proof; production and palette implementation unchanged | [summary](../.verification/correlated-drafts-20261002/predicate-summary.json) |
+
 ## 2 October: Room41 instruction-level completion provenance
 
 | Change | Result | Record |
