@@ -39,6 +39,16 @@ public sealed record LoomScriptNativeDependency(string Domain, LoomScriptOperand
     long? Value, bool? ValueEstimated, string? Estimate = null, string? UnresolvedReason = null);
 
 /// <summary>
+/// Actual operand chronology inside one executed expression. InstructionSequence belongs to
+/// the unchanged outer stream; Step orders this separate stream. Storage writes and scratch
+/// reads are copied at the point they happen, never replayed or turned into numeric origins.
+/// Unsupported/partial expressions retain their barrier and all inherited estimates.
+/// </summary>
+public sealed record LoomExpressionObservation(long InstructionSequence, int Step, long Slot,
+    long? ParentSlot, long Invocation, LoomScriptObservationSite Site, string Stage,
+    IReadOnlyList<LoomScriptOperandBinding> Bindings, bool PathEstimated, string? Barrier = null);
+
+/// <summary>
 /// A copied observation of selected explorer execution. Sequence orders instructions within a
 /// frame too; Slot persists across resumptions, while Invocation identifies one executor run.
 /// Values/estimates and cancellation targets are immutable copies, never runtime references.
@@ -60,7 +70,7 @@ public sealed record LoomScriptObservation(long Sequence, long Slot, long? Paren
 public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     Func<LoomScriptObservationSite, bool>? includeSite = null, Func<string, bool>? includeKey = null,
     bool captureOperandBindings = false, LoomRuntimeRelationTracker? runtimeRelations = null,
-    bool captureSourceAccess = false)
+    bool captureSourceAccess = false, Action<LoomExpressionObservation>? receiveExpression = null)
 {
     private long sequence;
     private long slots;
@@ -69,7 +79,19 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     internal long NewSlot() => ++slots;
     internal long NewInvocation() => ++invocations;
 
-    internal void Observe(long slot, long? parentSlot, long invocation, LoomScriptDisassembly script,
+    internal bool CapturesExpressions => receiveExpression is not null;
+
+    internal void Expression(long sequence, int step, long slot, long? parentSlot, long invocation,
+        LoomScriptDisassembly script, LoomScriptInstruction instruction, string stage, bool path,
+        Func<Func<string, bool>, IReadOnlyList<LoomScriptOperandBinding>> bind, string? barrier = null)
+    {
+        receiveExpression?.Invoke(new(sequence, step, slot, parentSlot, invocation,
+            new(script.ScriptId, script.Context, script.ContainerFileNumber, script.ResourceOffset,
+                "instruction", instruction.Offset, instruction.Operation, instruction.Operands), stage,
+            Array.AsReadOnly(bind(key => includeKey?.Invoke(key) != false).ToArray()), path, barrier));
+    }
+
+    internal long? Observe(long slot, long? parentSlot, long invocation, LoomScriptDisassembly script,
         string stage, int offset, string? operation, string? operands,
         IReadOnlyDictionary<string, ushort> values, IEnumerable<string> estimated, bool path,
         int? resume = null, bool? stop = null, string? unresolved = null,
@@ -81,7 +103,7 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
         if (includeSite is not null && !includeSite(site))
         {
             runtimeRelations?.NotifyExternal(reason: "filtered source site");
-            return;
+            return null;
         }
         var copy = new ReadOnlyDictionary<string, ushort>(values.Where(p => includeKey?.Invoke(p.Key) != false)
             .ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal));
@@ -93,6 +115,7 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
                 ? bindSourceAccess(key => includeKey?.Invoke(key) != false) : null);
         runtimeRelations?.Observe(observation);
         receive(observation);
+        return observation.Sequence;
     }
 
     internal void GlobalMutation(string key) => runtimeRelations?.NotifyExternal([key],

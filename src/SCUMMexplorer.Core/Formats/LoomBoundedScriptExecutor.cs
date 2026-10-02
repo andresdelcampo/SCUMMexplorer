@@ -156,7 +156,7 @@ public sealed class LoomBoundedScriptExecutor
 
             var instruction = instructions[instructionIndex];
             var next = instruction.Offset + EncodedLength(instruction.Bytes);
-            observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
+            var instructionSequence = observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
                 "instruction", instruction.Offset, instruction.Operation, instruction.Operands,
                 knownVariables, estimated, onEstimatedPath,
                 bindOperands: include => BindObservationOperands(instruction, knownVariables, estimated, include),
@@ -340,9 +340,27 @@ public sealed class LoomBoundedScriptExecutor
 
             if (instruction.Operation == "expression")
             {
-                if (!TryApplyExpression(instruction, script, knownVariables, estimated, runtime,
-                        onEstimatedPath, picks, trace, out var expressionDetail))
+                var expressionStep = 0;
+                void ObserveExpression(string stage, (string Role, string Operand)[] operands, string? barrier)
                 {
+                    if (instructionSequence is not { } sequence || observation?.Observer.CapturesExpressions != true) return;
+                    // A separate bounded stream cannot alter the outer instruction sequence or execution.
+                    if (++expressionStep > 4096)
+                    {
+                        if (expressionStep == 4097) observation.Observer.Expression(sequence, expressionStep,
+                            observation.Slot, observation.ParentSlot, observationRun, script, instruction,
+                            "barrier", onEstimatedPath, _ => [], "expression observation step bound reached");
+                        return;
+                    }
+                    observation.Observer.Expression(sequence, expressionStep, observation.Slot, observation.ParentSlot,
+                        observationRun, script, instruction, stage, onEstimatedPath,
+                        include => operands.Select(p => BindObservationOperand(p.Role, p.Operand, knownVariables, estimated, include)).ToArray(), barrier);
+                }
+                if (!TryApplyExpression(instruction, script, knownVariables, estimated, runtime,
+                        onEstimatedPath, picks, trace, out var expressionDetail,
+                        observation?.Observer.CapturesExpressions == true ? ObserveExpression : null))
+                {
+                    ObserveExpression("barrier", [], expressionDetail);
                     unresolved = $"{expressionDetail} at +0x{instruction.Offset:X4}";
                     break;
                 }
@@ -1706,7 +1724,8 @@ public sealed class LoomBoundedScriptExecutor
     // Only the nested getRandomNr form is supported here; other opcodes remain unresolved.
     private static bool TryApplyExpression(LoomScriptInstruction instruction, LoomScriptDisassembly script,
         Dictionary<string, ushort> variables, HashSet<string> estimated, LoomScriptRuntimeState? runtime,
-        bool pathEstimated, List<LoomRandomPick> picks, List<string> trace, out string detail)
+        bool pathEstimated, List<LoomRandomPick> picks, List<string> trace, out string detail,
+        Action<string, (string Role, string Operand)[], string?>? observe = null)
     {
         detail = "expression operands are unsupported";
         int separator = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
@@ -1722,6 +1741,8 @@ public sealed class LoomBoundedScriptExecutor
             end = token.Index + token.Length;
         }
         if (!string.IsNullOrWhiteSpace(body[end..])) return false;
+
+        observe?.Invoke("destination-selected", [("destination-before", instruction.Operands[..separator])], null);
 
         var stack = new Stack<(int Value, bool Estimated)>();
         foreach (Match token in tokens)
@@ -1745,6 +1766,8 @@ public sealed class LoomBoundedScriptExecutor
             else if (term.StartsWith("getRandomNr(", StringComparison.Ordinal))
             {
                 var parts = term[12..^1].Split(',', StringSplitOptions.TrimEntries);
+                if (parts.Length == 2) observe?.Invoke("nested-before",
+                    [("nested-destination-before", parts[0]), ("nested-bound-before", parts[1])], null);
                 if (runtime is null || parts.Length != 2 ||
                     !TryGetVariableKey(parts[0], variables, out var randomDestination) ||
                     !TryReadValue(parts[1], variables, out var max, out _))
@@ -1755,12 +1778,15 @@ public sealed class LoomBoundedScriptExecutor
                 MarkEstimated(estimated, randomDestination, true);
                 picks.Add(pick);
                 trace.Add($"{randomDestination} = {pick.Value}: nested seeded pick of 0..{max} (seed {pick.Seed}, draw {pick.Draw})");
+                observe?.Invoke("nested-write", [("destination-after", randomDestination)], null);
+                observe?.Invoke("scratch-read", [("implicit-scratch", "var[0x000]")], null);
                 if (!TryReadValue("var[0x000]", variables, out var scratch, out _))
                 { detail = "nested expression opcode leaves var[0x000] unknown"; return false; }
                 stack.Push((unchecked((short)scratch), IsEstimated("var[0x000]", estimated)));
             }
             else
             {
+                observe?.Invoke("read", [("source", term)], null);
                 if (!TryReadValue(term, variables, out var value, out var unknown))
                 { detail = $"expression reads {unknown}"; return false; }
                 stack.Push((unchecked((short)value), OperandIsEstimated(term, estimated, variables)));
@@ -1773,6 +1799,8 @@ public sealed class LoomBoundedScriptExecutor
         MarkEstimated(estimated, destination, pathEstimated || result.Estimated ||
             OperandIsEstimated(instruction.Operands[..separator], estimated, variables, indexOnly: true));
         trace.Add($"{destination} = {unchecked((short)result.Value)}: expression");
+        // The saved destination was selected before the expression; do not re-resolve its index.
+        observe?.Invoke("final-write", [("destination-after", destination)], null);
         detail = "known expression";
         return true;
     }
@@ -1793,26 +1821,8 @@ public sealed class LoomBoundedScriptExecutor
         IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include,
         bool extended = false)
     {
-        LoomScriptOperandBinding Bind(string role, string operand, int? argument = null, int depth = 0)
-        {
-            operand = operand.Trim();
-            if (depth >= 32) return new(role, operand, null, null, null, ArgumentIndex: argument,
-                UnresolvedReason: "operand index depth exceeded");
-            var indexed = IndexedPattern.Match(operand);
-            var index = indexed.Success ? Bind("index", indexed.Groups[3].Value, depth: depth + 1) : null;
-            if (index is { Value: null }) return new(role, operand, null, null, null, index,
-                ArgumentIndex: argument, UnresolvedReason: "unresolved index");
-            string? key = TryNormalizeKey(operand, variables, out var normalized) ? normalized : null;
-            var backing = key is not null && key.StartsWith("bit[", StringComparison.Ordinal)
-                ? $"var[0x{int.Parse(VariablePattern.Match(key).Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >> 4:X3}]" : null;
-            // Filtering applies to bindings too, including an omitted index/backing word.
-            if (key is not null && (!include(key) || backing is not null && !include(backing)))
-                return new(role, operand, key, null, null, index, backing, argument, "filtered operand");
-            var available = TryReadValue(operand, variables, out var value, out var detail);
-            return new(role, operand, key, available ? value : null,
-                available ? key is not null && IsEstimated(key, estimated) : null,
-                index, backing, argument, available ? null : detail);
-        }
+        LoomScriptOperandBinding Bind(string role, string operand, int? argument = null) =>
+            BindObservationOperand(role, operand, variables, estimated, include, argument);
 
         var op = instruction.Operation;
         var text = instruction.Operands;
@@ -1911,7 +1921,56 @@ public sealed class LoomBoundedScriptExecutor
                 .Concat(text[(open + 1)..^1].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                     .Select(value => Bind("class", value))).ToArray();
         }
-        if (extended && op is "actorOps" or "print" or "printEgo")
+        if (extended && op == "waitFor")
+        {
+            if (text == "message") return [Bind("implicit-message", LoomMessageTable.HaveMsgVariable)];
+            if (text == "camera") return [Bind("implicit-camera", "var[0x002]")];
+            var parts = text.Split(',', StringSplitOptions.TrimEntries);
+            return parts.Length == 2 && parts[0] == "actor" ? [Bind("target", parts[1])] : [];
+        }
+        if (extended && op is "stringOps" or "cursorCommand" or "resourceRoutines" or "roomOps")
+        {
+            var parts = text.Split(',', StringSplitOptions.TrimEntries);
+            var count = op switch {
+                "stringOps" => parts[0] switch {
+                    "copyString" or "createString" => 2,
+                    "setStringChar" or "getStringChar" => 3,
+                    // The remaining operand is inline text, never a numeric expression.
+                    "loadString" => -2,
+                    _ => -1
+                },
+                "cursorCommand" => parts[0] switch {
+                    "cursorImage" or "v3CharsetInit" => 2,
+                    "cursorHotspot" => 3,
+                    "cursorSet" or "charsetSet" => 1,
+                    "cursorOn" or "cursorOff" or "userInputOn" or "userInputOff" or
+                    "cursorSoftOn" or "cursorSoftOff" or "userInputSoftOn" or "userInputSoftOff" => 0,
+                    _ => -1
+                },
+                "roomOps" => parts[0] switch {
+                    "roomScroll" or "roomColorLegacy" or "setScreen" or "roomPalette" or "shakeOn" or "shakeOff" => 2,
+                    "setRoomScale" => 7,
+                    "roomIntensity" or "setRgbRoomIntensity" => 5,
+                    "saveLoad" => 4,
+                    "screenEffect" => 3,
+                    _ => -1
+                },
+                _ => parts[0] switch {
+                    "loadScript" or "loadSound" or "loadCostume" or "loadRoom" or
+                    "nukeScript" or "nukeSound" or "nukeCostume" or "nukeRoom" or
+                    "lockScript" or "lockSound" or "lockCostume" or "lockRoom" or
+                    "unlockScript" or "unlockSound" or "unlockCostume" or "unlockRoom" or
+                    "loadCharset" or "nukeCharset" => 1,
+                    "loadObject" => 2,
+                    _ => -1
+                }
+            };
+            if (count == -2) return parts.Length >= 3 ? [Bind("target", parts[1])] : [];
+            if (count < 0 || parts.Length != count + 1) return [];
+            return parts.Skip(1).Select((value, index) => Bind(op == "stringOps" && parts[0] == "getStringChar" && index == 0
+                ? "destination-before" : parts[0] + "-operand", value)).ToArray();
+        }
+        if (extended && op is "actorOps" or "verbOps" or "print" or "printEgo")
         {
             var open = text.IndexOf(", [", StringComparison.Ordinal);
             if (open < 0 || !text.EndsWith(']')) return [];
@@ -1925,13 +1984,18 @@ public sealed class LoomBoundedScriptExecutor
                 var parts = item.Split(',', StringSplitOptions.TrimEntries);
                 // Inline strings can contain semicolons, commas and variable-like text.
                 // Stop before them; the independent effect barrier covers the remainder.
-                if (parts[0] is "actorName" or "text") break;
+                if (parts[0] is "actorName" or "text" or "name") break;
                 var count = op == "actorOps" ? parts[0] switch {
                     "costume" or "sound" or "walkAnimation" or "standAnimation" or "elevation" or
                     "talkColor" or "initAnimation" or "width" or "alwaysZClip" or "animationSpeed" or "shadow" => 1,
                     "walkSpeed" or "talkAnimation" or "palette" or "scale" => 2,
                     "animation" => 3,
                     "init" or "defaultAnimations" or "neverZClip" or "ignoreBoxes" or "followBoxes" => 0,
+                    _ => -1
+                } : op == "verbOps" ? parts[0] switch {
+                    "image" or "color" or "highlightColor" or "dimColor" or "key" or "nameString" or "backColor" => 1,
+                    "at" or "assignObject" => 2,
+                    "on" or "off" or "delete" or "new" or "dim" or "center" => 0,
                     _ => -1
                 } : parts[0] switch {
                     "position" or "erase" or "sayVoice" => 2,
@@ -1953,7 +2017,9 @@ public sealed class LoomBoundedScriptExecutor
                 "loadRoom" or "actorFollowCamera" or "stopObjectScript" or "pickupObject" or "setCameraAt" or "panCameraTo" => 1,
                 "setState" or "setOwnerOf" or "setBoxFlags" or "putActorInRoom" or "putActorAtObject" or
                 "walkActorToObject" or "animateActor" or "faceActor" => 2,
-                "putActor" or "walkActorTo" or "walkActorToActor" => 3,
+                "putActor" or "walkActorTo" or "walkActorToActor" or "lights" or
+                "saveVerbs" or "restoreVerbs" or "deleteVerbs" => 3,
+                "drawBox" => 5,
                 _ => 0
             };
             var parts = text.Split(',', StringSplitOptions.TrimEntries);
@@ -1961,6 +2027,29 @@ public sealed class LoomBoundedScriptExecutor
                 return parts.Select((value, index) => Bind(index == 0 ? "target" : "source", value)).ToArray();
         }
         return [];
+    }
+
+    private static LoomScriptOperandBinding BindObservationOperand(string role, string operand,
+        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include,
+        int? argument = null, int depth = 0)
+    {
+        operand = operand.Trim();
+        if (depth >= 32) return new(role, operand, null, null, null, ArgumentIndex: argument,
+            UnresolvedReason: "operand index depth exceeded");
+        var indexed = IndexedPattern.Match(operand);
+        var index = indexed.Success ? BindObservationOperand("index", indexed.Groups[3].Value,
+            variables, estimated, include, depth: depth + 1) : null;
+        if (index is { Value: null }) return new(role, operand, null, null, null, index,
+            ArgumentIndex: argument, UnresolvedReason: "unresolved index");
+        string? key = TryNormalizeKey(operand, variables, out var normalized) ? normalized : null;
+        var backing = key is not null && key.StartsWith("bit[", StringComparison.Ordinal)
+            ? $"var[0x{int.Parse(VariablePattern.Match(key).Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >> 4:X3}]" : null;
+        if (key is not null && (!include(key) || backing is not null && !include(backing)))
+            return new(role, operand, key, null, null, index, backing, argument, "filtered operand");
+        var available = TryReadValue(operand, variables, out var value, out var detail);
+        return new(role, operand, key, available ? value : null,
+            available ? key is not null && IsEstimated(key, estimated) : null,
+            index, backing, argument, available ? null : detail);
     }
 
     private static LoomScriptSourceAccess BindSourceAccess(LoomScriptInstruction instruction,
