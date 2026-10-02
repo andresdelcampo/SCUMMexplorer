@@ -6,6 +6,32 @@ public sealed class LoomCallBoundaryOrderTests
 {
     [Theory]
     [InlineData("none")]
+    [InlineData("terminal-begin")]
+    [InlineData("yield-begin")]
+    public void ChildEndsRequireTheirOwnActualEndPhase(string defect)
+    {
+        var chronology = new List<object>();
+        LoomCallObservationTests.WithSession(new() { [2] = [0x80, 0] }, (session, _, _) => {
+            session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, []"), ("stopObjectCode", "")));
+            session.AdvanceFrame();
+        }, chronology: chronology);
+        var updates = new List<LoomCallCorrespondence>();
+        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        foreach (var item in chronology)
+        {
+            bool Alter(LoomScriptObservationSite? site, bool? stop) => site is { Script: 2, Stage: "end" } &&
+                (defect == "terminal-begin" && stop == true || defect == "yield-begin" && stop == false);
+            if (item is LoomScriptObservation script)
+                tracker.ObserveScript(Alter(script.Site, script.ReachedStop) ? script with { Site = script.Site! with { Stage = "begin" } } : script);
+            else if (item is LoomCallObservation call)
+                tracker.ObserveCall(Alter(call.Site, call.ReachedStop) ? call with { Site = call.Site with { Stage = "begin" } } : call);
+        }
+        if (defect == "none") Assert.Contains(updates, u => u.ChildTerminated);
+        else Assert.False(updates.Any(u => u.ChildTerminated), defect);
+    }
+
+    [Theory]
+    [InlineData("none")]
     [InlineData("host-offset")]
     [InlineData("host-sequence")]
     [InlineData("host-path")]

@@ -272,7 +272,7 @@ public sealed class LoomCallCorrespondenceTracker
 
     private bool Restore(Chain chain, LoomCallObservation boundary)
     {
-        if (!Aligned(boundary) || boundary.Barrier is not null || !CompleteLocals(boundary, restored: true) ||
+        if (boundary.Site.Stage != "begin" || !Aligned(boundary) || boundary.Barrier is not null || !CompleteLocals(boundary, restored: true) ||
             !ChainIdentity(chain, boundary) || chain.Terminal is not null || chain.Yield?.ResumeOffset != boundary.Site.Offset ||
             chain.Yield is null || chain.AwaitingFirst || !chain.Runs.Add(boundary.Invocation)) return false;
         chain.Run = boundary.Invocation;
@@ -290,7 +290,7 @@ public sealed class LoomCallCorrespondenceTracker
 
     private bool End(Chain chain, LoomCallObservation boundary)
     {
-        if (!Aligned(boundary) || !ChainIdentity(chain, boundary) || chain.Run != boundary.Invocation ||
+        if (boundary.Site.Stage != "end" || !Aligned(boundary) || !ChainIdentity(chain, boundary) || chain.Run != boundary.Invocation ||
             chain.Terminal is not null || chain.Yield is not null || chain.AwaitingFirst || boundary.Barrier is not null ||
             chain.LastInstruction is null) return false;
         if (boundary.ReachedStop == false && boundary.ResumeOffset is not null) { chain.Yield = boundary; return true; }
