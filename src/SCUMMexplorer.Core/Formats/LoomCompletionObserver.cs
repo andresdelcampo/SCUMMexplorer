@@ -4,12 +4,16 @@ namespace SCUMMexplorer.Core.Formats;
 /// A selected zero-read and its last surviving snapshot-confirmed literal writer, if any.
 /// Matching the causal child is evidence about this stream, never protocol completion.
 /// Writer/read value, index, inherited path and terminal observations remain independent.
-/// Termination requires an end in the writer's own invocation and causal parent; a later
-/// resumption's end needs independent continuity evidence that this observer does not infer.
+/// Termination requires the writer's own end, or a separately copied bounded chain of actual
+/// yielded ends and matching resumed begins/ends. A later invocation alone proves nothing.
 /// </summary>
 public sealed record LoomCompletionRead(LoomRuntimeRead Read, LoomRuntimeWrite? Writer,
     bool MatchesOwnLiteralChild, LoomScriptObservation? WriterEnd, string? Rejection,
-    IReadOnlyList<string> Limits, bool WriterTerminated = false, string? TerminalRejection = null);
+    IReadOnlyList<string> Limits, bool WriterTerminated = false, string? TerminalRejection = null,
+    LoomWriterTerminalContinuity? ResumedTerminalContinuity = null);
+
+/// <summary>Observed writer-to-terminal boundaries only, with every boundary's original estimates.</summary>
+public sealed record LoomWriterTerminalContinuity(long Writer, IReadOnlyList<LoomScriptObservation> Boundaries);
 
 /// <summary>
 /// Generic zero-wait observation over relation updates, without script IDs, room exceptions,
@@ -21,7 +25,18 @@ public sealed class LoomCompletionObserver
 {
     private readonly Action<LoomCompletionRead> receive;
     private readonly int slotLimit;
+    private readonly int boundaryLimit;
     private readonly Dictionary<long, LoomScriptObservation> ends = [];
+    private readonly Dictionary<long, Continuity> continuities = [];
+    private sealed class Continuity(LoomRuntimeWrite writer)
+    {
+        public LoomRuntimeWrite Writer { get; } = writer;
+        public long Invocation { get; set; } = writer.Observation.Invocation;
+        public HashSet<long> Invocations { get; } = [writer.Observation.Invocation];
+        public int? ExpectedResume { get; set; }
+        public LoomScriptObservation? Terminal { get; set; }
+        public List<LoomScriptObservation> Boundaries { get; } = [];
+    }
     private static readonly IReadOnlyList<string> limits = Array.AsReadOnly(new[] {
         "selected observations only; omitted/external/aliased/concurrent writers remain limits",
         "unchanged unobserved external effects require explicit invalidation",
@@ -29,21 +44,36 @@ public sealed class LoomCompletionObserver
         "terminal/self-stop observations do not establish scheduler/callee or cancellation-safe completion"
     });
 
-    public LoomCompletionObserver(Action<LoomCompletionRead> receive, int slotLimit = 4096)
+    public LoomCompletionObserver(Action<LoomCompletionRead> receive, int slotLimit = 4096, int boundaryLimit = 128)
     {
         ArgumentNullException.ThrowIfNull(receive);
         if (slotLimit is < 1 or > 100_000) throw new ArgumentOutOfRangeException(nameof(slotLimit));
+        if (boundaryLimit is < 1 or > 4096) throw new ArgumentOutOfRangeException(nameof(boundaryLimit));
         this.receive = receive;
         this.slotLimit = slotLimit;
+        this.boundaryLimit = boundaryLimit;
     }
 
     public void Observe(LoomRuntimeRelationUpdate update)
     {
         ArgumentNullException.ThrowIfNull(update);
+        // A missing/filtered/external stream boundary cannot bridge two invocations.
+        if (update.Observation is null && update.Barrier is not null) continuities.Clear();
+        foreach (var writer in update.Writes.Where(w => w.Value == 0 && w.Observation.Site?.Operation == "move"))
+        {
+            if (continuities.Count >= slotLimit) continuities.Clear();
+            continuities[writer.Id] = new(writer);
+        }
         if (update.Observation is { } observation)
         {
             if (observation.CancelledSlots is { } cancelled)
+            {
                 foreach (var slot in cancelled) ends.Remove(slot);
+                foreach (var id in continuities.Where(p => cancelled.Contains(p.Value.Writer.Observation.Slot) ||
+                    p.Value.Writer.Observation.ParentSlot is { } parent && cancelled.Contains(parent)).Select(p => p.Key).ToArray()) continuities.Remove(id);
+            }
+            foreach (var (id, continuity) in continuities.Where(p => p.Value.Writer.Observation.Slot == observation.Slot).ToArray())
+                if (!Advance(continuity, observation)) continuities.Remove(id);
             if (observation.Site is { Stage: "end" })
             {
                 if (ends.Count >= slotLimit) ends.Clear();
@@ -70,8 +100,43 @@ public sealed class LoomCompletionObserver
                     ? "writer end belongs to another invocation or causal parent" :
                 writerEnd.ReachedStop != true || writerEnd.ResumeOffset is not null || writerEnd.UnresolvedReason is not null
                     ? "writer end is yielded, partial or unresolved" : null;
+            LoomWriterTerminalContinuity? resumed = null;
+            if (terminalRejection is not null && writer is not null && continuities.TryGetValue(writer.Id, out var chain) &&
+                chain.Terminal is { } terminal && terminal.Sequence >= writer.ConfirmationSequence &&
+                terminal.Sequence < read.Observation.Sequence && terminal.Invocation != writer.Observation.Invocation)
+            {
+                writerEnd = terminal;
+                terminalRejection = null;
+                resumed = new(writer.Id, Array.AsReadOnly(chain.Boundaries.ToArray()));
+            }
             receive(new(read, writer, rejection is null, writerEnd, rejection, limits,
-                terminalRejection is null, terminalRejection));
+                terminalRejection is null, terminalRejection, resumed));
         }
+    }
+
+    private bool Advance(Continuity continuity, LoomScriptObservation observation)
+    {
+        var writer = continuity.Writer;
+        if (observation.Sequence < writer.ConfirmationSequence) return true;
+        if (observation.Site is not { } site || !site.SameResource(writer.Observation.Site) ||
+            observation.ParentSlot != writer.Observation.ParentSlot || observation.UnresolvedReason is not null) return false;
+        if (site.Stage == "begin")
+        {
+            if (continuity.Terminal is not null || continuity.ExpectedResume != site.Offset ||
+                !continuity.Invocations.Add(observation.Invocation)) return false;
+            continuity.Invocation = observation.Invocation;
+            continuity.ExpectedResume = null;
+        }
+        else
+        {
+            if (continuity.Terminal is not null || continuity.ExpectedResume is not null || observation.Invocation != continuity.Invocation) return false;
+            if (site.Stage != "end") return site.Stage == "instruction";
+            if (observation.ReachedStop == true && observation.ResumeOffset is null) continuity.Terminal = observation;
+            else if (observation.ReachedStop == false && observation.ResumeOffset is { } resume) continuity.ExpectedResume = resume;
+            else return false;
+        }
+        if (continuity.Boundaries.Count >= boundaryLimit) return false;
+        continuity.Boundaries.Add(observation);
+        return true;
     }
 }
