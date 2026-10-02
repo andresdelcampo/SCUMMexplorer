@@ -1924,6 +1924,14 @@ public sealed class LoomBoundedScriptExecutor
             return [Bind("implicit-ego", "var[0x001]"), Bind("target", match.Groups[1].Value), Bind("room", match.Groups[2].Value),
                 Coordinate("walk-x", x, match.Groups[3].Value), Coordinate("walk-y", y, match.Groups[4].Value)];
         }
+        if (extended && op == "drawObject")
+        {
+            var parts = text.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length == 4 && parts[1] == "at")
+                return [Bind("target", parts[0]), Bind("draw-x", parts[2]), Bind("draw-y", parts[3])];
+            if (parts.Length == 3 && parts[1] == "state") return [Bind("target", parts[0]), Bind("draw-state", parts[2])];
+            return parts.Length == 2 && parts[1] == "default state and position" ? [Bind("target", parts[0])] : [];
+        }
         if (extended && (IsActorQuery(op) || op is "getDist" or "findObject" or "isSoundRunning" or "isScriptRunning" or "getObjectOwner"))
         {
             var parts = text.Split(',', StringSplitOptions.TrimEntries);
@@ -2128,12 +2136,23 @@ public sealed class LoomBoundedScriptExecutor
         return new(Array.AsReadOnly(bindings.ToArray()), barrier, Array.AsReadOnly(new[] {
             "numeric storage operands only; native actor/object/message effects remain independent",
             "selected stream only; raw external writes, concurrency, scheduling and callee return remain limits"
-        }), BindNativeDependencies(instruction.Operation, bindings, states, runtime));
+        }), BindNativeDependencies(instruction.Operation, bindings, states, runtime, instruction.Operands));
     }
 
     private static IReadOnlyList<LoomScriptNativeDependency>? BindNativeDependencies(string op,
-        IReadOnlyList<LoomScriptOperandBinding> bindings, IReadOnlyDictionary<int, byte> states, LoomScriptRuntimeState? runtime)
+        IReadOnlyList<LoomScriptOperandBinding> bindings, IReadOnlyDictionary<int, byte> states, LoomScriptRuntimeState? runtime,
+        string? operands = null)
     {
+        // _userPut is native signed storage, not an invented numeric SCUMM variable. Soft
+        // commands read its old value; hard commands overwrite it. Effects remain incomplete.
+        if (op == "cursorCommand" && operands is "userInputOn" or "userInputOff" or "userInputSoftOn" or "userInputSoftOff")
+            return Array.AsReadOnly(new[] { new LoomScriptNativeDependency("user-input",
+                new("implicit-user-input", "_userPut", null, 0, false), runtime?.UserPut,
+                runtime is null ? null : runtime.UserPutEstimate is not null, runtime?.UserPutEstimate,
+                runtime is null ? "native user input unavailable" : null) });
+        if (op == "drawObject" && bindings.Count > 0)
+            return Array.AsReadOnly(ObjectPositionDependencies(bindings[0], runtime).Concat(new[] { new LoomScriptNativeDependency("draw-peer-effects",
+                bindings[0], null, null, UnresolvedReason: "peer/state/class/draw queue/effect dependencies not exhaustively captured") }).ToArray());
         if (op == "stringOps" && bindings.Count > 0)
             return Array.AsReadOnly(bindings.Where(b => b.Role != "destination-before")
                 .Select(b => new LoomScriptNativeDependency("string-storage", b, null, null,
@@ -2175,7 +2194,11 @@ public sealed class LoomBoundedScriptExecutor
         if (IsActorQuery(op))
         {
             if (selector.Value is not { } id || !LoomActorTable.IsValid(id) || runtime is null)
-                return Array.AsReadOnly(new[] { Missing(op, selector, "actor field unavailable; object fallback dependencies not captured") });
+            {
+                var missing = new[] { Missing(op, selector, "actor field unavailable; object fallback dependencies not captured") };
+                return Array.AsReadOnly(op is "getActorX" or "getActorY" && selector.Value >= LoomActorTable.Count
+                    ? missing.Concat(ObjectPositionDependencies(selector, runtime)).ToArray() : missing);
+            }
             var actor = runtime.Actors[id];
             long? value = op switch {
                 "getActorWalkBox" => actor.WalkBox, "getActorRoom" => actor.Room,
@@ -2202,6 +2225,22 @@ public sealed class LoomBoundedScriptExecutor
         if (!match.Success) return false;
         key = $"{match.Groups[1].Value}[0x{int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]";
         return true;
+    }
+
+    private static IReadOnlyList<LoomScriptNativeDependency> ObjectPositionDependencies(LoomScriptOperandBinding selector,
+        LoomScriptRuntimeState? runtime)
+    {
+        var available = selector.Value is { } subject && runtime?.ObjectPositions.ContainsKey(subject) == true;
+        RoomObjectPosition? position = available ? runtime!.ObjectPositions[selector.Value!.Value] : null;
+        var estimated = available ? runtime!.EstimatedStates.Contains(selector.Value!.Value) : (bool?)null;
+        // A stored drawing position is not the object's walk point, parent visibility,
+        // inventory owner or query result. Retain the original incomplete query barrier.
+        return Array.AsReadOnly(new[] {
+            new LoomScriptNativeDependency("object-position-x", selector, position?.X, estimated,
+                UnresolvedReason: available ? null : "stored object position unavailable"),
+            new LoomScriptNativeDependency("object-position-y", selector, position?.Y, estimated,
+                UnresolvedReason: available ? null : "stored object position unavailable")
+        });
     }
 
     private static bool IsEstimated(string key, IReadOnlySet<string> estimated)
@@ -2485,7 +2524,8 @@ public sealed class LoomBoundedScriptExecutor
             return false;
         }
 
-        positions[objectId] = position;
+        if (runtime is null) positions[objectId] = position;
+        else runtime.SetObjectPosition(objectId, position);
         foreach (var peer in roomObjects)
         {
             if (peer.Id == objectId || peer.Width != record.Width || peer.Height != record.Height ||

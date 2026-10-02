@@ -164,7 +164,8 @@ public sealed class LoomNativeDependencyTracker
     }
 
     private static string? Family(string domain) => domain switch {
-        "object-state" or "object-classes" => "object",
+        "object-state" or "object-classes" or "object-position" or "object-position-x" or "object-position-y" => "object",
+        "user-input" => "user-input",
         "actor" or "getActorX" or "getActorY" or "getActorRoom" or "getActorWalkBox" or
         "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" => "actor",
         _ => null

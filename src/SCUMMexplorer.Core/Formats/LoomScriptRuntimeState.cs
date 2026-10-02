@@ -24,6 +24,13 @@ public sealed class LoomScriptRuntimeState
     /// <summary>Class bits per object or actor number (ScummVM <c>_classData</c>).</summary>
     public Dictionary<int, uint> ObjectClasses { get; }
     public Dictionary<int, RoomObjectPosition> ObjectPositions { get; } = [];
+    /// <summary>Notified placement mutations; raw dictionary writes still require notification.</summary>
+    public void SetObjectPosition(int subject, RoomObjectPosition value)
+    { ObjectPositions[subject] = value; NotifyNativeMutation("object-position", subject); }
+    public bool TryAddObjectPosition(int subject, RoomObjectPosition value)
+    { var added = ObjectPositions.TryAdd(subject, value); NotifyNativeMutation("object-position", subject); return added; }
+    public bool RemoveObjectPosition(int subject)
+    { var removed = ObjectPositions.Remove(subject); NotifyNativeMutation("object-position", subject); return removed; }
     public Dictionary<string, ushort> GlobalVariables { get; } = new(StringComparer.Ordinal);
     internal LoomScriptObserver? MutationObserver { get; set; }
 
@@ -169,7 +176,17 @@ public sealed class LoomScriptRuntimeState
     /// 1/0 and the soft forms add or take one; clicks are read only while it is
     /// above 0 (<c>checkExecVerbs</c>). It starts at 0.
     /// </summary>
-    public int UserPut { get; set; }
+    private int userPut;
+    public int UserPut
+    {
+        get => userPut;
+        set { userPut = value; NotifyNativeMutation("user-input", 0); }
+    }
     /// <summary>Why <see cref="UserPut"/> is an estimate (it was set on a path behind a seeded pick), or null.</summary>
-    public string? UserPutEstimate { get; set; }
+    private string? userPutEstimate;
+    public string? UserPutEstimate
+    {
+        get => userPutEstimate;
+        set { userPutEstimate = value; NotifyNativeMutation("user-input", 0); }
+    }
 }

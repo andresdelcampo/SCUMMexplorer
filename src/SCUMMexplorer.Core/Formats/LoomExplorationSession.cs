@@ -750,7 +750,7 @@ public sealed partial class LoomExplorationSession
         _runtime.EstimatedVariables.Remove("var[0x011]");
         _runtime.EstimatedVariables.Remove("var[0x012]");
         foreach (var item in _currentObjects)
-            _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
+            _runtime.TryAddObjectPosition(item.Id, new RoomObjectPosition(item.X, item.Y));
         _runtime.SetGlobalVariable("var[0x004]", (ushort)room.ResourceId!.Value);
         _roomSize = (roomWidth, (roomBytes[6] ^ 0xFF) | ((roomBytes[7] ^ 0xFF) << 8));
         _pointer = null;
