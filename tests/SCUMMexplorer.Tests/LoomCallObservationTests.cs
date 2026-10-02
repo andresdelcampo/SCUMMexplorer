@@ -207,7 +207,7 @@ public sealed class LoomCallObservationTests
     internal static void WithSession(Dictionary<int, byte[]> programs,
         Action<LoomExplorationSession, List<LoomCallObservation>, List<LoomScriptObservation>> check,
         Func<LoomScriptObservationSite, bool>? site = null, Func<string, bool>? key = null, bool capture = true,
-        LoomCallCorrespondenceTracker? correspondence = null)
+        LoomCallCorrespondenceTracker? correspondence = null, List<object>? chronology = null)
     {
         var directory = Path.Combine(Path.GetTempPath(), "loom-calls-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
@@ -226,7 +226,9 @@ public sealed class LoomCallObservationTests
             var records = new List<LoomCallObservation>();
             var outer = new List<LoomScriptObservation>();
             check(new(game, new(new Dictionary<int, byte>(), new Dictionary<int, byte>()), completeBoot: false,
-                observer: new(outer.Add, site, key, receiveCall: capture ? records.Add : null, callCorrespondence: correspondence)), records, outer);
+                observer: new(s => { outer.Add(s); chronology?.Add(s); }, site, key,
+                    receiveCall: capture ? c => { records.Add(c); chronology?.Add(c); } : null,
+                    callCorrespondence: correspondence)), records, outer);
         }
         finally { Directory.Delete(directory, recursive: true); }
     }

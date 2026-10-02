@@ -60,6 +60,7 @@ public sealed class LoomCallCorrespondenceTracker
         public LoomObjectCalleeSelection? ObjectSelection { get; set; }
         public Chain? Child { get; set; }
         public Chain Caller { get; } = new(dispatch);
+        public LoomObservedCall? CallerIncoming { get; init; }
         public List<LoomCallObservation> ChildBoundaries { get; } = [];
         public LoomCallObservation? HostReturn { get; set; }
         public LoomCallObservation? Continued { get; set; }
@@ -158,7 +159,14 @@ public sealed class LoomCallCorrespondenceTracker
             if (!Aligned(boundary) || boundary.Slot != call.Slot || boundary.Invocation != call.Invocation ||
                 boundary.ParentSlot != call.ParentSlot || boundary.Site != call.Site)
             { Publish(null, "dispatch has no aligned actual instruction"); return; }
-            var entry = new Entry(boundary);
+            // The caller's incoming identity must come from its actual, still observed
+            // initialization/continuity. Equal restored locals or a matching slot alone
+            // cannot supply an omitted incoming dispatch later.
+            var incoming = active.Values.FirstOrDefault(e => e.ChildRejection is null && e.Binding is not null &&
+                e.Child is { Yield: null, AwaitingFirst: false, Terminal: null } child &&
+                child.Start.Slot == boundary.Slot && child.Run == boundary.Invocation &&
+                child.Start.ParentSlot == boundary.ParentSlot && child.Start.Site.SameResource(boundary.Site));
+            var entry = new Entry(boundary) { CallerIncoming = incoming?.Dispatch.Call };
             entry.Caller.LastInstruction = lastScript;
             active.Add(call.Id, entry);
             Publish(entry);
@@ -170,7 +178,8 @@ public sealed class LoomCallCorrespondenceTracker
             foreach (var pending in active.Values.Where(e => e.Dispatch.Slot == boundary.Slot && e.Caller.Yield is not null).ToArray())
             {
                 if (!Count(pending)) continue;
-                if (!Restore(pending.Caller, boundary)) pending.CallerRejection = "missing/foreign/reused caller restoration";
+                if (!ObservedCallerIncoming(pending, boundary) || !Restore(pending.Caller, boundary))
+                    pending.CallerRejection = "missing/foreign/reused caller restoration";
                 Publish(pending);
             }
         if (boundary.Call is not { } observed || !active.TryGetValue(observed.Id, out var current)) return;
@@ -268,6 +277,12 @@ public sealed class LoomCallCorrespondenceTracker
         chain.LastInstruction = null;
         return true;
     }
+
+    private bool ObservedCallerIncoming(Entry entry, LoomCallObservation boundary) =>
+        entry.CallerIncoming is { } incoming && boundary.Call is { } restored && SameCall(incoming, restored) &&
+        active.TryGetValue(incoming.Id, out var source) && source.ChildRejection is null && source.Binding is not null &&
+        source.Child is { } child && ChainIdentity(child, boundary) && child.Yield is not null &&
+        child.Yield.ResumeOffset == boundary.Site.Offset && !child.AwaitingFirst && child.Terminal is null;
 
     private bool End(Chain chain, LoomCallObservation boundary)
     {
