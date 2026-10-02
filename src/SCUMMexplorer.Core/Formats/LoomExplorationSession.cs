@@ -46,6 +46,11 @@ public sealed record LoomSessionSnapshot(
     /// <summary>Objects whose state a reached <c>setState</c> set since this room was entered.</summary>
     public IReadOnlyCollection<int> StatesSetByCode => StatesSetInRoom ?? [];
 
+    /// <summary>Runtime state slots to preserve when estimating artwork, including
+    /// estimated execution. This does not promote them into StatesSetByCode.</summary>
+    public IReadOnlyCollection<int> ArtworkStateIds() =>
+        StatesSetByCode.Concat(EstimatedStates).Distinct().ToArray();
+
     public bool IsFaithful => RoomId.HasValue && PendingScripts == 0 && Uncertainties.Count == 0;
 }
 
@@ -64,7 +69,8 @@ public sealed record LoomObjectActionResult(
         ? $"{Source}; no room load was reached."
         : $"{Source}; " +
           $"{ReachedRoomLoad.Operation} at {ReachedRoomLoad.SourceLabel} +0x{ReachedRoomLoad.Offset:X4} → " +
-          (DestinationRoomId is int target ? $"Room {target:00}" : "unresolved room") + ".";
+          (DestinationRoomId is int target ? $"Room {target:00}" : "unresolved room") +
+          (ReachedRoomLoad.Certainty == LoomScriptEventCertainty.Reached ? "." : " (estimated execution).");
 }
 
 /// <summary>
@@ -691,6 +697,9 @@ public sealed partial class LoomExplorationSession
         LoomEgoArrival? placeAfterLoadRoom = null)
     {
         var eventsBeforeVisit = _visitEvents.Count;
+        var estimatedLoad = load is { Certainty: not LoomScriptEventCertainty.Reached, Executed: true };
+        if (estimatedLoad)
+            _uncertainties.Add($"Room {room.ResourceId:00} entered by estimated execution at {load!.SourceLabel} +0x{load.Offset:X4}; execution continues without promoting the transition's certainty.");
         var withEgo = load is { Operation: "loadRoomWithEgo", ResolvedArguments: { Count: 4 } } ? load : null;
         int? ego = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoValue) && LoomActorTable.IsValid(egoValue) ? egoValue : null;
         if (withEgo is not null)
@@ -706,9 +715,9 @@ public sealed partial class LoomExplorationSession
         }
         if (_currentRoom is not null)
         {
-            RunGlobalHook(30, "before room exit");
-            RunEmbeddedRoomScript(_currentRoom, exit: true);
-            RunGlobalHook(31, "after room exit");
+            RunGlobalHook(30, "before room exit", estimatedLoad);
+            RunEmbeddedRoomScript(_currentRoom, exit: true, pathEstimated: estimatedLoad);
+            RunGlobalHook(31, "after room exit", estimatedLoad);
             // Room-scoped scripts cannot continue into a different room.
             _pending.RemoveAll(item => item.RoomId == _currentRoom.ResourceId);
         }
@@ -757,9 +766,9 @@ public sealed partial class LoomExplorationSession
         PlaceVirtualMouse();
         _uncertainties.Add(arrival);
 
-        RunGlobalHook(28, "before room entry");
-        RunEmbeddedRoomScript(room, exit: false);
-        RunGlobalHook(29, "after room entry");
+        RunGlobalHook(28, "before room entry", estimatedLoad);
+        RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);
+        RunGlobalHook(29, "after room entry", estimatedLoad);
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (placeAfterLoadRoom is not null && ego is int putEgo) PlaceEgoAfterLoadRoom(placeAfterLoadRoom, putEgo);
         else if (withEgo is not null) ForgetCamera($"{withEgo.SourceLabel} +0x{withEgo.Offset:X4} puts the camera on the ego, whose actor number is unknown");
@@ -1225,7 +1234,7 @@ public sealed partial class LoomExplorationSession
             return LastAction;
         }
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
-            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
+            IsExecutedRoomLoad(item) &&
             !_dispatchedLoads.Contains(item));
         var target = roomLoad?.TargetId is int id ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
         if (roomLoad is not null && target is not null)
@@ -1363,7 +1372,7 @@ public sealed partial class LoomExplorationSession
             return LastAction;
         }
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
-            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
+            IsExecutedRoomLoad(item) &&
             !_dispatchedLoads.Contains(item));
         var targetId = roomLoad?.TargetId;
         var target = targetId is int id
@@ -1447,7 +1456,7 @@ public sealed partial class LoomExplorationSession
         }
         StepWalksAndCamera();
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
-            item.Kind == LoomScriptEventKind.RoomLoaded && item.Certainty == LoomScriptEventCertainty.Reached &&
+            IsExecutedRoomLoad(item) &&
             !_dispatchedLoads.Contains(item));
         if (roomLoad is null || _currentRoom is null) return Snapshot;
         var target = roomLoad.TargetId is int id ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
@@ -1544,6 +1553,11 @@ public sealed partial class LoomExplorationSession
         }
         return _currentRoom?.ResourceId != room;
     }
+
+    // A selected execution may carry estimates; a merely discovered load is not execution.
+    private static bool IsExecutedRoomLoad(LoomScriptEvent item) =>
+        item.Kind == LoomScriptEventKind.RoomLoaded && item.Executed &&
+        item.Certainty is LoomScriptEventCertainty.Reached or LoomScriptEventCertainty.Conditional;
 
     /// <summary>
     /// Enters the room a global script loaded and resumes that script there in
@@ -1670,7 +1684,7 @@ public sealed partial class LoomExplorationSession
     /// <summary>Session-level steps (such as stopped scripts) in the order they were applied.</summary>
     public IReadOnlyList<string> SessionTrace => _visitTrace;
 
-    private void RunGlobalHook(int variableId, string phase)
+    private void RunGlobalHook(int variableId, string phase, bool pathEstimated = false)
     {
         var key = $"var[0x{variableId:X3}]";
         if (!_runtime.GlobalVariables.TryGetValue(key, out var scriptId))
@@ -1678,10 +1692,10 @@ public sealed partial class LoomExplorationSession
             _uncertainties.Add($"Global {phase} hook {key} is unknown because startup has not established it.");
             return;
         }
-        if (scriptId != 0) RunIndexedScript(scriptId, 0, null, 0);
+        if (scriptId != 0) RunIndexedScript(scriptId, 0, null, 0, pathEstimated: pathEstimated);
     }
 
-    private void RunEmbeddedRoomScript(GameResource room, bool exit)
+    private void RunEmbeddedRoomScript(GameResource room, bool exit, bool pathEstimated = false)
     {
         LoomScriptDisassembly? script;
         try
@@ -1695,7 +1709,7 @@ public sealed partial class LoomExplorationSession
         }
         if (!exit) { LastEntryScript = script; LastEntryRun = null; }
         if (script is null) return;
-        var result = RunScript(script, _currentObjects, 0, null, 0);
+        var result = RunScript(script, _currentObjects, 0, null, 0, pathEstimated: pathEstimated);
         if (!exit) LastEntryRun = result;
     }
 
@@ -1997,8 +2011,8 @@ public sealed partial class LoomExplorationSession
                 _runtime.ActiveSounds.Remove(stoppedId);
                 _soundClock.Stop(stoppedId, scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
                 return "";
-            case LoomScriptEventKind.RoomLoaded when scriptEvent.Certainty != LoomScriptEventCertainty.Reached:
-                return $"possible Room {scriptEvent.TargetId?.ToString("00", CultureInfo.InvariantCulture) ?? "dynamic"} load follows a seeded pick, so the session does not enter it";
+            case LoomScriptEventKind.RoomLoaded when !IsExecutedRoomLoad(scriptEvent):
+                return "room load was not executed; a discovered possibility cannot change the session room";
             case LoomScriptEventKind.RoomLoaded when _dispatchScope > 0 && _requestedLoad is null &&
                                                       _executing.Count > 0 && _executing[^1].Global &&
                                                       scriptEvent.TargetId is int loadedRoom &&

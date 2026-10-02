@@ -273,7 +273,7 @@ public sealed class LoomFirstVisitRenderingTests
                 // As in MainWindow.CloseArtworkGaps: when nothing is visible, show the fallback estimate.
                 if (!images.Any(selection.IsActive))
                     estimates = [.. estimates, .. selection.ShowUnresolvedArtwork(Batches.ForRoom(id), seed: id,
-                        snapshot.StatesSetByCode, Batches.EntryStatesForRoom(id))];
+                        snapshot.ArtworkStateIds(), Batches.EntryStatesForRoom(id))];
             }
             return (selection, estimates, background);
         }

@@ -945,7 +945,7 @@ public partial class MainWindow : Window
             snapshot.ObjectPositions, records, room, indexedStates, snapshot.DrawOrder);
         IReadOnlyList<RoomArtworkEstimate> estimates = snapshot.IsFaithful
             ? Array.Empty<RoomArtworkEstimate>()
-            : FillArtworkGaps(selection, resource, images, snapshot.StatesSetByCode, sceneBatches);
+            : FillArtworkGaps(selection, resource, images, snapshot.ArtworkStateIds(), sceneBatches);
         return (selection, estimates);
     }
 

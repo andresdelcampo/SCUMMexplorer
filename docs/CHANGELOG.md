@@ -1,5 +1,9 @@
 # Changelog
 
+## 2 October: let executed estimated room loads continue
+
+The session no longer stops an executed room load merely because its path carries estimates. Known destinations proceed with uncertainty preserved through room entry/exit; unknown destinations and unresolved branches remain blocked. The unchanged saved spell-input capture now completes090 through42/43/60/43, and looking at the Room18 sphere completes065. Other362 literal roots, four memberships, two sequences,76 room renders and15 direct-cage files remain exact. Core662,Blockers0,clean Release,protected57 exact/unstaged; no App launch/close/interaction or push. Original recipes/history and catalog coverage unchanged. A separate response18 experiment lacks the user's learned spell/available notes and does not establish their setup. [Validation](../.verification/estimated-room-loads-20261002/validation.md).
+
 ## 2 October: preserve the source-closed cage and name all draft responses
 
 From627b682: both catalog capture previews retain the closed Room43 background instead of borrowing the open-door image from later091. Generic fallback respects source-selected hidden regions, including overlapping images, while preserving the established entry/opening/unconditional-reset and gap policies. Room08's equivalent future-overlay guess is also corrected; other74 renders exact, all76 zero-gap. No native route improved; raw4 and all execution barriers stay unchanged. Core657,363 exact roots/fingerprints/four memberships/two sequences,Blockers0, clean normal main Release. No App launch/close/interaction or push;57 protected files exact. [Validation](../.verification/room43-cage-20261002/validation.md).

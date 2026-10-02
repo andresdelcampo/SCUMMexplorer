@@ -1,0 +1,90 @@
+{
+  "native": {
+    "before": {
+      "room": 41,
+      "frames": 7659,
+      "begun": 15,
+      "ended": 14
+    },
+    "after": {
+      "room": 43,
+      "frames": 5886,
+      "begun": 15,
+      "ended": 15
+    },
+    "recipeIdentical": true,
+    "oldEventsExactPrefix": 3800,
+    "end": {
+      "SourceScriptId": 90,
+      "SourceLabel": "Script 90",
+      "Offset": 1840,
+      "Kind": 9,
+      "Operation": "endCutscene",
+      "Operands": "",
+      "TargetKind": null,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    "roomsAfterOldStop": [
+      {
+        "elapsed": 4660,
+        "room": 42
+      },
+      {
+        "elapsed": 4741,
+        "room": 43
+      },
+      {
+        "elapsed": 4973,
+        "room": 60
+      },
+      {
+        "elapsed": 5224,
+        "room": 43
+      }
+    ],
+    "beforeSha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb",
+    "afterSha256": "4a988637d0bf569b49001de7ea1cfca3fa3d0af4fc81e83bb17a702a2c439b92"
+  },
+  "literal": {
+    "total": 363,
+    "unchanged": 362,
+    "changedOwner": "Room 18 object 370 Verb 0x36",
+    "beforeStatus": "Incomplete: prerequisites, waits or executor require review",
+    "afterStatus": "Validated state preview",
+    "beforeFrames": 218,
+    "afterFrames": 229,
+    "end": "endCutscene at Script 65 +0x0302 runs script 3"
+  },
+  "membershipsExact": 4,
+  "sequencesExact": 2,
+  "blockedSites": 0,
+  "rendersExact": 76,
+  "cageControlFilesExact": 15,
+  "corePassed": 662,
+  "releaseBuild": "0 warnings, 0 errors",
+  "protectedExactUnstaged": 57,
+  "response18SetupMismatch": {
+    "outcome": {
+      "room": 41,
+      "frames": 5375,
+      "begun": 16,
+      "ended": 16
+    },
+    "availableNotes": 4,
+    "learned": false,
+    "sequence": [
+      6,
+      6,
+      6,
+      5
+    ],
+    "captureDispatched": false
+  },
+  "limitation": "No WPF/manual response18 check; no catalog or coverage promotion; historical observer captures not rerun."
+}

@@ -41,7 +41,7 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
             selection.ExcludeInterfaceImages(batches.InterfaceImages.Keys);
             estimates = selection.FillGaps(batches.ForRoom(id), seed: id);
             if (!images.Any(selection.IsActive))
-                fallback = selection.ShowUnresolvedArtwork(batches.ForRoom(id), seed: id, snapshot.StatesSetByCode,
+                fallback = selection.ShowUnresolvedArtwork(batches.ForRoom(id), seed: id, snapshot.ArtworkStateIds(),
                     batches.EntryStatesForRoom(id));
         }
         var after = selection.VisibleGaps();
