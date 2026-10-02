@@ -20,6 +20,8 @@ public sealed class LoomCompletionObserverTests
         Assert.True(match.Read.Binding.ValueEstimated);
         Assert.False(match.Read.Observation.PathEstimated);
         Assert.True(match.WriterEnd!.ReachedStop);
+        Assert.True(match.WriterTerminated);
+        Assert.Null(match.TerminalRejection);
         Assert.Equal(1, match.Writer.Observation.Sequence);
         Assert.Equal(2, match.Writer.ConfirmationSequence);
         Assert.Equal(4, match.Read.Observation.Sequence);
@@ -104,6 +106,51 @@ public sealed class LoomCompletionObserverTests
         Assert.Throws<NotSupportedException>(() => ((IList<string>)results[0].Limits).Clear());
     }
 
+    [Theory]
+    [InlineData("yield")]
+    [InlineData("partial")]
+    [InlineData("unresolved")]
+    [InlineData("other-resource")]
+    public void WriterMatchDoesNotTurnAnUnrelatedOrNonterminalEndIntoTermination(string kind)
+    {
+        var results = Capture(tracker => {
+            Write(tracker, 1, 12, 8);
+            Confirm(tracker, 2, 12, estimated: true);
+            var end = End(3, 12);
+            end = kind switch {
+                "yield" => end with { ReachedStop = false, ResumeOffset = 1 },
+                "partial" => end with { ReachedStop = false },
+                "unresolved" => end with { UnresolvedReason = "omitted callee effects" },
+                _ => end with { Site = end.Site! with { ResourceOffset = 7 } }
+            };
+            tracker.Observe(end);
+            Read(tracker, 4, 8, estimated: true);
+        });
+        var match = Assert.Single(results);
+        Assert.False(match.WriterTerminated);
+        Assert.NotNull(match.TerminalRejection);
+        Assert.Equal(kind != "unresolved", match.MatchesOwnLiteralChild);
+        if (kind == "other-resource") Assert.Null(match.WriterEnd);
+        if (kind is "yield" or "partial") Assert.NotNull(match.WriterEnd);
+    }
+
+    [Fact]
+    public void ArithmeticZeroIsObservedButCannotBecomeALiteralCompletionWriter()
+    {
+        var results = Capture(tracker => {
+            tracker.Observe(LoomRuntimeRelationTests.Record(1, 12, 12, "and",
+                [new("destination-before", "var[0x060]", "var[0x060]", 1, false),
+                 new("source", "0x0000", null, 0, false)], ("var[0x060]", 1)) with { ParentSlot = 8 });
+            tracker.Observe(LoomRuntimeRelationTests.Record(2, 12, 12, "stopObjectCode", [], ("var[0x060]", 0)));
+            tracker.Observe(LoomRuntimeRelationTests.Record(3, 8, 8, "equalZero",
+                [new("condition", "var[0x060]", "var[0x060]", 0, false)], ("var[0x060]", 0)));
+        });
+        var match = Assert.Single(results);
+        Assert.NotNull(match.Writer);
+        Assert.False(match.MatchesOwnLiteralChild);
+        Assert.Equal("writer is not an observed literal zero move", match.Rejection);
+    }
+
     private static List<LoomCompletionRead> Capture(Action<LoomRuntimeRelationTracker> action)
     {
         var results = new List<LoomCompletionRead>();
@@ -116,7 +163,8 @@ public sealed class LoomCompletionObserverTests
             LoomRuntimeRelationTests.Record(sequence, slot, slot, "move",
                 [new("destination-before", "bit[0xD67]", "bit[0xD67]", 0, false, BackingWord: "var[0x0D6]"),
                  new("source", literal ? $"0x{value:X4}" : "local[0x000]", literal ? null : "local[0x000]", value, false)],
-                ("var[0x0D6]", 0), ("bit[0xD67]", 0)) with { ParentSlot = parent, PathEstimated = path });
+                ("var[0x0D6]", 0), ("bit[0xD67]", 0)) with { ParentSlot = parent, PathEstimated = path,
+                    Site = new(31, null, 1, 0, "instruction", 0, "move", "") });
     private static void Confirm(LoomRuntimeRelationTracker tracker, long sequence, long slot, ushort value = 0, bool estimated = false) =>
         tracker.Observe(LoomRuntimeRelationTests.Record(sequence, slot, slot, "stopObjectCode", [],
             ("var[0x0D6]", (ushort)(value << 7)), ("bit[0xD67]", value)) with {

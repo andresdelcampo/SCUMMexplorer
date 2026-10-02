@@ -5,7 +5,7 @@ namespace SCUMMexplorer.Core.Formats;
 public sealed record LoomRuntimeDependency(string Key, long? LocalSlot);
 public sealed record LoomRuntimeRead(long Id, LoomScriptObservation Observation,
     LoomScriptOperandBinding Binding, IReadOnlyList<LoomRuntimeDependency> Dependencies,
-    LoomRuntimeWrite? ObservedOrigin);
+    LoomRuntimeWrite? ObservedOrigin, LoomRuntimeRead? IndexRead = null);
 public sealed record LoomRuntimeWrite(long Id, LoomScriptObservation Observation,
     LoomScriptOperandBinding Destination, IReadOnlyList<long> SourceReads,
     ushort Value, bool ValueEstimated, long ConfirmationSequence);
@@ -124,10 +124,16 @@ public sealed class LoomRuntimeRelationTracker
                 }
                 else
                 {
-                    if (active.Count + bindings.Count >= relationLimit)
+                    var arithmetic = site.Operation is "add" or "subtract" or "multiply" or "divide" or "and" or "or" or "increment" or "decrement";
+                    var readCount = bindings.Sum(b => b.Role != "destination-before" || arithmetic
+                        ? ReadCount(b) : b.Index is { } index ? ReadCount(index) : 0);
+                    if (active.Count + readCount >= relationLimit || origins.Count >= relationLimit ||
+                        pending.Count >= relationLimit || previous.Count > relationLimit)
                     { barrier = "relation bound reached"; Clear(barrier, invalidated); }
-                    foreach (var binding in bindings.Where(b => b.Role != "destination-before"))
+                    if (previous.Count > relationLimit) previous.Clear();
+                    LoomRuntimeRead Read(LoomScriptOperandBinding binding)
                     {
+                        var indexRead = binding.Index is { } index ? Read(index) : null;
                         var dependencies = new List<LoomRuntimeDependency>();
                         Dependencies(binding, observation.Slot, dependencies);
                         LoomRuntimeWrite? origin = null;
@@ -135,23 +141,34 @@ public sealed class LoomRuntimeRelationTracker
                             origins.TryGetValue(Location(key, observation.Slot), out var found) &&
                             found.Destination.Key == key && found.Value == number) origin = found;
                         var read = new LoomRuntimeRead(++ids, observation, binding,
-                            Frozen(dependencies.Distinct()), origin);
+                            Frozen(dependencies.Distinct()), origin, indexRead);
                         reads.Add(read);
                         if (binding.Value is not null && dependencies.Count > 0) active.Add(read.Id, read);
+                        return read;
                     }
+                    // A single oversized argument/index batch cannot overrun the storage bound.
+                    var retain = readCount <= relationLimit && bindings.Count <= relationLimit;
+                    if (!retain) { barrier = "relation bound reached"; Clear(barrier, invalidated); }
+                    if (retain)
+                        foreach (var binding in bindings.Where(b => b.Role != "destination-before")) Read(binding);
                     foreach (var destination in bindings.Where(b => b.Role == "destination-before"))
                     {
+                        if (retain)
+                        {
+                            if (arithmetic) Read(destination with { Role = "destination-value" });
+                            else if (destination.Index is { } index) Read(index);
+                        }
                         if (destination.Key is null || destination.Index is { Value: null } ||
                             site.Operation == "setVarRange" && observation.SourceAccess is null)
                         { barrier = "unresolved or ranged write"; Clear(barrier, invalidated); }
                         else Invalidate(Location(destination.Key, observation.Slot), "source write (including same value and aliases)", invalidated);
                     }
-                    // Only a move is matched to its expected following snapshot. Arithmetic,
-                    // ranges and unknown effects invalidate storage without guessing a result.
-                    if (site.Operation == "move" && bindings.FirstOrDefault(b => b.Role == "destination-before") is { Key: not null } dest &&
-                        bindings.FirstOrDefault(b => b.Role == "source") is { Value: { } expected })
+                    // Captured numeric operands constrain a candidate only. The next snapshot in
+                    // this invocation must confirm it; no source hypothesis or effect is inferred.
+                    if (retain && bindings.FirstOrDefault(b => b.Role == "destination-before") is { Key: not null } dest &&
+                        TryExpected(site.Operation, dest, bindings, out var expected))
                         pending[observation.Invocation] = new(observation, dest, Frozen(reads.Select(r => r.Id)),
-                            dest.Key.StartsWith("bit[", StringComparison.Ordinal) ? (ushort)(expected == 0 ? 0 : 1) : expected);
+                            expected);
                 }
             }
             if (observation.Site is { Stage: "end" })
@@ -171,7 +188,7 @@ public sealed class LoomRuntimeRelationTracker
     {
         foreach (var id in active.Where(p => p.Value.Dependencies.Contains(location)).Select(p => p.Key).ToArray()) Remove(id, reason, output);
         origins.Remove(location);
-        foreach (var run in pending.Where(p => Location(p.Value.Destination.Key!, p.Value.Observation.Slot) == location).Select(p => p.Key).ToArray()) pending.Remove(run);
+        foreach (var run in pending.Where(p => PendingDependsOn(p.Value, location)).Select(p => p.Key).ToArray()) pending.Remove(run);
     }
 
     private void Clear(string reason, List<LoomRuntimeInvalidation> output)
@@ -188,6 +205,43 @@ public sealed class LoomRuntimeRelationTracker
         if (binding.Key is { } key) output.Add(Location(key, slot));
         if (binding.BackingWord is { } word) output.Add(Location(word, slot));
         if (binding.Index is { } index) Dependencies(index, slot, output);
+    }
+
+    private static bool PendingDependsOn(PendingWrite pending, LoomRuntimeDependency location)
+    {
+        var dependencies = new List<LoomRuntimeDependency>();
+        Dependencies(pending.Destination, pending.Observation.Slot, dependencies);
+        return dependencies.Contains(location);
+    }
+
+    private static int ReadCount(LoomScriptOperandBinding binding) => 1 + (binding.Index is { } index ? ReadCount(index) : 0);
+
+    private static bool TryExpected(string? operation, LoomScriptOperandBinding destination,
+        IReadOnlyList<LoomScriptOperandBinding> bindings, out ushort expected)
+    {
+        expected = 0;
+        var right = bindings.FirstOrDefault(b => b.Role == "source")?.Value;
+        if (operation == "move" && right is { } number)
+        {
+            expected = destination.Key!.StartsWith("bit[", StringComparison.Ordinal)
+                ? (ushort)(number == 0 ? 0 : 1) : number;
+            return true;
+        }
+        if (destination.Value is not { } left || destination.Key!.StartsWith("bit[", StringComparison.Ordinal)) return false;
+        if (operation is not ("increment" or "decrement") && right is null) return false;
+        expected = operation switch {
+            "add" => unchecked((ushort)(left + right!.Value)),
+            "subtract" => unchecked((ushort)(left - right!.Value)),
+            "multiply" => unchecked((ushort)(left * right!.Value)),
+            "divide" when right != 0 => (ushort)(left / right!.Value),
+            "and" => (ushort)(left & right!.Value),
+            "or" => (ushort)(left | right!.Value),
+            "increment" => unchecked((ushort)(left + 1)),
+            "decrement" => unchecked((ushort)(left - 1)),
+            _ => 0
+        };
+        return operation is "add" or "subtract" or "multiply" or "and" or "or" or "increment" or "decrement" ||
+            operation == "divide" && right != 0;
     }
 
     private static LoomRuntimeDependency Location(string key, long slot)

@@ -7,7 +7,7 @@ namespace SCUMMexplorer.Core.Formats;
 /// </summary>
 public sealed record LoomCompletionRead(LoomRuntimeRead Read, LoomRuntimeWrite? Writer,
     bool MatchesOwnLiteralChild, LoomScriptObservation? WriterEnd, string? Rejection,
-    IReadOnlyList<string> Limits);
+    IReadOnlyList<string> Limits, bool WriterTerminated = false, string? TerminalRejection = null);
 
 /// <summary>
 /// Generic zero-wait observation over relation updates, without script IDs, room exceptions,
@@ -60,10 +60,17 @@ public sealed class LoomCompletionObserver
                     ? "writer is not this reader's causal child" :
                 writer.Observation.Site?.Operation != "move" || literal is not { Key: null, Index: null, Value: 0, UnresolvedReason: null }
                     ? "writer is not an observed literal zero move" : null;
-            receive(new(read, writer, rejection is null,
-                writer is not null && ends.TryGetValue(writer.Observation.Slot, out var end) &&
-                    end.Sequence >= writer.ConfirmationSequence && end.Sequence < read.Observation.Sequence ? end : null,
-                rejection, limits));
+            var writerEnd = writer is not null && ends.TryGetValue(writer.Observation.Slot, out var end) &&
+                end.Sequence >= writer.ConfirmationSequence && end.Sequence < read.Observation.Sequence &&
+                end.Site?.Script == writer.Observation.Site?.Script &&
+                end.Site?.Context == writer.Observation.Site?.Context &&
+                end.Site?.Container == writer.Observation.Site?.Container &&
+                end.Site?.ResourceOffset == writer.Observation.Site?.ResourceOffset ? end : null;
+            var terminalRejection = writerEnd is null ? "no later source-consistent writer end" :
+                writerEnd.ReachedStop != true || writerEnd.ResumeOffset is not null || writerEnd.UnresolvedReason is not null
+                    ? "writer end is yielded, partial or unresolved" : null;
+            receive(new(read, writer, rejection is null, writerEnd, rejection, limits,
+                terminalRejection is null, terminalRejection));
         }
     }
 }

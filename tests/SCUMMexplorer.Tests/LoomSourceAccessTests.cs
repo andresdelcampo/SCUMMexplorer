@@ -43,6 +43,7 @@ public sealed class LoomSourceAccessTests
         Assert.NotNull(range.Barrier);
         Assert.Single(range.Invalidated);
         Assert.All(range.Observation!.SourceAccess!.Bindings, b => Assert.Null(b.Index!.Value));
+        Assert.All(range.Observation.SourceAccess.Bindings, b => Assert.Null(b.Key));
     }
 
     [Fact]

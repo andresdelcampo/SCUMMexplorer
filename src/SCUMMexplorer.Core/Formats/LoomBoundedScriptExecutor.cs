@@ -1818,8 +1818,11 @@ public sealed class LoomBoundedScriptExecutor
         var text = instruction.Operands;
         if (extended && op == "setVarRange")
         {
+            var count = text.IndexOf(", count=", StringComparison.Ordinal);
+            if (count < 0) return [];
+            var initial = Bind("destination-before", text[..count]);
+            if (initial.Key is null || initial.Index is { Value: null }) return [initial];
             if (!TryReadVarRange(text, variables, out var first, out var keys, out _)) return [];
-            var initial = Bind("destination-before", first);
             return keys.Select(key => Bind("destination-before", key) with
                 { Operand = first, Index = initial.Index }).ToArray();
         }

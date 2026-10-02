@@ -1,5 +1,13 @@
 # Changelog
 
+## 2 October: observed arithmetic/index lineage and separate writer termination
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Arithmetic/index/arguments | Captured before-values and recursive index origins; unsigned/wrapped numeric candidates require snapshot confirmation; no domain transport or callee binding | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
+| Writer termination | Separate from literal-child matching; source identity/order and terminal status required; arithmetic zero, yields and stale/foreign ends do not become protocol proof | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
+| API checks | Twelve lineage/five terminal cases; Core374, clean main Release; final preservation in progress; no App/push/promotion | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
+
 ## 2 October: numeric source access and notified runtime mutations
 
 | Change | Result | Record |
