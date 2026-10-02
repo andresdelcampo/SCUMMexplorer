@@ -143,8 +143,27 @@ public sealed class LoomBoundedScriptExecutor
         string? unresolved = null;
 
         var observationRun = observation?.Observer.NewInvocation() ?? 0;
-        observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
+        using var callRun = observation?.Observer.BeginCallRun(observationRun);
+        var beginSequence = observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
             "begin", pc, null, null, knownVariables, estimated, onEstimatedPath);
+        LoomScriptObservationSite CallSite(string stage, int offset, string? op = null, string? operands = null) =>
+            new(script.ScriptId, script.Context, script.ContainerFileNumber, script.ResourceOffset, stage, offset, op, operands);
+        if (observation?.Observer.CapturesCalls == true)
+        {
+            // Copy the actual 26 assignments above. Caller equality and historical origins
+            // supply none of these initializations.
+            var initialized = Enumerable.Range(0, 26).Select(index => {
+                var key = $"local[0x{index:X3}]";
+                var supplied = initialLocals?.ContainsKey(key) == true;
+                return BindObservationOperand(observation.Resuming ? "restored-local" : supplied ? "supplied-local" : "default-zero",
+                    key, knownVariables, estimated, observation.Observer.IncludesKey, index);
+            }).ToArray();
+            observation.Observer.CallBoundary(observation.Resuming ? "resumed-locals" : "initialized",
+                observation.Call, observation.Slot, observation.ParentSlot, observationRun, CallSite("begin", pc),
+                initialized, onEstimatedPath, beginSequence,
+                barrier: observation.Call is null ? "initialization has no observed dispatch; no caller transfer inferred" : null);
+        }
+        LoomObservedCall? dispatched = null;
 
         while (indexByOffset.TryGetValue(pc, out var instructionIndex))
         {
@@ -161,6 +180,13 @@ public sealed class LoomBoundedScriptExecutor
                 knownVariables, estimated, onEstimatedPath,
                 bindOperands: include => BindObservationOperands(instruction, knownVariables, estimated, include),
                 bindSourceAccess: include => BindSourceAccess(instruction, knownVariables, estimated, include, states, runtime));
+            if (dispatched is not null)
+            {
+                observation!.Observer.CallBoundary("caller-continued", dispatched, observation.Slot, observation.ParentSlot,
+                    observationRun, CallSite("instruction", instruction.Offset, instruction.Operation, instruction.Operands),
+                    [], onEstimatedPath, instructionSequence);
+                dispatched = null;
+            }
 
             if (instruction.Operation == "stopObjectCode")
             {
@@ -298,7 +324,21 @@ public sealed class LoomBoundedScriptExecutor
             {
                 CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
                 CopyEstimatedGlobals(estimated, runtime.EstimatedVariables);
-                eventHandling = onEvent(scriptEvent, runtime);
+                var call = instruction.Operation is "startScript" or "chainScript" or "startObject" or "cutscene" or "endCutscene"
+                    ? observation?.Observer.Dispatch(instructionSequence, observation.Slot, observation.ParentSlot,
+                        observationRun, script, instruction, onEstimatedPath,
+                        include => BindObservationOperands(instruction, knownVariables, estimated, include, extended: true)) : null;
+                using (observation?.Observer.EnterDispatch(call))
+                    eventHandling = onEvent(scriptEvent, runtime);
+                if (call is not null)
+                {
+                    observation!.Observer.CallBoundary("dispatch-ended", call, observation.Slot, observation.ParentSlot,
+                        observationRun, call.Site, [], onEstimatedPath, instructionSequence,
+                        barrier: eventHandling == StopAfterEvent ? "caller stopped after dispatch; no return inferred" :
+                            eventHandling == PauseAfterEvent ? "caller yielded after dispatch" :
+                            string.IsNullOrEmpty(eventHandling) ? "host dispatch returned; callee outcome remains separate" : eventHandling);
+                    dispatched = call;
+                }
                 foreach (var (key, value) in runtime.GlobalVariables) knownVariables[key] = value;
                 estimated.RemoveWhere(IsGlobalKey);
                 estimated.UnionWith(runtime.EstimatedVariables);
@@ -1115,8 +1155,13 @@ public sealed class LoomBoundedScriptExecutor
             CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
             CopyEstimatedGlobals(estimated, runtime.EstimatedVariables);
         }
-        observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
+        var endSequence = observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
             "end", pc, null, null, knownVariables, estimated, onEstimatedPath, resumeOffset, reachedStop, unresolved);
+        observation?.Observer.CallBoundary("end", observation.Call, observation.Slot, observation.ParentSlot, observationRun,
+            CallSite("end", pc), [], onEstimatedPath, endSequence, resumeOffset, reachedStop, unresolved);
+        if (dispatched is not null)
+            observation!.Observer.CallBoundary("caller-ended", dispatched, observation.Slot, observation.ParentSlot, observationRun,
+                CallSite("end", pc), [], onEstimatedPath, endSequence, resumeOffset, reachedStop, unresolved);
         return new LoomBoundedScriptResult(new Dictionary<int, byte>(states),
             new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
             trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray(),

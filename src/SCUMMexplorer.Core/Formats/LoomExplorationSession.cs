@@ -1725,7 +1725,8 @@ public sealed partial class LoomExplorationSession
     private LoomBoundedScriptResult? RunStartedScript(int scriptId, int startOffset,
         IReadOnlyDictionary<string, ushort>? locals, int depth,
         IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
-        bool freezeResistant = false, ScriptFrame? parent = null, bool recursive = false)
+        bool freezeResistant = false, ScriptFrame? parent = null, bool recursive = false,
+        LoomObservedCall? observedCall = null)
     {
         // A started script carries the room origin of the script that started it.
         parent ??= _executing.Count > 0 ? _executing[^1] : null;
@@ -1739,7 +1740,8 @@ public sealed partial class LoomExplorationSession
             }
         }
         var frame = new ScriptFrame { FreezeResistant = freezeResistant, Recursive = recursive, OriginRoom = parent?.OriginRoom,
-            ObservationParent = parent?.ObservationSlot };
+            ObservationParent = parent?.ObservationSlot, ObservationCall = observedCall ?? _observer?.CurrentCall };
+        if (frame.ObservationCall?.Slot != frame.ObservationParent) frame.ObservationCall = null;
         if (scriptId < _globalScriptCount)
             return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated, frame);
         if (_currentRoom is null)
@@ -1810,7 +1812,7 @@ public sealed partial class LoomExplorationSession
         RunScript(script, _currentObjects, 0, locals, depth + 1, null,
             EstimatedArguments(scriptEvent),
             scriptEvent.Certainty != LoomScriptEventCertainty.Reached,
-            new ScriptFrame { OriginRoom = parent?.OriginRoom });
+            new ScriptFrame { OriginRoom = parent?.OriginRoom, ObservationCall = _observer?.CurrentCall });
     }
 
     private static int ReadGlobalScriptCount(GameLibrary game)
@@ -1839,6 +1841,8 @@ public sealed partial class LoomExplorationSession
         {
             frame.ObservationSlot = _observer.NewSlot();
             frame.ObservationParent ??= _executing.Count > 0 ? _executing[^1].ObservationSlot : null;
+            frame.ObservationCall ??= _observer.CurrentCall;
+            if (frame.ObservationCall?.Slot != frame.ObservationParent) frame.ObservationCall = null;
         }
         frame.Label = script.Context ?? $"Script {script.ScriptId:00}";
         frame.Number = scriptNumber;
@@ -1869,7 +1873,9 @@ public sealed partial class LoomExplorationSession
                     return handling;
                 },
                 estimatedLocals: estimatedLocals, pathEstimated: pathEstimated,
-                observation: _observer is null ? null : new(_observer, frame.ObservationSlot, frame.ObservationParent));
+                observation: _observer is null ? null : new(_observer, frame.ObservationSlot, frame.ObservationParent,
+                    frame.ObservationCall, frame.ObservationRan));
+            frame.ObservationRan = true;
         }
         finally
         {
@@ -1897,7 +1903,7 @@ public sealed partial class LoomExplorationSession
             _chained = null;
             _visitTrace.Add($"{label} chains to script {chain.Script}");
             RunStartedScript(chain.Script, 0, chain.Arguments, depth, chain.EstimatedArguments, chain.PathEstimated,
-                frame.FreezeResistant, frame, frame.Recursive);
+                frame.FreezeResistant, frame, frame.Recursive, frame.ObservationChainCall);
         }
         if (result.ResumeOffset is int next && !frame.Stopped)
         {
@@ -1955,6 +1961,7 @@ public sealed partial class LoomExplorationSession
                 _chained = (_executing[^1], chained, chainArguments,
                     EstimatedArguments(scriptEvent),
                     scriptEvent.Certainty != LoomScriptEventCertainty.Reached);
+                _executing[^1].ObservationChainCall = _observer?.CurrentCall;
                 return LoomBoundedScriptExecutor.StopAfterEvent;
             case LoomScriptEventKind.ScriptStopped:
                 if (scriptEvent.TargetId is not int stoppedScript)
@@ -2247,6 +2254,9 @@ public sealed partial class LoomExplorationSession
         public bool Stopped { get; set; }
         public long ObservationSlot { get; set; }
         public long? ObservationParent { get; set; }
+        public LoomObservedCall? ObservationCall { get; set; }
+        public LoomObservedCall? ObservationChainCall { get; set; }
+        public bool ObservationRan { get; set; }
         public bool Global { get; set; }
         public int FreezeCount { get; set; }
         /// <summary>ScummVM <c>ScriptSlot.delay</c> while the slot is <c>ssPaused</c> by <c>delay</c>/<c>delayVariable</c>; null otherwise.</summary>

@@ -71,16 +71,80 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     Func<LoomScriptObservationSite, bool>? includeSite = null, Func<string, bool>? includeKey = null,
     bool captureOperandBindings = false, LoomRuntimeRelationTracker? runtimeRelations = null,
     bool captureSourceAccess = false, Action<LoomExpressionObservation>? receiveExpression = null,
-    LoomNativeDependencyTracker? nativeDependencies = null)
+    LoomNativeDependencyTracker? nativeDependencies = null, Action<LoomCallObservation>? receiveCall = null)
 {
     private long sequence;
     private long slots;
     private long invocations;
+    private long callSequence, callIds;
+    private readonly Dictionary<long, int> callSteps = [];
+    private LoomObservedCall? currentCall;
+    internal LoomObservedCall? CurrentCall => currentCall;
+    internal bool CapturesCalls => receiveCall is not null;
+    internal IDisposable? BeginCallRun(long invocation)
+    {
+        if (receiveCall is null) return null;
+        callSteps.Add(invocation, 0);
+        return new CallRunScope(this, invocation);
+    }
+    private sealed class CallRunScope(LoomScriptObserver owner, long invocation) : IDisposable
+    {
+        public void Dispose() => owner.callSteps.Remove(invocation);
+    }
+
+    internal LoomObservedCall? Dispatch(long? instructionSequence, long slot, long? parent, long invocation,
+        LoomScriptDisassembly script, LoomScriptInstruction instruction, bool path,
+        Func<Func<string, bool>, IReadOnlyList<LoomScriptOperandBinding>> bind)
+    {
+        if (receiveCall is null || instructionSequence is null || callSteps.GetValueOrDefault(invocation) >= 4096) return null;
+        var call = new LoomObservedCall(++callIds, instructionSequence, slot, parent, invocation,
+            new(script.ScriptId, script.Context, script.ContainerFileNumber, script.ResourceOffset,
+                "instruction", instruction.Offset, instruction.Operation, instruction.Operands),
+            Array.AsReadOnly(bind(key => includeKey?.Invoke(key) != false).ToArray()), path);
+        CallBoundary("dispatch", call, slot, parent, invocation, call.Site, [], path, instructionSequence);
+        return call;
+    }
+
+    internal IDisposable EnterDispatch(LoomObservedCall? call) => new DispatchScope(this, call);
+    private sealed class DispatchScope : IDisposable
+    {
+        private readonly LoomScriptObserver owner;
+        private readonly LoomObservedCall? previous;
+        public DispatchScope(LoomScriptObserver owner, LoomObservedCall? call)
+        { this.owner = owner; previous = owner.currentCall; owner.currentCall = call; }
+        public void Dispose() => owner.currentCall = previous;
+    }
+
+    internal void CallBoundary(string stage, LoomObservedCall? call, long slot, long? parent, long invocation,
+        LoomScriptObservationSite site, IReadOnlyList<LoomScriptOperandBinding> locals, bool path,
+        long? instructionSequence = null, int? resume = null, bool? stop = null, string? barrier = null)
+    {
+        if (receiveCall is null) return;
+        var step = callSteps.GetValueOrDefault(invocation) + 1;
+        callSteps[invocation] = step;
+        if (step > 4096)
+        {
+            if (step == 4097) receiveCall(new(++callSequence, "barrier", null, slot, parent, invocation,
+                site with { Operation = null, Operands = null }, [], path, Barrier: "call observation boundary bound reached"));
+            return;
+        }
+        if (includeSite?.Invoke(site) == false)
+        {
+            // Omitted boundaries never silently bridge this separate stream. Rejected
+            // operands and locals are not exposed through the barrier.
+            receiveCall(new(++callSequence, "barrier", null, slot, parent, invocation,
+                site with { Operation = null, Operands = null }, [], path, Barrier: "filtered call boundary"));
+            return;
+        }
+        receiveCall(new(++callSequence, stage, call, slot, parent, invocation, site,
+            Array.AsReadOnly(locals.ToArray()), path, instructionSequence, resume, stop, barrier));
+    }
 
     internal long NewSlot() => ++slots;
     internal long NewInvocation() => ++invocations;
 
     internal bool CapturesExpressions => receiveExpression is not null;
+    internal bool IncludesKey(string key) => includeKey?.Invoke(key) != false;
 
     internal void Expression(long sequence, int step, long slot, long? parentSlot, long invocation,
         LoomScriptDisassembly script, LoomScriptInstruction instruction, string stage, bool path,
@@ -141,4 +205,5 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
 }
 
 /// <summary>Identity passed by the session to an observed executor run; no mutable session state.</summary>
-public sealed record LoomScriptObservationContext(LoomScriptObserver Observer, long Slot, long? ParentSlot = null);
+public sealed record LoomScriptObservationContext(LoomScriptObserver Observer, long Slot, long? ParentSlot = null,
+    LoomObservedCall? Call = null, bool Resuming = false);
