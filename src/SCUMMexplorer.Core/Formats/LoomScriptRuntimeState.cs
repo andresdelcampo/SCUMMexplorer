@@ -12,6 +12,7 @@ public sealed class LoomScriptRuntimeState
         ObjectStates = new Dictionary<int, byte>(initialStates);
         ObjectOwners = initialOwners is null ? [] : new Dictionary<int, byte>(initialOwners);
         ObjectClasses = initialClasses is null ? [] : new Dictionary<int, uint>(initialClasses);
+        Actors.NativeMutation = NotifyNativeMutation;
         // Old-v3 bit variables address one of 256 global words. SCUMM starts
         // those words at zero; later scripts update the same backing words.
         for (var index = 0; index < 256; index++)
@@ -25,6 +26,20 @@ public sealed class LoomScriptRuntimeState
     public Dictionary<int, RoomObjectPosition> ObjectPositions { get; } = [];
     public Dictionary<string, ushort> GlobalVariables { get; } = new(StringComparer.Ordinal);
     internal LoomScriptObserver? MutationObserver { get; set; }
+
+    /// <summary>Native writes/removals notify even for identical or absent values; estimates are untouched.</summary>
+    public void SetObjectState(int subject, byte value)
+    { ObjectStates[subject] = value; NotifyNativeMutation("object-state", subject); }
+    public bool RemoveObjectState(int subject)
+    { var removed = ObjectStates.Remove(subject); NotifyNativeMutation("object-state", subject); return removed; }
+    public void SetObjectClasses(int subject, uint value)
+    { ObjectClasses[subject] = value; NotifyNativeMutation("object-classes", subject); }
+    public bool RemoveObjectClasses(int subject)
+    { var removed = ObjectClasses.Remove(subject); NotifyNativeMutation("object-classes", subject); return removed; }
+    public void SetObjectOwner(int subject, byte value)
+    { ObjectOwners[subject] = value; NotifyNativeMutation("object-owner", subject); }
+    public bool RemoveObjectOwner(int subject)
+    { var removed = ObjectOwners.Remove(subject); NotifyNativeMutation("object-owner", subject); return removed; }
 
     /// <summary>
     /// Report a runtime/session global write even when its number is unchanged. This does not

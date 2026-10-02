@@ -56,6 +56,10 @@ public sealed class LoomActorTable
     public const int PlayerClass = 23;
 
     private readonly Actor[] _actors = Enumerable.Range(0, Count).Select(number => new Actor(number)).ToArray();
+    // Connected only by runtime lifetime accounting. Notifications never supply state or
+    // estimates, invoke query callbacks, or consume the instruction observation sequence.
+    internal Action<string, int?>? NativeMutation { get; set; }
+    private void Notify(int number, string domain = "actor") => NativeMutation?.Invoke(domain, number);
 
     /// <summary>ScummVM <c>_egoPositioned</c>: set by <c>putActor</c> on the ego, cleared by <c>startScene</c>.</summary>
     public bool EgoPositioned { get; set; }
@@ -75,13 +79,16 @@ public sealed class LoomActorTable
     /// <summary>Every actor becomes unknown, for an operation whose actor number could not be read.</summary>
     public void ForgetAll(string reason)
     {
+        NativeMutation?.Invoke("actor", null);
         foreach (var actor in _actors.Skip(1)) actor.Forget(reason);
     }
 
-    public void Forget(int number, string reason) => _actors[number].Forget(reason);
+    public void Forget(int number, string reason)
+    { _actors[number].Forget(reason); Notify(number); }
 
     public void MarkEstimate(int number, string reason)
     {
+        Notify(number);
         // A reason other than a walk's timing outlasts the walk (see WalkWaited).
         var actor = _actors[number];
         if (actor.Estimate is null || actor.EstimateIsWalk) actor.Estimate = reason;
@@ -90,11 +97,13 @@ public sealed class LoomActorTable
     }
 
     /// <summary>Retains a possible palette write without changing placement or walk provenance.</summary>
-    public void MarkPaletteEstimate(int number, string reason) => _actors[number].PaletteEstimate ??= reason;
+    public void MarkPaletteEstimate(int number, string reason)
+    { _actors[number].PaletteEstimate ??= reason; Notify(number, "actor-palette"); }
 
     /// <summary><c>initActor(0)</c> (actorOps "init"): clears the last valid point and ignoreBoxes and resets the talk colour to 15; room and position stay.</summary>
     public void Init(int number)
     {
+        Notify(number);
         var actor = _actors[number];
         actor.LastValidX = actor.LastValidY = 0;
         actor.IgnoreBoxes = false;
@@ -111,10 +120,12 @@ public sealed class LoomActorTable
     /// <summary>The colour of the actor's talk text (<c>actorOps talkColor</c>, ScummVM <c>_talkColor</c>).</summary>
     public int TalkColor(int number) => _actors[number].TalkColor;
 
-    public void SetTalkColor(int number, int color) => _actors[number].TalkColor = color;
+    public void SetTalkColor(int number, int color)
+    { _actors[number].TalkColor = color; Notify(number); }
 
     /// <summary><c>_ignoreBoxes</c> from actorOps, or cleared by <c>setClass</c> 0 on an actor (small header).</summary>
-    public void SetIgnoreBoxes(int number, bool value) => _actors[number].IgnoreBoxes = value;
+    public void SetIgnoreBoxes(int number, bool value)
+    { _actors[number].IgnoreBoxes = value; Notify(number); }
 
     /// <summary>
     /// <c>Actor::putActor(x, y, room)</c>. In the current room the actor is shown
@@ -126,6 +137,7 @@ public sealed class LoomActorTable
 
     private void Put(int number, int? x, int? y, int? room, Placement place, int? ego, bool replace)
     {
+        Notify(number);
         var actor = _actors[number];
         actor.X = x;
         actor.Y = y;
@@ -173,6 +185,7 @@ public sealed class LoomActorTable
     /// </summary>
     public void PutInRoom(int number, int? room, Placement place, int? ego)
     {
+        Notify(number);
         if (room == 0)
         {
             Put(number, 0, 0, 0, place, ego);
@@ -189,6 +202,7 @@ public sealed class LoomActorTable
     /// </summary>
     public void CostumeChanged(int number, int? costume, Placement place)
     {
+        Notify(number);
         var actor = _actors[number];
         actor.CostumeNeedsInit = true;
         actor.Costume = costume;
@@ -207,20 +221,24 @@ public sealed class LoomActorTable
     }
 
     /// <summary>actorOps <c>elevation</c> (ScummVM <c>setElevation</c>); null is unknown.</summary>
-    public void SetElevation(int number, int? elevation) => _actors[number].Elevation = elevation;
+    public void SetElevation(int number, int? elevation)
+    { _actors[number].Elevation = elevation; Notify(number); }
 
     /// <summary>actorOps <c>walkSpeed</c> (<c>setActorWalkSpeed</c>).</summary>
-    public void SetWalkSpeed(int number, int x, int y) => (_actors[number].WalkSpeedX, _actors[number].WalkSpeedY) = (x, y);
+    public void SetWalkSpeed(int number, int x, int y)
+    { (_actors[number].WalkSpeedX, _actors[number].WalkSpeedY) = (x, y); Notify(number); }
 
     /// <summary>actorOps <c>palette i, c</c>: costume colour i draws EGA colour c.</summary>
     public void SetPalette(int number, int index, int color)
     {
-        if (index is >= 0 and < 16) _actors[number].Palette[index] = (byte)color;
+        if (index is >= 0 and < 16)
+        { _actors[number].Palette[index] = (byte)color; Notify(number, "actor-palette"); }
     }
 
     /// <summary>actorOps <c>initAnimation</c>, <c>walkAnimation</c>, <c>standAnimation</c> and <c>talkAnimation</c> (start, stop).</summary>
     public void SetFrame(int number, string kind, int frame)
     {
+        Notify(number);
         var actor = _actors[number];
         switch (kind)
         {
@@ -263,6 +281,7 @@ public sealed class LoomActorTable
 
     private void StartAnimation(Actor actor, int frame, Placement place)
     {
+        Notify(actor.Number);
         frame = frame switch
         {
             56 => actor.InitFrame,
@@ -292,6 +311,7 @@ public sealed class LoomActorTable
     /// </summary>
     public string Animate(int number, int value, Placement place)
     {
+        Notify(number);
         var actor = _actors[number];
         var chore = 0x3F - (value >> 2) + 2;
         var direction = LoomCostume.OldDirToNewDir(value & 3);
@@ -325,6 +345,7 @@ public sealed class LoomActorTable
 
     private void SetDirection(Actor actor, int facing, Placement place)
     {
+        Notify(actor.Number);
         facing = ((facing % 360) + 360) % 360;
         if (actor.Facing == facing) return;
         actor.Facing = facing;
@@ -411,6 +432,7 @@ public sealed class LoomActorTable
     /// </summary>
     public void FaceTo(int number, int x, int y, int width, Placement place)
     {
+        Notify(number);
         var actor = _actors[number];
         if (!InRoom(actor, place) || actor.X is not int ax || actor.Y is not int ay) return;
         var direction = ax < x ? 1 : 0;
@@ -441,6 +463,7 @@ public sealed class LoomActorTable
         foreach (var actor in _actors.Skip(1))
         {
             if (!InRoom(actor, place) || actor.Costume is not int costumeId || costumeId == 0) continue;
+            Notify(actor.Number);
             if (CostumeData(costumeId)?.IncreaseAnimations(actor.Animation) == true) changed.Add(actor.Number);
         }
         return changed;
@@ -465,6 +488,7 @@ public sealed class LoomActorTable
     /// </summary>
     public void Walk(int number, int? x, int? y, Placement place, string label, int direction = -1, bool atOnce = false)
     {
+        Notify(number);
         var actor = _actors[number];
         if (actor.Room is null || x is null || y is null)
         {
@@ -546,6 +570,7 @@ public sealed class LoomActorTable
         foreach (var actor in _actors.Skip(1))
         {
             if (!InRoom(actor, place) || actor.Moving == 0) continue;
+            Notify(actor.Number);
             if (actor.X is null || actor.Y is null)
             {
                 actor.Moving = 0;
@@ -802,6 +827,7 @@ public sealed class LoomActorTable
     {
         var actor = _actors[number];
         if (!actor.EstimateIsWalk || actor.X is null) return false;
+        Notify(number);
         actor.Estimate = null;
         actor.EstimateIsWalk = false;
         return true;
@@ -828,6 +854,7 @@ public sealed class LoomActorTable
         foreach (var actor in _actors.Skip(1))
         {
             // hideActor stops a walk (its stand frame is started in the room being left).
+            Notify(actor.Number);
             actor.Moving = 0;
             actor.Visible = false;
         }
@@ -840,12 +867,14 @@ public sealed class LoomActorTable
         {
             if (actor.Room is null)
             {
+                Notify(actor.Number);
                 actor.Visible = null;
                 actor.WalkBox = null;
                 continue;
             }
             if (actor.Room == place.CurrentRoom && actor.Visible != true)
             {
+                Notify(actor.Number);
                 AdjustPosition(actor, place, show: true);
                 ShowCostume(actor, place);
             }

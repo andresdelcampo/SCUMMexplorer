@@ -480,7 +480,8 @@ public sealed class LoomBoundedScriptExecutor
                     unresolved = $"setState operands do not identify a known object and byte state ({instruction.Operands})";
                     break;
                 }
-                states[(int)objectId] = (byte)state;
+                if (runtime is null) states[(int)objectId] = (byte)state;
+                else runtime.SetObjectState(objectId, (byte)state);
                 var stateEstimated = onEstimatedPath || OperandIsEstimated(parts[0], estimated, knownVariables) ||
                                      OperandIsEstimated(parts[1], estimated, knownVariables);
                 if (stateEstimated)
@@ -550,7 +551,7 @@ public sealed class LoomBoundedScriptExecutor
                     else if (cls is >= 1 and <= 32)
                         classBits = (value & 0x80) != 0 ? classBits | (1u << (cls - 1)) : classBits & ~(1u << (cls - 1));
                 }
-                runtime.ObjectClasses[classObject] = classBits;
+                runtime.SetObjectClasses(classObject, classBits);
                 var classEstimated = onEstimatedPath || instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
                     .Any(operand => OperandIsEstimated(operand.Trim('[', ']', ' '), estimated, knownVariables));
                 if (classEstimated) runtime.EstimatedStates.Add(classObject);
@@ -570,7 +571,7 @@ public sealed class LoomBoundedScriptExecutor
                     unresolved = $"setOwnerOf operands or owner table are unknown ({instruction.Operands})";
                     break;
                 }
-                runtime.ObjectOwners[objectId] = (byte)owner;
+                runtime.SetObjectOwner(objectId, (byte)owner);
                 if (knownVariables.TryGetValue("var[0x001]", out var ego))
                 {
                     if (owner == ego) runtime.Inventory.Add(objectId);
@@ -590,7 +591,7 @@ public sealed class LoomBoundedScriptExecutor
             if (instruction.Operation == "drawObject")
             {
                 if (!TryApplyDrawObject(instruction.Operands, roomObjects, states, positions,
-                        knownVariables, trace, drawQueue, out var detail))
+                        knownVariables, trace, drawQueue, out var detail, runtime))
                 {
                     unresolved = $"{detail} at +0x{instruction.Offset:X4}";
                     break;
@@ -1399,7 +1400,7 @@ public sealed class LoomBoundedScriptExecutor
                     {
                         // initActor(0): also clears the actor's classes.
                         actors.Init(number);
-                        runtime.ObjectClasses[number] = 0;
+                        runtime.SetObjectClasses(number, 0);
                     }
                     else if (item is "ignoreBoxes" or "followBoxes")
                     {
@@ -2440,7 +2441,7 @@ public sealed class LoomBoundedScriptExecutor
     private static bool TryApplyDrawObject(string operands, IReadOnlyList<LoomRoomObjectRecord> roomObjects,
         IDictionary<int, byte> states, IDictionary<int, RoomObjectPosition> positions,
         IDictionary<string, ushort> variables, ICollection<string> trace,
-        ICollection<int> drawQueue, out string detail)
+        ICollection<int> drawQueue, out string detail, LoomScriptRuntimeState? runtime = null)
     {
         var parts = operands.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 0 || !TryReadValue(parts[0], variables, out var rawId, out _))
@@ -2489,9 +2490,14 @@ public sealed class LoomBoundedScriptExecutor
         {
             if (peer.Id == objectId || peer.Width != record.Width || peer.Height != record.Height ||
                 !positions.TryGetValue(peer.Id, out var peerPosition) || peerPosition != position) continue;
-            if (states.ContainsKey(peer.Id)) states[peer.Id] = 0;
+            if (states.ContainsKey(peer.Id))
+            {
+                if (runtime is null) states[peer.Id] = 0;
+                else runtime.SetObjectState(peer.Id, 0);
+            }
         }
-        states[objectId] = state;
+        if (runtime is null) states[objectId] = state;
+        else runtime.SetObjectState(objectId, state);
         drawQueue.Add(objectId);
         trace.Add($"object {objectId} drawn at {position.X},{position.Y} in state {state}");
         detail = "known state";

@@ -667,7 +667,7 @@ public sealed partial class LoomExplorationSession
                 else if (cls is >= 1 and <= 32)
                     bits = (value & 0x80) != 0 ? bits | (1u << (cls - 1)) : bits & ~(1u << (cls - 1));
             }
-            _runtime.ObjectClasses[setClass.ObjectId] = bits;
+            _runtime.SetObjectClasses(setClass.ObjectId, bits);
             _visitTrace.Add($"catalog visit to Room {roomId:00}: object {setClass.ObjectId} classes set to 0x{bits:X6} ({arrival.Source} +0x{setClass.Offset:X4}, estimate)");
             _uncertainties.Add($"Room {roomId:00} was selected from the catalog: {arrival.Source} +0x{setClass.Offset:X4} sets object {setClass.ObjectId}'s classes " +
                                $"before the assumed arrival's load (+0x{arrival.Offset:X4}), so they were applied (estimate: the branch that led to the load was not executed).");
