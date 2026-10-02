@@ -1,0 +1,1399 @@
+[
+  {
+    "eventIndex": 0,
+    "source": "Room 34 local script 201",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 1,
+    "source": "Room 34 local script 201",
+    "offset": 10,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 2,
+    "source": "Room 34 local script 201",
+    "offset": 16,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 3,
+    "source": "Room 34 local script 201",
+    "offset": 29,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 4,
+    "source": "Room 34 local script 201",
+    "offset": 42,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 5,
+    "source": "Room 34 local script 201",
+    "offset": 48,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 6,
+    "source": "Room 34 local script 201",
+    "offset": 54,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 7,
+    "source": "Script 85",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 8,
+    "source": "Script 85",
+    "offset": 10,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 9,
+    "source": "Script 85",
+    "offset": 118,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 10,
+    "source": "Script 85",
+    "offset": 168,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 11,
+    "source": "Script 85",
+    "offset": 214,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 12,
+    "source": "Script 85",
+    "offset": 238,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 13,
+    "source": "Script 85",
+    "offset": 282,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 14,
+    "source": "Script 85",
+    "offset": 292,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 15,
+    "source": "Script 85",
+    "offset": 305,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 16,
+    "source": "Script 85",
+    "offset": 332,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 17,
+    "source": "Script 85",
+    "offset": 292,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 18,
+    "source": "Script 85",
+    "offset": 305,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 19,
+    "source": "Script 85",
+    "offset": 332,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 20,
+    "source": "Script 85",
+    "offset": 346,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 21,
+    "source": "Script 85",
+    "offset": 349,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 22,
+    "source": "Script 85",
+    "offset": 355,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 23,
+    "source": "Script 85",
+    "offset": 358,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 24,
+    "source": "Script 85",
+    "offset": 361,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 25,
+    "source": "Script 85",
+    "offset": 367,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 26,
+    "source": "Script 85",
+    "offset": 371,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 27,
+    "source": "Script 85",
+    "offset": 444,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 28,
+    "source": "Script 85",
+    "offset": 449,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 29,
+    "source": "Script 85",
+    "offset": 550,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 30,
+    "source": "Script 85",
+    "offset": 555,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 31,
+    "source": "Script 85",
+    "offset": 639,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 32,
+    "source": "Script 85",
+    "offset": 644,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 33,
+    "source": "Script 85",
+    "offset": 666,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 34,
+    "source": "Script 85",
+    "offset": 669,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 35,
+    "source": "Script 85",
+    "offset": 672,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 36,
+    "source": "Script 85",
+    "offset": 678,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 37,
+    "source": "Script 85",
+    "offset": 682,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 38,
+    "source": "Script 85",
+    "offset": 722,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 39,
+    "source": "Script 85",
+    "offset": 751,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 40,
+    "source": "Script 85",
+    "offset": 758,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 41,
+    "source": "Script 85",
+    "offset": 769,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 42,
+    "source": "Script 85",
+    "offset": 776,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 43,
+    "source": "Script 85",
+    "offset": 813,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 44,
+    "source": "Script 85",
+    "offset": 860,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 45,
+    "source": "Script 85",
+    "offset": 899,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 46,
+    "source": "Script 85",
+    "offset": 960,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 47,
+    "source": "Script 85",
+    "offset": 968,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 48,
+    "source": "Script 85",
+    "offset": 1010,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 49,
+    "source": "Script 85",
+    "offset": 1012,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 50,
+    "source": "Script 85",
+    "offset": 1017,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 51,
+    "source": "Script 85",
+    "offset": 1036,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 52,
+    "source": "Script 85",
+    "offset": 1045,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 53,
+    "source": "Script 85",
+    "offset": 1061,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 54,
+    "source": "Script 85",
+    "offset": 1100,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 55,
+    "source": "Script 85",
+    "offset": 1103,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 56,
+    "source": "Script 85",
+    "offset": 1108,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 57,
+    "source": "Script 85",
+    "offset": 1176,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 58,
+    "source": "Script 85",
+    "offset": 1252,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 59,
+    "source": "Script 85",
+    "offset": 1294,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 60,
+    "source": "Script 85",
+    "offset": 1357,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 61,
+    "source": "Script 85",
+    "offset": 1464,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 62,
+    "source": "Script 85",
+    "offset": 1475,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 63,
+    "source": "Script 85",
+    "offset": 1486,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 64,
+    "source": "Room 34 local script 202",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 65,
+    "source": "Room 34 local script 202",
+    "offset": 32,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 66,
+    "source": "Room 34 local script 202",
+    "offset": 39,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 67,
+    "source": "Room 34 local script 202",
+    "offset": 52,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 68,
+    "source": "Room 34 local script 202",
+    "offset": 60,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 69,
+    "source": "Room 34 local script 202",
+    "offset": 76,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 70,
+    "source": "Room 34 local script 202",
+    "offset": 79,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 71,
+    "source": "Room 34 local script 202",
+    "offset": 85,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 72,
+    "source": "Room 34 local script 202",
+    "offset": 98,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 73,
+    "source": "Room 34 local script 202",
+    "offset": 106,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 74,
+    "source": "Room 34 local script 202",
+    "offset": 122,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 75,
+    "source": "Room 34 local script 202",
+    "offset": 125,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 76,
+    "source": "Room 34 local script 202",
+    "offset": 131,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 77,
+    "source": "Room 34 local script 202",
+    "offset": 137,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 78,
+    "source": "Room 34 local script 202",
+    "offset": 140,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 79,
+    "source": "Room 34 local script 202",
+    "offset": 159,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 80,
+    "source": "Room 34 local script 202",
+    "offset": 162,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 81,
+    "source": "Room 34 local script 202",
+    "offset": 239,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 82,
+    "source": "Room 34 local script 202",
+    "offset": 266,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 83,
+    "source": "Room 34 local script 202",
+    "offset": 269,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 84,
+    "source": "Room 34 local script 202",
+    "offset": 295,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 85,
+    "source": "Room 34 local script 202",
+    "offset": 316,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 86,
+    "source": "Room 34 local script 202",
+    "offset": 319,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 87,
+    "source": "Room 34 local script 202",
+    "offset": 338,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 88,
+    "source": "Room 34 local script 202",
+    "offset": 341,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 89,
+    "source": "Room 34 local script 202",
+    "offset": 344,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 90,
+    "source": "Room 34 local script 202",
+    "offset": 351,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 91,
+    "source": "Room 34 local script 201",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 92,
+    "source": "Room 34 local script 201",
+    "offset": 10,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 93,
+    "source": "Room 34 local script 201",
+    "offset": 16,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 94,
+    "source": "Room 34 local script 201",
+    "offset": 29,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 95,
+    "source": "Room 34 local script 201",
+    "offset": 42,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 96,
+    "source": "Room 34 local script 201",
+    "offset": 48,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 97,
+    "source": "Room 34 local script 201",
+    "offset": 70,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 98,
+    "source": "Room 34 local script 201",
+    "offset": 80,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 99,
+    "source": "Room 34 local script 201",
+    "offset": 119,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 100,
+    "source": "Room 34 local script 201",
+    "offset": 137,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 101,
+    "source": "Room 34 local script 201",
+    "offset": 165,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 102,
+    "source": "Room 34 local script 201",
+    "offset": 249,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 103,
+    "source": "Room 34 local script 201",
+    "offset": 285,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 104,
+    "source": "Room 34 local script 201",
+    "offset": 298,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 105,
+    "source": "Room 34 local script 201",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 106,
+    "source": "Room 34 local script 201",
+    "offset": 10,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 107,
+    "source": "Room 34 local script 201",
+    "offset": 16,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 108,
+    "source": "Room 34 local script 201",
+    "offset": 29,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 109,
+    "source": "Room 34 local script 201",
+    "offset": 42,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 110,
+    "source": "Room 34 local script 201",
+    "offset": 48,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 111,
+    "source": "Room 34 local script 201",
+    "offset": 308,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 112,
+    "source": "Room 34 local script 201",
+    "offset": 318,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 113,
+    "source": "Room 34 local script 201",
+    "offset": 361,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 114,
+    "source": "Room 34 local script 201",
+    "offset": 390,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 115,
+    "source": "Room 34 local script 201",
+    "offset": 403,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 116,
+    "source": "Room 34 local script 201",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 117,
+    "source": "Room 34 local script 201",
+    "offset": 10,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 118,
+    "source": "Room 34 local script 201",
+    "offset": 16,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 119,
+    "source": "Room 34 local script 201",
+    "offset": 29,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 120,
+    "source": "Room 34 local script 201",
+    "offset": 42,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 121,
+    "source": "Room 34 local script 201",
+    "offset": 48,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 122,
+    "source": "Room 34 local script 201",
+    "offset": 407,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 123,
+    "source": "Room 34 local script 201",
+    "offset": 412,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 124,
+    "source": "Room 34 local script 201",
+    "offset": 448,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 125,
+    "source": "Room 34 local script 201",
+    "offset": 460,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  },
+  {
+    "eventIndex": 126,
+    "source": "Room 34 local script 201",
+    "offset": 473,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "keyboard": 1
+      }
+    }
+  }
+]

@@ -4,6 +4,8 @@ The session executes reached script/object/room instructions independently of re
 
 ## Current replay coverage (2 October)
 
+**Interactive evidence supplement (2 October):** Room34 adds four completed source sites through actual note-key dispatch with supported staff/notes/learned setup. Qualified literal+existing-sequence+new-input site union is176/235=74.89% (previous172);59 remain. The fresh single-action metric remains169/235=71.91%,66 literal gaps/49 owners and335 catalog starts, all unchanged. Input completion is not a new fresh replay recipe or native progression proof. [Definition, full comparison and remaining-site ledger](../.verification/room34-sequences-20261002/validation.md).
+
 Separately, one keyboard Sharpening-reverse reproduction with confirmed user status edits completes633/4B ->204(0) ->090 through42/43/60/43,15/15 scopes,all estimates retained. No new execution correction or literal-site promotion from this longer setup; no App interaction. [Bounded input evidence](../.verification/sharpening-reverse-20261002/validation.md).
 
 **Current:169/235 literal sites (71.91%),66 unvalidated sites,49 outstanding owners,123 unresolved static edges.** Sphere370/36 has an independently validated229-frame recipe for065 +0000/+0302 through18/19/18. Fresh Core result exactly matches the corrected prior audit.335 starts=85 scenes+250 reactions;330 old recipes/memberships and both sequences retained. Direct exploration/estimated arrival and return labelled; no new UI/physical-input claim. [Criteria and regeneration](../.verification/sphere-catalog-20261002/validation.md). Earlier counts below are historical.

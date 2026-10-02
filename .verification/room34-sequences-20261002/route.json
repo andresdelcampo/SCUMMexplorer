@@ -1,0 +1,66 @@
+[
+  {
+    "id": "room34-repeated-waking",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 34
+      },
+      {
+        "kind": "verb",
+        "objectId": 561,
+        "verb": 68
+      },
+      {
+        "kind": "frames",
+        "stage": "wake-first",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 561,
+        "verb": 76
+      },
+      {
+        "kind": "frames",
+        "stage": "change-appearances",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 561,
+        "verb": 68
+      },
+      {
+        "kind": "frames",
+        "stage": "wake-disguised",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 561,
+        "verb": 68
+      },
+      {
+        "kind": "frames",
+        "stage": "wake-again",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 561,
+        "verb": 68
+      },
+      {
+        "kind": "frames",
+        "stage": "wake-persistent",
+        "count": 3000,
+        "settle": true
+      }
+    ]
+  }
+]

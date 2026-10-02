@@ -1,0 +1,153 @@
+{
+  "outcome": "Five accepted keyboard casts complete the same Room34 scene progression as direct responses; no production fix.",
+  "directFrames": 2199,
+  "keyboardFrames": 2454,
+  "matchedBoundaries": 18,
+  "matchedSceneScopes": 9,
+  "bodyEventCount": 127,
+  "bodyDifferences": "Only Certainty differs: all direct Reached(0), all keyboard Conditional(1); every event remains Executed.",
+  "dispatches": [
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        561,
+        68
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        561,
+        76
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        561,
+        68
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        561,
+        68
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        561,
+        68
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    }
+  ],
+  "newSites": [
+    {
+      "owner": "Room 34 local 201",
+      "offset": "+0x0046"
+    },
+    {
+      "owner": "Room 34 local 201",
+      "offset": "+0x0134"
+    },
+    {
+      "owner": "Room 34 local 201",
+      "offset": "+0x0197"
+    },
+    {
+      "owner": "Room 34 local 202",
+      "offset": "+0x0000"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 172,
+    "after": 176,
+    "total": 235,
+    "percent": 74.89,
+    "remaining": 59,
+    "definition": "Union of completed literal previews, the two established audited catalog sequences, and this completed input comparison; not native full-game certainty."
+  },
+  "protectedExactUnstaged": 57,
+  "productionAndCatalogUnchanged": true,
+  "limitations": [
+    "Catalog Room34 arrival and default preview boot remain assumed.",
+    "Supported staff/notes/learned edits are explicit exploration choices.",
+    "All keyboard body events retain Conditional provenance; no estimate clearing.",
+    "Core input API only; no WPF or physical-input verification.",
+    "No frame-by-frame timing equivalence; input/walking/note animation legitimately adds time."
+  ],
+  "evidence": {
+    "Exe\\Room34Sequences-20261002\\input-2\\direct.json": "fcdf8beff1707719897abe10a629a4ce0efc9db4f2227389a24d1568a4bbdf5a",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

@@ -1,5 +1,7 @@
 # LOOM EGA script map
 
+Latest Room34 input evidence,2 October: supported staff/six notes/learned5+10, source notes/reverse flags retained. Note keys actually dispatch561/44,4C,44,44,44 at007 +002E. Local201 +0046/+0134/+0197 and202 +0000 complete;9/9 scopes, final34, D1/D98/DCC=2/1/1.127 recorded scene-body events match direct responses except retained Reached/Conditional provenance. No source certainty or full-game claim. [Paired evidence](../.verification/room34-sequences-20261002/validation.md).
+
 Latest manual18 evidence,2 October: confirmed Game Status staff/notes/learned edits plus reverse note keys execute633/4B +0000 ->204(0),204 end031E/chain031F ->090 loads0005/00CF/01F5/0379 and end0730. All Conditional/Executed;42/43/60/43,15/15 scopes,6342 total frames. Source notes/reverse flag unchanged; edits are labelled exploration choices. One representative Core reproduction, no App interaction or additional execution correction. [Evidence](../.verification/sharpening-reverse-20261002/validation.md). Earlier four-note/unlearned attempt is not this user's case.
 
 Latest sphere review,2 October after0318792:370/36 starts065 +0000, visits19, executes estimated return18 at+02E1 and end+0302. Fresh229-frame literal audit meets completion/settling criteria; added shared preview with assumptions retained. Literal coverage169/235=71.91%,335 starts; no execution change. [Evidence](../.verification/sphere-catalog-20261002/validation.md). Older route outcomes below remain historical.
