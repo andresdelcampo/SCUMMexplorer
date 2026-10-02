@@ -204,9 +204,10 @@ public sealed class LoomCallObservationTests
     internal static LoomScriptDisassembly Code(params (string Op, string Args)[] operations) => new(0, 0, 0, operations.Length, operations.Length,
         operations.Select((p, i) => new LoomScriptInstruction(i, 0, p.Op, p.Args, "00")).ToArray(), null, null, [], []);
 
-    private static void WithSession(Dictionary<int, byte[]> programs,
+    internal static void WithSession(Dictionary<int, byte[]> programs,
         Action<LoomExplorationSession, List<LoomCallObservation>, List<LoomScriptObservation>> check,
-        Func<LoomScriptObservationSite, bool>? site = null, Func<string, bool>? key = null, bool capture = true)
+        Func<LoomScriptObservationSite, bool>? site = null, Func<string, bool>? key = null, bool capture = true,
+        LoomCallCorrespondenceTracker? correspondence = null)
     {
         var directory = Path.Combine(Path.GetTempPath(), "loom-calls-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
@@ -225,7 +226,7 @@ public sealed class LoomCallObservationTests
             var records = new List<LoomCallObservation>();
             var outer = new List<LoomScriptObservation>();
             check(new(game, new(new Dictionary<int, byte>(), new Dictionary<int, byte>()), completeBoot: false,
-                observer: new(outer.Add, site, key, receiveCall: capture ? records.Add : null)), records, outer);
+                observer: new(outer.Add, site, key, receiveCall: capture ? records.Add : null, callCorrespondence: correspondence)), records, outer);
         }
         finally { Directory.Delete(directory, recursive: true); }
     }
