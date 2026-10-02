@@ -4,6 +4,8 @@ namespace SCUMMexplorer.Core.Formats;
 /// A selected zero-read and its last surviving snapshot-confirmed literal writer, if any.
 /// Matching the causal child is evidence about this stream, never protocol completion.
 /// Writer/read value, index, inherited path and terminal observations remain independent.
+/// Termination requires an end in the writer's own invocation and causal parent; a later
+/// resumption's end needs independent continuity evidence that this observer does not infer.
 /// </summary>
 public sealed record LoomCompletionRead(LoomRuntimeRead Read, LoomRuntimeWrite? Writer,
     bool MatchesOwnLiteralChild, LoomScriptObservation? WriterEnd, string? Rejection,
@@ -62,11 +64,10 @@ public sealed class LoomCompletionObserver
                     ? "writer is not an observed literal zero move" : null;
             var writerEnd = writer is not null && ends.TryGetValue(writer.Observation.Slot, out var end) &&
                 end.Sequence >= writer.ConfirmationSequence && end.Sequence < read.Observation.Sequence &&
-                end.Site?.Script == writer.Observation.Site?.Script &&
-                end.Site?.Context == writer.Observation.Site?.Context &&
-                end.Site?.Container == writer.Observation.Site?.Container &&
-                end.Site?.ResourceOffset == writer.Observation.Site?.ResourceOffset ? end : null;
+                end.Site?.SameResource(writer.Observation.Site) == true ? end : null;
             var terminalRejection = writerEnd is null ? "no later source-consistent writer end" :
+                writerEnd.Invocation != writer!.Observation.Invocation || writerEnd.ParentSlot != writer.Observation.ParentSlot
+                    ? "writer end belongs to another invocation or causal parent" :
                 writerEnd.ReachedStop != true || writerEnd.ResumeOffset is not null || writerEnd.UnresolvedReason is not null
                     ? "writer end is yielded, partial or unresolved" : null;
             receive(new(read, writer, rejection is null, writerEnd, rejection, limits,

@@ -4,7 +4,11 @@ using System.Text.Json.Serialization;
 namespace SCUMMexplorer.Core.Formats;
 
 public sealed record LoomScriptObservationSite(int Script, string? Context, int Container, int ResourceOffset,
-    string Stage, int Offset, string? Operation = null, string? Operands = null);
+    string Stage, int Offset, string? Operation = null, string? Operands = null)
+{
+    internal bool SameResource(LoomScriptObservationSite? other) => other is not null &&
+        Script == other.Script && Context == other.Context && Container == other.Container && ResourceOffset == other.ResourceOffset;
+}
 
 /// <summary>
 /// One decoded operand bound against the copied pre-instruction values. A selected cell and

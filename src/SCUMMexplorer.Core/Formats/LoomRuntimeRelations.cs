@@ -87,7 +87,9 @@ public sealed class LoomRuntimeRelationTracker
         {
             var confirmed = new HashSet<LoomRuntimeDependency>();
             if (pending.Remove(observation.Invocation, out var candidate) &&
-                observation.Slot == candidate.Observation.Slot && observation.UnresolvedReason is null &&
+                observation.Slot == candidate.Observation.Slot && observation.ParentSlot == candidate.Observation.ParentSlot &&
+                observation.Site is { Stage: "instruction" or "end" } confirmationSite &&
+                confirmationSite.SameResource(candidate.Observation.Site) && observation.UnresolvedReason is null &&
                 candidate.Destination.Key is { } confirmedKey &&
                 observation.Values.TryGetValue(confirmedKey, out var confirmedValue) && confirmedValue == candidate.Expected)
             {
@@ -164,7 +166,7 @@ public sealed class LoomRuntimeRelationTracker
                         else Invalidate(Location(destination.Key, observation.Slot), "source write (including same value and aliases)", invalidated);
                     }
                     // Captured numeric operands constrain a candidate only. The next snapshot in
-                    // this invocation must confirm it; no source hypothesis or effect is inferred.
+                    // this invocation/resource/causal parent must confirm it; no source hypothesis or effect is inferred.
                     if (retain && bindings.FirstOrDefault(b => b.Role == "destination-before") is { Key: not null } dest &&
                         TryExpected(site.Operation, dest, bindings, out var expected))
                         pending[observation.Invocation] = new(observation, dest, Frozen(reads.Select(r => r.Id)),

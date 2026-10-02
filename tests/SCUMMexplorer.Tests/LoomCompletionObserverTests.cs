@@ -39,7 +39,7 @@ public sealed class LoomCompletionObserverTests
     {
         var results = Capture(tracker => {
             Write(tracker, 1, 12, kind == "foreign" ? 9 : 8, value: kind == "early" ? (ushort)1 : (ushort)0);
-            Confirm(tracker, 2, 12, value: kind == "early" ? (ushort)1 : (ushort)0);
+            Confirm(tracker, 2, 12, value: kind == "early" ? (ushort)1 : (ushort)0, parent: kind == "foreign" ? 9 : 8);
             if (kind == "cancel") tracker.Observe(new(3, 8, null, 0, null, new Dictionary<string, ushort>(), [], false,
                 CancelledNumber: 31, CancelledSlots: [12]));
             if (kind == "alias") tracker.Observe(LoomRuntimeRelationTests.Record(3, 9, 9, "move",
@@ -141,7 +141,7 @@ public sealed class LoomCompletionObserverTests
             tracker.Observe(LoomRuntimeRelationTests.Record(1, 12, 12, "and",
                 [new("destination-before", "var[0x060]", "var[0x060]", 1, false),
                  new("source", "0x0000", null, 0, false)], ("var[0x060]", 1)) with { ParentSlot = 8 });
-            tracker.Observe(LoomRuntimeRelationTests.Record(2, 12, 12, "stopObjectCode", [], ("var[0x060]", 0)));
+            tracker.Observe(LoomRuntimeRelationTests.Record(2, 12, 12, "stopObjectCode", [], ("var[0x060]", 0)) with { ParentSlot = 8 });
             tracker.Observe(LoomRuntimeRelationTests.Record(3, 8, 8, "equalZero",
                 [new("condition", "var[0x060]", "var[0x060]", 0, false)], ("var[0x060]", 0)));
         });
@@ -165,9 +165,10 @@ public sealed class LoomCompletionObserverTests
                  new("source", literal ? $"0x{value:X4}" : "local[0x000]", literal ? null : "local[0x000]", value, false)],
                 ("var[0x0D6]", 0), ("bit[0xD67]", 0)) with { ParentSlot = parent, PathEstimated = path,
                     Site = new(31, null, 1, 0, "instruction", 0, "move", "") });
-    private static void Confirm(LoomRuntimeRelationTracker tracker, long sequence, long slot, ushort value = 0, bool estimated = false) =>
+    private static void Confirm(LoomRuntimeRelationTracker tracker, long sequence, long slot, ushort value = 0, bool estimated = false, long parent = 8) =>
         tracker.Observe(LoomRuntimeRelationTests.Record(sequence, slot, slot, "stopObjectCode", [],
             ("var[0x0D6]", (ushort)(value << 7)), ("bit[0xD67]", value)) with {
+                ParentSlot = parent, Site = new(31, null, 1, 0, "instruction", 0, "stopObjectCode", ""),
                 Estimated = estimated ? ["bit[0xD67]"] : [] });
     private static LoomScriptObservation End(long sequence, long slot) => new(sequence, slot, 8, slot,
         new(31, null, 1, 0, "end", 0x322), new Dictionary<string, ushort> { ["var[0x0D6]"] = 0, ["bit[0xD67]"] = 0 },
