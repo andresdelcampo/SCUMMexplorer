@@ -1,0 +1,778 @@
+{
+  "scope": "Optional copied runtime relation lifetimes and selected zero-read/writer correspondence. All independent estimates remain. No exhaustive writer/domain transport, inherited effect, scheduler/callee/cancellation-safe completion or native090 proof.",
+  "recipeCount": 13,
+  "fullPacketsIdentical": true,
+  "exactBindingChronology": true,
+  "observedZeroWaits": 76,
+  "ownLiteralChildMatches": 76,
+  "expandedChronologyIdentical": true,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 12,
+      "ownLiteralChildMatches": 12,
+      "readRelations": 5197,
+      "snapshotConfirmedMoves": 1691,
+      "barriers": {
+        "filtered source site": 100224,
+        "unresolved or ranged write": 103,
+        "unmodelled instruction access": 708,
+        "unresolved execution or omitted effects": 5
+      },
+      "invalidations": {
+        "source write (including same value and aliases)": 255,
+        "local slot ended": 280,
+        "filtered source site": 1299,
+        "unresolved or ranged write": 152,
+        "unmodelled instruction access": 1336,
+        "unresolved execution or omitted effects": 22
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204.json",
+          "sha256": "58453eec817e345003c93d5106cd0363fabe3537d2f1c6f50bad3d8515f77937"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-instructions.jsonl",
+          "sha256": "8a3c77e897d2f133c9511fa3b1325d6604267600fdc6ceffced2242aa464895e"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-cancellations.jsonl",
+          "sha256": "7de572e1a71ec9e8ee3df46cbc2fcb0aca00661f95bbd0ce6661173f19000512"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-relations.jsonl",
+          "sha256": "ce8e0a6c05f3d824a678005bd9c5f33a4a0635356b13f1eb2236c26aeda8079f"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-completion.jsonl",
+          "sha256": "7f1d3a107ce03b3a2a4caaf764101c570b8df7a1b5d4efb179852455eb0131ae"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-click",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 16,
+      "ownLiteralChildMatches": 16,
+      "readRelations": 5885,
+      "snapshotConfirmedMoves": 1964,
+      "barriers": {
+        "filtered source site": 106234,
+        "unresolved or ranged write": 115,
+        "unmodelled instruction access": 767,
+        "unresolved execution or omitted effects": 9
+      },
+      "invalidations": {
+        "source write (including same value and aliases)": 343,
+        "local slot ended": 330,
+        "filtered source site": 1447,
+        "unresolved or ranged write": 163,
+        "unmodelled instruction access": 1501,
+        "unresolved execution or omitted effects": 44
+      },
+      "observations": {
+        "primaryCompletion": {
+          "frame": 3036,
+          "Sequence": 4556,
+          "Slot": 408,
+          "Run": 12144,
+          "Site": {
+            "Script": 20,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 23959,
+            "Stage": "instruction",
+            "Offset": 40,
+            "Operation": "equalZero",
+            "Operands": "bit[0xD67], branch +0xFFFA -> 0x0027"
+          },
+          "Binding": {
+            "Role": "condition",
+            "Operand": "bit[0xD67]",
+            "Key": "bit[0xD67]",
+            "Value": 0,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": "var[0x0D6]",
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "PathEstimated": false,
+          "MatchesOwnLiteralChild": true,
+          "Rejection": null,
+          "Limits": [
+            "selected observations only; omitted/external/aliased/concurrent writers remain limits",
+            "unchanged unobserved external effects require explicit invalidation",
+            "value/index and inherited path/effect estimates are independent and retained",
+            "terminal/self-stop observations do not establish scheduler/callee or cancellation-safe completion"
+          ],
+          "Writer": {
+            "Id": 3745,
+            "Sequence": 4552,
+            "Slot": 412,
+            "ParentSlot": 408,
+            "Run": 12143,
+            "Site": {
+              "Script": 31,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 25739,
+              "Stage": "instruction",
+              "Offset": 797,
+              "Operation": "move",
+              "Operands": "bit[0xD67] = 0x0000"
+            },
+            "Value": 0,
+            "ValueEstimated": true,
+            "PathEstimated": true,
+            "ConfirmationSequence": 4553
+          },
+          "WriterEnd": {
+            "Sequence": 4554,
+            "ReachedStop": true,
+            "ResumeOffset": null,
+            "UnresolvedReason": null,
+            "Site": {
+              "Script": 31,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 25739,
+              "Stage": "end",
+              "Offset": 802,
+              "Operation": null,
+              "Operands": null
+            }
+          }
+        },
+        "practiceRead": {
+          "frame": 2870,
+          "Event": 58446,
+          "Kind": "read",
+          "Id": 2990,
+          "Sequence": 3617,
+          "Slot": 373,
+          "Run": 11819,
+          "Site": {
+            "Script": 201,
+            "Context": "Room 06 local script 201",
+            "Container": 6,
+            "ResourceOffset": 23281,
+            "Stage": "instruction",
+            "Offset": 33,
+            "Operation": "move",
+            "Operands": "local[0x001] = var[0x052+local[0x000]]"
+          },
+          "Binding": {
+            "Role": "source",
+            "Operand": "var[0x052+local[0x000]]",
+            "Key": "var[0x052]",
+            "Value": 1,
+            "ValueEstimated": true,
+            "Index": {
+              "Role": "index",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "Dependencies": [
+            {
+              "Key": "var[0x052]",
+              "LocalSlot": null
+            },
+            {
+              "Key": "local[0x000]",
+              "LocalSlot": 373
+            }
+          ],
+          "Origin": 2969,
+          "PathEstimated": false
+        },
+        "finalArguments": [
+          {
+            "frame": 4614,
+            "Event": 97824,
+            "Kind": "read",
+            "Id": 7843,
+            "Sequence": 8871,
+            "Slot": 694,
+            "Run": 17655,
+            "Site": {
+              "Script": 22,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 24141,
+              "Stage": "instruction",
+              "Offset": 195,
+              "Operation": "chainScript",
+              "Operands": "0x1A, [local[0x000], 0x0000]"
+            },
+            "Binding": {
+              "Role": "argument",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 4,
+              "ValueEstimated": true,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 0,
+              "UnresolvedReason": null
+            },
+            "Dependencies": [
+              {
+                "Key": "local[0x000]",
+                "LocalSlot": 694
+              }
+            ],
+            "Origin": null,
+            "PathEstimated": true
+          },
+          {
+            "frame": 4614,
+            "Event": 97824,
+            "Kind": "read",
+            "Id": 7844,
+            "Sequence": 8871,
+            "Slot": 694,
+            "Run": 17655,
+            "Site": {
+              "Script": 22,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 24141,
+              "Stage": "instruction",
+              "Offset": 195,
+              "Operation": "chainScript",
+              "Operands": "0x1A, [local[0x000], 0x0000]"
+            },
+            "Binding": {
+              "Role": "argument",
+              "Operand": "0x0000",
+              "Key": null,
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 1,
+              "UnresolvedReason": null
+            },
+            "Dependencies": [],
+            "Origin": null,
+            "PathEstimated": true
+          }
+        ]
+      },
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-click.json",
+          "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-click-instructions.jsonl",
+          "sha256": "df534edc2511aa83d00c2b45acaa0ee5b5e4776bdfb58d9bbb976003a0e9a910"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-click-cancellations.jsonl",
+          "sha256": "15a9e42d720733f096694605a956a198f4cfb0edf67c590f3b7bdee3f259cc5d"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-click-relations.jsonl",
+          "sha256": "0c1afd2381ebdb28f8cf03fbbac716fed1d5c9c3978b6ee3a2dad8bc42323ed0"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-click-completion.jsonl",
+          "sha256": "d3d4e0e88961d16621aaa8a5ef20dc3548022a0f7e8617ed07906c2413a9ce3c"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-key",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 16,
+      "ownLiteralChildMatches": 16,
+      "readRelations": 5885,
+      "snapshotConfirmedMoves": 1964,
+      "barriers": {
+        "filtered source site": 106213,
+        "unresolved or ranged write": 115,
+        "unmodelled instruction access": 767,
+        "unresolved execution or omitted effects": 9
+      },
+      "invalidations": {
+        "source write (including same value and aliases)": 343,
+        "local slot ended": 330,
+        "filtered source site": 1447,
+        "unresolved or ranged write": 163,
+        "unmodelled instruction access": 1501,
+        "unresolved execution or omitted effects": 44
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-key.json",
+          "sha256": "d0a7e60717b2b0a7a4b5c58499f153ec3a19b80f50e67183e5c5cbc2eaf1e2de"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-key-instructions.jsonl",
+          "sha256": "22873421925600fadf394e4f433a767195c9f3ee36758e11dab0399792b43a48"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-key-cancellations.jsonl",
+          "sha256": "15a9e42d720733f096694605a956a198f4cfb0edf67c590f3b7bdee3f259cc5d"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-key-relations.jsonl",
+          "sha256": "38fc2aabff2cd6db5bb50e53e2db6098ff557c3cee5138523f27b051197bebcf"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw4-key-completion.jsonl",
+          "sha256": "d3d4e0e88961d16621aaa8a5ef20dc3548022a0f7e8617ed07906c2413a9ce3c"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-click",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 4,
+      "ownLiteralChildMatches": 4,
+      "readRelations": 1422,
+      "snapshotConfirmedMoves": 555,
+      "barriers": {
+        "filtered source site": 68039,
+        "unmodelled instruction access": 177,
+        "unresolved execution or omitted effects": 1,
+        "unresolved or ranged write": 30
+      },
+      "invalidations": {
+        "unmodelled instruction access": 405,
+        "filtered source site": 325,
+        "source write (including same value and aliases)": 115,
+        "local slot ended": 96,
+        "unresolved or ranged write": 35
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-click.json",
+          "sha256": "f90c09c5ec5bcd60476417d0558e5a47bca9c9163c33a58d55db9c676207c31f"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-click-instructions.jsonl",
+          "sha256": "33a471f15fe142efb5fb967ce4cc08de84874ad3808f2c261e071dba800a93ad"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-click-cancellations.jsonl",
+          "sha256": "673b59cd5dee9bf41be0051bdd8cb43a629735b46beb3ccca7ce673783bdfc91"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-click-relations.jsonl",
+          "sha256": "43ba0fb68131a7eefaef867038bc46935186aaf0c42c5ca18794645937a0213b"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-click-completion.jsonl",
+          "sha256": "69a386005afec00102c1afeaeab54f6a0ef48404f38c7b9b4e9c1b6e3fa7c238"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-key",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 4,
+      "ownLiteralChildMatches": 4,
+      "readRelations": 1422,
+      "snapshotConfirmedMoves": 555,
+      "barriers": {
+        "filtered source site": 68018,
+        "unmodelled instruction access": 177,
+        "unresolved execution or omitted effects": 1,
+        "unresolved or ranged write": 30
+      },
+      "invalidations": {
+        "unmodelled instruction access": 405,
+        "filtered source site": 325,
+        "source write (including same value and aliases)": 115,
+        "local slot ended": 96,
+        "unresolved or ranged write": 35
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-key.json",
+          "sha256": "34e64d6340a93f6912b9bcb93d748f07a179d34b0bbeba081f4c68ec3015bc64"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-key-instructions.jsonl",
+          "sha256": "94cb671f2fea66dcc5452d2820ed720b96bf03d426e2f8e3edcf1d9eae800387"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-key-cancellations.jsonl",
+          "sha256": "673b59cd5dee9bf41be0051bdd8cb43a629735b46beb3ccca7ce673783bdfc91"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-key-relations.jsonl",
+          "sha256": "cfe91de40e0c37cefe864fd13ab3364d4648a0a75e40cbda34c9731dfa9252e5"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/room41-1/room41-raw6-key-completion.jsonl",
+          "sha256": "69a386005afec00102c1afeaeab54f6a0ef48404f38c7b9b4e9c1b6e3fa7c238"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 12,
+      "ownLiteralChildMatches": 12,
+      "readRelations": 4735,
+      "snapshotConfirmedMoves": 1519,
+      "barriers": {
+        "filtered source site": 63411,
+        "unresolved or ranged write": 91,
+        "unmodelled instruction access": 620,
+        "unresolved execution or omitted effects": 4
+      },
+      "invalidations": {
+        "source write (including same value and aliases)": 244,
+        "local slot ended": 267,
+        "filtered source site": 1185,
+        "unresolved or ranged write": 141,
+        "unmodelled instruction access": 1174,
+        "unresolved execution or omitted effects": 22
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel.json",
+          "sha256": "dd2815c1717a023bfc047a99a68b871160fbd59a4609eb63f8cf30d0ce76d24a"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-instructions.jsonl",
+          "sha256": "add2943a5d2457c4ec998e478e2136885428a41da244341b04631c32e7eacee9"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-cancellations.jsonl",
+          "sha256": "57729c8e495a03582148ea328670fa51f906ac41e571302b402e4b0649b56ac1"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-relations.jsonl",
+          "sha256": "006050aeec7d52b43266663df023d2f59db751bf6849187ddc76b03b8d64ce37"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-completion.jsonl",
+          "sha256": "9062056b83d49a429ba5630e2b75228cc2ce400dc3fbb43600ef8db88c1eb79d"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 12,
+      "ownLiteralChildMatches": 12,
+      "readRelations": 4735,
+      "snapshotConfirmedMoves": 1519,
+      "barriers": {
+        "filtered source site": 63128,
+        "unresolved or ranged write": 91,
+        "unmodelled instruction access": 620,
+        "unresolved execution or omitted effects": 4
+      },
+      "invalidations": {
+        "source write (including same value and aliases)": 244,
+        "local slot ended": 267,
+        "filtered source site": 1185,
+        "unresolved or ranged write": 141,
+        "unmodelled instruction access": 1174,
+        "unresolved execution or omitted effects": 22
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye.json",
+          "sha256": "39705828a5c46a4ddcdc4d96b5467f38b8cdc16ef0e8460365e56b0bbf8ae0ad"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-instructions.jsonl",
+          "sha256": "2c280b76e39d3e70984383988223d11aaf51b20286e313317dbb12df3990ea2f"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-cancellations.jsonl",
+          "sha256": "134653114024175dbe87cc0a5e06364cd658998442e19e08a7bf5d694f06a073"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-relations.jsonl",
+          "sha256": "ffb417e20770996184dfea973ffce8c279d21dae48152006a0376bcf72e1938e"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-completion.jsonl",
+          "sha256": "867d9416f5e196f26d3b9468b11d09da362462f5fd7e0aa763c07a9e6c2c82ec"
+        }
+      ]
+    },
+    {
+      "id": "late096-reached44",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 0,
+      "ownLiteralChildMatches": 0,
+      "readRelations": 588,
+      "snapshotConfirmedMoves": 88,
+      "barriers": {
+        "filtered source site": 28322,
+        "unresolved or ranged write": 8
+      },
+      "invalidations": {
+        "source write (including same value and aliases)": 30,
+        "local slot ended": 34,
+        "filtered source site": 232,
+        "unresolved or ranged write": 35
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-reached44.json",
+          "sha256": "f72baaabd02edcbf9d446aacbb47f3088114d38f04cbff66cbcc6c9e38e8a8ba"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-reached44-instructions.jsonl",
+          "sha256": "dea704a0c5f8c1455328db3326800022990943bf626669c1e45b595a4a15a26d"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-reached44-cancellations.jsonl",
+          "sha256": "8b55982129f085067ea597e6d4292532cf9df140da2e1e08686d044f6419b2c0"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-reached44-relations.jsonl",
+          "sha256": "2b860e39563623aff903b689c6de4c372fc37159aa8b5b9ea48d8306ce69f603"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-reached44-completion.jsonl",
+          "sha256": "ba7ef19c31a2468f7383cccf109c30eb50e8310398d1064c565472523aaf30b2"
+        }
+      ]
+    },
+    {
+      "id": "late096-source-skip095",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 0,
+      "ownLiteralChildMatches": 0,
+      "readRelations": 0,
+      "snapshotConfirmedMoves": 0,
+      "barriers": {
+        "filtered source site": 26587
+      },
+      "invalidations": {},
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-source-skip095.json",
+          "sha256": "3f3ccbf796262d2812d755288d59975567d305ab43894ac43f94cc07c0e320cb"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-source-skip095-instructions.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-source-skip095-cancellations.jsonl",
+          "sha256": "8b55982129f085067ea597e6d4292532cf9df140da2e1e08686d044f6419b2c0"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-source-skip095-relations.jsonl",
+          "sha256": "b3ea38274a69da7a9fd006bebd9b534b288c0a3d43bc8d754c279017787e46b8"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/late096-source-skip095-completion.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response390",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 0,
+      "ownLiteralChildMatches": 0,
+      "readRelations": 17,
+      "snapshotConfirmedMoves": 1,
+      "barriers": {
+        "filtered source site": 42331,
+        "unmodelled instruction access": 17,
+        "unresolved execution or omitted effects": 1
+      },
+      "invalidations": {
+        "filtered source site": 3,
+        "unmodelled instruction access": 2
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response390.json",
+          "sha256": "87bfae3c6891ad7ecefe4038c6fab2c0091b2de5fd237688235700a2c59f601c"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response390-instructions.jsonl",
+          "sha256": "cafc4bc6a2044dceb518c92a804ff058f3bcb39fbad0cb49948c95a8ab2d8c6a"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response390-cancellations.jsonl",
+          "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response390-relations.jsonl",
+          "sha256": "86f4571fe030674d3c015635b2441395b18654998be4fa15a994fe0601598be8"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response390-completion.jsonl",
+          "sha256": "d2ea09bc4d5b36682547fa4d27a03a41174ca4d633b3e640eafc17d604ed4f0f"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response391",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 0,
+      "ownLiteralChildMatches": 0,
+      "readRelations": 17,
+      "snapshotConfirmedMoves": 1,
+      "barriers": {
+        "filtered source site": 42331,
+        "unmodelled instruction access": 17,
+        "unresolved execution or omitted effects": 1
+      },
+      "invalidations": {
+        "filtered source site": 3,
+        "unmodelled instruction access": 2
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response391.json",
+          "sha256": "8e4d149d0806d5d473f8984feedb60aa199b608b0c9cb1231580ea66c98bef1a"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response391-instructions.jsonl",
+          "sha256": "b1ba1aaadd232cb8dfa74af8a2c498d56fb5ca55e32c4a769d3df3dae5ffd1c8"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response391-cancellations.jsonl",
+          "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response391-relations.jsonl",
+          "sha256": "586cba9715885cfee024b9382f0765bfe36ddc92678ea9920a39c116030ff02f"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source369-response391-completion.jsonl",
+          "sha256": "d2ea09bc4d5b36682547fa4d27a03a41174ca4d633b3e640eafc17d604ed4f0f"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response390",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 0,
+      "ownLiteralChildMatches": 0,
+      "readRelations": 17,
+      "snapshotConfirmedMoves": 1,
+      "barriers": {
+        "filtered source site": 42414,
+        "unmodelled instruction access": 17,
+        "unresolved execution or omitted effects": 1
+      },
+      "invalidations": {
+        "filtered source site": 3,
+        "unmodelled instruction access": 2
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response390.json",
+          "sha256": "560fd93d78a6701c784b2b5f38db4130b7208b8365f049bdef43757e80ef76e3"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response390-instructions.jsonl",
+          "sha256": "c37d3ecbbf6f6bd0b53b0039d7f4c46a61c12bfe953251d507cf3bf6e3343f64"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response390-cancellations.jsonl",
+          "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response390-relations.jsonl",
+          "sha256": "c8f0c70896c2cd86d7c1785a792a77b3542c8822a8bb19ad05a7341d147b6209"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response390-completion.jsonl",
+          "sha256": "b05ef928bb17dea742c78739e3415b22ca5babcbf03a0a33f8c1d6061d5bccea"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response391",
+      "wholePacketIdentical": true,
+      "exactBindingChronology": true,
+      "zeroWaits": 0,
+      "ownLiteralChildMatches": 0,
+      "readRelations": 17,
+      "snapshotConfirmedMoves": 1,
+      "barriers": {
+        "filtered source site": 42414,
+        "unmodelled instruction access": 17,
+        "unresolved execution or omitted effects": 1
+      },
+      "invalidations": {
+        "filtered source site": 3,
+        "unmodelled instruction access": 2
+      },
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response391.json",
+          "sha256": "c264750aa4d1c5e93d616909a9b713ca0cab77531ae07545bcd3b0a1b63bb665"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response391-instructions.jsonl",
+          "sha256": "15bace46609a4053dee838e9c57a59a93550bcc234295397414bad43c7b5416c"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response391-cancellations.jsonl",
+          "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response391-relations.jsonl",
+          "sha256": "d31b80958897e08bf3a8541da8d77d7675c4a8cdc43e11c5edbb2cd183d9baac"
+        },
+        {
+          "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/preserved-1/sleep-source371-response391-completion.jsonl",
+          "sha256": "b05ef928bb17dea742c78739e3415b22ca5babcbf03a0a33f8c1d6061d5bccea"
+        }
+      ]
+    }
+  ],
+  "expandedInstructions": {
+    "path": "Exe/RuntimeRelationsSession-20261002/final-evidence/expanded-room41-1/room41-raw4-click-instructions.jsonl",
+    "sha256": "ee2fd227b07921dbc43effe5fa4ec5dd39a5b334020877113fe38da8e6c83b94"
+  }
+}

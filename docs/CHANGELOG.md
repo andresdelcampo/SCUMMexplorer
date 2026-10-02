@@ -1,5 +1,13 @@
 # Changelog
 
+## 2 October: generic completion correspondence and fresh preservation
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Optional completion observer | Surviving literal writer, exact child/reader identity and sequence; independent estimates/terminal observations; stale/cancelled/aliased/external evidence rejected | [validation](../.verification/runtime-relations-20261002/validation.md) |
+| Native evidence | All13 packets and entire prior binding/cancellation/expanded chronology exact;76 own-child zero reads, primary3036/4552→4553→4556→4557 preserved;090 unresolved | [relations](../.verification/runtime-relations-20261002/relation-summary.json) |
+| Fresh checks | Core348;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;clean main Release;App0/no push/promotion | [checks](../.verification/runtime-relations-20261002/check-summary.json) |
+
 ## 2 October: optional runtime relation lifetimes
 
 | Change | Result | Record |
