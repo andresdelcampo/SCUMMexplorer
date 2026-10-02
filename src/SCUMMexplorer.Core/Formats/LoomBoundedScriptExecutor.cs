@@ -2172,8 +2172,18 @@ public sealed class LoomBoundedScriptExecutor
         {
             var wait = bindings[0];
             if (wait.Role == "target") return BindNativeDependencies("getActorMoving", [wait], states, runtime);
-            return Array.AsReadOnly(new[] { new LoomScriptNativeDependency(wait.Role == "implicit-message" ? "message-wait" : "camera-wait",
-                wait, null, null, UnresolvedReason: "native wait/timing dependencies not exhaustively captured") });
+            var opaque = new LoomScriptNativeDependency(wait.Role == "implicit-message" ? "message-wait" : "camera-wait",
+                wait, null, null, UnresolvedReason: "native wait/timing dependencies not exhaustively captured");
+            if (wait.Role != "implicit-message" || runtime is null || wait.Value is null || wait.UnresolvedReason is not null)
+                return Array.AsReadOnly(new[] { opaque });
+            // Selected storage only: the message table has no independent per-field estimate
+            // record. Retain that unknown and the original timing/effect barrier, even when
+            // current storage agrees with VAR_HAVE_MSG. No text/callback is inspected.
+            var messages = runtime.Messages;
+            LoomScriptNativeDependency Field(string domain, int value) => new(domain, wait, value, null,
+                messages.WaitEstimate, "independent native message field provenance/timing/effects not established");
+            return Array.AsReadOnly(new[] { opaque, Field("message-have-msg", messages.HaveMsg),
+                Field("message-talk-delay", messages.TalkDelay), Field("message-talking-actor", messages.TalkingActor) });
         }
         var selectors = bindings.Where(b => b.Role is "source" or "condition" or "target").ToArray();
         if (selectors.Length == 0) return null;

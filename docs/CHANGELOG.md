@@ -1,5 +1,11 @@
 # Changelog
 
+## 2 October: native message wait fields and notifications
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Message waits | Copied native status/delay/speaker retain unknown field provenance and original timing/effect barrier;executed same-value/no-op message notifications;12 new cases/focused45 | [message](../.verification/runtime-object-correspondence-20261002/message-validation.md) |
+
 ## 2 October: actual object callee selection
 
 | Change | Result | Record |

@@ -106,6 +106,12 @@ public sealed class LoomMessageTable
     private LoomPrintRequest? _source;
     private string? _estimate;
 
+    internal Action? NativeMutation { get; set; }
+
+    /// <summary>Existing message estimates copied for observation; no independent field provenance.</summary>
+    public string? WaitEstimate => Talk?.Estimate is { } shown && _estimate is { } original && shown != original
+        ? original + "; " + shown : Talk?.Estimate ?? _estimate;
+
     /// <summary>ScummVM <c>_talkDelay</c> in jiffies; the frame counts it down.</summary>
     public int TalkDelay { get; private set; }
 
@@ -134,6 +140,7 @@ public sealed class LoomMessageTable
     /// </summary>
     public void RouteSkipped(string reason)
     {
+        NativeMutation?.Invoke();
         foreach (var slot in _slots)
         {
             slot.PositionEstimate ??= reason;
@@ -147,6 +154,7 @@ public sealed class LoomMessageTable
     /// </summary>
     public string Print(LoomPrintRequest request, LoomScriptRuntimeState runtime)
     {
+        NativeMutation?.Invoke();
         var index = request.ActorToPrintFor switch { 252 => 3, 253 => 2, 254 => 1, _ => 0 };
         var slot = _slots[index];
         slot.LoadDefault();
@@ -315,6 +323,7 @@ public sealed class LoomMessageTable
     /// </summary>
     public string DrawBox(int x1, int y1, int x2, int y2, int color)
     {
+        NativeMutation?.Invoke();
         var box = new LoomScreenBox(Math.Min(x1, x2), Math.Min(y1, y2), Math.Max(x1, x2), Math.Max(y1, y2), color);
         var covered = Cover(box);
         return $"box drawn at ({box.Left}, {box.Top})–({box.Right}, {box.Bottom}), colour {color}: " +
@@ -336,6 +345,7 @@ public sealed class LoomMessageTable
     /// </summary>
     public string VerbDrawn(LoomScreenBox box)
     {
+        NativeMutation?.Invoke();
         var covered = Cover(box);
         return covered == 0 ? "" : $"; {covered} drawn string(s) covered";
     }
@@ -364,6 +374,7 @@ public sealed class LoomMessageTable
     /// </summary>
     public void StartFrame(int delta, LoomScriptRuntimeState runtime)
     {
+        NativeMutation?.Invoke();
         delta = Math.Clamp(delta, 1, MaxFrameDelta);
         TalkDelay = Math.Max(0, TalkDelay - delta);
         DisplayDialog(runtime);
@@ -375,7 +386,11 @@ public sealed class LoomMessageTable
     /// ends the message or shows its next chunk. The explorer uses it to click
     /// text away: assumed input.
     /// </summary>
-    public void SkipTalkDelay() => TalkDelay = 0;
+    public void SkipTalkDelay()
+    {
+        NativeMutation?.Invoke();
+        TalkDelay = 0;
+    }
 
     /// <summary>
     /// Runs an actor's talk frame (<c>runActorTalkScript</c>): true for the talk-start frame when a chunk of its
@@ -388,6 +403,7 @@ public sealed class LoomMessageTable
     /// <summary><c>startScene</c>: <c>stopTalk</c>, and the room redraw erases drawn strings.</summary>
     public void RoomEntered(LoomScriptRuntimeState runtime)
     {
+        NativeMutation?.Invoke();
         StopTalk();
         _drawn.Clear();
         runtime.SetGlobalVariable(HaveMsgVariable, 0);
@@ -396,6 +412,7 @@ public sealed class LoomMessageTable
     /// <summary>ScummVM <c>stopTalk</c>: no message, no delay, no talking actor, and the text is erased.</summary>
     private void StopTalk()
     {
+        NativeMutation?.Invoke();
         // stopTalk (v3): the talking actor in the current room goes back to its talk-stop frame.
         if (_useTalkAnims && TalkingActor != NoActor) TalkAnimation?.Invoke(TalkingActor, false);
         _useTalkAnims = false;
@@ -410,6 +427,7 @@ public sealed class LoomMessageTable
     /// <summary>ScummVM <c>displayDialog</c> for v3 (no line wrapping; the charset draws each character).</summary>
     private void DisplayDialog(LoomScriptRuntimeState runtime)
     {
+        NativeMutation?.Invoke();
         if (HaveMsg == 0) return;
         if (TalkDelay > 0) return;
         if (HaveMsg == 1)

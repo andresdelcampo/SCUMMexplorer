@@ -107,7 +107,8 @@ public sealed class LoomNativeDependencyTracker
                                 continue;
                             }
                             var family = Family(dependency.Domain);
-                            var storage = family is not null && dependency.Selector.Value is { } subject ? new LoomNativeStorage(family, subject) : null;
+                            var storage = family is not null && dependency.Selector.Value is { } subject
+                                ? new LoomNativeStorage(family, family == "message" ? 0 : subject) : null;
                             var numeric = new List<LoomRuntimeDependency>();
                             foreach (var part in parts)
                             {
@@ -166,6 +167,7 @@ public sealed class LoomNativeDependencyTracker
     private static string? Family(string domain) => domain switch {
         "object-state" or "object-classes" or "object-position" or "object-position-x" or "object-position-y" => "object",
         "user-input" => "user-input",
+        "message" or "message-have-msg" or "message-talk-delay" or "message-talking-actor" => "message",
         "actor" or "getActorX" or "getActorY" or "getActorRoom" or "getActorWalkBox" or
         "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" => "actor",
         _ => null

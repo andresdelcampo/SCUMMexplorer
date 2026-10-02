@@ -57,7 +57,8 @@ public sealed class LoomRemainingAccessTests
     public void NativeWaitFieldIsIndependentOfItsNumericSelectorAndTimingBarrier(string operands, string domain, long? value)
     {
         var access = Capture("waitFor", operands).SourceAccess!;
-        var native = Assert.Single(access.NativeDependencies!);
+        var native = access.NativeDependencies![0];
+        Assert.Equal(operands == "message" ? 4 : 1, access.NativeDependencies.Count);
         Assert.Equal(domain, native.Domain);
         Assert.Equal(value, native.Value);
         Assert.NotNull(access.Barrier);

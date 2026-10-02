@@ -13,6 +13,7 @@ public sealed class LoomScriptRuntimeState
         ObjectOwners = initialOwners is null ? [] : new Dictionary<int, byte>(initialOwners);
         ObjectClasses = initialClasses is null ? [] : new Dictionary<int, uint>(initialClasses);
         Actors.NativeMutation = NotifyNativeMutation;
+        Messages.NativeMutation = () => NotifyNativeMutation("message");
         // Old-v3 bit variables address one of 256 global words. SCUMM starts
         // those words at zero; later scripts update the same backing words.
         for (var index = 0; index < 256; index++)
