@@ -1,6 +1,12 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
-## Latest: executed estimated room loads now continue
+## Latest: sphere Look reviewed and catalogued
+
+Continuation from0318792: fresh sphere370/36 independently meets the literal preview criteria, identical to the corrected229-frame result (065 +0000/+0302,18/19/18). New shared recipe; **169/235=71.91%**,66 sites/49 owners outstanding,335 starts=85 scenes+250 reactions. All330 old recipes/memberships and both sequences exact; estimated/direct-verb labels retained. [Review](../.verification/sphere-catalog-20261002/validation.md). No runtime correction or App interaction; Core662/broad checks remain dated.
+
+Next: one bounded manual response18 reproduction. The user confirms Game Status edits for staff, enough notes and Sharpening learned, then note keys triggering the correct conversation. These are established user evidence; do not ask for prerequisites/input method again. Reproduce those edits through the public status API as labelled exploration choices, retaining source notes/reverse flag, and check633/4B ->204(0) ->090. No other fabricated prerequisites; the historical four-note/unlearned failure cannot represent this case. Raw4/history/protected57 untouched/unstaged; no App launch/close/interaction or push; separate commits.
+
+## Previous: executed estimated room loads now continue
 
 The user authorized correcting the overreaching room-load certainty guard generally. This supersedes the historical prohibition on accepting conditional loads, not the requirement to retain estimates. Actual executed loads to indexed rooms now proceed; unknown destinations and unexecuted branches remain blocked. Entry/exit effects inherit uncertainty, and artwork respects the state used by estimated execution. No room exception, invented prerequisite, cleared estimate or wait/stop bypass. [Current validation](../.verification/estimated-room-loads-20261002/validation.md), [summary](../.verification/estimated-room-loads-20261002/summary.json).
 

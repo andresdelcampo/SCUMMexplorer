@@ -1,0 +1,41 @@
+{
+  "recipe": {
+    "id": "Room 18 object 370 Verb 0x36",
+    "title": "Room 18 · Look at esfera",
+    "category": "Scenes",
+    "room": 18,
+    "objectId": 370,
+    "verb": 54,
+    "scriptIds": [
+      65
+    ],
+    "rooms": [
+      18,
+      19
+    ],
+    "frames": 229,
+    "source": "Room 18 object 370 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 229 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 65 +0x0000 runs script 2\nendCutscene at Script 65 +0x0302 runs script 3\nStored name in the trigger room."
+  },
+  "coverage": {
+    "before": 168,
+    "after": 169,
+    "total": 235,
+    "percent": 71.91,
+    "remaining": 66,
+    "outstandingOwners": 49
+  },
+  "starts": 335,
+  "scenes": 85,
+  "reactions": 250,
+  "unchangedExistingRecipes": 330,
+  "sequencesRetained": 2,
+  "freshSphereExact": true,
+  "protectedExactUnstaged": 57,
+  "sharedCatalogLoaded": 331,
+  "releaseBuild": "0 warnings,0 errors",
+  "evidence": {
+    "Exe/EstimatedRoomLoads-20261002/audits/literal/audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\SphereCatalog-20261002\\sphere-1\\audit.json": "6246bd320625b45642d78e4725fcffe05035925251ca498c0a93cb5e6ba484ec",
+    "src/SCUMMexplorer.App/loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

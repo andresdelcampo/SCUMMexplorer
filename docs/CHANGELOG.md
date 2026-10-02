@@ -1,5 +1,9 @@
 # Changelog
 
+## 2 October: catalogue the completed sphere Look preview
+
+Room18 sphere370/36 independently completes065 and meets the existing fresh literal preview criteria in229 frames. Added shared Play Cutscene recipe; coverage **169/235=71.91%**,335 starts (85 scenes/250 reactions),66 sites/49 owners outstanding. All330 existing recipes/memberships and both sequences unchanged; direct-verb/estimated-state labels retained. Fresh Core-only audit and actual catalog/name loader; no App launch/close/interaction or push. Prior Core662/broad runtime baseline remains dated. [Review](../.verification/sphere-catalog-20261002/validation.md).
+
 ## 2 October: let executed estimated room loads continue
 
 The session no longer stops an executed room load merely because its path carries estimates. Known destinations proceed with uncertainty preserved through room entry/exit; unknown destinations and unresolved branches remain blocked. The unchanged saved spell-input capture now completes090 through42/43/60/43, and looking at the Room18 sphere completes065. Other362 literal roots, four memberships, two sequences,76 room renders and15 direct-cage files remain exact. Core662,Blockers0,clean Release,protected57 exact/unstaged; no App launch/close/interaction or push. Original recipes/history and catalog coverage unchanged. A separate response18 experiment lacks the user's learned spell/available notes and does not establish their setup. [Validation](../.verification/estimated-room-loads-20261002/validation.md).

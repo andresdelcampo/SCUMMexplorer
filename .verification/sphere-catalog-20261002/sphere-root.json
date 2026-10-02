@@ -1,0 +1,29 @@
+{
+  "inputSha256": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+  "roots": [
+    {
+      "owner": "Room 18 object 370 Verb 0x36",
+      "room": 18,
+      "objectId": 370,
+      "verb": 54,
+      "candidates": [
+        "script 011",
+        "script 065"
+      ],
+      "source": [
+        {
+          "owner": "script 011",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        },
+        {
+          "owner": "script 065",
+          "offset": "+0x0000",
+          "operation": "cutscene",
+          "operands": "[0x0000]"
+        }
+      ]
+    }
+  ]
+}

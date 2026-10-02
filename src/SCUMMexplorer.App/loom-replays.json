@@ -1997,6 +1997,23 @@
       "source": "Room 18 object 369 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 103 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
     },
     {
+      "id": "Room 18 object 370 Verb 0x36",
+      "title": "Room 18 · Look at esfera",
+      "category": "Scenes",
+      "room": 18,
+      "objectId": 370,
+      "verb": 54,
+      "scriptIds": [
+        65
+      ],
+      "rooms": [
+        18,
+        19
+      ],
+      "frames": 229,
+      "source": "Room 18 object 370 Verb 0x36. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 229 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 65 +0x0000 runs script 2\nendCutscene at Script 65 +0x0302 runs script 3\nStored name in the trigger room."
+    },
+    {
       "id": "Room 18 object 370 Verb 0x56",
       "title": "Room 18 · Other draft response at esfera",
       "category": "Dialogue and reactions",
@@ -5410,7 +5427,7 @@
     {
       "title": "script 011",
       "status": "Shared input/draft helper; not a standalone story scene",
-      "source": "script 011; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 54; Incomplete: prerequisites, waits or executor require review: 1; No cutscene reached from this start: 3.\nPossible roots (not proof of reachability): Room 02 object 156 Verb 0x3A, Room 04 object 171 Verb 0x36, Room 04 object 172 Verb 0x36, Room 04 object 173 Verb 0x36, Room 04 object 174 Verb 0x36, Room 06 object 205 Verb 0x36, Room 06 object 206 Verb 0x3E, Room 06 object 206 Verb 0x3F, Room 06 object 207 Verb 0x3E, Room 06 object 207 Verb 0x3F, Room 06 object 210 Verb 0x3E, Room 06 object 210 Verb 0x3F, Room 06 object 211 Verb 0x3E, Room 06 object 211 Verb 0x3F, Room 06 object 214 Verb 0x36, Room 08 object 255 Verb 0x38, Room 08 object 256 Verb 0x3E, Room 08 object 256 Verb 0x3F, Room 08 object 257 Verb 0x3E, Room 08 object 257 Verb 0x3F, Room 08 object 258 Verb 0x3E, Room 08 object 258 Verb 0x3F, Room 09 object 268 Verb 0x37, Room 09 object 270 Verb 0x36, Room 09 object 270 Verb 0x3A, Room 09 object 272 Verb 0x36, Room 09 object 272 Verb 0x52, Room 09 object 273 Verb 0x4F, Room 09 object 273 Verb 0x51, Room 10 object 296 Verb 0x3A, Room 10 object 297 Verb 0x36, Room 10 object 298 Verb 0x36, Room 10 object 299 Verb 0x36, Room 10 object 300 Verb 0x36, Room 13 object 323 Verb 0x38, Room 13 object 325 Verb 0x36, Room 18 object 370 Verb 0x36, Room 20 object 386 Verb 0x36, Room 20 object 387 Verb 0x36, Room 23 entry, Room 24 object 432 Verb 0x36, Room 25 entry, Room 25 object 447 Verb 0x36, Room 28 object 470 Verb 0x3D, Room 28 object 471 Verb 0x3D, Room 28 object 472 Verb 0x3D, Room 31 object 523 Verb 0x36, Room 44 object 653 Verb 0x36, Room 46 object 682 Verb 0x3B, Room 46 object 683 Verb 0x3B, Room 46 object 684 Verb 0x3B, Room 46 object 685 Verb 0x3B, Room 62 object 808 Verb 0x3C, Room 62 object 808 Verb 0x3D, Room 62 object 809 Verb 0x3C, Room 62 object 809 Verb 0x3D, Room 62 object 810 Verb 0x36, Room 62 object 811 Verb 0x36"
+      "source": "script 011; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 55; No cutscene reached from this start: 3.\nPossible roots (not proof of reachability): Room 02 object 156 Verb 0x3A, Room 04 object 171 Verb 0x36, Room 04 object 172 Verb 0x36, Room 04 object 173 Verb 0x36, Room 04 object 174 Verb 0x36, Room 06 object 205 Verb 0x36, Room 06 object 206 Verb 0x3E, Room 06 object 206 Verb 0x3F, Room 06 object 207 Verb 0x3E, Room 06 object 207 Verb 0x3F, Room 06 object 210 Verb 0x3E, Room 06 object 210 Verb 0x3F, Room 06 object 211 Verb 0x3E, Room 06 object 211 Verb 0x3F, Room 06 object 214 Verb 0x36, Room 08 object 255 Verb 0x38, Room 08 object 256 Verb 0x3E, Room 08 object 256 Verb 0x3F, Room 08 object 257 Verb 0x3E, Room 08 object 257 Verb 0x3F, Room 08 object 258 Verb 0x3E, Room 08 object 258 Verb 0x3F, Room 09 object 268 Verb 0x37, Room 09 object 270 Verb 0x36, Room 09 object 270 Verb 0x3A, Room 09 object 272 Verb 0x36, Room 09 object 272 Verb 0x52, Room 09 object 273 Verb 0x4F, Room 09 object 273 Verb 0x51, Room 10 object 296 Verb 0x3A, Room 10 object 297 Verb 0x36, Room 10 object 298 Verb 0x36, Room 10 object 299 Verb 0x36, Room 10 object 300 Verb 0x36, Room 13 object 323 Verb 0x38, Room 13 object 325 Verb 0x36, Room 18 object 370 Verb 0x36, Room 20 object 386 Verb 0x36, Room 20 object 387 Verb 0x36, Room 23 entry, Room 24 object 432 Verb 0x36, Room 25 entry, Room 25 object 447 Verb 0x36, Room 28 object 470 Verb 0x3D, Room 28 object 471 Verb 0x3D, Room 28 object 472 Verb 0x3D, Room 31 object 523 Verb 0x36, Room 44 object 653 Verb 0x36, Room 46 object 682 Verb 0x3B, Room 46 object 683 Verb 0x3B, Room 46 object 684 Verb 0x3B, Room 46 object 685 Verb 0x3B, Room 62 object 808 Verb 0x3C, Room 62 object 808 Verb 0x3D, Room 62 object 809 Verb 0x3C, Room 62 object 809 Verb 0x3D, Room 62 object 810 Verb 0x36, Room 62 object 811 Verb 0x36"
     },
     {
       "title": "script 012",
@@ -5436,11 +5453,6 @@
       "title": "script 053",
       "status": "Start needs validation",
       "source": "script 053; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 13 entry"
-    },
-    {
-      "title": "script 065",
-      "status": "Start needs validation",
-      "source": "script 065; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Incomplete: prerequisites, waits or executor require review: 1.\nPossible roots (not proof of reachability): Room 18 object 370 Verb 0x36"
     },
     {
       "title": "script 066",
@@ -5643,7 +5655,7 @@
       "source": "Room 62 local 204; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 1.\nPossible roots (not proof of reachability): Room 62 object 809 Verb 0x3D"
     }
   ],
-  "summary": "84 scene starts and 250 dialogue/reaction previews, including 2 audited sequences. Literal-root gaps are retained; sequence completion does not resolve failed fresh-entry roots or static edges.",
+  "summary": "85 scene starts and 250 dialogue/reaction previews, including 2 audited sequences. Literal-root gaps are retained; sequence completion does not resolve failed fresh-entry roots or static edges.",
   "membership": [
     {
       "id": "Room 02 object 153 Verb 0x38",
@@ -6657,6 +6669,16 @@
         18
       ],
       "frames": 103,
+      "source": "Validated start room plus rooms observed during completed playback."
+    },
+    {
+      "id": "Room 18 object 370 Verb 0x36",
+      "startRoom": 18,
+      "rooms": [
+        18,
+        19
+      ],
+      "frames": 229,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {

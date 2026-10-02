@@ -1,5 +1,7 @@
 # LOOM EGA script map
 
+Latest sphere review,2 October after0318792:370/36 starts065 +0000, visits19, executes estimated return18 at+02E1 and end+0302. Fresh229-frame literal audit meets completion/settling criteria; added shared preview with assumptions retained. Literal coverage169/235=71.91%,335 starts; no execution change. [Evidence](../.verification/sphere-catalog-20261002/validation.md). Older route outcomes below remain historical.
+
 A working reference for the Spanish DOS LOOM EGA data in `Games/loom`: what the decoded scripts do, which variables they use, and how the session models them. Offsets are into each script's code, as `CodeDump` prints them (`.verification/fallback-evidence/code.tsv`, regenerated with `dotnet Exe/CodeDump/.../CodeDump.dll Games\loom .verification\fallback-evidence`). Each entry says whether a claim is **decoded** (read straight from instructions), **ScummVM** (engine behaviour checked against `engines/scumm`), or **reading** (an interpretation that has not been verified in a run).
 
 Last updated 2 October 2026 (Room41 certainty precision and source completion/domain research). See also [the plan](LOOM_EGA_PLAN.md), the [changelog](CHANGELOG.md), the [boot validation](../.verification/boot/validation.md) and the [cutscene continuation validation](../.verification/cutscene-continuation/validation.md).
