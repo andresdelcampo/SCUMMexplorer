@@ -1,0 +1,59 @@
+{
+  "core": 289,
+  "rootCount": 363,
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "sourceFingerprintsUnchanged": true,
+  "rootResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "blockedRandomSites": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "reports": [
+    {
+      "path": "Exe/Room41CertaintySession-20261002/checks-1/core-tests.txt",
+      "sha256": "a8c47e5fb48eb518629d98e559019db90d5e6dc0a21dc71437961fe2c31bf241"
+    },
+    {
+      "path": "Exe/Room41CertaintySession-20261002/checks-1/release-build.txt",
+      "sha256": "d38062f9b9b6ca24120608a322017dffc80f153baa3f7f573b96d579a04e3114"
+    },
+    {
+      "path": "Exe/Room41CertaintySession-20261002/checks-1/final-release-build.txt",
+      "sha256": "5bef5fe3cce3d2d2c4f92e2ee511f6b0bdabe56e2167df6ea784ba04d1b5abde"
+    },
+    {
+      "path": "Exe/Room41CertaintySession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/Room41CertaintySession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/Room41CertaintySession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/Room41CertaintySession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    }
+  ]
+}

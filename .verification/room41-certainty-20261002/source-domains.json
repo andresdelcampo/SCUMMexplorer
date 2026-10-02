@@ -1,0 +1,577 @@
+{
+  "source": {
+    "path": "Exe/VerificationSession-20261001/native-code-1/code.tsv",
+    "sha256": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569"
+  },
+  "scope": "Room01 local211 boot alternatives for slots0..4; source025/034 OR flags preserve low12 note bits. No whole-game or runtime certainty claim.",
+  "tables": [
+    {
+      "slot": 0,
+      "table": "+0x030E",
+      "random": null,
+      "write": "+0x030E",
+      "packed": [
+        12930
+      ],
+      "notes": [
+        [
+          3,
+          1,
+          3,
+          2
+        ]
+      ],
+      "allCanReverse": true
+    },
+    {
+      "slot": 1,
+      "table": "+0x0318",
+      "random": "+0x0322",
+      "write": "+0x032D",
+      "packed": [
+        5193,
+        5120,
+        4177
+      ],
+      "notes": [
+        [
+          2,
+          2,
+          2,
+          3
+        ],
+        [
+          1,
+          1,
+          1,
+          3
+        ],
+        [
+          2,
+          3,
+          2,
+          1
+        ]
+      ],
+      "allCanReverse": true
+    },
+    {
+      "slot": 2,
+      "table": "+0x02EB",
+      "random": "+0x02F5",
+      "write": "+0x0300",
+      "packed": [
+        4616,
+        4608,
+        4617
+      ],
+      "notes": [
+        [
+          1,
+          2,
+          1,
+          2
+        ],
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          2,
+          2,
+          1,
+          2
+        ]
+      ],
+      "allCanReverse": true
+    },
+    {
+      "slot": 3,
+      "table": "+0x02C8",
+      "random": "+0x02D2",
+      "write": "+0x02DD",
+      "packed": [
+        72,
+        513,
+        0
+      ],
+      "notes": [
+        [
+          1,
+          2,
+          2,
+          1
+        ],
+        [
+          2,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "allCanReverse": false
+    },
+    {
+      "slot": 4,
+      "table": "+0x033B",
+      "random": "+0x0345",
+      "write": "+0x0350",
+      "packed": [
+        4120,
+        5195,
+        4305
+      ],
+      "notes": [
+        [
+          1,
+          4,
+          1,
+          1
+        ],
+        [
+          4,
+          2,
+          2,
+          3
+        ],
+        [
+          2,
+          3,
+          4,
+          1
+        ]
+      ],
+      "allCanReverse": true
+    }
+  ],
+  "comparisons": [
+    {
+      "earlierSlot": 0,
+      "inputAlternative": 0,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 0,
+      "inputAlternative": 0,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 0,
+      "inputAlternative": 1,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 0,
+      "inputAlternative": 1,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 0,
+      "inputAlternative": 2,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 0,
+      "inputAlternative": 2,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 2,
+      "comparisonOffset": "+0x0109"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 0,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 0,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 0,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 0,
+      "candidateAlternative": 1,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 0,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 0,
+      "candidateAlternative": 2,
+      "reverse": true,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x00F4"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 1,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 1,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 1,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 1,
+      "candidateAlternative": 1,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 1,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 1,
+      "candidateAlternative": 2,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 2,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 2,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 2,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 2,
+      "candidateAlternative": 1,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 2,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 2,
+      "comparisonOffset": "+0x00A7"
+    },
+    {
+      "earlierSlot": 1,
+      "inputAlternative": 2,
+      "candidateAlternative": 2,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 0,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 0,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 0,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 0,
+      "candidateAlternative": 1,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 0,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 0,
+      "candidateAlternative": 2,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 1,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 1,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 1,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 1,
+      "candidateAlternative": 1,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 1,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 1,
+      "candidateAlternative": 2,
+      "reverse": true,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x00DF"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 2,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 2,
+      "candidateAlternative": 0,
+      "reverse": true,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x00F4"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 2,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 2,
+      "candidateAlternative": 1,
+      "reverse": true,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x00F4"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 2,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 2,
+      "inputAlternative": 2,
+      "candidateAlternative": 2,
+      "reverse": true,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x00F4"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 0,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 0,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 0,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 1,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 1,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 1,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 2,
+      "candidateAlternative": 0,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 2,
+      "candidateAlternative": 1,
+      "reverse": false,
+      "firstMismatch": 1,
+      "comparisonOffset": "+0x0092"
+    },
+    {
+      "earlierSlot": 3,
+      "inputAlternative": 2,
+      "candidateAlternative": 2,
+      "reverse": false,
+      "firstMismatch": 0,
+      "comparisonOffset": "+0x007D"
+    }
+  ],
+  "mismatchCounts": {
+    "+0x007D": 21,
+    "+0x00DF": 16,
+    "+0x0109": 1,
+    "+0x0092": 8,
+    "+0x00F4": 4,
+    "+0x00A7": 1
+  },
+  "conclusions": [
+    "All three slot4 alternatives differ from every earlier slot0..3 alternative in forward matching and in every source-capable reverse match.",
+    "Disjointness does not make the selected slot4 notes, learned/used bits, input buffer, index or inherited path known in the current executor."
+  ]
+}

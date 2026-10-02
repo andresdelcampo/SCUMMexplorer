@@ -1,0 +1,3868 @@
+{
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/room41-1/direct41-source-level4-skip204.json",
+        "sha256": "935f41a7d83193eefd1d122e33b79c10357e76dace4084786ee5232d7a94fcb8"
+      },
+      "elapsed": 5835,
+      "room": 43,
+      "begun": 15,
+      "ended": 15,
+      "boundaries": [
+        "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+        "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+        "cutscene at Script 46 +0x0000 runs script 2",
+        "endCutscene at Script 46 +0x1421 runs script 3",
+        "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+        "cutscene at Script 47 +0x0000 runs script 2",
+        "endCutscene at Script 47 +0x0D19 runs script 3",
+        "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+        "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+        "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+        "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3",
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3",
+        "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+        "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+        "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+        "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+        "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+        "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+        "cutscene at Script 90 +0x0000 runs script 2",
+        "endCutscene at Script 90 +0x0730 runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 9
+        },
+        {
+          "elapsed": 74,
+          "room": 8
+        },
+        {
+          "elapsed": 258,
+          "room": 9
+        },
+        {
+          "elapsed": 578,
+          "room": 67
+        },
+        {
+          "elapsed": 772,
+          "room": 9
+        },
+        {
+          "elapsed": 1053,
+          "room": 54
+        },
+        {
+          "elapsed": 1341,
+          "room": 9
+        },
+        {
+          "elapsed": 1767,
+          "room": 3
+        },
+        {
+          "elapsed": 1893,
+          "room": 8
+        },
+        {
+          "elapsed": 1941,
+          "room": 9
+        },
+        {
+          "elapsed": 2201,
+          "room": 11
+        },
+        {
+          "elapsed": 2390,
+          "room": 8
+        },
+        {
+          "elapsed": 2469,
+          "room": 9
+        },
+        {
+          "elapsed": 2871,
+          "room": 6
+        },
+        {
+          "elapsed": 3170,
+          "room": 62
+        },
+        {
+          "elapsed": 3473,
+          "room": 10
+        },
+        {
+          "elapsed": 3510,
+          "room": 11
+        },
+        {
+          "elapsed": 3749,
+          "room": 13
+        },
+        {
+          "elapsed": 3989,
+          "room": 41
+        },
+        {
+          "elapsed": 4609,
+          "room": 42
+        },
+        {
+          "elapsed": 4690,
+          "room": 43
+        },
+        {
+          "elapsed": 4922,
+          "room": 60
+        },
+        {
+          "elapsed": 5173,
+          "room": 43
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 4088,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 0,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 3,
+            "var[0x057]": 1,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 43,
+            "X": 91,
+            "Y": 89,
+            "Moving": 0,
+            "Estimate": null
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "room41-raw4-click",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/room41-1/room41-raw4-click.json",
+        "sha256": "9c02ecf8032c36fd2abb3cb907b010b642637c817895b22da8404f49543731d1"
+      },
+      "elapsed": 7659,
+      "room": 41,
+      "begun": 15,
+      "ended": 14,
+      "boundaries": [
+        "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+        "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+        "cutscene at Script 46 +0x0000 runs script 2",
+        "endCutscene at Script 46 +0x1421 runs script 3",
+        "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+        "cutscene at Script 47 +0x0000 runs script 2",
+        "endCutscene at Script 47 +0x0D19 runs script 3",
+        "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+        "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+        "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+        "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3",
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3",
+        "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+        "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+        "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+        "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+        "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+        "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+        "cutscene at Script 90 +0x0000 runs script 2"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 9
+        },
+        {
+          "elapsed": 74,
+          "room": 8
+        },
+        {
+          "elapsed": 258,
+          "room": 9
+        },
+        {
+          "elapsed": 578,
+          "room": 67
+        },
+        {
+          "elapsed": 772,
+          "room": 9
+        },
+        {
+          "elapsed": 1053,
+          "room": 54
+        },
+        {
+          "elapsed": 1341,
+          "room": 9
+        },
+        {
+          "elapsed": 1767,
+          "room": 3
+        },
+        {
+          "elapsed": 1893,
+          "room": 8
+        },
+        {
+          "elapsed": 1941,
+          "room": 9
+        },
+        {
+          "elapsed": 2201,
+          "room": 11
+        },
+        {
+          "elapsed": 2390,
+          "room": 8
+        },
+        {
+          "elapsed": 2469,
+          "room": 9
+        },
+        {
+          "elapsed": 2871,
+          "room": 6
+        },
+        {
+          "elapsed": 3170,
+          "room": 62
+        },
+        {
+          "elapsed": 3473,
+          "room": 10
+        },
+        {
+          "elapsed": 3510,
+          "room": 11
+        },
+        {
+          "elapsed": 3749,
+          "room": 13
+        },
+        {
+          "elapsed": 3989,
+          "room": 41
+        }
+      ],
+      "stages": [
+        {
+          "stage": "draft-2-before",
+          "frame": 0,
+          "eventCount": 2468,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 207,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16190,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 3,
+            "var[0x057]": 1,
+            "var[0x058]": 3,
+            "var[0x059]": 2
+          },
+          "estimatedKeys": [
+            "var[0x03A]",
+            "bit[0xD6C]"
+          ],
+          "ego": {
+            "Room": 6,
+            "X": 120,
+            "Y": 98,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-2-key-note-1",
+          "frame": 0,
+          "eventCount": 2479,
+          "values": {
+            "var[0x062]": 1,
+            "var[0x064]": 2,
+            "var[0x067]": 207,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16190,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 1,
+            "var[0x057]": 1,
+            "var[0x058]": 3,
+            "var[0x059]": 2
+          },
+          "estimatedKeys": [
+            "var[0x03A]",
+            "bit[0xD6C]"
+          ],
+          "ego": {
+            "Room": 6,
+            "X": 120,
+            "Y": 98,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-2-key-note-2",
+          "frame": 0,
+          "eventCount": 2489,
+          "values": {
+            "var[0x062]": 2,
+            "var[0x064]": 2,
+            "var[0x067]": 207,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16190,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 1,
+            "var[0x057]": 1,
+            "var[0x058]": 3,
+            "var[0x059]": 2
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x03A]",
+            "bit[0xD6C]",
+            "var[0x057]"
+          ],
+          "ego": {
+            "Room": 6,
+            "X": 120,
+            "Y": 98,
+            "Moving": 0,
+            "Estimate": "actor 1's actorOps at +0x0254 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-before",
+          "frame": 0,
+          "eventCount": 3702,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 3,
+            "var[0x057]": 1,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 4,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-click-note-1",
+          "frame": 0,
+          "eventCount": 3709,
+          "values": {
+            "var[0x062]": 1,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 1,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-click-note-2",
+          "frame": 0,
+          "eventCount": 3722,
+          "values": {
+            "var[0x062]": 2,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-click-note-3",
+          "frame": 0,
+          "eventCount": 3732,
+          "values": {
+            "var[0x062]": 3,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-click-note-4",
+          "frame": 0,
+          "eventCount": 3736,
+          "values": {
+            "var[0x062]": 4,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 3800,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        }
+      ],
+      "events": [
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 76,
+          "Operation": "startScript",
+          "Operands": "0x14, []",
+          "Certainty": 1,
+          "TargetId": 20,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 60,
+          "Operation": "startScript",
+          "Operands": "0x16, []",
+          "Certainty": 1,
+          "TargetId": 22,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0000]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0002]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0003]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 195,
+          "Operation": "chainScript",
+          "Operands": "0x1A, [0x0004, 0x0000]",
+          "Certainty": 1,
+          "TargetId": 26,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 113,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0055]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 127,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0041]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": [
+            1
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 74,
+          "Operation": "chainScript",
+          "Operands": "0x15, []",
+          "Certainty": 1,
+          "TargetId": 21,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 0,
+          "Operation": "cutscene",
+          "Operands": "[0x0001]",
+          "Certainty": 1,
+          "TargetId": null,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "Certainty": 1,
+          "TargetId": 42,
+          "EstimatedArgumentIndexes": null
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-key",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/room41-1/room41-raw4-key.json",
+        "sha256": "f9609a3c32bbef2221e69d2aaa2d000db3e6a052cfb316c6cb1a48157866e45e"
+      },
+      "elapsed": 7659,
+      "room": 41,
+      "begun": 15,
+      "ended": 14,
+      "boundaries": [
+        "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+        "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+        "cutscene at Script 46 +0x0000 runs script 2",
+        "endCutscene at Script 46 +0x1421 runs script 3",
+        "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+        "cutscene at Script 47 +0x0000 runs script 2",
+        "endCutscene at Script 47 +0x0D19 runs script 3",
+        "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+        "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+        "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+        "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3",
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3",
+        "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+        "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+        "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+        "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+        "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+        "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+        "cutscene at Script 90 +0x0000 runs script 2"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 9
+        },
+        {
+          "elapsed": 74,
+          "room": 8
+        },
+        {
+          "elapsed": 258,
+          "room": 9
+        },
+        {
+          "elapsed": 578,
+          "room": 67
+        },
+        {
+          "elapsed": 772,
+          "room": 9
+        },
+        {
+          "elapsed": 1053,
+          "room": 54
+        },
+        {
+          "elapsed": 1341,
+          "room": 9
+        },
+        {
+          "elapsed": 1767,
+          "room": 3
+        },
+        {
+          "elapsed": 1893,
+          "room": 8
+        },
+        {
+          "elapsed": 1941,
+          "room": 9
+        },
+        {
+          "elapsed": 2201,
+          "room": 11
+        },
+        {
+          "elapsed": 2390,
+          "room": 8
+        },
+        {
+          "elapsed": 2469,
+          "room": 9
+        },
+        {
+          "elapsed": 2871,
+          "room": 6
+        },
+        {
+          "elapsed": 3170,
+          "room": 62
+        },
+        {
+          "elapsed": 3473,
+          "room": 10
+        },
+        {
+          "elapsed": 3510,
+          "room": 11
+        },
+        {
+          "elapsed": 3749,
+          "room": 13
+        },
+        {
+          "elapsed": 3989,
+          "room": 41
+        }
+      ],
+      "stages": [
+        {
+          "stage": "draft-4-before",
+          "frame": 0,
+          "eventCount": 3702,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 3,
+            "var[0x057]": 1,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 4,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-key-note-1",
+          "frame": 0,
+          "eventCount": 3709,
+          "values": {
+            "var[0x062]": 1,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 1,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-key-note-2",
+          "frame": 0,
+          "eventCount": 3722,
+          "values": {
+            "var[0x062]": 2,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-key-note-3",
+          "frame": 0,
+          "eventCount": 3732,
+          "values": {
+            "var[0x062]": 3,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "draft-4-key-note-4",
+          "frame": 0,
+          "eventCount": 3736,
+          "values": {
+            "var[0x062]": 4,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        },
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 3800,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 4,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "bit[0xD70]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        }
+      ],
+      "events": [
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 76,
+          "Operation": "startScript",
+          "Operands": "0x14, []",
+          "Certainty": 1,
+          "TargetId": 20,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 60,
+          "Operation": "startScript",
+          "Operands": "0x16, []",
+          "Certainty": 1,
+          "TargetId": 22,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0000]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0001]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0002]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0003]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 195,
+          "Operation": "chainScript",
+          "Operands": "0x1A, [0x0004, 0x0000]",
+          "Certainty": 1,
+          "TargetId": 26,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 113,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0055]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 127,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0041]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": [
+            1
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 74,
+          "Operation": "chainScript",
+          "Operands": "0x15, []",
+          "Certainty": 1,
+          "TargetId": 21,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 0,
+          "Operation": "cutscene",
+          "Operands": "[0x0001]",
+          "Certainty": 1,
+          "TargetId": null,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "Certainty": 1,
+          "TargetId": 42,
+          "EstimatedArgumentIndexes": null
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-click",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/room41-1/room41-raw6-click.json",
+        "sha256": "2ff221fb25d396e07b357a0e902b84a8dd15f532b9f9f8fee22c7afaf59b0da6"
+      },
+      "elapsed": 4623,
+      "room": 41,
+      "begun": 12,
+      "ended": 11,
+      "boundaries": [
+        "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+        "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3",
+        "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+        "cutscene at Script 54 +0x0000 runs script 2",
+        "endCutscene at Script 54 +0x00C4 runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3",
+        "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+        "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+        "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+        "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3",
+        "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+        "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+        "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+        "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+        "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+        "cutscene at Script 90 +0x0000 runs script 2"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 9
+        },
+        {
+          "elapsed": 74,
+          "room": 10
+        },
+        {
+          "elapsed": 111,
+          "room": 11
+        },
+        {
+          "elapsed": 350,
+          "room": 13
+        },
+        {
+          "elapsed": 590,
+          "room": 15
+        },
+        {
+          "elapsed": 695,
+          "room": 28
+        },
+        {
+          "elapsed": 953,
+          "room": 41
+        }
+      ],
+      "stages": [
+        {
+          "stage": "draft-4-before",
+          "frame": 0,
+          "eventCount": 2089,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 4,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-click-note-1",
+          "frame": 0,
+          "eventCount": 2096,
+          "values": {
+            "var[0x062]": 1,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-click-note-2",
+          "frame": 0,
+          "eventCount": 2109,
+          "values": {
+            "var[0x062]": 2,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-click-note-3",
+          "frame": 0,
+          "eventCount": 2119,
+          "values": {
+            "var[0x062]": 3,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-click-note-4",
+          "frame": 0,
+          "eventCount": 2123,
+          "values": {
+            "var[0x062]": 4,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 2187,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x03A]",
+            "var[0x065]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's actorOps at +0x0017 follows a seeded pick"
+          }
+        }
+      ],
+      "events": [
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 76,
+          "Operation": "startScript",
+          "Operands": "0x14, []",
+          "Certainty": 0,
+          "TargetId": 20,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0004]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0004]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 60,
+          "Operation": "startScript",
+          "Operands": "0x16, []",
+          "Certainty": 0,
+          "TargetId": 22,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0000]",
+          "Certainty": 0,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0002]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0003]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 195,
+          "Operation": "chainScript",
+          "Operands": "0x1A, [0x0004, 0x0000]",
+          "Certainty": 1,
+          "TargetId": 26,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 113,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0055]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 127,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0041]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": [
+            1
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 74,
+          "Operation": "chainScript",
+          "Operands": "0x15, []",
+          "Certainty": 1,
+          "TargetId": 21,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 0,
+          "Operation": "cutscene",
+          "Operands": "[0x0001]",
+          "Certainty": 1,
+          "TargetId": null,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "Certainty": 1,
+          "TargetId": 42,
+          "EstimatedArgumentIndexes": null
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-key",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/room41-1/room41-raw6-key.json",
+        "sha256": "2e9acf9ed184ce84b331115d38936a0fbb4ed426f456d6af555e8339a9d5126d"
+      },
+      "elapsed": 4623,
+      "room": 41,
+      "begun": 12,
+      "ended": 11,
+      "boundaries": [
+        "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+        "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+        "cutscene at Script 52 +0x0000 runs script 2",
+        "endCutscene at Script 52 +0x017C runs script 3",
+        "cutscene at Room 13 Object 325 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 13 Object 325 Verb 0x36 +0x005B runs script 3",
+        "cutscene at Script 54 +0x0000 runs script 2",
+        "endCutscene at Script 54 +0x00C4 runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3",
+        "cutscene at Room 28 local script 218 +0x0000 runs script 2",
+        "endCutscene at Room 28 local script 218 +0x00AF runs script 3",
+        "cutscene at Room 28 local script 200 +0x0010 runs script 2",
+        "endCutscene at Room 28 local script 200 +0x0262 runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3",
+        "cutscene at Room 41 Object 632 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 41 Object 632 Verb 0x36 +0x009B runs script 3",
+        "cutscene at Room 41 local script 213 +0x0000 runs script 2",
+        "endCutscene at Room 41 local script 213 +0x00A9 runs script 3",
+        "cutscene at Room 41 local script 204 +0x0006 runs script 2",
+        "endCutscene at Room 41 local script 204 +0x031E runs script 3",
+        "cutscene at Script 90 +0x0000 runs script 2"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 9
+        },
+        {
+          "elapsed": 74,
+          "room": 10
+        },
+        {
+          "elapsed": 111,
+          "room": 11
+        },
+        {
+          "elapsed": 350,
+          "room": 13
+        },
+        {
+          "elapsed": 590,
+          "room": 15
+        },
+        {
+          "elapsed": 695,
+          "room": 28
+        },
+        {
+          "elapsed": 953,
+          "room": 41
+        }
+      ],
+      "stages": [
+        {
+          "stage": "draft-4-before",
+          "frame": 0,
+          "eventCount": 2089,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 4,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-key-note-1",
+          "frame": 0,
+          "eventCount": 2096,
+          "values": {
+            "var[0x062]": 1,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-key-note-2",
+          "frame": 0,
+          "eventCount": 2109,
+          "values": {
+            "var[0x062]": 2,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-key-note-3",
+          "frame": 0,
+          "eventCount": 2119,
+          "values": {
+            "var[0x062]": 3,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "draft-4-key-note-4",
+          "frame": 0,
+          "eventCount": 2123,
+          "values": {
+            "var[0x062]": 4,
+            "var[0x064]": 2,
+            "var[0x067]": 633,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": null
+          }
+        },
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 2187,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 6,
+            "var[0x03A]": 12312,
+            "var[0x03B]": 16961,
+            "var[0x065]": 16961,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": 0,
+            "var[0x056]": 1,
+            "var[0x057]": 4,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x03A]",
+            "var[0x065]"
+          ],
+          "ego": {
+            "Room": 41,
+            "X": 177,
+            "Y": 47,
+            "Moving": 0,
+            "Estimate": "actor 1's actorOps at +0x0017 follows a seeded pick"
+          }
+        }
+      ],
+      "events": [
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 76,
+          "Operation": "startScript",
+          "Operands": "0x14, []",
+          "Certainty": 0,
+          "TargetId": 20,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0004]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0004]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 10",
+          "Offset": 79,
+          "Operation": "chainScript",
+          "Operands": "0x1B, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 27,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 33,
+          "Operation": "startScript",
+          "Operands": "0x1F, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 31,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 60,
+          "Operation": "startScript",
+          "Operands": "0x16, []",
+          "Certainty": 0,
+          "TargetId": 22,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0000]",
+          "Certainty": 0,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0001]",
+          "Certainty": 0,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0002]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0003]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 105,
+          "Operation": "startScript",
+          "Operands": "0x17, [0x0004]",
+          "Certainty": 1,
+          "TargetId": 23,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 22",
+          "Offset": 195,
+          "Operation": "chainScript",
+          "Operands": "0x1A, [0x0004, 0x0000]",
+          "Certainty": 1,
+          "TargetId": 26,
+          "EstimatedArgumentIndexes": [
+            0
+          ]
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 113,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0055]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 26",
+          "Offset": 127,
+          "Operation": "startScript",
+          "Operands": "0x07, [var[0x067], 0x0041]",
+          "Certainty": 1,
+          "TargetId": 7,
+          "EstimatedArgumentIndexes": [
+            1
+          ]
+        },
+        {
+          "SourceLabel": "Script 20",
+          "Offset": 74,
+          "Operation": "chainScript",
+          "Operands": "0x15, []",
+          "Certainty": 1,
+          "TargetId": 21,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 0,
+          "Operation": "cutscene",
+          "Operands": "[0x0001]",
+          "Certainty": 1,
+          "TargetId": null,
+          "EstimatedArgumentIndexes": null
+        },
+        {
+          "SourceLabel": "Script 90",
+          "Offset": 5,
+          "Operation": "loadRoom",
+          "Operands": "0x2A",
+          "Certainty": 1,
+          "TargetId": 42,
+          "EstimatedArgumentIndexes": null
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/egg-first-1/native-level4-egg-dye-wheel.json",
+        "sha256": "052b4021c5728493fe398fc6fe0b86065bfa3848c458b45de88acb12012e61e0"
+      },
+      "elapsed": 3472,
+      "room": 62,
+      "begun": 9,
+      "ended": 9,
+      "boundaries": [
+        "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+        "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+        "cutscene at Script 46 +0x0000 runs script 2",
+        "endCutscene at Script 46 +0x1421 runs script 3",
+        "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+        "cutscene at Script 47 +0x0000 runs script 2",
+        "endCutscene at Script 47 +0x0D19 runs script 3",
+        "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+        "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+        "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+        "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 9
+        },
+        {
+          "elapsed": 74,
+          "room": 8
+        },
+        {
+          "elapsed": 258,
+          "room": 9
+        },
+        {
+          "elapsed": 578,
+          "room": 67
+        },
+        {
+          "elapsed": 772,
+          "room": 9
+        },
+        {
+          "elapsed": 1053,
+          "room": 54
+        },
+        {
+          "elapsed": 1341,
+          "room": 9
+        },
+        {
+          "elapsed": 1767,
+          "room": 3
+        },
+        {
+          "elapsed": 1893,
+          "room": 8
+        },
+        {
+          "elapsed": 1941,
+          "room": 9
+        },
+        {
+          "elapsed": 2201,
+          "room": 11
+        },
+        {
+          "elapsed": 2390,
+          "room": 8
+        },
+        {
+          "elapsed": 2469,
+          "room": 9
+        },
+        {
+          "elapsed": 2871,
+          "room": 6
+        },
+        {
+          "elapsed": 3170,
+          "room": 62
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 2803,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 808,
+            "var[0x07A]": 4,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 3,
+            "var[0x057]": 1,
+            "var[0x058]": 1,
+            "var[0x059]": 1
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 62,
+            "X": 144,
+            "Y": 105,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/dye-last-1/native-level4-egg-wheel-dye.json",
+        "sha256": "25439b1daab7ee73441fa3a16b6d249572011b347827f272ad690ae11127641e"
+      },
+      "elapsed": 3447,
+      "room": 6,
+      "begun": 9,
+      "ended": 9,
+      "boundaries": [
+        "cutscene at Room 09 Object 271 Verb 0x38 +0x0005 runs script 2",
+        "endCutscene at Room 09 Object 271 Verb 0x38 +0x006F runs script 3",
+        "cutscene at Script 46 +0x0000 runs script 2",
+        "endCutscene at Script 46 +0x1421 runs script 3",
+        "cutscene at Room 09 Object 270 Verb 0x36 +0x0000 runs script 2",
+        "endCutscene at Room 09 Object 270 Verb 0x36 +0x0015 runs script 3",
+        "cutscene at Script 47 +0x0000 runs script 2",
+        "endCutscene at Script 47 +0x0D19 runs script 3",
+        "cutscene at Room 62 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 200 +0x006D runs script 3",
+        "cutscene at Room 62 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 62 local script 201 +0x007B runs script 3",
+        "cutscene at Room 06 local script 201 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 201 +0x004E runs script 3",
+        "cutscene at Room 06 local script 200 +0x0000 runs script 2",
+        "endCutscene at Room 06 local script 200 +0x00CE runs script 3",
+        "cutscene at Script 29 +0x0000 runs script 2",
+        "endCutscene at Script 29 +0x00E2 runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 9
+        },
+        {
+          "elapsed": 74,
+          "room": 8
+        },
+        {
+          "elapsed": 258,
+          "room": 9
+        },
+        {
+          "elapsed": 578,
+          "room": 67
+        },
+        {
+          "elapsed": 772,
+          "room": 9
+        },
+        {
+          "elapsed": 1053,
+          "room": 54
+        },
+        {
+          "elapsed": 1341,
+          "room": 9
+        },
+        {
+          "elapsed": 1767,
+          "room": 3
+        },
+        {
+          "elapsed": 1893,
+          "room": 8
+        },
+        {
+          "elapsed": 1941,
+          "room": 9
+        },
+        {
+          "elapsed": 2201,
+          "room": 11
+        },
+        {
+          "elapsed": 2390,
+          "room": 8
+        },
+        {
+          "elapsed": 2469,
+          "room": 9
+        },
+        {
+          "elapsed": 2871,
+          "room": 62
+        },
+        {
+          "elapsed": 3134,
+          "room": 6
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 2803,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 207,
+            "var[0x07A]": 4,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 84,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 1,
+            "var[0x057]": 1,
+            "var[0x058]": 1,
+            "var[0x059]": 2
+          },
+          "estimatedKeys": [
+            "var[0x062]",
+            "var[0x064]",
+            "var[0x067]",
+            "var[0x07A]",
+            "var[0x03A]",
+            "var[0x065]",
+            "bit[0xD6C]",
+            "var[0x056]",
+            "var[0x057]",
+            "var[0x058]",
+            "var[0x059]"
+          ],
+          "ego": {
+            "Room": 6,
+            "X": 120,
+            "Y": 98,
+            "Moving": 0,
+            "Estimate": "actor 1's walkActorToObject at +0x00E9 follows a seeded pick"
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "late096-reached44",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/preserved-1/late096-reached44.json",
+        "sha256": "d7d36cd4a3ebd304a55a1e5fb34a0ed783aa4d606881fa7964cc04dd2d282638"
+      },
+      "elapsed": 4017,
+      "room": 43,
+      "begun": 4,
+      "ended": 3,
+      "boundaries": [
+        "cutscene at Script 95 +0x0000 runs script 2",
+        "endCutscene at Script 95 +0x079D runs script 3",
+        "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+        "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+        "cutscene at Script 92 +0x0000 runs script 2",
+        "endCutscene at Script 92 +0x0039 runs script 3",
+        "cutscene at Script 96 +0x0000 runs script 2"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 44
+        },
+        {
+          "elapsed": 228,
+          "room": 42
+        },
+        {
+          "elapsed": 234,
+          "room": 45
+        },
+        {
+          "elapsed": 969,
+          "room": 43
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 1312,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 0,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 21330,
+            "bit[0xD6C]": 0,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]",
+            "bit[0xD6C]"
+          ],
+          "ego": {
+            "Room": 43,
+            "X": 170,
+            "Y": 108,
+            "Moving": 0,
+            "Estimate": "actor 1's actorOps at +0x0005 follows a seeded pick"
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "late096-source-skip095",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/preserved-1/late096-source-skip095.json",
+        "sha256": "ed866e52d2b01a072cef7aa7b63089bdcbb68502d67a0951dcf55d71a67fe5f2"
+      },
+      "elapsed": 357,
+      "room": 46,
+      "begun": 4,
+      "ended": 4,
+      "boundaries": [
+        "cutscene at Script 95 +0x0000 runs script 2",
+        "endCutscene at Script 95 +0x079D runs script 3",
+        "cutscene at Room 45 Object 656 Verb 0x36 +0x0005 runs script 2",
+        "endCutscene at Room 45 Object 656 Verb 0x36 +0x0074 runs script 3",
+        "cutscene at Script 92 +0x0000 runs script 2",
+        "endCutscene at Script 92 +0x0039 runs script 3",
+        "cutscene at Script 96 +0x0000 runs script 2",
+        "endCutscene at Script 96 +0x00E7 runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 44
+        },
+        {
+          "elapsed": 45,
+          "room": 45
+        },
+        {
+          "elapsed": 163,
+          "room": 43
+        },
+        {
+          "elapsed": 241,
+          "room": 45
+        },
+        {
+          "elapsed": 304,
+          "room": 46
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 1213,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 2,
+            "var[0x067]": 0,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 0,
+            "bit[0xD6C]": null,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 46,
+            "X": 832,
+            "Y": 108,
+            "Moving": 0,
+            "Estimate": null
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "sleep-source369-response390",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/preserved-1/sleep-source369-response390.json",
+        "sha256": "16f7b32d7b7d3ed7606738fb296accb4c0eec47bb432f5b11c54a1d83ffddf32"
+      },
+      "elapsed": 1575,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "boundaries": [
+        "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+        "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+        "cutscene at Script 62 +0x0000 runs script 2",
+        "endCutscene at Script 62 +0x0018 runs script 3",
+        "cutscene at Script 63 +0x0000 runs script 2",
+        "endCutscene at Script 63 +0x001C runs script 3",
+        "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+        "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+        "cutscene at Room 20 local script 207 +0x000B runs script 2",
+        "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+        "cutscene at Script 58 +0x0000 runs script 2",
+        "endCutscene at Script 58 +0x0018 runs script 3",
+        "cutscene at Script 59 +0x0010 runs script 2",
+        "endCutscene at Script 59 +0x003F runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 16
+        },
+        {
+          "elapsed": 118,
+          "room": 18
+        },
+        {
+          "elapsed": 154,
+          "room": 20
+        },
+        {
+          "elapsed": 1436,
+          "room": 18
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 1177,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 0,
+            "bit[0xD6C]": null,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "Estimate": null
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "sleep-source369-response391",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/preserved-1/sleep-source369-response391.json",
+        "sha256": "1cbc712f8705de2e7291b9fdf5cf87e1ea39548e0bdef263c8f8911d7646c77a"
+      },
+      "elapsed": 1575,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "boundaries": [
+        "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+        "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+        "cutscene at Script 62 +0x0000 runs script 2",
+        "endCutscene at Script 62 +0x0018 runs script 3",
+        "cutscene at Script 63 +0x0000 runs script 2",
+        "endCutscene at Script 63 +0x001C runs script 3",
+        "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+        "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+        "cutscene at Room 20 local script 207 +0x000B runs script 2",
+        "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+        "cutscene at Script 58 +0x0000 runs script 2",
+        "endCutscene at Script 58 +0x0018 runs script 3",
+        "cutscene at Script 59 +0x0010 runs script 2",
+        "endCutscene at Script 59 +0x003F runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 16
+        },
+        {
+          "elapsed": 118,
+          "room": 18
+        },
+        {
+          "elapsed": 154,
+          "room": 20
+        },
+        {
+          "elapsed": 1436,
+          "room": 18
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 1177,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 0,
+            "bit[0xD6C]": null,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "Estimate": null
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "sleep-source371-response390",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/preserved-1/sleep-source371-response390.json",
+        "sha256": "5b0c4bdc71364405b1a3ccd86a374ea0a78f38ed30f6336524849ed59d6e4b9e"
+      },
+      "elapsed": 1612,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "boundaries": [
+        "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+        "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+        "cutscene at Script 56 +0x0000 runs script 2",
+        "endCutscene at Script 56 +0x0025 runs script 3",
+        "cutscene at Script 57 +0x0000 runs script 2",
+        "endCutscene at Script 57 +0x0029 runs script 3",
+        "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+        "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+        "cutscene at Room 20 local script 207 +0x000B runs script 2",
+        "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+        "cutscene at Script 58 +0x0000 runs script 2",
+        "endCutscene at Script 58 +0x0018 runs script 3",
+        "cutscene at Script 59 +0x0010 runs script 2",
+        "endCutscene at Script 59 +0x003F runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 16
+        },
+        {
+          "elapsed": 118,
+          "room": 18
+        },
+        {
+          "elapsed": 201,
+          "room": 20
+        },
+        {
+          "elapsed": 1473,
+          "room": 18
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 1181,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 0,
+            "bit[0xD6C]": null,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "Estimate": null
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "id": "sleep-source371-response391",
+      "packet": {
+        "path": "Exe/Room41CertaintySession-20261002/preserved-1/sleep-source371-response391.json",
+        "sha256": "5fee43a51fc820ca6962f281f41d6446c1646011d660ed1a9ebc9f39ac455836"
+      },
+      "elapsed": 1612,
+      "room": 18,
+      "begun": 7,
+      "ended": 7,
+      "boundaries": [
+        "cutscene at Room 16 local script 204 +0x0072 runs script 2",
+        "endCutscene at Room 16 local script 204 +0x0128 runs script 3",
+        "cutscene at Script 56 +0x0000 runs script 2",
+        "endCutscene at Script 56 +0x0025 runs script 3",
+        "cutscene at Script 57 +0x0000 runs script 2",
+        "endCutscene at Script 57 +0x0029 runs script 3",
+        "cutscene at Room 20 local script 206 +0x0000 runs script 2",
+        "endCutscene at Room 20 local script 206 +0x00A9 runs script 3",
+        "cutscene at Room 20 local script 207 +0x000B runs script 2",
+        "endCutscene at Room 20 local script 207 +0x0548 runs script 3",
+        "cutscene at Script 58 +0x0000 runs script 2",
+        "endCutscene at Script 58 +0x0018 runs script 3",
+        "cutscene at Script 59 +0x0010 runs script 2",
+        "endCutscene at Script 59 +0x003F runs script 3"
+      ],
+      "roomChanges": [
+        {
+          "elapsed": 1,
+          "room": 16
+        },
+        {
+          "elapsed": 118,
+          "room": 18
+        },
+        {
+          "elapsed": 201,
+          "room": 20
+        },
+        {
+          "elapsed": 1473,
+          "room": 18
+        }
+      ],
+      "stages": [
+        {
+          "stage": "final",
+          "frame": 0,
+          "eventCount": 1181,
+          "values": {
+            "var[0x062]": 0,
+            "var[0x064]": 0,
+            "var[0x067]": 0,
+            "var[0x07A]": 3,
+            "var[0x03A]": 4120,
+            "var[0x03B]": 16961,
+            "var[0x065]": 0,
+            "bit[0xD6C]": null,
+            "bit[0xD6F]": 0,
+            "bit[0xD70]": null,
+            "var[0x056]": 0,
+            "var[0x057]": 0,
+            "var[0x058]": 0,
+            "var[0x059]": 0
+          },
+          "estimatedKeys": [
+            "var[0x03A]"
+          ],
+          "ego": {
+            "Room": 18,
+            "X": 184,
+            "Y": 103,
+            "Moving": 0,
+            "Estimate": null
+          }
+        }
+      ],
+      "events": []
+    }
+  ],
+  "pairedInputModesHaveIdenticalDownstreamEventsStateTimingAndRooms": true,
+  "isolatedTracePacket": {
+    "path": "Exe/Room41CertaintySession-20261002/certainty-1/traces.json",
+    "sha256": "46db8569d76e93d61b37c5855b90e98a8aceea40e8be39f98914d8e74c507cbe"
+  },
+  "isolatedTraces": [
+    {
+      "packet": "Exe/Room41CertaintySession-20261002/room41-1\\room41-raw4-click.json",
+      "gate": {
+        "Trace": [
+          "branch at +0x0000 reads a seeded pick; later steps are estimates"
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": "instruction limit (1) reached at +0x0007",
+        "scope": "Only script010's first condition; expected instruction-limit stop at0007, no actor or note-buffer mutation."
+      },
+      "scan": {
+        "Trace": [
+          "branch at +0x0000 reads a seeded pick; later steps are estimates",
+          "chainScript at +0x00C3 ends this script"
+        ],
+        "Events": [
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0000]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0001]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0002]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0003]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0004]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 195,
+            "Kind": 1,
+            "Operation": "chainScript",
+            "Operands": "0x1A, [0x0004, 0x0000]",
+            "TargetKind": 6,
+            "TargetId": 26,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          }
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": null,
+        "children": [
+          {
+            "slot": 0,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 15162,
+            "responseEstimated": true
+          },
+          {
+            "slot": 1,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 15676,
+            "responseEstimated": true
+          },
+          {
+            "slot": 2,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16190,
+            "responseEstimated": true
+          },
+          {
+            "slot": 3,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 64,
+            "responseEstimated": true
+          },
+          {
+            "slot": 4,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16961,
+            "responseEstimated": true
+          }
+        ],
+        "scope": "Observed four-note globals; native022 and synchronous023, stop at chain026; no scene dispatch."
+      },
+      "dye": {
+        "Trace": [
+          "branch at +0x000A reads a seeded pick; later steps are estimates",
+          "startScript at +0x0020 ends this script"
+        ],
+        "Events": [
+          {
+            "SourceScriptId": 31,
+            "SourceLabel": "Script 31",
+            "Offset": 32,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x28, [0x0001]",
+            "TargetKind": 6,
+            "TargetId": 40,
+            "Certainty": 1,
+            "FreezeResistant": true,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": null,
+            "Executed": true
+          }
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": null,
+        "scope": "Observed first dye-note globals; stop at the first source event, without sound/actor effects."
+      }
+    },
+    {
+      "packet": "Exe/Room41CertaintySession-20261002/room41-1\\room41-raw4-key.json",
+      "gate": {
+        "Trace": [
+          "branch at +0x0000 reads a seeded pick; later steps are estimates"
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": "instruction limit (1) reached at +0x0007",
+        "scope": "Only script010's first condition; expected instruction-limit stop at0007, no actor or note-buffer mutation."
+      },
+      "scan": {
+        "Trace": [
+          "branch at +0x0000 reads a seeded pick; later steps are estimates",
+          "chainScript at +0x00C3 ends this script"
+        ],
+        "Events": [
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0000]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0001]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0002]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0003]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0004]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 195,
+            "Kind": 1,
+            "Operation": "chainScript",
+            "Operands": "0x1A, [0x0004, 0x0000]",
+            "TargetKind": 6,
+            "TargetId": 26,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          }
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": null,
+        "children": [
+          {
+            "slot": 0,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 15162,
+            "responseEstimated": true
+          },
+          {
+            "slot": 1,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 15676,
+            "responseEstimated": true
+          },
+          {
+            "slot": 2,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16190,
+            "responseEstimated": true
+          },
+          {
+            "slot": 3,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 64,
+            "responseEstimated": true
+          },
+          {
+            "slot": 4,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16961,
+            "responseEstimated": true
+          }
+        ],
+        "scope": "Observed four-note globals; native022 and synchronous023, stop at chain026; no scene dispatch."
+      },
+      "dye": {
+        "Trace": [
+          "branch at +0x000A reads a seeded pick; later steps are estimates",
+          "startScript at +0x0020 ends this script"
+        ],
+        "Events": [
+          {
+            "SourceScriptId": 31,
+            "SourceLabel": "Script 31",
+            "Offset": 32,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x28, [0x0001]",
+            "TargetKind": 6,
+            "TargetId": 40,
+            "Certainty": 1,
+            "FreezeResistant": true,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": null,
+            "Executed": true
+          }
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": null,
+        "scope": "Observed first dye-note globals; stop at the first source event, without sound/actor effects."
+      }
+    },
+    {
+      "packet": "Exe/Room41CertaintySession-20261002/room41-1\\room41-raw6-click.json",
+      "gate": {
+        "Trace": [],
+        "PathEstimated": false,
+        "UnresolvedReason": "instruction limit (1) reached at +0x0007",
+        "scope": "Only script010's first condition; expected instruction-limit stop at0007, no actor or note-buffer mutation."
+      },
+      "scan": {
+        "Trace": [
+          "branch at +0x007D reads a seeded pick; later steps are estimates",
+          "chainScript at +0x00C3 ends this script"
+        ],
+        "Events": [
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0000]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 0,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": null,
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0001]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 0,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": null,
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0002]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0003]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0004]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 195,
+            "Kind": 1,
+            "Operation": "chainScript",
+            "Operands": "0x1A, [0x0004, 0x0000]",
+            "TargetKind": 6,
+            "TargetId": 26,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          }
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": null,
+        "children": [
+          {
+            "slot": 0,
+            "Certainty": 0,
+            "EstimatedArgumentIndexes": null,
+            "response": 15162,
+            "responseEstimated": false
+          },
+          {
+            "slot": 1,
+            "Certainty": 0,
+            "EstimatedArgumentIndexes": null,
+            "response": 15676,
+            "responseEstimated": false
+          },
+          {
+            "slot": 2,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16190,
+            "responseEstimated": true
+          },
+          {
+            "slot": 3,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 64,
+            "responseEstimated": true
+          },
+          {
+            "slot": 4,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16961,
+            "responseEstimated": true
+          }
+        ],
+        "scope": "Observed four-note globals; native022 and synchronous023, stop at chain026; no scene dispatch."
+      },
+      "dye": null
+    },
+    {
+      "packet": "Exe/Room41CertaintySession-20261002/room41-1\\room41-raw6-key.json",
+      "gate": {
+        "Trace": [],
+        "PathEstimated": false,
+        "UnresolvedReason": "instruction limit (1) reached at +0x0007",
+        "scope": "Only script010's first condition; expected instruction-limit stop at0007, no actor or note-buffer mutation."
+      },
+      "scan": {
+        "Trace": [
+          "branch at +0x007D reads a seeded pick; later steps are estimates",
+          "chainScript at +0x00C3 ends this script"
+        ],
+        "Events": [
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0000]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 0,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": null,
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0001]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 0,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": null,
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0002]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0003]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 105,
+            "Kind": 0,
+            "Operation": "startScript",
+            "Operands": "0x17, [0x0004]",
+            "TargetKind": 6,
+            "TargetId": 23,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          },
+          {
+            "SourceScriptId": 22,
+            "SourceLabel": "Script 22",
+            "Offset": 195,
+            "Kind": 1,
+            "Operation": "chainScript",
+            "Operands": "0x1A, [0x0004, 0x0000]",
+            "TargetKind": 6,
+            "TargetId": 26,
+            "Certainty": 1,
+            "FreezeResistant": false,
+            "ResolvedArguments": null,
+            "Recursive": false,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "Executed": true
+          }
+        ],
+        "PathEstimated": true,
+        "UnresolvedReason": null,
+        "children": [
+          {
+            "slot": 0,
+            "Certainty": 0,
+            "EstimatedArgumentIndexes": null,
+            "response": 15162,
+            "responseEstimated": false
+          },
+          {
+            "slot": 1,
+            "Certainty": 0,
+            "EstimatedArgumentIndexes": null,
+            "response": 15676,
+            "responseEstimated": false
+          },
+          {
+            "slot": 2,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16190,
+            "responseEstimated": true
+          },
+          {
+            "slot": 3,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 64,
+            "responseEstimated": true
+          },
+          {
+            "slot": 4,
+            "Certainty": 1,
+            "EstimatedArgumentIndexes": [
+              0
+            ],
+            "response": 16961,
+            "responseEstimated": true
+          }
+        ],
+        "scope": "Observed four-note globals; native022 and synchronous023, stop at chain026; no scene dispatch."
+      },
+      "dye": null
+    }
+  ],
+  "sourceDomainPacket": {
+    "path": "D:/Documents/Personal/Code Projects/SCUMMexplorer/.verification/room41-certainty-20261002/source-domains.json",
+    "sha256": "ccb91156982909ecd6919f9333b9dbbd4eacca347d0205b37a3600181afa3401"
+  }
+}

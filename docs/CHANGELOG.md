@@ -2,6 +2,14 @@
 
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
+## 2 October: Room41 certainty layers and source-domain proof
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Native input certainty audit | Mouse/key pairs agree downstream; raw4 enters022 Conditional, older raw6 first taints at007D; inherited input/practice/actor dependencies localized without runtime writes | [evidence](../.verification/room41-certainty-20261002/validation.md) |
+| Source boot alternatives | 51 slot4/earlier-candidate comparisons exclude collisions; estimates and native090 gap retained, no engine/catalog changes | [derived source domains](../.verification/room41-certainty-20261002/source-domains.json) |
+| Preserved source recipes and checks | Both level4 orders,096 and four20 combinations unchanged; Core289,363 exact roots/fingerprints/memberships/sequences unchanged; Blockers0; Release clean | [checks](../.verification/room41-certainty-20261002/check-summary.json) |
+
 ## 2 October: native level4 prerequisites and Room41 certainty continuation
 
 | Change | Result | Record |
