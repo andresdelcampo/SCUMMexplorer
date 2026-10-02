@@ -1,0 +1,135 @@
+{
+  "core": 501,
+  "focused": 175,
+  "newActualCallCases": 13,
+  "newRemainingAccessCases": 12,
+  "newNativeMutationCases": 16,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "fullRecipePacketsUnchanged": 13,
+  "latestLegacyChronologiesAndCompletionRecordsExact": true,
+  "independentOwnInvocationTerminals": 76,
+  "actualRecipeWriterResumedTerminalChains": 0,
+  "numericSourceReportUnchanged": true,
+  "numericWorlds": 162,
+  "flagCases": 52,
+  "comparisons": 51,
+  "overlaps": 14,
+  "fabricatedMatches": 4,
+  "practiceArgumentCases": 12,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "sourceChallengeExpressions": 3,
+  "sourceChallengeSteps": 17,
+  "sourceChallengeEveryFrameTransparent": true,
+  "observedInitializationAndDispatchBoundaries": true,
+  "argumentEqualitySuppliesNoLocalOrigins": true,
+  "generalCalleeReturnAndEffectsRemainUnresolved": true,
+  "rawNativeSameValueMutationsStillRequireNotification": true,
+  "replayCoverage": {
+    "validatedLiteralSites": 168,
+    "totalLiteralSites": 235,
+    "coveredPercent": 71.49,
+    "scope": "validated literal cutscene sites only; unchanged, not an overall project-completion percentage"
+  },
+  "callBoundaries": 304620,
+  "dispatches": 884,
+  "reports": [
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/checks-final/core-tests.txt",
+      "sha256": "aaa26d01745ee25898dc565fa46b9848713e7734eafe1554ce12633dff165a5c"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/checks-final/release-build.txt",
+      "sha256": "f9a94e7537c7e8de23f00cad20de89861f4fd147a82ab3f72208ab4eec809718"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/focused-final/tests.txt",
+      "sha256": "7acf4326ca06039c002f6af37ad4d8bd478050320023531f97ad778d4abd8d55"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/final-release-build.txt",
+      "sha256": "7a39697572bca27d1a285b8cb6c5bab4012f5f34410603a49ae974473503daa9"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/app-state.txt",
+      "sha256": "b38816ef20f01225a399b68fa8554b75dc646c0c4e4b2bd4d7340914a74b0372"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/observer-build.txt",
+      "sha256": "6d3dc9b821456f341f0aa421a7396bbcb5130bbaab545483c625ed114aed1c6d"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/expanded-build.txt",
+      "sha256": "f4319f2c3e838f60198c3538718fb79be140112b983b7a6b18328ccb4a99cb88"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/room-audit-2/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/room-audit-2/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/png-comparison-2.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/numeric-fresh.json",
+      "sha256": "975698a5dddda7ac7e3ba00f019dc5a8cddf3ab2f34aaf6cb6b9bad626cb3fab"
+    },
+    {
+      "path": "Exe/RuntimeCallsFinalSession-20261002/passive-final/passive-expressions.json",
+      "sha256": "221792c63fd738ebeb780bf64b94faaff0d5203323b9a64e71a8cc0d1a960836"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/observer-1/source-manifest.json",
+    "sha256": "d72bb293406b7889dacca53fb5f52bb37a4b22c317d1f1883e8763c495d5b8f1"
+  }
+}

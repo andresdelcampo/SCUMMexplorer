@@ -1,5 +1,15 @@
 # Changelog
 
+## 2 October: actual callee/caller boundaries and notified native mutations
+
+| Change | Result | Record |
+| --- | --- | --- |
+| `5fcc2a0` | Actual supplied/default/restored locals,dispatch,child end/yield,host return and caller continuation;no equality-derived numeric origins | [calls](../.verification/runtime-calls-20261002/call-validation.md) |
+| `995e97e` | Copied loadRoomWithEgo/implicit ego/string/owner/wait dependencies;native/effect barriers and estimates intact | [access](../.verification/runtime-calls-20261002/access-validation.md) |
+| `b3ee09e` | Executed object/actor native mutation notifications,including identical/attempted no-op writes;palette lifetime separate | [native](../.verification/runtime-calls-20261002/native-validation.md) |
+| Final preservation | Core501/focused175;13 exact packets/legacy chronologies/completion records;76 original terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/native challenge exact;clean final main Release;App0/no launch/no push/promotion;71.49% literal-site coverage unchanged | [validation](../.verification/runtime-calls-20261002/validation.md) |
+
+
 ## 2 October: implicit chronology, native lifetimes and observed resumption chains
 
 | Change | Result | Record |

@@ -1,0 +1,1333 @@
+{
+  "scope": "Actual selected assignment/dispatch/end/yield/restored-local/caller-continuation records only. No equality-derived origins, domain/effect transport, completion promotion or scheduler/callee/cancellation proof.",
+  "recipeCount": 13,
+  "latestPacketsAndLegacyStreamsExact": true,
+  "independentOwnInvocationTerminals": 76,
+  "actualRecipeWriterResumedTerminalChains": 0,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 40734,
+      "stages": {
+        "barrier": 38762,
+        "initialized": 123,
+        "end": 758,
+        "dispatch": 152,
+        "dispatch-ended": 152,
+        "caller-ended": 52,
+        "caller-continued": 100,
+        "resumed-locals": 635
+      },
+      "dispatches": 152,
+      "nativeMutationNotifications": 191670,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-calls.jsonl",
+          "sha256": "cc1cba43adbf366f97b2ee8663146048fef4bcb5920b242eb00bf6e351079ce7"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-native.jsonl",
+          "sha256": "a67950a3677dbe9cb9dfedf7536184eb5ed0f175da3b60740508fcf00d4df6b5"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-click",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 42153,
+      "stages": {
+        "barrier": 39912,
+        "initialized": 138,
+        "end": 861,
+        "dispatch": 173,
+        "dispatch-ended": 173,
+        "caller-ended": 58,
+        "caller-continued": 115,
+        "resumed-locals": 723
+      },
+      "dispatches": 173,
+      "nativeMutationNotifications": 215440,
+      "selected": {
+        "practiceCaller": {
+          "Sequence": 23837,
+          "Stage": "dispatch",
+          "Call": {
+            "Id": 65,
+            "InstructionSequence": 3618,
+            "Slot": 373,
+            "ParentSlot": 372,
+            "Invocation": 11819,
+            "Site": {
+              "Script": 201,
+              "Context": "Room 06 local script 201",
+              "Container": 6,
+              "ResourceOffset": 23281,
+              "Stage": "instruction",
+              "Offset": 40,
+              "Operation": "startScript",
+              "Operands": "0x1E, [local[0x001]]"
+            },
+            "Operands": [
+              {
+                "Role": "target",
+                "Operand": "0x1E",
+                "Key": null,
+                "Value": 30,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x001]",
+                "Key": "local[0x001]",
+                "Value": 1,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              }
+            ],
+            "PathEstimated": false
+          },
+          "Slot": 373,
+          "ParentSlot": 372,
+          "Invocation": 11819,
+          "Site": {
+            "Script": 201,
+            "Context": "Room 06 local script 201",
+            "Container": 6,
+            "ResourceOffset": 23281,
+            "Stage": "instruction",
+            "Offset": 40,
+            "Operation": "startScript",
+            "Operands": "0x1E, [local[0x001]]"
+          },
+          "Locals": [],
+          "PathEstimated": false,
+          "InstructionSequence": 3618,
+          "ResumeOffset": null,
+          "ReachedStop": null,
+          "Barrier": null
+        },
+        "actualInitialized030": {
+          "Sequence": 23838,
+          "Stage": "initialized",
+          "Call": {
+            "Id": 65,
+            "InstructionSequence": 3618,
+            "Slot": 373,
+            "ParentSlot": 372,
+            "Invocation": 11819,
+            "Site": {
+              "Script": 201,
+              "Context": "Room 06 local script 201",
+              "Container": 6,
+              "ResourceOffset": 23281,
+              "Stage": "instruction",
+              "Offset": 40,
+              "Operation": "startScript",
+              "Operands": "0x1E, [local[0x001]]"
+            },
+            "Operands": [
+              {
+                "Role": "target",
+                "Operand": "0x1E",
+                "Key": null,
+                "Value": 30,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x001]",
+                "Key": "local[0x001]",
+                "Value": 1,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              }
+            ],
+            "PathEstimated": false
+          },
+          "Slot": 378,
+          "ParentSlot": 373,
+          "Invocation": 11824,
+          "Site": {
+            "Script": 30,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 25710,
+            "Stage": "begin",
+            "Offset": 0,
+            "Operation": null,
+            "Operands": null
+          },
+          "Locals": [
+            {
+              "Role": "supplied-local",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 1,
+              "ValueEstimated": true,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 0,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x001]",
+              "Key": "local[0x001]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 1,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x002]",
+              "Key": "local[0x002]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 2,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x003]",
+              "Key": "local[0x003]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 3,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x004]",
+              "Key": "local[0x004]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 4,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x005]",
+              "Key": "local[0x005]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 5,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x006]",
+              "Key": "local[0x006]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 6,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x007]",
+              "Key": "local[0x007]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 7,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x008]",
+              "Key": "local[0x008]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 8,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x009]",
+              "Key": "local[0x009]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 9,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00A]",
+              "Key": "local[0x00A]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 10,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00B]",
+              "Key": "local[0x00B]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 11,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00C]",
+              "Key": "local[0x00C]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 12,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00D]",
+              "Key": "local[0x00D]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 13,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00E]",
+              "Key": "local[0x00E]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 14,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00F]",
+              "Key": "local[0x00F]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 15,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x010]",
+              "Key": "local[0x010]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 16,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x011]",
+              "Key": "local[0x011]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 17,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x012]",
+              "Key": "local[0x012]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 18,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x013]",
+              "Key": "local[0x013]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 19,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x014]",
+              "Key": "local[0x014]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 20,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x015]",
+              "Key": "local[0x015]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 21,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x016]",
+              "Key": "local[0x016]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 22,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x017]",
+              "Key": "local[0x017]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 23,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x018]",
+              "Key": "local[0x018]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 24,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x019]",
+              "Key": "local[0x019]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 25,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": false,
+          "InstructionSequence": 3619,
+          "ResumeOffset": null,
+          "ReachedStop": null,
+          "Barrier": null
+        },
+        "nonreturningChain": {
+          "Sequence": 23848,
+          "Stage": "dispatch",
+          "Call": {
+            "Id": 67,
+            "InstructionSequence": 3624,
+            "Slot": 378,
+            "ParentSlot": 373,
+            "Invocation": 11824,
+            "Site": {
+              "Script": 30,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 25710,
+              "Stage": "instruction",
+              "Offset": 18,
+              "Operation": "chainScript",
+              "Operands": "0x1F, [local[0x000]]"
+            },
+            "Operands": [
+              {
+                "Role": "target",
+                "Operand": "0x1F",
+                "Key": null,
+                "Value": 31,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x000]",
+                "Key": "local[0x000]",
+                "Value": 1,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              }
+            ],
+            "PathEstimated": false
+          },
+          "Slot": 378,
+          "ParentSlot": 373,
+          "Invocation": 11824,
+          "Site": {
+            "Script": 30,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 25710,
+            "Stage": "instruction",
+            "Offset": 18,
+            "Operation": "chainScript",
+            "Operands": "0x1F, [local[0x000]]"
+          },
+          "Locals": [],
+          "PathEstimated": false,
+          "InstructionSequence": 3624,
+          "ResumeOffset": null,
+          "ReachedStop": null,
+          "Barrier": null
+        },
+        "actualInitialized031": {
+          "Sequence": 23852,
+          "Stage": "initialized",
+          "Call": {
+            "Id": 67,
+            "InstructionSequence": 3624,
+            "Slot": 378,
+            "ParentSlot": 373,
+            "Invocation": 11824,
+            "Site": {
+              "Script": 30,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 25710,
+              "Stage": "instruction",
+              "Offset": 18,
+              "Operation": "chainScript",
+              "Operands": "0x1F, [local[0x000]]"
+            },
+            "Operands": [
+              {
+                "Role": "target",
+                "Operand": "0x1F",
+                "Key": null,
+                "Value": 31,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x000]",
+                "Key": "local[0x000]",
+                "Value": 1,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              }
+            ],
+            "PathEstimated": false
+          },
+          "Slot": 382,
+          "ParentSlot": 378,
+          "Invocation": 11828,
+          "Site": {
+            "Script": 31,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 25739,
+            "Stage": "begin",
+            "Offset": 0,
+            "Operation": null,
+            "Operands": null
+          },
+          "Locals": [
+            {
+              "Role": "supplied-local",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 1,
+              "ValueEstimated": true,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 0,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x001]",
+              "Key": "local[0x001]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 1,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x002]",
+              "Key": "local[0x002]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 2,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x003]",
+              "Key": "local[0x003]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 3,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x004]",
+              "Key": "local[0x004]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 4,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x005]",
+              "Key": "local[0x005]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 5,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x006]",
+              "Key": "local[0x006]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 6,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x007]",
+              "Key": "local[0x007]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 7,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x008]",
+              "Key": "local[0x008]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 8,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x009]",
+              "Key": "local[0x009]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 9,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00A]",
+              "Key": "local[0x00A]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 10,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00B]",
+              "Key": "local[0x00B]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 11,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00C]",
+              "Key": "local[0x00C]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 12,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00D]",
+              "Key": "local[0x00D]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 13,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00E]",
+              "Key": "local[0x00E]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 14,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x00F]",
+              "Key": "local[0x00F]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 15,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x010]",
+              "Key": "local[0x010]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 16,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x011]",
+              "Key": "local[0x011]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 17,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x012]",
+              "Key": "local[0x012]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 18,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x013]",
+              "Key": "local[0x013]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 19,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x014]",
+              "Key": "local[0x014]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 20,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x015]",
+              "Key": "local[0x015]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 21,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x016]",
+              "Key": "local[0x016]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 22,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x017]",
+              "Key": "local[0x017]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 23,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x018]",
+              "Key": "local[0x018]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 24,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "default-zero",
+              "Operand": "local[0x019]",
+              "Key": "local[0x019]",
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 25,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": false,
+          "InstructionSequence": 3626,
+          "ResumeOffset": null,
+          "ReachedStop": null,
+          "Barrier": null
+        },
+        "actualCallerContinuation": {
+          "Sequence": 23860,
+          "Stage": "caller-continued",
+          "Call": {
+            "Id": 65,
+            "InstructionSequence": 3618,
+            "Slot": 373,
+            "ParentSlot": 372,
+            "Invocation": 11819,
+            "Site": {
+              "Script": 201,
+              "Context": "Room 06 local script 201",
+              "Container": 6,
+              "ResourceOffset": 23281,
+              "Stage": "instruction",
+              "Offset": 40,
+              "Operation": "startScript",
+              "Operands": "0x1E, [local[0x001]]"
+            },
+            "Operands": [
+              {
+                "Role": "target",
+                "Operand": "0x1E",
+                "Key": null,
+                "Value": 30,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x001]",
+                "Key": "local[0x001]",
+                "Value": 1,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              }
+            ],
+            "PathEstimated": false
+          },
+          "Slot": 373,
+          "ParentSlot": 372,
+          "Invocation": 11819,
+          "Site": {
+            "Script": 201,
+            "Context": "Room 06 local script 201",
+            "Container": 6,
+            "ResourceOffset": 23281,
+            "Stage": "instruction",
+            "Offset": 46,
+            "Operation": "breakHere",
+            "Operands": ""
+          },
+          "Locals": [],
+          "PathEstimated": false,
+          "InstructionSequence": 3660,
+          "ResumeOffset": null,
+          "ReachedStop": null,
+          "Barrier": null
+        },
+        "independentNativeWriterEnd": {
+          "Sequence": 24547,
+          "Stage": "end",
+          "Call": {
+            "Id": 85,
+            "InstructionSequence": 4377,
+            "Slot": 408,
+            "ParentSlot": 407,
+            "Invocation": 12099,
+            "Site": {
+              "Script": 20,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 23959,
+              "Stage": "instruction",
+              "Offset": 33,
+              "Operation": "startScript",
+              "Operands": "0x1F, [local[0x001]]"
+            },
+            "Operands": [
+              {
+                "Role": "target",
+                "Operand": "0x1F",
+                "Key": null,
+                "Value": 31,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x001]",
+                "Key": "local[0x001]",
+                "Value": 1,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              }
+            ],
+            "PathEstimated": false
+          },
+          "Slot": 412,
+          "ParentSlot": 408,
+          "Invocation": 12143,
+          "Site": {
+            "Script": 31,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 25739,
+            "Stage": "end",
+            "Offset": 802,
+            "Operation": null,
+            "Operands": null
+          },
+          "Locals": [],
+          "PathEstimated": true,
+          "InstructionSequence": 4554,
+          "ResumeOffset": null,
+          "ReachedStop": true,
+          "Barrier": null
+        }
+      },
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-calls.jsonl",
+          "sha256": "95edbd0a756d786b7b93538ab30865e409faa468bf72fc3c264d58bcaba8fd23"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-native.jsonl",
+          "sha256": "c749cd1aecacc98c508754efe1301ebf194406c71a4275dad5e02943b33e041d"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-key",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 42153,
+      "stages": {
+        "barrier": 39912,
+        "initialized": 138,
+        "end": 861,
+        "dispatch": 173,
+        "dispatch-ended": 173,
+        "caller-ended": 58,
+        "caller-continued": 115,
+        "resumed-locals": 723
+      },
+      "dispatches": 173,
+      "nativeMutationNotifications": 215403,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-calls.jsonl",
+          "sha256": "95edbd0a756d786b7b93538ab30865e409faa468bf72fc3c264d58bcaba8fd23"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-native.jsonl",
+          "sha256": "28816ec1240da945bad468aedbbc36f45a0a9c2b12de453ac684fc8c0be5a4d5"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-click",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 24623,
+      "stages": {
+        "barrier": 24126,
+        "initialized": 33,
+        "dispatch": 45,
+        "dispatch-ended": 45,
+        "caller-continued": 32,
+        "end": 181,
+        "caller-ended": 13,
+        "resumed-locals": 148
+      },
+      "dispatches": 45,
+      "nativeMutationNotifications": 136992,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-calls.jsonl",
+          "sha256": "1a7ba48c9f042f72cdff7f3a8429f223fac45d6b7bd0eff5955052b098a1db5b"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-native.jsonl",
+          "sha256": "8d03928273c692b1f01f96c05c26bd6e89f266eecb83cfc840e0f445c2d65b6f"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-key",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 24623,
+      "stages": {
+        "barrier": 24126,
+        "initialized": 33,
+        "dispatch": 45,
+        "dispatch-ended": 45,
+        "caller-continued": 32,
+        "end": 181,
+        "caller-ended": 13,
+        "resumed-locals": 148
+      },
+      "dispatches": 45,
+      "nativeMutationNotifications": 136955,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-calls.jsonl",
+          "sha256": "1a7ba48c9f042f72cdff7f3a8429f223fac45d6b7bd0eff5955052b098a1db5b"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-native.jsonl",
+          "sha256": "f64bc335e79d04929d431f051b7c8a855fb867f675c0f015e209a224c59187fd"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 26770,
+      "stages": {
+        "barrier": 24956,
+        "initialized": 111,
+        "end": 706,
+        "dispatch": 134,
+        "dispatch-ended": 134,
+        "caller-ended": 47,
+        "caller-continued": 87,
+        "resumed-locals": 595
+      },
+      "dispatches": 134,
+      "nativeMutationNotifications": 121136,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-calls.jsonl",
+          "sha256": "304a8cb1bb1506744bf0609a9659c0b579227db5c4396c3836f8182fa53068a0"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-native.jsonl",
+          "sha256": "3f0296c0b841d1f41a9351d3aa8cb65ead742eb56558b070646ed4ba78afe563"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 26746,
+      "stages": {
+        "barrier": 24932,
+        "initialized": 111,
+        "end": 706,
+        "dispatch": 134,
+        "dispatch-ended": 134,
+        "caller-ended": 47,
+        "caller-continued": 87,
+        "resumed-locals": 595
+      },
+      "dispatches": 134,
+      "nativeMutationNotifications": 120563,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-calls.jsonl",
+          "sha256": "61c57835ab6ca73d7128e8dd1d08e0332974e8ccee55688bbb62b715ee225355"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-native.jsonl",
+          "sha256": "4d3082fe6177feb4b84fd1cac84c183aaf8238e586d95a4c9d21a1f856a98028"
+        }
+      ]
+    },
+    {
+      "id": "late096-reached44",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 10992,
+      "stages": {
+        "barrier": 10748,
+        "initialized": 18,
+        "end": 98,
+        "dispatch": 16,
+        "dispatch-ended": 16,
+        "caller-ended": 8,
+        "caller-continued": 8,
+        "resumed-locals": 80
+      },
+      "dispatches": 16,
+      "nativeMutationNotifications": 103706,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/late096-reached44-calls.jsonl",
+          "sha256": "053ce657f46142870dc574e0ebaba2d96f0377d4145a410abf2bf32b9aa96c18"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/late096-reached44-native.jsonl",
+          "sha256": "9c22b921af7c17539f322e5bdb445f313fadaf5e28ff8818551e1e9e7be1e5b6"
+        }
+      ]
+    },
+    {
+      "id": "late096-source-skip095",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 9386,
+      "stages": {
+        "barrier": 9386
+      },
+      "dispatches": 0,
+      "nativeMutationNotifications": 44057,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-calls.jsonl",
+          "sha256": "01094d294cf43c1d5a9eab99baa4f232e8a2cb34fb271c85c510d00b4d5e9d1b"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-native.jsonl",
+          "sha256": "81ed6d6b1b3a2a0f881dc281bf910c0585b5e5b4cbfa73c6502469efb8c51f64"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response390",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 14137,
+      "stages": {
+        "barrier": 14120,
+        "initialized": 3,
+        "dispatch": 3,
+        "dispatch-ended": 3,
+        "caller-continued": 2,
+        "end": 4,
+        "caller-ended": 1,
+        "resumed-locals": 1
+      },
+      "dispatches": 3,
+      "nativeMutationNotifications": 73379,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-calls.jsonl",
+          "sha256": "0e0ac348d2f760c9d406c91997f1d11cb40d933182a40631eaafb9cece5e03d1"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-native.jsonl",
+          "sha256": "580032f2edcae4aac933755a09c363db16cc5d6eed9e74c20617f2c16669cc91"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response391",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 14137,
+      "stages": {
+        "barrier": 14120,
+        "initialized": 3,
+        "dispatch": 3,
+        "dispatch-ended": 3,
+        "caller-continued": 2,
+        "end": 4,
+        "caller-ended": 1,
+        "resumed-locals": 1
+      },
+      "dispatches": 3,
+      "nativeMutationNotifications": 73379,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-calls.jsonl",
+          "sha256": "2690e555e8ab9a7a4fb579c2e9b3a3e0ae4e70c2f5ed518b276db71b773e6da8"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-native.jsonl",
+          "sha256": "56f9a235d9023cef12009d9d1c968cd5de52e594ce45d64a29a2d9223e0bcd72"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response390",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 14083,
+      "stages": {
+        "barrier": 14066,
+        "initialized": 3,
+        "dispatch": 3,
+        "dispatch-ended": 3,
+        "caller-continued": 2,
+        "end": 4,
+        "caller-ended": 1,
+        "resumed-locals": 1
+      },
+      "dispatches": 3,
+      "nativeMutationNotifications": 73739,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-calls.jsonl",
+          "sha256": "e0b96b958aa872c4b62b83ce51f82298597526c56a3dadcd3a8423d5d22ee137"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-native.jsonl",
+          "sha256": "59111b1bf23e7b24d867a050d1f27d26d14558364a37af1bc9fdb0ce43032225"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response391",
+      "latestLegacyStreamsExact": true,
+      "callBoundaries": 14083,
+      "stages": {
+        "barrier": 14066,
+        "initialized": 3,
+        "dispatch": 3,
+        "dispatch-ended": 3,
+        "caller-continued": 2,
+        "end": 4,
+        "caller-ended": 1,
+        "resumed-locals": 1
+      },
+      "dispatches": 3,
+      "nativeMutationNotifications": 73739,
+      "selected": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-calls.jsonl",
+          "sha256": "6e968185c93f5b9a916f67ad420fb874806d488c577a116db9f5ad130afb2cc4"
+        },
+        {
+          "path": "Exe/RuntimeCallsFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-native.jsonl",
+          "sha256": "1af83ce3e380409ec0ad0edc9472b9104cd196780b446dd8edbccb1ece1eeb4e"
+        }
+      ]
+    }
+  ]
+}
