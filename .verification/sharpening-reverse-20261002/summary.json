@@ -1,0 +1,185 @@
+{
+  "userEvidence": "Confirmed Game Status staff, enough notes and learned Sharpening; note-key input already established.",
+  "setup": {
+    "staffHeld": true,
+    "availableNotes": 6,
+    "noteCountChoice": "minimum sufficient for unchanged seeded notes; exact user count unspecified",
+    "learned": true,
+    "sourceNotes": [
+      6,
+      6,
+      6,
+      5
+    ],
+    "reverseKeys": "tyyy",
+    "unchangedReverseFlag": true,
+    "precedingHistory": "existing source-input setup retained; not a captured user save"
+  },
+  "outcome": {
+    "room": 43,
+    "frames": 6342,
+    "begun": 15,
+    "ended": 15,
+    "postCastSettlingFrame": 1742,
+    "rooms": [
+      {
+        "elapsed": 5116,
+        "room": 42
+      },
+      {
+        "elapsed": 5197,
+        "room": 43
+      },
+      {
+        "elapsed": 5429,
+        "room": 60
+      },
+      {
+        "elapsed": 5680,
+        "room": 43
+      }
+    ],
+    "faithful": false
+  },
+  "executedEstimatedEvidence": [
+    {
+      "SourceScriptId": 41,
+      "SourceLabel": "Room 41 Object 633 Verb 0x4B",
+      "Offset": 0,
+      "Kind": 0,
+      "Operation": "startScript",
+      "Operands": "0xCC, [0x0000]",
+      "TargetKind": 6,
+      "TargetId": 204,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 204,
+      "SourceLabel": "Room 41 local script 204",
+      "Offset": 798,
+      "Kind": 9,
+      "Operation": "endCutscene",
+      "Operands": "",
+      "TargetKind": null,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 204,
+      "SourceLabel": "Room 41 local script 204",
+      "Offset": 799,
+      "Kind": 1,
+      "Operation": "chainScript",
+      "Operands": "0x5A, []",
+      "TargetKind": 6,
+      "TargetId": 90,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 90,
+      "SourceLabel": "Script 90",
+      "Offset": 5,
+      "Kind": 12,
+      "Operation": "loadRoom",
+      "Operands": "0x2A",
+      "TargetKind": 0,
+      "TargetId": 42,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 90,
+      "SourceLabel": "Script 90",
+      "Offset": 207,
+      "Kind": 12,
+      "Operation": "loadRoom",
+      "Operands": "0x2B",
+      "TargetKind": 0,
+      "TargetId": 43,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 90,
+      "SourceLabel": "Script 90",
+      "Offset": 501,
+      "Kind": 12,
+      "Operation": "loadRoom",
+      "Operands": "0x3C",
+      "TargetKind": 0,
+      "TargetId": 60,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 90,
+      "SourceLabel": "Script 90",
+      "Offset": 889,
+      "Kind": 12,
+      "Operation": "loadRoom",
+      "Operands": "0x2B",
+      "TargetKind": 0,
+      "TargetId": 43,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 90,
+      "SourceLabel": "Script 90",
+      "Offset": 1840,
+      "Kind": 9,
+      "Operation": "endCutscene",
+      "Operands": "",
+      "TargetKind": null,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    }
+  ],
+  "productionChanges": 0,
+  "reproductionRuns": 1,
+  "observerExpansion": false,
+  "coverage": "169/235 (71.91%), unchanged by this longer input recipe",
+  "protectedExactUnstaged": 57,
+  "raw4AndHistoricalEvidenceUnchanged": true,
+  "evidence": {
+    "Exe\\SharpeningReverse-20261002\\capture-1\\sharpening-reverse-user-status.json": "ef6aa8553ee78a2c4d992400ac668a5971427eaf0e0cad6cf98e69e863056192",
+    ".verification\\sharpening-reverse-20261002\\response18.json": "a1be5527106640f5d55fee34128e685791c9daa3f41ef53425c013621df0a666"
+  },
+  "limitation": "Core keyboard-input reproduction with confirmed kinds of user edits; no App interaction, exact user-history capture or physical-input claim."
+}

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2 October: verify Sharpening reverse with the user's confirmed setup
+
+One bounded Core keyboard reproduction uses the confirmed Game Status staff/enough-notes/learned edits and completes633/4B ->204(0) ->090, through42/43/60/43,15/15 scopes,6342 total frames. Full204 conversation; no skip of204/090. Source notes/reverse flag unchanged and estimates retained. No additional gameplay fix needed after0318792, no observer expansion; literal coverage stays169/235=71.91%. Raw4/history/protected57 unchanged/unstaged, no App launch/close/interaction or push. [Validation and limits](../.verification/sharpening-reverse-20261002/validation.md).
+
 ## 2 October: catalogue the completed sphere Look preview
 
 Room18 sphere370/36 independently completes065 and meets the existing fresh literal preview criteria in229 frames. Added shared Play Cutscene recipe; coverage **169/235=71.91%**,335 starts (85 scenes/250 reactions),66 sites/49 owners outstanding. All330 existing recipes/memberships and both sequences unchanged; direct-verb/estimated-state labels retained. Fresh Core-only audit and actual catalog/name loader; no App launch/close/interaction or push. Prior Core662/broad runtime baseline remains dated. [Review](../.verification/sphere-catalog-20261002/validation.md).

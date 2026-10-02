@@ -4,6 +4,8 @@ The session executes reached script/object/room instructions independently of re
 
 ## Current replay coverage (2 October)
 
+Separately, one keyboard Sharpening-reverse reproduction with confirmed user status edits completes633/4B ->204(0) ->090 through42/43/60/43,15/15 scopes,all estimates retained. No new execution correction or literal-site promotion from this longer setup; no App interaction. [Bounded input evidence](../.verification/sharpening-reverse-20261002/validation.md).
+
 **Current:169/235 literal sites (71.91%),66 unvalidated sites,49 outstanding owners,123 unresolved static edges.** Sphere370/36 has an independently validated229-frame recipe for065 +0000/+0302 through18/19/18. Fresh Core result exactly matches the corrected prior audit.335 starts=85 scenes+250 reactions;330 old recipes/memberships and both sequences retained. Direct exploration/estimated arrival and return labelled; no new UI/physical-input claim. [Criteria and regeneration](../.verification/sphere-catalog-20261002/validation.md). Earlier counts below are historical.
 
 Latest guard correction: one additional literal root completes, Room18 sphere Look370/36 (065 end+0302), and the separate unchanged saved native-input capture now completes090. Other362 roots, four memberships and two sequences remain exact. The sphere Look is not yet a catalog recipe; no automatic regeneration/promotion, so stored coverage remains168/235. Actual executed conditional room loads now continue with estimates retained under the user's explicit authorization. Historical no-route-improvement reports below remain records of the earlier builds. [Current validation](../.verification/estimated-room-loads-20261002/validation.md).

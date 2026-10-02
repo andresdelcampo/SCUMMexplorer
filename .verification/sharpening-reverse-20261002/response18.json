@@ -1,0 +1,288 @@
+[
+  {
+    "id": "sharpening-reverse-user-status",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 8
+      },
+      {
+        "kind": "verb",
+        "objectId": 255,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "source-trial",
+        "count": 5000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 9
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 270
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-approach",
+        "count": 80,
+        "settle": false
+      },
+      {
+        "kind": "look",
+        "objectId": 270
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-lesson",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "target",
+        "objectId": 270
+      },
+      {
+        "kind": "frames",
+        "stage": "egg-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft-key",
+        "slot": 0,
+        "gap": 8
+      },
+      {
+        "kind": "until-override",
+        "owner": "Script 47",
+        "stage": "047-override",
+        "count": 1000
+      },
+      {
+        "kind": "key",
+        "key": 27
+      },
+      {
+        "kind": "frames",
+        "stage": "native-level4",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 6
+      },
+      {
+        "kind": "verb",
+        "objectId": 205,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-lesson",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 207
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-approach",
+        "count": 80,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 207
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft-key",
+        "slot": 2,
+        "gap": 8
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 62
+      },
+      {
+        "kind": "verb",
+        "objectId": 810,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-lesson",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 808
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-approach",
+        "count": 80,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 808
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft-key",
+        "slot": 1,
+        "gap": 8,
+        "reverse": true
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 10
+      },
+      {
+        "kind": "verb",
+        "objectId": 295,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "052",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 13
+      },
+      {
+        "kind": "look",
+        "objectId": 325
+      },
+      {
+        "kind": "frames",
+        "stage": "native-learn4",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "user-status"
+      },
+      {
+        "kind": "visit",
+        "room": 37
+      },
+      {
+        "kind": "verb",
+        "objectId": 603,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "source-arrival41",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 41
+      },
+      {
+        "kind": "until-touchable",
+        "objectId": 632,
+        "stage": "632-ready",
+        "count": 3000
+      },
+      {
+        "kind": "look",
+        "objectId": 632
+      },
+      {
+        "kind": "until-touchable",
+        "objectId": 633,
+        "stage": "633-ready",
+        "count": 3000
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 633
+      },
+      {
+        "kind": "frames",
+        "stage": "approach",
+        "count": 40,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 633
+      },
+      {
+        "kind": "frames",
+        "stage": "633-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft-key",
+        "slot": 9,
+        "gap": 8,
+        "reverse": true
+      },
+      {
+        "kind": "frames",
+        "stage": "source090",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ],
+    "setupEvidence": "User confirmed Game Status staff, enough notes, learned spell, then note keys. Existing source-input approach retained as a representative setup, not a recording of their exact prior history."
+  }
+]

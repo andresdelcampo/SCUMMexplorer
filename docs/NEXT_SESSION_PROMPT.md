@@ -1,6 +1,16 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
-## Latest: sphere Look reviewed and catalogued
+## Latest: confirmed Sharpening-reverse keyboard setup completes
+
+After sphere commit292603a, one bounded Core reproduction uses the user's confirmed Game Status edits (staff, enough notes, Sharpening learned), then note keys.633/4B actually starts204(0); full204 ends031E/chains090 at031F;090 runs42/43/60/43 and ends0730. Room43,15/15 scopes,6342 total frames. All listed execution remains Conditional; final state nonfaithful/source-closed cage645=0 estimated. No new gameplay correction needed after0318792. [Validation](../.verification/sharpening-reverse-20261002/validation.md), [summary](../.verification/sharpening-reverse-20261002/summary.json).
+
+The user was right: correct conversation dispatch already established the relevant staff/notes/learning prerequisites. Do not ask those or the note-key input method again. The separate representative recipe uses six notes (minimum for unchanged seed0 sequence6,6,6,5), keeps source reverse flag, and presses reverse5,6,6,6 through the public input API. Actual user's exact note count/prior history is not claimed. Supported status edits are confirmed exploration choices, not fabricated source prerequisites. One reproduction only; no observer expansion.
+
+Current coverage **169/235=71.91%**,66 unvalidated sites/49 owners,335 starts/85 scenes/250 reactions after the independently qualified sphere recipe. This longer keyboard completion adds no literal site. Protected57 hash-exact/unstaged; raw4 and all history unchanged. No App launch/close/interaction or push. Fresh sphere/catalog checks and normal Release clean; Core662/full execution suite remain dated0318792. No WPF/physical-input claim. Both requested tasks are complete; do not automatically restart this diagnosis. Keep the user's App untouched.
+
+Ready-to-copy continuation: Continue SCUMMexplorer after the sphere catalog and confirmed Sharpening-reverse reproduction commits. Read the latest handoff plus .verification/sphere-catalog-20261002/validation.md and .verification/sharpening-reverse-20261002/validation.md. Sphere coverage is169/235 (71.91%); representative manual18 with confirmed user Game Status edits and keyboard notes completes633/4B ->204(0) ->090 through42/43/60/43,15/15,all estimates retained. Preserve raw4/history/protected57; no App launch/close/interaction or push; do not repeat prerequisite questions or expand observers. The bounded tasks are complete; follow the next user-selected route and commit completed tasks separately.
+
+## Previous: sphere Look reviewed and catalogued
 
 Continuation from0318792: fresh sphere370/36 independently meets the literal preview criteria, identical to the corrected229-frame result (065 +0000/+0302,18/19/18). New shared recipe; **169/235=71.91%**,66 sites/49 owners outstanding,335 starts=85 scenes+250 reactions. All330 old recipes/memberships and both sequences exact; estimated/direct-verb labels retained. [Review](../.verification/sphere-catalog-20261002/validation.md). No runtime correction or App interaction; Core662/broad checks remain dated.
 
