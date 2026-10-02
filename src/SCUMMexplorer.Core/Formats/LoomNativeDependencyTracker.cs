@@ -58,10 +58,19 @@ public sealed class LoomNativeDependencyTracker
     {
         ArgumentNullException.ThrowIfNull(observation);
         if (observation.Sequence <= lastSequence) throw new ArgumentException("Native observations must retain increasing source sequence.", nameof(observation));
+        var omitted = lastSequence != 0 && observation.Sequence != lastSequence + 1;
         lastSequence = observation.Sequence;
         var reads = new List<LoomNativeRead>();
         var invalidated = new List<LoomRuntimeInvalidation>();
         string? barrier = null;
+        if (omitted)
+        {
+            // A missing record may contain an identical native/selector mutation or
+            // a cancelled scope. Equal later values cannot bridge that missing lifetime.
+            // Fresh copied reads below retain their own IDs and independent estimates.
+            barrier = "missing native observation sequence boundary";
+            Retire(_ => true, barrier, invalidated);
+        }
         if (observation.CancelledSlots is { } cancelled)
             Retire(r => cancelled.Contains(r.Observation.Slot) || r.SelectorDependencies.Any(d => d.LocalSlot is { } slot && cancelled.Contains(slot)),
                 "native observation slot cancelled or replaced", invalidated);
