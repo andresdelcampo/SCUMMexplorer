@@ -1,0 +1,356 @@
+{
+  "scope": "Production opt-in copied observations of these13 selected explorer recipes; actual sequence and stable causal slot identities. Observed literal writers only, no universal external/aliased/concurrent/cancellation safety or runtime domain/path/effect promotion.",
+  "recipeCount": 13,
+  "fullPacketsIdentical": true,
+  "priorInstructionValuesIdentical": true,
+  "observedZeroWaits": 76,
+  "native090Completed": false,
+  "estimatesCleared": false,
+  "sourceManifest": {
+    "path": "Exe/CompletionObserverSession-20261002/observer-1/source-manifest.json",
+    "sha256": "fbdba260aeea6384f57ed8f50df475de73d359d1391a35bbb186b8d1da7f7e7e"
+  },
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "room": 43,
+      "elapsed": 5835,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 12,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/direct41-source-level4-skip204.json",
+        "sha256": "58453eec817e345003c93d5106cd0363fabe3537d2f1c6f50bad3d8515f77937"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/direct41-source-level4-skip204-instructions.jsonl",
+        "sha256": "16fefcf1178c3a410ad418c7fbe59d1c63c63e9ddfcf6295bce7149bbed0f8b7"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/direct41-source-level4-skip204-cancellations.jsonl",
+        "sha256": "f66f26391e831fe339b8db0f5a55c3c7523bb2e81f948adbdf2e47bd46369f2e"
+      }
+    },
+    {
+      "id": "room41-raw4-click",
+      "room": 41,
+      "elapsed": 7659,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 16,
+      "observations": {
+        "firstCompletionBinding": {
+          "writer": {
+            "Sequence": 4552,
+            "Slot": 412,
+            "ParentSlot": 408,
+            "Run": 12143,
+            "Script": 31,
+            "Context": null,
+            "Stage": "instruction",
+            "Offset": 797,
+            "Operation": "move",
+            "PathEstimated": true,
+            "frame": 3036
+          },
+          "afterWrite": {
+            "Sequence": 4553,
+            "Slot": 412,
+            "ParentSlot": 408,
+            "Run": 12143,
+            "Script": 31,
+            "Context": null,
+            "Stage": "instruction",
+            "Offset": 802,
+            "Operation": "stopObjectCode",
+            "PathEstimated": true,
+            "frame": 3036
+          },
+          "wait": {
+            "Sequence": 4556,
+            "Slot": 408,
+            "ParentSlot": 407,
+            "Run": 12144,
+            "Script": 20,
+            "Context": null,
+            "Stage": "instruction",
+            "Offset": 40,
+            "Operation": "equalZero",
+            "PathEstimated": false,
+            "frame": 3036
+          },
+          "afterWait": {
+            "Sequence": 4557,
+            "Slot": 408,
+            "ParentSlot": 407,
+            "Run": 12144,
+            "Script": 20,
+            "Context": null,
+            "Stage": "instruction",
+            "Offset": 45,
+            "Operation": "increment",
+            "PathEstimated": true,
+            "frame": 3036
+          }
+        },
+        "practiceCaller": {
+          "Sequence": 3618,
+          "Slot": 373,
+          "ParentSlot": 372,
+          "Run": 11819,
+          "Script": 201,
+          "Context": "Room 06 local script 201",
+          "Stage": "instruction",
+          "Offset": 40,
+          "Operation": "startScript",
+          "PathEstimated": false,
+          "frame": 2870
+        }
+      },
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw4-click.json",
+        "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw4-click-instructions.jsonl",
+        "sha256": "d47bdee5f31d79dc822cdbfa9d033e8943963706123449202d91d35bd84c51f5"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw4-click-cancellations.jsonl",
+        "sha256": "b41629b22d2683ba3e9f1e46e7e5194cdc1bfb1b6a61604d70f61810d992ff98"
+      }
+    },
+    {
+      "id": "room41-raw4-key",
+      "room": 41,
+      "elapsed": 7659,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 16,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw4-key.json",
+        "sha256": "d0a7e60717b2b0a7a4b5c58499f153ec3a19b80f50e67183e5c5cbc2eaf1e2de"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw4-key-instructions.jsonl",
+        "sha256": "d47bdee5f31d79dc822cdbfa9d033e8943963706123449202d91d35bd84c51f5"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw4-key-cancellations.jsonl",
+        "sha256": "b41629b22d2683ba3e9f1e46e7e5194cdc1bfb1b6a61604d70f61810d992ff98"
+      }
+    },
+    {
+      "id": "room41-raw6-click",
+      "room": 41,
+      "elapsed": 4623,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 4,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw6-click.json",
+        "sha256": "f90c09c5ec5bcd60476417d0558e5a47bca9c9163c33a58d55db9c676207c31f"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw6-click-instructions.jsonl",
+        "sha256": "f764dcff579691447746c76194afa822d219f5d9eb749f88a38980d4fe8238a4"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw6-click-cancellations.jsonl",
+        "sha256": "85d8292cf58a066d7c8742067ac53df468cffb9e8b4d35bb4a038d0cb49b7f4d"
+      }
+    },
+    {
+      "id": "room41-raw6-key",
+      "room": 41,
+      "elapsed": 4623,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 4,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw6-key.json",
+        "sha256": "34e64d6340a93f6912b9bcb93d748f07a179d34b0bbeba081f4c68ec3015bc64"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw6-key-instructions.jsonl",
+        "sha256": "f764dcff579691447746c76194afa822d219f5d9eb749f88a38980d4fe8238a4"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/room41-1/room41-raw6-key-cancellations.jsonl",
+        "sha256": "85d8292cf58a066d7c8742067ac53df468cffb9e8b4d35bb4a038d0cb49b7f4d"
+      }
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "room": 62,
+      "elapsed": 3472,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 12,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/egg-first-1/native-level4-egg-dye-wheel.json",
+        "sha256": "dd2815c1717a023bfc047a99a68b871160fbd59a4609eb63f8cf30d0ce76d24a"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/egg-first-1/native-level4-egg-dye-wheel-instructions.jsonl",
+        "sha256": "a9b14d708066abd4fa8d83e0c10cce2e82294a14df60b6241996d216f47d9ffd"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/egg-first-1/native-level4-egg-dye-wheel-cancellations.jsonl",
+        "sha256": "1e996b8876d1df02dde9d231cda556263c11ad865d0ed0cb0aed9e0274383643"
+      }
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "room": 6,
+      "elapsed": 3447,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 12,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/dye-last-1/native-level4-egg-wheel-dye.json",
+        "sha256": "39705828a5c46a4ddcdc4d96b5467f38b8cdc16ef0e8460365e56b0bbf8ae0ad"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/dye-last-1/native-level4-egg-wheel-dye-instructions.jsonl",
+        "sha256": "935a6ae09c7a3b0da30b2f08fc742e69047c155754e4d9b004372a08d53db5d2"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/dye-last-1/native-level4-egg-wheel-dye-cancellations.jsonl",
+        "sha256": "63077e965c54173692cc86cf8e6af0d70356af2c5a81d434d497a14c4d133b5f"
+      }
+    },
+    {
+      "id": "late096-reached44",
+      "room": 43,
+      "elapsed": 4017,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 0,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/late096-reached44.json",
+        "sha256": "f72baaabd02edcbf9d446aacbb47f3088114d38f04cbff66cbcc6c9e38e8a8ba"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/late096-reached44-instructions.jsonl",
+        "sha256": "0efcd8d626d76787d132bd1c2509fa07d8bdbeea43aab3faef83e8e5e3f34f6a"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/late096-reached44-cancellations.jsonl",
+        "sha256": "9cdc8a916c84b2c478b680c9f54c3080913fe51045d29f8ef85b9280a4dbdaec"
+      }
+    },
+    {
+      "id": "late096-source-skip095",
+      "room": 46,
+      "elapsed": 357,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 0,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/late096-source-skip095.json",
+        "sha256": "3f3ccbf796262d2812d755288d59975567d305ab43894ac43f94cc07c0e320cb"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/late096-source-skip095-instructions.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/late096-source-skip095-cancellations.jsonl",
+        "sha256": "9cdc8a916c84b2c478b680c9f54c3080913fe51045d29f8ef85b9280a4dbdaec"
+      }
+    },
+    {
+      "id": "sleep-source369-response390",
+      "room": 18,
+      "elapsed": 1575,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 0,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source369-response390.json",
+        "sha256": "87bfae3c6891ad7ecefe4038c6fab2c0091b2de5fd237688235700a2c59f601c"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source369-response390-instructions.jsonl",
+        "sha256": "9ccceefdac4b3ea9c1e70ad3d29e3d2439af7c7fe30c20a592997234d1992ad7"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source369-response390-cancellations.jsonl",
+        "sha256": "5c85c19afe49d1380781d837e3737f151d37040d3cf94d2199c5336bedec0c45"
+      }
+    },
+    {
+      "id": "sleep-source369-response391",
+      "room": 18,
+      "elapsed": 1575,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 0,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source369-response391.json",
+        "sha256": "8e4d149d0806d5d473f8984feedb60aa199b608b0c9cb1231580ea66c98bef1a"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source369-response391-instructions.jsonl",
+        "sha256": "efc2386b1939050aa75dd2d8180d82ec58aeb7fc66d3698187410d4e7fda2a77"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source369-response391-cancellations.jsonl",
+        "sha256": "5c85c19afe49d1380781d837e3737f151d37040d3cf94d2199c5336bedec0c45"
+      }
+    },
+    {
+      "id": "sleep-source371-response390",
+      "room": 18,
+      "elapsed": 1612,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 0,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source371-response390.json",
+        "sha256": "560fd93d78a6701c784b2b5f38db4130b7208b8365f049bdef43757e80ef76e3"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source371-response390-instructions.jsonl",
+        "sha256": "856dfdd54164d82df40165fc2c54eaa5a0cdcb69bcb32ff884e582e667084093"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source371-response390-cancellations.jsonl",
+        "sha256": "5c85c19afe49d1380781d837e3737f151d37040d3cf94d2199c5336bedec0c45"
+      }
+    },
+    {
+      "id": "sleep-source371-response391",
+      "room": 18,
+      "elapsed": 1612,
+      "fullPacketIdentical": true,
+      "priorInstructionValuesIdentical": true,
+      "zeroWaits": 0,
+      "observations": {},
+      "packet": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source371-response391.json",
+        "sha256": "c264750aa4d1c5e93d616909a9b713ca0cab77531ae07545bcd3b0a1b63bb665"
+      },
+      "instructions": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source371-response391-instructions.jsonl",
+        "sha256": "7e23bae73285021594523a33095718f0f9727d0121d397230d0f4106a60d782b"
+      },
+      "cancellations": {
+        "path": "Exe/CompletionObserverSession-20261002/preserved-1/sleep-source371-response391-cancellations.jsonl",
+        "sha256": "5c85c19afe49d1380781d837e3737f151d37040d3cf94d2199c5336bedec0c45"
+      }
+    }
+  ]
+}

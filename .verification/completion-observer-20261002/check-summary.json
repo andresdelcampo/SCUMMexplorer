@@ -1,0 +1,93 @@
+{
+  "core": 321,
+  "newObserverCases": 5,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "fullRecipePacketsUnchanged": 13,
+  "priorInstructionValuesUnchanged": true,
+  "observedZeroWaits": 76,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "reports": [
+    {
+      "path": "Exe/CompletionObserverSession-20261002/checks-1/core-tests.txt",
+      "sha256": "a2610a11e4f64c039042e0965589e681d18f1c9a1edaac8aa34b8b4674635b53"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/checks-1/release-build.txt",
+      "sha256": "8ef28ee65cebe86f4472c9bbbd53edc23dbf856931457ba61535bfaf0107cff2"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/final-release-build.txt",
+      "sha256": "374bddd180827109ef5e1e3449b65e6df2c2e3cf3237711d7351b12d667c1361"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/app-state.txt",
+      "sha256": "b38816ef20f01225a399b68fa8554b75dc646c0c4e4b2bd4d7340914a74b0372"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/observer-build.txt",
+      "sha256": "e7d8b2913f3eb07b8e5f9b178c4378725f880e5258f8c083acb1077fdefa4191"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/room-audit-2/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/room-audit-2/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/CompletionObserverSession-20261002/png-comparison-2.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/CompletionObserverSession-20261002/observer-1/source-manifest.json",
+    "sha256": "fbdba260aeea6384f57ed8f50df475de73d359d1391a35bbb186b8d1da7f7e7e"
+  }
+}

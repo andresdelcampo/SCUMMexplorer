@@ -1,5 +1,13 @@
 # Changelog
 
+## 2 October: production source/slot completion observations
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Optional Core observer | Copied read-only values/estimates, ordered instructions, stable causal slots and cancellation identities; no copied-Core patch or estimate change | [validation](../.verification/completion-observer-20261002/validation.md) |
+| Completion precision evidence | 13 exact whole packets/all prior instruction values;76 own-child zero waits; native write/wait both3036; limits retained | [observer](../.verification/completion-observer-20261002/observer-summary.json) |
+| Fresh preservation | Core321;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean main Release;no App/promotion/push | [checks](../.verification/completion-observer-20261002/check-summary.json) |
+
 ## 2 October: generic Core correlated numeric analysis
 
 | Change | Result | Record |

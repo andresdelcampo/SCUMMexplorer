@@ -79,6 +79,7 @@ public sealed partial class LoomExplorationSession
     private readonly LoomSoundClock _soundClock;
     private readonly LoomScriptReader _reader;
     private readonly LoomBoundedScriptExecutor _executor = new();
+    private readonly LoomScriptObserver? _observer;
     private readonly LoomRoomObjectDirectory _objects = new();
     private readonly LoomObjectVerbReader _verbs;
     private readonly LoomScriptRuntimeState _runtime;
@@ -102,13 +103,15 @@ public sealed partial class LoomExplorationSession
     /// <param name="stopAtBootInput">With completeBoot, enters the native intro and awaits actual input,
     /// before the explorer's assumed challenge answer. Frames continue the waiting boot after input.</param>
     public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
-        bool completeBoot = true, bool stopAtOpening = false, bool stopAtBootInput = false)
+        bool completeBoot = true, bool stopAtOpening = false, bool stopAtBootInput = false,
+        LoomScriptObserver? observer = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
         if (game.Version != ScummVersion.V3)
             throw new InvalidDataException("Only old-v3 LOOM has a session interpreter.");
         _game = game;
+        _observer = observer;
         var soundResources = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue)
             .GroupBy(r => r.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
         var soundLifetimes = new Dictionary<int, LoomSoundLifetime>();
@@ -1734,7 +1737,8 @@ public sealed partial class LoomExplorationSession
                 _visitTrace.Add($"script {scriptId} started again: runScript ended its running copy first");
             }
         }
-        var frame = new ScriptFrame { FreezeResistant = freezeResistant, Recursive = recursive, OriginRoom = parent?.OriginRoom };
+        var frame = new ScriptFrame { FreezeResistant = freezeResistant, Recursive = recursive, OriginRoom = parent?.OriginRoom,
+            ObservationParent = parent?.ObservationSlot };
         if (scriptId < _globalScriptCount)
             return RunIndexedScript(scriptId, startOffset, locals, depth, estimatedLocals, pathEstimated, frame);
         if (_currentRoom is null)
@@ -1830,6 +1834,11 @@ public sealed partial class LoomExplorationSession
                 _runtime.GlobalVariables, [], [], 0, false, "nested script limit reached");
         }
         frame ??= new ScriptFrame();
+        if (_observer is not null && frame.ObservationSlot == 0)
+        {
+            frame.ObservationSlot = _observer.NewSlot();
+            frame.ObservationParent ??= _executing.Count > 0 ? _executing[^1].ObservationSlot : null;
+        }
         frame.Label = script.Context ?? $"Script {script.ScriptId:00}";
         frame.Number = scriptNumber;
         // Indexed scripts run in global slots; room entry, exit, local and verb code is room-owned.
@@ -1858,7 +1867,8 @@ public sealed partial class LoomExplorationSession
                     }
                     return handling;
                 },
-                estimatedLocals: estimatedLocals, pathEstimated: pathEstimated);
+                estimatedLocals: estimatedLocals, pathEstimated: pathEstimated,
+                observation: _observer is null ? null : new(_observer, frame.ObservationSlot, frame.ObservationParent));
         }
         finally
         {
@@ -2212,6 +2222,9 @@ public sealed partial class LoomExplorationSession
         var slots = _executing.Concat(_pending.Select(item => item.Frame))
             .Concat(_frameScripts.Select(item => item.Frame))
             .Where(frame => frame.Number == number && !frame.Stopped).Distinct().ToArray();
+        if (slots.Length > 0)
+            _observer?.Cancel(number, _executing.Count > 0 ? _executing[^1].ObservationSlot : 0,
+                slots.Select(slot => slot.ObservationSlot));
         foreach (var slot in slots) slot.Stopped = true;
         _pending.RemoveAll(item => item.Frame.Stopped);
         return slots.Length;
@@ -2231,6 +2244,8 @@ public sealed partial class LoomExplorationSession
         public int? Number { get; set; }
         /// <summary>Cancellation belongs to this slot instance, never to a later copy of its number.</summary>
         public bool Stopped { get; set; }
+        public long ObservationSlot { get; set; }
+        public long? ObservationParent { get; set; }
         public bool Global { get; set; }
         public int FreezeCount { get; set; }
         /// <summary>ScummVM <c>ScriptSlot.delay</c> while the slot is <c>ssPaused</c> by <c>delay</c>/<c>delayVariable</c>; null otherwise.</summary>

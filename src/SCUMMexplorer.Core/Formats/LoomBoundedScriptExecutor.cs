@@ -98,7 +98,8 @@ public sealed class LoomBoundedScriptExecutor
         IReadOnlyDictionary<string, ushort>? initialLocals = null,
         Func<LoomScriptEvent, LoomScriptRuntimeState, string?>? onEvent = null,
         IReadOnlyCollection<string>? estimatedLocals = null,
-        bool pathEstimated = false)
+        bool pathEstimated = false,
+        LoomScriptObservationContext? observation = null)
     {
         ArgumentNullException.ThrowIfNull(script);
         ArgumentNullException.ThrowIfNull(initialObjectStates);
@@ -140,6 +141,10 @@ public sealed class LoomBoundedScriptExecutor
         string? delayEstimate = null;
         string? unresolved = null;
 
+        var observationRun = observation?.Observer.NewInvocation() ?? 0;
+        observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
+            "begin", pc, null, null, knownVariables, estimated, onEstimatedPath);
+
         while (indexByOffset.TryGetValue(pc, out var instructionIndex))
         {
             if (++visited > instructionLimit)
@@ -150,6 +155,9 @@ public sealed class LoomBoundedScriptExecutor
 
             var instruction = instructions[instructionIndex];
             var next = instruction.Offset + EncodedLength(instruction.Bytes);
+            observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
+                "instruction", instruction.Offset, instruction.Operation, instruction.Operands,
+                knownVariables, estimated, onEstimatedPath);
 
             if (instruction.Operation == "stopObjectCode")
             {
@@ -1086,6 +1094,8 @@ public sealed class LoomBoundedScriptExecutor
             CopyGlobalVariables(knownVariables, runtime.GlobalVariables);
             CopyEstimatedGlobals(estimated, runtime.EstimatedVariables);
         }
+        observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
+            "end", pc, null, null, knownVariables, estimated, onEstimatedPath, resumeOffset, reachedStop, unresolved);
         return new LoomBoundedScriptResult(new Dictionary<int, byte>(states),
             new Dictionary<int, RoomObjectPosition>(positions), new Dictionary<string, ushort>(knownVariables),
             trace, events, visited, reachedStop, unresolved, resumeOffset, drawQueue.ToArray(),
