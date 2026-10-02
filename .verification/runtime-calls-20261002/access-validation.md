@@ -1,0 +1,9 @@
+# Remaining room, string, owner and wait access — 2 October 2026
+
+Follows actual call-boundary task `5fcc2a0` while preserving every earlier checkpoint and constraint.
+
+Optional source access copies exact decoded loadRoomWithEgo object/room operands, implicit var001 ego and signed literal walk coordinates. Original decimal spelling is retained beside the unsigned storage number; malformed, out-of-range or variable-looking coordinate forms remain barriers. Room entry/placement/walk-point/camera dependencies are explicitly incomplete. No room transition or reached effect is inferred.
+
+String operands retain explicit opaque string-storage dependencies, without scanning inline text or inventing contents, lengths, estimates, results or lifetimes. getObjectOwner copies its selected pre-instruction owner field but leaves native estimate/inventory/effect coverage unresolved. Message/camera waits keep opaque native timing dependencies; actor waits independently copy the selected moving field. Native/effect barriers remain. These additions do not alter legacy bindings or instruction sequences, transport domains or grant numeric origins.
+
+Twelve new access regressions pass under `Exe/RuntimeCallsSession-20261002/access-1`. Full absolute-root Core485 and clean main Release pass under access-core. Final native/root/render/numeric preservation follows separately. Existing expression4096/subcommand128/index32/native4096/writer4096/boundary128 and independent call4096 limits remain. Every field/value/index/path estimate, historical origin, raw same-value notification and omitted/external/alias/concurrent/cancellation/replacement/scheduler/callee limit remains. No completion promotion, estimate clearing, injected prerequisite, room exception, shortcut, App launch or push. Protected work stays untouched/unstaged.

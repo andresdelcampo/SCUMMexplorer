@@ -1912,7 +1912,18 @@ public sealed class LoomBoundedScriptExecutor
             var count = text.IndexOf(", count=", StringComparison.Ordinal);
             return count >= 0 ? [Bind("destination-before", text[..count])] : [];
         }
-        if (extended && (IsActorQuery(op) || op is "getDist" or "findObject" or "isSoundRunning" or "isScriptRunning"))
+        if (extended && op == "loadRoomWithEgo")
+        {
+            // These walk coordinates are decoded signed literals, not variable expressions.
+            var match = Regex.Match(text, @"^(.+), (.+), walkTo=\((-?\d+), (-?\d+)\)$");
+            if (!match.Success || !short.TryParse(match.Groups[3].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var x) ||
+                !short.TryParse(match.Groups[4].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var y)) return [];
+            LoomScriptOperandBinding Coordinate(string role, short value, string original) =>
+                Bind(role, $"0x{unchecked((ushort)value):X4}") with { Operand = original };
+            return [Bind("implicit-ego", "var[0x001]"), Bind("target", match.Groups[1].Value), Bind("room", match.Groups[2].Value),
+                Coordinate("walk-x", x, match.Groups[3].Value), Coordinate("walk-y", y, match.Groups[4].Value)];
+        }
+        if (extended && (IsActorQuery(op) || op is "getDist" or "findObject" or "isSoundRunning" or "isScriptRunning" or "getObjectOwner"))
         {
             var parts = text.Split(',', StringSplitOptions.TrimEntries);
             var count = op is "getDist" or "findObject" ? 3 : 2;
@@ -2122,6 +2133,28 @@ public sealed class LoomBoundedScriptExecutor
     private static IReadOnlyList<LoomScriptNativeDependency>? BindNativeDependencies(string op,
         IReadOnlyList<LoomScriptOperandBinding> bindings, IReadOnlyDictionary<int, byte> states, LoomScriptRuntimeState? runtime)
     {
+        if (op == "stringOps" && bindings.Count > 0)
+            return Array.AsReadOnly(bindings.Where(b => b.Role != "destination-before")
+                .Select(b => new LoomScriptNativeDependency("string-storage", b, null, null,
+                    UnresolvedReason: "string contents/length/lifetime not captured; numeric operands only")).ToArray());
+        if (op == "loadRoomWithEgo" && bindings.Count > 0)
+            return Array.AsReadOnly(bindings.Where(b => b.Role is "implicit-ego" or "target" or "room")
+                .Select(b => new LoomScriptNativeDependency("room-arrival", b, null, null,
+                    UnresolvedReason: "entry/ego placement/object walk point/camera dependencies not exhaustively captured")).ToArray());
+        if (op == "getObjectOwner" && bindings.Count == 2)
+        {
+            var ownerSelector = bindings[1];
+            long? owner = ownerSelector.Value is { } id && runtime?.ObjectOwners.TryGetValue(id, out var value) == true ? value : null;
+            return Array.AsReadOnly(new[] { new LoomScriptNativeDependency("object-owner", ownerSelector, owner, null,
+                UnresolvedReason: "owner estimate/inventory/effect lifetime not captured") });
+        }
+        if (op == "waitFor" && bindings.Count == 1)
+        {
+            var wait = bindings[0];
+            if (wait.Role == "target") return BindNativeDependencies("getActorMoving", [wait], states, runtime);
+            return Array.AsReadOnly(new[] { new LoomScriptNativeDependency(wait.Role == "implicit-message" ? "message-wait" : "camera-wait",
+                wait, null, null, UnresolvedReason: "native wait/timing dependencies not exhaustively captured") });
+        }
         var selectors = bindings.Where(b => b.Role is "source" or "condition" or "target").ToArray();
         if (selectors.Length == 0) return null;
         LoomScriptNativeDependency Missing(string domain, LoomScriptOperandBinding selector, string reason) =>
