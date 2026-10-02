@@ -29,7 +29,11 @@ internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayR
             if (!File.Exists(path) || !Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).Equals(file.Sha256, StringComparison.OrdinalIgnoreCase))
                 return Empty("This edition has not been validated against the expanded replay catalog. The four established starts remain available; discovery and validation must be rerun for these files.");
         }
-        return catalog;
+        return catalog with
+        {
+            Replays = catalog.Replays.Select(recipe => recipe with
+                { Title = LoomDraftNames.ReplayTitle(recipe.Title, recipe.Verb) }).ToArray()
+        };
     }
     private static LoomReplayCatalog Empty(string note) => new([], [], [], note, []);
 }

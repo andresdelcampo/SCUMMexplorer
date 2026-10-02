@@ -15,31 +15,6 @@ internal static class LoomNoteNames
     public static string Label(int id) => id is >= 1 and <= 8 ? Choices[id - 1].Label : "Unresolved";
 }
 
-internal static class LoomDraftNames
-{
-    // Display labels only. Associations and terminology are recorded in the UI validation.
-    public static string Title(LoomDraftStatus draft) => (draft.Slot, draft.ForwardVerb, draft.ReverseVerb) switch
-    {
-        (0, 0x3A, 0x3B) => "Opening / Closing",
-        (1, 0x3C, 0x3D) => "Straw into Gold",
-        (2, 0x3E, 0x3F) => "Dyeing / Bleaching",
-        (3, 0x40, 0) => "Night Vision",
-        (4, 0x41, 0x42) => "Twisting",
-        (5, 0x43, 0x44) => "Invisibility",
-        (6, 0x45, 0x46) => "Emptying",
-        (7, 0x47, 0x48) => "Sleep",
-        (8, 0x49, 0) => "Terror",
-        (9, 0x4A, 0x4B) => "Sharpening",
-        (10, 0x4C, 0) => "Healing",
-        (11, 0x4D, 0) => "Reflection",
-        (12, 0x4E, 0x4F) => "Silence",
-        (13, 0x50, 0x51) => "Shaping",
-        (14, 0x52, 0x53) => "Unmaking",
-        (15, 0x54, 0) => "Transcend",
-        _ => $"Draft {draft.Slot + 1}"
-    };
-}
-
 internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyStaff, BitmapSource[] Notes, BitmapSource[] EmptyNotes)
 {
     public static LoomStatusArtwork? TryLoad(GameLibrary game, out string? error)
