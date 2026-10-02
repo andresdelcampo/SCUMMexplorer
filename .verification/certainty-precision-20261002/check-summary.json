@@ -1,0 +1,90 @@
+{
+  "core": 298,
+  "paletteCases": 9,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "reports": [
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/checks-2/core-tests.txt",
+      "sha256": "167d31bd16e76bad87a00302cb1f97113a99b59ca84ffcccee5a37bd68c47276"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/checks-2/release-build.txt",
+      "sha256": "607b67fe9608cae2003571ad80aa9f19b4db6308c0a0fdbead36bffc507fa02a"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/final-release-build.txt",
+      "sha256": "81ab44c2ae46fa71ff4cb3c9a75886edaa1253d285f22166f26f6be7b1dba722"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/literal-final/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/room-audit-1/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/room-audit-1/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/CertaintyPrecisionSession-20261002/png-comparison.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    }
+  ],
+  "sources": [
+    {
+      "path": "src/SCUMMexplorer.Core/Formats/LoomActors.cs",
+      "sha256": "78c5c0b43039328e2ad4ba44deae5357a2c813b31f8143bfd05e780f916a6a97"
+    },
+    {
+      "path": "src/SCUMMexplorer.Core/Formats/LoomBoundedScriptExecutor.cs",
+      "sha256": "f84df6418e570f1f026ec9c498e160341094287514dec2ef82b11679b1792227"
+    },
+    {
+      "path": "tests/SCUMMexplorer.Tests/LoomPaletteCertaintyTests.cs",
+      "sha256": "dfc593ebec9f44051ad613a252d369cbb2985c9b0e3aaf88e1ae52a8628aecdb"
+    }
+  ]
+}

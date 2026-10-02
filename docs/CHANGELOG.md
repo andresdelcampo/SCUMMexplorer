@@ -2,6 +2,13 @@
 
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
+## 2 October: generic palette certainty precision
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Palette versus placement provenance | Palette-only actor commands retain color uncertainty separately; dye input notes/count stay known, existing movement estimates retained; no room exceptions or estimate clearing | [implementation](../.verification/certainty-precision-20261002/palette-validation.md) |
+| Fresh preservation checks | Core298 including nine palette cases;363 exact roots/fingerprints, memberships/sequences unchanged; Blockers0;76 unchanged zero-gap renders; main Release clean; native090 still Conditional | [checks](../.verification/certainty-precision-20261002/check-summary.json) |
+
 ## 2 October: Room41 certainty layers and source-domain proof
 
 | Change | Result | Record |

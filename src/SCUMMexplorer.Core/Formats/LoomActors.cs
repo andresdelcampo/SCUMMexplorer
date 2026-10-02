@@ -30,6 +30,9 @@ public sealed record LoomActorLook(int? Costume, int? Elevation, int? Facing, in
     int InitFrame, int WalkFrame, int StandFrame, int TalkStartFrame, int TalkStopFrame,
     int WalkSpeedX, int WalkSpeedY, IReadOnlyList<byte> Palette, LoomCostumeAnimationState Animation, string? Estimate)
 {
+    /// <summary>Uncertainty in palette writes, independent of position, facing and movement.</summary>
+    public string? PaletteEstimate { get; init; }
+
     public static LoomActorLook Initial { get; } = new(0, 0, 180, 0, 1, 2, 3, 4, 5, 8, 2, new byte[16],
         new LoomCostumeAnimationState(), null);
 
@@ -85,6 +88,9 @@ public sealed class LoomActorTable
         // A reason given after a walk started is about that walk, so its arrival keeps it.
         actor.ClearEstimateOnArrival = false;
     }
+
+    /// <summary>Retains a possible palette write without changing placement or walk provenance.</summary>
+    public void MarkPaletteEstimate(int number, string reason) => _actors[number].PaletteEstimate ??= reason;
 
     /// <summary><c>initActor(0)</c> (actorOps "init"): clears the last valid point and ignoreBoxes and resets the talk colour to 15; room and position stay.</summary>
     public void Init(int number)
@@ -963,6 +969,7 @@ public sealed class LoomActorTable
         public bool CostumeNeedsInit { get; set; }
         public LoomCostumeAnimationState Animation { get; } = new();
         public string? LookEstimate { get; set; }
+        public string? PaletteEstimate { get; set; }
         public string? Estimate
         {
             get => _estimate;
@@ -993,6 +1000,7 @@ public sealed class LoomActorTable
                 Moving = Moving,
                 Look = new LoomActorLook(Costume, Elevation, Facing, Frame, InitFrame, WalkFrame, StandFrame,
                     TalkStartFrame, TalkStopFrame, WalkSpeedX, WalkSpeedY, Palette.ToArray(), Animation.Clone(), LookEstimate)
+                { PaletteEstimate = PaletteEstimate }
             };
     }
 }

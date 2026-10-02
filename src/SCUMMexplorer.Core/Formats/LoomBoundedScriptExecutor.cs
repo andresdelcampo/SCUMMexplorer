@@ -1033,6 +1033,15 @@ public sealed class LoomBoundedScriptExecutor
                 var placementEstimated = onEstimatedPath || instruction.Operands
                     .Split(new[] { ',', '[', ']', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries)
                     .Any(operand => OperandIsEstimated(operand, estimated, knownVariables));
+                if (IsPaletteOnly(instruction))
+                {
+                    var open = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
+                    var paletteOperands = instruction.Operands[(open + 3)..^1]
+                        .Split(';', StringSplitOptions.TrimEntries)
+                        .SelectMany(item => item.Split(',', StringSplitOptions.TrimEntries).Skip(1))
+                        .Prepend(instruction.Operands[..open]);
+                    placementEstimated |= paletteOperands.Any(operand => OperandIsEstimated(operand, estimated, knownVariables));
+                }
                 ApplyActorPlacement(instruction, runtime, roomObjects, knownVariables, placementEstimated, trace);
                 pc = next;
                 continue;
@@ -1232,6 +1241,13 @@ public sealed class LoomBoundedScriptExecutor
         var numberOperand = instruction.Operation == "actorOps" ? operands[..Math.Max(0, operands.IndexOf(", [", StringComparison.Ordinal))] : parts[0];
         if (!TryReadValue(numberOperand, variables, out var rawNumber, out _))
         {
+            if (IsPaletteOnly(instruction))
+            {
+                foreach (var actor in actors.Snapshot()) actors.MarkPaletteEstimate(actor.Number,
+                    $"{label} names an actor the preview cannot read ({numberOperand})");
+                trace.Add($"{label}: unknown actor number; possible palette changes retained");
+                return;
+            }
             if (instruction.Operation is "animateActor" or "faceActor")
             {
                 trace.Add($"{label}: unknown actor number; no actor's frame or facing is changed");
@@ -1325,8 +1341,12 @@ public sealed class LoomBoundedScriptExecutor
                         actors.SetElevation(number, ReadItem(item, 1) is int elevation ? (short)elevation : null);
                     else if (item.StartsWith("walkSpeed,", StringComparison.Ordinal) && ReadItem(item, 1) is int speedX && ReadItem(item, 2) is int speedY)
                         actors.SetWalkSpeed(number, speedX & 0xFF, speedY & 0xFF);
-                    else if (item.StartsWith("palette,", StringComparison.Ordinal) && ReadItem(item, 1) is int index && ReadItem(item, 2) is int color)
-                        actors.SetPalette(number, index & 0xFF, color & 0xFF);
+                    else if (item.StartsWith("palette,", StringComparison.Ordinal))
+                    {
+                        if (ReadItem(item, 1) is int index && ReadItem(item, 2) is int color)
+                            actors.SetPalette(number, index & 0xFF, color & 0xFF);
+                        else actors.MarkPaletteEstimate(number, $"{label}: a palette operand is unknown");
+                    }
                     else if (item.StartsWith("talkAnimation,", StringComparison.Ordinal))
                     {
                         if (ReadItem(item, 1) is int talkStart) actors.SetFrame(number, "talkStart", talkStart & 0xFF);
@@ -1364,7 +1384,12 @@ public sealed class LoomBoundedScriptExecutor
                 break;
             }
         }
-        if (estimate) actors.MarkEstimate(number, $"actor {number}'s {label} follows a seeded pick");
+        if (estimate)
+        {
+            var reason = $"actor {number}'s {label} follows a seeded pick";
+            if (IsPaletteOnly(instruction)) actors.MarkPaletteEstimate(number, reason);
+            else actors.MarkEstimate(number, reason);
+        }
         var state = actors[number];
         trace.Add($"actor {number}: {label} → room {Show(state.Room)}, ({Show(state.X)}, {Show(state.Y)}), box {Show(state.WalkBox)}, " +
                   $"{(state.Visible is bool visible ? visible ? "visible" : "hidden" : "visibility unknown")}{(state.Estimate is null ? "" : " (estimate)")}");
@@ -1440,11 +1465,35 @@ public sealed class LoomBoundedScriptExecutor
             return;
         }
         var operand = possible.Operands.Split(',', StringSplitOptions.TrimEntries)[0];
+        if (IsPaletteOnly(possible))
+        {
+            if (TryReadValue(operand, variables, out var paletteActor, out _))
+            {
+                if (LoomActorTable.IsValid(paletteActor)) runtime.Actors.MarkPaletteEstimate(paletteActor, reason);
+            }
+            else foreach (var actor in runtime.Actors.Snapshot()) runtime.Actors.MarkPaletteEstimate(actor.Number, reason);
+            return;
+        }
         if (TryReadValue(operand, variables, out var number, out _))
         {
             if (LoomActorTable.IsValid(number)) runtime.Actors.Forget(number, reason);
         }
         else runtime.Actors.ForgetAll(reason);
+    }
+
+    // Only the palette subcommand is independent of placement and movement.
+    // Keep mixed lists, init, costume, boxes, speed and unknown operations conservative.
+    private static bool IsPaletteOnly(LoomScriptInstruction instruction)
+    {
+        if (instruction.Operation != "actorOps") return false;
+        var open = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
+        if (open < 0 || !instruction.Operands.EndsWith(']')) return false;
+        var items = instruction.Operands[(open + 3)..^1].Split(';', StringSplitOptions.TrimEntries);
+        return items.Length > 0 && items.All(item =>
+        {
+            var parts = item.Split(',', StringSplitOptions.TrimEntries);
+            return parts.Length == 3 && parts[0] == "palette" && parts[1].Length > 0 && parts[2].Length > 0;
+        });
     }
 
     private static string Show(int? value) => value?.ToString(CultureInfo.InvariantCulture) ?? "?";
