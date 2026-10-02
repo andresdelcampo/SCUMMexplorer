@@ -1,0 +1,206 @@
+{
+  "outcome": "Six Room25 sites complete through actual walking, repeated lamb double-clicks and exit input; no production fix.",
+  "directFrames": 2634,
+  "inputFrames": 2650,
+  "matchedScopes": 6,
+  "identicalRecordedBodyEvents": 208,
+  "dispatches": [
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        447,
+        54
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        447,
+        54
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 7,
+      "SourceLabel": "Script 07",
+      "Offset": 46,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x000], local[0x001], []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        447,
+        54
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 6,
+      "SourceLabel": "Script 06",
+      "Offset": 347,
+      "Kind": 3,
+      "Operation": "startObject",
+      "Operands": "local[0x002], 0x37, []",
+      "TargetKind": 3,
+      "TargetId": null,
+      "Certainty": 0,
+      "FreezeResistant": false,
+      "ResolvedArguments": [
+        446,
+        55
+      ],
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    }
+  ],
+  "downstreamObjectCalls": [
+    {
+      "SourceScriptId": 25,
+      "SourceLabel": "Room 25 Object 447 Verb 0x36",
+      "Offset": 83,
+      "Kind": 0,
+      "Operation": "startScript",
+      "Operands": "0xCC, [0x0000]",
+      "TargetKind": 6,
+      "TargetId": 204,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 25,
+      "SourceLabel": "Room 25 Object 447 Verb 0x36",
+      "Offset": 97,
+      "Kind": 0,
+      "Operation": "startScript",
+      "Operands": "0xCD, []",
+      "TargetKind": 6,
+      "TargetId": 205,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 25,
+      "SourceLabel": "Room 25 Object 447 Verb 0x36",
+      "Offset": 108,
+      "Kind": 0,
+      "Operation": "startScript",
+      "Operands": "0xCE, []",
+      "TargetKind": 6,
+      "TargetId": 206,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    },
+    {
+      "SourceScriptId": 25,
+      "SourceLabel": "Room 25 Object 446 Verb 0x37",
+      "Offset": 20,
+      "Kind": 0,
+      "Operation": "startScript",
+      "Operands": "0xD0, []",
+      "TargetKind": 6,
+      "TargetId": 208,
+      "Certainty": 1,
+      "FreezeResistant": false,
+      "ResolvedArguments": null,
+      "Recursive": false,
+      "EstimatedArgumentIndexes": null,
+      "Executed": true
+    }
+  ],
+  "newSites": [
+    {
+      "owner": "Room 25 local 200",
+      "offset": "+0x0058"
+    },
+    {
+      "owner": "Room 25 local 204",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 25 local 205",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 25 local 206",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 25 local 208",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "script 069",
+      "offset": "+0x0000"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 176,
+    "after": 182,
+    "total": 235,
+    "percent": 77.45,
+    "remaining": 53
+  },
+  "protectedExactUnstaged": 57,
+  "productionAndCatalogUnchanged": true,
+  "limitations": [
+    "Default preview boot and catalog Room25 arrival are assumptions.",
+    "Public Core input API, not WPF or physical input.",
+    "Direct control shares the two initial walking actions.",
+    "All estimates are retained; recorded body equivalence is not whole-runtime or frame equivalence.",
+    "Multi-action completion does not qualify fresh single-action gaps."
+  ],
+  "evidence": {
+    "Exe\\Room25Input-20261002\\cycle-1\\direct.json": "dbbaffc1d04c43136dac9030241f8f37541d8dc94ad5f9abe70c04a92edfa3e5",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

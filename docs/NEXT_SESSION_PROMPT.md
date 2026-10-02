@@ -1,5 +1,15 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room25 six-site input route complete
+
+After89a2211, actual clicks on decoded box4 then box3 trigger local200 and069; three lamb double-clicks dispatch447/36 through007 +002E and complete204/205/206; exit click dispatches446/37 through006 +015B and completes208/loads24. Six scopes,208 exactly equal recorded scene-body events versus the direct-object control, all Executed, estimates retained. Direct2634/input2650frames; no production correction, observer expansion, status edits or spell prerequisites. [Validation](../.verification/room25-input-20261002/validation.md).
+
+Audited union **176→182/235=77.45%**, six newly qualified sites,53 remain. Separate fresh single-action **169/235=71.91%** unchanged,66 gaps/49 owners/335 catalog starts. Preserve all historical evidence and57 protected files exact/unstaged. No App launch/close/interaction or push; Core662/broad/main Release remain dated, fresh Core-only probe/checker pass.
+
+Next highest-value candidate: Room23's six-site cluster, using source walk-box transitions and actual input, then supported Game Status staff/notes/learned edits if spells are needed, explicitly labelled exploration choices. Do not rewrite source notes/reverse flags. Two bounded diagnostic cycles at most without a route-relevant implementation decision. Commit completed tasks separately. Room25, Room34, sphere and Sharpening are complete; do not repeat them.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from the Room25 input checkpoint using this handoff. Start with Room23's remaining cluster by source walking and actual input. Audited union182/235 (77.45%); fresh single-action169/235 (71.91%), distinct. Preserve all constraints/history/protected57 and the running App; no launch, close, interaction or push. Use supported labelled status edits for spell setup and preserve notes/reverse flags. Compare accepted input plus completion against direct controls, never substitute replay for input verification.
+
 ## Latest: Room34 input progression verified; select remaining work by practical coverage
 
 After7ddda08, the user delegates route selection by highest legitimate coverage value and prioritizes **interactive triggers**, since scenes generally already play. Staff, sufficient notes and learned spell are the established setup for casting; use supported Game Status edits as explicitly labelled exploration choices when appropriate. Do not ask those prerequisites again or use a direct preview as proof of keyboard dispatch.

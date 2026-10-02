@@ -1,5 +1,9 @@
 # Changelog
 
+## 2 October: verify Room25 walking and repeated lamb input
+
+Actual box4/box3 clicks, three lamb double-clicks and an exit click complete six previously unvalidated sites, returning24.208 recorded scene-body events exactly match the direct-object control; estimates preserved. Audited union176→182/235 (77.45%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room25-input-20261002/validation.md).
+
 ## 2 October: verify Room34 spells through game input
 
 Five keyboard casts, with staff/six notes/learned slots5 and10, trigger the same nine completed scopes as direct responses. Four new qualified source sites;127 scene events differ only in retained certainty labels. No production fix or catalog change. Audited site union172→176/235 (74.89%); fresh single-action coverage stays169/235 (71.91%). All57 protected files exact/unstaged; no App interaction or push. [Input evidence and coverage definition](../.verification/room34-sequences-20261002/validation.md).
