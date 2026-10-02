@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify Room36 terrain watcher input
+
+Room36 accepted box10→4→3→9 clicks complete all four watcher200 sites001D/0048/0077/00A6,547frames,4/4 scopes,29 Executed/Conditional body events. Audited union192→196/235 (83.40%),39 remaining; separate fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two bounded cycles; failed first long walk retained/excluded. No production/catalog change. Protected57 and prior evidence exact; running App untouched. [Validation](../.verification/room36-input-20261003/validation.md).
+
 ## 3 October: verify all four remaining Room10 sites through game input
 
 Two terrain transitions, the clam's gull-feeding refusal and its later closing scene complete through clicks and note keys, with an actual Room5 exit/return supplying source state. Five balanced scopes,1266 input/1113 direct frames;86 recorded body events differ only in30 retained certainty fields. Audited union188→192/235 (81.70%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room10-input-20261003/validation.md).

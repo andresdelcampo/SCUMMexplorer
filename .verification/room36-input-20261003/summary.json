@@ -1,0 +1,82 @@
+{
+  "outcome": "Four Room36 watcher sites complete through actual Core click input; no production fix.",
+  "frames": 547,
+  "completedScopes": 4,
+  "conditionalExecutedBodyEvents": 29,
+  "inputPoints": [
+    {
+      "box": 10,
+      "x": 354,
+      "y": 104
+    },
+    {
+      "box": 4,
+      "x": 75,
+      "y": 97
+    },
+    {
+      "box": 3,
+      "x": 84,
+      "y": 92
+    },
+    {
+      "box": 9,
+      "x": 349,
+      "y": 99
+    }
+  ],
+  "newSites": [
+    {
+      "owner": "Room 36 local 200",
+      "offset": "+0x001D"
+    },
+    {
+      "owner": "Room 36 local 200",
+      "offset": "+0x0048"
+    },
+    {
+      "owner": "Room 36 local 200",
+      "offset": "+0x0077"
+    },
+    {
+      "owner": "Room 36 local 200",
+      "offset": "+0x00A6"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 192,
+    "after": 196,
+    "total": 235,
+    "percent": 83.4,
+    "remaining": 39
+  },
+  "diagnosticCycles": 2,
+  "firstCycle": "Box3 click from box12 completes nearer box10 scene, interrupts walk; expected box3 end absent. Failed route excluded.",
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 116,
+  "productionAndCatalogUnchanged": true,
+  "limitations": [
+    "Default preview boot and catalog Room36 arrival are exploration assumptions.",
+    "Core input API only; no WPF, physical input, visual, audio or native full-game proof.",
+    "Watcher sites have no direct object-verb control; no private-script control fabricated.",
+    "All 29 recorded body events retain Conditional provenance; not an exhaustive instruction/writer trace.",
+    "Multi-action completion does not qualify fresh single-action gaps."
+  ],
+  "evidence": {
+    "Exe\\Room36Input-20261003\\cycle-2\\input.json": "64d54010713e91af16458a3ccfe8a73a94999a69cd12350a2b8c3921d2e9075f",
+    "Exe\\Room36Input-20261003\\cycle-1\\input.json": "fae40c66b45053fd2854f58a36fc85fa0127476929553379d32ea35a6ee7dd96",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\Room10Input-20261003\\cycle-2\\input.json": "45bc809447e4695a970ef18efa5ef6f40766b08ec4903ceaadb3bb2c855aa0e6"
+  }
+}

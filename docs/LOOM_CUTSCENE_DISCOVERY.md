@@ -4,6 +4,8 @@ The session executes reached script/object/room instructions independently of re
 
 ## Current replay coverage (2 October)
 
+**Latest Room36 input supplement,3 October:** Room36 accepted box10→4→3→9 clicks complete all four watcher200 sites001D/0048/0077/00A6,547frames,4/4 scopes,29 Executed/Conditional body events. Audited union192→196/235 (83.40%),39 remaining; separate fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two bounded cycles; failed first long walk retained/excluded. No production/catalog change. Protected57 and prior evidence exact; running App untouched. [Validation](../.verification/room36-input-20261003/validation.md). No fresh-root promotion or native full-game claim.
+
 **Latest Room10 input supplement,3 October:** four completed sites raise audited union188→192/235=81.70%,43 remaining. Separate fresh single-action169/235=71.91%,66 gaps/49 owners/335 starts unchanged. Source walking and three keyboard casts, with an actual exit/return between close responses, complete5/5 scopes;86 recorded body events match direct control except30 retained certainty labels. Failed first-cycle pair excluded. No production/catalog promotion or App interaction. [Validation and ledger](../.verification/room10-input-20261003/validation.md).
 
 **Latest Room23 input supplement:** six completed watcher sites raise audited union188/235=80.00%,47 remaining. Session gain12 with Room25. Fresh single-action169/235=71.91%,66 gaps/49 owners/335 starts unchanged. No catalog promotion or execution fix. Failed first cycle retained; second source-point route6/6. [Validation](../.verification/room23-input-20261002/validation.md).
