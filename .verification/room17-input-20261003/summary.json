@@ -1,0 +1,53 @@
+{
+  "outcome": "Room17 watcher pair completes through visible input points; off-picture first attempt retained.",
+  "frames": 241,
+  "completedScopes": 2,
+  "conditionalExecutedBodyEvents": 15,
+  "newSites": [
+    {
+      "owner": "Room 17 local 200",
+      "offset": "+0x0022"
+    },
+    {
+      "owner": "Room 17 local 200",
+      "offset": "+0x004D"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 201,
+    "after": 203,
+    "total": 235,
+    "percent": 86.38,
+    "remaining": 32
+  },
+  "diagnosticCycles": 2,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 151,
+  "productionAndCatalogUnchanged": true,
+  "limitations": [
+    "Catalog arrival/default preview are exploration assumptions.",
+    "Core API only; no WPF, physical-input or native-game claim.",
+    "All recorded watcher events Conditional; no fabricated direct-script control.",
+    "No fresh single-action promotion."
+  ],
+  "evidence": {
+    "Exe\\Room17Input-20261003\\cycle-2\\input.json": "3ffe3c4f69d12f8483844021d59b7b16a2ea91ee220e632276621a456dfd268e",
+    "Exe\\Room17Input-20261003\\cycle-1\\input.json": "a371c9a666ffa9ccb4f62e33543ae15c2ad293ffbd5be5fba1e54ba59e86755e",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\Room10Input-20261003\\cycle-2\\input.json": "45bc809447e4695a970ef18efa5ef6f40766b08ec4903ceaadb3bb2c855aa0e6",
+    "Exe\\Room36Input-20261003\\cycle-2\\input.json": "64d54010713e91af16458a3ccfe8a73a94999a69cd12350a2b8c3921d2e9075f",
+    "Exe\\Room24Input-20261003\\cycle-1\\input.json": "62d21cd625075fda73fcc45c086386571250a4cc3298ecfe638c7f5ca66b641c",
+    "Exe\\Room15Input-20261003\\cycle-1\\input.json": "ba65f8accf0006b265d69a5370e5ea8f2a794e16c1323d53a0dcd3256a4c6161"
+  }
+}
