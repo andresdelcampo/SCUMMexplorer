@@ -24,6 +24,50 @@ public sealed class LoomScriptRuntimeState
     public Dictionary<int, uint> ObjectClasses { get; }
     public Dictionary<int, RoomObjectPosition> ObjectPositions { get; } = [];
     public Dictionary<string, ushort> GlobalVariables { get; } = new(StringComparer.Ordinal);
+    internal LoomScriptObserver? MutationObserver { get; set; }
+
+    /// <summary>
+    /// Report a runtime/session global write even when its number is unchanged. This does not
+    /// change alias or estimate policy. Raw dictionary writes outside these APIs still require
+    /// explicit relation invalidation; the dictionary is retained for API compatibility.
+    /// </summary>
+    public void SetGlobalVariable(string key, ushort value)
+    {
+        GlobalVariables[key] = value;
+        MutationObserver?.GlobalMutation(key);
+    }
+
+    public bool RemoveGlobalVariable(string key)
+    {
+        var removed = GlobalVariables.Remove(key);
+        MutationObserver?.GlobalMutation(key);
+        return removed;
+    }
+
+    /// <summary>Scope mutation notification to the supplied observer, restoring it on disposal.</summary>
+    public IDisposable ObserveGlobalMutations(LoomScriptObserver observer)
+    {
+        ArgumentNullException.ThrowIfNull(observer);
+        return new MutationScope(this, observer);
+    }
+
+    private sealed class MutationScope : IDisposable
+    {
+        private LoomScriptRuntimeState? state;
+        private readonly LoomScriptObserver? previous;
+        public MutationScope(LoomScriptRuntimeState state, LoomScriptObserver observer)
+        {
+            this.state = state;
+            previous = state.MutationObserver;
+            state.MutationObserver = observer;
+        }
+        public void Dispose()
+        {
+            if (state is null) return;
+            state.MutationObserver = previous;
+            state = null;
+        }
+    }
     public HashSet<int> Inventory { get; } = [];
     public HashSet<int> ActiveSounds { get; } = [];
     /// <summary>Native resource-clock status, with unresolved/seeded route certainty; null outside a session.</summary>

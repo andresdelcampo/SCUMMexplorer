@@ -259,7 +259,7 @@ public sealed class LoomMessageTable
         _slotCopy = slot.Copy();
         TalkDelay = 0;
         HaveMsg = 0xFF;
-        runtime.GlobalVariables[HaveMsgVariable] = 0xFF;
+        runtime.SetGlobalVariable(HaveMsgVariable, 0xFF);
         DisplayDialog(runtime);
         return Talk is null
             ? $"print for actor {actor}: no text shown"
@@ -367,7 +367,7 @@ public sealed class LoomMessageTable
         delta = Math.Clamp(delta, 1, MaxFrameDelta);
         TalkDelay = Math.Max(0, TalkDelay - delta);
         DisplayDialog(runtime);
-        runtime.GlobalVariables[HaveMsgVariable] = (ushort)HaveMsg;
+        runtime.SetGlobalVariable(HaveMsgVariable, (ushort)HaveMsg);
     }
 
     /// <summary>
@@ -390,7 +390,7 @@ public sealed class LoomMessageTable
     {
         StopTalk();
         _drawn.Clear();
-        runtime.GlobalVariables[HaveMsgVariable] = 0;
+        runtime.SetGlobalVariable(HaveMsgVariable, 0);
     }
 
     /// <summary>ScummVM <c>stopTalk</c>: no message, no delay, no talking actor, and the text is erased.</summary>

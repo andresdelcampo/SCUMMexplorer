@@ -1,5 +1,13 @@
 # Changelog
 
+## 2 October: numeric source access and notified runtime mutations
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Optional access records | Query/expression/range destinations and debug/delay reads; legacy bindings and instruction sequence preserved; unknown/filtered access stays a barrier | [API validation](../.verification/runtime-access-20261002/api-validation.md) |
+| Runtime mutations | Known session/message/status writes and removals retire relations even for unchanged values; raw external dictionary writes require explicit notification | [API validation](../.verification/runtime-access-20261002/api-validation.md) |
+| API checks | Nine new cases, Core357, clean main Release; native preservation follows the separate lineage task; no App/push/promotion | [API validation](../.verification/runtime-access-20261002/api-validation.md) |
+
 ## 2 October: generic completion correspondence and fresh preservation
 
 | Change | Result | Record |

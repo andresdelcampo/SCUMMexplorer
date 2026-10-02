@@ -128,7 +128,8 @@ public sealed partial class LoomExplorationSession
         _verbs = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
         _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes)
         {
-            Random = new LoomSeededRandom(randomSeed)
+            Random = new LoomSeededRandom(randomSeed),
+            MutationObserver = observer
         };
         _globalScriptCount = ReadGlobalScriptCount(game);
         _runtime.ScriptRunning = IsScriptRunning;
@@ -139,7 +140,7 @@ public sealed partial class LoomExplorationSession
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
-            _runtime.GlobalVariables[timer] = 0;
+            _runtime.SetGlobalVariable(timer, 0);
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
         {
@@ -289,10 +290,10 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     private void UpdateTimersAndDelays(int delta)
     {
-        _runtime.GlobalVariables[TimerVariable] = (ushort)delta;
+        _runtime.SetGlobalVariable(TimerVariable, (ushort)delta);
         foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
             if (_runtime.GlobalVariables.TryGetValue(timer, out var value))
-                _runtime.GlobalVariables[timer] = (ushort)(value + delta);
+                _runtime.SetGlobalVariable(timer, (ushort)(value + delta));
         var counted = Math.Min(delta, MaxFrameDelta);
         foreach (var item in _pending)
         {
@@ -370,7 +371,7 @@ public sealed partial class LoomExplorationSession
     /// can exercise hooks the boot has not set. Never used by the app.
     /// </summary>
     internal void SetGlobalWord(int variable, ushort value) =>
-        _runtime.GlobalVariables[$"var[0x{variable:X3}]"] = value;
+        _runtime.SetGlobalVariable($"var[0x{variable:X3}]", value);
 
     /// <summary>Test seam: runs a synthetic script at the top level, as a frame would. Never used by the app.</summary>
     internal LoomBoundedScriptResult RunTopLevelScript(LoomScriptDisassembly script) =>
@@ -512,7 +513,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     private void EndClosedScenes(int roomId, IReadOnlyList<(ushort Data, string Script)> closed)
     {
-        _runtime.GlobalVariables[OverrideVariable] = 0;
+        _runtime.SetGlobalVariable(OverrideVariable, 0);
         _runtime.EstimatedVariables.Remove(OverrideVariable);
         var known = _runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var endScript);
         foreach (var (data, script) in closed)
@@ -604,7 +605,7 @@ public sealed partial class LoomExplorationSession
         _runtime.EstimatedVariables.Add(EgoSizeVariable);
         if (size is int value)
         {
-            _runtime.GlobalVariables[EgoSizeVariable] = (ushort)value;
+            _runtime.SetGlobalVariable(EgoSizeVariable, (ushort)value);
             _visitTrace.Add($"catalog visit to Room {roomId:00}: {EgoSizeVariable} = {value} (estimate, {how})");
             _uncertainties.Add($"Room {roomId:00} was selected from the catalog: the ego's size ({EgoSizeVariable}, script {EgoSizeScript:000}) is estimated as {value} from the assumed arrival's route: {how}.");
         }
@@ -740,17 +741,17 @@ public sealed partial class LoomExplorationSession
         // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
         var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
         _runtime.RoomCameraBounds = _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
-        _runtime.GlobalVariables[CameraVariable] = 160;
+        _runtime.SetGlobalVariable(CameraVariable, 160);
         _runtime.EstimatedVariables.Remove(CameraVariable);
         _runtime.Camera.Reset(160);
         // startScene resets VAR_CAMERA_MIN_X and VAR_CAMERA_MAX_X (v3: vars 17 and 18).
-        _runtime.GlobalVariables["var[0x011]"] = 160;
-        _runtime.GlobalVariables["var[0x012]"] = (ushort)Math.Max(160, roomWidth - 160);
+        _runtime.SetGlobalVariable("var[0x011]", 160);
+        _runtime.SetGlobalVariable("var[0x012]", (ushort)Math.Max(160, roomWidth - 160));
         _runtime.EstimatedVariables.Remove("var[0x011]");
         _runtime.EstimatedVariables.Remove("var[0x012]");
         foreach (var item in _currentObjects)
             _runtime.ObjectPositions.TryAdd(item.Id, new RoomObjectPosition(item.X, item.Y));
-        _runtime.GlobalVariables["var[0x004]"] = (ushort)room.ResourceId!.Value;
+        _runtime.SetGlobalVariable("var[0x004]", (ushort)room.ResourceId!.Value);
         _roomSize = (roomWidth, (roomBytes[6] ^ 0xFF) | ((roomBytes[7] ^ 0xFF) << 8));
         _pointer = null;
         PlaceVirtualMouse();
@@ -886,8 +887,8 @@ public sealed partial class LoomExplorationSession
         if (_roomSize is not { } size) return;
         if (_pointer is { } pointer)
         {
-            _runtime.GlobalVariables["var[0x014]"] = (ushort)pointer.X;
-            _runtime.GlobalVariables["var[0x015]"] = (ushort)pointer.Y;
+            _runtime.SetGlobalVariable("var[0x014]", (ushort)pointer.X);
+            _runtime.SetGlobalVariable("var[0x015]", (ushort)pointer.Y);
             _runtime.EstimatedVariables.Remove("var[0x014]");
             _runtime.EstimatedVariables.Remove("var[0x015]");
             _runtime.VirtualMouse = pointer;
@@ -896,8 +897,8 @@ public sealed partial class LoomExplorationSession
         }
         var x = CameraX ?? size.Width / 2;
         var y = size.Height;
-        _runtime.GlobalVariables["var[0x014]"] = (ushort)x;
-        _runtime.GlobalVariables["var[0x015]"] = (ushort)y;
+        _runtime.SetGlobalVariable("var[0x014]", (ushort)x);
+        _runtime.SetGlobalVariable("var[0x015]", (ushort)y);
         _runtime.EstimatedVariables.Remove("var[0x014]");
         _runtime.EstimatedVariables.Remove("var[0x015]");
         _runtime.VirtualMouse = (x, y);
@@ -1086,8 +1087,8 @@ public sealed partial class LoomExplorationSession
             // The pointer is over the verb screen, below the room picture (VAR_VIRT_MOUSE_Y past the room).
             _pointer = null;
             PlaceVirtualMouse();
-            _runtime.GlobalVariables[MouseXVariable] = (ushort)x;
-            _runtime.GlobalVariables[MouseYVariable] = (ushort)y;
+            _runtime.SetGlobalVariable(MouseXVariable, (ushort)x);
+            _runtime.SetGlobalVariable(MouseYVariable, (ushort)y);
             _runtime.EstimatedVariables.Remove(MouseXVariable);
             _runtime.EstimatedVariables.Remove(MouseYVariable);
             _visitTrace.Add($"click: verb area at screen ({x}, {y}), " + (verb is null ? "on no verb" : $"verb 0x{verbId:X2} (slot {verb.Slot})") +
@@ -1243,7 +1244,7 @@ public sealed partial class LoomExplorationSession
         _pointerNote = "where the explorer clicked; it stays there after the click";
         PlaceVirtualMouse();
         _runtime.VirtualMouseAssumption = $"assumed input: {which} at ({x}, {y}), sent by the explorer";
-        _runtime.GlobalVariables[ClickTimerVariable] = (ushort)gap;
+        _runtime.SetGlobalVariable(ClickTimerVariable, (ushort)gap);
         _runtime.EstimatedVariables.Remove(ClickTimerVariable);
         _uncertainties.Add($"Assumed input timing for {which}: var[0x00C] (VAR_TMR_2, jiffies since script 006 last reset it) = {gap}; the frame loop counts it on from there, but the player's time before the click is not known.");
         _visitTrace.Add($"click: {which} at ({x}, {y}) runs script {verbScript} with [{SceneClickArea}, 0, {InputMode}] (runInputScript)");
@@ -1278,7 +1279,7 @@ public sealed partial class LoomExplorationSession
     {
         var (min, max) = _runtime.CameraRange ?? (160, 160);
         var clamped = (ushort)Math.Clamp(x, min, max);
-        _runtime.GlobalVariables[CameraVariable] = clamped;
+        _runtime.SetGlobalVariable(CameraVariable, clamped);
         _runtime.Camera.DestX = x;
         _runtime.Camera.MovingToActor = false;
         if (estimate is null) _runtime.EstimatedVariables.Remove(CameraVariable);
@@ -1293,7 +1294,7 @@ public sealed partial class LoomExplorationSession
 
     private void ForgetCamera(string reason)
     {
-        _runtime.GlobalVariables.Remove(CameraVariable);
+        _runtime.RemoveGlobalVariable(CameraVariable);
         _runtime.EstimatedVariables.Remove(CameraVariable);
         _uncertainties.Add($"Camera x (var[0x002]) is unknown: {reason}.");
     }
@@ -1477,7 +1478,7 @@ public sealed partial class LoomExplorationSession
             followed = LoomActorTable.IsValid(cameraState.Follows) ? _runtime.Actors[cameraState.Follows] : null;
         var moved = cameraState.Move(camera, min, max, bounds, followed?.X);
         if (moved == camera) return;
-        _runtime.GlobalVariables[CameraVariable] = (ushort)moved;
+        _runtime.SetGlobalVariable(CameraVariable, (ushort)moved);
         if (followed?.Estimate is not null && _runtime.EstimatedVariables.Add(CameraVariable))
             _uncertainties.Add($"Camera x (var[0x002]) = {moved} is an estimate: it follows actor {followed.Number}, whose position is an estimate ({followed.Estimate}).");
     }
@@ -2052,7 +2053,7 @@ public sealed partial class LoomExplorationSession
     private string EndCutscene(LoomScriptEvent scriptEvent, int depth)
     {
         var estimate = scriptEvent.Certainty != LoomScriptEventCertainty.Reached;
-        _runtime.GlobalVariables[OverrideVariable] = 0;
+        _runtime.SetGlobalVariable(OverrideVariable, 0);
         if (estimate) _runtime.EstimatedVariables.Add(OverrideVariable);
         else _runtime.EstimatedVariables.Remove(OverrideVariable);
         ushort data = 0;
@@ -2110,7 +2111,7 @@ public sealed partial class LoomExplorationSession
         _overrides.Remove(depth);
         _pending[index] = _pending[index] with { Offset = point.JumpOffset };
         point.Frame.FreezeCount = 0;
-        _runtime.GlobalVariables[OverrideVariable] = 1;
+        _runtime.SetGlobalVariable(OverrideVariable, 1);
         _runtime.EstimatedVariables.Remove(OverrideVariable);
         _visitTrace.Add($"abortCutscene: {point.Frame.Label} continues at its skip jump +0x{point.JumpOffset:X4}, {OverrideVariable} = 1");
         return $"{point.Frame.Label} continues at its skip jump (+0x{point.JumpOffset:X4}) on the next frame, unfrozen, with {OverrideVariable} (VAR_OVERRIDE) = 1";

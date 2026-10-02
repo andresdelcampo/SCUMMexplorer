@@ -105,6 +105,7 @@ public sealed class LoomBoundedScriptExecutor
         ArgumentNullException.ThrowIfNull(initialObjectStates);
         ArgumentNullException.ThrowIfNull(roomObjects);
         if (instructionLimit is < 1 or > 100_000) throw new ArgumentOutOfRangeException(nameof(instructionLimit));
+        using var mutationScope = observation is null ? null : runtime?.ObserveGlobalMutations(observation.Observer);
 
         var states = runtime?.ObjectStates ?? new Dictionary<int, byte>(initialObjectStates);
         var positions = runtime?.ObjectPositions ?? new Dictionary<int, RoomObjectPosition>();
@@ -158,7 +159,8 @@ public sealed class LoomBoundedScriptExecutor
             observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
                 "instruction", instruction.Offset, instruction.Operation, instruction.Operands,
                 knownVariables, estimated, onEstimatedPath,
-                bindOperands: include => BindObservationOperands(instruction, knownVariables, estimated, include));
+                bindOperands: include => BindObservationOperands(instruction, knownVariables, estimated, include),
+                bindSourceAccess: include => BindSourceAccess(instruction, knownVariables, estimated, include));
 
             if (instruction.Operation == "stopObjectCode")
             {
@@ -911,7 +913,7 @@ public sealed class LoomBoundedScriptExecutor
                 if (cameraUnknown is not null)
                 {
                     knownVariables.Remove("var[0x002]");
-                    runtime.GlobalVariables.Remove("var[0x002]");
+                    runtime.RemoveGlobalVariable("var[0x002]");
                     estimated.Remove("var[0x002]");
                     limitations.Add($"camera x (var[0x002]) is unknown after actorFollowCamera: {cameraUnknown} (+0x{instruction.Offset:X4})");
                 }
@@ -1788,7 +1790,8 @@ public sealed class LoomBoundedScriptExecutor
     // Observations use the executor's operand resolver without changing a value, path or decision.
     // Only these decoded numeric/call forms are described; all other operations have no bindings.
     private static IReadOnlyList<LoomScriptOperandBinding> BindObservationOperands(LoomScriptInstruction instruction,
-        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include)
+        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include,
+        bool extended = false)
     {
         LoomScriptOperandBinding Bind(string role, string operand, int? argument = null, int depth = 0)
         {
@@ -1813,6 +1816,13 @@ public sealed class LoomBoundedScriptExecutor
 
         var op = instruction.Operation;
         var text = instruction.Operands;
+        if (extended && op == "setVarRange")
+        {
+            if (!TryReadVarRange(text, variables, out var first, out var keys, out _)) return [];
+            var initial = Bind("destination-before", first);
+            return keys.Select(key => Bind("destination-before", key) with
+                { Operand = first, Index = initial.Index }).ToArray();
+        }
         if (op is "move" or "add" or "subtract" or "multiply" or "divide" or "and" or "or")
         {
             var parts = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -1841,7 +1851,52 @@ public sealed class LoomBoundedScriptExecutor
             var count = text.IndexOf(", count=", StringComparison.Ordinal);
             return count >= 0 ? [Bind("destination-before", text[..count])] : [];
         }
+        if (extended && (IsActorQuery(op) || op is "getDist" or "findObject" or "isSoundRunning" or "isScriptRunning"))
+        {
+            var parts = text.Split(',', StringSplitOptions.TrimEntries);
+            var count = op is "getDist" or "findObject" ? 3 : 2;
+            return parts.Length == count ? new[] { Bind("destination-before", parts[0]) }
+                .Concat(parts.Skip(1).Select(p => Bind("source", p))).ToArray() : [];
+        }
+        if (extended && op is "debug" or "delayVariable")
+            return text.Length == 0 && op == "debug" ? [] : [Bind("source", text)];
+        if (extended && op == "expression")
+        {
+            var separator = text.IndexOf("= [", StringComparison.Ordinal);
+            if (separator < 0 || !text.EndsWith(']')) return [];
+            var body = text[(separator + 3)..^1];
+            // The executor's same bounded expression grammar. Nested random operations have
+            // intra-instruction writes and remain a barrier rather than fabricated accesses.
+            if (body.Contains("getRandomNr", StringComparison.Ordinal)) return [];
+            var tokens = Regex.Matches(body, @"(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+            if (tokens.Count is 0 or > 4096) return [];
+            var end = 0;
+            foreach (Match token in tokens)
+            {
+                if (!string.IsNullOrWhiteSpace(body[end..token.Index])) return [];
+                end = token.Index + token.Length;
+            }
+            if (!string.IsNullOrWhiteSpace(body[end..])) return [];
+            return new[] { Bind("destination-before", text[..separator]) }
+                .Concat(tokens.Cast<Match>().Where(t => t.Value is not ("+" or "-" or "*" or "/"))
+                    .Select(t => Bind("source", t.Value))).ToArray();
+        }
         return [];
+    }
+
+    private static LoomScriptSourceAccess BindSourceAccess(LoomScriptInstruction instruction,
+        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include)
+    {
+        var bindings = BindObservationOperands(instruction, variables, estimated, include, extended: true);
+        var harmless = instruction.Operation is "stopObjectCode" or "breakHere" or "jumpRelative" or "delay" ||
+            instruction.Operation == "debug" && instruction.Operands.Length == 0;
+        var barrier = bindings.Count == 0 && !harmless ? "unmodelled instruction access" :
+            bindings.Any(b => b.UnresolvedReason is not null || b.Index is { Value: null })
+                ? "unresolved or filtered source access" : null;
+        return new(Array.AsReadOnly(bindings.ToArray()), barrier, Array.AsReadOnly(new[] {
+            "numeric storage operands only; native actor/object/message effects remain independent",
+            "selected stream only; raw external writes, concurrency, scheduling and callee return remain limits"
+        }));
     }
 
     private static bool TryNormalizeKey(string operand, IDictionary<string, ushort> variables, out string key)
@@ -1899,6 +1954,7 @@ public sealed class LoomBoundedScriptExecutor
     private static void CopyGlobalVariables(IReadOnlyDictionary<string, ushort> source,
         IDictionary<string, ushort> destination)
     {
+        // Synchronization of already observed source writes, not a new external mutation.
         foreach (var (key, value) in source)
             if (key.StartsWith("var[", StringComparison.Ordinal) ||
                 key.StartsWith("bit[", StringComparison.Ordinal)) destination[key] = value;

@@ -126,9 +126,9 @@ public sealed partial class LoomExplorationSession
     }
     private void SetStatusWord(string key, ushort value, ushort mask = 0xFFFF, string origin = "Explicit user edit")
     {
-        _runtime.GlobalVariables[key] = value;
+        _runtime.SetGlobalVariable(key, value);
         int word = int.Parse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-        for (int bit = 0; bit < 16; bit++) _runtime.GlobalVariables[$"bit[0x{word * 16 + bit:X3}]"] = (ushort)((value >> bit) & 1);
+        for (int bit = 0; bit < 16; bit++) _runtime.SetGlobalVariable($"bit[0x{word * 16 + bit:X3}]", (ushort)((value >> bit) & 1));
         if (mask == 0xFFFF) _runtime.EstimatedVariables.Remove(key);
         if (_statusEdits.TryGetValue(key, out var earlier)) mask |= earlier.Mask;
         _statusEdits[key] = (value, mask, origin);

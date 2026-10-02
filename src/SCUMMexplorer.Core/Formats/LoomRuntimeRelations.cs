@@ -114,11 +114,12 @@ public sealed class LoomRuntimeRelationTracker
             }
             if (observation.Site is { Stage: "instruction" } site)
             {
-                var bindings = observation.OperandBindings;
-                if (bindings is null || bindings.Count == 0 && site.Operation is not
+                var bindings = observation.SourceAccess?.Bindings ?? observation.OperandBindings;
+                if (observation.SourceAccess?.Barrier is not null || bindings is null ||
+                    observation.SourceAccess is null && bindings.Count == 0 && site.Operation is not
                     ("stopObjectCode" or "breakHere" or "jumpRelative" or "debug"))
                 {
-                    barrier = "unmodelled instruction access";
+                    barrier = observation.SourceAccess?.Barrier ?? "unmodelled instruction access";
                     Clear(barrier, invalidated);
                 }
                 else
@@ -140,7 +141,8 @@ public sealed class LoomRuntimeRelationTracker
                     }
                     foreach (var destination in bindings.Where(b => b.Role == "destination-before"))
                     {
-                        if (destination.Key is null || destination.Index is { Value: null } || site.Operation == "setVarRange")
+                        if (destination.Key is null || destination.Index is { Value: null } ||
+                            site.Operation == "setVarRange" && observation.SourceAccess is null)
                         { barrier = "unresolved or ranged write"; Clear(barrier, invalidated); }
                         else Invalidate(Location(destination.Key, observation.Slot), "source write (including same value and aliases)", invalidated);
                     }

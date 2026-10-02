@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 
 namespace SCUMMexplorer.Core.Formats;
 
@@ -16,6 +17,14 @@ public sealed record LoomScriptOperandBinding(string Role, string Operand, strin
     int? ArgumentIndex = null, string? UnresolvedReason = null);
 
 /// <summary>
+/// Selected numeric storage accesses. A null barrier covers only these operands, never all
+/// actor/object/message effects, external writers, scheduling or callee return. Unknown forms
+/// are explicit barriers. Legacy OperandBindings keep their original shape and order.
+/// </summary>
+public sealed record LoomScriptSourceAccess(IReadOnlyList<LoomScriptOperandBinding> Bindings,
+    string? Barrier, IReadOnlyList<string> Limits);
+
+/// <summary>
 /// A copied observation of selected explorer execution. Sequence orders instructions within a
 /// frame too; Slot persists across resumptions, while Invocation identifies one executor run.
 /// Values/estimates and cancellation targets are immutable copies, never runtime references.
@@ -25,7 +34,9 @@ public sealed record LoomScriptObservation(long Sequence, long Slot, long? Paren
     LoomScriptObservationSite? Site, IReadOnlyDictionary<string, ushort> Values, IReadOnlyList<string> Estimated,
     bool PathEstimated, int? ResumeOffset = null, bool? ReachedStop = null, string? UnresolvedReason = null,
     int? CancelledNumber = null, IReadOnlyList<long>? CancelledSlots = null,
-    IReadOnlyList<LoomScriptOperandBinding>? OperandBindings = null);
+    IReadOnlyList<LoomScriptOperandBinding>? OperandBindings = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    LoomScriptSourceAccess? SourceAccess = null);
 
 /// <summary>
 /// Optional source-observation sink. Give each session its own observer. Filters limit captured
@@ -34,7 +45,8 @@ public sealed record LoomScriptObservation(long Sequence, long Slot, long? Paren
 /// </summary>
 public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     Func<LoomScriptObservationSite, bool>? includeSite = null, Func<string, bool>? includeKey = null,
-    bool captureOperandBindings = false, LoomRuntimeRelationTracker? runtimeRelations = null)
+    bool captureOperandBindings = false, LoomRuntimeRelationTracker? runtimeRelations = null,
+    bool captureSourceAccess = false)
 {
     private long sequence;
     private long slots;
@@ -47,7 +59,8 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
         string stage, int offset, string? operation, string? operands,
         IReadOnlyDictionary<string, ushort> values, IEnumerable<string> estimated, bool path,
         int? resume = null, bool? stop = null, string? unresolved = null,
-        Func<Func<string, bool>, IReadOnlyList<LoomScriptOperandBinding>>? bindOperands = null)
+        Func<Func<string, bool>, IReadOnlyList<LoomScriptOperandBinding>>? bindOperands = null,
+        Func<Func<string, bool>, LoomScriptSourceAccess>? bindSourceAccess = null)
     {
         var site = new LoomScriptObservationSite(script.ScriptId, script.Context, script.ContainerFileNumber,
             script.ResourceOffset, stage, offset, operation, operands);
@@ -61,10 +74,15 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
         var observation = new LoomScriptObservation(++sequence, slot, parentSlot, invocation, site, copy,
             Array.AsReadOnly(estimated.Order(StringComparer.Ordinal).ToArray()), path, resume, stop, unresolved,
             OperandBindings: (captureOperandBindings || runtimeRelations is not null) && bindOperands is not null
-                ? Array.AsReadOnly(bindOperands(key => includeKey?.Invoke(key) != false).ToArray()) : null);
+                ? Array.AsReadOnly(bindOperands(key => includeKey?.Invoke(key) != false).ToArray()) : null,
+            SourceAccess: (captureSourceAccess || runtimeRelations is not null) && bindSourceAccess is not null
+                ? bindSourceAccess(key => includeKey?.Invoke(key) != false) : null);
         runtimeRelations?.Observe(observation);
         receive(observation);
     }
+
+    internal void GlobalMutation(string key) => runtimeRelations?.NotifyExternal([key],
+        reason: "runtime global mutation (including same value)");
 
     internal void Cancel(int number, long caller, IEnumerable<long> targets)
     {
