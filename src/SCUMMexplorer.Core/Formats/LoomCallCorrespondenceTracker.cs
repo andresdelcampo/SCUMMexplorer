@@ -309,10 +309,12 @@ public sealed class LoomCallCorrespondenceTracker
             boundary.ReachedStop is not null) return false;
         // Ordinary calls initialize inside dispatch. A chain is dispatched only after its
         // chaining caller ends; require those actual boundaries instead of treating a late
-        // initialization as an ordinary nested call. Neither phase proves a successful return.
+        // initialization as an ordinary nested call. An opaque caller-end effect remains a
+        // caller rejection, independent of the child's actual assignment. Neither phase
+        // proves a successful return.
         return entry.Dispatch.Call!.Site.Operation == "chainScript"
-            ? entry.HostReturn is not null && entry.CallerRejection is null &&
-                entry.CallerEnd is { ReachedStop: true, ResumeOffset: null, Barrier: null }
+            ? entry.HostReturn is not null && entry.CallerRejection is null or "partial caller end" &&
+                entry.CallerEnd is { ReachedStop: true, ResumeOffset: null }
             : entry.HostReturn is null && entry.Continued is null && entry.CallerEnd is null;
     }
     private static bool SelectedCallee(Entry entry, LoomCallObservation boundary)

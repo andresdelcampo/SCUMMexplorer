@@ -94,6 +94,7 @@ public sealed class LoomCallBoundaryOrderTests
     [InlineData("missing-caller-end")]
     [InlineData("caller-end-begin")]
     [InlineData("caller-end-yield")]
+    [InlineData("caller-end-barrier")]
     [InlineData("omitted")]
     public void DeferredChainNeedsItsObservedHostAndTerminatedChainingCaller(string defect)
     {
@@ -110,6 +111,7 @@ public sealed class LoomCallBoundaryOrderTests
                     script = defect switch {
                         "caller-end-begin" => script with { Site = script.Site with { Stage = "begin" } },
                         "caller-end-yield" => script with { ReachedStop = false, ResumeOffset = 0 },
+                        "caller-end-barrier" => script with { UnresolvedReason = "opaque caller end effect" },
                         _ => script
                     };
                 tracker.ObserveScript(script);
@@ -121,6 +123,7 @@ public sealed class LoomCallBoundaryOrderTests
                     call = defect switch {
                         "caller-end-begin" => call with { Site = call.Site with { Stage = "begin" } },
                         "caller-end-yield" => call with { ReachedStop = false, ResumeOffset = 0 },
+                        "caller-end-barrier" => call with { Barrier = "opaque caller end effect" },
                         _ => call
                     };
                 if (call.Stage == "initialized" && call.Call?.Id == dispatch.Id && defect == "omitted")
@@ -129,8 +132,9 @@ public sealed class LoomCallBoundaryOrderTests
             }
         }
         var chain = updates.Where(u => u.Dispatch?.Id == dispatch.Id).ToArray();
-        if (defect == "none") Assert.Contains(chain, u => u.Binding is not null && u.ChildTerminated);
+        if (defect is "none" or "caller-end-barrier") Assert.Contains(chain, u => u.Binding is not null && u.ChildTerminated);
         else Assert.DoesNotContain(chain, u => u.Binding is not null);
+        if (defect == "caller-end-barrier") Assert.Contains(chain, u => u.Binding is not null && u.CallerRejection == "partial caller end");
         Assert.All(chain, u => Assert.Null(u.ImmediateStopCorrespondence));
     }
 
