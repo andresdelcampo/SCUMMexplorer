@@ -156,7 +156,8 @@ public sealed class LoomCallCorrespondenceTracker
             if (call.Id <= lastCallId) { NotifyExternal("reused call identity"); return; }
             lastCallId = call.Id;
             if (active.Count >= callLimit) NotifyExternal("call correspondence storage bound reached");
-            if (!Aligned(boundary) || boundary.Slot != call.Slot || boundary.Invocation != call.Invocation ||
+            if (boundary.Site.Stage != "instruction" || boundary.ReachedStop is not null || boundary.ResumeOffset is not null ||
+                !Aligned(boundary) || boundary.Slot != call.Slot || boundary.Invocation != call.Invocation ||
                 boundary.ParentSlot != call.ParentSlot || boundary.Site != call.Site)
             { Publish(null, "dispatch has no aligned actual instruction"); return; }
             // The caller's incoming identity must come from its actual, still observed
@@ -219,7 +220,8 @@ public sealed class LoomCallCorrespondenceTracker
                 else current.HostReturn = boundary; // Its barrier describes the host, never child success.
                 break;
             case "caller-continued":
-                if (boundary.Site.Stage != "instruction" || !CallerIdentity(current, boundary) || !Aligned(boundary) || current.HostReturn is null ||
+                if (boundary.Site.Stage != "instruction" || boundary.ReachedStop is not null || boundary.ResumeOffset is not null ||
+                    !CallerIdentity(current, boundary) || !Aligned(boundary) || current.HostReturn is null ||
                     current.Continued is not null || current.CallerEnd is not null || observed.Site.Operation == "chainScript")
                     current.CallerRejection = "no aligned surviving immediate caller continuation";
                 else current.Continued = boundary;
@@ -251,6 +253,10 @@ public sealed class LoomCallCorrespondenceTracker
         if (!active.ContainsKey(entry.Dispatch.Call!.Id) || !child && (entry.Continued is not null ||
             entry.Resumption is not null || entry.CallerEnd is { ReachedStop: true } || entry.CallerRejection is not null)) return;
         if (chain is null || chain.Start.Slot != instruction.Slot) return;
+        // Begin/instruction phases cannot donate an end result, even when the two
+        // copied streams agree. A malformed first instruction cannot resume a caller.
+        if (instruction.ReachedStop is not null || instruction.ResumeOffset is not null)
+        { Retire(entry, "instruction carries end result"); return; }
         if (!instruction.Site!.SameResource(chain.Start.Site) || instruction.ParentSlot != chain.Start.ParentSlot ||
             chain.Run != instruction.Invocation || chain.Terminal is not null || chain.Yield is not null && !chain.AwaitingFirst)
         { Retire(entry, "instruction breaks call continuity"); return; }
@@ -272,7 +278,8 @@ public sealed class LoomCallCorrespondenceTracker
 
     private bool Restore(Chain chain, LoomCallObservation boundary)
     {
-        if (boundary.Site.Stage != "begin" || !Aligned(boundary) || boundary.Barrier is not null || !CompleteLocals(boundary, restored: true) ||
+        if (boundary.Site.Stage != "begin" || boundary.ReachedStop is not null || boundary.ResumeOffset is not null ||
+            !Aligned(boundary) || boundary.Barrier is not null || !CompleteLocals(boundary, restored: true) ||
             !ChainIdentity(chain, boundary) || chain.Terminal is not null || chain.Yield?.ResumeOffset != boundary.Site.Offset ||
             chain.Yield is null || chain.AwaitingFirst || !chain.Runs.Add(boundary.Invocation)) return false;
         chain.Run = boundary.Invocation;
