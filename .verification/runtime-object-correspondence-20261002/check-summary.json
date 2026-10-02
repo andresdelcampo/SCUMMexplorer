@@ -1,0 +1,384 @@
+{
+  "core": 568,
+  "focused": 242,
+  "newActualCallCases": 13,
+  "newRemainingAccessCases": 12,
+  "newNativeMutationCases": 16,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "fullRecipePacketsUnchanged": 13,
+  "latestLegacyChronologiesAndCompletionRecordsExact": true,
+  "independentOwnInvocationTerminals": 76,
+  "actualRecipeWriterResumedTerminalChains": 0,
+  "numericSourceReportUnchanged": true,
+  "numericWorlds": 162,
+  "flagCases": 52,
+  "comparisons": 51,
+  "overlaps": 14,
+  "fabricatedMatches": 4,
+  "practiceArgumentCases": 12,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "sourceChallengeExpressions": 3,
+  "sourceChallengeSteps": 17,
+  "sourceChallengeEveryFrameTransparent": true,
+  "observedInitializationAndDispatchBoundaries": true,
+  "argumentEqualitySuppliesNoLocalOrigins": true,
+  "generalCalleeReturnAndEffectsRemainUnresolved": true,
+  "rawNativeSameValueMutationsStillRequireNotification": true,
+  "replayCoverage": {
+    "validatedLiteralSites": 168,
+    "totalLiteralSites": 235,
+    "coveredPercent": 71.49,
+    "scope": "validated literal cutscene sites only; unchanged, not an overall project-completion percentage"
+  },
+  "callBoundaries": 304620,
+  "dispatches": 884,
+  "reports": [
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/checks-final/core-tests.txt",
+      "sha256": "4a2cc06b17bb1e2b814aee77adb29852da3336adb7c0974d75fe7725bc9cf5cc"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/checks-final/release-build.txt",
+      "sha256": "47a061a861d2abcf611f3dcdb8e8999837aade9d43e410bfa0bb1ff9c4eaeaf8"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/focused-final/tests.txt",
+      "sha256": "bd751c6b77cc2d4ef97a72d27b10faf2c94f355cc39a9d733b6ca8e0c4d0c817"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-release-build.txt",
+      "sha256": "3a24345e1bfc645d8c422cafd3f1ca53835388215b606434e11c0b4580e8a38e"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/app-state.txt",
+      "sha256": "b38816ef20f01225a399b68fa8554b75dc646c0c4e4b2bd4d7340914a74b0372"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/observer-build.txt",
+      "sha256": "d2d544e7dcc600c82f9138bc4ac780f6a1936d37516776dfd1de90fb20233609"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/expanded-build.txt",
+      "sha256": "996c71350f9663ee7227636352ec9360f892b8081fce83ce7340512efc3c229f"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/room-audit-2/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/room-audit-2/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/png-comparison-2.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/numeric-fresh.json",
+      "sha256": "975698a5dddda7ac7e3ba00f019dc5a8cddf3ab2f34aaf6cb6b9bad626cb3fab"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/passive-final/passive-expressions.json",
+      "sha256": "221792c63fd738ebeb780bf64b94faaff0d5203323b9a64e71a8cc0d1a960836"
+    },
+    {
+      "path": "D:/Documents/Personal/Code Projects/SCUMMexplorer/.verification/runtime-object-correspondence-20261002/correspondence-summary.json",
+      "sha256": "ec2334be1e71df8ad229d39f8eee3c518fb5323e937b34ea2a147c97baaea75e"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/native-fields/fields.json",
+      "sha256": "6a060c144c38addaea80d54b9ea37cee79ec7af71b8854defe7ba1a7b6caa3ab"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/native-fields/build.txt",
+      "sha256": "f8be33307d8f08e8569e4da130e892894621509c30d3677a89e02b31ef175291"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/native-fields/run.txt",
+      "sha256": "38b20e154daedc01fca0294626fd27998a2f55acc8505798be45cb2aed38b21a"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/native-fields/field-audit/source-manifest.json",
+      "sha256": "5ec3640273d6b5d82db32fbc84f90693b5ef9ce59870057513e193dcfb01e58e"
+    },
+    {
+      "path": "D:/Documents/Personal/Code Projects/SCUMMexplorer/.verification/runtime-object-correspondence-20261002/native-field-summary.json",
+      "sha256": "5e4c6e9e1a00011b07d1a9531e708c0667e0ce7e375e01f03b594c11d926e121"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/direct41-source-level4-skip204-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/direct41-source-level4-skip204-correspondence.jsonl",
+      "sha256": "ef200778dff6943055cc779c4543632dc659f088e5048904189dd48bcc3ded64"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/direct41-source-level4-skip204-native.jsonl",
+      "sha256": "1557a5d0dd7a033582c3004dee4f3d599bb6c0b505b503f5e7b5de784c22e54a"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw4-click-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw4-click-correspondence.jsonl",
+      "sha256": "435537411bb77cfb68fabdaeeb4685f1f489d637a21c964f440ef79ab0727734"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw4-click-native.jsonl",
+      "sha256": "526538df1974a1c0c5c19c5dbfe6e8441ca8b50ad063e053c07695ed5f60b5fb"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw4-key-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw4-key-correspondence.jsonl",
+      "sha256": "435537411bb77cfb68fabdaeeb4685f1f489d637a21c964f440ef79ab0727734"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw4-key-native.jsonl",
+      "sha256": "3844a640cd2b8f1edca61bc8dbccbca9bb98fe6dc3319f6ae251cefac2947e43"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw6-click-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw6-click-correspondence.jsonl",
+      "sha256": "f2b8f9d39623dfcb9fd5220c874fd0807e19a610d9f2763657330264ca255f34"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw6-click-native.jsonl",
+      "sha256": "ce269f1d2e33392ee3567212b7da315882d3f6853bb0dc861510f921ce01d5d2"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw6-key-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw6-key-correspondence.jsonl",
+      "sha256": "f2b8f9d39623dfcb9fd5220c874fd0807e19a610d9f2763657330264ca255f34"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/room41-1/room41-raw6-key-native.jsonl",
+      "sha256": "ce8643749e38023bcc02e15e8d1b6bfe14a8183c35e73aa546d95914998188c8"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-correspondence.jsonl",
+      "sha256": "4c5068aff2fa1ddfeaa09647e891df89b0f7cc156f2309327e7167277b017e0b"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-native.jsonl",
+      "sha256": "f2130ccc3efe321cc7296d0c19051e85c94ae78c4c88db1a0a75307121835707"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-correspondence.jsonl",
+      "sha256": "0c98681b156fc9854647b98532c8fe281929f323985bdd593bcb915dab226103"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-native.jsonl",
+      "sha256": "07fa684c7f6eae390e5ffc5098ed9d1f0fe712691d7bdb88a03eb45e887eb3a9"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/late096-reached44-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/late096-reached44-correspondence.jsonl",
+      "sha256": "180ffb6cbe9f138520ec3fd65cd4dca795ebf39efdda921be92e8d2be3950381"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/late096-reached44-native.jsonl",
+      "sha256": "c8881244d6362217960582b26c968cef14082e48ad4be9b00e10f980d29961d1"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/late096-source-skip095-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/late096-source-skip095-correspondence.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/late096-source-skip095-native.jsonl",
+      "sha256": "3f68b20de5e288bf1a2a2022857e0569d50e3bda2f29288684c8c0fe79fab310"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source369-response390-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source369-response390-correspondence.jsonl",
+      "sha256": "4508e4d7b39ae16108f812ee2b5bdc60ab65da7ae1bd6d3cd2a66b219089a370"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source369-response390-native.jsonl",
+      "sha256": "3e4b3a1a60ae9d2a3f84bd2248383bcbf718add7aa86302b7ea935def6870df2"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source369-response391-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source369-response391-correspondence.jsonl",
+      "sha256": "9125f2bd11879cc0a26937fbccb2878b2357c0eb39f17d341ce7c9e3f0af0778"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source369-response391-native.jsonl",
+      "sha256": "b9f10ff347d80eb87c8b2907baa524e5a94b4c30add23591cd5f61f4be696d61"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source371-response390-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source371-response390-correspondence.jsonl",
+      "sha256": "7fb2743587255e220ae1c518ce5fb01aae4a9a2b5af8770dfc78af05c2390291"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source371-response390-native.jsonl",
+      "sha256": "d5b69e68338ded8ee9bd87362c36957027a78cf81462605131b768d415ec7f14"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source371-response391-object-selections.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source371-response391-correspondence.jsonl",
+      "sha256": "3ed9b9c7967876bf4c86ee88f3f44cf7885bbcb25359083b348005fdc76cd852"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/preserved-1/sleep-source371-response391-native.jsonl",
+      "sha256": "9f2fff7f3e3fa9f00f7ad8c4b493c6f9856f926a3725fd1380421696db2c13d5"
+    },
+    {
+      "path": "D:/Documents/Personal/Code Projects/SCUMMexplorer/.verification/runtime-object-correspondence-20261002/object-message-summary.json",
+      "sha256": "6d725d4a7fff11e1db303a6c78aa5e9fa3a5e768c859060e4e873065e6a1f816"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/recipe.json",
+      "sha256": "a09e57c29c81cff8e1e82cd8f4876a8a1662c9ceb16186fb47291f7a8a9e6c62"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/build.txt",
+      "sha256": "480a60c42b17acb3bd641d441c571c62f1237774c88a952aad265d4735c3b5a2"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/run.txt",
+      "sha256": "96fa80302ca99daacf05aa13d3c051adac8ecb1d38f2889a4dbcc36d164ff2cb"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/observer-1/source-manifest.json",
+      "sha256": "714385a3cd17e887d1417e91a06789a74ec5cc3a8a08a75595b96a4ea8ecb8ea"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click.json",
+      "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click-object-selections.jsonl",
+      "sha256": "8e034ad8c6a1db257b83f157222ac65206ec193ed58d0af018b6068e22df11a2"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click-calls.jsonl",
+      "sha256": "03a19b7f8e6851596232286c42429700668f63c9ad3e74dde24aab5d8ad44232"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click-correspondence.jsonl",
+      "sha256": "ecb464a5a94434781fb466ebbee6de7fff34e94b38c3a265c629f97ebd3a9877"
+    },
+    {
+      "path": "D:/Documents/Personal/Code Projects/SCUMMexplorer/.verification/runtime-object-correspondence-20261002/loaded-object-summary.json",
+      "sha256": "18506d8ed4e3f75ba135bda54b217c71fa5b12bb7b2cc9d0ce9a9737e9d768b5"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/final-evidence/observer-1/source-manifest.json",
+    "sha256": "714385a3cd17e887d1417e91a06789a74ec5cc3a8a08a75595b96a4ea8ecb8ea"
+  },
+  "newCorrespondenceCases": 20,
+  "newNativeFieldCases": 14,
+  "actualCalleeAssignmentsAndStructuralCorrespondence": true,
+  "bindings": 366,
+  "immediateStopCorrespondences": 55,
+  "observedCallerResumptions": 0,
+  "additionalCopiedNativeFields": 15,
+  "sourceChallengeNativeFieldReads": 11,
+  "sourceChallengeNativeFieldDomains": {
+    "user-input": 1,
+    "object-position-x": 5,
+    "object-position-y": 5
+  },
+  "sourceChallengeExplicitNotificationInvalidations": 11,
+  "protectedFilesUnchanged": 57,
+  "newObjectCorrespondenceCases": 21,
+  "newMessageDependencyCases": 12,
+  "actualObjectSelections": 0,
+  "actualObjectBindings": 0,
+  "actualFallbackObjectBindings": 0,
+  "copiedMessageFields": 15,
+  "nativeMessageFieldProvenanceUnknown": true,
+  "loadedMessageLifetimeClaim": false,
+  "separateLoadedObjectBindings": 16,
+  "separateLoadedObjectTerminations": 14,
+  "separateLoadedStructuralTriples": 9,
+  "separateLoadedCallerResumptions": 3,
+  "separateLoadedChildRestorations": 195,
+  "separateLoadedBoundaryRejections": 1
+}

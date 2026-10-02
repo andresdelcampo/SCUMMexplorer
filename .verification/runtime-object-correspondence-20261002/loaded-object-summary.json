@@ -1,0 +1,2592 @@
+{
+  "scope": "Separate all-site/key capture of the unchanged loaded raw4 recipe. Actual object entries and structural boundaries only;no successful return, numeric origins, completion or original writer resumed-chain claim. Primary legacy13 streams remain separate.",
+  "recipe": "room41-raw4-click",
+  "originalRecipeAndWholePacketExact": true,
+  "actualObjectSelections": 16,
+  "actualObjectBindings": 16,
+  "actualFallbackBindings": 0,
+  "terminatedObjectChildren": 14,
+  "immediateStructuralTriples": 9,
+  "observedCallerResumptions": 3,
+  "childRestorations": 195,
+  "rejectionCounts": {
+    "call correspondence boundary bound reached": 1
+  },
+  "selectedCallerResumptions": [
+    {
+      "dispatch": {
+        "Id": 214,
+        "InstructionSequence": 52986,
+        "Slot": 291,
+        "ParentSlot": 289,
+        "Invocation": 11234,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "instruction",
+          "Offset": 46,
+          "Operation": "startObject",
+          "Operands": "local[0x000], local[0x001], []"
+        },
+        "Operands": [
+          {
+            "Role": "target",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 270,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "verb",
+            "Operand": "local[0x001]",
+            "Key": "local[0x001]",
+            "Value": 54,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          }
+        ],
+        "PathEstimated": false
+      },
+      "yieldBoundary": {
+        "Sequence": 23164,
+        "Stage": "caller-ended",
+        "Call": {
+          "Id": 214,
+          "InstructionSequence": 52986,
+          "Slot": 291,
+          "ParentSlot": 289,
+          "Invocation": 11234,
+          "Site": {
+            "Script": 7,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 22064,
+            "Stage": "instruction",
+            "Offset": 46,
+            "Operation": "startObject",
+            "Operands": "local[0x000], local[0x001], []"
+          },
+          "Operands": [
+            {
+              "Role": "target",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 270,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "verb",
+              "Operand": "local[0x001]",
+              "Key": "local[0x001]",
+              "Value": 54,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": false
+        },
+        "Slot": 291,
+        "ParentSlot": 289,
+        "Invocation": 11234,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "end",
+          "Offset": 46,
+          "Operation": null,
+          "Operands": null
+        },
+        "Locals": [],
+        "PathEstimated": false,
+        "InstructionSequence": 53253,
+        "ResumeOffset": 52,
+        "ReachedStop": false,
+        "Barrier": null
+      },
+      "restoredLocals": {
+        "Sequence": 23581,
+        "Stage": "resumed-locals",
+        "Call": {
+          "Id": 213,
+          "InstructionSequence": 52979,
+          "Slot": 289,
+          "ParentSlot": 288,
+          "Invocation": 11232,
+          "Site": {
+            "Script": 6,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 21608,
+            "Stage": "instruction",
+            "Offset": 266,
+            "Operation": "startScript",
+            "Operands": "0x07, [local[0x002], 0x0036]"
+          },
+          "Operands": [
+            {
+              "Role": "target",
+              "Operand": "0x07",
+              "Key": null,
+              "Value": 7,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "argument",
+              "Operand": "local[0x002]",
+              "Key": "local[0x002]",
+              "Value": 270,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 0,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "argument",
+              "Operand": "0x0036",
+              "Key": null,
+              "Value": 54,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 1,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": false
+        },
+        "Slot": 291,
+        "ParentSlot": 289,
+        "Invocation": 11431,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "begin",
+          "Offset": 52,
+          "Operation": null,
+          "Operands": null
+        },
+        "Locals": [
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 270,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 0,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x001]",
+            "Key": "local[0x001]",
+            "Value": 54,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 1,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x002]",
+            "Key": "local[0x002]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 2,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x003]",
+            "Key": "local[0x003]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 3,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x004]",
+            "Key": "local[0x004]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 4,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x005]",
+            "Key": "local[0x005]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 5,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x006]",
+            "Key": "local[0x006]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 6,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x007]",
+            "Key": "local[0x007]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 7,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x008]",
+            "Key": "local[0x008]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 8,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x009]",
+            "Key": "local[0x009]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 9,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00A]",
+            "Key": "local[0x00A]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 10,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00B]",
+            "Key": "local[0x00B]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 11,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00C]",
+            "Key": "local[0x00C]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 12,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00D]",
+            "Key": "local[0x00D]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 13,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00E]",
+            "Key": "local[0x00E]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 14,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00F]",
+            "Key": "local[0x00F]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 15,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x010]",
+            "Key": "local[0x010]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 16,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x011]",
+            "Key": "local[0x011]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 17,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x012]",
+            "Key": "local[0x012]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 18,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x013]",
+            "Key": "local[0x013]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 19,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x014]",
+            "Key": "local[0x014]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 20,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x015]",
+            "Key": "local[0x015]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 21,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x016]",
+            "Key": "local[0x016]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 22,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x017]",
+            "Key": "local[0x017]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 23,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x018]",
+            "Key": "local[0x018]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 24,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x019]",
+            "Key": "local[0x019]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 25,
+            "UnresolvedReason": null
+          }
+        ],
+        "PathEstimated": false,
+        "InstructionSequence": 54508,
+        "ResumeOffset": null,
+        "ReachedStop": null,
+        "Barrier": null
+      },
+      "firstInstruction": {
+        "sequence": 54509,
+        "slot": 291,
+        "parent": 289,
+        "invocation": 11431,
+        "site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "instruction",
+          "Offset": 52,
+          "Operation": "jumpRelative",
+          "Operands": "+27  ->  0x0052"
+        },
+        "pathEstimated": false
+      }
+    },
+    {
+      "dispatch": {
+        "Id": 270,
+        "InstructionSequence": 56961,
+        "Slot": 349,
+        "ParentSlot": 347,
+        "Invocation": 11694,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "instruction",
+          "Offset": 46,
+          "Operation": "startObject",
+          "Operands": "local[0x000], local[0x001], []"
+        },
+        "Operands": [
+          {
+            "Role": "target",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 270,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "verb",
+            "Operand": "local[0x001]",
+            "Key": "local[0x001]",
+            "Value": 58,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          }
+        ],
+        "PathEstimated": false
+      },
+      "yieldBoundary": {
+        "Sequence": 24214,
+        "Stage": "caller-ended",
+        "Call": {
+          "Id": 270,
+          "InstructionSequence": 56961,
+          "Slot": 349,
+          "ParentSlot": 347,
+          "Invocation": 11694,
+          "Site": {
+            "Script": 7,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 22064,
+            "Stage": "instruction",
+            "Offset": 46,
+            "Operation": "startObject",
+            "Operands": "local[0x000], local[0x001], []"
+          },
+          "Operands": [
+            {
+              "Role": "target",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 270,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "verb",
+              "Operand": "local[0x001]",
+              "Key": "local[0x001]",
+              "Value": 58,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": false
+        },
+        "Slot": 349,
+        "ParentSlot": 347,
+        "Invocation": 11694,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "end",
+          "Offset": 46,
+          "Operation": null,
+          "Operands": null
+        },
+        "Locals": [],
+        "PathEstimated": false,
+        "InstructionSequence": 57031,
+        "ResumeOffset": 52,
+        "ReachedStop": false,
+        "Barrier": null
+      },
+      "restoredLocals": {
+        "Sequence": 24294,
+        "Stage": "resumed-locals",
+        "Call": {
+          "Id": 269,
+          "InstructionSequence": 56954,
+          "Slot": 347,
+          "ParentSlot": 345,
+          "Invocation": 11692,
+          "Site": {
+            "Script": 26,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 24766,
+            "Stage": "instruction",
+            "Offset": 127,
+            "Operation": "startScript",
+            "Operands": "0x07, [var[0x067], local[0x003]]"
+          },
+          "Operands": [
+            {
+              "Role": "target",
+              "Operand": "0x07",
+              "Key": null,
+              "Value": 7,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "argument",
+              "Operand": "var[0x067]",
+              "Key": "var[0x067]",
+              "Value": 270,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 0,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "argument",
+              "Operand": "local[0x003]",
+              "Key": "local[0x003]",
+              "Value": 58,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 1,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": false
+        },
+        "Slot": 349,
+        "ParentSlot": 347,
+        "Invocation": 11726,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "begin",
+          "Offset": 52,
+          "Operation": null,
+          "Operands": null
+        },
+        "Locals": [
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 270,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 0,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x001]",
+            "Key": "local[0x001]",
+            "Value": 58,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 1,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x002]",
+            "Key": "local[0x002]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 2,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x003]",
+            "Key": "local[0x003]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 3,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x004]",
+            "Key": "local[0x004]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 4,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x005]",
+            "Key": "local[0x005]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 5,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x006]",
+            "Key": "local[0x006]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 6,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x007]",
+            "Key": "local[0x007]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 7,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x008]",
+            "Key": "local[0x008]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 8,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x009]",
+            "Key": "local[0x009]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 9,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00A]",
+            "Key": "local[0x00A]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 10,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00B]",
+            "Key": "local[0x00B]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 11,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00C]",
+            "Key": "local[0x00C]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 12,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00D]",
+            "Key": "local[0x00D]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 13,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00E]",
+            "Key": "local[0x00E]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 14,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00F]",
+            "Key": "local[0x00F]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 15,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x010]",
+            "Key": "local[0x010]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 16,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x011]",
+            "Key": "local[0x011]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 17,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x012]",
+            "Key": "local[0x012]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 18,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x013]",
+            "Key": "local[0x013]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 19,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x014]",
+            "Key": "local[0x014]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 20,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x015]",
+            "Key": "local[0x015]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 21,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x016]",
+            "Key": "local[0x016]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 22,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x017]",
+            "Key": "local[0x017]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 23,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x018]",
+            "Key": "local[0x018]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 24,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x019]",
+            "Key": "local[0x019]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 25,
+            "UnresolvedReason": null
+          }
+        ],
+        "PathEstimated": false,
+        "InstructionSequence": 57343,
+        "ResumeOffset": null,
+        "ReachedStop": null,
+        "Barrier": null
+      },
+      "firstInstruction": {
+        "sequence": 57344,
+        "slot": 349,
+        "parent": 347,
+        "invocation": 11726,
+        "site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "instruction",
+          "Offset": 52,
+          "Operation": "jumpRelative",
+          "Operands": "+27  ->  0x0052"
+        },
+        "pathEstimated": false
+      }
+    },
+    {
+      "dispatch": {
+        "Id": 348,
+        "InstructionSequence": 62702,
+        "Slot": 435,
+        "ParentSlot": 433,
+        "Invocation": 12289,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "instruction",
+          "Offset": 46,
+          "Operation": "startObject",
+          "Operands": "local[0x000], local[0x001], []"
+        },
+        "Operands": [
+          {
+            "Role": "target",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 207,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "verb",
+            "Operand": "local[0x001]",
+            "Key": "local[0x001]",
+            "Value": 62,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          }
+        ],
+        "PathEstimated": true
+      },
+      "yieldBoundary": {
+        "Sequence": 25638,
+        "Stage": "caller-ended",
+        "Call": {
+          "Id": 348,
+          "InstructionSequence": 62702,
+          "Slot": 435,
+          "ParentSlot": 433,
+          "Invocation": 12289,
+          "Site": {
+            "Script": 7,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 22064,
+            "Stage": "instruction",
+            "Offset": 46,
+            "Operation": "startObject",
+            "Operands": "local[0x000], local[0x001], []"
+          },
+          "Operands": [
+            {
+              "Role": "target",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 207,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "verb",
+              "Operand": "local[0x001]",
+              "Key": "local[0x001]",
+              "Value": 62,
+              "ValueEstimated": true,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": true
+        },
+        "Slot": 435,
+        "ParentSlot": 433,
+        "Invocation": 12289,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "end",
+          "Offset": 46,
+          "Operation": null,
+          "Operands": null
+        },
+        "Locals": [],
+        "PathEstimated": true,
+        "InstructionSequence": 62732,
+        "ResumeOffset": 52,
+        "ReachedStop": false,
+        "Barrier": null
+      },
+      "restoredLocals": {
+        "Sequence": 25862,
+        "Stage": "resumed-locals",
+        "Call": {
+          "Id": 347,
+          "InstructionSequence": 62695,
+          "Slot": 433,
+          "ParentSlot": 429,
+          "Invocation": 12287,
+          "Site": {
+            "Script": 26,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 24766,
+            "Stage": "instruction",
+            "Offset": 127,
+            "Operation": "startScript",
+            "Operands": "0x07, [var[0x067], local[0x003]]"
+          },
+          "Operands": [
+            {
+              "Role": "target",
+              "Operand": "0x07",
+              "Key": null,
+              "Value": 7,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "argument",
+              "Operand": "var[0x067]",
+              "Key": "var[0x067]",
+              "Value": 207,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 0,
+              "UnresolvedReason": null
+            },
+            {
+              "Role": "argument",
+              "Operand": "local[0x003]",
+              "Key": "local[0x003]",
+              "Value": 62,
+              "ValueEstimated": true,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 1,
+              "UnresolvedReason": null
+            }
+          ],
+          "PathEstimated": true
+        },
+        "Slot": 435,
+        "ParentSlot": 433,
+        "Invocation": 12390,
+        "Site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "begin",
+          "Offset": 52,
+          "Operation": null,
+          "Operands": null
+        },
+        "Locals": [
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 207,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 0,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x001]",
+            "Key": "local[0x001]",
+            "Value": 62,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 1,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x002]",
+            "Key": "local[0x002]",
+            "Value": 0,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 2,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x003]",
+            "Key": "local[0x003]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 3,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x004]",
+            "Key": "local[0x004]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 4,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x005]",
+            "Key": "local[0x005]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 5,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x006]",
+            "Key": "local[0x006]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 6,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x007]",
+            "Key": "local[0x007]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 7,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x008]",
+            "Key": "local[0x008]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 8,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x009]",
+            "Key": "local[0x009]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 9,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00A]",
+            "Key": "local[0x00A]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 10,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00B]",
+            "Key": "local[0x00B]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 11,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00C]",
+            "Key": "local[0x00C]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 12,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00D]",
+            "Key": "local[0x00D]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 13,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00E]",
+            "Key": "local[0x00E]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 14,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x00F]",
+            "Key": "local[0x00F]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 15,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x010]",
+            "Key": "local[0x010]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 16,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x011]",
+            "Key": "local[0x011]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 17,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x012]",
+            "Key": "local[0x012]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 18,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x013]",
+            "Key": "local[0x013]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 19,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x014]",
+            "Key": "local[0x014]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 20,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x015]",
+            "Key": "local[0x015]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 21,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x016]",
+            "Key": "local[0x016]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 22,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x017]",
+            "Key": "local[0x017]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 23,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x018]",
+            "Key": "local[0x018]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 24,
+            "UnresolvedReason": null
+          },
+          {
+            "Role": "restored-local",
+            "Operand": "local[0x019]",
+            "Key": "local[0x019]",
+            "Value": 0,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": 25,
+            "UnresolvedReason": null
+          }
+        ],
+        "PathEstimated": true,
+        "InstructionSequence": 63343,
+        "ResumeOffset": null,
+        "ReachedStop": null,
+        "Barrier": null
+      },
+      "firstInstruction": {
+        "sequence": 63344,
+        "slot": 435,
+        "parent": 433,
+        "invocation": 12390,
+        "site": {
+          "Script": 7,
+          "Context": null,
+          "Container": 1,
+          "ResourceOffset": 22064,
+          "Stage": "instruction",
+          "Offset": 52,
+          "Operation": "jumpRelative",
+          "Operands": "+27  ->  0x0052"
+        },
+        "pathEstimated": true
+      }
+    }
+  ],
+  "selected": [
+    {
+      "dispatchId": 201,
+      "callerSlot": 282,
+      "callerInvocation": 11065,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 270,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": false,
+      "selection": {
+        "ObjectId": 270,
+        "VerbId": 57,
+        "CodeOffset": 15747,
+        "TableOffset": 15767,
+        "ScriptOffset": 15783,
+        "ResourceEnd": 15929,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 283,
+      "childParent": 282,
+      "childInvocation": 11066,
+      "childSite": {
+        "Script": 9,
+        "Context": "Room 09 Object 270 Verb 0x39",
+        "Container": 9,
+        "ResourceOffset": 15783,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": false,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 214,
+      "callerSlot": 291,
+      "callerInvocation": 11234,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 270,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 54,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": false,
+      "selection": {
+        "ObjectId": 270,
+        "VerbId": 54,
+        "CodeOffset": 15747,
+        "TableOffset": 15764,
+        "ScriptOffset": 15789,
+        "ResourceEnd": 15929,
+        "IsFallback": false,
+        "Label": "Verb 0x36"
+      },
+      "requestedVerb": 54,
+      "childSlot": 292,
+      "childParent": 291,
+      "childInvocation": 11235,
+      "childSite": {
+        "Script": 9,
+        "Context": "Room 09 Object 270 Verb 0x36",
+        "Container": 9,
+        "ResourceOffset": 15789,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": false,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 270,
+      "callerSlot": 349,
+      "callerInvocation": 11694,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 270,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 58,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": false,
+      "selection": {
+        "ObjectId": 270,
+        "VerbId": 58,
+        "CodeOffset": 15747,
+        "TableOffset": 15770,
+        "ScriptOffset": 15812,
+        "ResourceEnd": 15929,
+        "IsFallback": false,
+        "Label": "Verb 0x3A"
+      },
+      "requestedVerb": 58,
+      "childSlot": 350,
+      "childParent": 349,
+      "childInvocation": 11695,
+      "childSite": {
+        "Script": 9,
+        "Context": "Room 09 Object 270 Verb 0x3A",
+        "Container": 9,
+        "ResourceOffset": 15812,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": false,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 317,
+      "callerSlot": 403,
+      "callerInvocation": 12082,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 207,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": false,
+      "selection": {
+        "ObjectId": 207,
+        "VerbId": 57,
+        "CodeOffset": 20657,
+        "TableOffset": 20677,
+        "ScriptOffset": 20695,
+        "ResourceEnd": 20895,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 404,
+      "childParent": 403,
+      "childInvocation": 12083,
+      "childSite": {
+        "Script": 6,
+        "Context": "Room 06 Object 207 Verb 0x39",
+        "Container": 6,
+        "ResourceOffset": 20695,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": false,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 348,
+      "callerSlot": 435,
+      "callerInvocation": 12289,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 207,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 62,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 207,
+        "VerbId": 62,
+        "CodeOffset": 20657,
+        "TableOffset": 20680,
+        "ScriptOffset": 20832,
+        "ResourceEnd": 20895,
+        "IsFallback": false,
+        "Label": "Verb 0x3E"
+      },
+      "requestedVerb": 62,
+      "childSlot": 436,
+      "childParent": 435,
+      "childInvocation": 12290,
+      "childSite": {
+        "Script": 6,
+        "Context": "Room 06 Object 207 Verb 0x3E",
+        "Container": 6,
+        "ResourceOffset": 20832,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 356,
+      "callerSlot": 443,
+      "callerInvocation": 12380,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 207,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 207,
+        "VerbId": 57,
+        "CodeOffset": 20657,
+        "TableOffset": 20677,
+        "ScriptOffset": 20695,
+        "ResourceEnd": 20895,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 444,
+      "childParent": 443,
+      "childInvocation": 12381,
+      "childSite": {
+        "Script": 6,
+        "Context": "Room 06 Object 207 Verb 0x39",
+        "Container": 6,
+        "ResourceOffset": 20695,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 395,
+      "callerSlot": 488,
+      "callerInvocation": 12648,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 808,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 808,
+        "VerbId": 57,
+        "CodeOffset": 11928,
+        "TableOffset": 11948,
+        "ScriptOffset": 11966,
+        "ResourceEnd": 12185,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 489,
+      "childParent": 488,
+      "childInvocation": 12649,
+      "childSite": {
+        "Script": 62,
+        "Context": "Room 62 Object 808 Verb 0x39",
+        "Container": 62,
+        "ResourceOffset": 11966,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 429,
+      "callerSlot": 522,
+      "callerInvocation": 12937,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 808,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 61,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 808,
+        "VerbId": 61,
+        "CodeOffset": 11928,
+        "TableOffset": 11954,
+        "ScriptOffset": 12140,
+        "ResourceEnd": 12185,
+        "IsFallback": false,
+        "Label": "Verb 0x3D"
+      },
+      "requestedVerb": 61,
+      "childSlot": 523,
+      "childParent": 522,
+      "childInvocation": 12938,
+      "childSite": {
+        "Script": 62,
+        "Context": "Room 62 Object 808 Verb 0x3D",
+        "Container": 62,
+        "ResourceOffset": 12140,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 454,
+      "callerSlot": 547,
+      "callerInvocation": 13162,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 808,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 808,
+        "VerbId": 57,
+        "CodeOffset": 11928,
+        "TableOffset": 11948,
+        "ScriptOffset": 11966,
+        "ResourceEnd": 12185,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 548,
+      "childParent": 547,
+      "childInvocation": 13163,
+      "childSite": {
+        "Script": 62,
+        "Context": "Room 62 Object 808 Verb 0x39",
+        "Container": 62,
+        "ResourceOffset": 11966,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 481,
+      "callerSlot": 588,
+      "callerInvocation": 14392,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 325,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 325,
+        "VerbId": 57,
+        "CodeOffset": 31355,
+        "TableOffset": 31378,
+        "ScriptOffset": 31409,
+        "ResourceEnd": 31805,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 589,
+      "childParent": 588,
+      "childInvocation": 14393,
+      "childSite": {
+        "Script": 13,
+        "Context": "Room 13 Object 325 Verb 0x39",
+        "Container": 13,
+        "ResourceOffset": 31409,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 486,
+      "callerSlot": 592,
+      "callerInvocation": 14696,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 325,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 56,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 325,
+        "VerbId": 56,
+        "CodeOffset": 31355,
+        "TableOffset": 31375,
+        "ScriptOffset": 31415,
+        "ResourceEnd": 31805,
+        "IsFallback": false,
+        "Label": "Verb 0x38"
+      },
+      "requestedVerb": 56,
+      "childSlot": 593,
+      "childParent": 592,
+      "childInvocation": 14697,
+      "childSite": {
+        "Script": 13,
+        "Context": "Room 13 Object 325 Verb 0x38",
+        "Container": 13,
+        "ResourceOffset": 31415,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 488,
+      "callerSlot": 594,
+      "callerInvocation": 14698,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 325,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 54,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 325,
+        "VerbId": 54,
+        "CodeOffset": 31355,
+        "TableOffset": 31372,
+        "ScriptOffset": 31440,
+        "ResourceEnd": 31805,
+        "IsFallback": false,
+        "Label": "Verb 0x36"
+      },
+      "requestedVerb": 54,
+      "childSlot": 595,
+      "childParent": 594,
+      "childInvocation": 14699,
+      "childSite": {
+        "Script": 13,
+        "Context": "Room 13 Object 325 Verb 0x36",
+        "Container": 13,
+        "ResourceOffset": 31440,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 533,
+      "callerSlot": 649,
+      "callerInvocation": 15418,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 632,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 632,
+        "VerbId": 57,
+        "CodeOffset": 14667,
+        "TableOffset": 14687,
+        "ScriptOffset": 14704,
+        "ResourceEnd": 14870,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 650,
+      "childParent": 649,
+      "childInvocation": 15419,
+      "childSite": {
+        "Script": 41,
+        "Context": "Room 41 Object 632 Verb 0x39",
+        "Container": 41,
+        "ResourceOffset": 14704,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 541,
+      "callerSlot": 655,
+      "callerInvocation": 15548,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 632,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 54,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 632,
+        "VerbId": 54,
+        "CodeOffset": 14667,
+        "TableOffset": 14684,
+        "ScriptOffset": 14710,
+        "ResourceEnd": 14870,
+        "IsFallback": false,
+        "Label": "Verb 0x36"
+      },
+      "requestedVerb": 54,
+      "childSlot": 656,
+      "childParent": 655,
+      "childInvocation": 15549,
+      "childSite": {
+        "Script": 41,
+        "Context": "Room 41 Object 632 Verb 0x36",
+        "Container": 41,
+        "ResourceOffset": 14710,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 552,
+      "callerSlot": 668,
+      "callerInvocation": 17310,
+      "callerSite": {
+        "Script": 8,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22151,
+        "Stage": "instruction",
+        "Offset": 35,
+        "Operation": "startObject",
+        "Operands": "local[0x000], 0x39, []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 633,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "0x39",
+          "Key": null,
+          "Value": 57,
+          "ValueEstimated": false,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 633,
+        "VerbId": 57,
+        "CodeOffset": 14398,
+        "TableOffset": 14418,
+        "ScriptOffset": 14444,
+        "ResourceEnd": 14566,
+        "IsFallback": false,
+        "Label": "Verb 0x39"
+      },
+      "requestedVerb": 57,
+      "childSlot": 669,
+      "childParent": 668,
+      "childInvocation": 17311,
+      "childSite": {
+        "Script": 41,
+        "Context": "Room 41 Object 633 Verb 0x39",
+        "Container": 41,
+        "ResourceOffset": 14444,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    },
+    {
+      "dispatchId": 585,
+      "callerSlot": 702,
+      "callerInvocation": 17663,
+      "callerSite": {
+        "Script": 7,
+        "Context": null,
+        "Container": 1,
+        "ResourceOffset": 22064,
+        "Stage": "instruction",
+        "Offset": 46,
+        "Operation": "startObject",
+        "Operands": "local[0x000], local[0x001], []"
+      },
+      "callerOperands": [
+        {
+          "Role": "target",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 633,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "verb",
+          "Operand": "local[0x001]",
+          "Key": "local[0x001]",
+          "Value": 65,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ],
+      "callerPathEstimated": true,
+      "selection": {
+        "ObjectId": 633,
+        "VerbId": 65,
+        "CodeOffset": 14398,
+        "TableOffset": 14421,
+        "ScriptOffset": 14503,
+        "ResourceEnd": 14566,
+        "IsFallback": false,
+        "Label": "Verb 0x41"
+      },
+      "requestedVerb": 65,
+      "childSlot": 703,
+      "childParent": 702,
+      "childInvocation": 17664,
+      "childSite": {
+        "Script": 41,
+        "Context": "Room 41 Object 633 Verb 0x41",
+        "Container": 41,
+        "ResourceOffset": 14503,
+        "Stage": "begin",
+        "Offset": 0,
+        "Operation": null,
+        "Operands": null
+      },
+      "childPathEstimated": true,
+      "suppliedAssignments": [],
+      "defaultLocals": 26
+    }
+  ],
+  "reports": [
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/recipe.json",
+      "sha256": "a09e57c29c81cff8e1e82cd8f4876a8a1662c9ceb16186fb47291f7a8a9e6c62"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/build.txt",
+      "sha256": "480a60c42b17acb3bd641d441c571c62f1237774c88a952aad265d4735c3b5a2"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/run.txt",
+      "sha256": "96fa80302ca99daacf05aa13d3c051adac8ecb1d38f2889a4dbcc36d164ff2cb"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/observer-1/source-manifest.json",
+      "sha256": "714385a3cd17e887d1417e91a06789a74ec5cc3a8a08a75595b96a4ea8ecb8ea"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click.json",
+      "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click-object-selections.jsonl",
+      "sha256": "8e034ad8c6a1db257b83f157222ac65206ec193ed58d0af018b6068e22df11a2"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click-calls.jsonl",
+      "sha256": "03a19b7f8e6851596232286c42429700668f63c9ad3e74dde24aab5d8ad44232"
+    },
+    {
+      "path": "Exe/RuntimeObjectCorrespondenceFinalSession2-20261002/loaded-objects-2/route-1/room41-raw4-click-correspondence.jsonl",
+      "sha256": "ecb464a5a94434781fb466ebbee6de7fff34e94b38c3a265c629f97ebd3a9877"
+    }
+  ]
+}

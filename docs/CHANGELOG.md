@@ -1,5 +1,14 @@
 # Changelog
 
+## 2 October: object/message preservation and separate loaded caller resumption
+
+| Change | Result | Record |
+| --- | --- | --- |
+| `aaaa755` | Actual object selected-entry binding;fallback/defect controls;independent child/host/caller/restoration boundaries | [object](../.verification/runtime-object-correspondence-20261002/object-validation.md) |
+| `56ffa35` | Native message wait fields retain unknown provenance;executed message/no-op notifications | [message](../.verification/runtime-object-correspondence-20261002/message-validation.md) |
+| `729cbb9` | Callee begin-site filtering suppresses selection metadata and preserves omitted initialization barriers | [filter](../.verification/runtime-object-correspondence-20261002/filter-validation.md) |
+| Final preservation | Core568/focused242;13 exact primary streams;366 original bindings/55 triples/0 resumptions;separate unchanged raw4 capture16 object bindings/9 triples/3 caller resumptions;76 original writer terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/challenge exact;clean main Release;App0;57 protected files unchanged;71.49% literal-site coverage unchanged | [validation](../.verification/runtime-object-correspondence-20261002/validation.md) |
+
 ## 2 October: filtered callee selection metadata
 
 | Change | Result | Record |
