@@ -62,6 +62,10 @@ dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 
 ## Current work
 
+The user's 2 October route-priority decision supersedes older instructions to expand observer coverage as the next task. Follow the current priority and bounded workflow at the top of `docs/NEXT_SESSION_PROMPT.md` and in `docs/LOOM_EGA_PLAN.md`. Target one blocked route; use existing diagnostics first. Add instrumentation only to answer a named question that prevents that route's fix, then immediately return to the same route. Do not begin another general observer-hardening or access-coverage session by default. More tests, observations or unchanged captures are supporting evidence, not additional working routes.
+
+Start with the unchanged Room41 native090 raw4 recipe. After at most two focused diagnostic cycles without a route-relevant implementation decision, record the precise remaining blocker and next bounded experiment, then stop that investigation for the session instead of broadening it. Preserve every source/evidence/estimate barrier. Keep old captures immutable; a genuine execution fix must explain its expected differences in fresh captures while unaffected evidence remains exact. Never erase or renumber historical evidence to make comparisons pass. Documentation-only updates need document/protection checks, not a replay of the full runtime suite; execution changes retain the required regressions and final main Release build. No App launch or push under the current handoff.
+
 Replanned on 28 September around what the user sees. The priorities are: (M1) object clicks run the game's interaction and its text appears on screen in the game's font, (M2) actors are drawn with costume animation, and (M3) cutscenes and animations play with the game's timing. The session already runs most of this logic, but the app does not draw it. Engine gaps that do not change the screen wait until a milestone route needs them. See the plan's "Ordered work".
 
 <!-- rtk-instructions v2 -->
