@@ -34,14 +34,25 @@ public sealed class LoomScriptRuntimeState
     public void SetGlobalVariable(string key, ushort value)
     {
         GlobalVariables[key] = value;
-        MutationObserver?.GlobalMutation(key);
+        NotifyGlobalMutation(key);
     }
 
     public bool RemoveGlobalVariable(string key)
     {
         var removed = GlobalVariables.Remove(key);
-        MutationObserver?.GlobalMutation(key);
+        NotifyGlobalMutation(key);
         return removed;
+    }
+
+    /// <summary>
+    /// Notify the scoped/session observer after a raw global dictionary mutation, including
+    /// same-value writes or removals. This does not write storage, synchronize aliases, change
+    /// estimates or detect unnotified mutations. Unscoped locals use tracker.NotifyExternal.
+    /// </summary>
+    public void NotifyGlobalMutation(string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        MutationObserver?.GlobalMutation(key);
     }
 
     /// <summary>Scope mutation notification to the supplied observer, restoring it on disposal.</summary>

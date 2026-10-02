@@ -160,7 +160,7 @@ public sealed class LoomBoundedScriptExecutor
                 "instruction", instruction.Offset, instruction.Operation, instruction.Operands,
                 knownVariables, estimated, onEstimatedPath,
                 bindOperands: include => BindObservationOperands(instruction, knownVariables, estimated, include),
-                bindSourceAccess: include => BindSourceAccess(instruction, knownVariables, estimated, include));
+                bindSourceAccess: include => BindSourceAccess(instruction, knownVariables, estimated, include, states, runtime));
 
             if (instruction.Operation == "stopObjectCode")
             {
@@ -1836,11 +1836,14 @@ public sealed class LoomBoundedScriptExecutor
             "isLess" or "isLessEqual" or "isGreater" or "isGreaterEqual")
             return text.Split(", branch ", StringSplitOptions.None)[0]
                 .Split(',', StringSplitOptions.TrimEntries).Select(value => Bind("condition", value)).ToArray();
-        if (op is "startScript" or "chainScript")
+        if (op is "startScript" or "chainScript" || extended && op == "startObject")
         {
             var open = ArgumentListStart(text);
             if (open < 0 || !text.EndsWith(']')) return [];
-            return new[] { Bind("target", text[..open].Split(',')[0]) }
+            var targets = text[..open].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (op == "startObject" && targets.Length != 2) return [];
+            return targets.Take(op == "startObject" ? 2 : 1).Select((value, index) =>
+                    Bind(index == 0 ? "target" : "verb", value))
                 .Concat(text[(open + 1)..^1].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                     .Select((value, index) => Bind("argument", value, index))).ToArray();
         }
@@ -1865,13 +1868,13 @@ public sealed class LoomBoundedScriptExecutor
             return text.Length == 0 && op == "debug" ? [] : [Bind("source", text)];
         if (extended && op == "expression")
         {
-            var separator = text.IndexOf("= [", StringComparison.Ordinal);
+            var separator = text.IndexOf(", [", StringComparison.Ordinal);
+            if (separator < 0) separator = text.IndexOf("= [", StringComparison.Ordinal);
             if (separator < 0 || !text.EndsWith(']')) return [];
             var body = text[(separator + 3)..^1];
-            // The executor's same bounded expression grammar. Nested random operations have
-            // intra-instruction writes and remain a barrier rather than fabricated accesses.
-            if (body.Contains("getRandomNr", StringComparison.Ordinal)) return [];
-            var tokens = Regex.Matches(body, @"(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+            // Nested random operands are pre-instruction copies only. Their write and implicit
+            // scratch read happen within the instruction; the access barrier remains below.
+            var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
             if (tokens.Count is 0 or > 4096) return [];
             var end = 0;
             foreach (Match token in tokens)
@@ -1880,26 +1883,148 @@ public sealed class LoomBoundedScriptExecutor
                 end = token.Index + token.Length;
             }
             if (!string.IsNullOrWhiteSpace(body[end..])) return [];
-            return new[] { Bind("destination-before", text[..separator]) }
-                .Concat(tokens.Cast<Match>().Where(t => t.Value is not ("+" or "-" or "*" or "/"))
-                    .Select(t => Bind("source", t.Value))).ToArray();
+            var result = new List<LoomScriptOperandBinding> { Bind("destination-before", text[..separator]) };
+            foreach (Match token in tokens)
+            {
+                if (token.Value is "+" or "-" or "*" or "/") continue;
+                if (token.Value.StartsWith("getRandomNr(", StringComparison.Ordinal))
+                {
+                    var parts = token.Value[12..^1].Split(',', StringSplitOptions.TrimEntries);
+                    if (parts.Length != 2) return [];
+                    result.Add(Bind("nested-destination-before", parts[0]));
+                    result.Add(Bind("nested-bound-before", parts[1]));
+                    // Deliberately no copied scratch result or write origin.
+                }
+                else result.Add(Bind("source", token.Value));
+            }
+            return result;
+        }
+        if (extended && op is "ifState" or "ifNotState" or "isActorInBox")
+            return text.Split(", branch ", StringSplitOptions.None)[0].Split(',', StringSplitOptions.TrimEntries)
+                .Select(value => Bind("condition", value)).ToArray();
+        if (extended && op is "setClass" or "ifClassOfIs")
+        {
+            text = text.Split(", branch ", StringSplitOptions.None)[0];
+            var open = ArgumentListStart(text);
+            if (open < 0 || !text.EndsWith(']')) return [];
+            return new[] { Bind("target", text[..open].TrimEnd(' ', ',')) }
+                .Concat(text[(open + 1)..^1].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                    .Select(value => Bind("class", value))).ToArray();
+        }
+        if (extended && op is "actorOps" or "print" or "printEgo")
+        {
+            var open = text.IndexOf(", [", StringComparison.Ordinal);
+            if (open < 0 || !text.EndsWith(']')) return [];
+            var result = new List<LoomScriptOperandBinding> {
+                Bind(op == "printEgo" ? "implicit-ego" : "target", op == "printEgo" ? "var[0x001]" : text[..open])
+            };
+            var items = text[(open + 3)..^1].Split(';', StringSplitOptions.TrimEntries);
+            if (items.Length > 128) return [];
+            foreach (var item in items)
+            {
+                var parts = item.Split(',', StringSplitOptions.TrimEntries);
+                // Inline strings can contain semicolons, commas and variable-like text.
+                // Stop before them; the independent effect barrier covers the remainder.
+                if (parts[0] is "actorName" or "text") break;
+                var count = op == "actorOps" ? parts[0] switch {
+                    "costume" or "sound" or "walkAnimation" or "standAnimation" or "elevation" or
+                    "talkColor" or "initAnimation" or "width" or "alwaysZClip" or "animationSpeed" or "shadow" => 1,
+                    "walkSpeed" or "talkAnimation" or "palette" or "scale" => 2,
+                    "animation" => 3,
+                    "init" or "defaultAnimations" or "neverZClip" or "ignoreBoxes" or "followBoxes" => 0,
+                    _ => -1
+                } : parts[0] switch {
+                    "position" or "erase" or "sayVoice" => 2,
+                    "color" or "clipped" or "height" => 1,
+                    "center" or "overhead" => 0,
+                    _ => -1
+                };
+                if (count < 0 || parts.Length != count + 1) break;
+                result.AddRange(parts.Skip(1).Select(value => Bind(parts[0] + "-operand", value)));
+            }
+            return result;
+        }
+        if (extended)
+        {
+            // Exact decoded fixed-operand forms. Text, subcommands and unknown forms are not
+            // scanned for variable-looking strings; their effects retain the barrier below.
+            var count = op switch {
+                "stopScript" or "startMusic" or "startSound" or "stopSound" or "freezeScripts" or
+                "loadRoom" or "actorFollowCamera" or "stopObjectScript" or "pickupObject" or "setCameraAt" or "panCameraTo" => 1,
+                "setState" or "setOwnerOf" or "setBoxFlags" or "putActorInRoom" or "putActorAtObject" or
+                "walkActorToObject" or "animateActor" or "faceActor" => 2,
+                "putActor" or "walkActorTo" or "walkActorToActor" => 3,
+                _ => 0
+            };
+            var parts = text.Split(',', StringSplitOptions.TrimEntries);
+            if (count > 0 && parts.Length == count)
+                return parts.Select((value, index) => Bind(index == 0 ? "target" : "source", value)).ToArray();
         }
         return [];
     }
 
     private static LoomScriptSourceAccess BindSourceAccess(LoomScriptInstruction instruction,
-        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include)
+        IDictionary<string, ushort> variables, IReadOnlySet<string> estimated, Func<string, bool> include,
+        IReadOnlyDictionary<int, byte> states, LoomScriptRuntimeState? runtime)
     {
         var bindings = BindObservationOperands(instruction, variables, estimated, include, extended: true);
         var harmless = instruction.Operation is "stopObjectCode" or "breakHere" or "jumpRelative" or "delay" ||
             instruction.Operation == "debug" && instruction.Operands.Length == 0;
-        var barrier = bindings.Count == 0 && !harmless ? "unmodelled instruction access" :
+        var numeric = instruction.Operation is "move" or "add" or "subtract" or "multiply" or "divide" or "and" or "or" or
+            "increment" or "decrement" or "equalZero" or "notEqualZero" or "isEqual" or "isNotEqual" or "isLess" or
+            "isLessEqual" or "isGreater" or "isGreaterEqual" or "startScript" or "chainScript" or "getRandomNr" or
+            "setVarRange" or "debug" or "delayVariable" or "expression" or "getDist" or "findObject" or
+            "isSoundRunning" or "isScriptRunning" || IsActorQuery(instruction.Operation);
+        var nested = instruction.Operation == "expression" && instruction.Operands.Contains("getRandomNr", StringComparison.Ordinal);
+        var barrier = nested || !numeric && !harmless || bindings.Count == 0 && !harmless ? "unmodelled instruction access" :
             bindings.Any(b => b.UnresolvedReason is not null || b.Index is { Value: null })
                 ? "unresolved or filtered source access" : null;
         return new(Array.AsReadOnly(bindings.ToArray()), barrier, Array.AsReadOnly(new[] {
             "numeric storage operands only; native actor/object/message effects remain independent",
             "selected stream only; raw external writes, concurrency, scheduling and callee return remain limits"
-        }));
+        }), BindNativeDependencies(instruction.Operation, bindings, states, runtime));
+    }
+
+    private static IReadOnlyList<LoomScriptNativeDependency>? BindNativeDependencies(string op,
+        IReadOnlyList<LoomScriptOperandBinding> bindings, IReadOnlyDictionary<int, byte> states, LoomScriptRuntimeState? runtime)
+    {
+        var selectors = bindings.Where(b => b.Role is "source" or "condition" or "target").ToArray();
+        if (selectors.Length == 0) return null;
+        LoomScriptNativeDependency Missing(string domain, LoomScriptOperandBinding selector, string reason) =>
+            new(domain, selector, null, null, UnresolvedReason: reason);
+        var selector = selectors[0];
+        if (op is "ifState" or "ifNotState" or "ifClassOfIs")
+        {
+            var domain = op == "ifClassOfIs" ? "object-classes" : "object-state";
+            if (selector.Value is not { } id) return Array.AsReadOnly(new[] { Missing(domain, selector, "unresolved or filtered selector") });
+            long? value = op == "ifClassOfIs"
+                ? runtime?.ObjectClasses.TryGetValue(id, out var classes) == true ? classes : null
+                : states.TryGetValue(id, out var state) ? state : null;
+            return Array.AsReadOnly(new[] { new LoomScriptNativeDependency(domain, selector, value,
+                value is null ? null : runtime?.EstimatedStates.Contains(id) == true,
+                UnresolvedReason: value is null ? "native field unavailable" : null) });
+        }
+        if (IsActorQuery(op))
+        {
+            if (selector.Value is not { } id || !LoomActorTable.IsValid(id) || runtime is null)
+                return Array.AsReadOnly(new[] { Missing(op, selector, "actor field unavailable; object fallback dependencies not captured") });
+            var actor = runtime.Actors[id];
+            long? value = op switch {
+                "getActorWalkBox" => actor.WalkBox, "getActorRoom" => actor.Room,
+                "getActorX" => actor.X, "getActorY" => actor.Y, "getActorCostume" => actor.Look.Costume,
+                "getActorElevation" => actor.Look.Elevation, "getActorFacing" => actor.Look.Direction,
+                _ => actor.Moving
+            };
+            var reason = op is "getActorX" or "getActorY" or "getActorRoom" or "getActorWalkBox" ? actor.Estimate :
+                op == "getActorFacing" ? actor.Look.Estimate : null;
+            return Array.AsReadOnly(new[] { new LoomScriptNativeDependency(op, selector, value,
+                value is null ? null : reason is not null, reason, value is null ? "native field unavailable" : null) });
+        }
+        if (op is "isSoundRunning" or "isScriptRunning" or "getDist" or "findObject" or "isActorInBox")
+            return Array.AsReadOnly(selectors.Select(s => Missing(op, s, op is "isSoundRunning" or "isScriptRunning"
+                ? "callback status not copied; observation does not invoke callbacks"
+                : "position/owner/room/box/parent dependencies not exhaustively captured")).ToArray());
+        return null;
     }
 
     private static bool TryNormalizeKey(string operand, IDictionary<string, ushort> variables, out string key)

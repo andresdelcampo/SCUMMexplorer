@@ -22,7 +22,17 @@ public sealed record LoomScriptOperandBinding(string Role, string Operand, strin
 /// are explicit barriers. Legacy OperandBindings keep their original shape and order.
 /// </summary>
 public sealed record LoomScriptSourceAccess(IReadOnlyList<LoomScriptOperandBinding> Bindings,
-    string? Barrier, IReadOnlyList<string> Limits);
+    string? Barrier, IReadOnlyList<string> Limits,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyList<LoomScriptNativeDependency>? NativeDependencies = null);
+
+/// <summary>
+/// A copied native query dependency, separate from the numeric selector and inherited path.
+/// Value is a selected pre-instruction field, not a query result or a surviving relation.
+/// Missing fields/callbacks remain unresolved; no native mutation or effect coverage is inferred.
+/// </summary>
+public sealed record LoomScriptNativeDependency(string Domain, LoomScriptOperandBinding Selector,
+    long? Value, bool? ValueEstimated, string? Estimate = null, string? UnresolvedReason = null);
 
 /// <summary>
 /// A copied observation of selected explorer execution. Sequence orders instructions within a
