@@ -188,7 +188,8 @@ public sealed class LoomCallCorrespondenceTracker
         switch (boundary.Stage)
         {
             case "initialized":
-                if (current.Child is not null || boundary.ParentSlot != observed.Slot || boundary.Slot == observed.Slot || boundary.Invocation == observed.Invocation ||
+                if (current.Child is not null || current.ChildRejection is not null || !InitializationPhase(current, boundary) ||
+                    boundary.ParentSlot != observed.Slot || boundary.Slot == observed.Slot || boundary.Invocation == observed.Invocation ||
                     !Aligned(boundary) || boundary.Barrier is not null || !SelectedCallee(current, boundary) ||
                     !CompleteLocals(boundary, restored: false))
                 { current.ChildRejection = "no complete actual callee initialization"; break; }
@@ -211,17 +212,20 @@ public sealed class LoomCallCorrespondenceTracker
                 else current.ChildBoundaries.Add(boundary);
                 break;
             case "dispatch-ended":
-                if (!CallerIdentity(current, boundary) || current.HostReturn is not null) current.CallerRejection = "foreign or repeated host return";
+                if (!CallerIdentity(current, boundary) || boundary.Site != observed.Site ||
+                    boundary.InstructionSequence != observed.InstructionSequence || boundary.PathEstimated != observed.PathEstimated ||
+                    boundary.ResumeOffset is not null || boundary.ReachedStop is not null || current.HostReturn is not null)
+                    current.CallerRejection = "foreign or repeated host return";
                 else current.HostReturn = boundary; // Its barrier describes the host, never child success.
                 break;
             case "caller-continued":
-                if (!CallerIdentity(current, boundary) || !Aligned(boundary) || current.HostReturn is null ||
+                if (boundary.Site.Stage != "instruction" || !CallerIdentity(current, boundary) || !Aligned(boundary) || current.HostReturn is null ||
                     current.Continued is not null || current.CallerEnd is not null || observed.Site.Operation == "chainScript")
                     current.CallerRejection = "no aligned surviving immediate caller continuation";
                 else current.Continued = boundary;
                 break;
             case "caller-ended":
-                if (!CallerIdentity(current, boundary) || !Aligned(boundary) || current.HostReturn is null ||
+                if (boundary.Site.Stage != "end" || !CallerIdentity(current, boundary) || !Aligned(boundary) || current.HostReturn is null ||
                     current.Continued is not null || current.CallerEnd is not null)
                     current.CallerRejection = "foreign or repeated caller end";
                 else
@@ -299,6 +303,18 @@ public sealed class LoomCallCorrespondenceTracker
         boundary.Slot == script.Slot && boundary.ParentSlot == script.ParentSlot && boundary.Invocation == script.Invocation &&
         boundary.Site == script.Site && boundary.PathEstimated == script.PathEstimated &&
         boundary.ResumeOffset == script.ResumeOffset && boundary.ReachedStop == script.ReachedStop;
+    private static bool InitializationPhase(Entry entry, LoomCallObservation boundary)
+    {
+        if (boundary.Site is not { Stage: "begin", Offset: 0 } || boundary.ResumeOffset is not null ||
+            boundary.ReachedStop is not null) return false;
+        // Ordinary calls initialize inside dispatch. A chain is dispatched only after its
+        // chaining caller ends; require those actual boundaries instead of treating a late
+        // initialization as an ordinary nested call. Neither phase proves a successful return.
+        return entry.Dispatch.Call!.Site.Operation == "chainScript"
+            ? entry.HostReturn is not null && entry.CallerRejection is null &&
+                entry.CallerEnd is { ReachedStop: true, ResumeOffset: null, Barrier: null }
+            : entry.HostReturn is null && entry.Continued is null && entry.CallerEnd is null;
+    }
     private static bool SelectedCallee(Entry entry, LoomCallObservation boundary)
     {
         var call = entry.Dispatch.Call!;
