@@ -55,6 +55,18 @@ public sealed class LoomScriptRuntimeState
         MutationObserver?.GlobalMutation(key);
     }
 
+    /// <summary>
+    /// Notify an optional independent native dependency tracker of raw native writes/removals or
+    /// estimate changes, including same-value writes. Supported domains are object-state/classes,
+    /// actor query fields (or actor), and actor-palette; unknown domains retire all native reads.
+    /// No storage, estimates or numeric relations are changed; unnotified raw writes remain limits.
+    /// </summary>
+    public void NotifyNativeMutation(string domain, int? subject = null)
+    {
+        ArgumentNullException.ThrowIfNull(domain);
+        MutationObserver?.NativeMutation(domain, subject);
+    }
+
     /// <summary>Scope mutation notification to the supplied observer, restoring it on disposal.</summary>
     public IDisposable ObserveGlobalMutations(LoomScriptObserver observer)
     {

@@ -70,7 +70,8 @@ public sealed record LoomScriptObservation(long Sequence, long Slot, long? Paren
 public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     Func<LoomScriptObservationSite, bool>? includeSite = null, Func<string, bool>? includeKey = null,
     bool captureOperandBindings = false, LoomRuntimeRelationTracker? runtimeRelations = null,
-    bool captureSourceAccess = false, Action<LoomExpressionObservation>? receiveExpression = null)
+    bool captureSourceAccess = false, Action<LoomExpressionObservation>? receiveExpression = null,
+    LoomNativeDependencyTracker? nativeDependencies = null)
 {
     private long sequence;
     private long slots;
@@ -103,6 +104,7 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
         if (includeSite is not null && !includeSite(site))
         {
             runtimeRelations?.NotifyExternal(reason: "filtered source site");
+            nativeDependencies?.NotifyGlobalMutation(reason: "filtered source site");
             return null;
         }
         var copy = new ReadOnlyDictionary<string, ushort>(values.Where(p => includeKey?.Invoke(p.Key) != false)
@@ -111,15 +113,21 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
             Array.AsReadOnly(estimated.Order(StringComparer.Ordinal).ToArray()), path, resume, stop, unresolved,
             OperandBindings: (captureOperandBindings || runtimeRelations is not null) && bindOperands is not null
                 ? Array.AsReadOnly(bindOperands(key => includeKey?.Invoke(key) != false).ToArray()) : null,
-            SourceAccess: (captureSourceAccess || runtimeRelations is not null) && bindSourceAccess is not null
+            SourceAccess: (captureSourceAccess || runtimeRelations is not null || nativeDependencies is not null) && bindSourceAccess is not null
                 ? bindSourceAccess(key => includeKey?.Invoke(key) != false) : null);
         runtimeRelations?.Observe(observation);
+        nativeDependencies?.Observe(observation);
         receive(observation);
         return observation.Sequence;
     }
 
-    internal void GlobalMutation(string key) => runtimeRelations?.NotifyExternal([key],
-        reason: "runtime global mutation (including same value)");
+    internal void GlobalMutation(string key)
+    {
+        runtimeRelations?.NotifyExternal([key], reason: "runtime global mutation (including same value)");
+        nativeDependencies?.NotifyGlobalMutation(key);
+    }
+
+    internal void NativeMutation(string domain, int? subject) => nativeDependencies?.NotifyNativeMutation(domain, subject);
 
     internal void Cancel(int number, long caller, IEnumerable<long> targets)
     {
@@ -127,6 +135,7 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
             Array.AsReadOnly(Array.Empty<string>()), false, CancelledNumber: number,
             CancelledSlots: Array.AsReadOnly(targets.ToArray()));
         runtimeRelations?.Observe(observation);
+        nativeDependencies?.Observe(observation);
         receive(observation);
     }
 }

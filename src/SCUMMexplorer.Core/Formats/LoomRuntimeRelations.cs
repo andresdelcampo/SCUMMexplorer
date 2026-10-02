@@ -246,7 +246,7 @@ public sealed class LoomRuntimeRelationTracker
             operation == "divide" && right != 0;
     }
 
-    private static LoomRuntimeDependency Location(string key, long slot)
+    internal static LoomRuntimeDependency Location(string key, long slot)
     {
         if (key.StartsWith("bit[0x", StringComparison.Ordinal) &&
             int.TryParse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var bit))
