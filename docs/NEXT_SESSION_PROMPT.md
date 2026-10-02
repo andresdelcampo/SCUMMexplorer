@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room15 watcher pair complete — 3 October
+
+Afterd6dc64b. Room15 actual box3/5 clicks complete200 +001D/end0062 and006D/end00C4 in249frames,2/2 scopes,23 Executed/Conditional body events. Audited union199→201/235 (85.53%),34 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change. Protected57/prior evidence and running App untouched. [Validation](../.verification/room15-input-20261003/validation.md).
+
+Next candidate: Room17 watcher200 +0022/+004D via boxes4/5. Inspect source gates, then accepted clicks plus complete bodies. Continue successive bounded audits toward200K context per user, with exact telemetry unavailable; commit each completed task. Preserve all earlier constraints, estimates/history/protected57; no App launch, close, interaction, rebuild or push. Core662/broad/main Release remain dated. Keep completed Room15/24/36/10/23/25/34, sphere and Sharpening complete.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from Room15 using docs/NEXT_SESSION_PROMPT.md. Start Room17 watcher pair. Audited union201/235 versus fresh single-action169/235. Continue bounded audits toward200K context, commit each, preserve all constraints and the running App.
+
 ## Latest: Room24 three-site input cluster complete — 3 October
 
 After86a7501. Room24 box3/4 clicks and two dye keyboard casts complete all three remaining sites:200 +001D/+0089 and211 +0018. Source first dye changesC5=444→445 through211/213; repeat completes the refusal. Four balanced scopes,792 input/690 direct frames;115 recorded body events equal except93 retained certainty fields and two argument-estimate fields. Audited union196→199/235 (84.68%),36 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/prior evidence exact. [Validation](../.verification/room24-input-20261003/validation.md).

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify Room15 watcher input
+
+Room15 actual box3/5 clicks complete200 +001D/end0062 and006D/end00C4 in249frames,2/2 scopes,23 Executed/Conditional body events. Audited union199→201/235 (85.53%),34 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change. Protected57/prior evidence and running App untouched. [Validation](../.verification/room15-input-20261003/validation.md).
+
 ## 3 October: verify Room24 terrain and repeated dye input
 
 Room24 box3/4 clicks and two dye keyboard casts complete all three remaining sites:200 +001D/+0089 and211 +0018. Source first dye changesC5=444→445 through211/213; repeat completes the refusal. Four balanced scopes,792 input/690 direct frames;115 recorded body events equal except93 retained certainty fields and two argument-estimate fields. Audited union196→199/235 (84.68%),36 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/prior evidence exact. [Validation](../.verification/room24-input-20261003/validation.md).
