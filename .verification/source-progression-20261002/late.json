@@ -1,0 +1,170 @@
+[
+  {
+    "id": "late096-reached44",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "source-arrival44",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 45
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff45",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "late096-source-skip095",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "source-arrival44",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 44
+      },
+      {
+        "kind": "verb",
+        "objectId": 653,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "095-override",
+        "count": 2,
+        "settle": false
+      },
+      {
+        "kind": "key",
+        "key": 27
+      },
+      {
+        "kind": "frames",
+        "stage": "095",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 45
+      },
+      {
+        "kind": "verb",
+        "objectId": 656,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "staff45",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "verb",
+        "objectId": 655,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "return43",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "require-room",
+        "room": 43
+      },
+      {
+        "kind": "verb",
+        "objectId": 639,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "096",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  }
+]
