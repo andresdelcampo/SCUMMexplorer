@@ -1,0 +1,140 @@
+[
+  {
+    "id": "native-dye",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 6
+      },
+      {
+        "kind": "verb",
+        "objectId": 205,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-lesson",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 207
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-approach",
+        "count": 80,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 207
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft-key",
+        "slot": 2,
+        "gap": 8
+      },
+      {
+        "kind": "frames",
+        "stage": "dye-cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  },
+  {
+    "id": "native-wheel",
+    "actions": [
+      {
+        "kind": "visit",
+        "room": 9
+      },
+      {
+        "kind": "verb",
+        "objectId": 271,
+        "verb": 56
+      },
+      {
+        "kind": "frames",
+        "stage": "staff",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "visit",
+        "room": 62
+      },
+      {
+        "kind": "verb",
+        "objectId": 810,
+        "verb": 54
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-lesson",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "walk-point",
+        "objectId": 808
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-approach",
+        "count": 80,
+        "settle": false
+      },
+      {
+        "kind": "target",
+        "objectId": 808
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-aim",
+        "count": 1,
+        "settle": false
+      },
+      {
+        "kind": "draft-key",
+        "slot": 1,
+        "gap": 8
+      },
+      {
+        "kind": "frames",
+        "stage": "wheel-cast",
+        "count": 3000,
+        "settle": true
+      },
+      {
+        "kind": "inspect"
+      }
+    ]
+  }
+]
