@@ -1,0 +1,1047 @@
+{
+  "scope": "Copied numeric access and observed arithmetic/index/argument lineage only; no general runtime domains, inherited effects, exhaustive raw writers, scheduler/callee/cancellation-safe protocol or090 proof.",
+  "recipeCount": 13,
+  "priorWholePacketsAndChronologyExact": true,
+  "zeroWaits": 76,
+  "independentTerminations": 76,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 6302,
+      "accessOperations": {
+        "multiply": 23,
+        "move": 1691,
+        "increment": 596,
+        "and": 161,
+        "divide": 69,
+        "stopObjectCode": 71,
+        "isEqual": 441,
+        "chainScript": 51,
+        "equalZero": 648,
+        "startScript": 99,
+        "setVarRange": 103,
+        "jumpRelative": 107,
+        "notEqualZero": 235,
+        "actorOps": 140,
+        "getRandomNr": 40,
+        "add": 60,
+        "putActorInRoom": 46,
+        "putActor": 22,
+        "animateActor": 132,
+        "ifClassOfIs": 44,
+        "breakHere": 635,
+        "isLess": 493,
+        "subtract": 29,
+        "verbOps": 290,
+        "getDist": 12,
+        "isGreater": 21,
+        "isLessEqual": 21,
+        "cutscene": 1,
+        "print": 1,
+        "waitFor": 1,
+        "endCutscene": 1,
+        "resourceRoutines": 5,
+        "setState": 7,
+        "setClass": 5,
+        "isScriptRunning": 1
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 47,
+        "unmodelled instruction access": 695
+      },
+      "confirmedWrites": {
+        "multiply": 23,
+        "move": 1691,
+        "increment": 596,
+        "and": 161,
+        "divide": 69,
+        "add": 60,
+        "subtract": 29
+      },
+      "recursiveIndexReads": 719,
+      "notifiedMutations": 53364,
+      "zeroWaits": 12,
+      "independentTerminations": 12,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-access.jsonl",
+          "sha256": "d15d77c71ec5957754513c36ce64a95460357c152dbc2c37ea0af7066a9835a2"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-relations.jsonl",
+          "sha256": "5fdfd15588226d28b7b06ec23b78046d1f378a000ce070b49c9046163142de25"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-completion.jsonl",
+          "sha256": "1c462fc2c64eecd2e46ada544a79191fe26820002d528586701efb7adb27ebcf"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-click",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 7120,
+      "accessOperations": {
+        "multiply": 28,
+        "move": 1964,
+        "increment": 673,
+        "and": 196,
+        "divide": 84,
+        "stopObjectCode": 80,
+        "isEqual": 486,
+        "chainScript": 57,
+        "equalZero": 709,
+        "startScript": 114,
+        "setVarRange": 115,
+        "jumpRelative": 126,
+        "notEqualZero": 260,
+        "actorOps": 145,
+        "getRandomNr": 40,
+        "add": 60,
+        "putActorInRoom": 46,
+        "putActor": 22,
+        "animateActor": 142,
+        "ifClassOfIs": 44,
+        "breakHere": 723,
+        "isLess": 549,
+        "subtract": 33,
+        "verbOps": 330,
+        "getDist": 16,
+        "isGreater": 28,
+        "isLessEqual": 28,
+        "cutscene": 1,
+        "print": 1,
+        "waitFor": 1,
+        "endCutscene": 1,
+        "resourceRoutines": 5,
+        "setState": 7,
+        "setClass": 5,
+        "isScriptRunning": 1
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 47,
+        "unmodelled instruction access": 750
+      },
+      "confirmedWrites": {
+        "multiply": 28,
+        "move": 1964,
+        "increment": 673,
+        "and": 196,
+        "divide": 84,
+        "add": 60,
+        "subtract": 33
+      },
+      "recursiveIndexReads": 845,
+      "notifiedMutations": 67921,
+      "zeroWaits": 16,
+      "independentTerminations": 16,
+      "observations": {
+        "primaryCompletion": {
+          "frame": 3036,
+          "Sequence": 4556,
+          "Slot": 408,
+          "Run": 12144,
+          "Site": {
+            "Script": 20,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 23959,
+            "Stage": "instruction",
+            "Offset": 40,
+            "Operation": "equalZero",
+            "Operands": "bit[0xD67], branch +0xFFFA -> 0x0027"
+          },
+          "Binding": {
+            "Role": "condition",
+            "Operand": "bit[0xD67]",
+            "Key": "bit[0xD67]",
+            "Value": 0,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": "var[0x0D6]",
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "PathEstimated": false,
+          "MatchesOwnLiteralChild": true,
+          "Rejection": null,
+          "Limits": [
+            "selected observations only; omitted/external/aliased/concurrent writers remain limits",
+            "unchanged unobserved external effects require explicit invalidation",
+            "value/index and inherited path/effect estimates are independent and retained",
+            "terminal/self-stop observations do not establish scheduler/callee or cancellation-safe completion"
+          ],
+          "WriterTerminated": true,
+          "TerminalRejection": null,
+          "Writer": {
+            "Id": 5235,
+            "Sequence": 4552,
+            "Slot": 412,
+            "ParentSlot": 408,
+            "Run": 12143,
+            "Site": {
+              "Script": 31,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 25739,
+              "Stage": "instruction",
+              "Offset": 797,
+              "Operation": "move",
+              "Operands": "bit[0xD67] = 0x0000"
+            },
+            "Value": 0,
+            "ValueEstimated": true,
+            "PathEstimated": true,
+            "ConfirmationSequence": 4553
+          },
+          "WriterEnd": {
+            "Sequence": 4554,
+            "ReachedStop": true,
+            "ResumeOffset": null,
+            "UnresolvedReason": null,
+            "Site": {
+              "Script": 31,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 25739,
+              "Stage": "end",
+              "Offset": 802,
+              "Operation": null,
+              "Operands": null
+            }
+          }
+        },
+        "selectedWord": {
+          "frame": 4614,
+          "Event": 141345,
+          "Kind": "read",
+          "Id": 11170,
+          "Sequence": 8826,
+          "Slot": 699,
+          "Run": 17660,
+          "Site": {
+            "Script": 23,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 24523,
+            "Stage": "instruction",
+            "Offset": 5,
+            "Operation": "move",
+            "Operands": "local[0x002] = var[0x032+local[0x000]]"
+          },
+          "Binding": {
+            "Role": "source",
+            "Operand": "var[0x032+local[0x000]]",
+            "Key": "var[0x03A]",
+            "Value": 12312,
+            "ValueEstimated": true,
+            "Index": {
+              "Role": "index",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 8,
+              "ValueEstimated": true,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": null,
+              "UnresolvedReason": null
+            },
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "Dependencies": [
+            {
+              "Key": "var[0x03A]",
+              "LocalSlot": null
+            },
+            {
+              "Key": "local[0x000]",
+              "LocalSlot": 699
+            }
+          ],
+          "Origin": null,
+          "IndexRead": 11169,
+          "PathEstimated": true
+        },
+        "selectedIndex": {
+          "frame": 4614,
+          "Event": 141345,
+          "Kind": "read",
+          "Id": 11169,
+          "Sequence": 8826,
+          "Slot": 699,
+          "Run": 17660,
+          "Site": {
+            "Script": 23,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 24523,
+            "Stage": "instruction",
+            "Offset": 5,
+            "Operation": "move",
+            "Operands": "local[0x002] = var[0x032+local[0x000]]"
+          },
+          "Binding": {
+            "Role": "index",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 8,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "Dependencies": [
+            {
+              "Key": "local[0x000]",
+              "LocalSlot": 699
+            }
+          ],
+          "Origin": 11168,
+          "IndexRead": null,
+          "PathEstimated": true
+        },
+        "selectedIndexOrigin": {
+          "frame": 4614,
+          "Event": 141345,
+          "Kind": "write",
+          "Id": 11168,
+          "Sequence": 8825,
+          "Slot": 699,
+          "ParentSlot": 694,
+          "Run": 17660,
+          "Site": {
+            "Script": 23,
+            "Context": null,
+            "Container": 1,
+            "ResourceOffset": 24523,
+            "Stage": "instruction",
+            "Offset": 0,
+            "Operation": "multiply",
+            "Operands": "local[0x000] *= 0x0002"
+          },
+          "Destination": {
+            "Role": "destination-before",
+            "Operand": "local[0x000]",
+            "Key": "local[0x000]",
+            "Value": 4,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "SourceReads": [
+            11166,
+            11167
+          ],
+          "Value": 8,
+          "ValueEstimated": true,
+          "PathEstimated": true,
+          "ConfirmationSequence": 8826
+        },
+        "finalArguments": [
+          {
+            "frame": 4614,
+            "Event": 141390,
+            "Kind": "read",
+            "Id": 11280,
+            "Sequence": 8871,
+            "Slot": 694,
+            "Run": 17655,
+            "Site": {
+              "Script": 22,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 24141,
+              "Stage": "instruction",
+              "Offset": 195,
+              "Operation": "chainScript",
+              "Operands": "0x1A, [local[0x000], 0x0000]"
+            },
+            "Binding": {
+              "Role": "argument",
+              "Operand": "local[0x000]",
+              "Key": "local[0x000]",
+              "Value": 4,
+              "ValueEstimated": true,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 0,
+              "UnresolvedReason": null
+            },
+            "Dependencies": [
+              {
+                "Key": "local[0x000]",
+                "LocalSlot": 694
+              }
+            ],
+            "Origin": 11161,
+            "IndexRead": null,
+            "PathEstimated": true
+          },
+          {
+            "frame": 4614,
+            "Event": 141390,
+            "Kind": "read",
+            "Id": 11281,
+            "Sequence": 8871,
+            "Slot": 694,
+            "Run": 17655,
+            "Site": {
+              "Script": 22,
+              "Context": null,
+              "Container": 1,
+              "ResourceOffset": 24141,
+              "Stage": "instruction",
+              "Offset": 195,
+              "Operation": "chainScript",
+              "Operands": "0x1A, [local[0x000], 0x0000]"
+            },
+            "Binding": {
+              "Role": "argument",
+              "Operand": "0x0000",
+              "Key": null,
+              "Value": 0,
+              "ValueEstimated": false,
+              "Index": null,
+              "BackingWord": null,
+              "ArgumentIndex": 1,
+              "UnresolvedReason": null
+            },
+            "Dependencies": [],
+            "Origin": null,
+            "IndexRead": null,
+            "PathEstimated": true
+          }
+        ]
+      },
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-access.jsonl",
+          "sha256": "e315b0b45cb586a483719dbd6737580d468f4f9efa95118a22b553fbda851b03"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-relations.jsonl",
+          "sha256": "6a33c57be76ed53530972c6146b69b3e9455d6ab5f6987554532d2a5c27b9459"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-completion.jsonl",
+          "sha256": "6a5279f8406c74f1ff3cff99e6868f35c98400410c67372bd0cc7a29a2518f4b"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw4-key",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 7120,
+      "accessOperations": {
+        "multiply": 28,
+        "move": 1964,
+        "increment": 673,
+        "and": 196,
+        "divide": 84,
+        "stopObjectCode": 80,
+        "isEqual": 486,
+        "chainScript": 57,
+        "equalZero": 709,
+        "startScript": 114,
+        "setVarRange": 115,
+        "jumpRelative": 126,
+        "notEqualZero": 260,
+        "actorOps": 145,
+        "getRandomNr": 40,
+        "add": 60,
+        "putActorInRoom": 46,
+        "putActor": 22,
+        "animateActor": 142,
+        "ifClassOfIs": 44,
+        "breakHere": 723,
+        "isLess": 549,
+        "subtract": 33,
+        "verbOps": 330,
+        "getDist": 16,
+        "isGreater": 28,
+        "isLessEqual": 28,
+        "cutscene": 1,
+        "print": 1,
+        "waitFor": 1,
+        "endCutscene": 1,
+        "resourceRoutines": 5,
+        "setState": 7,
+        "setClass": 5,
+        "isScriptRunning": 1
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 47,
+        "unmodelled instruction access": 750
+      },
+      "confirmedWrites": {
+        "multiply": 28,
+        "move": 1964,
+        "increment": 673,
+        "and": 196,
+        "divide": 84,
+        "add": 60,
+        "subtract": 33
+      },
+      "recursiveIndexReads": 845,
+      "notifiedMutations": 67905,
+      "zeroWaits": 16,
+      "independentTerminations": 16,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-access.jsonl",
+          "sha256": "e315b0b45cb586a483719dbd6737580d468f4f9efa95118a22b553fbda851b03"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-relations.jsonl",
+          "sha256": "5f16a0835182a074c4a749d69be27c22dfd24fa0cfd970169aa3c3000dad1e75"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-completion.jsonl",
+          "sha256": "6a5279f8406c74f1ff3cff99e6868f35c98400410c67372bd0cc7a29a2518f4b"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-click",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 1700,
+      "accessOperations": {
+        "isEqual": 111,
+        "resourceRoutines": 5,
+        "startScript": 33,
+        "setState": 7,
+        "equalZero": 145,
+        "setClass": 5,
+        "actorOps": 25,
+        "animateActor": 26,
+        "putActorInRoom": 2,
+        "putActor": 2,
+        "notEqualZero": 58,
+        "isScriptRunning": 1,
+        "stopObjectCode": 20,
+        "multiply": 8,
+        "move": 555,
+        "increment": 152,
+        "and": 56,
+        "divide": 24,
+        "chainScript": 12,
+        "setVarRange": 30,
+        "jumpRelative": 31,
+        "subtract": 10,
+        "verbOps": 100,
+        "breakHere": 148,
+        "isLess": 116,
+        "getDist": 4,
+        "isGreater": 7,
+        "isLessEqual": 7
+      },
+      "accessBarriers": {
+        "unmodelled instruction access": 172,
+        "unresolved or filtered source access": 3
+      },
+      "confirmedWrites": {
+        "multiply": 8,
+        "move": 555,
+        "increment": 152,
+        "and": 56,
+        "divide": 24,
+        "subtract": 10
+      },
+      "recursiveIndexReads": 258,
+      "notifiedMutations": 43457,
+      "zeroWaits": 4,
+      "independentTerminations": 4,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-access.jsonl",
+          "sha256": "8c56d8f8a5263d76d6d281e5c483f859fec170be799fd3479d5647c5243f93d7"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-relations.jsonl",
+          "sha256": "7459aa3af153d9569f8f746969c4fb408a097e2e482cc2ab03d93f8afde74eed"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-completion.jsonl",
+          "sha256": "44890aeb4da508b691f6e3822a89bd24745b924c48256fe6ff4bdf9337d96c39"
+        }
+      ]
+    },
+    {
+      "id": "room41-raw6-key",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 1700,
+      "accessOperations": {
+        "isEqual": 111,
+        "resourceRoutines": 5,
+        "startScript": 33,
+        "setState": 7,
+        "equalZero": 145,
+        "setClass": 5,
+        "actorOps": 25,
+        "animateActor": 26,
+        "putActorInRoom": 2,
+        "putActor": 2,
+        "notEqualZero": 58,
+        "isScriptRunning": 1,
+        "stopObjectCode": 20,
+        "multiply": 8,
+        "move": 555,
+        "increment": 152,
+        "and": 56,
+        "divide": 24,
+        "chainScript": 12,
+        "setVarRange": 30,
+        "jumpRelative": 31,
+        "subtract": 10,
+        "verbOps": 100,
+        "breakHere": 148,
+        "isLess": 116,
+        "getDist": 4,
+        "isGreater": 7,
+        "isLessEqual": 7
+      },
+      "accessBarriers": {
+        "unmodelled instruction access": 172,
+        "unresolved or filtered source access": 3
+      },
+      "confirmedWrites": {
+        "multiply": 8,
+        "move": 555,
+        "increment": 152,
+        "and": 56,
+        "divide": 24,
+        "subtract": 10
+      },
+      "recursiveIndexReads": 258,
+      "notifiedMutations": 43441,
+      "zeroWaits": 4,
+      "independentTerminations": 4,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-access.jsonl",
+          "sha256": "8c56d8f8a5263d76d6d281e5c483f859fec170be799fd3479d5647c5243f93d7"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-relations.jsonl",
+          "sha256": "7c5f0bb910de6dbb18b48f4721a287362c00ef5894516c9e5709d25533c66c88"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-completion.jsonl",
+          "sha256": "44890aeb4da508b691f6e3822a89bd24745b924c48256fe6ff4bdf9337d96c39"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 5735,
+      "accessOperations": {
+        "multiply": 22,
+        "move": 1519,
+        "increment": 551,
+        "and": 154,
+        "divide": 66,
+        "stopObjectCode": 64,
+        "isEqual": 400,
+        "chainScript": 47,
+        "equalZero": 590,
+        "startScript": 85,
+        "setVarRange": 91,
+        "jumpRelative": 99,
+        "notEqualZero": 212,
+        "actorOps": 126,
+        "getRandomNr": 40,
+        "add": 60,
+        "putActorInRoom": 44,
+        "putActor": 20,
+        "animateActor": 120,
+        "ifClassOfIs": 44,
+        "breakHere": 595,
+        "isLess": 453,
+        "subtract": 25,
+        "verbOps": 250,
+        "getDist": 12,
+        "isGreater": 21,
+        "isLessEqual": 21,
+        "cutscene": 1,
+        "print": 1,
+        "waitFor": 1,
+        "endCutscene": 1
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 44,
+        "unmodelled instruction access": 608
+      },
+      "confirmedWrites": {
+        "multiply": 22,
+        "move": 1519,
+        "increment": 551,
+        "and": 154,
+        "divide": 66,
+        "add": 60,
+        "subtract": 25
+      },
+      "recursiveIndexReads": 633,
+      "notifiedMutations": 34323,
+      "zeroWaits": 12,
+      "independentTerminations": 12,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-access.jsonl",
+          "sha256": "0727d70da3dbe140d132a2fd3e106af9760928f7a678b77d26f64d2e908b267b"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-relations.jsonl",
+          "sha256": "28dbc05ff523544a590467a3b1fb0a33f80047db5b3dc2b6635cdbf56b23a476"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-completion.jsonl",
+          "sha256": "3f54492b409935d0e77b4b1dea78b2c3fd9c6f6d66f135a0b97d52e5259a391b"
+        }
+      ]
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 5735,
+      "accessOperations": {
+        "multiply": 22,
+        "move": 1519,
+        "increment": 551,
+        "and": 154,
+        "divide": 66,
+        "stopObjectCode": 64,
+        "isEqual": 400,
+        "chainScript": 47,
+        "equalZero": 590,
+        "startScript": 85,
+        "setVarRange": 91,
+        "jumpRelative": 99,
+        "notEqualZero": 212,
+        "actorOps": 126,
+        "getRandomNr": 40,
+        "add": 60,
+        "putActorInRoom": 44,
+        "putActor": 20,
+        "animateActor": 120,
+        "ifClassOfIs": 44,
+        "breakHere": 595,
+        "isLess": 453,
+        "subtract": 25,
+        "verbOps": 250,
+        "getDist": 12,
+        "isGreater": 21,
+        "isLessEqual": 21,
+        "cutscene": 1,
+        "print": 1,
+        "waitFor": 1,
+        "endCutscene": 1
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 44,
+        "unmodelled instruction access": 608
+      },
+      "confirmedWrites": {
+        "multiply": 22,
+        "move": 1519,
+        "increment": 551,
+        "and": 154,
+        "divide": 66,
+        "add": 60,
+        "subtract": 25
+      },
+      "recursiveIndexReads": 633,
+      "notifiedMutations": 34123,
+      "zeroWaits": 12,
+      "independentTerminations": 12,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-access.jsonl",
+          "sha256": "fe2941bb1e8cf2666cee02b5bec22cf16c4be7b3dcaf066de1313b656b669be1"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-relations.jsonl",
+          "sha256": "8f57b85787da45116a2b521f7ad1cf5a9e3db5b286a10876624c245f8f3c7533"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-completion.jsonl",
+          "sha256": "faf699b34e6d7ab96c5fa518665fa6fdf19aed7aa3009a8a4c582bf7f8be114b"
+        }
+      ]
+    },
+    {
+      "id": "late096-reached44",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 605,
+      "accessOperations": {
+        "multiply": 2,
+        "move": 88,
+        "increment": 90,
+        "and": 14,
+        "divide": 6,
+        "stopObjectCode": 10,
+        "isEqual": 83,
+        "chainScript": 8,
+        "equalZero": 96,
+        "startScript": 8,
+        "setVarRange": 8,
+        "jumpRelative": 8,
+        "notEqualZero": 24,
+        "breakHere": 80,
+        "isLess": 80
+      },
+      "accessBarriers": {},
+      "confirmedWrites": {
+        "multiply": 2,
+        "move": 88,
+        "increment": 90,
+        "and": 14,
+        "divide": 6
+      },
+      "recursiveIndexReads": 4,
+      "notifiedMutations": 38532,
+      "zeroWaits": 0,
+      "independentTerminations": 0,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-reached44-access.jsonl",
+          "sha256": "2a42ba77bab8dd24e30fdf6673d9220732327d50a16d3ce3fba906d2a1d34cf2"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-reached44-relations.jsonl",
+          "sha256": "b23dc41edbd789aeff0ca0219499cde489dc8da275e8073763f15b1786f3d2b6"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-reached44-completion.jsonl",
+          "sha256": "099d48be9464b3088a2b61729edac100f3649a6bc75c03d5d0cd3b64dd0ac00c"
+        }
+      ]
+    },
+    {
+      "id": "late096-source-skip095",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 0,
+      "accessOperations": {},
+      "accessBarriers": {},
+      "confirmedWrites": {},
+      "recursiveIndexReads": 0,
+      "notifiedMutations": 9249,
+      "zeroWaits": 0,
+      "independentTerminations": 0,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-access.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-relations.jsonl",
+          "sha256": "e26dd35e9c3a1f0a474681cc46cb23f6d09b513cbc9108f913e8985a7563fe58"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-completion.jsonl",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response390",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 33,
+      "accessOperations": {
+        "equalZero": 3,
+        "isEqual": 3,
+        "startScript": 3,
+        "notEqualZero": 2,
+        "move": 1,
+        "actorOps": 3,
+        "resourceRoutines": 4,
+        "setClass": 2,
+        "animateActor": 4,
+        "putActorInRoom": 2,
+        "putActor": 2,
+        "jumpRelative": 1,
+        "stopObjectCode": 3
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 3,
+        "unmodelled instruction access": 17
+      },
+      "confirmedWrites": {
+        "move": 1
+      },
+      "recursiveIndexReads": 0,
+      "notifiedMutations": 19004,
+      "zeroWaits": 0,
+      "independentTerminations": 0,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-access.jsonl",
+          "sha256": "bd0d72543a66769045810b1a54e3623078965a10b3580660ca14aa0846cc18db"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-relations.jsonl",
+          "sha256": "e8518f9c635d927ec33025102042ed31aebb889445405bbbd1777fa0ab70fb4a"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-completion.jsonl",
+          "sha256": "e9d0a70ee2bbc3d19f58442745ae59dbf5c57a34f3f95c804089dad76c6b94e1"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source369-response391",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 33,
+      "accessOperations": {
+        "equalZero": 3,
+        "isEqual": 3,
+        "startScript": 3,
+        "notEqualZero": 2,
+        "move": 1,
+        "actorOps": 3,
+        "resourceRoutines": 4,
+        "setClass": 2,
+        "animateActor": 4,
+        "putActorInRoom": 2,
+        "putActor": 2,
+        "jumpRelative": 1,
+        "stopObjectCode": 3
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 3,
+        "unmodelled instruction access": 17
+      },
+      "confirmedWrites": {
+        "move": 1
+      },
+      "recursiveIndexReads": 0,
+      "notifiedMutations": 19004,
+      "zeroWaits": 0,
+      "independentTerminations": 0,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-access.jsonl",
+          "sha256": "bc117620817e2286e10c7a6eec1b0f593635e09e583d922eeb15fe741a89274d"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-relations.jsonl",
+          "sha256": "bb6ca54be83b60d25fe4af6250fc7845b01927fc4f3988bd36a9b9cd0ee3b780"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-completion.jsonl",
+          "sha256": "e9d0a70ee2bbc3d19f58442745ae59dbf5c57a34f3f95c804089dad76c6b94e1"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response390",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 33,
+      "accessOperations": {
+        "equalZero": 3,
+        "isEqual": 3,
+        "startScript": 3,
+        "notEqualZero": 2,
+        "move": 1,
+        "actorOps": 3,
+        "resourceRoutines": 4,
+        "setClass": 2,
+        "animateActor": 4,
+        "putActorInRoom": 2,
+        "putActor": 2,
+        "jumpRelative": 1,
+        "stopObjectCode": 3
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 3,
+        "unmodelled instruction access": 17
+      },
+      "confirmedWrites": {
+        "move": 1
+      },
+      "recursiveIndexReads": 0,
+      "notifiedMutations": 19302,
+      "zeroWaits": 0,
+      "independentTerminations": 0,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-access.jsonl",
+          "sha256": "b18f9658f62cf1defa45ec13a2bde53007e084b59d4ca89deec7df1fd03f84bb"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-relations.jsonl",
+          "sha256": "78fea709358dce1c5587459af416af71a9d7c84fadc9e8d528e57dd17e91553e"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-completion.jsonl",
+          "sha256": "b9dfd242e6104544011630c11e091c3b57bf82956dc1dea307580f0b3790fd23"
+        }
+      ]
+    },
+    {
+      "id": "sleep-source371-response391",
+      "priorWholePacketAndChronologyExact": true,
+      "accessRecords": 33,
+      "accessOperations": {
+        "equalZero": 3,
+        "isEqual": 3,
+        "startScript": 3,
+        "notEqualZero": 2,
+        "move": 1,
+        "actorOps": 3,
+        "resourceRoutines": 4,
+        "setClass": 2,
+        "animateActor": 4,
+        "putActorInRoom": 2,
+        "putActor": 2,
+        "jumpRelative": 1,
+        "stopObjectCode": 3
+      },
+      "accessBarriers": {
+        "unresolved or filtered source access": 3,
+        "unmodelled instruction access": 17
+      },
+      "confirmedWrites": {
+        "move": 1
+      },
+      "recursiveIndexReads": 0,
+      "notifiedMutations": 19302,
+      "zeroWaits": 0,
+      "independentTerminations": 0,
+      "observations": {},
+      "reports": [
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-access.jsonl",
+          "sha256": "39e9cdfe10ddcf5b9a688f5521ce8bc4eb369af6bea000c62e009323a1bfa5c8"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-relations.jsonl",
+          "sha256": "137d8d45b3e4cd47d93f4a2283a85060a3c6cd1b92cb5b4535184ca552e7191b"
+        },
+        {
+          "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-completion.jsonl",
+          "sha256": "b9dfd242e6104544011630c11e091c3b57bf82956dc1dea307580f0b3790fd23"
+        }
+      ]
+    }
+  ]
+}

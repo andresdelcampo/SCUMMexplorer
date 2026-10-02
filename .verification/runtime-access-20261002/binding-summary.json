@@ -1,0 +1,1807 @@
+{
+  "scope": "Pre-instruction operand bindings and confirmed selected-run values in unchanged seeded explorer recipes. Numeric domains remain separate source hypotheses. No general selected-domain transport, exhaustive writer, inherited path/effect, scheduler/callee/cancellation or090 completion proof.",
+  "recipeCount": 13,
+  "fullPacketsIdentical": true,
+  "priorObservationsIdentical": true,
+  "observedZeroWaits": 76,
+  "native090Completed": false,
+  "estimatesCleared": false,
+  "sourceManifest": {
+    "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/observer-1/source-manifest.json",
+    "sha256": "0cc775c0b1b3d02c4a35bcc8438ca446a7ab6489fd737ff39268cf4ff2bcaaa5"
+  },
+  "bootSelection": {
+    "indexedRead": {
+      "frame": 0,
+      "Sequence": 79,
+      "Slot": 12,
+      "ParentSlot": 11,
+      "Run": 19,
+      "Script": 211,
+      "Context": "Room 01 local script 211",
+      "Offset": 841,
+      "Operation": "move",
+      "Operands": "local[0x000] = local[0x002+local[0x001]]",
+      "PathEstimated": false,
+      "OperandBindings": [
+        {
+          "Role": "destination-before",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 5120,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "source",
+          "Operand": "local[0x002+local[0x001]]",
+          "Key": "local[0x002]",
+          "Value": 4120,
+          "ValueEstimated": false,
+          "Index": {
+            "Role": "index",
+            "Operand": "local[0x001]",
+            "Key": "local[0x001]",
+            "Value": 0,
+            "ValueEstimated": true,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ]
+    },
+    "write": {
+      "frame": 0,
+      "Sequence": 80,
+      "Slot": 12,
+      "ParentSlot": 11,
+      "Run": 19,
+      "Script": 211,
+      "Context": "Room 01 local script 211",
+      "Offset": 848,
+      "Operation": "move",
+      "Operands": "var[0x032+0x008] = local[0x000]",
+      "PathEstimated": false,
+      "OperandBindings": [
+        {
+          "Role": "destination-before",
+          "Operand": "var[0x032+0x008]",
+          "Key": "var[0x03A]",
+          "Value": 0,
+          "ValueEstimated": false,
+          "Index": {
+            "Role": "index",
+            "Operand": "0x008",
+            "Key": null,
+            "Value": 8,
+            "ValueEstimated": false,
+            "Index": null,
+            "BackingWord": null,
+            "ArgumentIndex": null,
+            "UnresolvedReason": null
+          },
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        },
+        {
+          "Role": "source",
+          "Operand": "local[0x000]",
+          "Key": "local[0x000]",
+          "Value": 4120,
+          "ValueEstimated": true,
+          "Index": null,
+          "BackingWord": null,
+          "ArgumentIndex": null,
+          "UnresolvedReason": null
+        }
+      ]
+    },
+    "initialWord": "1018",
+    "currentWord": "3018",
+    "low12BitsAgree": true,
+    "limits": "Observed source selection and current numeric correspondence in this recipe; intervening provenance, unknown/external/aliased/concurrent effects and other inputs are not normalized away."
+  },
+  "expandedPacket": {
+    "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/expanded-room41-1/room41-raw4-click.json",
+    "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+  },
+  "expandedInstructions": {
+    "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/expanded-room41-1/room41-raw4-click-instructions.jsonl",
+    "sha256": "ee2fd227b07921dbc43effe5fa4ec5dd39a5b334020877113fe38da8e6c83b94"
+  },
+  "numericSourceReport": {
+    "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/numeric-fresh.json",
+    "sha256": "975698a5dddda7ac7e3ba00f019dc5a8cddf3ab2f34aaf6cb6b9bad626cb3fab"
+  },
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 12,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204.json",
+        "sha256": "58453eec817e345003c93d5106cd0363fabe3537d2f1c6f50bad3d8515f77937"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-instructions.jsonl",
+        "sha256": "8a3c77e897d2f133c9511fa3b1325d6604267600fdc6ceffced2242aa464895e"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/direct41-source-level4-skip204-cancellations.jsonl",
+        "sha256": "7de572e1a71ec9e8ee3df46cbc2fcb0aca00661f95bbd0ce6661173f19000512"
+      },
+      "observations": {}
+    },
+    {
+      "id": "room41-raw4-click",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 16,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-click.json",
+        "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-instructions.jsonl",
+        "sha256": "df534edc2511aa83d00c2b45acaa0ee5b5e4776bdfb58d9bbb976003a0e9a910"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-click-cancellations.jsonl",
+        "sha256": "15a9e42d720733f096694605a956a198f4cfb0edf67c590f3b7bdee3f259cc5d"
+      },
+      "observations": {
+        "selectedRecipeInput": {
+          "snapshotStage": "draft-4-before",
+          "packed": "3018",
+          "notes": [
+            1,
+            4,
+            1,
+            1
+          ],
+          "packedEstimated": true,
+          "limits": "The unchanged recipe selects mouse/key notes from this live snapshot; source-domain membership does not establish known input/index or inherited path/effects.",
+          "writes": [
+            {
+              "frame": 4568,
+              "Sequence": 7864,
+              "Slot": 671,
+              "ParentSlot": 670,
+              "Run": 17317,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x056]",
+                  "Value": 3,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 0,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4576,
+              "Sequence": 7985,
+              "Slot": 680,
+              "ParentSlot": 679,
+              "Run": 17374,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x057]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 1,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 4,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4584,
+              "Sequence": 8139,
+              "Slot": 685,
+              "ParentSlot": 684,
+              "Run": 17433,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x058]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 2,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4592,
+              "Sequence": 8257,
+              "Slot": 688,
+              "ParentSlot": 687,
+              "Run": 17492,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x059]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 3,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            }
+          ]
+        },
+        "practice": {
+          "decoder": {
+            "frame": 2870,
+            "Sequence": 3583,
+            "Slot": 377,
+            "ParentSlot": 373,
+            "Run": 11823,
+            "Script": 23,
+            "Context": null,
+            "Offset": 5,
+            "Operation": "move",
+            "Operands": "local[0x002] = var[0x032+local[0x000]]",
+            "PathEstimated": false,
+            "OperandBindings": [
+              {
+                "Role": "destination-before",
+                "Operand": "local[0x002]",
+                "Key": "local[0x002]",
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "source",
+                "Operand": "var[0x032+local[0x000]]",
+                "Key": "var[0x036]",
+                "Value": 4608,
+                "ValueEstimated": true,
+                "Index": {
+                  "Role": "index",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 4,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "read": {
+            "frame": 2870,
+            "Sequence": 3617,
+            "Slot": 373,
+            "ParentSlot": 372,
+            "Run": 11819,
+            "Script": 201,
+            "Context": "Room 06 local script 201",
+            "Offset": 33,
+            "Operation": "move",
+            "Operands": "local[0x001] = var[0x052+local[0x000]]",
+            "PathEstimated": false,
+            "OperandBindings": [
+              {
+                "Role": "destination-before",
+                "Operand": "local[0x001]",
+                "Key": "local[0x001]",
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "source",
+                "Operand": "var[0x052+local[0x000]]",
+                "Key": "var[0x052]",
+                "Value": 1,
+                "ValueEstimated": true,
+                "Index": {
+                  "Role": "index",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "call": {
+            "frame": 2870,
+            "Sequence": 3618,
+            "Slot": 373,
+            "ParentSlot": 372,
+            "Run": 11819,
+            "Script": 201,
+            "Context": "Room 06 local script 201",
+            "Offset": 40,
+            "Operation": "startScript",
+            "Operands": "0x1E, [local[0x001]]",
+            "PathEstimated": false,
+            "OperandBindings": [
+              {
+                "Role": "target",
+                "Operand": "0x1E",
+                "Key": null,
+                "Value": 30,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x001]",
+                "Key": "local[0x001]",
+                "Value": 1,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "tuple": [
+            1,
+            1,
+            1,
+            2
+          ]
+        },
+        "finalInput": {
+          "notes": [
+            1,
+            4,
+            1,
+            1
+          ],
+          "writes": [
+            {
+              "frame": 4568,
+              "Sequence": 7864,
+              "Slot": 671,
+              "ParentSlot": 670,
+              "Run": 17317,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x056]",
+                  "Value": 3,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 0,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4576,
+              "Sequence": 7985,
+              "Slot": 680,
+              "ParentSlot": 679,
+              "Run": 17374,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x057]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 1,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 4,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4584,
+              "Sequence": 8139,
+              "Slot": 685,
+              "ParentSlot": 684,
+              "Run": 17433,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x058]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 2,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4592,
+              "Sequence": 8257,
+              "Slot": 688,
+              "ParentSlot": 687,
+              "Run": 17492,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x059]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 3,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            }
+          ],
+          "scan": {
+            "frame": 4614,
+            "Sequence": 8636,
+            "Slot": 694,
+            "ParentSlot": 672,
+            "Run": 17655,
+            "Script": 22,
+            "Context": null,
+            "Offset": 100,
+            "Operation": "move",
+            "Operands": "local[0x000] = 0x0000",
+            "PathEstimated": true,
+            "OperandBindings": [
+              {
+                "Role": "destination-before",
+                "Operand": "local[0x000]",
+                "Key": "local[0x000]",
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "source",
+                "Operand": "0x0000",
+                "Key": null,
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "selectedWord": {
+            "frame": 4614,
+            "Sequence": 8826,
+            "Slot": 699,
+            "ParentSlot": 694,
+            "Run": 17660,
+            "Script": 23,
+            "Context": null,
+            "Offset": 5,
+            "Operation": "move",
+            "Operands": "local[0x002] = var[0x032+local[0x000]]",
+            "PathEstimated": true,
+            "OperandBindings": [
+              {
+                "Role": "destination-before",
+                "Operand": "local[0x002]",
+                "Key": "local[0x002]",
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "source",
+                "Operand": "var[0x032+local[0x000]]",
+                "Key": "var[0x03A]",
+                "Value": 12312,
+                "ValueEstimated": true,
+                "Index": {
+                  "Role": "index",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 8,
+                  "ValueEstimated": true,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "response": {
+            "frame": 4614,
+            "Sequence": 8828,
+            "Slot": 699,
+            "ParentSlot": 694,
+            "Run": 17660,
+            "Script": 23,
+            "Context": null,
+            "Offset": 15,
+            "Operation": "move",
+            "Operands": "var[0x065] = var[0x032+local[0x000]]",
+            "PathEstimated": true,
+            "OperandBindings": [
+              {
+                "Role": "destination-before",
+                "Operand": "var[0x065]",
+                "Key": "var[0x065]",
+                "Value": 64,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "source",
+                "Operand": "var[0x032+local[0x000]]",
+                "Key": "var[0x03B]",
+                "Value": 16961,
+                "ValueEstimated": false,
+                "Index": {
+                  "Role": "index",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 9,
+                  "ValueEstimated": true,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "endpoint": {
+            "frame": 4614,
+            "Sequence": 8871,
+            "Slot": 694,
+            "ParentSlot": 672,
+            "Run": 17655,
+            "Script": 22,
+            "Context": null,
+            "Offset": 195,
+            "Operation": "chainScript",
+            "Operands": "0x1A, [local[0x000], 0x0000]",
+            "PathEstimated": true,
+            "OperandBindings": [
+              {
+                "Role": "target",
+                "Operand": "0x1A",
+                "Key": null,
+                "Value": 26,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "local[0x000]",
+                "Key": "local[0x000]",
+                "Value": 4,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 0,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "argument",
+                "Operand": "0x0000",
+                "Key": null,
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": 1,
+                "UnresolvedReason": null
+              }
+            ]
+          }
+        },
+        "completion": {
+          "writer": {
+            "frame": 3036,
+            "Sequence": 4552,
+            "Slot": 412,
+            "ParentSlot": 408,
+            "Run": 12143,
+            "Script": 31,
+            "Context": null,
+            "Offset": 797,
+            "Operation": "move",
+            "Operands": "bit[0xD67] = 0x0000",
+            "PathEstimated": true,
+            "OperandBindings": [
+              {
+                "Role": "destination-before",
+                "Operand": "bit[0xD67]",
+                "Key": "bit[0xD67]",
+                "Value": 1,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": "var[0x0D6]",
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              },
+              {
+                "Role": "source",
+                "Operand": "0x0000",
+                "Key": null,
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "afterWrite": {
+            "frame": 3036,
+            "Sequence": 4553,
+            "Slot": 412,
+            "ParentSlot": 408,
+            "Run": 12143,
+            "Script": 31,
+            "Context": null,
+            "Offset": 802,
+            "Operation": "stopObjectCode",
+            "Operands": "",
+            "PathEstimated": true,
+            "OperandBindings": []
+          },
+          "wait": {
+            "frame": 3036,
+            "Sequence": 4556,
+            "Slot": 408,
+            "ParentSlot": 407,
+            "Run": 12144,
+            "Script": 20,
+            "Context": null,
+            "Offset": 40,
+            "Operation": "equalZero",
+            "Operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "PathEstimated": false,
+            "OperandBindings": [
+              {
+                "Role": "condition",
+                "Operand": "bit[0xD67]",
+                "Key": "bit[0xD67]",
+                "Value": 0,
+                "ValueEstimated": true,
+                "Index": null,
+                "BackingWord": "var[0x0D6]",
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          },
+          "afterWait": {
+            "frame": 3036,
+            "Sequence": 4557,
+            "Slot": 408,
+            "ParentSlot": 407,
+            "Run": 12144,
+            "Script": 20,
+            "Context": null,
+            "Offset": 45,
+            "Operation": "increment",
+            "Operands": "local[0x000]",
+            "PathEstimated": true,
+            "OperandBindings": [
+              {
+                "Role": "destination-before",
+                "Operand": "local[0x000]",
+                "Key": "local[0x000]",
+                "Value": 0,
+                "ValueEstimated": false,
+                "Index": null,
+                "BackingWord": null,
+                "ArgumentIndex": null,
+                "UnresolvedReason": null
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "room41-raw4-key",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 16,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-key.json",
+        "sha256": "d0a7e60717b2b0a7a4b5c58499f153ec3a19b80f50e67183e5c5cbc2eaf1e2de"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-instructions.jsonl",
+        "sha256": "22873421925600fadf394e4f433a767195c9f3ee36758e11dab0399792b43a48"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw4-key-cancellations.jsonl",
+        "sha256": "15a9e42d720733f096694605a956a198f4cfb0edf67c590f3b7bdee3f259cc5d"
+      },
+      "observations": {
+        "selectedRecipeInput": {
+          "snapshotStage": "draft-4-before",
+          "packed": "3018",
+          "notes": [
+            1,
+            4,
+            1,
+            1
+          ],
+          "packedEstimated": true,
+          "limits": "The unchanged recipe selects mouse/key notes from this live snapshot; source-domain membership does not establish known input/index or inherited path/effects.",
+          "writes": [
+            {
+              "frame": 4568,
+              "Sequence": 7864,
+              "Slot": 671,
+              "ParentSlot": 670,
+              "Run": 17317,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x056]",
+                  "Value": 3,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 0,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4576,
+              "Sequence": 7985,
+              "Slot": 680,
+              "ParentSlot": 679,
+              "Run": 17374,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x057]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 1,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 4,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4584,
+              "Sequence": 8139,
+              "Slot": 685,
+              "ParentSlot": 684,
+              "Run": 17433,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x058]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 2,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 4592,
+              "Sequence": 8257,
+              "Slot": 688,
+              "ParentSlot": 687,
+              "Run": 17492,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": true,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x059]",
+                  "Value": 1,
+                  "ValueEstimated": true,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 3,
+                    "ValueEstimated": true,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "room41-raw6-click",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 4,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-click.json",
+        "sha256": "f90c09c5ec5bcd60476417d0558e5a47bca9c9163c33a58d55db9c676207c31f"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-instructions.jsonl",
+        "sha256": "33a471f15fe142efb5fb967ce4cc08de84874ad3808f2c261e071dba800a93ad"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-click-cancellations.jsonl",
+        "sha256": "673b59cd5dee9bf41be0051bdd8cb43a629735b46beb3ccca7ce673783bdfc91"
+      },
+      "observations": {
+        "selectedRecipeInput": {
+          "snapshotStage": "draft-4-before",
+          "packed": "3018",
+          "notes": [
+            1,
+            4,
+            1,
+            1
+          ],
+          "packedEstimated": true,
+          "limits": "The unchanged recipe selects mouse/key notes from this live snapshot; source-domain membership does not establish known input/index or inherited path/effects.",
+          "writes": [
+            {
+              "frame": 1532,
+              "Sequence": 1072,
+              "Slot": 278,
+              "ParentSlot": 277,
+              "Run": 8744,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x056]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 0,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 1540,
+              "Sequence": 1193,
+              "Slot": 287,
+              "ParentSlot": 286,
+              "Run": 8801,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x057]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 1,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 4,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 1548,
+              "Sequence": 1347,
+              "Slot": 292,
+              "ParentSlot": 291,
+              "Run": 8860,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x058]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 2,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 1556,
+              "Sequence": 1465,
+              "Slot": 295,
+              "ParentSlot": 294,
+              "Run": 8919,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x059]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 3,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "room41-raw6-key",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 4,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-key.json",
+        "sha256": "34e64d6340a93f6912b9bcb93d748f07a179d34b0bbeba081f4c68ec3015bc64"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-instructions.jsonl",
+        "sha256": "94cb671f2fea66dcc5452d2820ed720b96bf03d426e2f8e3edcf1d9eae800387"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/room41-1/room41-raw6-key-cancellations.jsonl",
+        "sha256": "673b59cd5dee9bf41be0051bdd8cb43a629735b46beb3ccca7ce673783bdfc91"
+      },
+      "observations": {
+        "selectedRecipeInput": {
+          "snapshotStage": "draft-4-before",
+          "packed": "3018",
+          "notes": [
+            1,
+            4,
+            1,
+            1
+          ],
+          "packedEstimated": true,
+          "limits": "The unchanged recipe selects mouse/key notes from this live snapshot; source-domain membership does not establish known input/index or inherited path/effects.",
+          "writes": [
+            {
+              "frame": 1532,
+              "Sequence": 1072,
+              "Slot": 278,
+              "ParentSlot": 277,
+              "Run": 8744,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x056]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 0,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 1540,
+              "Sequence": 1193,
+              "Slot": 287,
+              "ParentSlot": 286,
+              "Run": 8801,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x057]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 1,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 4,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 1548,
+              "Sequence": 1347,
+              "Slot": 292,
+              "ParentSlot": 291,
+              "Run": 8860,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x058]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 2,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            },
+            {
+              "frame": 1556,
+              "Sequence": 1465,
+              "Slot": 295,
+              "ParentSlot": 294,
+              "Run": 8919,
+              "Script": 10,
+              "Context": null,
+              "Offset": 54,
+              "Operation": "move",
+              "Operands": "var[0x056+var[0x062]] = local[0x000]",
+              "PathEstimated": false,
+              "OperandBindings": [
+                {
+                  "Role": "destination-before",
+                  "Operand": "var[0x056+var[0x062]]",
+                  "Key": "var[0x059]",
+                  "Value": 0,
+                  "ValueEstimated": false,
+                  "Index": {
+                    "Role": "index",
+                    "Operand": "var[0x062]",
+                    "Key": "var[0x062]",
+                    "Value": 3,
+                    "ValueEstimated": false,
+                    "Index": null,
+                    "BackingWord": null,
+                    "ArgumentIndex": null,
+                    "UnresolvedReason": null
+                  },
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                },
+                {
+                  "Role": "source",
+                  "Operand": "local[0x000]",
+                  "Key": "local[0x000]",
+                  "Value": 1,
+                  "ValueEstimated": false,
+                  "Index": null,
+                  "BackingWord": null,
+                  "ArgumentIndex": null,
+                  "UnresolvedReason": null
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 12,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel.json",
+        "sha256": "dd2815c1717a023bfc047a99a68b871160fbd59a4609eb63f8cf30d0ce76d24a"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-instructions.jsonl",
+        "sha256": "add2943a5d2457c4ec998e478e2136885428a41da244341b04631c32e7eacee9"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/egg-first-1/native-level4-egg-dye-wheel-cancellations.jsonl",
+        "sha256": "57729c8e495a03582148ea328670fa51f906ac41e571302b402e4b0649b56ac1"
+      },
+      "observations": {}
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 12,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye.json",
+        "sha256": "39705828a5c46a4ddcdc4d96b5467f38b8cdc16ef0e8460365e56b0bbf8ae0ad"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-instructions.jsonl",
+        "sha256": "2c280b76e39d3e70984383988223d11aaf51b20286e313317dbb12df3990ea2f"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/dye-last-1/native-level4-egg-wheel-dye-cancellations.jsonl",
+        "sha256": "134653114024175dbe87cc0a5e06364cd658998442e19e08a7bf5d694f06a073"
+      },
+      "observations": {}
+    },
+    {
+      "id": "late096-reached44",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 0,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-reached44.json",
+        "sha256": "f72baaabd02edcbf9d446aacbb47f3088114d38f04cbff66cbcc6c9e38e8a8ba"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-reached44-instructions.jsonl",
+        "sha256": "dea704a0c5f8c1455328db3326800022990943bf626669c1e45b595a4a15a26d"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-reached44-cancellations.jsonl",
+        "sha256": "8b55982129f085067ea597e6d4292532cf9df140da2e1e08686d044f6419b2c0"
+      },
+      "observations": {}
+    },
+    {
+      "id": "late096-source-skip095",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 0,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095.json",
+        "sha256": "3f3ccbf796262d2812d755288d59975567d305ab43894ac43f94cc07c0e320cb"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-instructions.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/late096-source-skip095-cancellations.jsonl",
+        "sha256": "8b55982129f085067ea597e6d4292532cf9df140da2e1e08686d044f6419b2c0"
+      },
+      "observations": {}
+    },
+    {
+      "id": "sleep-source369-response390",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 0,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390.json",
+        "sha256": "87bfae3c6891ad7ecefe4038c6fab2c0091b2de5fd237688235700a2c59f601c"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-instructions.jsonl",
+        "sha256": "cafc4bc6a2044dceb518c92a804ff058f3bcb39fbad0cb49948c95a8ab2d8c6a"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response390-cancellations.jsonl",
+        "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+      },
+      "observations": {}
+    },
+    {
+      "id": "sleep-source369-response391",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 0,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391.json",
+        "sha256": "8e4d149d0806d5d473f8984feedb60aa199b608b0c9cb1231580ea66c98bef1a"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-instructions.jsonl",
+        "sha256": "b1ba1aaadd232cb8dfa74af8a2c498d56fb5ca55e32c4a769d3df3dae5ffd1c8"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source369-response391-cancellations.jsonl",
+        "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+      },
+      "observations": {}
+    },
+    {
+      "id": "sleep-source371-response390",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 0,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390.json",
+        "sha256": "560fd93d78a6701c784b2b5f38db4130b7208b8365f049bdef43757e80ef76e3"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-instructions.jsonl",
+        "sha256": "c37d3ecbbf6f6bd0b53b0039d7f4c46a61c12bfe953251d507cf3bf6e3343f64"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response390-cancellations.jsonl",
+        "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+      },
+      "observations": {}
+    },
+    {
+      "id": "sleep-source371-response391",
+      "fullPacketIdentical": true,
+      "priorObservationsIdentical": true,
+      "zeroWaits": 0,
+      "packet": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391.json",
+        "sha256": "c264750aa4d1c5e93d616909a9b713ca0cab77531ae07545bcd3b0a1b63bb665"
+      },
+      "instructions": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-instructions.jsonl",
+        "sha256": "15bace46609a4053dee838e9c57a59a93550bcc234295397414bad43c7b5416c"
+      },
+      "cancellations": {
+        "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/preserved-1/sleep-source371-response391-cancellations.jsonl",
+        "sha256": "72ea5b3f324ccc6e15cdc9deef25d2b8c6e5def9212169c7343d2b4707ff3e47"
+      },
+      "observations": {}
+    }
+  ]
+}

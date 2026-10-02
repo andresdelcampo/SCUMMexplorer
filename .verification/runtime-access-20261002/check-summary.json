@@ -1,0 +1,123 @@
+{
+  "core": 374,
+  "newOperandBindingCases": 5,
+  "rootCount": 363,
+  "comparedFields": [
+    "owner",
+    "status",
+    "frames",
+    "first",
+    "last",
+    "everOpen",
+    "begun",
+    "ended",
+    "rooms",
+    "sceneTrace"
+  ],
+  "rootStatuses": {
+    "No cutscene reached from this start": 19,
+    "Validated state preview": 330,
+    "Incomplete: prerequisites, waits or executor require review": 4,
+    "Brief input-suppression scope: not an independent replay": 10
+  },
+  "sourceFingerprintsUnchanged": true,
+  "literalResultsUnchanged": true,
+  "membershipsUnchanged": true,
+  "sequencesUnchanged": true,
+  "fullRecipePacketsUnchanged": 13,
+  "priorObservationsUnchanged": true,
+  "observedZeroWaits": 76,
+  "numericSourceReportUnchanged": true,
+  "numericWorlds": 162,
+  "flagCases": 52,
+  "comparisons": 51,
+  "overlaps": 14,
+  "fabricatedMatches": 4,
+  "practiceArgumentCases": 12,
+  "blockedRandomSites": 0,
+  "roomRenders": 76,
+  "remainingGaps": 0,
+  "changedPixels": 0,
+  "releaseWarnings": 0,
+  "releaseErrors": 0,
+  "appLaunched": false,
+  "estimatesCleared": false,
+  "native090Completed": false,
+  "reports": [
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/checks-final/core-tests.txt",
+      "sha256": "f8e0bf2907d808bf2272b800a5d3bb2a65832823e2da5c9f16c56d40f860b324"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/checks-final/release-build.txt",
+      "sha256": "d38062f9b9b6ca24120608a322017dffc80f153baa3f7f573b96d579a04e3114"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/final-release-build.txt",
+      "sha256": "14633fa0ed47fbd4ff2f623c8b3029fe04ed006c635b5fbaeb1776d62aa4539d"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/app-state.txt",
+      "sha256": "b38816ef20f01225a399b68fa8554b75dc646c0c4e4b2bd4d7340914a74b0372"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/observer-build.txt",
+      "sha256": "698ce30b262b82709393683401dbd133ee3015c25e0fb229b36dcf7f7b6355b1"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/expanded-build.txt",
+      "sha256": "6bba64bcec4c68d32108a7aff5301df34629748a66c6a21be4e7e78a6020798b"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/audits-1/literal/audit.json",
+      "sha256": "3bc3fc129c90e4cf28ce3d15d77cdf9d8fcf6e039793f99206cb90d92ce24353"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/audits-1/established.json",
+      "sha256": "389f0be1429c6bc7ac4bd59012926eb86b32dbcad6748bde825fd18896f94adb"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/audits-1/sequences.json",
+      "sha256": "94ca4cec1939055f8e6603ebd00b5c447d6820caa0380fe4c3c69d7ebed12a14"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/audits-1/blockers.txt",
+      "sha256": "83436ad2159c145e63f3e5dd12b64f5a7f7f7386075f83d03853d86054064bf1"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/room-audit-2/room-audit.tsv",
+      "sha256": "b9ef7dfa1312be0857e91af15e630ef771af95668ed20ccc2b47e1ebc124e4c7"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/room-audit-2/room-audit.txt",
+      "sha256": "8a68fc1ce7ae56ce59f5b7a06af2cd69bd92d626f5af2e6db0201e2a640df65e"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/png-comparison-2.txt",
+      "sha256": "135d9ecc2e6568aef9079381e6d577550479277aa013b515a4d3b358eb2a1d6c"
+    },
+    {
+      "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/numeric-fresh.json",
+      "sha256": "975698a5dddda7ac7e3ba00f019dc5a8cddf3ab2f34aaf6cb6b9bad626cb3fab"
+    }
+  ],
+  "sourceManifest": {
+    "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/observer-1/source-manifest.json",
+    "sha256": "0cc775c0b1b3d02c4a35bcc8438ca446a7ab6489fd737ff39268cf4ff2bcaaa5"
+  },
+  "newSourceAccessCases": 9,
+  "newObservedLineageCases": 12,
+  "newIndependentTerminalCases": 5,
+  "exactBindingChronologyUnchanged": true,
+  "expandedChronologyUnchanged": true,
+  "genericOwnLiteralChildMatches": 76,
+  "independentWriterTerminations": 76,
+  "notifiedSessionMutations": true,
+  "recursiveObservedIndexLineage": true,
+  "rawDictionaryExternalWritesStillRequireNotification": true,
+  "relationLimitsRetained": true,
+  "expandedSourceManifest": {
+    "path": "Exe/RuntimeAccessFinalSession-20261002/final-evidence/expanded-1/source-manifest.json",
+    "sha256": "0cc775c0b1b3d02c4a35bcc8438ca446a7ab6489fd737ff39268cf4ff2bcaaa5"
+  }
+}

@@ -1,12 +1,21 @@
 # Changelog
 
+## 2 October: access/lineage evidence and fresh preservation
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Copied access and lineage | Numeric operands, same-value runtime notifications, observed arithmetic/index/arguments; explicit unresolved/raw external/native-state/callee limits and all estimates retained | [validation](../.verification/runtime-access-20261002/validation.md) |
+| Independent completion precision | All13 whole packets/prior chronologies exact;76 own-literal-child zero waits and76 separate terminal observations; primary3036/4552→4553→4556→4557 unchanged;090 unresolved | [access evidence](../.verification/runtime-access-20261002/access-summary.json) |
+| Fresh checks | Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;final main Release zero warnings/errors;App0/no launch/no push/promotion | [checks](../.verification/runtime-access-20261002/check-summary.json) |
+
+
 ## 2 October: observed arithmetic/index lineage and separate writer termination
 
 | Change | Result | Record |
 | --- | --- | --- |
 | Arithmetic/index/arguments | Captured before-values and recursive index origins; unsigned/wrapped numeric candidates require snapshot confirmation; no domain transport or callee binding | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
 | Writer termination | Separate from literal-child matching; source identity/order and terminal status required; arithmetic zero, yields and stale/foreign ends do not become protocol proof | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
-| API checks | Twelve lineage/five terminal cases; Core374, clean main Release; final preservation in progress; no App/push/promotion | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
+| API checks | Twelve lineage/five terminal cases; Core374, clean main Release; final preservation completed in the follow-up above; no App/push/promotion | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
 
 ## 2 October: numeric source access and notified runtime mutations
 
