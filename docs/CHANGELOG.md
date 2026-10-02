@@ -1,5 +1,14 @@
 # Changelog
 
+## 2 October: selected native dependencies and observation boundaries
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Selected access `6442e4e` | Decoded expressions, nested pre-values, selected event/object-call/actor/print operands, independent native fields and explicit raw notifications; barriers/estimates intact | [API](../.verification/runtime-dependencies-20261002/api-validation.md) |
+| Source/causal boundaries `133b4d4` | Resource/parent/stage confirmation; own-invocation/parent termination; no callee-local argument binding or resumed continuity inference | [boundaries](../.verification/runtime-dependencies-20261002/boundary-validation.md) |
+| Final preservation | Core401;13 exact packets/chronologies;76 own-child matches/separate terminal observations;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/runtime-dependencies-20261002/validation.md) |
+
+
 ## 2 October: access/lineage evidence and fresh preservation
 
 | Change | Result | Record |
