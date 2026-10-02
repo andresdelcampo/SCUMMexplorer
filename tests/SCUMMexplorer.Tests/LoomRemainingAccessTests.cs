@@ -58,7 +58,7 @@ public sealed class LoomRemainingAccessTests
     {
         var access = Capture("waitFor", operands).SourceAccess!;
         var native = access.NativeDependencies![0];
-        Assert.Equal(operands == "message" ? 4 : 1, access.NativeDependencies.Count);
+        Assert.Equal(operands == "message" ? 4 : operands == "camera" ? 5 : 1, access.NativeDependencies.Count);
         Assert.Equal(domain, native.Domain);
         Assert.Equal(value, native.Value);
         Assert.NotNull(access.Barrier);

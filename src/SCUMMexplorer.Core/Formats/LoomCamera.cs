@@ -12,11 +12,14 @@ public sealed class LoomCamera
     /// <summary>ScummVM <c>camera._leftTrigger</c>/<c>_rightTrigger</c> (strips 10 and 30 of the 40 on screen).</summary>
     public const int LeftTrigger = 10, RightTrigger = 30;
 
-    public int Mode { get; set; } = Normal;
+    internal Action? NativeMutation { get; set; }
+    private int mode = Normal, follows, destX = 160;
+    private bool movingToActor;
+    public int Mode { get => mode; set { mode = value; NativeMutation?.Invoke(); } }
     /// <summary>The actor a follow-mode camera follows (<c>camera._follows</c>).</summary>
-    public int Follows { get; set; }
-    public int DestX { get; set; } = 160;
-    public bool MovingToActor { get; set; }
+    public int Follows { get => follows; set { follows = value; NativeMutation?.Invoke(); } }
+    public int DestX { get => destX; set { destX = value; NativeMutation?.Invoke(); } }
+    public bool MovingToActor { get => movingToActor; set { movingToActor = value; NativeMutation?.Invoke(); } }
 
     /// <summary><c>startScene</c>: normal mode, centred on the first screen.</summary>
     public void Reset(int x)
@@ -38,6 +41,9 @@ public sealed class LoomCamera
     /// </summary>
     public int Move(int current, int min, int max, (int Min, int Max) roomBounds, int? followedX)
     {
+        // An executed camera step is an independent native boundary, including a no-op
+        // or early clamp. Notification asserts no changed value or successful wait.
+        NativeMutation?.Invoke();
         var x = current & 0xFFF8;
         if (x < min) return Clamp(x + 8, roomBounds);
         if (x > max) return Clamp(x - 8, roomBounds);

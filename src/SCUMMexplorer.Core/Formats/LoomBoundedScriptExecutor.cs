@@ -2174,6 +2174,18 @@ public sealed class LoomBoundedScriptExecutor
             if (wait.Role == "target") return BindNativeDependencies("getActorMoving", [wait], states, runtime);
             var opaque = new LoomScriptNativeDependency(wait.Role == "implicit-message" ? "message-wait" : "camera-wait",
                 wait, null, null, UnresolvedReason: "native wait/timing dependencies not exhaustively captured");
+            if (wait.Role == "implicit-camera" && runtime is not null && wait.Value is not null && wait.UnresolvedReason is null)
+            {
+                // Native destination/mode/follow storage is independent of VAR_CAMERA_POS_X.
+                // There is no per-field provenance record; preserve that unknown and the
+                // existing opaque timing/effect dependency. No query/callback is executed.
+                var camera = runtime.Camera;
+                LoomScriptNativeDependency CameraField(string domain, long value) => new(domain, wait, value, null,
+                    UnresolvedReason: "independent native camera field provenance/timing/effects not established");
+                return Array.AsReadOnly(new[] { opaque, CameraField("camera-destination-x", camera.DestX),
+                    CameraField("camera-mode", camera.Mode), CameraField("camera-follows", camera.Follows),
+                    CameraField("camera-moving-to-actor", camera.MovingToActor ? 1 : 0) });
+            }
             if (wait.Role != "implicit-message" || runtime is null || wait.Value is null || wait.UnresolvedReason is not null)
                 return Array.AsReadOnly(new[] { opaque });
             // Selected storage only: the message table has no independent per-field estimate
