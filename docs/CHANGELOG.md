@@ -1,5 +1,14 @@
 # Changelog
 
+## 2 October: per-slot cancellation and completion writer identity
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Generic script cancellation | Executing/nested/upcoming copies stop; replacements remain distinct; seven new cases, Core305 | [validation](../.verification/certainty-protocol-20261002/validation.md) |
+| Stable slot observer | Native031 completion and020 wait both frame3036; prior frame pairing corrected;13 whole packets and all prior instruction records identical | [slot evidence](../.verification/certainty-protocol-20261002/protocol-summary.json) |
+| Fresh preservation | 363 exact roots/fingerprints, unchanged memberships/sequences, Blockers0,76 unchanged zero-gap renders; clean main Release; no App/promotion/push | [checks](../.verification/certainty-protocol-20261002/check-summary.json) |
+| User-approved existing cleanup | Pre-existing tracked deletions and plan trimming included with the completed task | [scope](../.verification/certainty-protocol-20261002/validation.md) |
+
 Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
 
 ## 2 October: complete correlated draft predicate

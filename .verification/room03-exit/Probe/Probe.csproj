@@ -1,5 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <!-- Session probe: Room 03 entry, object 162 verb 0x36, frame advances. -->
-  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
-  <ItemGroup><ProjectReference Include="..\..\..\src\SCUMMexplorer.Core\SCUMMexplorer.Core.csproj" /></ItemGroup>
-</Project>

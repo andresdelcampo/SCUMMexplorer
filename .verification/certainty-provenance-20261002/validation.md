@@ -1,5 +1,7 @@
 # Room41 instruction and completion provenance — 2 October 2026
 
+Later slot-identity audit corrects the completion pairing below: the native031 +031D writer and020 +0028 wait both occur at3036, in child412/parent408. This report's3035 claim is superseded; the original analyzer excluded same-frame writers and the original summary actually chose practice completion2909/run11960. The original trace chronology is unchanged and compares exactly. Use the later instruction-order/parent-identity analysis for writer pairing. [Correction and fresh evidence](../certainty-protocol-20261002/validation.md).
+
 Continued from `e8c1c75`, preserving palette implementation `e2d1729`. Production Core/App/catalog sources are unchanged. The new diagnostic observes an isolated compiled copy of Core; it supplies no prerequisites, removes no estimates and changes no recipe actions. [Compact instruction evidence](trace-summary.json), [fresh checks](check-summary.json).
 
 ## Directly observed dependency

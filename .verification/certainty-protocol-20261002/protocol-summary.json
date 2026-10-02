@@ -1,0 +1,1189 @@
+{
+  "scope": "Actual selected explorer slot/caller/writer chronology across resumptions. No numeric domain, all-path, external effect, cancellation-safe protocol or original-game proof.",
+  "recipeCount": 13,
+  "fullPacketsIdentical": true,
+  "productionManifest": {
+    "path": "Exe/CertaintyProtocolSession-20261002/observer-1/source-manifest.json",
+    "sha256": "c3145f292e2f617176d192d60ea939f91df4b62861e50ae64a9e437dc138a1ac"
+  },
+  "routes": [
+    {
+      "id": "direct41-source-level4-skip204",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/direct41-source-level4-skip204.json",
+        "sha256": "58453eec817e345003c93d5106cd0363fabe3537d2f1c6f50bad3d8515f77937"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/direct41-source-level4-skip204-instructions.jsonl",
+        "sha256": "f9243d7b615162ee10256b309ba458a7a17b434c52bc824fc3af8cfb09d8f6bd"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/direct41-source-level4-skip204-scheduler.jsonl",
+        "sha256": "c3eac766fc761d34cbee2045db9d2fda09521046dd8b72b3e38d3e627ae7865a"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 43,
+      "elapsed": 5835,
+      "observedSlots": 728,
+      "cancelledSlots": 39,
+      "zeroWaits": 12,
+      "writerSites": {
+        "031D": 12
+      },
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [
+        {
+          "start": {
+            "frame": 3026,
+            "slot": 2490,
+            "parentSlot": 2486,
+            "run": 78222,
+            "script": 31,
+            "context": null,
+            "offset": 0,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0001",
+            "pathEstimated": false
+          },
+          "completion": {
+            "frame": 3036,
+            "slot": 2490,
+            "parentSlot": 2486,
+            "run": 78265,
+            "script": 31,
+            "context": null,
+            "offset": 797,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0000",
+            "pathEstimated": true
+          },
+          "completionAfter": {
+            "frame": 3036,
+            "slot": 2490,
+            "parentSlot": 2486,
+            "run": 78265,
+            "script": 31,
+            "context": null,
+            "offset": 802,
+            "operation": "stopObjectCode",
+            "operands": "",
+            "pathEstimated": true
+          },
+          "wait": {
+            "frame": 3036,
+            "slot": 2486,
+            "parentSlot": 2485,
+            "run": 78266,
+            "script": 20,
+            "context": null,
+            "offset": 40,
+            "operation": "equalZero",
+            "operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "pathEstimated": false
+          },
+          "waitAfter": {
+            "frame": 3036,
+            "slot": 2486,
+            "parentSlot": 2485,
+            "run": 78266,
+            "script": 20,
+            "context": null,
+            "offset": 45,
+            "operation": "increment",
+            "operands": "local[0x000]",
+            "pathEstimated": true
+          }
+        }
+      ],
+      "observations": {}
+    },
+    {
+      "id": "room41-raw4-click",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw4-click.json",
+        "sha256": "ca57e124d6c5fcbf6ad13ad398b78448cf1e0da4779f69e79c32b205fa2cb1cb"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw4-click-instructions.jsonl",
+        "sha256": "856f91fc3db49fcb3e2359862962a746dd8ce1578744dca67e085ae33d41dccc"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw4-click-scheduler.jsonl",
+        "sha256": "b8132478336a5eba336084883eb897acb31e4b6cc7facf4bd6090187115d6907"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 41,
+      "elapsed": 7659,
+      "observedSlots": 716,
+      "cancelledSlots": 39,
+      "zeroWaits": 16,
+      "writerSites": {
+        "031D": 16
+      },
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [
+        {
+          "start": {
+            "frame": 3026,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12100,
+            "script": 31,
+            "context": null,
+            "offset": 0,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0001",
+            "pathEstimated": false
+          },
+          "completion": {
+            "frame": 3036,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12143,
+            "script": 31,
+            "context": null,
+            "offset": 797,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0000",
+            "pathEstimated": true
+          },
+          "completionAfter": {
+            "frame": 3036,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12143,
+            "script": 31,
+            "context": null,
+            "offset": 802,
+            "operation": "stopObjectCode",
+            "operands": "",
+            "pathEstimated": true
+          },
+          "wait": {
+            "frame": 3036,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12144,
+            "script": 20,
+            "context": null,
+            "offset": 40,
+            "operation": "equalZero",
+            "operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "pathEstimated": false
+          },
+          "waitAfter": {
+            "frame": 3036,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12144,
+            "script": 20,
+            "context": null,
+            "offset": 45,
+            "operation": "increment",
+            "operands": "local[0x000]",
+            "pathEstimated": true
+          }
+        }
+      ],
+      "observations": {
+        "firstPracticeStart": {
+          "frame": 2870,
+          "slot": 382,
+          "parentSlot": 378,
+          "run": 11828,
+          "script": 31,
+          "context": null,
+          "offset": 0,
+          "operation": null,
+          "operands": null,
+          "pathEstimated": false,
+          "variables": {
+            "local[0x000]": {
+              "value": 1,
+              "estimated": true
+            },
+            "local[0x001]": {
+              "value": 0,
+              "estimated": false
+            },
+            "bit[0xD6C]": {
+              "value": 1,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 0,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x052]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x053]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x054]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x055]": {
+              "value": 2,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          }
+        },
+        "practiceCaller": {
+          "Stage": "enter",
+          "Slot": 373,
+          "ParentSlot": 372,
+          "Label": "Room 06 local script 201",
+          "Number": 201,
+          "Offset": 0,
+          "Freeze": 0,
+          "Delay": null,
+          "PathEstimated": false
+        },
+        "practiceZero": {
+          "frame": 2870,
+          "slot": 382,
+          "parentSlot": 378,
+          "run": 11828,
+          "script": 31,
+          "context": null,
+          "offset": 551,
+          "operation": "move",
+          "operands": "bit[0xD6C] = 0x0000",
+          "pathEstimated": true,
+          "variables": {
+            "local[0x000]": {
+              "value": 1,
+              "estimated": true
+            },
+            "local[0x001]": {
+              "value": 0,
+              "estimated": false
+            },
+            "bit[0xD6C]": {
+              "value": 1,
+              "estimated": false
+            },
+            "bit[0xD67]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x064]": {
+              "value": 2,
+              "estimated": false
+            },
+            "var[0x07A]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x052]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x053]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x054]": {
+              "value": 1,
+              "estimated": true
+            },
+            "var[0x055]": {
+              "value": 2,
+              "estimated": true
+            },
+            "var[0x056]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x057]": {
+              "value": 1,
+              "estimated": false
+            },
+            "var[0x058]": {
+              "value": 3,
+              "estimated": false
+            },
+            "var[0x059]": {
+              "value": 2,
+              "estimated": false
+            }
+          }
+        },
+        "firstCompletionWait": {
+          "start": {
+            "frame": 3026,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12100,
+            "script": 31,
+            "context": null,
+            "offset": 0,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0001",
+            "pathEstimated": false,
+            "variables": {
+              "local[0x000]": {
+                "value": 1,
+                "estimated": false
+              },
+              "local[0x001]": {
+                "value": 0,
+                "estimated": false
+              },
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": true
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x052]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x053]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x054]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x055]": {
+                "value": 2,
+                "estimated": true
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "completion": {
+            "frame": 3036,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12143,
+            "script": 31,
+            "context": null,
+            "offset": 797,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0000",
+            "pathEstimated": true,
+            "variables": {
+              "local[0x000]": {
+                "value": 0,
+                "estimated": true
+              },
+              "local[0x001]": {
+                "value": 16,
+                "estimated": true
+              },
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x052]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x053]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x054]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x055]": {
+                "value": 2,
+                "estimated": true
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "completionAfter": {
+            "frame": 3036,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12143,
+            "script": 31,
+            "context": null,
+            "offset": 802,
+            "operation": "stopObjectCode",
+            "operands": "",
+            "pathEstimated": true,
+            "variables": {
+              "local[0x000]": {
+                "value": 0,
+                "estimated": true
+              },
+              "local[0x001]": {
+                "value": 16,
+                "estimated": true
+              },
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": true
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x052]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x053]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x054]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x055]": {
+                "value": 2,
+                "estimated": true
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "wait": {
+            "frame": 3036,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12144,
+            "script": 20,
+            "context": null,
+            "offset": 40,
+            "operation": "equalZero",
+            "operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "pathEstimated": false,
+            "variables": {
+              "local[0x000]": {
+                "value": 0,
+                "estimated": false
+              },
+              "local[0x001]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": true
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x052]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x053]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x054]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x055]": {
+                "value": 2,
+                "estimated": true
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          },
+          "waitAfter": {
+            "frame": 3036,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12144,
+            "script": 20,
+            "context": null,
+            "offset": 45,
+            "operation": "increment",
+            "operands": "local[0x000]",
+            "pathEstimated": true,
+            "variables": {
+              "local[0x000]": {
+                "value": 0,
+                "estimated": false
+              },
+              "local[0x001]": {
+                "value": 1,
+                "estimated": false
+              },
+              "bit[0xD6C]": {
+                "value": 0,
+                "estimated": true
+              },
+              "bit[0xD67]": {
+                "value": 0,
+                "estimated": true
+              },
+              "var[0x064]": {
+                "value": 2,
+                "estimated": false
+              },
+              "var[0x07A]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x052]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x053]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x054]": {
+                "value": 1,
+                "estimated": true
+              },
+              "var[0x055]": {
+                "value": 2,
+                "estimated": true
+              },
+              "var[0x056]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x057]": {
+                "value": 1,
+                "estimated": false
+              },
+              "var[0x058]": {
+                "value": 3,
+                "estimated": false
+              },
+              "var[0x059]": {
+                "value": 2,
+                "estimated": false
+              }
+            }
+          }
+        },
+        "previousFramePairing": {
+          "frame": 2909,
+          "run": 11960,
+          "correction": "Previous analyzer excluded same-frame writers. Actual last write and own child completion occur at3036 before the wait."
+        }
+      }
+    },
+    {
+      "id": "room41-raw4-key",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw4-key.json",
+        "sha256": "d0a7e60717b2b0a7a4b5c58499f153ec3a19b80f50e67183e5c5cbc2eaf1e2de"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw4-key-instructions.jsonl",
+        "sha256": "3347d8cd2945f152000329f904162f7554dcaa2215c3e77d3202a5f4ea01a53a"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw4-key-scheduler.jsonl",
+        "sha256": "70e3dae10b517ad78aff6a4e0be7d98064955df54fb51cd69053fadae39ddcb5"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 41,
+      "elapsed": 7659,
+      "observedSlots": 716,
+      "cancelledSlots": 39,
+      "zeroWaits": 16,
+      "writerSites": {
+        "031D": 16
+      },
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [
+        {
+          "start": {
+            "frame": 3026,
+            "slot": 1128,
+            "parentSlot": 1124,
+            "run": 32917,
+            "script": 31,
+            "context": null,
+            "offset": 0,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0001",
+            "pathEstimated": false
+          },
+          "completion": {
+            "frame": 3036,
+            "slot": 1128,
+            "parentSlot": 1124,
+            "run": 32960,
+            "script": 31,
+            "context": null,
+            "offset": 797,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0000",
+            "pathEstimated": true
+          },
+          "completionAfter": {
+            "frame": 3036,
+            "slot": 1128,
+            "parentSlot": 1124,
+            "run": 32960,
+            "script": 31,
+            "context": null,
+            "offset": 802,
+            "operation": "stopObjectCode",
+            "operands": "",
+            "pathEstimated": true
+          },
+          "wait": {
+            "frame": 3036,
+            "slot": 1124,
+            "parentSlot": 1123,
+            "run": 32961,
+            "script": 20,
+            "context": null,
+            "offset": 40,
+            "operation": "equalZero",
+            "operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "pathEstimated": false
+          },
+          "waitAfter": {
+            "frame": 3036,
+            "slot": 1124,
+            "parentSlot": 1123,
+            "run": 32961,
+            "script": 20,
+            "context": null,
+            "offset": 45,
+            "operation": "increment",
+            "operands": "local[0x000]",
+            "pathEstimated": true
+          }
+        }
+      ],
+      "observations": {}
+    },
+    {
+      "id": "room41-raw6-click",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw6-click.json",
+        "sha256": "f90c09c5ec5bcd60476417d0558e5a47bca9c9163c33a58d55db9c676207c31f"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw6-click-instructions.jsonl",
+        "sha256": "d492597940d7d7a3512638f980761621fbc796d5c437156f18473c91b3e6191f"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw6-click-scheduler.jsonl",
+        "sha256": "bde4d63fd6564359b81e880c63453efb09f4cfda14b7a511e35befb5b1a747df"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 41,
+      "elapsed": 4623,
+      "observedSlots": 323,
+      "cancelledSlots": 27,
+      "zeroWaits": 4,
+      "writerSites": {
+        "031D": 4
+      },
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    },
+    {
+      "id": "room41-raw6-key",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw6-key.json",
+        "sha256": "34e64d6340a93f6912b9bcb93d748f07a179d34b0bbeba081f4c68ec3015bc64"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw6-key-instructions.jsonl",
+        "sha256": "ad9d735f472c9117d8ff6c573ef1d140b23c5f026b0b1e96e60fadd5b9f71dc9"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/room41-1/room41-raw6-key-scheduler.jsonl",
+        "sha256": "77da7114705777cbdc9aaa5edb382ee63a868099c1a349558e9baa6ae425207f"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 41,
+      "elapsed": 4623,
+      "observedSlots": 323,
+      "cancelledSlots": 27,
+      "zeroWaits": 4,
+      "writerSites": {
+        "031D": 4
+      },
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    },
+    {
+      "id": "native-level4-egg-dye-wheel",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/egg-first-1/native-level4-egg-dye-wheel.json",
+        "sha256": "dd2815c1717a023bfc047a99a68b871160fbd59a4609eb63f8cf30d0ce76d24a"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/egg-first-1/native-level4-egg-dye-wheel-instructions.jsonl",
+        "sha256": "af4c6c197ce64feb505d59fdcdeecb40d1fb29434268ec5c990f3e5fe91363a0"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/egg-first-1/native-level4-egg-dye-wheel-scheduler.jsonl",
+        "sha256": "8df516cb050dcd754132d7aa8989a5dfa91b9592e1f52234ffaadcaf47797d2a"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 62,
+      "elapsed": 3472,
+      "observedSlots": 548,
+      "cancelledSlots": 30,
+      "zeroWaits": 12,
+      "writerSites": {
+        "031D": 12
+      },
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [
+        {
+          "start": {
+            "frame": 3026,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12100,
+            "script": 31,
+            "context": null,
+            "offset": 0,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0001",
+            "pathEstimated": false
+          },
+          "completion": {
+            "frame": 3036,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12143,
+            "script": 31,
+            "context": null,
+            "offset": 797,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0000",
+            "pathEstimated": true
+          },
+          "completionAfter": {
+            "frame": 3036,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12143,
+            "script": 31,
+            "context": null,
+            "offset": 802,
+            "operation": "stopObjectCode",
+            "operands": "",
+            "pathEstimated": true
+          },
+          "wait": {
+            "frame": 3036,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12144,
+            "script": 20,
+            "context": null,
+            "offset": 40,
+            "operation": "equalZero",
+            "operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "pathEstimated": false
+          },
+          "waitAfter": {
+            "frame": 3036,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12144,
+            "script": 20,
+            "context": null,
+            "offset": 45,
+            "operation": "increment",
+            "operands": "local[0x000]",
+            "pathEstimated": true
+          }
+        }
+      ],
+      "observations": {}
+    },
+    {
+      "id": "native-level4-egg-wheel-dye",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/dye-last-1/native-level4-egg-wheel-dye.json",
+        "sha256": "39705828a5c46a4ddcdc4d96b5467f38b8cdc16ef0e8460365e56b0bbf8ae0ad"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/dye-last-1/native-level4-egg-wheel-dye-instructions.jsonl",
+        "sha256": "d98b8b2dcd4c51412608a2d0b2b625e440d16b74c20c0aa1e6ac7aad8e9376fa"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/dye-last-1/native-level4-egg-wheel-dye-scheduler.jsonl",
+        "sha256": "4d7f3f5dfbac3cbc14d74fd9eb6f97d0ca685b43d89f89ec4255c95727382275"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 6,
+      "elapsed": 3447,
+      "observedSlots": 548,
+      "cancelledSlots": 30,
+      "zeroWaits": 12,
+      "writerSites": {
+        "031D": 12
+      },
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [
+        {
+          "start": {
+            "frame": 3027,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12102,
+            "script": 31,
+            "context": null,
+            "offset": 0,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0001",
+            "pathEstimated": false
+          },
+          "completion": {
+            "frame": 3037,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12145,
+            "script": 31,
+            "context": null,
+            "offset": 797,
+            "operation": "move",
+            "operands": "bit[0xD67] = 0x0000",
+            "pathEstimated": true
+          },
+          "completionAfter": {
+            "frame": 3037,
+            "slot": 412,
+            "parentSlot": 408,
+            "run": 12145,
+            "script": 31,
+            "context": null,
+            "offset": 802,
+            "operation": "stopObjectCode",
+            "operands": "",
+            "pathEstimated": true
+          },
+          "wait": {
+            "frame": 3037,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12146,
+            "script": 20,
+            "context": null,
+            "offset": 40,
+            "operation": "equalZero",
+            "operands": "bit[0xD67], branch +0xFFFA -> 0x0027",
+            "pathEstimated": false
+          },
+          "waitAfter": {
+            "frame": 3037,
+            "slot": 408,
+            "parentSlot": 407,
+            "run": 12146,
+            "script": 20,
+            "context": null,
+            "offset": 45,
+            "operation": "increment",
+            "operands": "local[0x000]",
+            "pathEstimated": true
+          }
+        }
+      ],
+      "observations": {}
+    },
+    {
+      "id": "late096-reached44",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/late096-reached44.json",
+        "sha256": "f72baaabd02edcbf9d446aacbb47f3088114d38f04cbff66cbcc6c9e38e8a8ba"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/late096-reached44-instructions.jsonl",
+        "sha256": "209c583add61bac3c3365d7a012918f9a821fd97cc07fe3ea2dd429e0b36aa7a"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/late096-reached44-scheduler.jsonl",
+        "sha256": "b5120a710dea8e23a040c111377f27368ef43df8cc9ab7b766f7866c946d45fb"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 43,
+      "elapsed": 4017,
+      "observedSlots": 184,
+      "cancelledSlots": 17,
+      "zeroWaits": 0,
+      "writerSites": {},
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    },
+    {
+      "id": "late096-source-skip095",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/late096-source-skip095.json",
+        "sha256": "3f3ccbf796262d2812d755288d59975567d305ab43894ac43f94cc07c0e320cb"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/late096-source-skip095-instructions.jsonl",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/late096-source-skip095-scheduler.jsonl",
+        "sha256": "a5c2ab8d01d6b4e9a224db56e7135ef2581791ac67ebc58803b531708bac7492"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 46,
+      "elapsed": 357,
+      "observedSlots": 170,
+      "cancelledSlots": 17,
+      "zeroWaits": 0,
+      "writerSites": {},
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    },
+    {
+      "id": "sleep-source369-response390",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source369-response390.json",
+        "sha256": "87bfae3c6891ad7ecefe4038c6fab2c0091b2de5fd237688235700a2c59f601c"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source369-response390-instructions.jsonl",
+        "sha256": "56ba74ef5cdcd68341d2856d210ccc7b0a88762fb199253f35271f9cd4f38945"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source369-response390-scheduler.jsonl",
+        "sha256": "268cac0b1a1dc480b01a15c2a7b207cc36827c71c7758efaab520a3782a1a2d1"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 18,
+      "elapsed": 1575,
+      "observedSlots": 162,
+      "cancelledSlots": 18,
+      "zeroWaits": 0,
+      "writerSites": {},
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    },
+    {
+      "id": "sleep-source369-response391",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source369-response391.json",
+        "sha256": "8e4d149d0806d5d473f8984feedb60aa199b608b0c9cb1231580ea66c98bef1a"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source369-response391-instructions.jsonl",
+        "sha256": "53a25ba1e0d9d6aac32fb6a01bc1bc60ca911434a2211da825f2e02a2761f0aa"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source369-response391-scheduler.jsonl",
+        "sha256": "083b9c6b3675bd8c977bb7b87b699d7f09a71b67a50216bc85b831a7a15c960a"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 18,
+      "elapsed": 1575,
+      "observedSlots": 162,
+      "cancelledSlots": 18,
+      "zeroWaits": 0,
+      "writerSites": {},
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    },
+    {
+      "id": "sleep-source371-response390",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source371-response390.json",
+        "sha256": "560fd93d78a6701c784b2b5f38db4130b7208b8365f049bdef43757e80ef76e3"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source371-response390-instructions.jsonl",
+        "sha256": "78645ae04851d873be81649b6e408f4ce99e534d2baa968c14005b6e0354a0aa"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source371-response390-scheduler.jsonl",
+        "sha256": "ddd659b622898fb25ed752532afa3236879f5f0351147565512c7f6513b408e6"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 18,
+      "elapsed": 1612,
+      "observedSlots": 163,
+      "cancelledSlots": 18,
+      "zeroWaits": 0,
+      "writerSites": {},
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    },
+    {
+      "id": "sleep-source371-response391",
+      "packet": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source371-response391.json",
+        "sha256": "c264750aa4d1c5e93d616909a9b713ca0cab77531ae07545bcd3b0a1b63bb665"
+      },
+      "instructions": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source371-response391-instructions.jsonl",
+        "sha256": "d8ef20c9a2e1a2c722afff3546ba4ee0785402e3a2e201e5ae78564b8ba3a964"
+      },
+      "scheduler": {
+        "path": "Exe/CertaintyProtocolSession-20261002/preserved-1/sleep-source371-response391-scheduler.jsonl",
+        "sha256": "fee5f3d007df73e3a42f80fdd9a7b9355245a3ec519674ce1ee7105e4f695f2c"
+      },
+      "fullPacketIdentical": true,
+      "priorInstructionTraceIdentical": true,
+      "room": 18,
+      "elapsed": 1612,
+      "observedSlots": 163,
+      "cancelledSlots": 18,
+      "zeroWaits": 0,
+      "writerSites": {},
+      "allObservedZeroWaitsBoundToOwnUncancelledChild": true,
+      "firstTaintBinding": [],
+      "observations": {}
+    }
+  ],
+  "native090Completed": false,
+  "estimatesCleared": false
+}

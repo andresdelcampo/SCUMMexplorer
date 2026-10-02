@@ -493,7 +493,7 @@ public sealed partial class LoomExplorationSession
                 ? "its script (no longer running)"
                 : string.Join(", ", ownerScripts.Select(item => item.ScriptNumber is int number ? $"script {number:000}" : $"a Room {item.RoomId:00} script"));
             foreach (var item in ownerScripts)
-                if (item.ScriptNumber is int number) _stopped.Add(number);
+                item.Frame.Stopped = true;
             _pending.RemoveAll(item => item.Frame == owner);
             _visitTrace.Add($"catalog visit to Room {roomId:00}: stops {script}, which began a cutscene (data {data})");
             closed.Add((data, script));
@@ -1411,7 +1411,6 @@ public sealed partial class LoomExplorationSession
         var runnable = _pending.ToArray();
         _pending.Clear();
         _frameScripts.AddRange(runnable);
-        _stopped.Clear();
         _dispatchScope++;
         _entersRoomLoads++;
         try
@@ -1422,7 +1421,7 @@ public sealed partial class LoomExplorationSession
                 // A room load earlier in this frame ended the room's scripts.
                 if (item.RoomId.HasValue && item.RoomId != _currentRoom?.ResourceId) continue;
                 // An earlier script in this frame may have stopped this one.
-                if (item.ScriptNumber is int number && _stopped.Contains(number)) continue;
+                if (item.Frame.Stopped) continue;
                 // runAllScripts skips frozen and paused (delayed) slots; they keep their place.
                 if (item.Frame.FreezeCount > 0 || item.Frame.Delay is not null)
                 {
@@ -1619,9 +1618,9 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     private (bool Running, string? Estimate) IsScriptRunning(int number)
     {
-        var running = _executing.Any(frame => frame.Number == number) ||
-                      _pending.Any(item => item.ScriptNumber == number) ||
-                      _frameScripts.Any(item => item.ScriptNumber == number && !_stopped.Contains(number));
+        var running = _executing.Any(frame => frame.Number == number && !frame.Stopped) ||
+                      _pending.Any(item => item.ScriptNumber == number && !item.Frame.Stopped) ||
+                      _frameScripts.Any(item => item.ScriptNumber == number && !item.Frame.Stopped);
         return running || !_endedUnmodelled.Contains(number)
             ? (running, null)
             : (false, $"script {number} ended at a step the preview does not model, so it may still run in the game");
@@ -1630,7 +1629,6 @@ public sealed partial class LoomExplorationSession
     private readonly List<LoomScriptEvent> _visitEvents = [];
     private readonly List<LoomSessionSoundEvent> _soundEvents = [];
     private readonly List<string> _visitTrace = [];
-    private readonly HashSet<int> _stopped = [];
     private readonly List<LoomRandomPick> _picks = [];
     // Scripts running now, outermost first; the last one is the current script.
     private readonly List<ScriptFrame> _executing = [];
@@ -1730,10 +1728,9 @@ public sealed partial class LoomExplorationSession
         // runScript: a start that is not recursive first ends the running copies (stopScript).
         if (!recursive)
         {
-            var ended = _pending.RemoveAll(item => item.ScriptNumber == scriptId);
+            var ended = StopRunningScript(scriptId);
             if (ended > 0)
             {
-                _stopped.Add(scriptId);
                 _visitTrace.Add($"script {scriptId} started again: runScript ended its running copy first");
             }
         }
@@ -1847,6 +1844,10 @@ public sealed partial class LoomExplorationSession
                 onEvent: (scriptEvent, _) =>
                 {
                     var handling = HandleEvent(scriptEvent, depth);
+                    // stopScript also kills executing/nested slots. A stopped caller
+                    // cannot resume after its child returns, even if a new copy of
+                    // the same script number was started in the meantime.
+                    if (frame.Stopped) return LoomBoundedScriptExecutor.StopAfterEvent;
                     // runScriptNested restores a caller only when its freezeCount is zero.
                     // A child may freeze its still-executing parent; save the parent's next
                     // instruction instead of letting it open another scope while frozen.
@@ -1887,7 +1888,7 @@ public sealed partial class LoomExplorationSession
             RunStartedScript(chain.Script, 0, chain.Arguments, depth, chain.EstimatedArguments, chain.PathEstimated,
                 frame.FreezeResistant, frame, frame.Recursive);
         }
-        if (result.ResumeOffset is int next)
+        if (result.ResumeOffset is int next && !frame.Stopped)
         {
             var preservedLocals = result.KnownVariables
                 .Where(pair => pair.Key.StartsWith("local[", StringComparison.Ordinal))
@@ -1949,11 +1950,11 @@ public sealed partial class LoomExplorationSession
                     return "stopped script depends on an unknown variable";
                 // ScummEngine::stopScript ends every running slot with this
                 // number; a script that is not running is left as it is.
-                var removed = _pending.RemoveAll(item => item.ScriptNumber == stoppedScript);
-                _stopped.Add(stoppedScript);
+                var pendingStopped = _pending.Any(item => item.ScriptNumber == stoppedScript && !item.Frame.Stopped);
+                var removed = StopRunningScript(stoppedScript);
                 _visitTrace.Add(removed == 0
                     ? $"stopScript {stoppedScript} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: script {stoppedScript} was not running"
-                    : $"stopScript {stoppedScript} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: ended its pending run");
+                    : $"stopScript {stoppedScript} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: ended its {(pendingStopped ? "pending" : "running")} run");
                 return "";
             case LoomScriptEventKind.ObjectScriptStarted:
                 StartObjectScript(scriptEvent, depth);
@@ -2121,9 +2122,9 @@ public sealed partial class LoomExplorationSession
         else if (!_runtime.GlobalVariables.TryGetValue(operand, out flag))
             return "freezeScripts flag depends on an unknown variable";
         var current = _executing.Count > 0 ? _executing[^1] : null;
-        var slots = _executing.Where(frame => frame != current)
+        var slots = _executing.Where(frame => frame != current && !frame.Stopped)
             .Concat(_pending.Select(item => item.Frame))
-            .Concat(_frameScripts.Where(item => item.ScriptNumber is not int number || !_stopped.Contains(number)).Select(item => item.Frame))
+            .Concat(_frameScripts.Where(item => !item.Frame.Stopped).Select(item => item.Frame))
             .Distinct().ToArray();
         if (flag != 0)
         {
@@ -2203,6 +2204,19 @@ public sealed partial class LoomExplorationSession
         IReadOnlyDictionary<string, ushort> Locals, int? RoomId, int? ScriptNumber,
         IReadOnlyCollection<string> EstimatedLocals, bool PathEstimated, ScriptFrame Frame);
 
+    /// <summary>stopScript kills existing global/local slots, including nested
+    /// callers and slots awaiting their turn in this frame. It does not kill a
+    /// replacement created later with the same number (runScriptNested).</summary>
+    private int StopRunningScript(int number)
+    {
+        var slots = _executing.Concat(_pending.Select(item => item.Frame))
+            .Concat(_frameScripts.Select(item => item.Frame))
+            .Where(frame => frame.Number == number && !frame.Stopped).Distinct().ToArray();
+        foreach (var slot in slots) slot.Stopped = true;
+        _pending.RemoveAll(item => item.Frame.Stopped);
+        return slots.Length;
+    }
+
     /// <summary>
     /// The freeze state of one running script slot (ScummVM <c>ScriptSlot</c>'s
     /// <c>freezeResistant</c> and <c>freezeCount</c>). It stays with the script
@@ -2215,6 +2229,8 @@ public sealed partial class LoomExplorationSession
         public bool Recursive { get; init; }
         /// <summary>Global or local script number; null for room entry, exit and verb code.</summary>
         public int? Number { get; set; }
+        /// <summary>Cancellation belongs to this slot instance, never to a later copy of its number.</summary>
+        public bool Stopped { get; set; }
         public bool Global { get; set; }
         public int FreezeCount { get; set; }
         /// <summary>ScummVM <c>ScriptSlot.delay</c> while the slot is <c>ssPaused</c> by <c>delay</c>/<c>delayVariable</c>; null otherwise.</summary>
