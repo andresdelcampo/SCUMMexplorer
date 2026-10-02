@@ -24,6 +24,11 @@ public sealed class LoomObjectVerbReader(ScummScriptDialect dialect = ScummScrip
     }
 
     public LoomScriptDisassembly Decode(GameResource room, LoomRoomObjectRecord record, int verbId)
+        => Decode(room, record, verbId, out _);
+
+    /// <summary>Returns the actual selected table entry, including a native fallback.</summary>
+    public LoomScriptDisassembly Decode(GameResource room, LoomRoomObjectRecord record, int verbId,
+        out LoomObjectVerbEntry selectedEntry)
     {
         if (room.Kind != ResourceKind.Room || room.ResourceId is not int roomId ||
             room.ContainerFileNumber is not int container)
@@ -34,6 +39,7 @@ public sealed class LoomObjectVerbReader(ScummScriptDialect dialect = ScummScrip
                     entries.FirstOrDefault(item => item.IsFallback);
         if (entry is null)
             throw new InvalidDataException($"Object {record.Id} has no verb 0x{verbId:X2} or fallback entry.");
+        selectedEntry = entry;
         var code = data.AsSpan(entry.ScriptOffset, entry.ResourceEnd - entry.ScriptOffset).ToArray();
         var decoded = LoomScriptDisassembler.Disassemble(code, dialect);
         return new LoomScriptDisassembly(roomId, container, entry.ScriptOffset, code.Length,

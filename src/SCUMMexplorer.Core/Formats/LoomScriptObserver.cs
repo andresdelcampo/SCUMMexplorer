@@ -72,7 +72,8 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     bool captureOperandBindings = false, LoomRuntimeRelationTracker? runtimeRelations = null,
     bool captureSourceAccess = false, Action<LoomExpressionObservation>? receiveExpression = null,
     LoomNativeDependencyTracker? nativeDependencies = null, Action<LoomCallObservation>? receiveCall = null,
-    LoomCallCorrespondenceTracker? callCorrespondence = null)
+    LoomCallCorrespondenceTracker? callCorrespondence = null,
+    Action<LoomObjectCalleeSelection>? receiveObjectSelection = null)
 {
     private long sequence;
     private long slots;
@@ -81,7 +82,7 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     private readonly Dictionary<long, int> callSteps = [];
     private LoomObservedCall? currentCall;
     internal LoomObservedCall? CurrentCall => currentCall;
-    internal bool CapturesCalls => receiveCall is not null || callCorrespondence is not null;
+    internal bool CapturesCalls => receiveCall is not null || callCorrespondence is not null || receiveObjectSelection is not null;
     internal IDisposable? BeginCallRun(long invocation)
     {
         if (!CapturesCalls) return null;
@@ -145,6 +146,18 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
     {
         callCorrespondence?.ObserveCall(boundary);
         receiveCall?.Invoke(boundary);
+    }
+
+    internal void ObjectCalleeSelected(int objectId, int requestedVerb, LoomObjectVerbEntry entry,
+        LoomScriptDisassembly script)
+    {
+        if (currentCall is not { Site.Operation: "startObject" } call) return;
+        if (!call.Operands.Any(b => b.Role == "target" && b.Value == objectId && b.UnresolvedReason is null) ||
+            !call.Operands.Any(b => b.Role == "verb" && b.Value == requestedVerb && b.UnresolvedReason is null)) return;
+        var selection = new LoomObjectCalleeSelection(call, objectId, requestedVerb, entry,
+            new(script.ScriptId, script.Context, script.ContainerFileNumber, script.ResourceOffset, "begin", 0));
+        callCorrespondence?.ObserveObjectSelection(selection);
+        receiveObjectSelection?.Invoke(selection);
     }
 
     internal long NewSlot() => ++slots;

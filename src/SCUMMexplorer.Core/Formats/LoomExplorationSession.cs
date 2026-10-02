@@ -1796,7 +1796,8 @@ public sealed partial class LoomExplorationSession
             return;
         }
         LoomScriptDisassembly script;
-        try { script = _verbs.Decode(_currentRoom, record, verbId); }
+        LoomObjectVerbEntry selectedEntry;
+        try { script = _verbs.Decode(_currentRoom, record, verbId, out selectedEntry); }
         catch (InvalidDataException ex) when (ex.Message.Contains("has no verb", StringComparison.Ordinal))
         {
             _visitTrace.Add($"{source}: object {objectId} has no verb 0x{verbId:X2} and no fallback, so startObject does nothing");
@@ -1808,6 +1809,7 @@ public sealed partial class LoomExplorationSession
             return;
         }
         var parent = _executing.Count > 0 ? _executing[^1] : null;
+        _observer?.ObjectCalleeSelected(objectId, verbId, selectedEntry, script);
         _visitTrace.Add($"{source}: startObject runs object {objectId} verb 0x{verbId:X2}");
         RunScript(script, _currentObjects, 0, locals, depth + 1, null,
             EstimatedArguments(scriptEvent),

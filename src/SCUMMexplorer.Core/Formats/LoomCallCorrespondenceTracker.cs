@@ -1,9 +1,15 @@
 namespace SCUMMexplorer.Core.Formats;
 
+/// <summary>The actual decoded object entry; no inventory, lifetime, effects or return proof.</summary>
+public sealed record LoomObjectCalleeSelection(LoomObservedCall Dispatch, int ObjectId, int RequestedVerb,
+    LoomObjectVerbEntry Entry, LoomScriptObservationSite Site);
+
 /// <summary>Actual supplied assignment attached to its dispatch; never a numeric origin.</summary>
 public sealed record LoomCalleeAssignment(LoomScriptOperandBinding Argument, LoomScriptOperandBinding Local);
 public sealed record LoomActualCalleeBinding(LoomObservedCall Dispatch, LoomCallObservation Initialization,
-    IReadOnlyList<LoomCalleeAssignment> SuppliedAssignments);
+    IReadOnlyList<LoomCalleeAssignment> SuppliedAssignments,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    LoomObjectCalleeSelection? ObjectSelection = null);
 public sealed record LoomCallerResumption(LoomCallObservation Yield, LoomCallObservation RestoredLocals,
     LoomScriptObservation FirstInstruction);
 /// <summary>Three observed immediate boundaries, not successful return or effects/completion proof.</summary>
@@ -51,6 +57,7 @@ public sealed class LoomCallCorrespondenceTracker
     {
         public LoomCallObservation Dispatch { get; } = dispatch;
         public LoomActualCalleeBinding? Binding { get; set; }
+        public LoomObjectCalleeSelection? ObjectSelection { get; set; }
         public Chain? Child { get; set; }
         public Chain Caller { get; } = new(dispatch);
         public List<LoomCallObservation> ChildBoundaries { get; } = [];
@@ -74,6 +81,31 @@ public sealed class LoomCallCorrespondenceTracker
     }
 
     public int PendingCalls => active.Count;
+
+    /// <summary>Consume the actual decoder selection before initialization; never infer from a label.</summary>
+    public void ObserveObjectSelection(LoomObjectCalleeSelection selection)
+    {
+        ArgumentNullException.ThrowIfNull(selection);
+        if (!active.TryGetValue(selection.Dispatch.Id, out var entry)) return;
+        if (!Count(entry)) return;
+        var call = entry.Dispatch.Call!;
+        var target = call.Operands.FirstOrDefault(b => b.Role == "target");
+        var verb = call.Operands.FirstOrDefault(b => b.Role == "verb");
+        var selected = selection.Entry;
+        if (!SameCall(call, selection.Dispatch) || call.Site.Operation != "startObject" || entry.ObjectSelection is not null ||
+            entry.Child is not null || entry.ChildRejection is not null || entry.HostReturn is not null || !Aligned(entry.Dispatch) ||
+            call.Operands.Count(b => b.Role == "target") != 1 || call.Operands.Count(b => b.Role == "verb") != 1 ||
+            target is not { Value: > 0, UnresolvedReason: null } || target.Value != selection.ObjectId ||
+            verb is not { Value: <= 255, UnresolvedReason: null } || verb.Value != selection.RequestedVerb ||
+            selected.ObjectId != selection.ObjectId || selected.VerbId != selection.RequestedVerb && !selected.IsFallback ||
+            selected.CodeOffset < 0 || selected.TableOffset < selected.CodeOffset + 17 ||
+            selected.ScriptOffset < selected.TableOffset + 4 || selected.ScriptOffset >= selected.ResourceEnd ||
+            selection.Site is not { Stage: "begin", Offset: 0, Context: not null } ||
+            selection.Site.ResourceOffset != selected.ScriptOffset)
+        { Retire(entry, "missing/foreign/repeated actual object selection"); return; }
+        entry.ObjectSelection = selection;
+        Publish(entry);
+    }
 
     /// <summary>Explicitly report an omitted/external boundary; unchanged numbers cannot bridge it.</summary>
     public void NotifyExternal(string reason = "external or omitted call boundary", long? slot = null)
@@ -148,15 +180,14 @@ public sealed class LoomCallCorrespondenceTracker
         {
             case "initialized":
                 if (current.Child is not null || boundary.ParentSlot != observed.Slot || boundary.Slot == observed.Slot || boundary.Invocation == observed.Invocation ||
-                    !Aligned(boundary) || boundary.Barrier is not null || observed.Site.Operation is not ("startScript" or "chainScript") ||
-                    observed.Operands.FirstOrDefault(b => b.Role == "target") is not { Value: { } target, UnresolvedReason: null } ||
-                    boundary.Site.Script != target || !CompleteLocals(boundary, restored: false))
+                    !Aligned(boundary) || boundary.Barrier is not null || !SelectedCallee(current, boundary) ||
+                    !CompleteLocals(boundary, restored: false))
                 { current.ChildRejection = "no complete actual callee initialization"; break; }
                 var arguments = observed.Operands.Where(b => b.Role == "argument").ToArray();
                 if (arguments.Length > 26 || boundary.Locals.Count(l => l.Role == "supplied-local") != arguments.Length || arguments.Where((a, i) => a.ArgumentIndex != i || a.Value is null ||
                     a.UnresolvedReason is not null || boundary.Locals[i].Role != "supplied-local").Any())
                 { current.ChildRejection = "unresolved actual supplied assignment"; break; }
-                current.Binding = new(observed, boundary, Frozen(arguments.Select((a, i) => new LoomCalleeAssignment(a, boundary.Locals[i]))));
+                current.Binding = new(observed, boundary, Frozen(arguments.Select((a, i) => new LoomCalleeAssignment(a, boundary.Locals[i]))), current.ObjectSelection);
                 current.Child = new(boundary);
                 current.ChildBoundaries.Add(boundary);
                 break;
@@ -253,6 +284,15 @@ public sealed class LoomCallCorrespondenceTracker
         boundary.Slot == script.Slot && boundary.ParentSlot == script.ParentSlot && boundary.Invocation == script.Invocation &&
         boundary.Site == script.Site && boundary.PathEstimated == script.PathEstimated &&
         boundary.ResumeOffset == script.ResumeOffset && boundary.ReachedStop == script.ReachedStop;
+    private static bool SelectedCallee(Entry entry, LoomCallObservation boundary)
+    {
+        var call = entry.Dispatch.Call!;
+        if (call.Site.Operation == "startObject")
+            return entry.ObjectSelection is { } selection && boundary.Site == selection.Site;
+        return call.Site.Operation is "startScript" or "chainScript" &&
+            call.Operands.FirstOrDefault(b => b.Role == "target") is { Value: { } target, UnresolvedReason: null } &&
+            boundary.Site.Script == target;
+    }
     private static bool ChainIdentity(Chain chain, LoomCallObservation b) => b.Slot == chain.Start.Slot &&
         b.ParentSlot == chain.Start.ParentSlot && b.Site.SameResource(chain.Start.Site);
     private static bool CallerIdentity(Entry entry, LoomCallObservation b) => b.Slot == entry.Dispatch.Slot &&

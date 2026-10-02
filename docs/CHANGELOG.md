@@ -1,5 +1,11 @@
 # Changelog
 
+## 2 October: actual object callee selection
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Object selection | Actual exact/fallback verb table entry and resource bind startObject independently of host return/caller continuation;20 new cases/focused53;no origins or completion promotion | [object](../.verification/runtime-object-correspondence-20261002/object-validation.md) |
+
 ## 2 October: bounded actual callee/caller correspondence and native fields
 
 | Change | Result | Record |
@@ -311,4 +317,3 @@ Top-right Game Status, Advanced-only global Play Cutscene and room replay beside
 # 1 October 2026: uniform original replay names
 
 Original opening/trial/transition/firewood use the shared room-and-description formatter in all replay views and Game Texts. Opening label01 verified against stopped boot69; recipes/memberships retained. [WPF15/15](../.verification/ui-refinements-20261001/validation.md).
-
