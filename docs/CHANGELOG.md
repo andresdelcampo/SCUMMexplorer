@@ -1,5 +1,11 @@
 # Changelog
 
+## 2 October: filtered callee selection metadata
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Callee-site filter | Selected object-entry metadata honors the omitted callee begin site;1 new case/call-focused54;original initialization/restoration barriers retained | [filter](../.verification/runtime-object-correspondence-20261002/filter-validation.md) |
+
 ## 2 October: native message wait fields and notifications
 
 | Change | Result | Record |

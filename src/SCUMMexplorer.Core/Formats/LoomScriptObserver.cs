@@ -156,6 +156,7 @@ public sealed class LoomScriptObserver(Action<LoomScriptObservation> receive,
             !call.Operands.Any(b => b.Role == "verb" && b.Value == requestedVerb && b.UnresolvedReason is null)) return;
         var selection = new LoomObjectCalleeSelection(call, objectId, requestedVerb, entry,
             new(script.ScriptId, script.Context, script.ContainerFileNumber, script.ResourceOffset, "begin", 0));
+        if (includeSite?.Invoke(selection.Site) == false) return;
         callCorrespondence?.ObserveObjectSelection(selection);
         receiveObjectSelection?.Invoke(selection);
     }

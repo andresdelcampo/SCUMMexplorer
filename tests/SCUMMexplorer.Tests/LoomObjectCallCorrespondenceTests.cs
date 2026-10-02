@@ -133,6 +133,17 @@ public sealed class LoomObjectCallCorrespondenceTests
     }
 
     [Fact]
+    public void FilteredCalleeSiteDoesNotExposeItsSelectedEntryOrSupplyABinding()
+    {
+        var chronology = new List<object>();
+        var updates = new List<LoomCallCorrespondence>();
+        WithRoom([0], 0x38, (session, _, _) => session.RunTopLevelScript(Caller()), tracker: new(updates.Add),
+            chronology: chronology, site: s => s.Stage != "begin" || s.Context is null);
+        Assert.DoesNotContain(chronology, item => item is LoomObjectCalleeSelection);
+        Assert.DoesNotContain(updates, u => u.Binding is not null || u.ChildTerminated || u.ImmediateStopCorrespondence is not null);
+    }
+
+    [Fact]
     public void ObjectSelectionAndTrackerLeaveLegacyCallsInstructionsAndPacketsExact()
     {
         string Run(bool tracked) {
@@ -151,7 +162,8 @@ public sealed class LoomObjectCallCorrespondenceTests
 
     private static void WithRoom(byte[] code, int entryVerb,
         Action<LoomExplorationSession, List<LoomCallObservation>, List<LoomScriptObservation>> check,
-        LoomCallCorrespondenceTracker? tracker = null, List<object>? chronology = null, Func<string, bool>? key = null)
+        LoomCallCorrespondenceTracker? tracker = null, List<object>? chronology = null, Func<string, bool>? key = null,
+        Func<LoomScriptObservationSite, bool>? site = null)
     {
         var folder = Path.Combine(Path.GetTempPath(), "loom-object-calls-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(folder);
@@ -174,7 +186,7 @@ public sealed class LoomObjectCallCorrespondenceTests
             var game = new GameLibrary("LOOM", folder, ScummVersion.V3, "DOS", [room], "synthetic object calls", GameId.Loom);
             var calls = new List<LoomCallObservation>();
             var scripts = new List<LoomScriptObservation>();
-            var observer = new LoomScriptObserver(s => { scripts.Add(s); chronology?.Add(s); }, includeKey: key,
+            var observer = new LoomScriptObserver(s => { scripts.Add(s); chronology?.Add(s); }, includeSite: site, includeKey: key,
                 receiveCall: c => { calls.Add(c); chronology?.Add(c); }, callCorrespondence: tracker,
                 receiveObjectSelection: s => chronology?.Add(s));
             var session = new LoomExplorationSession(game, new(new Dictionary<int, byte> { [204] = 0 },
