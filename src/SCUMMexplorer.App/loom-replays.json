@@ -5468,6 +5468,14 @@
         },
         {
           "kind": "visit",
+          "objectId": 35
+        },
+        {
+          "kind": "frames",
+          "frames": 8
+        },
+        {
+          "kind": "visit",
           "objectId": 34
         },
         {
@@ -5485,7 +5493,7 @@
           "expectedRoom": 34
         }
       ],
-      "silentSteps": 16,
+      "silentSteps": 18,
       "scriptIds": [
         98
       ],
@@ -5493,8 +5501,8 @@
         34,
         57
       ],
-      "frames": 1158,
-      "source": "Room 34 Walk response (script 098: Rusty's ghost). Replaces three direct Walk-response starts (objects 559, 560, 586 verb 0x37) that began in the fresh early state, where Rusty is still the sleeping living boy (costume 0x70); Room 34's entry shows the ghost (costume 0x78) only once scene 087 has set bit D9D. The first 16 steps run without being shown, so only the ghost scene plays: Bobbin as himself, before healing Rusty. They are the Awakening and the costume change on Rusty in Room 34 (Bobbin takes Rusty's look) and the Game Status edit 'staff held' (Bobbin carries the distaff when Stoke takes it), as direct verbs and a supported labelled edit from catalog visits; the story that led to them is not replayed, then the firewood scene 086 and the straw dream 087, which end with Bobbin in Room 38 (the game does not walk him back), so a catalog hop puts him in Room 34 (an exploration assumption that keeps the story state) and 40 settle frames follow; then object 559's verb 0x37 runs directly. No other writes.\nSteps: [{\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 68}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 85 +0x05CE\", \"expectedRoom\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 76}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Room 34 local script 202 +0x015F\", \"expectedRoom\": 34}, {\"kind\": \"visit\", \"objectId\": 36}, {\"kind\": \"staff\", \"objectId\": 1}, {\"kind\": \"frames\", \"frames\": 8}, {\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}, {\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"frames\", \"frames\": 40}, {\"kind\": \"verb\", \"objectId\": 559, \"verb\": 55}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 98 +0x0618\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3"
+      "frames": 1180,
+      "source": "Room 34 Walk response (script 098: Rusty's ghost). Replaces three direct Walk-response starts (objects 559, 560, 586 verb 0x37) that began in the fresh early state, where Rusty is still the sleeping living boy (costume 0x70); Room 34's entry shows the ghost (costume 0x78) only once scene 087 has set bit D9D. The first 16 steps run without being shown, so only the ghost scene plays: Bobbin as himself, before healing Rusty. They are the Awakening and the costume change on Rusty in Room 34 (Bobbin takes Rusty's look) and the Game Status edit 'staff held' (Bobbin carries the distaff when Stoke takes it), as direct verbs and a supported labelled edit from catalog visits; the story that led to them is not replayed, then the firewood scene 086 and the straw dream 087, which end with Bobbin in Room 38 (the game does not walk him back), so a catalog hop to Room 35 and one on to Room 34 put him back, as the game's own way (36→35→34) would, entering Room 34 from Room 35 (Room 35 object 587's arrival; hops are exploration assumptions that keep the story state) and 40 settle frames follow; then object 559's verb 0x37 runs directly. No other writes.\nSteps: [{\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 68}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 85 +0x05CE\", \"expectedRoom\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 76}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Room 34 local script 202 +0x015F\", \"expectedRoom\": 34}, {\"kind\": \"visit\", \"objectId\": 36}, {\"kind\": \"staff\", \"objectId\": 1}, {\"kind\": \"frames\", \"frames\": 8}, {\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}, {\"kind\": \"visit\", \"objectId\": 35}, {\"kind\": \"frames\", \"frames\": 8}, {\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"frames\", \"frames\": 40}, {\"kind\": \"verb\", \"objectId\": 559, \"verb\": 55}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 98 +0x0618\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3"
     },
     {
       "id": "bonus-room34-local200",
@@ -8862,7 +8870,7 @@
         34,
         57
       ],
-      "frames": 1158,
+      "frames": 1180,
       "source": "Start plus rooms observed with the shared sequence runner."
     },
     {
