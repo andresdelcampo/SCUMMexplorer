@@ -28,7 +28,7 @@ public sealed class LoomSceneSetupPlanner
     public const string StaffBit = "bit[0xD61]";
     private const int FirstStoryBit = 0xD72;
     /// <summary>The first room beyond the LOOM island (an estimate of the user's "outside the island").</summary>
-    public const int FirstRoomOffTheIsland = 13;
+    public const int FirstRoomOffTheIsland = 11;
 
     private readonly LoomSceneStateScanner _scanner;
     private IReadOnlyList<LoomStateSource>? _staffHeldWriters;
