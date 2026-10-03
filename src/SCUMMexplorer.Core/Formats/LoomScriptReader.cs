@@ -45,7 +45,7 @@ public sealed record LoomScriptDisassembly(
 
     public bool HasCompleteControlFlow => Issues is { Count: 0 };
 
-    public string Format()
+    public string Format(bool showBytes = true)
     {
         var output = new StringBuilder();
         output.AppendLine(Context is null
@@ -62,7 +62,9 @@ public sealed record LoomScriptDisassembly(
         foreach (var instruction in Instructions)
         {
             var operands = string.IsNullOrEmpty(instruction.Operands) ? "" : " " + instruction.Operands;
-            output.AppendLine($"{instruction.Offset:X4}  {instruction.Bytes,-17} {instruction.Operation}{operands}");
+            output.AppendLine(showBytes
+                ? $"{instruction.Offset:X4}  {instruction.Bytes,-17} {instruction.Operation}{operands}"
+                : $"{instruction.Offset:X4}  {instruction.Operation}{operands}");
         }
 
         if (Issues is { Count: > 0 })

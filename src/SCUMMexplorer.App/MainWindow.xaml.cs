@@ -537,6 +537,7 @@ public partial class MainWindow : Window
     private void UpdateAdvancedMode()
     {
         var advanced = IsAdvancedMode;
+        VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
         CutsceneMenuButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GameTextsButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         var rootGrid = ContentPanel.Parent as Grid;
@@ -662,7 +663,9 @@ public partial class MainWindow : Window
             try
             {
                 var disassembly = _scriptReader.Decode(resource);
-                ScriptOutput.Text = disassembly.Format();
+                _scriptShown = disassembly;
+                ScriptOutput.Text = disassembly.Format(_showScriptBytes);
+                ScriptPlayButton.Visibility = ScriptCutscene(resource.ResourceId) is null ? Visibility.Collapsed : Visibility.Visible;
                 var events = disassembly.Instructions
                     .Select(instruction => LoomScriptEvent.FromInstruction(disassembly, instruction,
                         LoomScriptEventCertainty.StaticPotential))
@@ -677,6 +680,8 @@ public partial class MainWindow : Window
             }
             catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
             {
+                _scriptShown = null;
+                ScriptPlayButton.Visibility = Visibility.Collapsed;
                 ScriptNote.Text = "This indexed script resource could not be decoded.";
                 ScriptOutput.Text = ex.Message;
                 StatusText.Text = $"{resource.Name} · bytecode unavailable";
@@ -863,7 +868,7 @@ public partial class MainWindow : Window
                 : string.Join(Environment.NewLine, snapshot.Uncertainties.TakeLast(8));
             AdvanceFrameButton.IsEnabled = snapshot.PendingScripts > 0;
             UpdatePlaybackControls();
-            ObjectsNote.Text = _estimatedObjectIds.Count == 0
+            ObjectsNote.Text = _estimatedObjectIds.Count == 0 || !IsAdvancedMode
                 ? "Click the scene to explore it. Hover to discover objects and exits."
                 : $"Some scene details are previews; the game state remains unresolved ({_estimatedObjectIds.Count} details).";
             ShowLastObjectAction(resource.ResourceId);
@@ -1273,6 +1278,70 @@ public partial class MainWindow : Window
             ConnectionsButton.ToolTip = exception.Message;
             ConnectionsButton.IsEnabled = false;
         }
+    }
+
+    // The bytecode column choice is kept from script to script (and while the app runs).
+    private bool _showScriptBytes = true;
+    private LoomScriptDisassembly? _scriptShown;
+
+    private void ScriptBytesToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        _showScriptBytes = ScriptBytesToggle.IsChecked == true;
+        if (_scriptShown is { } shown) ScriptOutput.Text = shown.Format(_showScriptBytes);
+    }
+
+    // A script the catalog knows as a scene can be played from its view: the cutscene machinery goes to the room and runs it.
+    private KnownCutscene? ScriptCutscene(int? scriptId) =>
+        scriptId is int id && _game?.Id == GameId.Loom
+            ? AllCutscenes().FirstOrDefault(c => c.Steps is null && c.ObjectId != 0 && (c.TextScripts?.Contains(id) ?? c.Script == id))
+              ?? AllCutscenes().FirstOrDefault(c => c.Steps is null && c.Script == id)
+            : null;
+
+    private void ScriptPlay_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedResource is not { Kind: ResourceKind.Script } script || ScriptCutscene(script.ResourceId) is not { } cutscene || !CanStartCutscene) return;
+        if (_lastViewedRoomResource is { } room) SelectResourceInTree(room);
+        PlayFromGameTexts(() => PlayKnownCutscene(cutscene));
+    }
+
+    private bool _fullscreen;
+    private WindowState _windowStateBefore;
+    private WindowStyle _windowStyleBefore;
+    private readonly List<(UIElement Element, Visibility Visibility)> _fullscreenHidden = [];
+    private Thickness _contentMarginBefore;
+
+    private void VerbStrip_MouseEnter(object sender, MouseEventArgs e) => FullscreenButton.Visibility = Visibility.Visible;
+    private void VerbStrip_MouseLeave(object sender, MouseEventArgs e) => FullscreenButton.Visibility = Visibility.Collapsed;
+    private void Fullscreen_Click(object sender, RoutedEventArgs e) => SetFullscreen(!_fullscreen);
+
+    /// <summary>The scene alone on the whole screen (F11 or the corner button); Escape leaves it. Everything else is hidden and comes back as it was.</summary>
+    private void SetFullscreen(bool on)
+    {
+        if (on == _fullscreen) return;
+        if (on)
+        {
+            _windowStateBefore = WindowState; _windowStyleBefore = WindowStyle; _contentMarginBefore = ContentPanel.Margin;
+            _fullscreenHidden.Clear();
+            foreach (UIElement element in new UIElement[] { AppHeader, SidePanel, AppStatusBar, RoomObjectPanel, PageHeader, RoomOptionsBar, RoomControlsPanel, StatusText })
+            {
+                _fullscreenHidden.Add((element, element.Visibility));
+                element.Visibility = Visibility.Collapsed;
+            }
+            ContentPanel.Margin = new Thickness(0);
+            Grid.SetColumnSpan(ContentPanel, 3); Grid.SetColumn(ContentPanel, 0);
+            WindowStyle = WindowStyle.None; WindowState = WindowState.Normal; WindowState = WindowState.Maximized;
+        }
+        else
+        {
+            foreach (var (element, visibility) in _fullscreenHidden) element.Visibility = visibility;
+            _fullscreenHidden.Clear();
+            ContentPanel.Margin = _contentMarginBefore;
+            Grid.SetColumn(ContentPanel, 1);
+            WindowStyle = _windowStyleBefore; WindowState = _windowStateBefore;
+            UpdateAdvancedMode();
+        }
+        _fullscreen = on;
+        UpdateRoomViewportLayout();
     }
 
     private void ShowPageHeader(bool show)
@@ -1888,6 +1957,9 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // Full screen: F11 toggles; Escape leaves it unless it is needed to skip a cutscene.
+        if (e.Key == Key.F11 && _game is not null && RoomDisplayLayout.Visibility == Visibility.Visible) { e.Handled = true; SetFullscreen(!_fullscreen); return; }
+        if (e.Key == Key.Escape && _fullscreen && !(GameClickActive && SessionInScene)) { e.Handled = true; SetFullscreen(false); return; }
         // Playback controls in the explore mode: Escape skips a cutscene
         // (abortCutscene, as the game's key does) and space pauses or plays the scene (the game's pause key).
         if (GameClickActive && Keyboard.FocusedElement is not (TextBox or ComboBox) && Keyboard.Modifiers == ModifierKeys.None)
@@ -3889,9 +3961,12 @@ public partial class MainWindow : Window
     private void SetVerbScreenNote(string summary, IEnumerable<string> details)
     {
         var lines = details.ToArray();
-        VerbStripBorder.ToolTip = lines.Length == 0 ? summary
+        _verbScreenNote = lines.Length == 0 ? summary
             : summary + Environment.NewLine + Environment.NewLine + string.Join(Environment.NewLine, lines);
+        VerbStripBorder.ToolTip = IsAdvancedMode ? _verbScreenNote : null;
     }
+
+    private string? _verbScreenNote;
 
     /// <summary>Verb numbers as hex ranges: 0x01–0x08, 0x31, 0x32.</summary>
     private static string VerbRanges(IEnumerable<int> verbs)
@@ -3928,7 +4003,7 @@ public partial class MainWindow : Window
     {
         var verb = ClickableVerbAt(e.GetPosition(VerbStripImage));
         VerbStripImage.Cursor = verb is null ? null : Cursors.Hand;
-        VerbStripImage.ToolTip = verb is null ? null
+        VerbStripImage.ToolTip = verb is null || !IsAdvancedMode ? null
             : $"Verb 0x{verb.VerbId:X2} (slot {verb.Slot}): a click goes to the game's input script as assumed input (runInputScript(1, 0x{verb.VerbId:X2}, 0)).";
     }
 
