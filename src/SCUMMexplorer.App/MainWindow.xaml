@@ -319,7 +319,7 @@
                         <Grid x:Name="CostumePanel" Visibility="Collapsed" Margin="28">
                             <ScrollViewer x:Name="CostumePoseScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                           SizeChanged="CostumePoseScrollViewer_SizeChanged"
-                                          Background="#0B1117">
+                                          Background="#1F2D3D">
                                 <WrapPanel x:Name="CostumePoseGallery" Margin="18" HorizontalAlignment="Center"/>
                             </ScrollViewer>
                             <Grid IsHitTestVisible="False">

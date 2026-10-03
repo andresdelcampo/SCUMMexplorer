@@ -16,3 +16,18 @@ Result: 159 costumes decode and draw. The 17 others fail at the header, before a
 No other LFL holds a valid costume header at those offsets. None of the 17 is named by any decoded script (248 literal costume uses, none of them these). The same situation is recorded for scripts 000/051/055/116 in LOOM_SCRIPT_MAP.md.
 
 Conclusion: leftover index entries, not a renderer or reader bug. ScummVM reads the index the same way, so it could not load them either. Reading, not proof: the data of the real costumes at those places was probably removed when the release was built.
+
+## Correction and fuller check (same day)
+
+The first "no script uses them" check read only the global scripts (the relationship index does not disassemble room entry, local or object scripts). Redone over global scripts, room entry/exit scripts, room local scripts and object verbs: the 17 are still never named by a `costume`, `loadCostume` or `lockCostume` operand. Only three costume operands are non-literal (Script 17 +009B from the size variables, Room 34 local 202 +00EF `var[0x07D]`, Room 34 local 217 +002D `local[1]`), which are the ego/Rusty costumes. So the conclusion holds. (104 and 166 are also never named, but they decode.)
+
+## The odd-looking costumes (reading, not tested against ScummVM frames)
+
+- 101: Room 31 loads it and gives it to actor 7 (entry +001A; local 200 +000F), animation 6/7/8, at (124, 119), next to the line "¿Ese reflejo soy YO? Qué feo." One limb, six cels (the sparse dotted ones and two solid ones) played in the order 1,2,3,4,5,6,5,3,2,1. It looks like Bobbin's reflection in the water: dotted cels are what the reflection is made of, so the gallery's pose 04–07 are not decode damage. Reading from the room context.
+- 99: Room 31 local 200 +002C: actors 3–6, a 2×4 pixel costume in two limbs. Four small things around the reflection scene (water sparkles or ripples, reading).
+- 94: Room 34 entry +02DC/+02EC/+0312, only when `bit[0xD62]` is set: actors 7 and 8 at (511, 116) and (567, 123), thin flat cels (24×5, 58×4). Placed in Room 34's far right; looks like a ground feature, not a character.
+- 63: Rooms 15–18 local scripts (e.g. Room 17 local 201): actor 2, a 2×1 pixel twinkle put at one of five fixed points for about six frames, removed, then a random wait, repeat.
+
+## Costume background colour
+
+Black costume pixels (palette entry 16) vanished on the near-black gallery background (11, 17, 23). The costume cards and the pose gallery now use (31, 45, 61). Rooms, the room viewport and other controls are unchanged. Shots: `shots/cards.png`, `shots/costume101.png` (scratch harness over the real MainWindow).

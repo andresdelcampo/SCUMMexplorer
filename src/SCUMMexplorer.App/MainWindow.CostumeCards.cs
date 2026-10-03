@@ -45,7 +45,7 @@ public partial class MainWindow
             var card = new Button
             {
                 Width = 96, Height = 94, Padding = new Thickness(4), Margin = new Thickness(2),
-                Background = new SolidColorBrush(Color.FromRgb(11, 17, 23)),
+                Background = new SolidColorBrush(Color.FromRgb(31, 45, 61)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(64, 82, 96)), BorderThickness = new Thickness(2),
                 Content = new TextBlock { Text = resource.Name, TextWrapping = TextWrapping.Wrap,
                     Foreground = new SolidColorBrush(Color.FromRgb(170, 180, 186)), FontSize = 11 },
