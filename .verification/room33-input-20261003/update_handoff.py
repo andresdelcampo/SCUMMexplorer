@@ -1,0 +1,11 @@
+from pathlib import Path
+text='Room33 Untwist/Twist keys on544 complete remaining202 +0006 after source201 establishesD81. Input706/direct604frames,4/4 scopes;63 Executed recorded events (entry Reached,62 Conditional),60 certainty-only differences plus two retaining argument-index uncertainty. Audited212→213/235 (90.64%),22 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room33-input-20261003/validation.md).'
+updates={
+'docs/NEXT_SESSION_PROMPT.md':('## Latest:', '## Latest: Room33 Untwist/Twist pair complete — 3 October\n\nAfter a8df5fb. '+text+'\n\nNext candidate: Room47 local205 +01B7, source re-entry/class prerequisites first. Supported staff/notes/learned setup labelled, original notes/reverse flags unchanged. Keep Room09 stopped this session. Continue successive bounded tasks toward200K context per user; exact telemetry unavailable. Commit each; at most two diagnostics per route without a route-relevant decision. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.\n\nReady-to-copy continuation: Continue SCUMMexplorer from Room33 using docs/NEXT_SESSION_PROMPT.md. Audited213/235 versus fresh single-action169/235. Start Room47 remaining site, continue bounded input audits toward200K context, commit each and leave running App untouched.\n\n'),
+'docs/LOOM_EGA_PLAN.md':('**Latest Room62','**Latest Room33 input,3 October:** '+text+' Next: Room47 source prerequisites.\n\n'),
+'docs/LOOM_SCRIPT_MAP.md':('Latest Room62','Latest Room33 input,3 October:201/203 +0000 establish/clearD81 around Untwist/Twist. '+text+'\n\n'),
+'docs/LOOM_CUTSCENE_DISCOVERY.md':('**Latest Room62','**Latest Room33 supplement,3 October:** '+text+'\n\n'),
+'docs/CHANGELOG.md':('## 3 October:','## 3 October: verify Room33 Untwist/Twist input\n\n'+text+'\n\n')}
+for name,(marker,addition) in updates.items():
+ p=Path(name); old=p.read_text(encoding='utf-8'); assert marker in old and addition not in old
+ p.write_text(old.replace(marker,addition+marker,1),encoding='utf-8')

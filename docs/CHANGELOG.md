@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify Room33 Untwist/Twist input
+
+Room33 Untwist/Twist keys on544 complete remaining202 +0006 after source201 establishesD81. Input706/direct604frames,4/4 scopes;63 Executed recorded events (entry Reached,62 Conditional),60 certainty-only differences plus two retaining argument-index uncertainty. Audited212→213/235 (90.64%),22 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room33-input-20261003/validation.md).
+
 ## 3 October: verify Room62 gold/straw input
 
 Room62 three keyboard casts808/3D,808/3C,809/3D establish source gold/straw states and complete remaining202/204 +0000. Input692/direct539frames,3/3 scopes;63 Executed/Conditional recorded events,63 certainty-only differences. Audited210→212/235 (90.21%),23 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room62-input-20261003/validation.md).
