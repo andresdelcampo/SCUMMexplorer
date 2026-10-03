@@ -156,6 +156,7 @@ internal static class Program
                     var panelList = Find<StackPanel>("ObjectActionsList");
                     report.Add($"actions: section {Find<Expander>("ObjectActionsSection").Visibility}, header '{((TextBlock)Find<Expander>("ObjectActionsSection").Header).Text}', rows {string.Join(" | ", panelList.Children.OfType<Button>().Select(b => b.Content))}; center panel {Find<FrameworkElement>("ObjectActionPanel").Visibility}");
                     SaveWindow("actions.png");
+                    report.Add("object used by: " + string.Join(" // ", panelList.Children.OfType<TextBlock>().Select(t => t.Text)));
                     var s0 = (LoomExplorationSession)Field("_session")!;
                     var jBefore = s0.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x02F]");
                     panelList.Children.OfType<Button>().First().RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -170,7 +171,12 @@ internal static class Program
                 await Task.Delay(500);
                 report.Add($"entry summary: {Find<TextBlock>("RoomEntrySummary").Text}; event rows {Find<StackPanel>("RoomEntryEventButtons").Children.Count}");
                 report.Add($"status text {Find<TextBlock>("SessionStatusText").Visibility}, objects note {Find<TextBlock>("ObjectsNote").Visibility}, last action: {Find<TextBlock>("LastActionSummary").Text}");
-                foreach (var tb in Find<StackPanel>("StateIssueList").Children.OfType<TextBlock>()) report.Add("  ISSUE: " + tb.ToolTip);
+                report.Add("what happened: " + string.Join(" | ", Find<TextBlock>("LastActionTimeline").Text.Split('\n').Take(8).Select(l => l.TrimEnd())));
+                foreach (var grp in Find<StackPanel>("StateIssueList").Children.OfType<Expander>())
+                {
+                    report.Add($"  GROUP: {grp.Header}");
+                    foreach (var tb in ((StackPanel)grp.Content).Children.OfType<TextBlock>().Skip(1)) report.Add("    ISSUE: " + tb.ToolTip);
+                }
                 SaveWindow("inspector.png");
                 // Advanced: scripts
                 var adv = Find<CheckBox>("AdvancedModeToggle");
@@ -181,6 +187,7 @@ internal static class Program
                 var readable = Find<CheckBox>("ScriptReadableToggle");
                 report.Add($"script 91 default: readable {readable.IsChecked}, title '{Find<TextBlock>("PageTitle").Text}', subtitle '{Find<TextBlock>("PageSubtitle").Text}', tree header '{(s91.Header)}'");
                 report.Add("readable head: " + string.Join(" / ", Find<TextBox>("ScriptOutput").Text.Split('\n').Skip(3).Take(6).Select(l => l.TrimEnd())));
+                report.Add($"used by: '{Find<Expander>("ScriptUsedByExpander").Header}': " + string.Join(" | ", Find<StackPanel>("ScriptUsedByList").Children.OfType<TextBlock>().Take(4).Select(t => t.Text)));
                 report.Add("event rows: " + string.Join(" | ", Find<StackPanel>("ScriptEventButtons").Children.OfType<Button>().Take(6).Select(b => b.Content)));
                 SaveWindow("script-readable.png");
                 readable.IsChecked = false; await Task.Delay(300);

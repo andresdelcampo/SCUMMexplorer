@@ -58,6 +58,9 @@ public sealed partial class LoomSceneStateScanner
     /// Calls <paramref name="visit"/> for every object verb (grouped by code), room entry, local script and global script of
     /// the game, object verbs first, in room order.
     /// </summary>
+    /// <summary>The same walk for other readers of the game's code (the "Used by" index).</summary>
+    public void VisitCodeUnits(Action<LoomScriptDisassembly?, int, int?, int?, string> visit) => ForEachCodeUnit(visit);
+
     private void ForEachCodeUnit(Action<LoomScriptDisassembly?, int, int?, int?, string> visit)
     {
         var verbs = new LoomObjectVerbReader(ScummScriptDialects.For(_game.Id));

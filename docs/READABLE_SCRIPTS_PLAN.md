@@ -1,4 +1,4 @@
-# Readable scripts, traces and assumptions (plan, 3 October 2026)
+# Readable scripts, traces and assumptions (plan, 3 October 2026; all six steps done the same day, see CHANGELOG)
 
 Why: Advanced mode shows raw bytecode, raw event lines and the explorer's own assumption log. The user "would not even dare to enter there": nothing explains what a script is, what a variable means or why a line matters. The reverse-engineering we already did (`docs/LOOM_SCRIPT_MAP.md`, the cutscene catalog, the story-bit names in Game Status, the verb and speaker names) should reach the screen.
 

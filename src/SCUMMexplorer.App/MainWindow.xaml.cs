@@ -209,6 +209,8 @@ public partial class MainWindow : Window
             : null;
         _game = game;
         _glossary = game.Id == GameId.Loom ? LoomGlossary.Load(game) : LoomGlossary.Default;
+        _usageIndex = LoomUsageIndex.Empty;
+        if (game.Id == GameId.Loom) _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
         _setupPlanner = null;
         _scriptReader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
@@ -698,6 +700,7 @@ public partial class MainWindow : Window
             PageSubtitle.Text = LoomResourceNames.Entry(_glossary, resource) is { } named
                 ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : "Indexed script resource · DOS LOOM old-v3";
             PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource);
+            UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
             ScriptNote.Text = "Reading DOS LOOM old-v3 bytecode…";
             try
@@ -1177,12 +1180,12 @@ public partial class MainWindow : Window
         LastActionSummary.Text = ObjectActionNote.Text;
         LastActionIssues.Children.Clear();
         RefreshStateIssues();
-        ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
-            string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
-            Environment.NewLine + (action.Script is null ? "Object bytecode unavailable." : FormatScript(action.Script)) +
         var timeline = LoomActionTimeline.Format(LoomActionTimeline.Build(action, new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull), actionName,
             action.VerbId == 0 ? null : LoomVerbNames.Label(action.VerbId)));
         LastActionTimeline.Text = timeline.TrimEnd();
+        ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
+            string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
+            Environment.NewLine + (action.Script is null ? "Object bytecode unavailable." : FormatScript(action.Script)) +
             Environment.NewLine + (action.Run?.FormatSummary() ?? "No object bytecode was run.");
         ObjectActionTraceExpander.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         UpdateAdvancedMode();
@@ -1225,6 +1228,20 @@ public partial class MainWindow : Window
             button.Click += (_, _) => ActivateObjectVerb(choice.Object, choice.Verb, play: true);
             host.Children.Add(button);
         }
+        if (inPanel) AddObjectUsedBy(choices[0].Object.Id);
+    }
+
+    /// <summary>"Used by" for an object: the code that runs one of its verbs with a literal number.</summary>
+    private void AddObjectUsedBy(int objectId)
+    {
+        var uses = _usageIndex.UsedBy(LoomUsageTarget.Object, objectId);
+        var text = uses.Count == 0
+            ? "Used by: no code names this object (clicks and drafts reach it through the input scripts)."
+            : "Used by: " + string.Join("; ", uses.Take(6).Select(use => LoomUsageIndex.Describe(use, _glossary, VerbNameOrNull))) + (uses.Count > 6 ? $"; {uses.Count - 6} more" : "");
+        ObjectActionsList.Children.Add(new TextBlock
+        {
+            Text = text, Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 6, 0, 0)
+        });
     }
 
     private bool ActivateObjectVerb(LoomRoomObjectRecord record, LoomObjectVerbEntry verb, bool play = false)
@@ -1351,13 +1368,26 @@ public partial class MainWindow : Window
             var items = new StackPanel { Margin = new Thickness(8, 2, 0, 4) };
             items.Children.Add(new TextBlock
             {
-                Text = LoomResourceNames.NameScripts(_glossary, issue) is { Length: > 150 } named ? named[..147] + "…" : LoomResourceNames.NameScripts(_glossary, issue),
-                ToolTip = issue,
-                Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
-                FontSize = 11,
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, 0, 0, 4)
+                Text = group.Meaning, Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 4)
             });
+            foreach (var issue in group.Items)
+                items.Children.Add(new TextBlock
+                {
+                    Text = LoomResourceNames.NameScripts(_glossary, issue) is { Length: > 150 } named ? named[..147] + "…" : LoomResourceNames.NameScripts(_glossary, issue),
+                    ToolTip = issue,
+                    Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
+                    FontSize = 11,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 0, 0, 4)
+                });
+            StateIssueList.Children.Add(new Expander
+            {
+                Header = $"{group.Title} · {group.Items.Count}",
+                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
+                Content = items,
+                Margin = new Thickness(0, 0, 0, 2)
+            });
+        }
         StateIssuesSection.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -1405,6 +1435,45 @@ public partial class MainWindow : Window
     // The bytecode column choice is kept from script to script (and while the app runs).
     private bool _showScriptBytes;
     private LoomGlossary _glossary = LoomGlossary.Default;
+    private LoomUsageIndex _usageIndex = LoomUsageIndex.Empty;
+
+    private async Task BuildUsageIndexAsync(GameLibrary game)
+    {
+        try
+        {
+            var index = await Task.Run(() => LoomUsageIndex.Build(game));
+            if (!ReferenceEquals(_game, game)) return;
+            _usageIndex = index;
+            if (_selectedResource is { Kind: ResourceKind.Script } selected) UpdateScriptUsedBy(selected);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
+    }
+
+    private Func<int, string?> VerbNameOrNull => LoomVerbNames.LabelOrNull;
+
+    private void UpdateScriptUsedBy(GameResource resource)
+    {
+        ScriptUsedByList.Children.Clear();
+        if (resource.Kind != ResourceKind.Script || resource.ResourceId is not int id || _game?.Id != GameId.Loom || !IsAdvancedMode)
+        {
+            ScriptUsedByExpander.Visibility = Visibility.Collapsed;
+            return;
+        }
+        ScriptUsedByExpander.Visibility = Visibility.Visible;
+        var uses = _usageIndex.UsedBy(LoomUsageTarget.Script, id);
+        ScriptUsedByExpander.Header = uses.Count == 0
+            ? "Used by · no literal reference (a hook, a click or a variable starts it)"
+            : $"Used by · {uses.Count}";
+        ScriptUsedByExpander.ToolTip = "Static references in the decoded code; whether a branch runs depends on the game state.";
+        foreach (var use in uses.Take(60))
+            ScriptUsedByList.Children.Add(new TextBlock
+            {
+                Text = LoomUsageIndex.Describe(use, _glossary, VerbNameOrNull),
+                Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 2)
+            });
+        if (uses.Count > 60)
+            ScriptUsedByList.Children.Add(new TextBlock { Text = $"… and {uses.Count - 60} more", Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11 });
+    }
     private LoomScriptDisassembly? _scriptShown;
 
     private void ScriptBytesToggle_Changed(object sender, RoutedEventArgs e)
@@ -1427,7 +1496,7 @@ public partial class MainWindow : Window
     }
 
     private string FormatScript(LoomScriptDisassembly script) => _readableScripts && _game?.Id == GameId.Loom
-        ? new LoomScriptPresenter(_glossary, verb => LoomVerbNames.Label(verb) is { } label && !label.StartsWith("Verb 0x", StringComparison.Ordinal) ? label : null).Present(script)
+        ? new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull).Present(script)
         : script.Format(_showScriptBytes);
 
     // A script the catalog knows as a scene can be played from its view: the cutscene machinery goes to the room and runs it.

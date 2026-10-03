@@ -352,6 +352,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <DockPanel Margin="0,0,0,6">
@@ -370,7 +371,12 @@
                                           HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,4">
                                 <StackPanel x:Name="ScriptEventButtons"/>
                             </ScrollViewer>
-                            <TextBox x:Name="ScriptOutput" Grid.Row="2" IsReadOnly="True" AcceptsReturn="True"
+                            <Expander x:Name="ScriptUsedByExpander" Grid.Row="2" Header="Used by" Foreground="#E7E0D2" Margin="0,0,0,4" Visibility="Collapsed">
+                                <ScrollViewer MaxHeight="110" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <StackPanel x:Name="ScriptUsedByList" Margin="14,2,0,2"/>
+                                </ScrollViewer>
+                            </Expander>
+                            <TextBox x:Name="ScriptOutput" Grid.Row="3" IsReadOnly="True" AcceptsReturn="True"
                                      IsReadOnlyCaretVisible="True" TextWrapping="NoWrap"
                                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                                      Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
@@ -446,13 +452,13 @@
                                       Margin="0,6,0,0" Foreground="#E7E0D2" Background="#0B1117">
                                 <StackPanel Margin="4,4,4,6">
                                     <TextBlock x:Name="LastActionSummary" Foreground="#D2C7B5" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                    <TextBlock x:Name="LastActionTimeline" Foreground="#B8AA8C" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,6"/>
                                     <StackPanel x:Name="LastActionIssues"/>
                                     <Expander Header="Raw trace" IsExpanded="False" Margin="0,6,0,0" Foreground="#9FABAE">
                                         <TextBox x:Name="ObjectActionTraceOutput" IsReadOnly="True" AcceptsReturn="True"
                                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                                                  Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
                                                  FontFamily="Consolas" FontSize="11" Height="240"/>
-                                    <TextBlock x:Name="LastActionTimeline" Foreground="#B8AA8C" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,6"/>
                                     </Expander>
                                 </StackPanel>
                             </Expander>
