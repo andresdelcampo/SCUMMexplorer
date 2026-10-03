@@ -27,6 +27,8 @@ public sealed class LoomSceneSetupPlanner
 {
     public const string StaffBit = "bit[0xD61]";
     private const int FirstStoryBit = 0xD72;
+    /// <summary>The first room beyond the LOOM island (an estimate of the user's "outside the island").</summary>
+    public const int FirstRoomOffTheIsland = 13;
 
     private readonly LoomSceneStateScanner _scanner;
     private IReadOnlyList<LoomStateSource>? _staffHeldWriters;
@@ -58,26 +60,28 @@ public sealed class LoomSceneSetupPlanner
         var clears = own.Where(t => t.Write && t.Variable == StaffBit && t.Where.StartsWith("Script ", StringComparison.Ordinal) &&
                                     t.Instruction.EndsWith("= 0x0000", StringComparison.Ordinal)).ToList();
         var sets = own.Where(t => t.Write && t.Variable == StaffBit && t.Instruction.EndsWith("= 0x0001", StringComparison.Ordinal)).ToList();
-        if (clears.Count > 0 && sets.Count == 0)
+        // The user's decision (3 October): outside the LOOM island Bobbin holds the distaff, so a scene that reads the bit
+        // in a room from FirstRoomOffTheIsland on starts with it held too. On the island (the opening rooms) the fresh state stays.
+        var reads = own.Where(t => !t.Write && t.Variable == StaffBit).ToList();
+        var presumesHeld = clears.Count > 0 || reads.Count > 0 && startRoom >= FirstRoomOffTheIsland;
+        if (presumesHeld && sets.Count == 0)
         {
             var writer = StaffHeldWriters.FirstOrDefault(w => w.ObjectId is not null && w.VerbId is not null);
-            var where = string.Join(", ", clears.Select(t => t.Where).Distinct().Take(3));
+            var why = clears.Count > 0
+                ? $"The scene clears bit D61 ({string.Join(", ", clears.Select(t => t.Where).Distinct().Take(3))}), so it presumes Bobbin holds the distaff."
+                : $"The scene's own code reads bit D61 ({string.Join(", ", reads.Select(t => t.Where).Distinct().Take(3))}) and Room {startRoom:00} is outside the island, where Bobbin holds the distaff (decided with the user, 3 October).";
             if (writer is { ObjectId: int obj, VerbId: int verb })
             {
                 steps.Add(new("visit", writer.Room));
                 steps.Add(new("verb", obj, verb));
                 steps.Add(new("frames", Frames: 8));
-                notes.Add($"The scene clears bit D61 ({where}), so it presumes Bobbin holds the distaff. A fresh game does not, so the " +
-                          $"game's own {writer.Where.Split(" +")[0]} (it sets D61 to 1) runs first, unseen, as an exploration action. " +
+                notes.Add($"{why} A fresh game does not, so the game's own {writer.Where.Split(" +")[0]} (it sets D61 to 1) runs first, unseen, as an exploration action. " +
                           $"Other places that set it: {string.Join(", ", StaffHeldWriters.Where(w => w != writer).Select(w => w.Where.Split(" +")[0]).Distinct().Take(4))}.");
             }
-            else notes.Add($"The scene clears bit D61 ({where}) but no object verb sets it; the Game Status edit \"staff held\" would be needed (not applied).");
+            else notes.Add($"{why} No object verb sets it; the Game Status edit \"staff held\" would be needed (not applied).");
         }
-        else if (own.Any(t => !t.Write && t.Variable == StaffBit))
-        {
-            var where = string.Join(", ", own.Where(t => !t.Write && t.Variable == StaffBit).Select(t => t.Where).Distinct().Take(3));
-            notes.Add($"The scene's own code reads bit D61 ({where}); the fresh state (distaff not held) is kept, so its without-distaff branch is the one shown.");
-        }
+        else if (reads.Count > 0)
+            notes.Add($"The scene's own code reads bit D61 ({string.Join(", ", reads.Select(t => t.Where).Distinct().Take(3))}); Room {startRoom:00} is on the island, so the fresh state (distaff not held) is kept and its without-distaff branch is the one shown.");
 
         // The ego's costume variable: a scene that tests it is reached with the fresh value, the first-visit branch.
         var costumeReads = own.Where(t => !t.Write && t.Variable == "var[0x07D]").Select(t => t.Where).Distinct().ToList();

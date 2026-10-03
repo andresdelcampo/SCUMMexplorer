@@ -65,9 +65,15 @@ public sealed class LoomSceneSetupPlannerTests
     [Fact]
     public void ReadsOfTheStaffAndStoryBitsAreLabelledNotInvented()
     {
-        var setup = new LoomSceneSetupPlanner(Game()).Derive(18, [58, 59]);
-        Assert.False(setup.HasSteps);
-        Assert.Contains(setup.Notes, n => n.Contains("reads bit D61", StringComparison.Ordinal));
+        var planner = new LoomSceneSetupPlanner(Game());
+        // Room 18 is outside the island: the staff is held, from the real pickup.
+        var off = planner.Derive(18, [58, 59]);
+        Assert.True(off.HasSteps);
+        Assert.Contains(off.Notes, n => n.Contains("outside the island", StringComparison.Ordinal));
+        // Room 9 is on it: the fresh state stays, labelled.
+        var on = planner.Derive(9, [47]);
+        Assert.False(on.HasSteps);
+        Assert.Contains(on.Notes, n => n.Contains("reads bit D61", StringComparison.Ordinal));
     }
 
     [Fact(Skip = "Diagnostic dump of every catalog scene's derived setup; run by hand (SCUMM_SETUP_DUMP=path).")]
