@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify script022 +0005 through Room41 input
+
+Script022 +0005/end001E ("too noisy to weave") completes in Room41 (D70=1): click 632 aims (631/633 are untouchable), then wrong notes 1,2,1,2 with labelled staff/7-notes setup. Audited231→232/235 (98.72%),3 remaining; fresh single-action169/235 unchanged. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+
 ## 3 October: verify script096 through Room43 input
 
 Script096 +0000/end00E7 completes through actual clicks (650 cage scene 093, 639, 653 look + Escape for 095, 656, 655 for 092, then 639) and loads Room46; 639 stays untouchable until 093 sets DB6. Audited230→231/235 (98.30%),4 remaining; fresh single-action169/235 (71.91%) unchanged. No status edits, production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).

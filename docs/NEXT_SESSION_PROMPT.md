@@ -1,5 +1,11 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: script022 +0005 complete — 3 October
+
+After ad99d16. Room41 (D70=1): actual click on 632 (631/633 untouchable) aims, then keys q,w,q,w (notes 1,2,1,2, no draft match) run 022 +0005/end001E. Staff/7 notes labelled setup only. 303 frames,1 scope. Audited231→232/235 (98.72%),3 remaining; fresh single-action169/235 unchanged. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+
+Next: remaining3 are Room34 local200 +0035/local207 +0079 (needs a Room33/46 return path after scene 087) and script009 +002C (Room69 local204 stall). No App launch or push.
+
 ## Latest: script096 complete — 3 October
 
 After 75e1995. Script096 +0000/end00E7 completes through actual clicks: 650 (cage scene 093 sets DB6; 639 is untouchable before it), 639→44, double-click 653 plus Escape (095 skip), 656 staff, 655 (092), 639 → 096 → Room46. 2228 frames, 5 balanced scopes. Audited230→231/235 (98.30%),4 remaining; fresh single-action169/235 unchanged. Four runs (two probe-side failures retained). The original native090/raw4 recipe is unchanged and still stops at the conditional Room42 load; this credit does not touch it. [Validation](../.verification/global-scripts-input-20261003/validation.md).
@@ -42,7 +48,7 @@ Next: from catalog Room34 select object586 for Healing4D, require209 end03C0, th
 
 ## START HERE: current state after b09b2fb — 3 October
 
-Audited **231/235 (98.30%)**, 4 sites left (script096 now credited, see Latest above); fresh single-action **169/235 (71.91%)** is a separate metric and unchanged. The older "Parked by user" section below is superseded: its Room34 601→36→35→34 route is proven source-blocked. Details and decoded gates: [global-scripts validation addendum](../.verification/global-scripts-input-20261003/validation.md) and [Room34 chain validation](../.verification/room34-chain-20261003/validation.md).
+Audited **232/235 (98.72%)**, 3 sites left (script096 and script022 +0005 now credited, see Latest above); fresh single-action **169/235 (71.91%)** is a separate metric and unchanged. The older "Parked by user" section below is superseded: its Room34 601→36→35→34 route is proven source-blocked. Details and decoded gates: [global-scripts validation addendum](../.verification/global-scripts-input-20261003/validation.md) and [Room34 chain validation](../.verification/room34-chain-20261003/validation.md).
 
 The 5 remaining sites and what each needs (none is a probe-only fix any more):
 

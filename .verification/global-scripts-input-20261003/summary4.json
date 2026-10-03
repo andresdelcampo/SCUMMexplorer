@@ -1,0 +1,31 @@
+{
+  "outcome": "Room41 (D70 noisy room): click 632 aims, four non-draft notes 1,2,1,2 run script022 +0005/end001E (too noisy to weave).",
+  "inputFrames": 303,
+  "completedScopes": 1,
+  "newSites": [
+    {
+      "owner": "script 022",
+      "offset": "+0x0005"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 231,
+    "after": 232,
+    "total": 235,
+    "percent": 98.72,
+    "remaining": 3
+  },
+  "diagnosticCycles": 2,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 318,
+  "evidence": {
+    "Exe\\GlobalInput-20261003\\f2\\input.json": "f25a9e3dd5d6411af02e7d5cb56fe735a383bfeffef6a9a0526cd90c0e230600",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}
