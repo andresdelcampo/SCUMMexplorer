@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room09 bounded investigation retained; no gain — 3 October
+
+After3fde694. Room09 two bounded cycles add no coverage. Source50→721/089→7→252→9 plus actual272 Look completes209/101,3/3 prefix scopes at1768frames; then probe incorrectly requires4D as reverse and stops before edits/casts. Slot11 is forward4D; slots12/13 reverse4F/51. Failed pairs retained/excluded; no engine defect established. Audited205/235 and fresh single-action169/235 unchanged. [Validation/next experiment](../.verification/room09-input-20261003/validation.md).
+
+Stop Room09 for this session after two cycles. Later correct draft selection by forward OR reverse verb, supported staff/seven notes/learned11/12/13, source notes/reverse flags unchanged; rerun full pair before crediting101 or spells. Next independent candidate: Room08 local211 +0008 and214 +000B; inspect source gates before input. Continue bounded tasks toward200K context per user; exact telemetry unavailable. Commit each checkpoint. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.
+
+Ready-to-copy continuation: Continue SCUMMexplorer using docs/NEXT_SESSION_PROMPT.md. Audited205/235 versus fresh single-action169/235. Room09 has a precise retained probe setup failure, no credit. Next Room08 two-site source/input audit; continue bounded tasks toward200K context and leave running App untouched.
+
 ## Latest: Room22 watcher pair complete — 3 October
 
 After59fbe94. Room22 box11→10 clicks complete200 +0083/end00D3 then002F/end0078,235frames,2/2 scopes,23 Executed/Conditional body events. Audited union203→205/235 (87.23%),30 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First wrong-order capture retained/excluded, second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room22-input-20261003/validation.md).

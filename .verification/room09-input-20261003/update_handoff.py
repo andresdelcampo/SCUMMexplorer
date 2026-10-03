@@ -1,0 +1,11 @@
+from pathlib import Path
+text='Room09 two bounded cycles add no coverage. Source50→721/089→7→252→9 plus actual272 Look completes209/101,3/3 prefix scopes at1768frames; then probe incorrectly requires4D as reverse and stops before edits/casts. Slot11 is forward4D; slots12/13 reverse4F/51. Failed pairs retained/excluded; no engine defect established. Audited205/235 and fresh single-action169/235 unchanged. [Validation/next experiment](../.verification/room09-input-20261003/validation.md).'
+updates={
+'docs/NEXT_SESSION_PROMPT.md':('## Latest:', '## Latest: Room09 bounded investigation retained; no gain — 3 October\n\nAfter3fde694. '+text+'\n\nStop Room09 for this session after two cycles. Later correct draft selection by forward OR reverse verb, supported staff/seven notes/learned11/12/13, source notes/reverse flags unchanged; rerun full pair before crediting101 or spells. Next independent candidate: Room08 local211 +0008 and214 +000B; inspect source gates before input. Continue bounded tasks toward200K context per user; exact telemetry unavailable. Commit each checkpoint. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.\n\nReady-to-copy continuation: Continue SCUMMexplorer using docs/NEXT_SESSION_PROMPT.md. Audited205/235 versus fresh single-action169/235. Room09 has a precise retained probe setup failure, no credit. Next Room08 two-site source/input audit; continue bounded tasks toward200K context and leave running App untouched.\n\n'),
+'docs/LOOM_EGA_PLAN.md':('**Latest Room22','**Latest Room09 investigation,3 October:** '+text+' Stop this route for session; next Room08.\n\n'),
+'docs/LOOM_SCRIPT_MAP.md':('Latest Room22','Latest Room09 investigation,3 October: Room50 entry writesD7B;721→089→7;252 late branch enters9;272/36→209019B→101/end08B3 writesDAC/DAD. '+text+'\n\n'),
+'docs/LOOM_CUTSCENE_DISCOVERY.md':('**Latest Room22','**Latest Room09 investigation,3 October:** '+text+'\n\n'),
+'docs/CHANGELOG.md':('## 3 October:','## 3 October: retain bounded Room09 prerequisite investigation\n\n'+text+'\n\n')}
+for name,(marker,addition) in updates.items():
+ p=Path(name); old=p.read_text(encoding='utf-8'); assert marker in old and addition not in old
+ p.write_text(old.replace(marker,addition+marker,1),encoding='utf-8')
