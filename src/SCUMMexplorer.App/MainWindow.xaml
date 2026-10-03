@@ -259,16 +259,16 @@
                                         <TextBlock x:Name="SessionStatusText" Foreground="#B8AA8C" TextWrapping="Wrap"
                                                    VerticalAlignment="Center" Margin="0,0,10,0"/>
                                         <StackPanel x:Name="SessionActions" Visibility="Collapsed" Orientation="Horizontal">
-                                            <Button Content="↺ Restart" ToolTip="Restart exploration from the boot state." Click="ResetSession_Click" Padding="8,4" Margin="0,0,5,0"
-                                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                            <Button x:Name="AdvanceFrameButton" Content="Step ▸" ToolTip="Advance the scene by one frame (for stepping while paused)." Click="AdvanceFrame_Click" Padding="8,4"
-                                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         </StackPanel>
                                     </DockPanel>
                                     <WrapPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
+                                        <Button x:Name="RestartButton" Visibility="Collapsed" Content="↺ Restart" ToolTip="Restart exploration from the boot state." Click="ResetSession_Click" Padding="8,4" Margin="0,0,5,0"
+                                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         <Button x:Name="PlaybackPauseButton" Content="⏸ Pause" Click="PlaybackPause_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
-                                                ToolTip="Pause or play the scene (space). While paused, Continue ▸ in the advanced session bar plays one frame."/>
+                                                ToolTip="Pause or play the scene (space). In Advanced mode, Step ▸ then plays one frame while paused."/>
+                                        <Button x:Name="AdvanceFrameButton" Content="Step ▸" ToolTip="Advance the scene by one frame (for stepping while paused)." Click="AdvanceFrame_Click" Padding="8,4" Margin="0,0,5,0" Visibility="Collapsed"
+                                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         <Button x:Name="SkipCutsceneButton" Content="⏭ Skip (Esc)" Click="SkipCutscene_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
                                         <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"

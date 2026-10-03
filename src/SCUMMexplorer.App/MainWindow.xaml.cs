@@ -589,6 +589,7 @@ public partial class MainWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
         SessionStatusText.Visibility = advanced && _session is not null && SessionModeToggle.IsChecked != true
             ? Visibility.Visible : Visibility.Collapsed;
+        AdvanceFrameButton.Visibility = RestartButton.Visibility = advanced && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         SessionActions.Visibility = advanced && _session is not null
             ? Visibility.Visible : Visibility.Collapsed;
         RoomCueTime.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
@@ -3094,7 +3095,7 @@ public partial class MainWindow : Window
         _playbackTimer?.Stop();
         _playbackPaused = true;
         _sceneSound.Pause();
-        StatusText.Text = "Paused. Play (or space) goes on; Continue ▸ plays one frame.";
+        StatusText.Text = "Paused. Play (or space) goes on.";
         StatusText.ToolTip = "The scene's frames wait while paused. The game's own pause key (space, VAR_PAUSE_KEY) stops ScummVM's frame loop the same way.";
         UpdatePlaybackControls();
     }
@@ -3118,7 +3119,7 @@ public partial class MainWindow : Window
         return timer;
     }
 
-    /// <summary>While paused, plays one frame (Continue ▸); the playback stays paused.</summary>
+    /// <summary>While paused, plays one frame (Step ▸); the playback stays paused.</summary>
     private void StepPausedPlayback()
     {
         if (_playback is null || !ViewShowsSessionRoom()) return;
