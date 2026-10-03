@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room62 gold/straw pair complete — 3 October
+
+After3aff8b7. Room62 three keyboard casts808/3D,808/3C,809/3D establish source gold/straw states and complete remaining202/204 +0000. Input692/direct539frames,3/3 scopes;63 Executed/Conditional recorded events,63 certainty-only differences. Audited210→212/235 (90.21%),23 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room62-input-20261003/validation.md).
+
+Next candidate: Room33 local2020006, source Untwist/Twist input. Supported staff/notes/learned setup labelled, original notes/reverse flags unchanged. Keep Room09 stopped this session. Continue successive bounded tasks toward200K context per user; exact telemetry unavailable. Commit each; at most two diagnostics per route without a route-relevant decision. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from Room62 using docs/NEXT_SESSION_PROMPT.md. Audited212/235 versus fresh single-action169/235. Start Room33 remaining site, continue bounded input audits toward200K context, commit each and leave running App untouched.
+
 ## Latest: Room28 camera/fire/continuation complete — 3 October
 
 After47dbb0b. Room28 actual camera click and470/3D then466/43 keys complete2030000, timed2120064 and0760000 through27/28. SourceCA0→1→2,D94missing→1→0; no story edits. Input949/direct847frames,9/9 scopes;207 selected Executed/Conditional body events,199 certainty-only differences. Audited207→210/235 (89.36%),25 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room28-input-20261003/validation.md).

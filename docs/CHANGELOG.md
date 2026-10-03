@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify Room62 gold/straw input
+
+Room62 three keyboard casts808/3D,808/3C,809/3D establish source gold/straw states and complete remaining202/204 +0000. Input692/direct539frames,3/3 scopes;63 Executed/Conditional recorded events,63 certainty-only differences. Audited210→212/235 (90.21%),23 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room62-input-20261003/validation.md).
+
 ## 3 October: verify Room28 camera, timed fire and continuation
 
 Room28 actual camera click and470/3D then466/43 keys complete2030000, timed2120064 and0760000 through27/28. SourceCA0→1→2,D94missing→1→0; no story edits. Input949/direct847frames,9/9 scopes;207 selected Executed/Conditional body events,199 certainty-only differences. Audited207→210/235 (89.36%),25 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room28-input-20261003/validation.md).
