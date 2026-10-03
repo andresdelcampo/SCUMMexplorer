@@ -208,6 +208,7 @@ public partial class MainWindow : Window
             ? _stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
             : null;
         _game = game;
+        _glossary = game.Id == GameId.Loom ? LoomGlossary.Load(game) : LoomGlossary.Default;
         _replayCatalog = LoomReplayCatalog.Load(game);
         _setupPlanner = null;
         _scriptReader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
@@ -334,7 +335,8 @@ public partial class MainWindow : Window
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
-            foreach (var item in group) node.Items.Add(new TreeViewItem { Header = item.Name, Tag = item });
+            foreach (var item in group)
+                node.Items.Add(new TreeViewItem { Header = LoomResourceNames.Label(_glossary, item), ToolTip = LoomResourceNames.Evidence(_glossary, item), Tag = item });
             ResourceTree.Items.Add(node);
         }
 
@@ -692,8 +694,10 @@ public partial class MainWindow : Window
             PreviewMessage.Visibility = Visibility.Collapsed;
             ScriptPanel.Visibility = Visibility.Visible;
             ShowPageHeader(true);
-            PageTitle.Text = resource.Name;
-            PageSubtitle.Text = "Indexed script resource · DOS LOOM old-v3";
+            PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
+            PageSubtitle.Text = LoomResourceNames.Entry(_glossary, resource) is { } named
+                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : "Indexed script resource · DOS LOOM old-v3";
+            PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource);
             ScriptOutput.Text = "";
             ScriptNote.Text = "Reading DOS LOOM old-v3 bytecode…";
             try
@@ -1281,7 +1285,7 @@ public partial class MainWindow : Window
         }
         foreach (var (target, verb, certainty, count) in rows)
         {
-            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {target.Name}{(count > 1 ? $" ×{count}" : "")}";
+            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {LoomResourceNames.Label(_glossary, target)}{(count > 1 ? $" ×{count}" : "")}";
             var button = new Button
             {
                 Content = label,
@@ -1342,7 +1346,7 @@ public partial class MainWindow : Window
         foreach (var issue in issues)
             StateIssueList.Children.Add(new TextBlock
             {
-                Text = issue.Length > 150 ? issue[..147] + "…" : issue,
+                Text = LoomResourceNames.NameScripts(_glossary, issue) is { Length: > 150 } named ? named[..147] + "…" : LoomResourceNames.NameScripts(_glossary, issue),
                 ToolTip = issue,
                 Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
                 FontSize = 11,
@@ -1395,6 +1399,7 @@ public partial class MainWindow : Window
 
     // The bytecode column choice is kept from script to script (and while the app runs).
     private bool _showScriptBytes;
+    private LoomGlossary _glossary = LoomGlossary.Default;
     private LoomScriptDisassembly? _scriptShown;
 
     private void ScriptBytesToggle_Changed(object sender, RoutedEventArgs e)
