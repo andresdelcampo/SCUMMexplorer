@@ -1,5 +1,11 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room02 script045 complete — 3 October
+
+AfterRoom34 record. Room02 script045 box-change scenes complete through accepted clicks on boxes4,5,10 (twice, after an interrupted walk) and 11: +001D/end003E,+0049/end006A,+0075/end0092,+009D/end00BA, 535 frames,5 balanced scopes. Audited219→223/235 (94.89%),12 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two cycles (first interrupted before +009D, retained/excluded); no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room02-input-20261003/validation.md).
+
+Next: remaining12 sites are Room34 local200 +0035/local207 +0079 (route via 601 blocked, see Room34 chain validation) and global scripts004,005 +01C0,009 +002C,011,012,013,022 +0005/+0138,066,096. Inspect their callers (F5 save key, input script, practice-mode notes, draft playback). No App launch or push.
+
 ## Latest: Room09 casts complete — 3 October
 
 After2892f99. Room09 corrected full route (Look 272→209/101, then 273/4D, 4F, 51 keyboard casts with supported staff/7 notes/learned 11-13 setup) completes 273/4D +000D, local223/224 +0000 and script101 +0000. Input3300/direct3147frames,6/6 scopes;252 Executed recorded events,3 certainty-only differences. Audited215→219/235 (93.19%),16 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room09-fix-20261003/validation.md).

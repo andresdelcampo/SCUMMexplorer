@@ -1,0 +1,43 @@
+{
+  "outcome": "Room02 script045 four box-change scenes complete via accepted clicks.",
+  "inputFrames": 535,
+  "completedScopes": 5,
+  "newSites": [
+    {
+      "owner": "script 045",
+      "offset": "+0x001D"
+    },
+    {
+      "owner": "script 045",
+      "offset": "+0x0049"
+    },
+    {
+      "owner": "script 045",
+      "offset": "+0x0075"
+    },
+    {
+      "owner": "script 045",
+      "offset": "+0x009D"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 219,
+    "after": 223,
+    "total": 235,
+    "percent": 94.89,
+    "remaining": 12
+  },
+  "diagnosticCycles": 2,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 295,
+  "evidence": {
+    "Exe\\Room02Input-20261003\\cycle-2\\input.json": "005c40947457ec0addc936a6486397a94803ddc7428a14559094042b24c5c3bb",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

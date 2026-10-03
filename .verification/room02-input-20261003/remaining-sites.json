@@ -1,0 +1,50 @@
+[
+  {
+    "owner": "Room 34 local 200",
+    "offset": "+0x0035"
+  },
+  {
+    "owner": "Room 34 local 207",
+    "offset": "+0x0079"
+  },
+  {
+    "owner": "script 004",
+    "offset": "+0x0000"
+  },
+  {
+    "owner": "script 005",
+    "offset": "+0x01C0"
+  },
+  {
+    "owner": "script 009",
+    "offset": "+0x002C"
+  },
+  {
+    "owner": "script 011",
+    "offset": "+0x0000"
+  },
+  {
+    "owner": "script 012",
+    "offset": "+0x0000"
+  },
+  {
+    "owner": "script 013",
+    "offset": "+0x0000"
+  },
+  {
+    "owner": "script 022",
+    "offset": "+0x0005"
+  },
+  {
+    "owner": "script 022",
+    "offset": "+0x0138"
+  },
+  {
+    "owner": "script 066",
+    "offset": "+0x0000"
+  },
+  {
+    "owner": "script 096",
+    "offset": "+0x0000"
+  }
+]
