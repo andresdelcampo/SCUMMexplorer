@@ -32,7 +32,7 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 ## Current follow-up (3 October, end of day)
 
-Next: readable scripts (glossary, names, Readable/Raw script view) per [READABLE_SCRIPTS_PLAN.md](READABLE_SCRIPTS_PLAN.md), then verify the draft verb names. The user's state rules (earliest room state, user-controlled Game Status, Advanced-only technical views) are in [CURRENT_WORK.md](CURRENT_WORK.md). The route and audit items below are parked unless a milestone needs them.
+Done 3 October (later): readable scripts steps 1-3 (glossary, names in the views, Readable/Raw script view) and the draft verb check (Sleep and Invisibility were swapped). Next: steps 4-6 of [READABLE_SCRIPTS_PLAN.md](READABLE_SCRIPTS_PLAN.md) (a timeline for Last action, grouped assumptions, "Used by"). The user's state rules (earliest room state, user-controlled Game Status, Advanced-only technical views) are in [CURRENT_WORK.md](CURRENT_WORK.md). The route and audit items below are parked unless a milestone needs them.
 
 ## Current follow-up (2 October)
 

@@ -157,7 +157,7 @@ Last updated 2 October 2026 (Room41 certainty precision and source completion/do
 | 0x39 | 112 | `var[0x068]` = the close-up image object | Close-up. Script 008 shows it in the verb area (decoded). |
 | 0x37 | 12 | Cutscene, `bit[0xD64]`, `walkActorToObject` (Room 04 objects 169/170 pan) | On click, before the walk. Script 006 runs it first (decoded). |
 | 0x56 | 96 | `startScript 0x29 [actor, x, y, …]` then `print` "Ese hechizo no funcionará con …" | A draft that does nothing here. Script 041 (0x29) is started with a point; reading: the spell's visual at that point. |
-| 0x3A–0x4D | 3–26 each | `startScript` of a room local (0xCC–0xD4) or 0x29, `print` | Specific drafts. For example Room 02 object 156 verb 0x3B prints "Parece que se ha cerrado." or "Tendría que abrirlo primero." by `bit[0xDA5]`. Which verb is which draft is not decoded yet. |
+| 0x3A–0x4D | 3–26 each | `startScript` of a room local (0xCC–0xD4) or 0x29, `print` | Specific drafts. For example Room 02 object 156 verb 0x3B prints "Parece que se ha cerrado." or "Tendría que abrirlo primero." by `bit[0xDA5]`. Checked on 3 October against what each verb does to the objects that answer it (see [Draft verb names](#draft-verb-names)). |
 | Fallback | 21 | Room 69 difficulty and note objects | |
 
 97 object verbs are trivial (only `move`, `breakHere`, `stopObjectCode`). 156 print text and 394 start scripts. Only 68 load a room.
@@ -383,3 +383,28 @@ Decoded + ScummVM Player_AD: supplied DOS effects 1-12 use instrument commands, 
 5. **Assumptions that stay labelled:** the default Room69 difficulty/draft answer (the opt-in native intro can now execute actual source input, with estimated continuation retained), the boot's seeded draft table, `getRandomNr` picks (seed 0 in the app), a catalog visit's arrival, and the input state (pointer, click timing, keys). Rooms 19, 51 and 86 rest on seeded ties between priority-1 draw batches.
 
 Resolved on 28 September, kept here for reference: `startScript` with a dynamic target ([validation](../.verification/dynamic-scripts/validation.md)), script arguments that hold an estimate ([validation](../.verification/estimated-arguments/validation.md)), and room loads left "awaiting bounded session dispatch" ([validation](../.verification/room-owned-loads/validation.md)).
+
+## Draft verb names
+
+Evidence for the verb -> draft table (`LoomDraftNames`), from the object verbs 0x3A-0x55 of every room (the object's stored name, its text and the scripts it starts; dump made with `LoomScriptPresenter` over `LoomObjectVerbReader`). 3 October 2026. **reading** = the objects' own texts support the name; **manual order** = no object answers it, the name only follows the assumed order.
+
+| Verbs | Draft | Evidence |
+| --- | --- | --- |
+| 0x3A / 0x3B | Opening / Closing | reading: Room 02 "cielo" 0x3B "Parece que se ha cerrado."; "agujero", "puerta", "caldero", "libro", "jaula" open and close |
+| 0x3C / 0x3D | Straw into Gold / reverse | reading: Room 38 "paja" 0x3C "Ya se ha tejido toda la paja", 0x3D "Ya se ha tejido todo el oro"; Room 28 "oro" and "paja" swap their scripts |
+| 0x3E / 0x3F | Dyeing / Bleaching | reading: Room 24 "ovejas" 0x3F "No es posible que sean mas blancas" |
+| 0x40 | Night Vision | reading: Room 63 and 65 "oscuridad"; Room 02 "cielo" "Ya le he sacado suficiente luz" |
+| 0x41 / 0x42 | Twisting / Straightening | reading: Room 33 "escalones" 0x41 "Ya parecen suficientemente enredados", 0x42 "Dudo que pueda desenredarlos mas" |
+| 0x43 / 0x44 | **Sleep** / Awaken | reading: Room 34 "chico" 0x43 "Ya esta totalmente dormido"; Rusty 0x43 "Esta durmiendo. Para siempre.", 0x44 "No esta dormido. Esta muerto!"; Room 28 dragon 0x43 / 0x44, and Terror needs it awake ("tendre que despertarlo primero"). **Was Invisibility** in the earlier table. |
+| 0x45 / 0x46 | Emptying / Filling | reading: Room 22 "caliz" 0x45 "Ya esta vacio", 0x46 "Esta lleno hasta arriba" |
+| 0x47 / 0x48 | **Invisibility** / Visibility | reading: Room 16 and 20 "obreros" start one script with 1 / 0 (on / off); Room 24 "durmiente" "Si duerme, no serviria de nada"; sheep "no me querran ni mirar". **Was Sleep.** |
+| 0x49 | Terror | reading: Room 24 "ovejas" "Son demasiado listas para asustarse tan facilmente"; Room 23 "pastores", Room 28 dragons |
+| 0x4A / 0x4B | Sharpening / reverse | reading: only Room 41 "espada" answers them; the direction of each verb is not shown by any text |
+| 0x4C | Reflection | reading: Room 34 Rusty "Yech. Ahora no quiero parecerme a el."; "chico" 0x4C starts local 202, the only writer of the disguise costume 0x67. play: swapped with Healing after the shepherds were healed by 0x4D |
+| 0x4D | Healing | play and reading: Room 26 "pastores" 0x4D; Room 09 Hetchel "Eso no ayudo. Debe estar bajo la influencia de algun hechizo." |
+| 0x4E / 0x4F | Silence | manual order: no object answers 0x4E, Room 09 Hetchel answers 0x4F |
+| 0x50 / 0x51 | Shaping | manual order: no object answers 0x50, Room 09 Hetchel answers 0x51 |
+| 0x52 / 0x53 | Unmaking | reading: Room 09 "telar" (the loom) 0x52 starts script 104 |
+| 0x54 | Transcend | reading: Room 66 object 833 "Bobbin" 0x54 starts script 106 (the ending) |
+
+Still unverified: Silence, Shaping (and their reverses), and which of Sharpening's two verbs is which.
