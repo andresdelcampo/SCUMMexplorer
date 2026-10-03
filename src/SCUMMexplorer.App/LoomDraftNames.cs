@@ -31,6 +31,19 @@ internal static class LoomDraftNames
         Names[draft.Slot].Forward == draft.ForwardVerb && Names[draft.Slot].Reverse == draft.ReverseVerb
             ? Names[draft.Slot].Title : $"Draft {draft.Slot + 1}";
 
+    /// <summary>The draft a verb number casts and whether it is the reverse (0x3A "Opening", 0x3B "Closing"...), or null for a verb that is not a draft.</summary>
+    public static (string Name, bool Reverse)? ForVerb(int verb)
+    {
+        foreach (var name in Names)
+        {
+            if (verb != name.Forward && verb != name.Reverse) continue;
+            var reverse = verb == name.Reverse;
+            var parts = name.Title.Split(" / ", StringSplitOptions.None);
+            return (parts.Length == 2 ? parts[reverse ? 1 : 0] : name.Title + (reverse ? " (reversed)" : ""), reverse);
+        }
+        return null;
+    }
+
     public static string ReplayTitle(string title, int verb)
     {
         if (verb == 0) return title;

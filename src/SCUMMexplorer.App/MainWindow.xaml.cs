@@ -1201,12 +1201,12 @@ public partial class MainWindow : Window
             ? "No action is available here yet."
             : $"{objectName} is part of this scene. Choose an action to explore it.";
         var host = inPanel ? ObjectActionsList : ObjectVerbButtons;
-        foreach (var choice in choices)
+        foreach (var choice in choices.OrderBy(item => LoomVerbNames.Order(item.Verb.VerbId)))
         {
             var button = new Button
             {
-                Content = choice.Verb.Label,
-                ToolTip = $"Object {choice.Object.Id} · {choice.Verb.Label} · code 0x{choice.Verb.ScriptOffset:X4}. " +
+                Content = LoomVerbNames.Label(choice.Verb.VerbId),
+                ToolTip = $"Object {choice.Object.Id} · verb 0x{choice.Verb.VerbId:X2} · code 0x{choice.Verb.ScriptOffset:X4}. " +
                           "This directly runs the object verb; input dispatch and walking are not simulated.",
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Left,

@@ -162,6 +162,8 @@
                     <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
                         <Button x:Name="BackToSceneButton" Visibility="Collapsed" Click="BackToScene_Click" Margin="0,0,8,0"
                                 Padding="10,4" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" AutomationProperties.Name="Back to the room"/>
+                        <Button x:Name="RestartButton" Visibility="Collapsed" Content="↺ Restart game state" Click="ResetSession_Click" Padding="10,4" Margin="0,0,8,0"
+                                ToolTip="Throw away the explored state (story, objects, inventory) and start again from the boot state." Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                         <Button x:Name="ConnectionsButton" Content="Connections" Visibility="Collapsed"
                                 Click="ConnectionsButton_Click"
                                 Padding="10,4" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
@@ -262,8 +264,6 @@
                                         </StackPanel>
                                     </DockPanel>
                                     <WrapPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
-                                        <Button x:Name="RestartButton" Visibility="Collapsed" Content="↺ Restart" ToolTip="Restart exploration from the boot state." Click="ResetSession_Click" Padding="8,4" Margin="0,0,5,0"
-                                                    Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         <Button x:Name="PlaybackPauseButton" Content="⏸ Pause" Click="PlaybackPause_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Pause or play the scene (space). In Advanced mode, Step ▸ then plays one frame while paused."/>
