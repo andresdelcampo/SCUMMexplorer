@@ -282,13 +282,6 @@
                                     <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,3,0,0">
                                         <TextBlock x:Name="ObjectActionNote" Foreground="#D2C7B5" TextWrapping="Wrap" TextAlignment="Center"/>
                                         <StackPanel x:Name="ObjectVerbButtons" Margin="0,5,0,0" HorizontalAlignment="Center"/>
-                                        <Expander x:Name="ObjectActionTraceExpander" Header="Advanced action details" Visibility="Collapsed"
-                                                  Foreground="#E7E0D2" Background="#0B1117" Margin="0,3,0,0">
-                                            <TextBox x:Name="ObjectActionTraceOutput" IsReadOnly="True" AcceptsReturn="True"
-                                                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                                                     Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
-                                                     FontFamily="Consolas" FontSize="11" Height="140"/>
-                                        </Expander>
                                     </StackPanel>
                                 </StackPanel>
                                 <StackPanel x:Name="RoomMusicPanel" Visibility="Collapsed" HorizontalAlignment="Center" MaxWidth="720">
@@ -423,17 +416,36 @@
                                 <Image x:Name="ObjectAssetPreview" Height="72" Stretch="Uniform" Visibility="Collapsed" Margin="0,8,0,0" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                                 <TextBlock x:Name="ObjectAssetDescription" Foreground="#B8AA8C" TextWrapping="Wrap" Margin="0,5,0,0"/>
                             </StackPanel>
-                            <Expander x:Name="RoomEntryTraceExpander" Header="Advanced room details"
-                                      Visibility="Collapsed" IsExpanded="False" Margin="0,10,0,0"
-                                      Foreground="#E7E0D2" Background="#0B1117">
-                                <StackPanel>
-                                    <TextBox x:Name="RoomEntryTraceOutput" IsReadOnly="True" AcceptsReturn="True"
-                                             IsReadOnlyCaretVisible="True" TextWrapping="Wrap"
-                                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                                             Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
-                                             FontFamily="Consolas" FontSize="11" Padding="4" Height="150"/>
-                                    <StackPanel x:Name="RoomEntryEventButtons" Margin="0,6,0,0"/>
+                            <Expander x:Name="RoomEntryTraceExpander" Header="Room entry" Visibility="Collapsed" IsExpanded="False"
+                                      Margin="0,10,0,0" Foreground="#E7E0D2" Background="#0B1117">
+                                <StackPanel Margin="4,4,4,6">
+                                    <TextBlock x:Name="RoomEntrySummary" Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                    <StackPanel x:Name="RoomEntryEventButtons"/>
+                                    <Expander Header="Raw disassembly" IsExpanded="False" Margin="0,6,0,0" Foreground="#9FABAE">
+                                        <TextBox x:Name="RoomEntryTraceOutput" IsReadOnly="True" AcceptsReturn="True"
+                                                 IsReadOnlyCaretVisible="True" TextWrapping="Wrap"
+                                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                                 Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
+                                                 FontFamily="Consolas" FontSize="11" Padding="4" Height="240"/>
+                                    </Expander>
                                 </StackPanel>
+                            </Expander>
+                            <Expander x:Name="ObjectActionTraceExpander" Header="Last action" Visibility="Collapsed" IsExpanded="False"
+                                      Margin="0,6,0,0" Foreground="#E7E0D2" Background="#0B1117">
+                                <StackPanel Margin="4,4,4,6">
+                                    <TextBlock x:Name="LastActionSummary" Foreground="#D2C7B5" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                    <StackPanel x:Name="LastActionIssues"/>
+                                    <Expander Header="Raw trace" IsExpanded="False" Margin="0,6,0,0" Foreground="#9FABAE">
+                                        <TextBox x:Name="ObjectActionTraceOutput" IsReadOnly="True" AcceptsReturn="True"
+                                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                                 Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
+                                                 FontFamily="Consolas" FontSize="11" Height="240"/>
+                                    </Expander>
+                                </StackPanel>
+                            </Expander>
+                            <Expander x:Name="StateIssuesSection" Header="Unresolved state" Visibility="Collapsed" IsExpanded="False"
+                                      Margin="0,6,0,0" Foreground="#E7E0D2" Background="#0B1117">
+                                <StackPanel x:Name="StateIssueList" Margin="4,4,4,6"/>
                             </Expander>
                         </StackPanel>
                     </ScrollViewer>

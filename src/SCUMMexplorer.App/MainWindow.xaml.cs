@@ -539,7 +539,7 @@ public partial class MainWindow : Window
     {
         var advanced = IsAdvancedMode;
         // The hint line under the scene is for Advanced mode and the inspection view; the game's own screen needs none.
-        ObjectsNote.Visibility = advanced || SessionModeToggle.IsChecked != true ? Visibility.Visible : Visibility.Collapsed;
+        ObjectsNote.Visibility = SessionModeToggle.IsChecked != true ? Visibility.Visible : Visibility.Collapsed;
         VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
         CutsceneMenuButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GameTextsButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
@@ -554,7 +554,7 @@ public partial class MainWindow : Window
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
             ? Visibility.Visible : Visibility.Collapsed;
-        SessionStatusText.Visibility = advanced && _session is not null
+        SessionStatusText.Visibility = advanced && _session is not null && SessionModeToggle.IsChecked != true
             ? Visibility.Visible : Visibility.Collapsed;
         SessionActions.Visibility = advanced && _session is not null
             ? Visibility.Visible : Visibility.Collapsed;
@@ -859,9 +859,12 @@ public partial class MainWindow : Window
                                         (_session.CameraEstimated ? " (estimate)" : "");
             // A room entered in the session opens where its camera is, not at the left edge.
             if (visit) _pendingCameraX = _session.CameraX;
-            RoomEntryTraceExpander.Header = "Advanced room details";
+            RoomEntryTraceExpander.Header = "Room entry";
             RoomEntryTraceExpander.Visibility = Visibility.Visible;
+            RoomEntrySummary.Text = $"{script?.Instructions.Count ?? 0} instructions · camera x {(_session.CameraX?.ToString() ?? "unknown")}{(_session.CameraEstimated ? " (estimate)" : "")} · " +
+                                    (snapshot.ActiveSounds.Count == 0 ? "no script-started sounds" : "sounds " + string.Join(", ", snapshot.ActiveSounds));
             ShowScriptEvents(RoomEntryEventButtons, _session.LastVisitEvents);
+            RefreshStateIssues();
             UpdateRoomMusicActions();
             SessionStatusText.Text = snapshot.IsFaithful
                 ? "Exploration state ready."
@@ -882,7 +885,8 @@ public partial class MainWindow : Window
         ObjectActionPanel.Visibility = Visibility.Collapsed;
         SessionStatusText.Text = "Inspection mode: a click cycles an object's stored images; it is not the game's click and runs no script. Each room starts from the index; changes are local to this view.";
         SessionStatusText.ToolTip = null;
-        RoomEntryTraceExpander.Header = "Advanced room details";
+        RoomEntryTraceExpander.Header = "Room entry";
+        RefreshStateIssues();
         AdvanceFrameButton.IsEnabled = false;
         UpdatePlaybackControls();
         _objectSelection = new RoomObjectSelection(images, _indexedStates, background: _currentRoom);
@@ -899,6 +903,7 @@ public partial class MainWindow : Window
             {
                 var run = _scriptExecutor.Execute(entryScript, _indexedStates, records);
                 ShowScriptEvents(RoomEntryEventButtons, run.Events);
+                RoomEntrySummary.Text = $"{entryScript.Instructions.Count} instructions" + (run.UnresolvedReason is null && !run.ResumeOffset.HasValue ? " · reached the end" : " · stopped early (see the raw disassembly)");
                 _objectSelection = new RoomObjectSelection(images, run.ObjectStates,
                     run.ObjectPositions, background: _currentRoom, drawQueue: run.DrawOrder);
                 if (run.UnresolvedReason is not null || run.ResumeOffset.HasValue)
@@ -1131,6 +1136,15 @@ public partial class MainWindow : Window
                 ? $"{actionName}: action tried; the result is still unresolved."
             : $"{actionName}: action tried; no scene change was reached.";
         ObjectActionNote.ToolTip = (action.DestinationRoomId is int destination ? $"Room {destination:00} · " : "") + action.Evidence;
+        LastActionSummary.Text = ObjectActionNote.Text;
+        LastActionIssues.Children.Clear();
+        foreach (var issue in action.Uncertainties.Distinct().Take(20))
+            LastActionIssues.Children.Add(new TextBlock
+            {
+                Text = issue.Length > 150 ? issue[..147] + "…" : issue, ToolTip = issue, FontSize = 11, TextWrapping = TextWrapping.Wrap,
+                Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), Margin = new Thickness(0, 0, 0, 4)
+            });
+        RefreshStateIssues();
         ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
             string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
             Environment.NewLine + (action.Script?.Format() ?? "Object bytecode unavailable.") +
@@ -1195,52 +1209,98 @@ public partial class MainWindow : Window
         return false;
     }
 
+    /// <summary>
+    /// The events a script or room entry causes, digestibly: one flat row per thing it starts or opens (grouped, with a count,
+    /// and a click opens it), then one line that counts the rest (character actions, dialogue...) with the full list in its tooltip.
+    /// </summary>
     private void ShowScriptEvents(StackPanel container, IReadOnlyList<LoomScriptEvent> events)
     {
         container.Children.Clear();
+        var rows = new List<(GameResource Target, string Verb, string Certainty, int Count)>();
+        var others = new List<LoomScriptEvent>();
         foreach (var scriptEvent in events)
         {
             var target = FindEventTarget(scriptEvent);
-            if (target is null)
+            if (target is null) { others.Add(scriptEvent); continue; }
+            var verb = scriptEvent.Kind switch
             {
-                container.Children.Add(new TextBlock
-                {
-                    Text = scriptEvent.Format(),
-                    Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
-                    TextWrapping = TextWrapping.Wrap,
-                    Margin = new Thickness(2, 2, 2, 2),
-                    FontSize = 11
-                });
-                continue;
-            }
-
-            var action = target.Kind switch
-            {
-                ResourceKind.Sound => "Open ",
-                ResourceKind.Script => "Inspect ",
-                ResourceKind.Room => "Open ",
-                _ => "Open "
+                LoomScriptEventKind.ScriptStarted or LoomScriptEventKind.ObjectScriptStarted => "starts",
+                LoomScriptEventKind.ScriptChained => "continues in",
+                LoomScriptEventKind.MusicStarted or LoomScriptEventKind.SoundStarted => "plays",
+                LoomScriptEventKind.RoomLoaded => "goes to",
+                _ => "uses"
             };
             var certainty = scriptEvent.Certainty switch
             {
                 LoomScriptEventCertainty.Reached => "",
-                LoomScriptEventCertainty.Conditional => "Possible · ",
-                _ => "Potential · "
+                LoomScriptEventCertainty.Conditional => "maybe",
+                _ => "possibly"
             };
+            var index = rows.FindIndex(row => row.Target == target && row.Verb == verb && row.Certainty == certainty);
+            if (index >= 0) rows[index] = rows[index] with { Count = rows[index].Count + 1 };
+            else rows.Add((target, verb, certainty, 1));
+        }
+        foreach (var (target, verb, certainty, count) in rows)
+        {
+            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {target.Name}{(count > 1 ? $" ×{count}" : "")}";
             var button = new Button
             {
-                Content = $"{certainty}{action}{target.Name}",
-                ToolTip = scriptEvent.Format(),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(7, 3, 7, 3),
-                Margin = new Thickness(0, 2, 0, 2),
-                Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
+                Content = label,
+                ToolTip = $"Open {target.Name}",
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Left,
+                Padding = new Thickness(7, 2, 7, 2),
+                Margin = new Thickness(0, 1, 0, 1),
+                Background = new SolidColorBrush(Color.FromRgb(31, 44, 56)),
                 Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
+                BorderThickness = new Thickness(0)
             };
             button.Click += (_, _) => SelectResourceInTree(target);
             container.Children.Add(button);
         }
+        if (others.Count > 0)
+        {
+            var counts = others.GroupBy(item => item.Kind switch
+            {
+                LoomScriptEventKind.CharacterAction => "character action",
+                LoomScriptEventKind.Dialogue => "line of dialogue",
+                LoomScriptEventKind.ObjectStateChanged => "object change",
+                LoomScriptEventKind.CutsceneStarted or LoomScriptEventKind.CutsceneEnded => "cutscene mark",
+                LoomScriptEventKind.ScriptsFrozen => "freeze",
+                _ => "other event"
+            }).Select(group => $"{group.Count()} {group.Key}{(group.Count() > 1 ? "s" : "")}");
+            container.Children.Add(new TextBlock
+            {
+                Text = "Also: " + string.Join(", ", counts),
+                ToolTip = string.Join(Environment.NewLine, others.Take(40).Select(item => item.Format())),
+                Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)),
+                FontSize = 11,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(2, 4, 2, 2)
+            });
+        }
+    }
+
+    /// <summary>The state the session could not settle, one short line each (the full text in the tooltip), in the inspector's own section.</summary>
+    private void RefreshStateIssues()
+    {
+        StateIssueList.Children.Clear();
+        if (_session is null || SessionModeToggle.IsChecked != true) { StateIssuesSection.Visibility = Visibility.Collapsed; return; }
+        var issues = new List<string>();
+        if (_estimatedObjectIds.Count > 0) issues.Add($"{_estimatedObjectIds.Count} scene detail(s) are previews drawn from an estimate.");
+        issues.AddRange(_session.Snapshot.Uncertainties.TakeLast(30).Distinct());
+        StateIssuesSection.Header = issues.Count == 0 ? "State complete" : $"Unresolved state · {issues.Count}";
+        foreach (var issue in issues)
+            StateIssueList.Children.Add(new TextBlock
+            {
+                Text = issue.Length > 150 ? issue[..147] + "…" : issue,
+                ToolTip = issue,
+                Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
+                FontSize = 11,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 4)
+            });
+        StateIssuesSection.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private GameResource? FindEventTarget(LoomScriptEvent scriptEvent)

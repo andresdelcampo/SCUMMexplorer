@@ -77,6 +77,24 @@ internal static class Program
                 Call("SetFullscreen", false);
                 await Task.Delay(800);
                 report.Add($"left full screen: state {window.WindowState}, style {window.WindowStyle}, header {Find<FrameworkElement>("AppHeader").Visibility}, side {Find<FrameworkElement>("SidePanel").Visibility}, room view {group.ActualWidth:0}x{group.ActualHeight:0}");
+                // Advanced: the inspector on Room 02 after one object action
+                var adv0 = Find<CheckBox>("AdvancedModeToggle");
+                adv0.IsChecked = true; Call("AdvancedModeToggle_Click", adv0, new RoutedEventArgs());
+                Call("SelectResourceInTree", items.First(i => KindOf(i) == "Room" && IdOf(i) == 2).Tag);
+                await Task.Delay(2500);
+                var sess = (LoomExplorationSession)Field("_session")!;
+                sess.ActivateObjectVerb(154, 0x36);
+                for (var i = 0; i < 90; i++) sess.AdvanceFrame();
+                Call("ShowLastObjectAction", 2);
+                await Task.Delay(500);
+                foreach (var n in new[] { "RoomEntryTraceExpander", "ObjectActionTraceExpander", "StateIssuesSection" })
+                {
+                    var ex = Find<Expander>(n); report.Add($"{n}: visible {ex.Visibility}, header '{ex.Header}'"); ex.IsExpanded = true;
+                }
+                await Task.Delay(500);
+                report.Add($"entry summary: {Find<TextBlock>("RoomEntrySummary").Text}; event rows {Find<StackPanel>("RoomEntryEventButtons").Children.Count}");
+                report.Add($"status text {Find<TextBlock>("SessionStatusText").Visibility}, objects note {Find<TextBlock>("ObjectsNote").Visibility}, last action: {Find<TextBlock>("LastActionSummary").Text}");
+                SaveWindow("inspector.png");
                 // Advanced: scripts
                 var adv = Find<CheckBox>("AdvancedModeToggle");
                 adv.IsChecked = true; Call("AdvancedModeToggle_Click", adv, new RoutedEventArgs());
