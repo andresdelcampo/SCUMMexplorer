@@ -173,7 +173,7 @@ public partial class MainWindow : Window
             {
                 if (_game?.Rooms.FirstOrDefault(room => room.ResourceId == roomId) is { } room)
                     SelectResourceInTree(room);
-            }, GalleryCutscenes()) { Owner = this };
+            }, GalleryCutscenes(), RenderFirstVisitRoomAsync) { Owner = this };
             gallery.ShowDialog();
         }
         catch (Exception ex)
@@ -464,6 +464,39 @@ public partial class MainWindow : Window
             catch (Exception) when (cancellationToken.IsCancellationRequested || Dispatcher.HasShutdownStarted) { return; }
             catch (Exception) { return; }
         }
+    }
+
+    private LoomSceneDrawBatches? _galleryBatches;
+
+    /// <summary>A room as the explorer first shows it (objects in their first-visit state, as on the room cards), at full size; null outside LOOM.</summary>
+    private async Task<BitmapSource?> RenderFirstVisitRoomAsync(int roomId)
+    {
+        if (_game is not { Id: GameId.Loom, Version: ScummVersion.V3 } game || _indexedObjectSnapshot is null ||
+            game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } resource) return null;
+        var snapshot = new LoomIndexedObjectSnapshot(
+            _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _indexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
+            _indexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
+        var states = new Dictionary<int, byte>(_indexedStates);
+        var batches = _galleryBatches;
+        try
+        {
+            return await Task.Run(() =>
+            {
+                batches ??= LoomSceneDrawBatches.Build(game);
+                var bytes = File.ReadAllBytes(resource.FilePath);
+                var room = new OldV3EgaRoomDecoder().Decode(bytes);
+                var records = new LoomRoomObjectDirectory().Decode(bytes);
+                var objects = new LoomRoomObjects().Decode(bytes);
+                var session = new LoomExplorationSession(game, snapshot);
+                var visited = session.VisitRoom(resource);
+                var initialized = CreateSessionRoomSelection(resource, room, records, objects, visited, states, batches);
+                var picture = CreateBitmap(room.Width, room.Height, initialized.Selection.Compose(room), room.Palette);
+                _galleryBatches = batches;
+                return (BitmapSource?)picture;
+            });
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or InvalidOperationException) { return null; }
     }
 
     private static BitmapSource RenderRoomCardThumbnail(GameLibrary game, GameResource roomResource,

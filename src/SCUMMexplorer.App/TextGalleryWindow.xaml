@@ -18,8 +18,8 @@
                         <TextBox x:Name="SearchBox" Height="34" Padding="8,5" FontSize="14"
                                  Background="#0B1117" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                  ToolTip="Search the extracted game text" TextChanged="Filters_Changed"/>
-                        <ComboBox x:Name="RoomFilter" Margin="0,8,0,0" Height="32" SelectionChanged="Filters_Changed"/>
-                        <ComboBox x:Name="KindFilter" Margin="0,7,0,0" Height="32" SelectionChanged="Filters_Changed">
+                        <ComboBox x:Name="RoomFilter" Margin="0,8,0,0" SelectionChanged="Filters_Changed"/>
+                        <ComboBox x:Name="KindFilter" Margin="0,6,0,0" SelectionChanged="Filters_Changed">
                             <ComboBoxItem Content="Every kind" Tag=""/>
                             <ComboBoxItem Content="Spoken lines" Tag="Spoken line"/>
                             <ComboBoxItem Content="Conversations and cutscenes" Tag="Conversation"/>
@@ -34,14 +34,14 @@
                     </StackPanel>
                     <ListBox x:Name="TextList" SelectionChanged="TextList_SelectionChanged"
                              Background="Transparent" BorderThickness="0" Foreground="#E7E0D2"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                             ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="#334452" BorderThickness="0,0,0,1" Padding="5,9">
+                                <Border BorderBrush="#334452" BorderThickness="0,0,0,1" Padding="5,6">
                                     <StackPanel>
                                         <TextBlock Text="{Binding ListHeading}" Foreground="#B8AA8C" FontSize="11"/>
-                                        <TextBlock Text="{Binding Text}" TextTrimming="CharacterEllipsis" MaxHeight="42"
-                                                   TextWrapping="Wrap" FontSize="14" Margin="0,3,0,0"/>
+                                        <TextBlock Text="{Binding Text}" TextTrimming="CharacterEllipsis" MaxHeight="38"
+                                                   TextWrapping="Wrap" FontSize="13.5" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -49,19 +49,19 @@
                     </ListBox>
                 </DockPanel>
             </Border>
-            <Border Grid.Column="1" Background="#151F29" BorderBrush="#334452" BorderThickness="1" CornerRadius="3" Padding="28">
+            <Border Grid.Column="1" Background="#151F29" BorderBrush="#334452" BorderThickness="1" CornerRadius="3" Padding="22,18">
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <StackPanel>
                         <TextBlock x:Name="SelectedKind" Text="SELECT A TEXT" Foreground="#B78442" FontSize="11" FontWeight="Bold"/>
                         <TextBlock x:Name="SelectedHeading" FontSize="14" Foreground="#B8AA8C" Margin="0,8,0,0" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <Image x:Name="RoomArtworkPreview" Grid.Row="1" Visibility="Collapsed" Height="150"
+                    <Image x:Name="RoomArtworkPreview" Grid.Row="1" Visibility="Collapsed" Height="170"
                            Stretch="Uniform" HorizontalAlignment="Left" Margin="0,16,0,0"
                            SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,20,0,18">
-                        <TextBlock x:Name="SelectedText" FontSize="24" LineHeight="36" TextWrapping="Wrap"
-                                   Foreground="#F3EBDD" VerticalAlignment="Center"/>
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,14,0,12">
+                        <TextBlock x:Name="SelectedText" FontSize="19" LineHeight="27" TextWrapping="Wrap"
+                                   Foreground="#F3EBDD" VerticalAlignment="Top"/>
                     </ScrollViewer>
                     <StackPanel Grid.Row="3">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

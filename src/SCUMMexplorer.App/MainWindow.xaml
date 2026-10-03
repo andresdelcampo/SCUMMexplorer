@@ -261,7 +261,7 @@
                                         <StackPanel x:Name="SessionActions" Visibility="Collapsed" Orientation="Horizontal">
                                             <Button Content="↺ Restart" ToolTip="Restart exploration from the boot state." Click="ResetSession_Click" Padding="8,4" Margin="0,0,5,0"
                                                     Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                            <Button x:Name="AdvanceFrameButton" Content="Continue ▸" ToolTip="Continue the scene: advance scripts paused at a frame boundary." Click="AdvanceFrame_Click" Padding="8,4"
+                                            <Button x:Name="AdvanceFrameButton" Content="Step ▸" ToolTip="Advance the scene by one frame (for stepping while paused)." Click="AdvanceFrame_Click" Padding="8,4"
                                                     Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                                         </StackPanel>
                                     </DockPanel>

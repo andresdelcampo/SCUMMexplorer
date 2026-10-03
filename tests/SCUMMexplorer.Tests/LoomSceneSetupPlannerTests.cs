@@ -47,6 +47,16 @@ public sealed class LoomSceneSetupPlannerTests
     }
 
     [Fact]
+    public void SpeakersGetTheirNamesFromTheLinesAndUnknownOnesKeepTheirNumber()
+    {
+        Assert.Equal("Bobbin", LoomSpeakerNames.Display("Actor 1"));
+        Assert.Equal("Bobbin", LoomSpeakerNames.Display("Ego"));
+        Assert.Equal("Hetchel", LoomSpeakerNames.Display("Actor 5"));
+        Assert.Equal("Actor 7", LoomSpeakerNames.Display("Actor 7"));
+        Assert.Equal("Unknown speaker", LoomSpeakerNames.Display(null));
+    }
+
+    [Fact]
     public void ARunningSessionThatAlreadyHoldsTheStaffIsNotGrantedItAgain()
     {
         var game = Game();
@@ -133,6 +143,17 @@ public sealed class LoomSceneSetupPlannerTests
         Assert.Throws<ArgumentOutOfRangeException>(() => session.UpdateStoryBit("bit[0xD61]", true));
         System.IO.File.WriteAllLines(Environment.GetEnvironmentVariable("SCUMM_EVENTS_DUMP") ?? System.IO.Path.GetTempPath() + "events.txt",
             events.Select(e => $"{e.Key} scenes=[{string.Join("; ", e.Scenes.Select(s => s.Where.Split(" +")[0]).Distinct().Take(4))}] all={e.Setters.Count}"));
+    }
+
+    [Fact(Skip = "Diagnostic: speakers with rooms and sample lines (SCUMM_SPEAKER_DUMP=path).")]
+    public void DumpSpeakers()
+    {
+        var game = Game();
+        var extraction = new LoomTextExtractor().Extract(game);
+        var lines = extraction.Entries.Where(e => e.Speaker is not null).GroupBy(e => e.Speaker!).OrderBy(g => g.Key, StringComparer.Ordinal)
+            .Select(g => $"{g.Key}: rooms [{string.Join(",", g.Select(e => e.RoomId).Distinct().OrderBy(r => r).Take(12))}] n={g.Count()}  e.g. " +
+                string.Join(" | ", g.Select(e => e.Text).Distinct().Take(4)));
+        System.IO.File.WriteAllLines(Environment.GetEnvironmentVariable("SCUMM_SPEAKER_DUMP") ?? System.IO.Path.GetTempPath() + "speakers.txt", lines);
     }
 
     [Fact(Skip = "Diagnostic dump of every catalog scene's derived setup; run by hand (SCUMM_SETUP_DUMP=path).")]

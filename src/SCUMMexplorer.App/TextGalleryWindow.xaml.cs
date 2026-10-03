@@ -40,9 +40,13 @@ public partial class TextGalleryWindow : Window
     private LoomTextEntry? _selectedEntry;
 
     /// <param name="cutscenes">Known cutscenes by the indexed script that prints their texts (044, 046…).</param>
+    private readonly Func<int, Task<BitmapSource?>>? _roomImage;
+
+    /// <param name="roomImage">The room as it first looks in the game (the explorer's initial state), or null to show the stored background.</param>
     public TextGalleryWindow(GameLibrary game, LoomTextExtraction extraction, Action<int> visitRoom,
-        IReadOnlyDictionary<int, GalleryCutscene>? cutscenes = null)
+        IReadOnlyDictionary<int, GalleryCutscene>? cutscenes = null, Func<int, Task<BitmapSource?>>? roomImage = null)
     {
+        _roomImage = roomImage;
         InitializeComponent();
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _extraction = extraction ?? throw new ArgumentNullException(nameof(extraction));
@@ -139,7 +143,7 @@ public partial class TextGalleryWindow : Window
             : (item.Entry.RoomId is int selectedRoom ? $"Room {selectedRoom:00}" : "Elsewhere in game") + objectContext;
         if (item.Entry.ConversationId is string conversationId)
         {
-            SelectedText.Text = string.Join(Environment.NewLine + Environment.NewLine,
+            SelectedText.Text = string.Join(Environment.NewLine,
                 _extraction.Entries.Where(entry => entry.ConversationId == conversationId)
                     .OrderBy(entry => entry.ConversationLine)
                     .GroupBy(entry => (entry.CodeOffset, entry.Text, entry.Speaker))
@@ -171,10 +175,15 @@ public partial class TextGalleryWindow : Window
         if (room is null) return;
         try
         {
-            var decoded = await _roomDecoder.DecodeAsync(room.FilePath);
+            BitmapSource? picture = null;
+            if (_roomImage is not null) picture = await _roomImage(roomId);
+            if (picture is null)
+            {
+                var decoded = await _roomDecoder.DecodeAsync(room.FilePath);
+                picture = CreateBitmap(decoded.Width, decoded.Height, decoded.Pixels.ToArray(), decoded.Palette);
+            }
             if (!ReferenceEquals(_selectedEntry, item.Entry)) return;
-            RoomArtworkPreview.Source = CreateBitmap(decoded.Width, decoded.Height,
-                decoded.Pixels.ToArray(), decoded.Palette);
+            RoomArtworkPreview.Source = picture;
             RoomArtworkPreview.Visibility = Visibility.Visible;
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException)
@@ -267,8 +276,8 @@ public partial class TextGalleryWindow : Window
 
     private static string FormatConversationLine(LoomTextEntry entry) =>
         entry.IsPlayerChoice ? $"▸ {entry.Text}"
-        : entry.ChoiceVerbId.HasValue ? $"      {entry.Speaker ?? "Unknown speaker"}: {entry.Text}"
-        : $"{entry.Speaker ?? "Unknown speaker"}: {entry.Text}";
+        : entry.ChoiceVerbId.HasValue ? $"      {LoomSpeakerNames.Display(entry.Speaker)}: {entry.Text}"
+        : $"{LoomSpeakerNames.Display(entry.Speaker)}: {entry.Text}";
 
     private static BitmapSource CreateBitmap(int width, int height, byte[] pixels, IReadOnlyList<uint> palette)
     {

@@ -17,7 +17,8 @@ internal static class Program
     {
         var output = args[1];
         Directory.CreateDirectory(output);
-        var app = new Application();
+        var app = new App();
+        app.InitializeComponent();
         var window = new MainWindow { Width = 1400, Height = 900 };
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
@@ -37,6 +38,29 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 await Task.Delay(1500);
+                // Game Texts: room 06 conversations, first-visit picture, speaker names, compact dropdowns
+                {
+                    var game = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                    var extraction = new LoomTextExtractor().Extract(game);
+                    Func<int, Task<System.Windows.Media.Imaging.BitmapSource?>> roomImage = id => (Task<System.Windows.Media.Imaging.BitmapSource?>)typeof(MainWindow).GetMethod("RenderFirstVisitRoomAsync", Private)!.Invoke(window, [id])!;
+                    var gallery = new TextGalleryWindow(game, extraction, _ => { }, null, roomImage) { Owner = window };
+                    gallery.Show();
+                    await Task.Delay(1500);
+                    var roomFilter = (ComboBox)gallery.FindName("RoomFilter");
+                    var pick = roomFilter.Items.Cast<object>().First(i => i.ToString()!.Contains("Room 06"));
+                    roomFilter.SelectedItem = pick;
+                    await Task.Delay(800);
+                    var list = (ListBox)gallery.FindName("TextList");
+                    report.Add($"gallery: room 06 rows {list.Items.Count}");
+                    list.SelectedIndex = Enumerable.Range(0, list.Items.Count).First(i => (list.Items[i].GetType().GetProperty("ListHeading")!.GetValue(list.Items[i]) as string ?? "").Contains("CUTSCENE"));
+                    await Task.Delay(2500);
+                    report.Add("gallery text: " + ((TextBlock)gallery.FindName("SelectedText")).Text.Replace(Environment.NewLine, " / "));
+                    var gb = new RenderTargetBitmap((int)gallery.ActualWidth, (int)gallery.ActualHeight, 96, 96, PixelFormats.Pbgra32); gb.Render((Visual)gallery.Content);
+                    var ge = new PngBitmapEncoder(); ge.Frames.Add(BitmapFrame.Create(gb)); using (var gs = File.Create(Path.Combine(output, "gallery.png"))) ge.Save(gs);
+                    roomFilter.IsDropDownOpen = true; await Task.Delay(500);
+                    report.Add($"combo height {roomFilter.ActualHeight:0}");
+                    gallery.Close();
+                }
                 var tree = Find<TreeView>("ResourceTree");
                 var items = tree.Items.OfType<TreeViewItem>().SelectMany(g => g.Items.OfType<TreeViewItem>()).ToList();
                 string KindOf(TreeViewItem i) => i.Tag?.GetType().GetProperty("Kind")?.GetValue(i.Tag)?.ToString() ?? "";
