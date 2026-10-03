@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:SCUMMexplorer.App"
         mc:Ignorable="d"
         Title="SCUMMexplorer" Height="760" Width="1180" MinHeight="600" MinWidth="900"
+        Icon="Assets/costume-133-pose-04.ico"
         Background="#101821" Foreground="#E7E0D2">
     <Window.Resources>
         <Style TargetType="TreeViewItem">
