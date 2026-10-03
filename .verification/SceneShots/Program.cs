@@ -80,9 +80,12 @@ internal static class Program
                         if (Field("_playback") is null && clock.ElapsedMilliseconds > 800) break;
                     }
                     Save($"{tag}-end.png");
+                    { window.UpdateLayout(); var bmp = new RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32); bmp.Render((Visual)window.Content);
+                      var enc = new PngBitmapEncoder(); enc.Frames.Add(BitmapFrame.Create(bmp)); using var st = File.Create(Path.Combine(output, $"{tag}-window.png")); enc.Save(st); }
                     report.Add($"   ended after {clock.ElapsedMilliseconds} ms, {n} shots; status: {Find<TextBlock>("StatusText").Text}");
                     var sess = (LoomExplorationSession)Field("_session")!;
                     var ego = sess.Actors.FirstOrDefault(a => a.Number == 1);
+                    report.Add($"   room view size: {Find<FrameworkElement>("RoomDisplayGroup").ActualWidth:0}x{Find<FrameworkElement>("RoomDisplayGroup").ActualHeight:0}; controls {Find<FrameworkElement>("RoomControlsPanel").ActualHeight:0}; window {window.ActualWidth:0}x{window.ActualHeight:0}");
                     report.Add($"   story bits set: {string.Join(" ", sess.StoryEvents.Where(e => sess.StoryBit(e.Key) == true).Select(e => e.Key))}");
                     report.Add($"   ego: room {ego?.Room} at ({ego?.X},{ego?.Y}) costume {ego?.Look.Costume:X2} staff {sess.GameStatus.StaffHeld}");
                 }

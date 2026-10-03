@@ -156,9 +156,11 @@
             </Border>
             <Grid x:Name="ContentPanel" Grid.Column="1" Margin="26">
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                <StackPanel Margin="0,0,0,16">
+                <StackPanel x:Name="PageHeader" Margin="0,0,0,16">
                     <TextBlock x:Name="PageTitle" Text="Welcome to SCUMMexplorer" FontSize="22" FontWeight="SemiBold"/>
                     <TextBlock x:Name="PageSubtitle" Text="Open a game folder to step inside." Foreground="#AAB4BA" Margin="0,3,0,0"/>
+                    <Button x:Name="BackToSceneButton" Visibility="Collapsed" Click="BackToScene_Click" HorizontalAlignment="Left" Margin="0,9,0,0"
+                            Padding="10,5" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" AutomationProperties.Name="Back to the room"/>
                     <Button x:Name="ConnectionsButton" Content="Connections" Visibility="Collapsed"
                             Click="ConnectionsButton_Click" HorizontalAlignment="Left" Margin="0,9,0,0"
                             Padding="10,5" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
@@ -226,10 +228,13 @@
                                     </Grid>
                                 </StackPanel>
                             </Grid>
-                            <!-- MinHeight: the controls' usual height with the music row and a two-line note, so the
-                                 room above keeps its size while they change (a cutscene's rooms, its notes). -->
-                            <StackPanel x:Name="RoomControlsPanel" Grid.Row="2" Margin="0,4,0,8" MinHeight="108"
+                            <!-- MinHeight: the controls' usual height with a two-line note (108 with the music row, shown only in the
+                                 inspection mode), so the room above keeps its size while they change (a cutscene's rooms, its notes). -->
+                            <StackPanel x:Name="RoomControlsPanel" Grid.Row="2" Margin="0,4,0,8" MinHeight="72"
                                         HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                <StackPanel.Style><Style TargetType="StackPanel"><Style.Triggers>
+                                    <DataTrigger Binding="{Binding Visibility, ElementName=RoomMusicPanel}" Value="Visible"><Setter Property="MinHeight" Value="108"/></DataTrigger>
+                                </Style.Triggers></Style></StackPanel.Style>
                                 <StackPanel x:Name="SceneInteractionCard" MaxWidth="520" HorizontalAlignment="Center" Margin="8,0,8,8">
                                     <DockPanel x:Name="SceneSessionBar" LastChildFill="False" HorizontalAlignment="Center" Margin="0,0,0,5">
                                         <TextBlock x:Name="SessionStatusText" Foreground="#B8AA8C" TextWrapping="Wrap"

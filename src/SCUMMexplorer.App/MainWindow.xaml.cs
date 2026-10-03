@@ -342,6 +342,7 @@ public partial class MainWindow : Window
         PopulateCostumeCards(game);
         UpdateAdvancedMode();
 
+        ShowPageHeader(true);
         PageTitle.Text = game.Title;
         PageSubtitle.Text = game.Id switch
         {
@@ -653,6 +654,7 @@ public partial class MainWindow : Window
             RoomNavigationToggle.Visibility = Visibility.Collapsed;
             PreviewMessage.Visibility = Visibility.Collapsed;
             ScriptPanel.Visibility = Visibility.Visible;
+            ShowPageHeader(true);
             PageTitle.Text = resource.Name;
             PageSubtitle.Text = "Indexed script resource · DOS LOOM old-v3";
             ScriptOutput.Text = "";
@@ -689,6 +691,7 @@ public partial class MainWindow : Window
         _previewCancellation?.Cancel();
         _previewCancellation = new CancellationTokenSource();
         var token = _previewCancellation.Token;
+        ShowPageHeader(false); // the scene needs the height more than a title that only repeats the mode
         PageTitle.Text = "Explore the scene";
         PageTitle.ToolTip = resource.Name;
         PageSubtitle.Text = "Original LOOM EGA artwork";
@@ -1272,8 +1275,32 @@ public partial class MainWindow : Window
         }
     }
 
+    private void ShowPageHeader(bool show)
+    {
+        var visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        PageTitle.Visibility = PageSubtitle.Visibility = visibility;
+        PageHeader.Margin = new Thickness(0, 0, 0, show ? 16 : 6);
+    }
+
+    /// <summary>A script, sound or costume view replaces the scene: offer the way back to the room the user came from.</summary>
+    private void UpdateBackToSceneButton()
+    {
+        if (_selectedResource is { Kind: not ResourceKind.Room } && _lastViewedRoomResource is { } room)
+        {
+            BackToSceneButton.Content = $"← Back to Room {room.ResourceId:00}";
+            BackToSceneButton.Visibility = Visibility.Visible;
+        }
+        else BackToSceneButton.Visibility = Visibility.Collapsed;
+    }
+
+    private void BackToScene_Click(object sender, RoutedEventArgs e)
+    {
+        if (_lastViewedRoomResource is { } room) SelectResourceInTree(room);
+    }
+
     private void UpdateConnectionsButton()
     {
+        UpdateBackToSceneButton();
         if (!IsAdvancedMode || _selectedResource is null || _game is not { Id: GameId.Loom, Version: ScummVersion.V3 })
         {
             ConnectionsButton.Visibility = Visibility.Collapsed;
@@ -1477,6 +1504,7 @@ public partial class MainWindow : Window
         RoomObjectPanel.Visibility = Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, 2);
 
+        ShowPageHeader(true);
         PageTitle.Text = resource.Name;
         PageSubtitle.Text = "Static pose gallery · all stored decodable poses at the same pixel scale";
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
@@ -1950,6 +1978,7 @@ public partial class MainWindow : Window
         ObjectAssetPreview.Source = null;
         ObjectAssetPreview.Visibility = Visibility.Collapsed;
         ObjectAssetDescription.Text = "";
+        ShowPageHeader(true);
         PageTitle.Text = resource.Name;
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         PageSubtitle.Text = "Play this sound on demand.";

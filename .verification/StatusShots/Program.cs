@@ -67,6 +67,34 @@ internal static class Program
                 report.Add($"after apply: session bit {session.StoryBit("bit[0xDB6]")}, message '{((TextBlock)status.FindName("EditMessage")).Text}'");
                 Save(status, "status-3-applied.png");
                 status.Close();
+                // Advanced mode: a script, a sound and a costume view each offer the way back to the room.
+                var adv = (CheckBox)window.FindName("AdvancedModeToggle");
+                adv.IsChecked = true; Call("AdvancedModeToggle_Click", adv, new RoutedEventArgs());
+                var tree = (TreeView)window.FindName("ResourceTree");
+                var back = (Button)window.FindName("BackToSceneButton");
+                var items = tree.Items.OfType<TreeViewItem>().SelectMany(g => g.Items.OfType<TreeViewItem>()).ToList();
+                string KindOf(TreeViewItem i) => i.Tag?.GetType().GetProperty("Kind")?.GetValue(i.Tag)?.ToString() ?? "";
+                int? IdOf(TreeViewItem i) => (int?)i.Tag?.GetType().GetProperty("ResourceId")?.GetValue(i.Tag);
+                var room17 = items.First(i => KindOf(i) == "Room" && IdOf(i) == 17);
+                Call("SelectResourceInTree", room17.Tag);
+                await Task.Delay(1500);
+                report.Add($"room 17 shown: back button {back.Visibility}");
+                foreach (var kind in new[] { "Script", "Sound", "Costume" })
+                {
+                    var item = items.FirstOrDefault(i => KindOf(i) == kind);
+                    if (item is null) { report.Add($"{kind}: none in the tree"); continue; }
+                    Call("SelectResourceInTree", item.Tag);
+                    await Task.Delay(900);
+                    report.Add($"{kind} view: back button {back.Visibility} '{back.Content}'");
+                    Save(window, $"advanced-{kind}.png");
+                    if (back.Visibility == Visibility.Visible)
+                    {
+                        Call("BackToScene_Click", back, new RoutedEventArgs());
+                        await Task.Delay(1500);
+                        var shown = Field("_currentRoomResource");
+                        report.Add($"  after clicking: back {back.Visibility}, room shown {shown?.GetType().GetProperty("ResourceId")?.GetValue(shown)}");
+                    }
+                }
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }
             finally { File.WriteAllLines(Path.Combine(output, "report.txt"), report); window.Close(); app.Shutdown(); }
