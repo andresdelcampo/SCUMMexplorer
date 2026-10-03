@@ -34,6 +34,24 @@ After51aa4dd. Verified input now completes Room36 box10→4→3→9, 599→37, f
 
 Next: from catalog Room34 select object586 for Healing4D, require209 end03C0, then box6→8 watcher (check camera source first). Keep all constraints; no App launch or push.
 
+## START HERE: current state after b09b2fb — 3 October
+
+Audited **230/235 (97.87%)**, 5 sites left; fresh single-action **169/235 (71.91%)** is a separate metric and unchanged. The older "Parked by user" section below is superseded: its Room34 601→36→35→34 route is proven source-blocked. Details and decoded gates: [global-scripts validation addendum](../.verification/global-scripts-input-20261003/validation.md) and [Room34 chain validation](../.verification/room34-chain-20261003/validation.md).
+
+The 5 remaining sites and what each needs (none is a probe-only fix any more):
+
+1. **Room 34 local200 +0035 and local207 +0079.** Needs Healing 586/4D, which is touchable only after scene 087 sets D9D, then box6→8 with camera>464. After 087 the ego costume is reset to 1, so Room37 exit601 (needs costume 0x67, only set by Room34 local202) refuses, and Room 34 is reachable only through 36→35. A path via Room 33 or 46 (objects 557/559) after 087 is unexplored. 207 also needs D9D/DC7.
+2. **script 009 +002C** (practice hint). Needs var07B=0 plus a wrong try so script 027 turns verb 0x35 on. Clicking Room69 object 876 sets var07B=0, but Room69 then stalls after local201→204 (what does 204 wait for?), and a catalog hop leaves input script var[0x20]=Room69 local200 so keys never reach script 005. Needs either understanding 204 or a proper boot-to-Room01 route.
+3. **script 022 +0005** ("too noisy to weave"). Needs D70=1 (Room36 entry, Room41 local206) with an aimed object. Room36 has no aimable object (600 has no verbs). Room41 untried.
+4. **script 096.** Room43 object 639/38 needs D7B≠0, staff D61, and DA3, which only script095 +0725 sets: it is the Room41 native090/095 chain.
+
+
+Rules unchanged: tie each credit to accepted input and a complete settled body; labelled staff/notes/learned setup only; no story/class/actor injection; at most two diagnostic cycles per route; retain failures; commit each task; no App launch or push; never conflate audited and fresh coverage. Note the CLAUDE.md priority (Room41 native090 raw4) is the same blocker as site 4.
+
+Ready-to-copy prompt:
+
+> Continue SCUMMexplorer from b09b2fb using docs/NEXT_SESSION_PROMPT.md ("START HERE" section first). Audited is 230/235, with 5 sites left, each with a decoded gate in .verification/global-scripts-input-20261003/validation.md; fresh single-action is a separate 169/235. Pick the highest-value remaining gate: (a) Room69 local204 stall after the practice click, (b) a Room33/46 return path to Room34 after scene 087, or (c) the Room41 native090/095 chain that also unlocks script096. Report the audit counter after each credited site. Keep all constraints, commit each task, no App launch, no push.
+
 ## Parked by user: Room34 prerequisites retained — 3 October
 
 After410b76c. Room34 watcher prerequisite investigation stopped after two failed cycles: fresh38 Look610 reproduces incomplete087 in37; fresh36 exit599 is hidden by class24 and never dispatches. Four failed captures retained/excluded; no coverage gain or production defect established. Next source step is Room36 box9 watcher200 +0077/end009B, which clears599 class24 at+0094. Audited215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Protected57/history/App untouched. [Validation and precise next experiment](../.verification/room34-watcher-20261003/validation.md).
