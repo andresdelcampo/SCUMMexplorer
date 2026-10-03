@@ -4,6 +4,8 @@ The session executes reached script/object/room instructions independently of re
 
 ## Current replay coverage (2 October)
 
+**Latest Room08 supplement,3 October:** Room08 four keyboard casts256/3F,256/3E,257/3E,257/3F complete both tapestry restoration sites2110008/214000B with sourceD7D/D7E setup. Input1024/direct820frames,4/4 scopes,79 Executed/Conditional recorded events,76 certainty-only differences. Audited205→207/235 (88.09%),28 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change. Protected57/history/App untouched. [Validation](../.verification/room08-input-20261003/validation.md).
+
 **Latest Room09 investigation,3 October:** Room09 two bounded cycles add no coverage. Source50→721/089→7→252→9 plus actual272 Look completes209/101,3/3 prefix scopes at1768frames; then probe incorrectly requires4D as reverse and stops before edits/casts. Slot11 is forward4D; slots12/13 reverse4F/51. Failed pairs retained/excluded; no engine defect established. Audited205/235 and fresh single-action169/235 unchanged. [Validation/next experiment](../.verification/room09-input-20261003/validation.md).
 
 **Latest Room22 supplement,3 October:** Room22 box11→10 clicks complete200 +0083/end00D3 then002F/end0078,235frames,2/2 scopes,23 Executed/Conditional body events. Audited union203→205/235 (87.23%),30 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First wrong-order capture retained/excluded, second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room22-input-20261003/validation.md).

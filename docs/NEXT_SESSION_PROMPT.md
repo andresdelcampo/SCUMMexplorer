@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room08 tapestry restoration pair complete — 3 October
+
+After191bf6d. Room08 four keyboard casts256/3F,256/3E,257/3E,257/3F complete both tapestry restoration sites2110008/214000B with sourceD7D/D7E setup. Input1024/direct820frames,4/4 scopes,79 Executed/Conditional recorded events,76 certainty-only differences. Audited205→207/235 (88.09%),28 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change. Protected57/history/App untouched. [Validation](../.verification/room08-input-20261003/validation.md).
+
+Next candidate: Room28 local2030000/2120064 and chained0760000. Source prerequisites/actual input first; supported staff/notes/learned edits labelled and source notes/reverse flags unchanged. Keep Room09 investigation stopped this session; its full failed recipes add no coverage. Continue bounded tasks toward200K context per user; exact telemetry unavailable. Commit each checkpoint; at most two diagnostic cycles per route without route-relevant decision. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from Room08 using docs/NEXT_SESSION_PROMPT.md. Audited207/235 versus fresh single-action169/235. Start Room28 source/input cluster; continue bounded audits toward200K context, commit each and leave running App untouched.
+
 ## Latest: Room09 bounded investigation retained; no gain — 3 October
 
 After3fde694. Room09 two bounded cycles add no coverage. Source50→721/089→7→252→9 plus actual272 Look completes209/101,3/3 prefix scopes at1768frames; then probe incorrectly requires4D as reverse and stops before edits/casts. Slot11 is forward4D; slots12/13 reverse4F/51. Failed pairs retained/excluded; no engine defect established. Audited205/235 and fresh single-action169/235 unchanged. [Validation/next experiment](../.verification/room09-input-20261003/validation.md).
