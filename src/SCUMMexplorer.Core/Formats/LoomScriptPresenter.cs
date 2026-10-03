@@ -285,6 +285,13 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
                 case "cursorCommand": return "cursor: " + CursorText(ins.Operands);
                 case "resourceRoutines": return Resource(a[0], a);
                 case "verbOps": return $"verb {Value(a[0])}: {string.Join("; ", Items(a[1]))}";
+                case "roomOps": return RoomOp(a);
+                case "stringOps": return StringOp(a);
+                case "getStringWidth": return $"{Value(a[0])} = width of string {Value(a[1])}";
+                case "getInventoryCount": return $"{Value(a[0])} = how many objects {Value(a[1], Role.Actor)} holds";
+                case "saveLoadGame": return $"{Value(a[0])} = result of save/load command {Value(a[1])}";
+                case "saveLoadVars": return $"save/load variables ({a[0]})";
+                case "doSentence": return DoSentence(a);
                 default: return Raw(ins);
             }
         }
@@ -292,6 +299,49 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
         {
             return Raw(ins);
         }
+    }
+
+    // roomOps: the operands are the two room parameters after the sub-operation name. The colour operations only say what they
+    // set (the numbers stay visible); what each palette slot means on screen is not claimed here.
+    private string RoomOp(List<string> a)
+    {
+        string P(int i) => i < a.Count ? Value(a[i]) : "?";
+        return a[0] switch
+        {
+            "roomScroll" => $"camera limits: x from {P(1)} to {P(2)}",
+            "setScreen" => $"set the screen to rows {P(1)} to {P(2)}",
+            "shakeOn" => "the screen starts shaking",
+            "shakeOff" => "the screen stops shaking",
+            "roomColorLegacy" => $"set room colour ({P(1)}, {P(2)})",
+            "roomPalette" => $"set room palette ({P(1)}, {P(2)})",
+            "saveLoad" => $"save/load game ({string.Join(", ", a.Skip(1).Select(x => Value(x)))})",
+            "screenEffect" => $"screen effect {P(3)}",
+            _ => $"room: {Regex.Replace(a[0], "([A-Z])", " $1").ToLowerInvariant()} {string.Join(", ", a.Skip(1).Select(x => Value(x)))}".TrimEnd()
+        };
+    }
+
+    private string StringOp(List<string> a)
+    {
+        string P(int i) => i < a.Count ? Value(a[i]) : "?";
+        return a[0] switch
+        {
+            "loadString" => $"string {P(1)} = {(a.Count > 2 ? CleanText(a[2]) : "?")}",
+            "copyString" => $"string {P(1)} = a copy of string {P(2)}",
+            "setStringChar" => $"character {P(2)} of string {P(1)} = {P(3)}",
+            "getStringChar" => $"{P(1)} = character {P(3)} of string {P(2)}",
+            "createString" => $"string {P(1)} = an empty string of {P(2)} characters",
+            _ => Raw(new LoomScriptInstruction(0, 0, "stringOps", string.Join(", ", a), ""))
+        };
+    }
+
+    // doSentence verb, object, object (ScummVM: verb 0xFE cancels the pending sentence).
+    private string DoSentence(List<string> a)
+    {
+        if (Literal(a[0]) == 0xFE) return "cancel the pending sentence";
+        var text = VerbText(a[0]);
+        if (a.Count > 1 && !(Literal(a[1]) is 0)) text += $" {Value(a[1], Role.Object)}";
+        if (a.Count > 2 && !(Literal(a[2]) is 0)) text += $" with {Value(a[2], Role.Object)}";
+        return "do the sentence: " + text;
     }
 
     private static string Resource(string routine, List<string> a)

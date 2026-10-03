@@ -10,7 +10,7 @@ The readable-scripts plan ([READABLE_SCRIPTS_PLAN.md](READABLE_SCRIPTS_PLAN.md))
 
 - Glossary growth: story bits set by a catalog scene are named "set by the scene: ..." (`reading`); other bits still show as `bit[0x...]`. Actor names are context-dependent (numbers are reused by scene); extend the scoped names only with evidence.
 - "Used by" lists only literal references (calls through a variable, hooks and clicks are not listed).
-- Presenter phrases still missing: `roomOps`, `saveLoad`, `doSentence`, strings (they keep their raw line).
+- Presenter phrases: `roomOps`, `stringOps`, `getStringWidth`, `getInventoryCount`, `saveLoadGame`/`saveLoadVars` and `doSentence` have plain phrases (colour and palette operations only say what they set); other unmapped operations keep their raw line.
 - Silence (0x4E/0x4F) and Shaping (0x50/0x51) draft names follow the manual order (no object answers 0x4E/0x50); Sharpening's two verbs are not told apart.
 - `.verification/WindowCheck` still looks for the removed "Show exits" checkbox; update or retire it.
 - Needing the user: on-screen check of the staff scenes (Room 43), El Muerto and Room 17 sizes; Room 34 local200 +0035 (probably dead code, needs a real ScummVM save); actor 4 placement; costume leftovers need a story order the data does not give.

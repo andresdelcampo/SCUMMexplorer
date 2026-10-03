@@ -81,4 +81,20 @@ public sealed class LoomScriptPresenterTests
         }
         Assert.Equal(File.ReadAllText(path), text);
     }
+
+    [Theory]
+    [InlineData("roomOps", "roomScroll, 0x0098, 0x00A0", "camera limits: x from 152 to 160")]
+    [InlineData("roomOps", "setScreen, 0x0000, 0x0090", "set the screen to rows 0 to 144")]
+    [InlineData("roomOps", "shakeOn, 0x0000, 0x0000", "the screen starts shaking")]
+    [InlineData("stringOps", "loadString, 0x04, \"Pausa.\"", "string 4 = “Pausa.”")]
+    [InlineData("stringOps", "getStringChar, local[0x007], local[0x005], local[0x006]", "local 7 = character local 6 of string local 5")]
+    [InlineData("doSentence", "0xFE, 0x0000, 0x0000", "cancel the pending sentence")]
+    public void RoomStringAndSentenceOperationsGetPlainPhrases(string operation, string operands, string expected)
+    {
+        var instructions = new[] { new LoomScriptInstruction(0, 0, operation, operands, "") };
+        var script = new LoomScriptDisassembly(1, 1, 0, 1, 1, instructions, null, null, [], []);
+        var text = new LoomScriptPresenter(LoomGlossary.Default).Present(script);
+        Assert.Contains(expected, text);
+        Assert.DoesNotContain("[raw]", text);
+    }
 }

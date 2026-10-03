@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: presenter phrases for roomOps, strings, doSentence and save/load
+
+The readable script view no longer shows a raw line for them: camera limits, screen rows, shake, colour/palette settings, string operations, the sentence queue (verb 0xFE cancels it). Colour and palette phrases keep their numbers and claim no on-screen meaning. Test: `LoomScriptPresenterTests.RoomStringAndSentenceOperationsGetPlainPhrases` (operand shapes read from every LOOM script).
+
 ## 3 October: story bits named by catalog scenes
 
 Advanced views only. `LoomGlossary.StoryBitLabel` is wired to the catalog scene titles (a background scan after a game opens), so the readable script view and the Assumptions name a story bit as "set by the scene: ..." with `reading` evidence; bits no catalog scene sets stay raw. Validation: [.verification/readable-scripts/validation.md](../.verification/readable-scripts/validation.md).
