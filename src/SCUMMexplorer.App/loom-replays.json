@@ -3896,40 +3896,6 @@
       "source": "Room 33 object 544 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 105 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Room 33 local script 205 +0x0000 runs script 2\nendCutscene at Room 33 local script 205 +0x00B0 runs script 3\nStored name in the trigger room."
     },
     {
-      "id": "Room 34 object 559 Verb 0x37",
-      "title": "Room 34 · Walk response · Reached Room 57",
-      "category": "Scenes",
-      "room": 34,
-      "objectId": 559,
-      "verb": 55,
-      "scriptIds": [
-        98
-      ],
-      "rooms": [
-        34,
-        57
-      ],
-      "frames": 1158,
-      "source": "Room 34 object 559 Verb 0x37. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 1158 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3\nNaming gap: no useful stored name in any supplied room definition; no validated naming instruction supplies one. Label uses the decoded action and validated reached rooms."
-    },
-    {
-      "id": "Room 34 object 560 Verb 0x37",
-      "title": "Room 34 · Walk response · Reached Room 57",
-      "category": "Scenes",
-      "room": 34,
-      "objectId": 560,
-      "verb": 55,
-      "scriptIds": [
-        98
-      ],
-      "rooms": [
-        34,
-        57
-      ],
-      "frames": 1158,
-      "source": "Room 34 object 560 Verb 0x37. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 1158 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3\nNaming gap: no useful stored name in any supplied room definition; no validated naming instruction supplies one. Label uses the decoded action and validated reached rooms."
-    },
-    {
       "id": "Room 34 object 561 Verb 0x36",
       "title": "Room 34 · Look at chico",
       "category": "Scenes",
@@ -4059,23 +4025,6 @@
       ],
       "frames": 101,
       "source": "Room 34 object 562 Verb 0x56. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 101 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 41 +0x0000 runs script 2\nendCutscene at Script 41 +0x009A runs script 3\nStored name in the trigger room."
-    },
-    {
-      "id": "Room 34 object 586 Verb 0x37",
-      "title": "Room 34 · Walk to Rusty",
-      "category": "Scenes",
-      "room": 34,
-      "objectId": 586,
-      "verb": 55,
-      "scriptIds": [
-        98
-      ],
-      "rooms": [
-        34,
-        57
-      ],
-      "frames": 1158,
-      "source": "Room 34 object 586 Verb 0x37. Fresh post-boot seed-0 session; catalog arrival assumed; direct object verb, not game input. Completed in 1158 audit frames, including the final 32 idle frames. Reached scene boundaries:\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3\nStored name in the trigger room."
     },
     {
       "id": "Room 34 object 586 Verb 0x43",
@@ -5408,6 +5357,76 @@
       "source": "Fresh post-boot seed-0 sequence. Catalog arrival, direct verbs and click timing are explicit exploration assumptions. No prerequisite writes. Stored name in the trigger room. Conditional naming operands (not validated live names): oro, paja.\nSteps: [{\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}]\nReached scene boundaries:\ncutscene at Script 86 +0x0000 runs script 2\nendCutscene at Script 86 +0x055C runs script 3\ncutscene at Script 87 +0x0000 runs script 2\nendCutscene at Script 87 +0x09B9 runs script 3"
     },
     {
+      "id": "sequence-087-098",
+      "title": "The firewood scene, the dream, then Room 34 · Rusty the ghost (Walk response)",
+      "category": "Scenes",
+      "room": 36,
+      "objectId": 599,
+      "verb": 56,
+      "steps": [
+        {
+          "kind": "verb",
+          "objectId": 599,
+          "verb": 56
+        },
+        {
+          "kind": "frames",
+          "frames": 32
+        },
+        {
+          "kind": "click",
+          "x": 109,
+          "y": 102
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 86 +0x055C",
+          "expectedRoom": 38
+        },
+        {
+          "kind": "verb",
+          "objectId": 610,
+          "verb": 54
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 87 +0x09B9",
+          "expectedRoom": 38
+        },
+        {
+          "kind": "visit",
+          "objectId": 34
+        },
+        {
+          "kind": "frames",
+          "frames": 40
+        },
+        {
+          "kind": "verb",
+          "objectId": 559,
+          "verb": 55
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 98 +0x0618",
+          "expectedRoom": 34
+        }
+      ],
+      "scriptIds": [
+        98
+      ],
+      "rooms": [
+        34,
+        36,
+        37,
+        38,
+        57,
+        58
+      ],
+      "frames": 4128,
+      "source": "Room 34 Walk response (script 098: Rusty's ghost). Replaces the three direct Walk-response starts (objects 559, 560, 586 verb 0x37), which began in the fresh early state where Rusty is still the sleeping, living boy (costume 0x70) instead of the ghost (costume 0x78): Room 34's entry picks the ghost only once scene 087 has set bit D9D. Fresh post-boot seed-0 sequence: the firewood scene 086 and the straw dream 087 run first (direct verbs and click timing are exploration assumptions), then a catalog visit to Room 34 (explicit exploration assumption that keeps the story state reached), then object 559's verb 0x37 runs directly (the ghost arrives, script 098). No prerequisite writes.\nSteps: [{\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}, {\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"frames\", \"frames\": 40}, {\"kind\": \"verb\", \"objectId\": 559, \"verb\": 55}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 98 +0x0618\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Script 86 +0x0000 runs script 2\nendCutscene at Script 86 +0x055C runs script 3\ncutscene at Script 87 +0x0000 runs script 2\nendCutscene at Script 87 +0x09B9 runs script 3\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3"
+    },
+    {
       "id": "bonus-room34-local200",
       "title": "Room 34 · Bonus: the ledge lookout (camera pan east)",
       "category": "Bonus scenes",
@@ -5681,7 +5700,7 @@
       "source": "Room 62 local 204; unvalidated cutscene sites: +0x0000.\nLiteral trigger probes: Validated state preview: 1.\nPossible roots (not proof of reachability): Room 62 object 809 Verb 0x3D"
     }
   ],
-  "summary": "85 scene starts and 250 dialogue/reaction previews, including 2 audited sequences. Literal-root gaps are retained; sequence completion does not resolve failed fresh-entry roots or static edges.",
+  "summary": "83 scene starts, 1 bonus scene and 250 dialogue/reaction previews, including 3 sequences. Literal-root gaps are retained; sequence completion does not resolve failed fresh-entry roots or static edges.",
   "membership": [
     {
       "id": "Room 02 object 153 Verb 0x38",
@@ -7866,26 +7885,6 @@
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
-      "id": "Room 34 object 559 Verb 0x37",
-      "startRoom": 34,
-      "rooms": [
-        34,
-        57
-      ],
-      "frames": 1158,
-      "source": "Validated start room plus rooms observed during completed playback."
-    },
-    {
-      "id": "Room 34 object 560 Verb 0x37",
-      "startRoom": 34,
-      "rooms": [
-        34,
-        57
-      ],
-      "frames": 1158,
-      "source": "Validated start room plus rooms observed during completed playback."
-    },
-    {
       "id": "Room 34 object 561 Verb 0x36",
       "startRoom": 34,
       "rooms": [
@@ -7960,16 +7959,6 @@
         34
       ],
       "frames": 101,
-      "source": "Validated start room plus rooms observed during completed playback."
-    },
-    {
-      "id": "Room 34 object 586 Verb 0x37",
-      "startRoom": 34,
-      "rooms": [
-        34,
-        57
-      ],
-      "frames": 1158,
       "source": "Validated start room plus rooms observed during completed playback."
     },
     {
@@ -8794,6 +8783,20 @@
         68
       ],
       "frames": 2930,
+      "source": "Start plus rooms observed with the shared sequence runner."
+    },
+    {
+      "id": "sequence-087-098",
+      "startRoom": 36,
+      "rooms": [
+        34,
+        36,
+        37,
+        38,
+        57,
+        58
+      ],
+      "frames": 4128,
       "source": "Start plus rooms observed with the shared sequence runner."
     },
     {

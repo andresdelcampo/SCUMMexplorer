@@ -50,4 +50,28 @@ public sealed class LoomReplaySequenceTests
         Assert.Contains(session.SessionTrace, line => line.StartsWith("cutscene at Room 34 local script 200 +0x0035", StringComparison.Ordinal));
         Assert.Contains("started directly at +0x0035", sequence.LastAction!.Input);
     }
+
+    [Fact]
+    public void RustysWalkResponseRunsAfterTheDreamSoTheGhostArrives()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
+        session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 36));
+        var sequence = new LoomReplaySequence(session, [
+            new("verb", 599, 56), new("frames", Frames: 32), new("click", X: 109, Y: 102),
+            new("scene", EndBoundary: "endCutscene at Script 86 +0x055C", ExpectedRoom: 38),
+            new("verb", 610, 54), new("scene", EndBoundary: "endCutscene at Script 87 +0x09B9", ExpectedRoom: 38),
+            new("visit", 34), new("frames", Frames: 40)]);
+        for (var frame = 0; sequence.Continue() && frame < 6000; frame++) { session.AdvanceFrame(); sequence.FrameAdvanced(); }
+        Assert.True(sequence.Complete, sequence.Failure);
+        // The ghost (costume 0x78) stands where the living, sleeping Rusty (costume 0x70) would in a fresh visit.
+        Assert.Equal(0x78, session.Actors.Single(a => a.Number == 3).Look!.Costume);
+        Assert.True(session.Snapshot.IsUntouchable(561));
+        Assert.False(session.Snapshot.IsUntouchable(586));
+        var walk = new LoomReplaySequence(session, [new("verb", 559, 55),
+            new("scene", EndBoundary: "endCutscene at Script 98 +0x0618", ExpectedRoom: 34)]);
+        for (var frame = 0; walk.Continue() && frame < 3000; frame++) { session.AdvanceFrame(); walk.FrameAdvanced(); }
+        Assert.True(walk.Complete, walk.Failure);
+    }
 }

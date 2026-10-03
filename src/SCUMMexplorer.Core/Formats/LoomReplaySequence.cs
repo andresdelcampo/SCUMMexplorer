@@ -17,7 +17,7 @@ public sealed class LoomReplaySequence
 
     public LoomReplaySequence(LoomExplorationSession session, IReadOnlyList<LoomReplayStep> steps)
     {
-        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "frames" or "scene") ||
+        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "frames" or "scene") ||
             s.Frames < 1 || s.Frames > LoomExplorationSession.CutsceneFrameLimit ||
             s.Kind == "scene" && (s.EndBoundary is null || s.ExpectedRoom is null)))
             throw new ArgumentException("A sequence needs explicit inputs and bounded, source-established completion waits.", nameof(steps));
@@ -32,6 +32,13 @@ public sealed class LoomReplaySequence
         while (_index < _steps.Count)
         {
             var step = _steps[_index];
+            if (step.Kind == "visit")
+            {
+                // A catalog hop (ObjectId = room): an explicit exploration assumption that keeps the story state so far.
+                _session.VisitRoomById(step.ObjectId);
+                _traceStart = _session.SessionTrace.Count; _begun = _session.CutscenesBegun;
+                Next(); continue;
+            }
             if (step.Kind is "verb" or "click" or "script")
             {
                 // "script": ObjectId is the room-local script number and X the start offset (a bonus preview).

@@ -1392,6 +1392,14 @@ public sealed partial class LoomExplorationSession
     }
 
     /// <summary>
+    /// A catalog visit by room number (<see cref="VisitRoom"/>), for a replay sequence that moves on to a
+    /// room without the game's own route, keeping the story state reached so far.
+    /// </summary>
+    public LoomSessionSnapshot VisitRoomById(int roomId) =>
+        VisitRoom(_game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) ??
+                  throw new ArgumentOutOfRangeException(nameof(roomId), $"Room {roomId:00} is not in this game."));
+
+    /// <summary>
     /// Starts the current room's local script <paramref name="scriptId"/> at instruction offset
     /// <paramref name="offset"/>, as a bonus preview of a scene whose trigger the game's own flow
     /// has no decoded way to meet (for example a watcher that needs the ego to step from one walk

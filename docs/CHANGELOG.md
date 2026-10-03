@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: Room 34 Rusty ghost replay fixed
+
+Three duplicate "Walk response, Reached Room 57" entries (objects 559, 560, 586 verb 0x37) started script 098 from the fresh state, where Rusty is still the sleeping living boy (Room 34's entry needs bit D9D from scene 087 to show the ghost). Replaced by one sequence after the firewood/dream scenes with a catalog visit step (`visit`); Game Texts can now offer it for script 098. [Validation](../.verification/bonus-room34-20261003/validation.md).
+
 ## 3 October: bonus scene for Room 34 local200 +0035
 
 The unreachable Room 34 watcher scene is playable from the cutscene menu as a labelled bonus preview ("Bonus scenes" filter): new `RunLocalScriptAt` and sequence step `script` start the scene body directly (132 frames, balanced). Not audited coverage (234/235 and fresh 169/235 unchanged). [Validation](../.verification/bonus-room34-20261003/validation.md).
