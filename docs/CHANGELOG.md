@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: catalog arrival takes the size of its depth (Room 17 from Room 22)
+
+An arrival with no size of its own took the size carried back through earlier rooms (Room 16's entry: small), whatever depth it stands at. Room 17's Room 22 door arrives at (252, 141), near the viewer, and showed a tiny Bobbin. `EstimateEgoSize` now takes, for such arrivals, the nearest sample in depth from the room's own code (other arrivals that set a size and walk to a point; the watcher jumps in local scripts that start script 017 with a literal and `putActor` the ego): size 0 here (Room 16 object 349, y 134). Labelled as an estimate in the uncertainties. Arrivals with their own size (Room 16 doors) are unchanged. The Room 17 watcher cutscene (local 200 +0x0022, box 4/5 jump to the centre with size 0/1) already plays on a click toward the centre.
+
 ## 3 October: generic per-scene start setup (staff pickup derived from the game's code)
 
 `LoomSceneStateScanner` scans a scene's scripts (plus the scripts and room entries they reach) for reads and writes of globals and story bits; `LoomSceneSetupPlanner` derives the least labelled start from that. Scenes whose own global script clears bit D61 (091, 093) now start after the game's real pickup (Room 09 object 271 verb 0x38, found by `FindConstantWriters`) run unseen, then a catalog visit; no `staff` edit and no story flag. Reads of D61, var[0x07D] and story bits keep their first-visit value and are listed in the picker note. Costume, visit-chain and `place` derivations found no scanned dependency and are not applied. [Validation](../.verification/setup-placer-20261003/validation.md).

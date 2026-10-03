@@ -193,6 +193,22 @@ public sealed class LoomActorLookTests
     }
 
     [Fact]
+    public void Room17FromRoom22ArrivesAtTheDepthsSizeNotTheOneCarriedFromFarBack()
+    {
+        if (!HasGame) return;
+        var game = new GameFolderScanner().Scan(Folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 22));
+        session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 17));
+
+        // Room 22's door brings the ego to (252, 141) in Room 17, near the viewer. Room 17's own samples at that depth
+        // give size 0 (Room 16 object 349 walks to y 134 after var[0x07C] = 0); the small size carried from Room 16's entry
+        // (costume 3) belongs to another depth. Estimated, and labelled so.
+        Assert.Equal(1, session.Actors[0].Look.Costume);
+        Assert.Contains(session.Snapshot.Uncertainties, u => u.Contains("nearest sample in depth", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Room12ShowsTheBoatAfterACatalogVisit()
     {
         if (!HasGame) return;

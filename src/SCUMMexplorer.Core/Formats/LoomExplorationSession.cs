@@ -607,7 +607,14 @@ public sealed partial class LoomExplorationSession
         var starts = index.StartsOf(EgoSizeScript).ToArray();
         // Only rooms whose entry keeps the size of the room before read it; the others set their own.
         if (!starts.Any(item => item.IsRoomEntry && item.SourceRoom == roomId && item.FirstArgument == EgoSizeVariable)) return;
-        var (size, how) = SizeOnRoute(arrival);
+        var (size, how, own) = SizeOnRoute(arrival);
+        // No size of its own on the arrival: the size left by rooms further back says nothing about the depth the ego
+        // arrives at. The room's own samples (a size and the place it comes with) do: take the nearest in depth.
+        if (!own && arrival.WalkX != -1 && NearestDepthSample(roomId, arrival, index, starts) is { } sample)
+        {
+            size = sample.Size;
+            how = $"the arrival stands at y {arrival.WalkY}; the room's own nearest sample in depth is size {sample.Size} at y {sample.Y} ({sample.Source}); the size carried from other rooms was not used";
+        }
         _runtime.EstimatedVariables.Add(EgoSizeVariable);
         if (size is int value)
         {
@@ -618,7 +625,7 @@ public sealed partial class LoomExplorationSession
         else
             _uncertainties.Add($"Room {roomId:00} was selected from the catalog: no literal size for the ego ({EgoSizeVariable}, script {EgoSizeScript:000}) is on the assumed arrival's route, so the size left by the room shown before is kept and is unknown.");
 
-        (int? Size, string How) SizeOnRoute(LoomEgoArrival first)
+        (int? Size, string How, bool Own) SizeOnRoute(LoomEgoArrival first)
         {
             // The arrival's own code first (the size it set before the load: most doors move a literal into var[0x07C],
             // Room 16's six give 0, 1 or 2), then the entries of the rooms it came through.
@@ -627,7 +634,7 @@ public sealed partial class LoomExplorationSession
                 .Concat(index.MovesTo(EgoSizeVariable).Where(item => item.Source == first.Source && item.Offset < first.Offset)
                     .Select(item => (item.Offset, Size: item.Value, How: $"{item.Source} +0x{item.Offset:X4} sets {EgoSizeVariable} = {item.Value} before the load")))
                 .OrderByDescending(item => item.Offset).ToArray();
-            if (own.Length > 0) return (own[0].Size, own[0].How);
+            if (own.Length > 0) return (own[0].Size, own[0].How, true);
             var queue = new Queue<(int Room, string Path)>();
             var seen = new HashSet<int> { roomId };
             if (first.SourceRoom is int source && seen.Add(source)) queue.Enqueue((source, $"the route came through Room {source:00}"));
@@ -637,18 +644,59 @@ public sealed partial class LoomExplorationSession
                 var entry = starts.FirstOrDefault(item => item.IsRoomEntry && item.SourceRoom == room);
                 if (entry is null) continue;
                 if (Literal(entry) is int literal)
-                    return (literal, $"{path}, whose entry sets it (Room {room:00} entry +0x{entry.Offset:X4} startScript {EgoSizeScript:000}, [{entry.FirstArgument}])");
+                    return (literal, $"{path}, whose entry sets it (Room {room:00} entry +0x{entry.Offset:X4} startScript {EgoSizeScript:000}, [{entry.FirstArgument}])", false);
                 if (entry.FirstArgument != EgoSizeVariable) continue;
                 foreach (var before in index.Into(room))
                     if (before.SourceRoom is int earlier && seen.Add(earlier))
                         queue.Enqueue((earlier, $"{path}, which keeps the size of the room before it; a route came through Room {earlier:00}"));
             }
-            return (null, "");
+            return (null, "", false);
         }
 
         static int? Literal(LoomScriptStart start) =>
             start.FirstArgument is { } argument && argument.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
             int.TryParse(argument.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value) ? value : null;
+    }
+
+    private sealed record DepthSample(int Y, int Size, string Source);
+
+    /// <summary>
+    /// Samples of (depth, size) inside <paramref name="roomId"/>, from the game's own code: the other arrivals into the room
+    /// that set a size themselves and walk to a point, and the room's local scripts that start script 017 with a literal
+    /// size and then <c>putActor</c> the ego (the walk-box watchers' jumps, as Room 17's local 200). Returns the sample
+    /// nearest in y to the arrival (the smaller size on a tie), or null when the room has none.
+    /// </summary>
+    private DepthSample? NearestDepthSample(int roomId, LoomEgoArrival arrival, LoomEgoArrivalIndex index, LoomScriptStart[] starts)
+    {
+        var samples = new List<DepthSample>();
+        foreach (var other in index.Into(roomId).Where(a => a.WalkX != -1 && a.PlacementKey != arrival.PlacementKey))
+        {
+            var set = index.MovesTo(EgoSizeVariable).Where(m => m.Source == other.Source && m.Offset < other.Offset).OrderByDescending(m => m.Offset).FirstOrDefault();
+            if (set is not null) samples.Add(new(other.WalkY, set.Value, $"{other.Source} +0x{other.Offset:X4} walks to ({other.WalkX}, {other.WalkY}) after {EgoSizeVariable} = {set.Value}"));
+        }
+        if (_game.Rooms.FirstOrDefault(r => r.ResourceId == roomId) is { } room)
+            foreach (var id in LoomScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(room.FilePath), _globalScriptCount))
+            {
+                LoomScriptDisassembly? script;
+                try { script = _reader.DecodeRoomLocalScript(room, id, _globalScriptCount); }
+                catch (Exception ex) when (ex is InvalidDataException or IOException) { continue; }
+                if (script is null) continue;
+                int? size = null; var since = 0;
+                foreach (var ins in script.Instructions)
+                {
+                    since++;
+                    if (ins.Operation == "startScript" && ins.Operands.StartsWith($"0x{EgoSizeScript:X2}, [0x", StringComparison.Ordinal) &&
+                        int.TryParse(ins.Operands.AsSpan(ins.Operands.IndexOf("[0x", StringComparison.Ordinal) + 3).TrimEnd(']').TrimEnd(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var literal))
+                    { size = literal; since = 0; }
+                    else if (size is int known && since <= 3 && ins.Operation == "putActor" && ins.Operands.StartsWith("0x01, ", StringComparison.Ordinal))
+                    {
+                        var parts = ins.Operands.Split(", ");
+                        if (parts.Length == 3 && int.TryParse(parts[2].AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var y))
+                            samples.Add(new(y, known, $"Room {roomId:00} local {id} +0x{ins.Offset:X4} puts the ego there after startScript {EgoSizeScript:000} [{known}]"));
+                    }
+                }
+            }
+        return samples.OrderBy(sample => Math.Abs(sample.Y - arrival.WalkY)).ThenBy(sample => sample.Size).Cast<DepthSample?>().FirstOrDefault();
     }
 
     /// <summary>
