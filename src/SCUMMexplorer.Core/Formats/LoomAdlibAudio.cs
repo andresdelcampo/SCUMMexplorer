@@ -283,6 +283,7 @@ public sealed partial class LoomAdlibAudio
                         _position = _loopStart;
                         continue;
                     }
+                    if (meta == 0x58) { _position += 5; goto afterCommand; }
                     var length = Read(_position++);
                     if (meta == 0x51 && length >= 3)
                     {
@@ -319,6 +320,7 @@ public sealed partial class LoomAdlibAudio
                     }
                     else { End(); return; }
                 }
+                afterCommand:
                 if (_position >= _data.Length) { End(); return; }
                 if (_data[_position] == 0) { _position++; continue; }
                 var delay = Read(_position++);
@@ -334,8 +336,9 @@ public sealed partial class LoomAdlibAudio
             var channel = Array.FindIndex(_voices, 0, _voiceCount, v => v.Event == 0);
             if (channel < 0) return;
             SetupChannel(channel, instrument);
-            var pitch = Math.Max(0, note - 31);
-            var octave = Math.Min(7, pitch / 12);
+            // setupFrequency takes an int8: the note wraps as a signed byte, then clamps at 0.
+            var pitch = Math.Max(0, (int)unchecked((sbyte)((sbyte)note - 31)));
+            var octave = pitch / 12;
             var fNumber = NoteFNumbers[pitch % 12];
             Write(0xa0 + channel, fNumber & 0xff);
             Write(0xb0 + channel, ((octave << 2) | (fNumber >> 8) | 0x20) & 0xff);
@@ -398,7 +401,8 @@ public sealed partial class LoomAdlibAudio
         private void End(bool normal = false)
         {
             for (var i = 0; i < _voiceCount; i++) if (_voices[i].Event != 0) StopNote(i);
-            if (_rhythm != 0) { _rhythm = 0; Write(0xbd, 0); }
+            _rhythm = 0;
+            Write(0xbd, 0);
             Active = false;
             EndedNormally = normal;
         }

@@ -1,6 +1,13 @@
-// PC speaker decoder and synthesis adapted from ScummVM's Player_V2Base and
+// PC speaker decoder and synthesis ported from ScummVM's Player_V2Base and
 // Player_V2 (https://github.com/scummvm/scummvm/tree/master/engines/scumm/players).
 // Copyright (C) ScummVM contributors. SPDX-License-Identifier: GPL-3.0-or-later
+//
+// The channel state is kept as the same array of 16-bit words as ScummVM's
+// channel_data struct, so script parameter writes alias the same fields, and the
+// tick, envelope and square-generator arithmetic (16.16 fixed point, integer
+// low-pass filter) follows the C++ line by line. Only the 22 050 Hz output rate
+// differs from the ScummVM mixer rate; ScummVM derives the filter decay from the
+// rate in the same way (see _decay below).
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Domain;
 
@@ -16,30 +23,47 @@ public sealed class LoomPcSpeakerAudio
     private const int TickRate = 236;
     private const int SampleRate = 22050;
     private const int MaxTicks = TickRate * 180;
-    private const double SpeakerAmplitude = 5440;
-    private const double FilterInput = 0.609375;
+    private const int FixShift = 16;
+    private const int MaxScriptSteps = 1 << 16;
 
-    // The V2 sound bytecode selects an envelope for each channel. Each pair is
-    // either an absolute volume (duration -1), or a per-tick change and the
-    // number of ticks before the next pair. The release starts at pair 4.
-    private static readonly HullStep[][] Hulls =
-    [
-        [new(3, -1), new(0, 0), new(0, 0), new(0, 0), new(0, -1), new(0, 0)],
-        [new(3, -1), new(0, 32), new(0, -1), new(0, 0), new(0, -1), new(0, 0)],
-        [new(3, -1), new(0, 0), new(0, 0), new(0, 0), new(0, 0), new(0, 0)],
-        [new(3, -1), new(0, 2), new(0, -1), new(0, 0), new(0, -1), new(0, 0)],
-        [new(3, -1), new(0, 6), new(0, -1), new(0, 0), new(0, -1), new(0, 0)],
-        [new(3, -1), new(0, 16), new(0, -1), new(0, 0), new(0, -1), new(0, 0)],
-        [new(60000, -1), new(-1000, 20), new(0, 0), new(0, 0), new(40000, -1), new(-5000, 5), new(0, -1), new(0, 0)],
-        [new(50000, -1), new(0, 8), new(30000, -1), new(0, 0), new(28000, -1), new(-5000, 5), new(0, -1), new(0, 0)],
-        [new(60000, -1), new(-2000, 16), new(0, 0), new(0, 0), new(28000, -1), new(-6000, 5), new(0, -1), new(0, 0)],
-        [new(55000, -1), new(0, 8), new(35000, -1), new(0, 0), new(40000, -1), new(-2000, 10), new(0, -1), new(0, 0)],
-        [new(60000, -1), new(0, 4), new(-2000, 8), new(0, 0), new(40000, -1), new(-6000, 5), new(0, -1), new(0, 0)],
-        [new(63000, -1), new(-1968, 32), new(0, -1), new(0, 0), new(44000, -1), new(-733, 60), new(0, -1), new(0, 0)],
-        [new(0, -1), new(150, 340), new(-150, 340), new(0, -1), new(0, -1), new(0, 0)],
-        [new(20000, -1), new(4000, 7), new(1000, 15), new(0, 0), new(35000, -1), new(-2000, 15), new(0, -1), new(0, 0)],
-        [new(35000, -1), new(500, 20), new(0, 0), new(0, 0), new(45000, -1), new(-500, 60), new(0, -1), new(0, 0)]
-    ];
+    // channel_data field indices (each a uint16 in ScummVM's struct).
+    private const int TimeLeft = 0, NextCmd = 1, BaseFreq = 2, FreqDelta = 3, Freq = 4, Volume = 5, VolumeDelta = 6,
+        Tempo = 7, InterNotePause = 8, Transpose = 9, NoteLength = 10, HullCurve = 11, HullOffset = 12,
+        HullCounter = 13, FreqmodTable = 14, FreqmodOffset = 15, FreqmodIncr = 16, FreqmodMultiplier = 17,
+        FreqmodModulo = 18, ChannelWords = 25;
+
+    // ScummVM's `hulls` table, verbatim (including the (int16) casts of the large values).
+    // Entries are (value, ticks) pairs; ticks -1 means "set the volume to value".
+    private static readonly short[] Hulls = Array.ConvertAll(new int[]
+    {
+        3, -1, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0,
+        3, -1, 0, 32, 0, -1, 0, 0, 0, -1, 0, 0,
+        3, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        3, -1, 0, 2, 0, -1, 0, 0, 0, -1, 0, 0,
+        3, -1, 0, 6, 0, -1, 0, 0, 0, -1, 0, 0,
+        3, -1, 0, 16, 0, -1, 0, 0, 0, -1, 0, 0,
+        60000, -1, -1000, 20, 0, 0, 0, 0, 40000, -1, -5000, 5, 0, -1, 0, 0,
+        50000, -1, 0, 8, 30000, -1, 0, 0, 28000, -1, -5000, 5, 0, -1, 0, 0,
+        60000, -1, -2000, 16, 0, 0, 0, 0, 28000, -1, -6000, 5, 0, -1, 0, 0,
+        55000, -1, 0, 8, 35000, -1, 0, 0, 40000, -1, -2000, 10, 0, -1, 0, 0,
+        60000, -1, 0, 4, -2000, 8, 0, 0, 40000, -1, -6000, 5, 0, -1, 0, 0,
+        0, -1, 150, 340, -150, 340, 0, -1, 0, -1, 0, 0,
+        20000, -1, 4000, 7, 1000, 15, 0, 0, 35000, -1, -2000, 15, 0, -1, 0, 0,
+        35000, -1, 500, 20, 0, 0, 0, 0, 45000, -1, -500, 60, 0, -1, 0, 0,
+        44000, -1, -4400, 10, 0, -1, 0, 0, 0, -1, 0, 0,
+        53000, -1, -5300, 10, 0, -1, 0, 0, 0, -1, 0, 0,
+        63000, -1, -6300, 10, 0, -1, 0, 0, 0, -1, 0, 0,
+        44000, -1, -1375, 32, 0, -1, 0, 0, 0, -1, 0, 0,
+        53000, -1, -1656, 32, 0, -1, 0, 0, 0, -1, 0, 0,
+        63000, -1, -1968, 32, 0, -1, 0, 0, 0, -1, 0, 0,
+        44000, -1, -733, 60, 0, -1, 0, 0, 0, -1, 0, 0,
+        53000, -1, -883, 60, 0, -1, 0, 0, 0, -1, 0, 0,
+        63000, -1, -1050, 60, 0, -1, 0, 0, 0, -1, 0, 0,
+        44000, -1, -488, 90, 0, -1, 0, 0, 0, -1, 0, 0,
+        53000, -1, -588, 90, 0, -1, 0, 0, 0, -1, 0, 0,
+        63000, -1, -700, 90, 0, -1, 0, 0, 0, -1, 0, 0
+    }, value => unchecked((short)value));
+    private static readonly int[] HullOffsets = [0, 12, 24, 36, 48, 60, 72, 88, 104, 120, 136, 256, 152, 164, 180];
     private static readonly int[] ModulationPeriods = [0x1000, 0x1000, 0x20, 0x2000, 0x1000];
 
     public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
@@ -60,242 +84,22 @@ public sealed class LoomPcSpeakerAudio
             data[8] != 0 || data[9] != 0 || data[10] != 0 || data[11] != 0)
             throw new NotSupportedException("This sound uses a different LOOM music encoding. PC speaker playback is available for the old-bundle tracks.");
 
-        var channels = Enumerable.Range(0, 4).Select(_ => new Channel()).ToArray();
-        for (var i = 0; i < 4; i++)
-        {
-            channels[i].Position = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(6 + i * 2, 2));
-            channels[i].Remaining = channels[i].Position == 0 ? 0 : 1;
-        }
+        var player = new Player(data);
         var samples = new List<short>();
-        double samplesToToggle = 0;
-        var speakerHigh = false;
-        double filteredSample = 0;
-        var sampleRemainder = 0;
         var hadSound = false;
-        var returnPosition = 0;
-        for (var tick = 0; tick < MaxTicks && channels.Any(c => c.Remaining > 0); tick++)
+        for (var tick = 0; tick < MaxTicks && player.Playing; tick++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            foreach (var channel in channels)
-            {
-                if (channel.Remaining == 0) continue;
-                channel.Volume = (ushort)(channel.Volume + channel.Parameters[6]);
-                channel.Divisor = (ushort)(channel.Divisor + (short)channel.Parameters[3]);
-                if (channel.Parameters[18] > 0)
-                {
-                    channel.ModulationPosition = (channel.ModulationPosition + channel.Parameters[16]) % channel.Parameters[18];
-                    var modulation = ModulationValue(channel.ModulationCurve, channel.ModulationPosition >> 4);
-                    channel.CurrentDivisor = (ushort)(channel.Divisor + modulation * channel.Parameters[17] / 256);
-                }
-                else channel.CurrentDivisor = channel.Divisor;
-
-                if (channel.NoteLength > 0 && --channel.NoteLength == 0)
-                {
-                    channel.HullPosition = 4;
-                    channel.HullCounter = 1;
-                }
-                channel.Remaining--;
-                if (channel.Remaining == 0) Execute(data, channels, channel, ref returnPosition);
-                AdvanceHull(channel);
-            }
-
-            var active = channels.FirstOrDefault(c => c.Remaining > 0 && c.Volume != 0 && c.CurrentDivisor > 0);
-            var frequency = active is null ? 0 : 1193000.0 / active.CurrentDivisor;
-            if (frequency > 0) hadSound = true;
-            sampleRemainder += SampleRate;
-            var count = sampleRemainder / TickRate;
-            sampleRemainder %= TickRate;
-            var halfPeriodSamples = frequency > 0 ? SampleRate / (2 * frequency) : 0;
-            for (var i = 0; i < count; i++)
-            {
-                var pulse = 0.0;
-                if (halfPeriodSamples > 0)
-                {
-                    // Retain the PIT's time to the next transition across
-                    // divisor changes, then integrate both levels over this
-                    // sample. Point sampling creates inharmonic alias tones.
-                    var highDuration = speakerHigh ? samplesToToggle : 0;
-                    samplesToToggle -= 1;
-                    while (samplesToToggle <= 0)
-                    {
-                        speakerHigh = !speakerHigh;
-                        if (speakerHigh) highDuration += halfPeriodSamples;
-                        samplesToToggle += halfPeriodSamples;
-                    }
-                    if (speakerHigh) highDuration -= samplesToToggle;
-                    pulse = (2 * highDuration - 1) * SpeakerAmplitude;
-                }
-                filteredSample += (pulse - filteredSample) * FilterInput;
-                samples.Add((short)Math.Clamp((int)Math.Round(filteredSample), short.MinValue, short.MaxValue));
-            }
+            player.NextTick();
+            hadSound |= player.HasWinner;
+            player.Generate(samples, player.TakeTickSamples());
         }
         if (!hadSound)
             throw new NotSupportedException("This resource has no playable PC speaker notes.");
-        // The real low-pass stage continues to settle after the final command.
-        for (var i = 0; i < 32; i++)
-        {
-            filteredSample *= 1 - FilterInput;
-            samples.Add((short)Math.Round(filteredSample));
-        }
+        // ScummVM keeps running the low-pass filter on silence until it has settled.
+        player.Settle(samples);
         return ToWave(samples);
     }
-
-    private static int ModulationValue(int curve, int index)
-    {
-        var tableIndex = LoomPcSpeakerModulationTable.Offsets[curve] + index;
-        if ((uint)tableIndex >= LoomPcSpeakerModulationTable.Values.Length)
-            throw new InvalidDataException("Sound modulation index is invalid.");
-        return LoomPcSpeakerModulationTable.Values[tableIndex];
-    }
-
-    private static void AdvanceHull(Channel channel)
-    {
-        if (channel.HullCounter == 0 || --channel.HullCounter != 0) return;
-        var hull = Hulls[channel.HullCurve];
-        while (channel.HullPosition < hull.Length)
-        {
-            var step = hull[channel.HullPosition++];
-            if (step.Ticks == -1)
-            {
-                channel.Volume = (ushort)step.Value;
-                if (step.Value == 0) channel.Parameters[6] = 0;
-                continue;
-            }
-            channel.Parameters[6] = (ushort)step.Value;
-            channel.HullCounter = step.Ticks;
-            return;
-        }
-    }
-
-    private static void Execute(byte[] data, Channel[] channels, Channel channel, ref int returnPosition)
-    {
-        var steps = 0;
-        while (channel.Position > 0 && channel.Position < data.Length && ++steps < 2048)
-        {
-            var opcode = data[channel.Position++];
-            switch (opcode)
-            {
-                case 0xF8 or 0xF9:
-                    var curve = ReadByte(data, channel);
-                    if (opcode == 0xF8)
-                    {
-                        if (curve / 2 >= Hulls.Length) throw new InvalidDataException("Sound hull curve is invalid.");
-                        channel.HullCurve = curve / 2;
-                    }
-                    else
-                    {
-                        if (curve / 4 >= ModulationPeriods.Length) throw new InvalidDataException("Sound modulation curve is invalid.");
-                        channel.ModulationCurve = curve / 4;
-                        channel.Parameters[18] = ModulationPeriods[channel.ModulationCurve];
-                    }
-                    break;
-                case 0xFD:
-                    var target = ReadWord(data, channel) / 50;
-                    if (target >= 0 && target < channels.Length)
-                    {
-                        if (channels[target] != channel) channels[target].Position = 0;
-                        channels[target].Remaining = 0;
-                        channels[target].Volume = 0;
-                        channels[target].HullCurve = 0;
-                        channels[target].HullPosition = 0;
-                        channels[target].HullCounter = 0;
-                        channels[target].ModulationCurve = 0;
-                        channels[target].ModulationPosition = 0;
-                        channels[target].NoteLength = 0;
-                        Array.Clear(channels[target].Parameters);
-                    }
-                    break;
-                case 0xFA:
-                    channel.Position = 0;
-                    channel.Volume = 0;
-                    return;
-                case 0xFB:
-                    if (returnPosition == 0) throw new InvalidDataException("Sound subroutine return has no call.");
-                    channel.Position = returnPosition;
-                    returnPosition = 0;
-                    break;
-                case 0xFC:
-                    var destination = ReadWord(data, channel);
-                    returnPosition = channel.Position;
-                    channel.Position = destination;
-                    break;
-                case 0xFE:
-                    var parameter = ReadByte(data, channel) / 2;
-                    var relative = (short)ReadWord(data, channel);
-                    if (parameter >= channel.Parameters.Length) throw new InvalidDataException("Sound loop parameter is invalid.");
-                    if (channel.Parameters[parameter] == 0 || --channel.Parameters[parameter] != 0)
-                        channel.Position += relative;
-                    break;
-                case 0xFF:
-                    var index = ReadByte(data, channel) / 2;
-                    var value = ReadWord(data, channel);
-                    if (index >= channel.Parameters.Length) throw new InvalidDataException("Sound parameter is invalid.");
-                    channel.Parameters[index] = value;
-                    if (index == 2) channel.Divisor = value;
-                    if (index == 5) channel.Volume = value;
-                    if (index == 0)
-                    {
-                        channel.Remaining = value;
-                        if (value == 0) channel.Position = 0;
-                        return;
-                    }
-                    break;
-                default:
-                    var destinationChannel = channels[(opcode >> 5) & 3];
-                    int note, duration;
-                    bool last;
-                    if ((opcode & 0x80) == 0)
-                    {
-                        var lengthIndex = opcode & 31;
-                        if (lengthIndex >= NoteLengths.Length) throw new InvalidDataException("Sound note length is invalid.");
-                        duration = Math.Max(1, (channel.Parameters[7] == 0 ? 1 : channel.Parameters[7]) * NoteLengths[lengthIndex]);
-                        note = ReadByte(data, channel);
-                        last = (note & 0x80) != 0;
-                        note &= 0x7F;
-                        if (note == 0x7F)
-                        {
-                            channel.Remaining = duration;
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        duration = Math.Max(1, ((opcode & 7) << 8) | ReadByte(data, channel));
-                        if ((opcode & 0x10) != 0)
-                        {
-                            channel.Remaining = duration;
-                            return;
-                        }
-                        note = ReadByte(data, channel) & 0x7F;
-                        last = false;
-                    }
-                    var pitch = note + (short)destinationChannel.Parameters[9];
-                    while (pitch < 0) pitch += 12;
-                    var octave = pitch / 12;
-                    destinationChannel.Divisor = Math.Max(1, Divisors[pitch % 12] >> Math.Min(octave, 15));
-                    destinationChannel.CurrentDivisor = destinationChannel.Divisor;
-                    destinationChannel.Remaining = duration;
-                    destinationChannel.ModulationPosition = 0;
-                    destinationChannel.NoteLength = (ushort)(duration - destinationChannel.Parameters[8]);
-                    destinationChannel.HullPosition = 0;
-                    destinationChannel.HullCounter = 1;
-                    channel.Remaining = duration;
-                    if (last) return;
-                    break;
-            }
-        }
-        if (steps >= 2048) throw new InvalidDataException("The sound stream does not advance.");
-        channel.Position = 0;
-        channel.Remaining = 0;
-    }
-
-    private static int ReadByte(byte[] data, Channel channel)
-    {
-        if (channel.Position < 0 || channel.Position >= data.Length) throw new InvalidDataException("The sound stream ends unexpectedly.");
-        return data[channel.Position++];
-    }
-
-    private static int ReadWord(byte[] data, Channel channel) => ReadByte(data, channel) | (ReadByte(data, channel) << 8);
 
     private static byte[] ToWave(List<short> samples)
     {
@@ -317,21 +121,325 @@ public sealed class LoomPcSpeakerAudio
         return stream.ToArray();
     }
 
-    private sealed class Channel
+    /// <summary>Player_V2Base channel script and envelope logic plus Player_V2's speaker output.</summary>
+    private sealed class Player
     {
-        public int Position;
-        public int Remaining;
-        public int Divisor;
-        public int CurrentDivisor;
-        public int Volume;
-        public int NoteLength;
-        public int HullCurve;
-        public int HullPosition;
-        public int HullCounter;
-        public int ModulationCurve;
-        public int ModulationPosition;
-        public int[] Parameters { get; } = new int[25];
-    }
+        private readonly byte[] _data;
+        // ScummVM has a fifth, never-ticked channel that absorbs out-of-range 0xFD targets.
+        private readonly ushort[][] _channels = Enumerable.Range(0, 5).Select(_ => new ushort[ChannelWords]).ToArray();
+        private int _returnAddress = -1;
 
-    private readonly record struct HullStep(int Value, int Ticks);
+        // Player_V2 output state.
+        private readonly uint _tickLength = (uint)(((long)SampleRate << FixShift) / TickRate);
+        private readonly uint _updateStep = (uint)(((long)SampleRate << FixShift) / (1193000 * 2));
+        private readonly uint _decay;
+        private readonly int _volumeLevel0 = (int)(255 * 128.0 / 3.0);
+        private uint _nextTick;
+        private int _level;
+        private int _timerCount;
+        private bool _timerOutput;
+
+        public Player(byte[] data)
+        {
+            _data = data;
+            for (var i = 0; i < 4; i++)
+            {
+                _channels[i][NextCmd] = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(6 + 2 * i, 2));
+                if (_channels[i][NextCmd] != 0) _channels[i][TimeLeft] = 1;
+            }
+            // Adapt _decay to the sample rate; it is squared when the rate halves.
+            var decay = 0xa000u;
+            for (var i = 0; (SampleRate << i) < 30000; i++) decay = decay * decay / 65536;
+            _decay = decay;
+        }
+
+        public bool Playing => _channels.Take(4).Any(channel => channel[TimeLeft] != 0);
+
+        public bool HasWinner => WinningChannel() >= 0;
+
+        public void NextTick()
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                if (_channels[i][TimeLeft] == 0) continue;
+                NextFreqs(_channels[i]);
+            }
+        }
+
+        /// <summary>The whole samples of the tick just started; the remainder carries over as in readBuffer.</summary>
+        public int TakeTickSamples()
+        {
+            if ((_nextTick >> FixShift) == 0) _nextTick += _tickLength;
+            var step = (int)(_nextTick >> FixShift);
+            _nextTick -= (uint)step << FixShift;
+            return step;
+        }
+
+        private int WinningChannel()
+        {
+            for (var i = 0; i < 4; i++)
+                if (_channels[i][Volume] != 0 && _channels[i][TimeLeft] != 0) return i;
+            return -1;
+        }
+
+        public void Generate(List<short> output, int length)
+        {
+            var winner = WinningChannel();
+            var buffer = new int[length];
+            if (winner >= 0) SquareGenerator(_channels[winner][Freq], buffer);
+            else if (_level == 0)
+            {
+                // Shortcut in ScummVM: no sound is being played.
+                for (var i = 0; i < length; i++) output.Add(0);
+                return;
+            }
+            LowPass(buffer);
+            foreach (var value in buffer) output.Add((short)value);
+        }
+
+        public void Settle(List<short> output)
+        {
+            for (var guard = 0; guard < SampleRate && _level is not (0 or -1); guard++)
+                Generate(output, 1);
+        }
+
+        private void SquareGenerator(int freq, int[] samples)
+        {
+            var period = unchecked((int)(_updateStep * (uint)freq));
+            if (period == 0) period = (int)_updateStep;
+            for (var i = 0; i < samples.Length; i++)
+            {
+                uint duration = 0;
+                if (_timerOutput) duration += unchecked((uint)_timerCount);
+                _timerCount -= 1 << FixShift;
+                while (_timerCount <= 0)
+                {
+                    _timerOutput = !_timerOutput;
+                    if (_timerOutput) duration += (uint)period;
+                    _timerCount += period;
+                }
+                if (_timerOutput) duration -= unchecked((uint)_timerCount);
+                var value = samples[i] + (int)((long)unchecked((int)(duration - (1 << (FixShift - 1)))) * _volumeLevel0 >> FixShift);
+                samples[i] = Math.Clamp(value, -0x8000, 0x7fff);
+            }
+        }
+
+        private void LowPass(int[] samples)
+        {
+            for (var i = 0; i < samples.Length; i++)
+            {
+                _level = unchecked((int)((uint)_level * _decay + (uint)samples[i] * (0x10000 - _decay))) >> 16;
+                samples[i] = _level;
+            }
+        }
+
+        private static int ReadModulation(int table, int index)
+        {
+            var at = table + index;
+            if ((uint)at >= LoomPcSpeakerModulationTable.Values.Length)
+                throw new InvalidDataException("Sound modulation index is invalid.");
+            return LoomPcSpeakerModulationTable.Values[at];
+        }
+
+        private void NextFreqs(ushort[] channel)
+        {
+            channel[Volume] = unchecked((ushort)(channel[Volume] + channel[VolumeDelta]));
+            channel[BaseFreq] = unchecked((ushort)(channel[BaseFreq] + channel[FreqDelta]));
+            if (channel[FreqmodModulo] > 0)
+                channel[FreqmodOffset] = (ushort)((channel[FreqmodOffset] + channel[FreqmodIncr]) % channel[FreqmodModulo]);
+            else
+                channel[FreqmodOffset] = 0;
+            channel[Freq] = unchecked((ushort)(ReadModulation(channel[FreqmodTable], channel[FreqmodOffset] >> 4)
+                * channel[FreqmodMultiplier] / 256 + channel[BaseFreq]));
+
+            if (channel[NoteLength] != 0 && --channel[NoteLength] == 0)
+            {
+                channel[HullOffset] = 16;
+                channel[HullCounter] = 1;
+            }
+            if (--channel[TimeLeft] == 0) ExecuteCommand(channel);
+            if (channel[HullCounter] != 0 && --channel[HullCounter] == 0)
+            {
+                for (var guard = 0; ; guard++)
+                {
+                    var at = channel[HullCurve] + channel[HullOffset] / 2;
+                    if (guard > 64 || at + 1 >= Hulls.Length) throw new InvalidDataException("Sound hull envelope is invalid.");
+                    if (Hulls[at + 1] == -1)
+                    {
+                        channel[Volume] = unchecked((ushort)Hulls[at]);
+                        if (Hulls[at] == 0) channel[VolumeDelta] = 0;
+                        channel[HullOffset] += 4;
+                    }
+                    else
+                    {
+                        channel[VolumeDelta] = unchecked((ushort)Hulls[at]);
+                        channel[HullCounter] = unchecked((ushort)Hulls[at + 1]);
+                        channel[HullOffset] += 4;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private byte Byte(ref int position)
+        {
+            if (position < 0 || position >= _data.Length) throw new ScriptOverrun();
+            return _data[position++];
+        }
+
+        private ushort Word(ref int position) => (ushort)(Byte(ref position) | (Byte(ref position) << 8));
+
+        private static void ClearFields(ushort[] channel)
+        {
+            channel[NextCmd] = 0;
+            channel[BaseFreq] = 0;
+            channel[FreqDelta] = 0;
+            channel[Freq] = 0;
+            channel[Volume] = 0;
+            channel[VolumeDelta] = 0;
+            channel[InterNotePause] = 0;
+            channel[Transpose] = 0;
+            channel[HullCurve] = 0;
+            channel[HullOffset] = 0;
+            channel[HullCounter] = 0;
+            channel[FreqmodTable] = 0;
+            channel[FreqmodOffset] = 0;
+            channel[FreqmodIncr] = 0;
+            channel[FreqmodMultiplier] = 0;
+            channel[FreqmodModulo] = 0;
+        }
+
+        private sealed class ScriptOverrun : Exception;
+
+        /// <summary>ScummVM would read past the resource here; the channel script ends instead.</summary>
+        private void ExecuteCommand(ushort[] current)
+        {
+            try { ExecuteCommandCore(current); }
+            catch (ScriptOverrun) { current[NextCmd] = 0; current[TimeLeft] = 0; }
+        }
+
+        /// <summary>execute_cmd: note that after 0xFD ScummVM keeps running the script on the cleared target channel.</summary>
+        private void ExecuteCommandCore(ushort[] current)
+        {
+            var channel = current;
+            if (channel[NextCmd] != 0)
+            {
+                var position = (int)channel[NextCmd];
+                for (var steps = 0; ; steps++)
+                {
+                    if (steps > MaxScriptSteps) throw new InvalidDataException("The sound stream does not advance.");
+                    var opcode = Byte(ref position);
+                    if (opcode >= 0xf8)
+                    {
+                        switch (opcode)
+                        {
+                            case 0xf8:
+                            {
+                                var curve = Byte(ref position) / 2;
+                                if (curve >= HullOffsets.Length) throw new InvalidDataException("Sound hull curve is invalid.");
+                                channel[HullCurve] = (ushort)HullOffsets[curve];
+                                break;
+                            }
+                            case 0xf9:
+                            {
+                                var curve = Byte(ref position) / 4;
+                                if (curve >= ModulationPeriods.Length) throw new InvalidDataException("Sound modulation curve is invalid.");
+                                channel[FreqmodTable] = (ushort)LoomPcSpeakerModulationTable.Offsets[curve];
+                                channel[FreqmodModulo] = (ushort)ModulationPeriods[curve];
+                                break;
+                            }
+                            case 0xfd:
+                            {
+                                var target = Word(ref position) / (ChannelWords * 2);
+                                if (target >= 4) target = 4;
+                                channel = _channels[target];
+                                ClearFields(channel);
+                                break;
+                            }
+                            case 0xfa:
+                                ClearFields(channel);
+                                break;
+                            case 0xfb:
+                                if (_returnAddress < 0) throw new InvalidDataException("Sound subroutine return has no call.");
+                                position = _returnAddress;
+                                break;
+                            case 0xfc:
+                            {
+                                var destination = (short)Word(ref position);
+                                _returnAddress = position;
+                                position = destination;
+                                break;
+                            }
+                            case 0xfe:
+                            {
+                                var parameter = Byte(ref position) / 2;
+                                var relative = (short)Word(ref position);
+                                if (parameter >= ChannelWords) throw new InvalidDataException("Sound loop parameter is invalid.");
+                                if (channel[parameter] == 0 || --channel[parameter] != 0) position += relative;
+                                break;
+                            }
+                            case 0xff:
+                            {
+                                var raw = Byte(ref position);
+                                var value = Word(ref position);
+                                if (raw / 2 >= ChannelWords) throw new InvalidDataException("Sound parameter is invalid.");
+                                channel[raw / 2] = value;
+                                if (raw == 0) goto end;
+                                break;
+                            }
+                        }
+                        continue;
+                    }
+
+                    // Note commands; one command can start notes on several channels.
+                    while (true)
+                    {
+                        var destination = _channels[(opcode >> 5) & 3];
+                        int note;
+                        bool isLastNote;
+                        if ((opcode & 0x80) == 0)
+                        {
+                            var tempo = channel[Tempo];
+                            if (tempo == 0) tempo = 1;
+                            channel[TimeLeft] = unchecked((ushort)(tempo * NoteLengths[opcode & 0x1f]));
+                            note = Byte(ref position);
+                            isLastNote = (note & 0x80) != 0;
+                            note &= 0x7f;
+                            if (note == 0x7f) goto end;
+                        }
+                        else
+                        {
+                            channel[TimeLeft] = (ushort)(((opcode & 7) << 8) | Byte(ref position));
+                            if ((opcode & 0x10) != 0) goto end;
+                            isLastNote = false;
+                            note = Byte(ref position) & 0x7f;
+                        }
+
+                        destination[TimeLeft] = channel[TimeLeft];
+                        destination[NoteLength] = unchecked((ushort)(channel[TimeLeft] - destination[InterNotePause]));
+                        note = (short)(note + destination[Transpose]);
+                        while (note < 0) note += 12;
+                        var octave = note / 12;
+                        note %= 12;
+                        destination[HullOffset] = 0;
+                        destination[HullCounter] = 1;
+                        destination[Freq] = destination[BaseFreq] = (ushort)(Divisors[note] >> octave);
+                        if (isLastNote) goto end;
+                        opcode = Byte(ref position);
+                    }
+                }
+            end:
+                channel = current;
+                if (channel[TimeLeft] != 0)
+                {
+                    channel[NextCmd] = (ushort)position;
+                    return;
+                }
+                // fall through: the channel script has finished
+                channel[NextCmd] = 0;
+                return;
+            }
+            // next_cmd == 0 (check_stopped): the sound ends when no channel has time left; the render loop checks that.
+        }
+    }
 }
