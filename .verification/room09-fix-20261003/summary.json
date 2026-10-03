@@ -1,0 +1,47 @@
+{
+  "outcome": "Room09 prefix plus three casts complete via accepted input.",
+  "inputFrames": 3300,
+  "directFrames": 3147,
+  "completedScopes": 6,
+  "recordedBodyEvents": 252,
+  "certaintyOnlyDifferences": 3,
+  "newSites": [
+    {
+      "owner": "Room 09 local 223",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 09 local 224",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 09 object 273 Verb 0x4D",
+      "offset": "+0x000D"
+    },
+    {
+      "owner": "script 101",
+      "offset": "+0x0000"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 215,
+    "after": 219,
+    "total": 235,
+    "percent": 93.19,
+    "remaining": 16
+  },
+  "diagnosticCycles": 1,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 281,
+  "evidence": {
+    "Exe\\Room09Fix-20261003\\cycle-1\\input.json": "1df97318ba6cf0637d7bf438e007d673c2b64d8a2d20ffc9208e72db0d6d2991",
+    "Exe\\Room09Fix-20261003\\cycle-1\\direct.json": "87633c14264176490a18fec240ad9a72b1c23dac40f4e7452ae044f3bad56f9e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

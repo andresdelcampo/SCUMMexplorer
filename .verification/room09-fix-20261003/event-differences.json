@@ -1,0 +1,35 @@
+[
+  {
+    "index": 111,
+    "source": "Room 09 Object 273 Verb 0x4D",
+    "offset": 13,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 115,
+    "source": "Room 09 Object 273 Verb 0x4F",
+    "offset": 5,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  },
+  {
+    "index": 116,
+    "source": "Room 09 local script 223",
+    "offset": 0,
+    "differences": {
+      "Certainty": {
+        "direct": 0,
+        "input": 1
+      }
+    }
+  }
+]

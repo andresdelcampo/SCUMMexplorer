@@ -1,5 +1,11 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room09 casts complete — 3 October
+
+After2892f99. Room09 corrected full route (Look 272→209/101, then 273/4D, 4F, 51 keyboard casts with supported staff/7 notes/learned 11-13 setup) completes 273/4D +000D, local223/224 +0000 and script101 +0000. Input3300/direct3147frames,6/6 scopes;252 Executed recorded events,3 certainty-only differences. Audited215→219/235 (93.19%),16 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room09-fix-20261003/validation.md).
+
+Next: remaining16 sites are Room34 local200 +0035/local207 +0079 and global scripts004,005 +01C0,009 +002C,011,012,013,022 +0005/+0138,045 x4,066,096. Inspect source callers first; Room34 Healing needs object586 selection. Preserve all constraints; no App launch or push.
+
 ## Latest: Room34 chain source barrier — 3 October
 
 After51aa4dd. Verified input now completes Room36 box10→4→3→9, 599→37, firewood086 end055C, Look610→087 end09B9, Opening617 end00B2 and exit609→37. Then Room37 object601 verb0x37 refuses (ego costume 1 != 0x67, "Mejor no vuelvo allí..."), blocking601→36 and so the whole 601→36→35→34 route; the only ego-0x67 writer is Room34 local202 +00DB/+00EF. A catalog-Room34 Healing cycle targeted object561 not586 (probe error). Two cycles, no coverage gain: audited215/235 and fresh169/235 unchanged. [Validation](../.verification/room34-chain-20261003/validation.md).
