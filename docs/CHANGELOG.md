@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify Room20 Waking through continuous input
+
+Room20 remaining206 +0000 completes via Sleep350 keys, exit346, Room18 conversation372 then revealed crystal371, and Waking390 keys. SourceD8F missing→1→0; final18 via207/058/059. Input3263/direct3161frames,8/8 scopes;154 Executed/Conditional selected events,153 certainty-only differences plus one retaining argument-index uncertainty. Audited214→215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First hidden-bell attempt retained/excluded; second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room20-input-20261003/validation.md).
+
 ## 3 October: verify Room47 return response
 
 Room47 Cygna697 Look and actual exits696→46→681→47 complete205 +01B7/end03F1. Source100 removes703 class24; DC5/DC6 remain missing. Input/direct2423frames,3/3 scopes;117 Executed/Reached selected events match exactly. Audited213→214/235 (91.06%),21 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change, protected57/history/App untouched. [Validation](../.verification/room47-input-20261003/validation.md).

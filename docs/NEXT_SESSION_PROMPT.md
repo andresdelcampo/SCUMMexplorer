@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room20 Waking route complete — 3 October
+
+After905e18e. Room20 remaining206 +0000 completes via Sleep350 keys, exit346, Room18 conversation372 then revealed crystal371, and Waking390 keys. SourceD8F missing→1→0; final18 via207/058/059. Input3263/direct3161frames,8/8 scopes;154 Executed/Conditional selected events,153 certainty-only differences plus one retaining argument-index uncertainty. Audited214→215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First hidden-bell attempt retained/excluded; second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room20-input-20261003/validation.md).
+
+Next candidate: Room34 remaining200 +0035 (box6→8/camera prerequisite) and207 +0079 (sourceD9D). Inspect source prerequisites before input. Keep completed Room34 spell sequences complete and Room09 stopped this session. Supported staff/notes/learned setup labelled, original notes/reverse flags unchanged. Continue successive bounded tasks toward200K context per user; exact telemetry unavailable. Commit each; at most two diagnostics per route without a route-relevant decision. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from Room20 using docs/NEXT_SESSION_PROMPT.md. Audited215/235 versus fresh single-action169/235. Inspect Room34 remaining watcher prerequisites; continue bounded input audits toward200K context, commit each and leave running App untouched.
+
 ## Latest: Room47 return response complete — 3 October
 
 After69c4690. Room47 Cygna697 Look and actual exits696→46→681→47 complete205 +01B7/end03F1. Source100 removes703 class24; DC5/DC6 remain missing. Input/direct2423frames,3/3 scopes;117 Executed/Reached selected events match exactly. Audited213→214/235 (91.06%),21 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change, protected57/history/App untouched. [Validation](../.verification/room47-input-20261003/validation.md).
