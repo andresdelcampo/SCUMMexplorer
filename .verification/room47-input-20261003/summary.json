@@ -1,0 +1,56 @@
+{
+  "outcome": "Room47 Cygna Look followed by actual exits through46 completes the remaining return response.",
+  "inputFrames": 2423,
+  "directFrames": 2423,
+  "completedScopes": 3,
+  "executedSelectedEvents": 117,
+  "reachedEvents": 117,
+  "certaintyDifferences": 0,
+  "unknownFlags": [
+    "bit[0xDC5]",
+    "bit[0xDC6]"
+  ],
+  "newSites": [
+    {
+      "owner": "Room 47 local 205",
+      "offset": "+0x01B7"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 213,
+    "after": 214,
+    "total": 235,
+    "percent": 91.06,
+    "remaining": 21
+  },
+  "diagnosticCycles": 1,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 239,
+  "productionAndCatalogUnchanged": true,
+  "evidence": {
+    "Exe\\Room47Input-20261003\\cycle-1\\input.json": "50b719a3059bc71e2369e02c65e37567fecac5a6e1a8bc1dbb392a1c83bbf8fb",
+    "Exe\\Room47Input-20261003\\cycle-1\\direct.json": "2b9e97b175beeee6db1f2c68945b9bbf51fbf043c90e518292907f8457f6b581",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\Room10Input-20261003\\cycle-2\\input.json": "45bc809447e4695a970ef18efa5ef6f40766b08ec4903ceaadb3bb2c855aa0e6",
+    "Exe\\Room36Input-20261003\\cycle-2\\input.json": "64d54010713e91af16458a3ccfe8a73a94999a69cd12350a2b8c3921d2e9075f",
+    "Exe\\Room24Input-20261003\\cycle-1\\input.json": "62d21cd625075fda73fcc45c086386571250a4cc3298ecfe638c7f5ca66b641c",
+    "Exe\\Room15Input-20261003\\cycle-1\\input.json": "ba65f8accf0006b265d69a5370e5ea8f2a794e16c1323d53a0dcd3256a4c6161",
+    "Exe\\Room17Input-20261003\\cycle-2\\input.json": "3ffe3c4f69d12f8483844021d59b7b16a2ea91ee220e632276621a456dfd268e",
+    "Exe\\Room22Input-20261003\\cycle-2\\input.json": "2bb31dc15a89abc19b40502876ece4c27412353e8565006abb44770f661c72c6",
+    "Exe\\Room08Input-20261003\\cycle-1\\input.json": "eee2b50425b810928a31f8be5d61b692b81403a8824994e19b42e4c91572a446",
+    "Exe\\Room28Input-20261003\\cycle-1\\input.json": "b334097d3f47268817b4380f983c13efb6246e29b96a1929303b036455c726ae",
+    "Exe\\Room62Input-20261003\\cycle-1\\input.json": "df14512db9af091e5928faef29d1778cf82e2917397619fd2f4b752a94568f32",
+    "Exe\\Room33Input-20261003\\cycle-1\\input.json": "7e3e9b10469a045ae57ec6fa2f648c6c55d67a15d73a5165094422c2fc879e70"
+  }
+}

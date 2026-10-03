@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room47 return response complete — 3 October
+
+After69c4690. Room47 Cygna697 Look and actual exits696→46→681→47 complete205 +01B7/end03F1. Source100 removes703 class24; DC5/DC6 remain missing. Input/direct2423frames,3/3 scopes;117 Executed/Reached selected events match exactly. Audited213→214/235 (91.06%),21 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change, protected57/history/App untouched. [Validation](../.verification/room47-input-20261003/validation.md).
+
+Next candidate: Room20 local206 +0000, establish source Sleep350 prerequisite and actual navigation before response keys. Supported staff/notes/learned setup labelled, original notes/reverse flags unchanged. Keep Room09 stopped this session. Continue successive bounded tasks toward200K context per user; exact telemetry unavailable. Commit each; at most two diagnostics per route without a route-relevant decision. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from Room47 using docs/NEXT_SESSION_PROMPT.md. Audited214/235 versus fresh single-action169/235. Start Room20 remaining site, continue bounded input audits toward200K context, commit each and leave running App untouched.
+
 ## Latest: Room33 Untwist/Twist pair complete — 3 October
 
 After a8df5fb. Room33 Untwist/Twist keys on544 complete remaining202 +0006 after source201 establishesD81. Input706/direct604frames,4/4 scopes;63 Executed recorded events (entry Reached,62 Conditional),60 certainty-only differences plus two retaining argument-index uncertainty. Audited212→213/235 (90.64%),22 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room33-input-20261003/validation.md).
