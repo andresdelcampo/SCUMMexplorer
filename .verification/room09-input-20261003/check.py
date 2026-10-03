@@ -12,7 +12,7 @@ for i,p in enumerate(map(read,paths)):
     assert p['failure'] and p['sourceFiles']==catalog['sourceFiles']
     assert p['frames']==(3322 if i<2 else 1768) and p['boundaries']==(early if i<2 else later)
     assert ('missing endCutscene at Script 101' if i<2 else 'Expected three source draft slots') in p['failure']
-    assert [r['room'] for r in p['rooms']]==[11,7,9]
+    assert [r['room'] for r in p['rooms']]==([11,7,9] if i<2 else [11,7,9,59,9])
     assert not any(a.get('userStatusEdits') for a in p['actions'])
     for a in p['actions']:
         result=a.get('result',a)

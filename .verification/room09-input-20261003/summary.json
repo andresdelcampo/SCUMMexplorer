@@ -1,0 +1,22 @@
+{
+  "outcome": "No gain: prerequisite conversation completes, then probe draft-direction assertion fails.",
+  "diagnosticCycles": 2,
+  "cycle1Frames": 3322,
+  "cycle2Frames": 1768,
+  "cycle2CompletedPrefixScopes": 3,
+  "coverage": {
+    "audited": 205,
+    "freshSingleAction": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 175,
+  "nextExperiment": "Select by ForwardVerb OR ReverseVerb: slot11 forward4D, slot12 reverse4F, slot13 reverse51. Supported staff/seven notes/learned11,12,13. Rerun actual50->7->9 and double-click272 before paired casts in a later session.",
+  "evidence": {
+    "Exe\\Room09Input-20261003\\cycle-1\\direct.json": "90cc0485b7b583b2c762a0741ea02b33504a766b878bbe7eb54220979577e8c5",
+    "Exe\\Room09Input-20261003\\cycle-1\\input.json": "394d887d3b6bb53b90ec1d32d6bb39ea4b27c9170f3307de4fe478d53fb11a9d",
+    "Exe\\Room09Input-20261003\\cycle-2\\direct.json": "3ff2929c3287889b2eb714864cddfec5440f01fb4600fc91149e62ab1476d777",
+    "Exe\\Room09Input-20261003\\cycle-2\\input.json": "42357b3bac5b03b6fdabb90745929192a86b7d0f335a9c8cb941717d61181fdc"
+  }
+}
