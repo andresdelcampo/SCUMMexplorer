@@ -32,8 +32,7 @@ public partial class CutscenePickerWindow : Window
     {
         var item = SceneList.SelectedItem as CutscenePickerItem;
         PlayButton.IsEnabled = item?.Play is not null;
-        SelectionNote.Text = item?.Play is null ? item?.Status ?? "Choose a scene." :
-            "Validated explorer preview from an assumed arrival. Direct draft responses do not imply the draft was played. Prior game choices are not reconstructed.";
+        SelectionNote.Text = item?.Play is null ? item?.Status ?? "Choose a scene." : "";
         SourceDetails.Text = item?.Note ?? "";
     }
     private void Play_Click(object sender, RoutedEventArgs e)

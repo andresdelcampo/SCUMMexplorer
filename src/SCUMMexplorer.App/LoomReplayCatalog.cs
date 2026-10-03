@@ -38,7 +38,7 @@ internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayR
     private static LoomReplayCatalog Empty(string note) => new([], [], [], note, []);
 }
 
-internal sealed record CutscenePickerItem(string Title, string Category, string Note, Action? Play, string Status = "Validated state preview");
+internal sealed record CutscenePickerItem(string Title, string Category, string Note, Action? Play, string Status = "");
 
 internal static class LoomReplayTitle
 {
