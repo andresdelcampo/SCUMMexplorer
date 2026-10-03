@@ -15,3 +15,9 @@ New labelled setup step `place` (`LoomExplorationSession.PlaceEgo`, replay step 
 `bonus-room34-local200` now starts with `place (378,134)`: Bobbin at the east end of box 9, camera 376 (the user's reference), then the direct start of the scene. Run: camera 376 → 464 → back to 376, ego faces east (0xF9) and stays at (378,134), 115 frames, balanced scopes, boundary end +0056. The old direct start (ego at (64,74), camera 160) panned 160 → 464 → 376 and then snapped back to 160. The picker text says the placement is an assumed setup and that the walker's own camera at that end is 320.
 
 Tests: `ThePlaceStepStandsTheEgoAtTheCliffEndWithTheCameraOnIt`, ghost-scene test updated for the Room 35 arrival.
+
+## Revision after user feedback (same day)
+
+- The `place` teleport on the lookout entry is withdrawn (catalog entry back to its direct start, 132 frames): the user wants a generic per-scene start placer later, not a one-off teleport. `PlaceEgo` / step `place` stay in Core as an unused, tested building block for that design.
+- The user's memory of Bobbin walking east to the edge and back is **script 098** (the ghost scene): +0x040A starts room script 206 (camera limits 160..464, pan to 464, ego walks to (388,88)); Rusty walks to (366,79); "Caray."; +0x0596 Bobbin walks back to (244,88) and the camera pans to 160. The standalone lookout (local200) may be a different or dead scene.
+- The blue frame in the exits view is **object 560**: hotspot (288,0) 32x144, walk point (288,81), no image. Verb 0x37 (walk) starts script 98 while DC7=0; verb 0x36 (look) starts local205 ("Mejor no te vayas muy lejos") while DC7 != 0. In the early layout B it is untouchable (so a click shows "action tried; unresolved"). Probe `CliffHotspot` lists Room 34's directory records. Whether it is also the trigger of the user's "cliff" scene is open: it is the object, not a box watcher.
