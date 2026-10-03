@@ -2839,10 +2839,86 @@ public partial class MainWindow : Window
         if (SkipTalkAt(x, y)) return;
         if (GameClickActive)
         {
+            SelectInteractTarget(HotspotRowRecordAt(x, y));
             QueueGameClick(x, y);
             return;
         }
         HandleRoomPoint(x, y);
+    }
+
+    private LoomRoomObjectRecord? _interactTarget;
+
+    /// <summary>Selects the object the Interact menu acts on (null clears it).</summary>
+    private void SelectInteractTarget(LoomRoomObjectRecord? record)
+    {
+        _interactTarget = record;
+        UpdateInteractButton();
+    }
+
+    private void UpdateInteractButton()
+    {
+        if (_interactTarget is not null && !_currentRoomObjectRecords.Any(item => item.Id == _interactTarget.Id)) _interactTarget = null;
+        var name = _interactTarget is not null && _roomObjectNames.TryGetValue(_interactTarget.Id, out var stored) ? stored : null;
+        InteractButton.Content = name is null ? "Interact ▾" : $"Interact · {name} ▾";
+        InteractButton.IsEnabled = _interactTarget is not null && InteractVerbs(_interactTarget).Count > 0 && !SessionInScene && _session is not null;
+    }
+
+    /// <summary>The verbs offered in the menu: look, use or go, and the drafts the object answers (the plumbing verbs stay in Advanced).</summary>
+    private IReadOnlyList<LoomObjectVerbEntry> InteractVerbs(LoomRoomObjectRecord record) =>
+        _roomVerbs.TryGetValue(record.Id, out var verbs)
+            ? verbs.Where(verb => verb.VerbId is 0x36 or 0x38 || LoomDraftNames.ForVerb(verb.VerbId) is not null)
+                .DistinctBy(verb => verb.VerbId).OrderBy(verb => LoomVerbNames.Order(verb.VerbId)).ToArray()
+            : [];
+
+    private void OpenInteractMenu(LoomRoomObjectRecord record, FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement)
+    {
+        var host = new StackPanel { MinWidth = 170 };
+        var menu = new ContextMenu
+        {
+            PlacementTarget = target, Placement = placement,
+            Background = new SolidColorBrush(Color.FromRgb(16, 24, 32)), BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98)),
+            Padding = new Thickness(0), HasDropShadow = false
+        };
+        host.Children.Add(new TextBlock
+        {
+            Text = _roomObjectNames.TryGetValue(record.Id, out var name) ? name.ToUpperInvariant() : $"OBJECT {record.Id}",
+            Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)), FontSize = 11, FontWeight = FontWeights.Bold, Margin = new Thickness(8, 6, 8, 4)
+        });
+        foreach (var verb in InteractVerbs(record))
+        {
+            var item = new Button
+            {
+                Content = LoomVerbNames.Label(verb.VerbId), HorizontalContentAlignment = HorizontalAlignment.Left, Padding = new Thickness(10, 5, 10, 5),
+                Background = Brushes.Transparent, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)), BorderThickness = new Thickness(0)
+            };
+            item.MouseEnter += (_, _) => item.Background = new SolidColorBrush(Color.FromRgb(46, 92, 116));
+            item.MouseLeave += (_, _) => item.Background = Brushes.Transparent;
+            item.Click += (_, _) =>
+            {
+                menu.IsOpen = false;
+                if (!SessionInScene) ActivateObjectVerb(record, verb, play: true);
+            };
+            host.Children.Add(item);
+        }
+        menu.Items.Add(new Border { Child = host, Background = menu.Background, Padding = new Thickness(0, 0, 0, 4) });
+        menu.IsOpen = true;
+    }
+
+    private void Interact_Click(object sender, RoutedEventArgs e)
+    {
+        if (_interactTarget is { } record) OpenInteractMenu(record, InteractButton, System.Windows.Controls.Primitives.PlacementMode.Top);
+    }
+
+    private void RoomPreview_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!GameClickActive || SessionInScene || !TryGetRoomImagePoint(e.GetPosition(RoomPreview), out var x, out var y)) return;
+        var record = HotspotRowRecordAt(x, y);
+        SelectInteractTarget(record);
+        if (record is not null && InteractVerbs(record).Count > 0)
+        {
+            e.Handled = true;
+            OpenInteractMenu(record, RoomPreview, System.Windows.Controls.Primitives.PlacementMode.MousePoint);
+        }
     }
 
     private void RoomPreview_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -3193,6 +3269,7 @@ public partial class MainWindow : Window
         GameStatusButton.IsEnabled = _session is not null; // Inspection is available during playback too; editing stays guarded.
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         var active = GameClickActive && _game?.Id == GameId.Loom;
+        UpdateInteractButton();
         // Step plays one frame of a paused scene; with nothing paused there is nothing to step.
         AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;

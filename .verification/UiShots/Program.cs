@@ -106,6 +106,26 @@ internal static class Program
                 Call("SetFullscreen", false);
                 await Task.Delay(800);
                 report.Add($"left full screen: state {window.WindowState}, style {window.WindowStyle}, header {Find<FrameworkElement>("AppHeader").Visibility}, side {Find<FrameworkElement>("SidePanel").Visibility}, room view {group.ActualWidth:0}x{group.ActualHeight:0}");
+                // Normal mode: the Interact button
+                {
+                    Call("SelectResourceInTree", items.First(i => KindOf(i) == "Room" && IdOf(i) == 2).Tag);
+                    await Task.Delay(2500);
+                    var ib = Find<Button>("InteractButton");
+                    report.Add($"interact (nothing selected): '{ib.Content}' enabled {ib.IsEnabled}");
+                    var recs = (System.Collections.IEnumerable)Field("_currentRoomObjectRecords")!;
+                    var hoja = recs.Cast<object>().First(r => (int)r.GetType().GetProperty("Id")!.GetValue(r)! == 154);
+                    Call("SelectInteractTarget", hoja);
+                    await Task.Delay(200);
+                    report.Add($"interact (hoja selected): '{ib.Content}' enabled {ib.IsEnabled}");
+                    var verbs = (System.Collections.IEnumerable)Call("InteractVerbs", hoja)!;
+                    report.Add("menu verbs: " + string.Join(" | ", verbs.Cast<object>().Select(v => (int)v.GetType().GetProperty("VerbId")!.GetValue(v)!).Select(id => typeof(MainWindow).Assembly.GetType("SCUMMexplorer.App.LoomVerbNames")!.GetMethod("Label")!.Invoke(null, [id]))));
+                    SaveWindow("interact-normal.png");
+                    var first = verbs.Cast<object>().First();
+                    var s1 = (LoomExplorationSession)Field("_session")!;
+                    Call("ActivateObjectVerb", hoja, first, true);
+                    await Task.Delay(2500);
+                    report.Add($"after Look at: playback {(Field("_playback") is not null)}, messages: {string.Join(" | ", s1.Messages.Log.TakeLast(2).Select(m2 => m2.Text))}");
+                }
                 // Advanced: the inspector on Room 02 after one object action
                 var adv0 = Find<CheckBox>("AdvancedModeToggle");
                 adv0.IsChecked = true; Call("AdvancedModeToggle_Click", adv0, new RoutedEventArgs());

@@ -209,7 +209,7 @@
                                                   LostKeyboardFocus="RoomViewport_LostKeyboardFocus" Background="#0B1117">
                                         <Grid x:Name="RoomSceneSurface">
                                             <Image x:Name="RoomPreview" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True"
-                                                   RenderOptions.BitmapScalingMode="NearestNeighbor" MouseLeftButtonUp="RoomPreview_MouseLeftButtonUp" MouseLeftButtonDown="RoomPreview_MouseLeftButtonDown"
+                                                   RenderOptions.BitmapScalingMode="NearestNeighbor" MouseLeftButtonUp="RoomPreview_MouseLeftButtonUp" MouseLeftButtonDown="RoomPreview_MouseLeftButtonDown" MouseRightButtonUp="RoomPreview_MouseRightButtonUp"
                                                    MouseMove="RoomPreview_MouseMove" MouseLeave="RoomPreview_MouseLeave"/>
                                             <Image x:Name="RoomActorOverlay" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True"
                                                    RenderOptions.BitmapScalingMode="NearestNeighbor" IsHitTestVisible="False"/>
@@ -274,6 +274,9 @@
                                         <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Skip the current line, as with the '.' key."/>
+                                        <Button x:Name="InteractButton" Content="Interact ▾" Click="Interact_Click" IsEnabled="False" Padding="8,4" Margin="0,0,5,0"
+                                                Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"
+                                                ToolTip="Click an object to select it, then choose what to do with it. Right-clicking an object opens the same menu."/>
                                         <Button x:Name="RoomCutsceneButton" Content="Play Cutscene" Visibility="Collapsed"
                                                 Click="RoomCutscene_Click" Padding="8,4" MinWidth="104" Height="27"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
