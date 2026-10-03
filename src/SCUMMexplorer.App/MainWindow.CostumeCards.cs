@@ -68,6 +68,7 @@ public partial class MainWindow
             if (token.IsCancellationRequested) return;
             BitmapSource? bitmap = null;
             string detail;
+            bool noData = false;
             try
             {
                 (bitmap, detail) = await Task.Run(() =>
@@ -101,9 +102,15 @@ public partial class MainWindow
             }
             catch (OperationCanceledException) { return; }
             catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException)
-            { detail = resource.Name + " · picture unavailable"; }
+            {
+                detail = resource.Name + " · picture unavailable";
+                // The index entry points at no costume (missing file, offset past the end, not a header): see
+                // .verification/costume-leftovers-20261003. Normal mode hides such cards; Advanced lists them in the tree.
+                noData = ex is InvalidDataException or FileNotFoundException;
+            }
             if (token.IsCancellationRequested || !ReferenceEquals(_game, game)) return;
             var card = CostumeCardList.Children.OfType<Button>().Single(c => Equals(c.Tag, resource));
+            if (noData) { CostumeCardList.Children.Remove(card); continue; }
             if (bitmap is not null)
             {
                 var content = new StackPanel();

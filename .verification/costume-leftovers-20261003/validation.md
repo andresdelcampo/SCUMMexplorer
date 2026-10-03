@@ -31,3 +31,7 @@ The first "no script uses them" check read only the global scripts (the relation
 ## Costume background colour
 
 Black costume pixels (palette entry 16) vanished on the near-black gallery background (11, 17, 23). The costume cards and the pose gallery now use (31, 45, 61). Rooms, the room viewport and other controls are unchanged. Shots: `shots/cards.png`, `shots/costume101.png` (scratch harness over the real MainWindow).
+
+## Hidden in normal mode
+
+The costume cards of entries with no costume data are removed after their thumbnail attempt fails with an invalid-data or missing-file error (other errors keep the grey tile). Harness count: 159 cards; absent: 20, 21, 42, 66, 70, 74, 75, 89, 90, 91, 136, 171-176 (0 is no costume). Advanced mode lists all costumes in the resource tree, unchanged.
