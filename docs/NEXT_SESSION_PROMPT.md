@@ -2,7 +2,9 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOO
 
 ## NEXT SESSION: generic per-cutscene start placer (planned 3 October, after dfd3e3b)
 
-**Task:** build the generic start setup for every cutscene started from the cutscene view (look, staff, place, camera). No one-off teleports: the lookout's `place` step was withdrawn at the user's request (375a0b3); `PlaceEgo` and the replay step `place` stay in Core, tested, as a building block only.
+**Status (3 October, after fe69aec): placer built for the staff dependency.** `LoomSceneStateScanner`/`LoomSceneSetupPlanner` (Core) derive a start setup per catalog scene without hand-written steps; `PlayKnownCutscene` runs it unseen and the picker note lists it. Applied to Room 43 objects 643 and 650 (scripts 091/093 clear D61: real pickup Room 09/271 first). Not derived (no scanned dependency, not proof): costume setups, visit chains, `place`. Open for the next session: (1) check in-game look of 091/093 with the staff held (App launch needs the user), (2) decide with the user whether read-only D61 scenes (018/059, 062 Room 62 entry, 047) should start with the staff held, (3) scenes whose room entry branches on story bits that an earlier real scene sets (none found by the scan). See [validation](../.verification/setup-placer-20261003/validation.md).
+
+**Task (done in part, see status):** build the generic start setup for every cutscene started from the cutscene view (look, staff, place, camera). No one-off teleports: the lookout's `place` step was withdrawn at the user's request (375a0b3); `PlaceEgo` and the replay step `place` stay in Core, tested, as a building block only.
 
 **Facts to start from (all in the 3 October evening section below and the linked validations):**
 - Building blocks: `visit` (a catalog hop; the arrival comes from the previous room's own code when it has one, so a `visit` of the neighbour first picks the real route, as done for the ghost scene: 35 then 34), `staff`, `place`, `RunSilently(n)` (leading steps unseen), real earlier scenes.

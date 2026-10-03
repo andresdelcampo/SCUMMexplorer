@@ -22,7 +22,7 @@ Tests: `LoomSceneSetupPlannerTests`, `LoomSceneSetupSceneTests` (relevant tests 
 - Not changed: scenes with explicit sequences (052-053, 086-087, 087-098, the lookout) keep their hand-written steps.
 
 ## Not done / open
-- The ego's costume: the only own-code read is Room 10 entry (+0x0050, costume 0x11); no catalog scene's first-visit branch needs another look, so no costume setup is derived.
+- The ego's costume: the only own-code read is Room 10 entry (+0x0050, costume 0x11); the scan found no other costume dependency, so no costume setup is derived (not proven: a scene may branch on an actor look the scan does not name).
 - Arrival through a real neighbour room and `place` are not derived: no scanned scene reads state that a visit chain or placement would change.
   The building blocks stay in Core.
 - The staff pickup is an exploration action (object 271 is untouchable in the preview); the chosen writer is the first in room order, an estimate.

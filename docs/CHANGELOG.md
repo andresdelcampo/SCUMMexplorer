@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: generic per-scene start setup (staff pickup derived from the game's code)
+
+`LoomSceneStateScanner` scans a scene's scripts (plus the scripts and room entries they reach) for reads and writes of globals and story bits; `LoomSceneSetupPlanner` derives the least labelled start from that. Scenes whose own global script clears bit D61 (091, 093) now start after the game's real pickup (Room 09 object 271 verb 0x38, found by `FindConstantWriters`) run unseen, then a catalog visit; no `staff` edit and no story flag. Reads of D61, var[0x07D] and story bits keep their first-visit value and are listed in the picker note. Costume, visit-chain and `place` derivations found no scanned dependency and are not applied. [Validation](../.verification/setup-placer-20261003/validation.md).
+
 ## 3 October: Forge lookout starts at the cliff end (new `place` setup step)
 
 `PlaceEgo` / step `place`: a labelled, estimated ego placement with the camera put on it. The lookout scene now starts with Bobbin at (378,134) and camera 376 (the user's reference), not at (64,74) with camera 160. The 6→8 trigger is still unreachable (matrix 6→8 = 7; camera follow gives 320 at that end); no trigger claim. [Validation](../.verification/cliff-scene-20261003/validation.md).
