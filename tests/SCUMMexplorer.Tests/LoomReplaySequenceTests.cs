@@ -56,7 +56,7 @@ public sealed class LoomReplaySequenceTests
         new("visit", 34),
         new("verb", 561, 0x44), new("scene", EndBoundary: "endCutscene at Script 85 +0x05CE", ExpectedRoom: 34),
         new("verb", 561, 0x4C), new("scene", EndBoundary: "endCutscene at Room 34 local script 202 +0x015F", ExpectedRoom: 34),
-        new("visit", 36)
+        new("visit", 36), new("staff", 1), new("frames", Frames: 8)
     ];
 
     [Fact]
@@ -67,8 +67,9 @@ public sealed class LoomReplaySequenceTests
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 36));
         var sequence = new LoomReplaySequence(session, [.. RustyPrefix(), new("verb", 599, 0x38)]);
-        Assert.True(sequence.RunSilently(6), sequence.Failure);
-        Assert.Equal(6, sequence.Stage);
+        Assert.True(sequence.RunSilently(8), sequence.Failure);
+        Assert.Equal(8, sequence.Stage);
+        Assert.True(session.GameStatus.StaffHeld);
         Assert.Equal(103, session.Actors.Single(a => a.Number == 1).Look!.Costume);
         Assert.Equal(36, session.Snapshot.RoomId);
         Assert.Null(sequence.LastAction is { VerbId: 0x38 } ? "sent early" : null);
@@ -87,7 +88,7 @@ public sealed class LoomReplaySequenceTests
             new("verb", 610, 54), new("scene", EndBoundary: "endCutscene at Script 87 +0x09B9", ExpectedRoom: 38),
             new("visit", 34), new("frames", Frames: 40),
             new("verb", 559, 55), new("scene", EndBoundary: "endCutscene at Script 98 +0x0618", ExpectedRoom: 34)]);
-        Assert.True(sequence.RunSilently(14), sequence.Failure);
+        Assert.True(sequence.RunSilently(16), sequence.Failure);
         // Before the ghost scene: Rusty is the ghost (costume 0x78, untouchable chico, touchable Rusty), Bobbin is himself.
         Assert.Equal(0x78, session.Actors.Single(a => a.Number == 3).Look!.Costume);
         Assert.Equal(1, session.Actors.Single(a => a.Number == 1).Look!.Costume);

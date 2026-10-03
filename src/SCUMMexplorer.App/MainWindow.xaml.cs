@@ -2776,6 +2776,8 @@ public partial class MainWindow : Window
         };
         _playbackRequestedRoom = null;
         _playbackPaused = false;
+        // The scene opens where the game's camera is, whatever the view showed before (a replay can start in a wide room).
+        if (_session?.CameraX is int startCamera && ViewShowsSessionRoom()) ScrollToGameCamera(startCamera);
         if (_game is not null && _session is not null && !_sceneSound.Follows(_session)) _sceneSound.Attach(_game, _session);
         if (_playInstantly || instant)
         {
@@ -2966,7 +2968,8 @@ public partial class MainWindow : Window
             "(bit[0xD9A] is 0) Room 37's entry starts local 200 (+0x0097), which chains to script 086 once Bobbin's walk box " +
             "becomes 8 (+0x0016–0x001D). Script 086: Stoke mistakes Bobbin for Rusty; Rooms 37, 58, 37 and 38; skip point " +
             "+0x0023; endCutscene +0x055C in Room 38. Bobbin wears Rusty's look here: the unseen first steps of this " +
-            "sequence cast the Awakening and the costume change on Rusty in Room 34 (the game's own scenes, run without showing them).",
+            "sequence cast the Awakening and the costume change on Rusty in Room 34 (the game's own scenes, run without showing them) and apply " +
+            "the supported Game Status edit \"staff held\", since Stoke takes the distaff in this scene.",
             Steps: FirewoodSteps, SilentSteps: FirewoodSilentSteps)
     ];
 
@@ -2977,11 +2980,11 @@ public partial class MainWindow : Window
         new("visit", 34),
         new("verb", 561, 0x44), new("scene", EndBoundary: "endCutscene at Script 85 +0x05CE", ExpectedRoom: 34),
         new("verb", 561, 0x4C), new("scene", EndBoundary: "endCutscene at Room 34 local script 202 +0x015F", ExpectedRoom: 34),
-        new("visit", 36),
+        new("visit", 36), new("staff", 1), new("frames", Frames: 8),
         new("verb", 599, 0x38), new("frames", Frames: 32), new("click", X: 109, Y: 102),
         new("scene", EndBoundary: "endCutscene at Script 86 +0x055C", ExpectedRoom: 38)
     ];
-    internal const int FirewoodSilentSteps = 6;
+    internal const int FirewoodSilentSteps = 8;
 
     private IEnumerable<KnownCutscene> AllCutscenes()
     {
@@ -3064,7 +3067,7 @@ public partial class MainWindow : Window
         picker.PickerScope.Text = $"Associated with Room {roomId:00} by validated start or reached rooms. Replay starts a fresh session.";
         // A room may have only dialogue/reaction previews. Do not open an empty
         // Scenes category while its matching entries exist in another category.
-        picker.CategoryFilter.SelectedIndex = 3;
+        picker.CategoryFilter.SelectedIndex = 2;
         return picker;
     }
 
@@ -3141,7 +3144,7 @@ public partial class MainWindow : Window
 
     private static string CutsceneStartNote(KnownCutscene cutscene) =>
         cutscene.Steps is not null ? "Stated sequence: a fresh post-boot seed-0 session and assumed catalog arrival. " +
-        "Explicit direct verbs, clicks, catalog hops (a visit step keeps the story state so far) and (for bonus scenes) direct script starts run in the same session, waiting for each audited scene boundary, balanced scopes and settled state before the next input. " +
+        "Explicit direct verbs, clicks, catalog hops (a visit step keeps the story state so far), supported Game Status edits (staff held) and, where the explorer cannot reach a scene by the game's own trigger, direct script starts run in the same session, waiting for each audited scene boundary, balanced scopes and settled state before the next input. " +
         "These exploration choices do not establish original-game prerequisites. Failed or skipped stages cancel later inputs. " + cutscene.Source :
         $"Stated start: a fresh session after the boot (seed 0), Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
         "there is assumed), " + (cutscene.ObjectId == 0 ? "then the room's entry scripts play on the clock. " :

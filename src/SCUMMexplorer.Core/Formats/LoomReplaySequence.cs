@@ -32,7 +32,7 @@ public sealed class LoomReplaySequence
 
     public LoomReplaySequence(LoomExplorationSession session, IReadOnlyList<LoomReplayStep> steps)
     {
-        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "frames" or "scene") ||
+        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "staff" or "frames" or "scene") ||
             s.Frames < 1 || s.Frames > LoomExplorationSession.CutsceneFrameLimit ||
             s.Kind == "scene" && (s.EndBoundary is null || s.ExpectedRoom is null)))
             throw new ArgumentException("A sequence needs explicit inputs and bounded, source-established completion waits.", nameof(steps));
@@ -48,6 +48,17 @@ public sealed class LoomReplaySequence
         {
             if (PauseAt is int pause && _index >= pause) return false;
             var step = _steps[_index];
+            if (step.Kind == "staff")
+            {
+                // The Game Status edit "staff held" (ObjectId 1 = held, 0 = not), a supported labelled setup for scenes that
+                // expect Bobbin to carry the distaff (the story that gave it to him is not replayed).
+                // The edit needs a settled session (no scene, draft, movement or dialogue): wait for it.
+                if (!_session.GameStatus.CanEdit)
+                    return _frames >= step.Frames ? Fail("The staff edit never became possible: the session did not settle.") : true;
+                try { _session.UpdateStaffPossession(step.ObjectId != 0); }
+                catch (InvalidOperationException ex) { return Fail($"The staff edit was refused: {ex.Message}"); }
+                Next(); continue;
+            }
             if (step.Kind == "visit")
             {
                 // A catalog hop (ObjectId = room): an explicit exploration assumption that keeps the story state so far.

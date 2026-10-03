@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: lookout is a scene, ghost scene camera, staff for the firewood scene
+
+"First sight of the Forge" is an ordinary scene (no Bonus label or filter). Playback now scrolls to the game's camera when a scene starts. The firewood sequences hold the staff (new `staff` step) as well as wearing Rusty's look. [Validation](../.verification/bonus-room34-20261003/validation.md).
+
 ## 3 October: Rusty scenes separated, Rusty's look, Forge lookout named
 
 The ghost scene (098) now plays alone: the earlier scenes it needs run unseen (new `RunSilently`/`silentSteps`). The firewood/dream sequences start with Bobbin in Rusty's look (Awakening and costume change run unseen first). The bonus scene is "first sight of the Forge (cliff lookout)", once-only per the user's memory. [Validation](../.verification/bonus-room34-20261003/validation.md).
