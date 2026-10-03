@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: costumes that do not show
+
+17 gallery costumes (20, 21, 42, 66, 70, 74, 75, 89-91, 136, 171-176) have index entries that point at no costume data and no script uses them; not a renderer bug. Record: [costume-leftovers-20261003](../.verification/costume-leftovers-20261003/validation.md).
+
 ## 3 October: WindowCheck harness repaired
 
 It looked for the removed "Show exits" checkbox; those two checks are gone and the rest still runs (Rooms 03 and 17, exit 0). Record: [window-check-20261003](../.verification/window-check-20261003/validation.md).
