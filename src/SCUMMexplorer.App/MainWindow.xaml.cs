@@ -2873,16 +2873,15 @@ public partial class MainWindow : Window
     private void OpenInteractMenu(LoomRoomObjectRecord record, FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement)
     {
         var host = new StackPanel { MinWidth = 170 };
-        var menu = new ContextMenu
+        var popup = new System.Windows.Controls.Primitives.Popup
         {
-            PlacementTarget = target, Placement = placement,
-            Background = new SolidColorBrush(Color.FromRgb(16, 24, 32)), BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98)),
-            Padding = new Thickness(0), HasDropShadow = false
+            PlacementTarget = target, Placement = placement, StaysOpen = false, AllowsTransparency = true,
+            PopupAnimation = System.Windows.Controls.Primitives.PopupAnimation.None
         };
         host.Children.Add(new TextBlock
         {
             Text = _roomObjectNames.TryGetValue(record.Id, out var name) ? name.ToUpperInvariant() : $"OBJECT {record.Id}",
-            Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)), FontSize = 11, FontWeight = FontWeights.Bold, Margin = new Thickness(8, 6, 8, 4)
+            Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)), FontSize = 11, FontWeight = FontWeights.Bold, Margin = new Thickness(10, 7, 10, 3)
         });
         foreach (var verb in InteractVerbs(record))
         {
@@ -2895,13 +2894,17 @@ public partial class MainWindow : Window
             item.MouseLeave += (_, _) => item.Background = Brushes.Transparent;
             item.Click += (_, _) =>
             {
-                menu.IsOpen = false;
+                popup.IsOpen = false;
                 if (!SessionInScene) ActivateObjectVerb(record, verb, play: true);
             };
             host.Children.Add(item);
         }
-        menu.Items.Add(new Border { Child = host, Background = menu.Background, Padding = new Thickness(0, 0, 0, 4) });
-        menu.IsOpen = true;
+        popup.Child = new Border
+        {
+            Child = host, Background = new SolidColorBrush(Color.FromRgb(16, 24, 32)), BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98)),
+            BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(3), Padding = new Thickness(0, 0, 0, 4)
+        };
+        popup.IsOpen = true;
     }
 
     private void Interact_Click(object sender, RoutedEventArgs e)

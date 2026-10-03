@@ -18,8 +18,8 @@ internal static class LoomDraftNames
         (0x47, 0x48, "Sleep"),
         (0x49, 0, "Terror"),
         (0x4A, 0x4B, "Sharpening"),
-        (0x4C, 0, "Healing"),
-        (0x4D, 0, "Reflection"),
+        (0x4C, 0, "Reflection"),   // swapped 3 Oct after play: the scene run by verb 0x4D heals the shepherds (Room 34 object 586)
+        (0x4D, 0, "Healing"),
         (0x4E, 0x4F, "Silence"),
         (0x50, 0x51, "Shaping"),
         (0x52, 0x53, "Unmaking"),

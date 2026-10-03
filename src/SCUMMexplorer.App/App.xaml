@@ -70,6 +70,18 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- Context menus: dark and plain (the default template adds a white icon gutter on the left). -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="#101820" BorderBrush="#4A5962" BorderThickness="1" CornerRadius="3">
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="ScrollPageButton" TargetType="RepeatButton">
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="IsTabStop" Value="False"/>

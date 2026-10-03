@@ -120,6 +120,15 @@ internal static class Program
                     var verbs = (System.Collections.IEnumerable)Call("InteractVerbs", hoja)!;
                     report.Add("menu verbs: " + string.Join(" | ", verbs.Cast<object>().Select(v => (int)v.GetType().GetProperty("VerbId")!.GetValue(v)!).Select(id => typeof(MainWindow).Assembly.GetType("SCUMMexplorer.App.LoomVerbNames")!.GetMethod("Label")!.Invoke(null, [id]))));
                     SaveWindow("interact-normal.png");
+                    Call("OpenInteractMenu", hoja, ib, System.Windows.Controls.Primitives.PlacementMode.Top);
+                    await Task.Delay(700);
+                    {
+                        var origin = ib.PointToScreen(new Point(0, 0));
+                        using var shot = new System.Drawing.Bitmap(760, 220);
+                        using (var g = System.Drawing.Graphics.FromImage(shot)) g.CopyFromScreen((int)origin.X - 20, (int)origin.Y - 190, 0, 0, shot.Size);
+                        shot.Save(Path.Combine(output, "interact-menu.png"));
+                    }
+
                     var first = verbs.Cast<object>().First();
                     var s1 = (LoomExplorationSession)Field("_session")!;
                     Call("ActivateObjectVerb", hoja, first, true);
