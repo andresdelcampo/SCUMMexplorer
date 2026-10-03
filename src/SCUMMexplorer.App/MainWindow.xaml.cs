@@ -49,6 +49,7 @@ public partial class MainWindow : Window
     private GameResource? _lastViewedRoomResource;
     private int _relationshipBuildGeneration;
     private int _roomCardGeneration;
+    private bool _roomCardsMayUseCache;
     private CancellationTokenSource? _roomCardCancellation;
     private CancellationTokenSource? _previewCancellation;
     private RoomImage? _currentRoom;
@@ -244,7 +245,13 @@ public partial class MainWindow : Window
         {
             if (!File.Exists(LastFolderFile)) return;
             var folder = File.ReadAllText(LastFolderFile).Trim();
-            if (Directory.Exists(folder)) OpenGameFolder(folder);
+            if (Directory.Exists(folder))
+            {
+                // Only reopening the last game may reuse the saved room thumbnails; the Open button rebuilds them.
+                _roomCardsMayUseCache = true;
+                try { OpenGameFolder(folder); }
+                finally { _roomCardsMayUseCache = false; }
+            }
             else StatusText.Text = "Last game folder is unavailable. Choose a folder to open.";
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
@@ -416,6 +423,17 @@ public partial class MainWindow : Window
             RoomCardList.Children.Add(button);
         }
 
+        // Reopening the last game reuses the saved thumbnails; opening with the button, or a missing or stale
+        // cache, rebuilds them with the asynchronous loader and saves each one.
+        var cached = _roomCardsMayUseCache
+            ? RoomThumbnailCache.TryLoad(game.FolderPath, rooms.Select(room => room.ResourceId ?? -1)) : null;
+        if (cached is not null)
+        {
+            foreach (var roomResource in rooms)
+                if (cached.TryGetValue(roomResource.ResourceId ?? -1, out var thumbnail)) SetRoomCardThumbnail(roomResource, thumbnail);
+            return;
+        }
+        RoomThumbnailCache.Begin(game.FolderPath);
         _ = LoadRoomCardThumbnailsAsync(game, rooms, indexedSnapshot, indexedStates,
             generation, cancellation.Token);
     }
@@ -455,6 +473,8 @@ public partial class MainWindow : Window
             }
 
             if (cancellationToken.IsCancellationRequested) return;
+            if (bitmap is not null && roomResource.ResourceId is int savedId && generation == _roomCardGeneration)
+                RoomThumbnailCache.Save(game.FolderPath, savedId, bitmap);
             try
             {
                 await Dispatcher.InvokeAsync(() =>
