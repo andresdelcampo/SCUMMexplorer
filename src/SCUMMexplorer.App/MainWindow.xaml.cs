@@ -1167,9 +1167,8 @@ public partial class MainWindow : Window
             ? action.IsGameInput
                 ? $"{actionName}: a new scene opened. The game walk remains a preview."
                 : $"{actionName}: a new scene opened in this state preview."
-            : _session!.Snapshot.PendingScripts > 0
-                ? $"{actionName}: a script is still running."
-            : $"{actionName}: done; no scene change followed.";
+            : action.VerbId == 0 ? $"{actionName}: ran; no scene change followed."
+            : $"{actionName} · {LoomVerbNames.Label(action.VerbId)}: ran; no scene change followed.";
         ObjectActionNote.ToolTip = (action.DestinationRoomId is int destination ? $"Room {destination:00} · " : "") + action.Evidence;
         LastActionSummary.Text = ObjectActionNote.Text;
         LastActionIssues.Children.Clear();
