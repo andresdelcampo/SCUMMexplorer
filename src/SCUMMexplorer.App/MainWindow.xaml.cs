@@ -3049,7 +3049,7 @@ public partial class MainWindow : Window
         picker.PickerScope.Text = $"Associated with Room {roomId:00} by validated start or reached rooms. Replay starts a fresh session.";
         // A room may have only dialogue/reaction previews. Do not open an empty
         // Scenes category while its matching entries exist in another category.
-        picker.CategoryFilter.SelectedIndex = 2;
+        picker.CategoryFilter.SelectedIndex = 3;
         return picker;
     }
 
@@ -3126,7 +3126,7 @@ public partial class MainWindow : Window
 
     private static string CutsceneStartNote(KnownCutscene cutscene) =>
         cutscene.Steps is not null ? "Stated sequence: a fresh post-boot seed-0 session and assumed catalog arrival. " +
-        "Explicit direct verbs and clicks run in the same session, waiting for each audited scene boundary, balanced scopes and settled state before the next input. " +
+        "Explicit direct verbs, clicks and (for bonus scenes) direct script starts run in the same session, waiting for each audited scene boundary, balanced scopes and settled state before the next input. " +
         "These exploration choices do not establish original-game prerequisites. Failed or skipped stages cancel later inputs. " + cutscene.Source :
         $"Stated start: a fresh session after the boot (seed 0), Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
         "there is assumed), " + (cutscene.ObjectId == 0 ? "then the room's entry scripts play on the clock. " :

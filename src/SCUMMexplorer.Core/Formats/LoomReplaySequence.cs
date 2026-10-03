@@ -17,7 +17,7 @@ public sealed class LoomReplaySequence
 
     public LoomReplaySequence(LoomExplorationSession session, IReadOnlyList<LoomReplayStep> steps)
     {
-        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "frames" or "scene") ||
+        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "frames" or "scene") ||
             s.Frames < 1 || s.Frames > LoomExplorationSession.CutsceneFrameLimit ||
             s.Kind == "scene" && (s.EndBoundary is null || s.ExpectedRoom is null)))
             throw new ArgumentException("A sequence needs explicit inputs and bounded, source-established completion waits.", nameof(steps));
@@ -32,9 +32,15 @@ public sealed class LoomReplaySequence
         while (_index < _steps.Count)
         {
             var step = _steps[_index];
-            if (step.Kind is "verb" or "click")
+            if (step.Kind is "verb" or "click" or "script")
             {
-                LastAction = step.Kind == "verb" ? _session.ActivateObjectVerb(step.ObjectId, step.Verb) : _session.Click(step.X, step.Y);
+                // "script": ObjectId is the room-local script number and X the start offset (a bonus preview).
+                LastAction = step.Kind switch
+                {
+                    "verb" => _session.ActivateObjectVerb(step.ObjectId, step.Verb),
+                    "script" => _session.RunLocalScriptAt(step.ObjectId, step.X),
+                    _ => _session.Click(step.X, step.Y)
+                };
                 if (LastAction.Uncertainties.Any(t => t.Contains("not sent, because", StringComparison.Ordinal)))
                     return Fail("Sequence input was refused by the session.");
                 Next(); continue;

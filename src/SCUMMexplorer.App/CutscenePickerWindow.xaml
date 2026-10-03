@@ -12,7 +12,7 @@
         </StackPanel>
         <DockPanel Grid.Row="1" Margin="0,0,0,12">
             <ComboBox x:Name="CategoryFilter" DockPanel.Dock="Right" Width="190" Margin="12,0,0,0" SelectionChanged="Filter_Changed" SelectedIndex="0">
-                <ComboBoxItem Content="Scenes"/><ComboBoxItem Content="Dialogue and reactions"/><ComboBoxItem Content="All playable"/><ComboBoxItem Content="Needs validation"/>
+                <ComboBoxItem Content="Scenes"/><ComboBoxItem Content="Dialogue and reactions"/><ComboBoxItem Content="Bonus scenes"/><ComboBoxItem Content="All playable"/><ComboBoxItem Content="Needs validation"/>
             </ComboBox>
             <TextBox x:Name="SearchBox" TextChanged="Search_Changed" Padding="8,5" ToolTip="Search titles, rooms and source evidence"/>
         </DockPanel>

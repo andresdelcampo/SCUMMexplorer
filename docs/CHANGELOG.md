@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: bonus scene for Room 34 local200 +0035
+
+The unreachable Room 34 watcher scene is playable from the cutscene menu as a labelled bonus preview ("Bonus scenes" filter): new `RunLocalScriptAt` and sequence step `script` start the scene body directly (132 frames, balanced). Not audited coverage (234/235 and fresh 169/235 unchanged). [Validation](../.verification/bonus-room34-20261003/validation.md).
+
 ## 3 October: verify Room34 local207 +0079 through 097 after scene 087
 
 Local207 +0079/end0100 ("¡De eso nada!") completes via actual clicks: route3 prefix to scene 087 (D9D), catalog hop to Room43, the 096 route, Look 684 (097) into Room34 layout A, then two clicks on 559 (098, then 207). Audited233→234/235 (99.57%),1 remaining (Room34 local200 +0035); fresh single-action169/235 unchanged. Labelled staff/notes/learned setup and the catalog hops only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).

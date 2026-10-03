@@ -22,7 +22,8 @@ public partial class CutscenePickerWindow : Window
         {
             0 => i.Play is not null && i.Category == "Scenes",
             1 => i.Play is not null && i.Category == "Dialogue and reactions",
-            2 => i.Play is not null,
+            2 => i.Play is not null && i.Category == "Bonus scenes",
+            3 => i.Play is not null,
             _ => i.Play is null
         }).Where(i => text.Length == 0 || (i.Title + " " + i.Note).Contains(text, StringComparison.OrdinalIgnoreCase)).ToArray();
         if (SceneList.Items.Count > 0) SceneList.SelectedIndex = 0;
@@ -33,6 +34,7 @@ public partial class CutscenePickerWindow : Window
         var item = SceneList.SelectedItem as CutscenePickerItem;
         PlayButton.IsEnabled = item?.Play is not null;
         SelectionNote.Text = item?.Play is null ? item?.Status ?? "Choose a scene." :
+            item.Category == "Bonus scenes" ? "Bonus scene: its trigger has no decoded route in the game's own flow, so the scene body is started directly from an assumed arrival. Read the source note." :
             "Validated explorer preview from an assumed arrival. Direct draft responses do not imply the draft was played. Prior game choices are not reconstructed.";
         SourceDetails.Text = item?.Note ?? "";
     }

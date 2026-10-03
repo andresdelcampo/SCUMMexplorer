@@ -1392,6 +1392,38 @@ public sealed partial class LoomExplorationSession
     }
 
     /// <summary>
+    /// Starts the current room's local script <paramref name="scriptId"/> at instruction offset
+    /// <paramref name="offset"/>, as a bonus preview of a scene whose trigger the game's own flow
+    /// has no decoded way to meet (for example a watcher that needs the ego to step from one walk
+    /// box straight into another). It is an exploration action like <see cref="ActivateObjectVerb"/>:
+    /// the watcher's test is skipped, everything after the offset is the game's own code, and
+    /// any running copy of the script is ended first, as <c>runScript</c> does.
+    /// </summary>
+    public LoomObjectActionResult RunLocalScriptAt(int scriptId, int offset)
+    {
+        _browsingStaffFloor = null;
+        if (_currentRoom?.ResourceId is not int sourceRoomId)
+            throw new InvalidOperationException("Visit a room before starting one of its scripts.");
+        if (scriptId < _globalScriptCount)
+            throw new ArgumentOutOfRangeException(nameof(scriptId), "Only a room-local script can be started at an offset.");
+        _uncertainties.StartStep();
+        var beforeUncertainties = _uncertainties.Count;
+        var beforeEvents = _visitEvents.Count;
+        var input = $"Room {sourceRoomId:00} local script {scriptId} was started directly at +0x{offset:X4}";
+        _uncertainties.Add($"{input}: an exploration action, not the game's flow. The condition that guards this offset was not met or tested; input dispatch and the ego's walk were not simulated.");
+        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        _dispatchScope++;
+        _entersRoomLoads++;
+        try { RunStartedScript(scriptId, offset, new Dictionary<string, ushort>(), 0); }
+        finally
+        {
+            _dispatchScope--;
+            _entersRoomLoads--;
+        }
+        return FinishInput(beforeUncertainties, beforeEvents);
+    }
+
+    /// <summary>
     /// Continues every pending script by one frame. When a continued script
     /// reaches a literal room load, the session visits that room, as
     /// <see cref="ActivateObjectVerb"/> does for a load reached directly, and

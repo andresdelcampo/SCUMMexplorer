@@ -5406,6 +5406,32 @@
       ],
       "frames": 2930,
       "source": "Fresh post-boot seed-0 sequence. Catalog arrival, direct verbs and click timing are explicit exploration assumptions. No prerequisite writes. Stored name in the trigger room. Conditional naming operands (not validated live names): oro, paja.\nSteps: [{\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}]\nReached scene boundaries:\ncutscene at Script 86 +0x0000 runs script 2\nendCutscene at Script 86 +0x055C runs script 3\ncutscene at Script 87 +0x0000 runs script 2\nendCutscene at Script 87 +0x09B9 runs script 3"
+    },
+    {
+      "id": "bonus-room34-local200",
+      "title": "Room 34 · Bonus: the ledge lookout (camera pan east)",
+      "category": "Bonus scenes",
+      "room": 34,
+      "objectId": 0,
+      "verb": 0,
+      "steps": [
+        {
+          "kind": "script",
+          "objectId": 200,
+          "x": 53
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Room 34 local script 200 +0x0056",
+          "expectedRoom": 34
+        }
+      ],
+      "scriptIds": [],
+      "rooms": [
+        34
+      ],
+      "frames": 132,
+      "source": "Room 34 local script 200 +0x0035 (the scene after the watcher's test). Bonus preview: the game's own flow has no decoded way to meet the watcher's condition (the ego must step from walk box 6 straight into box 8 while the camera is left of x 464, but the walker and the box matrix always route 6 to 7 to 8, and the wake script 085 switches the watcher off for good). The scene body is started directly: an exploration action, not game input. The camera pans to x 464, the ego plays animation 0xF9, the script waits 300 jiffies and scrolls back. What it is meant to show is not established. Fresh post-boot seed-0 session; catalog arrival assumed; no prerequisite writes. Completed in 132 frames, balanced scopes.\nSteps: [{\"kind\": \"script\", \"objectId\": 200, \"x\": 53}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Room 34 local script 200 +0x0056\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Room 34 local script 200 +0x0035 runs script 2\nendCutscene at Room 34 local script 200 +0x0056 runs script 3"
     }
   ],
   "coverage": [
@@ -5617,7 +5643,7 @@
     {
       "title": "Room 34 local 200",
       "status": "Start needs validation",
-      "source": "Room 34 local 200; unvalidated cutscene sites: +0x0035.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 34 entry"
+      "source": "Room 34 local 200; unvalidated cutscene sites: +0x0035.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 34 entry\nPlayable only as the bonus preview (Room 34 · Bonus: the ledge lookout), with the scene body started directly; no game flow that reaches the site is decoded."
     },
     {
       "title": "Room 34 local 201",
@@ -8769,6 +8795,15 @@
       ],
       "frames": 2930,
       "source": "Start plus rooms observed with the shared sequence runner."
+    },
+    {
+      "id": "bonus-room34-local200",
+      "startRoom": 34,
+      "rooms": [
+        34
+      ],
+      "frames": 132,
+      "source": "Start plus rooms observed with the bonus sequence."
     }
   ]
 }
