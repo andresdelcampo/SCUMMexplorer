@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify script066 through Room17 box8 input
+
+Script066 +0000/end0152 completes through actual Room17 clicks on box8 (after the box4 scene 200 +0022/+0042 interrupts the first walk), then loads Room56. Audited229→230/235 (97.87%),5 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. No status edits, production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+
 ## 3 October: verify global-script sites through input
 
 Six global-script sites complete through accepted input: note keys with no aim/too-high/too-far give 013,011,012 (+0000); four wrong notes give 022 +0138; Escape during playback gives 005 +01C0; F5 plus the Cancel click gives 004 +0000/end0206 (session remains in Room70, return unverified). Audited223→229/235 (97.45%),6 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Labelled staff/notes status edits only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).

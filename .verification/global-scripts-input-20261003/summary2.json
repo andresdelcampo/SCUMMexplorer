@@ -1,0 +1,31 @@
+{
+  "outcome": "Room17 box8 click completes script066 +0000/end0152 and loads Room56.",
+  "inputFrames": 908,
+  "completedScopes": 2,
+  "newSites": [
+    {
+      "owner": "script 066",
+      "offset": "+0x0000"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 229,
+    "after": 230,
+    "total": 235,
+    "percent": 97.87,
+    "remaining": 5
+  },
+  "diagnosticCycles": 3,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 318,
+  "evidence": {
+    "Exe\\GlobalInput-20261003\\c3\\input.json": "ccb59a854f669913ddcde2533cefecd01072e3920a7ffcb08527f9b5d0415d99",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

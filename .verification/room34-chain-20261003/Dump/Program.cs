@@ -11,8 +11,18 @@ var dialect = ScummScriptDialects.For(game.Id);
 var reader = new LoomScriptReader(dialect);
 var verbs = new LoomObjectVerbReader(dialect);
 var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(folder, "00.LFL"));
-var res = game.Rooms.Single(r => r.ResourceId == 70);
-foreach (var o in new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(res.FilePath))) Console.WriteLine($"obj {o.Id} (0x{o.Id:X}) x{o.X} y{o.Y} w{o.Width} h{o.Height} walk {o.WalkX},{o.WalkY}");
+var gc = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(args[0], "00.LFL"));
+var res = game.Rooms.Single(r => r.ResourceId == 43);
+var recs = new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(res.FilePath));
+var o639 = recs.Single(o => o.Id == 639);
+Console.WriteLine($"obj 639 x{o639.X} y{o639.Y} w{o639.Width} h{o639.Height} walk {o639.WalkX},{o639.WalkY}");
+foreach (var v in new LoomObjectVerbReader(dialect).ReadAll(File.ReadAllBytes(res.FilePath), recs)[639]) { Console.WriteLine("verb " + v.Label); foreach (var i in new LoomObjectVerbReader(dialect).Decode(res, o639, v.VerbId).Instructions) Console.WriteLine($"  {i.Offset:X4} {i.Operation} {i.Operands}"); }
+var r96 = game.Resources.Single(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && r.ResourceId == 96);
+foreach (var i in new LoomScriptReader(dialect).Decode(r96).Instructions.Take(40)) Console.WriteLine($"96 {i.Offset:X4} {i.Operation} {i.Operands}");
+var r17 = game.Rooms.Single(r => r.ResourceId == 17);
+foreach (var i in new LoomScriptReader(dialect).DecodeRoomLocalScript(r17, 200, gc).Instructions) Console.WriteLine($"17/200 {i.Offset:X4} {i.Operation} {i.Operands}");
+var r66 = game.Resources.Single(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && r.ResourceId == 66);
+foreach (var i in new LoomScriptReader(dialect).Decode(r66).Instructions.Take(25)) Console.WriteLine($"66 {i.Offset:X4} {i.Operation} {i.Operands}");
 return;
 void Scan(string source, Func<LoomScriptDisassembly?> decode)
 {

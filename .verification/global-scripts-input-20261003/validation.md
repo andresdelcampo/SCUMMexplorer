@@ -20,3 +20,9 @@ No production/catalog change; protected 57 exact/unstaged; App untouched; no pus
 rtk proxy dotnet run --project .verification/global-scripts-input-20261003/GlobalInputProbe/GlobalInputProbe.csproj -c Release -- Games/loom Exe/<fresh-directory>
 rtk proxy python -X utf8 .verification/global-scripts-input-20261003/check.py
 ```
+
+## Addendum: script 066 via Room17 box 8 (audited 229→230/235, 97.87%, 5 remaining)
+
+Source: Room 17 local 200 polls the ego's box; entering box 8 with bit DB9 clear runs `chainScript 066 [previous box]` (+009A). Script 066 sets DB9=1 and runs its cutscene `+0000/end0152`, then the session enters Room 56 (frame 464). Route (catalog Room17 arrival, no status edits): click box 8 centroid → the walk is first interrupted by the box-4 scene `200 +0022/end0042` (c1, retained, excluded); click box 8 again → `066 +0000/end0152` completes (c2 expected Room17 instead of the resulting Room56, a probe expectation error, retained, excluded); c3 with expected Room56 passes: 908 frames, 4 balanced boundaries, `Exe/GlobalInput-20261003/c3/input.json`. Probe `Room17Box8Probe`, check `check2.py` (summary2/remaining-sites2.json). No direct object-verb control exists for this watcher site. Three cycles, of which the first two were probe-side.
+
+Tried and parked: script 022 +0005 in Room36 (D70=1): Room36's only non-exit object 600 has no verbs, so no object can be aimed (notes give 013 instead; `b1`, retained, excluded). Script 096 needs Room43 object 639/38 with D7B≠0, staff held (D61) and DA3≠0 — prerequisites not yet traced. Remaining 5: Room34 local200 +0035/local207 +0079, script009 +002C, script022 +0005, script096 +0000.
