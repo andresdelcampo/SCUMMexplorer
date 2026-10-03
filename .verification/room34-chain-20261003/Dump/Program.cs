@@ -11,18 +11,11 @@ var dialect = ScummScriptDialects.For(game.Id);
 var reader = new LoomScriptReader(dialect);
 var verbs = new LoomObjectVerbReader(dialect);
 var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(folder, "00.LFL"));
+var res69 = game.Rooms.Single(r => r.ResourceId == 69);
 var gc = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(args[0], "00.LFL"));
-var res = game.Rooms.Single(r => r.ResourceId == 43);
-var recs = new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(res.FilePath));
-var o639 = recs.Single(o => o.Id == 639);
-Console.WriteLine($"obj 639 x{o639.X} y{o639.Y} w{o639.Width} h{o639.Height} walk {o639.WalkX},{o639.WalkY}");
-foreach (var v in new LoomObjectVerbReader(dialect).ReadAll(File.ReadAllBytes(res.FilePath), recs)[639]) { Console.WriteLine("verb " + v.Label); foreach (var i in new LoomObjectVerbReader(dialect).Decode(res, o639, v.VerbId).Instructions) Console.WriteLine($"  {i.Offset:X4} {i.Operation} {i.Operands}"); }
-var r96 = game.Resources.Single(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && r.ResourceId == 96);
-foreach (var i in new LoomScriptReader(dialect).Decode(r96).Instructions.Take(40)) Console.WriteLine($"96 {i.Offset:X4} {i.Operation} {i.Operands}");
-var r17 = game.Rooms.Single(r => r.ResourceId == 17);
-foreach (var i in new LoomScriptReader(dialect).DecodeRoomLocalScript(r17, 200, gc).Instructions) Console.WriteLine($"17/200 {i.Offset:X4} {i.Operation} {i.Operands}");
-var r66 = game.Resources.Single(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && r.ResourceId == 66);
-foreach (var i in new LoomScriptReader(dialect).Decode(r66).Instructions.Take(25)) Console.WriteLine($"66 {i.Offset:X4} {i.Operation} {i.Operands}");
+var rd = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+foreach (var n in new[] { 201, 204 }) { Console.WriteLine("== local " + n); foreach (var i in rd.DecodeRoomLocalScript(res69, n, gc).Instructions) Console.WriteLine($"{i.Offset:X4} {i.Operation} {i.Operands}"); }
+Console.WriteLine("== exit"); foreach (var i in rd.DecodeRoomExit(res69).Instructions) Console.WriteLine($"{i.Offset:X4} {i.Operation} {i.Operands}");
 return;
 void Scan(string source, Func<LoomScriptDisassembly?> decode)
 {
@@ -30,7 +23,7 @@ void Scan(string source, Func<LoomScriptDisassembly?> decode)
     try { script = decode(); } catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { return; }
     if (script is null) return;
     foreach (var i in script.Instructions)
-        if (i.Operands.Contains("bit[0xD70]") || i.Operands.Contains("bit[0xD6F]") || i.Operands.Contains("var[0x07A]") && i.Operation=="move") Console.WriteLine($"{source} +0x{i.Offset:X4} {i.Operation} {i.Operands}");
+        if ((i.Operation is "move" or "increment" or "decrement" or "add" or "subtract") && (i.Operands.StartsWith("var[0x063]") || i.Operands.StartsWith("var[0x07B]")) || i.Operation=="verbOps" && i.Operands.Contains("0x35")) Console.WriteLine($"{source} +0x{i.Offset:X4} {i.Operation} {i.Operands}");
 }
 foreach (var r in game.Resources.Where(r => r.Kind == ResourceKind.Script && r.ResourceId.HasValue).OrderBy(r => r.ResourceId))
     Scan($"script {r.ResourceId:000}", () => reader.Decode(r));

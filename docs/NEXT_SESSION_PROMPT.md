@@ -1,5 +1,9 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: remaining 5 sites decoded — 3 October
+
+After af6d5f6. Audited230/235 (97.87%) versus fresh single-action169/235 (71.91%). Each remaining site has a decoded gate, see the addendum in [global-scripts validation](../.verification/global-scripts-input-20261003/validation.md): 009 +002C needs practice mode (Room69 click on 876 works but Room69 then stalls after local201→204, and a catalog hop leaves input script=Room69 local200); 022 +0005 needs an aimable object in a D70 room (Room36 has none; Room41 untried); 096 needs DA3 from script095 +0725 (the blocked Room41 native090/095 chain); Room34 local200/207 need Healing586 after087 plus a return path past the Room37 exit601 costume gate. Do not repeat the Room34 601→36→35→34 route.
+
 ## Latest: script066 complete — 3 October
 
 After54347ce. Script066 +0000/end0152 completes through actual Room17 clicks on box8 (after the box4 scene 200 +0022/+0042 interrupts the first walk), then loads Room56. Audited229→230/235 (97.87%),5 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. No status edits, production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
