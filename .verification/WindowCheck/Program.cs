@@ -31,8 +31,6 @@ internal static class Program
                 var roomCards = (WrapPanel)window.FindName("RoomCardList");
                 var roomCardScroll = (ScrollViewer)window.FindName("RoomCardScroll");
                 var rawTree = (TreeView)window.FindName("ResourceTree");
-                var exitToggle = (CheckBox)window.FindName("RoomNavigationToggle");
-                var exitOverlay = (Canvas)window.FindName("RoomNavigationOverlay");
                 var expectedRoomCount = ((GameLibrary)Field("_game")!).Scenes.Count();
                 var report = new List<string>();
                 foreach (int room in args.Length > 2 ? args.Skip(2).Select(int.Parse) : new[] {3, 17})
@@ -46,9 +44,8 @@ internal static class Program
                     await Task.Delay(300);
                     window.UpdateLayout();
                     if (advancedToggle.IsChecked == true || rawTree.Visibility != Visibility.Collapsed ||
-                        roomCards.Children.Count != expectedRoomCount || roomCardScroll.Visibility != Visibility.Visible ||
-                        exitToggle.IsChecked == true || exitOverlay.Visibility != Visibility.Collapsed)
-                        throw new Exception("Visual-first defaults failed: room cards, hidden resource tree, or hidden exits are incorrect.");
+                        roomCards.Children.Count != expectedRoomCount || roomCardScroll.Visibility != Visibility.Visible)
+                        throw new Exception("Visual-first defaults failed: room cards or hidden resource tree are incorrect.");
                     if (((TextBlock)window.FindName("PageTitle")).Text.Contains("Room", StringComparison.OrdinalIgnoreCase))
                         throw new Exception("A raw room label is visible in the scene title.");
                     if (roomCards.Children.OfType<Button>().Any(button =>

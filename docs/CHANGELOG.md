@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: WindowCheck harness repaired
+
+It looked for the removed "Show exits" checkbox; those two checks are gone and the rest still runs (Rooms 03 and 17, exit 0). Record: [window-check-20261003](../.verification/window-check-20261003/validation.md).
+
 ## 3 October: presenter phrases for roomOps, strings, doSentence and save/load
 
 The readable script view no longer shows a raw line for them: camera limits, screen rows, shake, colour/palette settings, string operations, the sentence queue (verb 0xFE cancels it). Colour and palette phrases keep their numbers and claim no on-screen meaning. Test: `LoomScriptPresenterTests.RoomStringAndSentenceOperationsGetPlainPhrases` (operand shapes read from every LOOM script).

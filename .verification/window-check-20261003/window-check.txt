@@ -1,0 +1,14 @@
+Room 03: active images 
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click the scene to explore it. Hover to discover objects and exits.
+StatusText: Scene ready
+Doorway button "Room 02": Static candidate: Room 03 object 160 (Verb 0x38) code 0x2D71, room-load instruction +0x0005 (direct). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 05": Static candidate: Room 03 object 161 (Verb 0x36, Verb 0x38) code 0x2D1D, room-load instruction +0x0008 (local script 201). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 04": Static candidate: Room 03 object 162 (Verb 0x36, Verb 0x38) code 0x2D3A, room-load instruction +0x0008 (local script 200). | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 10": Static candidates (2 sources): | • Room 03 object 163 (Verb 0x36, Verb 0x38) code 0x2D57, room-load instruction +0x0008 (local script 202) | • Room 03 object 164 (Verb 0x38) code 0x2D95, room-load instruction +0x0008 (local script 202) | Open directly for exploration; script conditions and effects are not simulated.
+Room 17: active images 363,364,365,366
+SessionStatusText: Exploration state is incomplete. Hover for details.
+ObjectsNote: Click the scene to explore it. Hover to discover objects and exits.
+StatusText: Scene ready
+Doorway button "Room 16": Static candidates (2 sources): | • Room 17 object 352 (Verb 0x38) code 0x4DF4, room-load instruction +0x0000 (direct) | • Room 17 object 356 (Verb 0x38) code 0x4DD5, room-load instruction +0x0000 (direct) | Open directly for exploration; script conditions and effects are not simulated.
+Doorway button "Room 22": Static candidate: Room 17 object 353 (Verb 0x38) code 0x4E13, room-load instruction +0x0000 (direct). | Open directly for exploration; script conditions and effects are not simulated.
