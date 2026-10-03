@@ -171,7 +171,7 @@
                     <Grid>
                         <Grid x:Name="RoomDisplayLayout" Visibility="Collapsed" SizeChanged="RoomDisplayLayout_SizeChanged">
                             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                            <Expander x:Name="RoomOptionsExpander" Grid.Row="0" Header="Options" Margin="10,6,10,2" Foreground="#E7E0D2" IsExpanded="False">
+                            <Expander x:Name="RoomOptionsExpander" Grid.Row="0" Header="Options" Margin="10,6,10,2" Foreground="#E7E0D2" IsExpanded="False" Expanded="RoomOptions_Toggled" Collapsed="RoomOptions_Toggled">
                                 <WrapPanel x:Name="RoomOptionsBar" Margin="0,6,0,4" VerticalAlignment="Center">
                                     <CheckBox x:Name="NormalRoomWidthToggle" Content="Original framing" IsChecked="True"
                                               Margin="0,0,22,4" VerticalAlignment="Center" Foreground="#E7E0D2"
@@ -184,9 +184,9 @@
                                         <RadioButton x:Name="DoorwaysAlways" GroupName="Doorways" Content="Always" Foreground="#E7E0D2" Checked="DoorwayMode_Changed"/>
                                     </StackPanel>
                                     <StackPanel x:Name="ObjectAreaOptions" Orientation="Horizontal" Visibility="Collapsed" Margin="0,0,22,4">
-                                        <TextBlock Text="Objects" Foreground="#C6B99F" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                        <RadioButton x:Name="ObjectsNever" GroupName="ObjectAreas" Content="Never" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="ObjectAreaMode_Changed"/>
-                                        <RadioButton x:Name="ObjectsHover" GroupName="ObjectAreas" Content="On hover" IsChecked="True" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="ObjectAreaMode_Changed"/>
+                                        <TextBlock Text="Object hotspots" Foreground="#C6B99F" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="Outline the areas of the scene you can click"/>
+                                        <RadioButton x:Name="ObjectsNever" GroupName="ObjectAreas" Content="Never" IsChecked="True" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="ObjectAreaMode_Changed"/>
+                                        <RadioButton x:Name="ObjectsHover" GroupName="ObjectAreas" Content="On hover" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="ObjectAreaMode_Changed"/>
                                         <RadioButton x:Name="ObjectsAlways" GroupName="ObjectAreas" Content="Always" Foreground="#E7E0D2" Checked="ObjectAreaMode_Changed"/>
                                     </StackPanel>
                                     <CheckBox x:Name="RoomMaskToggle" Content="Show depth areas" Visibility="Collapsed"
@@ -443,7 +443,7 @@
                                     </Expander>
                                 </StackPanel>
                             </Expander>
-                            <Expander x:Name="StateIssuesSection" Header="Unresolved state" Visibility="Collapsed" IsExpanded="False"
+                            <Expander x:Name="StateIssuesSection" Header="Assumptions" Visibility="Collapsed" IsExpanded="False"
                                       Margin="0,6,0,0" Foreground="#E7E0D2" Background="#0B1117">
                                 <StackPanel x:Name="StateIssueList" Margin="4,4,4,6"/>
                             </Expander>

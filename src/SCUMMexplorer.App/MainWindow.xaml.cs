@@ -839,6 +839,7 @@ public partial class MainWindow : Window
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             if (visit) FollowSessionSound();
+            if (visit) _issueBaseline = _session.Snapshot.Uncertainties.Count;
             var snapshot = visit ? _session.VisitRoom(resource, preserveStaffLevel: !_playbackEnteringRoom && _replaySequence is null) : _session.Snapshot;
             var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
@@ -1133,17 +1134,11 @@ public partial class MainWindow : Window
                 ? $"{actionName}: a new scene opened. The game walk remains a preview."
                 : $"{actionName}: a new scene opened in this state preview."
             : _session!.Snapshot.PendingScripts > 0
-                ? $"{actionName}: action tried; the result is still unresolved."
-            : $"{actionName}: action tried; no scene change was reached.";
+                ? $"{actionName}: a script is still running."
+            : $"{actionName}: done; no scene change followed.";
         ObjectActionNote.ToolTip = (action.DestinationRoomId is int destination ? $"Room {destination:00} · " : "") + action.Evidence;
         LastActionSummary.Text = ObjectActionNote.Text;
         LastActionIssues.Children.Clear();
-        foreach (var issue in action.Uncertainties.Distinct().Take(20))
-            LastActionIssues.Children.Add(new TextBlock
-            {
-                Text = issue.Length > 150 ? issue[..147] + "…" : issue, ToolTip = issue, FontSize = 11, TextWrapping = TextWrapping.Wrap,
-                Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), Margin = new Thickness(0, 0, 0, 4)
-            });
         RefreshStateIssues();
         ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
             string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
@@ -1282,14 +1277,24 @@ public partial class MainWindow : Window
     }
 
     /// <summary>The state the session could not settle, one short line each (the full text in the tooltip), in the inspector's own section.</summary>
+    private int _issueBaseline;
+
     private void RefreshStateIssues()
     {
         StateIssueList.Children.Clear();
         if (_session is null || SessionModeToggle.IsChecked != true) { StateIssuesSection.Visibility = Visibility.Collapsed; return; }
         var issues = new List<string>();
-        if (_estimatedObjectIds.Count > 0) issues.Add($"{_estimatedObjectIds.Count} scene detail(s) are previews drawn from an estimate.");
-        issues.AddRange(_session.Snapshot.Uncertainties.TakeLast(30).Distinct());
-        StateIssuesSection.Header = issues.Count == 0 ? "State complete" : $"Unresolved state · {issues.Count}";
+        if (_estimatedObjectIds.Count > 0) issues.Add($"The artwork of {_estimatedObjectIds.Count} object(s) is estimated.");
+        // The session logs everything it assumed since it began; this view lists what came after the last room entry.
+        var log = _session.Snapshot.Uncertainties;
+        issues.AddRange(log.Skip(Math.Min(_issueBaseline, log.Count)).Distinct().TakeLast(30));
+        StateIssuesSection.Header = issues.Count == 0 ? "No assumptions" : $"Assumptions · {issues.Count}";
+        if (issues.Count > 0)
+            StateIssueList.Children.Add(new TextBlock
+            {
+                Text = "What the explorer had to assume or estimate to show this room (clicks sent as assumed input, camera or artwork estimates). Nothing is waiting on you.",
+                Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6)
+            });
         foreach (var issue in issues)
             StateIssueList.Children.Add(new TextBlock
             {
@@ -1731,6 +1736,7 @@ public partial class MainWindow : Window
 
     private void NormalRoomWidthToggle_Changed(object sender, RoutedEventArgs e)
     {
+        SaveViewOptions();
         StopRoomPan();
         UpdateRoomViewportLayout();
     }
@@ -2752,7 +2758,9 @@ public partial class MainWindow : Window
                     switch (parts[0])
                     {
                         case "doorways": (parts[1] == "Always" ? DoorwaysAlways : parts[1] == "Hover" ? DoorwaysHover : DoorwaysNever).IsChecked = true; break;
-                        case "objects": (parts[1] == "Always" ? ObjectsAlways : parts[1] == "Never" ? ObjectsNever : ObjectsHover).IsChecked = true; break;
+                        case "objects": (parts[1] == "Always" ? ObjectsAlways : parts[1] == "Hover" ? ObjectsHover : ObjectsNever).IsChecked = true; break;
+                        case "framing": NormalRoomWidthToggle.IsChecked = parts[1] != "0"; break;
+                        case "optionsOpen": RoomOptionsExpander.IsExpanded = parts[1] == "1"; break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
                     }
                 }
@@ -2761,13 +2769,15 @@ public partial class MainWindow : Window
         _viewOptionsReady = true;
     }
 
+    private void RoomOptions_Toggled(object sender, RoutedEventArgs e) { if (ReferenceEquals(sender, e.OriginalSource)) SaveViewOptions(); }
+
     private void SaveViewOptions()
     {
         if (!_viewOptionsReady) return;
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
-            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"objects={ObjectAreaMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}"]);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"objects={ObjectAreaMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}"]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }

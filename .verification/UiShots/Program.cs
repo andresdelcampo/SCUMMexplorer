@@ -94,6 +94,7 @@ internal static class Program
                 await Task.Delay(500);
                 report.Add($"entry summary: {Find<TextBlock>("RoomEntrySummary").Text}; event rows {Find<StackPanel>("RoomEntryEventButtons").Children.Count}");
                 report.Add($"status text {Find<TextBlock>("SessionStatusText").Visibility}, objects note {Find<TextBlock>("ObjectsNote").Visibility}, last action: {Find<TextBlock>("LastActionSummary").Text}");
+                foreach (var tb in Find<StackPanel>("StateIssueList").Children.OfType<TextBlock>()) report.Add("  ISSUE: " + tb.ToolTip);
                 SaveWindow("inspector.png");
                 // Advanced: scripts
                 var adv = Find<CheckBox>("AdvancedModeToggle");
