@@ -1,0 +1,49 @@
+{
+  "outcome": "Room34 watcher route stopped after two failed prerequisite attempts; no coverage credit.",
+  "framesPerCapture": 3041,
+  "failedCaptures": 4,
+  "completeRecipes": 0,
+  "nextExperiment": "Later session: Room36 box9 watcher opens599, then actual exit599, firewood086, Look610/087, Opening617 and exits back to34, Healing586, camera watcher. Preserve source setup and stop after two cycles.",
+  "newSites": [],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 215,
+    "after": 215,
+    "total": 235,
+    "percent": 91.49,
+    "remaining": 20
+  },
+  "diagnosticCycles": 2,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 267,
+  "productionAndCatalogUnchanged": true,
+  "evidence": {
+    "Exe\\Room34Watcher-20261003\\cycle-2\\input.json": "7bcb74dc34cb3485b86be31acfb57e8aa7f1925a724192d0a728357e8cc14e6c",
+    "Exe\\Room34Watcher-20261003\\cycle-2\\direct.json": "3e333a38cf2948fe58ab7b8de907499d028eb9000147307192273b6e67ca3abc",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\Room10Input-20261003\\cycle-2\\input.json": "45bc809447e4695a970ef18efa5ef6f40766b08ec4903ceaadb3bb2c855aa0e6",
+    "Exe\\Room36Input-20261003\\cycle-2\\input.json": "64d54010713e91af16458a3ccfe8a73a94999a69cd12350a2b8c3921d2e9075f",
+    "Exe\\Room24Input-20261003\\cycle-1\\input.json": "62d21cd625075fda73fcc45c086386571250a4cc3298ecfe638c7f5ca66b641c",
+    "Exe\\Room15Input-20261003\\cycle-1\\input.json": "ba65f8accf0006b265d69a5370e5ea8f2a794e16c1323d53a0dcd3256a4c6161",
+    "Exe\\Room17Input-20261003\\cycle-2\\input.json": "3ffe3c4f69d12f8483844021d59b7b16a2ea91ee220e632276621a456dfd268e",
+    "Exe\\Room22Input-20261003\\cycle-2\\input.json": "2bb31dc15a89abc19b40502876ece4c27412353e8565006abb44770f661c72c6",
+    "Exe\\Room08Input-20261003\\cycle-1\\input.json": "eee2b50425b810928a31f8be5d61b692b81403a8824994e19b42e4c91572a446",
+    "Exe\\Room28Input-20261003\\cycle-1\\input.json": "b334097d3f47268817b4380f983c13efb6246e29b96a1929303b036455c726ae",
+    "Exe\\Room62Input-20261003\\cycle-1\\input.json": "df14512db9af091e5928faef29d1778cf82e2917397619fd2f4b752a94568f32",
+    "Exe\\Room33Input-20261003\\cycle-1\\input.json": "7e3e9b10469a045ae57ec6fa2f648c6c55d67a15d73a5165094422c2fc879e70",
+    "Exe\\Room47Input-20261003\\cycle-1\\input.json": "50b719a3059bc71e2369e02c65e37567fecac5a6e1a8bc1dbb392a1c83bbf8fb",
+    "Exe\\Room20Input-20261003\\cycle-2\\input.json": "d6e2d2fc22c02b24fca84fce3718a89407ae92ac4313e6f5b446fc9e18b3e310",
+    "Exe\\Room34Watcher-20261003\\cycle-1\\direct.json": "9eccbfc9460518fc62644f773923d03befad496998e0eb3d5d52814d5c4c1d9c",
+    "Exe\\Room34Watcher-20261003\\cycle-1\\input.json": "2a36d27d8e487f933c489a97e1c094d9a76c73805cdbd39254cd025db5d00c9d"
+  }
+}
