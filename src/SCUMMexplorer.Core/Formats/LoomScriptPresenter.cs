@@ -21,11 +21,13 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
     private readonly Dictionary<int, int> _loopEnds = new();
     private readonly HashSet<int> _openLoops = [];
     private string? _scope;
+    private string? _roomScope;
 
     public string Present(LoomScriptDisassembly script)
     {
         _used.Clear();
         _scope = script.Context is null ? $"script:{script.ScriptId}" : null;
+        _roomScope = RoomScope(script.Context);
         var output = new StringBuilder();
         output.AppendLine(script.Context is null ? ScriptTitle(script) : $"{script.Context}  ·  {script.ContainerFileNumber:00}.LFL");
         output.AppendLine("Readable view: the decoded instructions in plain language. Static paths, not proof of execution. " +
@@ -298,6 +300,20 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
         return a.Count > 1 ? $"{words} {string.Join(", ", a.Skip(1).Select(x => Literal(x)?.ToString(CultureInfo.InvariantCulture) ?? x))}" : words;
     }
 
+    /// <summary>The plain-language phrase for an event the executor recorded (it keeps the instruction's operation and operands).</summary>
+    public string Describe(LoomScriptEvent scriptEvent)
+    {
+        _scope = null;
+        _roomScope = RoomScope(scriptEvent.SourceLabel);
+        return Phrase(new LoomScriptInstruction(scriptEvent.Offset, 0, scriptEvent.Operation, scriptEvent.Operands, ""));
+    }
+
+    private static string? RoomScope(string? label) =>
+        label is not null && RoomLabelRegex().Match(label) is { Success: true } m ? $"room:{int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture)}" : null;
+
+    [GeneratedRegex(@"^Room (\d+)")]
+    private static partial Regex RoomLabelRegex();
+
     private static string Raw(LoomScriptInstruction ins) => $"[raw] {ins.Operation}{(ins.Operands.Length > 0 ? " " + ins.Operands : "")}";
 
     private static string Strip(string text, string symbol) => text.StartsWith(symbol, StringComparison.Ordinal) ? text[symbol.Length..].Trim() : text;
@@ -460,7 +476,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
             switch (role)
             {
                 case Role.Actor:
-                    return glossary.Actor(value, _scope) is { } actor ? Use(actor, $"actor {value}") : $"actor {value}";
+                    return glossary.Actor(value, _scope, _roomScope) is { } actor ? Use(actor, $"actor {value}") : $"actor {value}";
                 case Role.Object:
                     return glossary.Object(0, value) is { } named ? Use(named, $"object {value}", $"object {value} “{named.Name}”") : $"object {value}";
                 case Role.Room:

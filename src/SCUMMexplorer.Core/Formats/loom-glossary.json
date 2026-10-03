@@ -122,6 +122,7 @@
     { "kind": "actor", "key": "2", "name": "Elder (actor 2)", "evidence": "reading", "source": "the council's lines in the trial and the Room 43 cage scene. Actor numbers are reused: script 042 uses actor 2 for the flying actor in Room 03" },
     { "kind": "actor", "key": "3", "name": "Elder (actor 3)", "evidence": "reading", "source": "the council's lines in the trial and the Room 43 cage scene. Actor numbers are reused: script 044 uses actor 3 for the fairy" },
     { "kind": "actor", "scope": "script:42", "key": "2", "name": "flying actor of Room 03", "evidence": "decoded", "source": "script 042 flies actor 2 (costume 5) across the sky at random points" },
+    { "kind": "actor", "scope": "room:2", "key": "5", "name": "last leaf of Room 02", "evidence": "decoded", "source": "Room 02 local 200 gives actor 5 costume 8, a leaf at (807, 25)" },
     { "kind": "actor", "scope": "script:44", "key": "3", "name": "fairy", "evidence": "decoded", "source": "script 044's fairy flies off in Room 02" },
     { "kind": "actor", "key": "4", "name": "Elder (actor 4)", "evidence": "reading", "source": "the council's lines" },
     { "kind": "actor", "key": "5", "name": "Hetchel", "evidence": "reading", "source": "\"Mi destino esta en vuestras manos, Ancianos.\" (the trial). Actor numbers are reused: script 086 (Room 37) uses actor 5 for Stoke, the man Bobbin greets (reading)" },

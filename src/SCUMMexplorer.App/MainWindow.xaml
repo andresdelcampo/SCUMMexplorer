@@ -452,6 +452,7 @@
                                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                                                  Background="#0B1117" Foreground="#E7E0D2" BorderThickness="0"
                                                  FontFamily="Consolas" FontSize="11" Height="240"/>
+                                    <TextBlock x:Name="LastActionTimeline" Foreground="#B8AA8C" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,6"/>
                                     </Expander>
                                 </StackPanel>
                             </Expander>

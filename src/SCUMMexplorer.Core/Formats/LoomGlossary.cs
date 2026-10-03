@@ -98,7 +98,8 @@ public sealed class LoomGlossary
 
     public GlossaryEntry? Script(int id) => Find("script", id);
     /// <summary>Actor numbers are reused from scene to scene; a name with a scope (for example <c>script:42</c>) applies only inside that script and wins over the general one.</summary>
-    public GlossaryEntry? Actor(int id, string? scope = null) => (scope is null ? null : Find("actor", id, scope)) ?? Find("actor", id);
+    public GlossaryEntry? Actor(int id, params string?[] scopes) =>
+        scopes.Where(scope => scope is not null).Select(scope => Find("actor", id, scope)).FirstOrDefault(entry => entry is not null) ?? Find("actor", id);
     public GlossaryEntry? Room(int id) => Find("room", id);
     public GlossaryEntry? Sound(int id) => Find("sound", id);
 

@@ -1180,6 +1180,9 @@ public partial class MainWindow : Window
         ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
             string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
             Environment.NewLine + (action.Script is null ? "Object bytecode unavailable." : FormatScript(action.Script)) +
+        var timeline = LoomActionTimeline.Format(LoomActionTimeline.Build(action, new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull), actionName,
+            action.VerbId == 0 ? null : LoomVerbNames.Label(action.VerbId)));
+        LastActionTimeline.Text = timeline.TrimEnd();
             Environment.NewLine + (action.Run?.FormatSummary() ?? "No object bytecode was run.");
         ObjectActionTraceExpander.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         UpdateAdvancedMode();

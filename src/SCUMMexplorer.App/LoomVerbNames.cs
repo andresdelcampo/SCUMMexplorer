@@ -17,6 +17,9 @@ internal static class LoomVerbNames
         _ => LoomDraftNames.ForVerb(verb) is { } draft ? "Draft: " + draft.Name : $"Verb 0x{verb:X2}"
     };
 
+    /// <summary>The label of a known verb, or null for a verb outside the known ranges (which would show as "Verb 0x..").</summary>
+    public static string? LabelOrNull(int verb) => Label(verb) is { } label && !label.StartsWith("Verb 0x", StringComparison.Ordinal) ? label : null;
+
     /// <summary>Display order: look, use, on click, close-up, then the drafts in the game's order, the catch-all draft last.</summary>
     public static int Order(int verb) => verb switch { 0x36 => 0, 0x38 => 1, 0x37 => 2, 0x39 => 3, 0x56 => 1000, _ => 100 + verb };
 }
