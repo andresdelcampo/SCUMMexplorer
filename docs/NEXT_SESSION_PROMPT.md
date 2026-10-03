@@ -1,5 +1,21 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## NEXT SESSION: generic per-cutscene start placer (planned 3 October, after dfd3e3b)
+
+**Task:** build the generic start setup for every cutscene started from the cutscene view (look, staff, place, camera). No one-off teleports: the lookout's `place` step was withdrawn at the user's request (375a0b3); `PlaceEgo` and the replay step `place` stay in Core, tested, as a building block only.
+
+**Facts to start from (all in the 3 October evening section below and the linked validations):**
+- Building blocks: `visit` (a catalog hop; the arrival comes from the previous room's own code when it has one, so a `visit` of the neighbour first picks the real route, as done for the ghost scene: 35 then 34), `staff`, `place`, `RunSilently(n)` (leading steps unseen), real earlier scenes.
+- Ghost scene check: arrival at Room 33's spot (64,73) hides Bobbin's head behind object 565's depth mask (not a limb fault); the Room 35 arrival (330,79) is clean. Setups must therefore choose the arrival that matches the route open in that story state, and be labelled estimates.
+- Design (not built): per catalog entry a derived `setup`, from a scan of each scene's script and callers for reads of ego costume (var 0x07D), bit D61 (staff), D9D/D7B/DC7/DC8/DD0-style story bits, object states/classes; emit the least setup: real earlier scenes unseen, a `visit` chain through the real neighbour, then `staff`/`place` only where no real scene sets the state; show every assumption in the picker note. Audit order: scenes that clear or read D61, scenes after a costume change, scenes whose room entry branches on story bits.
+- Open items that do not block the placer: Room 34 local200 +0035 (decoded box 6→8 + `464 > camera`; the matrix routes 6→8 via 7; camera follow gives 320 at the east end of box 9); object 560 (the blue frame, hotspot (288,0) 32x144, walk point (288,81)) is untouchable in the early layout, its Walk starts script 98 while DC7=0, its Look starts local205. Script 098 itself contains the east walk and back the user remembers (+0x040A starts local206: camera to 464, ego to (388,88); +0x0596 walks back to (244,88)). A ScummVM check was tried and is not usable: `room 34` from the debugger does not place Bobbin, and `camera mode 2`/`camera follow 1` do not make the camera follow; only a real save in Room 34's early state would settle the trigger.
+- Corrections to older text: the Room 41 conditional-load guard was already fixed on 2 October (0318792); the unchanged raw4 recipe reaches Room 43 (15/15). CLAUDE.md "Current work" and parts of the older sections below still say otherwise; update CLAUDE.md with the user's approval.
+- Rules unchanged: labelled setups only, no invented story flags, commit each task, no App launch, no push. Keep audited 234/235 and fresh single-action 169/235 distinct.
+
+Ready-to-copy prompt:
+
+> Continue SCUMMexplorer from dfd3e3b using docs/NEXT_SESSION_PROMPT.md ("NEXT SESSION" section first). Build the generic per-cutscene start placer: scan each catalog scene for the state it reads (ego costume 0x07D, bit D61, story bits, object states), derive the least labelled setup from real earlier scenes run unseen, a visit chain through the real neighbour room and staff/place only where needed, show it in the picker note, and apply it to the scenes in the list in the audit order given. No one-off teleports, no invented story flags. Test with the relevant unit tests only, commit each step, no App launch, no push. Ask before editing CLAUDE.md.
+
 ## Latest: 3 October evening (after fe285a5): ghost head, cliff start, Room 41 guard, setup design
 
 1. **Ghost scene "headless Bobbin" is not a limb fault.** The ego's head limb is set and drawn; object 565 (state 1 after scene 087) has a depth mask over y 0..47 that hid his head at Room 33's arrival spot (64,73). `sequence-087-098` now hops 35→34 (arrival of Room 35 object 587, box 8), which is the route open after 087. [Validation](../.verification/ghost-headless-20261003/validation.md). Whether the original shows him clipped at (64,73) is unverified.
