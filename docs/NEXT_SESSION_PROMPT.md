@@ -1,5 +1,11 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room34 chain source barrier — 3 October
+
+After51aa4dd. Verified input now completes Room36 box10→4→3→9, 599→37, firewood086 end055C, Look610→087 end09B9, Opening617 end00B2 and exit609→37. Then Room37 object601 verb0x37 refuses (ego costume 1 != 0x67, "Mejor no vuelvo allí..."), blocking601→36 and so the whole 601→36→35→34 route; the only ego-0x67 writer is Room34 local202 +00DB/+00EF. A catalog-Room34 Healing cycle targeted object561 not586 (probe error). Two cycles, no coverage gain: audited215/235 and fresh169/235 unchanged. [Validation](../.verification/room34-chain-20261003/validation.md).
+
+Next: from catalog Room34 select object586 for Healing4D, require209 end03C0, then box6→8 watcher (check camera source first). Keep all constraints; no App launch or push.
+
 ## Parked by user: Room34 prerequisites retained — 3 October
 
 After410b76c. Room34 watcher prerequisite investigation stopped after two failed cycles: fresh38 Look610 reproduces incomplete087 in37; fresh36 exit599 is hidden by class24 and never dispatches. Four failed captures retained/excluded; no coverage gain or production defect established. Next source step is Room36 box9 watcher200 +0077/end009B, which clears599 class24 at+0094. Audited215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Protected57/history/App untouched. [Validation and precise next experiment](../.verification/room34-watcher-20261003/validation.md).
