@@ -7,7 +7,7 @@ using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Formats;
 
-// "Show verb area" (presentation): in the real MainWindow, checks that the toggle
+// OBSOLETE: "Show verb area" (presentation): in the real MainWindow, checks that the toggle
 // is off by default while the interactive mode keeps the verb screen, that the strip sits under the room at the room's scale without clipping,
 // draws the verbs the session's slots have on (after script 018, and the close-up
 // after a hover), sends clicks on verbs that are on to the game when "Click as
