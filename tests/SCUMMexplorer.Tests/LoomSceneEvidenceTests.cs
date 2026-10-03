@@ -161,4 +161,18 @@ public sealed class LoomSceneEvidenceTests
         Assert.DoesNotContain(session.Snapshot.DrawOrder, id => id is 876 or 877 or 878);
         Assert.Contains(885, session.Snapshot.DrawOrder);
     }
+
+    [Fact]
+    public void Rooms82To85AreSoundBanksAndLeaveTheSceneListWhileRoom61Stays()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
+        var banks = game.Rooms.Where(SCUMMexplorer.Core.Rendering.LoomRoomKinds.IsResourceBank).Select(r => r.ResourceId!.Value).ToArray();
+        Assert.Equal([82, 83, 84, 85], banks);
+        Assert.DoesNotContain(game.Scenes, r => banks.Contains(r.ResourceId!.Value));
+        Assert.Contains(game.Scenes, r => r.ResourceId == 61);
+        Assert.Equal(game.Rooms.Count() - 4, game.Scenes.Count());
+        Assert.Equal(32, game.Resources.Count(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Sound && r.ResourceId is >= 33 and <= 64));
+    }
 }

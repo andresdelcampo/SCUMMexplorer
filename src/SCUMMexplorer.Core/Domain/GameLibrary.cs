@@ -54,4 +54,6 @@ public sealed record GameLibrary(
     GameId Id = GameId.Unknown)
 {
     public IEnumerable<GameResource> Rooms => Resources.Where(r => r.Kind == ResourceKind.Room);
+    /// <summary>The rooms worth showing as scenes: LOOM's dummy sound-bank rooms (82-85) are left out.</summary>
+    public IEnumerable<GameResource> Scenes => Id == GameId.Loom ? Rooms.Where(r => !Rendering.LoomRoomKinds.IsResourceBank(r)) : Rooms;
 }

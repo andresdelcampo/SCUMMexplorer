@@ -33,7 +33,7 @@ internal static class Program
                 var rawTree = (TreeView)window.FindName("ResourceTree");
                 var exitToggle = (CheckBox)window.FindName("RoomNavigationToggle");
                 var exitOverlay = (Canvas)window.FindName("RoomNavigationOverlay");
-                var expectedRoomCount = ((GameLibrary)Field("_game")!).Rooms.Count();
+                var expectedRoomCount = ((GameLibrary)Field("_game")!).Scenes.Count();
                 var report = new List<string>();
                 foreach (int room in args.Length > 2 ? args.Skip(2).Select(int.Parse) : new[] {3, 17})
                 {

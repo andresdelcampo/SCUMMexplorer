@@ -320,8 +320,8 @@ public partial class MainWindow : Window
         RoomCardList.Children.Clear();
         RoomCardScroll.Visibility = Visibility.Visible;
 
-        var rooms = new TreeViewItem { Header = $"Rooms  ({game.Rooms.Count()})", IsExpanded = false };
-        foreach (var room in game.Rooms)
+        var rooms = new TreeViewItem { Header = $"Rooms  ({game.Scenes.Count()})", IsExpanded = false };
+        foreach (var room in game.Scenes)
             rooms.Items.Add(new TreeViewItem { Header = room.Name, Tag = room });
         ResourceTree.Items.Add(rooms);
 
@@ -361,7 +361,7 @@ public partial class MainWindow : Window
                 ? "Select a room to view its EGA background."
                 : "This game layout does not yet have a supported room background decoder.";
         StatusText.Text = "Choose a room to begin.";
-        StatusText.ToolTip = $"{game.Rooms.Count()} indexed rooms found.";
+        StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
     }
@@ -372,7 +372,7 @@ public partial class MainWindow : Window
         var cancellation = new CancellationTokenSource();
         _roomCardCancellation = cancellation;
         var generation = ++_roomCardGeneration;
-        var rooms = game.Rooms.ToArray();
+        var rooms = game.Scenes.ToArray();
         var indexedSnapshot = _indexedObjectSnapshot is null ? null : new LoomIndexedObjectSnapshot(
             _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
             _indexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
@@ -2808,7 +2808,7 @@ public partial class MainWindow : Window
         RefreshRoomNavigationOverlay();
     }
 
-    // The viewing options (doorways, object areas, bytecode column) are remembered between runs.
+    // The viewing options (doorways, bytecode column; object hotspots always start at Never) are remembered between runs.
     private static readonly string ViewOptionsFile = Path.Combine(Path.GetDirectoryName(LastFolderFile)!, "view-options.txt");
 
     private void LoadViewOptions()
@@ -2823,7 +2823,6 @@ public partial class MainWindow : Window
                     switch (parts[0])
                     {
                         case "doorways": (parts[1] == "Always" ? DoorwaysAlways : parts[1] == "Hover" ? DoorwaysHover : DoorwaysNever).IsChecked = true; break;
-                        case "objects": (parts[1] == "Always" ? ObjectsAlways : parts[1] == "Hover" ? ObjectsHover : ObjectsNever).IsChecked = true; break;
                         case "framing": NormalRoomWidthToggle.IsChecked = parts[1] != "0"; break;
                         case "optionsOpen": RoomOptionsExpander.IsExpanded = parts[1] == "1"; break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
@@ -2843,7 +2842,7 @@ public partial class MainWindow : Window
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
-            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"objects={ObjectAreaMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}"]);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}"]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
