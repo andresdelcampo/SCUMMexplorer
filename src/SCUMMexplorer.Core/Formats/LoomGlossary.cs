@@ -36,10 +36,10 @@ public sealed record GlossaryEntry(string Name, GlossaryEvidence Evidence, strin
 /// </summary>
 public sealed class LoomGlossary
 {
-    private sealed record Row(string Kind, string Key, string? To, string Name, string Evidence, string? Source);
+    private sealed record Row(string Kind, string Key, string? To, string Name, string Evidence, string? Source, string? Scope = null);
     private sealed record File(List<Row> Entries);
 
-    private readonly Dictionary<string, List<(int From, int To, GlossaryEntry Entry)>> _byKind = new();
+    private readonly Dictionary<string, List<(int From, int To, GlossaryEntry Entry, string? Scope)>> _byKind = new();
     private readonly Dictionary<int, (int Room, string Name)> _objects = new();
 
     /// <summary>Optional names for story bits (for example the catalog scene that sets one); used only where the table has none.</summary>
@@ -66,7 +66,7 @@ public sealed class LoomGlossary
             var to = row.To is null ? from : ParseNumber(row.To);
             var evidence = Enum.Parse<GlossaryEvidence>(row.Evidence, ignoreCase: true);
             if (!glossary._byKind.TryGetValue(row.Kind, out var list)) glossary._byKind[row.Kind] = list = [];
-            list.Add((from, to, new GlossaryEntry(row.Name, evidence, row.Source ?? "")));
+            list.Add((from, to, new GlossaryEntry(row.Name, evidence, row.Source ?? ""), row.Scope));
         }
         if (game is not null && game.Id == GameId.Loom) glossary.ReadObjects(game);
         return glossary;
@@ -97,7 +97,8 @@ public sealed class LoomGlossary
             : null);
 
     public GlossaryEntry? Script(int id) => Find("script", id);
-    public GlossaryEntry? Actor(int id) => Find("actor", id);
+    /// <summary>Actor numbers are reused from scene to scene; a name with a scope (for example <c>script:42</c>) applies only inside that script and wins over the general one.</summary>
+    public GlossaryEntry? Actor(int id, string? scope = null) => (scope is null ? null : Find("actor", id, scope)) ?? Find("actor", id);
     public GlossaryEntry? Room(int id) => Find("room", id);
     public GlossaryEntry? Sound(int id) => Find("sound", id);
 
@@ -109,11 +110,11 @@ public sealed class LoomGlossary
     /// <summary>The room that holds an object, when the game's data names it.</summary>
     public int? ObjectRoom(int id) => _objects.TryGetValue(id, out var found) ? found.Room : null;
 
-    private GlossaryEntry? Find(string kind, int index)
+    private GlossaryEntry? Find(string kind, int index, string? scope = null)
     {
         if (!_byKind.TryGetValue(kind, out var list)) return null;
-        foreach (var (from, to, entry) in list)
-            if (index >= from && index <= to) return entry;
+        foreach (var (from, to, entry, entryScope) in list)
+            if (index >= from && index <= to && entryScope == scope) return entry;
         return null;
     }
 

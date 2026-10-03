@@ -506,8 +506,8 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 
 Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
   actor 1          Bobbin  [decoded]  the ego, var[0x001]
-  actor 2          Elder (actor 2)  [reading]  the council's lines in the trial; also script 042's flying speck in Room 03
-  actor 3          Elder (actor 3)  [reading]  the council's lines; script 044's fairy
+  actor 2          Elder (actor 2)  [reading]  the council's lines in the trial and the Room 43 cage scene. Actor numbers are reused: script 042 uses actor 2 for the flying actor in Room 03
+  actor 3          Elder (actor 3)  [reading]  the council's lines in the trial and the Room 43 cage scene. Actor numbers are reused: script 044 uses actor 3 for the fairy
   bit[0xD61]       the distaff (staff) is held  [decoded]  script 003 starts script 018 unless it is set; script 017 picks the costume frames by it; the pickup in Room 09 object 271 sets it
   bit[0xD65]       the notes played so far are being collected  [reading]  script 010 stores notes while it is set; script 021 clears it
   bit[0xD66]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set

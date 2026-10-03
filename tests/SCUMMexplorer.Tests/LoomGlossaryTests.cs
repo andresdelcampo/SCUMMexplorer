@@ -52,4 +52,14 @@ public sealed class LoomGlossaryTests
         Assert.Equal(2, glossary.ObjectRoom(154));
         Assert.Contains("cage", glossary.Script(91)!.Name);
     }
+
+    [Fact]
+    public void ActorNamesAreScopedBecauseNumbersAreReused()
+    {
+        var glossary = LoomGlossary.Default;
+        Assert.Equal("Elder (actor 2)", glossary.Actor(2)!.Name);
+        Assert.Equal("Elder (actor 2)", glossary.Actor(2, "script:91")!.Name);
+        Assert.Equal("flying actor of Room 03", glossary.Actor(2, "script:42")!.Name);
+        Assert.Equal("fairy", glossary.Actor(3, "script:44")!.Name);
+    }
 }

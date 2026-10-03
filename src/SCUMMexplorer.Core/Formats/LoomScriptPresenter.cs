@@ -20,10 +20,12 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
     private readonly Dictionary<string, (GlossaryEntry Entry, string Ref)> _used = new();
     private readonly Dictionary<int, int> _loopEnds = new();
     private readonly HashSet<int> _openLoops = [];
+    private string? _scope;
 
     public string Present(LoomScriptDisassembly script)
     {
         _used.Clear();
+        _scope = script.Context is null ? $"script:{script.ScriptId}" : null;
         var output = new StringBuilder();
         output.AppendLine(script.Context is null ? ScriptTitle(script) : $"{script.Context}  ·  {script.ContainerFileNumber:00}.LFL");
         output.AppendLine("Readable view: the decoded instructions in plain language. Static paths, not proof of execution. " +
@@ -458,7 +460,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
             switch (role)
             {
                 case Role.Actor:
-                    return glossary.Actor(value) is { } actor ? Use(actor, $"actor {value}") : $"actor {value}";
+                    return glossary.Actor(value, _scope) is { } actor ? Use(actor, $"actor {value}") : $"actor {value}";
                 case Role.Object:
                     return glossary.Object(0, value) is { } named ? Use(named, $"object {value}", $"object {value} “{named.Name}”") : $"object {value}";
                 case Role.Room:
