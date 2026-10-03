@@ -171,21 +171,32 @@
                     <Grid>
                         <Grid x:Name="RoomDisplayLayout" Visibility="Collapsed" SizeChanged="RoomDisplayLayout_SizeChanged">
                             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                            <WrapPanel x:Name="RoomOptionsBar" Grid.Row="0" Margin="10,8,10,6" VerticalAlignment="Center">
-                                <CheckBox x:Name="NormalRoomWidthToggle" Content="Original framing" IsChecked="True"
-                                          Margin="0,0,16,0" VerticalAlignment="Center" Foreground="#E7E0D2"
-                                          ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
-                                          Checked="NormalRoomWidthToggle_Changed" Unchecked="NormalRoomWidthToggle_Changed"/>
-                                <CheckBox x:Name="RoomNavigationToggle" Content="Show exits" Visibility="Collapsed" IsChecked="False"
-                                          Margin="0,0,14,0" Foreground="#E7E0D2"
-                                          Checked="RoomNavigationToggle_Changed" Unchecked="RoomNavigationToggle_Changed"/>
-                                <CheckBox x:Name="RoomMaskToggle" Content="Show depth areas" Visibility="Collapsed"
-                                          Margin="0,0,14,0" Foreground="#E7E0D2" IsEnabled="False"
-                                          Checked="RoomMaskToggle_Changed" Unchecked="RoomMaskToggle_Changed"/>
-                                <CheckBox x:Name="WalkBoxToggle" Content="Show walk boxes" Visibility="Collapsed"
-                                          Foreground="#E7E0D2" IsEnabled="False"
-                                          Checked="WalkBoxToggle_Changed" Unchecked="WalkBoxToggle_Changed"/>
-                            </WrapPanel>
+                            <Expander x:Name="RoomOptionsExpander" Grid.Row="0" Header="Options" Margin="10,6,10,2" Foreground="#E7E0D2" IsExpanded="False">
+                                <WrapPanel x:Name="RoomOptionsBar" Margin="0,6,0,4" VerticalAlignment="Center">
+                                    <CheckBox x:Name="NormalRoomWidthToggle" Content="Original framing" IsChecked="True"
+                                              Margin="0,0,22,4" VerticalAlignment="Center" Foreground="#E7E0D2"
+                                              ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
+                                              Checked="NormalRoomWidthToggle_Changed" Unchecked="NormalRoomWidthToggle_Changed"/>
+                                    <StackPanel x:Name="DoorwayOptions" Orientation="Horizontal" Visibility="Collapsed" Margin="0,0,22,4">
+                                        <TextBlock Text="Doorways" Foreground="#C6B99F" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <RadioButton x:Name="DoorwaysNever" GroupName="Doorways" Content="Never" IsChecked="True" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="DoorwayMode_Changed"/>
+                                        <RadioButton x:Name="DoorwaysHover" GroupName="Doorways" Content="On hover" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="DoorwayMode_Changed"/>
+                                        <RadioButton x:Name="DoorwaysAlways" GroupName="Doorways" Content="Always" Foreground="#E7E0D2" Checked="DoorwayMode_Changed"/>
+                                    </StackPanel>
+                                    <StackPanel x:Name="ObjectAreaOptions" Orientation="Horizontal" Visibility="Collapsed" Margin="0,0,22,4">
+                                        <TextBlock Text="Objects" Foreground="#C6B99F" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <RadioButton x:Name="ObjectsNever" GroupName="ObjectAreas" Content="Never" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="ObjectAreaMode_Changed"/>
+                                        <RadioButton x:Name="ObjectsHover" GroupName="ObjectAreas" Content="On hover" IsChecked="True" Foreground="#E7E0D2" Margin="0,0,8,0" Checked="ObjectAreaMode_Changed"/>
+                                        <RadioButton x:Name="ObjectsAlways" GroupName="ObjectAreas" Content="Always" Foreground="#E7E0D2" Checked="ObjectAreaMode_Changed"/>
+                                    </StackPanel>
+                                    <CheckBox x:Name="RoomMaskToggle" Content="Show depth areas" Visibility="Collapsed"
+                                              Margin="0,0,14,4" Foreground="#E7E0D2" IsEnabled="False"
+                                              Checked="RoomMaskToggle_Changed" Unchecked="RoomMaskToggle_Changed"/>
+                                    <CheckBox x:Name="WalkBoxToggle" Content="Show walk boxes" Visibility="Collapsed"
+                                              Margin="0,0,0,4" Foreground="#E7E0D2" IsEnabled="False"
+                                              Checked="WalkBoxToggle_Changed" Unchecked="WalkBoxToggle_Changed"/>
+                                </WrapPanel>
+                            </Expander>
                             <Grid x:Name="RoomViewportHost" Grid.Row="1" SizeChanged="RoomViewportHost_SizeChanged">
                                 <StackPanel x:Name="RoomDisplayGroup" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <ScrollViewer x:Name="RoomViewport" HorizontalScrollBarVisibility="Auto"
@@ -238,7 +249,7 @@
                             </Grid>
                             <!-- MinHeight: the controls' usual height with a two-line note (108 with the music row, shown only in the
                                  inspection mode), so the room above keeps its size while they change (a cutscene's rooms, its notes). -->
-                            <StackPanel x:Name="RoomControlsPanel" Grid.Row="2" Margin="0,4,0,8" MinHeight="72"
+                            <StackPanel x:Name="RoomControlsPanel" Grid.Row="2" Margin="0,4,0,8" MinHeight="40"
                                         HorizontalAlignment="Center" VerticalAlignment="Bottom">
                                 <StackPanel.Style><Style TargetType="StackPanel"><Style.Triggers>
                                     <DataTrigger Binding="{Binding Visibility, ElementName=RoomMusicPanel}" Value="Visible"><Setter Property="MinHeight" Value="108"/></DataTrigger>
@@ -348,7 +359,7 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <DockPanel Margin="0,0,0,6">
-                                <CheckBox x:Name="ScriptBytesToggle" DockPanel.Dock="Right" Content="Show bytecode" IsChecked="True" VerticalAlignment="Center"
+                                <CheckBox x:Name="ScriptBytesToggle" DockPanel.Dock="Right" Content="Show bytecode" IsChecked="False" VerticalAlignment="Center"
                                           Foreground="#E7E0D2" Margin="12,0,0,0" Checked="ScriptBytesToggle_Changed" Unchecked="ScriptBytesToggle_Changed"/>
                                 <Button x:Name="ScriptPlayButton" DockPanel.Dock="Right" Content="▶ Play as cutscene" Visibility="Collapsed" Click="ScriptPlay_Click"
                                         Padding="10,3" Margin="12,0,0,0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"

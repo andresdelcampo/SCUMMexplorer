@@ -106,6 +106,7 @@ public partial class MainWindow : Window
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         PreviewKeyDown += MainWindow_PreviewKeyDown;
+        LoadViewOptions();
         PreviewTextInput += MainWindow_PreviewTextInput;
         _roomPanTimer.Tick += RoomPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
@@ -287,7 +288,7 @@ public partial class MainWindow : Window
         RoomNavigationButtons.Children.Clear();
         RoomNavigationPanel.Visibility = Visibility.Collapsed;
         RoomNavigationOverlay.Visibility = Visibility.Collapsed;
-        RoomNavigationToggle.Visibility = Visibility.Collapsed;
+        DoorwayOptions.Visibility = ObjectAreaOptions.Visibility = Visibility.Collapsed;
         ObjectActionPanel.Visibility = Visibility.Collapsed;
         ObjectVerbButtons.Children.Clear();
         ObjectActionTraceExpander.Visibility = Visibility.Collapsed;
@@ -537,6 +538,8 @@ public partial class MainWindow : Window
     private void UpdateAdvancedMode()
     {
         var advanced = IsAdvancedMode;
+        // The hint line under the scene is for Advanced mode and the inspection view; the game's own screen needs none.
+        ObjectsNote.Visibility = advanced || SessionModeToggle.IsChecked != true ? Visibility.Visible : Visibility.Collapsed;
         VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
         CutsceneMenuButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GameTextsButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
@@ -614,7 +617,7 @@ public partial class MainWindow : Window
         RoomEntryEventButtons.Children.Clear();
         RoomNavigationPanel.Visibility = Visibility.Collapsed;
         RoomNavigationOverlay.Visibility = Visibility.Collapsed;
-        RoomNavigationToggle.Visibility = Visibility.Collapsed;
+        DoorwayOptions.Visibility = ObjectAreaOptions.Visibility = Visibility.Collapsed;
         RoomMusicPanel.Visibility = Visibility.Collapsed;
         RoomPreview.ToolTip = null;
         RoomPreview.Cursor = Cursors.Arrow;
@@ -652,7 +655,7 @@ public partial class MainWindow : Window
             RoomMaskToggle.Visibility = Visibility.Collapsed;
             WalkBoxToggle.Visibility = Visibility.Collapsed;
             WalkBoxOverlay.Visibility = Visibility.Collapsed;
-            RoomNavigationToggle.Visibility = Visibility.Collapsed;
+            DoorwayOptions.Visibility = ObjectAreaOptions.Visibility = Visibility.Collapsed;
             PreviewMessage.Visibility = Visibility.Collapsed;
             ScriptPanel.Visibility = Visibility.Visible;
             ShowPageHeader(true);
@@ -715,7 +718,7 @@ public partial class MainWindow : Window
         RoomMaskToggle.Visibility = Visibility.Collapsed;
         WalkBoxToggle.Visibility = Visibility.Collapsed;
         WalkBoxOverlay.Visibility = Visibility.Collapsed;
-        RoomNavigationToggle.Visibility = Visibility.Collapsed;
+        DoorwayOptions.Visibility = ObjectAreaOptions.Visibility = Visibility.Collapsed;
         ClearObjectList();
         ObjectsNote.Text = "Reading room objects…";
         _currentRoom = null;
@@ -1108,7 +1111,8 @@ public partial class MainWindow : Window
     private void ShowLastObjectAction(int? roomId)
     {
         var action = _session?.LastAction;
-        if (action is null || roomId is null ||
+        // "Action tried; the result is unresolved" is for Advanced mode; the scene itself shows what happened.
+        if (!IsAdvancedMode || action is null || roomId is null ||
             action.SourceRoomId != roomId && action.DestinationRoomId != roomId)
         {
             ObjectActionPanel.Visibility = Visibility.Collapsed;
@@ -1281,12 +1285,13 @@ public partial class MainWindow : Window
     }
 
     // The bytecode column choice is kept from script to script (and while the app runs).
-    private bool _showScriptBytes = true;
+    private bool _showScriptBytes;
     private LoomScriptDisassembly? _scriptShown;
 
     private void ScriptBytesToggle_Changed(object sender, RoutedEventArgs e)
     {
         _showScriptBytes = ScriptBytesToggle.IsChecked == true;
+        SaveViewOptions();
         if (_scriptShown is { } shown) ScriptOutput.Text = shown.Format(_showScriptBytes);
     }
 
@@ -1322,7 +1327,7 @@ public partial class MainWindow : Window
         {
             _windowStateBefore = WindowState; _windowStyleBefore = WindowStyle; _contentMarginBefore = ContentPanel.Margin;
             _fullscreenHidden.Clear();
-            foreach (UIElement element in new UIElement[] { AppHeader, SidePanel, AppStatusBar, RoomObjectPanel, PageHeader, RoomOptionsBar, RoomControlsPanel, StatusText })
+            foreach (UIElement element in new UIElement[] { AppHeader, SidePanel, AppStatusBar, RoomObjectPanel, PageHeader, RoomOptionsExpander, RoomControlsPanel, StatusText })
             {
                 _fullscreenHidden.Add((element, element.Visibility));
                 element.Visibility = Visibility.Collapsed;
@@ -2640,14 +2645,71 @@ public partial class MainWindow : Window
         return string.Join("\n", lines);
     }
 
-    private void RoomNavigationToggle_Changed(object sender, RoutedEventArgs e)
+    private enum DisplayMode { Never, Hover, Always }
+    private DisplayMode DoorwayMode => DoorwaysAlways.IsChecked == true ? DisplayMode.Always : DoorwaysHover.IsChecked == true ? DisplayMode.Hover : DisplayMode.Never;
+    private DisplayMode ObjectAreaMode => ObjectsAlways.IsChecked == true ? DisplayMode.Always : ObjectsHover.IsChecked == true ? DisplayMode.Hover : DisplayMode.Never;
+    private bool _viewOptionsReady;
+    private HashSet<int> _hoveredDoorwayIds = [];
+
+    private void DoorwayMode_Changed(object sender, RoutedEventArgs e)
     {
-        if (RoomNavigationOverlay is null) return;
-        RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 &&
-            RoomNavigationToggle.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-        if (RoomNavigationOverlay.Visibility == Visibility.Visible)
-            RoomNavigationOverlay.Dispatcher.BeginInvoke(RefreshRoomNavigationOverlay,
-                DispatcherPriority.Loaded);
+        if (!_viewOptionsReady || RoomNavigationOverlay is null) return;
+        SaveViewOptions();
+        _hoveredDoorwayIds = [];
+        RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never ? Visibility.Visible : Visibility.Collapsed;
+        RoomNavigationOverlay.Dispatcher.BeginInvoke(RefreshRoomNavigationOverlay, DispatcherPriority.Loaded);
+    }
+
+    private void ObjectAreaMode_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_viewOptionsReady || HotspotHighlightOverlay is null) return;
+        SaveViewOptions();
+        ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : _highlightedHotspot);
+    }
+
+    /// <summary>On-hover doorways: the doorway boxes under the pointer are the only ones drawn.</summary>
+    private void UpdateDoorwayHover(int? x, int? y)
+    {
+        if (DoorwayMode != DisplayMode.Hover) return;
+        var ids = x is int px && y is int py ? DoorwaysAt(px, py).Select(record => record.Id).ToHashSet() : [];
+        if (ids.SetEquals(_hoveredDoorwayIds)) return;
+        _hoveredDoorwayIds = ids;
+        RefreshRoomNavigationOverlay();
+    }
+
+    // The viewing options (doorways, object areas, bytecode column) are remembered between runs.
+    private static readonly string ViewOptionsFile = Path.Combine(Path.GetDirectoryName(LastFolderFile)!, "view-options.txt");
+
+    private void LoadViewOptions()
+    {
+        try
+        {
+            if (File.Exists(ViewOptionsFile))
+                foreach (var line in File.ReadAllLines(ViewOptionsFile))
+                {
+                    var parts = line.Split('=', 2);
+                    if (parts.Length != 2) continue;
+                    switch (parts[0])
+                    {
+                        case "doorways": (parts[1] == "Always" ? DoorwaysAlways : parts[1] == "Hover" ? DoorwaysHover : DoorwaysNever).IsChecked = true; break;
+                        case "objects": (parts[1] == "Always" ? ObjectsAlways : parts[1] == "Never" ? ObjectsNever : ObjectsHover).IsChecked = true; break;
+                        case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
+                    }
+                }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        _viewOptionsReady = true;
+    }
+
+    private void SaveViewOptions()
+    {
+        if (!_viewOptionsReady) return;
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"objects={ObjectAreaMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}"]);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
 
     private void RoomPreview_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -3822,16 +3884,23 @@ public partial class MainWindow : Window
             RoomPreview.Cursor = Cursors.Arrow;
             RoomPreview.ToolTip = null;
             ShowHoveredHotspotRow(null);
+            UpdateDoorwayHover(null, null);
             SendPointerToGame(null, null);
             return;
         }
         var hoveredRow = SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null;
         ShowHoveredHotspotRow(hoveredRow);
+        UpdateDoorwayHover(x, y);
         SendPointerToGame((x, y), hoveredRow?.Id ?? 0);
         if (GameClickActive)
         {
             var doorways = DoorwaysAt(x, y);
             RoomPreview.Cursor = hoveredRow is null && doorways.Count == 0 ? Cursors.Arrow : Cursors.Hand;
+            if (!IsAdvancedMode)
+            {
+                RoomPreview.ToolTip = hoveredRow is not null && _roomObjectNames.TryGetValue(hoveredRow.Id, out var plainName) ? plainName : null;
+                return;
+            }
             var what = hoveredRow is null ? "Nothing listed here: a click walks Bobbin to this point." :
                 $"{(_roomObjectNames.TryGetValue(hoveredRow.Id, out var name) ? name : $"Object {hoveredRow.Id}")}: " +
                 "a click walks Bobbin over and uses it (verb 0x38); a double click also looks at it (verb 0x36).";
@@ -3873,6 +3942,7 @@ public partial class MainWindow : Window
 
     private void RoomPreview_MouseLeave(object sender, MouseEventArgs e)
     {
+        UpdateDoorwayHover(null, null);
         RoomPreview.Cursor = Cursors.Arrow;
         RoomPreview.ToolTip = null;
         ShowHoveredHotspotRow(null);
@@ -4094,7 +4164,7 @@ public partial class MainWindow : Window
         }
         // The row's own hover and focus outline take the box when the pointer leaves the room.
         if (record is not null || ObjectList.Children.OfType<Button>().All(button => !button.IsMouseOver && !button.IsKeyboardFocused))
-            ShowHotspotHighlight(record);
+            ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : record);
     }
 
     private IReadOnlyList<RoomVerbChoice> FindVerbChoicesAt(int x, int y)
@@ -4240,7 +4310,7 @@ public partial class MainWindow : Window
         {
             RoomNavigationPanel.Visibility = Visibility.Collapsed;
             RoomNavigationOverlay.Visibility = Visibility.Collapsed;
-            RoomNavigationToggle.Visibility = Visibility.Collapsed;
+            DoorwayOptions.Visibility = ObjectAreaOptions.Visibility = Visibility.Collapsed;
             return;
         }
         var candidates = new List<RoomVerbDestination>();
@@ -4291,8 +4361,9 @@ public partial class MainWindow : Window
         RoomNavigationPanel.ToolTip = "Possible doorways: rooms that decoded hotspot code can load. " +
                                       "A button opens the room directly for exploration; clicking a doorway box on the room runs its script.";
         RoomNavigationPanel.Visibility = IsAdvancedMode && _roomNavigationCandidates.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        RoomNavigationToggle.Visibility = _roomNavigationCandidates.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
-        RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && RoomNavigationToggle.IsChecked == true
+        DoorwayOptions.Visibility = _roomNavigationCandidates.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+        ObjectAreaOptions.Visibility = Visibility.Visible;
+        RoomNavigationOverlay.Visibility = _roomNavigationCandidates.Count > 0 && DoorwayMode != DisplayMode.Never
             ? Visibility.Visible : Visibility.Collapsed;
         RefreshRoomNavigationOverlay();
     }
@@ -4315,7 +4386,7 @@ public partial class MainWindow : Window
 
         if (_session?.Snapshot is not { } snapshot) return;
         // Doorways that share one rectangle get one box and one label.
-        foreach (var group in VisibleDoorways(snapshot).GroupBy(record =>
+        foreach (var group in VisibleDoorways(snapshot).Where(record => DoorwayMode == DisplayMode.Always || DoorwayMode == DisplayMode.Hover && _hoveredDoorwayIds.Contains(record.Id)).GroupBy(record =>
                  {
                      var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
                          ? current : new RoomObjectPosition(record.X, record.Y);
@@ -4381,9 +4452,10 @@ public partial class MainWindow : Window
     {
         _highlightedHotspot = record;
         HotspotHighlightOverlay.Children.Clear();
-        HotspotHighlightOverlay.Visibility = record is null ? Visibility.Collapsed : Visibility.Visible;
-        if (record is null || _currentRoom is null || HotspotHighlightOverlay.ActualWidth <= 0 ||
-            HotspotHighlightOverlay.ActualHeight <= 0) return;
+        var all = ObjectAreaMode == DisplayMode.Always && SessionModeToggle.IsChecked == true && _session is not null;
+        HotspotHighlightOverlay.Visibility = record is null && !all ? Visibility.Collapsed : Visibility.Visible;
+        if (_currentRoom is null || HotspotHighlightOverlay.ActualWidth <= 0 ||
+            HotspotHighlightOverlay.ActualHeight <= 0 || record is null && !all) return;
 
         var room = _currentRoom;
         var scale = Math.Min(HotspotHighlightOverlay.ActualWidth / room.Width,
@@ -4391,6 +4463,22 @@ public partial class MainWindow : Window
         if (scale <= 0) return;
         var offsetX = (HotspotHighlightOverlay.ActualWidth - room.Width * scale) / 2;
         var offsetY = (HotspotHighlightOverlay.ActualHeight - room.Height * scale) / 2;
+        if (all)
+            foreach (var other in _currentRoomObjectRecords)
+            {
+                if (other.Id == record?.Id || !IsVerbHotspotAvailable(other, _session!.Snapshot)) continue;
+                var otherAt = _session.Snapshot.ObjectPositions.TryGetValue(other.Id, out var pos) ? pos : new RoomObjectPosition(other.X, other.Y);
+                var faint = new Border
+                {
+                    Width = Math.Max(1, other.Width * scale), Height = Math.Max(1, other.Height * scale),
+                    BorderThickness = new Thickness(1), BorderBrush = new SolidColorBrush(Color.FromArgb(150, 120, 220, 255)),
+                    Background = new SolidColorBrush(Color.FromArgb(22, 120, 220, 255)), CornerRadius = new CornerRadius(2)
+                };
+                Canvas.SetLeft(faint, offsetX + otherAt.X * scale);
+                Canvas.SetTop(faint, offsetY + otherAt.Y * scale);
+                HotspotHighlightOverlay.Children.Add(faint);
+            }
+        if (record is null) return;
         var at = _session?.Snapshot.ObjectPositions.TryGetValue(record.Id, out var current) == true
             ? current : new RoomObjectPosition(record.X, record.Y);
         var bounds = new Border
