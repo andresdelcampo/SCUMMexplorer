@@ -53,7 +53,10 @@ public sealed class LoomSceneSetupPlanner
         // Bit D61 (the distaff). A scene whose own code clears it takes the distaff from Bobbin, so it presumes he
         // holds it; a fresh game does not. Unless the scene itself sets the bit first, a real earlier scene that
         // assigns 1 (the first object verb in room order) is run unseen.
-        var clears = own.Where(t => t.Write && t.Variable == StaffBit && t.Instruction.EndsWith("= 0x0000", StringComparison.Ordinal)).ToList();
+        // Only the scene's own global scripts count: the entry and local scripts of rooms it passes through reset
+        // the look for their own arrival (Room 10 local 203) or restore a saved copy (Room 10 local 200), which is not a presumption.
+        var clears = own.Where(t => t.Write && t.Variable == StaffBit && t.Where.StartsWith("Script ", StringComparison.Ordinal) &&
+                                    t.Instruction.EndsWith("= 0x0000", StringComparison.Ordinal)).ToList();
         var sets = own.Where(t => t.Write && t.Variable == StaffBit && t.Instruction.EndsWith("= 0x0001", StringComparison.Ordinal)).ToList();
         if (clears.Count > 0 && sets.Count == 0)
         {

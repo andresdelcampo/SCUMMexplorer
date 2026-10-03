@@ -42,6 +42,8 @@ public partial class MainWindow : Window
         "SCUMMexplorer", "last-folder.txt");
     private GameLibrary? _game;
     private LoomReplayCatalog? _replayCatalog;
+    private LoomSceneSetupPlanner? _setupPlanner;
+    private readonly Dictionary<string, LoomStartSetup> _startSetups = [];
     private LoomRelationshipIndex? _relationshipIndex;
     private GameResource? _selectedResource;
     private GameResource? _lastViewedRoomResource;
@@ -205,6 +207,7 @@ public partial class MainWindow : Window
             : null;
         _game = game;
         _replayCatalog = LoomReplayCatalog.Load(game);
+        _setupPlanner = null;
         _scriptReader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
         _verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
         _sceneBatches = null;
@@ -3142,7 +3145,21 @@ public partial class MainWindow : Window
                              string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
     }
 
-    private static string CutsceneStartNote(KnownCutscene cutscene) =>
+    /// <summary>
+    /// The start setup derived from the scene's own code (<see cref="LoomSceneSetupPlanner"/>): real earlier scenes run
+    /// unseen before the scene's start. Scenes with hand-written sequences keep their explicit steps.
+    /// </summary>
+    private LoomStartSetup StartSetup(KnownCutscene cutscene)
+    {
+        if (_game is null || _game.Id != GameId.Loom || cutscene.Steps is not null || cutscene.ObjectId == 0) return LoomStartSetup.None;
+        if (_startSetups.TryGetValue(cutscene.Id, out var cached)) return cached;
+        _setupPlanner ??= new LoomSceneSetupPlanner(_game);
+        return _startSetups[cutscene.Id] = _setupPlanner.Derive(cutscene.RoomId, cutscene.TextScripts ?? [cutscene.Script]);
+    }
+
+    private string CutsceneStartNote(KnownCutscene cutscene) => CutsceneBaseNote(cutscene) + (StartSetup(cutscene).Describe() is { Length: > 0 } setup ? " " + setup : "");
+
+    private static string CutsceneBaseNote(KnownCutscene cutscene) =>
         cutscene.Steps is not null ? "Stated sequence: a fresh post-boot seed-0 session and assumed catalog arrival. " +
         "Explicit direct verbs, clicks, catalog hops (a visit step keeps the story state so far), supported Game Status edits (staff held) and, where the explorer cannot reach a scene by the game's own trigger, direct script starts run in the same session, waiting for each audited scene boundary, balanced scopes and settled state before the next input. " +
         "These exploration choices do not establish original-game prerequisites. Failed or skipped stages cancel later inputs. " + cutscene.Source :
@@ -3168,8 +3185,18 @@ public partial class MainWindow : Window
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
         // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
         // A sequence with unseen leading steps runs them first (the story state they reach is the scene's start), then attaches.
-        if (cutscene.Steps is null || cutscene.SilentSteps == 0) _sceneSound.Attach(_game, _session);
+        var setup = StartSetup(cutscene);
+        var unseenSetup = cutscene.Steps is null && setup.HasSteps;
+        if (!unseenSetup && (cutscene.Steps is null || cutscene.SilentSteps == 0)) _sceneSound.Attach(_game, _session);
         _session.VisitRoom(room);
+        string? setupFailure = null;
+        if (unseenSetup)
+        {
+            // The derived setup (real earlier scenes, then a visit of the scene's room) runs unseen; the sounds start with the scene.
+            var prelude = new LoomReplaySequence(_session, setup.Steps);
+            if (!prelude.RunSilently(setup.Steps.Count)) setupFailure = $"The derived start setup stopped ({prelude.Failure ?? "no result"}); the scene starts from the catalog visit.";
+            _sceneSound.Attach(_game, _session);
+        }
         LoomObjectActionResult? action;
         if (cutscene.Steps is { } steps)
         {
@@ -3187,6 +3214,7 @@ public partial class MainWindow : Window
         }
         else action = cutscene.ObjectId == 0 ? null : _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
         var uncertainties = (action?.Uncertainties ?? _session.Snapshot.Uncertainties).ToList();
+        if (setupFailure is not null) uncertainties.Insert(0, setupFailure);
         if (cutscene.Click is { } click)
         {
             // The verb's loadRoomWithEgo walks Bobbin in; the click is sent once he stands, as a player's would be.

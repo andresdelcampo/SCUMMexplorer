@@ -90,3 +90,31 @@ public sealed class LoomSceneSetupPlannerTests
         File.WriteAllLines(Environment.GetEnvironmentVariable("SCUMM_SETUP_DUMP") ?? Path.Combine(Path.GetTempPath(), "setups.txt"), lines);
     }
 }
+
+public sealed class LoomSceneSetupSceneTests
+{
+    private static string Run(bool withSetup, int room, int obj, int verb, int script)
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
+        session.VisitRoomById(room);
+        if (withSetup)
+        {
+            var setup = new LoomSceneSetupPlanner(game).Derive(room, [script]);
+            new LoomReplaySequence(session, setup.Steps).RunSilently(setup.Steps.Count);
+        }
+        session.ActivateObjectVerb(obj, verb);
+        for (var i = 0; i < 6000; i++) session.AdvanceFrame();
+        var ends = session.SessionTrace.Where(t => t.StartsWith("endCutscene at ", StringComparison.Ordinal)).ToArray();
+        return $"room={session.Snapshot.RoomId} inScene={session.InCutscene} ends=[{string.Join("; ", ends)}] unsup={session.Snapshot.Uncertainties.Count(t => t.Contains("unsupported", StringComparison.OrdinalIgnoreCase))}";
+    }
+
+    [Fact]
+    public void TheCageScenesStillReachTheirOwnEndFromTheDerivedSetup()
+    {
+        Assert.Contains("endCutscene at Script 91 +0x0E83", Run(true, 43, 643, 0x3A, 91));
+        Assert.Contains("endCutscene at Script 93 +0x05FB", Run(true, 43, 650, 0x38, 93));
+        Assert.DoesNotContain("unsup=1", Run(true, 43, 650, 0x38, 93));
+    }
+}
