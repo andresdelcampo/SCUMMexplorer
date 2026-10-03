@@ -28,3 +28,13 @@ No status/class/story/actor injection beyond labelled supported staff/notes/lear
 rtk proxy dotnet run --project .verification/room34-chain-20261003/Room34ChainProbe/Room34ChainProbe.csproj -c Release -- Games/loom Exe/<fresh-directory>
 rtk proxy dotnet run --project .verification/room34-chain-20261003/Room34Cycle2Probe/Room34Cycle2Probe.csproj -c Release -- Games/loom Exe/<fresh-directory>
 ```
+
+## Addendum: route attempts 2–3 (same day; retained, no coverage)
+
+Source finding: Room34 entry sets object 561 touchable/586 untouchable while D9D=0 (the default); scene 087 sets D9D=1, which swaps them (586 touchable). So Healing 586/4D is only reachable after 087, i.e. after Room37's costume gate.
+
+Route 2 (`Room34Route2Probe`, `route2-a/b`): catalog Room34, 561/44 then 561/4C (local202 +015F) gives the ego costume 103 (0x67). Exit 558→35 needs a ~900-frame wait for Room35 local204's staged scene (first attempt's click at 588 was swallowed by it, route2-a); then 588→36 passes (route2-b, frame 2635, costume 103).
+
+Route 3 (`Room34Route3Probe`, `route3-a/b`): from the west, box9 needs two clicks (box3 scene 001D/003D first, then 009B). Then 599→37, 086 end055C, Look610→087 end09B9, Opening end00B2, exit609 all pass. But scene 087 resets the ego costume 103→1, so exit 601 refuses again (frame 9244 timeout). Re-casting 4C needs Room34, which is only reachable through 601 first.
+
+Conclusion: Room34 Healing 586/4D and the box6→8 watcher cannot be reached by the 601→36→35→34 route; any route would have to reach Room34 from 33 or 46 (557/559) after 087 — unexplored and large. Route stopped. Failed captures route2-a, route3-a/b retained and excluded.
