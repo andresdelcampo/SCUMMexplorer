@@ -112,6 +112,60 @@ public sealed partial class LoomSceneStateScanner
         return found;
     }
 
+    /// <summary>Every plain <c>move</c> of <paramref name="value"/> into a story bit (D72 and up) in the game's code, in code order.</summary>
+    public IReadOnlyList<LoomStateSource> FindStoryBitMoves(int value)
+    {
+        var found = new List<LoomStateSource>();
+        var tail = $" = 0x{value:X4}";
+        ForEachCodeUnit((script, room, obj, verb, label) =>
+        {
+            if (script is null) return;
+            foreach (var ins in script.Instructions)
+                if (ins.Operation == "move" && ins.Operands.StartsWith("bit[0x", StringComparison.Ordinal) && ins.Operands.EndsWith(tail, StringComparison.Ordinal) &&
+                    int.TryParse(ins.Operands.AsSpan(6, ins.Operands.IndexOf(']') - 6), System.Globalization.NumberStyles.HexNumber, null, out var bit) && bit >= 0xD72)
+                    found.Add(new(room, obj, verb, $"{label} +0x{ins.Offset:X4}", $"move {ins.Operands}"));
+        });
+        return found;
+    }
+
+    /// <summary>Every instruction in the game's code that assigns <paramref name="variable"/> (any value), in code order; the audit's view of who can change a state.</summary>
+    public IReadOnlyList<LoomStateTouch> FindWriters(string variable)
+    {
+        var found = new List<LoomStateTouch>();
+        ForEachCodeUnit((script, _, _, _, label) =>
+        {
+            if (script is null) return;
+            var touches = new List<LoomStateTouch>();
+            foreach (var ins in script.Instructions)
+            {
+                touches.Clear();
+                Classify(ins, $"{label} +0x{ins.Offset:X4}", touches, []);
+                found.AddRange(touches.Where(t => t.Write && t.Variable == variable));
+            }
+        });
+        return found;
+    }
+
+    /// <summary>Every <c>actorOps</c> costume assignment in the game's code (object verbs, room entries, local and global scripts), in code order, with its operands.</summary>
+    public IReadOnlyList<(int Room, string Where, string Operands)> FindCostumeChanges()
+    {
+        var found = new List<(int, string, string)>();
+        ForEachCodeUnit((script, room, _, _, label) =>
+        {
+            if (script is null) return;
+            foreach (var ins in script.Instructions)
+                if (ins.Operation == "actorOps" && ins.Operands.Contains("costume,", StringComparison.Ordinal))
+                    found.Add((room, $"{label} +0x{ins.Offset:X4}", ins.Operands));
+        });
+        return found;
+    }
+
+    /// <summary>
+    /// What the entry script of <paramref name="room"/> (run when the room is entered) and the scripts it starts with a
+    /// constant number read and write; the start-room dependencies the scene's own scripts do not show.
+    /// </summary>
+    public LoomSceneScan ScanRoomEntry(int room) => Scan(room, [], entryOfStartRoom: true);
+
     /// <summary>
     /// The places in the game's code that put <paramref name="actor"/> into <paramref name="room"/> and then at a point
     /// (<c>putActor</c> with literals, or <c>putActorAtObject</c>) within the next three instructions, in code order.
@@ -143,7 +197,7 @@ public sealed partial class LoomSceneStateScanner
     /// Scans scripts <paramref name="scriptIds"/> as seen from <paramref name="startRoom"/>, following constant calls,
     /// and the code of object <paramref name="objectId"/>'s verb <paramref name="verbId"/> in that room when given.
     /// </summary>
-    public LoomSceneScan Scan(int startRoom, IEnumerable<int> scriptIds, int objectId = 0, int verbId = 0)
+    public LoomSceneScan Scan(int startRoom, IEnumerable<int> scriptIds, int objectId = 0, int verbId = 0, bool entryOfStartRoom = false)
     {
         var touches = new List<LoomStateTouch>();
         var costume = new List<string>();
@@ -175,6 +229,7 @@ public sealed partial class LoomSceneStateScanner
             seen.Add(label);
             Process(verbScript, label, startRoom);
         }
+        if (entryOfStartRoom) pending.Enqueue((startRoom, 0, true));
         foreach (var id in scriptIds) pending.Enqueue((startRoom, id, false));
         while (pending.Count > 0)
         {
@@ -244,7 +299,7 @@ public sealed partial class LoomSceneStateScanner
 
     private static void Classify(LoomScriptInstruction ins, string where, List<LoomStateTouch> touches, List<string> costume)
     {
-        if (ins.Operation == "actorOps" && ins.Operands.Contains("costume ", StringComparison.Ordinal))
+        if (ins.Operation == "actorOps" && ins.Operands.Contains("costume,", StringComparison.Ordinal))
             costume.Add($"{where}: {ins.Operands}");
         var variables = VariableRegex().Matches(ins.Operands).Select(m => m.Value).ToList();
         if (variables.Count == 0) return;

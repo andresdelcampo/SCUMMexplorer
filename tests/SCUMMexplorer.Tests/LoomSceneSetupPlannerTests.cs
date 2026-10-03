@@ -76,6 +76,21 @@ public sealed class LoomSceneSetupPlannerTests
         Assert.Contains(on.Notes, n => n.Contains("reads bit D61", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void TheScannerSeesEgoCostumeChangesAndRoomEntryReads()
+    {
+        var scanner = new LoomSceneStateScanner(Game());
+        // The disassembler prints "costume, 0x11" (a comma), which the first version of the scan missed.
+        Assert.Contains(scanner.FindCostumeChanges(), c => c.Where.StartsWith("Room 10 local 203", StringComparison.Ordinal) && c.Operands.StartsWith("0x01, [costume, 0x11", StringComparison.Ordinal));
+        Assert.Contains(scanner.FindCostumeChanges(), c => c.Where.StartsWith("Room 34 local 202", StringComparison.Ordinal) && c.Operands.Contains("costume, var[0x07D]", StringComparison.Ordinal));
+        // Room 38's entry gives the ego costume 0x70 and branches on story bit D9E (set by the ghost scene's chain).
+        var entry = scanner.ScanRoomEntry(38);
+        Assert.Contains(entry.CostumeChanges, c => c.StartsWith("Room 38 entry", StringComparison.Ordinal) && c.Contains("costume, 0x70", StringComparison.Ordinal));
+        Assert.Contains(entry.Touches, t => !t.Write && t.Variable == "bit[0xD9E]" && t.Where.StartsWith("Room 38 entry", StringComparison.Ordinal));
+        Assert.Contains(scanner.FindWriters("var[0x07D]"), t => t.Where.StartsWith("Room 34 local 202", StringComparison.Ordinal));
+        Assert.Contains(scanner.FindStoryBitMoves(0), t => t.Where.StartsWith("Script 093 +0x0005", StringComparison.Ordinal) && t.Instruction.Contains("bit[0xDB7]", StringComparison.Ordinal));
+    }
+
     [Fact(Skip = "Diagnostic dump of every catalog scene's derived setup; run by hand (SCUMM_SETUP_DUMP=path).")]
     public void DumpCatalogSetups()
     {
@@ -94,6 +109,65 @@ public sealed class LoomSceneSetupPlannerTests
             lines.AddRange(setup.Notes.Select(n => "   " + n));
         }
         File.WriteAllLines(Environment.GetEnvironmentVariable("SCUMM_SETUP_DUMP") ?? Path.Combine(Path.GetTempPath(), "setups.txt"), lines);
+    }
+
+    [Fact(Skip = "Diagnostic audit dump (costume changes, room-entry reads, scene presumptions); run by hand (SCUMM_AUDIT_DUMP=path).")]
+    public void DumpCostumeAndEntryAudit()
+    {
+        var game = Game();
+        var scanner = new LoomSceneStateScanner(game);
+        var lines = new List<string> { "== costume changes ==" };
+        lines.AddRange(scanner.FindCostumeChanges().Select(c => $"Room {c.Room:00} {c.Where}: {c.Operands}"));
+        lines.Add("== writers of var[0x07D] (the saved ego costume) ==");
+        lines.AddRange(scanner.FindWriters("var[0x07D]").Select(t => $"{t.Where}: {t.Instruction}"));
+        lines.Add("== story bits cleared (set to 0) by scene-own code ==");
+        lines.AddRange(scanner.FindStoryBitMoves(0).Select(t => $"{t.Where}: {t.Instruction}"));
+        lines.Add("== ego (actor 1) costume after a fresh catalog visit of each room ==");
+        foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).OrderBy(i => i))
+        {
+            try
+            {
+                var session = Session(game);
+                session.VisitRoomById(room);
+                for (var i = 0; i < 30; i++) session.AdvanceFrame();
+                var ego = session.Actors.FirstOrDefault(a => a.Number == 1);
+                lines.Add($"Room {room:00}: costume {ego?.Look.Costume?.ToString("X2") ?? "?"} room {ego?.Room} staff {session.GameStatus.StaffHeld}");
+            }
+            catch (Exception ex) { lines.Add($"Room {room:00}: {ex.GetType().Name}"); }
+        }
+        lines.Add("== room entries: reads of global vars/bits ==");
+        foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).OrderBy(i => i))
+        {
+            var scan = scanner.ScanRoomEntry(room);
+            var reads = scan.Touches.Where(t => !t.Write && !LoomSceneStateScanner.IsSystemCode(t.Where)).Select(t => $"{t.Variable}@{t.Where}").Distinct().ToList();
+            lines.Add($"Room {room:00}: scripts [{string.Join(", ", scan.Scripts)}] reads [{string.Join(" ", reads)}] costume [{string.Join(" | ", scan.CostumeChanges)}]");
+        }
+        lines.Add("== scenes: story bits read but not written by the scene's own code, and who sets them ==");
+        var json = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../src/SCUMMexplorer.App/loom-replays.json"));
+        using var doc = JsonDocument.Parse(File.ReadAllText(json));
+        static bool Story(string v) => v.StartsWith("bit[0x", StringComparison.Ordinal) && int.Parse(v.AsSpan(6, v.Length - 7), System.Globalization.NumberStyles.HexNumber) >= 0xD72;
+        var writerCache = new Dictionary<string, IReadOnlyList<LoomStateSource>>();
+        foreach (var r in doc.RootElement.GetProperty("replays").EnumerateArray())
+        {
+            var ids = r.GetProperty("scriptIds").EnumerateArray().Select(e => e.GetInt32()).Where(i => i >= LoomSceneStateScanner.SystemScriptLimit).ToArray();
+            var source = r.GetProperty("source").GetString() ?? "";
+            if (ids.Length == 0 && !source.Contains("cutscene at", StringComparison.Ordinal)) continue;
+            var room = r.GetProperty("room").GetInt32();
+            var scan = scanner.Scan(room, ids, r.GetProperty("objectId").GetInt32(), r.GetProperty("verb").GetInt32());
+            var own = scan.OwnTouches.ToList();
+            var written = own.Where(t => t.Write).Select(t => t.Variable).ToHashSet();
+            var reads = own.Where(t => !t.Write && Story(t.Variable) && !written.Contains(t.Variable)).Select(t => t.Variable).Distinct().Order().ToList();
+            var costumeReads = own.Where(t => !t.Write && (t.Variable == "var[0x07D]" || t.Instruction.StartsWith("getActorCostume", StringComparison.Ordinal))).Select(t => t.Where).Distinct().ToList();
+            var ownCostume = scan.CostumeChanges.Where(c => c.Contains("costume, 0x", StringComparison.Ordinal) || c.Contains("costume, var", StringComparison.Ordinal)).Count();
+            if (reads.Count == 0 && costumeReads.Count == 0) continue;
+            lines.Add($"{r.GetProperty("id").GetString()} (scripts {string.Join(",", ids)}): reads [{string.Join(" ", reads)}] costumeReads [{string.Join(", ", costumeReads)}]");
+            foreach (var bit in reads)
+            {
+                if (!writerCache.TryGetValue(bit, out var w)) writerCache[bit] = w = scanner.FindConstantWriters(bit, 1);
+                lines.Add($"      {bit} set to 1 by: {(w.Count == 0 ? "(no code)" : string.Join("; ", w.Select(x => x.Where.Split(" +")[0]).Distinct().Take(5)))}");
+            }
+        }
+        File.WriteAllLines(Environment.GetEnvironmentVariable("SCUMM_AUDIT_DUMP") ?? Path.Combine(Path.GetTempPath(), "audit.txt"), lines);
     }
 }
 

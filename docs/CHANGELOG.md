@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: placer audit of costume changes and story-bit room entries (no setup change)
+
+Re-scan of the game's code for the two remaining audit cases. The scanner missed every costume change (it looked for `costume ` where the disassembler prints `costume,`); fixed and pinned by a test. New Core queries `FindCostumeChanges`, `FindWriters`, `FindStoryBitMoves`, `ScanRoomEntry`. Result: room entries already give the ego the costume they own on a catalog visit, no scene's own code presumes a leftover costume, and no scene clears a story bit other than D61 to presume it, so no further start setup is derived; the candidate chains (Room 43-45 cage scenes, ghost chain) and the open story-order decisions are in the [audit](../.verification/setup-placer-20261003/audit-costume-entries.md).
+
 ## 3 October: scenes bring in the actors who speak (Room 09 El Muerto and others)
 
 Room 09 object 275 verb 0x56 ("Other draft response at El Muerto") ran but showed only a half-second flash of the ghost: its two lines are printed for actor 4, who is not in Room 9 in a catalog start, and `actorTalk` shows nothing for an actor outside the room (ScummVM). The setup planner now also scans the object verb's own code (`Scan(..., objectId, verbId)`) for lines printed for constant actors the scene does not place itself, finds the game's own `putActorInRoom` + `putActor`/`putActorAtObject` into that room (`FindActorPlacers`), and applies the first one in the start room's code, else the first in code order, through the new labelled replay step `actor` (`PlaceActorInRoom`; a no-op when the actor is already there). It is listed as an estimate in the picker note with the other placements. Effect on the 29 catalog entries it touches (probe, 3000 frames): Room 09 obj 275 0→2 lines, Room 09 obj 274 3→6, Room 23 objs 422-425 0→1 each, Room 51 obj 742 0→1; the rest had the actor already and are unchanged.
