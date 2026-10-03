@@ -1,0 +1,56 @@
+{
+  "outcome": "Room28 camera, timed fire and076 continuation complete by clicks and two keyboard casts.",
+  "inputFrames": 949,
+  "directFrames": 847,
+  "completedScopes": 9,
+  "conditionalExecutedBodyEvents": 207,
+  "certaintyDifferences": 199,
+  "newSites": [
+    {
+      "owner": "Room 28 local 203",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "Room 28 local 212",
+      "offset": "+0x0064"
+    },
+    {
+      "owner": "script 076",
+      "offset": "+0x0000"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "percent": 71.91,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 207,
+    "after": 210,
+    "total": 235,
+    "percent": 89.36,
+    "remaining": 25
+  },
+  "diagnosticCycles": 1,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 200,
+  "productionAndCatalogUnchanged": true,
+  "evidence": {
+    "Exe\\Room28Input-20261003\\cycle-1\\input.json": "b334097d3f47268817b4380f983c13efb6246e29b96a1929303b036455c726ae",
+    "Exe\\Room28Input-20261003\\cycle-1\\direct.json": "f5495ba5c790c80c2c83b89e55d1407ea77cf9c7d33c1c293a3295f90e382de4",
+    "Exe\\EstimatedRoomLoads-20261002\\audits\\literal\\audit.json": "bd352eae00bdc822bbbbd377f9cfdf6fd078e7d70765b2fc93c11ab8021d0e8e",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e",
+    "Exe\\Room34Sequences-20261002\\input-2\\keyboard.json": "3ddacbfa44dd35123d9aef96b05ea67c0c19882639854438d9ee8d0e351de228",
+    "Exe\\Room25Input-20261002\\cycle-1\\input.json": "c37e2c35ebf000bb9b1c5987981b9691792e61d8c97b7d2a8d481acf68f7e54f",
+    "Exe\\Room23Input-20261002\\cycle-2\\input.json": "06bfe2b301cac252557c7739c244ac5799e0f8ad30f1c074b1900b78b6d10a0b",
+    "Exe\\Room10Input-20261003\\cycle-2\\input.json": "45bc809447e4695a970ef18efa5ef6f40766b08ec4903ceaadb3bb2c855aa0e6",
+    "Exe\\Room36Input-20261003\\cycle-2\\input.json": "64d54010713e91af16458a3ccfe8a73a94999a69cd12350a2b8c3921d2e9075f",
+    "Exe\\Room24Input-20261003\\cycle-1\\input.json": "62d21cd625075fda73fcc45c086386571250a4cc3298ecfe638c7f5ca66b641c",
+    "Exe\\Room15Input-20261003\\cycle-1\\input.json": "ba65f8accf0006b265d69a5370e5ea8f2a794e16c1323d53a0dcd3256a4c6161",
+    "Exe\\Room17Input-20261003\\cycle-2\\input.json": "3ffe3c4f69d12f8483844021d59b7b16a2ea91ee220e632276621a456dfd268e",
+    "Exe\\Room22Input-20261003\\cycle-2\\input.json": "2bb31dc15a89abc19b40502876ece4c27412353e8565006abb44770f661c72c6",
+    "Exe\\Room08Input-20261003\\cycle-1\\input.json": "eee2b50425b810928a31f8be5d61b692b81403a8824994e19b42e4c91572a446"
+  }
+}

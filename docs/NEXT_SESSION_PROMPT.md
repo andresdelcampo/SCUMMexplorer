@@ -1,5 +1,13 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room28 camera/fire/continuation complete — 3 October
+
+After47dbb0b. Room28 actual camera click and470/3D then466/43 keys complete2030000, timed2120064 and0760000 through27/28. SourceCA0→1→2,D94missing→1→0; no story edits. Input949/direct847frames,9/9 scopes;207 selected Executed/Conditional body events,199 certainty-only differences. Audited207→210/235 (89.36%),25 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room28-input-20261003/validation.md).
+
+Next candidate: Room62 local202/204 +0000 via reversible gold/straw input. Source prerequisites first; supported staff/notes/learned edits labelled, notes/reverse flags unchanged. Keep Room09 stopped this session after two diagnostics. Continue bounded tasks toward200K context per user; exact telemetry unavailable. Commit each checkpoint; preserve all constraints/history/protected57/estimates. No App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.
+
+Ready-to-copy continuation: Continue SCUMMexplorer from Room28 using docs/NEXT_SESSION_PROMPT.md. Audited210/235 versus fresh single-action169/235. Start Room62 remaining pair, then bounded input audits toward200K context; commit each and leave running App untouched.
+
 ## Latest: Room08 tapestry restoration pair complete — 3 October
 
 After191bf6d. Room08 four keyboard casts256/3F,256/3E,257/3E,257/3F complete both tapestry restoration sites2110008/214000B with sourceD7D/D7E setup. Input1024/direct820frames,4/4 scopes,79 Executed/Conditional recorded events,76 certainty-only differences. Audited205→207/235 (88.09%),28 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change. Protected57/history/App untouched. [Validation](../.verification/room08-input-20261003/validation.md).
