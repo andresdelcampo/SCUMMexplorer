@@ -1,5 +1,11 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room34 local207 +0079 complete — 3 October
+
+After 31061e0. Local207 +0079/end0100 completes: route3 prefix to scene 087 (D9D=1), catalog hop to Room43, the 096 click route, Look 684 (097) into Room34 layout A (D7B≠0), click 559 twice (098 then 207). Audited233→234/235 (99.57%),1 remaining; fresh single-action169/235 unchanged. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+
+Next: only Room34 local200 +0035 remains (ego must reach box 8 with previous box 6, camera <464 by the decoded test; layout B has box 8 on but the ego walks 6→7→8; layout A has box 8 off). Open question: does ScummVM's walk step ever skip box 7 (matrix/step size), or is the site reachable by another mover (putActor into box 8)? No App launch or push.
+
 ## Latest: script009 +002C complete — 3 October
 
 After 9ad982d. Room69's local204 wait is the copy-protection question; four glyph clicks (answers read from var052..055) release native boot into Room02 with practice mode, then notes q,w and a click on verb 0x35 run 009 +002C/end0079 (verb 0x35 exists only briefly after the notes). Audited232→233/235 (99.15%),2 remaining; fresh single-action169/235 unchanged. [Validation](../.verification/global-scripts-input-20261003/validation.md).
@@ -54,7 +60,7 @@ Next: from catalog Room34 select object586 for Healing4D, require209 end03C0, th
 
 ## START HERE: current state after b09b2fb — 3 October
 
-Audited **233/235 (99.15%)**, 2 sites left (script096, script022 +0005 and script009 +002C now credited, see Latest above); fresh single-action **169/235 (71.91%)** is a separate metric and unchanged. The older "Parked by user" section below is superseded: its Room34 601→36→35→34 route is proven source-blocked. Details and decoded gates: [global-scripts validation addendum](../.verification/global-scripts-input-20261003/validation.md) and [Room34 chain validation](../.verification/room34-chain-20261003/validation.md).
+Audited **234/235 (99.57%)**, 1 site left (Room34 local200 +0035; the other four now credited, see Latest above); fresh single-action **169/235 (71.91%)** is a separate metric and unchanged. The older "Parked by user" section below is superseded: its Room34 601→36→35→34 route is proven source-blocked. Details and decoded gates: [global-scripts validation addendum](../.verification/global-scripts-input-20261003/validation.md) and [Room34 chain validation](../.verification/room34-chain-20261003/validation.md).
 
 The 5 remaining sites and what each needs (none is a probe-only fix any more):
 

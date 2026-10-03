@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify Room34 local207 +0079 through 097 after scene 087
+
+Local207 +0079/end0100 ("¡De eso nada!") completes via actual clicks: route3 prefix to scene 087 (D9D), catalog hop to Room43, the 096 route, Look 684 (097) into Room34 layout A, then two clicks on 559 (098, then 207). Audited233→234/235 (99.57%),1 remaining (Room34 local200 +0035); fresh single-action169/235 unchanged. Labelled staff/notes/learned setup and the catalog hops only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+
 ## 3 October: verify script009 +002C through native boot and practice mode
 
 Room69's "stall" is the copy-protection question: four glyph clicks (886,890,895,887) release the boot into Room02 with practice mode (876). Two notes then show verb 0x35 briefly; its click runs script009 +002C/end0079. Audited232→233/235 (99.15%),2 remaining; fresh single-action169/235 unchanged. Labelled staff/7-notes setup only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).

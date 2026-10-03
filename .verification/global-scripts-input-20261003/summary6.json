@@ -1,0 +1,31 @@
+{
+  "outcome": "Route3 prefix to scene 087 (D9D), catalog hop to Room43, actual clicks 650/639/653+Escape/656/655/639 (096), 684 Look (097) into Room34 layout A, two clicks on 559 (098 then 207) run local207 +0079/end0100",
+  "inputFrames": 9610,
+  "completedScopes": 0,
+  "newSites": [
+    {
+      "owner": "Room 34 local 207",
+      "offset": "+0x0079"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 233,
+    "after": 234,
+    "total": 235,
+    "percent": 99.57,
+    "remaining": 1
+  },
+  "diagnosticCycles": 2,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 318,
+  "evidence": {
+    "Exe\\GlobalInput-20261003\\l1\\input.json": "885c94fecb29d08aa58bd9b9028dfd8e341ea65c0abbb83a91a0b50b2e64715f",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}
