@@ -1,0 +1,31 @@
+{
+  "outcome": "Actual clicks 650 (093 cage scene), 639, double-click 653 + Escape (095), 656, 655 (092), 639 complete script096 +0000/end00E7 and load Room46.",
+  "inputFrames": 2228,
+  "completedScopes": 5,
+  "newSites": [
+    {
+      "owner": "script 096",
+      "offset": "+0x0000"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 230,
+    "after": 231,
+    "total": 235,
+    "percent": 98.3,
+    "remaining": 4
+  },
+  "diagnosticCycles": 4,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 318,
+  "evidence": {
+    "Exe\\GlobalInput-20261003\\e4\\input.json": "d747115ec0e14d7bf2679b209777df7134f9ccbb196353af574c64cfc549432c",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}

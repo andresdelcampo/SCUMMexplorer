@@ -1,5 +1,11 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: script096 complete — 3 October
+
+After 75e1995. Script096 +0000/end00E7 completes through actual clicks: 650 (cage scene 093 sets DB6; 639 is untouchable before it), 639→44, double-click 653 plus Escape (095 skip), 656 staff, 655 (092), 639 → 096 → Room46. 2228 frames, 5 balanced scopes. Audited230→231/235 (98.30%),4 remaining; fresh single-action169/235 unchanged. Four runs (two probe-side failures retained). The original native090/raw4 recipe is unchanged and still stops at the conditional Room42 load; this credit does not touch it. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+
+Next: remaining4 are Room34 local200 +0035/local207 +0079 (needs a Room33/46 return path after scene 087), script009 +002C (Room69 local204 stall), script022 +0005 (D70 room with an aimable object; Room41 untried). No App launch or push.
+
 ## Latest: remaining 5 sites decoded — 3 October
 
 After af6d5f6. Audited230/235 (97.87%) versus fresh single-action169/235 (71.91%). Each remaining site has a decoded gate, see the addendum in [global-scripts validation](../.verification/global-scripts-input-20261003/validation.md): 009 +002C needs practice mode (Room69 click on 876 works but Room69 then stalls after local201→204, and a catalog hop leaves input script=Room69 local200); 022 +0005 needs an aimable object in a D70 room (Room36 has none; Room41 untried); 096 needs DA3 from script095 +0725 (the blocked Room41 native090/095 chain); Room34 local200/207 need Healing586 after087 plus a return path past the Room37 exit601 costume gate. Do not repeat the Room34 601→36→35→34 route.
@@ -36,7 +42,7 @@ Next: from catalog Room34 select object586 for Healing4D, require209 end03C0, th
 
 ## START HERE: current state after b09b2fb — 3 October
 
-Audited **230/235 (97.87%)**, 5 sites left; fresh single-action **169/235 (71.91%)** is a separate metric and unchanged. The older "Parked by user" section below is superseded: its Room34 601→36→35→34 route is proven source-blocked. Details and decoded gates: [global-scripts validation addendum](../.verification/global-scripts-input-20261003/validation.md) and [Room34 chain validation](../.verification/room34-chain-20261003/validation.md).
+Audited **231/235 (98.30%)**, 4 sites left (script096 now credited, see Latest above); fresh single-action **169/235 (71.91%)** is a separate metric and unchanged. The older "Parked by user" section below is superseded: its Room34 601→36→35→34 route is proven source-blocked. Details and decoded gates: [global-scripts validation addendum](../.verification/global-scripts-input-20261003/validation.md) and [Room34 chain validation](../.verification/room34-chain-20261003/validation.md).
 
 The 5 remaining sites and what each needs (none is a probe-only fix any more):
 

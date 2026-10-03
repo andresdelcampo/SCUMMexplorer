@@ -33,3 +33,13 @@ Tried and parked: script 022 +0005 in Room36 (D70=1): Room36's only non-exit obj
 - **script 022 +0005** ("too noisy to weave"): needs D70=1 (Room36 entry, Room41 local206) plus four notes with an aimed object. Room36's only non-exit object 600 has no verbs, so nothing can be aimed (`b1`: 013 instead). Room41 untried.
 - **script 096 +0000**: Room43 object 639/38 needs D7B≠0, staff held (D61) and bit DA3 — set only by script 095 +0725, i.e. the Room41 native090/095 chain that is the blocked route-priority task.
 - **Room34 local200 +0035 / local207 +0079**: see Room34 chain validation; Healing 586/4D only after scene 087 sets D9D, and the 601 costume gate blocks the way back.
+
+## Addendum: script 096 via actual Room43 clicks (audited 230→231/235, 98.30%, 4 remaining)
+
+Earlier recipe `late096` reached 096 with direct verbs (exploration action, not audited). This task replays it with public `Click`/`PressKey` only (probe `Room43Probe`, check `check3.py`, summary3/remaining-sites3). Route from catalog Room43 (arrival = explicit exploration assumption), no status/flag/class/actor edits:
+1. Click object 650 → script 093 (cage scene `+0000/end05FB`, Rooms 87→43→44→43). Source: 093 sets DB6=1/DB7=0, and Room43's class-24 setup (local202 +0031) leaves 639 untouchable until then; the first two cycles (e1, e2: click hit 641, then untouchable 639) are retained and excluded. 640 shadows 650 geometrically but is itself untouchable, so the probe skips untouchable earlier objects when picking a point.
+2. Click 639 → Room44; double click 653, two frames, Escape → 095 `+0000/end079D` (skip override) → Room45.
+3. Double click 656 (staff, entry resolved as Verb 0x38 +0005, same object code as the inventoried Verb 0x36 entry — not a separate site), click 655 → 092 `+0000/end0039` → Room43.
+4. Click 639 → `096 +0000/end00E7`, then Room46.
+2228 frames, 5 balanced cutscene scopes, every click `IsGameInput`, none "not sent". Script 096 events Executed (Certainty value 1, as recorded). New audited site: script 096 +0x0000. Fresh single-action coverage 169/235 unchanged.
+Four runs (e1–e4): e1/e2 probe-side (click selection, untouchable 639), e3 probe error (650 shadowing), e4 passes; evidence `Exe/GlobalInput-20261003/e4/input.json`. Remaining 4: Room34 local200 +0035/local207 +0079, script009 +002C, script022 +0005. Protected 57 exact/unstaged; no production/catalog change; no App; no push.
