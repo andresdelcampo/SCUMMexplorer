@@ -30,6 +30,10 @@ The Core session already runs a lot of the game: the boot, the hooks, cutscenes,
 
 **Consequence for the old task list:** the remaining "Blockers" stops (`expression` ×3, `getActorCostume` ×1, `getActorElevation` ×1), the refused-input label wording and the KeyInputCheck extension do not change what the user sees. They are dropped as separate tasks. The actor work below models `actorOps costume/elevation`, which removes two of those stops as a side effect.
 
+## Current follow-up (3 October, end of day)
+
+Next: readable scripts (glossary, names, Readable/Raw script view) per [READABLE_SCRIPTS_PLAN.md](READABLE_SCRIPTS_PLAN.md), then verify the draft verb names. The user's state rules (earliest room state, user-controlled Game Status, Advanced-only technical views) are in [CURRENT_WORK.md](CURRENT_WORK.md). The route and audit items below are parked unless a milestone needs them.
+
 ## Current follow-up (2 October)
 
 **Parked by user,3 October:** Room34 watcher prerequisite investigation stopped after two failed cycles: fresh38 Look610 reproduces incomplete087 in37; fresh36 exit599 is hidden by class24 and never dispatches. Four failed captures retained/excluded; no coverage gain or production defect established. Next source step is Room36 box9 watcher200 +0077/end009B, which clears599 class24 at+0094. Audited215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Protected57/history/App untouched. [Validation and precise next experiment](../.verification/room34-watcher-20261003/validation.md). Session gain23 audited sites from192 to215; exact200K threshold not measured.

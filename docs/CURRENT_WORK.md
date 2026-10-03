@@ -157,3 +157,6 @@ Rooms start in the earliest game state. A room moves to a late state only after 
 
 ## State control (user, 3 October)
 The user controls the game state (Game Status: staff, notes, drafts, story events) and can change it freely to explore. The app only helps by raising the state to the minimum the chosen room or cutscene needs, and keeps a later state if the session already has one (menu picks should not reset the session; a "Start over" resets). Done 3 October: a single cutscene picked from the menu keeps the running session (`PlayKnownCutscene`) and `LoomSceneSetupPlanner.Adapt` drops the staff pickup when the session already holds it; stated sequences still start fresh (they carry their own steps). Restart returns to the boot. Story-event checkboxes need no extra presetting: the real pickups and scenes that run set their bits, and they show as checked. The LOOM-specific flag list is `LoomEgaStateFlags` (App), the window is generic.
+
+## Interface rules (user, 3 October)
+Technical text (traces, assumptions, raw bytecode, source details) belongs to Advanced mode and must be digestible there (see READABLE_SCRIPTS_PLAN.md); normal mode shows the scene, the game's own text and a few clear controls. One short subtitle per window; no sentence that repeats another. Do not run the full test suite routinely.
