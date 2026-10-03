@@ -631,6 +631,23 @@ public sealed class LoomBoundedScriptExecutor
                 trace.Add(known
                     ? runtime.Messages.DrawBox((short)values[0], (short)values[1], (short)values[2], (short)values[3], values[4])
                     : $"drawBox {instruction.Operands} not applied: an operand is unknown");
+                if (known && values[4] == 0)
+                {
+                    // A black box also blanks queued object images it fully covers (Room 69 local 201 over
+                    // the difficulty buttons drawn by 202). Their pixels are gone, so they leave the queue.
+                    int left = Math.Min((short)values[0], (short)values[2]), right = Math.Max((short)values[0], (short)values[2]);
+                    int top = Math.Min((short)values[1], (short)values[3]), bottom = Math.Max((short)values[1], (short)values[3]);
+                    foreach (var queued in drawQueue.ToArray())
+                    {
+                        var covered = roomObjects.FirstOrDefault(item => item.Id == queued);
+                        if (covered is null || !positions.TryGetValue(queued, out var at) ||
+                            at.X < left || at.Y < top || at.X + covered.Width - 1 > right || at.Y + covered.Height - 1 > bottom)
+                            continue;
+                        drawQueue.Remove(queued);
+                        runtime.SetObjectState(queued, 0);
+                        trace.Add($"object {queued} blanked by the box");
+                    }
+                }
                 pc = next;
                 continue;
             }

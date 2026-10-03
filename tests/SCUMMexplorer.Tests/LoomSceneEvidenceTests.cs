@@ -144,4 +144,21 @@ public sealed class LoomSceneEvidenceTests
         Assert.DoesNotContain(drawn, id => id is 876 or 877 or 878);
         Assert.Contains(885, drawn);
     }
+
+    [Fact]
+    public void Room69SessionBlanksTheQueuedDifficultyButtonsWhenLocal201BoxesOverThem()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game,
+            new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")), completeBoot: false);
+        session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 69));
+        for (var i = 0; i < 30; i++) session.AdvanceFrame();
+        Assert.Contains(877, session.Snapshot.DrawOrder);
+        session.Click(160, 72);
+        for (var i = 0; i < 60; i++) session.AdvanceFrame();
+        Assert.DoesNotContain(session.Snapshot.DrawOrder, id => id is 876 or 877 or 878);
+        Assert.Contains(885, session.Snapshot.DrawOrder);
+    }
 }
