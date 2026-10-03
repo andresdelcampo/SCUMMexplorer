@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: Rusty scenes separated, Rusty's look, Forge lookout named
+
+The ghost scene (098) now plays alone: the earlier scenes it needs run unseen (new `RunSilently`/`silentSteps`). The firewood/dream sequences start with Bobbin in Rusty's look (Awakening and costume change run unseen first). The bonus scene is "first sight of the Forge (cliff lookout)", once-only per the user's memory. [Validation](../.verification/bonus-room34-20261003/validation.md).
+
 ## 3 October: Room 34 Rusty ghost replay fixed
 
 Three duplicate "Walk response, Reached Room 57" entries (objects 559, 560, 586 verb 0x37) started script 098 from the fresh state, where Rusty is still the sleeping living boy (Room 34's entry needs bit D9D from scene 087 to show the ghost). Replaced by one sequence after the firewood/dream scenes with a catalog visit step (`visit`); Game Texts can now offer it for script 098. [Validation](../.verification/bonus-room34-20261003/validation.md).

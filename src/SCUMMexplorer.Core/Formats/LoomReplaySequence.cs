@@ -14,6 +14,21 @@ public sealed class LoomReplaySequence
     public string? Failure { get; private set; }
     public LoomObjectActionResult? LastAction { get; private set; }
     public int Stage => _index;
+    /// <summary>When set, <see cref="Continue"/> sends nothing from this step on (used to run the leading steps unseen).</summary>
+    public int? PauseAt { get; set; }
+
+    /// <summary>
+    /// Runs the first <paramref name="steps"/> steps to completion at once, frame by frame without showing them,
+    /// so a later scene starts from the story state they really reach (for example a look change or a flag the
+    /// earlier scenes set). The inputs and waits are the sequence's own; nothing is written. False if a stage fails.
+    /// </summary>
+    public bool RunSilently(int steps, int maxFrames = 40000)
+    {
+        PauseAt = steps;
+        for (var frame = 0; frame < maxFrames && Continue(); frame++) { _session.AdvanceFrame(); FrameAdvanced(); }
+        PauseAt = null;
+        return Failure is null && _index >= steps;
+    }
 
     public LoomReplaySequence(LoomExplorationSession session, IReadOnlyList<LoomReplayStep> steps)
     {
@@ -31,6 +46,7 @@ public sealed class LoomReplaySequence
         if (Failure is not null) return false;
         while (_index < _steps.Count)
         {
+            if (PauseAt is int pause && _index >= pause) return false;
             var step = _steps[_index];
             if (step.Kind == "visit")
             {

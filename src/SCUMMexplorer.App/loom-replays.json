@@ -5310,6 +5310,34 @@
       "verb": 56,
       "steps": [
         {
+          "kind": "visit",
+          "objectId": 34
+        },
+        {
+          "kind": "verb",
+          "objectId": 561,
+          "verb": 68
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 85 +0x05CE",
+          "expectedRoom": 34
+        },
+        {
+          "kind": "verb",
+          "objectId": 561,
+          "verb": 76
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Room 34 local script 202 +0x015F",
+          "expectedRoom": 34
+        },
+        {
+          "kind": "visit",
+          "objectId": 36
+        },
+        {
           "kind": "verb",
           "objectId": 599,
           "verb": 56
@@ -5354,16 +5382,45 @@
         68
       ],
       "frames": 2930,
-      "source": "Fresh post-boot seed-0 sequence. Catalog arrival, direct verbs and click timing are explicit exploration assumptions. No prerequisite writes. Stored name in the trigger room. Conditional naming operands (not validated live names): oro, paja.\nSteps: [{\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}]\nReached scene boundaries:\ncutscene at Script 86 +0x0000 runs script 2\nendCutscene at Script 86 +0x055C runs script 3\ncutscene at Script 87 +0x0000 runs script 2\nendCutscene at Script 87 +0x09B9 runs script 3"
+      "source": "Fresh post-boot seed-0 sequence. Catalog arrival, direct verbs and click timing are explicit exploration assumptions. No prerequisite writes. Stored name in the trigger room. Conditional naming operands (not validated live names): oro, paja.\nBobbin wears Rusty's look in these scenes: the first six steps (a catalog visit to Room 34, the Awakening and the costume change as direct verbs, then a catalog visit to Room 36) run without being shown. No prerequisite writes.\nSteps: [{\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 68}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 85 +0x05CE\", \"expectedRoom\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 76}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Room 34 local script 202 +0x015F\", \"expectedRoom\": 34}, {\"kind\": \"visit\", \"objectId\": 36}, {\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}]\nReached scene boundaries:\ncutscene at Script 86 +0x0000 runs script 2\nendCutscene at Script 86 +0x055C runs script 3\ncutscene at Script 87 +0x0000 runs script 2\nendCutscene at Script 87 +0x09B9 runs script 3",
+      "silentSteps": 6
     },
     {
       "id": "sequence-087-098",
-      "title": "The firewood scene, the dream, then Room 34 · Rusty the ghost (Walk response)",
+      "title": "Rusty the ghost (Walk response)",
       "category": "Scenes",
-      "room": 36,
-      "objectId": 599,
-      "verb": 56,
+      "room": 34,
+      "objectId": 559,
+      "verb": 55,
       "steps": [
+        {
+          "kind": "visit",
+          "objectId": 34
+        },
+        {
+          "kind": "verb",
+          "objectId": 561,
+          "verb": 68
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Script 85 +0x05CE",
+          "expectedRoom": 34
+        },
+        {
+          "kind": "verb",
+          "objectId": 561,
+          "verb": 76
+        },
+        {
+          "kind": "scene",
+          "endBoundary": "endCutscene at Room 34 local script 202 +0x015F",
+          "expectedRoom": 34
+        },
+        {
+          "kind": "visit",
+          "objectId": 36
+        },
         {
           "kind": "verb",
           "objectId": 599,
@@ -5412,23 +5469,20 @@
           "expectedRoom": 34
         }
       ],
+      "silentSteps": 14,
       "scriptIds": [
         98
       ],
       "rooms": [
         34,
-        36,
-        37,
-        38,
-        57,
-        58
+        57
       ],
-      "frames": 4128,
-      "source": "Room 34 Walk response (script 098: Rusty's ghost). Replaces the three direct Walk-response starts (objects 559, 560, 586 verb 0x37), which began in the fresh early state where Rusty is still the sleeping, living boy (costume 0x70) instead of the ghost (costume 0x78): Room 34's entry picks the ghost only once scene 087 has set bit D9D. Fresh post-boot seed-0 sequence: the firewood scene 086 and the straw dream 087 run first (direct verbs and click timing are exploration assumptions), then a catalog visit to Room 34 (explicit exploration assumption that keeps the story state reached), then object 559's verb 0x37 runs directly (the ghost arrives, script 098). No prerequisite writes.\nSteps: [{\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}, {\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"frames\", \"frames\": 40}, {\"kind\": \"verb\", \"objectId\": 559, \"verb\": 55}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 98 +0x0618\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Script 86 +0x0000 runs script 2\nendCutscene at Script 86 +0x055C runs script 3\ncutscene at Script 87 +0x0000 runs script 2\nendCutscene at Script 87 +0x09B9 runs script 3\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3"
+      "frames": 1158,
+      "source": "Room 34 Walk response (script 098: Rusty's ghost). Replaces three direct Walk-response starts (objects 559, 560, 586 verb 0x37) that began in the fresh early state, where Rusty is still the sleeping living boy (costume 0x70); Room 34's entry shows the ghost (costume 0x78) only once scene 087 has set bit D9D. The leading steps (everything up to the catalog visit back to Room 34 and 40 settle frames: the Awakening, the costume change, the firewood scene 086 and the straw dream 087) run without being shown, so only the ghost scene plays: Bobbin as himself, before healing Rusty. They are direct verbs, clicks and catalog visits from an assumed arrival (exploration assumptions); nothing is written, and the story before it is not reconstructed.\nSteps: [{\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 68}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 85 +0x05CE\", \"expectedRoom\": 34}, {\"kind\": \"verb\", \"objectId\": 561, \"verb\": 76}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Room 34 local script 202 +0x015F\", \"expectedRoom\": 34}, {\"kind\": \"visit\", \"objectId\": 36}, {\"kind\": \"verb\", \"objectId\": 599, \"verb\": 56}, {\"kind\": \"frames\", \"frames\": 32}, {\"kind\": \"click\", \"x\": 109, \"y\": 102}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 86 +0x055C\", \"expectedRoom\": 38}, {\"kind\": \"verb\", \"objectId\": 610, \"verb\": 54}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 87 +0x09B9\", \"expectedRoom\": 38}, {\"kind\": \"visit\", \"objectId\": 34}, {\"kind\": \"frames\", \"frames\": 40}, {\"kind\": \"verb\", \"objectId\": 559, \"verb\": 55}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Script 98 +0x0618\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Script 98 +0x0035 runs script 2\nendCutscene at Script 98 +0x0618 runs script 3"
     },
     {
       "id": "bonus-room34-local200",
-      "title": "Room 34 · Bonus: the ledge lookout (camera pan east)",
+      "title": "Room 34 · Bonus: first sight of the Forge (cliff lookout)",
       "category": "Bonus scenes",
       "room": 34,
       "objectId": 0,
@@ -5450,7 +5504,7 @@
         34
       ],
       "frames": 132,
-      "source": "Room 34 local script 200 +0x0035 (the scene after the watcher's test). Bonus preview: the game's own flow has no decoded way to meet the watcher's condition (the ego must step from walk box 6 straight into box 8 while the camera is left of x 464, but the walker and the box matrix always route 6 to 7 to 8, and the wake script 085 switches the watcher off for good). The scene body is started directly: an exploration action, not game input. The camera pans to x 464, the ego plays animation 0xF9, the script waits 300 jiffies and scrolls back. What it is meant to show is not established. Fresh post-boot seed-0 session; catalog arrival assumed; no prerequisite writes. Completed in 132 frames, balanced scopes.\nSteps: [{\"kind\": \"script\", \"objectId\": 200, \"x\": 53}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Room 34 local script 200 +0x0056\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Room 34 local script 200 +0x0035 runs script 2\nendCutscene at Room 34 local script 200 +0x0056 runs script 3"
+      "source": "Room 34 local script 200 +0x0035 (the scene after the watcher's test). Bonus preview. In the game this is the first view of the blacksmiths' fortress, shown once (bit DD0) when Bobbin reaches the far end of the cliff without going down: the app takes over and scrolls. The explorer cannot yet reproduce that trigger: the decoded condition has no way to be met by the explorer's walker (the ego must step from walk box 6 straight into box 8 while the camera is left of x 464, but the walker and the box matrix always route 6 to 7 to 8, and the wake script 085 switches the watcher off for good). The scene body is started directly: an exploration action, not game input. The camera pans to x 464, the ego plays animation 0xF9, the script waits 300 jiffies and scrolls back. The scene's purpose (the first sight of the Forge) is the user's recollection of the original game, not something the decoded script states. Fresh post-boot seed-0 session; catalog arrival assumed; no prerequisite writes. Completed in 132 frames, balanced scopes.\nSteps: [{\"kind\": \"script\", \"objectId\": 200, \"x\": 53}, {\"kind\": \"scene\", \"endBoundary\": \"endCutscene at Room 34 local script 200 +0x0056\", \"expectedRoom\": 34}]\nReached scene boundaries:\ncutscene at Room 34 local script 200 +0x0035 runs script 2\nendCutscene at Room 34 local script 200 +0x0056 runs script 3"
     }
   ],
   "coverage": [
@@ -5662,7 +5716,7 @@
     {
       "title": "Room 34 local 200",
       "status": "Start needs validation",
-      "source": "Room 34 local 200; unvalidated cutscene sites: +0x0035.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 34 entry\nPlayable only as the bonus preview (Room 34 · Bonus: the ledge lookout), with the scene body started directly; no game flow that reaches the site is decoded."
+      "source": "Room 34 local 200; unvalidated cutscene sites: +0x0035.\nLiteral trigger probes: No cutscene reached from this start: 1.\nPossible roots (not proof of reachability): Room 34 entry\nPlayable only as the bonus preview (Room 34 · Bonus: first sight of the Forge), with the scene body started directly; no game flow that reaches the site is decoded."
     },
     {
       "title": "Room 34 local 201",
@@ -8787,16 +8841,12 @@
     },
     {
       "id": "sequence-087-098",
-      "startRoom": 36,
+      "startRoom": 34,
       "rooms": [
         34,
-        36,
-        37,
-        38,
-        57,
-        58
+        57
       ],
-      "frames": 4128,
+      "frames": 1158,
       "source": "Start plus rooms observed with the shared sequence runner."
     },
     {

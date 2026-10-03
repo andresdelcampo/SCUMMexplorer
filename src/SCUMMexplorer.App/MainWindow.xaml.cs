@@ -2946,7 +2946,7 @@ public partial class MainWindow : Window
     /// </summary>
     private sealed record KnownCutscene(string Description, int RoomId, int ObjectId, int VerbId, int Script, string Source,
         (int X, int Y)? Click = null, string Category = "Scenes", int[]? TextScripts = null,
-        LoomReplayStep[]? Steps = null, string? SequenceId = null)
+        LoomReplayStep[]? Steps = null, string? SequenceId = null, int SilentSteps = 0)
     {
         public string Title => LoomReplayTitle.Format(RoomId, Description);
         public string Id => SequenceId ?? (ObjectId == 0 ? $"Room {RoomId:00} entry" : $"Room {RoomId:00} object {ObjectId} Verb 0x{VerbId:X2}");
@@ -2965,9 +2965,23 @@ public partial class MainWindow : Window
             "Room 36 object 599 verb 0x38 leads into Room 37 (loadRoomWithEgo, walk to (24, 101)). On a first visit " +
             "(bit[0xD9A] is 0) Room 37's entry starts local 200 (+0x0097), which chains to script 086 once Bobbin's walk box " +
             "becomes 8 (+0x0016–0x001D). Script 086: Stoke mistakes Bobbin for Rusty; Rooms 37, 58, 37 and 38; skip point " +
-            "+0x0023; endCutscene +0x055C in Room 38.",
-            (109, 102))
+            "+0x0023; endCutscene +0x055C in Room 38. Bobbin wears Rusty's look here: the unseen first steps of this " +
+            "sequence cast the Awakening and the costume change on Rusty in Room 34 (the game's own scenes, run without showing them).",
+            Steps: FirewoodSteps, SilentSteps: FirewoodSilentSteps)
     ];
+
+    // Room 34's Awakening (script 085) and costume change (local 202) give Bobbin Rusty's look (costume 0x67), which
+    // scenes 086 and 087 show. These are direct verbs from an assumed catalog arrival; the story is not reconstructed.
+    internal static LoomReplayStep[] FirewoodSteps =>
+    [
+        new("visit", 34),
+        new("verb", 561, 0x44), new("scene", EndBoundary: "endCutscene at Script 85 +0x05CE", ExpectedRoom: 34),
+        new("verb", 561, 0x4C), new("scene", EndBoundary: "endCutscene at Room 34 local script 202 +0x015F", ExpectedRoom: 34),
+        new("visit", 36),
+        new("verb", 599, 0x38), new("frames", Frames: 32), new("click", X: 109, Y: 102),
+        new("scene", EndBoundary: "endCutscene at Script 86 +0x055C", ExpectedRoom: 38)
+    ];
+    internal const int FirewoodSilentSteps = 6;
 
     private IEnumerable<KnownCutscene> AllCutscenes()
     {
@@ -2976,7 +2990,8 @@ public partial class MainWindow : Window
         {
             if (recipe.Steps is null && KnownCutscenes.Any(k => k.RoomId == recipe.Room && k.ObjectId == recipe.ObjectId && k.VerbId == recipe.Verb)) continue;
             yield return new(recipe.Title, recipe.Room, recipe.ObjectId, recipe.Verb, recipe.ScriptIds.FirstOrDefault(),
-                recipe.Source, Category: recipe.Category, TextScripts: recipe.ScriptIds, Steps: recipe.Steps, SequenceId: recipe.Id);
+                recipe.Source, Category: recipe.Category, TextScripts: recipe.ScriptIds, Steps: recipe.Steps, SequenceId: recipe.Id,
+                SilentSteps: recipe.SilentSteps);
         }
     }
 
@@ -3149,13 +3164,22 @@ public partial class MainWindow : Window
         StopScenePlayback();
         _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
         // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
-        _sceneSound.Attach(_game, _session);
+        // A sequence with unseen leading steps runs them first (the story state they reach is the scene's start), then attaches.
+        if (cutscene.Steps is null || cutscene.SilentSteps == 0) _sceneSound.Attach(_game, _session);
         _session.VisitRoom(room);
         LoomObjectActionResult? action;
         if (cutscene.Steps is { } steps)
         {
             _replaySequence = new LoomReplaySequence(_session, steps);
-            _replaySequence.Continue();
+            if (cutscene.SilentSteps > 0)
+            {
+                _replaySequence.RunSilently(cutscene.SilentSteps);
+                _sceneSound.Attach(_game, _session);
+                // The unseen steps may have moved on to another room: the scene plays where the session now is.
+                if (_session.Snapshot.RoomId is int nowRoom && _game.Rooms.FirstOrDefault(item => item.ResourceId == nowRoom) is { } nowResource)
+                    room = nowResource;
+            }
+            if (_replaySequence.Failure is null) _replaySequence.Continue();
             action = _replaySequence.LastAction;
         }
         else action = cutscene.ObjectId == 0 ? null : _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
@@ -3167,7 +3191,7 @@ public partial class MainWindow : Window
             action = _session.Click(click.X, click.Y);
             uncertainties.AddRange(action.Uncertainties);
         }
-        if (_currentRoomResource?.ResourceId == cutscene.RoomId && _currentRoom is not null)
+        if (_currentRoomResource?.ResourceId == room.ResourceId && _currentRoom is not null)
         {
             ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
             UpdateRoomNavigationActions(room);
