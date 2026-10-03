@@ -1400,6 +1400,36 @@ public sealed partial class LoomExplorationSession
                   throw new ArgumentOutOfRangeException(nameof(roomId), $"Room {roomId:00} is not in this game."));
 
     /// <summary>
+    /// A labelled setup edit: stands the ego at (<paramref name="x"/>, <paramref name="y"/>) in the current room
+    /// (<c>putActor</c>, adjusted into the walk boxes) with the camera put on it as <c>loadRoomWithEgo</c> does (the
+    /// ego's x, rounded to a strip, inside the camera limits) and following it. It states where a scene may start when
+    /// the explorer's own walker cannot reach that place by the game's route; the result is an estimate, listed as such.
+    /// Needs a settled session (no scene, movement or dialogue), like the Game Status edits.
+    /// </summary>
+    public void PlaceEgo(int x, int y)
+    {
+        if (!StatusEditable) throw new InvalidOperationException("Finish the current scene, draft, movement or dialogue before placing the ego.");
+        if (_currentRoom?.ResourceId is not int room || !_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
+            throw new InvalidOperationException("Visit a room with a known ego before placing it.");
+        _browsingStaffFloor = null;
+        _uncertainties.StartStep();
+        var label = $"Explorer setup (explicit): the ego was placed at ({x}, {y}) in Room {room:00} and the camera put on it; where the game's route would have left them is not simulated";
+        _runtime.Actors.Put(ego, x, y, room, CurrentPlacement(), ego);
+        _runtime.Actors.MarkEstimate(ego, label);
+        var (min, max) = _runtime.CameraRange ?? _runtime.RoomCameraBounds ?? (160, 160);
+        var placed = _runtime.Actors[ego];
+        var camera = Math.Clamp((placed.X ?? x) & 0xFFF8, min, Math.Max(min, max));
+        _runtime.SetGlobalVariable(CameraVariable, (ushort)camera);
+        _runtime.EstimatedVariables.Add(CameraVariable);
+        _runtime.Camera.DestX = camera;
+        _runtime.Camera.MovingToActor = false;
+        _runtime.Camera.Mode = LoomCamera.FollowActor;
+        _runtime.Camera.Follows = ego;
+        _uncertainties.Add($"{label}; camera x = {camera} is an estimate that follows from it.");
+        _visitTrace.Add($"{label}: the ego stands at ({placed.X}, {placed.Y}), box {placed.WalkBox?.ToString() ?? "?"}, camera {camera} (estimate)");
+    }
+
+    /// <summary>
     /// Starts the current room's local script <paramref name="scriptId"/> at instruction offset
     /// <paramref name="offset"/>, as a bonus preview of a scene whose trigger the game's own flow
     /// has no decoded way to meet (for example a watcher that needs the ego to step from one walk

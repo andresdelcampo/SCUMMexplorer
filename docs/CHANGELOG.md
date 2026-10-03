@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: Forge lookout starts at the cliff end (new `place` setup step)
+
+`PlaceEgo` / step `place`: a labelled, estimated ego placement with the camera put on it. The lookout scene now starts with Bobbin at (378,134) and camera 376 (the user's reference), not at (64,74) with camera 160. The 6→8 trigger is still unreachable (matrix 6→8 = 7; camera follow gives 320 at that end); no trigger claim. [Validation](../.verification/cliff-scene-20261003/validation.md).
+
 ## 3 October: ghost scene arrives from Room 35 (head no longer clipped)
 
 The "headless Bobbin" was the depth mask of object 565 (state 1 after scene 087) hiding the head at Room 33's arrival spot (64,73), not a limb/animation fault. The ghost sequence now hops 35→34 first, so the arrival is Room 35's (the route that is open after 087). [Validation](../.verification/ghost-headless-20261003/validation.md).

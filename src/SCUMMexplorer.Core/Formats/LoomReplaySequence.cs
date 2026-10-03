@@ -32,7 +32,7 @@ public sealed class LoomReplaySequence
 
     public LoomReplaySequence(LoomExplorationSession session, IReadOnlyList<LoomReplayStep> steps)
     {
-        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "staff" or "frames" or "scene") ||
+        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "staff" or "place" or "frames" or "scene") ||
             s.Frames < 1 || s.Frames > LoomExplorationSession.CutsceneFrameLimit ||
             s.Kind == "scene" && (s.EndBoundary is null || s.ExpectedRoom is null)))
             throw new ArgumentException("A sequence needs explicit inputs and bounded, source-established completion waits.", nameof(steps));
@@ -57,6 +57,15 @@ public sealed class LoomReplaySequence
                     return _frames >= step.Frames ? Fail("The staff edit never became possible: the session did not settle.") : true;
                 try { _session.UpdateStaffPossession(step.ObjectId != 0); }
                 catch (InvalidOperationException ex) { return Fail($"The staff edit was refused: {ex.Message}"); }
+                Next(); continue;
+            }
+            if (step.Kind == "place")
+            {
+                // A labelled setup: the ego at (X, Y) with the camera on it (see PlaceEgo); waits for a settled session like "staff".
+                if (!_session.GameStatus.CanEdit)
+                    return _frames >= step.Frames ? Fail("The ego placement never became possible: the session did not settle.") : true;
+                try { _session.PlaceEgo(step.X, step.Y); }
+                catch (InvalidOperationException ex) { return Fail($"The ego placement was refused: {ex.Message}"); }
                 Next(); continue;
             }
             if (step.Kind == "visit")
