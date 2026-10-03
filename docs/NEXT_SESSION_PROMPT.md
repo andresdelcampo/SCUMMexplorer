@@ -2,6 +2,8 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOO
 
 ## Latest: Room34 local200 +0035 investigated, not credited — 3 October
 
+Update (same day): with the watcher live (catalog hops, no wake) the ego still walks 6→7→8, and ScummVM walkActor/matrix agree; the scene looks unreachable in play. Details in the validation addendum (runs n1,o1,o2). Next step for this site is a real-engine (ScummVM) check or accepting it as dead code.
+
 After ca469dc. Healing 586/4D completes after scene 087 + catalog Room34 (staff re-held), but the ego walks 6→7→8, so the watcher's previous-box-6 test never holds; Room35 587 arrival gives previous box 9. Two cycles, no credit. Audited stays234/235 (99.57%) with this single site left; fresh single-action169/235 unchanged. Precise blocker and the one next experiment (check whether ScummVM's per-step box update can skip the sliver box 7) are in the [validation](../.verification/global-scripts-input-20261003/validation.md). No App launch or push.
 
 ## Latest: Room34 local207 +0079 complete — 3 October
