@@ -159,6 +159,30 @@ public sealed partial class LoomExplorationSession
         if (held) RunStartedScript(18, 0, new Dictionary<string, ushort> { ["local[0x000]"] = 2 }, 0);
     }
 
+    private IReadOnlyList<LoomStoryEvent>? _storyEvents;
+
+    /// <summary>The story bits the game's code sets (see <see cref="LoomStoryEvent"/>), read once per session.</summary>
+    public IReadOnlyList<LoomStoryEvent> StoryEvents => _storyEvents ??= LoomStoryEvents.Read(_game);
+
+    /// <summary>Whether a story bit is set now; null when the game has not defined it yet.</summary>
+    public bool? StoryBit(string key) => _runtime.GlobalVariables.TryGetValue(key, out var v) ? v != 0 : null;
+
+    /// <summary>
+    /// Marks a story event as having happened (or not): sets or clears its bit, as an explicit exploration choice. The bit is not
+    /// established by the scene that normally sets it, and a room already on screen only shows the change when it is entered again.
+    /// </summary>
+    public void UpdateStoryBit(string key, bool happened)
+    {
+        RequireStatusEdit();
+        var bit = int.Parse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        if (bit < LoomStoryEvents.FirstBit) throw new ArgumentOutOfRangeException(nameof(key), "Only story bits can be edited here.");
+        var word = $"var[0x{bit >> 4:X3}]";
+        ushort mask = (ushort)(1 << (bit & 15));
+        var value = _runtime.GlobalVariables.GetValueOrDefault(word);
+        SetStatusWord(word, happened ? (ushort)(value | mask) : (ushort)(value & ~mask), mask, "Explicit user edit (story event)");
+        _statusEdits[key] = ((ushort)(happened ? 1 : 0), 1, "Explicit user edit (story event)");
+    }
+
     public void UpdateAvailableNotes(int count)
     {
         var schema = RequireStatusEdit();

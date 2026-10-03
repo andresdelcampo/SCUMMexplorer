@@ -1,7 +1,7 @@
 <Window x:Class="SCUMMexplorer.App.GameStatusWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Game Status" Width="900" Height="650" MinWidth="820" MinHeight="520"
+        Title="Game Status" Width="900" Height="780" MinWidth="820" MinHeight="620"
         WindowStartupLocation="CenterOwner" Background="#101821" Foreground="#E7E0D2">
     <Window.Resources>
         <Style x:Key="ArtworkChoice" TargetType="Button">
@@ -52,7 +52,7 @@
         </Style>
     </Window.Resources>
     <Grid Margin="20">
-        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <StackPanel>
             <TextBlock Text="Game Status" FontSize="24" FontWeight="SemiBold"/>
             <TextBlock x:Name="SessionSummary" Foreground="#C6B99F" Margin="0,6,0,14" TextWrapping="Wrap"/>
@@ -79,7 +79,7 @@
                 <TextBlock x:Name="NotesOrigin" Grid.Column="1" Foreground="#9FABAE" FontSize="11" TextTrimming="CharacterEllipsis" Visibility="Collapsed"/>
             </Grid>
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" MinHeight="150">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
             <TextBlock Text="Spell / draft sequences" FontSize="17" Margin="0,0,0,8"/>
             <DataGrid x:Name="DraftGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
@@ -115,7 +115,27 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
-        <StackPanel Grid.Row="3" Margin="0,12,0,0">
+        <Expander x:Name="FlagExpander" Grid.Row="3" Margin="0,10,0,0" Foreground="#E7E0D2" Visibility="Collapsed"
+                  Header="Story: conversations, scenes and objects the game remembers">
+            <StackPanel Margin="0,6,0,0">
+                <TextBlock x:Name="FlagIntro" Foreground="#9FABAE" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                <TextBox x:Name="FlagFilter" Background="#151F29" Foreground="#E7E0D2" BorderBrush="#334452" Padding="4,3" Margin="0,0,0,6"
+                         TextChanged="FlagFilter_Changed" AutomationProperties.Name="Filter story events" ToolTip="Filter the list by name"/>
+                <ListBox x:Name="FlagList" MaxHeight="150" Background="#151F29" BorderBrush="#334452" Foreground="#E7E0D2"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate><DataTemplate>
+                        <DockPanel ToolTip="{Binding Detail}" Margin="2">
+                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Style="{StaticResource LearnedCheck}" Margin="0,0,10,0" AutomationProperties.Name="{Binding Label}"/>
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding Key}" Foreground="#6F7F86" FontSize="11" Margin="12,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </DataTemplate></ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="Focusable" Value="False"/><Setter Property="Padding" Value="2"/></Style></ListBox.ItemContainerStyle>
+                </ListBox>
+            </StackPanel>
+        </Expander>
+        <StackPanel Grid.Row="4" Margin="0,12,0,0">
             <TextBlock x:Name="EditMessage" Foreground="#C6B99F" TextWrapping="Wrap" Margin="0,0,0,8"/>
             <DockPanel LastChildFill="False">
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">

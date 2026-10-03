@@ -9,8 +9,30 @@ using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.App;
 
+/// <summary>A named yes/no fact about the game ("this scene happened"), shown as a checkbox. The game-specific code decides how they are found.</summary>
+public sealed record StateFlag(string Key, string Label, string Detail);
+
 public partial class GameStatusWindow : Window
 {
+    /// <summary>The generic state-flag list: what to show, how to read a flag and how to set it. Supplied by the game-specific code.</summary>
+    public sealed record FlagSource(Func<LoomExplorationSession, IReadOnlyList<StateFlag>> Flags, Func<LoomExplorationSession, string, bool?> Read,
+        Action<LoomExplorationSession, string, bool> Write, string Intro);
+
+    public sealed class FlagRow : INotifyPropertyChanged
+    {
+        public required string Key { get; init; }
+        public required string Label { get; init; }
+        public required string Detail { get; init; }
+        public bool Baseline { get; set; }
+        private bool _checked;
+        public bool Checked { get => _checked; set { if (_checked == value) return; _checked = value; PropertyChanged?.Invoke(this, new(nameof(Checked))); } }
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
+
+    private readonly FlagSource? _flagSource;
+    private readonly List<FlagRow> _flagRows = [];
+    private LoomExplorationSession? _flagSession;
+
     private readonly Func<LoomExplorationSession?> _session;
     private readonly Func<bool> _canEdit;
     private readonly Func<bool> _advanced;
@@ -55,8 +77,9 @@ public partial class GameStatusWindow : Window
     }
 
     public GameStatusWindow(Func<LoomExplorationSession?> session, Func<bool> canEdit, Action refreshRoom,
-        GameLibrary? game = null, Func<bool>? advanced = null)
+        GameLibrary? game = null, Func<bool>? advanced = null, FlagSource? flags = null)
     {
+        _flagSource = flags;
         InitializeComponent(); _session = session; _canEdit = canEdit; _refreshRoom = refreshRoom; _advanced = advanced ?? (() => false);
         _artwork = game is null ? null : LoomStatusArtwork.TryLoad(game, out _artworkError);
         double noteHeight = (_artwork?.Notes[0].PixelHeight ?? 20) * 2;
@@ -84,7 +107,8 @@ public partial class GameStatusWindow : Window
     }
 
     private bool PendingChanges => _baseline is not null && (_staffHeld != _baseline.StaffHeld || _noteCount != _baseline.AvailableNoteCount ||
-        _rows.Any(r => _baseline.Drafts.FirstOrDefault(d => d.Slot == r.Slot) is { } d && (!r.Notes.SequenceEqual(d.Notes) || r.Learned != d.Learned)));
+        _rows.Any(r => _baseline.Drafts.FirstOrDefault(d => d.Slot == r.Slot) is { } d && (!r.Notes.SequenceEqual(d.Notes) || r.Learned != d.Learned)) ||
+        _flagRows.Any(f => f.Checked != f.Baseline));
 
     private static bool SameState(LoomGameStatus a, LoomGameStatus b) => a.StaffHeld == b.StaffHeld && a.AvailableNoteCount == b.AvailableNoteCount &&
         a.Drafts.Select(d => (d.Packed, d.ForwardVerb, d.ReverseVerb)).SequenceEqual(b.Drafts.Select(d => (d.Packed, d.ForwardVerb, d.ReverseVerb)));
@@ -114,9 +138,37 @@ public partial class GameStatusWindow : Window
             foreach (var row in _rows) row.Load(status.Drafts.Single(d => d.Slot == row.Slot));
             _loadingRows = false;
         }
+        RefreshFlags(session, status);
         StaffOrigin.Text = status?.StaffOrigin ?? "Unresolved"; NotesOrigin.Text = status?.NotesOrigin ?? "Unresolved";
         StaffOrigin.ToolTip = StaffOrigin.Text; NotesOrigin.ToolTip = NotesOrigin.Text;
         UpdateSelectors(); UpdateControls();
+    }
+
+    private void RefreshFlags(LoomExplorationSession? session, LoomGameStatus? status)
+    {
+        if (_flagSource is null || session is null || status?.Supported != true) { FlagExpander.Visibility = Visibility.Collapsed; return; }
+        FlagExpander.Visibility = Visibility.Visible;
+        if (!ReferenceEquals(_flagSession, session))
+        {
+            _flagSession = session; _flagRows.Clear();
+            _flagRows.AddRange(_flagSource.Flags(session).Select(f => new FlagRow { Key = f.Key, Label = f.Label, Detail = f.Detail }));
+            foreach (var row in _flagRows) row.PropertyChanged += (_, _) => UpdateControls();
+            FlagList.ItemsSource = _flagRows; FlagIntro.Text = _flagSource.Intro;
+            FlagFilter_Changed(null, null);
+        }
+        if (_flagRows.Any(f => f.Checked != f.Baseline)) return;
+        foreach (var row in _flagRows)
+        {
+            var value = _flagSource.Read(session, row.Key) ?? false;
+            row.Baseline = value; row.Checked = value;
+        }
+    }
+
+    private void FlagFilter_Changed(object? sender, TextChangedEventArgs? e)
+    {
+        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(_flagRows);
+        var text = FlagFilter.Text.Trim();
+        view.Filter = text.Length == 0 ? null : o => o is FlagRow r && (r.Label.Contains(text, StringComparison.OrdinalIgnoreCase) || r.Detail.Contains(text, StringComparison.OrdinalIgnoreCase));
     }
 
     private void UpdateControls()
@@ -126,6 +178,7 @@ public partial class GameStatusWindow : Window
         StaffButton.IsEnabled = editable && _staffHeld.HasValue;
         NoteButtons.IsEnabled = editable && _noteCount.HasValue && _staffHeld.HasValue;
         DraftGrid.IsReadOnly = !editable;
+        FlagList.IsEnabled = editable;
         ApplyButton.IsEnabled = editable && PendingChanges && !stale;
         if (PendingChanges) EditMessage.Text = stale ? "Game status changed. Close and reopen to inspect the new values before applying." :
             editable ? "Unapplied changes" : "Unapplied changes. Finish playback, dialogue or movement to apply.";
@@ -164,6 +217,7 @@ public partial class GameStatusWindow : Window
         if (!_canEdit() || _session() is not { } session || !ReferenceEquals(session, _editedSession) || _baseline is null) { Refresh(); return; }
         if (!SameState(session.GameStatus, _baseline)) { EditMessage.Text = "Game status changed. Close and reopen before applying."; UpdateControls(); return; }
         if (_staffHeld is not bool held || _noteCount is not int count || _rows.Any(r => !r.Resolved)) return;
+        var flagChanges = _flagRows.Where(f => f.Checked != f.Baseline).ToList();
         try
         {
             foreach (var row in _rows)
@@ -174,6 +228,7 @@ public partial class GameStatusWindow : Window
             }
             if (held != _baseline.StaffHeld) session.UpdateStaffPossession(held);
             if (count != _baseline.AvailableNoteCount) session.UpdateAvailableNotes(count);
+            foreach (var flag in flagChanges) { _flagSource!.Write(session, flag.Key, flag.Checked); flag.Baseline = flag.Checked; }
             _baseline = null; EditMessage.Text = "Changes applied"; _refreshRoom(); Refresh();
         }
         catch (InvalidOperationException ex) { EditMessage.Text = ex.Message; }

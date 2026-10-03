@@ -192,7 +192,39 @@ public partial class MainWindow : Window
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview(); UpdateActorLayer(); UpdateVerbArea(); UpdatePlaybackControls();
         }
-    }, _game, () => IsAdvancedMode) { Owner = this, Resources = Resources };
+    }, _game, () => IsAdvancedMode, StoryFlagSource()) { Owner = this, Resources = Resources };
+
+    /// <summary>
+    /// LOOM's story events as generic state flags: each story bit the game's code sets, named after the catalog scene that sets it
+    /// (object verb, or the scene's script), else after the room script that does.
+    /// </summary>
+    private GameStatusWindow.FlagSource StoryFlagSource() => new(
+        session => session.StoryEvents.Select(e => (Flag: new StateFlag(e.Key, StoryEventLabel(e), StoryEventDetail(e)), Named: e.Scenes.Any(s => SceneTitle(s) is not null)))
+            .OrderBy(t => t.Named ? 0 : 1).ThenBy(t => t.Flag.Label, StringComparer.OrdinalIgnoreCase).Select(t => t.Flag).ToList(),
+        (session, key) => session.StoryBit(key), (session, key, value) => session.UpdateStoryBit(key, value),
+        "The game remembers what happened in story bits. Check one to mark that scene or conversation as done, as the game would after it ran; clear it to undo. " +
+        "A room already on screen shows the change when it is entered again. These are your choices, not played scenes.");
+
+    private string? SceneTitle(LoomStateSource setter)
+    {
+        var recipes = _replayCatalog?.Replays ?? [];
+        if (setter.ObjectId is int obj && setter.VerbId is int verb)
+            return recipes.FirstOrDefault(r => r.Steps is null && r.Room == setter.Room && r.ObjectId == obj && r.Verb == verb)?.Title;
+        if (setter.Where.StartsWith("Script ", StringComparison.Ordinal) && int.TryParse(setter.Where.AsSpan(7, 3), out var script))
+            return recipes.FirstOrDefault(r => r.ScriptIds.Contains(script))?.Title;
+        return null;
+    }
+
+    private string StoryEventLabel(LoomStoryEvent e)
+    {
+        var titles = e.Scenes.Select(SceneTitle).Where(t => t is not null).Distinct().Take(2).ToList();
+        if (titles.Count > 0) return string.Join(" / ", titles) + (e.Scenes.Select(s => s.Where.Split(" +")[0]).Distinct().Count() > titles.Count ? " …" : "");
+        var first = e.Scenes.FirstOrDefault() ?? e.Setters[0];
+        return first.Where.Split(" +")[0] + " ran";
+    }
+
+    private static string StoryEventDetail(LoomStoryEvent e) =>
+        e.Key + " is set by: " + string.Join("; ", e.Setters.Select(s => s.Where).Take(6)) + (e.Setters.Count > 6 ? "; " + (e.Setters.Count - 6) + " more" : "");
 
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {

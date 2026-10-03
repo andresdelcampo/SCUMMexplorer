@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: Game Status lists the story events as checkboxes
+
+`LoomStoryEvents` (Core) finds the 90 story bits (D72 and up) that the game's code sets to 1; 27 are set by a catalog scene (global script or object verb) and are named by its title, the others by the room script that sets them. `LoomExplorationSession.StoryEvents`, `StoryBit` and `UpdateStoryBit` read and edit them like the other status edits (exploration choices, applied with the window's Apply). The window's list is generic (`StateFlag`, `FlagSource`: name, detail, read, write); only the search and the naming are LOOM-specific. Checked in the real window with `.verification/StatusShots` ([captures](../.verification/setup-placer-20261003/status/report.txt)). Design intent (user): the user controls the state; the app only raises it to the minimum an action needs.
+
 ## 3 October: placer audit of costume changes and story-bit room entries (no setup change)
 
 Re-scan of the game's code for the two remaining audit cases. The scanner missed every costume change (it looked for `costume ` where the disassembler prints `costume,`); fixed and pinned by a test. New Core queries `FindCostumeChanges`, `FindWriters`, `FindStoryBitMoves`, `ScanRoomEntry`. Result: room entries already give the ego the costume they own on a catalog visit, no scene's own code presumes a leftover costume, and no scene clears a story bit other than D61 to presume it, so no further start setup is derived; the candidate chains (Room 43-45 cage scenes, ghost chain) and the open story-order decisions are in the [audit](../.verification/setup-placer-20261003/audit-costume-entries.md).

@@ -154,3 +154,6 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ## Room state rule (user, 3 October)
 Rooms start in the earliest game state. A room moves to a late state only after the user triggers the late cutscene that causes it (the session then carries that state on). So no scene is chained after other scenes to show a later branch (the Room 44/652, Room 45/655, Room 41/633 question is closed: fresh branch). The staff rule for scenes outside the island (decided 3 October) stays as its own explicit exception.
+
+## State control (user, 3 October)
+The user controls the game state (Game Status: staff, notes, drafts, story events) and can change it freely to explore. The app only helps by raising the state to the minimum the chosen room or cutscene needs, and keeps a later state if the session already has one (menu picks should not reset the session; a "Start over" resets). Open: make menu picks keep the running session and apply only the minimum.

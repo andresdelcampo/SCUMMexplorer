@@ -91,6 +91,31 @@ public sealed class LoomSceneSetupPlannerTests
         Assert.Contains(scanner.FindStoryBitMoves(0), t => t.Where.StartsWith("Script 093 +0x0005", StringComparison.Ordinal) && t.Instruction.Contains("bit[0xDB7]", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void StoryEventsListTheBitsTheGameSetsAndCanBeMarkedHappened()
+    {
+        var game = Game();
+        var session = Session(game);
+        session.VisitRoomById(43);
+        for (var i = 0; i < 40; i++) session.AdvanceFrame();
+        var events = session.StoryEvents;
+        Assert.True(events.Count > 40, $"{events.Count} story bits");
+        Assert.All(events, e => Assert.True(e.Bit >= LoomStoryEvents.FirstBit));
+        // Script 093 (the cage scene) sets DB6; the list names it as a scene.
+        var db6 = Assert.Single(events, e => e.Key == "bit[0xDB6]");
+        Assert.Contains(db6.Scenes, s => s.Where.StartsWith("Script 093", StringComparison.Ordinal));
+        Assert.False(session.StoryBit("bit[0xDB6]") ?? false);
+        Assert.True(session.GameStatus.CanEdit, "session settled");
+        session.UpdateStoryBit("bit[0xDB6]", true);
+        Assert.True(session.StoryBit("bit[0xDB6]"));
+        Assert.Equal(1, session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xDB6]"));
+        session.UpdateStoryBit("bit[0xDB6]", false);
+        Assert.False(session.StoryBit("bit[0xDB6]"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => session.UpdateStoryBit("bit[0xD61]", true));
+        System.IO.File.WriteAllLines(Environment.GetEnvironmentVariable("SCUMM_EVENTS_DUMP") ?? System.IO.Path.GetTempPath() + "events.txt",
+            events.Select(e => $"{e.Key} scenes=[{string.Join("; ", e.Scenes.Select(s => s.Where.Split(" +")[0]).Distinct().Take(4))}] all={e.Setters.Count}"));
+    }
+
     [Fact(Skip = "Diagnostic dump of every catalog scene's derived setup; run by hand (SCUMM_SETUP_DUMP=path).")]
     public void DumpCatalogSetups()
     {
