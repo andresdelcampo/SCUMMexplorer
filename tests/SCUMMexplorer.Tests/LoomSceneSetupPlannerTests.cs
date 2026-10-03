@@ -35,7 +35,7 @@ public sealed class LoomSceneSetupPlannerTests
             Assert.True(setup.HasSteps, $"script {script:000}");
             Assert.Equal(("visit", 9), (setup.Steps[0].Kind, setup.Steps[0].ObjectId));
             Assert.Equal(("verb", 271, 0x38), (setup.Steps[1].Kind, setup.Steps[1].ObjectId, setup.Steps[1].Verb));
-            Assert.Equal(("visit", room), (setup.Steps[^1].Kind, setup.Steps[^1].ObjectId));
+            Assert.Equal(("visit", room), (setup.Steps[3].Kind, setup.Steps[3].ObjectId)); // the pickup, then the scene's room, then any speakers
             Assert.Contains(setup.Notes, n => n.Contains("clears bit D61", StringComparison.Ordinal));
             var session = Session(game);
             session.VisitRoomById(room);
@@ -88,7 +88,7 @@ public sealed class LoomSceneSetupPlannerTests
         {
             if (r.TryGetProperty("steps", out var steps) && steps.ValueKind == JsonValueKind.Array) continue;
             var ids = r.GetProperty("scriptIds").EnumerateArray().Select(e => e.GetInt32()).ToArray();
-            var setup = planner.Derive(r.GetProperty("room").GetInt32(), ids);
+            var setup = planner.Derive(r.GetProperty("room").GetInt32(), ids, r.GetProperty("objectId").GetInt32(), r.GetProperty("verb").GetInt32());
             if (setup.Notes.Count == 0) continue;
             lines.Add($"{r.GetProperty("id").GetString()} steps={string.Join(" ", setup.Steps.Select(s => $"{s.Kind}:{s.ObjectId}"))}");
             lines.AddRange(setup.Notes.Select(n => "   " + n));
@@ -99,6 +99,27 @@ public sealed class LoomSceneSetupPlannerTests
 
 public sealed class LoomSceneSetupSceneTests
 {
+    [Fact]
+    public void ElMuertosLinesAreSpokenBecauseTheDerivedSetupBringsActor4IntoRoom09()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var game = new GameFolderScanner().Scan(folder);
+        var planner = new LoomSceneSetupPlanner(game);
+        // Room 09 object 275, verb 0x56 starts local 221: actor 8's apparition, then two lines printed for actor 4.
+        var setup = planner.Derive(9, [], 275, 0x56);
+        var step = Assert.Single(setup.Steps, s => s.Kind == "actor");
+        Assert.Equal(4, step.ObjectId);
+        Assert.Contains(setup.Notes, n => n.Contains("actor 4", StringComparison.Ordinal) && n.Contains("estimate", StringComparison.Ordinal));
+
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
+        session.VisitRoomById(9);
+        Assert.True(new LoomReplaySequence(session, setup.Steps).RunSilently(setup.Steps.Count));
+        Assert.Equal(9, session.Actors.Single(a => a.Number == 4).Room);
+        session.ActivateObjectVerb(275, 0x56);
+        for (var i = 0; i < 1500; i++) session.AdvanceFrame();
+        Assert.Contains(session.Messages.Log, m => m.Actor == 4 && m.Text.Contains("Tu magia de Tejedor", StringComparison.Ordinal));
+    }
+
     private static string Run(bool withSetup, int room, int obj, int verb, int script)
     {
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));

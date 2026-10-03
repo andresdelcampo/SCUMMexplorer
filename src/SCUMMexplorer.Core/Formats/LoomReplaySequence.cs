@@ -32,7 +32,7 @@ public sealed class LoomReplaySequence
 
     public LoomReplaySequence(LoomExplorationSession session, IReadOnlyList<LoomReplayStep> steps)
     {
-        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "staff" or "place" or "frames" or "scene") ||
+        if (steps.Count == 0 || steps.Any(s => s.Kind is not ("verb" or "click" or "script" or "visit" or "staff" or "place" or "actor" or "frames" or "scene") ||
             s.Frames < 1 || s.Frames > LoomExplorationSession.CutsceneFrameLimit ||
             s.Kind == "scene" && (s.EndBoundary is null || s.ExpectedRoom is null)))
             throw new ArgumentException("A sequence needs explicit inputs and bounded, source-established completion waits.", nameof(steps));
@@ -66,6 +66,16 @@ public sealed class LoomReplaySequence
                     return _frames >= step.Frames ? Fail("The ego placement never became possible: the session did not settle.") : true;
                 try { _session.PlaceEgo(step.X, step.Y); }
                 catch (InvalidOperationException ex) { return Fail($"The ego placement was refused: {ex.Message}"); }
+                Next(); continue;
+            }
+            if (step.Kind == "actor")
+            {
+                // A labelled setup: actor ObjectId in the current room at (X, Y), or at object Verb's walk point (see PlaceActorInRoom);
+                // EndBoundary names the game code the placement is taken from.
+                if (!_session.GameStatus.CanEdit)
+                    return _frames >= step.Frames ? Fail("The actor placement never became possible: the session did not settle.") : true;
+                try { _session.PlaceActorInRoom(step.ObjectId, step.X, step.Y, step.Verb, step.EndBoundary ?? "the game's code"); }
+                catch (InvalidOperationException ex) { return Fail($"The actor placement was refused: {ex.Message}"); }
                 Next(); continue;
             }
             if (step.Kind == "visit")

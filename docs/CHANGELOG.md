@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: scenes bring in the actors who speak (Room 09 El Muerto and others)
+
+Room 09 object 275 verb 0x56 ("Other draft response at El Muerto") ran but showed only a half-second flash of the ghost: its two lines are printed for actor 4, who is not in Room 9 in a catalog start, and `actorTalk` shows nothing for an actor outside the room (ScummVM). The setup planner now also scans the object verb's own code (`Scan(..., objectId, verbId)`) for lines printed for constant actors the scene does not place itself, finds the game's own `putActorInRoom` + `putActor`/`putActorAtObject` into that room (`FindActorPlacers`), and applies the first one in the start room's code, else the first in code order, through the new labelled replay step `actor` (`PlaceActorInRoom`; a no-op when the actor is already there). It is listed as an estimate in the picker note with the other placements. Effect on the 29 catalog entries it touches (probe, 3000 frames): Room 09 obj 275 0→2 lines, Room 09 obj 274 3→6, Room 23 objs 422-425 0→1 each, Room 51 obj 742 0→1; the rest had the actor already and are unchanged.
+
 ## 3 October: catalog arrival takes the size of its depth (Room 17 from Room 22)
 
 An arrival with no size of its own took the size carried back through earlier rooms (Room 16's entry: small), whatever depth it stands at. Room 17's Room 22 door arrives at (252, 141), near the viewer, and showed a tiny Bobbin. `EstimateEgoSize` now takes, for such arrivals, the nearest sample in depth from the room's own code (other arrivals that set a size and walk to a point; the watcher jumps in local scripts that start script 017 with a literal and `putActor` the ego): size 0 here (Room 16 object 349, y 134). Labelled as an estimate in the uncertainties. Arrivals with their own size (Room 16 doors) are unchanged. The Room 17 watcher cutscene (local 200 +0x0022, box 4/5 jump to the centre with size 0/1) already plays on a click toward the centre.

@@ -3154,7 +3154,7 @@ public partial class MainWindow : Window
         if (_game is null || _game.Id != GameId.Loom || cutscene.Steps is not null || cutscene.ObjectId == 0) return LoomStartSetup.None;
         if (_startSetups.TryGetValue(cutscene.Id, out var cached)) return cached;
         _setupPlanner ??= new LoomSceneSetupPlanner(_game);
-        return _startSetups[cutscene.Id] = _setupPlanner.Derive(cutscene.RoomId, cutscene.TextScripts ?? [cutscene.Script]);
+        return _startSetups[cutscene.Id] = _setupPlanner.Derive(cutscene.RoomId, cutscene.TextScripts ?? [cutscene.Script], cutscene.ObjectId, cutscene.VerbId);
     }
 
     private string CutsceneStartNote(KnownCutscene cutscene) => CutsceneBaseNote(cutscene) + (StartSetup(cutscene).Describe() is { Length: > 0 } setup ? " " + setup : "");

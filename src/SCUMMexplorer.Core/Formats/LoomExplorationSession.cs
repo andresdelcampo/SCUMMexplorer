@@ -1478,6 +1478,33 @@ public sealed partial class LoomExplorationSession
     }
 
     /// <summary>
+    /// A labelled setup edit: brings <paramref name="actor"/> into the current room, as <c>putActorInRoom</c> then
+    /// <c>putActor</c> (or <c>putActorAtObject</c>, the object's walk point) in the game's own code at <paramref name="basis"/>
+    /// does, for a scene whose lines or moves need that actor present (<c>actorTalk</c> shows nothing for an actor outside
+    /// the room). Nothing happens when the actor is already in the room. The place is an estimate: which of the game's
+    /// placements preceded the scene was not executed. Needs a settled session, like <see cref="PlaceEgo"/>.
+    /// </summary>
+    public void PlaceActorInRoom(int actor, int x, int y, int atObject, string basis)
+    {
+        if (!StatusEditable) throw new InvalidOperationException("Finish the current scene, draft, movement or dialogue before placing an actor.");
+        if (_currentRoom?.ResourceId is not int room || !LoomActorTable.IsValid(actor))
+            throw new InvalidOperationException("Visit a room before placing an actor in it.");
+        if (_runtime.Actors[actor].Room == room) return;
+        if (atObject != 0)
+        {
+            var record = _currentObjects.FirstOrDefault(item => item.Id == atObject);
+            (x, y) = record is null ? (240, 120) : (record.WalkX, record.WalkY);
+        }
+        _uncertainties.StartStep();
+        var label = $"Explorer setup (explicit, from {basis}): actor {actor} was brought into Room {room:00} at ({x}, {y}); which earlier scene left it there is not simulated";
+        _runtime.Actors.PutInRoom(actor, room, CurrentPlacement(), null);
+        _runtime.Actors.Put(actor, x, y, room, CurrentPlacement(), null);
+        _runtime.Actors.MarkEstimate(actor, label);
+        _uncertainties.Add(label + " (estimate).");
+        _visitTrace.Add($"{label}: actor {actor} stands at ({x}, {y}) (estimate)");
+    }
+
+    /// <summary>
     /// Starts the current room's local script <paramref name="scriptId"/> at instruction offset
     /// <paramref name="offset"/>, as a bonus preview of a scene whose trigger the game's own flow
     /// has no decoded way to meet (for example a watcher that needs the ego to step from one walk

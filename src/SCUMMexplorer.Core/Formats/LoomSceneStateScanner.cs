@@ -9,7 +9,8 @@ public sealed record LoomStateTouch(string Variable, bool Write, string Where, s
 
 /// <summary>What a scene's code reads and writes, statically (every decoded instruction, no execution).</summary>
 public sealed record LoomSceneScan(IReadOnlyList<string> Scripts, IReadOnlyList<LoomStateTouch> Touches,
-    IReadOnlyList<string> CostumeChanges, IReadOnlyList<string> Unreadable)
+    IReadOnlyList<string> CostumeChanges, IReadOnlyList<string> Unreadable,
+    IReadOnlyList<int> PrintedActors, IReadOnlyList<int> PlacedActors)
 {
     public IEnumerable<string> Reads => Touches.Where(t => !t.Write).Select(t => t.Variable).Distinct();
     public IEnumerable<string> Writes => Touches.Where(t => t.Write).Select(t => t.Variable).Distinct();
@@ -17,6 +18,9 @@ public sealed record LoomSceneScan(IReadOnlyList<string> Scripts, IReadOnlyList<
     /// <summary>The touches made by the scene's own code: everything except the shared system scripts 000-043 (cutscene hooks, drafts, the distaff display).</summary>
     public IEnumerable<LoomStateTouch> OwnTouches => Touches.Where(t => !LoomSceneStateScanner.IsSystemCode(t.Where));
 }
+
+/// <summary>A place whose code puts an actor into a room and then at a point (an object for putActorAtObject, else X/Y).</summary>
+public sealed record LoomActorPlacer(int Actor, int Room, string Where, int? X, int? Y, int? AtObject);
 
 /// <summary>A place whose own code assigns a constant to a variable (see <see cref="LoomSceneStateScanner.FindConstantWriters"/>).</summary>
 public sealed record LoomStateSource(int Room, int? ObjectId, int? VerbId, string Where, string Instruction);
@@ -51,24 +55,15 @@ public sealed partial class LoomSceneStateScanner
     public const int SystemScriptLimit = 44;
 
     /// <summary>
-    /// Every room entry and exit, local script and object verb (and global script) whose code itself assigns
-    /// <paramref name="value"/> to <paramref name="variable"/> with a plain <c>move</c>; the real places that can
-    /// establish that state. Object verbs come first (they are what a player or the explorer can start).
+    /// Calls <paramref name="visit"/> for every object verb (grouped by code), room entry, local script and global script of
+    /// the game, object verbs first, in room order.
     /// </summary>
-    public IReadOnlyList<LoomStateSource> FindConstantWriters(string variable, int value)
+    private void ForEachCodeUnit(Action<LoomScriptDisassembly?, int, int?, int?, string> visit)
     {
-        var wanted = $"{variable} = 0x{value:X4}";
-        var found = new List<LoomStateSource>();
-        void Check(LoomScriptDisassembly? script, int room, int? obj, int? verb, string label)
-        {
-            if (script is null) return;
-            foreach (var ins in script.Instructions)
-                if (ins.Operation == "move" && ins.Operands == wanted)
-                    found.Add(new(room, obj, verb, $"{label} +0x{ins.Offset:X4}", $"move {ins.Operands}"));
-        }
         var verbs = new LoomObjectVerbReader(ScummScriptDialects.For(_game.Id));
         var directory = new LoomRoomObjectDirectory();
-        foreach (var room in _game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r.ResourceId))
+        var rooms = _game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r.ResourceId).ToArray();
+        foreach (var room in rooms)
         {
             var id = room.ResourceId!.Value;
             try
@@ -79,35 +74,107 @@ public sealed partial class LoomSceneStateScanner
                 foreach (var record in records)
                     if (tables.TryGetValue(record.Id, out var entries))
                         foreach (var group in entries.GroupBy(item => item.ScriptOffset))
-                            Check(verbs.Decode(room, record, group.First().VerbId), id, record.Id, group.First().VerbId,
+                            visit(verbs.Decode(room, record, group.First().VerbId), id, record.Id, group.First().VerbId,
                                 $"Room {id:00} object {record.Id} verb {(group.First().IsFallback ? "fallback" : $"0x{group.First().VerbId:X2}")}");
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
         }
-        foreach (var room in _game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r.ResourceId))
+        foreach (var room in rooms)
         {
             var id = room.ResourceId!.Value;
-            Check(Entry(id), id, null, null, $"Room {id:00} entry");
+            visit(Entry(id), id, null, null, $"Room {id:00} entry");
             try
             {
                 foreach (var local in LoomScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(room.FilePath), _globalScriptCount))
-                    Check(Script(id, local), id, null, null, $"Room {id:00} local {local}");
+                    visit(Script(id, local), id, null, null, $"Room {id:00} local {local}");
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException) { }
         }
-        for (var g = 0; g < _globalScriptCount; g++) Check(Script(0, g), 0, null, null, $"Script {g:000}");
+        for (var g = 0; g < _globalScriptCount; g++) visit(Script(0, g), 0, null, null, $"Script {g:000}");
+    }
+
+    /// <summary>
+    /// Every room entry and exit, local script and object verb (and global script) whose code itself assigns
+    /// <paramref name="value"/> to <paramref name="variable"/> with a plain <c>move</c>; the real places that can
+    /// establish that state. Object verbs come first (they are what a player or the explorer can start).
+    /// </summary>
+    public IReadOnlyList<LoomStateSource> FindConstantWriters(string variable, int value)
+    {
+        var wanted = $"{variable} = 0x{value:X4}";
+        var found = new List<LoomStateSource>();
+        ForEachCodeUnit((script, room, obj, verb, label) =>
+        {
+            if (script is null) return;
+            foreach (var ins in script.Instructions)
+                if (ins.Operation == "move" && ins.Operands == wanted)
+                    found.Add(new(room, obj, verb, $"{label} +0x{ins.Offset:X4}", $"move {ins.Operands}"));
+        });
         return found;
     }
 
-    /// <summary>Scans scripts <paramref name="scriptIds"/> as seen from <paramref name="startRoom"/>, following constant calls.</summary>
-    public LoomSceneScan Scan(int startRoom, IEnumerable<int> scriptIds)
+    /// <summary>
+    /// The places in the game's code that put <paramref name="actor"/> into <paramref name="room"/> and then at a point
+    /// (<c>putActor</c> with literals, or <c>putActorAtObject</c>) within the next three instructions, in code order.
+    /// </summary>
+    public IReadOnlyList<LoomActorPlacer> FindActorPlacers(int actor, int room)
+    {
+        var found = new List<LoomActorPlacer>();
+        ForEachCodeUnit((script, _, _, _, label) =>
+        {
+            if (script is null) return;
+            var list = script.Instructions;
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (list[i].Operation != "putActorInRoom" || ActorRoomOf(list[i]) is not (int a, int r) || a != actor || r != room) continue;
+                foreach (var next in list.Skip(i + 1).Take(3))
+                {
+                    var parts = next.Operands.Split(", ");
+                    if (next.Operation == "putActor" && parts.Length == 3 && Literal(parts[0]) == actor && Literal(parts[1]) is int x && Literal(parts[2]) is int y)
+                    { found.Add(new(actor, room, $"{label} +0x{list[i].Offset:X4}", (short)x, (short)y, null)); break; }
+                    if (next.Operation == "putActorAtObject" && parts.Length == 2 && Literal(parts[0]) == actor && Literal(parts[1]) is int obj)
+                    { found.Add(new(actor, room, $"{label} +0x{list[i].Offset:X4}", null, null, obj)); break; }
+                }
+            }
+        });
+        return found;
+    }
+
+    /// <summary>
+    /// Scans scripts <paramref name="scriptIds"/> as seen from <paramref name="startRoom"/>, following constant calls,
+    /// and the code of object <paramref name="objectId"/>'s verb <paramref name="verbId"/> in that room when given.
+    /// </summary>
+    public LoomSceneScan Scan(int startRoom, IEnumerable<int> scriptIds, int objectId = 0, int verbId = 0)
     {
         var touches = new List<LoomStateTouch>();
         var costume = new List<string>();
         var names = new List<string>();
         var unreadable = new List<string>();
+        var printed = new SortedSet<int>();
+        var placed = new SortedSet<int>();
         var seen = new HashSet<string>();
         var pending = new Queue<(int Room, int Script, bool Entry)>();
+
+        void Process(LoomScriptDisassembly script, string label, int room)
+        {
+            names.Add(label);
+            foreach (var ins in script.Instructions)
+            {
+                var where = $"{label} +0x{ins.Offset:X4}";
+                Classify(ins, where, touches, costume);
+                if (ins.Operation == "print" && ins.Operands.Contains("text,", StringComparison.Ordinal) && FirstConstant(ins.Operands) is int speaker and > 1 and < 13)
+                    printed.Add(speaker);
+                if (ins.Operation == "putActorInRoom" && ActorRoomOf(ins) is (int actor, int toRoom) && toRoom != 0) placed.Add(actor);
+                if (ins.Operation is "startScript" or "chainScript" && FirstConstant(ins.Operands) is int callee) pending.Enqueue((room, callee, false));
+                else if (ins.Operation is "loadRoom" or "loadRoomWithEgo" && RoomArgument(ins) is int target && target != room) pending.Enqueue((target, 0, true));
+            }
+        }
+
+        if (objectId != 0 && VerbCode(startRoom, objectId, verbId) is { } verbScript)
+        {
+            var label = $"Room {startRoom:00} object {objectId} verb 0x{verbId:X2}";
+            seen.Add(label);
+            Process(verbScript, label, startRoom);
+        }
         foreach (var id in scriptIds) pending.Enqueue((startRoom, id, false));
         while (pending.Count > 0)
         {
@@ -116,19 +183,33 @@ public sealed partial class LoomSceneStateScanner
             var label = entry ? $"Room {room:00} entry" : id < _globalScriptCount ? $"Script {id:000}" : $"Room {room:00} local {id}";
             if (!seen.Add(label)) continue;
             if (script is null) { unreadable.Add(label); continue; }
-            names.Add(label);
-            foreach (var ins in script.Instructions)
-            {
-                var where = $"{label} +0x{ins.Offset:X4}";
-                Classify(ins, where, touches, costume);
-                if (ins.Operation is "startScript" or "chainScript" &&
-                    FirstConstant(ins.Operands) is int callee) pending.Enqueue((room, callee, false));
-                else if (ins.Operation is "loadRoom" or "loadRoomWithEgo" &&
-                    RoomArgument(ins) is int target && target != room) pending.Enqueue((target, 0, true));
-            }
+            Process(script, label, room);
         }
-        return new LoomSceneScan(names, touches, costume, unreadable);
+        return new LoomSceneScan(names, touches, costume, unreadable, [.. printed], [.. placed]);
     }
+
+    /// <summary>Object <paramref name="objectId"/>'s verb code (its fallback when it has no entry for the verb) in a room, or null.</summary>
+    private LoomScriptDisassembly? VerbCode(int room, int objectId, int verbId)
+    {
+        try
+        {
+            var resource = _game.Rooms.FirstOrDefault(r => r.ResourceId == room);
+            if (resource is null) return null;
+            var record = new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(resource.FilePath)).FirstOrDefault(r => r.Id == objectId);
+            return record is null ? null : new LoomObjectVerbReader(ScummScriptDialects.For(_game.Id)).Decode(resource, record, verbId);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { return null; }
+    }
+
+    /// <summary>(actor, room) of a <c>putActorInRoom</c> with two literals.</summary>
+    private static (int Actor, int Room)? ActorRoomOf(LoomScriptInstruction ins)
+    {
+        var parts = ins.Operands.Split(", ");
+        return parts.Length == 2 && Literal(parts[0]) is int a && Literal(parts[1]) is int r ? (a, r) : null;
+    }
+
+    private static int? Literal(string text) =>
+        text.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(text.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out var value) ? value : null;
 
     private LoomScriptDisassembly? Script(int room, int id)
     {
