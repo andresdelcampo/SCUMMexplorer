@@ -1,0 +1,55 @@
+using SCUMMexplorer.Core.Discovery;
+using SCUMMexplorer.Core.Formats;
+
+namespace SCUMMexplorer.Tests;
+
+public sealed class LoomGlossaryTests
+{
+    [Fact]
+    public void NamesCarryTheirEvidenceAndRangesAreCovered()
+    {
+        var glossary = LoomGlossary.Default;
+        var staff = glossary.Bit(0xD61);
+        Assert.NotNull(staff);
+        Assert.Equal(GlossaryEvidence.Decoded, staff!.Evidence);
+        Assert.Contains("staff", staff.Name);
+        Assert.Equal("engine", glossary.Variable(0x002)!.EvidenceLabel);
+        Assert.Equal("draft table (pattern words)", glossary.Variable(0x040)!.Name);
+        Assert.Equal("ego size", glossary.Variable(0x07C)!.Name);
+        Assert.Equal(GlossaryEvidence.Reading, glossary.Bit(0xDA5)!.Evidence);
+    }
+
+    [Fact]
+    public void UnknownThingsStayUnnamed()
+    {
+        var glossary = LoomGlossary.Default;
+        Assert.Null(glossary.Variable(0x0D1));
+        Assert.Null(glossary.Bit(0xD96));
+        Assert.Null(glossary.Script(77));
+        Assert.Null(glossary.Object(2, 154));
+    }
+
+    [Fact]
+    public void StoryBitLabelsFillOnlyMissingBitsAndAreMarkedAsReading()
+    {
+        var glossary = LoomGlossary.Default;
+        var custom = LoomGlossary.CreateNew();
+        custom.StoryBitLabel = bit => bit == 0xD96 ? "cage scene happened" : null;
+        Assert.Equal("cage scene happened", custom.Bit(0xD96)!.Name);
+        Assert.Equal(GlossaryEvidence.Reading, custom.Bit(0xD96)!.Evidence);
+        Assert.Contains("staff", custom.Bit(0xD61)!.Name);
+        Assert.Null(custom.Bit(0xD97));
+        Assert.Null(glossary.Bit(0xD96));
+    }
+
+    [Fact]
+    public void ObjectNamesComeFromTheGameData()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var glossary = LoomGlossary.Load(new GameFolderScanner().Scan(folder));
+        Assert.Equal("hoja", glossary.Object(2, 154)!.Name);
+        Assert.Null(glossary.Object(9, 154));
+        Assert.Equal(2, glossary.ObjectRoom(154));
+        Assert.Contains("cage", glossary.Script(91)!.Name);
+    }
+}
