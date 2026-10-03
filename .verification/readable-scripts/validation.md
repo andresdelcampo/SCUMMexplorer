@@ -7,3 +7,9 @@ Step 3 of `docs/READABLE_SCRIPTS_PLAN.md`: `LoomScriptPresenter` (Core) renders 
 - Names carry evidence (`decoded`, `engine`, `reading`, `play`); the end of each readable view lists every name used with its evidence and source. Unnamed things keep their raw form (`bit[0xD96]`, `var[0x0D1]`).
 - Raw stays one click away: the Advanced script view has a Readable checkbox (default on, remembered in `view-options.txt` as `readable=`); the bytecode column belongs to the raw view.
 - On screen: `UiShots` (`script-readable.png`, `report.txt`): tree label, page title and subtitle, event rows with names, Readable/Raw switch, bytecode toggle disabled while Readable.
+
+## Story bits named by catalog scenes (3 October 2026)
+
+`LoomEgaStateFlags.BitLabels` (the same catalog titles Game Status uses) feeds `LoomGlossary.StoryBitLabel` after a one-second background scan (`MainWindow.NameStoryBitsAsync`). A bit gets a name only when a catalog scene sets it; the entry is `reading` ("set by the scene: ..."). Bits no catalog scene sets stay `bit[0x...]`. The Assumptions lines get the name after each `bit[0x...]` (`LoomResourceNames.NameBits`; the line stays the tooltip).
+- On screen: `UiShots` report, `ui2/report.txt` ("readable head"): script 91 shows `if set by the scene: Room 43 · Opening at jaula / Room 44 · Look at Mandible` for `bit[0xD96]`; `bit[0xD68]` (engine range, no scene) stays raw.
+- Filtered tests: `LoomGlossary`, `LoomScriptPresenter` (13 passed).

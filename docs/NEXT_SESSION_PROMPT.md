@@ -8,8 +8,8 @@ The readable-scripts plan ([READABLE_SCRIPTS_PLAN.md](READABLE_SCRIPTS_PLAN.md))
 
 ## Open items
 
-- Glossary growth: story bits other than the named ones show as `bit[0x...]` (`LoomGlossary.StoryBitLabel` is not wired to the catalog scene labels yet). Actor names are context-dependent (numbers are reused by scene); extend the scoped names only with evidence.
-- "Used by" lists only literal references (calls through a variable, hooks and clicks are not listed); wiring `LoomGlossary.StoryBitLabel` would also name the story bits in the Assumptions and the readable view.
+- Glossary growth: story bits set by a catalog scene are named "set by the scene: ..." (`reading`); other bits still show as `bit[0x...]`. Actor names are context-dependent (numbers are reused by scene); extend the scoped names only with evidence.
+- "Used by" lists only literal references (calls through a variable, hooks and clicks are not listed).
 - Presenter phrases still missing: `roomOps`, `saveLoad`, `doSentence`, strings (they keep their raw line).
 - Silence (0x4E/0x4F) and Shaping (0x50/0x51) draft names follow the manual order (no object answers 0x4E/0x50); Sharpening's two verbs are not told apart.
 - `.verification/WindowCheck` still looks for the removed "Show exits" checkbox; update or retire it.
@@ -23,4 +23,4 @@ The readable-scripts plan ([READABLE_SCRIPTS_PLAN.md](READABLE_SCRIPTS_PLAN.md))
 - Another session may work in the same tree: stage files by explicit path, never `git add -A`, and leave other uncommitted files alone.
 - Tooling: in this environment backslash escapes in bash heredocs are altered; write scripts and C# with backslashes using the Write tool or build them with `chr(92)`. `.verification/**/*.txt` is git-ignored (use `git add -f` for golden files).
 
-> Ready-to-copy prompt: Continue SCUMMexplorer from the latest commit using docs/NEXT_SESSION_PROMPT.md and docs/CURRENT_WORK.md. Pick the next task with the user from the open items (glossary growth for the unnamed story bits, missing presenter phrases, the WindowCheck harness) and keep the standing rules: name only what the script map, the game's text or play supports; technical views stay Advanced-only; verify with the UiShots harness, not the whole suite; commit each step, no push; ask before editing CLAUDE.md.
+> Ready-to-copy prompt: Continue SCUMMexplorer from the latest commit using docs/NEXT_SESSION_PROMPT.md and docs/CURRENT_WORK.md. Pick the next task with the user from the open items (missing presenter phrases, the WindowCheck harness) and keep the standing rules: name only what the script map, the game's text or play supports; technical views stay Advanced-only; verify with the UiShots harness, not the whole suite; commit each step, no push; ask before editing CLAUDE.md.

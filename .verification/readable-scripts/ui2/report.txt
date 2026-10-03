@@ -1,0 +1,58 @@
+gallery: room 06 rows 35
+gallery lines: Bobbin: Este es el Libro de Diseños que
+Hetchel me deja leer a veces. | Bobbin: Mejor me lo llevo.
+second pick in the same room: picture ready after 122 ms, shown Visible
+combo height 28
+options expander: expanded True; doorway radios Visible, object radios Visible
+defaults: doorway overlay Collapsed (0), object overlay Collapsed (0)
+doorways Always: overlay Visible children 10
+objects Always: overlay Visible children 7
+doorways Hover (nothing hovered): children 0; objects Never: overlay Collapsed
+saved options file: doorways=Never | bytecode=0 | readable=1 | framing=1 | optionsOpen=1
+normal: room view 948x620; note 'Click the scene to explore it. Hover to discover objects and exits.'; verb tooltip none
+full-screen button before hover: Collapsed
+after hover: Visible
+full screen: state Maximized, style None, header Collapsed, side Collapsed, room view 1879x1202, window 2207x1247
+left full screen: state Normal, style SingleBorderWindow, header Visible, side Visible, room view 948x620
+interact (nothing selected): 'Interact ▾' enabled False
+interact (hoja selected): 'Interact · hoja ▾' enabled True
+menu verbs: Look at | Draft: Twisting | Draft: Twisting (reversed)
+after Look at: playback True, messages:  | Ultima hoja del año.
+actions: section Visible, header 'ACTIONS · hoja', rows Look at | Close-up | Draft: Twisting | Draft: Twisting (reversed) | Any other draft; center panel Collapsed
+object used by: Used by: no code names this object (clicks and drafts reach it through the input scripts).
+after a pick, with no mouse movement: timer 5157 -> 5295; playback running True
+RoomEntryTraceExpander: visible Visible, header 'Room entry'
+ObjectActionTraceExpander: visible Visible, header 'Last action'
+StateIssuesSection: visible Visible, header 'Assumptions · 14'
+entry summary: 54 instructions · camera x 536 (estimate) · sounds 25; event rows 7
+status text Collapsed, objects note Collapsed, last action: hoja · Look at: ran; no scene change followed.
+what happened:  1. hoja → Look at was run directly (an exploration action: no click, no walk) |  2. begin cutscene (arguments 0)  [Room 02 Object 154 Verb 0x36] |  3. object 154 “hoja”: set class 24 |  4. start Script 08 · show or hide the close-up in the verb area with 0 |  5. last leaf of Room 02 walks to (807, 152) |  6. Result: no scene change followed
+  GROUP: Arrived by a shortcut · 4
+    ISSUE: Room 02 was selected from the catalog: the ego's size (var[0x07C], script 017) is estimated as 2 from the assumed arrival's route: Room 03 Object 160 Verb 0x38 +0x0000 sets var[0x07C] = 2 before the load.
+    ISSUE: Room 02 selected from the catalog; the route to it was not executed from game input. Assumed arrival: the ego enters as Room 03 Object 160 Verb 0x38 +0x0005 (object 153, walk to (568, 114)) would bring it in (the only source-backed arrival (Room 17 has none into it)). Which route led here was not executed; the arrival is a possible outcome, not a reached one.
+    ISSUE: Object 154 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+    ISSUE: Object 154 is untouchable (class 24) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.
+  GROUP: Estimates · 8
+    ISSUE: The artwork of 1 object(s) is estimated.
+    ISSUE: Camera x (var[0x002]) = 540 is an estimate: the camera is put on the ego at Room 03 Object 160 Verb 0x38 +0x0005, whose position is an estimate (assumed arrival at Room 03 Object 160 Verb 0x38 +0x0005 after a catalog visit).
+    ISSUE: Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: the pointer rests over the room at (677, 15), placed by the explorer's hover, with no click
+    ISSUE: Script 45 +0x0001: getActorWalkBox reads actor 1: assumed arrival at Room 03 Object 160 Verb 0x38 +0x0005 after a catalog visit, so what follows is an estimate (+0x0001)
+    ISSUE: Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: the pointer rests over the room at (673, 15), placed by the explorer's hover, with no click
+    ISSUE: Script 45 +0x0006: getActorWalkBox reads actor 1: assumed arrival at Room 03 Object 160 Verb 0x38 +0x0005 after a catalog visit, so what follows is an estimate (+0x0006)
+    ISSUE: Script 06 +0x01BB: findObject at +0x0096 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (536, 144)
+    ISSUE: Script 03 +0x0000: camera x follows actor 1, whose position is an estimate (assumed arrival at Room 03 Object 160 Verb 0x38 +0x0005 after a catalog visit) (+0x0018)
+  GROUP: Effects not drawn · 2
+    ISSUE: Room 02 entry script +0x0000: presentation operation not applied: resourceRoutines
+    ISSUE: Script 14 +0x0000: presentation operation not applied: lights
+script 91 default: readable True, title 'Script 91 · Room 43 cage scene', subtitle 'Indexed script resource · DOS LOOM old-v3 · name: reading', tree header 'Script 91 · Room 43 cage scene'
+readable head: 0000  set: bit[0xD68] / 0005  if set by the scene: Room 43 · Opening at jaula / Room 44 · Look at Mandible / 000A      Bobbin says: “Ya la he abierto.” / 0020      stop this script /       end if / 0022  begin cutscene (arguments 0)
+used by: 'Used by · 1': Room 43 object 643 “jaula” verb 0x3A +0x0000 starts it
+event rows: possibly starts Script 28 · clear the draft buffer | possibly starts Script 08 · show or hide the close-up in the verb area | possibly starts Script 34 | possibly starts Script 40 · play a sound (effect) | possibly starts Script 17 · give the ego a costume (by size) ×2 | possibly starts Script 19 · hide the distaff verbs ×2
+story bits in script 91 readable view: Script 91 · Room 43 cage scene  ·  43.LFL | 0000  set: bit[0xD68] | 0005  if set by the scene: Room 43 · Opening at jaula / Room 44 · Look at Mandible | 0022  begin cutscene (arguments 0) | 0027  set: set by the scene: Room 43 · Opening at jaula / Room 44 · Look at Mandible | 00CA  if set by the scene: Room 41 · Twisting at espada | 00D2      set: set by the scene: Room 41 · Twisting at espada / Room 43 · Opening at jaula | 0DFB      clear: set by the scene: Room 41 · Twisting at espada / Room 43 · Opening at jaula
+raw view: first lines 0005  notEqualZero bit[0xD96], branch +0x0018 -> 0x0022 / 000A  print 0x01, [center; text, "Ya la he abierto."]; bytecode toggle enabled True
+script 91 default: bytecode toggle False
+script 91: bytecode on -> 0005  A8 96 8D 18 00    notEqualZero bit[0xD96], branch +0x0018 -> 0x0022 / 000A  14 01 04 0F 59 61 20 6C 61 20 68 65 20 61 62 69 65 72 74 6F 2E 00 print 0x01, [center; text, "Ya la he abierto."]; play button Visible
+bytecode off -> 0005  notEqualZero bit[0xD96], branch +0x0018 -> 0x0022 / 000A  print 0x01, [center; text, "Ya la he abierto."]
+next script keeps the choice: toggle False, output 0005  loadRoom 0x2B / 0007  setCameraAt 0x00A0
+script 05 (not a scene): play button Collapsed
+play as cutscene: session room 43, in scene True, playback True, selected view room 43

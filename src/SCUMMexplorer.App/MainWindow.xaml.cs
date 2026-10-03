@@ -212,6 +212,7 @@ public partial class MainWindow : Window
         _usageIndex = LoomUsageIndex.Empty;
         if (game.Id == GameId.Loom) _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
+        if (game.Id == GameId.Loom) _ = NameStoryBitsAsync(game, _glossary, _replayCatalog.Replays);
         _setupPlanner = null;
         _scriptReader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
         _verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
@@ -1373,7 +1374,7 @@ public partial class MainWindow : Window
             foreach (var issue in group.Items)
                 items.Children.Add(new TextBlock
                 {
-                    Text = LoomResourceNames.NameScripts(_glossary, issue) is { Length: > 150 } named ? named[..147] + "…" : LoomResourceNames.NameScripts(_glossary, issue),
+                    Text = LoomResourceNames.NameBits(_glossary, LoomResourceNames.NameScripts(_glossary, issue)) is { Length: > 150 } named ? named[..147] + "…" : LoomResourceNames.NameBits(_glossary, LoomResourceNames.NameScripts(_glossary, issue)),
                     ToolTip = issue,
                     Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
                     FontSize = 11,
@@ -1445,6 +1446,20 @@ public partial class MainWindow : Window
             if (!ReferenceEquals(_game, game)) return;
             _usageIndex = index;
             if (_selectedResource is { Kind: ResourceKind.Script } selected) UpdateScriptUsedBy(selected);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
+    }
+
+    /// <summary>Names the story bits after the catalog scene that sets them (about a second of scanning, so off the UI thread).</summary>
+    private async Task NameStoryBitsAsync(GameLibrary game, LoomGlossary glossary, ReplayRecipe[] recipes)
+    {
+        try
+        {
+            var labels = await Task.Run(() => LoomEgaStateFlags.BitLabels(LoomStoryEvents.Read(game), recipes));
+            if (!ReferenceEquals(_game, game)) return;
+            glossary.StoryBitLabel = bit => labels.GetValueOrDefault(bit);
+            if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
+            RefreshStateIssues();
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
     }

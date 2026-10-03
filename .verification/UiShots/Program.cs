@@ -189,6 +189,7 @@ internal static class Program
                 report.Add("readable head: " + string.Join(" / ", Find<TextBox>("ScriptOutput").Text.Split('\n').Skip(3).Take(6).Select(l => l.TrimEnd())));
                 report.Add($"used by: '{Find<Expander>("ScriptUsedByExpander").Header}': " + string.Join(" | ", Find<StackPanel>("ScriptUsedByList").Children.OfType<TextBlock>().Take(4).Select(t => t.Text)));
                 report.Add("event rows: " + string.Join(" | ", Find<StackPanel>("ScriptEventButtons").Children.OfType<Button>().Take(6).Select(b => b.Content)));
+                report.Add("story bits in script 91 readable view: " + string.Join(" | ", Find<TextBox>("ScriptOutput").Text.Split('\n').Where(l => l.Contains("bit[0x") || l.Contains("scene")).Select(l => l.Trim()).Take(8)));
                 SaveWindow("script-readable.png");
                 readable.IsChecked = false; await Task.Delay(300);
                 report.Add($"raw view: first lines {string.Join(" / ", Find<TextBox>("ScriptOutput").Text.Split('\n').Skip(6).Take(2).Select(l => l.TrimEnd()))}; bytecode toggle enabled {Find<CheckBox>("ScriptBytesToggle").IsEnabled}");

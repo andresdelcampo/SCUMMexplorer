@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: story bits named by catalog scenes
+
+Advanced views only. `LoomGlossary.StoryBitLabel` is wired to the catalog scene titles (a background scan after a game opens), so the readable script view and the Assumptions name a story bit as "set by the scene: ..." with `reading` evidence; bits no catalog scene sets stay raw. Validation: [.verification/readable-scripts/validation.md](../.verification/readable-scripts/validation.md).
+
 ## 3 October: readable scripts, steps 4-6 (timeline, grouped assumptions, "Used by")
 
 Advanced inspector only. **Last action** shows "what happened" as numbered steps built from the bounded run's events (`LoomActionTimeline`; each step reuses the presenter's phrases, a step from an untaken branch is marked "maybe", the raw trace stays below). **Assumptions** are grouped as "Arrived by a shortcut", "Estimates" and "Effects not drawn", each with one sentence on what it means for the picture (`LoomAssumptionGroups`; the original lines stay as the evidence in each group). **Used by** on every global script (an expander on the script page) and on the selected object (a line under its actions): `LoomUsageIndex` scans all code once, in the background, for literal `startScript`/`chainScript`/`startObject`/`loadRoom`/sound references. Calls through a variable and the player's clicks are not listed, and the text says so. Actor names in the glossary can be scoped to a script or a room (numbers are reused: script 42 actor 2 is the flying actor, script 44 actor 3 the fairy, Room 02 actor 5 the last leaf), so the Elder names apply only where the council speaks.

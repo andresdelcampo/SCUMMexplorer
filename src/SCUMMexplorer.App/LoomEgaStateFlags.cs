@@ -17,6 +17,10 @@ internal static class LoomEgaStateFlags
         "The game remembers what happened in story bits. Check one to mark that scene or conversation as done, as the game would after it ran; clear it to undo. " +
         "A room already on screen shows the change when it is entered again. These are your choices, not played scenes.");
 
+    /// <summary>The catalog scene titles of the story bits that have one (a bit whose setters are no catalog scene stays unnamed).</summary>
+    public static Dictionary<int, string> BitLabels(IEnumerable<LoomStoryEvent> events, IReadOnlyList<ReplayRecipe> recipes) =>
+        events.Where(e => e.Scenes.Any(s => SceneTitle(s, recipes) is not null)).ToDictionary(e => e.Bit, e => $"set by the scene: {Label(e, recipes)}");
+
     private static string? SceneTitle(LoomStateSource setter, IEnumerable<ReplayRecipe> recipes)
     {
         if (setter.ObjectId is int obj && setter.VerbId is int verb)
