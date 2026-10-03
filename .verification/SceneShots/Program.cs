@@ -63,7 +63,9 @@ internal static class Program
                     report.Add($"== {wanted} ({Prop(scene, "Title")})");
                     report.Add("   start note: " + (string)typeof(MainWindow).GetMethod("CutsceneStartNote", Private)!.Invoke(window, [scene])!);
                     var clock = Stopwatch.StartNew();
+                    var before = Field("_session");
                     Call("PlayKnownCutscene", scene);
+                    report.Add($"   session kept: {ReferenceEquals(before, Field("_session"))}");
                     var n = 0;
                     var lastText = "";
                     var nextShot = 0L;
@@ -81,6 +83,7 @@ internal static class Program
                     report.Add($"   ended after {clock.ElapsedMilliseconds} ms, {n} shots; status: {Find<TextBlock>("StatusText").Text}");
                     var sess = (LoomExplorationSession)Field("_session")!;
                     var ego = sess.Actors.FirstOrDefault(a => a.Number == 1);
+                    report.Add($"   story bits set: {string.Join(" ", sess.StoryEvents.Where(e => sess.StoryBit(e.Key) == true).Select(e => e.Key))}");
                     report.Add($"   ego: room {ego?.Room} at ({ego?.X},{ego?.Y}) costume {ego?.Look.Costume:X2} staff {sess.GameStatus.StaffHeld}");
                 }
             }

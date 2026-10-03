@@ -192,39 +192,8 @@ public partial class MainWindow : Window
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview(); UpdateActorLayer(); UpdateVerbArea(); UpdatePlaybackControls();
         }
-    }, _game, () => IsAdvancedMode, StoryFlagSource()) { Owner = this, Resources = Resources };
+    }, _game, () => IsAdvancedMode, LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
 
-    /// <summary>
-    /// LOOM's story events as generic state flags: each story bit the game's code sets, named after the catalog scene that sets it
-    /// (object verb, or the scene's script), else after the room script that does.
-    /// </summary>
-    private GameStatusWindow.FlagSource StoryFlagSource() => new(
-        session => session.StoryEvents.Select(e => (Flag: new StateFlag(e.Key, StoryEventLabel(e), StoryEventDetail(e)), Named: e.Scenes.Any(s => SceneTitle(s) is not null)))
-            .OrderBy(t => t.Named ? 0 : 1).ThenBy(t => t.Flag.Label, StringComparer.OrdinalIgnoreCase).Select(t => t.Flag).ToList(),
-        (session, key) => session.StoryBit(key), (session, key, value) => session.UpdateStoryBit(key, value),
-        "The game remembers what happened in story bits. Check one to mark that scene or conversation as done, as the game would after it ran; clear it to undo. " +
-        "A room already on screen shows the change when it is entered again. These are your choices, not played scenes.");
-
-    private string? SceneTitle(LoomStateSource setter)
-    {
-        var recipes = _replayCatalog?.Replays ?? [];
-        if (setter.ObjectId is int obj && setter.VerbId is int verb)
-            return recipes.FirstOrDefault(r => r.Steps is null && r.Room == setter.Room && r.ObjectId == obj && r.Verb == verb)?.Title;
-        if (setter.Where.StartsWith("Script ", StringComparison.Ordinal) && int.TryParse(setter.Where.AsSpan(7, 3), out var script))
-            return recipes.FirstOrDefault(r => r.ScriptIds.Contains(script))?.Title;
-        return null;
-    }
-
-    private string StoryEventLabel(LoomStoryEvent e)
-    {
-        var titles = e.Scenes.Select(SceneTitle).Where(t => t is not null).Distinct().Take(2).ToList();
-        if (titles.Count > 0) return string.Join(" / ", titles) + (e.Scenes.Select(s => s.Where.Split(" +")[0]).Distinct().Count() > titles.Count ? " …" : "");
-        var first = e.Scenes.FirstOrDefault() ?? e.Setters[0];
-        return first.Where.Split(" +")[0] + " ran";
-    }
-
-    private static string StoryEventDetail(LoomStoryEvent e) =>
-        e.Key + " is set by: " + string.Join("; ", e.Setters.Select(s => s.Where).Take(6)) + (e.Setters.Count > 6 ? "; " + (e.Setters.Count - 6) + " more" : "");
 
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {
@@ -3195,7 +3164,7 @@ public partial class MainWindow : Window
         cutscene.Steps is not null ? "Stated sequence: a fresh post-boot seed-0 session and assumed catalog arrival. " +
         "Explicit direct verbs, clicks, catalog hops (a visit step keeps the story state so far), supported Game Status edits (staff held) and, where the explorer cannot reach a scene by the game's own trigger, direct script starts run in the same session, waiting for each audited scene boundary, balanced scopes and settled state before the next input. " +
         "These exploration choices do not establish original-game prerequisites. Failed or skipped stages cancel later inputs. " + cutscene.Source :
-        $"Stated start: a fresh session after the boot (seed 0), Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
+        $"Stated start: the running session, or a fresh one after the boot (seed 0), with Room {cutscene.RoomId:00} opened from the catalog (the ego's arrival " +
         "there is assumed), " + (cutscene.ObjectId == 0 ? "then the room's entry scripts play on the clock. " :
         $"then object {cutscene.ObjectId}'s verb 0x{cutscene.VerbId:X2} run directly: an exploration action, not " +
         "the game's click (Bobbin does not walk there, and the object may be untouchable in this state). Draft response verbs do not simulate casting a draft. ") +
@@ -3203,7 +3172,7 @@ public partial class MainWindow : Window
             ? $"The verb leads into the next room; once Bobbin's arrival walk ends (run before the view shows it), the game's click at " +
               $"({click.X}, {click.Y}) (assumed input) walks him on, and the room's own code starts the cutscene. "
             : "") +
-        "The frames after it play on the playback clock at the game's frame rate. The current exploration state is replaced.";
+        "The frames after it play on the playback clock at the game's frame rate. The running exploration session is kept (Restart gives the fresh state); only the minimum the scene needs and the session lacks is added.";
 
     /// <summary>
     /// Plays a known cutscene from its stated start (<see cref="CutsceneStartNote"/>): a fresh session after the boot,
@@ -3214,10 +3183,14 @@ public partial class MainWindow : Window
         if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene ||
             _game.Rooms.FirstOrDefault(item => item.ResourceId == cutscene.RoomId) is not { } room) return;
         StopScenePlayback();
-        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+        // A single scene keeps the running session (the user's state stays, a later one too; "Restart" goes back to the boot) and gets only
+        // the minimum it needs. A stated sequence carries its own steps from the post-boot state, so it starts a fresh session.
+        var keepSession = cutscene.Steps is null && _session is { BootRunning: false };
+        if (!keepSession) _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
         // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
         // A sequence with unseen leading steps runs them first (the story state they reach is the scene's start), then attaches.
         var setup = StartSetup(cutscene);
+        if (keepSession && _setupPlanner is not null) setup = _setupPlanner.Adapt(setup, _session!);
         var unseenSetup = cutscene.Steps is null && setup.HasSteps;
         if (!unseenSetup && (cutscene.Steps is null || cutscene.SilentSteps == 0)) _sceneSound.Attach(_game, _session);
         _session.VisitRoom(room);

@@ -26,6 +26,8 @@ public sealed record LoomStartSetup(IReadOnlyList<LoomReplayStep> Steps, IReadOn
 public sealed class LoomSceneSetupPlanner
 {
     public const string StaffBit = "bit[0xD61]";
+    /// <summary>Tag on the steps that grant the staff (see <see cref="Adapt"/>).</summary>
+    public const string StaffGrant = "grant:staff";
     private const int FirstStoryBit = 0xD72;
     /// <summary>The first room beyond the LOOM island (an estimate of the user's "outside the island").</summary>
     public const int FirstRoomOffTheIsland = 11;
@@ -76,9 +78,9 @@ public sealed class LoomSceneSetupPlanner
                 : $"The scene's own code reads bit D61 ({string.Join(", ", reads.Select(t => t.Where).Distinct().Take(3))}) and Room {startRoom:00} is outside the island, where Bobbin holds the distaff (decided with the user, 3 October).";
             if (writer is { ObjectId: int obj, VerbId: int verb })
             {
-                steps.Add(new("visit", writer.Room));
-                steps.Add(new("verb", obj, verb));
-                steps.Add(new("frames", Frames: 8));
+                steps.Add(new("visit", writer.Room, EndBoundary: StaffGrant));
+                steps.Add(new("verb", obj, verb, EndBoundary: StaffGrant));
+                steps.Add(new("frames", Frames: 8, EndBoundary: StaffGrant));
                 notes.Add($"{why} A fresh game does not, so the game's own {writer.Where.Split(" +")[0]} (it sets D61 to 1) runs first, unseen, as an exploration action. " +
                           $"Other places that set it: {string.Join(", ", StaffHeldWriters.Where(w => w != writer).Select(w => w.Where.Split(" +")[0]).Distinct().Take(4))}.");
             }
@@ -119,6 +121,18 @@ public sealed class LoomSceneSetupPlanner
             notes.Add($"Story bits read by the scene's own code ({string.Join(" ", storyReads)}) keep their first-visit value 0; no flag is set by the explorer.");
 
         return notes.Count == 0 ? LoomStartSetup.None : new LoomStartSetup(steps, notes);
+    }
+
+    /// <summary>
+    /// The setup for a running session: what the session already has is not granted again (a later state is kept; only the minimum the
+    /// scene needs and the session lacks is added). Today that is the staff.
+    /// </summary>
+    public LoomStartSetup Adapt(LoomStartSetup setup, LoomExplorationSession session)
+    {
+        if (!setup.Steps.Any(st => st.EndBoundary == StaffGrant) || session.GameStatus.StaffHeld != true) return setup;
+        var notes = setup.Notes.Where(n => !n.Contains("bit D61", StringComparison.Ordinal)).ToList();
+        notes.Insert(0, "Bobbin already holds the distaff in the running session, so the pickup is not run again.");
+        return new(setup.Steps.Where(st => st.EndBoundary != StaffGrant).ToArray(), notes);
     }
 
     private readonly Dictionary<(int, int), IReadOnlyList<LoomActorPlacer>> _placers = [];

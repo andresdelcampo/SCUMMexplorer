@@ -47,6 +47,25 @@ public sealed class LoomSceneSetupPlannerTests
     }
 
     [Fact]
+    public void ARunningSessionThatAlreadyHoldsTheStaffIsNotGrantedItAgain()
+    {
+        var game = Game();
+        var planner = new LoomSceneSetupPlanner(game);
+        var setup = planner.Derive(43, [91]);
+        var fresh = Session(game);
+        fresh.VisitRoomById(43);
+        Assert.Same(setup, planner.Adapt(setup, fresh)); // not held: the pickup stays
+        var held = Session(game);
+        held.VisitRoomById(43);
+        for (var i = 0; i < 40; i++) held.AdvanceFrame();
+        held.UpdateStaffPossession(true);
+        var adapted = planner.Adapt(setup, held);
+        Assert.DoesNotContain(adapted.Steps, st => st.EndBoundary == LoomSceneSetupPlanner.StaffGrant);
+        Assert.Contains(adapted.Steps, st => st is { Kind: "visit", ObjectId: 43 });
+        Assert.Contains(adapted.Notes, n => n.Contains("already holds the distaff", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void ASceneThatDoesNotDependOnTheStaffKeepsTheFreshCatalogVisit()
     {
         var planner = new LoomSceneSetupPlanner(Game());

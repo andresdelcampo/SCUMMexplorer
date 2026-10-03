@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: menu cutscenes keep the running session; LOOM flags split from the generic window
+
+`PlayKnownCutscene` keeps the running session for a single scene (a late state stays) and `LoomSceneSetupPlanner.Adapt` skips grants the session already has (the staff pickup); stated sequences and the boot still start fresh. The story-flag naming moved from MainWindow into `LoomEgaStateFlags`, so Game Status only knows generic `StateFlag`s. Checked with `.verification/SceneShots` ([keep](../.verification/setup-placer-20261003/keep/report.txt): pickup, then Room 43 scene in the same session, staff kept, D96 set by the scene).
+
 ## 3 October: Game Status lists the story events as checkboxes
 
 `LoomStoryEvents` (Core) finds the 90 story bits (D72 and up) that the game's code sets to 1; 27 are set by a catalog scene (global script or object verb) and are named by its title, the others by the room script that sets them. `LoomExplorationSession.StoryEvents`, `StoryBit` and `UpdateStoryBit` read and edit them like the other status edits (exploration choices, applied with the window's Apply). The window's list is generic (`StateFlag`, `FlagSource`: name, detail, read, write); only the search and the naming are LOOM-specific. Checked in the real window with `.verification/StatusShots` ([captures](../.verification/setup-placer-20261003/status/report.txt)). Design intent (user): the user controls the state; the app only raises it to the minimum an action needs.
