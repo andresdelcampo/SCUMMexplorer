@@ -2929,12 +2929,11 @@ public partial class MainWindow : Window
         RoomCutsceneButton.IsEnabled = active && CanStartCutscene;
         RoomCutsceneButton.Content = roomChoices.Count == 1 ? "Play Cutscene" : "Play Cutscene ▾";
         RoomCutsceneButton.ToolTip = !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
-            roomChoices.Count == 1 ? $"Replay {roomChoices[0].Title} from its validated fresh-session start. The current exploration state is replaced." :
-            "Choose a replay associated with this room by its validated start or reached rooms. Each replay starts a fresh session and replaces the current exploration state.";
+            roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
         if (!active) return;
         CutsceneMenuButton.Content = "Play Cutscene ▾";
         CutsceneMenuButton.IsEnabled = CanStartCutscene;
-        CutsceneMenuButton.ToolTip = CanStartCutscene ? "Choose a cutscene from anywhere in the game. Each replay replaces exploration with its stated start." : "Playback is active. Finish or skip it before starting another scene.";
+        CutsceneMenuButton.ToolTip = CanStartCutscene ? "Choose a cutscene from anywhere in the game." : "Playback is active. Finish or skip it before starting another scene.";
         UpdateRoomScrollButtons();
         var inCutscene = SessionInScene;
         var skippable = _session?.CutsceneSkippable == true;
@@ -3046,7 +3045,7 @@ public partial class MainWindow : Window
         var items = PlayableCutsceneItems().Select(choice => choice.Item).ToList();
         foreach (var gap in _replayCatalog?.Coverage ?? [])
             items.Add(new(gap.Title, "Needs validation", gap.Source, null, gap.Status));
-        return new(items, _replayCatalog?.Summary ?? "Four established replay starts.") { Owner = this };
+        return new(items, _replayCatalog?.Summary ?? "", IsAdvancedMode, roomScope: false) { Owner = this };
     }
 
     private List<(string Id, CutscenePickerItem Item)> PlayableCutsceneItems()
@@ -3066,12 +3065,9 @@ public partial class MainWindow : Window
     private CutscenePickerWindow BuildRoomCutscenePicker(int roomId)
     {
         var items = RoomCutsceneItems(roomId);
-        var picker = new CutscenePickerWindow(items, $"{items.Count} validated starts associated with Room {roomId:00}. Replay replaces exploration with its stated fresh-session start.") { Owner = this };
+        var picker = new CutscenePickerWindow(items, "", IsAdvancedMode, roomScope: true) { Owner = this };
         picker.Title = $"Play Cutscene · Room {roomId:00}";
-        picker.PickerScope.Text = $"Associated with Room {roomId:00} by validated start or reached rooms. Replay starts a fresh session.";
-        // A room may have only dialogue/reaction previews. Do not open an empty
-        // Scenes category while its matching entries exist in another category.
-        picker.CategoryFilter.SelectedIndex = 2;
+        picker.PickerScope.Text = items.Count == 1 ? "One cutscene happens in this room." : $"{items.Count} cutscenes happen in this room.";
         return picker;
     }
 

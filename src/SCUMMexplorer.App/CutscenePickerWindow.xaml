@@ -7,7 +7,7 @@
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <StackPanel>
             <TextBlock Text="Play Cutscene" FontSize="24" FontWeight="SemiBold"/>
-            <TextBlock x:Name="PickerScope" Text="Choose a scene from anywhere in the game. Replay starts a fresh exploration session." TextWrapping="Wrap" Foreground="#AAB4BA" Margin="0,6,0,12"/>
+            <TextBlock x:Name="PickerScope" Text="Choose a scene from anywhere in the game." TextWrapping="Wrap" Foreground="#AAB4BA" Margin="0,6,0,12"/>
             <TextBlock x:Name="CoverageSummary" TextWrapping="Wrap" Foreground="#B8AA8C" Margin="0,0,0,12"/>
         </StackPanel>
         <DockPanel Grid.Row="1" Margin="0,0,0,12">
@@ -33,7 +33,7 @@
         </ListBox>
         <StackPanel Grid.Row="3" Margin="0,12,0,0">
             <TextBlock x:Name="SelectionNote" TextWrapping="Wrap" MaxHeight="70" Foreground="#AAB4BA"/>
-            <Expander Header="Start and source details" Foreground="#B8AA8C" Margin="0,7,0,0">
+            <Expander x:Name="DetailsExpander" Header="Start and source details" Foreground="#B8AA8C" Margin="0,7,0,0">
                 <TextBox x:Name="SourceDetails" IsReadOnly="True" TextWrapping="Wrap" Height="110" VerticalScrollBarVisibility="Auto" Background="#0B1117" Foreground="#AAB4BA" BorderThickness="0"/>
             </Expander>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">

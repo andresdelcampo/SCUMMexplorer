@@ -7,9 +7,22 @@ namespace SCUMMexplorer.App;
 public partial class CutscenePickerWindow : Window
 {
     private IReadOnlyList<CutscenePickerItem> _items = [];
-    internal CutscenePickerWindow(IReadOnlyList<CutscenePickerItem> items, string summary)
+    /// <summary>
+    /// <paramref name="summary"/> (the catalog's coverage statement) and the "Needs validation" entries are for Advanced mode only.
+    /// A room's own list is short (at most about 30 entries), so it has no category filter, and no search when it is small.
+    /// </summary>
+    internal CutscenePickerWindow(IReadOnlyList<CutscenePickerItem> items, string summary, bool advanced = false, bool roomScope = false)
     {
-        InitializeComponent(); _items = items; CoverageSummary.Text = summary; Refresh();
+        InitializeComponent(); _items = items;
+        CoverageSummary.Text = summary; CoverageSummary.Visibility = advanced && summary.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        if (!advanced) { CategoryFilter.Items.RemoveAt(3); DetailsExpander.Visibility = Visibility.Collapsed; }
+        if (roomScope)
+        {
+            CategoryFilter.SelectedIndex = 2; // all playable; a room may have only dialogue previews
+            CategoryFilter.Visibility = Visibility.Collapsed;
+            if (items.Count <= 15) SearchBox.Visibility = Visibility.Collapsed;
+        }
+        Refresh();
     }
     internal Action? SelectedPlay { get; private set; }
     private void Filter_Changed(object sender, SelectionChangedEventArgs e) => Refresh();
