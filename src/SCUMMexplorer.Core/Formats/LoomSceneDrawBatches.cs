@@ -155,8 +155,56 @@ public sealed class LoomSceneDrawBatches
             }
         }
 
+        foreach (var (script, source) in decoded)
+            ApplyBoxErasures(script, source, byRoom, rectByObject);
+
         return new LoomSceneDrawBatches(byRoom.ToDictionary(pair => pair.Key,
             pair => (IReadOnlyList<RoomDrawBatch>)pair.Value), FindInterfaceImages(decoded), entryStates);
+    }
+
+    private static readonly Regex LocalScriptSource = new(@"^Room (?<room>\d+) local script \d+$",
+        RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// A room-local script that stops another local script of its room and then paints a literal
+    /// <c>drawBox</c> over an object's whole image removes that object from the stopped script's
+    /// batches: the box blanks what the stopped script drew (Room 69 local 201 stops 202, the
+    /// difficulty menu, and boxes over its three buttons). Objects the box only partly covers stay.
+    /// </summary>
+    private static void ApplyBoxErasures(LoomScriptDisassembly script, string source,
+        Dictionary<int, List<RoomDrawBatch>> byRoom,
+        IReadOnlyDictionary<int, (int X, int Y, int Width, int Height)> rectByObject)
+    {
+        var match = LocalScriptSource.Match(source);
+        if (!match.Success || !byRoom.TryGetValue(int.Parse(match.Groups["room"].Value, CultureInfo.InvariantCulture), out var batches))
+            return;
+        var roomId = int.Parse(match.Groups["room"].Value, CultureInfo.InvariantCulture);
+        var stopped = new HashSet<int>();
+        foreach (var instruction in script.Instructions)
+        {
+            if (instruction.Operation == "stopScript" && TryReadLiteral(instruction.Operands, out var id) && id != 0)
+                stopped.Add(id);
+            if (instruction.Operation != "drawBox" || stopped.Count == 0) continue;
+            var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length != 5) continue;
+            var corners = new int[4];
+            var literal = true;
+            for (var i = 0; literal && i < 4; i++) literal = TryReadLiteral(parts[i], out corners[i]);
+            if (!literal) continue;
+            int left = Math.Min(corners[0], corners[2]), right = Math.Max(corners[0], corners[2]);
+            int top = Math.Min(corners[1], corners[3]), bottom = Math.Max(corners[1], corners[3]);
+            for (var b = batches.Count - 1; b >= 0; b--)
+            {
+                var batch = batches[b];
+                if (!stopped.Any(id => batch.Source.Contains($"Room {roomId:00} local script {id} +0x", StringComparison.Ordinal)))
+                    continue;
+                var kept = batch.Steps.Where(step => !rectByObject.TryGetValue(step.ObjectId, out var r) ||
+                    !(r.X >= left && r.Y >= top && r.X + r.Width - 1 <= right && r.Y + r.Height - 1 <= bottom)).ToArray();
+                if (kept.Length == batch.Steps.Count) continue;
+                if (kept.Length == 0) batches.RemoveAt(b);
+                else batches[b] = batch with { Steps = kept };
+            }
+        }
     }
 
     /// <summary>

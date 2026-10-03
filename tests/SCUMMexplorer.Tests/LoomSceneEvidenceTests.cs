@@ -132,4 +132,16 @@ public sealed class LoomSceneEvidenceTests
 
     private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
         new(1, 1, 0, 32, 16, instructions, null, null, [], []);
+
+    [Fact]
+    public void Room69DifficultyButtonsAreBlankedByLocal201SoTheyAreNotDrawnBack()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
+        var drawn = LoomSceneDrawBatches.Build(game).ForRoom(69).SelectMany(batch => batch.Steps).Select(step => step.ObjectId);
+        // Local 201 stops 202 and boxes (120,64)-(200,128) over objects 876-878.
+        Assert.DoesNotContain(drawn, id => id is 876 or 877 or 878);
+        Assert.Contains(885, drawn);
+    }
 }
