@@ -102,7 +102,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Loaded += (_, _) => ReopenLastFolder();
+        SyncSoundIcons();
+        Loaded += (_, _) => { SyncSoundIcons(); ReopenLastFolder(); };
         Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
@@ -2436,8 +2437,21 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>The icon buttons mirror the combo (the radios do not exist yet while the window is being built).</summary>
+    private void SyncSoundIcons()
+    {
+        if (SoundAdlibRadio is null || SoundModeCombo.SelectedIndex < 0) return;
+        SoundNoneRadio.IsChecked = SoundModeCombo.SelectedIndex == 0;
+        SoundSpeakerRadio.IsChecked = SoundModeCombo.SelectedIndex == 1;
+        SoundAdlibRadio.IsChecked = SoundModeCombo.SelectedIndex == 2;
+    }
+
+    private void SoundIcon_Click(object sender, RoutedEventArgs e) =>
+        SoundModeCombo.SelectedIndex = int.Parse((string)((FrameworkElement)sender).Tag);
+
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        SyncSoundIcons();
         if (!IsLoaded || SoundModeCombo.SelectedIndex < 0) return;
         if (SessionInScene)
         {

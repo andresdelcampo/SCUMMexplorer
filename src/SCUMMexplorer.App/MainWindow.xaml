@@ -61,6 +61,39 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- The sound device picker: one icon button per device (X, speaker, note). The hidden SoundModeCombo stays
+             the single source of the choice; these buttons set it and mirror it. -->
+        <Style x:Key="SoundIconRadio" TargetType="RadioButton">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Foreground" Value="#8E9BA3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Frame" Background="#1E2B37" BorderBrush="#4A5962" BorderThickness="1" Margin="-1,0,0,0">
+                            <Viewbox Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <ContentPresenter/>
+                            </Viewbox>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Frame" Property="Background" Value="#2C3E4C"/>
+                                <Setter Property="Foreground" Value="#E7E0D2"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Frame" Property="Background" Value="#2E404E"/>
+                                <Setter TargetName="Frame" Property="BorderBrush" Value="#6C7B85"/>
+                                <Setter Property="Foreground" Value="#E7E0D2"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="PanelHeading" TargetType="TextBlock">
             <Setter Property="Foreground" Value="#B78442"/>
             <Setter Property="FontSize" Value="11"/>
@@ -112,13 +145,35 @@
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <TextBlock Text="SCUMMexplorer" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="16,0,0,0">
-                    <ComboBox x:Name="SoundModeCombo" Width="110" VerticalAlignment="Center" Margin="0,0,12,0"
-                              SelectionChanged="SoundModeCombo_SelectionChanged"
-                              ToolTip="Music and effects. Changing device stops current audio; the next sound command uses the selected device.">
+                    <ComboBox x:Name="SoundModeCombo" Visibility="Collapsed" SelectionChanged="SoundModeCombo_SelectionChanged">
                         <ComboBoxItem Content="No Sound"/>
                         <ComboBoxItem Content="PC Speaker"/>
                         <ComboBoxItem Content="AdLib" IsSelected="True"/>
                     </ComboBox>
+                    <StackPanel x:Name="SoundIconPanel" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,14,0"
+                                IsEnabled="{Binding IsEnabled, ElementName=SoundModeCombo}"
+                                ToolTip="Music and effects. Changing device stops current audio; the next sound command uses the selected device.">
+                        <RadioButton x:Name="SoundNoneRadio" Tag="0" GroupName="SoundDevice" Style="{StaticResource SoundIconRadio}" Click="SoundIcon_Click"
+                                     ToolTip="No Sound" AutomationProperties.Name="No Sound">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M5,5 L19,19 M19,5 L5,19" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" StrokeThickness="2.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            </Canvas>
+                        </RadioButton>
+                        <RadioButton x:Name="SoundSpeakerRadio" Tag="1" GroupName="SoundDevice" Style="{StaticResource SoundIconRadio}" Click="SoundIcon_Click"
+                                     ToolTip="PC Speaker" AutomationProperties.Name="PC Speaker">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M2,9 H6.5 L12,4 V20 L6.5,15 H2 Z" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                                <Path Data="M15.5,8.5 Q18,12 15.5,15.5 M18.5,5.5 Q23,12 18.5,18.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            </Canvas>
+                        </RadioButton>
+                        <RadioButton x:Name="SoundAdlibRadio" Tag="2" GroupName="SoundDevice" Style="{StaticResource SoundIconRadio}" Click="SoundIcon_Click"
+                                     IsChecked="True" ToolTip="AdLib" AutomationProperties.Name="AdLib">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M2.5,18 a3.3,2.4 -20 1 0 6.6,0 a3.3,2.4 -20 1 0 -6.6,0 M13,15.5 a3.3,2.4 -20 1 0 6.6,0 a3.3,2.4 -20 1 0 -6.6,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                                <Path Data="M9,17.5 V5.5 L19.5,3 V15 M9,9.5 L19.5,7" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" StrokeThickness="2" StrokeLineJoin="Round"/>
+                            </Canvas>
+                        </RadioButton>
+                    </StackPanel>
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click"
                               VerticalAlignment="Center" Margin="0,0,12,0" Foreground="#D2C7B5"
                               ToolTip="Show SCUMM resource lists, script state, and diagnostic controls."/>
