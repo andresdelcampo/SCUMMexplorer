@@ -1,5 +1,9 @@
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, docs/LOOM_EGA_PLAN.md Current follow-up, docs/LOOM_SCRIPT_MAP.md Follow-up findings/Not modelled yet, docs/LOOM_CUTSCENE_DISCOVERY.md, and the current validations below. LOOM Spanish DOS EGA remains the focus.
 
+## Latest: Room34 local200 +0035 investigated, not credited — 3 October
+
+After ca469dc. Healing 586/4D completes after scene 087 + catalog Room34 (staff re-held), but the ego walks 6→7→8, so the watcher's previous-box-6 test never holds; Room35 587 arrival gives previous box 9. Two cycles, no credit. Audited stays234/235 (99.57%) with this single site left; fresh single-action169/235 unchanged. Precise blocker and the one next experiment (check whether ScummVM's per-step box update can skip the sliver box 7) are in the [validation](../.verification/global-scripts-input-20261003/validation.md). No App launch or push.
+
 ## Latest: Room34 local207 +0079 complete — 3 October
 
 After 31061e0. Local207 +0079/end0100 completes: route3 prefix to scene 087 (D9D=1), catalog hop to Room43, the 096 click route, Look 684 (097) into Room34 layout A (D7B≠0), click 559 twice (098 then 207). Audited233→234/235 (99.57%),1 remaining; fresh single-action169/235 unchanged. [Validation](../.verification/global-scripts-input-20261003/validation.md).
