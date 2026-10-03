@@ -1,0 +1,51 @@
+{
+  "outcome": "Six global-script sites complete via accepted keys and clicks; F5 leaves the session in the Room70 save menu.",
+  "inputFrames": 943,
+  "completedScopes": 6,
+  "newSites": [
+    {
+      "owner": "script 004",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "script 005",
+      "offset": "+0x01C0"
+    },
+    {
+      "owner": "script 011",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "script 012",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "script 013",
+      "offset": "+0x0000"
+    },
+    {
+      "owner": "script 022",
+      "offset": "+0x0138"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 223,
+    "after": 229,
+    "total": 235,
+    "percent": 97.45,
+    "remaining": 6
+  },
+  "diagnosticCycles": 2,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 301,
+  "evidence": {
+    "Exe\\GlobalInput-20261003\\a9\\input.json": "e957691033cecb2ea0168c834d6d2fbaec593e7ef397cc1dbfabe5ad91923311",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}
