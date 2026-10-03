@@ -1346,8 +1346,10 @@ public partial class MainWindow : Window
                 Text = "What the explorer had to assume or estimate to show this room (clicks sent as assumed input, camera or artwork estimates). Nothing is waiting on you.",
                 Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6)
             });
-        foreach (var issue in issues)
-            StateIssueList.Children.Add(new TextBlock
+        foreach (var group in LoomAssumptionGroups.Group(issues))
+        {
+            var items = new StackPanel { Margin = new Thickness(8, 2, 0, 4) };
+            items.Children.Add(new TextBlock
             {
                 Text = LoomResourceNames.NameScripts(_glossary, issue) is { Length: > 150 } named ? named[..147] + "…" : LoomResourceNames.NameScripts(_glossary, issue),
                 ToolTip = issue,
