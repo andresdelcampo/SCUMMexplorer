@@ -704,7 +704,7 @@ public partial class MainWindow : Window
             {
                 var disassembly = _scriptReader.Decode(resource);
                 _scriptShown = disassembly;
-                ScriptOutput.Text = disassembly.Format(_showScriptBytes);
+                ScriptOutput.Text = FormatScript(disassembly);
                 ScriptPlayButton.Visibility = ScriptCutscene(resource.ResourceId) is null ? Visibility.Collapsed : Visibility.Visible;
                 var events = disassembly.Instructions
                     .Select(instruction => LoomScriptEvent.FromInstruction(disassembly, instruction,
@@ -886,7 +886,7 @@ public partial class MainWindow : Window
             _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
             var run = _session.LastEntryRun;
             var script = _session.LastEntryScript;
-            RoomEntryTraceOutput.Text = (script?.Format() ?? "No embedded entry script.") +
+            RoomEntryTraceOutput.Text = (script is null ? "No embedded entry script." : FormatScript(script)) +
                                         Environment.NewLine + "SESSION INTERPRETATION" + Environment.NewLine +
                                         (run?.FormatSummary() ?? "No entry run recorded.") +
                                         Environment.NewLine + "Known global variables: " + snapshot.KnownGlobalVariables.Count +
@@ -944,7 +944,7 @@ public partial class MainWindow : Window
                     run.ObjectPositions, background: _currentRoom, drawQueue: run.DrawOrder);
                 if (run.UnresolvedReason is not null || run.ResumeOffset.HasValue)
                     CloseArtworkGaps(resource, images);
-                RoomEntryTraceOutput.Text = entryScript.Format() + Environment.NewLine +
+                RoomEntryTraceOutput.Text = FormatScript(entryScript) + Environment.NewLine +
                                             "BOUNDED INTERPRETATION" + Environment.NewLine + run.FormatSummary();
                 RoomEntryTraceExpander.Visibility = Visibility.Visible;
                 ObjectsNote.Text = run.UnresolvedReason is null && !run.ResumeOffset.HasValue
@@ -1179,7 +1179,7 @@ public partial class MainWindow : Window
         RefreshStateIssues();
         ObjectActionTraceOutput.Text = action.Evidence + Environment.NewLine +
             string.Join(Environment.NewLine, action.Uncertainties.Select(item => "Unresolved: " + item)) +
-            Environment.NewLine + (action.Script?.Format() ?? "Object bytecode unavailable.") +
+            Environment.NewLine + (action.Script is null ? "Object bytecode unavailable." : FormatScript(action.Script)) +
             Environment.NewLine + (action.Run?.FormatSummary() ?? "No object bytecode was run.");
         ObjectActionTraceExpander.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         UpdateAdvancedMode();
@@ -1406,8 +1406,24 @@ public partial class MainWindow : Window
     {
         _showScriptBytes = ScriptBytesToggle.IsChecked == true;
         SaveViewOptions();
-        if (_scriptShown is { } shown) ScriptOutput.Text = shown.Format(_showScriptBytes);
+        if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
     }
+
+    // Readable (names, if/else blocks) is the default; Raw is the decoded instructions and stays one click away. The choice is remembered.
+    private bool _readableScripts = true;
+
+    private void ScriptReadableToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (ScriptBytesToggle is null) return;
+        _readableScripts = ScriptReadableToggle.IsChecked == true;
+        ScriptBytesToggle.IsEnabled = !_readableScripts;
+        SaveViewOptions();
+        if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
+    }
+
+    private string FormatScript(LoomScriptDisassembly script) => _readableScripts && _game?.Id == GameId.Loom
+        ? new LoomScriptPresenter(_glossary, verb => LoomVerbNames.Label(verb) is { } label && !label.StartsWith("Verb 0x", StringComparison.Ordinal) ? label : null).Present(script)
+        : script.Format(_showScriptBytes);
 
     // A script the catalog knows as a scene can be played from its view: the cutscene machinery goes to the room and runs it.
     private KnownCutscene? ScriptCutscene(int? scriptId) =>
@@ -2811,6 +2827,7 @@ public partial class MainWindow : Window
                         case "framing": NormalRoomWidthToggle.IsChecked = parts[1] != "0"; break;
                         case "optionsOpen": RoomOptionsExpander.IsExpanded = parts[1] == "1"; break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
+                        case "readable": _readableScripts = parts[1] != "0"; ScriptReadableToggle.IsChecked = _readableScripts; ScriptBytesToggle.IsEnabled = !_readableScripts; break;
                     }
                 }
         }
@@ -2826,7 +2843,7 @@ public partial class MainWindow : Window
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
-            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"objects={ObjectAreaMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}"]);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"objects={ObjectAreaMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}"]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }

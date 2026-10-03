@@ -1,0 +1,84 @@
+using SCUMMexplorer.Core.Discovery;
+using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Formats;
+
+namespace SCUMMexplorer.Tests;
+
+public sealed class LoomScriptPresenterTests
+{
+    private static string Present(byte[] code)
+    {
+        var decoded = LoomScriptDisassembler.Disassemble(code);
+        Assert.Empty(decoded.Issues);
+        var script = new LoomScriptDisassembly(1, 1, 0, code.Length, code.Length, decoded.Instructions, null, null, [], []);
+        return new LoomScriptPresenter(LoomGlossary.Default).Present(script);
+    }
+
+    [Fact]
+    public void ForwardBranchWithAJumpBecomesIfElse()
+    {
+        // notEqualZero bit[0xD61] jumps when the bit is clear, so the body runs while the staff is held.
+        var text = Present([0xA8, 0x61, 0x8D, 0x04, 0x00, 0x80, 0x18, 0x01, 0x00, 0x80, 0x00]);
+        var lines = text.Split(Environment.NewLine);
+        Assert.Contains(lines, l => l.StartsWith("0000") && l.EndsWith("if the distaff (staff) is held"));
+        Assert.Contains(lines, l => l.TrimEnd() == "          else" || l.Trim() == "else");
+        Assert.Contains(lines, l => l.Trim() == "end if");
+        Assert.Contains("[decoded]", text);
+    }
+
+    [Fact]
+    public void BackwardJumpToTheConditionBecomesWhile()
+    {
+        var text = Present([0xA8, 0x61, 0x8D, 0x04, 0x00, 0x80, 0x18, 0xF7, 0xFF, 0x00]);
+        Assert.Contains("while the distaff (staff) is held", text);
+        Assert.Contains("end while", text);
+    }
+
+    [Fact]
+    public void ConditionsAreReadWithScummVmsJumpIfFalseSemantics()
+    {
+        // isGreater var[0x002], 464: ScummVM jumps unless (464 > var), so the body runs while camera x < 464.
+        var text = Present([0x78, 0x02, 0x00, 0xD0, 0x01, 0x02, 0x00, 0x80, 0x80, 0x00]);
+        Assert.Contains("if camera x < 464", text);
+    }
+
+    [Fact]
+    public void UnknownThingsKeepTheirRawForm()
+    {
+        // move var[0x0D1] = 5 has no name; bit[0xD96] = 1 is shown raw too.
+        var text = Present([0x1A, 0xD1, 0x00, 0x05, 0x00, 0x1A, 0x96, 0x8D, 0x01, 0x00, 0x00]);
+        Assert.Contains("var[0x0D1] = 5", text);
+        Assert.Contains("set: bit[0xD96]", text);
+    }
+
+    [Fact]
+    public void PrintNamesTheSpeakerAndStartScriptNamesTheScript()
+    {
+        // print actor 1 [text "Hi"], startScript 17 [0]
+        byte[] code = [0x14, 0x01, 0x0F, (byte)'H', (byte)'i', 0x00, 0x0A, 0x11, 0x00, 0x00, 0x00, 0xFF, 0x00];
+        var text = Present(code);
+        Assert.Contains("Bobbin says: “Hi”", text);
+        Assert.Contains("start Script 17 · give the ego a costume (by size)", text);
+    }
+
+    // Golden outputs for a few real scripts; written when missing or when SCUMM_UPDATE_GOLDEN=1, then reviewed by hand.
+    [Theory]
+    [InlineData(91)]
+    [InlineData(17)]
+    [InlineData(6)]
+    public void RealScriptsMatchTheirGoldenOutput(int scriptId)
+    {
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
+        var game = new GameFolderScanner().Scan(Path.Combine(root, "Games/loom"));
+        var glossary = LoomGlossary.Load(game);
+        var script = new LoomScriptReader().Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == scriptId));
+        var text = new LoomScriptPresenter(glossary).Present(script);
+        var path = Path.Combine(root, ".verification", "readable-scripts", $"script-{scriptId:000}.txt");
+        if (!File.Exists(path) || Environment.GetEnvironmentVariable("SCUMM_UPDATE_GOLDEN") == "1")
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, text);
+        }
+        Assert.Equal(File.ReadAllText(path), text);
+    }
+}

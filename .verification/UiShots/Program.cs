@@ -7,7 +7,7 @@ using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Formats;
 
-// Normal-mode layout, the corner full-screen button and the Advanced script view (bytecode toggle, play button) in the real MainWindow.
+// Normal-mode layout, the corner full-screen button and the Advanced script view (Readable/Raw, names, bytecode toggle, play button) in the real MainWindow.
 // Arguments: <Games\loom> <output folder>
 internal static class Program
 {
@@ -178,6 +178,13 @@ internal static class Program
                 var s91 = items.First(i => KindOf(i) == "Script" && IdOf(i) == 91);
                 Call("SelectResourceInTree", s91.Tag);
                 await Task.Delay(1200);
+                var readable = Find<CheckBox>("ScriptReadableToggle");
+                report.Add($"script 91 default: readable {readable.IsChecked}, title '{Find<TextBlock>("PageTitle").Text}', subtitle '{Find<TextBlock>("PageSubtitle").Text}', tree header '{(s91.Header)}'");
+                report.Add("readable head: " + string.Join(" / ", Find<TextBox>("ScriptOutput").Text.Split('\n').Skip(3).Take(6).Select(l => l.TrimEnd())));
+                report.Add("event rows: " + string.Join(" | ", Find<StackPanel>("ScriptEventButtons").Children.OfType<Button>().Take(6).Select(b => b.Content)));
+                SaveWindow("script-readable.png");
+                readable.IsChecked = false; await Task.Delay(300);
+                report.Add($"raw view: first lines {string.Join(" / ", Find<TextBox>("ScriptOutput").Text.Split('\n').Skip(6).Take(2).Select(l => l.TrimEnd()))}; bytecode toggle enabled {Find<CheckBox>("ScriptBytesToggle").IsEnabled}");
                 var toggle = Find<CheckBox>("ScriptBytesToggle");
                 report.Add($"script 91 default: bytecode toggle {toggle.IsChecked}");
                 toggle.IsChecked = true; await Task.Delay(300);
@@ -196,6 +203,7 @@ internal static class Program
                 Call("SelectResourceInTree", s5.Tag);
                 await Task.Delay(600);
                 report.Add($"script 05 (not a scene): play button {Find<Button>("ScriptPlayButton").Visibility}");
+                readable.IsChecked = true; await Task.Delay(200); // restore the user's remembered choice
                 // Play as cutscene
                 Call("SelectResourceInTree", s91.Tag);
                 await Task.Delay(800);

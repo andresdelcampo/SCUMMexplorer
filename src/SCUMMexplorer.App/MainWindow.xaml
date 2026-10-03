@@ -355,7 +355,10 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <DockPanel Margin="0,0,0,6">
-                                <CheckBox x:Name="ScriptBytesToggle" DockPanel.Dock="Right" Content="Show bytecode" IsChecked="False" VerticalAlignment="Center"
+                                <CheckBox x:Name="ScriptReadableToggle" DockPanel.Dock="Right" Content="Readable" IsChecked="True" VerticalAlignment="Center"
+                                          ToolTip="Plain-language view with names and if/else blocks; clear it for the raw instructions as decoded"
+                                          Foreground="#E7E0D2" Margin="12,0,0,0" Checked="ScriptReadableToggle_Changed" Unchecked="ScriptReadableToggle_Changed"/>
+                                <CheckBox x:Name="ScriptBytesToggle" DockPanel.Dock="Right" Content="Show bytecode" IsChecked="False" IsEnabled="False" ToolTip="The bytecode column belongs to the raw view" VerticalAlignment="Center"
                                           Foreground="#E7E0D2" Margin="12,0,0,0" Checked="ScriptBytesToggle_Changed" Unchecked="ScriptBytesToggle_Changed"/>
                                 <Button x:Name="ScriptPlayButton" DockPanel.Dock="Right" Content="▶ Play as cutscene" Visibility="Collapsed" Click="ScriptPlay_Click"
                                         Padding="10,3" Margin="12,0,0,0" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"

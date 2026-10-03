@@ -1,0 +1,128 @@
+Script 06 · click handler (input loop)  ·  01.LFL
+Readable view: the decoded instructions in plain language. Static paths, not proof of execution. Names carry their evidence (listed at the end); anything unnamed keeps its raw form. Switch to Raw for the instructions as decoded.
+
+0000  local 1 = 0
+0005  if click-recorded flag (double-click test) != 0
+000A      if timer 2 < 40
+0011          if mouse x >= last click x
+0018              local 3 = mouse x
+001D              local 3 -= last click x
+              else
+0025              local 3 = last click x
+002A              local 3 -= mouse x
+              end if
+002F          if local 3 < 6
+0036              if mouse y >= last click y
+003D                  local 3 = mouse y
+0042                  local 3 -= last click y
+                  else
+004A                  local 3 = last click y
+004F                  local 3 -= mouse y
+                  end if
+0054              if local 3 < 3
+005B                  local 1 += 1
+005E                  click-recorded flag (double-click test) = 0
+                  end if
+              end if
+          end if
+      end if
+0063  if local 1 == 0
+0068      timer 2 = 0
+006D      last click x = mouse x
+0072      last click y = mouse y
+0077      click-recorded flag (double-click test) += 1
+      end if
+007A  if not (a draft is playing back)
+0082      var[0x06D] = mouse y
+0087      if var[0x06D] >= 0
+0091          var[0x06C] = mouse x
+0096          local 2 = the object at (var[0x06C], var[0x06D])
+009D          if local 2 is in class 1
+00A6              if local 0 != 0
+00AB                  object under the pointer or clicked = local 2
+00B0                  if local 2 != object whose close-up is shown
+00B7                      start Script 08 · show or hide the close-up in the verb area with local 2
+                      end if
+00BD                  walk target x = x of local 2
+00C2                  walk target y = y of local 2
+00C7                  if local 2 is in class 2
+00D0                      exit the player arrived through = local 2
+                      end if
+00D5                  set: an object's verb 0x37 is running
+00DA                  clear: the walk and the sentence were stopped
+00DF                  run verb 0x37 of local 2
+00E4                  if not (the walk and the sentence were stopped)
+00E9                      Bobbin walks to local 2
+00EE                      wait until Bobbin stops walking
+00F2                      start Script 07 · run a sentence (verb on an object) with local 2, 56
+                      end if
+00FB                  clear: an object's verb 0x37 is running
+0100                  if local 1 != 0
+0105                      local 1 = 0
+010A                      start Script 07 · run a sentence (verb on an object) with local 2, 54
+                      end if
+                  else
+0116                  if object under the pointer or clicked == 0
+011B                      start Script 08 · show or hide the close-up in the verb area with local 2
+                      end if
+                  end if
+              else
+0124              if local 0 != 0
+0129                  object under the pointer or clicked = 0
+012E                  start Script 08 · show or hide the close-up in the verb area with 0
+0134                  if local 2 != 0
+0139                      walk target x = x of local 2
+013E                      walk target y = y of local 2
+0143                      if local 2 is in class 2
+014C                          exit the player arrived through = local 2
+                          end if
+0151                      set: an object's verb 0x37 is running
+0156                      clear: the walk and the sentence were stopped
+015B                      run verb 0x37 of local 2
+0160                      if not (the walk and the sentence were stopped)
+0165                          Bobbin walks to local 2
+016A                          wait until Bobbin stops walking
+016E                          start Script 07 · run a sentence (verb on an object) with local 2, 56
+                          end if
+0177                      clear: an object's verb 0x37 is running
+017C                      if local 1 != 0
+0181                          local 1 = 0
+0186                          start Script 07 · run a sentence (verb on an object) with local 2, 54
+                          end if
+                      else
+0192                      walk target x = var[0x06C]
+0197                      walk target y = var[0x06D]
+019C                      Bobbin walks to (walk target x, walk target y)
+01A3                      wait until Bobbin stops walking
+                      end if
+                  else
+01AA                  if object under the pointer or clicked == 0
+01AF                      if object whose close-up is shown != 0
+01B4                          start Script 08 · show or hide the close-up in the verb area with 0
+                          end if
+                      end if
+                  end if
+              end if
+          end if
+      end if
+01BA  pause until the next frame
+01BB  local 0 = 0
+01C0  go back to 007A
+
+Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
+  bit[0xD63]       an object's verb 0x37 is running  [decoded]  script 006
+  bit[0xD64]       the walk and the sentence were stopped  [decoded]  set by a verb 0x37 that refuses; script 006 +0x00E4
+  bit[0xD66]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set
+  script 7         run a sentence (verb on an object)  [decoded]  starts the object's verb when the ego is within 3 of it
+  script 8         show or hide the close-up in the verb area  [decoded]
+  var[0x00C]       timer 2  [engine]  VAR_TMR_2; script 006 uses it for the double-click time
+  var[0x014]       mouse x  [engine]  VAR_VIRT_MOUSE_X
+  var[0x015]       mouse y  [engine]  VAR_VIRT_MOUSE_Y
+  var[0x066]       object whose close-up is shown  [decoded]  script 008 +0x0019
+  var[0x067]       object under the pointer or clicked  [decoded]  script 006 +0x00AB; script 010 needs it to aim a note
+  var[0x069]       click-recorded flag (double-click test)  [decoded]  script 006 +0x0077
+  var[0x06A]       walk target x  [decoded]  script 006: the clicked object's walk point, or the clicked point
+  var[0x06B]       walk target y  [decoded]  script 006
+  var[0x06E]       last click x  [decoded]  script 006 +0x006D
+  var[0x06F]       last click y  [decoded]  script 006 +0x006D
+  var[0x071]       exit the player arrived through  [decoded]  script 006 sets it for class-2 objects (exit hotspots)

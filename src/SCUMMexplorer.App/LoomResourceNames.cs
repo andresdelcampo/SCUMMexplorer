@@ -25,7 +25,7 @@ internal static class LoomResourceNames
 
     /// <summary>Adds the glossary name after each "script 028" in a line of the explorer's own text (the line itself stays the evidence in the tooltip).</summary>
     public static string NameScripts(LoomGlossary glossary, string text) =>
-        System.Text.RegularExpressions.Regex.Replace(text, @"([Ss]cript )(\d{1,3})(?! \()", match =>
+        System.Text.RegularExpressions.Regex.Replace(text, @"\b([Ss]cript )(\d{1,3})\b(?! \()", match =>
             glossary.Script(int.Parse(match.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture)) is { } entry
                 ? $"{match.Value} ({entry.Name})" : match.Value);
 }
