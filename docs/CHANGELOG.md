@@ -1,5 +1,9 @@
 # Changelog
 
+## 3 October: verify script009 +002C through native boot and practice mode
+
+Room69's "stall" is the copy-protection question: four glyph clicks (886,890,895,887) release the boot into Room02 with practice mode (876). Two notes then show verb 0x35 briefly; its click runs script009 +002C/end0079. Audited232→233/235 (99.15%),2 remaining; fresh single-action169/235 unchanged. Labelled staff/7-notes setup only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+
 ## 3 October: verify script022 +0005 through Room41 input
 
 Script022 +0005/end001E ("too noisy to weave") completes in Room41 (D70=1): click 632 aims (631/633 are untouchable), then wrong notes 1,2,1,2 with labelled staff/7-notes setup. Audited231→232/235 (98.72%),3 remaining; fresh single-action169/235 unchanged. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).

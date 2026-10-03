@@ -1,0 +1,31 @@
+{
+  "outcome": "Native boot: Room69 answers via clicks (practice 876, four glyph answers), boot reaches Room2 with var07B=0; two notes then verb 0x35 click run script009 +002C/end0079",
+  "inputFrames": 9944,
+  "completedScopes": 2,
+  "newSites": [
+    {
+      "owner": "script 009",
+      "offset": "+0x002C"
+    }
+  ],
+  "literalCoverage": {
+    "validated": 169,
+    "total": 235,
+    "unchanged": true
+  },
+  "auditedSiteUnion": {
+    "before": 232,
+    "after": 233,
+    "total": 235,
+    "percent": 99.15,
+    "remaining": 2
+  },
+  "diagnosticCycles": 5,
+  "protectedExactUnstaged": 57,
+  "preservedFiles": 318,
+  "evidence": {
+    "Exe\\GlobalInput-20261003\\g5\\input.json": "58ef91a82f54e49d245cffc5658575cdaa373ce0c34396323d66859b6f6f0f7a",
+    "Exe\\VerificationSession-20261001\\native-code-1\\code.tsv": "0d0f8af036d1dc8ce0ebc80fbf1bfd3090f160e926803890b06ec34e9625c569",
+    "src\\SCUMMexplorer.App\\loom-replays.json": "9b5cf681a7a8a23807ea55f460a5666d87eeb633b1f54003f2ef49e99b323e5e"
+  }
+}
