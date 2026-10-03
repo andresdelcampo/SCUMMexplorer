@@ -60,8 +60,11 @@
                            Stretch="Uniform" HorizontalAlignment="Left" Margin="0,16,0,0"
                            SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,14,0,12">
+                        <StackPanel>
+                        <StackPanel x:Name="ConversationLines" Grid.IsSharedSizeScope="True" Visibility="Collapsed"/>
                         <TextBlock x:Name="SelectedText" FontSize="19" LineHeight="27" TextWrapping="Wrap"
                                    Foreground="#F3EBDD" VerticalAlignment="Top"/>
+                        </StackPanel>
                     </ScrollViewer>
                     <StackPanel Grid.Row="3">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

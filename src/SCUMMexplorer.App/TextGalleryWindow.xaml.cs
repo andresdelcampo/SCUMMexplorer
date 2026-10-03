@@ -82,6 +82,7 @@ public partial class TextGalleryWindow : Window
         if (TextList is null) return;
         var query = SearchBox.Text.Trim();
         var roomId = (RoomFilter.SelectedItem as ComboBoxItem)?.Tag as int? ?? -1;
+        if (roomId >= 0) _ = GetRoomPicture(roomId); // prepare the picked room once; every text of it then shows at once
         var kind = (KindFilter.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
         var candidates = _extraction.Entries.Where(entry =>
             (roomId < 0 || entry.RoomId == roomId) &&
@@ -143,14 +144,17 @@ public partial class TextGalleryWindow : Window
             : (item.Entry.RoomId is int selectedRoom ? $"Room {selectedRoom:00}" : "Elsewhere in game") + objectContext;
         if (item.Entry.ConversationId is string conversationId)
         {
-            SelectedText.Text = string.Join(Environment.NewLine,
-                _extraction.Entries.Where(entry => entry.ConversationId == conversationId)
-                    .OrderBy(entry => entry.ConversationLine)
-                    .GroupBy(entry => (entry.CodeOffset, entry.Text, entry.Speaker))
-                    .Select(group => group.First())
-                    .Select(FormatConversationLine));
+            ShowConversation(_extraction.Entries.Where(entry => entry.ConversationId == conversationId)
+                .OrderBy(entry => entry.ConversationLine)
+                .GroupBy(entry => (entry.CodeOffset, entry.Text, entry.Speaker))
+                .Select(group => group.First()).ToList());
         }
-        else SelectedText.Text = item.Entry.Text;
+        else
+        {
+            ConversationLines.Visibility = Visibility.Collapsed;
+            SelectedText.Visibility = Visibility.Visible;
+            SelectedText.Text = item.Entry.Text;
+        }
         RoomArtworkPreview.Source = null;
         RoomArtworkPreview.Visibility = Visibility.Collapsed;
         var location = item.Entry.ObjectId is int objectId
@@ -175,22 +179,39 @@ public partial class TextGalleryWindow : Window
         if (room is null) return;
         try
         {
-            BitmapSource? picture = null;
-            if (_roomImage is not null) picture = await _roomImage(roomId);
-            if (picture is null)
-            {
-                var decoded = await _roomDecoder.DecodeAsync(room.FilePath);
-                picture = CreateBitmap(decoded.Width, decoded.Height, decoded.Pixels.ToArray(), decoded.Palette);
-            }
+            var picture = await GetRoomPicture(roomId);
             if (!ReferenceEquals(_selectedEntry, item.Entry)) return;
             RoomArtworkPreview.Source = picture;
-            RoomArtworkPreview.Visibility = Visibility.Visible;
+            RoomArtworkPreview.Visibility = picture is null ? Visibility.Collapsed : Visibility.Visible;
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException)
         {
             RoomArtworkPreview.Source = null;
             RoomArtworkPreview.Visibility = Visibility.Collapsed;
         }
+    }
+
+    private readonly Dictionary<int, Task<BitmapSource?>> _roomPictures = [];
+
+    /// <summary>A room's picture, made once (the room's states are worked out on the first request) and kept for every later text.</summary>
+    private Task<BitmapSource?> GetRoomPicture(int roomId)
+    {
+        if (_roomPictures.TryGetValue(roomId, out var cached)) return cached;
+        return _roomPictures[roomId] = MakeRoomPicture(roomId);
+    }
+
+    private async Task<BitmapSource?> MakeRoomPicture(int roomId)
+    {
+        var room = _game.Rooms.FirstOrDefault(resource => resource.ResourceId == roomId);
+        if (room is null) return null;
+        try
+        {
+            BitmapSource? picture = _roomImage is null ? null : await _roomImage(roomId);
+            if (picture is not null) return picture;
+            var decoded = await _roomDecoder.DecodeAsync(room.FilePath);
+            return CreateBitmap(decoded.Width, decoded.Height, decoded.Pixels.ToArray(), decoded.Palette);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { return null; }
     }
 
     private void VisitRoom_Click(object sender, RoutedEventArgs e)
@@ -272,6 +293,46 @@ public partial class TextGalleryWindow : Window
         }
 
         return string.Join(Environment.NewLine, output);
+    }
+
+    // One colour per speaker, in order of appearance, so who talks is clear at a glance.
+    private static readonly Color[] SpeakerColors =
+    [
+        Color.FromRgb(240, 176, 96), Color.FromRgb(120, 200, 232), Color.FromRgb(150, 214, 140),
+        Color.FromRgb(214, 150, 200), Color.FromRgb(232, 120, 110), Color.FromRgb(200, 200, 120)
+    ];
+
+    /// <summary>A conversation as rows: the speaker (bold, in their colour) in one aligned column, the line beside it, wrapping under itself.</summary>
+    private void ShowConversation(IReadOnlyList<LoomTextEntry> lines)
+    {
+        SelectedText.Visibility = Visibility.Collapsed;
+        ConversationLines.Visibility = Visibility.Visible;
+        ConversationLines.Children.Clear();
+        var colours = new Dictionary<string, Color>();
+        foreach (var entry in lines)
+        {
+            var row = new Grid { Margin = new Thickness(0, 0, 0, 5) };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto, SharedSizeGroup = "speaker" });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            string who;
+            Color colour;
+            if (entry.IsPlayerChoice) { who = "▸"; colour = Color.FromRgb(183, 132, 66); }
+            else
+            {
+                who = LoomSpeakerNames.Display(entry.Speaker);
+                if (!colours.TryGetValue(who, out colour)) colours[who] = colour = SpeakerColors[colours.Count % SpeakerColors.Length];
+            }
+            var name = new TextBlock
+            {
+                Text = who, FontWeight = FontWeights.SemiBold, FontSize = 15, Foreground = new SolidColorBrush(colour),
+                Margin = new Thickness(entry.ChoiceVerbId.HasValue && !entry.IsPlayerChoice ? 22 : 0, 2, 14, 0), VerticalAlignment = VerticalAlignment.Top
+            };
+            var text = new TextBlock { Text = entry.Text, FontSize = 18, LineHeight = 25, TextWrapping = TextWrapping.Wrap, Foreground = new SolidColorBrush(Color.FromRgb(243, 235, 221)) };
+            Grid.SetColumn(text, 1);
+            row.Children.Add(name);
+            row.Children.Add(text);
+            ConversationLines.Children.Add(row);
+        }
     }
 
     private static string FormatConversationLine(LoomTextEntry entry) =>

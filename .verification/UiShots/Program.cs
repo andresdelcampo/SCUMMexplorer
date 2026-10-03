@@ -54,7 +54,12 @@ internal static class Program
                     report.Add($"gallery: room 06 rows {list.Items.Count}");
                     list.SelectedIndex = Enumerable.Range(0, list.Items.Count).First(i => (list.Items[i].GetType().GetProperty("ListHeading")!.GetValue(list.Items[i]) as string ?? "").Contains("CUTSCENE"));
                     await Task.Delay(2500);
-                    report.Add("gallery text: " + ((TextBlock)gallery.FindName("SelectedText")).Text.Replace(Environment.NewLine, " / "));
+                    report.Add("gallery lines: " + string.Join(" | ", ((StackPanel)gallery.FindName("ConversationLines")).Children.OfType<Grid>().Select(g => string.Join(": ", g.Children.OfType<TextBlock>().Select(t => t.Text)))));
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+                    list.SelectedIndex = list.SelectedIndex == 0 ? 1 : 0; await Task.Delay(50);
+                    list.SelectedIndex = Enumerable.Range(0, list.Items.Count).First(i => (list.Items[i].GetType().GetProperty("ListHeading")!.GetValue(list.Items[i]) as string ?? "").Contains("CUTSCENE"));
+                    await Task.Delay(50);
+                    report.Add($"second pick in the same room: picture ready after {sw.ElapsedMilliseconds} ms, shown {((Image)gallery.FindName("RoomArtworkPreview")).Visibility}");
                     var gb = new RenderTargetBitmap((int)gallery.ActualWidth, (int)gallery.ActualHeight, 96, 96, PixelFormats.Pbgra32); gb.Render((Visual)gallery.Content);
                     var ge = new PngBitmapEncoder(); ge.Frames.Add(BitmapFrame.Create(gb)); using (var gs = File.Create(Path.Combine(output, "gallery.png"))) ge.Save(gs);
                     roomFilter.IsDropDownOpen = true; await Task.Delay(500);
@@ -111,6 +116,24 @@ internal static class Program
                 for (var i = 0; i < 90; i++) sess.AdvanceFrame();
                 Call("ShowLastObjectAction", 2);
                 await Task.Delay(500);
+                // Interaction menu: in the right panel, and the scene runs on its own clock after a pick
+                {
+                    var recs = (System.Collections.IEnumerable)Field("_currentRoomObjectRecords")!;
+                    var hoja = recs.Cast<object>().First(r => (int)r.GetType().GetProperty("Id")!.GetValue(r)! == 154);
+                    int hx = (int)hoja.GetType().GetProperty("X")!.GetValue(hoja)! + 2, hy = (int)hoja.GetType().GetProperty("Y")!.GetValue(hoja)! + 2;
+                    var choices = Call("FindVerbChoicesAt", hx, hy)!;
+                    Call("ShowObjectVerbChoices", choices);
+                    await Task.Delay(300);
+                    var panelList = Find<StackPanel>("ObjectActionsList");
+                    report.Add($"actions: section {Find<Expander>("ObjectActionsSection").Visibility}, header '{((TextBlock)Find<Expander>("ObjectActionsSection").Header).Text}', rows {string.Join(" | ", panelList.Children.OfType<Button>().Select(b => b.Content))}; center panel {Find<FrameworkElement>("ObjectActionPanel").Visibility}");
+                    SaveWindow("actions.png");
+                    var s0 = (LoomExplorationSession)Field("_session")!;
+                    var jBefore = s0.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x02F]");
+                    panelList.Children.OfType<Button>().First().RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    await Task.Delay(2500);
+                    var jAfter = s0.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x02F]");
+                    report.Add($"after a pick, with no mouse movement: timer {jBefore} -> {jAfter}; playback running {Field("_playback") is not null}");
+                }
                 foreach (var n in new[] { "RoomEntryTraceExpander", "ObjectActionTraceExpander", "StateIssuesSection" })
                 {
                     var ex = Find<Expander>(n); report.Add($"{n}: visible {ex.Visibility}, header '{ex.Header}'"); ex.IsExpanded = true;

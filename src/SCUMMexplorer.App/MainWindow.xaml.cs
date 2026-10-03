@@ -281,7 +281,6 @@ public partial class MainWindow : Window
         SessionModeToggle.Visibility = _session is null ? Visibility.Collapsed : Visibility.Visible;
         SessionActions.Visibility = _session is null ? Visibility.Collapsed : Visibility.Visible;
         SessionStatusText.Text = _session is null ? "" : "Session ready. Select a room to visit it.";
-        AdvanceFrameButton.IsEnabled = _session?.Snapshot.PendingScripts > 0;
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         RoomEntryTraceOutput.Text = "";
         RoomEntryEventButtons.Children.Clear();
@@ -907,7 +906,6 @@ public partial class MainWindow : Window
             SessionStatusText.ToolTip = snapshot.Uncertainties.Count == 0
                 ? "A script may be waiting for the next frame."
                 : string.Join(Environment.NewLine, snapshot.Uncertainties.TakeLast(8));
-            AdvanceFrameButton.IsEnabled = snapshot.PendingScripts > 0;
             UpdatePlaybackControls();
             ObjectsNote.Text = _estimatedObjectIds.Count == 0 || !IsAdvancedMode
                 ? "Click the scene to explore it. Hover to discover objects and exits."
@@ -922,7 +920,6 @@ public partial class MainWindow : Window
         SessionStatusText.ToolTip = null;
         RoomEntryTraceExpander.Header = "Room entry";
         RefreshStateIssues();
-        AdvanceFrameButton.IsEnabled = false;
         UpdatePlaybackControls();
         _objectSelection = new RoomObjectSelection(images, _indexedStates, background: _currentRoom);
         _artworkEstimates = [];
@@ -1155,11 +1152,14 @@ public partial class MainWindow : Window
         if (!IsAdvancedMode || action is null || roomId is null ||
             action.SourceRoomId != roomId && action.DestinationRoomId != roomId)
         {
+            ObjectActionsSection.Visibility = Visibility.Collapsed;
             ObjectActionPanel.Visibility = Visibility.Collapsed;
             return;
         }
         ObjectActionPanel.Visibility = Visibility.Visible;
         ObjectVerbButtons.Children.Clear();
+        ObjectActionsList.Children.Clear();
+        ObjectActionsSection.Visibility = Visibility.Collapsed;
         var actionName = _currentRoomObjectRecords.FirstOrDefault(record => record.Id == action.ObjectId) is { } actionObject &&
                          _roomObjectNames.TryGetValue(actionObject.Id, out var storedName)
             ? storedName : "Something in the scene";
@@ -1182,37 +1182,46 @@ public partial class MainWindow : Window
         UpdateAdvancedMode();
     }
 
+    /// <summary>
+    /// The verbs an object offers, as flat rows named by what they do. In Advanced mode they sit in the right panel under the hotspots
+    /// (where the object is listed); without it the right panel is hidden, so they stay under the scene.
+    /// </summary>
     private void ShowObjectVerbChoices(IReadOnlyList<RoomVerbChoice> choices)
     {
-        ObjectActionPanel.Visibility = Visibility.Visible;
         ObjectActionTraceExpander.Visibility = Visibility.Collapsed;
         ObjectVerbButtons.Children.Clear();
+        ObjectActionsList.Children.Clear();
+        var inPanel = IsAdvancedMode && choices.Count > 0;
+        ObjectActionPanel.Visibility = inPanel ? Visibility.Collapsed : Visibility.Visible;
+        ObjectActionsSection.Visibility = inPanel ? Visibility.Visible : Visibility.Collapsed;
         var objectName = choices.Count > 0 && _roomObjectNames.TryGetValue(choices[0].Object.Id, out var storedObjectName)
             ? storedObjectName : "This detail";
+        ObjectActionsHeader.Text = $"ACTIONS · {objectName}";
         ObjectActionNote.Text = choices.Count == 0
             ? "No action is available here yet."
             : $"{objectName} is part of this scene. Choose an action to explore it.";
-        for (var index = 0; index < choices.Count; index++)
+        var host = inPanel ? ObjectActionsList : ObjectVerbButtons;
+        foreach (var choice in choices)
         {
-            var choice = choices[index];
             var button = new Button
             {
-                Content = $"Interaction {index + 1}",
+                Content = choice.Verb.Label,
                 ToolTip = $"Object {choice.Object.Id} · {choice.Verb.Label} · code 0x{choice.Verb.ScriptOffset:X4}. " +
-                          "This directly runs the object verb; input dispatch and walking are unresolved.",
+                          "This directly runs the object verb; input dispatch and walking are not simulated.",
+                HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(7, 4, 7, 4),
-                Margin = new Thickness(0, 0, 0, 4),
+                Padding = new Thickness(8, 4, 8, 4),
+                Margin = new Thickness(0, 0, 0, 3),
                 Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
                 Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
+                BorderThickness = new Thickness(0)
             };
-            button.Click += (_, _) => ActivateObjectVerb(choice.Object, choice.Verb);
-            ObjectVerbButtons.Children.Add(button);
+            button.Click += (_, _) => ActivateObjectVerb(choice.Object, choice.Verb, play: true);
+            host.Children.Add(button);
         }
     }
 
-    private bool ActivateObjectVerb(LoomRoomObjectRecord record, LoomObjectVerbEntry verb)
+    private bool ActivateObjectVerb(LoomRoomObjectRecord record, LoomObjectVerbEntry verb, bool play = false)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         FollowSessionSound();
@@ -1235,6 +1244,8 @@ public partial class MainWindow : Window
         ApplyRoomState(sourceRoom, _currentRoomObjectRecords, _objects, visit: false);
         UpdateRoomNavigationActions(sourceRoom);
         RefreshRoomPreview();
+        // The scene goes on by itself on the playback clock (otherwise its frames only moved when the pointer did).
+        if (play) StartPlayback($"Object {record.Id}'s verb 0x{verb.VerbId:X2} (run directly)", action, sourceRoom, doorways: null, leftRoom: false);
         return false;
     }
 
@@ -3183,6 +3194,8 @@ public partial class MainWindow : Window
         GameStatusButton.IsEnabled = _session is not null; // Inspection is available during playback too; editing stays guarded.
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         var active = GameClickActive && _game?.Id == GameId.Loom;
+        // Step plays one frame of a paused scene; with nothing paused there is nothing to step.
+        AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         SoundModeCombo.IsEnabled = !SessionInScene;
         AdlibGainPanel.IsEnabled = !SessionInScene;

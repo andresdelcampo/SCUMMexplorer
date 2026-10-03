@@ -412,6 +412,12 @@
                                 </Expander.Header>
                                 <StackPanel x:Name="ObjectList" Margin="0,4,0,0"/>
                             </Expander>
+                            <Expander x:Name="ObjectActionsSection" Style="{StaticResource PanelSection}" Visibility="Collapsed" IsExpanded="True">
+                                <Expander.Header>
+                                    <TextBlock x:Name="ObjectActionsHeader" Text="ACTIONS" Style="{StaticResource PanelHeading}"/>
+                                </Expander.Header>
+                                <StackPanel x:Name="ObjectActionsList" Margin="0,4,0,0"/>
+                            </Expander>
                             <StackPanel x:Name="ObjectAssetSection" Margin="0,4,0,0">
                                 <Image x:Name="ObjectAssetPreview" Height="72" Stretch="Uniform" Visibility="Collapsed" Margin="0,8,0,0" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                                 <TextBlock x:Name="ObjectAssetDescription" Foreground="#B8AA8C" TextWrapping="Wrap" Margin="0,5,0,0"/>
