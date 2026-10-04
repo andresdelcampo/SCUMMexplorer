@@ -2,5 +2,5 @@
   {"id":"opening","stopAtOpening":true,"room":0,"objectId":0,"verb":0},
   {"id":"Room 08 object 255 Verb 0x38","room":8,"objectId":255,"verb":56},
   {"id":"Room 10 object 295 Verb 0x38","room":10,"objectId":295,"verb":56},
-  {"id":"Room 36 object 599 Verb 0x38","room":36,"objectId":599,"verb":56,"clickX":109,"clickY":102}
+  {"id":"Room 36 object 600 Verb 0x38","room":36,"objectId":600,"verb":56,"clickX":109,"clickY":102}
 ]

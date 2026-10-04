@@ -5,6 +5,7 @@ using SCUMMexplorer.Core.Rendering;
 
 // Usage: ScriptDump <game folder> <global script id>...
 //        ScriptDump <game folder> room <room> <local id>
+//        ScriptDump <game folder> entry <room>
 //        ScriptDump <game folder> objmap <other game folder>   (room objects of both editions side by side, matched by directory position)
 var game = new GameFolderScanner().Scan(args[0]);
 var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
@@ -37,6 +38,8 @@ if (args[1] == "objmap")
             Console.WriteLine($"  {(i < a[room].Count ? a[room][i].Id.ToString() : "-"),5} {(i < a[room].Count ? a[room][i].Name : ""),-14} | {(i < other.Count ? other[i].Id.ToString() : "-"),5} {(i < other.Count ? other[i].Name : "")}");
     }
 }
+else if (args[1] == "entry")
+    Dump($"room {args[2]} entry", reader.DecodeRoomEntry(game.Rooms.Single(r => r.ResourceId == int.Parse(args[2]))));
 else if (args[1] == "room")
     Dump($"room {args[2]} local {args[3]}", reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == int.Parse(args[2])), int.Parse(args[3]), game.Resources.Count(r => r.Kind == ResourceKind.Script)));
 else foreach (var a in args.Skip(1))

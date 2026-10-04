@@ -17,7 +17,7 @@ $outRoot = Join-Path $scratch "out-$Tag"
 New-Item -ItemType Directory -Force $outRoot | Out-Null
 $results = Join-Path $scratch "results-$Tag.tsv"
 if (-not (Test-Path $results)) { "name`tbuild`texit`tseconds`tnote" | Out-File $results -Encoding utf8 }
-$env:SCUMM_SOUND_TEST_ROOT = "$root\Games\loom"
+$env:SCUMM_SOUND_TEST_ROOT = "$root\Games\loom ega en"
 $env:SCUMM_INDY3_EGA_TEST_ROOT = "$root\Games\IndyCru\EGA"
 $env:SCUMM_HARNESS_FAILURE_LOG = "$scratch\failures-$Tag.log"
 $projects = Get-ChildItem "$root\.verification" -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '\\obj\\' } | Sort-Object FullName
@@ -35,7 +35,7 @@ foreach ($p in $projects) {
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $psi = New-Object Diagnostics.ProcessStartInfo
   $psi.FileName = $exe.FullName; $psi.WorkingDirectory = $root
-  $psi.Arguments = "`"$root\Games\loom`" `"$out`""
+  $psi.Arguments = "`"$root\Games\loom ega en`" `"$out`""
   $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.UseShellExecute = $false
   $proc = [Diagnostics.Process]::Start($psi)
   $so = $proc.StandardOutput.ReadToEndAsync(); $se = $proc.StandardError.ReadToEndAsync()

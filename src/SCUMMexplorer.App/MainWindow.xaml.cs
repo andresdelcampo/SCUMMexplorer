@@ -3495,15 +3495,15 @@ public partial class MainWindow : Window
     [
         new("Walk to Room 13", 10, 295, 0x38, 52,
             "Room 10 object 295 verb 0x38 starts script 052 (+0x0003): a cutscene that waits 60 jiffies (+0x0041), loads Room 11 " +
-            "(+0x0045), sets its skip point (+0x00C6) and ends with loadRoomWithEgo into Room 13 (+0x017D)."),
+            "(+0x0045), sets its skip point (+0x00C1) and ends with loadRoomWithEgo into Room 13 (+0x0168)."),
         new("The Elders' trial", 8, 255, 0x38, 46,
             "Room 08 object 255 verb 0x38 (the sanctuary door) starts script 046 (+0x0000): a cutscene with its skip point at " +
-            "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x1421 in Room 09."),
-        new("The firewood scene", 36, 599, 0x38, 86,
-            "Room 36 object 599 verb 0x38 leads into Room 37 (loadRoomWithEgo, walk to (24, 101)). On a first visit " +
-            "(bit[0xD9A] is 0) Room 37's entry starts local 200 (+0x0097), which chains to script 086 once Bobbin's walk box " +
+            "+0x0020, through Rooms 09, 67, 09, 54, 09, 03, 08, 09, 11, 08 and 09, ending at +0x13AA in Room 09."),
+        new("The firewood scene", 36, 600, 0x38, 86,
+            "Room 36 object 600 verb 0x38 leads into Room 37 (loadRoomWithEgo, walk to (24, 101)). On a first visit " +
+            "(bit[0xD99] is 0) Room 37's entry starts local 200 (+0x008C), which chains to script 086 once Bobbin's walk box " +
             "becomes 8 (+0x0016–0x001D). Script 086: Stoke mistakes Bobbin for Rusty; Rooms 37, 58, 37 and 38; skip point " +
-            "+0x0023; endCutscene +0x055C in Room 38. Bobbin wears Rusty's look here: the unseen first steps of this " +
+            "+0x0023; endCutscene +0x0536 in Room 38. Bobbin wears Rusty's look here: the unseen first steps of this " +
             "sequence cast the Awakening and the costume change on Rusty in Room 34 (the game's own scenes, run without showing them) and apply " +
             "the supported Game Status edit \"staff held\", since Stoke takes the distaff in this scene.",
             Steps: FirewoodSteps, SilentSteps: FirewoodSilentSteps)
@@ -3514,11 +3514,11 @@ public partial class MainWindow : Window
     internal static LoomReplayStep[] FirewoodSteps =>
     [
         new("visit", 34),
-        new("verb", 561, 0x44), new("scene", EndBoundary: "endCutscene at Script 85 +0x05CE", ExpectedRoom: 34),
-        new("verb", 561, 0x4C), new("scene", EndBoundary: "endCutscene at Room 34 local script 202 +0x015F", ExpectedRoom: 34),
+        new("verb", 562, 0x44), new("scene", EndBoundary: "endCutscene at Script 85 +0x05A8", ExpectedRoom: 34),
+        new("verb", 562, 0x4C), new("scene", EndBoundary: "endCutscene at Room 34 local script 202 +0x015F", ExpectedRoom: 34),
         new("visit", 36), new("staff", 1), new("frames", Frames: 8),
-        new("verb", 599, 0x38), new("frames", Frames: 32), new("click", X: 109, Y: 102),
-        new("scene", EndBoundary: "endCutscene at Script 86 +0x055C", ExpectedRoom: 38)
+        new("verb", 600, 0x38), new("frames", Frames: 32), new("click", X: 109, Y: 102),
+        new("scene", EndBoundary: "endCutscene at Script 86 +0x0536", ExpectedRoom: 38)
     ];
     internal const int FirewoodSilentSteps = 8;
 
@@ -3637,9 +3637,9 @@ public partial class MainWindow : Window
     private static readonly string OpeningTitle = LoomReplayTitle.Format(1, "Opening");
 
     private const string OpeningSource =
-        "Script 001 +0x0222 starts script 044 and waits for it (+0x0225): Rooms 01, 02, 01, 02, 53 and 02, with the copyright " +
+        "Script 001 +0x021A starts script 044 and waits for it (+0x021D): Rooms 01, 02, 01, 02, 53 and 02, with the copyright " +
         "line, Room 01's points of light (locals 200–208), the fairy's message in Room 53 and Bobbin's lines on the cliff. " +
-        "Two skip points (beginOverride +0x005A, +0x0124); after a skip Bobbin faces the screen (+0x063E).";
+        "Two skip points (beginOverride +0x005A, +0x0124); after a skip Bobbin faces the screen (+0x0622).";
 
     private const string OpeningStartNote =
         "Stated start: a fresh session (seed 0) whose boot stops on the frame script 001 starts script 044, after the intro " +
