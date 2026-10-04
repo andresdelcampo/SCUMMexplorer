@@ -2994,7 +2994,7 @@ public partial class MainWindow : Window
     {
         if (_interactTarget is not null && !_currentRoomObjectRecords.Any(item => item.Id == _interactTarget.Id)) _interactTarget = null;
         var name = _interactTarget is not null && _roomObjectNames.TryGetValue(_interactTarget.Id, out var stored) ? stored : null;
-        InteractButton.Content = name is null ? "Interact ▾" : $"Interact · {name} ▾";
+        InteractButton.Content = name is null ? "Interact ▴" : $"Interact · {name} ▴";
         InteractButton.IsEnabled = _interactTarget is not null && InteractVerbs(_interactTarget).Count > 0 && !SessionInScene && _session is not null;
     }
 
@@ -3007,6 +3007,18 @@ public partial class MainWindow : Window
 
     private void OpenInteractMenu(LoomRoomObjectRecord record, FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement)
     {
+        var heading = _roomObjectNames.TryGetValue(record.Id, out var name) ? name.ToUpperInvariant() : $"OBJECT {record.Id}";
+        var entries = InteractVerbs(record).Select(verb => (LoomVerbNames.Label(verb.VerbId), (string?)null, (Action)(() =>
+        {
+            if (!SessionInScene) ActivateObjectVerb(record, verb, play: true);
+        })));
+        OpenPopupMenu(target, placement, heading, entries);
+    }
+
+    /// <summary>The dark pop-up menu used by Interact and the room's Play Cutscene: a small heading and one row per choice.</summary>
+    private static void OpenPopupMenu(FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement, string heading,
+        IEnumerable<(string Label, string? Tip, Action Run)> entries)
+    {
         var host = new StackPanel { MinWidth = 170 };
         var popup = new System.Windows.Controls.Primitives.Popup
         {
@@ -3015,25 +3027,28 @@ public partial class MainWindow : Window
         };
         host.Children.Add(new TextBlock
         {
-            Text = _roomObjectNames.TryGetValue(record.Id, out var name) ? name.ToUpperInvariant() : $"OBJECT {record.Id}",
+            Text = heading,
             Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)), FontSize = 11, FontWeight = FontWeights.Bold, Margin = new Thickness(10, 7, 10, 3)
         });
-        foreach (var verb in InteractVerbs(record))
+        var rows = new StackPanel();
+        foreach (var (label, tip, run) in entries)
         {
             var item = new Button
             {
-                Content = LoomVerbNames.Label(verb.VerbId), HorizontalContentAlignment = HorizontalAlignment.Left, Padding = new Thickness(10, 5, 10, 5),
-                Background = Brushes.Transparent, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)), BorderThickness = new Thickness(0)
+                Content = label, HorizontalContentAlignment = HorizontalAlignment.Left, Padding = new Thickness(10, 5, 10, 5),
+                Background = Brushes.Transparent, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)), BorderThickness = new Thickness(0),
+                ToolTip = tip
             };
             item.MouseEnter += (_, _) => item.Background = new SolidColorBrush(Color.FromRgb(46, 92, 116));
             item.MouseLeave += (_, _) => item.Background = Brushes.Transparent;
             item.Click += (_, _) =>
             {
                 popup.IsOpen = false;
-                if (!SessionInScene) ActivateObjectVerb(record, verb, play: true);
+                run();
             };
-            host.Children.Add(item);
+            rows.Children.Add(item);
         }
+        host.Children.Add(new ScrollViewer { Content = rows, MaxHeight = 340, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
         popup.Child = new Border
         {
             Child = host, Background = new SolidColorBrush(Color.FromRgb(16, 24, 32)), BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98)),
@@ -3422,11 +3437,11 @@ public partial class MainWindow : Window
         var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
         RoomCutsceneButton.Visibility = active && roomChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.IsEnabled = active && CanStartCutscene;
-        RoomCutsceneButton.Content = roomChoices.Count == 1 ? "Play Cutscene" : "Play Cutscene…";
+        RoomCutsceneButton.Content = roomChoices.Count == 1 ? "Play Cutscene" : "Play Cutscene ▴";
         RoomCutsceneButton.ToolTip = !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
             roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
         if (!active) return;
-        CutsceneMenuButton.Content = "Play Cutscene…";
+        CutsceneMenuButton.Content = "Play Cutscene";
         CutsceneMenuButton.IsEnabled = CanStartCutscene;
         CutsceneMenuButton.ToolTip = CanStartCutscene ? "Choose a cutscene from anywhere in the game." : "Playback is active. Finish or skip it before starting another scene.";
         UpdateRoomScrollButtons();
@@ -3557,25 +3572,15 @@ public partial class MainWindow : Window
         return PlayableCutsceneItems().Where(choice => ids.Contains(choice.Id)).Select(choice => choice.Item).ToList();
     }
 
-    private CutscenePickerWindow BuildRoomCutscenePicker(int roomId)
-    {
-        var items = RoomCutsceneItems(roomId);
-        var picker = new CutscenePickerWindow(items, "", IsAdvancedMode, roomScope: true) { Owner = this };
-        picker.Title = $"Play Cutscene · Room {roomId:00}";
-        picker.PickerScope.Text = items.Count == 1 ? "One cutscene happens in this room." : $"{items.Count} cutscenes happen in this room.";
-        return picker;
-    }
-
     private void RoomCutscene_Click(object sender, RoutedEventArgs e)
     {
         if (!CanStartCutscene || _currentRoomResource?.ResourceId is not int roomId) return;
         var items = RoomCutsceneItems(roomId);
         if (items.Count == 1) items[0].Play?.Invoke();
         else if (items.Count > 1)
-        {
-            var picker = BuildRoomCutscenePicker(roomId);
-            if (picker.ShowDialog() == true) picker.SelectedPlay?.Invoke();
-        }
+            OpenPopupMenu(RoomCutsceneButton, System.Windows.Controls.Primitives.PlacementMode.Top, "CUTSCENES IN THIS ROOM",
+                items.Where(item => item.Play is not null)
+                    .Select(item => (item.Title, IsAdvancedMode ? item.Note : null, item.Play!)));
     }
 
     private List<(string Title, string Source, Action Play)> CutsceneChoices()

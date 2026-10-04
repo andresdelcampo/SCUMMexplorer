@@ -27,7 +27,7 @@
                             <ComboBoxItem Content="Other labels and stored text" Tag="Other"/>
                         </ComboBox>
                         <TextBlock x:Name="ResultCount" Foreground="#B8AA8C" FontSize="11" Margin="1,8,0,0"/>
-                        <Button x:Name="ExportButton" Content="Export visible text…" Click="Export_Click"
+                        <Button x:Name="ExportButton" Content="Export visible text" Click="Export_Click"
                                 IsEnabled="False" Margin="0,8,0,0" Padding="9,7"
                                 HorizontalAlignment="Stretch" Background="#273642" Foreground="#E7E0D2"
                                 BorderBrush="#4A5962"/>
