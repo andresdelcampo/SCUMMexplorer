@@ -53,7 +53,14 @@ public sealed class LoomSceneSetupPlannerTests
         Assert.Equal("Bobbin", LoomSpeakerNames.Display("Ego"));
         Assert.Equal("Hetchel", LoomSpeakerNames.Display("Actor 5"));
         Assert.Equal("Actor 7", LoomSpeakerNames.Display("Actor 7"));
-        Assert.Equal("Unknown speaker", LoomSpeakerNames.Display(null));
+        Assert.Equal("Unknown speaker", LoomSpeakerNames.Display((string?)null));
+        // The scene settles who a reused actor number is (script 105 and Room 09: the Dead One; script 091: Mandible and Cob).
+        LoomTextEntry Line(string speaker, int? script, int? room) => new("x", "Dialogue", "src", room, null, null, script, 0, Speaker: speaker);
+        Assert.Equal("The Dead One", LoomSpeakerNames.Display(Line("Actor 4", 105, null)));
+        Assert.Equal("The Dead One", LoomSpeakerNames.Display(Line("Actor 4", 221, 9)));
+        Assert.Equal("Elder (actor 4)", LoomSpeakerNames.Display(Line("Actor 4", 46, null)));
+        Assert.Equal("Mandible", LoomSpeakerNames.Display(Line("Actor 2", 91, null)));
+        Assert.Equal("Cob", LoomSpeakerNames.Display(Line("Actor 3", 91, null)));
     }
 
     [Fact]

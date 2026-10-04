@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October (night, 2): glossary and story flags checked on English
+
+New tool `.verification/GlossaryCheck` compares every glossary entry across the editions ([ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md), report in `.verification/glossary-english-20261004/`). Bits, variables, scripts, rooms and sounds hold; the actor names did not: the Room 43 cage scene's speakers are Mandible and Cob (not Elders), script 098's actor 3 is Rusty, script 086's actor 5 Mr. Stoke, Room 09's actor 4 the Dead One. Scoped glossary entries and scene-aware speaker names in the Game Texts browser; presenter goldens are now one set per edition.
+
 ## 4 October (night): El Muerto is drawn, room animation runs between inputs, build clean
 
 El Muerto (Room 09, actor 4) was placed but kept the costume the last room gave his actor slot (Room 02's costume 141, a 32x13 floor shimmer), so only a few pixels showed while he spoke. `PlaceActorInRoom` now runs the game's own room-local script when the placer is one (Room 09 local 217: costume 0x82, elevation, walk/talk animations, talk colour, put at (68, 130)); other placers keep the plain placement. Tested by `ElMuertosLinesAreSpokenBecauseTheDerivedSetupBringsActor4IntoRoom09` (costume and place asserted); seen in SceneShots for Room 09 objects 275/0x56 and 274/0x36 (`.verification/el-muerto-20261004/run8`, `run9`). The main window now has an idle frame clock: with no playback running, one game frame runs per frame interval (10 a second), so ambient animation (Room 09 loom, swan, waves) no longer waits for the pointer; it pauses while another window is open or the app is inactive. The Options expander always starts collapsed (its open state is no longer restored). The three build warnings are fixed. New tool `.verification/CostumeSheet` draws every animation of a costume.

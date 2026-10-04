@@ -73,7 +73,9 @@ public sealed class LoomScriptPresenterTests
         var glossary = LoomGlossary.Load(game);
         var script = new LoomScriptReader().Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == scriptId));
         var text = new LoomScriptPresenter(glossary).Present(script);
-        var path = Path.Combine(root, ".verification", "readable-scripts", $"script-{scriptId:000}.txt");
+        // One golden per edition: the text, the offsets and the bit numbers differ between the releases.
+        var edition = Path.GetFileName(game.FolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        var path = Path.Combine(root, ".verification", "readable-scripts", edition, $"script-{scriptId:000}.txt");
         if (!File.Exists(path) || Environment.GetEnvironmentVariable("SCUMM_UPDATE_GOLDEN") == "1")
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);

@@ -21,6 +21,29 @@ public static class LoomSpeakerNames
         [255] = "Game menu",
     };
 
+    /// <summary>
+    /// The display name for a line: <see cref="Display(string?)"/>, except where the scene settles who an actor number is
+    /// (numbers are reused from scene to scene). Names come from the lines of the scene in both editions, as in the glossary.
+    /// </summary>
+    public static string Display(LoomTextEntry entry)
+    {
+        if (entry.Speaker is { } speaker && speaker.StartsWith("Actor ", StringComparison.Ordinal) &&
+            int.TryParse(speaker.AsSpan(6), NumberStyles.None, CultureInfo.InvariantCulture, out var number))
+        {
+            var scoped = (number, entry.ScriptId, entry.RoomId) switch
+            {
+                (2, 91 or 93, _) => "Mandible",
+                (3, 91 or 93, _) => "Cob",
+                (3, 98, _) => "Rusty",
+                (4, 105, _) or (4, _, 9) => "The Dead One",
+                (5, 86 or 87, _) => "Mr. Stoke",
+                _ => null
+            };
+            if (scoped is not null) return scoped;
+        }
+        return Display(entry.Speaker);
+    }
+
     /// <summary>The display name for a speaker as the extractor labels it ("Actor 5", "Ego"); anything else is returned unchanged.</summary>
     public static string Display(string? speaker)
     {

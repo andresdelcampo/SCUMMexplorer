@@ -319,7 +319,7 @@ public partial class TextGalleryWindow : Window
             if (entry.IsPlayerChoice) { who = "▸"; colour = Color.FromRgb(183, 132, 66); }
             else
             {
-                who = LoomSpeakerNames.Display(entry.Speaker);
+                who = LoomSpeakerNames.Display(entry);
                 if (!colours.TryGetValue(who, out colour)) colours[who] = colour = SpeakerColors[colours.Count % SpeakerColors.Length];
             }
             var name = new TextBlock
@@ -337,8 +337,8 @@ public partial class TextGalleryWindow : Window
 
     private static string FormatConversationLine(LoomTextEntry entry) =>
         entry.IsPlayerChoice ? $"▸ {entry.Text}"
-        : entry.ChoiceVerbId.HasValue ? $"      {LoomSpeakerNames.Display(entry.Speaker)}: {entry.Text}"
-        : $"{LoomSpeakerNames.Display(entry.Speaker)}: {entry.Text}";
+        : entry.ChoiceVerbId.HasValue ? $"      {LoomSpeakerNames.Display(entry)}: {entry.Text}"
+        : $"{LoomSpeakerNames.Display(entry)}: {entry.Text}";
 
     private static BitmapSource CreateBitmap(int width, int height, byte[] pixels, IReadOnlyList<uint> palette)
     {

@@ -72,7 +72,10 @@ public sealed class LoomGlossaryTests
     {
         var glossary = LoomGlossary.Default;
         Assert.Equal("Elder (actor 2)", glossary.Actor(2)!.Name);
-        Assert.Equal("Elder (actor 2)", glossary.Actor(2, "script:91")!.Name);
+        Assert.Equal("Mandible", glossary.Actor(2, "script:91")!.Name);
+        Assert.Equal("Cob", glossary.Actor(3, "script:91")!.Name);
+        Assert.Equal("the Dead One (El Muerto)", glossary.Actor(4, "room:9")!.Name);
+        Assert.Equal("Elder (actor 4)", glossary.Actor(4, "script:46")!.Name);
         Assert.Equal("flying actor of Room 03", glossary.Actor(2, "script:42")!.Name);
         Assert.Equal("fairy", glossary.Actor(3, "script:44")!.Name);
     }

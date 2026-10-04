@@ -1,0 +1,525 @@
+Script 91 · Room 43 cage scene  ·  43.LFL
+Readable view: the decoded instructions in plain language. Static paths, not proof of execution. Names carry their evidence (listed at the end); anything unnamed keeps its raw form. Switch to Raw for the instructions as decoded.
+
+0000  set: bit[0xD67]
+0005  if bit[0xD95]
+000A      Bobbin says: “I already opened it.”
+0023      stop this script
+      end if
+0025  begin cutscene (arguments 0)
+002A  set: bit[0xD95]
+002F  wait until not (a note is playing)
+0035  clear: the notes played so far are being collected
+003A  wait until not (a draft is playing back)
+0040  start Script 28 · clear the draft buffer
+0043  object under the pointer or clicked = 0
+0048  start Script 08 · show or hide the close-up in the verb area with 0
+004E  start Script 34 with 0
+0054  pause until the next frame
+0055  actor 11: elevation 100
+005B  put actor 11 in Room 43
+005E  place actor 11 at (116, 162)
+0064  actor 11: plays animation 12
+0067  start Script 40 · play a sound (effect) with 23
+006D  local 0 = 1
+0072  repeat
+0072      pause until the next frame
+0073      local 0 += 1
+0076  until local 0 > 6
+007D  actor 11: plays animation 13
+0080  local 0 = 1
+0085  repeat
+0085      pause until the next frame
+0086      local 0 += 1
+0089  until local 0 > 12
+0090  actor 10: faces towards the screen
+0093  put actor 10 in Room 43
+0096  place actor 10 at (130, 55)
+009C  actor 10: plays animation 9
+009F  draw object 646 at (255, 255)
+00A6  local 0 = 1
+00AB  repeat
+00AB      pause until the next frame
+00AC      local 0 += 1
+00AF  until local 0 > 12
+00B6  actor 11: plays animation 14
+00B9  local 0 = 1
+00BE  repeat
+00BE      pause until the next frame
+00BF      local 0 += 1
+00C2  until local 0 > 6
+00C9  put actor 11 in Room 00
+00CC  pause until the next frame
+00CD  if bit[0xDA1]
+00D2      start Script 202
+00D5      set: bit[0xDBF]
+00DA      begin the skippable part (if the player skips, the game jumps to 0DCF)
+00DF      Bobbin: clear all classes, set class 22, set class 21
+00EC      Bobbin walks to (105, 89)
+00F2      wait until Bobbin stops walking
+00F5      place Bobbin at (128, 110)
+00FB      Bobbin: costume 157
+0100      Bobbin: plays animation 6
+0103      local 0 = 1
+0108      repeat
+0108          pause until the next frame
+0109          local 0 += 1
+010C      until local 0 > 5
+0113      Bobbin: costume 1
+0118      Bobbin: clear all classes, set class 23
+0122      place Bobbin at (128, 110)
+0128      Bobbin: plays animation 3
+012B      pause until the next frame
+012C      Bobbin walks to (140, 110)
+0132      wait until Bobbin stops walking
+0135      Mandible: faces towards the screen
+0138      pause until the next frame
+0139      Mandible says: “You see, Cob? An elusive breed, / these Weavers.”  (at 160, text line y)
+0172      wait until the message is gone
+0174      pause until the next frame
+0175      Mandible walks to (165, 110)
+017B      wait until Mandible stops walking
+017E      Mandible: plays animation 10
+0181      pause until the next frame
+0182      pause until the next frame
+0183      pause until the next frame
+0184      clear: the distaff (staff) is held
+0189      start Script 17 · give the ego a costume (by size) with 0
+018F      Mandible: init animation 3; walk animation 2; stand animation 3
+0198      Mandible: plays animation 3
+019B      start Script 19 · hide the distaff verbs
+019E      pause until the next frame
+019F      Mandible walks to (200, 109)
+01A5      pause until the next frame
+01A6      Mandible says: “Luckily, they are quite helpless / without their weaving sticks.”  (at 160, 152)
+01EF      wait until Mandible stops walking
+01F2      Mandible: faces towards the screen
+01F5      pause until the next frame
+01F6      Mandible: faces left
+01F9      pause until the next frame
+01FA      if message-on-screen flag != 0
+01FF          Mandible: plays animation 4
+          end if
+0202      wait until the message is gone
+0204      pause until the next frame
+0205      Bobbin walks to Mandible (stopping 24 away)
+0209      pause until the next frame
+020A      Bobbin says: “Give me that!”
+021C      wait until Bobbin stops walking
+021F      if message-on-screen flag != 0
+0224          Bobbin: plays animation 4
+          end if
+0227      wait until the message is gone
+0229      pause until the next frame
+022A      Cob: walk speed 8, 2
+0230      Cob walks to (140, 109)
+0236      pause until the next frame
+0237      Cob says: “You dare raise your voice / at His Excellency?”
+0269      start Script 214
+026C      wait until Cob stops walking
+026F      Cob: walk speed 4, 2
+0275      if message-on-screen flag != 0
+027A          Cob: plays animation 4
+          end if
+027D      wait until the message is gone
+027F      pause until the next frame
+0280      Mandible says: “Now, now, Cob! We mustn't be / rude to our guest.”
+02B5      local 0 = 1
+02BA      repeat
+02BA          pause until the next frame
+02BB          local 0 += 1
+02BE      until local 0 > 12
+02C5      Cob: faces towards the screen
+02C8      pause until the next frame
+02C9      Cob: faces right
+02CC      wait until the message is gone
+02CE      pause until the next frame
+02CF      Mandible says: “Not after he was kind enough to bring / us such a magnificent gift.”
+0316      wait until the message is gone
+0318      pause until the next frame
+0319      Bobbin says: “Mandible! That distaff will / never work for you.”
+034E      local 0 = 1
+0353      repeat
+0353          pause until the next frame
+0354          local 0 += 1
+0357      until local 0 > 8
+035E      Cob: faces towards the screen
+0361      pause until the next frame
+0362      Cob: faces left
+0365      pause until the next frame
+0366      wait until the message is gone
+0368      pause until the next frame
+0369      Mandible walks to Cob (stopping 24 away)
+036D      pause until the next frame
+036E      Mandible says: “You are wrong, my arrogant young friend.”
+039B      local 0 = 1
+03A0      repeat
+03A0          pause until the next frame
+03A1          local 0 += 1
+03A4      until local 0 > 8
+03AB      Cob: faces towards the screen
+03AE      pause until the next frame
+03AF      Cob: faces right
+03B2      pause until the next frame
+03B3      wait until Mandible stops walking
+03B6      if message-on-screen flag != 0
+03BB          Mandible: plays animation 4
+          end if
+03BE      wait until the message is gone
+03C0      pause until the next frame
+03C1      Mandible walks to object 640
+03C5      pause until the next frame
+03C6      Mandible says: “Come. Let me show you why.”
+03E5      repeat
+03E5          pause until the next frame
+03E6          local 1 = walk box of Mandible
+03EA      until local 1 == 0
+03F1      start Script 32 with 2, 8
+03FA      wait until Mandible stops walking
+03FD      wait until the message is gone
+03FF      Cob: faces towards the screen
+0402      pause until the next frame
+0403      Cob: faces left
+0406      pause until the next frame
+0407      Cob says: “You heard the Exalted One. Move it!”
+042F      wait until the message is gone
+0431      pause until the next frame
+0432      go to Room 44
+0434      the camera jumps to x=160
+0437      Bobbin: clear all classes, set class 22, set class 21
+0444      Bobbin: faces left
+0447      put Bobbin in Room 44
+044A      place Bobbin at (300, 134)
+0450      Cob: clear all classes, set class 22, set class 21
+045D      Cob: faces left
+0460      put Cob in Room 44
+0463      place Cob at (324, 120)
+0469      Mandible: clear all classes, set class 22, set class 21
+0476      Mandible: faces left
+0479      put Mandible in Room 44
+047C      place Mandible at (300, 126)
+0482      pause until the next frame
+0483      pause until the next frame
+0484      Mandible walks to (243, 126)
+048A      pause until the next frame
+048B      pause until the next frame
+048C      Mandible says: “Consider the common graveyard.”  (at 160, 152)
+04B4      wait until Mandible stops walking
+04B7      if message-on-screen flag != 0
+04BC          Mandible: plays animation 4
+          end if
+04BF      Bobbin walks to (268, 134)
+04C5      Cob walks to (260, 120)
+04CB      wait until the message is gone
+04CD      pause until the next frame
+04CE      Mandible says: “In a graveyard, the boundary between the / Living and the Dead is ... indistinct.”
+0523      wait until the message is gone
+0525      pause until the next frame
+0526      Mandible: faces towards the screen
+0529      pause until the next frame
+052A      Mandible says: “You Weavers would say that the Pattern / here is fragile. Thin as gauze.”
+0576      local 0 = 1
+057B      repeat
+057B          pause until the next frame
+057C          local 0 += 1
+057F      until local 0 > 8
+0586      Cob: faces towards the screen
+0589      wait until the message is gone
+058B      pause until the next frame
+058C      wait until Bobbin stops walking
+058F      Bobbin walks to (238, 134)
+0595      pause until the next frame
+0596      Bobbin says: “Not just here. Every graveyard is like that.”
+05C7      wait until Bobbin stops walking
+05CA      if message-on-screen flag != 0
+05CF          Bobbin: plays animation 4
+          end if
+05D2      wait until the message is gone
+05D4      pause until the next frame
+05D5      go to Room 42
+05D7      the camera jumps to x=160
+05DA      pause until the next frame
+05DB      pause until the next frame
+05DC      text with no actor: “I suspected as much.”  (at 160, 152, colour 142)
+05FC      wait until the message is gone
+05FE      pause until the next frame
+05FF      text with no actor: “Now, imagine what might happen if this / delicate boundary was somehow breached.”
+0653      wait until the message is gone
+0655      pause until the next frame
+0656      text with no actor: “+Torn open,/ so to speak.”
+0674      wait until the message is gone
+0676      pause until the next frame
+0677      go to Room 44
+0679      the camera jumps to x=160
+067C      pause until the next frame
+067D      pause until the next frame
+067E      Bobbin: faces away from the screen
+0681      pause until the next frame
+0682      Bobbin says: “Forget it, Mandible.”  (at 160, 152)
+06A0      local 0 = 1
+06A5      repeat
+06A5          pause until the next frame
+06A6          local 0 += 1
+06A9      until local 0 > 12
+06B0      Mandible: faces towards the screen
+06B3      pause until the next frame
+06B4      pause until the next frame
+06B5      pause until the next frame
+06B6      pause until the next frame
+06B7      wait until the message is gone
+06B9      pause until the next frame
+06BA      Bobbin walks to (268, 134)
+06C0      pause until the next frame
+06C1      Bobbin says: “You can't just rip the Pattern / apart like an old rag.”
+06FC      pause until the next frame
+06FD      pause until the next frame
+06FE      wait until Bobbin stops walking
+0701      Bobbin: turns to face away from the screen
+0704      pause until the next frame
+0705      Bobbin: faces left
+0708      pause until the next frame
+0709      if message-on-screen flag != 0
+070E          Bobbin: plays animation 4
+          end if
+0711      wait until the message is gone
+0713      pause until the next frame
+0714      go to Room 60
+0716      the camera jumps to x=160
+0719      pause until the next frame
+071A      pause until the next frame
+071B      text with no actor: “But I can. I can! /  / All I require is a / Weaver's distaff, and / the four threads of / an Opening draft. /  / Thank you for supplying / both so readily.”  (at 24, 24, colour 142)
+07B9      wait until the message is gone
+07BB      pause until the next frame
+07BC      draw object 806 at (255, 255)
+07C3      pause until the next frame
+07C4      draw object 807 at (255, 255)
+07CB      pause until the next frame
+07CC      draw object 806 at (255, 255)
+07D3      pause until the next frame
+07D4      draw object 805 at (255, 255)
+07DB      pause until the next frame
+07DC      text with no actor: “When the boundary is / breached, the Dead / will stream back onto / the plane of the Living, / eager to reclaim their / place among us! /  / And I will be waiting / for them. Ready to offer / my vast expertise in / spiritual leadership.”  (at 24, 16)
+08C7      wait until the message is gone
+08C9      pause until the next frame
+08CA      draw object 806 at (255, 255)
+08D1      pause until the next frame
+08D2      draw object 807 at (255, 255)
+08D9      pause until the next frame
+08DA      draw object 806 at (255, 255)
+08E1      pause until the next frame
+08E2      draw object 805 at (255, 255)
+08E9      pause until the next frame
+08EA      draw object 803 at (255, 255)
+08F1      pause until the next frame
+08F2      draw object 804 at (255, 255)
+08F9      pause until the next frame
+08FA      text with no actor: “I shall preside over / a teeming multitude / of restless shades. /  / Immortal. Invincible. /  / An Army of the Dead! / With myself as its / supreme commander.”  (at 24, 24)
+099A      wait until the message is gone
+099C      pause until the next frame
+099D      go to Room 42
+099F      the camera jumps to x=160
+09A2      pause until the next frame
+09A3      pause until the next frame
+09A4      text with no actor: “An army nourished by the / meat of the Shepherds.”  (at 160, 152, colour 142)
+09E0      wait until the message is gone
+09E2      pause until the next frame
+09E3      text with no actor: “Armed with the swords / of the Blacksmiths.”
+0A12      wait until the message is gone
+0A14      pause until the next frame
+0A15      text with no actor: “And guided by the / Sphere of the Glassmakers!”
+0A47      wait until the message is gone
+0A49      pause until the next frame
+0A4A      go to Room 43
+0A4C      the camera jumps to x=160
+0A4F      load costume 4
+0A52      actor 11: clear all classes, set class 22, set class 20
+0A5F      actor 11: costume 4; elevation 0
+0A67      actor 11: faces towards the screen
+0A6A      Bobbin: clear all classes, set class 23
+0A74      Bobbin: faces right
+0A77      put Bobbin in Room 43
+0A7A      place Bobbin at (142, 93)
+0A80      start Script 32 with 1, 8
+0A89      Bobbin: palette, 0x09, 0x09
+0A8F      Mandible: clear all classes
+0A96      Mandible: faces right
+0A99      put Mandible in Room 43
+0A9C      place Mandible at (142, 93)
+0AA2      start Script 32 with 2, 8
+0AAB      Cob: clear all classes
+0AB2      Cob: faces right
+0AB5      put Cob in Room 43
+0AB8      place Cob at (142, 93)
+0ABE      start Script 32 with 3, 8
+0AC7      pause until the next frame
+0AC8      Mandible walks to object 641 “sphere”
+0ACC      pause until the next frame
+0ACD      Mandible says: “I was preparing to invoke the Dead / by other, more forceful means.”  (at 160, 152)
+0B19      repeat
+0B19          pause until the next frame
+0B1A          local 1 = walk box of Mandible
+0B1E      until local 1 != 0
+0B23      start Script 33 with 2
+0B29      start Script 215
+0B2C      wait until Mandible stops walking
+0B2F      start Script 216
+0B32      if message-on-screen flag != 0
+0B37          Mandible: plays animation 4
+          end if
+0B3A      wait until the message is gone
+0B3C      pause until the next frame
+0B3D      put actor 11 in Room 43
+0B40      place actor 11 at (254, 73)
+0B46      actor 11: plays animation 6
+0B49      local 0 = 1
+0B4E      repeat
+0B4E          pause until the next frame
+0B4F          local 0 += 1
+0B52      until local 0 > 6
+0B59      actor 11: plays animation 7
+0B5C      Mandible says: “Then the Glassmakers delivered my Sphere. / It foretold your convenient arrival.”
+0BB0      wait until the message is gone
+0BB2      pause until the next frame
+0BB3      Mandible says: “Now it shows me the Smiths repairing / the sword you tried to ruin.”
+0BFA      wait until the message is gone
+0BFC      pause until the next frame
+0BFD      actor 11: plays animation 8
+0C00      pause until the next frame
+0C01      Mandible: faces away from the screen
+0C04      pause until the next frame
+0C05      Mandible: faces left
+0C08      pause until the next frame
+0C09      Mandible says: “The Age of the Clerics will soon / be upon us!”
+0C3B      pause until the next frame
+0C3C      pause until the next frame
+0C3D      pause until the next frame
+0C3E      put actor 11 in Room 00
+0C41      pause until the next frame
+0C42      wait until the message is gone
+0C44      pause until the next frame
+0C45      Mandible walks to (200, 109)
+0C4B      pause until the next frame
+0C4C      Mandible says: “Cob, don't let him out of your sight.”  (at 160, 152)
+0C7B      wait until Mandible stops walking
+0C7E      Mandible: faces left
+0C81      pause until the next frame
+0C82      if message-on-screen flag != 0
+0C87          Mandible: plays animation 4
+          end if
+0C8A      wait until the message is gone
+0C8C      pause until the next frame
+0C8D      Cob says: “I won't, Excellency.”
+0CA6      wait until the message is gone
+0CA8      pause until the next frame
+0CA9      Mandible walks to object 640
+0CAD      pause until the next frame
+0CAE      Mandible says: “And don't let him touch anything.”
+0CD4      repeat
+0CD4          pause until the next frame
+0CD5          local 1 = walk box of Mandible
+0CD9      until local 1 == 0
+0CE0      start Script 32 with 2, 8
+0CE9      wait until Mandible stops walking
+0CEC      put Mandible in Room 00
+0CEF      wait until the message is gone
+0CF1      pause until the next frame
+0CF2      go to Room 44
+0CF4      the camera jumps to x=160
+0CF7      wait 60 jiffies (60 jiffies = 1 second)
+0CFB      put Mandible in Room 44
+0CFE      place Mandible at (300, 126)
+0D04      Mandible walks to (243, 126)
+0D0A      wait until Mandible stops walking
+0D0D      Mandible: turns to face towards the screen
+0D10      pause until the next frame
+0D11      Mandible: plays animation 11
+0D14      pause until the next frame
+0D15      pause until the next frame
+0D16      pause until the next frame
+0D17      Mandible says: “Lord Mandible. Ruler of the Universe!”  (at 160, 152)
+0D46      wait until the message is gone
+0D48      pause until the next frame
+0D49      Mandible: plays animation 12
+0D4C      pause until the next frame
+0D4D      pause until the next frame
+0D4E      pause until the next frame
+0D4F      Mandible: plays animation 3
+0D52      pause until the next frame
+0D53      Mandible: turns to face left
+0D56      pause until the next frame
+0D57      Mandible says: “Time to change my stationery.”
+0D79      wait until the message is gone
+0D7B      pause until the next frame
+0D7C      go to Room 43
+0D7E      the camera jumps to x=160
+0D81      pause until the next frame
+0D82      pause until the next frame
+0D83      Cob walks to (170, 95)
+0D89      wait until Cob stops walking
+0D8C      Cob: turns to face towards the screen
+0D8F      pause until the next frame
+0D90      pause until the next frame
+0D91      Cob says: “Not so dangerous now, are you? / Heh, heh, heh.”  (at 160, 152)
+0DC9      wait until the message is gone
+0DCB      pause until the next frame
+0DCC      start Script 212
+0DCF      clear: bit[0xDBF]
+0DD4      set: bit[0xDB7]
+0DD9      if cutscene skipped != 0
+0DDE          put actor 11 in Room 00
+0DE1          Mandible: stops and stands facing away from the screen
+0DE4          put Mandible in Room 00
+0DE7          Cob: stops and stands facing away from the screen
+0DEA          start Script 33 with 3
+0DF0          Cob: faces towards the screen
+0DF3          put Cob in Room 43
+0DF6          place Cob at (170, 95)
+0DFC          Bobbin: stops and stands facing away from the screen
+0DFF          Bobbin: clear all classes, set class 23
+0E09          Bobbin: walk speed 4, 2
+0E0F          clear: the distaff (staff) is held
+0E14          start Script 17 · give the ego a costume (by size) with 0
+0E1A          Bobbin: faces right
+0E1D          put Bobbin in Room 43
+0E20          place Bobbin at (120, 116)
+0E26          Bobbin: plays animation 10
+0E29          set: bit[0xDB6]
+0E2E          start Script 19 · hide the distaff verbs
+0E31          if current room != Room 43
+0E38              go to Room 43
+0E3A              the camera jumps to x=160
+              else
+0E40              stop Script 202
+0E42              stop Script 214
+0E44              stop Script 215
+0E46              stop Script 216
+              end if
+0E48          start Script 212
+0E4B          pause until the next frame
+          end if
+0E4C      Bobbin says: “”  (at 160, text line y)
+0E56      pause until the next frame
+      end if
+0E57  end cutscene
+0E58  continue in Script 204 (this script ends)
+0E5B  end of script
+
+Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
+  actor 1          Bobbin  [decoded]  the ego, var[0x001]
+  actor 2          Mandible  [reading]  script 091 (Room 43 cage scene): Bobbin answers actor 2's lines with "Mandible! That distaff will never ..." (English text); not an Elder
+  actor 3          Cob  [reading]  script 091: actor 2 says "You see, Cob?" and actor 3 answers for "His Excellence" (English text)
+  bit[0xD61]       the distaff (staff) is held  [decoded]  script 003 starts script 018 unless it is set; script 017 picks the costume frames by it; the pickup in Room 09 object 271 sets it
+  bit[0xD64]       the notes played so far are being collected  [reading]  script 010 stores notes while it is set; script 021 clears it; Spanish release's bit 0xD65, this edition numbers it 0xD64 (same position in the shifted layout, not checked entry by entry)
+  bit[0xD65]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set; Spanish release's bit 0xD66, this edition numbers it 0xD65 (same position in the shifted layout, not checked entry by entry)
+  bit[0xD66]       a note is playing  [reading]  script 031 sets it while the note sounds; callers wait on it; Spanish release's bit 0xD67, this edition numbers it 0xD66 (same position in the shifted layout, not checked entry by entry)
+  object 641       sphere  [decoded]  the name stored in Room 43's data
+  script 17        give the ego a costume (by size)  [decoded]  argument 0, 1 or 2 picks the size; uses the staff bit for the frames
+  script 19        hide the distaff verbs  [reading]  script 002 starts it; the counterpart of 018
+  script 28        clear the draft buffer  [decoded]
+  script 40        play a sound (effect)  [decoded]
+  script 8         show or hide the close-up in the verb area  [decoded]
+  var[0x003]       message-on-screen flag  [engine]  VAR_HAVE_MSG
+  var[0x004]       current room  [engine]  VAR_ROOM
+  var[0x005]       cutscene skipped  [engine]  VAR_OVERRIDE: 1 when the player skipped a cutscene
+  var[0x067]       object under the pointer or clicked  [decoded]  script 006 +0x00AB; script 010 needs it to aim a note
+  var[0x0A6]       text line y  [decoded]  script 016 copies its argument here; prints use it as y
