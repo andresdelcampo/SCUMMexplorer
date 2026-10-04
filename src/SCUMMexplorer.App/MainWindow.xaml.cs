@@ -2333,13 +2333,15 @@ public partial class MainWindow : Window
         PageSubtitle.ToolTip = resource.FilePath;
         AudioTitle.Text = resource.Name;
         AudioDescription.Text = $"Preparing {format} audio…";
-        AudioTime.Text = "0:00 / 0:00";
+        // No length until there is one: 0:00 / 0:00 would read as a sound of no length.
+        AudioTime.Text = "Preparing…";
         PlayButton.IsEnabled = false;
         PauseButton.IsEnabled = false;
         StopButton.IsEnabled = false;
         AdlibGainSlider.IsEnabled = false;
         if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.None)
         {
+            _audioTimeNote = AudioTime.Text = "Muted";
             AudioDescription.Text = "No Sound selected";
             StatusText.Text = $"{resource.Name} · muted";
             return;
@@ -2362,6 +2364,7 @@ public partial class MainWindow : Window
             }
             _audioFile = path;
             _playWhenReady = autoPlay;
+            _audioKnownDuration = WaveDuration(wave, adlib);
             _audioPlayer.Open(new Uri(path));
             _audioReady = true;
             PlayButton.IsEnabled = true;
@@ -2379,6 +2382,7 @@ public partial class MainWindow : Window
         {
             if (token.IsCancellationRequested) return;
             AudioDescription.Text = ex.Message;
+            _audioTimeNote = AudioTime.Text = "No playable audio";
             StatusText.Text = $"{resource.Name} · playback unavailable";
         }
     }
@@ -2408,7 +2412,7 @@ public partial class MainWindow : Window
         RoomCuePlayButton.IsEnabled = false;
         RoomCuePauseButton.IsEnabled = false;
         RoomCueStopButton.IsEnabled = true;
-        RoomCueTime.Text = "0:00 / 0:00";
+        RoomCueTime.Text = "Preparing…";
         _audioCancellation = new CancellationTokenSource();
         var token = _audioCancellation.Token;
         try
@@ -2426,6 +2430,7 @@ public partial class MainWindow : Window
             }
             _audioFile = path;
             _playWhenReady = true;
+            _audioKnownDuration = WaveDuration(wave, adlib);
             _audioPlayer.Open(new Uri(path));
             _audioReady = true;
             RoomCuePlayButton.IsEnabled = true;
@@ -2437,6 +2442,7 @@ public partial class MainWindow : Window
         {
             if (token.IsCancellationRequested) return;
             RoomCueStatus.Text = $"Playback unavailable: {ex.Message}";
+            _audioTimeNote = RoomCueTime.Text = "No playable audio";
             RoomCuePlayButton.ToolTip = RoomCueStatus.Text;
             RoomCuePlayButton.IsEnabled = true;
             RoomCuePauseButton.IsEnabled = false;
@@ -2614,10 +2620,18 @@ public partial class MainWindow : Window
     private void UpdateAudioTime()
     {
         var current = _audioPlayer.Position;
-        var total = _audioPlayer.NaturalDuration.HasTimeSpan ? _audioPlayer.NaturalDuration.TimeSpan : TimeSpan.Zero;
-        AudioTime.Text = $"{current:m\\:ss} / {total:m\\:ss}";
+        // The player reports the length only once the file is open; the rendered wave's own length is known at once.
+        TimeSpan? total = _audioPlayer.NaturalDuration.HasTimeSpan ? _audioPlayer.NaturalDuration.TimeSpan : _audioKnownDuration;
+        AudioTime.Text = total is TimeSpan length ? $"{current:m\\:ss} / {length:m\\:ss}" : _audioTimeNote ?? "Preparing…";
         RoomCueTime.Text = AudioTime.Text;
     }
+
+    // The length of the rendered wave (null until it exists) and, when no wave can exist, what to show instead of a length.
+    private TimeSpan? _audioKnownDuration;
+    private string? _audioTimeNote;
+
+    private static TimeSpan WaveDuration(byte[] wave, bool adlib) =>
+        TimeSpan.FromSeconds(Math.Max(0, wave.Length - 44) / (double)(adlib ? 49716 * 4 : 22050 * 2));
 
     private void StopAudio()
     {
@@ -2630,6 +2644,8 @@ public partial class MainWindow : Window
         _audioCancellation?.Cancel();
         _audioTimer.Stop();
         _audioPlayer.Close();
+        _audioKnownDuration = null;
+        _audioTimeNote = null;
         _audioReady = false;
         _audioSurface = AudioSurface.None;
         _roomRenderedCue = null;
