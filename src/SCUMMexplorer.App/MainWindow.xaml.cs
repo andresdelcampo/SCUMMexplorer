@@ -211,6 +211,7 @@ public partial class MainWindow : Window
         _game = game;
         _glossary = game.Id == GameId.Loom ? LoomGlossary.Load(game) : LoomGlossary.Default;
         _usageIndex = LoomUsageIndex.Empty;
+        _soundNotes = [];
         if (game.Id == GameId.Loom) _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
         if (game.Id == GameId.Loom) _ = NameStoryBitsAsync(game, _glossary, _replayCatalog.Replays);
@@ -302,7 +303,6 @@ public partial class MainWindow : Window
         ObjectActionPanel.Visibility = Visibility.Collapsed;
         ObjectVerbButtons.Children.Clear();
         ObjectActionTraceExpander.Visibility = Visibility.Collapsed;
-        RoomMusicButtons.Children.Clear();
         RoomMusicPanel.Visibility = Visibility.Collapsed;
         _roomSelectedCue = null;
         _roomRenderedCue = null;
@@ -1460,6 +1460,7 @@ public partial class MainWindow : Window
     private bool _showScriptBytes;
     private LoomGlossary _glossary = LoomGlossary.Default;
     private LoomUsageIndex _usageIndex = LoomUsageIndex.Empty;
+    private Dictionary<int, LoomSoundNote> _soundNotes = [];
 
     private async Task BuildUsageIndexAsync(GameLibrary game)
     {
@@ -1469,6 +1470,19 @@ public partial class MainWindow : Window
             if (!ReferenceEquals(_game, game)) return;
             _usageIndex = index;
             if (_selectedResource is { Kind: ResourceKind.Script } selected) UpdateScriptUsedBy(selected);
+            var glossary = _glossary;
+            var notes = await Task.Run(() => LoomSoundNotes.Build(game, index, glossary));
+            if (!ReferenceEquals(_game, game)) return;
+            _soundNotes = notes;
+            foreach (var group in ResourceTree.Items.OfType<TreeViewItem>())
+                foreach (var node in group.Items.OfType<TreeViewItem>().Where(item => item.Tag is GameResource { Kind: ResourceKind.Sound }))
+                {
+                    var sound = (GameResource)node.Tag;
+                    node.Header = LoomResourceNames.SoundLabel(glossary, sound, notes);
+                    var note = sound.ResourceId is int soundId && notes.TryGetValue(soundId, out var found) ? found.Evidence : null;
+                    var named = LoomResourceNames.Evidence(glossary, sound);
+                    node.ToolTip = named is not null && note is not null ? named + Environment.NewLine + note : named ?? note;
+                }
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
     }
@@ -3427,6 +3441,7 @@ public partial class MainWindow : Window
         AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         SoundModeCombo.IsEnabled = !SessionInScene;
+        RoomSoundsButton.IsEnabled = !SessionInScene;
         SoundModeCombo.ToolTip = SessionInScene ? "The sound device can be changed when the scene is over." : SoundModeToolTip;
         AdlibGainPanel.IsEnabled = !SessionInScene;
         PlaybackPauseButton.IsEnabled = active && _playback is not null && (_playbackPaused || PlaybackHasActivity);
@@ -4835,17 +4850,15 @@ public partial class MainWindow : Window
     private async void UpdateRoomMusicActions()
     {
         var generation = ++_roomMusicUpdateGeneration;
-        RoomMusicButtons.Children.Clear();
         RoomMusicPanel.Visibility = Visibility.Collapsed;
-        RoomMusicMoreButton.Visibility = Visibility.Collapsed;
+        _roomSoundChoices = [];
+        RoomSoundsButton.Visibility = Visibility.Collapsed;
         if (_game is null || _currentRoomResource is not { } room) return;
         // The interactive LOOM mode plays the music the game's scripts start (SceneSoundPlayer), so the panel's own
         // player would only duplicate it (the user's choice, 30 Sep; .verification/room-music-analysis). Inspection mode keeps it.
-        if (_game.Id == GameId.Loom && SessionModeToggle.IsChecked == true)
-        {
-            if (_audioSurface == AudioSurface.Room) StopAudio();
-            return;
-        }
+        // The Sounds menu (every music and effect the room may start, played on demand) serves both modes.
+        var interactive = _game.Id == GameId.Loom && SessionModeToggle.IsChecked == true;
+        if (interactive && _audioSurface == AudioSurface.Room && _roomCueSourceRoomId != room.ResourceId) StopAudio();
         var game = _game;
         var soundById = game.Resources.Where(item => item.Kind == ResourceKind.Sound && item.ResourceId.HasValue)
             .GroupBy(item => item.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
@@ -4894,6 +4907,20 @@ public partial class MainWindow : Window
             _roomCueTrackCache[id] = result;
             if (result.Duration is TimeSpan duration) _roomCueDurations[id] = duration;
         }
+        var choiceEvidence = possible.Where(item => item.SoundId.HasValue).GroupBy(item => item.SoundId!.Value)
+            .ToDictionary(group => group.Key, group => string.Join(Environment.NewLine, group.Select(item => item.Evidence)));
+        _roomSoundChoices = choiceEvidence.Keys.Concat(events.Where(item => item.Event.TargetId.HasValue).Select(item => item.Event.TargetId!.Value))
+            .Distinct().Where(soundById.ContainsKey)
+            .Select(id =>
+            {
+                var track = scannedTracks.GetValueOrDefault(id);
+                return (Resource: soundById[id], Music: track.IsMusic, Duration: track.Duration,
+                    Evidence: choiceEvidence.GetValueOrDefault(id, "Started during this session."));
+            })
+            .OrderByDescending(item => item.Music).ThenByDescending(item => item.Duration ?? TimeSpan.Zero).ThenBy(item => item.Resource.ResourceId)
+            .ToList();
+        RoomSoundsButton.Visibility = _roomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        if (interactive) return;
         bool IsMusic(int id) => scannedTracks.TryGetValue(id, out var result) && result.IsMusic;
         var reached = session is not null
             ? LoomSoundCueResolver.ResolveForRoom(events, room.ResourceId!.Value, entrySequence, IsMusic)
@@ -4938,46 +4965,41 @@ public partial class MainWindow : Window
                 : "Possible room music from static script paths; those paths have not been reached.";
         RoomMusicNote.Text = note;
         RoomMusicNote.ToolTip = "Room music candidates shorter than 15 seconds are omitted. The default is the longest first-pass estimate; looped tracks are measured through their first loop boundary, with estimates capped at 3:00.";
-        RoomMusicMoreButton.ToolTip = RoomMusicNote.Text + " " + RoomMusicNote.ToolTip;
         RoomCueTitle.ToolTip = selectedEvidence + Environment.NewLine + note;
 
-        foreach (var item in candidates.Where(item => item.Resource.ResourceId != selectedId))
-        {
-            var id = item.Resource.ResourceId!.Value;
-            var evidence = id == reachedId ? reached.Start!.Format() : evidenceById.GetValueOrDefault(id, "");
-            var isReached = id == reachedId;
-            var button = new Button
-            {
-                Content = $"▶ {item.Resource.Name} · {FormatRoomCueDuration(item.Duration)}",
-                ToolTip = (isReached ? "Reached during this session. " : "Static script possibility; execution has not reached this cue. ") + evidence,
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                Padding = new Thickness(7, 2, 7, 2),
-                Margin = new Thickness(0, 0, 0, 3),
-                Background = new SolidColorBrush(Color.FromRgb(39, 54, 66)),
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(74, 89, 98))
-            };
-            button.Click += async (_, _) =>
-            {
-                SelectRoomCue(item.Resource, evidence, isReached, manuallySelected: true);
-                RoomMusicMoreButton.ContextMenu!.IsOpen = false;
-                UpdateRoomMusicActions();
-                await PlayRoomCueAsync();
-            };
-            RoomMusicButtons.Children.Add(button);
-        }
-        RoomMusicMoreButton.Content = $"Other possible music · {RoomMusicButtons.Children.Count} ▾";
-        RoomMusicMoreButton.Visibility = RoomMusicButtons.Children.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         RoomMusicPanel.Visibility = Visibility.Visible;
     }
 
-    private void RoomMusicMore_Click(object sender, RoutedEventArgs e)
+    private List<(GameResource Resource, bool Music, TimeSpan? Duration, string Evidence)> _roomSoundChoices = [];
+
+    private void RoomSounds_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { ContextMenu: { } menu } button)
+        if (_roomSoundChoices.Count == 0 || SessionInScene) return;
+        var entries = new List<(string Label, string? Tip, Action Run)>();
+        if (_audioSurface == AudioSurface.Room) entries.Add(("■ Stop", null, StopAudio));
+        foreach (var choice in _roomSoundChoices)
         {
-            menu.PlacementTarget = button;
-            menu.IsOpen = true;
+            var picked = choice;
+            // A glossary name ("opening music") already says what it is; otherwise say music or effect.
+            var named = LoomResourceNames.Entry(_glossary, picked.Resource) is not null;
+            var label = $"▶ {LoomResourceNames.Label(_glossary, picked.Resource)}{(named ? "" : picked.Music ? " · music" : " · effect")}" +
+                        (picked.Duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
+            entries.Add((label, IsAdvancedMode ? picked.Evidence : null, () => _ = AuditionRoomSoundAsync(picked)));
         }
+        OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
+    }
+
+    /// <summary>Plays a sound picked from the room's list on demand (an exploration action; the game's own sounds stop first).</summary>
+    private async Task AuditionRoomSoundAsync((GameResource Resource, bool Music, TimeSpan? Duration, string Evidence) choice)
+    {
+        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.None)
+        {
+            StatusText.Text = "Sound is off. Choose PC Speaker or AdLib to listen.";
+            return;
+        }
+        _sceneSound.StopAll("a sound was picked from the room's sound list");
+        SelectRoomCue(choice.Resource, choice.Evidence, false, manuallySelected: true);
+        await PlayRoomCueAsync();
     }
 
     private static string FormatRoomCueDuration(TimeSpan duration) =>
