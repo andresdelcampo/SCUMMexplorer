@@ -1,7 +1,10 @@
-# Sound device picker as icons (3 October 2026)
+# Sound device picker and Advanced switch (3-4 October 2026)
 
-The header's sound drop-down is now three small icon buttons: an X (No Sound), a speaker (PC Speaker) and a music note (AdLib). The chosen one gets a quiet lighter fill and border; tooltips and automation names carry the device names. The X and the speaker are plain vector shapes drawn here. The AdLib button uses the user's `Assets/AdLib_logo.svg` (one path, converted to a WPF path with the even-odd rule `F0`), filled with the button's own colour, not the SVG's red. Buttons are 38 x 34 with a 24 px icon area. Close-ups: `z0.png` (X), `z1.png` (speaker), `z2.png` (AdLib selected).
+First version (3 October): three icon buttons. Replaced on 4 October at the user's request by a dropdown that shows each device's icon and name, in the closed box and in the list rows:
 
-`SoundModeCombo` stays in the window, collapsed, as the single source of the choice (about a dozen harnesses drive it); the buttons set it (`SoundIcon_Click`) and mirror it (`SyncSoundIcons`, also after load). The icon panel's enabled state is bound to the combo's, so it is disabled during a scene exactly as before.
+- No Sound: an X. PC Speaker: a speaker. AdLib: the AdLib logo.
+- The AdLib mark is a simplified rebuild of `Assets/AdLib_logo.svg` (kept unchanged): the same note silhouette (flag polygon plus head ellipse) with 7 thick slots cut out instead of about 24 thin ones, so it survives at 20 px. It takes the text colour like the other icons (no red).
+- `SoundModeCombo` is the visible control again (harnesses keep working); the icon comes from an item template keyed on the item text. While a scene plays the combo is disabled and its tooltip says the device can be changed when the scene is over.
+- Advanced is a small switch (track and knob, amber when on) with its label; it is still the `AdvancedModeToggle` CheckBox.
 
-Scratch harness over the real MainWindow: start combo 2 / AdLib lit; click speaker -> combo 1, mode PcSpeaker; click X -> combo 0, mode None; combo set to 2 -> AdLib lit; combo disabled -> panel disabled. Shots: `sound-adlib.png`, `sound-speaker.png`, `sound-none.png`. No other harness was run.
+Scratch harness over the real MainWindow: selecting each item sets the player mode (None, PcSpeaker, Adlib); the Advanced switch toggles on and off. Shots: `header-0/1/2.png` (each device in the closed box), `header-adv-on.png` (Advanced on shows the extra buttons), `rows.png` (list rows). No other harness was run.

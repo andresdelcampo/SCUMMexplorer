@@ -102,8 +102,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        SyncSoundIcons();
-        Loaded += (_, _) => { SyncSoundIcons(); ReopenLastFolder(); };
+        Loaded += (_, _) => ReopenLastFolder();
         Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
@@ -2437,21 +2436,10 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>The icon buttons mirror the combo (the radios do not exist yet while the window is being built).</summary>
-    private void SyncSoundIcons()
-    {
-        if (SoundAdlibRadio is null || SoundModeCombo.SelectedIndex < 0) return;
-        SoundNoneRadio.IsChecked = SoundModeCombo.SelectedIndex == 0;
-        SoundSpeakerRadio.IsChecked = SoundModeCombo.SelectedIndex == 1;
-        SoundAdlibRadio.IsChecked = SoundModeCombo.SelectedIndex == 2;
-    }
-
-    private void SoundIcon_Click(object sender, RoutedEventArgs e) =>
-        SoundModeCombo.SelectedIndex = int.Parse((string)((FrameworkElement)sender).Tag);
+    private const string SoundModeToolTip = "Music and effects. Changing device stops current audio; the next sound command uses the selected device.";
 
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        SyncSoundIcons();
         if (!IsLoaded || SoundModeCombo.SelectedIndex < 0) return;
         if (SessionInScene)
         {
@@ -3421,6 +3409,7 @@ public partial class MainWindow : Window
         AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         SoundModeCombo.IsEnabled = !SessionInScene;
+        SoundModeCombo.ToolTip = SessionInScene ? "The sound device can be changed when the scene is over." : SoundModeToolTip;
         AdlibGainPanel.IsEnabled = !SessionInScene;
         PlaybackPauseButton.IsEnabled = active && _playback is not null && (_playbackPaused || PlaybackHasActivity);
         PlaybackPauseButton.Content = _playbackPaused ? "▶ Play" : "⏸ Pause";
