@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October: sphere rooms, El Muerto, button row, English data
+
+Rooms 19 and 86 (the sphere visions) start as a plain sphere: the entry script's explicit reset to state 0 now wins over a later script's draw batch when the background already fills the position (only these two of the 76 first-visit renders change; new test `SphereVisionRoomsStartAsAPlainSphere`). The Advanced interaction menu applies the planner's actor placements before a direct verb (El Muerto's lines in Room 09 show). The Advanced button rows share one height and font and a 5 px gap. The tests default to the English data in `Games/loom ega en` (63 of 710 fail: [ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md)). The harness review was corrected: exit code 0 hides FAIL lines in WPF harnesses.
+
 ## 4 October: harness clean-up and `Exe` compaction
 
 Decided on effort, regression risk, rebuild cost, whether the code is still touched and use for other versions: 35 obsolete harness projects removed (20 stale UI checks, 15 probes needing an old saved input; source stays in git history), `StatusShots`, `TextGalleryCheck` and `SpellAudioCheck` repaired and passing, the rest kept (see [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md)). `Exe/` went from 27.6 GB to about 1.4 GB: the 75 evidence folders of 2–3 October are packed unchanged in `Exe/_evidence-archive/*.tar.gz` (each verified against its file list before removal). M5 parked; the other-versions order agreed (LOOM-specific vs generic, English LOOM/Indy3, Indy3 as second game).
