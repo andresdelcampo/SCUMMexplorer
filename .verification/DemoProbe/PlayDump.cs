@@ -19,7 +19,7 @@ static class PlayDump
             var now = session.Snapshot.RoomId;
             if (now != room)
             {
-                Console.WriteLine($"frame {frame}: room {room} -> {now}, pending {session.Snapshot.PendingScripts}");
+                Console.WriteLine($"frame {frame}: room {room} -> {now}, pending {session.Snapshot.PendingScripts}; ego costume {session.Actors.FirstOrDefault(a => a.Number == 1)?.Look.Costume}");
                 room = now;
             }
             if (frame % 500 == 0)

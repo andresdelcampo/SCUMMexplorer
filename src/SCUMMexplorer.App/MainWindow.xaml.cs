@@ -35,7 +35,7 @@ public partial class MainWindow : Window
     // The sounds the scripts start while the playback clock runs (cutscenes); separate from the room music panel.
     private readonly SceneSoundPlayer _sceneSound = new();
     private readonly DispatcherTimer _audioTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
-    private readonly DispatcherTimer _idleFrameTimer = new() { Interval = TimeSpan.FromMilliseconds(100) };
+    private readonly DispatcherTimer _idleFrameTimer = new() { Interval = TimeSpan.FromMilliseconds(15) };
     private readonly DispatcherTimer _roomPanTimer =new() { Interval = TimeSpan.FromMilliseconds(75) };
     private readonly DispatcherTimer _adlibGainDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private static readonly string LastFolderFile = Path.Combine(
@@ -3859,7 +3859,11 @@ public partial class MainWindow : Window
         var now = DateTime.UtcNow;
         if (!ReferenceEquals(_idleSession, session)) { _idleSession = session; _idleSignature = null; _idleNextFrame = now; }
         if (now < _idleNextFrame) return;
-        _idleNextFrame = now + PlaybackFrameInterval();
+        // Count on from the due time, not from now: the timer ticks every 15 ms, so the frames keep the game's rate (a tick
+        // arriving just before the due time used to cost a whole extra tick, which made the idle frames about half as fast
+        // as the playback clock). After a long stall, start over rather than catching up in a burst.
+        var interval = PlaybackFrameInterval();
+        _idleNextFrame = now - _idleNextFrame > interval ? now + interval : _idleNextFrame + interval;
         FollowSessionSound();
         var snapshot = session.AdvanceFrame();
         UpdateSessionSound();

@@ -14,6 +14,18 @@ if (args.Length > 1 && args[1] == "texts")
     foreach (var e in extraction.Entries.Where(e => e.Kind != "Object name").Take(12)) Console.WriteLine($"  [{e.Kind}] room {e.RoomId} script {e.ScriptId}: {e.Text}");
     return;
 }
+if (args.Length > 3 && args[1] == "ego")
+{
+    // DemoProbe <folder> ego <room> <room>...: visit the rooms in turn and print the actors in each (costume, room, position).
+    var egoGame = new GameFolderScanner().Scan(args[0]);
+    var egoSession = new LoomExplorationSession(egoGame, new LflObjectStateReader().ReadSnapshot(Path.Combine(egoGame.FolderPath, "00.LFL")));
+    foreach (var room in args.Skip(2).Select(int.Parse))
+    {
+        egoSession.VisitRoomById(room);
+        Console.WriteLine($"room {room}: " + string.Join("; ", egoSession.Actors.Where(a => a.Room == room).Select(a => $"actor {a.Number} costume {a.Look.Costume} at {a.X},{a.Y}")));
+    }
+    return;
+}
 if (args.Length > 1 && args[1] == "index") { IndexDump.Run(args[0]); return; }
 if (args.Length > 1 && args[1] is "play" or "idle") { PlayDump.Run(args[0], args.Length > 2 ? int.Parse(args[2]) : 3000, args[1] == "idle"); return; }
 // What the existing code makes of a LOOM folder: identity, resources, every script decoded, every room opened in a session, the boot.

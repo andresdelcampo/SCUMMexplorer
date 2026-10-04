@@ -67,7 +67,8 @@ internal static class Program
                 }
                 report.Add($"after {seconds} s of the preview: rooms entered {string.Join(" > ", seen)}; playback running {Field("_playback") is not null}; status \"{Find<TextBlock>("StatusText").Text}\"");
                 // Open another room: the preview must stop and the session be a fresh one.
-                var other = game.Rooms.First(r => r.ResourceId == 9);
+                Save("before-leaving.png");
+                var other = game.Rooms.First(r => r.ResourceId == (args.Length > 3 ? int.Parse(args[3]) : 9));
                 Call("SelectResourceInTree", other);
                 await Task.Delay(2500);
                 var room9 = SessionRoom();
@@ -75,6 +76,10 @@ internal static class Program
                 var leftover = Field("_playback");
                 report.Add($"opened Room 09: playback null {leftover is null}, still the preview {leftover?.GetType().GetProperty("Preview")?.GetValue(leftover)}, what \"{leftover?.GetType().GetProperty("What")?.GetValue(leftover)}\"; session room {room9} then {SessionRoom()} (expected 9 both: the director no longer runs)");
                 Save("after-leaving.png");
+                var s = (SCUMMexplorer.Core.Formats.LoomExplorationSession)Field("_session")!;
+                report.Add("session actors after leaving: " + string.Join("; ", s.Actors.Where(a => a.Room == s.Snapshot.RoomId).Select(a => $"actor {a.Number} costume {a.Look.Costume} at {a.X},{a.Y} visible {a.Visible} frame {a.Look.Frame} facing {a.Look.Facing} elev {a.Look.Elevation}")));
+                var overlay = Find<Image>("RoomActorOverlay");
+                report.Add($"actor overlay: visibility {overlay.Visibility}, source {(overlay.Source is null ? "null" : overlay.Source.Width + "x" + overlay.Source.Height)}, playback {Field("_playback") is not null}");
             }
             catch (Exception ex) { report.Add("FAILED: " + ex); }
             File.WriteAllLines(Path.Combine(output, "demo-preview-check.txt"), report);
