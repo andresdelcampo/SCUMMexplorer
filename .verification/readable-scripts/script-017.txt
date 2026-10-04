@@ -60,7 +60,7 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
   actor 1          Bobbin  [decoded]  the ego, var[0x001]
   bit[0xD61]       the distaff (staff) is held  [decoded]  script 003 starts script 018 unless it is set; script 017 picks the costume frames by it; the pickup in Room 09 object 271 sets it
-  bit[0xD6E]       a cutscene is running  [decoded]  script 002 sets it, script 003 clears it
+  bit[0xD6D]       a cutscene is running  [reading]  script 002 sets it, script 003 clears it; Spanish release's bit 0xD6E, this edition numbers it 0xD6D (same position in the shifted layout, not checked entry by entry)
   script 18        show the distaff  [decoded]  turns the note verbs on and prints the note letters
   script 19        hide the distaff verbs  [reading]  script 002 starts it; the counterpart of 018
   var[0x031]       video mode  [decoded]  VAR_VIDEOMODE: 4 is CGA, 13 EGA; script 044 and 017 pick CGA palettes on 4

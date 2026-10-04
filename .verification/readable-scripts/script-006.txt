@@ -110,9 +110,9 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 01C0  go back to 007A
 
 Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
-  bit[0xD63]       an object's verb 0x37 is running  [decoded]  script 006
-  bit[0xD64]       the walk and the sentence were stopped  [decoded]  set by a verb 0x37 that refuses; script 006 +0x00E4
-  bit[0xD66]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set
+  bit[0xD62]       an object's verb 0x37 is running  [reading]  script 006; Spanish release's bit 0xD63, this edition numbers it 0xD62 (same position in the shifted layout, not checked entry by entry)
+  bit[0xD63]       the walk and the sentence were stopped  [reading]  set by a verb 0x37 that refuses; script 006 +0x00E4; Spanish release's bit 0xD64, this edition numbers it 0xD63 (same position in the shifted layout, not checked entry by entry)
+  bit[0xD65]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set; Spanish release's bit 0xD66, this edition numbers it 0xD65 (same position in the shifted layout, not checked entry by entry)
   script 7         run a sentence (verb on an object)  [decoded]  starts the object's verb when the ego is within 3 of it
   script 8         show or hide the close-up in the verb area  [decoded]
   var[0x00C]       timer 2  [engine]  VAR_TMR_2; script 006 uses it for the double-click time

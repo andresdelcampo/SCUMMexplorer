@@ -13,10 +13,10 @@ public sealed class LoomUsageIndexTests
         var game = new GameFolderScanner().Scan(Folder);
         var glossary = LoomGlossary.Load(game);
         var uses = LoomUsageIndex.Build(game).UsedBy(LoomUsageTarget.Script, 91);
-        var use = Assert.Single(uses, u => u.ObjectId == 643);
-        Assert.Equal("Room 43 object 643 verb 0x3A", use.Where);
+        var use = Assert.Single(uses, u => u.ObjectId == 644);
+        Assert.Equal("Room 43 object 644 verb 0x3A", use.Where);
         var text = LoomUsageIndex.Describe(use, glossary, v => v == 0x3A ? "Draft: Opening" : null);
-        Assert.Contains("“jaula”", text);
+        Assert.Contains("“cage”", text);
         Assert.EndsWith("starts it", text);
     }
 }
