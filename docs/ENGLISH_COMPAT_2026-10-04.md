@@ -25,7 +25,7 @@ Evidence: `ScriptDump` (`.verification/ScriptDump`, a disassembler: `ScriptDump 
 
 **The English release is not a translation of the same code.** Same scripts, other lengths, and other numbering:
 
-- Global bits from 0xD65 on are one lower (`bit[0xD6E]` "cutscene running" is 0xD6D; `bit[0xDC5]` is 0xDC4; story bits start at 0xD71, not 0xD72). Bits 0xD61-0xD63 and all variables (`var[...]`) match. Measured from script 023's learned-draft bit (0xD68 against 0xD69); seen uniform through 0xDC5 in the scripts compared (010, 017, 022, 023, 025, 026, 034, 001 and Room 46 local 204, plus Room 38's entry).
+- The Spanish `bit[0xD62]` ("full animation", set by its boot) does not exist; Spanish bits from 0xD63 on are one lower in English (`bit[0xD6E]` "cutscene running" is 0xD6D; `bit[0xDC5]` is 0xDC4; story bits start at 0xD71, not 0xD72). Bit 0xD61 and all variables (`var[...]`) match. Measured from script 023's learned-draft bit (0xD68 against 0xD69); seen uniform through 0xDC5 in the scripts compared (010, 017, 022, 023, 025, 026, 034, 001 and Room 46 local 204, plus Room 38's entry).
 - Object numbers and class numbers shift by one from some object on (Room 46 class tests 0x2AB-0x2AD are 0x2AC-0x2AE; object 599 / 637 / 830 / 885 / 827 of the tests are not those objects). Offsets inside scripts move with the text length.
 - Real behaviour differences, not only labels: English script 001 (boot) does not set the Spanish `bit[0xD62]` or `bit[0xD76]`, so Room 03's entry starts script 0x2A there. Charset 0 has 128 glyphs (no accents), the file is half the size.
 
@@ -33,7 +33,7 @@ Evidence: `ScriptDump` (`.verification/ScriptDump`, a disassembler: `ScriptDump 
 
 1. **Game Status** found the draft contract by byte offset and by Spanish bit numbers; it now finds every instruction by pattern and reads the learned/reverse/last-note bits, the two draft wait bits (used to decide whether the status can be edited) and the staff checkpoint bit from the scripts. All 19 `LoomGameStatusTests` pass on English and on the Spanish folder.
 2. **Hard-coded Spanish bit numbers in the app:** the "draft is playing" test in `MainWindow` (three places, bit 0xD66) is now `session.DraftPlaying`; the story-bit range (`LoomStoryEvents.FirstBit`, the planner and `UpdateStoryBit`) starts at `FirstBitFor(game)`.
-3. **Glossary bit names** (18 entries written for the Spanish numbering) would have labelled the wrong bit on English. `LoomGlossary.Load(game)` now looks bits from 0xD65 up one lower for a shifted edition, and the entry says so and carries the evidence level "reading" (the shift is measured; each name is not re-checked entry by entry).
+3. **Glossary bit names** (18 entries written for the Spanish numbering) would have labelled the wrong bit on English. `LoomGlossary.Load(game)` now looks bits from the Spanish 0xD63 on up one lower (the Spanish 0xD62 has no English counterpart) for a shifted edition, and the entry says so and carries the evidence level "reading" (the shift is measured; each name is not re-checked entry by entry).
 
 ### Remaining failures (42 of 710 on English after step 1) triaged
 
@@ -48,7 +48,7 @@ Test-only: the assertion names Spanish text, a bit number, an object or class id
 | Object / class ids | FirstVisitRendering Rooms 38, 42, 46, 65, 86; ActorTests (827 is 828); SceneEvidence Room 69 (885); Cutscene `AWalkIntoRoom37sBox8...` (object 599) | ids shift by one |
 | Needs a real read | ReplaySequence x2 (firewood, Rusty's ghost: stage 3 waits for Script 85 `+0x05CE`), SceneSetupScene `TheCageScenesStillReachTheirOwnEnd...` (Room 43 `ends=[]`) | likely offsets and ids in the recipe, but not yet read: could hide a real English difference in the scene's start |
 
-Room 03: the test comment says Script 1 sets `bit[0xD62]` so the entry skips script 0x2A; the English boot does not set it, so on English the entry starts 0x2A. That is the data, not a defect; whether 0x2A is visible in play is a question for a later check.
+Room 03: the test comment says Script 1 sets `bit[0xD62]` (Spanish "full animation") so the entry skips script 0x2A; the English release has no such bit, so on English the entry always starts 0x2A. That is the data, not a defect.
 
 ### Catalog and glossary per edition (task 4, decision open)
 

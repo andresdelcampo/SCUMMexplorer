@@ -143,10 +143,10 @@ public sealed class LoomRandomPickTests
         // +0x0026 picks 0..4 (never the previous 5), +0x004F picks 0..2 for the animation.
         Assert.Equal([0x0026, 0x004F], resumed.RandomPicks.Select(pick => pick.Offset));
         Assert.Equal(0x0085, resumed.ResumeOffset);
-        Assert.Equal(1, (runtime.GlobalVariables["var[0x0D7]"] >> 10) & 1);
+        Assert.Equal(1, (runtime.GlobalVariables["var[0x0D7]"] >> 9) & 1);
         // The bit is set after a loop that branches on the pick, so it is an estimate.
         Assert.True(resumed.PathEstimated);
-        Assert.Contains("bit[0xD7A]", runtime.EstimatedVariables);
+        Assert.Contains("bit[0xD79]", runtime.EstimatedVariables);
     }
 
     [Fact]

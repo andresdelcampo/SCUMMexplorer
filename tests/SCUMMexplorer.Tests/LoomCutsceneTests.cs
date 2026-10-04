@@ -191,7 +191,7 @@ public sealed class LoomCutsceneTests
         Assert.False(session.InCutscene);
         Assert.Contains("Script 52 continues at +0x0047 in Room 11 after loadRoom", session.SessionTrace);
         var last = session.LastAction!;
-        Assert.Equal((10, 295, 13, 0x017D), (last.SourceRoomId, last.ObjectId, last.DestinationRoomId, last.ReachedRoomLoad!.Offset));
+        Assert.Equal((10, 295, 13, 0x0168), (last.SourceRoomId, last.ObjectId, last.DestinationRoomId, last.ReachedRoomLoad!.Offset));
         Assert.Contains(last.Uncertainties, item => item == "Script 52 passed through Room 11 (loadRoom at +0x0045) before this load.");
     }
 
@@ -227,9 +227,9 @@ public sealed class LoomCutsceneTests
         var (game, index) = data;
         var session = new LoomExplorationSession(game, index);
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 36));
-        // Room 36 object 599's doorway: loadRoomWithEgo into Room 37, walk to (24, 101) in box 0. A first visit
-        // (bit[0xD9A] is 0) starts local 200, which watches the ego's walk box.
-        session.ActivateObjectVerb(599, 0x38);
+        // Room 36 object 600's doorway: loadRoomWithEgo into Room 37, walk to (24, 101) in box 0. A first visit
+        // (bit[0xD99] is 0) starts local 200, which watches the ego's walk box.
+        session.ActivateObjectVerb(600, 0x38);
         Assert.Equal(37, session.Snapshot.RoomId);
         for (var frame = 0; frame < 100 && session.EgoMoving; frame++) session.AdvanceFrame();
         var ego = session.Actors.Single(actor => actor.Number == 1);
@@ -249,14 +249,14 @@ public sealed class LoomCutsceneTests
         }
 
         Assert.Contains("Room 37 local script 200 chains to script 86", session.SessionTrace);
-        Assert.Contains("endCutscene at Script 86 +0x055C runs script 3", session.SessionTrace);
+        Assert.Contains("endCutscene at Script 86 +0x0536 runs script 3", session.SessionTrace);
         Assert.Equal([37, 58, 37, 38], rooms);
         // All 13 of script 086's printed lines (the last print, +0x0551, is empty).
         Assert.Equal(13, lines.Count);
-        Assert.Equal("Vaya, vaya, vaya.", lines[0]);
-        Assert.Equal("Y no vendré sólo.", lines[^1]);
+        Assert.Equal("Well, well, well.", lines[0]);
+        Assert.Equal("And I won't be alone.", lines[^1]);
         Assert.False(session.InCutscene);
-        Assert.Equal((ushort)1, session.Snapshot.KnownGlobalVariables["bit[0xD9A]"]);
+        Assert.Equal((ushort)1, session.Snapshot.KnownGlobalVariables["bit[0xD99]"]);
     }
 
     [Fact]
@@ -277,13 +277,13 @@ public sealed class LoomCutsceneTests
         // the cutscene's own script keeps running.
         Assert.Contains("freezeScripts 0x7F at Script 02 +0x0004: frozen: Room 10 Object 295 Verb 0x38, Script 06, Room 10 local script 200",
             session.SessionTrace);
-        Assert.Equal((ushort)1, session.Snapshot.KnownGlobalVariables["bit[0xD6E]"]);
+        Assert.Equal((ushort)1, session.Snapshot.KnownGlobalVariables["bit[0xD6D]"]);
 
         Assert.True(session.ContinueUntilRoomChanges(32));
 
-        Assert.Contains("endCutscene at Script 52 +0x017C runs script 3", session.SessionTrace);
+        Assert.Contains("endCutscene at Script 52 +0x0167 runs script 3", session.SessionTrace);
         Assert.Contains("freezeScripts 0x00 at Script 03 +0x0016: no script is frozen", session.SessionTrace);
-        Assert.Equal((ushort)0, session.Snapshot.KnownGlobalVariables["bit[0xD6E]"]);
+        Assert.Equal((ushort)0, session.Snapshot.KnownGlobalVariables["bit[0xD6D]"]);
         Assert.Equal((ushort)0, session.Snapshot.KnownGlobalVariables["var[0x005]"]);
         Assert.Equal(13, session.Snapshot.RoomId);
     }

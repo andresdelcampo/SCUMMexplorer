@@ -58,10 +58,10 @@ public sealed class LoomKeyInputTests
         session.PressKey('c');
         Assert.Equal((ushort?)1, Var(session, "var[0x057]"));
         Assert.Equal((ushort?)2, Var(session, "var[0x062]"));
-        // Script 020 (started by the first note) sets bit[0xD66] while it plays the draft back.
-        Assert.Equal((ushort?)1, Var(session, "bit[0xD66]"));
+        // Script 020 (started by the first note) sets bit[0xD65] while it plays the draft back.
+        Assert.Equal((ushort?)1, Var(session, "bit[0xD65]"));
 
-        // Escape (+0x01A4) outside a cutscene: the close-up goes off, and with bit[0xD66] set
+        // Escape (+0x01A4) outside a cutscene: the close-up goes off, and with bit[0xD65] set
         // a cutscene runs scripts 028 and 021, which stop the playback and clear the draft.
         from = session.SessionTrace.Count;
         session.PressKey(0x1B);
@@ -69,7 +69,7 @@ public sealed class LoomKeyInputTests
         Assert.True(Traced(session, from, "cutscene at Script 05 +0x01C0"));
         Assert.Equal((ushort?)0, Var(session, "var[0x067]"));
         Assert.Equal((ushort?)0, Var(session, "var[0x062]"));
-        Assert.Equal((ushort?)0, Var(session, "bit[0xD66]"));
+        Assert.Equal((ushort?)0, Var(session, "bit[0xD65]"));
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public sealed class LoomKeyInputTests
     public void F5RunsTheSaveScreenScript()
     {
         if (Start() is not { } session) return;
-        // F5 (0x13F, +0x0237): bit[0xD6F] is 0, so script 004 runs; it loads Room 70 in a cutscene.
+        // F5 (0x13F, +0x0237): bit[0xD6E] is 0, so script 004 runs; it loads Room 70 in a cutscene.
         var from = session.SessionTrace.Count;
         session.PressKey(0x13F);
         Frames(session, 12);
@@ -136,14 +136,14 @@ public sealed class LoomKeyInputTests
             null, null, [], [], "Synthetic test script"));
         Assert.True(session.InCutscene);
 
-        // Before +0x00C6 beginOverride, abortCutscene has nothing to jump to.
+        // Before +0x00C1 beginOverride, abortCutscene has nothing to jump to.
         Assert.False(session.CutsceneSkippable);
         var early = session.PressKey(0x1B);
         Assert.Contains(early.Uncertainties, line => line.Contains("the open cutscene has no override set", StringComparison.Ordinal));
         Assert.Contains(early.Uncertainties, line => line.Contains("did not reach the input script after abortCutscene, because user input is off", StringComparison.Ordinal));
         Assert.Equal((ushort)0, Var(session, "var[0x005]"));
 
-        // In Room 11, past +0x00C6: the skip jump (+0x00C8) goes to +0x0157, which reads VAR_OVERRIDE.
+        // In Room 11, past +0x00C1: the skip jump (+0x00C3) goes to +0x0142, which reads VAR_OVERRIDE.
         for (var frame = 0; frame < 40 && session.Snapshot.RoomId != 11; frame++) session.AdvanceFrame();
         Frames(session, 20);
         Assert.Equal(11, session.Snapshot.RoomId);
@@ -151,13 +151,13 @@ public sealed class LoomKeyInputTests
         var from = session.SessionTrace.Count;
         session.PressKey(0x1B);
         Assert.False(session.CutsceneSkippable);
-        Assert.True(Traced(session, from, "abortCutscene: Script 52 continues at its skip jump +0x00C8, var[0x005] = 1"));
+        Assert.True(Traced(session, from, "abortCutscene: Script 52 continues at its skip jump +0x00C3, var[0x005] = 1"));
         Assert.Equal((ushort)1, Var(session, "var[0x005]"));
 
         for (var frame = 0; frame < 20 && session.Snapshot.RoomId != 13; frame++) session.AdvanceFrame();
         Assert.Equal(13, session.Snapshot.RoomId);
-        Assert.True(Traced(session, from, "stopScript 210 at Script 52 +0x015C"));
-        Assert.True(Traced(session, from, "endCutscene at Script 52 +0x017C runs script 3"));
+        Assert.True(Traced(session, from, "stopScript 210 at Script 52 +0x0147"));
+        Assert.True(Traced(session, from, "endCutscene at Script 52 +0x0167 runs script 3"));
         Assert.Equal((ushort)0, Var(session, "var[0x005]"));
     }
 }

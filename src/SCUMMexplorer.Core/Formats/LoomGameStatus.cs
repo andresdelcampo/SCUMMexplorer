@@ -12,7 +12,7 @@ public sealed record LoomGameStatus(bool Supported, string Evidence, bool CanEdi
 /// <summary>
 /// Verify the loaded LOOM script contract before interpreting or editing its fields. Instructions are found by their pattern
 /// (neighbouring instructions and operands), not by byte offset: the Spanish and English DOS releases have scripts of other
-/// lengths, and the English one numbers the global bits from 0xD65 on one lower, so the bits are read from the scripts too.
+/// lengths, and the English one lacks the Spanish bit 0xD62 and numbers the bits from 0xD63 on one lower, so the bits are read from the scripts too.
 /// </summary>
 internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, int DraftBase, int DraftCount, int InitialNotes, string CheckpointKey, int CheckpointNotes,
     string DraftStartKey, string DraftPlayKey, int BitShift, string Evidence)

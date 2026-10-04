@@ -84,7 +84,7 @@ public sealed class LoomReplaySequenceTests
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 34));
         var sequence = new LoomReplaySequence(session, [.. RustyPrefix(),
             new("verb", 599, 56), new("frames", Frames: 32), new("click", X: 109, Y: 102),
-            new("scene", EndBoundary: "endCutscene at Script 86 +0x055C", ExpectedRoom: 38),
+            new("scene", EndBoundary: "endCutscene at Script 86 +0x0536", ExpectedRoom: 38),
             new("verb", 610, 54), new("scene", EndBoundary: "endCutscene at Script 87 +0x09B9", ExpectedRoom: 38),
             new("visit", 35), new("frames", Frames: 8), new("visit", 34), new("frames", Frames: 40),
             new("verb", 559, 55), new("scene", EndBoundary: "endCutscene at Script 98 +0x0618", ExpectedRoom: 34)]);

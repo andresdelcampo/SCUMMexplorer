@@ -156,7 +156,7 @@ public sealed class LoomActorTests
         var index = LoomEgoArrivalIndex.For(game, 200);
 
         // Script 072 +0x0024: loadRoom 0x41, setCameraAt 0xA0, putActorInRoom 1, 0x41,
-        // putActorAtObject 1, 0x33B, walkActorTo 1, 0xE4, 0x2C (decoded).
+        // putActorAtObject 1, 0x33C, walkActorTo 1, 0xE4, 0x2C (decoded).
         var room65 = Assert.Single(index.Into(65));
         Assert.False(room65.IsLoadRoomWithEgo);
         Assert.Equal("Script 072", room65.Source);
@@ -164,7 +164,7 @@ public sealed class LoomActorTests
         Assert.Equal(1, room65.EgoActor);
         Assert.Equal(160, room65.CameraX);
         Assert.Equal([LoomEgoArrivalStepKind.PutAtObject, LoomEgoArrivalStepKind.Walk], room65.Steps!.Select(step => step.Kind));
-        Assert.Equal(0x33B, room65.Steps![0].A);
+        Assert.Equal(0x33C, room65.Steps![0].A);
         // Room 43: scripts 091 and 092 put the ego at (142, 93); 090, 093 and 094 load it
         // without putting the ego in straight-line code, so they are not arrivals.
         Assert.Equal(["Script 091", "Script 092"], index.Into(43).Select(item => item.Source));
@@ -181,7 +181,7 @@ public sealed class LoomActorTests
         Assert.Equal(160, session.CameraX);
         Assert.True(session.CameraEstimated);
         var label = session.Snapshot.Uncertainties.Last(line => line.Contains("Assumed arrival", StringComparison.Ordinal));
-        Assert.Contains("loadRoom, then actor 1 put at object 827, then walks to (228, 44)", label);
+        Assert.Contains("loadRoom, then actor 1 put at object 828, then walks to (228, 44)", label);
         Assert.Contains("no decoded loadRoomWithEgo brings the ego in", label);
 
         // A room with a doorway arrival keeps it: Room 30 has loadRoom arrivals too (script 072

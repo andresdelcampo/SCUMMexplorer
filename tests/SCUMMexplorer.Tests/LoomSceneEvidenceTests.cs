@@ -155,11 +155,11 @@ public sealed class LoomSceneEvidenceTests
             new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")), completeBoot: false);
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 69));
         for (var i = 0; i < 30; i++) session.AdvanceFrame();
-        Assert.Contains(877, session.Snapshot.DrawOrder);
+        Assert.Contains(878, session.Snapshot.DrawOrder);
         session.Click(160, 72);
         for (var i = 0; i < 60; i++) session.AdvanceFrame();
-        Assert.DoesNotContain(session.Snapshot.DrawOrder, id => id is 876 or 877 or 878);
-        Assert.Contains(885, session.Snapshot.DrawOrder);
+        Assert.DoesNotContain(session.Snapshot.DrawOrder, id => id is 877 or 878 or 879);
+        Assert.Contains(886, session.Snapshot.DrawOrder);
     }
 
     [Fact]

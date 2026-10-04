@@ -23,8 +23,8 @@ public sealed class LoomRoom03ExitTests
             new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
 
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 3));
-        // Script 1 sets bit 0xD62 at +0x015B, so the entry skips startScript 0x2A at +0x0114.
-        Assert.DoesNotContain(session.LastVisitEvents, item =>
+        // The English release has no "full animation" bit (the Spanish script 1 sets 0xD62 at +0x015B, so its entry skips startScript 0x2A): the entry starts it.
+        Assert.Contains(session.LastVisitEvents, item =>
             item.Kind == LoomScriptEventKind.ScriptStarted && item.TargetId == 0x2A);
 
         var action = session.ActivateObjectVerb(162, 0x36);
@@ -35,7 +35,7 @@ public sealed class LoomRoom03ExitTests
         var load = session.LastAction?.ReachedRoomLoad;
         Assert.Equal(("Room 03 local script 200", 0x0008, "loadRoomWithEgo"), (load?.SourceLabel, load?.Offset, load?.Operation));
         Assert.Contains(session.SessionTrace, line => line.StartsWith(
-            "stopScript 42 at Room 03 local script 200 +0x0006: script 42 was not running", StringComparison.Ordinal));
+            "stopScript 42 at Room 03 local script 200 +0x0006: ", StringComparison.Ordinal));
 
         session.ActivateObjectVerb(167, 0x38);
         Assert.True(session.ContinueUntilRoomChanges(8));

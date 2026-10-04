@@ -95,9 +95,9 @@ public sealed class LoomGlossary
 
     public GlossaryEntry? Variable(int index) => Find("var", index);
 
-    /// <summary>Bits from 0xD65 on are numbered <see cref="_bitShift"/> higher in this edition than in the Spanish release the table was written for (0 for it).</summary>
+    /// <summary>Bits from 0xD63 on are numbered <see cref="_bitShift"/> higher in this edition than in the Spanish release the table was written for (0 for it); the Spanish 0xD62 ("full animation", set by its boot) has no counterpart in the English scripts, where 0xD62 is the Spanish 0xD63.</summary>
     private int _bitShift;
-    private const int SpanishShiftedFrom = 0xD65;
+    private const int SpanishShiftedFrom = 0xD63;
 
     public GlossaryEntry? Bit(int index)
     {
