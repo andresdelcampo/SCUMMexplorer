@@ -112,12 +112,12 @@ public sealed class LoomSceneSetupPlannerTests
         // The disassembler prints "costume, 0x11" (a comma), which the first version of the scan missed.
         Assert.Contains(scanner.FindCostumeChanges(), c => c.Where.StartsWith("Room 10 local 203", StringComparison.Ordinal) && c.Operands.StartsWith("0x01, [costume, 0x11", StringComparison.Ordinal));
         Assert.Contains(scanner.FindCostumeChanges(), c => c.Where.StartsWith("Room 34 local 202", StringComparison.Ordinal) && c.Operands.Contains("costume, var[0x07D]", StringComparison.Ordinal));
-        // Room 38's entry gives the ego costume 0x70 and branches on story bit D9E (set by the ghost scene's chain).
+        // Room 38's entry gives the ego costume 0x70 and branches on story bit D9D (set by the ghost scene's chain).
         var entry = scanner.ScanRoomEntry(38);
         Assert.Contains(entry.CostumeChanges, c => c.StartsWith("Room 38 entry", StringComparison.Ordinal) && c.Contains("costume, 0x70", StringComparison.Ordinal));
-        Assert.Contains(entry.Touches, t => !t.Write && t.Variable == "bit[0xD9E]" && t.Where.StartsWith("Room 38 entry", StringComparison.Ordinal));
+        Assert.Contains(entry.Touches, t => !t.Write && t.Variable == "bit[0xD9D]" && t.Where.StartsWith("Room 38 entry", StringComparison.Ordinal));
         Assert.Contains(scanner.FindWriters("var[0x07D]"), t => t.Where.StartsWith("Room 34 local 202", StringComparison.Ordinal));
-        Assert.Contains(scanner.FindStoryBitMoves(0), t => t.Where.StartsWith("Script 093 +0x0005", StringComparison.Ordinal) && t.Instruction.Contains("bit[0xDB7]", StringComparison.Ordinal));
+        Assert.Contains(scanner.FindStoryBitMoves(0), t => t.Where.StartsWith("Script 093 +0x0005", StringComparison.Ordinal) && t.Instruction.Contains("bit[0xDB6]", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -129,17 +129,17 @@ public sealed class LoomSceneSetupPlannerTests
         for (var i = 0; i < 40; i++) session.AdvanceFrame();
         var events = session.StoryEvents;
         Assert.True(events.Count > 40, $"{events.Count} story bits");
-        Assert.All(events, e => Assert.True(e.Bit >= LoomStoryEvents.FirstBit));
-        // Script 093 (the cage scene) sets DB6; the list names it as a scene.
-        var db6 = Assert.Single(events, e => e.Key == "bit[0xDB6]");
+        Assert.All(events, e => Assert.True(e.Bit >= LoomStoryEvents.FirstBitFor(game)));
+        // Script 093 (the cage scene) sets DB5; the list names it as a scene.
+        var db6 = Assert.Single(events, e => e.Key == "bit[0xDB5]");
         Assert.Contains(db6.Scenes, s => s.Where.StartsWith("Script 093", StringComparison.Ordinal));
-        Assert.False(session.StoryBit("bit[0xDB6]") ?? false);
+        Assert.False(session.StoryBit("bit[0xDB5]") ?? false);
         Assert.True(session.GameStatus.CanEdit, "session settled");
-        session.UpdateStoryBit("bit[0xDB6]", true);
-        Assert.True(session.StoryBit("bit[0xDB6]"));
-        Assert.Equal(1, session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xDB6]"));
-        session.UpdateStoryBit("bit[0xDB6]", false);
-        Assert.False(session.StoryBit("bit[0xDB6]"));
+        session.UpdateStoryBit("bit[0xDB5]", true);
+        Assert.True(session.StoryBit("bit[0xDB5]"));
+        Assert.Equal(1, session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xDB5]"));
+        session.UpdateStoryBit("bit[0xDB5]", false);
+        Assert.False(session.StoryBit("bit[0xDB5]"));
         Assert.Throws<ArgumentOutOfRangeException>(() => session.UpdateStoryBit("bit[0xD61]", true));
         System.IO.File.WriteAllLines(Environment.GetEnvironmentVariable("SCUMM_EVENTS_DUMP") ?? System.IO.Path.GetTempPath() + "events.txt",
             events.Select(e => $"{e.Key} scenes=[{string.Join("; ", e.Scenes.Select(s => s.Where.Split(" +")[0]).Distinct().Take(4))}] all={e.Setters.Count}"));
