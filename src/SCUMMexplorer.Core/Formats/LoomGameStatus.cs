@@ -197,6 +197,9 @@ public sealed partial class LoomExplorationSession
 
     private IReadOnlyList<LoomStoryEvent>? _storyEvents;
 
+    /// <summary>Whether a draft is being played back (script 020 keeps this bit set until 021 finishes it); the bit is read from the scripts.</summary>
+    public bool DraftPlaying => StatusSchema is { } schema && _runtime.GlobalVariables.GetValueOrDefault(schema.DraftPlayKey) != 0;
+
     /// <summary>The story bits the game's code sets (see <see cref="LoomStoryEvent"/>), read once per session.</summary>
     public IReadOnlyList<LoomStoryEvent> StoryEvents => _storyEvents ??= LoomStoryEvents.Read(_game);
 
@@ -211,7 +214,7 @@ public sealed partial class LoomExplorationSession
     {
         RequireStatusEdit();
         var bit = int.Parse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-        if (bit < LoomStoryEvents.FirstBit) throw new ArgumentOutOfRangeException(nameof(key), "Only story bits can be edited here.");
+        if (bit < LoomStoryEvents.FirstBitFor(_game)) throw new ArgumentOutOfRangeException(nameof(key), "Only story bits can be edited here.");
         var word = $"var[0x{bit >> 4:X3}]";
         ushort mask = (ushort)(1 << (bit & 15));
         var value = _runtime.GlobalVariables.GetValueOrDefault(word);

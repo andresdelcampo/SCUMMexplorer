@@ -3432,7 +3432,7 @@ public partial class MainWindow : Window
 
     private bool PlaybackHasActivity => _replaySequence is { Complete: false, Failure: null } || SessionInScene || _session is { } session &&
         (session.EgoMoving || session.CameraMoving || !string.IsNullOrWhiteSpace(session.Messages.Talk?.Text) ||
-         session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]") != 0);
+         session.DraftPlaying);
 
     private bool CanStartCutscene => GameClickActive && !SessionInScene &&
         (_playback is null || !PlaybackHasActivity && !_playbackPaused);
@@ -3777,7 +3777,7 @@ public partial class MainWindow : Window
         if (session.Snapshot.PendingScripts == 0 && !talking && !moving) return false;
         // Script 020 keeps bit[0xD66] set until script 021 finishes the draft. Its notes and spell result
         // can take longer than the ordinary 32-frame idle window; keep their clock running as for a scene.
-        var draftPlaying = session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]") != 0;
+        var draftPlaying = session.DraftPlaying;
         if (SessionInScene || draftPlaying)
         {
             if (playback.CutsceneFrames < LoomExplorationSession.CutsceneFrameLimit) return true;
@@ -3793,7 +3793,7 @@ public partial class MainWindow : Window
         if (!PlaybackShouldContinue()) return false;
         var session = _session!;
         var playback = _playback!;
-        if (SessionInScene || session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]") != 0) playback.CutsceneFrames++;
+        if (SessionInScene || session.DraftPlaying) playback.CutsceneFrames++;
         // Frames of a walk do not count as idle: the sentence that waits for it runs after it.
         else if (!session.EgoMoving && !session.CameraMoving) playback.IdleFrames++;
         var room = session.Snapshot.RoomId;

@@ -19,6 +19,13 @@ public static class LoomStoryEvents
     /// <summary>First bit of the story range (bits below it belong to the engine, the staff, drafts and input).</summary>
     public const int FirstBit = 0xD72;
 
+    /// <summary>The first story bit of this edition: the Spanish release's 0xD72 moved by the shift the status schema measures (the English release numbers bits from 0xD65 one lower).</summary>
+    public static int FirstBitFor(GameLibrary game)
+    {
+        try { return FirstBit + LoomStatusSchema.Read(game).BitShift; }
+        catch (InvalidDataException) { return FirstBit; }
+    }
+
     /// <summary>The story bits the game's code can set to 1, in bit order. Scans every room, script and object verb once (about a second).</summary>
     public static IReadOnlyList<LoomStoryEvent> Read(GameLibrary game)
     {

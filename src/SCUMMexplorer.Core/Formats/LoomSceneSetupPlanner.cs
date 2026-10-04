@@ -28,14 +28,18 @@ public sealed class LoomSceneSetupPlanner
     public const string StaffBit = "bit[0xD61]";
     /// <summary>Tag on the steps that grant the staff (see <see cref="Adapt"/>).</summary>
     public const string StaffGrant = "grant:staff";
-    private const int FirstStoryBit = 0xD72;
+    private readonly int _firstStoryBit;
     /// <summary>The first room beyond the LOOM island (an estimate of the user's "outside the island").</summary>
     public const int FirstRoomOffTheIsland = 11;
 
     private readonly LoomSceneStateScanner _scanner;
     private IReadOnlyList<LoomStateSource>? _staffHeldWriters;
 
-    public LoomSceneSetupPlanner(GameLibrary game) => _scanner = new LoomSceneStateScanner(game);
+    public LoomSceneSetupPlanner(GameLibrary game)
+    {
+        _scanner = new LoomSceneStateScanner(game);
+        _firstStoryBit = LoomStoryEvents.FirstBitFor(game);
+    }
 
     /// <summary>The scan behind a scene (the scripts it names and what they call), for the audit and the tests.</summary>
     public LoomSceneScan Scan(int startRoom, IEnumerable<int> scriptIds) => _scanner.Scan(startRoom, scriptIds);
@@ -140,7 +144,7 @@ public sealed class LoomSceneSetupPlanner
     private IReadOnlyList<LoomActorPlacer> ActorPlacers(int actor, int room) =>
         _placers.TryGetValue((actor, room), out var cached) ? cached : _placers[(actor, room)] = _scanner.FindActorPlacers(actor, room);
 
-    private static bool IsStoryBit(string variable) =>
+    private bool IsStoryBit(string variable) =>
         variable.StartsWith("bit[0x", StringComparison.Ordinal) &&
-        int.TryParse(variable.AsSpan(6, variable.Length - 7), System.Globalization.NumberStyles.HexNumber, null, out var bit) && bit >= FirstStoryBit;
+        int.TryParse(variable.AsSpan(6, variable.Length - 7), System.Globalization.NumberStyles.HexNumber, null, out var bit) && bit >= _firstStoryBit;
 }
