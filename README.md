@@ -1,56 +1,55 @@
 # SCUMMexplorer
 
-Explore SCUMM games through their rooms, objects, characters and sounds. The goal is to click through the world, try its interactions and discover its secrets, with script evidence available when wanted.
+An audio-visual, interactive explorer for classic SCUMM adventures. Walk through the rooms in any order, click objects and exits, replay the cutscenes, hear the original music and read the games' texts, all rebuilt from your own game files. It is not meant as a technical SCUMM viewer: the script evidence is there when you want it (Advanced mode), not in your way.
 
-**Current scope: DOS LOOM EGA exploration, plus Indiana Jones and the Last Crusade EGA room-background previews.** Indy object art, scripts, sounds, and the VGA edition are not yet supported.
+**Current scope.** DOS **LOOM EGA** is the main focus. The English release is the reference edition (the Spanish release also opens). The two LOOM self-running previews (`LOOMDEMO.EXE`, short and long) open too. **Indiana Jones and the Last Crusade EGA** is supported only for room backgrounds and texts, including its dialogue choices. Indy object art, scripts, sounds, the VGA edition and the other SCUMM games are not supported yet.
 
-Start with the [LOOM EGA plan and progress tracker](docs/LOOM_EGA_PLAN.md) for the vision, assessment, priorities and next bounded work session.
+Game files are not included and never committed: you open a folder you own.
 
-## What you can do today
+## What you can do today (LOOM EGA)
 
-- Choose a scene by its original artwork in the visual room picker. Room numbers stay in tooltips or Advanced mode. Exit outlines are off until requested; hovering still reveals a supported object or possible exit.
-- Click scene details to try decoded actions. Short scene feedback keeps the result in view, while unresolved script state stays clearly labelled. The original room music controls sit beneath the artwork.
-- Open **Advanced** for the raw resource tree, script and state traces, hotspot lists, input assumptions, depth and walk-box overlays, and resource links. Exploration status, Restart/Continue, and room playback time also appear in Advanced mode.
-- Open a DOS LOOM EGA folder and browse room backgrounds, local object artwork and depth masks. The app remembers the last successfully opened folder.
-- View the original framing, scaled to use the available room area. Wider rooms scroll with the left/right keys while the room is focused or the wide left/right controls directly below the artwork; the scrollbar stays hidden. Taps move two source pixels; holding a key or button gradually accelerates. Turn off **Original framing** to see the full panorama. Room music controls sit centered at the bottom beneath the graphic, and **Show depth areas** stays selected when browsing other rooms in Advanced mode.
-- Open an Indiana Jones and the Last Crusade EGA folder and preview indexed room backgrounds. Object art, scripts, sounds, and gameplay routes have not been decoded for Indy yet.
-- See each room without black gaps. Images are painted in SCUMM's order (room directory redraw, then `drawObject` calls on top), and gaps that the partial script state leaves open are filled from the game's own script draw batches, preferring the frame a script draws right after loading the room, or else a seeded random stored image. Every fill is labelled as an estimate.
-- Click room artwork to preview stored alternatives, including restoring hidden artwork at the same position. Showing an image refills the cut-outs inside it (for example a close-up face's eyes and mouth); hiding is offered only when the background behind has no gap. These changes affect the displayed view, not persistent game state.
-- Click decoded object verbs directly on room artwork, including code-only hotspots. The Advanced hotspot list also provides keyboard access. A reached room-load instruction opens its destination; a script waiting on unresolved state stays pending. Statically discovered doorways remain possible destinations, and an exit outline can be enabled when wanted.
-- Keep known script state across room visits, reset the session or advance a paused frame. Asset inspection is also available separately.
-- Play indexed sounds and room cue candidates with PC speaker or AdLib music playback. Room playback is on demand. Sound effects currently use PC speaker; AdLib effects and MT-32 remain future work.
-- Browse extracted dialogue, object names and stored text in the searchable **Game Texts** gallery. Room-linked entries show their original room artwork and can take you back to that room. Object-linked entries identify their source object where the decoded data establishes it. Empty, single-character and symbol-only entries are omitted. The **Conversations and cutscenes** view gathers spoken lines in source order, distinguishing decoded cutscene marker blocks from other script dialogue; source details remain available on demand. These groups are partial transcripts: conditional branches, script calls and timing do not yet establish a complete conversation as played.
-- Inspect all decoded static costume poses together at a shared scale, bounded script disassembly and resource connections. Stored poses do not yet establish a timed animation.
+- **Pick a scene by its artwork** in the visual room picker, and see each room without black gaps. Room numbers and exit outlines are available on request.
+- **Click the world.** A click walks Bobbin to an object and uses it through the game's own scripts; a double click also looks at it; exits lead on to the next room. Bobbin, the other actors and their costumes are drawn and animated, with the camera following, and room animations keep running as in the game.
+- **Cutscenes and drafts play.** About 335 cutscene starts (generated from the game's own code, plus a few hand-built sequences) can be launched from **Play Cutscene**, each with a start setup derived from the scene's code; drafts and the staff go through the game's scripts. **Game Status** lets you set the staff, notes, learned drafts and story events yourself. Every assumption a start makes is shown in the picker's note.
+- **Hear it.** Music and effects through AdLib (NukedOPL3Sharp), PC speaker, or No Sound; sounds and a room's music cues can be played on demand.
+- **Read the games' texts** in the searchable **Game Texts** gallery (Advanced): extracted dialogue, object names and stored text with the original room artwork, and links that play the cutscene a text belongs to.
+- **Open a LOOM demo.** The rooms are explorable like the full game's, and **The preview** (in Play Cutscene) plays the demo's own self-running tour until you open another room. A demo is another build of the game, not a subset: its scripts, rooms and index differ, so full-game names and scene catalogs are not applied to it.
+- **Advanced mode** shows the raw resource tree, readable and raw script views with a glossary, the last action's timeline, hotspot lists, depth and walk-box overlays, and resource links.
 
-The explorer is still partial. The text gallery decodes stored strings from indexed scripts, room scripts and object verbs, including DOS accents and visible control markers. Text on unsupported or unvisited script paths may be missing, and storage order does not establish cutscene order. In exploration mode, code-only hotspots take precedence where they overlap artwork; inspection mode keeps artwork cycling. Draft selection, actor walking and timed cutscenes are not yet a complete gameplay experience. Unknown script state is covered by labelled artwork estimates; these are previews, not verified first-visit states. Static script paths and possible music cues do not establish what actually occurs in a playthrough.
+Everything is labelled by how well the game's data supports it: a decoded branch is a *possible* outcome, calling a verb directly is an *exploration action*, a partial session is a *state preview*, and artwork the scripts leave undecided is filled with a labelled estimate that never changes the game state.
 
-Stored text extraction also covers Indiana Jones and the Last Crusade EGA, whose scripts use a slightly different opcode dialect (`wait`, `waitForActor` and `getActorX/Y` operands). Its multiple-choice dialogue labels are grouped as **Dialogue choices**, each followed by the replies spoken in its selection branch. This is a bounded text preview, not Indy gameplay execution.
-
-The standalone conversation map at `Games/indy3/indy3-conversations.html` expands the decoded choice menus into collapsible, source-linked branches and embeds the original EGA room backgrounds. Regenerate it from a supplied EGA folder with `rtk proxy dotnet run --project tools/Indy3ConversationExport/Indy3ConversationExport.csproj -- Games/indy3/EGA`; the tool also writes a `.graph.json` audit beside the HTML. Conditional state is left unevaluated, unresolved script activation is marked, and the map does not assign outcomes or a preferred path.
+For Indiana Jones and the Last Crusade EGA, the app previews the indexed room backgrounds and extracts stored text. Its scripts use a slightly different opcode dialect (`wait`, `waitForActor` and `getActorX/Y` operands), and its multiple-choice dialogue labels are grouped as **Dialogue choices**, each followed by the replies spoken in its branch. This is a bounded text preview, not Indy gameplay. The standalone conversation map is generated from an EGA folder with `dotnet run --project tools/Indy3ConversationExport/Indy3ConversationExport.csproj -- "Games/indy3 ega en"`; it expands the decoded menus into collapsible, source-linked branches with the room backgrounds, and writes a `.graph.json` audit beside the HTML. Conditional state is left unevaluated and the map does not assign outcomes.
 
 ## Documentation
 
 | Document | Purpose |
 |---|---|
-| [LOOM EGA plan](docs/LOOM_EGA_PLAN.md) | Current product direction, priorities and milestones |
-| [Script map](docs/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, object verbs and rooms |
+| [LOOM EGA plan](docs/LOOM_EGA_PLAN.md) | Product direction, state, open items and milestones |
+| [Current work](docs/CURRENT_WORK.md) | The rules set for the project |
+| [Next session](docs/NEXT_SESSION_PROMPT.md) | Hand-off: state, ordered tasks, tooling notes |
 | [Changelog](docs/CHANGELOG.md) | Finished work with links to its validation |
-| [Implementation audit](docs/EXPLORATION_AUDIT.md) | Existing capabilities, limitations and historical verification results |
+| [Script map](docs/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, object verbs and rooms |
+| [English edition compatibility](docs/ENGLISH_COMPAT_2026-10-04.md) | What differs between the English and Spanish data |
+| [Cutscene discovery](docs/LOOM_CUTSCENE_DISCOVERY.md) | How the cutscene catalog is generated and audited |
 | [Object-state reference](docs/SCUMM_OBJECT_STATES.md) | Format evidence, rendering rules and preview semantics |
 | [Script coverage](docs/LOOM_SCRIPT_COVERAGE.md) | Measured decoder coverage; not gameplay coverage |
+| [Harness review](docs/HARNESS_REVIEW_2026-10-04.md) | Which verification tools are kept and why |
 | [Research](docs/RESEARCH.md) | Technical references and prior research |
 
 ## Development
 
-Windows WPF application targeting .NET 10. `SCUMMexplorer.Core` owns parsing, rendering and bounded execution; `SCUMMexplorer.App` owns the desktop UI; `SCUMMexplorer.Tests` contains focused Core tests. Game data stays local in the game folder you open.
+Windows WPF application targeting .NET 10. `SCUMMexplorer.Core` owns parsing, rendering and bounded script execution; `SCUMMexplorer.App` owns the desktop UI; `SCUMMexplorer.Tests` holds the Core tests; `.verification/` holds UI harnesses and evidence (see its README). Game data stays local in the folder you open.
 
-From the repository root, with the .NET 10 SDK and RTK available:
+From the repository root, with the .NET 10 SDK:
 
 ```powershell
-rtk proxy dotnet build SCUMMexplorer.slnx
+dotnet build SCUMMexplorer.slnx
+$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom ega en"
+$env:SCUMM_INDY3_EGA_TEST_ROOT = "$PWD\Games\indy3 ega en"
+dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 ```
 
-The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. Audio regression tests can use `SCUMM_SOUND_TEST_ROOT` to locate a supplied DOS LOOM folder. Indy EGA compatibility tests can use `SCUMM_INDY3_EGA_TEST_ROOT` to locate that edition's folder.
+The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. The LOOM tests find `Games/loom ega en` (then `loom ega es`) next to the repository, or the folder in `SCUMM_LOOM_TEST_ROOT`; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip. Tests that need the demo folders skip when they are absent.
 
 ## Audio and third-party notices
 
