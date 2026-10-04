@@ -230,12 +230,12 @@
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                 <StackPanel x:Name="PageHeader" Margin="0,0,0,10">
                     <TextBlock x:Name="PageTitle" Text="Welcome to SCUMMexplorer" FontSize="22" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="PageSubtitle" Text="Open a game folder to step inside." Foreground="#AAB4BA" Margin="0,3,0,0"/>
+                    <TextBlock x:Name="PageSubtitle" Text="Explore classic adventure games from the inside." Foreground="#AAB4BA" Margin="0,3,0,0"/>
                     <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
                         <Button x:Name="BackToSceneButton" Visibility="Collapsed" Click="BackToScene_Click" Margin="0,0,8,0"
                                 Padding="10,4" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" AutomationProperties.Name="Back to the room"/>
                         <Button x:Name="RestartButton" Visibility="Collapsed" Content="↺ Restart game state" Click="ResetSession_Click" Padding="10,4" Margin="0,0,8,0"
-                                ToolTip="Throw away the explored state (story, objects, inventory) and start again from the boot state." Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                                ToolTip="Forget everything explored so far (story, objects, inventory) and start again from the beginning of the game." Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
                         <Button x:Name="ConnectionsButton" Content="Connections" Visibility="Collapsed"
                                 Click="ConnectionsButton_Click"
                                 Padding="10,4" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
@@ -249,7 +249,7 @@
                                 <WrapPanel x:Name="RoomOptionsBar" Margin="0,6,0,4" VerticalAlignment="Center">
                                     <CheckBox x:Name="NormalRoomWidthToggle" Content="Original framing" IsChecked="True"
                                               Margin="0,0,22,4" VerticalAlignment="Center" Foreground="#E7E0D2"
-                                              ToolTip="Show up to 320 stored horizontal pixels, enlarged to fit the available view. Pan to see the rest of a wide room."
+                                              ToolTip="Show the room with the game's own 320-pixel-wide framing, enlarged to fit. Pan to see the rest of a wide room."
                                               Checked="NormalRoomWidthToggle_Changed" Unchecked="NormalRoomWidthToggle_Changed"/>
                                     <StackPanel x:Name="DoorwayOptions" Orientation="Horizontal" Visibility="Collapsed" Margin="0,0,22,4">
                                         <TextBlock Text="Doorways" Foreground="#C6B99F" VerticalAlignment="Center" Margin="0,0,8,0"/>
@@ -370,7 +370,7 @@
                                         <TextBlock x:Name="RoomCueEvidence" Visibility="Collapsed" Foreground="#B8AA8C" FontSize="11"/>
                                         <TextBlock x:Name="RoomCueStatus" Visibility="Collapsed" Foreground="#B8AA8C" FontSize="11"/>
                                         <Button x:Name="RoomMusicMoreButton" Content="Other possible music" Visibility="Collapsed"
-                                                ToolTip="Possible tracks come from static room and object script paths." Padding="6,2"
+                                                ToolTip="Other music this room's scripts may start; the game does not necessarily play all of it." Padding="6,2"
                                                 Click="RoomMusicMore_Click"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962">
                                             <Button.ContextMenu>
@@ -455,9 +455,9 @@
                                      FontFamily="Consolas" FontSize="13" Padding="4"/>
                         </Grid>
                         <StackPanel x:Name="PreviewMessage" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520" Margin="30">
-                            <TextBlock Text="ROOM BACKGROUND" Foreground="#B78442" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="ROOMS" Foreground="#B78442" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <TextBlock x:Name="PreviewTitle" Text="Your game will appear here" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,10,0,6"/>
-                            <TextBlock x:Name="PreviewDescription" Text="SCUMMexplorer is being built around game concepts: rooms first, with their objects, scripts, characters and sounds close at hand." TextWrapping="Wrap" TextAlignment="Center" Foreground="#AAB4BA"/>
+                            <TextBlock x:Name="PreviewDescription" Text="Walk through rooms, trigger cutscenes, change objects and discover the game's secrets." TextWrapping="Wrap" TextAlignment="Center" Foreground="#AAB4BA"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -470,7 +470,7 @@
                     <StackPanel Margin="0,4,8,8">
                         <DockPanel>
                             <CheckBox x:Name="SessionModeToggle" DockPanel.Dock="Right" Content="Interactive" IsChecked="True"
-                                      ToolTip="Interactive mode: hover automatically sends the pointer's room position to script 006, so script 008 can show the object's close-up; it sends no click. A click is the game's click (scripts 005–007, assumed input): Bobbin walks over and uses what is there (verb 0x38; doorways lead on), and a double click also looks at it (verb 0x36). Keys go to the game as in ScummVM: q-w-e-r-t-y-u-i and c-d-e-f-g-a-b-C play the distaff's notes, '.' skips the text shown, Escape skips a cutscene, space pauses it. Uncheck for inspection mode, where a click cycles an object's stored images and no script runs. Returning to normal view restores Interactive."
+                                      ToolTip="Interactive: click as in the game. Bobbin walks to what you click and uses it (doorways lead on); a double click also looks at it. Keys go to the game: q w e r t y u i and c d e f g a b C play the distaff's notes, . skips the text shown, Escape skips a cutscene, space pauses it. Uncheck to inspect: a click then cycles an object's stored images and no script runs."
                                       Checked="SessionMode_Changed" Unchecked="SessionMode_Changed"
                                       Foreground="#E7E0D2" VerticalAlignment="Center" Visibility="Collapsed"/>
                             <TextBlock Text="IN THIS ROOM" Foreground="#B78442" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>

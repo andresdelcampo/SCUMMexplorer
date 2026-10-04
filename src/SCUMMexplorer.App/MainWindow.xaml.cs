@@ -359,18 +359,18 @@ public partial class MainWindow : Window
         PageSubtitle.Text = game.Id switch
         {
             GameId.IndianaJones3 when game.Version == ScummVersion.V3 =>
-                "EGA room background preview · object and script decoding is not yet verified.",
+                "Room backgrounds and texts from the game.",
             GameId.Loom when game.Version == ScummVersion.V3 => "Explore rooms, objects, and sounds.",
             _ => "The folder index was read, but room and resource inspection is not supported for this game yet."
         };
         PageSubtitle.ToolTip = game.DetectionNote;
         PreviewTitle.Text = "Choose a room";
         PreviewDescription.Text = game.Id == GameId.IndianaJones3 && game.Version == ScummVersion.V3
-            ? "Select an EGA room to preview its background."
+            ? "Select a room to see its background."
             : game.Id == GameId.Loom && game.Version == ScummVersion.V3
-                ? "Select a room to view its EGA background."
+                ? "Pick a room to explore the game from there."
                 : "This game layout does not yet have a supported room background decoder.";
-        StatusText.Text = "Choose a room to begin.";
+        StatusText.Text = "Ready";
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
@@ -763,7 +763,7 @@ public partial class MainWindow : Window
         ShowPageHeader(false); // the scene needs the height more than a title that only repeats the mode
         PageTitle.Text = "Explore the scene";
         PageTitle.ToolTip = resource.Name;
-        PageSubtitle.Text = "Original LOOM EGA artwork";
+        PageSubtitle.Text = "Original artwork from the game";
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         PageSubtitle.ToolTip = resource.FilePath;
         PreviewTitle.Text = "Scene";
@@ -844,9 +844,9 @@ public partial class MainWindow : Window
                 ShowWalkBoxToggle();
                 PreviewMessage.Visibility = Visibility.Collapsed;
                 UpdateAdvancedMode();
-                PageSubtitle.Text = "EGA background preview · object and script decoding is not yet verified.";
-                StatusText.Text = "Background ready";
-                StatusText.ToolTip = "Room background decoded from its individual LFL resource.";
+                PageSubtitle.Text = "Original artwork from the game";
+                StatusText.Text = "Ready";
+                StatusText.ToolTip = "Room background read from the game's own data.";
                 return;
             }
             var objectRecords = _objectDirectory.Decode(bytes);
@@ -1819,7 +1819,7 @@ public partial class MainWindow : Window
 
         ShowPageHeader(true);
         PageTitle.Text = resource.Name;
-        PageSubtitle.Text = "Static pose gallery · all stored decodable poses at the same pixel scale";
+        PageSubtitle.Text = "Every stored pose of this costume, at the same scale";
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         CostumeMessage.Text = "Reading costume…";
         CostumeMessage.Visibility = Visibility.Visible;
