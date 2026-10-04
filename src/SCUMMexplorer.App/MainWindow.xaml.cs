@@ -372,6 +372,9 @@ public partial class MainWindow : Window
                 : "This game layout does not yet have a supported room background decoder.";
         StatusText.Text = "Ready";
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
+        // Game Status needs the session, not a room: show it as soon as the game is loaded (the header then stays still).
+        GameStatusButton.Visibility = game.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
+        GameStatusButton.IsEnabled = _session is not null;
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
     }
