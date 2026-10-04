@@ -10,9 +10,10 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 - `docs/`: the plan, audits and references. Start with `docs/LOOM_EGA_PLAN.md` (priorities and milestones). `docs/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do. `docs/CHANGELOG.md` lists finished work with links to its validation records. `docs/NEXT_SESSION_PROMPT.md` is the hand-off for the next session: its state, ordered tasks, rules and tooling notes. The other docs are historical.
 - `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
 - `Games/`: the local game data. Never commit it.
-  - `Games/loom`: DOS LOOM EGA, Spanish.
-  - `Games/IndyCru/EGA`: Indy3 EGA, **English**. The Indy tests expect this one.
-  - `Games/indy3/EGA`: Indy3 EGA, Spanish.
+  - `Games/loom ega en`: DOS LOOM EGA, **English**. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
+  - `Games/loom ega es`: DOS LOOM EGA, Spanish. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
+  - `Games/indy3 ega en`: Indy3 EGA, **English**. The Indy tests expect this one (`SCUMM_INDY3_EGA_TEST_ROOT`).
+  - `Games/indy3 ega es`, `indy3 vga es`, `indy3 demo en`, `monkey1`, `mmansion`: other local data, not used by the tests.
 - `scummvm/`: a ScummVM Windows build for comparing behaviour at runtime. It contains no source code.
 - Build output goes to `Exe/<Project>/…` (see `Directory.Build.props`).
 
@@ -22,12 +23,12 @@ From the repository root (Windows, .NET 10 SDK):
 
 ```powershell
 dotnet build SCUMMexplorer.slnx
-$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom"
-$env:SCUMM_INDY3_EGA_TEST_ROOT = "$PWD\Games\IndyCru\EGA"
+$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom ega en"
+$env:SCUMM_INDY3_EGA_TEST_ROOT = "$PWD\Games\indy3 ega en"
 dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 ```
 
-`.verification\run-verify.cmd` does the same and writes `.verification\verify.log`. The README uses `rtk proxy dotnet …`; RTK is optional. The LOOM data tests find `Games/loom` relative to the test binary.
+`.verification\run-verify.cmd` does the same and writes `.verification\verify.log`. The README uses `rtk proxy dotnet …`; RTK is optional. The LOOM data tests find `Games/loom ega en` (then `loom ega es`) relative to the test binary; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip silently.
 
 ## Engine facts that matter here (checked against ScummVM `engines/scumm`)
 
@@ -37,6 +38,7 @@ dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
   - `drawObject` only queues an object. Queued objects are painted on top in call order (`processDrawQue`).
   - `setState` marks the object's area dirty and clears the queue.
   - Close-up faces (LOOM rooms 56, 58, 86 and others) have colour-0 cut-outs that their eye or mouth images fill. Painting in directory order alone leaves black gaps.
+- **Editions differ in data, not only text.** Spanish and English LOOM EGA have other script lengths, so never key code on a byte offset; the English release lacks the Spanish `bit[0xD62]` and numbers bits from the Spanish 0xD63 on one lower; object ids from Room 34 on are one higher (English Room 33 has an extra object). Derive bits, ids and offsets from the scripts (see `LoomStatusSchema`), and compare editions with `.verification/ScriptDump`.
 - **Script dialects:** Indy3 EGA (non-Mac) differs from LOOM in a few opcodes:
   - `0xAE` wait has no subopcode.
   - `0x3B`/`0xBB` is waitForActor with a byte parameter. In LOOM it is a no-op with no operands.

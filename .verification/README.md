@@ -1,0 +1,7 @@
+# .verification: what is live and what is a record
+
+**Live (rebuilt and run on `Games/loom ega en`):** the harness projects that take `<game folder> <output folder>` (`UiShots`, `SceneShots`, `StatusShots`, `WindowCheck`, `TextGalleryCheck`, `RoomAudit`, `DoorwayClickCheck`, `Blockers`, `CodeDump`, `ScriptDump`, `ReplayAudit`, `MembershipAudit` and the other checks kept in `docs/HARNESS_REVIEW_2026-10-04.md`), the drivers `run-verify.cmd` and `harness-review-20261004/run-all.ps1`, the golden files in `readable-scripts/` (English), and `english-catalog-20261004/` (how `loom-replays.json` was regenerated).
+
+**Records (historical):** every other dated folder (`*-2026MMDD`, for example `room43-cage-20261002`, `native-replay-coverage-20261001`) is evidence from the Spanish-edition work of 27 September to 4 October 2026. Its `validation.md`, traces and scripts describe what was checked then, on `Games/loom` (now `Games/loom ega es`); the offsets, bit numbers and object ids in them are Spanish ones. `docs/CHANGELOG.md` and the docs link to them, so they stay in place and are not re-run. Do not copy a number from a record into code without checking it on the English data (`ScriptDump`).
+
+The `*.ps1` and `*.py` scripts inside those folders that name `Games\loom` are part of the record and will not run as written; to repeat one, change the folder argument and expect English differences. Heavy captures are packed in `Exe/_evidence-archive/`.

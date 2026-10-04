@@ -18,7 +18,7 @@ New-Item -ItemType Directory -Force $outRoot | Out-Null
 $results = Join-Path $scratch "results-$Tag.tsv"
 if (-not (Test-Path $results)) { "name`tbuild`texit`tseconds`tnote" | Out-File $results -Encoding utf8 }
 $env:SCUMM_SOUND_TEST_ROOT = "$root\Games\loom ega en"
-$env:SCUMM_INDY3_EGA_TEST_ROOT = "$root\Games\IndyCru\EGA"
+$env:SCUMM_INDY3_EGA_TEST_ROOT = "$root\Games\indy3 ega en"
 $env:SCUMM_HARNESS_FAILURE_LOG = "$scratch\failures-$Tag.log"
 $projects = Get-ChildItem "$root\.verification" -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '\\obj\\' } | Sort-Object FullName
 foreach ($p in $projects) {

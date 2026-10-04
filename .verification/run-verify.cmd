@@ -6,7 +6,7 @@ where dotnet >> %LOG% 2>&1
 dotnet build SCUMMexplorer.slnx --verbosity quiet -nologo >> %LOG% 2>&1
 echo BUILD_EXIT=%ERRORLEVEL% >> %LOG%
 set SCUMM_SOUND_TEST_ROOT=%CD%\Games\loom ega en
-set SCUMM_INDY3_EGA_TEST_ROOT=%CD%\Games\IndyCru\EGA
+set SCUMM_INDY3_EGA_TEST_ROOT=%CD%\Games\indy3 ega en
 dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build --verbosity quiet -nologo >> %LOG% 2>&1
 echo TEST_EXIT=%ERRORLEVEL% >> %LOG%
 if exist .verification\RoomAudit\RoomAudit.csproj dotnet build .verification\RoomAudit\RoomAudit.csproj --verbosity quiet -nologo >> %LOG% 2>&1
