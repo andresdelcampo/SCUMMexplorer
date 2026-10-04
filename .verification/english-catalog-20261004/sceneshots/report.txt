@@ -1,0 +1,10 @@
+== Room 02 object 154 Verb 0x36 (Room 02 · Look at leaf)
+   start note: Stated start: the running session, or a fresh one after the boot (seed 0), with Room 02 opened from the catalog (the ego's arrival there is assumed), then object 154's verb 0x36 run directly: an exploration action, not the game's click (Bobbin does not walk there, and the object may be untouchable in this state). Draft response verbs do not simulate casting a draft. The frames after it play on the playback clock at the game's frame rate. The running exploration session is kept (Restart gives the fresh state); only the minimum the scene needs and the session lacks is added.
+   session kept: True
+     5852 ms room 02: Room 02 Object 154 Verb 0x36: Last leaf of the year.
+     9261 ms room 02: 
+   ended after 9893 ms, 4 shots; status: Object 154's verb 0x36 (run directly) sent to the game (assumed input); no room load was reached
+   room view size: 948x620; controls 45; window 1400x900
+   story bits set: bit[0xD79] bit[0xD82] bit[0xD85] bit[0xD88] bit[0xD89]
+   ego: room 2 at (828,60) costume 01 staff False
+NOT FOUND: The firewood scene
