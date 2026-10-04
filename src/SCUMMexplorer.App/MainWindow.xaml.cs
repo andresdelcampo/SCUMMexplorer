@@ -3422,11 +3422,11 @@ public partial class MainWindow : Window
         var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
         RoomCutsceneButton.Visibility = active && roomChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.IsEnabled = active && CanStartCutscene;
-        RoomCutsceneButton.Content = roomChoices.Count == 1 ? "Play Cutscene" : "Play Cutscene ▾";
+        RoomCutsceneButton.Content = roomChoices.Count == 1 ? "Play Cutscene" : "Play Cutscene…";
         RoomCutsceneButton.ToolTip = !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
             roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
         if (!active) return;
-        CutsceneMenuButton.Content = "Play Cutscene ▾";
+        CutsceneMenuButton.Content = "Play Cutscene…";
         CutsceneMenuButton.IsEnabled = CanStartCutscene;
         CutsceneMenuButton.ToolTip = CanStartCutscene ? "Choose a cutscene from anywhere in the game." : "Playback is active. Finish or skip it before starting another scene.";
         UpdateRoomScrollButtons();

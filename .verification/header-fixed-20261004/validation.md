@@ -7,3 +7,7 @@ Measured in the real MainWindow (`report.txt`): sound dropdown x = 960 (w 142) a
 ## Game Status shown from the loaded game (same day)
 
 Game Status needs the exploration session, not a room: the session is created when the game opens, and the status window only syncs the room view when a room happens to be open. The button was nevertheless shown only after the first room visit (the playback-controls update). It now appears as soon as a LOOM game is loaded, so the header no longer changes when the first room is chosen. Harness: after load the button is visible and enabled, and `BuildGameStatusWindow` builds with no room chosen. Fixed group positions unchanged (960 / 1116).
+
+## Menu arrows vs dialog ellipses (same day)
+
+Only Play Cutscene carried a down arrow, yet it opens a picker window (so do the room's Play Cutscene when it has several choices, Game Texts and Game Status). A down arrow means a drop-down menu; a trailing ellipsis means a dialog. The header buttons now read "Play Cutscene…", "Game Texts…" and "Game Status…" (like "Open Game Folder…"); the room's Play Cutscene shows the ellipsis when it opens the picker and none when it plays its single cutscene directly. Arrows stay where a real menu opens: Interact ▾ (object verbs) and Other possible music ▾. Build only; text change, no layout harness.
