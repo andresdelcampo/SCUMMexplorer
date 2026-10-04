@@ -11,6 +11,7 @@ static class MaskSample
     private static IReadOnlyList<RoomObjectImage>? _images;
     private static LoomWalkBoxSet? _boxes;
     private static readonly Dictionary<int, LoomCostume?> Costumes = [];
+    private static bool _shot;
 
     public static void Print(GameLibrary game, LoomExplorationSession session, int roomId, int click, int frame)
     {
@@ -28,6 +29,29 @@ static class MaskSample
         var selection = new RoomObjectSelection(_images, states, snapshot.ObjectPositions, _records, _room, drawQueue: snapshot.DrawOrder);
         var mask = selection.ComposeDepthMask(_room);
         var ego = session.Actors.Single(a => a.Number == 1);
+        if (Environment.GetEnvironmentVariable("DEMO_SHOT") is { Length: > 0 } shotPath && click == 2 && ego.X == int.Parse(Environment.GetEnvironmentVariable("DEMO_SHOT_X") ?? "550") && !_shot)
+        {
+            // Our frame for ScummVM's camera: room x 376..696 at scale 4 (ScummVM's window shows 320 x 144 rows at 3.5 x 4.2).
+            _shot = true;
+            var pixels = selection.Compose(_room);
+            var layer = LoomActorRenderer.Render(session.Actors, roomId, _room.Width, _room.Height, id => Costumes.TryGetValue(id, out var c) ? c : Costumes[id] = LoomCostume.Load(game, id), selection.ComposeDepthMask(_room), _boxes, session.ObjectClasses);
+            const int x0 = 376, width = 320, scale = 4;
+            var bmp = new byte[width * scale * _room.Height * scale * 3];
+            for (var y = 0; y < _room.Height * scale; y++)
+                for (var x = 0; x < width * scale; x++)
+                {
+                    var rx = x0 + x / scale; var ry = y / scale;
+                    var index = layer.Pixels[ry * _room.Width + rx];
+                    var color = _room.Palette[index == LoomActorRenderer.Transparent ? pixels[ry * _room.Width + rx] : index];
+                    var o = ((_room.Height * scale - 1 - y) * width * scale + x) * 3;
+                    bmp[o] = (byte)(color & 0xFF); bmp[o + 1] = (byte)(color >> 8 & 0xFF); bmp[o + 2] = (byte)(color >> 16 & 0xFF);
+                }
+            using var file = File.Create(shotPath); using var w = new BinaryWriter(file);
+            w.Write((byte)'B'); w.Write((byte)'M'); w.Write(54 + bmp.Length); w.Write(0); w.Write(54);
+            w.Write(40); w.Write(width * scale); w.Write(_room.Height * scale); w.Write((short)1); w.Write((short)24);
+            w.Write(0); w.Write(bmp.Length); w.Write(0); w.Write(0); w.Write(0); w.Write(0); w.Write(bmp);
+            Console.WriteLine($"   shot written: ego ({ego.X},{ego.Y}) costume {ego.Look.Costume}");
+        }
         if (click == 0 && frame == 23)
             foreach (var box in _boxes!.Boxes)
                 Console.WriteLine($"   Box {box.Index}: mask {box.Mask}, flags 0x{box.Flags:X2}; {string.Join(';', box.Corners)}");

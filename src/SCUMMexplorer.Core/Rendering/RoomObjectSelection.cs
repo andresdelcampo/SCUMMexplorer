@@ -106,7 +106,12 @@ public sealed class RoomObjectSelection
                     _indexedBackground.Add(peer.Id);
                 }
         }
+        // The images the reached states draw: only these change the depth mask. Images shown later by the artwork
+        // estimates (or by the viewer) fill gaps in the picture; they are not what the game drew.
+        _reachedActive.UnionWith(objects.Where(IsActive).Select(obj => obj.Id));
     }
+
+    private readonly HashSet<int> _reachedActive = [];
 
     /// <summary>Objects drawn since the last redraw, in call order.</summary>
     public IReadOnlyList<int> DrawQueue => _drawQueue;
@@ -194,7 +199,8 @@ public sealed class RoomObjectSelection
     /// The depth mask (z-plane 1) as the room redraw leaves it: the room's mask, then each active image's own mask
     /// over its rectangle in paint order (ScummVM <c>drawBitmap</c> → <c>decodeMask</c>; EGA strips are never
     /// transparent, so an object's mask replaces the room's there). Null when the room has no mask. An image whose
-    /// mask could not be read leaves the mask under it as it was.
+    /// mask could not be read leaves the mask under it as it was. Only images the reached states draw count: an image
+    /// the artwork estimate shows (Room 02's object 157, state 0 in the game) paints no mask, so it cannot hide an actor.
     /// </summary>
     public byte[]? ComposeDepthMask(RoomImage room)
     {
@@ -202,7 +208,7 @@ public sealed class RoomObjectSelection
         if (room.DepthMask is not { } depth) return null;
         var mask = depth.Pixels.ToArray();
         foreach (var obj in PaintOrder())
-            if (obj.Mask is { } objectMask)
+            if (obj.Mask is { } objectMask && _reachedActive.Contains(obj.Id))
                 Paint(obj with { Pixels = objectMask }, mask, room.Width, room.Height, GetPosition(obj));
         return mask;
     }
