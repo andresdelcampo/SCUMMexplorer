@@ -45,15 +45,15 @@ public sealed class LflResourceChainTests
     }
 
     [Fact]
-    public void GameTextsListTheFourLeftoverScriptsSeparately()
+    public void GameTextsListTheLeftoverScriptsSeparately()
     {
         if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(Folder);
 
         var extraction = new LoomTextExtractor().Extract(game);
 
-        Assert.Equal([0, 51, 55, 116], extraction.LeftoverEntries.Select(item => item.Entry.ResourceId!.Value).Order());
-        Assert.Equal(["Costume 01", "Script 49", "Room 18", "Script 114"],
+        Assert.Equal([0, 116], extraction.LeftoverEntries.Select(item => item.Entry.ResourceId!.Value).Order());
+        Assert.Equal(["Costume 01", "Script 114"],
             extraction.LeftoverEntries.OrderBy(item => item.Entry.ResourceId).Select(item => item.OwnerLabel));
         // They are no longer counted or reported as decode failures.
         Assert.DoesNotContain(extraction.Diagnostics, line =>

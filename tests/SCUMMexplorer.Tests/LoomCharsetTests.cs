@@ -17,8 +17,8 @@ public sealed class LoomCharsetTests
         var charset = LoomCharset.TryLoad(Folder, 0, out var error);
         Assert.Null(error);
         Assert.NotNull(charset);
-        // +4: 240 glyphs; +5: font height 8.
-        Assert.Equal(240, charset.GlyphCount);
+        // +4: 128 glyphs (the English release; the Spanish one has 240); +5: font height 8.
+        Assert.Equal(128, charset.GlyphCount);
         Assert.Equal(8, charset.FontHeight);
         Assert.Equal(7, charset.CharWidth('A'));
         Assert.Equal(4, charset.CharWidth(' '));
@@ -41,7 +41,7 @@ public sealed class LoomCharsetTests
         var charset = LoomCharset.TryLoad(Folder, 0, out _)!;
         session.ActivateObjectVerb(156, 0x36);
         var message = session.Messages.Talk!;
-        Assert.Equal("Amanecer.", message.Text);
+        Assert.Equal("Dawn.", message.Text);
 
         var layer = LoomMessageRenderer.Render(message, charset);
         var width = charset.StringWidth(message.LineGlyphs[0]);

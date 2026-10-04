@@ -17,7 +17,7 @@ public sealed class LoomScriptIndexTests
         Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     [Fact]
-    public void ScriptsThatFailToDecodePointInsideAnotherIndexedResource()
+    public void ScriptsOffTheResourceChainPointInsideAnotherIndexedResource()
     {
         var indexPath = Path.Combine(Folder, "00.LFL");
         if (!File.Exists(indexPath)) return;
@@ -31,22 +31,20 @@ public sealed class LoomScriptIndexTests
             try { reader.Decode(script); }
             catch (InvalidDataException) { failing.Add(script.ResourceId!.Value); }
         }
-        Assert.Equal([0, 51, 55, 116], failing.Order());
+        Assert.Empty(failing); // every script decodes in the English release (the Spanish one failed on 0, 51, 55, 116)
 
+        var offChain = new List<int>();
         foreach (var entry in index.Where(item => item.Kind == ResourceKind.Script))
         {
             var chain = ResourceChain(entry.ContainerFileNumber);
-            if (!failing.Contains(entry.ResourceId))
-            {
-                Assert.Contains(chain, item => item.Start == entry.Offset);
-                continue;
-            }
+            if (chain.Any(item => item.Start == entry.Offset)) continue;
             // Off the chain, and strictly inside a resource another index entry owns.
-            Assert.DoesNotContain(chain, item => item.Start == entry.Offset);
+            offChain.Add(entry.ResourceId);
             var owner = Assert.Single(chain, item => item.Start < entry.Offset && entry.Offset < item.Start + item.Length);
             Assert.Contains(index, other => other.ContainerFileNumber == entry.ContainerFileNumber &&
                                             other.Offset == owner.Start && other != entry);
         }
+        Assert.Equal([0, 116], offChain.Order());
     }
 
     private static List<(int Start, int Length)> ResourceChain(int fileNumber)

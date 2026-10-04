@@ -150,7 +150,7 @@ public sealed class LoomMessageTests
         if (Start() is not { } started) return;
         var session = started.Session;
         // Room 02 object 154 verb 0x36: a cutscene, actor 5 walks, 8 frames, the ego turns,
-        // two more frames, then print 0x01, [center; position, 0x00A0, var[0x0A6]; text, "Ultima hoja del a\xA4o."].
+        // two more frames, then print 0x01, [center; position, 0x00A0, var[0x0A6]; text, "Last leaf of the year."].
         session.ActivateObjectVerb(154, 0x36);
         Assert.NotEqual("Room 02 Object 154 Verb 0x36 +0x0037", session.Messages.Talk?.Source);
         FramesUntilTalk(session, "Room 02 Object 154 Verb 0x36 +0x0037", 20);
