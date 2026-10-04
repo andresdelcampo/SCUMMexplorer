@@ -1,0 +1,9 @@
+# Catalog sample played through the real MainWindow (English LOOM EGA), 4 October night
+
+Method: `run-sample.sh` / `run-each.sh` (SceneShots: `PlayKnownCutscene`, the picker's own entry, screenshots every few seconds, texts, actors, end state), sample in `sample.json`: the three hand-built scenes (Walk to Room 13, the Elders' trial, the firewood scene) and 22 catalog starts spread over both categories (13 Scenes, 9 Dialogue and reactions). The fourth hand-built entry the hand-off mentions is not a separate scene in the English catalog (the catalog has no entries with steps).
+
+Result: 25 starts, **no failure**: each starts, plays, shows its texts and ends in the room the catalog says (Walk to Room 13 -> Room 13 with the distaff; firewood -> Room 38 with Rusty's look, costume 0x67; Room 02 object 153 -> 03; Room 12 object 322 -> 13; Room 30 object 508 -> 31; Room 51 object 742 -> 66). Long scenes (the trial, 2,120 frames) were cut by the 120 s cap and show "Scene ready" at the cap, not a stall. Screenshots inspected: Room 09 El Muerto, Room 46, Room 38 (firewood end), Room 08 trial.
+
+Harness notes (not app issues): (1) ids with a trailing carriage return (Windows python output) are "NOT FOUND": strip it; (2) a scene that outlasts the cap blocks the next start in a shared process, so the later scenes of that batch are not valid: run long scenes one per process (`run-each.sh`); (3) hand-built scenes are matched by their computed Id (`Room 10 object 295 Verb 0x38`), not by title.
+
+App issues found while playing: El Muerto was not drawn (fixed: costume from the game's own placement, see CHANGELOG 4 October night), the actor placement used the wrong step fields (fixed), the room animation ran only on pointer moves (fixed: idle frame clock). Not found in this sample: blank rooms, wrong end rooms, missing texts.
