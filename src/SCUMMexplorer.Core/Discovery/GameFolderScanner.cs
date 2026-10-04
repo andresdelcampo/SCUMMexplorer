@@ -36,6 +36,8 @@ public sealed class GameFolderScanner
         var hasRoomFiles = lflFiles.Length > 1;
 
         var resources = new List<GameResource>();
+        var chains = new Dictionary<string, IReadOnlyList<LflChainResource>?>(StringComparer.OrdinalIgnoreCase);
+        var omitted = 0;
         var indexWasParsed = false;
         foreach (var item in lflFiles)
         {
@@ -52,6 +54,13 @@ public sealed class GameFolderScanner
                             var fileName = $"{indexed.ContainerFileNumber:00}.LFL";
                             var resourcePath = Path.Combine(fullPath, fileName);
                             if (indexed.Kind == ResourceKind.Room && !File.Exists(resourcePath)) continue;
+                            // A demo's index is not a subset of the full game's: it keeps entries for resources its
+                            // folder lacks (no container file) or whose offset is not where a resource starts.
+                            if (isDemo && indexed.Kind != ResourceKind.Room && !StartsResource(chains, resourcePath, indexed.Offset))
+                            {
+                                omitted++;
+                                continue;
+                            }
                             var label = indexed.Kind switch
                             {
                                 ResourceKind.Room => $"Room {indexed.ResourceId:00}",
@@ -99,6 +108,8 @@ public sealed class GameFolderScanner
         var version = indexWasParsed ? ScummVersion.V3 : ScummVersion.Unknown;
         var note = gameId switch
         {
+            GameId.Loom when indexWasParsed && isDemo =>
+                $"LOOM self-running preview (LOOMDEMO.EXE): a subset of the game's rooms. Its 00.LFL index also lists {omitted} scripts, costumes and sounds that this folder does not contain; they are left out.",
             GameId.Loom when indexWasParsed =>
                 "DOS LOOM profile inferred from its files; the 00.LFL SCUMM v3 signature and resource directories were read.",
             GameId.Loom =>
@@ -113,6 +124,17 @@ public sealed class GameFolderScanner
         };
 
         return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId);
+    }
+
+    private static bool StartsResource(Dictionary<string, IReadOnlyList<LflChainResource>?> chains, string path, int offset)
+    {
+        if (!chains.TryGetValue(path, out var chain))
+        {
+            try { chain = File.Exists(path) ? LflResourceChain.Read(File.ReadAllBytes(path)) : null; }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { chain = null; }
+            chains[path] = chain;
+        }
+        return chain is not null && chain.Any(item => item.Start == offset);
     }
 
     private static int? ParseLflId(string path)

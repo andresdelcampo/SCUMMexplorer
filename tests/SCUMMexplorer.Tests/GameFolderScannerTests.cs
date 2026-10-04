@@ -35,6 +35,32 @@ public sealed class GameFolderScannerTests
     }
 
     [Fact]
+    public void LoomDemoKeepsOnlyResourcesItsFolderContains()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(folder);
+        try
+        {
+            File.WriteAllBytes(Path.Combine(folder, "LOOMDEMO.EXE"), []);
+            WriteOldV3Index(Path.Combine(folder, "00.LFL"));
+            File.WriteAllBytes(Path.Combine(folder, "01.LFL"), []);
+            File.WriteAllBytes(Path.Combine(folder, "02.LFL"), []);
+
+            var game = new GameFolderScanner().Scan(folder);
+
+            Assert.Equal("LOOM (demo)", game.Title);
+            Assert.Equal(new int?[] { 1, 2 }, game.Rooms.Select(room => room.ResourceId));
+            // The index entries point into empty files: no resource starts there.
+            Assert.DoesNotContain(game.Resources, resource => resource.Kind is ResourceKind.Costume or ResourceKind.Script or ResourceKind.Sound);
+            Assert.Contains("self-running preview", game.DetectionNote);
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    [Fact]
     public void RecognizesIndianaJonesEgaFromItsOldV3Index()
     {
         var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
