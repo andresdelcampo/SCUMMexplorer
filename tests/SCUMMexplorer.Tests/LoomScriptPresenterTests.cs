@@ -69,7 +69,7 @@ public sealed class LoomScriptPresenterTests
     public void RealScriptsMatchTheirGoldenOutput(int scriptId)
     {
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
-        var game = new GameFolderScanner().Scan(Path.Combine(root, "Games/loom"));
+        var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative)));
         var glossary = LoomGlossary.Load(game);
         var script = new LoomScriptReader().Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == scriptId));
         var text = new LoomScriptPresenter(glossary).Present(script);

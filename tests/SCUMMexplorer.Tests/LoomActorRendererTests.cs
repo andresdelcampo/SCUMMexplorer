@@ -8,7 +8,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomActorRendererTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     private static bool HasGame => File.Exists(Path.Combine(Folder, "00.LFL"));
 

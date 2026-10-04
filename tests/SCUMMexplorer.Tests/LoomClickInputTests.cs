@@ -13,7 +13,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomClickInputTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     private static (GameLibrary Game, LoomExplorationSession Session)? Start()
     {

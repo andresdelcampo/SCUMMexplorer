@@ -8,7 +8,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomSceneSetupPlannerTests
 {
     private static GameLibrary Game() =>
-        new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom")));
+        new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative)));
 
     private static LoomExplorationSession Session(GameLibrary game) =>
         new(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")));
@@ -241,7 +241,7 @@ public sealed class LoomSceneSetupSceneTests
     [Fact]
     public void ElMuertosLinesAreSpokenBecauseTheDerivedSetupBringsActor4IntoRoom09()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var planner = new LoomSceneSetupPlanner(game);
         // Room 09 object 275, verb 0x56 starts local 221: actor 8's apparition, then two lines printed for actor 4.
@@ -261,7 +261,7 @@ public sealed class LoomSceneSetupSceneTests
 
     private static string Run(bool withSetup, int room, int obj, int verb, int script)
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoomById(room);

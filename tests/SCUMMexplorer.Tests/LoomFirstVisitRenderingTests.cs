@@ -258,7 +258,7 @@ public sealed class LoomFirstVisitRenderingTests
     {
         public static Fixture? Load()
         {
-            var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+            var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
             if (!File.Exists(Path.Combine(folder, "00.LFL"))) return null;
             var game = new GameFolderScanner().Scan(folder);
             return new Fixture(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")),

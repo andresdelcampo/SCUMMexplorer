@@ -132,5 +132,5 @@ public sealed class LoomRoomObjectsTests
     }
 
     private static string GameFolder() => Path.GetFullPath(
-        Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 }

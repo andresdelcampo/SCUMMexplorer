@@ -11,7 +11,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomActorTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     private static LoomWalkBoxSet Room02Boxes() =>
         LoomWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "02.LFL")));

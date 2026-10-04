@@ -7,7 +7,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LflResourceChainTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     [Fact]
     public void ChainFollowsEachResourceLength()

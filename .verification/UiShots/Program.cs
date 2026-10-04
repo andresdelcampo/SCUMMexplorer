@@ -47,11 +47,15 @@ internal static class Program
                     gallery.Show();
                     await Task.Delay(1500);
                     var roomFilter = (ComboBox)gallery.FindName("RoomFilter");
-                    var pick = roomFilter.Items.Cast<object>().First(i => i.ToString()!.Contains("Room 06"));
-                    roomFilter.SelectedItem = pick;
-                    await Task.Delay(800);
                     var list = (ListBox)gallery.FindName("TextList");
-                    report.Add($"gallery: room 06 rows {list.Items.Count}");
+                    // The first room whose texts include a cutscene group (the gallery lists only rooms that have texts).
+                    foreach (var candidate in roomFilter.Items.Cast<object>().Skip(1))
+                    {
+                        roomFilter.SelectedItem = candidate;
+                        await Task.Delay(400);
+                        if (Enumerable.Range(0, list.Items.Count).Any(i => (list.Items[i].GetType().GetProperty("ListHeading")!.GetValue(list.Items[i]) as string ?? "").Contains("CUTSCENE"))) break;
+                    }
+                    report.Add($"gallery: {((roomFilter.SelectedItem as ComboBoxItem)?.Content)} rows {list.Items.Count}");
                     list.SelectedIndex = Enumerable.Range(0, list.Items.Count).First(i => (list.Items[i].GetType().GetProperty("ListHeading")!.GetValue(list.Items[i]) as string ?? "").Contains("CUTSCENE"));
                     await Task.Delay(2500);
                     report.Add("gallery lines: " + string.Join(" | ", ((StackPanel)gallery.FindName("ConversationLines")).Children.OfType<Grid>().Select(g => string.Join(": ", g.Children.OfType<TextBlock>().Select(t => t.Text)))));

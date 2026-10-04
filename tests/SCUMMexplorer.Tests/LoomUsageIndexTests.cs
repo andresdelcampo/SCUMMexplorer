@@ -5,7 +5,7 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class LoomUsageIndexTests
 {
-    private static string Folder => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+    private static string Folder => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     [Fact]
     public void UsedByListsTheCodeThatStartsAScript()

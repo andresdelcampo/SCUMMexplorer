@@ -12,7 +12,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomVerbAreaTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     private static RoomObjectImage? Image(GameLibrary game, int room, int objectId) =>
         new LoomRoomObjects().Decode(File.ReadAllBytes(game.Rooms.Single(item => item.ResourceId == room).FilePath))

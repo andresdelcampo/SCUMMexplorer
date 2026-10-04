@@ -8,7 +8,7 @@ public sealed class LoomNestedFreezeTests
     [Fact]
     public void AChildThatFreezesItsCallerSuspendsTheInstructionAfterItsStart()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         var parent = new LoomScriptDisassembly(250, 1, 0, 11, 11, [

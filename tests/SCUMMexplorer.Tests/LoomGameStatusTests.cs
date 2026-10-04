@@ -7,7 +7,7 @@ public sealed class LoomGameStatusTests
 {
     private static LoomExplorationSession Start()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         for (int i = 0; i < 3000 && !session.GameStatus.CanEdit; i++) session.AdvanceFrame();
@@ -93,7 +93,7 @@ public sealed class LoomGameStatusTests
     [Fact]
     public void BrowsingRaisesHeldStaffToInitialLevelAndKeepsHigherExplicitChoices()
     {
-        var session = Start(); var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom")));
+        var session = Start(); var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative)));
         session.UpdateAvailableNotes(1);
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 26), preserveStaffLevel: true);
         for (int i = 0; i < 1000 && !session.GameStatus.CanEdit; i++) session.AdvanceFrame();

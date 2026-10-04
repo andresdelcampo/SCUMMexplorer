@@ -8,7 +8,7 @@ public sealed class LoomReplaySequenceTests
     [Fact]
     public void AnUnmatchedStageNeverSendsItsFollowingInput()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 10));
@@ -26,7 +26,7 @@ public sealed class LoomReplaySequenceTests
     [Fact]
     public void CheckingAWaitTwiceDoesNotAdvanceItsFrameCount()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         var sequence = new LoomReplaySequence(session, [new("frames", Frames: 1)]);
@@ -38,7 +38,7 @@ public sealed class LoomReplaySequenceTests
     [Fact]
     public void ABonusScriptStartRunsRoom34sLookoutSceneToItsEnd()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 34));
@@ -62,7 +62,7 @@ public sealed class LoomReplaySequenceTests
     [Fact]
     public void TheFirewoodSequenceStartsWithBobbinInRustysLook()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 36));
@@ -78,7 +78,7 @@ public sealed class LoomReplaySequenceTests
     [Fact]
     public void RustysGhostSceneStartsAfterTheDreamWithBobbinAsHimself()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 34));
@@ -104,7 +104,7 @@ public sealed class LoomReplaySequenceTests
     [Fact]
     public void ThePlaceStepStandsTheEgoAtTheCliffEndWithTheCameraOnIt()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 34));

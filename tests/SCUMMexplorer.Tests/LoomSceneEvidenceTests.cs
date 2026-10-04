@@ -136,7 +136,7 @@ public sealed class LoomSceneEvidenceTests
     [Fact]
     public void Room69DifficultyButtonsAreBlankedByLocal201SoTheyAreNotDrawnBack()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
         var drawn = LoomSceneDrawBatches.Build(game).ForRoom(69).SelectMany(batch => batch.Steps).Select(step => step.ObjectId);
@@ -148,7 +148,7 @@ public sealed class LoomSceneEvidenceTests
     [Fact]
     public void Room69SessionBlanksTheQueuedDifficultyButtonsWhenLocal201BoxesOverThem()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game,
@@ -165,7 +165,7 @@ public sealed class LoomSceneEvidenceTests
     [Fact]
     public void Rooms82To85AreSoundBanksAndLeaveTheSceneListWhileRoom61Stays()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
         var banks = game.Rooms.Where(SCUMMexplorer.Core.Rendering.LoomRoomKinds.IsResourceBank).Select(r => r.ResourceId!.Value).ToArray();

@@ -11,7 +11,7 @@ public sealed class LoomObjectLookAuditTests(ITestOutputHelper output)
     [Fact(Skip = "Diagnostic trace that prints and asserts nothing; run it by hand when auditing Look verbs.")]
     public void TraceRoom17Object357DoubleClick()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
@@ -41,7 +41,7 @@ public sealed class LoomObjectLookAuditTests(ITestOutputHelper output)
     [Fact(Skip = "Diagnostic trace that prints and asserts nothing; run it by hand when auditing Look verbs.")]
     public void AuditRoom02AndLaterRoomLookVerbs()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(folder);
         var directory = new LoomRoomObjectDirectory();

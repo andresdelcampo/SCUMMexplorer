@@ -13,7 +13,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomCutsceneTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     [Theory]
     [InlineData("delay", "0x00003C", 60)]

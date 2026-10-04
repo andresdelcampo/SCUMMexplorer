@@ -64,7 +64,7 @@ public sealed class LoomEgaRoomDecoderTests
     [Fact]
     public async Task DecodesIndexedRoomsInSuppliedLoomReleaseWhenAvailable()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
 
         var game = new GameFolderScanner().Scan(folder);
@@ -96,7 +96,7 @@ public sealed class LoomEgaRoomDecoderTests
     [Fact]
     public void EveryLoomObjectImageCarriesAReadableDepthMask()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(folder);
         var counts = new Dictionary<(int Room, int Object), int>();

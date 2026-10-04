@@ -11,7 +11,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomObjectClassTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     [Theory]
     [InlineData("[0x0098]", 0u, true)]           // 0x80|24 sets class 24

@@ -45,7 +45,7 @@ public sealed class LoomGlossaryTests
     [Fact]
     public void ObjectNamesComeFromTheGameData()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var glossary = LoomGlossary.Load(new GameFolderScanner().Scan(folder));
         Assert.Equal("hoja", glossary.Object(2, 154)!.Name);
         Assert.Null(glossary.Object(9, 154));

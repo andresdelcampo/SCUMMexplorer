@@ -8,7 +8,7 @@ public sealed class LoomEstimatedRoomLoadTests
 {
     private static LoomExplorationSession? Session()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return null;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")), completeBoot: false);
@@ -48,7 +48,7 @@ public sealed class LoomEstimatedRoomLoadTests
         Assert.Contains(645, session.Snapshot.EstimatedStates);
         Assert.DoesNotContain(645, session.Snapshot.StatesSetByCode);
         Assert.Contains(645, session.Snapshot.ArtworkStateIds());
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var bytes = File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 43).FilePath);
         var background = new LoomEgaRoomDecoder().Decode(bytes);

@@ -337,28 +337,28 @@
                                         <StackPanel x:Name="SessionActions" Visibility="Collapsed" Orientation="Horizontal">
                                         </StackPanel>
                                     </DockPanel>
-                                    <WrapPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
+                                    <WrapPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0" Visibility="Collapsed">
                                         <!-- Two groups that wrap as wholes: playback controls, then the room actions. -->
                                         <StackPanel Orientation="Horizontal">
-                                        <Button x:Name="PlaybackPauseButton" Content="⏸ Pause" Click="PlaybackPause_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
+                                        <Button x:Name="PlaybackPauseButton" Content="⏸ Pause" Click="PlaybackPause_Click" Padding="8,0" Height="27" FontSize="12.5" Margin="0,0,5,5" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Pause or play the scene (space). In Advanced mode, Step ▸ then plays one frame while paused."/>
-                                        <Button x:Name="AdvanceFrameButton" Content="Step ▸" ToolTip="Advance the scene by one frame (for stepping while paused)." Click="AdvanceFrame_Click" Padding="8,4" Margin="0,0,5,0" Visibility="Collapsed"
+                                        <Button x:Name="AdvanceFrameButton" Content="Step ▸" ToolTip="Advance the scene by one frame (for stepping while paused)." Click="AdvanceFrame_Click" Padding="8,0" Height="27" FontSize="12.5" Margin="0,0,5,5" Visibility="Collapsed"
                                                     Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                        <Button x:Name="SkipCutsceneButton" Content="⏭ Skip (Esc)" Click="SkipCutscene_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
+                                        <Button x:Name="SkipCutsceneButton" Content="⏭ Skip (Esc)" Click="SkipCutscene_Click" Padding="8,0" Height="27" FontSize="12.5" Margin="0,0,5,5" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
-                                        <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
+                                        <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,0" Height="27" FontSize="12.5" Margin="0,0,5,5" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Skip the current line, as with the '.' key."/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                         <Button x:Name="RoomCutsceneButton" Content="Play Cutscene" Visibility="Collapsed"
-                                                Click="RoomCutscene_Click" Padding="8,4" Margin="0,0,5,0" MinWidth="104" Height="27"
+                                                Click="RoomCutscene_Click" Padding="8,0" Height="27" FontSize="12.5" Margin="0,0,5,5" MinWidth="104"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
-                                        <Button x:Name="InteractButton" Content="Interact ▴" Click="Interact_Click" IsEnabled="False" Padding="8,4" Margin="0,0,5,0"
+                                        <Button x:Name="InteractButton" Content="Interact ▴" Click="Interact_Click" IsEnabled="False" Padding="8,0" Height="27" FontSize="12.5" Margin="0,0,5,5"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"
                                                 ToolTip="Click an object to select it, then choose what to do with it. Right-clicking an object opens the same menu."/>
-                                        <Button x:Name="RoomSoundsButton" Content="Sounds ▴" Visibility="Collapsed" Click="RoomSounds_Click" Padding="8,4" Margin="0,0,5,0"
+                                        <Button x:Name="RoomSoundsButton" Content="Sounds ▴" Visibility="Collapsed" Click="RoomSounds_Click" Padding="8,0" Height="27" FontSize="12.5" Margin="0,0,5,5"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"
                                                 ToolTip="Music and sound effects this room's scripts may start. Pick one to hear it; the game does not necessarily play all of them."/>
                                         </StackPanel>

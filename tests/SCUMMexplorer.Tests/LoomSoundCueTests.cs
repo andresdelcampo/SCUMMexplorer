@@ -73,7 +73,7 @@ public sealed class LoomSoundCueTests
     }
 
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     [Fact]
     public void IntroSoundIsNotRoomMusicButRoomSixteensOwnCueIs()

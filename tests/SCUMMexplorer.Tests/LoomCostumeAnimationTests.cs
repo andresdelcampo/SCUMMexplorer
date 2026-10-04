@@ -11,7 +11,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomCostumeAnimationTests
 {
     private static readonly string Folder =
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom"));
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     private static LoomCostume? EgoCostume() =>
         File.Exists(Path.Combine(Folder, "00.LFL")) ? LoomCostume.Load(new GameFolderScanner().Scan(Folder), 1) : null;
