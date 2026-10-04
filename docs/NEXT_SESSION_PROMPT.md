@@ -16,11 +16,11 @@ Done in the demos session (records: [.verification/demos-20261004/README.md](../
 
 ## Decided with the user
 
-- Order of the other versions: LOOM demos (done), then **M5, the secrets guide** (next; brought back in scope on 4 October, decisions in the plan: all kinds of secrets, no spoiler gating, seen and unseen with a filter), then **Indy3 EGA as the second explorable game**.
+- Order of the other versions: LOOM demos (done), then **M5, the secrets guide** (next; brought back in scope on 4 October, decisions in the plan: all kinds of secrets, no spoiler gating, seen and unseen with a filter), then **LOOM VGA** (needs the data in `Games/`; probe the format first), then **Indy3 EGA**.
 - A demo plays both ways: rooms explorable, the preview as a cutscene, no new button.
 - Harness review: obsolete harnesses removed, three repaired; archive folders are records, not harnesses. Room17Check's interrupted walk is expected.
 
-## After M5: Indy3 EGA (`Games/indy3 ega en`)
+## After LOOM VGA: Indy3 EGA (`Games/indy3 ega en`)
 
 Found earlier: the generic session opens all 40 Indy3 rooms tried without errors; the app creates a session only for LOOM, so Indy3 shows plain backgrounds; about 40 `GameId.Loom` gates in `MainWindow.xaml.cs` decide what Indy3 gets. Indy3 needs its own dialect checks (`ScummScriptDialects.For(game.Id)`), dialogue choices (verbs 120–125) and texts; backgrounds and texts are the stated scope.
 

@@ -42,13 +42,14 @@ Decisions (user, 4 October):
 - **Spoilers:** ignored. The whole app is a spoiler, so there are no spoiler levels and no reveal gating.
 - **Scope:** both seen and unseen content, with a filter (all / triggered this session / not yet triggered), using Game Status bits and session history where a trigger is known.
 
-## Next phase: other versions (agreed 4 October; starts after M5)
+## Next phase: other versions (starts after M5; order: LOOM VGA, then Indy3)
 
 Done: English LOOM EGA as the reference edition, and the two LOOM demos. Local data: `Games/indy3 ega en` (the tests expect it), `indy3 ega es`, `indy3 vga es`, `indy3 demo en`, `monkey1`, `mmansion`, plus `Games/FUTURE/`. There is no LOOM VGA data yet.
 
 1. **Separate the LOOM-specific from the generic.** About 40 `GameId.Loom` gates in `MainWindow.xaml.cs`; propose which become generic before changing them. `Loom*` Core types hold LOOM-only parts (`LoomEgaStateFlags`, `loom-glossary.json`, `loom-replays.json`, `LoomDraftNames`, the catalog and setup planner) and generic ones (executor, actors, costumes, camera, walk boxes, text extraction, audio). No behaviour change; check on LOOM.
-2. **Indy3 EGA as the second explorable game**, scoped to backgrounds, texts and dialogue choices (verbs 120–125), using [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md).
-3. **LOOM VGA (CD, SCUMM v4) and later containers** (Monkey Island, Maniac Mansion): needs the data in `Games/` first, then a feasibility probe of the resource format and opcode set. None of it is decoded.
+2. **LOOM VGA (CD, SCUMM v4), the rest of LOOM.** Needs the data in `Games/` first (not there yet; `Games/FUTURE/` may hold it, to check). Then a feasibility probe of the resource container and opcode set, before any app work. If the data is not available when M5 is done, do step 3 and come back.
+3. **Indy3 EGA as the next explorable game**, scoped to backgrounds, texts and dialogue choices (verbs 120–125), using [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md).
+4. **Later containers and dialects** (Monkey Island, Maniac Mansion): assess the resource format and opcode set from the data first; none of it is decoded.
 
 ## Evidence rules
 
