@@ -1,0 +1,73 @@
+gallery: Room 02 rows 37
+gallery lines: Bobbin: Last leaf of the year.
+second pick in the same room: picture ready after 124 ms, shown Visible
+combo height 28
+options expander: expanded True; doorway radios Visible, object radios Visible
+defaults: doorway overlay Collapsed (0), object overlay Collapsed (0)
+doorways Always: overlay Visible children 10
+objects Always: overlay Visible children 7
+doorways Hover (nothing hovered): children 0; objects Never: overlay Collapsed
+saved options file: doorways=Never | bytecode=0 | readable=1 | framing=1 | optionsOpen=1
+normal: room view 948x620; note 'Click the scene to explore it. Hover to discover objects and exits.'; verb tooltip none
+full-screen button before hover: Collapsed
+after hover: Visible
+full screen: state Maximized, style None, header Collapsed, side Collapsed, room view 1879x1202, window 2207x1247
+left full screen: state Normal, style SingleBorderWindow, header Visible, side Visible, room view 948x620
+interact (nothing selected): 'Interact ▴' enabled False
+interact (hoja selected): 'Interact · leaf ▴' enabled True
+menu verbs: Look at | Draft: Twisting | Draft: Twisting (reversed)
+after Look at: playback True, messages:  | Last leaf of the year.
+actions: section Visible, header 'ACTIONS · leaf', rows Look at | Close-up | Draft: Twisting | Draft: Twisting (reversed) | Any other draft; center panel Collapsed
+object used by: Used by: no code names this object (clicks and drafts reach it through the input scripts).
+after a pick, with no mouse movement: timer 5193 -> 5331; playback running True
+RoomEntryTraceExpander: visible Visible, header 'Room entry'
+ObjectActionTraceExpander: visible Visible, header 'Last action'
+StateIssuesSection: visible Visible, header 'Assumptions · 31'
+entry summary: 50 instructions · camera x 536 (estimate) · sounds 25; event rows 8
+status text Collapsed, objects note Collapsed, last action: leaf · Look at: ran; no scene change followed.
+what happened:  1. leaf → Look at was run directly (an exploration action: no click, no walk) |  2. begin cutscene (arguments 0)  [Room 02 Object 154 Verb 0x36] |  3. object 154 “leaf”: set class 24 |  4. start Script 08 · show or hide the close-up in the verb area with 0 |  5. last leaf of Room 02 walks to (807, 152) |  6. Result: no scene change followed
+  GROUP: Arrived by a shortcut · 2
+    ISSUE: Object 154 verb 0x36 was activated directly; input dispatch, actor walk, and class-based hit selection were not simulated.
+    ISSUE: Object 154 is untouchable (class 24) in this preview, so the game's findObject would not select it; its verb ran only as an exploration action.
+  GROUP: Estimates · 29
+    ISSUE: The artwork of 1 object(s) is estimated.
+    ISSUE: Script 42: the delay at +0x009D reads local[0x003] = 32, an estimate; when it runs again is an estimate.
+    ISSUE: Script 42 +0x0091: getRandomNr at +0x0096 picked 31 of 0..60 (seeded pick, seed 0, draw 2); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x0026 picked 3 of 0..4 (seeded pick, seed 0, draw 4); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x004F picked 2 of 0..2 (seeded pick, seed 0, draw 4); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42: the delay at +0x009D reads local[0x003] = 7, an estimate; when it runs again is an estimate.
+    ISSUE: Script 42 +0x0091: getRandomNr at +0x0096 picked 6 of 0..60 (seeded pick, seed 0, draw 3); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 03 +0x0000: camera x follows actor 1, whose position is an estimate (assumed arrival at Room 03 Object 160 Verb 0x38 +0x0005 after a catalog visit) (+0x0018)
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x0026 picked 2 of 0..4 (seeded pick, seed 0, draw 5); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x004F picked 2 of 0..2 (seeded pick, seed 0, draw 5); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42: the delay at +0x009D reads local[0x003] = 53, an estimate; when it runs again is an estimate.
+    ISSUE: Script 42 +0x0091: getRandomNr at +0x0096 picked 52 of 0..60 (seeded pick, seed 0, draw 4); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x0026 picked 2 of 0..4 (seeded pick, seed 0, draw 6); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x0026 picked 0 of 0..4 (seeded pick, seed 0, draw 7); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x004F picked 2 of 0..2 (seeded pick, seed 0, draw 6); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42: the delay at +0x009D reads local[0x003] = 33, an estimate; when it runs again is an estimate.
+    ISSUE: Script 42 +0x0091: getRandomNr at +0x0096 picked 32 of 0..60 (seeded pick, seed 0, draw 5); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x0026 picked 4 of 0..4 (seeded pick, seed 0, draw 8); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x004F picked 1 of 0..2 (seeded pick, seed 0, draw 7); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42: the delay at +0x009D reads local[0x003] = 21, an estimate; when it runs again is an estimate.
+    ISSUE: Script 42 +0x0091: getRandomNr at +0x0096 picked 20 of 0..60 (seeded pick, seed 0, draw 6); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x0026 picked 1 of 0..4 (seeded pick, seed 0, draw 9); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x004F picked 0 of 0..2 (seeded pick, seed 0, draw 8); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42: the delay at +0x009D reads local[0x003] = 9, an estimate; when it runs again is an estimate.
+    ISSUE: Script 42 +0x0091: getRandomNr at +0x0096 picked 8 of 0..60 (seeded pick, seed 0, draw 7); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x0026 picked 0 of 0..4 (seeded pick, seed 0, draw 10); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42 +0x0021: getRandomNr at +0x004F picked 2 of 0..2 (seeded pick, seed 0, draw 9); what follows from it is an estimate, not a reached game state.
+    ISSUE: Script 42: the delay at +0x009D reads local[0x003] = 49, an estimate; when it runs again is an estimate.
+    ISSUE: Script 42 +0x0091: getRandomNr at +0x0096 picked 48 of 0..60 (seeded pick, seed 0, draw 8); what follows from it is an estimate, not a reached game state.
+script 91 default: readable True, title 'Script 91 · Room 43 cage scene', subtitle 'Indexed script resource · DOS LOOM old-v3 · name: reading', tree header 'Script 91 · Room 43 cage scene'
+readable head: 0000  set: a note is playing / 0005  if bit[0xD95] / 000A      Bobbin says: “I already opened it.” / 0023      stop this script /       end if / 0025  begin cutscene (arguments 0)
+used by: 'Used by · 1': Room 43 object 644 “cage” verb 0x3A +0x0000 starts it
+event rows: possibly starts Script 28 · clear the draft buffer | possibly starts Script 08 · show or hide the close-up in the verb area | possibly starts Script 34 | possibly starts Script 40 · play a sound (effect) | possibly starts Script 17 · give the ego a costume (by size) ×2 | possibly starts Script 19 · hide the distaff verbs ×2
+story bits in script 91 readable view: Script 91 · Room 43 cage scene  ·  43.LFL | 0005  if bit[0xD95] | 0025  begin cutscene (arguments 0) | 002A  set: bit[0xD95] | 00CD  if bit[0xDA1] | 00D5      set: bit[0xDBF] | 0DCF      clear: bit[0xDBF] | 0DD4      set: bit[0xDB7]
+raw view: first lines 0005  notEqualZero bit[0xD95], branch +0x001B -> 0x0025 / 000A  print 0x01, [center; text, "I already opened it."]; bytecode toggle enabled True
+script 91 default: bytecode toggle False
+script 91: bytecode on -> 0005  A8 95 8D 1B 00    notEqualZero bit[0xD95], branch +0x001B -> 0x0025 / 000A  14 01 04 0F 49 20 61 6C 72 65 61 64 79 20 6F 70 65 6E 65 64 20 69 74 2E 00 print 0x01, [center; text, "I already opened it."]; play button Collapsed
+bytecode off -> 0005  notEqualZero bit[0xD95], branch +0x001B -> 0x0025 / 000A  print 0x01, [center; text, "I already opened it."]
+next script keeps the choice: toggle False, output 0005  loadRoom 0x2B / 0007  setCameraAt 0x00A0
+script 05 (not a scene): play button Collapsed
+play as cutscene: session room 2, in scene False, playback False, selected view room 

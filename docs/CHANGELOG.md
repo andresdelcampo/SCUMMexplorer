@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October (later): English LOOM EGA, first compatibility step
+
+Game Status finds its draft contract by instruction pattern (not byte offset or Spanish bit numbers), the "draft playing" and story-bit ranges and the glossary's bit names follow the edition's bit numbering (English numbers bits from 0xD65 one lower); 42 of the 63 English failures remain and are triaged in [ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md) (almost all test-only: text, bit, offset and object-id expectations). New tool `.verification/ScriptDump`; UiShots on the English folder in `.verification/english-compat-20261004/`.
+
 ## 4 October: sphere rooms, El Muerto, button row, English data
 
 Rooms 19 and 86 (the sphere visions) start as a plain sphere: the entry script's explicit reset to state 0 now wins over a later script's draw batch when the background already fills the position (only these two of the 76 first-visit renders change; new test `SphereVisionRoomsStartAsAPlainSphere`). The Advanced interaction menu applies the planner's actor placements before a direct verb (El Muerto's lines in Room 09 show). The Advanced button rows share one height and font and a 5 px gap. The tests default to the English data in `Games/loom ega en` (63 of 710 fail: [ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md)). The harness review was corrected: exit code 0 hides FAIL lines in WPF harnesses.

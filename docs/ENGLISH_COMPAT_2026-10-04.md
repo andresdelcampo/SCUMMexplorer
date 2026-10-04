@@ -2,7 +2,7 @@
 
 The user added the English DOS EGA release as `Games/loom ega en` ("fully compatible" at a glance) and asked that the tests use it by default: the failures are the list of places where the code or the tests assume the Spanish release (`Games/loom`, to be renamed `Games/loom ega es`). The helper `tests/SCUMMexplorer.Tests/TestGames.cs` picks the folder (`loom ega en`, then `loom ega es`, then `loom`); `SCUMM_LOOM_TEST_ROOT` overrides it with a full path (set it to the Spanish folder to get the old baseline: 703 passed, 5 skipped, before the sphere and interaction changes of 4 October).
 
-**Run on English data:** 710 tests, 642 passed, 63 failed, 5 skipped. Nothing here is triaged beyond the first look below; do not assume a failure is a test problem or an app problem before reading it.
+**Run on English data:** 710 tests, 642 passed, 63 failed, 5 skipped (after Game Status was fixed: 42 failed of 710; triage at the end of this file). Nothing here is triaged beyond the first look below; do not assume a failure is a test problem or an app problem before reading it.
 
 ## First look at causes
 
@@ -18,3 +18,40 @@ The user added the English DOS EGA release as `Games/loom ega en` ("fully compat
 2. Run the app on `Games/loom ega en`: boot, the room picker, a few rooms, texts (charset), a click and a cutscene; note what looks wrong.
 3. Triage the remaining failures into test-only (Spanish text, offsets: make the assertion edition-neutral or give each edition its own golden) and app issues.
 4. Decide how the catalog and glossary data are made per edition (generated at open time, or one file per edition).
+
+## Findings and triage (4 October, later the same day)
+
+Evidence: `ScriptDump` (`.verification/ScriptDump`, a disassembler: `ScriptDump <folder> <script ids>` or `ScriptDump <folder> room <room> <local id>`) on both folders, the failing assertions, and UiShots on `Games/loom ega en` (`.verification/english-compat-20261004/uishots`: rooms, English texts, verbs, "Last leaf of the year." play on the English data).
+
+**The English release is not a translation of the same code.** Same scripts, other lengths, and other numbering:
+
+- Global bits from 0xD65 on are one lower (`bit[0xD6E]` "cutscene running" is 0xD6D; `bit[0xDC5]` is 0xDC4; story bits start at 0xD71, not 0xD72). Bits 0xD61-0xD63 and all variables (`var[...]`) match. Measured from script 023's learned-draft bit (0xD68 against 0xD69); seen uniform through 0xDC5 in the scripts compared (010, 017, 022, 023, 025, 026, 034, 001 and Room 46 local 204, plus Room 38's entry).
+- Object numbers and class numbers shift by one from some object on (Room 46 class tests 0x2AB-0x2AD are 0x2AC-0x2AE; object 599 / 637 / 830 / 885 / 827 of the tests are not those objects). Offsets inside scripts move with the text length.
+- Real behaviour differences, not only labels: English script 001 (boot) does not set the Spanish `bit[0xD62]` or `bit[0xD76]`, so Room 03's entry starts script 0x2A there. Charset 0 has 128 glyphs (no accents), the file is half the size.
+
+### Fixed in the app (committed)
+
+1. **Game Status** found the draft contract by byte offset and by Spanish bit numbers; it now finds every instruction by pattern and reads the learned/reverse/last-note bits, the two draft wait bits (used to decide whether the status can be edited) and the staff checkpoint bit from the scripts. All 19 `LoomGameStatusTests` pass on English and on the Spanish folder.
+2. **Hard-coded Spanish bit numbers in the app:** the "draft is playing" test in `MainWindow` (three places, bit 0xD66) is now `session.DraftPlaying`; the story-bit range (`LoomStoryEvents.FirstBit`, the planner and `UpdateStoryBit`) starts at `FirstBitFor(game)`.
+3. **Glossary bit names** (18 entries written for the Spanish numbering) would have labelled the wrong bit on English. `LoomGlossary.Load(game)` now looks bits from 0xD65 up one lower for a shifted edition, and the entry says so and carries the evidence level "reading" (the shift is measured; each name is not re-checked entry by entry).
+
+### Remaining failures (42 of 710 on English after step 1) triaged
+
+Test-only: the assertion names Spanish text, a bit number, an object or class id, or a byte offset. The fix is an edition-neutral assertion (derive the id, bit or offset from the data) or a per-edition expectation; none needs an app change.
+
+| Group | Tests | Why |
+|---|---|---|
+| Spanish text | LoomMessage x4 (sky, leaf), LoomCharset sky line, Glossary `ObjectNamesComeFromTheGameData`, RoomObjects `StoredObjectNamesLabelRoom17Hotspots`, SceneSetupScene El Muerto lines, ScriptPresenter goldens 6, 17, 91 (also bits and offsets) | "Amanecer.", "hoja", Spanish lines; English texts shown correctly in the app (UiShots) |
+| Charset | `CharsetZeroIsReadFrom99Lfl` | English font has 128 glyphs, not 240 |
+| Bit numbers | LoomBoot x4, KeyInput `NoteLetters...`, Cutscene `CutsceneRuns...` and `GlobalScript...`, RandomPick Script 42, SceneSetupPlanner `StoryEvents...` and `TheScannerSees...` | D6B/D6E/D66/D7x/D9D/DB6 are one lower |
+| Offsets | Boot (`+0x015A` vs `+0x0162`, Script 44 `+0x041B`), KeyInput `EscapeSkipsScript052`, Room 03 doorway (Script 1 `+0x015B`), FirstVisitRendering Rooms 2, 18, 56, 58, 65 (`+0x03A0` is `+0x0395`; `+0x00DA` is `+0x00D5`), UsedBy, ScriptIndex and `LflResourceChain` leftover-script lists | script lengths |
+| Object / class ids | FirstVisitRendering Rooms 38, 42, 46, 65, 86; ActorTests (827 is 828); SceneEvidence Room 69 (885); Cutscene `AWalkIntoRoom37sBox8...` (object 599) | ids shift by one |
+| Needs a real read | ReplaySequence x2 (firewood, Rusty's ghost: stage 3 waits for Script 85 `+0x05CE`), SceneSetupScene `TheCageScenesStillReachTheirOwnEnd...` (Room 43 `ends=[]`) | likely offsets and ids in the recipe, but not yet read: could hide a real English difference in the scene's start |
+
+Room 03: the test comment says Script 1 sets `bit[0xD62]` so the entry skips script 0x2A; the English boot does not set it, so on English the entry starts 0x2A. That is the data, not a defect; whether 0x2A is visible in play is a question for a later check.
+
+### Catalog and glossary per edition (task 4, decision open)
+
+- `loom-replays.json` lists SHA-256 hashes of the Spanish files and the catalog is not used on another edition (`LoomReplayCatalog` checks them), so the English app has no ready-made cutscene replays yet; everything derived from the scripts (rooms, objects, texts, verbs, Game Status) works.
+- The glossary is Spanish-numbered for bits (now handled, see above); variable, script, room, actor and sound names have not been compared with the English data, so those names are unchecked on English.
+- Options: (a) generate the catalog at open time from the scripts (large, but removes the hash), (b) a second catalog file made by the same tool for English, (c) leave replays Spanish-only until Indy3 (phase 3) shows what the container needs. Recommendation: (b), because the replay tool already writes the file; ask the user before choosing.
