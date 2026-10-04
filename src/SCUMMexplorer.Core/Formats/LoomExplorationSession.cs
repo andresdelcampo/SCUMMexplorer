@@ -89,6 +89,7 @@ public sealed partial class LoomExplorationSession
     private readonly LoomRoomObjectDirectory _objects = new();
     private readonly LoomObjectVerbReader _verbs;
     private readonly LoomScriptRuntimeState _runtime;
+    private readonly bool _demoPreview;
     private readonly int _globalScriptCount;
     private readonly UncertaintyList _uncertainties = [];
     private readonly List<PendingScript> _pending = [];
@@ -122,6 +123,7 @@ public sealed partial class LoomExplorationSession
         if (game.Version != ScummVersion.V3)
             throw new InvalidDataException("Only old-v3 LOOM has a session interpreter.");
         _game = game;
+        _demoPreview = demoPreview;
         _observer = observer;
         var soundResources = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue)
             .GroupBy(r => r.ResourceId!.Value).ToDictionary(group => group.Key, group => group.First());
@@ -478,6 +480,18 @@ public sealed partial class LoomExplorationSession
         _runtime.Messages.RouteSkipped($"Room {room.ResourceId:00} was selected from the catalog, so prints on the route to it did not run");
         if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
             return EnterRoom(room, arrival);
+        var entered = CatalogEnterWithEgo(room, arrival, ego);
+        // A demo has no script 017, so the ego keeps the look the last room left; the demo's own preview says which look the room has.
+        if (_game.IsDemo && !_demoPreview && LoomDemoLooks.EgoCostumes(_game).TryGetValue(room.ResourceId!.Value, out var costume))
+        {
+            _runtime.Actors.CostumeChanged(ego, costume, CurrentPlacement());
+            _uncertainties.Add($"Room {room.ResourceId:00} was selected from the catalog: the ego wears costume {costume}, the one this demo's preview gives him when it first enters the room (the demo has no script 017 to choose it).");
+        }
+        return entered;
+    }
+
+    private LoomSessionSnapshot CatalogEnterWithEgo(GameResource room, string arrival, ushort ego)
+    {
         var (assumed, label, chosen) = PickCatalogArrival(room.ResourceId!.Value, ego);
         // The ego's position before the arrival (where the route would have left it) is not known.
         _runtime.Actors.Forget(ego, assumed is null

@@ -63,6 +63,22 @@ public sealed class LoomDemoTests
 
     [Theory]
     [MemberData(nameof(Demos))]
+    public void CatalogVisitDressesTheEgoAsThePreviewDoes(string name, int rooms)
+    {
+        if (Folder(name) is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
+        int? EgoCostume() => session.Actors.First(a => a.Number == 1).Look.Costume;
+        // Room 03 shows the smaller Bobbin (costume 3), the beach the ordinary one (costume 1), in either order of visits.
+        session.VisitRoomById(3);
+        Assert.Equal(3, EgoCostume());
+        session.VisitRoomById(16);
+        Assert.Equal(1, EgoCostume());
+        Assert.NotEqual(0, rooms);
+    }
+
+    [Theory]
+    [MemberData(nameof(Demos))]
     public void DemoPlaysThroughItsRoomsAndStartsOver(string name, int rooms)
     {
         if (Folder(name) is not { } folder) return;
