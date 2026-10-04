@@ -35,7 +35,8 @@ public partial class MainWindow : Window
     // The sounds the scripts start while the playback clock runs (cutscenes); separate from the room music panel.
     private readonly SceneSoundPlayer _sceneSound = new();
     private readonly DispatcherTimer _audioTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
-    private readonly DispatcherTimer _roomPanTimer = new() { Interval = TimeSpan.FromMilliseconds(75) };
+    private readonly DispatcherTimer _idleFrameTimer = new() { Interval = TimeSpan.FromMilliseconds(100) };
+    private readonly DispatcherTimer _roomPanTimer =new() { Interval = TimeSpan.FromMilliseconds(75) };
     private readonly DispatcherTimer _adlibGainDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private static readonly string LastFolderFile = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -111,6 +112,8 @@ public partial class MainWindow : Window
         PreviewTextInput += MainWindow_PreviewTextInput;
         _roomPanTimer.Tick += RoomPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
+        _idleFrameTimer.Tick += IdleFrameTimer_Tick;
+        _idleFrameTimer.Start();
         _adlibGainDebounceTimer.Tick += async (_, _) =>
         {
             _adlibGainDebounceTimer.Stop();
@@ -2960,7 +2963,6 @@ public partial class MainWindow : Window
                     {
                         case "doorways": (parts[1] == "Always" ? DoorwaysAlways : parts[1] == "Hover" ? DoorwaysHover : DoorwaysNever).IsChecked = true; break;
                         case "framing": NormalRoomWidthToggle.IsChecked = parts[1] != "0"; break;
-                        case "optionsOpen": RoomOptionsExpander.IsExpanded = parts[1] == "1"; break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
                         case "readable": _readableScripts = parts[1] != "0"; ScriptReadableToggle.IsChecked = _readableScripts; ScriptBytesToggle.IsEnabled = !_readableScripts; break;
                     }
@@ -3803,6 +3805,60 @@ public partial class MainWindow : Window
         // The sounds the frame's scripts started or stopped (instant playback has no frames to wait for).
         if (!_playbackBatch) _sceneSound.Update();
         return true;
+    }
+
+    private string? _idleSignature;
+    private LoomExplorationSession? _idleSession;
+    private DateTime _idleNextFrame;
+
+    /// <summary>
+    /// The game's frame loop keeps running between inputs (ambient scripts such as the loom's weaving, the swan or the
+    /// waves animate without the pointer). With no playback clock running, one frame runs per game frame interval and
+    /// the view is redrawn when something visible changed. A scene or a message that starts on its own gets a playback.
+    /// </summary>
+    private void IdleFrameTimer_Tick(object? sender, EventArgs e)
+    {
+        if (!GameClickActive || _session is not { } session || _playInstantly || _playbackBatch || PlaybackRunning || _playbackPaused ||
+            _currentRoomResource is not { } room || _currentRoom is null || session.Snapshot.RoomId != room.ResourceId ||
+            OwnedWindows.Count > 0 || !IsActive)
+            return;
+        var now = DateTime.UtcNow;
+        if (!ReferenceEquals(_idleSession, session)) { _idleSession = session; _idleSignature = null; _idleNextFrame = now; }
+        if (now < _idleNextFrame) return;
+        _idleNextFrame = now + PlaybackFrameInterval();
+        FollowSessionSound();
+        var snapshot = session.AdvanceFrame();
+        UpdateSessionSound();
+        if (snapshot.RoomId is int reached && reached != room.ResourceId)
+        {
+            AdvanceIdleReachedRoom(reached);
+            return;
+        }
+        var signature = FrameSignature(snapshot);
+        if (signature != _idleSignature)
+        {
+            var first = _idleSignature is null;
+            _idleSignature = signature;
+            if (!first)
+            {
+                ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+                UpdateRoomNavigationActions(room);
+                RefreshRoomPreview();
+            }
+        }
+        if (session.CameraX is int cameraX && session.CameraMoving) ScrollToGameCamera(cameraX);
+        UpdateActorLayer();
+        UpdateMessageLayer();
+        if (SessionInScene || session.EgoMoving || session.CameraMoving || session.Messages.HaveMsg != 0)
+            StartPlayback("A scene that started on its own", null, room, doorways: null, leftRoom: false);
+    }
+
+    private void AdvanceIdleReachedRoom(int reached)
+    {
+        if (_game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is not { } targetRoom) return;
+        StatusText.Text = "You step into another scene.";
+        StatusText.ToolTip = $"Room {reached:00} · " + (_session?.LastAction?.Evidence ?? "");
+        SelectResourceInTree(targetRoom);
     }
 
     private void FollowSessionSound()
