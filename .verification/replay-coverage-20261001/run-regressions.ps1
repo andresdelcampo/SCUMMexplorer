@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 $rtk='C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe'
 & $rtk proxy dotnet build .verification/doorway-clicks/DoorwayClickCheck/DoorwayClickCheck.csproj -c Release
 if($LASTEXITCODE){exit $LASTEXITCODE}
-& $rtk proxy dotnet build .verification/scene-room-controls-20260930/RoomControlsCheck/RoomControlsCheck.csproj -c Release
+& $rtk proxy dotnet build .verification/archive/scene-room-controls-20260930/RoomControlsCheck/RoomControlsCheck.csproj -c Release
 if($LASTEXITCODE){exit $LASTEXITCODE}
 New-Item -ItemType Directory -Path $Output | Out-Null
 $root=(Get-Location).Path

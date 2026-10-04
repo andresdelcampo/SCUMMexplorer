@@ -1,0 +1,11 @@
+from pathlib import Path
+text='Room47 Cygna697 Look and actual exits696→46→681→47 complete205 +01B7/end03F1. Source100 removes703 class24; DC5/DC6 remain missing. Input/direct2423frames,3/3 scopes;117 Executed/Reached selected events match exactly. Audited213→214/235 (91.06%),21 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change, protected57/history/App untouched. [Validation](../.verification/archive/room47-input-20261003/validation.md).'
+updates={
+'docs/NEXT_SESSION_PROMPT.md':('## Latest:', '## Latest: Room47 return response complete — 3 October\n\nAfter69c4690. '+text+'\n\nNext candidate: Room20 local206 +0000, establish source Sleep350 prerequisite and actual navigation before response keys. Supported staff/notes/learned setup labelled, original notes/reverse flags unchanged. Keep Room09 stopped this session. Continue successive bounded tasks toward200K context per user; exact telemetry unavailable. Commit each; at most two diagnostics per route without a route-relevant decision. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.\n\nReady-to-copy continuation: Continue SCUMMexplorer from Room47 using docs/NEXT_SESSION_PROMPT.md. Audited214/235 versus fresh single-action169/235. Start Room20 remaining site, continue bounded input audits toward200K context, commit each and leave running App untouched.\n\n'),
+'docs/LOOM_EGA_PLAN.md':('**Latest Room33','**Latest Room47 input,3 October:** '+text+' Next: Room20 source prerequisites.\n\n'),
+'docs/LOOM_SCRIPT_MAP.md':('Latest Room33','Latest Room47 input,3 October:100 +0A3C removes class24 from703 before205 +01A2/+01B7 on re-entry; missing flags remain unknown. '+text+'\n\n'),
+'docs/LOOM_CUTSCENE_DISCOVERY.md':('**Latest Room33','**Latest Room47 supplement,3 October:** '+text+'\n\n'),
+'docs/CHANGELOG.md':('## 3 October:','## 3 October: verify Room47 return response\n\n'+text+'\n\n')}
+for name,(marker,addition) in updates.items():
+ p=Path(name); old=p.read_text(encoding='utf-8'); assert marker in old and addition not in old
+ p.write_text(old.replace(marker,addition+marker,1),encoding='utf-8')

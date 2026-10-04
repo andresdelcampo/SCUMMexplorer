@@ -1,0 +1,11 @@
+from pathlib import Path
+text='Room08 four keyboard casts256/3F,256/3E,257/3E,257/3F complete both tapestry restoration sites2110008/214000B with sourceD7D/D7E setup. Input1024/direct820frames,4/4 scopes,79 Executed/Conditional recorded events,76 certainty-only differences. Audited205→207/235 (88.09%),28 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change. Protected57/history/App untouched. [Validation](../.verification/archive/room08-input-20261003/validation.md).'
+updates={
+'docs/NEXT_SESSION_PROMPT.md':('## Latest:', '## Latest: Room08 tapestry restoration pair complete — 3 October\n\nAfter191bf6d. '+text+'\n\nNext candidate: Room28 local2030000/2120064 and chained0760000. Source prerequisites/actual input first; supported staff/notes/learned edits labelled and source notes/reverse flags unchanged. Keep Room09 investigation stopped this session; its full failed recipes add no coverage. Continue bounded tasks toward200K context per user; exact telemetry unavailable. Commit each checkpoint; at most two diagnostic cycles per route without route-relevant decision. Preserve all constraints/history/protected57/estimates; no App launch/close/interaction/rebuild or push. Core662/broad/main Release dated.\n\nReady-to-copy continuation: Continue SCUMMexplorer from Room08 using docs/NEXT_SESSION_PROMPT.md. Audited207/235 versus fresh single-action169/235. Start Room28 source/input cluster; continue bounded audits toward200K context, commit each and leave running App untouched.\n\n'),
+'docs/LOOM_EGA_PLAN.md':('**Latest Room09','**Latest Room08 input,3 October:** '+text+' Next: Room28 source/input cluster.\n\n'),
+'docs/LOOM_SCRIPT_MAP.md':('Latest Room09','Latest Room08 input,3 October:2120010 setsD7D1,211000D resets0;213000D setsD7E1,2140010 resets0. '+text+'\n\n'),
+'docs/LOOM_CUTSCENE_DISCOVERY.md':('**Latest Room09','**Latest Room08 supplement,3 October:** '+text+'\n\n'),
+'docs/CHANGELOG.md':('## 3 October:','## 3 October: verify Room08 tapestry restoration input\n\n'+text+'\n\n')}
+for name,(marker,addition) in updates.items():
+ p=Path(name); old=p.read_text(encoding='utf-8'); assert marker in old and addition not in old
+ p.write_text(old.replace(marker,addition+marker,1),encoding='utf-8')

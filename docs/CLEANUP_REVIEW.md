@@ -4,7 +4,7 @@
 
 ## Verified checkout
 
-`master` started at `45fedaf`. Tracked files were clean; the unrelated untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs` remain untouched. All 16 registered Claude worktrees have clean tracked/untracked status and their HEADs are ancestors of master. `git log master.. --all` is empty. Exact paths and commit IDs: [inventory](../.verification/cleanup-review-20260930/inventory.txt).
+`master` started at `45fedaf`. Tracked files were clean; the unrelated untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs` remain untouched. All 16 registered Claude worktrees have clean tracked/untracked status and their HEADs are ancestors of master. `git log master.. --all` is empty. Exact paths and commit IDs: [inventory](../.verification/archive/cleanup-review-20260930/inventory.txt).
 
 Main Release solution rebuilt successfully: zero warnings/errors. The main app is `Exe/SCUMMexplorer.App/Release/net10.0-windows/SCUMMexplorer.App.exe`. Committed tests: 246 passed, zero failures, with the unrelated audit excluded by test filter. No app process was running at the initial check. No on-screen behaviour changes in this task.
 

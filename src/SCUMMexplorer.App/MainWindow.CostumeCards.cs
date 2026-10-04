@@ -105,7 +105,7 @@ public partial class MainWindow
             {
                 detail = resource.Name + " · picture unavailable";
                 // The index entry points at no costume (missing file, offset past the end, not a header): see
-                // .verification/costume-leftovers-20261003. Normal mode hides such cards; Advanced lists them in the tree.
+                // .verification/archive/costume-leftovers-20261003. Normal mode hides such cards; Advanced lists them in the tree.
                 noData = ex is InvalidDataException or FileNotFoundException;
             }
             if (token.IsCancellationRequested || !ReferenceEquals(_game, game)) return;

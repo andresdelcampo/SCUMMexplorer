@@ -22,11 +22,11 @@ Build clean, 703 unit tests pass (5 skipped diagnostic dumps), DoorwayClickCheck
 
 ## 3 October: costumes that do not show
 
-17 gallery costumes (20, 21, 42, 66, 70, 74, 75, 89-91, 136, 171-176) have index entries that point at no costume data and no script uses them; not a renderer bug. Record: [costume-leftovers-20261003](../.verification/costume-leftovers-20261003/validation.md).
+17 gallery costumes (20, 21, 42, 66, 70, 74, 75, 89-91, 136, 171-176) have index entries that point at no costume data and no script uses them; not a renderer bug. Record: [costume-leftovers-20261003](../.verification/archive/costume-leftovers-20261003/validation.md).
 
 ## 3 October: WindowCheck harness repaired
 
-It looked for the removed "Show exits" checkbox; those two checks are gone and the rest still runs (Rooms 03 and 17, exit 0). Record: [window-check-20261003](../.verification/window-check-20261003/validation.md).
+It looked for the removed "Show exits" checkbox; those two checks are gone and the rest still runs (Rooms 03 and 17, exit 0). Record: [window-check-20261003](../.verification/archive/window-check-20261003/validation.md).
 
 ## 3 October: presenter phrases for roomOps, strings, doSentence and save/load
 
@@ -50,15 +50,15 @@ Scene area 508 -> about 620 px high at 1400x900 (the reserved music row, the tit
 
 ## 3 October: menu cutscenes keep the running session; LOOM flags split from the generic window
 
-`PlayKnownCutscene` keeps the running session for a single scene (a late state stays) and `LoomSceneSetupPlanner.Adapt` skips grants the session already has (the staff pickup); stated sequences and the boot still start fresh. The story-flag naming moved from MainWindow into `LoomEgaStateFlags`, so Game Status only knows generic `StateFlag`s. Checked with `.verification/SceneShots` ([keep](../.verification/setup-placer-20261003/keep/report.txt): pickup, then Room 43 scene in the same session, staff kept, D96 set by the scene).
+`PlayKnownCutscene` keeps the running session for a single scene (a late state stays) and `LoomSceneSetupPlanner.Adapt` skips grants the session already has (the staff pickup); stated sequences and the boot still start fresh. The story-flag naming moved from MainWindow into `LoomEgaStateFlags`, so Game Status only knows generic `StateFlag`s. Checked with `.verification/SceneShots` ([keep](../.verification/archive/setup-placer-20261003/keep/report.txt): pickup, then Room 43 scene in the same session, staff kept, D96 set by the scene).
 
 ## 3 October: Game Status lists the story events as checkboxes
 
-`LoomStoryEvents` (Core) finds the 90 story bits (D72 and up) that the game's code sets to 1; 27 are set by a catalog scene (global script or object verb) and are named by its title, the others by the room script that sets them. `LoomExplorationSession.StoryEvents`, `StoryBit` and `UpdateStoryBit` read and edit them like the other status edits (exploration choices, applied with the window's Apply). The window's list is generic (`StateFlag`, `FlagSource`: name, detail, read, write); only the search and the naming are LOOM-specific. Checked in the real window with `.verification/StatusShots` ([captures](../.verification/setup-placer-20261003/status/report.txt)). Design intent (user): the user controls the state; the app only raises it to the minimum an action needs.
+`LoomStoryEvents` (Core) finds the 90 story bits (D72 and up) that the game's code sets to 1; 27 are set by a catalog scene (global script or object verb) and are named by its title, the others by the room script that sets them. `LoomExplorationSession.StoryEvents`, `StoryBit` and `UpdateStoryBit` read and edit them like the other status edits (exploration choices, applied with the window's Apply). The window's list is generic (`StateFlag`, `FlagSource`: name, detail, read, write); only the search and the naming are LOOM-specific. Checked in the real window with `.verification/StatusShots` ([captures](../.verification/archive/setup-placer-20261003/status/report.txt)). Design intent (user): the user controls the state; the app only raises it to the minimum an action needs.
 
 ## 3 October: placer audit of costume changes and story-bit room entries (no setup change)
 
-Re-scan of the game's code for the two remaining audit cases. The scanner missed every costume change (it looked for `costume ` where the disassembler prints `costume,`); fixed and pinned by a test. New Core queries `FindCostumeChanges`, `FindWriters`, `FindStoryBitMoves`, `ScanRoomEntry`. Result: room entries already give the ego the costume they own on a catalog visit, no scene's own code presumes a leftover costume, and no scene clears a story bit other than D61 to presume it, so no further start setup is derived; the candidate chains (Room 43-45 cage scenes, ghost chain) and the open story-order decisions are in the [audit](../.verification/setup-placer-20261003/audit-costume-entries.md).
+Re-scan of the game's code for the two remaining audit cases. The scanner missed every costume change (it looked for `costume ` where the disassembler prints `costume,`); fixed and pinned by a test. New Core queries `FindCostumeChanges`, `FindWriters`, `FindStoryBitMoves`, `ScanRoomEntry`. Result: room entries already give the ego the costume they own on a catalog visit, no scene's own code presumes a leftover costume, and no scene clears a story bit other than D61 to presume it, so no further start setup is derived; the candidate chains (Room 43-45 cage scenes, ghost chain) and the open story-order decisions are in the [audit](../.verification/archive/setup-placer-20261003/audit-costume-entries.md).
 
 ## 3 October: scenes bring in the actors who speak (Room 09 El Muerto and others)
 
@@ -70,391 +70,391 @@ An arrival with no size of its own took the size carried back through earlier ro
 
 ## 3 October: generic per-scene start setup (staff pickup derived from the game's code)
 
-`LoomSceneStateScanner` scans a scene's scripts (plus the scripts and room entries they reach) for reads and writes of globals and story bits; `LoomSceneSetupPlanner` derives the least labelled start from that. Scenes whose own global script clears bit D61 (091, 093) now start after the game's real pickup (Room 09 object 271 verb 0x38, found by `FindConstantWriters`) run unseen, then a catalog visit; no `staff` edit and no story flag. Reads of D61, var[0x07D] and story bits keep their first-visit value and are listed in the picker note. Costume, visit-chain and `place` derivations found no scanned dependency and are not applied. [Validation](../.verification/setup-placer-20261003/validation.md).
+`LoomSceneStateScanner` scans a scene's scripts (plus the scripts and room entries they reach) for reads and writes of globals and story bits; `LoomSceneSetupPlanner` derives the least labelled start from that. Scenes whose own global script clears bit D61 (091, 093) now start after the game's real pickup (Room 09 object 271 verb 0x38, found by `FindConstantWriters`) run unseen, then a catalog visit; no `staff` edit and no story flag. Reads of D61, var[0x07D] and story bits keep their first-visit value and are listed in the picker note. Costume, visit-chain and `place` derivations found no scanned dependency and are not applied. [Validation](../.verification/archive/setup-placer-20261003/validation.md).
 
 ## 3 October: Forge lookout starts at the cliff end (new `place` setup step)
 
-`PlaceEgo` / step `place`: a labelled, estimated ego placement with the camera put on it. The lookout scene now starts with Bobbin at (378,134) and camera 376 (the user's reference), not at (64,74) with camera 160. The 6→8 trigger is still unreachable (matrix 6→8 = 7; camera follow gives 320 at that end); no trigger claim. [Validation](../.verification/cliff-scene-20261003/validation.md).
+`PlaceEgo` / step `place`: a labelled, estimated ego placement with the camera put on it. The lookout scene now starts with Bobbin at (378,134) and camera 376 (the user's reference), not at (64,74) with camera 160. The 6→8 trigger is still unreachable (matrix 6→8 = 7; camera follow gives 320 at that end); no trigger claim. [Validation](../.verification/archive/cliff-scene-20261003/validation.md).
 
 ## 3 October: ghost scene arrives from Room 35 (head no longer clipped)
 
-The "headless Bobbin" was the depth mask of object 565 (state 1 after scene 087) hiding the head at Room 33's arrival spot (64,73), not a limb/animation fault. The ghost sequence now hops 35→34 first, so the arrival is Room 35's (the route that is open after 087). [Validation](../.verification/ghost-headless-20261003/validation.md).
+The "headless Bobbin" was the depth mask of object 565 (state 1 after scene 087) hiding the head at Room 33's arrival spot (64,73), not a limb/animation fault. The ghost sequence now hops 35→34 first, so the arrival is Room 35's (the route that is open after 087). [Validation](../.verification/archive/ghost-headless-20261003/validation.md).
 
 ## 3 October: lookout is a scene, ghost scene camera, staff for the firewood scene
 
-"First sight of the Forge" is an ordinary scene (no Bonus label or filter). Playback now scrolls to the game's camera when a scene starts. The firewood sequences hold the staff (new `staff` step) as well as wearing Rusty's look. [Validation](../.verification/bonus-room34-20261003/validation.md).
+"First sight of the Forge" is an ordinary scene (no Bonus label or filter). Playback now scrolls to the game's camera when a scene starts. The firewood sequences hold the staff (new `staff` step) as well as wearing Rusty's look. [Validation](../.verification/archive/bonus-room34-20261003/validation.md).
 
 ## 3 October: Rusty scenes separated, Rusty's look, Forge lookout named
 
-The ghost scene (098) now plays alone: the earlier scenes it needs run unseen (new `RunSilently`/`silentSteps`). The firewood/dream sequences start with Bobbin in Rusty's look (Awakening and costume change run unseen first). The bonus scene is "first sight of the Forge (cliff lookout)", once-only per the user's memory. [Validation](../.verification/bonus-room34-20261003/validation.md).
+The ghost scene (098) now plays alone: the earlier scenes it needs run unseen (new `RunSilently`/`silentSteps`). The firewood/dream sequences start with Bobbin in Rusty's look (Awakening and costume change run unseen first). The bonus scene is "first sight of the Forge (cliff lookout)", once-only per the user's memory. [Validation](../.verification/archive/bonus-room34-20261003/validation.md).
 
 ## 3 October: Room 34 Rusty ghost replay fixed
 
-Three duplicate "Walk response, Reached Room 57" entries (objects 559, 560, 586 verb 0x37) started script 098 from the fresh state, where Rusty is still the sleeping living boy (Room 34's entry needs bit D9D from scene 087 to show the ghost). Replaced by one sequence after the firewood/dream scenes with a catalog visit step (`visit`); Game Texts can now offer it for script 098. [Validation](../.verification/bonus-room34-20261003/validation.md).
+Three duplicate "Walk response, Reached Room 57" entries (objects 559, 560, 586 verb 0x37) started script 098 from the fresh state, where Rusty is still the sleeping living boy (Room 34's entry needs bit D9D from scene 087 to show the ghost). Replaced by one sequence after the firewood/dream scenes with a catalog visit step (`visit`); Game Texts can now offer it for script 098. [Validation](../.verification/archive/bonus-room34-20261003/validation.md).
 
 ## 3 October: bonus scene for Room 34 local200 +0035
 
-The unreachable Room 34 watcher scene is playable from the cutscene menu as a labelled bonus preview ("Bonus scenes" filter): new `RunLocalScriptAt` and sequence step `script` start the scene body directly (132 frames, balanced). Not audited coverage (234/235 and fresh 169/235 unchanged). [Validation](../.verification/bonus-room34-20261003/validation.md).
+The unreachable Room 34 watcher scene is playable from the cutscene menu as a labelled bonus preview ("Bonus scenes" filter): new `RunLocalScriptAt` and sequence step `script` start the scene body directly (132 frames, balanced). Not audited coverage (234/235 and fresh 169/235 unchanged). [Validation](../.verification/archive/bonus-room34-20261003/validation.md).
 
 ## 3 October: verify Room34 local207 +0079 through 097 after scene 087
 
-Local207 +0079/end0100 ("¡De eso nada!") completes via actual clicks: route3 prefix to scene 087 (D9D), catalog hop to Room43, the 096 route, Look 684 (097) into Room34 layout A, then two clicks on 559 (098, then 207). Audited233→234/235 (99.57%),1 remaining (Room34 local200 +0035); fresh single-action169/235 unchanged. Labelled staff/notes/learned setup and the catalog hops only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+Local207 +0079/end0100 ("¡De eso nada!") completes via actual clicks: route3 prefix to scene 087 (D9D), catalog hop to Room43, the 096 route, Look 684 (097) into Room34 layout A, then two clicks on 559 (098, then 207). Audited233→234/235 (99.57%),1 remaining (Room34 local200 +0035); fresh single-action169/235 unchanged. Labelled staff/notes/learned setup and the catalog hops only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/global-scripts-input-20261003/validation.md).
 
 ## 3 October: verify script009 +002C through native boot and practice mode
 
-Room69's "stall" is the copy-protection question: four glyph clicks (886,890,895,887) release the boot into Room02 with practice mode (876). Two notes then show verb 0x35 briefly; its click runs script009 +002C/end0079. Audited232→233/235 (99.15%),2 remaining; fresh single-action169/235 unchanged. Labelled staff/7-notes setup only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+Room69's "stall" is the copy-protection question: four glyph clicks (886,890,895,887) release the boot into Room02 with practice mode (876). Two notes then show verb 0x35 briefly; its click runs script009 +002C/end0079. Audited232→233/235 (99.15%),2 remaining; fresh single-action169/235 unchanged. Labelled staff/7-notes setup only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/global-scripts-input-20261003/validation.md).
 
 ## 3 October: verify script022 +0005 through Room41 input
 
-Script022 +0005/end001E ("too noisy to weave") completes in Room41 (D70=1): click 632 aims (631/633 are untouchable), then wrong notes 1,2,1,2 with labelled staff/7-notes setup. Audited231→232/235 (98.72%),3 remaining; fresh single-action169/235 unchanged. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+Script022 +0005/end001E ("too noisy to weave") completes in Room41 (D70=1): click 632 aims (631/633 are untouchable), then wrong notes 1,2,1,2 with labelled staff/7-notes setup. Audited231→232/235 (98.72%),3 remaining; fresh single-action169/235 unchanged. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/global-scripts-input-20261003/validation.md).
 
 ## 3 October: verify script096 through Room43 input
 
-Script096 +0000/end00E7 completes through actual clicks (650 cage scene 093, 639, 653 look + Escape for 095, 656, 655 for 092, then 639) and loads Room46; 639 stays untouchable until 093 sets DB6. Audited230→231/235 (98.30%),4 remaining; fresh single-action169/235 (71.91%) unchanged. No status edits, production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+Script096 +0000/end00E7 completes through actual clicks (650 cage scene 093, 639, 653 look + Escape for 095, 656, 655 for 092, then 639) and loads Room46; 639 stays untouchable until 093 sets DB6. Audited230→231/235 (98.30%),4 remaining; fresh single-action169/235 (71.91%) unchanged. No status edits, production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/global-scripts-input-20261003/validation.md).
 
 ## 3 October: verify script066 through Room17 box8 input
 
-Script066 +0000/end0152 completes through actual Room17 clicks on box8 (after the box4 scene 200 +0022/+0042 interrupts the first walk), then loads Room56. Audited229→230/235 (97.87%),5 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. No status edits, production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+Script066 +0000/end0152 completes through actual Room17 clicks on box8 (after the box4 scene 200 +0022/+0042 interrupts the first walk), then loads Room56. Audited229→230/235 (97.87%),5 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. No status edits, production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/global-scripts-input-20261003/validation.md).
 
 ## 3 October: verify global-script sites through input
 
-Six global-script sites complete through accepted input: note keys with no aim/too-high/too-far give 013,011,012 (+0000); four wrong notes give 022 +0138; Escape during playback gives 005 +01C0; F5 plus the Cancel click gives 004 +0000/end0206 (session remains in Room70, return unverified). Audited223→229/235 (97.45%),6 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Labelled staff/notes status edits only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/global-scripts-input-20261003/validation.md).
+Six global-script sites complete through accepted input: note keys with no aim/too-high/too-far give 013,011,012 (+0000); four wrong notes give 022 +0138; Escape during playback gives 005 +01C0; F5 plus the Cancel click gives 004 +0000/end0206 (session remains in Room70, return unverified). Audited223→229/235 (97.45%),6 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Labelled staff/notes status edits only; no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/global-scripts-input-20261003/validation.md).
 
 ## 3 October: verify Room02 script045 scenes through input
 
-Room02 script045 box-change scenes complete through accepted clicks on boxes4,5,10 (twice, after an interrupted walk) and 11: +001D/end003E,+0049/end006A,+0075/end0092,+009D/end00BA, 535 frames,5 balanced scopes. Audited219→223/235 (94.89%),12 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two cycles (first interrupted before +009D, retained/excluded); no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room02-input-20261003/validation.md).
+Room02 script045 box-change scenes complete through accepted clicks on boxes4,5,10 (twice, after an interrupted walk) and 11: +001D/end003E,+0049/end006A,+0075/end0092,+009D/end00BA, 535 frames,5 balanced scopes. Audited219→223/235 (94.89%),12 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two cycles (first interrupted before +009D, retained/excluded); no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room02-input-20261003/validation.md).
 
 ## 3 October: verify Room09 late-game casts through input
 
-Room09 corrected full route (Look 272→209/101, then 273/4D, 4F, 51 keyboard casts with supported staff/7 notes/learned 11-13 setup) completes 273/4D +000D, local223/224 +0000 and script101 +0000. Input3300/direct3147frames,6/6 scopes;252 Executed recorded events,3 certainty-only differences. Audited215→219/235 (93.19%),16 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room09-fix-20261003/validation.md).
+Room09 corrected full route (Look 272→209/101, then 273/4D, 4F, 51 keyboard casts with supported staff/7 notes/learned 11-13 setup) completes 273/4D +000D, local223/224 +0000 and script101 +0000. Input3300/direct3147frames,6/6 scopes;252 Executed recorded events,3 certainty-only differences. Audited215→219/235 (93.19%),16 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room09-fix-20261003/validation.md).
 
 ## 3 October: park after Room34 prerequisite investigation
 
-Room34 watcher prerequisite investigation stopped after two failed cycles: fresh38 Look610 reproduces incomplete087 in37; fresh36 exit599 is hidden by class24 and never dispatches. Four failed captures retained/excluded; no coverage gain or production defect established. Next source step is Room36 box9 watcher200 +0077/end009B, which clears599 class24 at+0094. Audited215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Protected57/history/App untouched. [Validation and precise next experiment](../.verification/room34-watcher-20261003/validation.md). User explicitly requested parking and a next prompt after compactions; session gain23 audited sites from84da7df. No exact200K claim.
+Room34 watcher prerequisite investigation stopped after two failed cycles: fresh38 Look610 reproduces incomplete087 in37; fresh36 exit599 is hidden by class24 and never dispatches. Four failed captures retained/excluded; no coverage gain or production defect established. Next source step is Room36 box9 watcher200 +0077/end009B, which clears599 class24 at+0094. Audited215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Protected57/history/App untouched. [Validation and precise next experiment](../.verification/archive/room34-watcher-20261003/validation.md). User explicitly requested parking and a next prompt after compactions; session gain23 audited sites from84da7df. No exact200K claim.
 
 ## 3 October: verify Room20 Waking through continuous input
 
-Room20 remaining206 +0000 completes via Sleep350 keys, exit346, Room18 conversation372 then revealed crystal371, and Waking390 keys. SourceD8F missing→1→0; final18 via207/058/059. Input3263/direct3161frames,8/8 scopes;154 Executed/Conditional selected events,153 certainty-only differences plus one retaining argument-index uncertainty. Audited214→215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First hidden-bell attempt retained/excluded; second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room20-input-20261003/validation.md).
+Room20 remaining206 +0000 completes via Sleep350 keys, exit346, Room18 conversation372 then revealed crystal371, and Waking390 keys. SourceD8F missing→1→0; final18 via207/058/059. Input3263/direct3161frames,8/8 scopes;154 Executed/Conditional selected events,153 certainty-only differences plus one retaining argument-index uncertainty. Audited214→215/235 (91.49%),20 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First hidden-bell attempt retained/excluded; second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room20-input-20261003/validation.md).
 
 ## 3 October: verify Room47 return response
 
-Room47 Cygna697 Look and actual exits696→46→681→47 complete205 +01B7/end03F1. Source100 removes703 class24; DC5/DC6 remain missing. Input/direct2423frames,3/3 scopes;117 Executed/Reached selected events match exactly. Audited213→214/235 (91.06%),21 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change, protected57/history/App untouched. [Validation](../.verification/room47-input-20261003/validation.md).
+Room47 Cygna697 Look and actual exits696→46→681→47 complete205 +01B7/end03F1. Source100 removes703 class24; DC5/DC6 remain missing. Input/direct2423frames,3/3 scopes;117 Executed/Reached selected events match exactly. Audited213→214/235 (91.06%),21 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change, protected57/history/App untouched. [Validation](../.verification/archive/room47-input-20261003/validation.md).
 
 ## 3 October: verify Room33 Untwist/Twist input
 
-Room33 Untwist/Twist keys on544 complete remaining202 +0006 after source201 establishesD81. Input706/direct604frames,4/4 scopes;63 Executed recorded events (entry Reached,62 Conditional),60 certainty-only differences plus two retaining argument-index uncertainty. Audited212→213/235 (90.64%),22 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room33-input-20261003/validation.md).
+Room33 Untwist/Twist keys on544 complete remaining202 +0006 after source201 establishesD81. Input706/direct604frames,4/4 scopes;63 Executed recorded events (entry Reached,62 Conditional),60 certainty-only differences plus two retaining argument-index uncertainty. Audited212→213/235 (90.64%),22 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room33-input-20261003/validation.md).
 
 ## 3 October: verify Room62 gold/straw input
 
-Room62 three keyboard casts808/3D,808/3C,809/3D establish source gold/straw states and complete remaining202/204 +0000. Input692/direct539frames,3/3 scopes;63 Executed/Conditional recorded events,63 certainty-only differences. Audited210→212/235 (90.21%),23 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room62-input-20261003/validation.md).
+Room62 three keyboard casts808/3D,808/3C,809/3D establish source gold/straw states and complete remaining202/204 +0000. Input692/direct539frames,3/3 scopes;63 Executed/Conditional recorded events,63 certainty-only differences. Audited210→212/235 (90.21%),23 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room62-input-20261003/validation.md).
 
 ## 3 October: verify Room28 camera, timed fire and continuation
 
-Room28 actual camera click and470/3D then466/43 keys complete2030000, timed2120064 and0760000 through27/28. SourceCA0→1→2,D94missing→1→0; no story edits. Input949/direct847frames,9/9 scopes;207 selected Executed/Conditional body events,199 certainty-only differences. Audited207→210/235 (89.36%),25 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/room28-input-20261003/validation.md).
+Room28 actual camera click and470/3D then466/43 keys complete2030000, timed2120064 and0760000 through27/28. SourceCA0→1→2,D94missing→1→0; no story edits. Input949/direct847frames,9/9 scopes;207 selected Executed/Conditional body events,199 certainty-only differences. Audited207→210/235 (89.36%),25 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room28-input-20261003/validation.md).
 
 ## 3 October: verify Room08 tapestry restoration input
 
-Room08 four keyboard casts256/3F,256/3E,257/3E,257/3F complete both tapestry restoration sites2110008/214000B with sourceD7D/D7E setup. Input1024/direct820frames,4/4 scopes,79 Executed/Conditional recorded events,76 certainty-only differences. Audited205→207/235 (88.09%),28 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change. Protected57/history/App untouched. [Validation](../.verification/room08-input-20261003/validation.md).
+Room08 four keyboard casts256/3F,256/3E,257/3E,257/3F complete both tapestry restoration sites2110008/214000B with sourceD7D/D7E setup. Input1024/direct820frames,4/4 scopes,79 Executed/Conditional recorded events,76 certainty-only differences. Audited205→207/235 (88.09%),28 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle; no production/catalog change. Protected57/history/App untouched. [Validation](../.verification/archive/room08-input-20261003/validation.md).
 
 ## 3 October: retain bounded Room09 prerequisite investigation
 
-Room09 two bounded cycles add no coverage. Source50→721/089→7→252→9 plus actual272 Look completes209/101,3/3 prefix scopes at1768frames; then probe incorrectly requires4D as reverse and stops before edits/casts. Slot11 is forward4D; slots12/13 reverse4F/51. Failed pairs retained/excluded; no engine defect established. Audited205/235 and fresh single-action169/235 unchanged. [Validation/next experiment](../.verification/room09-input-20261003/validation.md).
+Room09 two bounded cycles add no coverage. Source50→721/089→7→252→9 plus actual272 Look completes209/101,3/3 prefix scopes at1768frames; then probe incorrectly requires4D as reverse and stops before edits/casts. Slot11 is forward4D; slots12/13 reverse4F/51. Failed pairs retained/excluded; no engine defect established. Audited205/235 and fresh single-action169/235 unchanged. [Validation/next experiment](../.verification/archive/room09-input-20261003/validation.md).
 
 ## 3 October: verify Room22 watcher input
 
-Room22 box11→10 clicks complete200 +0083/end00D3 then002F/end0078,235frames,2/2 scopes,23 Executed/Conditional body events. Audited union203→205/235 (87.23%),30 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First wrong-order capture retained/excluded, second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room22-input-20261003/validation.md).
+Room22 box11→10 clicks complete200 +0083/end00D3 then002F/end0078,235frames,2/2 scopes,23 Executed/Conditional body events. Audited union203→205/235 (87.23%),30 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First wrong-order capture retained/excluded, second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room22-input-20261003/validation.md).
 
 ## 3 October: verify Room17 watcher input
 
-Room17 visible exit353 center312,72 then upper-path300,90 clicks complete200 +0022/end0042 and004D/end006D.241frames,2/2 scopes,15 Executed/Conditional body events. Audited union201→203/235 (86.38%),32 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First off-picture click rejected/excluded; second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/room17-input-20261003/validation.md).
+Room17 visible exit353 center312,72 then upper-path300,90 clicks complete200 +0022/end0042 and004D/end006D.241frames,2/2 scopes,15 Executed/Conditional body events. Audited union201→203/235 (86.38%),32 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. First off-picture click rejected/excluded; second cycle passes. No production/catalog change; protected57/history/App untouched. [Validation](../.verification/archive/room17-input-20261003/validation.md).
 
 ## 3 October: verify Room15 watcher input
 
-Room15 actual box3/5 clicks complete200 +001D/end0062 and006D/end00C4 in249frames,2/2 scopes,23 Executed/Conditional body events. Audited union199→201/235 (85.53%),34 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change. Protected57/prior evidence and running App untouched. [Validation](../.verification/room15-input-20261003/validation.md).
+Room15 actual box3/5 clicks complete200 +001D/end0062 and006D/end00C4 in249frames,2/2 scopes,23 Executed/Conditional body events. Audited union199→201/235 (85.53%),34 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change. Protected57/prior evidence and running App untouched. [Validation](../.verification/archive/room15-input-20261003/validation.md).
 
 ## 3 October: verify Room24 terrain and repeated dye input
 
-Room24 box3/4 clicks and two dye keyboard casts complete all three remaining sites:200 +001D/+0089 and211 +0018. Source first dye changesC5=444→445 through211/213; repeat completes the refusal. Four balanced scopes,792 input/690 direct frames;115 recorded body events equal except93 retained certainty fields and two argument-estimate fields. Audited union196→199/235 (84.68%),36 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/prior evidence exact. [Validation](../.verification/room24-input-20261003/validation.md).
+Room24 box3/4 clicks and two dye keyboard casts complete all three remaining sites:200 +001D/+0089 and211 +0018. Source first dye changesC5=444→445 through211/213; repeat completes the refusal. Four balanced scopes,792 input/690 direct frames;115 recorded body events equal except93 retained certainty fields and two argument-estimate fields. Audited union196→199/235 (84.68%),36 remaining; fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. One cycle, no production/catalog change; protected57/prior evidence exact. [Validation](../.verification/archive/room24-input-20261003/validation.md).
 
 ## 3 October: verify Room36 terrain watcher input
 
-Room36 accepted box10→4→3→9 clicks complete all four watcher200 sites001D/0048/0077/00A6,547frames,4/4 scopes,29 Executed/Conditional body events. Audited union192→196/235 (83.40%),39 remaining; separate fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two bounded cycles; failed first long walk retained/excluded. No production/catalog change. Protected57 and prior evidence exact; running App untouched. [Validation](../.verification/room36-input-20261003/validation.md).
+Room36 accepted box10→4→3→9 clicks complete all four watcher200 sites001D/0048/0077/00A6,547frames,4/4 scopes,29 Executed/Conditional body events. Audited union192→196/235 (83.40%),39 remaining; separate fresh single-action169/235 (71.91%),66 gaps/49 owners/335 starts unchanged. Two bounded cycles; failed first long walk retained/excluded. No production/catalog change. Protected57 and prior evidence exact; running App untouched. [Validation](../.verification/archive/room36-input-20261003/validation.md).
 
 ## 3 October: verify all four remaining Room10 sites through game input
 
-Two terrain transitions, the clam's gull-feeding refusal and its later closing scene complete through clicks and note keys, with an actual Room5 exit/return supplying source state. Five balanced scopes,1266 input/1113 direct frames;86 recorded body events differ only in30 retained certainty fields. Audited union188→192/235 (81.70%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room10-input-20261003/validation.md).
+Two terrain transitions, the clam's gull-feeding refusal and its later closing scene complete through clicks and note keys, with an actual Room5 exit/return supplying source state. Five balanced scopes,1266 input/1113 direct frames;86 recorded body events differ only in30 retained certainty fields. Audited union188→192/235 (81.70%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/archive/room10-input-20261003/validation.md).
 
 ## 2 October: verify Room23 shepherd and terrain watcher input
 
-Six actual walking inputs complete202/214 and four200 sites,6/6 scopes in1393frames;139 recorded body events remain Conditional/Executed. Audited union182→188/235 (80.00%), session+12; fresh single-action169/235 unchanged. Two bounded cycles, failed centroid route retained. No production change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room23-input-20261002/validation.md).
+Six actual walking inputs complete202/214 and four200 sites,6/6 scopes in1393frames;139 recorded body events remain Conditional/Executed. Audited union182→188/235 (80.00%), session+12; fresh single-action169/235 unchanged. Two bounded cycles, failed centroid route retained. No production change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/archive/room23-input-20261002/validation.md).
 
 ## 2 October: verify Room25 walking and repeated lamb input
 
-Actual box4/box3 clicks, three lamb double-clicks and an exit click complete six previously unvalidated sites, returning24.208 recorded scene-body events exactly match the direct-object control; estimates preserved. Audited union176→182/235 (77.45%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/room25-input-20261002/validation.md).
+Actual box4/box3 clicks, three lamb double-clicks and an exit click complete six previously unvalidated sites, returning24.208 recorded scene-body events exactly match the direct-object control; estimates preserved. Audited union176→182/235 (77.45%); fresh single-action169/235 unchanged. No production fix, catalog change, App interaction or push; protected57 exact/unstaged. [Validation](../.verification/archive/room25-input-20261002/validation.md).
 
 ## 2 October: verify Room34 spells through game input
 
-Five keyboard casts, with staff/six notes/learned slots5 and10, trigger the same nine completed scopes as direct responses. Four new qualified source sites;127 scene events differ only in retained certainty labels. No production fix or catalog change. Audited site union172→176/235 (74.89%); fresh single-action coverage stays169/235 (71.91%). All57 protected files exact/unstaged; no App interaction or push. [Input evidence and coverage definition](../.verification/room34-sequences-20261002/validation.md).
+Five keyboard casts, with staff/six notes/learned slots5 and10, trigger the same nine completed scopes as direct responses. Four new qualified source sites;127 scene events differ only in retained certainty labels. No production fix or catalog change. Audited site union172→176/235 (74.89%); fresh single-action coverage stays169/235 (71.91%). All57 protected files exact/unstaged; no App interaction or push. [Input evidence and coverage definition](../.verification/archive/room34-sequences-20261002/validation.md).
 
 ## 2 October: verify Sharpening reverse with the user's confirmed setup
 
-One bounded Core keyboard reproduction uses the confirmed Game Status staff/enough-notes/learned edits and completes633/4B ->204(0) ->090, through42/43/60/43,15/15 scopes,6342 total frames. Full204 conversation; no skip of204/090. Source notes/reverse flag unchanged and estimates retained. No additional gameplay fix needed after0318792, no observer expansion; literal coverage stays169/235=71.91%. Raw4/history/protected57 unchanged/unstaged, no App launch/close/interaction or push. [Validation and limits](../.verification/sharpening-reverse-20261002/validation.md).
+One bounded Core keyboard reproduction uses the confirmed Game Status staff/enough-notes/learned edits and completes633/4B ->204(0) ->090, through42/43/60/43,15/15 scopes,6342 total frames. Full204 conversation; no skip of204/090. Source notes/reverse flag unchanged and estimates retained. No additional gameplay fix needed after0318792, no observer expansion; literal coverage stays169/235=71.91%. Raw4/history/protected57 unchanged/unstaged, no App launch/close/interaction or push. [Validation and limits](../.verification/archive/sharpening-reverse-20261002/validation.md).
 
 ## 2 October: catalogue the completed sphere Look preview
 
-Room18 sphere370/36 independently completes065 and meets the existing fresh literal preview criteria in229 frames. Added shared Play Cutscene recipe; coverage **169/235=71.91%**,335 starts (85 scenes/250 reactions),66 sites/49 owners outstanding. All330 existing recipes/memberships and both sequences unchanged; direct-verb/estimated-state labels retained. Fresh Core-only audit and actual catalog/name loader; no App launch/close/interaction or push. Prior Core662/broad runtime baseline remains dated. [Review](../.verification/sphere-catalog-20261002/validation.md).
+Room18 sphere370/36 independently completes065 and meets the existing fresh literal preview criteria in229 frames. Added shared Play Cutscene recipe; coverage **169/235=71.91%**,335 starts (85 scenes/250 reactions),66 sites/49 owners outstanding. All330 existing recipes/memberships and both sequences unchanged; direct-verb/estimated-state labels retained. Fresh Core-only audit and actual catalog/name loader; no App launch/close/interaction or push. Prior Core662/broad runtime baseline remains dated. [Review](../.verification/archive/sphere-catalog-20261002/validation.md).
 
 ## 2 October: let executed estimated room loads continue
 
-The session no longer stops an executed room load merely because its path carries estimates. Known destinations proceed with uncertainty preserved through room entry/exit; unknown destinations and unresolved branches remain blocked. The unchanged saved spell-input capture now completes090 through42/43/60/43, and looking at the Room18 sphere completes065. Other362 literal roots, four memberships, two sequences,76 room renders and15 direct-cage files remain exact. Core662,Blockers0,clean Release,protected57 exact/unstaged; no App launch/close/interaction or push. Original recipes/history and catalog coverage unchanged. A separate response18 experiment lacks the user's learned spell/available notes and does not establish their setup. [Validation](../.verification/estimated-room-loads-20261002/validation.md).
+The session no longer stops an executed room load merely because its path carries estimates. Known destinations proceed with uncertainty preserved through room entry/exit; unknown destinations and unresolved branches remain blocked. The unchanged saved spell-input capture now completes090 through42/43/60/43, and looking at the Room18 sphere completes065. Other362 literal roots, four memberships, two sequences,76 room renders and15 direct-cage files remain exact. Core662,Blockers0,clean Release,protected57 exact/unstaged; no App launch/close/interaction or push. Original recipes/history and catalog coverage unchanged. A separate response18 experiment lacks the user's learned spell/available notes and does not establish their setup. [Validation](../.verification/archive/estimated-room-loads-20261002/validation.md).
 
 ## 2 October: preserve the source-closed cage and name all draft responses
 
-From627b682: both catalog capture previews retain the closed Room43 background instead of borrowing the open-door image from later091. Generic fallback respects source-selected hidden regions, including overlapping images, while preserving the established entry/opening/unconditional-reset and gap policies. Room08's equivalent future-overlay guess is also corrected; other74 renders exact, all76 zero-gap. No native route improved; raw4 and all execution barriers stay unchanged. Core657,363 exact roots/fingerprints/four memberships/two sequences,Blockers0, clean normal main Release. No App launch/close/interaction or push;57 protected files exact. [Validation](../.verification/room43-cage-20261002/validation.md).
+From627b682: both catalog capture previews retain the closed Room43 background instead of borrowing the open-door image from later091. Generic fallback respects source-selected hidden regions, including overlapping images, while preserving the established entry/opening/unconditional-reset and gap policies. Room08's equivalent future-overlay guess is also corrected; other74 renders exact, all76 zero-gap. No native route improved; raw4 and all execution barriers stay unchanged. Core657,363 exact roots/fingerprints/four memberships/two sequences,Blockers0, clean normal main Release. No App launch/close/interaction or push;57 protected files exact. [Validation](../.verification/archive/room43-cage-20261002/validation.md).
 
-All132 numbered draft-response titles now use the existing Game Status spell associations in the shared catalog, including reverse directions. Global picker, room picker and Game Texts agree; original recipes, IDs, generated JSON and evidence are untouched. [Naming validation](../.verification/room43-cage-20261002/names-validation.md). The user clarifies that Play Cutscene works, while manual18 remains blocked before42; its exact native setup is separate from unchanged raw4.
+All132 numbered draft-response titles now use the existing Game Status spell associations in the shared catalog, including reverse directions. Global picker, room picker and Game Texts agree; original recipes, IDs, generated JSON and evidence are untouched. [Naming validation](../.verification/archive/room43-cage-20261002/names-validation.md). The user clarifies that Play Cutscene works, while manual18 remains blocked before42; its exact native setup is separate from unchanged raw4.
 
 ## 2 October: bound the raw4 failure and separate the reported cage issue
 
-Continued `55cb5ec`; no route improved. Rebuilt the existing Core probe and replayed only the unchanged Room41 raw4 recipe: whole packet byte-exact, Room41,15/14,7659frames. Two diagnostic cycles confirm the conditional Room42 rejection leaves no090 resumption and that uncertainty predates204-to090; no execution, observer, catalog or recipe change. The user clarified that Play Cutscene reaches the cage but shows it open rather than expected closed; preserve this separate report for a bounded source state/image check of the exact selected entry. All57 protected files remain exact/unstaged, prior runtime suite/build remain dated, no App launch or push. A stray App was stopped before the user opened another and explicitly requested it be left open. [Validation, limits and reproduction](../.verification/room41-route-20261002/validation.md).
+Continued `55cb5ec`; no route improved. Rebuilt the existing Core probe and replayed only the unchanged Room41 raw4 recipe: whole packet byte-exact, Room41,15/14,7659frames. Two diagnostic cycles confirm the conditional Room42 rejection leaves no090 resumption and that uncertainty predates204-to090; no execution, observer, catalog or recipe change. The user clarified that Play Cutscene reaches the cage but shows it open rather than expected closed; preserve this separate report for a bounded source state/image check of the exact selected entry. All57 protected files remain exact/unstaged, prior runtime suite/build remain dated, no App launch or push. A stray App was stopped before the user opened another and explicitly requested it be left open. [Validation, limits and reproduction](../.verification/archive/room41-route-20261002/validation.md).
 
 ## 2 October: prioritize a concrete blocked route
 
 After `9b5fdc3`, the user requested a new continuation prompt and working rules focused on route results. Room41 native090 with the unchanged raw4 recipe is the first target. The plan now bounds diagnostic detours to two focused cycles without a route-relevant implementation decision, defers general observer expansion, and requires plain-language before/after results. Existing evidence and constraints remain; genuine execution fixes must explain fresh differences without rewriting historical packets. CLAUDE.md and the handoff carry the same priority. Documentation-only change: no new runtime validation, route completion or coverage increase;168/235=71.49% remains. See [current plan](LOOM_EGA_PLAN.md#current-priority-make-one-blocked-route-work) and [next-session prompt](NEXT_SESSION_PROMPT.md).
 
-2 October continuation from `f649ff1`: `02c9fc1` rejects stop/resume result payloads on actual dispatch/restoration/continuation instructions; `b65cb4e` retires previous native lifetimes across omitted observation sequences. Twenty call-phase cases reproduce15 false correspondences;12 native cases reproduce5 stale-lifetime failures. Complete incoming-dispatch initialization/continuity and every boundary/barrier remain;opaque caller-end effects stay independent of actual child assignment. String contents/length/lifetime and exhaustive raw/native effects remain unresolved. No equality-derived origin,successful return,domain/effect transport or completion promotion. Fresh Core654/focused328;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;13 exact primary packets/chronologies;primary366/55/0 and76 original writer terminals/0 new original writer resumed chains;15 unknown message fields/camera waits0. Separate raw4 object16/14/9/3/195/rejection1,fallback0 and chronology IDs/estimates exact;separate camera55 waits/220 unknown fields with no lifetime/completion claim. Numeric report and native challenge3 expressions/17 steps/36 exact frames/11 reads/11 invalidations unchanged. Clean final main Release;all57 protected files exact/unstaged;App0/no launch/no push. Literal-site coverage168/235=71.49%;broader plan has no fixed denominator. Evidence:`Exe/RuntimePhasePayloadFinalSession2-20261002`. [Validation](../.verification/runtime-phase-payloads-20261002/validation.md),[checks](../.verification/runtime-phase-payloads-20261002/check-summary.json). Continue remaining bounded callee/caller correspondence and implicit/string/native access/mutations under every retained constraint.
+2 October continuation from `f649ff1`: `02c9fc1` rejects stop/resume result payloads on actual dispatch/restoration/continuation instructions; `b65cb4e` retires previous native lifetimes across omitted observation sequences. Twenty call-phase cases reproduce15 false correspondences;12 native cases reproduce5 stale-lifetime failures. Complete incoming-dispatch initialization/continuity and every boundary/barrier remain;opaque caller-end effects stay independent of actual child assignment. String contents/length/lifetime and exhaustive raw/native effects remain unresolved. No equality-derived origin,successful return,domain/effect transport or completion promotion. Fresh Core654/focused328;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;13 exact primary packets/chronologies;primary366/55/0 and76 original writer terminals/0 new original writer resumed chains;15 unknown message fields/camera waits0. Separate raw4 object16/14/9/3/195/rejection1,fallback0 and chronology IDs/estimates exact;separate camera55 waits/220 unknown fields with no lifetime/completion claim. Numeric report and native challenge3 expressions/17 steps/36 exact frames/11 reads/11 invalidations unchanged. Clean final main Release;all57 protected files exact/unstaged;App0/no launch/no push. Literal-site coverage168/235=71.49%;broader plan has no fixed denominator. Evidence:`Exe/RuntimePhasePayloadFinalSession2-20261002`. [Validation](../.verification/archive/runtime-phase-payloads-20261002/validation.md),[checks](../.verification/archive/runtime-phase-payloads-20261002/check-summary.json). Continue remaining bounded callee/caller correspondence and implicit/string/native access/mutations under every retained constraint.
 
-2 October continuation from `f84460f`: `6ad392d`, `3ed2da7` and `6c06692` require actual initialization/host/caller/child phases, including a terminated chaining caller before deferred initialization; `4b7c646` copies implicit ego plus independently unknown owner/inventory membership and notifies executed inventory mutations. Preserves `3f32e5f`, `32f1ecb`, `a3a90ec` and every earlier checkpoint. Nineteen boundary tests reproduce twelve former failures; fifteen owner/inventory/string controls preserve independent provenance and opaque string storage. Entire incoming-dispatch initialization/continuity remains required for caller restoration. No argument-derived origin, successful return, domain/effect transport or completion follows. Fresh Core622/focused296;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;13 exact primary packets/chronologies;primary366 bindings/55 triples/0 caller resumptions/76 original writer terminals/0 new original writer resumed chains;15 unknown message fields and0 camera waits. Separate raw4 objects remain16/14/9/3/195 with one per-call128 rejection,loaded fallback0;separate camera55 waits/220 unknown fields. Numeric report and native challenge3 expressions/17 steps/36 exact frames/11 reads/11 invalidations remain exact. Clean final main Release,all57 protected files exact/unstaged,App0/no launch/no push. Literal coverage168/235=71.49%;broader plan has no fixed denominator. [Validation](../.verification/runtime-boundaries-20261002/validation.md),[checks](../.verification/runtime-boundaries-20261002/check-summary.json). Evidence:`Exe/RuntimeBoundariesFinalSession4-20261002`. Continue remaining actual callee/return/yield/resumed correspondence and implicit/string/native access/mutations under every retained bound and barrier.
+2 October continuation from `f84460f`: `6ad392d`, `3ed2da7` and `6c06692` require actual initialization/host/caller/child phases, including a terminated chaining caller before deferred initialization; `4b7c646` copies implicit ego plus independently unknown owner/inventory membership and notifies executed inventory mutations. Preserves `3f32e5f`, `32f1ecb`, `a3a90ec` and every earlier checkpoint. Nineteen boundary tests reproduce twelve former failures; fifteen owner/inventory/string controls preserve independent provenance and opaque string storage. Entire incoming-dispatch initialization/continuity remains required for caller restoration. No argument-derived origin, successful return, domain/effect transport or completion follows. Fresh Core622/focused296;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;13 exact primary packets/chronologies;primary366 bindings/55 triples/0 caller resumptions/76 original writer terminals/0 new original writer resumed chains;15 unknown message fields and0 camera waits. Separate raw4 objects remain16/14/9/3/195 with one per-call128 rejection,loaded fallback0;separate camera55 waits/220 unknown fields. Numeric report and native challenge3 expressions/17 steps/36 exact frames/11 reads/11 invalidations remain exact. Clean final main Release,all57 protected files exact/unstaged,App0/no launch/no push. Literal coverage168/235=71.49%;broader plan has no fixed denominator. [Validation](../.verification/archive/runtime-boundaries-20261002/validation.md),[checks](../.verification/archive/runtime-boundaries-20261002/check-summary.json). Evidence:`Exe/RuntimeBoundariesFinalSession4-20261002`. Continue remaining actual callee/return/yield/resumed correspondence and implicit/string/native access/mutations under every retained bound and barrier.
 
 ## 2 October: observed caller incoming identity and independent camera access
 
 | Change | Result | Record |
 | --- | --- | --- |
-| `3f32e5f` | Actual incoming dispatch initialization/continuity required for caller restoration;8 cases,5 prior false resumptions reproduced;all omitted/native/cancellation/replacement barriers retained | [identity](../.verification/runtime-restoration-20261002/identity-validation.md) |
-| `32f1ecb` | Four unknown-provenance native camera wait fields retain global/opaque barriers;independent same-value/no-op camera mutation notifications;12 cases | [camera](../.verification/runtime-restoration-20261002/camera-validation.md) |
-| Final preservation | Core588/focused262;13 entire latest streams exact;primary366/55/0;separate raw4 object16/terminal14/triple9/resumption3/restoration195/rejection1 exact;separate camera55 waits/220 unknown-provenance fields;363 roots/fingerprints/memberships/sequences;Blockers0;76 exact zero-gap Core renders;numeric/challenge exact;clean final main Release;App0;57 protected files unchanged;168/235=71.49% unchanged | [validation](../.verification/runtime-restoration-20261002/validation.md) |
+| `3f32e5f` | Actual incoming dispatch initialization/continuity required for caller restoration;8 cases,5 prior false resumptions reproduced;all omitted/native/cancellation/replacement barriers retained | [identity](../.verification/archive/runtime-restoration-20261002/identity-validation.md) |
+| `32f1ecb` | Four unknown-provenance native camera wait fields retain global/opaque barriers;independent same-value/no-op camera mutation notifications;12 cases | [camera](../.verification/archive/runtime-restoration-20261002/camera-validation.md) |
+| Final preservation | Core588/focused262;13 entire latest streams exact;primary366/55/0;separate raw4 object16/terminal14/triple9/resumption3/restoration195/rejection1 exact;separate camera55 waits/220 unknown-provenance fields;363 roots/fingerprints/memberships/sequences;Blockers0;76 exact zero-gap Core renders;numeric/challenge exact;clean final main Release;App0;57 protected files unchanged;168/235=71.49% unchanged | [validation](../.verification/archive/runtime-restoration-20261002/validation.md) |
 
 ## 2 October: object/message preservation and separate loaded caller resumption
 
 | Change | Result | Record |
 | --- | --- | --- |
-| `aaaa755` | Actual object selected-entry binding;fallback/defect controls;independent child/host/caller/restoration boundaries | [object](../.verification/runtime-object-correspondence-20261002/object-validation.md) |
-| `56ffa35` | Native message wait fields retain unknown provenance;executed message/no-op notifications | [message](../.verification/runtime-object-correspondence-20261002/message-validation.md) |
-| `729cbb9` | Callee begin-site filtering suppresses selection metadata and preserves omitted initialization barriers | [filter](../.verification/runtime-object-correspondence-20261002/filter-validation.md) |
-| Final preservation | Core568/focused242;13 exact primary streams;366 original bindings/55 triples/0 resumptions;separate unchanged raw4 capture16 object bindings/9 triples/3 caller resumptions;76 original writer terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/challenge exact;clean main Release;App0;57 protected files unchanged;71.49% literal-site coverage unchanged | [validation](../.verification/runtime-object-correspondence-20261002/validation.md) |
+| `aaaa755` | Actual object selected-entry binding;fallback/defect controls;independent child/host/caller/restoration boundaries | [object](../.verification/archive/runtime-object-correspondence-20261002/object-validation.md) |
+| `56ffa35` | Native message wait fields retain unknown provenance;executed message/no-op notifications | [message](../.verification/archive/runtime-object-correspondence-20261002/message-validation.md) |
+| `729cbb9` | Callee begin-site filtering suppresses selection metadata and preserves omitted initialization barriers | [filter](../.verification/archive/runtime-object-correspondence-20261002/filter-validation.md) |
+| Final preservation | Core568/focused242;13 exact primary streams;366 original bindings/55 triples/0 resumptions;separate unchanged raw4 capture16 object bindings/9 triples/3 caller resumptions;76 original writer terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/challenge exact;clean main Release;App0;57 protected files unchanged;71.49% literal-site coverage unchanged | [validation](../.verification/archive/runtime-object-correspondence-20261002/validation.md) |
 
 ## 2 October: filtered callee selection metadata
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Callee-site filter | Selected object-entry metadata honors the omitted callee begin site;1 new case/call-focused54;original initialization/restoration barriers retained | [filter](../.verification/runtime-object-correspondence-20261002/filter-validation.md) |
+| Callee-site filter | Selected object-entry metadata honors the omitted callee begin site;1 new case/call-focused54;original initialization/restoration barriers retained | [filter](../.verification/archive/runtime-object-correspondence-20261002/filter-validation.md) |
 
 ## 2 October: native message wait fields and notifications
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Message waits | Copied native status/delay/speaker retain unknown field provenance and original timing/effect barrier;executed same-value/no-op message notifications;12 new cases/focused45 | [message](../.verification/runtime-object-correspondence-20261002/message-validation.md) |
+| Message waits | Copied native status/delay/speaker retain unknown field provenance and original timing/effect barrier;executed same-value/no-op message notifications;12 new cases/focused45 | [message](../.verification/archive/runtime-object-correspondence-20261002/message-validation.md) |
 
 ## 2 October: actual object callee selection
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Object selection | Actual exact/fallback verb table entry and resource bind startObject independently of host return/caller continuation;20 new cases/focused53;no origins or completion promotion | [object](../.verification/runtime-object-correspondence-20261002/object-validation.md) |
+| Object selection | Actual exact/fallback verb table entry and resource bind startObject independently of host return/caller continuation;20 new cases/focused53;no origins or completion promotion | [object](../.verification/archive/runtime-object-correspondence-20261002/object-validation.md) |
 
 ## 2 October: bounded actual callee/caller correspondence and native fields
 
 | Change | Result | Record |
 | --- | --- | --- |
-| `00f01a8` | Actual callee assignments and independent child/host/caller/restoration correspondence;no numeric origins or successful-return/completion proof | [calls](../.verification/runtime-correspondence-20261002/call-validation.md) |
-| `8110900` | Copied drawObject/stored drawing positions/native signed _userPut;explicit identical/absent position/input notifications;native/effect barriers retained | [native](../.verification/runtime-correspondence-20261002/native-validation.md) |
-| Final preservation | Core535/focused209;13 exact packets/legacy/call/completion streams;76 original writer terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/native challenge exact;clean final main Release;App0/no launch/no push;57 protected files unchanged;71.49% literal-site coverage unchanged | [validation](../.verification/runtime-correspondence-20261002/validation.md) |
+| `00f01a8` | Actual callee assignments and independent child/host/caller/restoration correspondence;no numeric origins or successful-return/completion proof | [calls](../.verification/archive/runtime-correspondence-20261002/call-validation.md) |
+| `8110900` | Copied drawObject/stored drawing positions/native signed _userPut;explicit identical/absent position/input notifications;native/effect barriers retained | [native](../.verification/archive/runtime-correspondence-20261002/native-validation.md) |
+| Final preservation | Core535/focused209;13 exact packets/legacy/call/completion streams;76 original writer terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/native challenge exact;clean final main Release;App0/no launch/no push;57 protected files unchanged;71.49% literal-site coverage unchanged | [validation](../.verification/archive/runtime-correspondence-20261002/validation.md) |
 
 ## 2 October: actual callee/caller boundaries and notified native mutations
 
 | Change | Result | Record |
 | --- | --- | --- |
-| `5fcc2a0` | Actual supplied/default/restored locals,dispatch,child end/yield,host return and caller continuation;no equality-derived numeric origins | [calls](../.verification/runtime-calls-20261002/call-validation.md) |
-| `995e97e` | Copied loadRoomWithEgo/implicit ego/string/owner/wait dependencies;native/effect barriers and estimates intact | [access](../.verification/runtime-calls-20261002/access-validation.md) |
-| `b3ee09e` | Executed object/actor native mutation notifications,including identical/attempted no-op writes;palette lifetime separate | [native](../.verification/runtime-calls-20261002/native-validation.md) |
-| Final preservation | Core501/focused175;13 exact packets/legacy chronologies/completion records;76 original terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/native challenge exact;clean final main Release;App0/no launch/no push/promotion;71.49% literal-site coverage unchanged | [validation](../.verification/runtime-calls-20261002/validation.md) |
+| `5fcc2a0` | Actual supplied/default/restored locals,dispatch,child end/yield,host return and caller continuation;no equality-derived numeric origins | [calls](../.verification/archive/runtime-calls-20261002/call-validation.md) |
+| `995e97e` | Copied loadRoomWithEgo/implicit ego/string/owner/wait dependencies;native/effect barriers and estimates intact | [access](../.verification/archive/runtime-calls-20261002/access-validation.md) |
+| `b3ee09e` | Executed object/actor native mutation notifications,including identical/attempted no-op writes;palette lifetime separate | [native](../.verification/archive/runtime-calls-20261002/native-validation.md) |
+| Final preservation | Core501/focused175;13 exact packets/legacy chronologies/completion records;76 original terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric/native challenge exact;clean final main Release;App0/no launch/no push/promotion;71.49% literal-site coverage unchanged | [validation](../.verification/archive/runtime-calls-20261002/validation.md) |
 
 
 ## 2 October: implicit chronology, native lifetimes and observed resumption chains
 
 | Change | Result | Record |
 | --- | --- | --- |
-| `ec9a525` | Additional copied subcommand/implicit access and actual separate expression reads/writes/scratch chronology; barriers/estimates intact | [access](../.verification/runtime-continuity-20261002/access-validation.md) |
-| `75d9cd7` | Independent copied native field/selector lifetimes and explicit raw native same-value notification | [native](../.verification/runtime-continuity-20261002/native-validation.md) |
-| `9593435` | Fully observed bounded yield/begin/end continuity for resumed terminals; original invocation checks and completion limits intact | [terminal](../.verification/runtime-continuity-20261002/terminal-validation.md) |
-| Final preservation | Core460;13 exact packets/chronologies/completion records;76 own-child matches/separate own-invocation terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;3 source challenge expressions/17 actual steps;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/runtime-continuity-20261002/validation.md) |
+| `ec9a525` | Additional copied subcommand/implicit access and actual separate expression reads/writes/scratch chronology; barriers/estimates intact | [access](../.verification/archive/runtime-continuity-20261002/access-validation.md) |
+| `75d9cd7` | Independent copied native field/selector lifetimes and explicit raw native same-value notification | [native](../.verification/archive/runtime-continuity-20261002/native-validation.md) |
+| `9593435` | Fully observed bounded yield/begin/end continuity for resumed terminals; original invocation checks and completion limits intact | [terminal](../.verification/archive/runtime-continuity-20261002/terminal-validation.md) |
+| Final preservation | Core460;13 exact packets/chronologies/completion records;76 own-child matches/separate own-invocation terminals;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;3 source challenge expressions/17 actual steps;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/archive/runtime-continuity-20261002/validation.md) |
 
 
 ## 2 October: selected native dependencies and observation boundaries
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Selected access `6442e4e` | Decoded expressions, nested pre-values, selected event/object-call/actor/print operands, independent native fields and explicit raw notifications; barriers/estimates intact | [API](../.verification/runtime-dependencies-20261002/api-validation.md) |
-| Source/causal boundaries `133b4d4` | Resource/parent/stage confirmation; own-invocation/parent termination; no callee-local argument binding or resumed continuity inference | [boundaries](../.verification/runtime-dependencies-20261002/boundary-validation.md) |
-| Final preservation | Core401;13 exact packets/chronologies;76 own-child matches/separate terminal observations;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/runtime-dependencies-20261002/validation.md) |
+| Selected access `6442e4e` | Decoded expressions, nested pre-values, selected event/object-call/actor/print operands, independent native fields and explicit raw notifications; barriers/estimates intact | [API](../.verification/archive/runtime-dependencies-20261002/api-validation.md) |
+| Source/causal boundaries `133b4d4` | Resource/parent/stage confirmation; own-invocation/parent termination; no callee-local argument binding or resumed continuity inference | [boundaries](../.verification/archive/runtime-dependencies-20261002/boundary-validation.md) |
+| Final preservation | Core401;13 exact packets/chronologies;76 own-child matches/separate terminal observations;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;numeric unchanged;clean main Release;App0/no launch/no push/promotion | [validation](../.verification/archive/runtime-dependencies-20261002/validation.md) |
 
 
 ## 2 October: access/lineage evidence and fresh preservation
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Copied access and lineage | Numeric operands, same-value runtime notifications, observed arithmetic/index/arguments; explicit unresolved/raw external/native-state/callee limits and all estimates retained | [validation](../.verification/runtime-access-20261002/validation.md) |
-| Independent completion precision | All13 whole packets/prior chronologies exact;76 own-literal-child zero waits and76 separate terminal observations; primary3036/4552→4553→4556→4557 unchanged;090 unresolved | [access evidence](../.verification/runtime-access-20261002/access-summary.json) |
-| Fresh checks | Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;final main Release zero warnings/errors;App0/no launch/no push/promotion | [checks](../.verification/runtime-access-20261002/check-summary.json) |
+| Copied access and lineage | Numeric operands, same-value runtime notifications, observed arithmetic/index/arguments; explicit unresolved/raw external/native-state/callee limits and all estimates retained | [validation](../.verification/archive/runtime-access-20261002/validation.md) |
+| Independent completion precision | All13 whole packets/prior chronologies exact;76 own-literal-child zero waits and76 separate terminal observations; primary3036/4552→4553→4556→4557 unchanged;090 unresolved | [access evidence](../.verification/archive/runtime-access-20261002/access-summary.json) |
+| Fresh checks | Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;final main Release zero warnings/errors;App0/no launch/no push/promotion | [checks](../.verification/archive/runtime-access-20261002/check-summary.json) |
 
 
 ## 2 October: observed arithmetic/index lineage and separate writer termination
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Arithmetic/index/arguments | Captured before-values and recursive index origins; unsigned/wrapped numeric candidates require snapshot confirmation; no domain transport or callee binding | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
-| Writer termination | Separate from literal-child matching; source identity/order and terminal status required; arithmetic zero, yields and stale/foreign ends do not become protocol proof | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
-| API checks | Twelve lineage/five terminal cases; Core374, clean main Release; final preservation completed in the follow-up above; no App/push/promotion | [lineage validation](../.verification/runtime-access-20261002/lineage-validation.md) |
+| Arithmetic/index/arguments | Captured before-values and recursive index origins; unsigned/wrapped numeric candidates require snapshot confirmation; no domain transport or callee binding | [lineage validation](../.verification/archive/runtime-access-20261002/lineage-validation.md) |
+| Writer termination | Separate from literal-child matching; source identity/order and terminal status required; arithmetic zero, yields and stale/foreign ends do not become protocol proof | [lineage validation](../.verification/archive/runtime-access-20261002/lineage-validation.md) |
+| API checks | Twelve lineage/five terminal cases; Core374, clean main Release; final preservation completed in the follow-up above; no App/push/promotion | [lineage validation](../.verification/archive/runtime-access-20261002/lineage-validation.md) |
 
 ## 2 October: numeric source access and notified runtime mutations
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Optional access records | Query/expression/range destinations and debug/delay reads; legacy bindings and instruction sequence preserved; unknown/filtered access stays a barrier | [API validation](../.verification/runtime-access-20261002/api-validation.md) |
-| Runtime mutations | Known session/message/status writes and removals retire relations even for unchanged values; raw external dictionary writes require explicit notification | [API validation](../.verification/runtime-access-20261002/api-validation.md) |
-| API checks | Nine new cases, Core357, clean main Release; native preservation follows the separate lineage task; no App/push/promotion | [API validation](../.verification/runtime-access-20261002/api-validation.md) |
+| Optional access records | Query/expression/range destinations and debug/delay reads; legacy bindings and instruction sequence preserved; unknown/filtered access stays a barrier | [API validation](../.verification/archive/runtime-access-20261002/api-validation.md) |
+| Runtime mutations | Known session/message/status writes and removals retire relations even for unchanged values; raw external dictionary writes require explicit notification | [API validation](../.verification/archive/runtime-access-20261002/api-validation.md) |
+| API checks | Nine new cases, Core357, clean main Release; native preservation follows the separate lineage task; no App/push/promotion | [API validation](../.verification/archive/runtime-access-20261002/api-validation.md) |
 
 ## 2 October: generic completion correspondence and fresh preservation
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Optional completion observer | Surviving literal writer, exact child/reader identity and sequence; independent estimates/terminal observations; stale/cancelled/aliased/external evidence rejected | [validation](../.verification/runtime-relations-20261002/validation.md) |
-| Native evidence | All13 packets and entire prior binding/cancellation/expanded chronology exact;76 own-child zero reads, primary3036/4552→4553→4556→4557 preserved;090 unresolved | [relations](../.verification/runtime-relations-20261002/relation-summary.json) |
-| Fresh checks | Core348;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;clean main Release;App0/no push/promotion | [checks](../.verification/runtime-relations-20261002/check-summary.json) |
+| Optional completion observer | Surviving literal writer, exact child/reader identity and sequence; independent estimates/terminal observations; stale/cancelled/aliased/external evidence rejected | [validation](../.verification/archive/runtime-relations-20261002/validation.md) |
+| Native evidence | All13 packets and entire prior binding/cancellation/expanded chronology exact;76 own-child zero reads, primary3036/4552→4553→4556→4557 preserved;090 unresolved | [relations](../.verification/archive/runtime-relations-20261002/relation-summary.json) |
+| Fresh checks | Core348;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;clean main Release;App0/no push/promotion | [checks](../.verification/archive/runtime-relations-20261002/check-summary.json) |
 
 ## 2 October: optional runtime relation lifetimes
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Runtime source relations | Historical read/move/argument lineage separated from live correspondence; writes/indexes/aliases/omissions/external effects/cancellation invalidate without changing estimates | [API validation](../.verification/runtime-relations-20261002/api-validation.md) |
+| Runtime source relations | Historical read/move/argument lineage separated from live correspondence; writes/indexes/aliases/omissions/external effects/cancellation invalidate without changing estimates | [API validation](../.verification/archive/runtime-relations-20261002/api-validation.md) |
 | Focused validation | Twelve lifetime cases; unchanged executor decisions and observation sequence; numeric domains remain source-only | [Core tests](../tests/SCUMMexplorer.Tests/LoomRuntimeRelationTests.cs) |
 
 ## 2 October: selected Room41 input/index provenance audit
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Selected operand chain | Boot1018/live3018 →whole native input[1,4,1,1] →056..059/indexes0..3 →actual023 slot4/index8,response/index9 →026(4,0); practice index0/estimated note1 bound; estimates intact | [validation](../.verification/runtime-bindings-20261002/validation.md) |
-| Completion/preservation | 13 exact whole packets/prior records; original3036/4552→4553→4556→4557 ordering and76 own-child literal zero waits retained; native090 unresolved; numeric source report unchanged | [bindings](../.verification/runtime-bindings-20261002/binding-summary.json) |
-| Fresh checks | Core326;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean final main Release;App0/no push/promotion | [checks](../.verification/runtime-bindings-20261002/check-summary.json) |
+| Selected operand chain | Boot1018/live3018 →whole native input[1,4,1,1] →056..059/indexes0..3 →actual023 slot4/index8,response/index9 →026(4,0); practice index0/estimated note1 bound; estimates intact | [validation](../.verification/archive/runtime-bindings-20261002/validation.md) |
+| Completion/preservation | 13 exact whole packets/prior records; original3036/4552→4553→4556→4557 ordering and76 own-child literal zero waits retained; native090 unresolved; numeric source report unchanged | [bindings](../.verification/archive/runtime-bindings-20261002/binding-summary.json) |
+| Fresh checks | Core326;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean final main Release;App0/no push/promotion | [checks](../.verification/archive/runtime-bindings-20261002/check-summary.json) |
 
 ## 2 October: optional operand binding observations
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Core operand snapshots | Exact selected cells, separate value/index/path estimates, bit aliases and ordered arguments; unknown/filtered indexes unresolved; no execution policy change | [API validation](../.verification/runtime-bindings-20261002/api-validation.md) |
-| Fresh preservation | Five new cases/Core326;13 exact packets/prior sequences;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean main Release;App0/no push | [checks](../.verification/runtime-bindings-20261002/check-summary.json) |
+| Core operand snapshots | Exact selected cells, separate value/index/path estimates, bit aliases and ordered arguments; unknown/filtered indexes unresolved; no execution policy change | [API validation](../.verification/archive/runtime-bindings-20261002/api-validation.md) |
+| Fresh preservation | Five new cases/Core326;13 exact packets/prior sequences;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean main Release;App0/no push | [checks](../.verification/archive/runtime-bindings-20261002/check-summary.json) |
 
 ## 2 October: production source/slot completion observations
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Optional Core observer | Copied read-only values/estimates, ordered instructions, stable causal slots and cancellation identities; no copied-Core patch or estimate change | [validation](../.verification/completion-observer-20261002/validation.md) |
-| Completion precision evidence | 13 exact whole packets/all prior instruction values;76 own-child zero waits; native write/wait both3036; limits retained | [observer](../.verification/completion-observer-20261002/observer-summary.json) |
-| Fresh preservation | Core321;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean main Release;no App/promotion/push | [checks](../.verification/completion-observer-20261002/check-summary.json) |
+| Optional Core observer | Copied read-only values/estimates, ordered instructions, stable causal slots and cancellation identities; no copied-Core patch or estimate change | [validation](../.verification/archive/completion-observer-20261002/validation.md) |
+| Completion precision evidence | 13 exact whole packets/all prior instruction values;76 own-child zero waits; native write/wait both3036; limits retained | [observer](../.verification/archive/completion-observer-20261002/observer-summary.json) |
+| Fresh preservation | Core321;363 exact roots/fingerprints/memberships/sequences;Blockers0;76 unchanged zero-gap renders;clean main Release;no App/promotion/push | [checks](../.verification/archive/completion-observer-20261002/check-summary.json) |
 
 ## 2 October: generic Core correlated numeric analysis
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Bounded source-analysis API | Whole correlated worlds, masks/indexes/arguments, opaque responses and explicit effect/callee boundaries; no runtime estimates changed | [validation](../.verification/correlated-core-20261002/validation.md) |
-| Fresh loaded-source reproduction | 162 worlds,52 flags,51 comparisons/14 overlaps,four Cartesian witnesses,12 practice argument cases; Core316 and clean main Release | [summary](../.verification/correlated-core-20261002/numeric-summary.json) |
+| Bounded source-analysis API | Whole correlated worlds, masks/indexes/arguments, opaque responses and explicit effect/callee boundaries; no runtime estimates changed | [validation](../.verification/archive/correlated-core-20261002/validation.md) |
+| Fresh loaded-source reproduction | 162 worlds,52 flags,51 comparisons/14 overlaps,four Cartesian witnesses,12 practice argument cases; Core316 and clean main Release | [summary](../.verification/archive/correlated-core-20261002/numeric-summary.json) |
 
 ## 2 October: per-slot cancellation and completion writer identity
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Generic script cancellation | Executing/nested/upcoming copies stop; replacements remain distinct; seven new cases, Core305 | [validation](../.verification/certainty-protocol-20261002/validation.md) |
-| Stable slot observer | Native031 completion and020 wait both frame3036; prior frame pairing corrected;13 whole packets and all prior instruction records identical | [slot evidence](../.verification/certainty-protocol-20261002/protocol-summary.json) |
-| Fresh preservation | 363 exact roots/fingerprints, unchanged memberships/sequences, Blockers0,76 unchanged zero-gap renders; clean main Release; no App/promotion/push | [checks](../.verification/certainty-protocol-20261002/check-summary.json) |
-| User-approved existing cleanup | Pre-existing tracked deletions and plan trimming included with the completed task | [scope](../.verification/certainty-protocol-20261002/validation.md) |
+| Generic script cancellation | Executing/nested/upcoming copies stop; replacements remain distinct; seven new cases, Core305 | [validation](../.verification/archive/certainty-protocol-20261002/validation.md) |
+| Stable slot observer | Native031 completion and020 wait both frame3036; prior frame pairing corrected;13 whole packets and all prior instruction records identical | [slot evidence](../.verification/archive/certainty-protocol-20261002/protocol-summary.json) |
+| Fresh preservation | 363 exact roots/fingerprints, unchanged memberships/sequences, Blockers0,76 unchanged zero-gap renders; clean main Release; no App/promotion/push | [checks](../.verification/archive/certainty-protocol-20261002/check-summary.json) |
+| User-approved existing cleanup | Pre-existing tracked deletions and plan trimming included with the completed task | [scope](../.verification/archive/certainty-protocol-20261002/validation.md) |
 
-Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/replay-gaps-20261001/validation.md).
+Coverage checkpoint: all 45 incomplete starts diagnosed individually; 42 sound/helper waits, one actor-box wait, two unmatched scopes. Reached Room13 watcher recorded without promotion. [Research](../.verification/archive/replay-gaps-20261001/validation.md).
 
 ## 2 October: complete correlated draft predicate
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Source-only022/023 numeric interpretation | All162 forward/reverse worlds select slot4 before026;52 flag projections;51 previous comparisons/14 overlaps reproduced; four Cartesian input artifacts exposed | [research](../.verification/correlated-drafts-20261002/validation.md) |
-| Certainty limits retained | No selected runtime input/index, path, scheduler/cancellation, movement, dispatch or native090 proof; production and palette implementation unchanged | [summary](../.verification/correlated-drafts-20261002/predicate-summary.json) |
+| Source-only022/023 numeric interpretation | All162 forward/reverse worlds select slot4 before026;52 flag projections;51 previous comparisons/14 overlaps reproduced; four Cartesian input artifacts exposed | [research](../.verification/archive/correlated-drafts-20261002/validation.md) |
+| Certainty limits retained | No selected runtime input/index, path, scheduler/cancellation, movement, dispatch or native090 proof; production and palette implementation unchanged | [summary](../.verification/archive/correlated-drafts-20261002/predicate-summary.json) |
 
 ## 2 October: Room41 instruction-level completion provenance
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Isolated source observer | Direct031 practice-note +0026 →D6C0 →031 completion +031D →020 wait +0028 provenance; all13 recipe packets identical, production unchanged | [evidence](../.verification/certainty-provenance-20261002/validation.md) |
-| Fresh Core preservation checks | Core298;363 exact roots/fingerprints; memberships/sequences unchanged; Blockers0;76 unchanged zero-gap renders; clean main Release; no App or push | [checks](../.verification/certainty-provenance-20261002/check-summary.json) |
+| Isolated source observer | Direct031 practice-note +0026 →D6C0 →031 completion +031D →020 wait +0028 provenance; all13 recipe packets identical, production unchanged | [evidence](../.verification/archive/certainty-provenance-20261002/validation.md) |
+| Fresh Core preservation checks | Core298;363 exact roots/fingerprints; memberships/sequences unchanged; Blockers0;76 unchanged zero-gap renders; clean main Release; no App or push | [checks](../.verification/archive/certainty-provenance-20261002/check-summary.json) |
 
 ## 2 October: Room41 completion protocol and correlated-domain research
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Source completion/input audit | Four dye notes now known; gap snapshots bound020 D67 path taint; D6C terminal projection and D67 early-stop counterexample recorded without production resets | [evidence](../.verification/certainty-precision-20261002/validation.md) |
-| Packed-domain precision | Seven loaded023 masks,51 disjoint tuple comparisons and14 first-component overlaps; no native090 completion/promotion | [summary](../.verification/certainty-precision-20261002/precision-summary.json) |
+| Source completion/input audit | Four dye notes now known; gap snapshots bound020 D67 path taint; D6C terminal projection and D67 early-stop counterexample recorded without production resets | [evidence](../.verification/archive/certainty-precision-20261002/validation.md) |
+| Packed-domain precision | Seven loaded023 masks,51 disjoint tuple comparisons and14 first-component overlaps; no native090 completion/promotion | [summary](../.verification/archive/certainty-precision-20261002/precision-summary.json) |
 
 ## 2 October: generic palette certainty precision
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Palette versus placement provenance | Palette-only actor commands retain color uncertainty separately; dye input notes/count stay known, existing movement estimates retained; no room exceptions or estimate clearing | [implementation](../.verification/certainty-precision-20261002/palette-validation.md) |
-| Fresh preservation checks | Core298 including nine palette cases;363 exact roots/fingerprints, memberships/sequences unchanged; Blockers0;76 unchanged zero-gap renders; main Release clean; native090 still Conditional | [checks](../.verification/certainty-precision-20261002/check-summary.json) |
+| Palette versus placement provenance | Palette-only actor commands retain color uncertainty separately; dye input notes/count stay known, existing movement estimates retained; no room exceptions or estimate clearing | [implementation](../.verification/archive/certainty-precision-20261002/palette-validation.md) |
+| Fresh preservation checks | Core298 including nine palette cases;363 exact roots/fingerprints, memberships/sequences unchanged; Blockers0;76 unchanged zero-gap renders; main Release clean; native090 still Conditional | [checks](../.verification/archive/certainty-precision-20261002/check-summary.json) |
 
 ## 2 October: Room41 certainty layers and source-domain proof
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Native input certainty audit | Mouse/key pairs agree downstream; raw4 enters022 Conditional, older raw6 first taints at007D; inherited input/practice/actor dependencies localized without runtime writes | [evidence](../.verification/room41-certainty-20261002/validation.md) |
-| Source boot alternatives | 51 slot4/earlier-candidate comparisons exclude collisions; estimates and native090 gap retained, no engine/catalog changes | [derived source domains](../.verification/room41-certainty-20261002/source-domains.json) |
-| Preserved source recipes and checks | Both level4 orders,096 and four20 combinations unchanged; Core289,363 exact roots/fingerprints/memberships/sequences unchanged; Blockers0; Release clean | [checks](../.verification/room41-certainty-20261002/check-summary.json) |
+| Native input certainty audit | Mouse/key pairs agree downstream; raw4 enters022 Conditional, older raw6 first taints at007D; inherited input/practice/actor dependencies localized without runtime writes | [evidence](../.verification/archive/room41-certainty-20261002/validation.md) |
+| Source boot alternatives | 51 slot4/earlier-candidate comparisons exclude collisions; estimates and native090 gap retained, no engine/catalog changes | [derived source domains](../.verification/archive/room41-certainty-20261002/source-domains.json) |
+| Preserved source recipes and checks | Both level4 orders,096 and four20 combinations unchanged; Core289,363 exact roots/fingerprints/memberships/sequences unchanged; Blockers0; Release clean | [checks](../.verification/archive/room41-certainty-20261002/check-summary.json) |
 
 ## 2 October: native level4 prerequisites and Room41 certainty continuation
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Native slot-use/level4 source recipes | Loaded native egg, dye and reverse-gold actions execute034 for slots0/2/1; both final gates execute029(4),9/9; randomized/source-path estimates retained | [recipes](../.verification/native-prerequisites-20261002/level4-validation.md) |
-| Room41 certainty localization | Raw4 source route replaces direct5/6 shortcuts; native15/14 remains unresolved, same-setup direct633/204 override15/15 completes43;022 is Conditional before slot4 selection; no code exception/catalog promotion | [evidence](../.verification/native-prerequisites-20261002/validation.md) |
-| Preserved recipes/fresh regressions | 096 source override and all four20 combinations unchanged; Core289;363 roots/fingerprints/memberships/sequences unchanged; Blockers0; Release clean | [checks](../.verification/native-prerequisites-20261002/check-summary.json) |
+| Native slot-use/level4 source recipes | Loaded native egg, dye and reverse-gold actions execute034 for slots0/2/1; both final gates execute029(4),9/9; randomized/source-path estimates retained | [recipes](../.verification/archive/native-prerequisites-20261002/level4-validation.md) |
+| Room41 certainty localization | Raw4 source route replaces direct5/6 shortcuts; native15/14 remains unresolved, same-setup direct633/204 override15/15 completes43;022 is Conditional before slot4 selection; no code exception/catalog promotion | [evidence](../.verification/archive/native-prerequisites-20261002/validation.md) |
+| Preserved recipes/fresh regressions | 096 source override and all four20 combinations unchanged; Core289;363 roots/fingerprints/memberships/sequences unchanged; Blockers0; Release clean | [checks](../.verification/archive/native-prerequisites-20261002/check-summary.json) |
 
 ## 2 October: source progression
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Generic expressions/native intro input | Signed integer postfix stack and nested seeded random scratch semantics; native201 challenge now executes; optional input-awaiting boot preserves default UI; Core289/WPF62, all roots/sequences/pixels unchanged | [implementation](../.verification/source-progression-20261002/expression-validation.md) |
-| Source096 completion | Actual095 Escape override writes known flags; staff/092/639 route completes096 in46,4/4; ordinary full095 control remains incomplete | [recipe](../.verification/source-progression-20261002/late096-validation.md) |
-| Usable20 arrivals/both responses | Actual16 sleep writes D8F, both18 arrivals settle20 with source ego,390/391 finish in all four combinations,7/7; fresh catalog20 gaps retained | [recipes](../.verification/source-progression-20261002/room20-validation.md) |
-| Room41/native level4 audit | Actual37 arrival/native633 still inherits Conditional090; direct633+204 override completes43 separately; correct D6F=0 and used-slot gates recorded; native challenge and egg input advance without native opening/raw4 claims | [source evidence](../.verification/source-progression-20261002/validation.md) |
+| Generic expressions/native intro input | Signed integer postfix stack and nested seeded random scratch semantics; native201 challenge now executes; optional input-awaiting boot preserves default UI; Core289/WPF62, all roots/sequences/pixels unchanged | [implementation](../.verification/archive/source-progression-20261002/expression-validation.md) |
+| Source096 completion | Actual095 Escape override writes known flags; staff/092/639 route completes096 in46,4/4; ordinary full095 control remains incomplete | [recipe](../.verification/archive/source-progression-20261002/late096-validation.md) |
+| Usable20 arrivals/both responses | Actual16 sleep writes D8F, both18 arrivals settle20 with source ego,390/391 finish in all four combinations,7/7; fresh catalog20 gaps retained | [recipes](../.verification/archive/source-progression-20261002/room20-validation.md) |
+| Room41/native level4 audit | Actual37 arrival/native633 still inherits Conditional090; direct633+204 override completes43 separately; correct D6F=0 and used-slot gates recorded; native challenge and egg input advance without native opening/raw4 claims | [source evidence](../.verification/archive/source-progression-20261002/validation.md) |
 
 ## 1 October: global cutscene access
 
 | Change | Result | Record |
 | --- | --- | --- |
-| Status controls and normal costumes | Single-click Learned, read-only reverse,38px native notes, staff/note coupling with C/D/E edit minimum,16 source-associated names, stable toolbar position and graphical costume cards; WPF62/62, Core277/277, doorways16/16 and controls19/19 | [validation](../.verification/status-refinements-20261001/validation.md) |
-| Scythe background preservation | Generic fallback avoids index-hidden later erasing overlays; polishing scene indexed20 restored; only20 of76 room renders changes, zero gaps; source/replay results unchanged | [source and validation](../.verification/status-refinements-20261001/scythe-validation.md) |
-| Native draft progression and source-route correction | Native325 learning, source levels5/6, delayed active633 and native633/41 casting established;090/096 certainty and four fresh failures retained; transient20 entry corrected; Core275/275, main Release clean, no production/catalog changes | [validation](../.verification/source-progression-20261001/validation.md) |
-| Compact spell rows | Height reduced from32 to26; spell text, note selectors, checkboxes and Advanced provenance vertically centered; visible WPF47/47, final Release build clean | [validation](../.verification/spell-row-layout-20261001/validation.md) |
-| Staff bound, native score and Transcend | Inclusive levels1..8/no None, native combined artwork, sixteen loaded drafts, catalog-only higher-level preservation and verified limited floors; Core275/275, WPF47/47, all363 roots/sequences/pixels unchanged | [validation](../.verification/staff-correction-20261001/validation.md) |
-| Continued source dependency audit | Native634 is a valid Room41 aim target but high-note refusal remains; late096 actor movement finishes but certainty blocks load45; both fresh20 arrivals remain unestablished; all four fresh incomplete owners retained | [source findings](../.verification/staff-correction-20261001/source-routes.md) |
-| Requested UI refinements | Completed toolbar/Advanced visibility, uniform original names, ready-to-edit Apply/Close, musical labels, separate Learned/Can reverse, two verified name pairs and native graphical staff/contiguous notes; Core265/265, WPF42/42, all363 roots/sequences/pixels unchanged | [validation](../.verification/ui-refinements-20261001/validation.md), [next prompt](NEXT_SESSION_PROMPT.md) |
-| Game status | Live source-validated staff, available-note identities/count and fifteen draft sequences; explicit edits preserve flags/targets, busy/paused/stale guards; Core260/260, WPF16/16 | [status validation](../.verification/game-status-20261001/validation.md) |
-| Nested scope scheduling and three promotions | Frozen callers suspend; upcoming slots stay accessible; Room24/432 and Room41/63341/4B complete;334 starts,168/235 literal sites; late096/native Room41 input retained unresolved | [scope validation](../.verification/draft-scopes-20261001/validation.md) |
-| Generic sequence replays | 052/input/053 and086/look/087 promoted with audited per-stage waits, actual memberships and pause/cancellation guards;331 starts; literal-root gaps retained | [sequence validation](../.verification/sequence-replays-20261001/validation.md) |
-| Continued source routes | 052/input completes053 and086/look completes087, normal WPF8/8; Room41/096 remain unmatched, all site gaps retained; main Release rebuilt | [route investigation](../.verification/coverage-routes-20261001/validation.md) |
-| Sound-unblocked catalog promotion | 38 additional validated previews: 329 starts, 163/235 sites, 55 unresolved owners; all 38 WPF replays verified, global21/21 and room20/20 | [promotion](../.verification/native-replay-coverage-20261001/validation.md) |
-| Native sound completion waits | Finite AdLib clocks release script040 naturally; loops/unknowns retain status; 38 former failures now complete, seven unresolved; 253 Core tests and normal-clock WPF8/8 | [sound lifetimes](../.verification/sound-lifetimes-20261001/validation.md) |
-| Top-level Play Cutscene | Existing replay starts available from every room; playback/pause/departure guards preserved | [picker](../.verification/global-cutscene-picker-20261001/validation.md) |
-| Advanced Game Texts | Game Texts appears only in Advanced; normal view returns to interactive input | [visibility](../.verification/global-cutscene-picker-20261001/validation.md) |
+| Status controls and normal costumes | Single-click Learned, read-only reverse,38px native notes, staff/note coupling with C/D/E edit minimum,16 source-associated names, stable toolbar position and graphical costume cards; WPF62/62, Core277/277, doorways16/16 and controls19/19 | [validation](../.verification/archive/status-refinements-20261001/validation.md) |
+| Scythe background preservation | Generic fallback avoids index-hidden later erasing overlays; polishing scene indexed20 restored; only20 of76 room renders changes, zero gaps; source/replay results unchanged | [source and validation](../.verification/archive/status-refinements-20261001/scythe-validation.md) |
+| Native draft progression and source-route correction | Native325 learning, source levels5/6, delayed active633 and native633/41 casting established;090/096 certainty and four fresh failures retained; transient20 entry corrected; Core275/275, main Release clean, no production/catalog changes | [validation](../.verification/archive/source-progression-20261001/validation.md) |
+| Compact spell rows | Height reduced from32 to26; spell text, note selectors, checkboxes and Advanced provenance vertically centered; visible WPF47/47, final Release build clean | [validation](../.verification/archive/spell-row-layout-20261001/validation.md) |
+| Staff bound, native score and Transcend | Inclusive levels1..8/no None, native combined artwork, sixteen loaded drafts, catalog-only higher-level preservation and verified limited floors; Core275/275, WPF47/47, all363 roots/sequences/pixels unchanged | [validation](../.verification/archive/staff-correction-20261001/validation.md) |
+| Continued source dependency audit | Native634 is a valid Room41 aim target but high-note refusal remains; late096 actor movement finishes but certainty blocks load45; both fresh20 arrivals remain unestablished; all four fresh incomplete owners retained | [source findings](../.verification/archive/staff-correction-20261001/source-routes.md) |
+| Requested UI refinements | Completed toolbar/Advanced visibility, uniform original names, ready-to-edit Apply/Close, musical labels, separate Learned/Can reverse, two verified name pairs and native graphical staff/contiguous notes; Core265/265, WPF42/42, all363 roots/sequences/pixels unchanged | [validation](../.verification/archive/ui-refinements-20261001/validation.md), [next prompt](NEXT_SESSION_PROMPT.md) |
+| Game status | Live source-validated staff, available-note identities/count and fifteen draft sequences; explicit edits preserve flags/targets, busy/paused/stale guards; Core260/260, WPF16/16 | [status validation](../.verification/archive/game-status-20261001/validation.md) |
+| Nested scope scheduling and three promotions | Frozen callers suspend; upcoming slots stay accessible; Room24/432 and Room41/63341/4B complete;334 starts,168/235 literal sites; late096/native Room41 input retained unresolved | [scope validation](../.verification/archive/draft-scopes-20261001/validation.md) |
+| Generic sequence replays | 052/input/053 and086/look/087 promoted with audited per-stage waits, actual memberships and pause/cancellation guards;331 starts; literal-root gaps retained | [sequence validation](../.verification/archive/sequence-replays-20261001/validation.md) |
+| Continued source routes | 052/input completes053 and086/look completes087, normal WPF8/8; Room41/096 remain unmatched, all site gaps retained; main Release rebuilt | [route investigation](../.verification/archive/coverage-routes-20261001/validation.md) |
+| Sound-unblocked catalog promotion | 38 additional validated previews: 329 starts, 163/235 sites, 55 unresolved owners; all 38 WPF replays verified, global21/21 and room20/20 | [promotion](../.verification/archive/native-replay-coverage-20261001/validation.md) |
+| Native sound completion waits | Finite AdLib clocks release script040 naturally; loops/unknowns retain status; 38 former failures now complete, seven unresolved; 253 Core tests and normal-clock WPF8/8 | [sound lifetimes](../.verification/archive/sound-lifetimes-20261001/validation.md) |
+| Top-level Play Cutscene | Existing replay starts available from every room; playback/pause/departure guards preserved | [picker](../.verification/archive/global-cutscene-picker-20261001/validation.md) |
+| Advanced Game Texts | Game Texts appears only in Advanced; normal view returns to interactive input | [visibility](../.verification/archive/global-cutscene-picker-20261001/validation.md) |
 | Source-derived replay coverage | 291 global replay starts, grouped/searchable; 139/235 sites reached, 79 owners with explicit unresolved coverage | [replay audit](../.verification/replay-coverage-20261001/validation.md) |
-| Unattended harness crashes | All rebuilt verification executables log fatal failures and exit 1; four deliberate crash probes pass without user input | [failure policy](../.verification/harness-failures-20261001/validation.md) |
-| Automatic interactive hover | Pointer checkbox removed; native hover in normal/Advanced, inspection preserved, room/note clicks survive both round trips, paused scenes do not advance | [input checks](../.verification/automatic-pointer-20261001/validation.md) |
-| Shared source-backed replay titles | Stored object names retained; 39 unnamed targets have action/reached-room descriptors and explicit naming gaps; 9/9 WPF checks | [names](../.verification/replay-names-20261001/validation.md) |
+| Unattended harness crashes | All rebuilt verification executables log fatal failures and exit 1; four deliberate crash probes pass without user input | [failure policy](../.verification/archive/harness-failures-20261001/validation.md) |
+| Automatic interactive hover | Pointer checkbox removed; native hover in normal/Advanced, inspection preserved, room/note clicks survive both round trips, paused scenes do not advance | [input checks](../.verification/archive/automatic-pointer-20261001/validation.md) |
+| Shared source-backed replay titles | Stored object names retained; 39 unnamed targets have action/reached-room descriptors and explicit naming gaps; 9/9 WPF checks | [names](../.verification/archive/replay-names-20261001/validation.md) |
 | Room Play Cutscene | One match plays, multiple use shared filtered picker, none hides button; all 291 memberships from validated start/observed rooms including original four; 20/20 WPF checks | [room access](../.verification/room-replays-20261001/validation.md) |
 
 Finished work, oldest first. Each entry links to the validation record that holds the details, the commands and the counts. Reverse-engineering findings live in the [script map](LOOM_SCRIPT_MAP.md); priorities live in the [plan](LOOM_EGA_PLAN.md). This file replaces `WIP_2026-09-27.md` and the history table that was in the plan (28 September 2026).
@@ -549,11 +549,11 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 | The game's keys and '.' to skip text (user reports F and G) | Keys go to the game in the interactive LOOM mode with no option (the user's choice): the note rows cast spells, and the other keys script 005 reads work. '.', ScummVM's talk-stop key, ends the text shown, also in cutscenes. KeyInputCheck 0 | [game-keys](../.verification/game-keys/validation.md) |
 | The cutscene menu lists the room's cutscenes (user report H) | "Play a cutscene" lists only the known cutscenes that start in the room shown or whose script loads it (the scripts' `loadRoom` operands, decoded); elsewhere one disabled line names the rooms that have one. CutsceneMenuCheck 0. Tests 244/244 | [cutscene-menu-rooms](../.verification/cutscene-menu-rooms/validation.md) |
 | The room media player hidden in the interactive mode (user item I) | Analysis: in the interactive mode the MUSIC panel duplicated the game's music, called reached music "not reached", and played over a cutscene's own copy of the same track. With the user's choice, it is hidden in the interactive LOOM mode, and a sound the game starts stops the app's other player. The inspection mode is unchanged. MusicPanelCheck 0 | [room-music-analysis](../.verification/room-music-analysis/validation.md) |
-| Integrate the interrupted H/I worktree onto master | Reviewed and fast-forwarded the three completed commits; rebuilt the main Release app with zero warnings. Tests 244/244; fresh CutsceneMenuCheck and MusicPanelCheck 0 failures. Separate room-controls commit left untouched | [integration-hi-20260930](../.verification/integration-hi-20260930/validation.md) |
-| Discard obsolete room-controls work | With the user's instruction, removed the clean detached worktree without integrating its old UI commit 8878cd9; updated the handoff so it is no longer pending | [drop-room-controls-20260930](../.verification/drop-room-controls-20260930/validation.md) |
-| Room cutscene buttons and Skip line | One scene plays directly; several use simple menu titles; no scene hides the control. Skip line shares '.' and continues the current scene. ControlsCheck 10 PASS; tests 244/244 | [cutscene-controls-20260930](../.verification/cutscene-controls-20260930/validation.md) |
-| Remove obsolete Advanced controls | Visible verb notes accept clicks without Show verb area. Removed the entry-pan option, timer and CameraPanCheck; source-driven camera remains. VerbAreaCheck and six required doorway rooms pass | [advanced-controls-20260930](../.verification/advanced-controls-20260930/validation.md) |
-| Spell notes and result audio | Draft playback runs through its completion; audio follows interactive and Advanced actions. Executed estimated sounds remain labelled previews, unexecuted possibilities stay silent. Four note tracks and result sound 19 open; SceneSoundCheck 0; tests 246/246 | [spell-audio-20260930](../.verification/spell-audio-20260930/validation.md) |
+| Integrate the interrupted H/I worktree onto master | Reviewed and fast-forwarded the three completed commits; rebuilt the main Release app with zero warnings. Tests 244/244; fresh CutsceneMenuCheck and MusicPanelCheck 0 failures. Separate room-controls commit left untouched | [integration-hi-20260930](../.verification/archive/integration-hi-20260930/validation.md) |
+| Discard obsolete room-controls work | With the user's instruction, removed the clean detached worktree without integrating its old UI commit 8878cd9; updated the handoff so it is no longer pending | [drop-room-controls-20260930](../.verification/archive/drop-room-controls-20260930/validation.md) |
+| Room cutscene buttons and Skip line | One scene plays directly; several use simple menu titles; no scene hides the control. Skip line shares '.' and continues the current scene. ControlsCheck 10 PASS; tests 244/244 | [cutscene-controls-20260930](../.verification/archive/cutscene-controls-20260930/validation.md) |
+| Remove obsolete Advanced controls | Visible verb notes accept clicks without Show verb area. Removed the entry-pan option, timer and CameraPanCheck; source-driven camera remains. VerbAreaCheck and six required doorway rooms pass | [advanced-controls-20260930](../.verification/archive/advanced-controls-20260930/validation.md) |
+| Spell notes and result audio | Draft playback runs through its completion; audio follows interactive and Advanced actions. Executed estimated sounds remain labelled previews, unexecuted possibilities stay silent. Four note tracks and result sound 19 open; SceneSoundCheck 0; tests 246/246 | [spell-audio-20260930](../.verification/archive/spell-audio-20260930/validation.md) |
 
 ## State at the end of 28 September
 
@@ -563,12 +563,12 @@ Unless noted, "no physical input" applies: the WPF harnesses drive the real wind
 - Blockers baseline: `.verification/room-owned-loads/blockers-after.txt` (5839 over 134 reasons). The real stops left are `expression` (3), `getActorCostume` (1) and `getActorElevation` (1). The rest are labels.
 # 1 October: source-backed replay titles
 
-Stored names resolved across source room definitions; 39 genuinely unnamed targets use decoded action/reached-room descriptors with explicit gaps. Shared picker/Game Texts titles, 9/9 WPF checks; replay actions and coverage unchanged. [Validation](../.verification/replay-names-20261001/validation.md).
+Stored names resolved across source room definitions; 39 genuinely unnamed targets use decoded action/reached-room descriptors with explicit gaps. Shared picker/Game Texts titles, 9/9 WPF checks; replay actions and coverage unchanged. [Validation](../.verification/archive/replay-names-20261001/validation.md).
 
 # 1 October 2026: requested replay/status control placement
 
-Top-right Game Status, Advanced-only global Play Cutscene and room replay beside Skip line; shared memberships and playback guards retained. [WPF11/11 and screenshots](../.verification/ui-refinements-20261001/validation.md).
+Top-right Game Status, Advanced-only global Play Cutscene and room replay beside Skip line; shared memberships and playback guards retained. [WPF11/11 and screenshots](../.verification/archive/ui-refinements-20261001/validation.md).
 
 # 1 October 2026: uniform original replay names
 
-Original opening/trial/transition/firewood use the shared room-and-description formatter in all replay views and Game Texts. Opening label01 verified against stopped boot69; recipes/memberships retained. [WPF15/15](../.verification/ui-refinements-20261001/validation.md).
+Original opening/trial/transition/firewood use the shared room-and-description formatter in all replay views and Game Texts. Opening label01 verified against stopped boot69; recipes/memberships retained. [WPF15/15](../.verification/archive/ui-refinements-20261001/validation.md).

@@ -1,0 +1,87 @@
+"""Record the separately committed APIs only after all fresh preservation reports pass."""
+from pathlib import Path
+import json
+
+base = Path(__file__).parent
+checks = json.loads((base/'check-summary.json').read_text(encoding='utf-8'))
+assert checks['core'] == 374 and checks['rootCount'] == 363
+assert checks['genericOwnLiteralChildMatches'] == checks['independentWriterTerminations'] == 76
+assert checks['numericSourceReportUnchanged'] and checks['changedPixels'] == checks['remainingGaps'] == 0
+assert checks['releaseWarnings'] == checks['releaseErrors'] == 0 and not checks['appLaunched']
+p = Path('docs/NEXT_SESSION_PROMPT.md')
+text = p.read_text(encoding='utf-8')
+marker = 'State at checkpoint (2 October 2026):\n'
+assert text.count(marker) == 1
+state = '''
+* Continuation from `30f4e17`: generic numeric source access/runtime mutation notification is separately committed in `b20dc4e`; observed arithmetic/index lineage and independent writer-end precision are committed in `a22ff2a`. Earlier lifetime `8bad888`, completion observations `0518da4`, operand API `82679ae`, provenance `e523f8a`, palette `e2d1729`, numeric `8a224a7`, observer `96b79f6` and cancellation `c91f860` remain preserved. Optional `LoomScriptSourceAccess` covers query destinations, debug/delay operands, ordinary expressions and parsed range cells without changing legacy bindings. Unknown/filtered/nested-random forms remain barriers. Known session/message/status writes/removals notify relations even for identical numbers. Raw external dictionary writes still need `NotifyExternal`; scoped host mutation notification is optional. Neither source access nor a null barrier proves exhaustive actor/object/message effects, external writers, callee return or scheduling.
+* Arithmetic lineage records actual before-values and recursive index reads/origins, plus ordered caller arguments. Captured unsigned/wrapped candidates require a following same-invocation snapshot; missing values, bit arithmetic, divide-by-zero and mismatched snapshots establish no origin. Historical copies remain distinct from live storage. Notified destination-index writes reject pending confirmations; oversized argument/index batches fail closed. Filtered range indexes disclose no selected key. Ranges/query results/expressions remain access records, not guessed write lineage. No hypothetical numeric world, callee-local argument binding or inherited path/effect transport is introduced.
+* Writer matching and terminal status remain separate. `WriterTerminated` requires a source-consistent end after confirmation and before the read, with reached stop and no resume/unresolved reason. Yielded/partial/unresolved/stale/foreign-resource ends cannot establish termination; an arithmetic zero cannot masquerade as a literal-zero completion move. A matched writer or termination still proves no protocol completion or universal scheduler/callee/cancellation safety.
+* Fresh final evidence: all13 whole packets and complete prior operand-binding/cancellation/expanded chronologies are exact. All76 zero waits still match their own observed literal child only in these13 recipes, with76 separate source-consistent terminal observations. Native031 child412/run12143 +031D/4552 →confirmation4553 →020 parent408/run12144 +0028/4556 →estimated increment4557 remain frame3036. All writer/read value/index/path estimates and omitted/external/aliased/concurrent writer, cancellation/replacement, raw same-value external and scheduler/callee limits remain. Early0019/D671 and D6C projection limits remain; native090 is unresolved.
+* Selected values remain boot1018/current3018, native input[1,4,1,1],056..059/indexes0..3,023 slot4/index8 and response03B/index9/4241, then026(4,0). The selected index now records its own observed multiply origin without acquiring a source domain. Practice index0/local000 selects estimated052=1, then estimated030 argument1. Numeric analysis stays source-only: the complete162-world/52-flag/51-comparison/14-overlap/four-fabricated-match/12-practice report is exactly unchanged. No general runtime-domain transport, inherited effects or090 proof.
+* Core374 (26 new cases:9 access/mutation,12 lineage,5 terminal);363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;final main Release zero warnings/errors;App0/no launch/no push. Raw4=41,15/14, raw6=41,12/11, separate direct633/actual204 Escape=43,15/15; both level4 orders,096/all four20 routes, palette/placement separation, all four known dye notes/count, status/costume/scythe/UI and unrelated work remain. Final evidence/checks: `Exe/RuntimeAccessFinalSession-20261002`. [API](../.verification/archive/runtime-access-20261002/api-validation.md), [lineage](../.verification/archive/runtime-access-20261002/lineage-validation.md), [validation](../.verification/archive/runtime-access-20261002/validation.md), [access](../.verification/archive/runtime-access-20261002/access-summary.json), [bindings](../.verification/archive/runtime-access-20261002/binding-summary.json), [relations](../.verification/archive/runtime-access-20261002/relation-summary.json), [checks](../.verification/archive/runtime-access-20261002/check-summary.json). Earlier generator/fixture diagnostics and pre-final capture are retained under `Exe/RuntimeAccessSession-20261002`. Session token usage remains unavailable; account limits were not substituted.
+* Read runtime-access-20261002 validations/summaries/scripts/Core APIs/tests first, then runtime-relations-20261002, runtime-bindings-20261002, correlated-core/completion-observer and original certainty-protocol/provenance/correlated-drafts. Next: coverage of remaining source/event/nested-expression accesses and native-state dependencies; notified raw external/same-value mutations; observed argument/callee boundaries and independent writer/path/effect/scheduler/cancellation evidence. Preserve each barrier and historical estimate. No estimate clearing, injected prerequisites, room exceptions, helper shortcuts, general runtime-domain transport or promotion.
+
+Earlier checkpoints remain historical. Their move-only/no-access-notification proposals are superseded only by these optional copied APIs. Their limits on raw external writes, inherited effects, scheduler/callee/cancellation-safe completion and native090 remain current.
+'''
+text = text.replace(marker, marker+state)
+old = 'Read runtime-relations-20261002 first, then runtime-bindings-20261002. Optional copied relation lifetime/invalidation and selected completion correspondence are implemented. Continue generic source-access coverage, external/same-value mutation notifications and observed arithmetic/index/argument lineage, retaining independent inherited path/effects, omitted/external/concurrent writers and slot replacement/cancellation.'
+new = 'Read runtime-access-20261002 first, then runtime-relations-20261002 and runtime-bindings-20261002. Optional numeric access/mutation records, observed arithmetic/index lineage and separate terminal precision are implemented. Continue remaining source/event/nested-expression access coverage, native-state dependencies, raw external/same-value notification and observed argument/callee boundaries, retaining independent inherited path/effects, omitted/external/concurrent writers and slot replacement/cancellation.'
+assert old in text
+text = text.replace(old, new)
+start = text.index('Next-session request (ready to copy):')
+prompt = '''Next-session request (ready to copy):
+
+Continue SCUMMexplorer from the latest handoff after access/mutation `b20dc4e` and observed lineage/terminal precision `a22ff2a`, preserving lifetime `8bad888`, completion observations `0518da4`, operand API `82679ae`, provenance `e523f8a`, palette `e2d1729`, numeric `8a224a7`, observer `96b79f6` and cancellation `c91f860`.
+
+Read docs/NEXT_SESSION_PROMPT.md and all referenced guidance. Read runtime-access-20261002 validations/summaries/scripts and Core APIs/tests first; then runtime-relations-20261002; runtime-bindings-20261002; correlated-core/completion-observer; original certainty-protocol/provenance/correlated-drafts.
+
+Prioritize remaining source/event/nested-expression access coverage and independent native-state dependencies, notified raw external/same-value writes, observed argument/callee boundaries and independent completion writer/path/effect/scheduler/cancellation precision. Current access records cover numeric queries/debug/delay/ordinary expressions/parsed ranges. Unknown/filtered/nested-random forms remain barriers; raw dictionary writes still need explicit notification. Arithmetic candidates require confirming snapshots, recursive indexes retain their own historical origins, arguments do not infer callee binding/return, and termination remains separate from own-literal-child matching. Preserve all bounds, missing/alias/external/concurrent/cancellation/replacement limits and every original value/index/path estimate.
+
+Selected bindings remain boot1018/current3018, input[1,4,1,1], cells056..059/indexes0..3,023 slot4/index8 and response03B/index9/4241, then026(4,0). Practice index0/local000 selects estimated052=1. Numeric analysis stays source-only;162 worlds,52 flags,51 comparisons/14 overlaps,four fabricated matches and12 practice cases prove no runtime-domain transport, inherited effects or090 completion.
+
+All76 zero waits match their own observed literal child only in these13 recipes; separate terminal observations prove no protocol completion. Primary native031 child412/run12143 +031D/4552 →confirmation4553 →020 parent408/run12144 +0028/4556 →estimated increment4557 stays frame3036. Preserve writer/read estimates, omitted/external/aliased/concurrent writer, raw same-value mutation, scheduler/callee, cancellation/replacement, early0019/D671 and D6C projection limits.
+
+No estimate clearing, injected prerequisites, room exceptions, helper shortcuts or promotion. Preserve palette/placement separation, all four known dye notes/count, raw4=41,15/14, raw6=41,12/11, separate direct633/actual204 Escape=43,15/15, both level4 orders,096/all four20 routes and every route/UI/unrelated-work constraint in the handoff. Keep the verb-area comment, two untracked audit directories and untracked test untouched/unstaged.
+
+Baseline: Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;clean final main Release. Final evidence/checks: Exe/RuntimeAccessFinalSession-20261002. Run fresh appropriate regressions, rebuild main Release, commit tasks separately and update handoff. No App running/launched; no push. Session token usage unavailable; account limits are not session usage. Finish with a ready-to-copy continuation prompt; no separate chat unless requested.
+'''
+p.write_text(text[:start]+prompt, encoding='utf-8')
+print('Handoff records separately committed access/lineage tasks and retains all historical constraints.')
+
+def prepend_after(path, marker, paragraph):
+    page = Path(path)
+    original = page.read_text(encoding='utf-8')
+    assert original.count(marker) == 1, (path, marker)
+    page.write_text(original.replace(marker, marker+'\n'+paragraph+'\n', 1), encoding='utf-8')
+
+prepend_after('docs/LOOM_EGA_PLAN.md', '## Current follow-up (2 October)\n',
+    '2 October final preservation after `b20dc4e` and `a22ff2a`: optional numeric access/mutation notification, observed arithmetic/index/argument lineage and separate writer-terminal precision preserve all13 whole packets and prior binding/cancellation/expanded chronologies. All76 zero waits still match their own literal child only in these13 recipes, with76 separate source-consistent terminal observations; primary3036/4552→4553→4556→4557 and every estimate remain exact. Fresh Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;complete source-only numeric report unchanged;final main Release zero warnings/errors;App0/no launch/no push. Route/palette/UI and unrelated work remain untouched. Next: remaining source/event/nested-expression accesses and native-state dependencies, notified raw external/same-value writes, observed argument/callee boundaries and independent writer/path/effect/scheduler/cancellation evidence. No domain transport, inherited-effect or090 completion proof, estimate clearing or promotion. [Final validation](../.verification/archive/runtime-access-20261002/validation.md).')
+
+plan = Path('docs/LOOM_EGA_PLAN.md')
+plan_text = plan.read_text(encoding='utf-8')
+plan_text = plan_text.replace('with final native/root/render/numeric preservation in progress.', 'with final native/root/render/numeric preservation completed in the follow-up above.')
+plan.write_text(plan_text, encoding='utf-8')
+
+prepend_after('docs/LOOM_SCRIPT_MAP.md', '## Follow-up findings (30 September)\n',
+    '2 October after access `b20dc4e` and lineage `a22ff2a`: optional copied numeric access covers query destinations, debug/delay reads, ordinary expressions and parsed range cells; unknown/filtered/nested-random forms remain barriers. Known runtime writes/removals notify even identical values; raw dictionary writes still require explicit notification. Observed arithmetic requires following same-invocation snapshot confirmation; before-value/index origins and ordered caller arguments retain independent estimates without domain/callee binding. Own-literal-child matching remains separate from a source-consistent reached-stop observation. All13 whole packets/prior chronologies and76 matches remain exact, including3036/4552→4553→4556→4557; selected boot1018/live3018/input[1,4,1,1], cells056..059/indexes0..3, slot4/index8, response03B/index9 and026(4,0), plus practice index0/estimated052=1 are preserved. The selected multiply index records its own observed origin without acquiring a source domain. Missing/aliased/external/concurrent writers, raw same-value writes, cancellation/replacement, scheduler/callee and independent inherited effects remain limits. Arithmetic zero is not a literal completion writer; native090 remains unresolved. Core374 and all root/render/numeric/Release preservation checks pass without App/push/promotion. [Validation](../.verification/archive/runtime-access-20261002/validation.md).')
+
+prepend_after('docs/LOOM_CUTSCENE_DISCOVERY.md', '## Current replay coverage (2 October)\n',
+    '2 October after `b20dc4e` and `a22ff2a`: optional numeric access/mutation records and observed arithmetic/index lineage retain all prior estimates,13 whole packets and binding/cancellation/expanded chronologies. All76 selected zero waits match their own literal child only in these13 recipes;76 independent writer-end observations prove no protocol completion. Raw external/same-value writes, native-state effects, omitted/aliased/concurrent writers, scheduler/callee and cancellation/replacement remain independent limits. No numeric world enters playback and native090 stays unresolved. Coverage remains334 starts,168/235 sites,50 outstanding owners,123 unresolved edges. Fresh Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;clean final main Release;App0/no launch/no push/promotion. All route/palette/UI constraints remain. [Validation](../.verification/archive/runtime-access-20261002/validation.md).')
+
+prepend_after('docs/CHANGELOG.md', '# Changelog\n', '''## 2 October: access/lineage evidence and fresh preservation
+
+| Change | Result | Record |
+| --- | --- | --- |
+| Copied access and lineage | Numeric operands, same-value runtime notifications, observed arithmetic/index/arguments; explicit unresolved/raw external/native-state/callee limits and all estimates retained | [validation](../.verification/archive/runtime-access-20261002/validation.md) |
+| Independent completion precision | All13 whole packets/prior chronologies exact;76 own-literal-child zero waits and76 separate terminal observations; primary3036/4552→4553→4556→4557 unchanged;090 unresolved | [access evidence](../.verification/archive/runtime-access-20261002/access-summary.json) |
+| Fresh checks | Core374;363 exact roots/fingerprints/four memberships/both sequences;Blockers0;76 unchanged zero-gap renders;numeric report unchanged;final main Release zero warnings/errors;App0/no launch/no push/promotion | [checks](../.verification/archive/runtime-access-20261002/check-summary.json) |
+''')
+changelog = Path('docs/CHANGELOG.md')
+changelog.write_text(changelog.read_text(encoding='utf-8').replace(
+    'final preservation in progress; no App/push/promotion',
+    'final preservation completed in the follow-up above; no App/push/promotion'), encoding='utf-8')
+
+for name in ('api-validation.md', 'lineage-validation.md'):
+    page = base/name
+    page.write_text(page.read_text(encoding='utf-8')+'\nFinal preservation completed from the final source state under `Exe/RuntimeAccessFinalSession-20261002`: Core374, all13 exact packets/chronologies,363 exact roots/fingerprints/memberships/sequences, Blockers0,76 unchanged zero-gap renders and own-literal-child matches,76 separate terminal observations, unchanged numeric report and clean final main Release/App0. [Final validation](validation.md), [checks](check-summary.json).\n', encoding='utf-8')
+print('Plan, script map, discovery, changelog and API follow-ups now point to completed final checks.')

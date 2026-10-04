@@ -12,7 +12,7 @@ Room state (3 October). Rooms start in the earliest game state. A room moves to 
 
 State control (3 October). The user controls the game state (Game Status: staff, notes, drafts, story events) and can change it freely. The app only raises the state to the minimum the chosen room or cutscene needs, and keeps a later state if the session already has one. A single cutscene picked from the menu keeps the running session (`PlayKnownCutscene`); `LoomSceneSetupPlanner.Adapt` drops the staff pickup when the session already holds it; stated sequences start fresh; Restart returns to the boot. Story-event checkboxes need no presetting: the real pickups and scenes set their bits. The LOOM-specific flag list is `LoomEgaStateFlags` (App); the window is generic.
 
-Costumes (3 October). The ego keeps whatever costume a scene gave him when he moves to another room, unless that room's own code needs a different one. A catalog start has no previous scene, so it takes the costume the room's entry gives (audit: `.verification/setup-placer-20261003/audit-costume-entries.md`).
+Costumes (3 October). The ego keeps whatever costume a scene gave him when he moves to another room, unless that room's own code needs a different one. A catalog start has no previous scene, so it takes the costume the room's entry gives (audit: `.verification/archive/setup-placer-20261003/audit-costume-entries.md`).
 
 Cutscene starts. The picker derives a per-scene start setup from the scene's own code (`LoomSceneStateScanner`, `LoomSceneSetupPlanner`). No one-off teleports and no invented story flags.
 

@@ -8,7 +8,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 - `src/SCUMMexplorer.App`: the WPF desktop UI (net10.0-windows). `MainWindow.xaml.cs` holds most of the UI logic; `TextGalleryWindow` is the Game Texts browser.
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
 - `docs/`: the plan, audits and references. Start with `docs/LOOM_EGA_PLAN.md` (priorities and milestones). `docs/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do. `docs/CHANGELOG.md` lists finished work with links to its validation records. `docs/NEXT_SESSION_PROMPT.md` is the hand-off for the next session: its state, ordered tasks, rules and tooling notes. The other docs are historical.
-- `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
+- `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. Evidence from the Spanish-edition work (27 September to 4 October 2026) is in `.verification/archive/`; `.verification/README.md` says what is live and what is a record. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
 - `Games/`: the local game data. Never commit it.
   - `Games/loom ega en`: DOS LOOM EGA, **English**. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
   - `Games/loom ega es`: DOS LOOM EGA, Spanish. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).

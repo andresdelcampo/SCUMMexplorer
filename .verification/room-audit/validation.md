@@ -5,7 +5,7 @@ Applies `.verification/wip-rendering-and-doorways.patch` (items 3–6 of `docs/W
 - Build: `dotnet build SCUMMexplorer.slnx`: 0 warnings, 0 errors.
 - Tests: **94/94 passed**, with `SCUMM_SOUND_TEST_ROOT=Games\loom` and `SCUMM_INDY3_EGA_TEST_ROOT=Games\IndyCru\EGA`. That is 86 before the patch, plus 3 from the patch and 5 real-data tests in `LoomFirstVisitRenderingTests`.
 - Room audit ([harness](../RoomAudit/README.md), [report](room-audit.txt), [summary](room-audit.tsv)): 76 rooms. Gaps before filling: 8 (Rooms 13, 33, 56, 58). **Gaps after filling: 0 in every room.**
-- WPF check ([captures and text](../window-check-2026-09-27/window-check.txt)): the real `MainWindow` shows Room 03 → 166, Room 17 → 363–366 (no black patches), Room 56 → 779, 782, Room 58 → 790, 795 and Room 86 → 918, matching the audit. The check selects rooms through the tree; it uses no physical input.
+- WPF check ([captures and text](../archive/window-check-2026-09-27/window-check.txt)): the real `MainWindow` shows Room 03 → 166, Room 17 → 363–366 (no black patches), Room 56 → 779, 782, Room 58 → 790, 795 and Room 86 → 918, matching the audit. The check selects rooms through the tree; it uses no physical input.
 
 ## Follow-up change: opening frame = first load in a script
 
