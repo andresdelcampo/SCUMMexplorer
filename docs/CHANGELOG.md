@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October: full test and harness review, documentation rewritten
+
+Build clean, 703 unit tests pass (5 skipped diagnostic dumps), DoorwayClickCheck 16/16, RoomAudit zero gaps, Blockers 0 blocked sites. All 129 verification harnesses were run: 76 run clean; the other 53 are stale checks (UI changed on purpose), one-off probes needing an old saved input, documented failed investigations or deliberate crash probes, with no game-behaviour regression found. Nothing deleted: the list for review is [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md). Docs: the 90 KB plan was rewritten to its current state and open items, its dated checkpoints moved unchanged to [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md); CURRENT_WORK and NEXT_SESSION_PROMPT rewritten (RTK block removed, plan for other versions proposed). Records: `.verification/harness-review-20261004/`.
+
 ## 3 October: costumes that do not show
 
 17 gallery costumes (20, 21, 42, 66, 70, 74, 75, 89-91, 136, 171-176) have index entries that point at no costume data and no script uses them; not a renderer bug. Record: [costume-leftovers-20261003](../.verification/costume-leftovers-20261003/validation.md).
