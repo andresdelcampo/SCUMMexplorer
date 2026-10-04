@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October (evening): migration to the English release
+
+Unit tests, harness drivers and the replay catalog use `Games/loom ega en`; all 706 tests pass (5 skipped diagnostics). Catalog regenerated with the unchanged pipeline: 332 starts, 169/235 cutscene sites. Corrected bit layout (the Spanish 0xD62 is absent in English; bits from 0xD63 shift by one) and the object-id shift (+1 from Room 34). Details in [ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md), validation in `.verification/english-catalog-20261004/`.
+
 ## 4 October (later): English LOOM EGA, first compatibility step
 
 Game Status finds its draft contract by instruction pattern (not byte offset or Spanish bit numbers), the "draft playing" and story-bit ranges and the glossary's bit names follow the edition's bit numbering (English lacks the Spanish bit 0xD62 and numbers bits from 0xD63 on one lower); 42 of the 63 English failures remain and are triaged in [ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md) (almost all test-only: text, bit, offset and object-id expectations). New tool `.verification/ScriptDump`; UiShots on the English folder in `.verification/english-compat-20261004/`.
