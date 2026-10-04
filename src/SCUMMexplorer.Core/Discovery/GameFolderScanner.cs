@@ -123,7 +123,7 @@ public sealed class GameFolderScanner
             _ => "Folder contents found. Game and SCUMM version are not confirmed yet."
         };
 
-        return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId);
+        return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo);
     }
 
     private static bool StartsResource(Dictionary<string, IReadOnlyList<LflChainResource>?> chains, string path, int offset)

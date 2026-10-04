@@ -51,7 +51,8 @@ public sealed record GameLibrary(
     string Platform,
     IReadOnlyList<GameResource> Resources,
     string DetectionNote,
-    GameId Id = GameId.Unknown)
+    GameId Id = GameId.Unknown,
+    bool IsDemo = false)
 {
     public IEnumerable<GameResource> Rooms => Resources.Where(r => r.Kind == ResourceKind.Room);
     /// <summary>The rooms worth showing as scenes: LOOM's dummy sound-bank rooms (82-85) are left out.</summary>

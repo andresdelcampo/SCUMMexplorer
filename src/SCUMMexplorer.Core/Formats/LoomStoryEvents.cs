@@ -23,7 +23,7 @@ public static class LoomStoryEvents
     public static int FirstBitFor(GameLibrary game)
     {
         try { return FirstBit + LoomStatusSchema.Read(game).BitShift; }
-        catch (InvalidDataException) { return FirstBit; }
+        catch (Exception ex) when (ex is InvalidDataException or InvalidOperationException or IOException) { return FirstBit; }
     }
 
     /// <summary>The story bits the game's code can set to 1, in bit order. Scans every room, script and object verb once (about a second).</summary>

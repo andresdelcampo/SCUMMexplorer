@@ -60,7 +60,10 @@ public sealed class LoomGlossary
             ?? throw new InvalidOperationException("The glossary data is missing from the assembly.");
         var file = JsonSerializer.Deserialize<File>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             ?? throw new InvalidDataException("The glossary data could not be read.");
-        foreach (var row in file.Entries)
+        // The table's script, bit, actor and sound names were checked on the full game's data. A demo is another build
+        // (its script 045 directs the preview), so those numbers are not named there; variables and rooms are kept.
+        var demo = game is { IsDemo: true };
+        foreach (var row in file.Entries.Where(row => !demo || row.Kind is not ("script" or "bit" or "actor" or "sound")))
         {
             var from = ParseNumber(row.Key);
             var to = row.To is null ? from : ParseNumber(row.To);
@@ -71,7 +74,7 @@ public sealed class LoomGlossary
         if (game is not null && game.Id == GameId.Loom)
         {
             glossary.ReadObjects(game);
-            glossary._bitShift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
+            if (!demo) glossary._bitShift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
         }
         return glossary;
     }

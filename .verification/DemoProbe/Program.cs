@@ -3,8 +3,9 @@ using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.Core.Rendering;
 
-// Usage: DemoProbe <game folder> [index]
+// Usage: DemoProbe <game folder> [index | play <frames>]
 if (args.Length > 1 && args[1] == "index") { IndexDump.Run(args[0]); return; }
+if (args.Length > 1 && args[1] == "play") { PlayDump.Run(args[0], args.Length > 2 ? int.Parse(args[2]) : 3000); return; }
 // What the existing code makes of a LOOM folder: identity, resources, every script decoded, every room opened in a session, the boot.
 var game = new GameFolderScanner().Scan(args[0]);
 Console.WriteLine($"{game.Title}: id {game.Id}, version {game.Version}, rooms {game.Rooms.Count()}, resources {game.Resources.Count} ({string.Join(", ", game.Resources.GroupBy(r => r.Kind).Select(g => $"{g.Count()} {g.Key}"))})");
