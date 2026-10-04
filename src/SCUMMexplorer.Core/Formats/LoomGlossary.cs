@@ -68,7 +68,11 @@ public sealed class LoomGlossary
             if (!glossary._byKind.TryGetValue(row.Kind, out var list)) glossary._byKind[row.Kind] = list = [];
             list.Add((from, to, new GlossaryEntry(row.Name, evidence, row.Source ?? ""), row.Scope));
         }
-        if (game is not null && game.Id == GameId.Loom) glossary.ReadObjects(game);
+        if (game is not null && game.Id == GameId.Loom)
+        {
+            glossary.ReadObjects(game);
+            glossary._bitShift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
+        }
         return glossary;
     }
 
@@ -91,10 +95,24 @@ public sealed class LoomGlossary
 
     public GlossaryEntry? Variable(int index) => Find("var", index);
 
-    public GlossaryEntry? Bit(int index) => Find("bit", index) ??
-        (StoryBitLabel?.Invoke(index) is { } label
-            ? new GlossaryEntry(label, GlossaryEvidence.Reading, "the catalog scene whose code sets this story bit")
-            : null);
+    /// <summary>Bits from 0xD65 on are numbered <see cref="_bitShift"/> higher in this edition than in the Spanish release the table was written for (0 for it).</summary>
+    private int _bitShift;
+    private const int SpanishShiftedFrom = 0xD65;
+
+    public GlossaryEntry? Bit(int index)
+    {
+        if (_bitShift != 0 && index >= SpanishShiftedFrom + _bitShift)
+        {
+            // The table names the Spanish numbering; the same role is read here one bit lower, and the entry says so.
+            return Find("bit", index - _bitShift) is { } named
+                ? new GlossaryEntry(named.Name, GlossaryEvidence.Reading, $"{named.Source}; Spanish release's bit 0x{index - _bitShift:X3}, this edition numbers it 0x{index:X3} (same position in the shifted layout, not checked entry by entry)")
+                : null;
+        }
+        return Find("bit", index) ??
+            (StoryBitLabel?.Invoke(index) is { } label
+                ? new GlossaryEntry(label, GlossaryEvidence.Reading, "the catalog scene whose code sets this story bit")
+                : null);
+    }
 
     public GlossaryEntry? Script(int id) => Find("script", id);
     /// <summary>Actor numbers are reused from scene to scene; a name with a scope (for example <c>script:42</c>) applies only inside that script and wins over the general one.</summary>

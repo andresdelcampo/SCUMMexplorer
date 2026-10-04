@@ -20,6 +20,20 @@ public sealed class LoomGlossaryTests
     }
 
     [Fact]
+    public void BitNamesFollowTheEditionsBitNumbering()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
+        var game = new GameFolderScanner().Scan(folder);
+        int shift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
+        var glossary = LoomGlossary.Load(game);
+        // The staff bit is below the shifted range; "a cutscene is running" is the Spanish release's 0xD6E.
+        Assert.Contains("staff", glossary.Bit(0xD61)!.Name);
+        var cutscene = glossary.Bit(0xD6E + shift);
+        Assert.Equal("a cutscene is running", cutscene!.Name);
+        if (shift != 0) Assert.Equal(GlossaryEvidence.Reading, cutscene.Evidence);
+    }
+
+    [Fact]
     public void UnknownThingsStayUnnamed()
     {
         var glossary = LoomGlossary.Default;
