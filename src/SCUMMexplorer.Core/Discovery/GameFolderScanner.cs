@@ -27,7 +27,9 @@ public sealed class GameFolderScanner
             .OrderBy(item => item.Id)
             .ToArray();
         var executableNames = files.Select(path => Path.GetFileName(path)).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var gameId = executableNames.Contains("LOOM.EXE") ? GameId.Loom
+        // The self-running LOOM previews ship as LOOMDEMO.EXE with a subset of the game's rooms, same resource layout.
+        var isDemo = executableNames.Contains("LOOMDEMO.EXE");
+        var gameId = executableNames.Contains("LOOM.EXE") || isDemo ? GameId.Loom
             : executableNames.Contains("INDY3.EXE") ? GameId.IndianaJones3
             : GameId.Unknown;
         var hasIndex = lflFiles.Any(item => item.Id == 0);
@@ -90,7 +92,7 @@ public sealed class GameFolderScanner
 
         var title = gameId switch
         {
-            GameId.Loom => "LOOM",
+            GameId.Loom => isDemo ? "LOOM (demo)" : "LOOM",
             GameId.IndianaJones3 => "Indiana Jones and the Last Crusade",
             _ => Path.GetFileName(fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
         };
