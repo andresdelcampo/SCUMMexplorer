@@ -183,6 +183,12 @@
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <TextBlock Text="SCUMMexplorer" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <Button x:Name="CutsceneMenuButton" Content="Play Cutscene ▾" Visibility="Collapsed" Click="CutsceneMenu_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" IsEnabled="False"/>
+                    <Button x:Name="GameTextsButton" Content="Game Texts" Click="GameTexts_Click" Visibility="Collapsed" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                    <Button x:Name="GameStatusButton" Content="Game Status" Visibility="Collapsed" Click="GameStatus_Click"
+                            Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
+                    <!-- Fixed group at the right edge (sound, Advanced, Open): the buttons that come and go sit to its left,
+                         so these never move when a game opens or Advanced changes. -->
                     <ComboBox x:Name="SoundModeCombo" Width="142" MinHeight="32" VerticalAlignment="Center" Margin="0,0,14,0"
                               ItemTemplate="{StaticResource SoundDeviceItem}" SelectedIndex="2" ToolTipService.ShowOnDisabled="True"
                               SelectionChanged="SoundModeCombo_SelectionChanged"
@@ -194,10 +200,6 @@
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click" Style="{StaticResource SwitchCheck}"
                               VerticalAlignment="Center" Margin="0,0,14,0"
                               ToolTip="Show SCUMM resource lists, script state, and diagnostic controls."/>
-                    <Button x:Name="CutsceneMenuButton" Content="Play Cutscene ▾" Visibility="Collapsed" Click="CutsceneMenu_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" IsEnabled="False"/>
-                    <Button x:Name="GameTextsButton" Content="Game Texts" Click="GameTexts_Click" Visibility="Collapsed" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                    <Button x:Name="GameStatusButton" Content="Game Status" Visibility="Collapsed" Click="GameStatus_Click"
-                            Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
                     <Button Content="Open Game Folder…" Click="OpenFolder_Click" Padding="16,8" Margin="0,9,0,9" Background="#B78442" Foreground="#111820" BorderThickness="0" FontWeight="SemiBold"/>
                 </WrapPanel>
             </Grid>
