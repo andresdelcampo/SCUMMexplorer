@@ -1,10 +1,10 @@
 # Current work
 
-Rewritten 4 October 2026 (the old route-priority and observer-hardening text, and an RTK command block that duplicated the global instructions, are gone; the route/observer history is in [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md)). CLAUDE.md points here. The hand-off for the next session is [NEXT_SESSION_PROMPT.md](NEXT_SESSION_PROMPT.md); priorities, state and open items are in [LOOM_EGA_PLAN.md](LOOM_EGA_PLAN.md).
+Rewritten 4 October 2026 (the old route-priority and observer-hardening text, and an RTK command block that duplicated the global instructions, are gone; the route/observer history is in [PLAN_HISTORY_2026-10.md](archive/PLAN_HISTORY_2026-10.md)). CLAUDE.md points here. The hand-off for the next session is [NEXT_SESSION_PROMPT.md](NEXT_SESSION_PROMPT.md); priorities, state and open items are in [LOOM_EGA_PLAN.md](LOOM_EGA_PLAN.md).
 
 ## Where the work stands
 
-LOOM EGA exploration is functionally complete for the user's three priorities (object interactions, cutscenes and animation, on-screen text). 234 of 235 cutscene sites are audited as reached; the one left (Room 34 local200 +0035) looks unreachable. The next phase is support for other versions (see the plan). The checks of 4 October are in [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md).
+LOOM EGA exploration is functionally complete for the user's three priorities (object interactions, cutscenes and animation, on-screen text). 234 of 235 cutscene sites are audited as reached; the one left (Room 34 local200 +0035) looks unreachable. The next phase is support for other versions (see the plan). The checks of 4 October are in [HARNESS_REVIEW_2026-10-04.md](archive/HARNESS_REVIEW_2026-10-04.md).
 
 ## Rules the user has set
 

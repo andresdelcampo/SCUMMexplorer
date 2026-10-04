@@ -1,7 +1,7 @@
 # .verification: what is live and what is a record
 
 **Live (rebuilt and run on `Games/loom ega en`):**
-- The harness projects directly in this folder that take `<game folder> <output folder>` (`UiShots`, `SceneShots`, `StatusShots`, `WindowCheck`, `TextGalleryCheck`, `RoomAudit`, `DoorwayClickCheck`, `Blockers`, `CodeDump`, `ScriptDump` and the other checks kept in `docs/HARNESS_REVIEW_2026-10-04.md`).
+- The harness projects directly in this folder that take `<game folder> <output folder>` (`UiShots`, `SceneShots`, `StatusShots`, `WindowCheck`, `TextGalleryCheck`, `RoomAudit`, `DoorwayClickCheck`, `Blockers`, `CodeDump`, `ScriptDump` and the other checks kept in `docs/archive/HARNESS_REVIEW_2026-10-04.md`).
 - The replay catalog pipeline: `replay-coverage-20261001/` (`ReplayAudit`, `discover_replays.py`, `export_catalog.py`), `room-replays-20261001/` (`MembershipAudit`, `established-starts.json`) and `english-catalog-20261004/` (the run that produced `loom-replays.json`).
 - `english-compat-20261004/` (UiShots on the English data), the drivers `run-verify.cmd` and `harness-review-20261004/run-all.ps1`, and the golden files in `readable-scripts/` (English).
 

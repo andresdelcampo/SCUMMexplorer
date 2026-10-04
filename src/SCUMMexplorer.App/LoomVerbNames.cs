@@ -1,7 +1,7 @@
 namespace SCUMMexplorer.App;
 
 /// <summary>
-/// What an object's verb number means, from the decoded verb roles (docs/LOOM_SCRIPT_MAP.md "Object verbs"): 0x36 look (script 006 runs it after a
+/// What an object's verb number means, from the decoded verb roles (docs/loom/LOOM_SCRIPT_MAP.md "Object verbs"): 0x36 look (script 006 runs it after a
 /// double click), 0x38 use or go (script 007, after a click), 0x37 what happens first on a click, 0x39 the close-up shown in the verb area,
 /// 0x3A-0x55 the sixteen drafts (forward and reverse), 0x56 any other draft, which does nothing here.
 /// </summary>

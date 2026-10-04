@@ -28,13 +28,13 @@ For Indiana Jones and the Last Crusade EGA, the app previews the indexed room ba
 | [Current work](docs/CURRENT_WORK.md) | The rules set for the project |
 | [Next session](docs/NEXT_SESSION_PROMPT.md) | Hand-off: state, ordered tasks, tooling notes |
 | [Changelog](docs/CHANGELOG.md) | Finished work with links to its validation |
-| [Script map](docs/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, object verbs and rooms |
-| [English edition compatibility](docs/ENGLISH_COMPAT_2026-10-04.md) | What differs between the English and Spanish data |
-| [Cutscene discovery](docs/LOOM_CUTSCENE_DISCOVERY.md) | How the cutscene catalog is generated and audited |
-| [Object-state reference](docs/SCUMM_OBJECT_STATES.md) | Format evidence, rendering rules and preview semantics |
-| [Script coverage](docs/LOOM_SCRIPT_COVERAGE.md) | Measured decoder coverage; not gameplay coverage |
-| [Harness review](docs/HARNESS_REVIEW_2026-10-04.md) | Which verification tools are kept and why |
-| [Research](docs/RESEARCH.md) | Technical references and prior research |
+| [Script map](docs/loom/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, object verbs and rooms |
+| [English edition compatibility](docs/loom/ENGLISH_COMPAT_2026-10-04.md) | What differs between the English and Spanish data |
+| [Cutscene discovery](docs/loom/LOOM_CUTSCENE_DISCOVERY.md) | How the cutscene catalog is generated and audited |
+| [Object-state reference](docs/engine/SCUMM_OBJECT_STATES.md) | Format evidence, rendering rules and preview semantics |
+| [Script coverage](docs/archive/LOOM_SCRIPT_COVERAGE.md) | Measured decoder coverage; not gameplay coverage |
+| [Harness review](docs/archive/HARNESS_REVIEW_2026-10-04.md) | Which verification tools are kept and why |
+| [Research](docs/engine/RESEARCH.md) | Technical references and prior research |
 
 ## Development
 

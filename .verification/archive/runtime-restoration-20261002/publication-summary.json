@@ -64,11 +64,11 @@
       "sha256": "6065142fcd03fecae66957b1f5dd098bf717f48fe9278c43d0912601a05a3848"
     },
     {
-      "path": "docs/LOOM_SCRIPT_MAP.md",
+      "path": "docs/loom/LOOM_SCRIPT_MAP.md",
       "sha256": "354201042181a08ab8cfcdfa9bbba3cd84a3a42a988fb5c38c56806e48c1df9f"
     },
     {
-      "path": "docs/LOOM_CUTSCENE_DISCOVERY.md",
+      "path": "docs/loom/LOOM_CUTSCENE_DISCOVERY.md",
       "sha256": "875e965c92a52e4fdc544e0eae5f4d33637cb0d3125286a52b68854092c94e88"
     },
     {

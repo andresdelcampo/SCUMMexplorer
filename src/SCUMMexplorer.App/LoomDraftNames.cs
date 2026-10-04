@@ -6,7 +6,7 @@ internal static class LoomDraftNames
 {
     // Shared display associations already used by Game Status. They do not supply spell prerequisites or change the
     // source verb selected by a replay. The slot order is the game's draft table; the names were checked on 3 October
-    // against what each verb does to the objects that answer it (docs/LOOM_SCRIPT_MAP.md, "Draft verb names"). Evidence per entry:
+    // against what each verb does to the objects that answer it (docs/loom/LOOM_SCRIPT_MAP.md, "Draft verb names"). Evidence per entry:
     private static readonly (int Forward, int Reverse, string Title)[] Names =
     [
         // Room 02 "cielo" 0x3A starts script 049, 0x3B answers "Parece que se ha cerrado."; "agujero", "puerta", "jaula" open and close.

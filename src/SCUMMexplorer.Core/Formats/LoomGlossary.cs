@@ -31,7 +31,7 @@ public sealed record GlossaryEntry(string Name, GlossaryEvidence Evidence, strin
 
 /// <summary>
 /// Evidence-carrying names for LOOM EGA's variables, bits, scripts, actors, rooms, sounds and objects. The table is the data
-/// file <c>loom-glossary.json</c> (seeded from docs/LOOM_SCRIPT_MAP.md); object names come from the game's own data. Anything
+/// file <c>loom-glossary.json</c> (seeded from docs/loom/LOOM_SCRIPT_MAP.md); object names come from the game's own data. Anything
 /// not listed stays unnamed: callers show the raw form (<c>var[0x0D1]</c>) rather than a guess.
 /// </summary>
 public sealed class LoomGlossary

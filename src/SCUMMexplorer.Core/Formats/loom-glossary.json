@@ -1,5 +1,5 @@
 {
-  "note": "Names for DOS LOOM EGA variables, bits, scripts, actors, rooms and sounds. Every entry carries its evidence: decoded (read from instructions), engine (ScummVM engines/scumm behaviour), reading (an interpretation from the game's own text or the way scripts use it, not verified in a run), play (seen in play). Source points to docs/LOOM_SCRIPT_MAP.md or a validation record. Things not listed here stay unnamed on purpose.",
+  "note": "Names for DOS LOOM EGA variables, bits, scripts, actors, rooms and sounds. Every entry carries its evidence: decoded (read from instructions), engine (ScummVM engines/scumm behaviour), reading (an interpretation from the game's own text or the way scripts use it, not verified in a run), play (seen in play). Source points to docs/loom/LOOM_SCRIPT_MAP.md or a validation record. Things not listed here stay unnamed on purpose.",
   "entries": [
     { "kind": "var", "key": "0x001", "name": "ego actor", "evidence": "engine", "source": "script 001 +0x0184; VAR_EGO" },
     { "kind": "var", "key": "0x002", "name": "camera x", "evidence": "engine", "source": "VAR_CAMERA_POS_X" },
