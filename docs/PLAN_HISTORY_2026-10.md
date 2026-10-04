@@ -244,3 +244,19 @@ Arrival music fixed: visible catalog loads start their pending scripts on the or
 Room 36's exit investigated: fresh catalog state marks object 599 Untouchable; click selects no object, walks to (465,126), and stays in Room 36. [Trace and source gate](../.verification/archive/room36-exit-20260930/validation.md). Condition for replacing 086's labelled direct-verb start not met; no state invented.
 
 Minor Room 02 mountain mask investigated: [source mask/frame trace](../.verification/archive/room02-mountain-mask-20260930/validation.md), no speculative adjustment. Next: matching ScummVM pose/coordinate comparison if this minor issue is pursued; promote discovered cutscenes only after validating their state/entry recipes. CameraPanCheck is removed; historical mentions below are dated evidence only.
+
+## State of the app as of 4 October 2026 (late), moved out of LOOM_EGA_PLAN.md on 4 October
+
+| Area | State |
+| --- | --- |
+| Rooms and objects | 76 rooms render with no gaps in their first-visit state (RoomAudit: 0 rooms with gaps). Object images, depth masks, walk boxes and doorway navigation work; DoorwayClickCheck 16/16 (rooms 2, 3, 4, 8, 10, 37). |
+| Interaction | Game input, notes and drafts go through the game's own scripts. Game Status lets the user set staff, notes, learned drafts and the 90 story events; the app only raises the state to the minimum an action needs. |
+| Cutscenes | Play Cutscene (global in Advanced, per room beside Interact) offers about 335 catalog starts (330 generated in `loom-replays.json` plus the hand-built opening, trial, transition, firewood and bonus scenes), each with a derived setup and its assumptions in the picker note. Sequences (052 → input → 053, 086 → look → 087) replay as stated chains. |
+| Audio | PC speaker, AdLib (NukedOPL3Sharp) and No Sound; Room Sounds menu. |
+| Texts | Game Texts (Advanced-only) browses extracted dialogue with room pictures and Play Cutscene links. |
+| Advanced inspector | Readable/Raw script view with a glossary, Last action timeline, grouped assumptions and "Used by". |
+| Coverage of the 235 cutscene sites | 234/235 reached by some route; 169/235 by a single action. Room 34 local200 +0035 looks unreachable. |
+| LOOM demos | Short and long demo open; "The preview" is one more cutscene. Evidence: `.verification/demos-20261004/README.md`. |
+| Quality | Build 0 errors; 703 unit tests passed, 5 skipped diagnostic dumps; harness review in HARNESS_REVIEW_2026-10-04.md. |
+
+Housekeeping closed that day: 35 stale harnesses removed and 3 repaired, `Exe/` shrunk from 27.6 GB to about 1.4 GB, nullable warnings gone, README refreshed (commit 113b36e). Room 02 mountain depth mask closed (ScummVM hides Bobbin at the same place; `.verification/room02-mountain-20261004/README.md`).
