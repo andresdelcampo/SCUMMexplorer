@@ -100,4 +100,29 @@ public sealed class LoomRolandAudioTests
         // Song length (2.5 s) plus the release tail.
         Assert.InRange((wave.Length - 44) / 4.0 / rate, 2.5, 7);
     }
+
+    [Fact]
+    public void TheRolandSoundCardMakesTheScriptsChooseRolandSounds()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_SOUND_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder) || !File.Exists(Path.Combine(folder, "82.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
+
+        List<int> SoundIds(int card)
+        {
+            var session = new LoomExplorationSession(game, snapshot, soundCard: card);
+            Assert.Equal(card, session.SoundCard);
+            for (var frame = 0; frame < 1500; frame++) session.AdvanceFrame();
+            return session.SoundEvents.Where(item => item.Event.Kind is LoomScriptEventKind.SoundStarted or LoomScriptEventKind.MusicStarted)
+                .Select(item => item.Event.TargetId).OfType<int>().ToList();
+        }
+
+        var roland = SoundIds(LoomExplorationSession.RolandSoundCard);
+        Assert.NotEmpty(roland);
+        Assert.All(roland, id => Assert.InRange(id, 33, 64));
+        var plain = SoundIds(0);
+        Assert.NotEmpty(plain);
+        Assert.All(plain, id => Assert.InRange(id, 1, 32));
+    }
 }

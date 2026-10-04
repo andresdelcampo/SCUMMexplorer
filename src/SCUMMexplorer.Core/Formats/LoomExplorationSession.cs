@@ -116,7 +116,7 @@ public sealed partial class LoomExplorationSession
     /// </param>
     public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
         bool completeBoot = true, bool stopAtOpening = false, bool stopAtBootInput = false,
-        LoomScriptObserver? observer = null, bool demoPreview = false)
+        LoomScriptObserver? observer = null, bool demoPreview = false, int soundCard = 0)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -132,7 +132,8 @@ public sealed partial class LoomExplorationSession
         {
             if (!soundLifetimes.TryGetValue(id, out var lifetime))
                 soundLifetimes[id] = lifetime = soundResources.TryGetValue(id, out var resource)
-                    ? game.Id == GameId.Loom ? new LoomAdlibAudio().ReadLifetime(resource)
+                    ? game.Id == GameId.Loom
+                        ? LoomRolandSong.IsRoland(resource) ? LoomRolandSong.ReadLifetime(resource) : new LoomAdlibAudio().ReadLifetime(resource)
                         : new(LoomSoundLifetimeKind.Unknown, null, false, "native LOOM AdLib clock does not establish this game's sound lifetime")
                     : new(LoomSoundLifetimeKind.Unknown, null, false, "no indexed native sound resource");
             return lifetime;
@@ -154,6 +155,7 @@ public sealed partial class LoomExplorationSession
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
             _runtime.SetGlobalVariable(timer, 0);
+        if (soundCard != 0) _runtime.SetGlobalVariable(SoundCardVariable, (ushort)soundCard);
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
         {
@@ -192,6 +194,17 @@ public sealed partial class LoomExplorationSession
     /// The opening cutscene: script 001 +0x0222 starts script 044 and waits while it runs (+0x0225–0x022A). Decoded.
     /// </summary>
     public const int OpeningScript = 44;
+
+    /// <summary><c>VAR_SOUNDCARD</c>: 0 in a session by default, 3 for AdLib in ScummVM and 4 for the Roland upgrade, whose sounds (33 to 64) the scripts then choose.</summary>
+    public const string SoundCardVariable = "var[0x030]";
+    public const int RolandSoundCard = 4;
+
+    /// <summary>The sound card the game's scripts see. Changing it takes effect at the scripts' next read, as it would in the game.</summary>
+    public int SoundCard
+    {
+        get => _runtime.GlobalVariables.GetValueOrDefault(SoundCardVariable);
+        set => _runtime.SetGlobalVariable(SoundCardVariable, (ushort)value);
+    }
 
     /// <summary>
     /// True while the boot is still running: only after a session built with <c>stopAtOpening</c>, until the frames

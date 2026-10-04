@@ -54,6 +54,24 @@ public sealed class LoomRolandSong
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return false; }
     }
 
+    /// <summary>
+    /// How long the game's sound clock keeps the sound running: its length, in the 472 Hz callbacks the other sounds are counted in.
+    /// A song with no end marker ends where its data does (every sound of the upgrade does).
+    /// </summary>
+    public static LoomSoundLifetime ReadLifetime(GameResource resource)
+    {
+        try
+        {
+            var song = Read(resource);
+            if (song.Loops) return new(LoomSoundLifetimeKind.Looping, null, true);
+            return new(LoomSoundLifetimeKind.Finite, Math.Max(1, (int)Math.Round(song.Ticks * SecondsPerTick * 472)), song.Duration.TotalSeconds > 3);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+        {
+            return new(LoomSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
+    }
+
     public static LoomRolandSong Read(GameResource resource)
     {
         if (resource.Kind != ResourceKind.Sound || resource.Offset is null || resource.ContainerFileNumber is null)
