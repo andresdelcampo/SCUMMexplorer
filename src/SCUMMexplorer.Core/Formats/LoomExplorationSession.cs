@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Rendering;
 
@@ -1477,6 +1478,9 @@ public sealed partial class LoomExplorationSession
         _visitTrace.Add($"{label}: the ego stands at ({placed.X}, {placed.Y}), box {placed.WalkBox?.ToString() ?? "?"}, camera {camera} (estimate)");
     }
 
+    [GeneratedRegex(@"^Room (\d+) local (\d+) \+0x[0-9A-F]+$")]
+    private static partial Regex LocalScriptPlacement();
+
     /// <summary>
     /// A labelled setup edit: brings <paramref name="actor"/> into the current room, as <c>putActorInRoom</c> then
     /// <c>putActor</c> (or <c>putActorAtObject</c>, the object's walk point) in the game's own code at <paramref name="basis"/>
@@ -1490,6 +1494,22 @@ public sealed partial class LoomExplorationSession
         if (_currentRoom?.ResourceId is not int room || !LoomActorTable.IsValid(actor))
             throw new InvalidOperationException("Visit a room before placing an actor in it.");
         if (_runtime.Actors[actor].Room == room) return;
+        // A placement in one of this room's own local scripts dresses the actor first (costume, elevation, walk and talk
+        // animations, talk colour; Room 09 local 217 gives El Muerto costume 0x82): the script itself runs, so he looks as the
+        // game makes him, not as the last room left his actor slot (Room 02's costume 141 is only a floor shimmer).
+        if (LocalScriptPlacement().Match(basis) is { Success: true } local && int.Parse(local.Groups[1].Value) == room &&
+            int.Parse(local.Groups[2].Value) is var scriptId && scriptId >= _globalScriptCount)
+        {
+            RunLocalScriptAt(scriptId, 0);
+            if (_runtime.Actors[actor].Room == room)
+            {
+                var ranLabel = $"Explorer setup (explicit, from {basis}): the game's own script ran to bring actor {actor} into Room {room:00}, costume and place as it sets them; which earlier scene left him there is not simulated";
+                _runtime.Actors.MarkEstimate(actor, ranLabel);
+                _uncertainties.Add(ranLabel + " (estimate).");
+                _visitTrace.Add(ranLabel);
+                return;
+            }
+        }
         if (atObject != 0)
         {
             var record = _currentObjects.FirstOrDefault(item => item.Id == atObject);

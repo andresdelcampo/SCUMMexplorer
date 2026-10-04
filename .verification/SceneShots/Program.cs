@@ -64,10 +64,11 @@ internal static class Program
                     report.Add("   start note: " + (string)typeof(MainWindow).GetMethod("CutsceneStartNote", Private)!.Invoke(window, [scene])!);
                     var clock = Stopwatch.StartNew();
                     var before = Field("_session");
+                    { var bs = (LoomExplorationSession?)before; var b4 = bs?.Actors.FirstOrDefault(a => a.Number == 4); report.Add($"   before: session room {bs?.Snapshot.RoomId}; actor4 room {b4?.Room} at ({b4?.X},{b4?.Y}) costume {b4?.Look.Costume} estimate {b4?.Estimate}"); }
                     Call("PlayKnownCutscene", scene);
                     report.Add($"   session kept: {ReferenceEquals(before, Field("_session"))}");
                     var n = 0;
-                    var lastText = "";
+                    var lastText = ""; var lastActors = "";
                     var nextShot = 0L;
                     while (clock.ElapsedMilliseconds < seconds * 1000L)
                     {
@@ -75,7 +76,20 @@ internal static class Program
                         var session = (LoomExplorationSession)Field("_session")!;
                         var room = session.Snapshot.RoomId;
                         var text = string.Join(" | ", session.Messages.OnScreen.Where(m => m.Lines.Any(l => l.Trim().Length > 0)).Select(m => $"{m.SourceLabel}: {string.Join(" / ", m.Lines)}"));
-                        if (text != lastText) { report.Add($"   {clock.ElapsedMilliseconds,6} ms room {room:00}: {text}"); lastText = text; }
+                        if (text != lastText) { report.Add($"   {clock.ElapsedMilliseconds,6} ms room {room:00}: {text}"); lastText = text; report.Add("      actors: " + string.Join("; ", session.Actors.Where(a => a.Room == room).Select(a => $"#{a.Number} ({a.X},{a.Y}) vis={a.Visible} costume={a.Look.Costume} frame={a.Look.Frame} elev={a.Look.Elevation}"))); }
+                        var actorSig = string.Join("; ", session.Actors.Where(a => a.Room == room).Select(a => $"#{a.Number} vis={a.Visible} costume={a.Look.Costume}"));
+                        if (actorSig != lastActors && actorSig.Contains("#8")) {
+                            var rimg = (SCUMMexplorer.Core.Rendering.RoomImage)Field("_currentRoom")!; var gm = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                            var sel = Field("_objectSelection")!; var mask = (byte[]?)sel.GetType().GetMethod("ComposeDepthMask")!.Invoke(sel, [rimg]);
+                            foreach (var useMask in new[] { false, true }) {
+                                var lay = SCUMMexplorer.Core.Rendering.LoomActorRenderer.Render(session.Actors, room!.Value, rimg.Width, rimg.Height, id => SCUMMexplorer.Core.Rendering.LoomCostume.Load(gm, id), useMask ? mask : null, session.CurrentWalkBoxes, session.ObjectClasses);
+                                report.Add($"      render mask={useMask}: " + string.Join("; ", lay.Actors.Select(a => $"#{a.Number} px={a.Pixels} z={a.ZPlane} bounds={a.Bounds} dir={a.Direction} frame={a.Frame}")) + " skipped: " + string.Join("|", lay.Skipped));
+                            }
+                                                        { var only = SCUMMexplorer.Core.Rendering.LoomActorRenderer.Render(session.Actors.Where(a => a.Number == 8).ToArray(), room!.Value, rimg.Width, rimg.Height, id => SCUMMexplorer.Core.Rendering.LoomCostume.Load(gm, id));
+                              var hist = only.Pixels.Where(b => b != 0xFF).GroupBy(b => b).OrderByDescending(g => g.Count()).Select(g => $"{g.Key}:{g.Count()}=#{rimg.Palette[g.Key]:X6}"); report.Add("      actor8 colours: " + string.Join(" ", hist)); }
+                            var a4 = session.Actors.First(a => a.Number == 8); report.Add($"      actor4 box={a4.WalkBox} look.anim={a4.Look.Animation} facing={a4.Look.Facing} classes={(session.ObjectClasses.TryGetValue(4, out var cb) ? cb : 0u):X}");
+                        }
+                        if (actorSig != lastActors) { report.Add($"   {clock.ElapsedMilliseconds,6} ms ACTORS: {actorSig}"); lastActors = actorSig; Save($"{tag}-actors-{clock.ElapsedMilliseconds}.png"); }
                         if (clock.ElapsedMilliseconds >= nextShot) { Save($"{tag}-{n++:00}.png"); nextShot += interval; }
                         if (Field("_playback") is null && clock.ElapsedMilliseconds > 800) break;
                     }

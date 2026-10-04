@@ -253,7 +253,10 @@ public sealed class LoomSceneSetupSceneTests
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoomById(9);
         Assert.True(new LoomReplaySequence(session, setup.Steps).RunSilently(setup.Steps.Count));
-        Assert.Equal(9, session.Actors.Single(a => a.Number == 4).Room);
+        var elMuerto = session.Actors.Single(a => a.Number == 4);
+        Assert.Equal(9, elMuerto.Room);
+        // Room 09 local 217 dresses him (actorOps costume 0x82); Room 02's costume 141 is a floor shimmer.
+        Assert.Equal((0x82, 0x44, 0x82), (elMuerto.Look.Costume, elMuerto.X, elMuerto.Y));
         session.ActivateObjectVerb(275, 0x56);
         for (var i = 0; i < 1500; i++) session.AdvanceFrame();
         Assert.Contains(session.Messages.Log, m => m.Actor == 4 && m.Text.Contains("Your Weaver magic", StringComparison.Ordinal));

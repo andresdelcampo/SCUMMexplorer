@@ -1,0 +1,73 @@
+== Room 09 object 274 Verb 0x36 (Room 09 · Look at feather)
+   start note: Stated start: the running session, or a fresh one after the boot (seed 0), with Room 09 opened from the catalog (the ego's arrival there is assumed), then object 274's verb 0x36 run directly: an exploration action, not the game's click (Bobbin does not walk there, and the object may be untouchable in this state). Draft response verbs do not simulate casting a draft. The frames after it play on the playback clock at the game's frame rate. The running exploration session is kept (Restart gives the fresh state); only the minimum the scene needs and the session lacks is added. Derived start setup (estimates): The scene prints lines for actor 4, and a line for an actor outside the room shows nothing. The game puts him into Room 09 at Room 09 local 217 +0x004A (68, 130); that placement is applied if he is not there already (estimate: which earlier scene left him there was not executed). Other placements: Script 046 +0x01D2, Script 046 +0x0E73, Script 101 +0x00A0. Story bits read by the scene's own code (bit[0xDCA]) keep their first-visit value 0; no flag is set by the explorer.
+   before: session room 2; actor4 room 2 at (433,129) costume 141 estimate 
+   session kept: True
+     3102 ms room 09: Script 105: Hetchel's feather! It's still there!
+      actors: #1 (40,132) vis=True costume=1 frame=14 elev=0; #4 (68,130) vis=True costume=130 frame=6 elev=0; #6 (168,100) vis=True costume=39 frame=6 elev=0; #7 (172,100) vis=True costume=44 frame=6 elev=0
+     3103 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=44
+     3677 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40
+     3795 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40; #7 vis=True costume=44
+     4372 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #7 vis=True costume=44
+     4496 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40
+     4622 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40; #7 vis=True costume=44
+     5169 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=44
+     5295 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39
+     5373 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=43
+     5731 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=38; #7 vis=True costume=43
+     6091 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=38
+     6169 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37
+     6997 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130
+     7122 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40
+     7341 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40; #7 vis=True costume=43
+     7655 ms room 09: 
+      actors: #1 (40,132) vis=True costume=1 frame=15 elev=0; #4 (68,130) vis=True costume=130 frame=6 elev=0; #6 (232,100) vis=True costume=40 frame=7 elev=0; #7 (146,100) vis=True costume=43 frame=6 elev=0
+     7792 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=43
+     7875 ms room 09: Script 105: So it is, young Weaver.
+      actors: #1 (40,132) vis=True costume=1 frame=15 elev=0; #4 (68,130) vis=True costume=130 frame=4 elev=0; #6 (168,100) vis=True costume=39 frame=7 elev=0; #7 (146,100) vis=True costume=43 frame=6 elev=0
+     8011 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39
+     8122 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=43
+     8341 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=38; #7 vis=True costume=43
+     8794 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37
+     8917 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37; #7 vis=True costume=43
+     9556 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130
+     9681 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40
+    10325 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39
+    10779 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=44
+    10904 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=38; #7 vis=True costume=44
+    11219 ms room 09: 
+      actors: #1 (40,132) vis=True costume=1 frame=15 elev=0; #4 (68,130) vis=True costume=130 frame=5 elev=0; #6 (146,100) vis=True costume=38 frame=7 elev=0; #7 (172,100) vis=True costume=44 frame=6 elev=0
+    11358 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37; #7 vis=True costume=44
+    11436 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37
+    11558 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37; #7 vis=True costume=44
+    12095 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #7 vis=True costume=44
+    12222 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40
+    12345 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40; #7 vis=True costume=44
+    12895 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=44
+    13019 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39
+    13473 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=38
+    13881 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37
+    14238 ms room 09: Script 105: I shall keep it as a souvenir / of our encounter.
+      actors: #1 (40,132) vis=True costume=1 frame=15 elev=0; #4 (68,130) vis=True costume=130 frame=4 elev=0; #6 (92,100) vis=True costume=37 frame=7 elev=0
+    14663 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130
+    14788 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37
+    15335 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37; #7 vis=True costume=44
+    15553 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=38; #7 vis=True costume=44
+    15965 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39
+    16114 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39; #7 vis=True costume=44
+    16523 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40; #7 vis=True costume=44
+    16742 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40
+    16868 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40; #7 vis=True costume=44
+    17179 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #7 vis=True costume=44
+    17303 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37; #7 vis=True costume=44
+    17524 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=37
+    18073 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=38
+    18485 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=39
+    19091 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #6 vis=True costume=40
+    19642 ms room 09: 
+      actors: #1 (40,132) vis=True costume=1 frame=15 elev=0; #4 (68,130) vis=True costume=130 frame=5 elev=0; #6 (232,100) vis=True costume=40 frame=6 elev=0
+    19737 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #5 vis=True costume=4
+    19861 ms ACTORS: #1 vis=True costume=1; #4 vis=True costume=130; #5 vis=True costume=4; #6 vis=True costume=40
+   ended after 20122 ms, 6 shots; status: Scene ready
+   room view size: 996x650; controls 45; window 1400x900
+   story bits set: bit[0xD82] bit[0xD85] bit[0xD88] bit[0xD89] bit[0xDAB] bit[0xDCA]
+   ego: room 9 at (40,132) costume 01 staff False

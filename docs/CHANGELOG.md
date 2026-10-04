@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October (night): El Muerto is drawn, room animation runs between inputs, build clean
+
+El Muerto (Room 09, actor 4) was placed but kept the costume the last room gave his actor slot (Room 02's costume 141, a 32x13 floor shimmer), so only a few pixels showed while he spoke. `PlaceActorInRoom` now runs the game's own room-local script when the placer is one (Room 09 local 217: costume 0x82, elevation, walk/talk animations, talk colour, put at (68, 130)); other placers keep the plain placement. Tested by `ElMuertosLinesAreSpokenBecauseTheDerivedSetupBringsActor4IntoRoom09` (costume and place asserted); seen in SceneShots for Room 09 objects 275/0x56 and 274/0x36 (`.verification/el-muerto-20261004/run8`, `run9`). The main window now has an idle frame clock: with no playback running, one game frame runs per frame interval (10 a second), so ambient animation (Room 09 loom, swan, waves) no longer waits for the pointer; it pauses while another window is open or the app is inactive. The Options expander always starts collapsed (its open state is no longer restored). The three build warnings are fixed. New tool `.verification/CostumeSheet` draws every animation of a costume.
+
 ## 4 October (evening): migration to the English release
 
 Unit tests, harness drivers and the replay catalog use `Games/loom ega en`; all 706 tests pass (5 skipped diagnostics). Catalog regenerated with the unchanged pipeline: 332 starts, 169/235 cutscene sites. Corrected bit layout (the Spanish 0xD62 is absent in English; bits from 0xD63 shift by one) and the object-id shift (+1 from Room 34). Details in [ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md), validation in `.verification/english-catalog-20261004/`.
