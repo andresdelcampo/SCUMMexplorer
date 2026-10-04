@@ -27,25 +27,25 @@ public sealed class LoomBootTests
         Assert.Equal(2, snapshot.RoomId);
         Assert.InRange(session.BootFrames, 1, LoomExplorationSession.BootFrameLimit - 1);
         Assert.Contains("Script 01 chains to script 6", session.SessionTrace);
-        Assert.Contains("Script 01 continues at +0x0162 in Room 69 after loadRoom", session.SessionTrace);
-        Assert.Contains("Script 44 continues at +0x03BC in Room 53 after loadRoom", session.SessionTrace);
+        Assert.Contains("Script 01 continues at +0x015A in Room 69 after loadRoom", session.SessionTrace);
+        Assert.Contains("Script 44 continues at +0x03AE in Room 53 after loadRoom", session.SessionTrace);
         Assert.False(session.InCutscene);
         Assert.Null(session.LastAction);
 
         // Values script 001 sets after the intro wait (+0x016B to +0x01B1) and at its end (+0x0240).
-        Assert.Equal((ushort)1, variables["bit[0xD6B]"]);
+        Assert.Equal((ushort)1, variables["bit[0xD6A]"]);
         Assert.Equal((ushort)5, variables["var[0x020]"]);
         Assert.Equal((ushort)14, variables["var[0x01D]"]);
         Assert.Equal((ushort)15, variables["var[0x01E]"]);
         Assert.Equal((ushort)2, variables["var[0x023]"]);
         Assert.Equal((ushort)3, variables["var[0x024]"]);
         Assert.Equal((ushort)1, variables["var[0x001]"]);
-        Assert.Equal((ushort)1, variables["bit[0xD83]"]);
-        Assert.Equal((ushort)0, variables["bit[0xD6E]"]);
+        Assert.Equal((ushort)1, variables["bit[0xD82]"]);
+        Assert.Equal((ushort)0, variables["bit[0xD6D]"]);
 
         // The intro screen's answer is an assumption, and it says which code it stands for.
-        Assert.Contains(snapshot.Uncertainties, line => line.StartsWith("Player input assumed: script 001 +0x0166 waits for bit[0xD6B], which only Room 69 local script 205 sets (+0x0048)", StringComparison.Ordinal) &&
-                                                        line.Contains("local 203 +0x01D8, local 203 +0x0241", StringComparison.Ordinal));
+        Assert.Contains(snapshot.Uncertainties, line => line.StartsWith("Player input assumed: script 001 +0x015E waits for bit[0xD6A], which only Room 69 local script 205 sets (+0x0048)", StringComparison.Ordinal) &&
+                                                        line.Contains("local 203 +0x0236", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class LoomBootTests
         // Local 208's only limitation was its animateActor, which the actor table applies since M2b.
         Assert.DoesNotContain(snapshot.Uncertainties, line => line.StartsWith("Room 01 local script 208 +0x0000", StringComparison.Ordinal));
         Assert.Contains("script 208 started again: runScript ended its running copy first", session.SessionTrace);
-        Assert.Contains("stopScript 200 at Script 44 +0x041B: ended its pending run", session.SessionTrace);
+        Assert.Contains("stopScript 200 at Script 44 +0x0407: ended its pending run", session.SessionTrace);
     }
 
     [Fact]
@@ -78,9 +78,9 @@ public sealed class LoomBootTests
         Assert.True(played.BootRunning);
         // Script 044 opens no cutscene (no beginCutscene): script 001 +0x021D sets the in-a-cutscene bit itself.
         Assert.False(played.InCutscene);
-        Assert.Equal((ushort)1, played.Snapshot.KnownGlobalVariables["bit[0xD6E]"]);
+        Assert.Equal((ushort)1, played.Snapshot.KnownGlobalVariables["bit[0xD6D]"]);
         Assert.InRange(played.BootFramesBeforeOpening, 1, booted.BootFrames - 1);
-        Assert.Contains(played.Snapshot.Uncertainties, line => line.StartsWith("Player input assumed: script 001 +0x0166", StringComparison.Ordinal));
+        Assert.Contains(played.Snapshot.Uncertainties, line => line.StartsWith("Player input assumed: script 001 +0x015E", StringComparison.Ordinal));
 
         var rooms = new List<int>();
         var lightsInRoom01 = new HashSet<int>();
@@ -148,7 +148,7 @@ public sealed class LoomBootTests
     }
 
     [Fact]
-    public void NativeIntroAwaitsInputAndExecutesChallengeExpressions()
+    public void NativeIntroAwaitsInputWithoutAChallengeInTheEnglishRelease()
     {
         string folder = Environment.GetEnvironmentVariable("SCUMM_SOUND_TEST_ROOT") ?? Folder;
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
@@ -157,14 +157,12 @@ public sealed class LoomBootTests
             stopAtBootInput: true);
         Assert.Equal(69, session.Snapshot.RoomId);
         Assert.Equal(200, session.Snapshot.KnownGlobalVariables["var[0x020]"]);
-        Assert.Equal(0, session.Snapshot.KnownGlobalVariables["bit[0xD6B]"]);
+        Assert.Equal(0, session.Snapshot.KnownGlobalVariables["bit[0xD6A]"]);
         Assert.DoesNotContain(session.Snapshot.Uncertainties, line => line.Contains("as if the player", StringComparison.Ordinal));
-        var target = new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 69).FilePath)).Single(o => o.Id == 876);
-        session.Click(target.X + target.Width / 2, target.Y + target.Height / 2);
-        for (int i = 0; i < 32; i++) session.AdvanceFrame();
-        Assert.All(Enumerable.Range(0, 4), i => Assert.InRange(session.Snapshot.KnownGlobalVariables[$"var[0x{0x52+i:X3}]"], (ushort)0, (ushort)11));
-        Assert.Contains(session.Snapshot.RandomPicks, pick => pick.Offset == 0x0049 && pick.Max == 5);
+        // The English release has no copy-protection challenge: Room 69 local 205 (+0x0048) only sets the bit, with no random picks
+        // (the Spanish release picks the challenge words at +0x0049 and checks the answer in local 203).
+        Assert.DoesNotContain(session.Snapshot.RandomPicks, pick => pick.Offset == 0x0049);
         Assert.Equal(69, session.Snapshot.RoomId);
-        Assert.Equal(0, session.Snapshot.KnownGlobalVariables["bit[0xD6B]"]);
+        Assert.Equal(0, session.Snapshot.KnownGlobalVariables["bit[0xD6A]"]);
     }
 }
