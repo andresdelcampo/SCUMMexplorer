@@ -21,16 +21,16 @@ public sealed class LoomFirstVisitRenderingTests
         var opening = data.Batches.ForRoom(56).Where(batch => batch.Priority == LoomSceneDrawBatches.OpeningFramePriority).ToArray();
         // Script 68 loads Room 56 twice; only its first load is an opening frame. Script 108's
         // cutscene body (after its beginOverride) opens the room on the same face and mouth.
-        Assert.Equal(["opening frame of Room 56 in script 108 +0x0188", "opening frame of Room 56 in script 68 +0x0103"],
+        Assert.Equal(["opening frame of Room 56 in script 108 +0x0178", "opening frame of Room 56 in script 68 +0x00F3"],
             opening.Select(batch => batch.Source).Order(StringComparer.Ordinal));
-        Assert.All(opening, batch => Assert.Equal([779, 782], batch.Steps.Select(step => step.ObjectId)));
+        Assert.All(opening, batch => Assert.Equal([780, 783], batch.Steps.Select(step => step.ObjectId)));
 
         var (selection, estimates, background) = data.FirstVisit(56);
 
-        Assert.Equal([779, 782], estimates.Select(item => item.ObjectId));
-        Assert.Equal([779, 782], selection.PaintOrder().Select(obj => obj.Id).TakeLast(2));
+        Assert.Equal([780, 783], estimates.Select(item => item.ObjectId));
+        Assert.Equal([780, 783], selection.PaintOrder().Select(obj => obj.Id).TakeLast(2));
         Assert.Empty(selection.VisibleGaps());
-        AssertTopImageIsVisible(selection, background, 782);
+        AssertTopImageIsVisible(selection, background, 783);
     }
 
     [Fact]
@@ -40,11 +40,11 @@ public sealed class LoomFirstVisitRenderingTests
         // Script 86's cutscene body lies after its beginOverride skip jump. Until the
         // disassembler followed beginOverride, no decoded code loaded Room 58.
         var opening = Assert.Single(data.Batches.ForRoom(58), batch => batch.Priority == LoomSceneDrawBatches.OpeningFramePriority);
-        Assert.Equal("opening frame of Room 58 in script 86 +0x018A", opening.Source);
+        Assert.Equal("opening frame of Room 58 in script 86 +0x0172", opening.Source);
 
         var (selection, estimates, _) = data.FirstVisit(58);
 
-        Assert.Equal([new RoomArtworkEstimate(792, opening.Source)], estimates);
+        Assert.Equal([new RoomArtworkEstimate(793, opening.Source)], estimates);
         Assert.Empty(selection.VisibleGaps());
     }
 
@@ -52,11 +52,11 @@ public sealed class LoomFirstVisitRenderingTests
     public void DrawsTheSameScriptUndoesAreNotBatches()
     {
         if (Data.Value is not { } data) return;
-        // Script 90 flashes 637 and 638 in Room 42 (drawObject, breakHere, setState 0).
+        // Script 90 flashes 638 and 639 in Room 42 (drawObject, breakHere, setState 0).
         Assert.DoesNotContain(data.Batches.ForRoom(42), batch => batch.Source.StartsWith("script 90 ", StringComparison.Ordinal));
         // Script 99 later removes the scythe using these background repair images.
         // Its batch remains decoded, but first-visit fallback must retain the scythe.
-        Assert.Contains(data.Batches.ForRoom(20), batch => batch.Source == "script 99 +0x02BB" &&
+        Assert.Contains(data.Batches.ForRoom(20), batch => batch.Source == "script 99 +0x02CA" &&
             batch.Steps.Select(step => step.ObjectId).Order().SequenceEqual(new[] {392, 393, 394, 395, 396}));
         var (selection, estimates, background) = data.FirstVisit(20);
         Assert.Empty(estimates);
@@ -90,8 +90,8 @@ public sealed class LoomFirstVisitRenderingTests
     }
 
     [Theory]
-    [InlineData(18, 373, "Room 18 entry script +0x00DA sets it to 0 on every path")]
-    [InlineData(42, 637, "Room 42 entry script +0x0000 sets it to 0 on every path")]
+    [InlineData(18, 373, "Room 18 entry script +0x00D5 sets it to 0 on every path")]
+    [InlineData(42, 638, "Room 42 entry script +0x0000 sets it to 0 on every path")]
     public void EntryStatesSetOnEveryPathKeepTheirObjectsHidden(int roomId, int objectId, string source)
     {
         if (Data.Value is not { } data) return;
@@ -105,8 +105,8 @@ public sealed class LoomFirstVisitRenderingTests
     }
 
     [Theory]
-    [InlineData(2, 157, "opening frame of Room 02 in script 106 +0x03A0")]
-    [InlineData(65, 830, "opening frame of Room 65 in script 72 +0x0029")]
+    [InlineData(2, 157, "opening frame of Room 02 in script 106 +0x0395")]
+    [InlineData(65, 831, "opening frame of Room 65 in script 72 +0x0029")]
     [InlineData(4, 178, "Room 04 local script 201 +0x0082, last frame from the table set at +0x000C")]
     public void NothingVisibleFallbackOpensOnTheStrongestScriptBatch(int roomId, int objectId, string source)
     {
@@ -146,8 +146,8 @@ public sealed class LoomFirstVisitRenderingTests
     [Theory]
     [InlineData(30, 520)]
     // Room 38 draws 612 since the boot sets bit[0xD83] (script 001 +0x01B1).
-    [InlineData(38, 612)]
-    [InlineData(46, 687)]
+    [InlineData(38, 613)]
+    [InlineData(46, 688)]
     public void EntryScriptsThatTestClassesDrawTheirRoomsThemselves(int roomId, int objectId)
     {
         if (Data.Value is not { } data) return;
@@ -228,7 +228,7 @@ public sealed class LoomFirstVisitRenderingTests
         if (Data.Value is not { } data) return;
         var (selection, _, background) = data.FirstVisit(86);
         var images = data.Images(86);
-        var hood = images.Single(obj => obj.Id == 925);
+        var hood = images.Single(obj => obj.Id == 926);
 
         // The sphere starts as a plain sphere (the entry resets every vision image to state 0), so cycling begins from the empty position.
         var current = images.FirstOrDefault(obj => obj.X == hood.X && obj.Y == hood.Y && obj.Width == hood.Width &&
@@ -237,8 +237,8 @@ public sealed class LoomFirstVisitRenderingTests
         for (var step = 0; step < 4 && current.Id != hood.Id; step++)
             current = selection.Next(current) ?? throw new InvalidOperationException("Cycling reached the background.");
 
-        Assert.Equal(925, current.Id);
-        var face = Assert.Single(images, obj => obj.Id is 926 or 927 or 928 && selection.IsActive(obj));
+        Assert.Equal(926, current.Id);
+        var face = Assert.Single(images, obj => obj.Id is 927 or 928 or 929 && selection.IsActive(obj));
         Assert.Equal(face.Id, selection.PaintOrder()[^1].Id);
         Assert.Empty(selection.VisibleGaps());
         AssertTopImageIsVisible(selection, background, face.Id);
