@@ -37,7 +37,7 @@ public sealed class LoomRoomObjectsTests
         var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
 
         // Two graves share one stored name; the side panel tells them apart by index.
-        Assert.Equal(2, names.Values.Count(name => name == "tumba"));
+        Assert.Equal(2, names.Values.Count(name => name == "grave"));
         Assert.All(names.Keys, id => Assert.Contains(records, record => record.Id == id));
     }
 

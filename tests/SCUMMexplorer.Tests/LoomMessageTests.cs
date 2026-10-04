@@ -92,22 +92,22 @@ public sealed class LoomMessageTests
         // Script 001 +0x0012 sets VAR_CHARINC to 5; +0x0017 sets VAR_TIMER_NEXT to 6.
         Assert.Equal((ushort?)5, Var(session, 0x025));
         Assert.Equal(6, session.FrameJiffies);
-        // The opening cutscene's last print (script 044 +0x06AA, actor 1, an empty text)
+        // The opening cutscene's last print (script 044 +0x068E, actor 1, an empty text)
         // is still on the screen after the boot; it set the slot's position and height.
-        Assert.Equal("Script 44 +0x06AA", session.Messages.Talk?.Source);
+        Assert.Equal("Script 44 +0x068E", session.Messages.Talk?.Source);
         Assert.Equal("", session.Messages.Talk!.Text);
 
-        // Room 02 object 156 verb 0x36 +0x0000: print 0x01, [center; text, "Amanecer."].
+        // Room 02 object 156 verb 0x36 +0x0000: print 0x01, [center; text, "Dawn."].
         session.ActivateObjectVerb(156, 0x36);
         var message = session.Messages.Talk;
         Assert.NotNull(message);
-        Assert.Equal("Amanecer.", message.Text);
+        Assert.Equal("Dawn.", message.Text);
         Assert.Equal(LoomMessageKind.Talk, message.Kind);
         Assert.Equal(1, message.Actor);
         Assert.True(message.Center);
         Assert.Equal("Room 02 Object 156 Verb 0x36 +0x0000", message.Source);
-        // displayDialog: 60 jiffies, plus VAR_CHARINC for each of the 9 characters.
-        Assert.Equal(60 + 9 * 5, message.TalkDelay);
+        // displayDialog: 60 jiffies, plus VAR_CHARINC for each of the 5 characters.
+        Assert.Equal(60 + 5 * 5, message.TalkDelay);
         // actorTalk sets VAR_HAVE_MSG to 0xFF; displayDialog leaves _haveMsg at 1 at the text's end.
         Assert.Equal((ushort?)0xFF, Var(session, 0x003));
         Assert.Equal(1, session.Messages.HaveMsg);
@@ -115,11 +115,11 @@ public sealed class LoomMessageTests
 
         // Each frame takes VAR_TIMER_NEXT (6) jiffies off before the scripts run, and
         // displayDialog ends the message (stopTalk) in the frame that reaches 0:
-        // 105 jiffies stay on the screen for 17 frames and go in the 18th.
-        for (var frame = 1; frame <= 17; frame++)
+        // 85 jiffies stay on the screen for 14 frames and go in the 15th.
+        for (var frame = 1; frame <= 14; frame++)
         {
             session.AdvanceFrame();
-            Assert.Equal("Amanecer.", session.Messages.Talk?.Text);
+            Assert.Equal("Dawn.", session.Messages.Talk?.Text);
         }
         session.AdvanceFrame();
         Assert.Null(session.Messages.Talk);
@@ -138,7 +138,7 @@ public sealed class LoomMessageTests
         var frames = FramesUntilTalk(session, "Room 02 Object 156 Verb 0x36 +0x0000", 12);
         var message = session.Messages.Talk;
         Assert.NotNull(message);
-        Assert.Equal("Amanecer.", message.Text);
+        Assert.Equal("Dawn.", message.Text);
         Assert.Equal("Room 02 Object 156 Verb 0x36 +0x0000", message.Source);
         Assert.True(frames < 12);
         Assert.Equal(2, session.Snapshot.RoomId);
@@ -156,10 +156,10 @@ public sealed class LoomMessageTests
         FramesUntilTalk(session, "Room 02 Object 154 Verb 0x36 +0x0037", 20);
         var message = session.Messages.Talk;
         Assert.NotNull(message);
-        Assert.Equal("Ultima hoja del año.", message.Text);
+        Assert.Equal("Last leaf of the year.", message.Text);
         Assert.Equal(160, message.X);
         Assert.Equal(Var(session, 0x0A6), (ushort)message.Y);
-        Assert.Equal(60 + 20 * 5, message.TalkDelay);
+        Assert.Equal(60 + 22 * 5, message.TalkDelay);
         Assert.Equal("Room 02 Object 154 Verb 0x36 +0x0037", message.Source);
     }
 
