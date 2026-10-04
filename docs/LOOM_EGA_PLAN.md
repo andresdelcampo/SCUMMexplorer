@@ -52,14 +52,14 @@ Steps:
 3. **Player:** Roland sequence playback through the emulator into the existing audio output; mode selector entry beside PC Speaker, AdLib, No Sound; "no MT-32 ROMs found" state; the scripts' sound-card variable follows the mode, so the right sound ids are chosen.
 4. **Verification:** rendered-wave checks for a few sounds, an A/B against ScummVM, a record under `.verification/mt32/`, a changelog row.
 
-Open decision for the user: whether the sound-card variable changes with the mode (as the real game would) or only the player does. Optional later: a General MIDI fallback for users without ROMs, labelled as a different sound.
+Decided (user, 4 October): the game is emulated as it was with Roland, not AdLib faked into Roland. The sound mode sets the game's own sound-card variable (`var[0x030]`: 3 AdLib, 4 Roland), so its scripts choose the Roland sounds, and the Roland resources play through the emulator. Changing the mode mid-session takes effect as the game would see it (to be checked in step 1: which scripts read the variable and when). Optional later: a General MIDI fallback for users without ROMs, labelled as a different sound.
 
 ## Then: LOOM VGA and more languages (user, 4 October; Indy3 is deferred)
 
 Order: M5, MT-32, then these. Indy3 is on hold until the user moves its data from `Games/FUTURE/` back to `Games/`.
 
 1. **LOOM VGA (CD, SCUMM v4).** The data is not in `Games/` yet. Once there: a feasibility probe of the resource container and opcode set before any app work.
-2. **More languages of LOOM EGA** (Spanish and English work; others when the data arrives). Each language is checked the way English was: compare the glossary, bits, ids and offsets across editions with `GlossaryCheck` and `ScriptDump`, never key code on offsets (see CLAUDE.md, "Editions differ in data").
+2. **More languages of LOOM EGA** (later; Spanish and English work, others when the data arrives). Each language is checked the way English was: compare the glossary, bits, ids and offsets across editions with `GlossaryCheck` and `ScriptDump`, never key code on offsets (see CLAUDE.md, "Editions differ in data").
 3. **Separate the LOOM-specific from the generic**, as far as VGA and the languages need it. About 40 `GameId.Loom` gates in `MainWindow.xaml.cs`; propose which become generic before changing them.
 4. **Deferred:** Indy3 EGA (backgrounds, texts, dialogue choices, verbs 120–125; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion, whose formats are not decoded.
 
