@@ -29,7 +29,7 @@ Make the DOS *LOOM* EGA release (Spanish data in `Games/loom`) a place to explor
 ## What is still open for LOOM
 
 Needing the user (on-screen or ScummVM checks):
-- Staff scenes in Room 43, El Muerto and Room 17 sizes, actor 4 placement, Room 02 mountain-side depth mask (minor: Bobbin hides a few pixels early walking to the village).
+- Staff scenes in Room 43, El Muerto and Room 17 sizes, actor 4 placement. (Room 02 mountain-side depth mask: closed 4 October; ScummVM hides Bobbin at the same place, see [the record](../.verification/room02-mountain-20261004/README.md).)
 - Room 34 local200 +0035: probably dead code; only a real ScummVM save could show otherwise.
 - Verify on screen that the draft verbs show their text and animation (M4 below is implemented through the game's scripts; the draft table is a seeded estimate until each draft is learnt through a route).
 

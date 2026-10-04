@@ -26,6 +26,69 @@ if (args.Length > 3 && args[1] == "ego")
     }
     return;
 }
+if (args.Length > 6 && args[1] == "shot") { RoomShot.Run(args[0], int.Parse(args[2]), int.Parse(args[3]), int.Parse(args[4]), int.Parse(args[5]), args[6], args.Length > 7 ? args[7] : ""); return; }
+if (args.Length > 4 && args[1] == "adjust")
+{
+    // DemoProbe <folder> adjust <room> <x> <y>: our Contains / ClosestPointOnBox / Adjust for a destination point, per box.
+    var adGame = new GameFolderScanner().Scan(args[0]);
+    var adBoxes = LoomWalkBoxReader.Read(File.ReadAllBytes(adGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2])).FilePath));
+    int ax = int.Parse(args[3]), ay = int.Parse(args[4]);
+    foreach (var box in adBoxes.Boxes.Where(b => b.Index >= 11))
+    {
+        var closest = LoomWalkBoxSet.ClosestPointOnBox(box, ax, ay);
+        Console.WriteLine($"box {box.Index}: contains {adBoxes.Contains(box.Index, ax, ay)}, closest ({closest.X},{closest.Y}) dist² {closest.Distance}");
+    }
+    var adjusted = adBoxes.Adjust(ax, ay, true, 551, 111);
+    Console.WriteLine($"Adjust({ax},{ay}) -> ({adjusted.X},{adjusted.Y}) box {adjusted.Box}");
+    return;
+}
+if (args.Length > 3 && args[1] == "verbs")
+{
+    // DemoProbe <folder> verbs <room> <object>: every verb of the object, decoded.
+    var vbGame = new GameFolderScanner().Scan(args[0]);
+    var vbRoom = vbGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
+    var vbBytes = File.ReadAllBytes(vbRoom.FilePath);
+    var vbRecord = new LoomRoomObjectDirectory().Decode(vbBytes).Single(r => r.Id == int.Parse(args[3]));
+    var vbReader = new LoomObjectVerbReader(ScummScriptDialects.For(vbGame.Id));
+    foreach (var entry in vbReader.ReadAll(vbBytes, [vbRecord])[vbRecord.Id])
+    {
+        Console.WriteLine($"== {entry.Label} (code +0x{entry.ScriptOffset:X4})");
+        foreach (var i in vbReader.Decode(vbRoom, vbRecord, entry.VerbId).Instructions) Console.WriteLine($"{i.Offset:X4} {i.Operation} {i.Operands}");
+    }
+    return;
+}
+if (args.Length > 2 && args[1] == "objects")
+{
+    // DemoProbe <folder> objects <room>: the room's object records (id, rectangle, walk point).
+    var obGame = new GameFolderScanner().Scan(args[0]);
+    var obRoom = obGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
+    var obBytes = File.ReadAllBytes(obRoom.FilePath);
+    var obNames = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(obBytes), new LoomRoomObjectDirectory().Decode(obBytes));
+    foreach (var r in new LoomRoomObjectDirectory().Decode(obBytes))
+        Console.WriteLine($"object {r.Id} \"{obNames.GetValueOrDefault(r.Id, "")}\": {System.Text.Json.JsonSerializer.Serialize(r)}");
+    return;
+}
+if (args.Length > 2 && args[1] == "findload")
+{
+    // DemoProbe <folder> findload <room>: every loadRoom/loadRoomWithEgo in the room's local scripts and entry, with the lines before it.
+    var flGame = new GameFolderScanner().Scan(args[0]);
+    var flReader = new LoomScriptReader(ScummScriptDialects.For(flGame.Id));
+    var flRoom = flGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
+    var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(flGame.FolderPath, "00.LFL"));
+    foreach (var id in LoomScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(flRoom.FilePath), globalCount))
+    {
+        var script = flReader.DecodeRoomLocalScript(flRoom, id, globalCount);
+        if (script is null) continue;
+        var list = script.Instructions.ToList();
+        for (var i = 0; i < list.Count; i++)
+            if (list[i].Operation.StartsWith("loadRoom"))
+            {
+                Console.WriteLine($"== local {id} +0x{list[i].Offset:X4}");
+                foreach (var l in list.Skip(Math.Max(0, i - 10)).Take(12)) Console.WriteLine($"   {l.Offset:X4} {l.Operation} {l.Operands}");
+            }
+    }
+    return;
+}
 if (args.Length > 4 && args[1] == "walk")
 {
     // DemoProbe <folder> walk <room> <x> <y>: visit the room, click the point, and print the ego's place, box, costume and size every few frames.
@@ -35,7 +98,9 @@ if (args.Length > 4 && args[1] == "walk")
     var lastLine = "";
     for (var click = 0; click < 3 && walkSession.Snapshot.RoomId == int.Parse(args[2]); click++)
     {
-        walkSession.Click(int.Parse(args[3]), int.Parse(args[4]));
+        var action = walkSession.Click(int.Parse(args[3]), int.Parse(args[4]));
+        Console.WriteLine($"click {click}: {action.Evidence}");
+        foreach (var note in action.Uncertainties.Take(6)) Console.WriteLine("   - " + note);
         for (var frame = 0; frame < 400 && walkSession.Snapshot.RoomId == int.Parse(args[2]); frame++)
         {
             var ego = walkSession.Actors.First(a => a.Number == 1);

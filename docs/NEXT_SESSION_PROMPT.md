@@ -38,7 +38,7 @@ Suggested order: (1) the scanner keeps only present, valid resources and says it
 
 ## Open items (details in the plan)
 
-- User-only checks: Room 43 staff scenes, El Muerto and Room 17 sizes, actor 4 placement, draft verbs on screen, Room 02 mountain mask; Room 34 local200 +0035 needs a real ScummVM save.
+- User-only checks: Room 43 staff scenes, El Muerto and Room 17 sizes, actor 4 placement, draft verbs on screen (the Room 02 mountain mask matches ScummVM: closed); Room 34 local200 +0035 needs a real ScummVM save.
 - Evidence-bound: Silence/Shaping/Sharpening draft names, glossary growth, "Used by" literal-only, 17 costume leftovers, Room 70 truncated stored text, engine gaps only if a route needs them.
 - Housekeeping: 2 nullable warnings (`MainWindow.xaml.cs:3691-3692`), README refresh, `.claude/worktrees` (17 historical worktrees) and `CLEANUP_REVIEW.md` proposals. Evidence packets from earlier sessions are packed in `Exe/_evidence-archive/` (`tar -xzf` to read one).
 
