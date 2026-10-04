@@ -3707,45 +3707,45 @@ public partial class MainWindow : Window
         // A single scene keeps the running session (the user's state stays, a later one too; "Restart" goes back to the boot) and gets only
         // the minimum it needs. A stated sequence carries its own steps from the post-boot state, so it starts a fresh session.
         var keepSession = cutscene.Steps is null && _session is { BootRunning: false };
-        if (!keepSession) _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+        var session = keepSession ? _session! : _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
         // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
         // A sequence with unseen leading steps runs them first (the story state they reach is the scene's start), then attaches.
         var setup = StartSetup(cutscene);
         if (keepSession && _setupPlanner is not null) setup = _setupPlanner.Adapt(setup, _session!);
         var unseenSetup = cutscene.Steps is null && setup.HasSteps;
-        if (!unseenSetup && (cutscene.Steps is null || cutscene.SilentSteps == 0)) _sceneSound.Attach(_game, _session);
-        _session.VisitRoom(room);
+        if (!unseenSetup && (cutscene.Steps is null || cutscene.SilentSteps == 0)) _sceneSound.Attach(_game, session);
+        session.VisitRoom(room);
         string? setupFailure = null;
         if (unseenSetup)
         {
             // The derived setup (real earlier scenes, then a visit of the scene's room) runs unseen; the sounds start with the scene.
-            var prelude = new LoomReplaySequence(_session, setup.Steps);
+            var prelude = new LoomReplaySequence(session, setup.Steps);
             if (!prelude.RunSilently(setup.Steps.Count)) setupFailure = $"The derived start setup stopped ({prelude.Failure ?? "no result"}); the scene starts from the catalog visit.";
-            _sceneSound.Attach(_game, _session);
+            _sceneSound.Attach(_game, session);
         }
         LoomObjectActionResult? action;
         if (cutscene.Steps is { } steps)
         {
-            _replaySequence = new LoomReplaySequence(_session, steps);
+            _replaySequence = new LoomReplaySequence(session, steps);
             if (cutscene.SilentSteps > 0)
             {
                 _replaySequence.RunSilently(cutscene.SilentSteps);
-                _sceneSound.Attach(_game, _session);
+                _sceneSound.Attach(_game, session);
                 // The unseen steps may have moved on to another room: the scene plays where the session now is.
-                if (_session.Snapshot.RoomId is int nowRoom && _game.Rooms.FirstOrDefault(item => item.ResourceId == nowRoom) is { } nowResource)
+                if (session.Snapshot.RoomId is int nowRoom && _game.Rooms.FirstOrDefault(item => item.ResourceId == nowRoom) is { } nowResource)
                     room = nowResource;
             }
             if (_replaySequence.Failure is null) _replaySequence.Continue();
             action = _replaySequence.LastAction;
         }
-        else action = cutscene.ObjectId == 0 ? null : _session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
-        var uncertainties = (action?.Uncertainties ?? _session.Snapshot.Uncertainties).ToList();
+        else action = cutscene.ObjectId == 0 ? null : session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
+        var uncertainties = (action?.Uncertainties ?? session.Snapshot.Uncertainties).ToList();
         if (setupFailure is not null) uncertainties.Insert(0, setupFailure);
         if (cutscene.Click is { } click)
         {
             // The verb's loadRoomWithEgo walks Bobbin in; the click is sent once he stands, as a player's would be.
-            for (var frame = 0; frame < LoomExplorationSession.CutsceneFrameLimit && _session.EgoMoving; frame++) _session.AdvanceFrame();
-            action = _session.Click(click.X, click.Y);
+            for (var frame = 0; frame < LoomExplorationSession.CutsceneFrameLimit && session.EgoMoving; frame++) session.AdvanceFrame();
+            action = session.Click(click.X, click.Y);
             uncertainties.AddRange(action.Uncertainties);
         }
         if (_currentRoomResource?.ResourceId == room.ResourceId && _currentRoom is not null)

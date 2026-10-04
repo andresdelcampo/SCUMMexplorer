@@ -218,7 +218,7 @@ public sealed class LoomFirstVisitRenderingTests
         var (selection, _, _) = data.FirstVisit(roomId);
         // The entry script sets every vision image to state 0, and the background already holds the empty sphere:
         // a later script's draw of the chicken (Room 19) or the red vision (Room 86) is not the first-visit state.
-        Assert.Empty(data.Images(roomId).Where(selection.IsActive));
+        Assert.DoesNotContain(data.Images(roomId), selection.IsActive);
         Assert.Empty(selection.VisibleGaps());
     }
 
