@@ -25,6 +25,7 @@ foreach ($p in $projects) {
   $name = $p.BaseName
   $key = $p.Directory.FullName.Substring($root.Length + 14)
   if ($key -notlike $Filter) { continue }
+  if ($name -in 'CostumeSheet','GlossaryCheck','ObjectActors','ScriptDump') { continue }   # tools with their own arguments, not harnesses
   if (Select-String -Path $results -Pattern ("^\\?" + [regex]::Escape($key) + "`t") -Quiet) { continue }
   $b = & dotnet build $p.FullName -nologo -v q 2>&1
   if ($LASTEXITCODE -ne 0) { "$key`tFAIL`t-`t0`t$(($b | Select-Object -Last 2) -join ' / ')" | Out-File $results -Append -Encoding utf8; continue }
