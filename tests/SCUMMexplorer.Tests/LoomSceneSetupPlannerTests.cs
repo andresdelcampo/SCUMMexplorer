@@ -28,7 +28,7 @@ public sealed class LoomSceneSetupPlannerTests
     {
         var game = Game();
         var planner = new LoomSceneSetupPlanner(game);
-        // Room 43 object 643 (script 091) and object 650 (script 093) both clear bit D61.
+        // Room 43 object 644 (script 091) and object 651 (script 093) both clear bit D61.
         foreach (var (room, script) in new[] { (43, 91), (43, 93) })
         {
             var setup = planner.Derive(room, [script]);
@@ -256,7 +256,7 @@ public sealed class LoomSceneSetupSceneTests
         Assert.Equal(9, session.Actors.Single(a => a.Number == 4).Room);
         session.ActivateObjectVerb(275, 0x56);
         for (var i = 0; i < 1500; i++) session.AdvanceFrame();
-        Assert.Contains(session.Messages.Log, m => m.Actor == 4 && m.Text.Contains("Tu magia de Tejedor", StringComparison.Ordinal));
+        Assert.Contains(session.Messages.Log, m => m.Actor == 4 && m.Text.Contains("Your Weaver magic", StringComparison.Ordinal));
     }
 
     private static string Run(bool withSetup, int room, int obj, int verb, int script)
@@ -279,8 +279,8 @@ public sealed class LoomSceneSetupSceneTests
     [Fact]
     public void TheCageScenesStillReachTheirOwnEndFromTheDerivedSetup()
     {
-        Assert.Contains("endCutscene at Script 91 +0x0E83", Run(true, 43, 643, 0x3A, 91));
-        Assert.Contains("endCutscene at Script 93 +0x05FB", Run(true, 43, 650, 0x38, 93));
-        Assert.DoesNotContain("unsup=1", Run(true, 43, 650, 0x38, 93));
+        Assert.Contains("endCutscene at Script 91 +0x0E57", Run(true, 43, 644, 0x3A, 91));
+        Assert.Contains("endCutscene at Script 93 +0x05C8", Run(true, 43, 651, 0x38, 93));
+        Assert.DoesNotContain("unsup=1", Run(true, 43, 651, 0x38, 93));
     }
 }
