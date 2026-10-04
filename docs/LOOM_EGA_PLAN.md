@@ -42,7 +42,19 @@ Decisions (user, 4 October):
 - **Spoilers:** ignored. The whole app is a spoiler, so there are no spoiler levels and no reveal gating.
 - **Scope:** both seen and unseen content, with a filter (all / triggered this session / not yet triggered), using Game Status bits and session history where a trigger is known.
 
-## Next phase: other versions (starts after M5; order: LOOM VGA, then Indy3)
+## After M5: LOOM EGA with MT-32 music (user, 4 October)
+
+The app plays PC speaker and AdLib (`SceneSoundPlayer.SoundMode`). Add Roland MT-32 as a third sound mode for the same DOS LOOM EGA data. Local material: the MT-32 and CM-32L ROM images in `Games/mt32/` (copyrighted, never committed or shipped; the app must ask for their folder). Known so far: the game's scripts branch on `var[0x030]` (sound card) values 3 and 4 (AdLib, Roland) when choosing sounds (script map).
+
+Steps:
+1. **Probe the data:** which sound resources in `Games/loom ega en` are Roland, how they differ from the AdLib ones (header, instruments, SysEx/patch data), and which sounds have no Roland version. Compare with ScummVM's MT-32 driver behaviour (`scummvm/` can play it with the ROMs for an A/B listen).
+2. **Choose the synth:** an MT-32 emulator (Munt `mt32emu`, LGPL, native library wrapped for .NET) against a managed port; licence and packaging decided with the user before adding a dependency.
+3. **Player:** Roland sequence playback through the emulator into the existing audio output; mode selector entry beside PC Speaker, AdLib, No Sound; "no MT-32 ROMs found" state; the scripts' sound-card variable follows the mode, so the right sound ids are chosen.
+4. **Verification:** rendered-wave checks for a few sounds, an A/B against ScummVM, a record under `.verification/mt32/`, a changelog row.
+
+Open decisions for the user: emulator choice and licence; whether the sound-card variable changes with the mode (as the real game would) or only the player does.
+
+## Next phase: other versions (after MT-32; order: LOOM VGA, then Indy3)
 
 Done: English LOOM EGA as the reference edition, and the two LOOM demos. Local data: `Games/indy3 ega en` (the tests expect it), `indy3 ega es`, `indy3 vga es`, `indy3 demo en`, `monkey1`, `mmansion`, plus `Games/FUTURE/`. There is no LOOM VGA data yet.
 

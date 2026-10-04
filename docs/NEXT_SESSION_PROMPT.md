@@ -16,7 +16,7 @@ Done in the demos session (records: [.verification/demos-20261004/README.md](../
 
 ## Decided with the user
 
-- Order of the other versions: LOOM demos (done), then **M5, the secrets guide** (next; brought back in scope on 4 October, decisions in the plan: all kinds of secrets, no spoiler gating, seen and unseen with a filter), then **LOOM VGA** (needs the data in `Games/`; probe the format first), then **Indy3 EGA**.
+- Order of the other versions: LOOM demos (done), then **M5, the secrets guide** (next; brought back in scope on 4 October, decisions in the plan: all kinds of secrets, no spoiler gating, seen and unseen with a filter), then **LOOM EGA with MT-32 music** (ROMs in `Games/mt32`; probe the Roland sound data first, plan section "After M5"), then **LOOM VGA** (needs the data in `Games/`; probe the format first), then **Indy3 EGA**.
 - A demo plays both ways: rooms explorable, the preview as a cutscene, no new button.
 - Harness review: obsolete harnesses removed, three repaired; archive folders are records, not harnesses. Room17Check's interrupted walk is expected.
 
