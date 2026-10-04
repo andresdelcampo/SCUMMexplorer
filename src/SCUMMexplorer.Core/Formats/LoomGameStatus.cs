@@ -9,56 +9,92 @@ public sealed record LoomDraftStatus(int Slot, ushort? Packed, int[] Notes, bool
 public sealed record LoomGameStatus(bool Supported, string Evidence, bool CanEdit, bool? StaffHeld,
     string StaffOrigin, int? AvailableNoteCount, string NotesOrigin, IReadOnlyList<LoomDraftStatus> Drafts);
 
-/// <summary>Verify the loaded LOOM script contract before interpreting or editing its fields.</summary>
-internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, int DraftBase, int DraftCount, int InitialNotes, string CheckpointKey, int CheckpointNotes, string Evidence)
+/// <summary>
+/// Verify the loaded LOOM script contract before interpreting or editing its fields. Instructions are found by their pattern
+/// (neighbouring instructions and operands), not by byte offset: the Spanish and English DOS releases have scripts of other
+/// lengths, and the English one numbers the global bits from 0xD65 on one lower, so the bits are read from the scripts too.
+/// </summary>
+internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, int DraftBase, int DraftCount, int InitialNotes, string CheckpointKey, int CheckpointNotes,
+    string DraftStartKey, string DraftPlayKey, int BitShift, string Evidence)
 {
+    /// <summary>The Spanish release's learned-draft bit; the edition's bit minus this is <see cref="BitShift"/>.</summary>
+    private const int SpanishLearnedBit = 0xD69;
+
     public static LoomStatusSchema Read(GameLibrary game)
     {
         if (game.Id != GameId.Loom || game.Version != ScummVersion.V3) throw new InvalidDataException("Game status fields have only been established for LOOM old-v3.");
         var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
-        var scripts = new Dictionary<int, LoomScriptDisassembly>();
-        LoomScriptInstruction At(int id, int offset, string operation, string? operands = null)
+        var scripts = new Dictionary<int, IReadOnlyList<LoomScriptInstruction>>();
+        int scriptCount = game.Resources.Count(r => r.Kind == ResourceKind.Script);
+        IReadOnlyList<LoomScriptInstruction> Code(int id)
         {
-            if (!scripts.TryGetValue(id, out var script)) scripts[id] = script = reader.Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == id));
-            var instruction = script.Instructions.SingleOrDefault(i => i.Offset == offset);
-            if (instruction is null || instruction.Operation != operation || operands is not null && instruction.Operands != operands)
-                throw new InvalidDataException($"Loaded script {id:000} +0x{offset:X4} does not establish the status contract.");
-            return instruction;
+            if (!scripts.TryGetValue(id, out var code))
+                scripts[id] = code = reader.Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == id)).Instructions.ToList();
+            return code;
+        }
+        InvalidDataException Fail(string where) => new($"Loaded script {where} does not establish the status contract.");
+        // The instruction with this operation and operands and the one before it (both must exist).
+        (LoomScriptInstruction Before, LoomScriptInstruction At) Pair(IReadOnlyList<LoomScriptInstruction> code, string where, string operation, string operands)
+        {
+            for (int i = 1; i < code.Count; i++)
+                if (code[i].Operation == operation && code[i].Operands == operands) return (code[i - 1], code[i]);
+            throw Fail(where);
         }
         string Key(string text, string pattern) => Regex.Match(text, pattern) is { Success: true } match ? match.Value : throw new InvalidDataException("Status operand could not be resolved.");
-        var staff = Key(At(17, 0x7D, "equalZero").Operands, @"bit\[0x[0-9A-F]+\]");
-        At(17, 0x82, "move", "var[0x072] = 0x0008"); // Zero selects the without-staff animations.
-        var noteLimit = Key(At(10, 0x20, "isLess").Operands, @"var\[0x[0-9A-F]+\]");
-        At(10, 0x27, "chainScript", "0x0B, []"); // Old-v3 tests limit < ID; IDs above the limit are refused.
-        var table = Regex.Match(At(23, 5, "move").Operands, @"var\[0x([0-9A-F]+)\+local\[0x000\]\]");
-        if (!table.Success) throw new InvalidDataException("Draft table base is unresolved.");
-        At(23, 0, "multiply", "local[0x000] *= 0x0002");
-        At(23, 0x48, "and", "local[0x001] &= 0x0007");
-        At(23, 0x5C, "and", "local[0x001] &= 0x0038");
-        At(23, 0x75, "and", "local[0x001] &= 0x01C0");
-        At(23, 0x8E, "and", "local[0x001] &= 0x0E00");
-        At(23, 0x1B, "and", "local[0x001] &= 0x2000");
-        At(23, 0x2A, "and", "local[0x001] &= 0x1000");
-        At(23, 0x20, "move", "bit[0xD69] = local[0x001]");
-        At(23, 0x2F, "move", "bit[0xD6A] = local[0x001]");
-        At(26, 0, "equalZero", "bit[0xD69], branch +0x004B -> 0x0050");
-        At(22, 0xCC, "notEqualZero", "bit[0xD6A], branch +0x005D -> 0x012E");
-        At(25, 0x16, "or", "local[0x002] |= 0x2000");
-        At(34, 0x16, "or", "local[0x002] |= 0x4000");
-        At(22, 0x131, "isLess", "local[0x000], 0x000F, branch +0xFF31 -> 0x0069");
-        At(18, 0x6A, "verbOps", "0x08, [at, 0x00C0, local[0x004]; image, 0x008E; on]");
-        var init = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 1), 211, game.Resources.Count(r => r.Kind == ResourceKind.Script));
-        var checkpoint = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 46), 204, game.Resources.Count(r => r.Kind == ResourceKind.Script));
-        if (init?.Instructions.SingleOrDefault(i => i.Offset == 0x2C3) is not { Operation: "move", Operands: "var[0x07A] = 0x0003" } ||
-            checkpoint?.Instructions.SingleOrDefault(i => i.Offset == 0x24) is not { Operation: "move", Operands: "bit[0xDC5] = 0x0001" } ||
-            checkpoint.Instructions.SingleOrDefault(i => i.Offset == 0x29) is not { Operation: "startScript", Operands: "0x1D, [0x0007, 0x000C]" })
+        int Number(string bit) => int.Parse(bit.AsSpan(6, bit.Length - 7), NumberStyles.HexNumber);
+
+        // 017: the instruction before "var[0x072] = 8" tests the staff bit; zero selects the without-staff animations.
+        var (staffTest, staffMove) = Pair(Code(17), "017", "move", "var[0x072] = 0x0008");
+        if (staffTest.Operation != "equalZero") throw Fail("017");
+        var staff = Key(staffTest.Operands, @"bit\[0x[0-9A-F]+\]");
+        // 010: old-v3 tests limit < ID; IDs above the limit are refused (chain 0x0B).
+        var (limitTest, limitChain) = Pair(Code(10), "010", "chainScript", "0x0B, []");
+        if (limitTest.Operation != "isLess" || !limitTest.Operands.StartsWith("local[0x000], var[", StringComparison.Ordinal)) throw Fail("010");
+        var noteLimit = Key(limitTest.Operands, @"var\[0x[0-9A-F]+\]");
+        // 023: two words per draft, four 3-bit notes + 1, and the three flag bits, each copied into its own bit.
+        var draft = Code(23);
+        if (draft.Count == 0 || draft[0].Operation != "multiply" || draft[0].Operands != "local[0x000] *= 0x0002") throw Fail("023");
+        var table = draft.Where(i => i.Operation == "move").Select(i => Regex.Match(i.Operands, @"var\[0x([0-9A-F]+)\+local\[0x000\]\]")).FirstOrDefault(m => m.Success)
+            ?? throw new InvalidDataException("Draft table base is unresolved.");
+        foreach (var mask in new[] { "0x0007", "0x0038", "0x01C0", "0x0E00" })
+            if (!draft.Any(i => i.Operation == "and" && i.Operands == $"local[0x001] &= {mask}")) throw Fail("023");
+        string FlagFor(string mask)
+        {
+            for (int i = 0; i + 1 < draft.Count; i++)
+                if (draft[i].Operation == "and" && draft[i].Operands == $"local[0x001] &= {mask}" && draft[i + 1].Operation == "move" &&
+                    Regex.Match(draft[i + 1].Operands, @"^(bit\[0x[0-9A-F]+\]) = local\[0x001\]$") is { Success: true } m) return m.Groups[1].Value;
+            throw Fail("023");
+        }
+        var learned = FlagFor("0x2000"); var reverse = FlagFor("0x1000"); var lastNote = FlagFor("0x4000");
+        // 026 refuses matched unlearned drafts; 022 searches the slots and skips reverse matching without the reverse flag.
+        if (Code(26) is not [{ Operation: "equalZero" } refuse, ..] || !refuse.Operands.StartsWith(learned + ",", StringComparison.Ordinal)) throw Fail("026");
+        var search = Code(22);
+        // The two "wait until set" loops that follow starting script 028: the first ends when the draft starts, the second when its playback is over.
+        var waits = search.Where(i => i.Operation == "equalZero" && i.Operands.StartsWith("bit[", StringComparison.Ordinal) && i.Operands.Contains("branch +0xFFFA", StringComparison.Ordinal)).ToList();
+        if (waits.Count < 2) throw Fail("022");
+        var startKey = Key(waits[0].Operands, @"bit\[0x[0-9A-F]+\]"); var playKey = Key(waits[1].Operands, @"bit\[0x[0-9A-F]+\]");
+        if (!search.Any(i => i.Operation == "notEqualZero" && i.Operands.StartsWith(reverse + ",", StringComparison.Ordinal)) ||
+            !search.Any(i => i.Operation == "isLess" && i.Operands.StartsWith("local[0x000], 0x000F,", StringComparison.Ordinal))) throw Fail("022");
+        // 025 and 034 set the learned and last-note flags.
+        var learnedScript = Code(25); var lastScript = Code(34);
+        if (learnedScript.Count == 0 || learnedScript[0].Operands != $"{learned} = 0x0001" || !learnedScript.Any(i => i.Operation == "or" && i.Operands == "local[0x002] |= 0x2000") ||
+            lastScript.Count == 0 || lastScript[0].Operands != $"{lastNote} = 0x0001" || !lastScript.Any(i => i.Operation == "or" && i.Operands == "local[0x002] |= 0x4000")) throw Fail("025/034");
+        // 018 puts the note controls on screen.
+        if (!Code(18).Any(i => i.Operation == "verbOps" && i.Operands == "0x08, [at, 0x00C0, local[0x004]; image, 0x008E; on]")) throw Fail("018");
+        var init = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 1), 211, scriptCount);
+        var checkpoint = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 46), 204, scriptCount);
+        if (init is null || !init.Instructions.Any(i => i.Operation == "move" && i.Operands == "var[0x07A] = 0x0003") || checkpoint is null)
             throw new InvalidDataException("Loaded staff progression checkpoints are unresolved.");
-        return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 3, "bit[0xDC5]", 7,
-            $"Loaded scripts017 +0x007D/+0x0082: {staff}=1 means held;010 +0x0020/+0x0027: note IDs1..8 up to and including {noteLimit} are available. " +
-            "023: two words per draft, four 3-bit notes +1; flags0x2000 learned/0x1000 reverse/0x4000 last-note knowledge. " +
-            "022 searches slots0..15 inclusively, including Transcend.026 refuses matched unlearned drafts before target dispatch;022 skips reverse matching without0x1000. " +
-            "Sequence edits preserve flags and response verbs; Learned edits change only0x2000. " +
-            "Staff edits refresh the existing normal Bobbin appearance through017 and note controls through018/019; special room costumes remain under room code. " +
+        var cp = checkpoint.Instructions.ToList();
+        int cpIndex = cp.FindIndex(i => i.Operation == "startScript" && i.Operands == "0x1D, [0x0007, 0x000C]");
+        if (cpIndex < 1 || cp[cpIndex - 1].Operation != "move" || Regex.Match(cp[cpIndex - 1].Operands, @"^(bit\[0x[0-9A-F]+\]) = 0x0001$") is not { Success: true } cpBit)
+            throw new InvalidDataException("Loaded staff progression checkpoints are unresolved.");
+        return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 3, cpBit.Groups[1].Value, 7, startKey, playKey, Number(learned) - SpanishLearnedBit,
+            $"Loaded scripts 017 +0x{staffTest.Offset:X4}/+0x{staffMove.Offset:X4}: {staff}=1 means held; 010 +0x{limitTest.Offset:X4}/+0x{limitChain.Offset:X4}: note IDs 1..8 up to and including {noteLimit} are available. " +
+            $"023: two words per draft, four 3-bit notes +1; flags 0x2000 learned ({learned})/0x1000 reverse ({reverse})/0x4000 last-note knowledge ({lastNote}). " +
+            "022 searches slots 0..15 inclusively, including Transcend. 026 refuses matched unlearned drafts before target dispatch; 022 skips reverse matching without 0x1000. " +
+            "Sequence edits preserve flags and response verbs; Learned edits change only 0x2000. " +
+            "Staff edits refresh the existing normal Bobbin appearance through 017 and note controls through 018/019; special room costumes remain under room code. " +
             "These explicit edits are exploration choices, not source-established pickups, learning or replay prerequisites.");
     }
 }
@@ -83,7 +119,7 @@ public sealed partial class LoomExplorationSession
     }
     private bool StatusEditable => _currentRoom is not null && !BootRunning && !InCutscene && !EgoMoving && !CameraMoving &&
         Messages.HaveMsg == 0 && _pending.All(p => p.Frame.FreezeCount == 0) &&
-        _runtime.GlobalVariables.GetValueOrDefault("bit[0xD66]") == 0 && _runtime.GlobalVariables.GetValueOrDefault("bit[0xD67]") == 0;
+        StatusSchema is { } schema && _runtime.GlobalVariables.GetValueOrDefault(schema.DraftStartKey) == 0 && _runtime.GlobalVariables.GetValueOrDefault(schema.DraftPlayKey) == 0;
 
     public LoomGameStatus GameStatus
     {
