@@ -108,7 +108,8 @@ public sealed class LoomSceneSetupPlannerTests
         Assert.Contains(off.Notes, n => n.Contains("outside the island", StringComparison.Ordinal));
         // Room 9 is on it: the fresh state stays, labelled.
         var on = planner.Derive(9, [47]);
-        Assert.False(on.HasSteps);
+        // No staff pickup (only actors the scene uses are brought in).
+        Assert.DoesNotContain(on.Steps, step => step.Kind != "actor");
         Assert.Contains(on.Notes, n => n.Contains("reads bit D61", StringComparison.Ordinal));
     }
 
@@ -253,9 +254,9 @@ public sealed class LoomSceneSetupSceneTests
         var planner = new LoomSceneSetupPlanner(game);
         // Room 09 object 275, verb 0x56 starts local 221: actor 8's apparition, then two lines printed for actor 4.
         var setup = planner.Derive(9, [], 275, 0x56);
-        var step = Assert.Single(setup.Steps, s => s.Kind == "actor");
+        var step = Assert.Single(setup.Steps, s => s.Kind == "actor" && s.ObjectId == 4);
         Assert.Equal(4, step.ObjectId);
-        Assert.Contains(setup.Notes, n => n.Contains("actor 4", StringComparison.Ordinal) && n.Contains("estimate", StringComparison.Ordinal));
+        Assert.Contains(setup.Notes, n => n.Contains("Room 09 local 217", StringComparison.Ordinal) && n.Contains("estimate", StringComparison.Ordinal));
 
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
         session.VisitRoomById(9);
@@ -267,6 +268,26 @@ public sealed class LoomSceneSetupSceneTests
         session.ActivateObjectVerb(275, 0x56);
         for (var i = 0; i < 1500; i++) session.AdvanceFrame();
         Assert.Contains(session.Messages.Log, m => m.Actor == 4 && m.Text.Contains("Your Weaver magic", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData(275, 4)]   // "Dead One": the game puts actor 4 at (68, 130), inside the object's rectangle
+    [InlineData(273, 5)]   // "Hetchel": actor 5 at (230, 132)
+    [InlineData(270, 9)]   // "egg": putActorAtObject 9, 270
+    [InlineData(271, 11)]  // "distaff": putActorAtObject 11, 271
+    public void AnObjectThatIsAnActorBringsHimIntoTheRoomWithAnyInteraction(int objectId, int actor)
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
+        var game = new GameFolderScanner().Scan(folder);
+        var setup = new LoomSceneSetupPlanner(game).Derive(9, [], objectId, 0x36);
+        Assert.Contains(setup.Steps, step => step.Kind == "actor" && step.ObjectId == actor);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
+        session.VisitRoomById(9);
+        Assert.True(new LoomReplaySequence(session, setup.Steps).RunSilently(setup.Steps.Count));
+        var shown = session.Actors.Single(a => a.Number == actor);
+        Assert.Equal(9, shown.Room);
+        Assert.True(shown.Visible);
+        Assert.NotEqual(0, shown.Look.Costume);
     }
 
     private static string Run(bool withSetup, int room, int obj, int verb, int script)

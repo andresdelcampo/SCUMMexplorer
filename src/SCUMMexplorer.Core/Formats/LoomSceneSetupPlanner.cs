@@ -1,4 +1,5 @@
 using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Core.Formats;
 
@@ -33,11 +34,13 @@ public sealed class LoomSceneSetupPlanner
     public const int FirstRoomOffTheIsland = 11;
 
     private readonly LoomSceneStateScanner _scanner;
+    private readonly GameLibrary _game;
     private IReadOnlyList<LoomStateSource>? _staffHeldWriters;
 
     public LoomSceneSetupPlanner(GameLibrary game)
     {
-        _scanner = new LoomSceneStateScanner(game);
+        _game = game;
+        _scanner = LoomSceneStateScanner.For(game);
         _firstStoryBit = LoomStoryEvents.FirstBitFor(game);
     }
 
@@ -95,22 +98,29 @@ public sealed class LoomSceneSetupPlanner
 
         if (steps.Count > 0 && steps[0].ObjectId != startRoom) steps.Add(new("visit", startRoom));
 
-        // Speakers. A line printed for an actor who is not in the room shows nothing (ScummVM's actorTalk), so a scene whose
-        // own code prints for actor N without putting him in a room first needs him there. The game's own placement of him into
+        // Actors. A line printed for an actor who is not in the room shows nothing (ScummVM's actorTalk), and one that is told to walk or
+        // animate is not seen either, so a scene whose own code uses actor N without putting him in a room first needs him there. The game's own placement of him into
         // this room (putActorInRoom then putActor / putActorAtObject) is taken as the labelled estimate; the first in the
         // start room's own code, else the first in code order, and the others are listed.
-        foreach (var actor in scan.PrintedActors.Except(scan.PlacedActors))
+        // An actor shown as an object: the named object of an interaction is an actor when the game itself puts an actor at that
+        // object (putActorAtObject) or at a point inside its rectangle; he comes into the room with the interaction.
+        var tied = objectId == 0 ? [] : ActorsAtObject(startRoom, objectId);
+        foreach (var actor in scan.UsedActors.Concat(tied.Keys).Distinct().Except(scan.PlacedActors).Order())
         {
             var placers = ActorPlacers(actor, startRoom);
             if (placers.Count == 0)
             {
-                notes.Add($"The scene prints lines for actor {actor}, who no code of the game puts into Room {startRoom:00}; if he is not there his lines show nothing (not applied).");
+                notes.Add($"The scene uses actor {actor}, who no code of the game puts into Room {startRoom:00}; if he is not there he is not shown (not applied).");
                 continue;
             }
-            var chosen = placers.FirstOrDefault(p => p.Where.StartsWith($"Room {startRoom:00} ", StringComparison.Ordinal)) ?? placers[0];
-            steps.Add(new("actor", actor, chosen.X ?? 0, chosen.Y ?? 0, chosen.AtObject ?? 0, EndBoundary: chosen.Where));
-            notes.Add($"The scene prints lines for actor {actor}, and a line for an actor outside the room shows nothing. The game puts him into Room {startRoom:00} at {chosen.Where}" +
-                      $"{(chosen.AtObject is int o ? $" (at object {o}'s walk point)" : $" ({chosen.X}, {chosen.Y})")}; that placement is applied if he is not there already (estimate: which earlier scene left him there was not executed)." +
+            var chosen = tied.TryGetValue(actor, out var atObject) ? atObject
+                : placers.FirstOrDefault(p => p.Where.StartsWith($"Room {startRoom:00} ", StringComparison.Ordinal)) ?? placers[0];
+            steps.Add(new("actor", actor, Verb: chosen.AtObject ?? 0, X: chosen.X ?? 0, Y: chosen.Y ?? 0, EndBoundary: chosen.Where));
+            var why = tied.ContainsKey(actor)
+                ? $"Object {objectId} is an actor in the game's own placements (the game puts him {(chosen.AtObject == objectId ? "at the object" : $"at ({chosen.X}, {chosen.Y}), inside its rectangle")})"
+                : $"The scene uses actor {actor} (lines, walks or animations) without putting him into the room";
+            notes.Add($"{why}, and an actor outside the room is not shown. The game puts him into Room {startRoom:00} at {chosen.Where}" +
+                      $"{(chosen.AtObject is int o ? $" (at object {o}'s walk point)" : $" ({chosen.X}, {chosen.Y})")}, dressed as it dresses him; that placement is applied if he is not there already (estimate: which earlier scene left him there was not executed)." +
                       (placers.Count > 1 ? $" Other placements: {string.Join(", ", placers.Where(p => p != chosen).Select(p => p.Where).Take(4))}." : ""));
         }
 
@@ -137,6 +147,34 @@ public sealed class LoomSceneSetupPlanner
         var notes = setup.Notes.Where(n => !n.Contains("bit D61", StringComparison.Ordinal)).ToList();
         notes.Insert(0, "Bobbin already holds the distaff in the running session, so the pickup is not run again.");
         return new(setup.Steps.Where(st => st.EndBoundary != StaffGrant).ToArray(), notes);
+    }
+
+    /// <summary>
+    /// The actors the game puts at a named object of the room: <c>putActorAtObject</c> on it, or <c>putActor</c> to a literal point inside its
+    /// rectangle by the room's own code (other scenes stand their actors anywhere; an unnamed rectangle is no actor). The first placement in the room's own code wins.
+    /// </summary>
+    private Dictionary<int, LoomActorPlacer> ActorsAtObject(int room, int objectId)
+    {
+        var found = new Dictionary<int, LoomActorPlacer>();
+        try
+        {
+            var resource = _game.Rooms.FirstOrDefault(r => r.ResourceId == room);
+            if (resource is null) return found;
+            var bytes = File.ReadAllBytes(resource.FilePath);
+            var records = new LoomRoomObjectDirectory().Decode(bytes);
+            if (records.FirstOrDefault(r => r.Id == objectId) is not { } record) return found;
+            if (!LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records).TryGetValue(objectId, out var name) || string.IsNullOrWhiteSpace(name)) return found;
+            for (var actor = 2; actor < 13; actor++)
+            {
+                var hit = ActorPlacers(actor, room)
+                    .Where(p => p.AtObject == objectId ||
+                                p.Where.StartsWith($"Room {room:00} ", StringComparison.Ordinal) && p.X is int x && p.Y is int y && x >= record.X && x < record.X + record.Width && y >= record.Y && y < record.Y + record.Height)
+                    .OrderBy(p => p.Where.StartsWith($"Room {room:00} ", StringComparison.Ordinal) ? 0 : 1).FirstOrDefault();
+                if (hit is not null) found[actor] = hit;
+            }
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
+        return found;
     }
 
     private readonly Dictionary<(int, int), IReadOnlyList<LoomActorPlacer>> _placers = [];

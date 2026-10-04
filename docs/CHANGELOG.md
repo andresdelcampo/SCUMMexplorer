@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October (night, 3): an interaction brings in the actors it involves
+
+One rule replaces the El Muerto special case: an actor the scene or interaction uses (lines, walks, turns, animations) without placing him, or an actor that is the named object being interacted with, is brought into the room and dressed as the game dresses him. "Is the object" is read from the game's own placements: `putActorAtObject` on the object, or a `putActor` by the room's own code to a point inside its rectangle (Room 09: Dead One 275 = actor 4, Hetchel 273 = actor 5, egg 270 = actor 9, distaff 271 = actor 11). The dressing is the literal `actorOps` costume, elevation and talk colour before the game's `putActorInRoom` and the stand frame after it (`LoomActorPlacer.Dress`). The Advanced interaction menu and the picker both use it. Also fixed: the planner passed the actor's position in the wrong step fields (placements fell back to (240, 120)); the scanner now walks the game's code once per room for all actors (it was once per actor, 80 s on a first start). Tests: `AnObjectThatIsAnActorBringsHimIntoTheRoomWithAnyInteraction`.
+
 ## 4 October (night, 2): glossary and story flags checked on English
 
 New tool `.verification/GlossaryCheck` compares every glossary entry across the editions ([ENGLISH_COMPAT_2026-10-04.md](ENGLISH_COMPAT_2026-10-04.md), report in `.verification/glossary-english-20261004/`). Bits, variables, scripts, rooms and sounds hold; the actor names did not: the Room 43 cage scene's speakers are Mandible and Cob (not Elders), script 098's actor 3 is Rusty, script 086's actor 5 Mr. Stoke, Room 09's actor 4 the Dead One. Scoped glossary entries and scene-aware speaker names in the Game Texts browser; presenter goldens are now one set per edition.

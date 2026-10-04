@@ -10,7 +10,7 @@ public sealed record LoomStateTouch(string Variable, bool Write, string Where, s
 /// <summary>What a scene's code reads and writes, statically (every decoded instruction, no execution).</summary>
 public sealed record LoomSceneScan(IReadOnlyList<string> Scripts, IReadOnlyList<LoomStateTouch> Touches,
     IReadOnlyList<string> CostumeChanges, IReadOnlyList<string> Unreadable,
-    IReadOnlyList<int> PrintedActors, IReadOnlyList<int> PlacedActors)
+    IReadOnlyList<int> UsedActors, IReadOnlyList<int> PlacedActors)
 {
     public IEnumerable<string> Reads => Touches.Where(t => !t.Write).Select(t => t.Variable).Distinct();
     public IEnumerable<string> Writes => Touches.Where(t => t.Write).Select(t => t.Variable).Distinct();
@@ -20,7 +20,14 @@ public sealed record LoomSceneScan(IReadOnlyList<string> Scripts, IReadOnlyList<
 }
 
 /// <summary>A place whose code puts an actor into a room and then at a point (an object for putActorAtObject, else X/Y).</summary>
-public sealed record LoomActorPlacer(int Actor, int Room, string Where, int? X, int? Y, int? AtObject);
+public sealed record LoomActorPlacer(int Actor, int Room, string Where, int? X, int? Y, int? AtObject)
+{
+    /// <summary>The game's own dressing of the actor next to the placement (its <c>actorOps</c> just before, its stand animation just after).</summary>
+    public LoomActorDress? Dress { get; init; }
+}
+
+/// <summary>Literal <c>actorOps</c> values the game's code gives an actor right before it puts him into a room, and his animation right after.</summary>
+public sealed record LoomActorDress(int? Costume, int? Elevation, int? TalkColor, int? Animation);
 
 /// <summary>A place whose own code assigns a constant to a variable (see <see cref="LoomSceneStateScanner.FindConstantWriters"/>).</summary>
 public sealed record LoomStateSource(int Room, int? ObjectId, int? VerbId, string Where, string Instruction);
@@ -39,6 +46,11 @@ public sealed partial class LoomSceneStateScanner
     private readonly Dictionary<int, LoomScriptDisassembly?> _globals = [];
     private readonly Dictionary<(int Room, int Script), LoomScriptDisassembly?> _locals = [];
     private readonly Dictionary<int, LoomScriptDisassembly?> _entries = [];
+
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<GameLibrary, LoomSceneStateScanner> Shared = new();
+
+    /// <summary>The scanner of this game, shared so that its decoded code and placement caches are built once (the planner and the session both ask).</summary>
+    public static LoomSceneStateScanner For(GameLibrary game) => Shared.GetValue(game, g => new LoomSceneStateScanner(g));
 
     public LoomSceneStateScanner(GameLibrary game)
     {
@@ -173,8 +185,15 @@ public sealed partial class LoomSceneStateScanner
     /// The places in the game's code that put <paramref name="actor"/> into <paramref name="room"/> and then at a point
     /// (<c>putActor</c> with literals, or <c>putActorAtObject</c>) within the next three instructions, in code order.
     /// </summary>
-    public IReadOnlyList<LoomActorPlacer> FindActorPlacers(int actor, int room)
+    public IReadOnlyList<LoomActorPlacer> FindActorPlacers(int actor, int room) =>
+        PlacersInRoom(room).Where(p => p.Actor == actor).ToArray();
+
+    private readonly Dictionary<int, IReadOnlyList<LoomActorPlacer>> _placersByRoom = [];
+
+    /// <summary>One walk over the game's code finds every actor's placements into <paramref name="room"/> (cached: the walk decodes every unit).</summary>
+    private IReadOnlyList<LoomActorPlacer> PlacersInRoom(int room)
     {
+        if (_placersByRoom.TryGetValue(room, out var cached)) return cached;
         var found = new List<LoomActorPlacer>();
         ForEachCodeUnit((script, _, _, _, label) =>
         {
@@ -182,18 +201,43 @@ public sealed partial class LoomSceneStateScanner
             var list = script.Instructions;
             for (var i = 0; i < list.Count; i++)
             {
-                if (list[i].Operation != "putActorInRoom" || ActorRoomOf(list[i]) is not (int a, int r) || a != actor || r != room) continue;
+                if (list[i].Operation != "putActorInRoom" || ActorRoomOf(list[i]) is not (int actor, int r) || r != room) continue;
                 foreach (var next in list.Skip(i + 1).Take(3))
                 {
                     var parts = next.Operands.Split(", ");
                     if (next.Operation == "putActor" && parts.Length == 3 && Literal(parts[0]) == actor && Literal(parts[1]) is int x && Literal(parts[2]) is int y)
-                    { found.Add(new(actor, room, $"{label} +0x{list[i].Offset:X4}", (short)x, (short)y, null)); break; }
+                    { found.Add(new(actor, room, $"{label} +0x{list[i].Offset:X4}", (short)x, (short)y, null) { Dress = DressingAround(list, i, actor) }); break; }
                     if (next.Operation == "putActorAtObject" && parts.Length == 2 && Literal(parts[0]) == actor && Literal(parts[1]) is int obj)
-                    { found.Add(new(actor, room, $"{label} +0x{list[i].Offset:X4}", null, null, obj)); break; }
+                    { found.Add(new(actor, room, $"{label} +0x{list[i].Offset:X4}", null, null, obj) { Dress = DressingAround(list, i, actor) }); break; }
                 }
             }
         });
-        return found;
+        return _placersByRoom[room] = found;
+    }
+
+    /// <summary>
+    /// The literal costume, elevation and talk colour of the last <c>actorOps</c> for <paramref name="actor"/> within twelve instructions
+    /// before the <c>putActorInRoom</c> at <paramref name="index"/>, and the literal <c>animateActor</c> within five after it (his stand frame).
+    /// </summary>
+    private static LoomActorDress? DressingAround(IReadOnlyList<LoomScriptInstruction> list, int index, int actor)
+    {
+        int? costume = null, elevation = null, talk = null, animation = null;
+        for (var i = Math.Max(0, index - 12); i < index; i++)
+        {
+            if (list[i].Operation != "actorOps" || Literal(list[i].Operands.Split(", ")[0]) != actor) continue;
+            foreach (var part in list[i].Operands[(list[i].Operands.IndexOf('[') + 1)..].TrimEnd(']').Split("; "))
+            {
+                var field = part.Split(", ");
+                if (field.Length < 2 || Literal(field[1]) is not int value) continue;
+                if (field[0] == "costume") costume = value;
+                else if (field[0] == "elevation") elevation = value;
+                else if (field[0] == "talkColor") talk = value;
+            }
+        }
+        foreach (var next in list.Skip(index + 1).Take(5))
+            if (next.Operation == "animateActor" && next.Operands.Split(", ") is [var who, var value] && Literal(who) == actor && Literal(value) is int frame && frame < 0xF0)
+            { animation = frame; break; }
+        return costume is null && elevation is null && talk is null && animation is null ? null : new LoomActorDress(costume, elevation, talk, animation);
     }
 
     /// <summary>
@@ -218,8 +262,12 @@ public sealed partial class LoomSceneStateScanner
             {
                 var where = $"{label} +0x{ins.Offset:X4}";
                 Classify(ins, where, touches, costume);
+                // Every actor the scene speaks for, walks, turns or animates by a constant number must be in the room to show.
                 if (ins.Operation == "print" && ins.Operands.Contains("text,", StringComparison.Ordinal) && FirstConstant(ins.Operands) is int speaker and > 1 and < 13)
                     printed.Add(speaker);
+                else if (ins.Operation is "walkActorTo" or "walkActorToActor" or "walkActorToObject" or "faceActor" or "animateActor" &&
+                         FirstConstant(ins.Operands) is int moved and > 1 and < 13 && !(ins.Operation == "animateActor" && ins.Operands.EndsWith("0xFF", StringComparison.Ordinal)))
+                    printed.Add(moved);
                 if (ins.Operation == "putActorInRoom" && ActorRoomOf(ins) is (int actor, int toRoom) && toRoom != 0) placed.Add(actor);
                 if (ins.Operation is "startScript" or "chainScript" && FirstConstant(ins.Operands) is int callee) pending.Enqueue((room, callee, false));
                 else if (ins.Operation is "loadRoom" or "loadRoomWithEgo" && RoomArgument(ins) is int target && target != room) pending.Enqueue((target, 0, true));

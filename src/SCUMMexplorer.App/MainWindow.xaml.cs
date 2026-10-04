@@ -1285,7 +1285,7 @@ public partial class MainWindow : Window
             try { _session.PlaceActorInRoom(step.ObjectId, step.X, step.Y, step.Verb, step.EndBoundary ?? "the game's code"); }
             catch (InvalidOperationException) { continue; }
         }
-        notes.AddRange(setup.Notes.Where(note => note.StartsWith("The scene prints lines for actor", StringComparison.Ordinal)));
+        notes.AddRange(setup.Notes.Where(note => note.Contains("an actor outside the room is not shown", StringComparison.Ordinal)));
         return notes;
     }
 

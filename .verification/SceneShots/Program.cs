@@ -57,7 +57,7 @@ internal static class Program
                 for (var s = 0; s < ids.Length; s++)
                 {
                     var wanted = ids[s];
-                    var scene = all.FirstOrDefault(o => Prop(o, "SequenceId") == wanted || Prop(o, "Title") == wanted);
+                    var scene = all.FirstOrDefault(o => Prop(o, "SequenceId") == wanted || Prop(o, "Id") == wanted || Prop(o, "Title") == wanted);
                     if (scene is null) { report.Add($"NOT FOUND: {wanted}"); continue; }
                     var tag = $"s{s}";
                     report.Add($"== {wanted} ({Prop(scene, "Title")})");
