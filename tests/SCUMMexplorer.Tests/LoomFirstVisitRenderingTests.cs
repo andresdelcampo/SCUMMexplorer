@@ -209,6 +209,19 @@ public sealed class LoomFirstVisitRenderingTests
         Assert.Equal([2, 4, 5, 10], targets);
     }
 
+    [Theory]
+    [InlineData(19)]
+    [InlineData(86)]
+    public void SphereVisionRoomsStartAsAPlainSphere(int roomId)
+    {
+        if (Data.Value is not { } data) return;
+        var (selection, _, _) = data.FirstVisit(roomId);
+        // The entry script sets every vision image to state 0, and the background already holds the empty sphere:
+        // a later script's draw of the chicken (Room 19) or the red vision (Room 86) is not the first-visit state.
+        Assert.Empty(data.Images(roomId).Where(selection.IsActive));
+        Assert.Empty(selection.VisibleGaps());
+    }
+
     [Fact]
     public void Room86CyclingToTheOpenHoodFillsItsFaceCutout()
     {
@@ -217,8 +230,10 @@ public sealed class LoomFirstVisitRenderingTests
         var images = data.Images(86);
         var hood = images.Single(obj => obj.Id == 925);
 
-        var current = images.First(obj => obj.X == hood.X && obj.Y == hood.Y && obj.Width == hood.Width &&
-                                          obj.Height == hood.Height && selection.IsActive(obj));
+        // The sphere starts as a plain sphere (the entry resets every vision image to state 0), so cycling begins from the empty position.
+        var current = images.FirstOrDefault(obj => obj.X == hood.X && obj.Y == hood.Y && obj.Width == hood.Width &&
+                                                   obj.Height == hood.Height && selection.IsActive(obj))
+                      ?? selection.Next(hood) ?? throw new InvalidOperationException("The empty sphere position cannot be cycled.");
         for (var step = 0; step < 4 && current.Id != hood.Id; step++)
             current = selection.Next(current) ?? throw new InvalidOperationException("Cycling reached the background.");
 

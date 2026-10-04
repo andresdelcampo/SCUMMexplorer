@@ -271,7 +271,13 @@ public sealed class RoomObjectSelection
             _objects.Any(other => statesSetByCode?.Contains(other.Id) == true &&
                 entryStates?.ContainsKey(other.Id) != true && Intersects(obj, other) && !IsBackgroundGap(other));
 
-        bool Open(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) && !KeepIndexedBackground(obj) &&
+        // The room's entry script sets every image at this position to state 0 on every path, and the background already
+        // fills the position (no gap): the entry reset wins over a later script's draw (Room 19's sphere stays a plain sphere
+        // instead of showing the chicken that script 094 draws during the vision).
+        bool EntryKeepsBackground(RoomObjectImage obj) => _background is not null && entryStates is not null && !IsBackgroundGap(obj) &&
+            Peers(obj).All(peer => entryStates.TryGetValue(peer.Id, out var evidence) && (evidence.State & 0x0F) == 0);
+
+        bool Open(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) && !KeepIndexedBackground(obj) && !EntryKeepsBackground(obj) &&
                                           !Peers(obj).Any(IsActive) &&
                                           !_objects.Any(other => IsActive(other) && Intersects(obj, other));
 
