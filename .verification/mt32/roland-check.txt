@@ -1,0 +1,14 @@
+combo items: No Sound, PC Speaker, AdLib, Roland MT-32; selected AdLib
+game has Roland sounds: True
+AdLib: session sound card 0
+AdLib, Roland-only sound 53: time "No playable audio", Play enabled False; "This sound exists only for the Roland MT-32. Choose that device to hear it."
+after choosing Roland: mode Roland, ROMs MT-32, session sound card 4, combo "Roland MT-32"
+Roland, Roland sound sound 53: time "0:00 / 0:11", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
+Roland, its AdLib twin sound 21: time "0:00 / 0:11", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
+Roland, slot 24 (its twin 56 is the overture, which no other edition has) sound 24: time "0:00 / 2:36", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
+opening: session sound card 4; sound log: frame 3 start sound 56 music (Roland MT-32) | frame 3 opened sound 56 music (Roland MT-32)
+sound ids the scripts started: 56
+device change while the opening plays: mode Roland (refused until the scene is over)
+after Restart: session sound card 4
+back on AdLib: mode Adlib, session sound card 0
+AdLib, Roland-only sound 53: time "No playable audio", Play enabled False; "This sound exists only for the Roland MT-32. Choose that device to hear it."

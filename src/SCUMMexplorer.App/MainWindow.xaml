@@ -101,6 +101,12 @@
                             </CombinedGeometry>
                         </Path.Data>
                     </Path>
+                    <Canvas Width="22" Height="20">
+                        <Canvas.Style><Style TargetType="{x:Type Canvas}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding}" Value="Roland MT-32"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Canvas.Style>
+                        <Rectangle Canvas.Left="1" Canvas.Top="5" Width="20" Height="10" RadiusX="1.5" RadiusY="1.5" StrokeThickness="1.6" Stroke="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"/>
+                        <Rectangle Canvas.Left="4" Canvas.Top="8" Width="8" Height="2.4" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"/>
+                        <Ellipse Canvas.Left="14.5" Canvas.Top="8" Width="2.6" Height="2.6" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"/>
+                    </Canvas>
                 </Grid>
                 <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
             </StackPanel>
@@ -189,13 +195,14 @@
                             Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
                     <!-- Fixed group at the right edge (sound, Advanced, Open): the buttons that come and go sit to its left,
                          so these never move when a game opens or Advanced changes. -->
-                    <ComboBox x:Name="SoundModeCombo" Width="142" MinHeight="32" VerticalAlignment="Center" Margin="0,0,14,0"
+                    <ComboBox x:Name="SoundModeCombo" Width="166" MinHeight="32" VerticalAlignment="Center" Margin="0,0,14,0"
                               ItemTemplate="{StaticResource SoundDeviceItem}" SelectedIndex="2" ToolTipService.ShowOnDisabled="True"
                               SelectionChanged="SoundModeCombo_SelectionChanged"
                               ToolTip="Music and effects. Changing device stops current audio; the next sound command uses the selected device.">
                         <sys:String>No Sound</sys:String>
                         <sys:String>PC Speaker</sys:String>
                         <sys:String>AdLib</sys:String>
+                        <sys:String>Roland MT-32</sys:String>
                     </ComboBox>
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click" Style="{StaticResource SwitchCheck}"
                               VerticalAlignment="Center" Margin="0,0,14,0"

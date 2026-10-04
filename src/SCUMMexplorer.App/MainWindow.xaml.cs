@@ -226,7 +226,13 @@ public partial class MainWindow : Window
         _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
         StopScenePlayback();
         _sceneSound.StopAll("another game was opened");
-        _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot);
+        // The Roland device needs the upgrade's sounds in this folder; another folder falls back to AdLib.
+        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && !SceneSoundPlayer.HasRolandSounds(game))
+        {
+            _sceneSound.SetMode(SceneSoundPlayer.SoundMode.Adlib);
+            SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.Adlib;
+        }
+        _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
         if (_session is not null) _sceneSound.Attach(game, _session);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
@@ -649,7 +655,7 @@ public partial class MainWindow : Window
             if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } &&
                 (_session?.BootRunning == true || leavingPreview) && _game is not null && _indexedObjectSnapshot is not null)
             {
-                _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+                _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, soundCard: SoundCard);
                 _sceneSound.Attach(_game, _session);
                 UpdatePlaybackControls();
             }
@@ -1112,7 +1118,7 @@ public partial class MainWindow : Window
         if (_game is null || _indexedObjectSnapshot is null) return;
         StopScenePlayback();
         _sceneSound.StopAll("the session was reset");
-        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, soundCard: SoundCard);
         _sceneSound.Attach(_game, _session);
         if (_currentRoomResource is { } room && _currentRoom is not null)
         {
@@ -2312,7 +2318,8 @@ public partial class MainWindow : Window
         Grid.SetColumnSpan(ContentPanel, 2);
         _selectedSound = resource;
         var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
-        var format = adlib ? "AdLib FM" : "PC speaker";
+        var roland = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
+        var format = adlib ? "AdLib FM" : roland ? "Roland MT-32" : "PC speaker";
         AdlibGainPanel.Visibility = adlib ? Visibility.Visible : Visibility.Collapsed;
         _previewCancellation?.Cancel();
         RoomPreview.Visibility = Visibility.Collapsed;
@@ -2371,7 +2378,7 @@ public partial class MainWindow : Window
             PauseButton.IsEnabled = true;
             StopButton.IsEnabled = true;
             AdlibGainSlider.IsEnabled = adlib;
-            AudioDescription.Text = wave.Length >= 44 + (adlib ? 49716 * 4 : 22050 * 2) * 179
+            AudioDescription.Text = !roland && wave.Length >= 44 + (adlib ? 49716 * 4 : 22050 * 2) * 179
                 ? $"DOS {format} rendition · preview limited to three minutes"
                 : $"DOS {format} rendition · select Play to listen";
             StatusText.Text = $"{resource.Name} · {format} track ready";
@@ -2388,9 +2395,23 @@ public partial class MainWindow : Window
     }
 
     private Task<byte[]> RenderAudioWaveAsync(GameResource resource, bool adlib,
-        CancellationToken token) => Task.Run(() => adlib
-            ? _adlibDecoder.RenderWave(resource, token)
-            : _audioDecoder.RenderWave(resource, token), token);
+        CancellationToken token) => Task.Run(() =>
+        {
+            if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland)
+            {
+                if (_sceneSound.Roms is not { } roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
+                if (!LoomRolandSong.IsRoland(resource))
+                {
+                    // The scripts of a Roland card choose the sound 32 higher for the same piece (scripts 001, 039, 040, 046, 095, 104).
+                    var twin = _game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == resource.ResourceId + 32);
+                    if (twin is null || !LoomRolandSong.IsRoland(twin)) throw new NotSupportedException("This sound has no Roland version.");
+                    resource = twin;
+                }
+                return new LoomMt32Audio(roms).RenderWave(resource, token);
+            }
+            if (LoomRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
+            return adlib ? _adlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
+        }, token);
 
     private async void RoomCuePlay_Click(object sender, RoutedEventArgs e) => await PlayRoomCueAsync();
 
@@ -2473,6 +2494,56 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>The sound card number the scripts see for the selected device (see <see cref="SceneSoundPlayer.SoundCardFor"/>).</summary>
+    private int SoundCard => SceneSoundPlayer.SoundCardFor(_sceneSound.Mode);
+
+    private static readonly string Mt32FolderFile = Path.Combine(Path.GetDirectoryName(LastFolderFile)!, "mt32-rom-folder.txt");
+
+    /// <summary>
+    /// Makes the Roland device usable: this game folder must have the upgrade's sounds, and the MT-32 ROM images must be found
+    /// (an environment override, the saved folder, an <c>mt32</c> folder beside the game folder, else the user is asked). Says why when not.
+    /// </summary>
+    private bool PrepareRoland()
+    {
+        if (_game is null || !SceneSoundPlayer.HasRolandSounds(_game))
+        {
+            MessageBox.Show(this, "This game folder does not have the LOOM Roland upgrade installed (its sounds 33 to 64 are missing), so there is no Roland music to play.",
+                "Roland MT-32", MessageBoxButton.OK, MessageBoxImage.Information);
+            return false;
+        }
+        if (_sceneSound.Roms is not null) return true;
+        string? saved = null;
+        try { if (File.Exists(Mt32FolderFile)) saved = File.ReadAllText(Mt32FolderFile).Trim(); }
+        catch (IOException) { }
+        var beside = Path.GetDirectoryName(_game.FolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        var roms = Mt32RomSet.Find(Environment.GetEnvironmentVariable("SCUMM_MT32_ROM_ROOT")) ?? Mt32RomSet.Find(saved) ??
+            (beside is null ? null : Mt32RomSet.Find(Path.Combine(beside, "mt32")));
+        if (roms is null)
+        {
+            var picker = new OpenFolderDialog
+            {
+                Title = "Choose the folder with your MT-32 ROM images (MT32_CONTROL.ROM and MT32_PCM.ROM, or the CM32L pair)",
+                Multiselect = false
+            };
+            if (picker.ShowDialog(this) != true) return false;
+            roms = Mt32RomSet.Find(picker.FolderName);
+            if (roms is null)
+            {
+                MessageBox.Show(this, "That folder has no MT32_CONTROL.ROM and MT32_PCM.ROM (or CM32L_CONTROL.ROM and CM32L_PCM.ROM). The ROM images are not part of this program; use your own copies.",
+                    "Roland MT-32", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(Mt32FolderFile)!);
+                File.WriteAllText(Mt32FolderFile, picker.FolderName);
+            }
+            catch (IOException) { }
+        }
+        _sceneSound.Roms = roms;
+        return true;
+    }
+
     private const string SoundModeToolTip = "Music and effects. Changing device stops current audio; the next sound command uses the selected device.";
 
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -2483,10 +2554,18 @@ public partial class MainWindow : Window
             SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
             return;
         }
+        var requested = (SceneSoundPlayer.SoundMode)SoundModeCombo.SelectedIndex;
+        if (requested == SceneSoundPlayer.SoundMode.Roland && !PrepareRoland())
+        {
+            SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
+            return;
+        }
         var surface = _audioSurface;
         var selected = _selectedSound;
         StopAudio();
-        _sceneSound.SetMode((SceneSoundPlayer.SoundMode)SoundModeCombo.SelectedIndex);
+        _sceneSound.SetMode(requested);
+        // The game's scripts read the sound card when they choose a sound, so the new device applies from the next one on.
+        if (_session is not null) _session.SoundCard = SoundCard;
         if (surface == AudioSurface.Resource && selected is not null)
             await ShowAudio(selected, preserveFormat: true);
         else if (surface == AudioSurface.Room)
@@ -2630,8 +2709,9 @@ public partial class MainWindow : Window
     private TimeSpan? _audioKnownDuration;
     private string? _audioTimeNote;
 
-    private static TimeSpan WaveDuration(byte[] wave, bool adlib) =>
-        TimeSpan.FromSeconds(Math.Max(0, wave.Length - 44) / (double)(adlib ? 49716 * 4 : 22050 * 2));
+    private TimeSpan WaveDuration(byte[] wave, bool adlib) => _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && wave.Length >= 44
+        ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4))
+        : TimeSpan.FromSeconds(Math.Max(0, wave.Length - 44) / (double)(adlib ? 49716 * 4 : 22050 * 2));
 
     private void StopAudio()
     {
@@ -3705,7 +3785,7 @@ public partial class MainWindow : Window
     {
         if (_game is null || _indexedObjectSnapshot is null || !CanStartCutscene) return;
         StopScenePlayback();
-        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, stopAtOpening: true);
+        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, stopAtOpening: true, soundCard: SoundCard);
         _sceneSound.Attach(_game, _session);
         if (_session.Snapshot.RoomId is not int roomId || _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } room)
             return;
@@ -3755,7 +3835,7 @@ public partial class MainWindow : Window
         // A single scene keeps the running session (the user's state stays, a later one too; "Restart" goes back to the boot) and gets only
         // the minimum it needs. A stated sequence carries its own steps from the post-boot state, so it starts a fresh session.
         var keepSession = cutscene.Steps is null && _session is { BootRunning: false };
-        var session = keepSession ? _session! : _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
+        var session = keepSession ? _session! : _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, soundCard: SoundCard);
         // Sounds from here on: the boot's are over; the visit's, the verb's and the click's play with the first frame.
         // A sequence with unseen leading steps runs them first (the story state they reach is the scene's start), then attaches.
         var setup = StartSetup(cutscene);

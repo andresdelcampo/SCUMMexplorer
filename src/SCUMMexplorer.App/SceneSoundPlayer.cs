@@ -19,8 +19,20 @@ namespace SCUMMexplorer.App;
 /// </summary>
 public sealed class SceneSoundPlayer
 {
-    public enum SoundMode { None, PcSpeaker, Adlib }
+    public enum SoundMode { None, PcSpeaker, Adlib, Roland }
     public SoundMode Mode { get; private set; } = SoundMode.Adlib;
+
+    /// <summary>The MT-32 ROM images the Roland device needs (the user's own files); null until a folder with them is known.</summary>
+    public Mt32RomSet? Roms { get; set; }
+
+    /// <summary>True for a game folder with the Roland upgrade installed (its sounds 33 to 64 are Roland streams).</summary>
+    public static bool HasRolandSounds(GameLibrary game) =>
+        game.Id == GameId.Loom && game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == 33) is { } sound && LoomRolandSong.IsRoland(sound);
+
+    /// <summary>The sound card number the scripts see for a device: 4 for the Roland upgrade, which makes them choose its sounds; the other devices keep 0.</summary>
+    public static int SoundCardFor(SoundMode mode) => mode == SoundMode.Roland ? LoomExplorationSession.RolandSoundCard : 0;
+
+    public static string DeviceName(SoundMode mode) => mode switch { SoundMode.Adlib => "AdLib", SoundMode.Roland => "Roland MT-32", _ => "PC speaker" };
 
     /// <summary>Changing device stops current voices; subsequent script commands use the new device.</summary>
     public void SetMode(SoundMode mode)
@@ -156,7 +168,7 @@ public sealed class SceneSoundPlayer
         var frame = _frames;
         var render = Render(id, mode);
         var (path, music) = render.IsCompleted ? render.Result : await render;
-        var device = mode == SoundMode.Adlib ? "AdLib" : "PC speaker";
+        var device = DeviceName(mode);
         var kind = path is null ? $"unavailable ({device})" : $"{(music ? "music" : "effect")} ({device})";
         Log.Add(new(frame, voice.StartedAt, estimated ? "preview start" : "start", id, kind, source));
         if (voice.Stopped || path is null)
@@ -197,15 +209,29 @@ public sealed class SceneSoundPlayer
             {
                 try
                 {
-                    var music = _adlib.HasMusic(resource);
-                    var wave = mode == SoundMode.Adlib
-                        ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), 6)
-                        : _speaker.RenderWave(resource);
+                    bool music;
+                    byte[] wave;
+                    if (mode == SoundMode.Roland)
+                    {
+                        // Only the upgrade's own sounds have a Roland rendition; the scripts choose them when the sound card is 4.
+                        if (Roms is not { } roms || !LoomRolandSong.IsRoland(resource)) return (null, false);
+                        var song = LoomRolandSong.Read(resource);
+                        music = song.Duration.TotalSeconds > 3;
+                        wave = new LoomMt32Audio(roms).RenderWave(song);
+                    }
+                    else
+                    {
+                        music = _adlib.HasMusic(resource);
+                        wave = mode == SoundMode.Adlib
+                            ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), 6)
+                            : _speaker.RenderWave(resource);
+                    }
                     var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");
                     File.WriteAllBytes(path, wave);
                     return (path, music);
                 }
-                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException
+                    or Mt32emu.Mt32EmuException or InvalidOperationException or DllNotFoundException)
                 {
                     return (null, false);
                 }

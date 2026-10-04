@@ -2,6 +2,10 @@
 
 Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT_WORK.md](CURRENT_WORK.md) (rules), [LOOM_EGA_PLAN.md](LOOM_EGA_PLAN.md) (state, open items, next phase) and [HARNESS_REVIEW_2026-10-04.md](archive/HARNESS_REVIEW_2026-10-04.md) (what was kept, removed and why). Finished work is in [CHANGELOG.md](CHANGELOG.md); older hand-offs are in [HANDOFF_HISTORY_2026-10.md](archive/HANDOFF_HISTORY_2026-10.md) and [PLAN_HISTORY_2026-10.md](archive/PLAN_HISTORY_2026-10.md).
 
+## State (5 October): MT-32 built, M5 on hold
+
+The user put M5 on hold and asked for MT-32 support. Done and committed (not pushed): the Roland sounds are decoded and rendered through Munt, the app has a "Roland MT-32" device that sets the session's sound card to 4 ([.verification/mt32/README.md](../.verification/mt32/README.md), changelog row 5 October). **Next:** the user listens (samples in `Exe/mt32-samples/`, or pick the device); then answer the M5 proposal (kinds: hidden cutscene, draft response, optional reaction, learnable draft, story milestone, alternate outcome, unresolved code; plain exits out; reactions collapsed; a played-set added to the session) and continue M5. `Games/loom vga en` has appeared in `Games/`.
+
 ## State (end of the 4 October late session)
 
 LOOM EGA English (`Games/loom ega en`) is the reference edition. Build clean (0 warnings); the filtered tests of each change pass. Not pushed.

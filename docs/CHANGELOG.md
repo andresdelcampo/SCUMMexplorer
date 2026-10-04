@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October: Roland MT-32 device (the LOOM Roland upgrade's music)
+
+Sounds 33–64 of the EGA folders with the Roland upgrade are tagless MIDI-like streams (`F0/F1` waits, 120 ticks per quarter at 500000 us, program numbers only, MIDI channels 1–9), and the game's scripts choose them when the sound card `var[0x030]` is 4 (script 001, 039, 040, 044, 046, 095, 104; Roland id = other id + 32). New: `LoomRolandSong`, `LoomMt32Audio` + `Mt32RomSet` (Munt through Mt32emu.net 1.0.0, LGPL-2.1+; the user's own ROMs), `LoomExplorationSession.SoundCard`, and a fourth sound device "Roland MT-32" that sets the card to 4 so the scripts pick the Roland sounds (the opening then starts the overture, sound 56). Tests `LoomRolandAudioTests` (10); tools `Mt32Probe`, `RolandCheck`; record [.verification/mt32/README.md](../.verification/mt32/README.md). Not yet listened to by the user.
+
 ## 4 October (late): the two LOOM demos open
 
 `Games/loom ega short demo en` and `long demo en` (`LOOMDEMO.EXE`) are another build of the game, not a subset: their `00.LFL` lists resources the folders lack, and rooms 72, 80 (long: also 73, 74, 76, 77, 81) exist only in them. The scanner keeps only index entries that start a resource and read as their kind (short: 19 scripts, 36 costumes, 20 sounds; long: 20, 52, 27) and sets `GameLibrary.IsDemo`; a demo's glossary leaves out script, bit, actor and sound names (script 045 there is the preview's director); the Game Status schema failure no longer stops the window from opening. A demo session keeps the director stopped so the rooms can be explored; "The preview" plays it on the playback clock from Room 01 through the existing Play Cutscene launchers (Room 01, Advanced picker) until another room is opened. Tools: `DemoProbe` (`index`, `texts`, `play`, `idle`), `DemoPreviewCheck`; tests `LoomDemoTests`. Record: [.verification/demos-20261004/](../.verification/demos-20261004/README.md).

@@ -1,0 +1,32 @@
+roland 33: 1,2s loops=False end=False | adlib 1: effect/other
+roland 34: 1,2s loops=False end=False | adlib 2: effect/other
+roland 35: 1,2s loops=False end=False | adlib 3: effect/other
+roland 36: 1,2s loops=False end=False | adlib 4: effect/other
+roland 37: 1,2s loops=False end=False | adlib 5: effect/other
+roland 38: 1,2s loops=False end=False | adlib 6: effect/other
+roland 39: 1,2s loops=False end=False | adlib 7: effect/other
+roland 40: 1,2s loops=False end=False | adlib 8: effect/other
+roland 41: 0,1s loops=False end=False | adlib 9: effect/other
+roland 42: 0,3s loops=False end=False | adlib 10: effect/other
+roland 43: 78,5s loops=False end=False | adlib 11: effect/other
+roland 44: 0,3s loops=False end=False | adlib 12: effect/other
+roland 45: 2,5s loops=False end=False | adlib 13: 2,6s music
+roland 46: 4,8s loops=False end=False | adlib 14: 5,0s music
+roland 47: 7,2s loops=False end=False | adlib 15: 7,4s music
+roland 48: 1,8s loops=False end=False | adlib 16: 2,6s music
+roland 49: 2,4s loops=False end=False | adlib 17: 2,9s music
+roland 50: 4,3s loops=False end=False | adlib 18: 2,8s music
+roland 51: 8,4s loops=False end=False | adlib 19: 9,5s music
+roland 52: 11,7s loops=False end=False | adlib 20: 12,3s music
+roland 53: 8,5s loops=False end=False | adlib 21: 8,2s music
+roland 54: 2,1s loops=False end=False | adlib 22: 2,2s music
+roland 55: 4,1s loops=False end=False | adlib 23: 4,3s music
+roland 56: 153,2s loops=False end=False | adlib 24: effect/other
+roland 57: 140,5s loops=False end=False | adlib 25: 143,5s music
+roland 58: 189,0s loops=False end=False | adlib 26: 192,9s music
+roland 59: 72,3s loops=False end=False | adlib 27: 73,5s music
+roland 60: 165,0s loops=False end=False | adlib 28: 143,0s music
+roland 61: 23,4s loops=False end=False | adlib 29: 24,7s music
+roland 62: 88,9s loops=False end=False | adlib 30: 91,7s music
+roland 63: 302,1s loops=False end=False | adlib 31: 226,5s music
+roland 64: 109,7s loops=False end=False | adlib 32: 107,7s music

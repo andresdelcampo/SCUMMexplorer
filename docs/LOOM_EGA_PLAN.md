@@ -10,7 +10,7 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 
 ## What is really left for LOOM EGA
 
-**1. M5, the secrets guide** (back in scope, 4 October; decisions made) The only unbuilt feature. See below.
+**1. M5, the secrets guide** (back in scope, 4 October; decisions made; **on hold since 5 October** while MT-32 was built). The only unbuilt LOOM EGA feature. See below; the proposal of kinds and entry schema from 5 October awaits the user's answers (plain exits out? reactions in? a played-set in the session?).
 
 **2. Needs the user (on-screen or ScummVM checks)**
 - Staff scenes in Room 43, El Muerto and Room 17 sizes, actor 4 placement.
@@ -42,23 +42,18 @@ Decisions (user, 4 October):
 - **Spoilers:** ignored. The whole app is a spoiler, so there are no spoiler levels and no reveal gating.
 - **Scope:** both seen and unseen content, with a filter (all / triggered this session / not yet triggered), using Game Status bits and session history where a trigger is known.
 
-## After M5: LOOM EGA with MT-32 music (user, 4 October)
+## LOOM EGA with MT-32 music (user, 4 October; built 5 October, M5 on hold)
 
-The app plays PC speaker and AdLib (`SceneSoundPlayer.SoundMode`). Add Roland MT-32 as a third sound mode for the same DOS LOOM EGA data. Local material: the MT-32 and CM-32L ROM images in `Games/mt32/` (copyrighted, never committed or shipped; the app asks for their folder; the user placed them there on 4 October). Known so far: the game's scripts branch on `var[0x030]` (sound card) values 3 and 4 (AdLib, Roland) when choosing sounds (script map).
+The user put M5 on hold on 5 October and asked for MT-32 first. Built and checked (record: [.verification/mt32/README.md](../.verification/mt32/README.md)): the Roland upgrade's sounds 33–64 are tagless MIDI-like streams (`LoomRolandSong`) that the game's scripts choose when `var[0x030]` is 4; `LoomMt32Audio` renders them through Munt (`mt32emu` via Mt32emu.net 1.0.0, LGPL-2.1+; the user's own ROMs from `Games/mt32`, `Mt32RomSet`); the app has a fourth device, "Roland MT-32", that sets the session's sound card to 4 (`LoomExplorationSession.SoundCard`, also a constructor argument) so the scripts pick the Roland sounds, as decided. Local material: the MT-32 and CM-32L ROM images in `Games/mt32/` (copyrighted, never committed or shipped; the app finds them via `SCUMM_MT32_ROM_ROOT`, the saved folder, a `mt32` folder beside the game folder, or asks).
 
-Found 4 October (checked on the files, not yet decoded): `Games/loom ega en` and `loom ega es` already have the **Roland upgrade installed**. They carry `READ.ME` ("THE LOOM ROLAND UPGRADE DISK", started with `loom r`), `Loomup.exe` (a self-extracting archive that holds `82.LFL`–`85.LFL`), `69.LF_` and `INSTALL.BAT`. `82.LFL`–`85.LFL` exist in those two folders (identical in en and es) and not in `loom ega ibm en` / `ibm es`, whose indexes still point sounds 33–64 at them; the same sounds are indexed in all four. So the Roland data is very likely sounds 33–64 in files 82–85 (the overture and the music), and the `ibm` folders are the game without the upgrade. Not yet known: whether the upgrade also patched other files (00.LFL, 69.LFL differ between the folders, but those folders are also different releases), what the Roland sound format is (no plain or XOR-0xFF `41 10 16 12` SysEx header was found in any LFL), and what the app's AdLib player currently does with sounds 33–64. The READ.ME says Roland save files are incompatible with non-Roland ones, which supports "mode change = new session".
-
-Steps:
-1. **Probe the data:** which sound resources in `Games/loom ega en` are Roland, how they differ from the AdLib ones (header, instruments, SysEx/patch data), and which sounds have no Roland version. Compare with ScummVM's MT-32 driver behaviour (`scummvm/` can play it with the ROMs for an A/B listen).
-2. **Choose the synth:** criteria set by the user: free, least restrictive licence, best sound; no preference of product. Candidate: Munt `mt32emu` (LGPL, the reference emulator, also what ScummVM uses; native library wrapped for .NET, dynamically linked). MT-32 emulation needs the ROM images, because the PCM ROM holds the instrument samples; an emulator that sounds the same without them does not exist (a General MIDI mapping or the SoundFont `scummvm/SoundCanvas.sf2` would play but sound different). Check the candidates' licences and ROM requirement, then record the choice here.
-3. **Player:** Roland sequence playback through the emulator into the existing audio output; mode selector entry beside PC Speaker, AdLib, No Sound; "no MT-32 ROMs found" state; the scripts' sound-card variable follows the mode, so the right sound ids are chosen.
-4. **Verification:** rendered-wave checks for a few sounds, an A/B against ScummVM, a record under `.verification/mt32/`, a changelog row.
-
-Decided (user, 4 October): the game is emulated as it was with Roland, not AdLib faked into Roland. The sound mode sets the game's own sound-card variable (`var[0x030]`: 3 AdLib, 4 Roland), so its scripts choose the Roland sounds, and the Roland resources play through the emulator. Changing the mode mid-session takes effect as the game would see it (to be checked in step 1: which scripts read the variable and when). Optional later: a General MIDI fallback for users without ROMs, labelled as a different sound.
+Left, in order of value:
+1. **The user listens**: A/B of the rendered samples (`Exe/mt32-samples/*.wav`, or the device in the app) against the bundled ScummVM with the same ROMs. Known possible differences: ScummVM's IMuse scales channel volume and may allocate parts; the app passes the stream through unchanged, as the original driver did.
+2. Decide on the Mt32emu.net dependency (single third-party author with a prebuilt DLL) or build `mt32emu` from the Munt sources.
+3. Optional: a General MIDI fallback for users without ROMs (labelled as a different sound); the room sounds menu's possible-sound list shown per card; 48–50, 60 and 63 are longer or shorter than their AdLib twins (not examined).
 
 ## Then: LOOM VGA and more languages (user, 4 October; Indy3 is deferred)
 
-Order: M5, MT-32, then these. Indy3 is on hold until the user moves its data from `Games/FUTURE/` back to `Games/`.
+Order: M5 (on hold), MT-32 (built, awaiting the listening check), then these. `Games/loom vga en` is now in `Games/` (5 October): the feasibility probe can start. Indy3 is on hold until the user moves its data from `Games/FUTURE/` back to `Games/`.
 
 1. **LOOM VGA (CD, SCUMM v4).** The data is not in `Games/` yet. Once there: a feasibility probe of the resource container and opcode set before any app work.
 2. **More languages of LOOM EGA** (later; Spanish and English work, others when the data arrives). Each language is checked the way English was: compare the glossary, bits, ids and offsets across editions with `GlossaryCheck` and `ScriptDump`, never key code on offsets (see CLAUDE.md, "Editions differ in data").
