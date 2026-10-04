@@ -26,6 +26,32 @@ if (args.Length > 3 && args[1] == "ego")
     }
     return;
 }
+if (args.Length > 4 && args[1] == "walk")
+{
+    // DemoProbe <folder> walk <room> <x> <y>: visit the room, click the point, and print the ego's place, box, costume and size every few frames.
+    var walkGame = new GameFolderScanner().Scan(args[0]);
+    var walkSession = new LoomExplorationSession(walkGame, new LflObjectStateReader().ReadSnapshot(Path.Combine(walkGame.FolderPath, "00.LFL")));
+    walkSession.VisitRoomById(int.Parse(args[2]));
+    var lastLine = "";
+    for (var click = 0; click < 3 && walkSession.Snapshot.RoomId == int.Parse(args[2]); click++)
+    {
+        walkSession.Click(int.Parse(args[3]), int.Parse(args[4]));
+        for (var frame = 0; frame < 400 && walkSession.Snapshot.RoomId == int.Parse(args[2]); frame++)
+        {
+            var ego = walkSession.Actors.First(a => a.Number == 1);
+            var line = $"({ego.X},{ego.Y}) box {ego.WalkBox} costume {ego.Look.Costume} size {walkSession.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x07C]")}";
+            // Print when box, costume or size change, and every 20th frame.
+            var key = line[(line.IndexOf(')') + 1)..];
+            if (key != lastLine[(lastLine.IndexOf(')') + 1 is var i and > 0 ? i : 0)..] || frame % 20 == 0) Console.WriteLine($"click {click} frame {frame}: {line}");
+            lastLine = line;
+            if (args.Length > 5 && args[5] == "mask") MaskSample.Print(walkGame, walkSession, int.Parse(args[2]), click, frame);
+            walkSession.AdvanceFrame();
+            if (!walkSession.EgoMoving && !walkSession.InCutscene && frame > 32) break;
+        }
+    }
+    Console.WriteLine($"final room {walkSession.Snapshot.RoomId}");
+    return;
+}
 if (args.Length > 1 && args[1] == "index") { IndexDump.Run(args[0]); return; }
 if (args.Length > 1 && args[1] is "play" or "idle") { PlayDump.Run(args[0], args.Length > 2 ? int.Parse(args[2]) : 3000, args[1] == "idle"); return; }
 // What the existing code makes of a LOOM folder: identity, resources, every script decoded, every room opened in a session, the boot.
