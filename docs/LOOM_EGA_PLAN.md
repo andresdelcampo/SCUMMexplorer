@@ -44,24 +44,24 @@ Decisions (user, 4 October):
 
 ## After M5: LOOM EGA with MT-32 music (user, 4 October)
 
-The app plays PC speaker and AdLib (`SceneSoundPlayer.SoundMode`). Add Roland MT-32 as a third sound mode for the same DOS LOOM EGA data. Local material: the MT-32 and CM-32L ROM images in `Games/mt32/` (copyrighted, never committed or shipped; the app must ask for their folder). Known so far: the game's scripts branch on `var[0x030]` (sound card) values 3 and 4 (AdLib, Roland) when choosing sounds (script map).
+The app plays PC speaker and AdLib (`SceneSoundPlayer.SoundMode`). Add Roland MT-32 as a third sound mode for the same DOS LOOM EGA data. Local material: the MT-32 and CM-32L ROM images in `Games/mt32/` (copyrighted, never committed or shipped; the app asks for their folder; the user placed them there on 4 October). Known so far: the game's scripts branch on `var[0x030]` (sound card) values 3 and 4 (AdLib, Roland) when choosing sounds (script map).
 
 Steps:
 1. **Probe the data:** which sound resources in `Games/loom ega en` are Roland, how they differ from the AdLib ones (header, instruments, SysEx/patch data), and which sounds have no Roland version. Compare with ScummVM's MT-32 driver behaviour (`scummvm/` can play it with the ROMs for an A/B listen).
-2. **Choose the synth:** an MT-32 emulator (Munt `mt32emu`, LGPL, native library wrapped for .NET) against a managed port; licence and packaging decided with the user before adding a dependency.
+2. **Choose the synth:** criteria set by the user: free, least restrictive licence, best sound; no preference of product. Candidate: Munt `mt32emu` (LGPL, the reference emulator, also what ScummVM uses; native library wrapped for .NET, dynamically linked). MT-32 emulation needs the ROM images, because the PCM ROM holds the instrument samples; an emulator that sounds the same without them does not exist (a General MIDI mapping or the SoundFont `scummvm/SoundCanvas.sf2` would play but sound different). Check the candidates' licences and ROM requirement, then record the choice here.
 3. **Player:** Roland sequence playback through the emulator into the existing audio output; mode selector entry beside PC Speaker, AdLib, No Sound; "no MT-32 ROMs found" state; the scripts' sound-card variable follows the mode, so the right sound ids are chosen.
 4. **Verification:** rendered-wave checks for a few sounds, an A/B against ScummVM, a record under `.verification/mt32/`, a changelog row.
 
-Open decisions for the user: emulator choice and licence; whether the sound-card variable changes with the mode (as the real game would) or only the player does.
+Open decision for the user: whether the sound-card variable changes with the mode (as the real game would) or only the player does. Optional later: a General MIDI fallback for users without ROMs, labelled as a different sound.
 
-## Next phase: other versions (after MT-32; order: LOOM VGA, then Indy3)
+## Then: LOOM VGA and more languages (user, 4 October; Indy3 is deferred)
 
-Done: English LOOM EGA as the reference edition, and the two LOOM demos. Local data: `Games/indy3 ega en` (the tests expect it), `indy3 ega es`, `indy3 vga es`, `indy3 demo en`, `monkey1`, `mmansion`, plus `Games/FUTURE/`. There is no LOOM VGA data yet.
+Order: M5, MT-32, then these. Indy3 is on hold until the user moves its data from `Games/FUTURE/` back to `Games/`.
 
-1. **Separate the LOOM-specific from the generic.** About 40 `GameId.Loom` gates in `MainWindow.xaml.cs`; propose which become generic before changing them. `Loom*` Core types hold LOOM-only parts (`LoomEgaStateFlags`, `loom-glossary.json`, `loom-replays.json`, `LoomDraftNames`, the catalog and setup planner) and generic ones (executor, actors, costumes, camera, walk boxes, text extraction, audio). No behaviour change; check on LOOM.
-2. **LOOM VGA (CD, SCUMM v4), the rest of LOOM.** Needs the data in `Games/` first (not there yet; `Games/FUTURE/` may hold it, to check). Then a feasibility probe of the resource container and opcode set, before any app work. If the data is not available when M5 is done, do step 3 and come back.
-3. **Indy3 EGA as the next explorable game**, scoped to backgrounds, texts and dialogue choices (verbs 120–125), using [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md).
-4. **Later containers and dialects** (Monkey Island, Maniac Mansion): assess the resource format and opcode set from the data first; none of it is decoded.
+1. **LOOM VGA (CD, SCUMM v4).** The data is not in `Games/` yet. Once there: a feasibility probe of the resource container and opcode set before any app work.
+2. **More languages of LOOM EGA** (Spanish and English work; others when the data arrives). Each language is checked the way English was: compare the glossary, bits, ids and offsets across editions with `GlossaryCheck` and `ScriptDump`, never key code on offsets (see CLAUDE.md, "Editions differ in data").
+3. **Separate the LOOM-specific from the generic**, as far as VGA and the languages need it. About 40 `GameId.Loom` gates in `MainWindow.xaml.cs`; propose which become generic before changing them.
+4. **Deferred:** Indy3 EGA (backgrounds, texts, dialogue choices, verbs 120–125; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion, whose formats are not decoded.
 
 ## Evidence rules
 
