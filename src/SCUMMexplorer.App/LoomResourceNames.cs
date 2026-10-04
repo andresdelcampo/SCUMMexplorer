@@ -9,19 +9,13 @@ internal static class LoomResourceNames
     public static GlossaryEntry? Entry(LoomGlossary glossary, GameResource resource) => resource.ResourceId is not int id ? null : resource.Kind switch
     {
         ResourceKind.Script => glossary.Script(id),
-        ResourceKind.Sound => glossary.Sound(id),
+        ResourceKind.Sound => null, // sounds stay plain "Sound NN": a name or a music/effect guess was not reliable enough (user, 4 October)
         ResourceKind.Room => glossary.Room(id),
         _ => null
     };
 
     public static string Label(LoomGlossary glossary, GameResource resource) =>
         Entry(glossary, resource) is { } entry ? $"{resource.Name} · {entry.Name}" : resource.Name;
-
-    /// <summary>A sound's label: the glossary's name where it has one, else what its own data and the decoded code say (every sound gets a note).</summary>
-    public static string SoundLabel(LoomGlossary glossary, GameResource resource, IReadOnlyDictionary<int, LoomSoundNote>? notes) =>
-        Entry(glossary, resource) is { } entry ? $"{resource.Name} · {entry.Name}"
-        : resource.ResourceId is int id && notes is not null && notes.TryGetValue(id, out var note) ? $"{resource.Name} · {note.Short}"
-        : resource.Name;
 
     /// <summary>The tooltip that says how well the name is supported.</summary>
     public static string? Evidence(LoomGlossary glossary, GameResource resource) =>

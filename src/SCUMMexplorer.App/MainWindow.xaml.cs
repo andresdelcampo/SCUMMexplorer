@@ -211,7 +211,6 @@ public partial class MainWindow : Window
         _game = game;
         _glossary = game.Id == GameId.Loom ? LoomGlossary.Load(game) : LoomGlossary.Default;
         _usageIndex = LoomUsageIndex.Empty;
-        _soundNotes = [];
         if (game.Id == GameId.Loom) _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
         if (game.Id == GameId.Loom) _ = NameStoryBitsAsync(game, _glossary, _replayCatalog.Replays);
@@ -1460,7 +1459,6 @@ public partial class MainWindow : Window
     private bool _showScriptBytes;
     private LoomGlossary _glossary = LoomGlossary.Default;
     private LoomUsageIndex _usageIndex = LoomUsageIndex.Empty;
-    private Dictionary<int, LoomSoundNote> _soundNotes = [];
 
     private async Task BuildUsageIndexAsync(GameLibrary game)
     {
@@ -1470,19 +1468,6 @@ public partial class MainWindow : Window
             if (!ReferenceEquals(_game, game)) return;
             _usageIndex = index;
             if (_selectedResource is { Kind: ResourceKind.Script } selected) UpdateScriptUsedBy(selected);
-            var glossary = _glossary;
-            var notes = await Task.Run(() => LoomSoundNotes.Build(game, index, glossary));
-            if (!ReferenceEquals(_game, game)) return;
-            _soundNotes = notes;
-            foreach (var group in ResourceTree.Items.OfType<TreeViewItem>())
-                foreach (var node in group.Items.OfType<TreeViewItem>().Where(item => item.Tag is GameResource { Kind: ResourceKind.Sound }))
-                {
-                    var sound = (GameResource)node.Tag;
-                    node.Header = LoomResourceNames.SoundLabel(glossary, sound, notes);
-                    var note = sound.ResourceId is int soundId && notes.TryGetValue(soundId, out var found) ? found.Evidence : null;
-                    var named = LoomResourceNames.Evidence(glossary, sound);
-                    node.ToolTip = named is not null && note is not null ? named + Environment.NewLine + note : named ?? note;
-                }
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
     }
@@ -4917,7 +4902,7 @@ public partial class MainWindow : Window
                 return (Resource: soundById[id], Music: track.IsMusic, Duration: track.Duration,
                     Evidence: choiceEvidence.GetValueOrDefault(id, "Started during this session."));
             })
-            .OrderByDescending(item => item.Music).ThenByDescending(item => item.Duration ?? TimeSpan.Zero).ThenBy(item => item.Resource.ResourceId)
+            .OrderBy(item => item.Resource.ResourceId)
             .ToList();
         RoomSoundsButton.Visibility = _roomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         if (interactive) return;
@@ -4980,10 +4965,7 @@ public partial class MainWindow : Window
         foreach (var choice in _roomSoundChoices)
         {
             var picked = choice;
-            // A glossary name ("opening music") already says what it is; otherwise say music or effect.
-            var named = LoomResourceNames.Entry(_glossary, picked.Resource) is not null;
-            var label = $"▶ {LoomResourceNames.Label(_glossary, picked.Resource)}{(named ? "" : picked.Music ? " · music" : " · effect")}" +
-                        (picked.Duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
+            var label = $"▶ {picked.Resource.Name}";
             entries.Add((label, IsAdvancedMode ? picked.Evidence : null, () => _ = AuditionRoomSoundAsync(picked)));
         }
         OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);

@@ -338,6 +338,8 @@
                                         </StackPanel>
                                     </DockPanel>
                                     <WrapPanel x:Name="PlaybackBar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
+                                        <!-- Two groups that wrap as wholes: playback controls, then the room actions. -->
+                                        <StackPanel Orientation="Horizontal">
                                         <Button x:Name="PlaybackPauseButton" Content="⏸ Pause" Click="PlaybackPause_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Pause or play the scene (space). In Advanced mode, Step ▸ then plays one frame while paused."/>
@@ -348,6 +350,8 @@
                                         <Button x:Name="SkipLineButton" Content="Skip line" Click="SkipLine_Click" Padding="8,4" Margin="0,0,5,0" IsEnabled="False"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"
                                                 ToolTip="Skip the current line, as with the '.' key."/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
                                         <Button x:Name="InteractButton" Content="Interact ▴" Click="Interact_Click" IsEnabled="False" Padding="8,4" Margin="0,0,5,0"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"
                                                 ToolTip="Click an object to select it, then choose what to do with it. Right-clicking an object opens the same menu."/>
@@ -357,6 +361,7 @@
                                         <Button x:Name="RoomCutsceneButton" Content="Play Cutscene" Visibility="Collapsed"
                                                 Click="RoomCutscene_Click" Padding="8,4" MinWidth="104" Height="27"
                                                 Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" ToolTipService.ShowOnDisabled="True"/>
+                                        </StackPanel>
                                     </WrapPanel>
                                     <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center"/>
                                     <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,3,0,0">
