@@ -4965,7 +4965,7 @@ public partial class MainWindow : Window
         foreach (var choice in _roomSoundChoices)
         {
             var picked = choice;
-            var label = $"▶ {picked.Resource.Name}";
+            var label = $"▶ {picked.Resource.Name}" + (picked.Duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
             entries.Add((label, IsAdvancedMode ? picked.Evidence : null, () => _ = AuditionRoomSoundAsync(picked)));
         }
         OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
