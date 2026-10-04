@@ -1,6 +1,7 @@
 using System.Globalization;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Formats;
+using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Core.Discovery;
 
@@ -93,6 +94,8 @@ public sealed class GameFolderScanner
                     "Physical LFL file; no supported index was parsed."));
         }
 
+        if (isDemo && indexWasParsed) omitted += DropUnreadableDemoResources(fullPath, resources);
+
         foreach (var path in files.Where(path => SoundExtensions.Contains(Path.GetExtension(path))))
             resources.Add(new GameResource(Path.GetFileName(path), ResourceKind.Sound, path));
 
@@ -124,6 +127,40 @@ public sealed class GameFolderScanner
         };
 
         return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo);
+    }
+
+    /// <summary>
+    /// Some stale entries of a demo's index start a real resource of another kind (two entries claim one start) or a
+    /// resource that is not what the entry says. An entry stays only if its resource reads as its kind: a script
+    /// decodes without issues, a costume loads (sounds are only checked for where they start); where a script and
+    /// a costume or sound claim the same start, the costume or sound wins when it reads. Returns how many were dropped.
+    /// </summary>
+    private static int DropUnreadableDemoResources(string folder, List<GameResource> resources)
+    {
+        var provisional = new GameLibrary("LOOM (demo)", folder, ScummVersion.V3, "DOS (inferred)", resources, "", GameId.Loom, true);
+        var scripts = new LoomScriptReader(ScummScriptDialects.For(GameId.Loom));
+        bool Reads(GameResource resource)
+        {
+            try
+            {
+                return resource.Kind switch
+                {
+                    ResourceKind.Script => scripts.Decode(resource) is { Issues: not { Count: > 0 }, DecodeNote: null },
+                    ResourceKind.Costume => resource.ResourceId is int id && LoomCostume.Load(provisional, id) is not null,
+                    // Sounds are only checked for where they start: half of the full game's sounds have no AdLib or PC speaker bundle either.
+                    _ => true
+                };
+            }
+            catch (Exception) { return false; }
+        }
+        var indexed = resources.Where(r => r.Kind is ResourceKind.Script or ResourceKind.Costume or ResourceKind.Sound).ToArray();
+        var reads = indexed.ToDictionary(r => r, Reads);
+        var drop = indexed.Where(r => !reads[r]).ToHashSet();
+        foreach (var shared in indexed.GroupBy(r => (r.ContainerFileNumber, r.Offset)).Where(g => g.Select(r => r.Kind).Distinct().Count() > 1))
+            if (shared.Any(r => r.Kind != ResourceKind.Script && reads[r]))
+                foreach (var script in shared.Where(r => r.Kind == ResourceKind.Script)) drop.Add(script);
+        resources.RemoveAll(drop.Contains);
+        return drop.Count;
     }
 
     private static bool StartsResource(Dictionary<string, IReadOnlyList<LflChainResource>?> chains, string path, int offset)

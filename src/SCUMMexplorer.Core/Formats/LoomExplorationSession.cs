@@ -108,9 +108,14 @@ public sealed partial class LoomExplorationSession
     /// </param>
     /// <param name="stopAtBootInput">With completeBoot, enters the native intro and awaits actual input,
     /// before the explorer's assumed challenge answer. Frames continue the waiting boot after input.</param>
+    /// <param name="demoPreview">
+    /// A LOOM demo's boot (script 001, then Room 01's entry) starts a director script that shows the rooms in turn and
+    /// starts over. A demo session leaves it stopped, so the rooms can be explored like the full game's, unless this is
+    /// true: then it runs (frames advance it; <see cref="AdvanceFrame"/> walks the self-running preview).
+    /// </param>
     public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
         bool completeBoot = true, bool stopAtOpening = false, bool stopAtBootInput = false,
-        LoomScriptObserver? observer = null)
+        LoomScriptObserver? observer = null, bool demoPreview = false)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -164,6 +169,11 @@ public sealed partial class LoomExplorationSession
             _dispatchScope--;
         }
         DispatchRequestedLoads("during the boot");
+        if (game.IsDemo && !demoPreview)
+        {
+            _pending.Clear();
+            _uncertainties.Add("This is a LOOM demo: the preview's director script (started by Room 01's entry) is not running, so the rooms can be explored; 'Play the preview' runs it.");
+        }
         if (stopAtBootInput)
         {
             // Keep script 001 waiting on the intro's source-owned D6B gate.

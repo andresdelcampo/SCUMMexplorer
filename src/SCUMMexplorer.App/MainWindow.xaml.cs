@@ -639,12 +639,15 @@ public partial class MainWindow : Window
         // Opening another view stops the playback clock, unless the playback itself entered the room.
         if (!_playbackEnteringRoom)
         {
+            var leavingPreview = _playback is { Preview: true };
             if (SessionInScene) _sceneSound.StopAll("the cutscene was left from the catalog");
+            if (leavingPreview) _sceneSound.StopAll("the demo's preview was left from the catalog");
             StopScenePlayback();
             // The opening is suspended boot code, rather than an open cutscene. A catalog
             // departure uses the ordinary post-boot exploration state so it cannot resume later.
+            // The same for a demo's preview: its director script keeps running in that session, so leaving takes a fresh one.
             if (e.NewValue is TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } } &&
-                _session?.BootRunning == true && _game is not null && _indexedObjectSnapshot is not null)
+                (_session?.BootRunning == true || leavingPreview) && _game is not null && _indexedObjectSnapshot is not null)
             {
                 _session = new LoomExplorationSession(_game, _indexedObjectSnapshot);
                 _sceneSound.Attach(_game, _session);
@@ -3263,6 +3266,8 @@ public partial class MainWindow : Window
         public int IdleFrames { get; set; }
         public int CutsceneFrames { get; set; }
         public int WaitTicks { get; set; }
+        // A LOOM demo's self-running preview: it runs until the user opens another room.
+        public bool Preview { get; init; }
         public string? Note { get; set; }
         public string? FrameSignature { get; set; }
         public int? CameraX { get; set; }
@@ -3300,11 +3305,11 @@ public partial class MainWindow : Window
     /// load reached while playing opens that room, and playback goes on there.
     /// </summary>
     private void StartPlayback(string what, LoomObjectActionResult? action, GameResource sourceRoom,
-        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null)
+        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false)
     {
         _playback = new Playback
         {
-            What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom,
+            What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom, Preview = preview,
             CameraX = _session?.CameraX,
             SceneBefore = sceneBefore ?? (_session?.CutscenesBegun ?? 0, _session?.EgoPuts ?? 0)
         };
@@ -3432,7 +3437,7 @@ public partial class MainWindow : Window
     /// </summary>
     private bool SessionInScene => _session is { } session && (session.InCutscene || session.BootRunning);
 
-    private bool PlaybackHasActivity => _replaySequence is { Complete: false, Failure: null } || SessionInScene || _session is { } session &&
+    private bool PlaybackHasActivity => _replaySequence is { Complete: false, Failure: null } || SessionInScene || _playback is { Preview: true } || _session is { } session &&
         (session.EgoMoving || session.CameraMoving || !string.IsNullOrWhiteSpace(session.Messages.Talk?.Text) ||
          session.DraftPlaying);
 
@@ -3543,7 +3548,7 @@ public partial class MainWindow : Window
     private Dictionary<int, GalleryCutscene> GalleryCutscenes()
     {
         var cutscenes = new Dictionary<int, GalleryCutscene>();
-        if (_game?.Id != GameId.Loom || _session is null || _indexedObjectSnapshot is null) return cutscenes;
+        if (_game?.Id != GameId.Loom || _game.IsDemo || _session is null || _indexedObjectSnapshot is null) return cutscenes;
         cutscenes[LoomExplorationSession.OpeningScript] = new(OpeningTitle, OpeningStartNote, () => PlayFromGameTexts(PlayOpening));
         foreach (var cutscene in KnownCutscenes)
             cutscenes[cutscene.Script] = new(cutscene.Title, CutsceneStartNote(cutscene),
@@ -3583,8 +3588,33 @@ public partial class MainWindow : Window
         return new(items, _replayCatalog?.Summary ?? "", IsAdvancedMode, roomScope: false) { Owner = this };
     }
 
+    private const string DemoPreviewTitle = "The preview";
+
+    private const string DemoPreviewNote =
+        "LOOM's self-running preview (LOOMDEMO.EXE): script 001 loads Room 01, whose entry starts script 045, a director that " +
+        "visits the demo's rooms in turn and starts over. It is a different build from the full game (its own scripts and rooms; " +
+        "script and story-bit names of the full game are not applied). It plays on the clock at the game's frame rate until you open another room.";
+
+    private CutscenePickerItem DemoPreviewItem() => new(DemoPreviewTitle, "Scenes", DemoPreviewNote, PlayDemoPreview);
+
+    /// <summary>Plays a LOOM demo's preview: a fresh session whose director script runs, on the playback clock, until another room is opened.</summary>
+    private void PlayDemoPreview()
+    {
+        if (_game is not { IsDemo: true } || _indexedObjectSnapshot is null || !CanStartCutscene) return;
+        StopScenePlayback();
+        _session = new LoomExplorationSession(_game, _indexedObjectSnapshot, demoPreview: true);
+        _sceneSound.Attach(_game, _session);
+        if (_session.Snapshot.RoomId is not int roomId || _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } room)
+            return;
+        StartPlayback(DemoPreviewTitle, null, room, doorways: null, leftRoom: false, preview: true);
+        StatusText.Text = "Playing the demo's preview. Open any room to stop it.";
+        StatusText.ToolTip = DemoPreviewNote + Environment.NewLine + string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
+    }
+
     private List<(string Id, CutscenePickerItem Item)> PlayableCutsceneItems()
     {
+        // A demo has no catalog of scenes: the full game's replays name its rooms, objects and scripts.
+        if (_game is { IsDemo: true }) return [("demo-preview", DemoPreviewItem())];
         var items = new List<(string, CutscenePickerItem)> { ("opening", new(OpeningTitle, "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening)) };
         foreach (var scene in AllCutscenes())
             items.Add((scene.Id, new(scene.Title, scene.Category, scene.Source + " " + CutsceneStartNote(scene), () => PlayKnownCutscene(scene))));
@@ -3593,6 +3623,7 @@ public partial class MainWindow : Window
 
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
+        if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
         return PlayableCutsceneItems().Where(choice => ids.Contains(choice.Id)).Select(choice => choice.Item).ToList();
     }
@@ -3612,6 +3643,7 @@ public partial class MainWindow : Window
     {
         var choices = new List<(string Title, string Source, Action Play)>();
         if (_game?.Id != GameId.Loom || _session is null) return choices;
+        if (_game.IsDemo) return [(DemoPreviewTitle, DemoPreviewNote, PlayDemoPreview)];
         choices.Add((OpeningTitle, OpeningSource + " " + OpeningStartNote, PlayOpening));
         foreach (var cutscene in AllCutscenes())
             choices.Add((cutscene.Title, cutscene.Source + " " + CutsceneStartNote(cutscene), () => PlayKnownCutscene(cutscene)));
@@ -3772,6 +3804,8 @@ public partial class MainWindow : Window
             playback.Note = sequence.Failure;
             return continuing;
         }
+        // The demo's director script is always pending and starts over; nothing but the user ends the preview.
+        if (playback.Preview) return true;
         var talking = session.Messages.HaveMsg != 0;
         // The ego's walk or turn, or a camera pan, still in progress plays on (M3a), even with no script left.
         // Other actors are not waited for: ambient walkers (script 042's swan) never stop.

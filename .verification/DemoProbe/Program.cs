@@ -4,8 +4,18 @@ using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.Core.Rendering;
 
 // Usage: DemoProbe <game folder> [index | play <frames>]
+if (args.Length > 1 && args[1] == "texts")
+{
+    var textGame = new GameFolderScanner().Scan(args[0]);
+    var extraction = new LoomTextExtractor().Extract(textGame);
+    Console.WriteLine($"{extraction.Entries.Count} texts; {extraction.Coverage}; skipped ranges {extraction.ResourcesSkipped}; unresolved {extraction.UnresolvedPaths}");
+    foreach (var d in extraction.Diagnostics.Take(8)) Console.WriteLine("  diag: " + d);
+    foreach (var group in extraction.Entries.GroupBy(e => e.Kind)) Console.WriteLine($"  {group.Key}: {group.Count()}");
+    foreach (var e in extraction.Entries.Where(e => e.Kind != "Object name").Take(12)) Console.WriteLine($"  [{e.Kind}] room {e.RoomId} script {e.ScriptId}: {e.Text}");
+    return;
+}
 if (args.Length > 1 && args[1] == "index") { IndexDump.Run(args[0]); return; }
-if (args.Length > 1 && args[1] == "play") { PlayDump.Run(args[0], args.Length > 2 ? int.Parse(args[2]) : 3000); return; }
+if (args.Length > 1 && args[1] is "play" or "idle") { PlayDump.Run(args[0], args.Length > 2 ? int.Parse(args[2]) : 3000, args[1] == "idle"); return; }
 // What the existing code makes of a LOOM folder: identity, resources, every script decoded, every room opened in a session, the boot.
 var game = new GameFolderScanner().Scan(args[0]);
 Console.WriteLine($"{game.Title}: id {game.Id}, version {game.Version}, rooms {game.Rooms.Count()}, resources {game.Resources.Count} ({string.Join(", ", game.Resources.GroupBy(r => r.Kind).Select(g => $"{g.Count()} {g.Key}"))})");

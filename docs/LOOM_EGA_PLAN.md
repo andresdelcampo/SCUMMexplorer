@@ -23,6 +23,7 @@ Make the DOS *LOOM* EGA release (Spanish data in `Games/loom`) a place to explor
 | Texts | Game Texts (Advanced-only) browses extracted dialogue with room pictures and Play Cutscene links. |
 | Advanced inspector | Readable/Raw script view with a glossary, Last action timeline, grouped assumptions and "Used by" (readable-scripts plan complete). |
 | Coverage of the game's 235 cutscene sites | 234/235 audited as reached by some route; 169/235 by a single action. The remaining site is Room 34 local200 +0035, which looks unreachable in play. |
+| LOOM demos (4 October, late) | `Games/loom ega short demo en` and `long demo en` open: a different build, not a subset of the full game (own rooms, scripts, stale index entries dropped), rooms explorable in their first-visit state; "The preview" (the demo's self-running director, script 045 there) is one more cutscene in the existing launchers. No glossary script/bit names, replay catalog or Game Texts cutscene links for a demo. Evidence: `.verification/demos-20261004/README.md`. |
 | Quality | Build: 0 errors. Unit tests: 703 passed, 5 skipped diagnostic dumps. Harnesses: 129 run, none of the failures reflected game behaviour; 35 obsolete ones removed, 3 repaired (see the review). |
 
 ## What is still open for LOOM

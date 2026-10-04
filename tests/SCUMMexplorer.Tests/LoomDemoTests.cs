@@ -48,11 +48,24 @@ public sealed class LoomDemoTests
 
     [Theory]
     [MemberData(nameof(Demos))]
-    public void DemoPlaysThroughItsRoomsAndStartsOver(string name, int rooms)
+    public void DemoSessionStaysInRoom01UntilThePreviewIsPlayed(string name, int rooms)
     {
         if (Folder(name) is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
+        for (var frame = 0; frame < 600; frame++) session.AdvanceFrame();
+        Assert.Equal(1, session.Snapshot.RoomId);
+        Assert.Equal(0, session.Snapshot.PendingScripts);
+        Assert.NotEqual(0, rooms);
+    }
+
+    [Theory]
+    [MemberData(nameof(Demos))]
+    public void DemoPlaysThroughItsRoomsAndStartsOver(string name, int rooms)
+    {
+        if (Folder(name) is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")), demoPreview: true);
         var visited = new List<int>();
         for (var frame = 0; frame < 8000 && visited.Count(room => room == 1) < 2; frame++)
         {

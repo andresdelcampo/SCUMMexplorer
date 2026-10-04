@@ -14,6 +14,17 @@ static class IndexDump
             var end = c.Count == 0 ? 0 : c[^1].Start + c[^1].Length;
             Console.WriteLine($"chain {Path.GetFileName(file)}: {c.Count} resources, covers {end} of {new FileInfo(file).Length}");
         }
+        var scanned = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
+        foreach (var costume in scanned.Resources.Where(r => r.Kind == ResourceKind.Costume && r.ResourceId is 1 or 2 or 3))
+            try { Console.WriteLine($"costume {costume.ResourceId}: " + (SCUMMexplorer.Core.Rendering.LoomCostume.Load(scanned, costume.ResourceId!.Value) is { } c ? "loads" : "null")); }
+            catch (Exception ex) { Console.WriteLine($"costume {costume.ResourceId}: {ex.GetType().Name}: {ex.Message}"); }
+        foreach (var sound in scanned.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId is 41 or 40 or 3))
+            try { Console.WriteLine($"sound {sound.ResourceId}: " + new LoomAdlibAudio().ReadLifetime(sound)); }
+            catch (Exception ex) { Console.WriteLine($"sound {sound.ResourceId}: {ex.GetType().Name}: {ex.Message}"); }
+        var lifetimes = scanned.Resources.Where(r => r.Kind == ResourceKind.Sound).Select(r => (r, l: new LoomAdlibAudio().ReadLifetime(r))).ToArray();
+        Console.WriteLine($"sounds kept {lifetimes.Length}: lifetime Unknown {lifetimes.Count(x => x.l.Kind == LoomSoundLifetimeKind.Unknown)}");
+        foreach (var group in entries.Where(e => e.Kind != ResourceKind.Room).GroupBy(e => (e.ContainerFileNumber, e.Offset)).Where(g => g.Select(e => e.Kind).Distinct().Count() > 1))
+            Console.WriteLine($"shared start {group.Key.ContainerFileNumber:00}.LFL @0x{group.Key.Offset:X4}: {string.Join(", ", group.Select(e => $"{e.Kind} {e.ResourceId}"))}");
         foreach (var kind in new[] { ResourceKind.Script, ResourceKind.Costume, ResourceKind.Sound })
         {
             var counts = new SortedDictionary<string, int>();
