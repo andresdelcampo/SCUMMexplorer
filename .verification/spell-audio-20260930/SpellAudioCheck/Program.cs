@@ -85,9 +85,10 @@ internal static class Program
                     Check(Session().Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0xD66]")==0,"four-note draft completes");
                 }
                 Call("StopScenePlayback");
-                await Pick(13);
+                await Pick(13); for (int n = 0; n < 200 && Field("_playback") is not null; n++) await Task.Delay(100);
                 eventStart=Session().SoundEvents.Count; logStart=player.Log.Count;
                 // Room 13 object 325's look plays a draft through scripts 030/031/040; seeded notes are estimates.
+                Session().VisitRoomById(13);
                 Session().ActivateObjectVerb(325,0x36);
                 for(int n=0;n<55;n++) { Call("AdvanceOneFrame"); await Task.Delay(100); }
                 report.Add("Direct look at object 325, Advanced Continue path, estimated draft:");

@@ -1,6 +1,6 @@
 # LOOM EGA exploration plan
 
-Rewritten 4 October 2026. The dated checkpoints that used to fill this file (route coverage, certainty and observer work, completed UI specifications) are kept unchanged in [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md). Finished work is in the [changelog](CHANGELOG.md); what the decoded scripts, variables and rooms do is in the [script map](LOOM_SCRIPT_MAP.md). The test and harness audit of 4 October is in [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md).
+Rewritten 4 October 2026 (M5 parked and the other-versions order agreed with the user the same day). The dated checkpoints that used to fill this file (route coverage, certainty and observer work, completed UI specifications) are kept unchanged in [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md). Finished work is in the [changelog](CHANGELOG.md); what the decoded scripts, variables and rooms do is in the [script map](LOOM_SCRIPT_MAP.md). The test and harness audit of 4 October is in [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md).
 
 ## Product direction
 
@@ -23,7 +23,7 @@ Make the DOS *LOOM* EGA release (Spanish data in `Games/loom`) a place to explor
 | Texts | Game Texts (Advanced-only) browses extracted dialogue with room pictures and Play Cutscene links. |
 | Advanced inspector | Readable/Raw script view with a glossary, Last action timeline, grouped assumptions and "Used by" (readable-scripts plan complete). |
 | Coverage of the game's 235 cutscene sites | 234/235 audited as reached by some route; 169/235 by a single action. The remaining site is Room 34 local200 +0035, which looks unreachable in play. |
-| Quality | Build: 0 errors. Unit tests: 703 passed, 5 skipped diagnostic dumps. Harnesses: see the review; none of the failures reflects game behaviour. |
+| Quality | Build: 0 errors. Unit tests: 703 passed, 5 skipped diagnostic dumps. Harnesses: 129 run, none of the failures reflected game behaviour; 35 obsolete ones removed, 3 repaired (see the review). |
 
 ## What is still open for LOOM
 
@@ -39,18 +39,17 @@ Evidence-bound work (do only when it changes what the user sees):
 - Stored-text coverage: Room 70 locals 203 and 204 are truncated; unreachable code is not scanned.
 - Engine gaps, only if a route needs them: `stopObjectScript`, inventory object code, `killScriptsAndResources` ending other room-owned scripts at a room load; the Room 69 difficulty and draft answer are assumed, not simulated; the Room 03 town and cemetery labels are unidentified. (The earlier `expression` blockers are gone: Blockers reports 0 blocked random sites.)
 
-Housekeeping (needs the user's decision):
-- Retire or repair the stale harnesses listed in the harness review (about 20 stale checks, about 15 one-off probes, about 36 route-evidence probes).
-- 5 skipped diagnostic unit tests: keep or delete.
+Housekeeping:
+- Done 4 October: stale harnesses removed (35) and three repaired, `Exe/` shrunk from 27.6 GB to about 1.4 GB (evidence packed into `Exe/_evidence-archive/`). See the harness review. The 5 skipped diagnostic unit tests stay as audit utilities.
 - 2 nullable build warnings at `MainWindow.xaml.cs:3691-3692`.
 - `README.md` still describes the earlier scope and UI; refresh when the other-versions work starts.
 - 17 historical git worktrees under `.claude/worktrees/` and the open proposals in [CLEANUP_REVIEW.md](CLEANUP_REVIEW.md).
 
-## M5. Secrets and guide (not started)
+## M5. Secrets and guide (parked by the user, 4 October)
 
 Build a discoverable, spoiler-aware index of secrets from verified triggers and outcomes, with source links. The 235 audited cutscene sites, the story-event bits and the draft table are the raw material; every entry must carry its evidence level.
 
-## Next phase: support for other versions (proposal, to agree with the user)
+## Next phase: support for other versions (agreed with the user, 4 October)
 
 LOOM EGA Spanish is the working reference, and the old-v3 dialect switch already exists (`ScummScriptDialects.For(GameId)`; Indy3 EGA differs in four opcodes). Local data for other games sits in `Games/` (`IndyCru/EGA` English, `indy3/EGA` Spanish, `monkey1`, `mmansion`); only LOOM and Indy3 EGA are supported today (Indy3: backgrounds, texts and dialogue choices). A sensible order, each step small and visible:
 

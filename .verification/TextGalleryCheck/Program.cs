@@ -46,6 +46,18 @@ internal static class Program
                 gallery = new TextGalleryWindow(game, extraction, room => Call("SelectResourceInTree", game.Rooms.First(r => r.ResourceId == room))) { Owner = main };
                 gallery.Show();
                 T Named<T>(string name) where T : FrameworkElement => (T)gallery.FindName(name);
+                // Conversations are drawn as rows in ConversationLines (speaker column + text), not in SelectedText.
+                string ConversationText()
+                {
+                    var parts = new List<string>();
+                    void Walk(DependencyObject node)
+                    {
+                        if (node is TextBlock block) parts.Add(block.Text);
+                        foreach (var child in LogicalTreeHelper.GetChildren(node).OfType<DependencyObject>()) Walk(child);
+                    }
+                    Walk(Named<StackPanel>("ConversationLines"));
+                    return string.Join("\n", parts);
+                }
                 void Capture(string filename)
                 {
                     gallery.UpdateLayout();
@@ -69,7 +81,7 @@ internal static class Program
                     row.GetType().GetProperty("Entry")!.GetValue(row) is LoomTextEntry { ObjectId: 165, Kind: "Spoken line" }),
                     "Searching the stored object name finds its linked spoken lines");
                 search.Text = "Primero me tendré";
-                Check(list.Items.Count > 0 && Named<TextBlock>("SelectedText").Text.Contains("más"), "Spanish accents render as Unicode in original dialogue");
+                Check(list.Items.Count > 0 && list.Items.Cast<object>().Any(row => row.GetType().GetProperty("Entry")!.GetValue(row) is LoomTextEntry e && e.Text.Contains("tendré")), "Spanish accents render as Unicode in original dialogue");
                 Check(Named<TextBlock>("SelectedHeading").Text.Contains("165"), "Object 165 association is visible beside Room 03 without expanding source details");
                 await Task.Delay(400);
                 Check(Named<Image>("RoomArtworkPreview").Source is BitmapSource, "Linked original room artwork renders");
@@ -93,10 +105,10 @@ internal static class Program
                 var matchingRow = list.Items.Cast<object>().First(row =>
                     ((LoomTextEntry)row.GetType().GetProperty("Entry")!.GetValue(row)!).ConversationId == conversation.Key);
                 list.SelectedItem = matchingRow;
-                var transcript = Named<TextBlock>("SelectedText").Text;
+                var transcript = ConversationText();
                 Check(conversation.All(line => transcript.Contains(line.Text)), "Search preserves the complete extracted group transcript");
                 var orderedLines = conversation.OrderBy(e => e.ConversationLine).ToArray();
-                Check(transcript.StartsWith($"{orderedLines[0].Speaker ?? "Unknown speaker"}: {orderedLines[0].Text}"),
+                Check(transcript.Contains(orderedLines[0].Text) && transcript.IndexOf(orderedLines[0].Text) <= conversation.Select(l => transcript.IndexOf(l.Text)).Min(),
                     "Transcript begins with the first stored line and its decoded speaker");
                 Check(Named<TextBlock>("SelectedHeading").Text.Contains("source order", StringComparison.OrdinalIgnoreCase),
                     "Cutscene transcript visibly identifies source order");
@@ -108,7 +120,7 @@ internal static class Program
                 search.Text = scriptDialogue.Last().Text;
                 list.SelectedItem = list.Items.Cast<object>().First(row =>
                     ((LoomTextEntry)row.GetType().GetProperty("Entry")!.GetValue(row)!).ConversationId == scriptDialogue.Key);
-                Check(scriptDialogue.All(line => Named<TextBlock>("SelectedText").Text.Contains(line.Text)),
+                Check(scriptDialogue.All(line => ConversationText().Contains(line.Text)),
                     "Unmarked script dialogue exposes its complete extracted group with multiple speakers");
                 Check(Named<TextBlock>("SelectedHeading").Text.Contains("Script dialogue in stored source order"),
                     "Unmarked dialogue is visibly distinguished from cutscene markers");

@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 October: harness clean-up and `Exe` compaction
+
+Decided on effort, regression risk, rebuild cost, whether the code is still touched and use for other versions: 35 obsolete harness projects removed (20 stale UI checks, 15 probes needing an old saved input; source stays in git history), `StatusShots`, `TextGalleryCheck` and `SpellAudioCheck` repaired and passing, the rest kept (see [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md)). `Exe/` went from 27.6 GB to about 1.4 GB: the 75 evidence folders of 2–3 October are packed unchanged in `Exe/_evidence-archive/*.tar.gz` (each verified against its file list before removal). M5 parked; the other-versions order agreed (LOOM-specific vs generic, English LOOM/Indy3, Indy3 as second game).
+
 ## 4 October: full test and harness review, documentation rewritten
 
 Build clean, 703 unit tests pass (5 skipped diagnostic dumps), DoorwayClickCheck 16/16, RoomAudit zero gaps, Blockers 0 blocked sites. All 129 verification harnesses were run: 76 run clean; the other 53 are stale checks (UI changed on purpose), one-off probes needing an old saved input, documented failed investigations or deliberate crash probes, with no game-behaviour regression found. Nothing deleted: the list for review is [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md). Docs: the 90 KB plan was rewritten to its current state and open items, its dated checkpoints moved unchanged to [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md); CURRENT_WORK and NEXT_SESSION_PROMPT rewritten (RTK block removed, plan for other versions proposed). Records: `.verification/harness-review-20261004/`.

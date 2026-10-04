@@ -1,57 +1,41 @@
 # Test and harness review, 4 October 2026
 
-Full run of the unit tests and of every verification executable in `.verification/` (129 projects) at the end of the LOOM EGA work. Nothing was deleted or edited; this file is the list for the user's review. Raw results of this run: `.verification/harness-review-20261004/results.tsv` (git-ignored, regenerate with the driver notes at the end).
+Full run of the unit tests and of every verification executable in `.verification/` (129 projects) at the end of the LOOM EGA work, followed by the clean-up decisions the user delegated. Raw results: `.verification/harness-review-20261004/results.tsv` (results of the first run, before the clean-up) and the driver `run-all.ps1` next to it.
 
-## Result in one line
+## Result of the run
 
-- **Build:** 0 errors; 2 nullable warnings (`MainWindow.xaml.cs:3691` CS8604 and `:3692` CS8602, `SceneSoundPlayer.Attach` call).
-- **Unit tests:** 703 passed, 0 failed, 5 skipped (all five are diagnostic dumps, see below).
-- **Harnesses:** 76 run clean (Blockers reports 0 blocked random sites; CacheCheck runs but gives no verdict); 53 do not, and **none of the 53 shows a game-behaviour regression**. They are stale checks (the UI changed on purpose), one-off research probes that need an old saved input, probes with no automatic verdict, documented failed investigations, and two deliberate crash probes. Details below.
-- **Core product checks all green:** DoorwayClickCheck 16/16 (rooms 2, 3, 4, 8, 10, 37), RoomAudit (0 rooms with gaps), UiShots, WindowCheck, SceneShots, ScoreCheck, WalkBoxCheck, KeyInputCheck, ClickInputCheck, OpeningPlaybackCheck, CutscenePlaybackCheck, SequenceUiCheck, MessageAppCheck, MusicPanelCheck, SceneLeaveCheck, RoomControlsCheck, ModeCheck, AudioCheck, ArrivalCheck and the rest of the pass list.
+- **Build:** 0 errors; 2 nullable warnings (`MainWindow.xaml.cs:3691` CS8604 and `:3692` CS8602, the `SceneSoundPlayer.Attach` call).
+- **Unit tests:** 703 passed, 0 failed, 5 skipped (diagnostic dumps).
+- **Harnesses:** 76 ran clean, 53 did not; none of the 53 showed a game-behaviour regression. Blockers: 0 blocked random sites. DoorwayClickCheck 16/16 (rooms 2, 3, 4, 8, 10, 37; over all rooms it takes more than 15 minutes). RoomAudit: 0 rooms with gaps.
+- Room17Check ended in an interrupted walk: the first approach to the tomb triggers a cutscene (user, 4 October). Expected, no defect.
 
-## A. Stale WPF checks (the UI they assert has changed) - fix or retire
+## Decisions taken (criteria: effort to repair now, chance of regression, effort to rebuild later, is the code still being touched, does it pass now, does it help other versions or games)
 
-Each one still builds and starts the real `MainWindow`; the assertion or the reflection seam no longer matches the app. They fail fast or wait forever on a window the user never sees, so a run can look "frozen".
+**Kept, passing (about 76).** Cheap to keep, they pass now, and the generic ones are the tools for auditing other LOOM editions and other games: `RoomAudit` (room rendering gaps), `UiShots`, `SceneShots`, `StatusShots`, `WindowCheck`, `TextGalleryCheck`, `DoorwayClickCheck`, `Blockers`, `VisitProbe`, `CodeDump`, `ScriptRefs`, `DurationAudit`, the audio, input, key, click, score, walk-box, opening, cutscene-playback, sequence, mode, scene-leave and music checks.
 
-| Harness | Why it fails now | Suggestion |
-| --- | --- | --- |
-| `BusyCheck`, `ControlsCheck`, `RoomReplayCheck`/`ReplayCheck` (partly) | The "Play Cutscene" button opens a modal picker window (`ShowDialog`); the harness never closes it, so it waits for ever (CPU-bound, no output). | Retire; the guard logic is covered by the Core session tests and by `SceneLeaveCheck`/`RoomControlsCheck`. Or call the picker's own methods instead of clicking. |
-| `CutsceneMenuCheck` | Looks for the old titles ("The opening (script 044)"); scenes are now "Room 01 – Opening" and so on. | Retire or update the title strings. |
-| `PickerCheck` | Expects global Play Cutscene visible in normal Room 16; it is Advanced-only now. | Update. |
-| `StaffCheck`, `RefinementCheck`, `StatusRefinementCheck`, `StatusUiCheck` | "Room Play Cutscene follows Skip line" (moved to the left of Interact, 4 Oct), Game Status position, fifteen drafts (now sixteen), note tiles are a `Canvas` not a `UniformGrid`, costume cards (17 unavailable costumes are no longer listed), draft names. | Retire (their intent now lives in `StatusShots`/`UiShots` plus the Game Status unit tests) or update once. |
-| `NamesCheck`, `RoomReplayCheck` | Counts of 290/291 starts (now 335) and the draft-response titles were renamed. | Update the counts; or retire in favour of `LoomReplaySequenceTests`. |
-| `PointerInputCheck`, `ObjectInteractionCheck`, `VerbAreaCheck`, `StatusShots`, `PresentationCheck` | Controls/methods removed (pointer-as-input toggle, verb-strip toggle, `BuildRoomCutscenePicker`, the interaction note); lookups return null. | Retire or rewrite; `StatusShots` is worth repairing because it is the status screenshot tool. |
-| `SoundLifetimeCheck` | `MainWindow.KnownCutscene` constructor changed. | Retire (the sound clock has unit tests: `LoomSoundClockTests`, `LoomSoundCueTests`). |
-| `SpellAudioCheck` | Asks for object 325 in Room 10; it is in Room 13. | One-word fix, or retire. |
-| `TextGalleryCheck` | Expects "más" in the selected text after a search; conversations are now grouped and the first line is selected. Accent decoding itself is covered by `LoomScummTextDecoderTests` (passing). | Update. |
-| `RouteUiCheck`, `ScopeUiCheck` | Time out / exit 1 without a message (cause not captured). | Retire unless wanted. |
-| `Room17Check` | Diagnostic trace of the Room 17 object 357 double click; prints "Look 0x36 reached=False" and has no assertion. | **Worth one manual look**: it is the only one that may reflect behaviour (double click = look). The two skipped unit tests below cover the same object. |
+**Repaired (3).** `StatusShots` (the picker method was renamed), `TextGalleryCheck` (conversations are now drawn as lines in their own panel; the check reads that panel), `SpellAudioCheck` (the arrival to Room 13 now plays through Room 10; the check visits Room 13 before the look). All three pass; they cover the picker/Game Status screenshots, the Game Texts gallery (generic, reusable for Indy3 and other games) and spell audio.
 
-## B. Research probes that need an old saved input (not regression tests)
+**Removed (35 projects).** Source remains in git history (`git log --diff-filter=D -- .verification/<topic>/<name>`).
+- *Stale UI checks (20).* They reflect on private members of the old window (toggles and methods that no longer exist) or assert layouts and counts that changed on purpose, so each would need a rewrite against the current UI, and a rewrite later is as cheap as a repair now: `BusyCheck`, `ControlsCheck`, `CutsceneMenuCheck`, `PickerCheck`, `ReplayCheck`, `RoomReplayCheck`, `NamesCheck`, `StaffCheck`, `RefinementCheck`, `StatusRefinementCheck`, `StatusUiCheck`, `PointerInputCheck`, `ObjectInteractionCheck`, `VerbAreaCheck`, `PresentationCheck`, `SoundLifetimeCheck`, `RouteUiCheck`, `ScopeUiCheck`, `NativeReplayCheck`, `Room17Check`. Three of them (BusyCheck, ControlsCheck, ReplayCheck) hung for ever on the modal Play Cutscene picker.
+- *Probes that need an old saved input (15).* They read a recipes JSON in a shape that no longer exists, and their findings are in the `validation.md` of each topic folder: `HandshakeAudit`, `CliffCamera`, `coverage-routes/RouteProbe`, `ReplayAudit`, `GapProbe`, `MembershipAudit`, `SequenceAudit`, `SharpeningProbe`, `staff-correction/RouteProbe`, four `ProgressionProbe`, `DraftProbe`, `CertaintyAudit`.
+- **Coverage gap this leaves:** nothing automatic now exercises the Play Cutscene button guards (no start during playback), the Game Status window layout, or the pointer/hover handling at window level. Unit tests cover the session logic; UiShots/StatusShots give screenshots. Rebuild these as small checks against the new UI if a change touches them.
 
-They read a recipes/evidence JSON written by an earlier session (arguments `<game> <json> <out>`); the current `loom-replays.json` has a different shape, so they throw on the first `GetProperty`. Their findings are recorded in the `validation.md` next to each. **Candidates for removal:** `HandshakeAudit`, `CliffCamera`, `coverage-routes/RouteProbe`, `ReplayAudit`, `GapProbe`, `MembershipAudit`, `SequenceAudit`, `SharpeningProbe`, `staff-correction/RouteProbe`, the four `ProgressionProbe` (native-prerequisites, room41-certainty, source-progression ×2), `DraftProbe`, `CertaintyAudit`, `NativeReplayCheck`.
+**Kept on purpose although they are not regression tests.**
+- The ~36 route-evidence probes of 2–3 October (Room 02 … Room 62 inputs, `GlobalInputProbe`, `Room34*`, `Room69*`): the long bespoke input recipes behind the "234/235 audited sites" figure. 26 pass when given a fresh output folder; 10 fail exactly as `PLAN_HISTORY_2026-10.md` records (Room 34 chain/watcher/local200, Room 69, Room 09), and they are the starting point if the parked Room 34 work resumes. Rebuilding them would take hours; keeping them costs nothing.
+- Utilities that print data and need arguments: `MessageRender`, `CostumeAnimRender`, `CacheCheck` (needs `SCUMM_ROOM_CACHE_DIR`).
+- `ConsoleFailureProbe`, `FailureProbe`: crash on purpose to prove the harness failure policy (exit 1 is their pass).
+- The 5 skipped unit tests (`LoomObjectLookAuditTests` ×2, `LoomSceneSetupPlannerTests.Dump*` ×3): `Skip`-marked diagnostics that cost nothing to carry and are the quickest audit of costumes, speakers and catalog setups when another game or edition is opened.
 
-## C. No automatic verdict (need arguments, print data)
+## The `Exe` folder (27.6 GB → about 1.4 GB)
 
-`MessageRender`, `CostumeAnimRender`, `VisitProbe` (usage: `<game> <step>...`), `CacheCheck` (needs `SCUMM_ROOM_CACHE_DIR`; logs cache counts, no pass/fail). Utilities rather than tests; keep `VisitProbe` (generic) and decide on the others.
+`Exe/` is git-ignored build output plus evidence packets. The 27.2 GB were 75 evidence folders from the 2–3 October observer and route sessions (mostly `.jsonl` captures, referenced by the `validation.md` files). Each was packed unchanged into `Exe/_evidence-archive/<name>.tar.gz` (1.1 GB in total) and removed only after the archive's file list matched. To read one: `tar -xzf Exe/_evidence-archive/<name>.tar.gz -C Exe`. Build outputs of the removed harnesses were deleted; the rest rebuilds with `dotnet build`. The app (`Exe/SCUMMexplorer.App`) was not touched.
 
-## D. Recorded failed or parked investigations (fail as documented)
+## Repository housekeeping still open
 
-`Room34Local200`, `Room34Local200Hop`, `Room34NoWake`, `Room36NoisyProbe`, `Room69Probe`, `Room09InputProbe`, `Room34ChainProbe`, `Room34Cycle2Probe`, `Room34Route3Probe`, `Room34WatcherProbe`. Their failures are exactly what `docs/PLAN_HISTORY_2026-10.md` records ("failed captures retained/excluded", Room 34 prerequisites parked). The other ~26 route probes of 3 October (Room 02 … Room 62, `GlobalInputProbe`, …) pass when given a fresh output folder. These ~36 are evidence captures for audited site coverage, not regression tests: **candidates for removal or archiving** once the user accepts the coverage figures (234/235 audited sites).
+- `.claude/worktrees/` holds 17 historical git worktrees (clean ancestors of `master` per `CLEANUP_REVIEW.md`); they slow file searches.
+- `docs/CLEANUP_REVIEW.md` proposals (source backup, old patch, `ui-refresh-*` captures) are still open.
+- The 2 nullable warnings above.
 
-## E. Intentional
+## How the run was done
 
-`ConsoleFailureProbe`, `FailureProbe`: crash on purpose to prove the harness failure policy; exit 1 is their pass.
-
-## Skipped unit tests (5)
-
-All are diagnostic dumps, not checks: `LoomObjectLookAuditTests.TraceRoom17Object357DoubleClick`, `LoomObjectLookAuditTests.AuditRoom02AndLaterRoomLookVerbs`, `LoomSceneSetupPlannerTests.DumpCostumeAndEntryAudit`, `.DumpSpeakers`, `.DumpCatalogSetups`. Keep or delete on review.
-
-## Repository housekeeping seen on the way
-
-- `.claude/worktrees/` holds 17 historical git worktrees (all clean ancestors of `master` per `CLEANUP_REVIEW.md`); they inflate every file search and `find` over the repo.
-- `docs/CLEANUP_REVIEW.md` proposals are still open (source backup, old patch, `ui-refresh-*` captures).
-
-## How this run was done (so it can be repeated)
-
-Each harness project was built (`dotnet build`) and run as `<exe> <Games\loom> <fresh output folder>` with a 200 s limit and a watcher that stops a process whose extra window stays open for 30 s. Probes that need other arguments were run with `src/SCUMMexplorer.App/loom-replays.json` and a fresh output file. `DoorwayClickCheck` takes `<game> <out.txt> 2 3 4 8 10 37` (all rooms takes over 15 minutes). `SequenceUiCheck` takes 8 minutes; `Blockers` takes about 9 minutes and writes to a file argument.
+Each harness project was built and run as `<exe> <Games\loom> <fresh output folder>` with a 200 s limit and a watcher that stops a process whose extra window stays open 30 s. Probes that need other arguments got `src/SCUMMexplorer.App/loom-replays.json` and a fresh output file. `SequenceUiCheck` takes 8 minutes, `Blockers` 9 minutes (its second argument is a file).

@@ -39,7 +39,7 @@ internal static class Program
                 var session = (LoomExplorationSession)Field("_session")!;
                 session.VisitRoomById(43);
                 for (var i = 0; i < 60; i++) session.AdvanceFrame();
-                foreach (var (name, picker) in new[] { ("picker-room02", (Window)Call("BuildRoomCutscenePicker", 2)!), ("picker-all", (Window)Call("BuildCutscenePicker")!) })
+                foreach (var (name, picker) in new[] { ("picker-all", (Window)Call("BuildCutscenePicker")!) })
                 {
                     picker.Show();
                     await Task.Delay(800);
