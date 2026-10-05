@@ -51,7 +51,25 @@ Left, in order of value:
 2. The Mt32emu.net dependency is accepted (user, 5 October).
 3. Optional: a General MIDI fallback for users without ROMs (labelled as a different sound); the room sounds menu's possible-sound list shown per card; 48–50, 60 and 63 are longer or shorter than their AdLib twins (not examined).
 
-## Next: LOOM VGA (CD, SCUMM v4), then more languages (user, 5 October; Indy3 deferred, M5 shelved, MT-32 built)
+## Next: LOOM EGA editions, before VGA (user, 5 October)
+
+New order: the editions of LOOM EGA first, then LOOM VGA. Reason: the folder named `loom ega en` is the Roland-upgraded copy (see the MT-32 section), so the names should say so, and more editions are now in `Games/`.
+
+**1. Rename the game folders (user's instruction; do it first, as its own commit).**
+- `Games/loom ega en` → `Games/loom ega mt32 en`, and `loom ega es` → `loom ega mt32 es` (the Roland upgrade installed).
+- Then `Games/loom ega ibm en` → `Games/loom ega en`, and `loom ega ibm es` → `loom ega es` (the plain game, no upgrade).
+- Do the two renames in this order (the old names are taken until the first pair has moved). Games/ is not in git, so the rename is a filesystem move that the user or the session does; everything that names the folders changes in the same step: `tests/SCUMMexplorer.Tests/TestGames.cs` (lookup list `"loom ega en", "loom ega es", "loom"`), `SCUMM_SOUND_TEST_ROOT` and `SCUMM_LOOM_TEST_ROOT` in CLAUDE.md, `.verification/run-verify.cmd`, `.verification/harness-review-20261004/*.ps1`, harness drivers and `loom-replays.json` sources, README, docs, and the memory note `english-reference-edition`. Run `git grep -n "loom ega"` for the full list (about 20 tracked files outside the archives).
+- Decide which edition is the reference afterwards. Today's tests, replay catalog and glossary were built on the Roland-upgraded English copy; the new plain `loom ega en` has other file sizes (it is another release: `00.LFL` and most room files differ from the upgraded copy) and lacks files 82–85, so the first run will show what breaks. Until that is checked, keep `loom ega mt32 en` as the reference and point the tests at it.
+
+**2. Try the plain editions and the new languages**, each as English was tried (open it, then compare with `GlossaryCheck` and `ScriptDump`; never key code on offsets, bits or object ids; record under `.verification/editions-<date>/`):
+- the new `loom ega en` and `loom ega es` (the plain game, the former `ibm` folders; their indexes still point sounds 33–64 at files 82–85 that are not there, so sounds must degrade cleanly);
+- `loom ega fr`, `loom ega de`, `loom ega hebrew` (already in `Games/`; the Hebrew copy has its own `Go.bat`, `README.TXT` and `VGA.PIC`, so check the text and font handling and whether it is a right-to-left or patched build);
+- `Loom v1.2 ega es` and `Loom v1.2 ega de` (version 1.2 of the game; check what 1.2 changed in scripts, text and room files against the plain editions).
+None of these has the Roland files (no `82.LFL`), so they are plain-sound editions. For each: does the folder open and get identified, are the rooms right, do the cutscene catalog, Game Status and glossary hold or need per-edition entries, do the texts extract. Fix what breaks only where it changes what the user sees.
+
+**3. Then LOOM VGA** (next section).
+
+## Then: LOOM VGA (CD, SCUMM v4) (user, 5 October; Indy3 deferred, M5 shelved, MT-32 built)
 
 **What is in `Games/loom vga en`** (read from the files on 5 October, nothing decoded yet): `Loom.cue` + `Loom.bin`, 630 MB, `MODE1/2352` raw sectors with an ISO 9660 volume "LOOM" (268,245 sectors). Track 1 is the data track; track 2 is one CD audio track that starts at 04:57:60 (pregap 2 s) and fills the rest of the disc, about 54 minutes. The data track's root holds only `000.LFL` (index, 8 KB), `901.LFL`–`904.LFL` (2–4 KB each, probably charsets), `DISK01.LEC` (4 MB, the resource file) and `LOOM.EXE`. That is the SCUMM v4 layout: an index plus one `.LEC` container instead of the per-room `NN.LFL` files of the EGA game. The audio track probably carries the spoken dialogue and the music that the scripts start by position (not checked; ScummVM's Loom CD support is the reference).
 
@@ -68,7 +86,7 @@ Left, in order of value:
 
 Decided (user, 5 October): **C**, a game file source that is a folder or a disc image. **CD audio comes last**, after picture, scripts and cutscenes. The user picks a folder (or image) and the app identifies the game and edition itself, as it does today; VGA is a different edition, so detection must recognise it (internal game id and edition naming are an implementation detail, not a new menu choice).
 
-**After that:** more languages of LOOM EGA (later; Spanish and English work, others when the data arrives; each checked as English was, with `GlossaryCheck` and `ScriptDump`, never keyed on offsets). **Deferred:** Indy3 EGA (until the user moves its data from `Games/FUTURE/` to `Games/`; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion.
+**Also in `Games/`:** `loom vga en kixx` (another `LOOM.bin`/`LOOM.cue` of the CD, probably the budget re-release; compare it with `loom vga en` in the probe). **Deferred:** Indy3 EGA (until the user moves its data from `Games/FUTURE/` to `Games/`; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion.
 
 ## Evidence rules
 
