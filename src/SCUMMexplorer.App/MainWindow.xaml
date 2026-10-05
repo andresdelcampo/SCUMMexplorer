@@ -78,7 +78,7 @@
                         <Path Data="M13,7 Q15,10 13,13 M15.5,4.5 Q19.5,10 15.5,15.5" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stroke="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"/>
                     </Canvas>
                     <Path Width="14" Height="20" Stretch="Uniform" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}">
-                        <Path.Style><Style TargetType="{x:Type Path}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding}" Value="AdLib"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Path.Style>
+                        <Path.Style><Style TargetType="{x:Type Path}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding}" Value="AdLib (hardware)"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding}" Value="AdLib (ScummVM)"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Path.Style>
                         <Path.Data>
                             <CombinedGeometry GeometryCombineMode="Exclude">
                                 <CombinedGeometry.Geometry1>
@@ -195,13 +195,14 @@
                             Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
                     <!-- Fixed group at the right edge (sound, Advanced, Open): the buttons that come and go sit to its left,
                          so these never move when a game opens or Advanced changes. -->
-                    <ComboBox x:Name="SoundModeCombo" Width="166" MinHeight="32" VerticalAlignment="Center" Margin="0,0,14,0"
+                    <ComboBox x:Name="SoundModeCombo" Width="196" MinHeight="32" VerticalAlignment="Center" Margin="0,0,14,0"
                               ItemTemplate="{StaticResource SoundDeviceItem}" SelectedIndex="2" ToolTipService.ShowOnDisabled="True"
                               SelectionChanged="SoundModeCombo_SelectionChanged"
-                              ToolTip="Music and effects. Changing device stops current audio; the next sound command uses the selected device.">
+                              ToolTip="Music and effects. AdLib (hardware) is the OPL chip as it behaves; AdLib (ScummVM) is the emulation ScummVM uses. Changing device stops current audio; the next sound command uses the selected device.">
                         <sys:String>No Sound</sys:String>
                         <sys:String>PC Speaker</sys:String>
-                        <sys:String>AdLib</sys:String>
+                        <sys:String>AdLib (hardware)</sys:String>
+                        <sys:String>AdLib (ScummVM)</sys:String>
                         <sys:String>Roland MT-32</sys:String>
                     </ComboBox>
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click" Style="{StaticResource SwitchCheck}"
@@ -410,9 +411,9 @@
                             <StackPanel x:Name="AdlibGainPanel" Visibility="Collapsed" Margin="12,0,12,12">
                                 <DockPanel LastChildFill="True">
                                     <TextBlock Text="AdLib level" Foreground="#E7E0D2" VerticalAlignment="Center"/>
-                                    <TextBlock x:Name="AdlibGainValue" Text="+0.0 dB" Foreground="#B8AA8C" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                                    <TextBlock x:Name="AdlibGainValue" Text="+6.0 dB" Foreground="#B8AA8C" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
                                 </DockPanel>
-                                <Slider x:Name="AdlibGainSlider" Minimum="0" Maximum="24" Value="0" TickFrequency="3"
+                                <Slider x:Name="AdlibGainSlider" Minimum="0" Maximum="24" Value="6" TickFrequency="3"
                                         IsSnapToTickEnabled="False" ValueChanged="AdlibGainSlider_ValueChanged"
                                         ToolTip="AdLib playback gain. Peaks are kept below clipping; some tracks may reach their safe maximum before 24 dB."/>
                             </StackPanel>

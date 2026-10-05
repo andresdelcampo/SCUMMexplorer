@@ -10,7 +10,7 @@
 namespace SCUMMexplorer.Core.Formats;
 
 /// <summary>A YM3812 as ScummVM's MAME OPL core emulates it. Mono output.</summary>
-public sealed class MameOpl2
+public sealed class MameOpl2 : IOplChip
 {
     private const int EnvBits = 16;
     private const int EgEnt = 4096;

@@ -6,6 +6,10 @@ namespace SCUMMexplorer.Core.Formats;
 /// <summary>Renders old-bundle LOOM AdLib music and effects through an OPL chip emulator.</summary>
 public sealed partial class LoomAdlibAudio
 {
+    private readonly AdlibEmulation _emulation;
+
+    public LoomAdlibAudio(AdlibEmulation emulation = AdlibEmulation.Hardware) => _emulation = emulation;
+
     private const int SampleRate = 49716;
     private const int CallbackRate = 472;
     private const int MaxSeconds = 180;
@@ -30,7 +34,7 @@ public sealed partial class LoomAdlibAudio
         var data = ReadTrack(resource);
         if (data.Length < 0x94 || data[2] != 0x80)
             throw new NotSupportedException("This AdLib resource is not a music track.");
-        var player = new MusicPlayer(data);
+        var player = new MusicPlayer(data, _emulation);
         var callbacks = 0;
         while (player.Active && !player.LoopBoundaryReached && callbacks < CallbackRate * MaxLifetimeSeconds)
         {
@@ -50,7 +54,7 @@ public sealed partial class LoomAdlibAudio
             var data = ReadTrack(resource);
             if (data[2] == 0x80)
             {
-                var player = new MusicPlayer(data);
+                var player = new MusicPlayer(data, _emulation);
                 for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds; callbacks++)
                 {
                     player.Tick();
@@ -64,7 +68,7 @@ public sealed partial class LoomAdlibAudio
                 }
                 return new(LoomSoundLifetimeKind.Unknown, null, true, "music exceeds the bounded lifetime analysis");
             }
-            var effect = new EffectPlayer(data);
+            var effect = new EffectPlayer(data, _emulation);
             for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds; callbacks++)
             {
                 effect.Tick();
@@ -83,9 +87,9 @@ public sealed partial class LoomAdlibAudio
     public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
     {
         var data = ReadTrack(resource);
-        if (data[2] != 0x80) return RenderEffectWave(data, cancellationToken);
+        if (data[2] != 0x80) return RenderEffectWave(data, _emulation, cancellationToken);
         if (data.Length < 0x94) throw new InvalidDataException("AdLib music header is incomplete.");
-        var player = new MusicPlayer(data);
+        var player = new MusicPlayer(data, _emulation);
         var lifetime = ReadLifetime(resource);
         var maxCallbacks = lifetime.Kind == LoomSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxSeconds;
         var samples = new List<short>();
@@ -230,14 +234,15 @@ public sealed partial class LoomAdlibAudio
         private int _ticks;
         private int _rhythm;
 
-        public MameOpl2 Chip { get; } = new(SampleRate);
+        public IOplChip Chip { get; }
         public bool Active { get; private set; } = true;
         public bool EndedNormally { get; private set; }
         public int LoopBoundaries { get; private set; }
         public bool LoopBoundaryReached => LoopBoundaries != 0;
 
-        public MusicPlayer(byte[] data)
+        public MusicPlayer(byte[] data, AdlibEmulation emulation)
         {
+            Chip = NukedOplChip.Create(emulation, SampleRate);
             _data = data;
             Write(0x01, 0x20);
             if (data.Length <= 0x93) throw new InvalidDataException("AdLib music header is incomplete.");

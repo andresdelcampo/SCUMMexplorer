@@ -58,3 +58,42 @@ public sealed class MameOpl2Tests
         Assert.True(none > one && one > two && two > three, $"{none:F0} {one:F0} {two:F0} {three:F0}");
     }
 }
+
+public sealed class ScummVmVolumeChipTests
+{
+    private sealed class Recorder : IOplChip
+    {
+        public readonly Dictionary<int, byte> Written = [];
+        public void WriteRegister(ushort register, byte value) => Written[register] = value;
+        public void GenerateStream(short[] stereo) { }
+    }
+
+    [Fact]
+    public void ScalesTheCarrierOfAnFmChannelButNotItsModulator()
+    {
+        var recorder = new Recorder();
+        var chip = new ScummVmVolumeChip(recorder, 192);
+        chip.WriteRegister(0xC0, 0x00);      // FM: only the carrier (operator offset 3 of channel 0) is scaled
+        chip.WriteRegister(0x40, 0x05);      // modulator, kept
+        chip.WriteRegister(0x43, 0x80 | 0x00); // carrier: key scale bits kept, level 63 -> 63 * 192 / 255 = 47
+        Assert.Equal(0x05, recorder.Written[0x40]);
+        Assert.Equal(0x80 | (0x3F - 47), recorder.Written[0x43]);
+    }
+
+    [Fact]
+    public void ScalesBothOperatorsOfAnAdditiveChannel()
+    {
+        var recorder = new Recorder();
+        var chip = new ScummVmVolumeChip(recorder, 192);
+        chip.WriteRegister(0xC0, 0x01);
+        chip.WriteRegister(0x40, 0x00);
+        Assert.Equal(0x3F - 47, recorder.Written[0x40]);
+    }
+
+    [Fact]
+    public void ChoosesTheChipByEmulation()
+    {
+        Assert.IsType<NukedOplChip>(NukedOplChip.Create(AdlibEmulation.Hardware, 49716));
+        Assert.IsType<ScummVmVolumeChip>(NukedOplChip.Create(AdlibEmulation.ScummVm, 49716));
+    }
+}

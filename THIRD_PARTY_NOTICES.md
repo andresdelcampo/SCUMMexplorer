@@ -30,6 +30,15 @@ the port is verified sample for sample against the C++ code.
 
 - [mame.cpp](https://github.com/scummvm/scummvm/blob/master/audio/softsynth/opl/mame.cpp)
 
+## NukedOPL3Sharp 1.3.1
+
+The "AdLib (hardware)" device synthesizes with NukedOPL3Sharp, copyright 2025-2026 Stefan Hueg and
+nukeykt, licensed under LGPL-2.1-only.
+
+- [Source](https://github.com/codengine/NukedOPL3Sharp/tree/c6171530c68403fa05ec659e155b8f382bb979d0)
+- [License](licenses/NukedOPL3Sharp-LGPL-2.1.txt)
+- [Upstream notices](licenses/NukedOPL3Sharp-NOTICES.md)
+
 ## Munt mt32emu and Mt32emu.net 1.0.0
 
 The Roland MT-32 device renders through Munt's `mt32emu` emulator (copyright the

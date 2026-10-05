@@ -1,8 +1,8 @@
 # Changelog
 
-## 5 October: AdLib through a port of ScummVM's MAME OPL core
+## 5 October: two AdLib renderings, hardware chip and ScummVM's
 
-Instruments in the title music sounded low or different from ScummVM. The driver already wrote the same registers as ScummVM's `Player_AD`; the difference was the chip: ScummVM plays AdLib through its MAME OPL2 core (a different level, a swapped key scale level 1/2, faster slow attacks, other vibrato). `MameOpl2` is now a C# port of that core and replaces NukedOPL3Sharp for music and effects; it matches the C++ sample for sample. The default AdLib gain is 0 dB (was +6 dB, which the louder core makes up for). [validation](../.verification/archive/audio-accuracy-20261003/validation.md)
+Instruments in the title music sounded low or different from ScummVM. The driver already wrote the same registers as ScummVM's `Player_AD`; the difference was the chip (ScummVM uses its MAME OPL2 core: other level, key scale level 1/2 swapped, a fast attack curve, other vibrato). `MameOpl2` is a C# port of that core (identical to the C++ sample for sample on music and effects), wrapped by `ScummVmVolumeChip` (ScummVM's default volume 192). After listening, the intro matched ScummVM better but the spell notes (which swell slowly on the hardware chip) sounded better with Nuked, so the sound-device dropdown now has "AdLib (hardware)" (Nuked, default) and "AdLib (ScummVM)", each with its own default level, remembered between runs (`adlib=` in `view-options.txt`). [validation](../.verification/archive/audio-accuracy-20261003/validation.md)
 
 ## 5 October: Roland MT-32 device (the LOOM Roland upgrade's music)
 

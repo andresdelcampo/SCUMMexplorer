@@ -6,9 +6,9 @@ namespace SCUMMexplorer.Core.Formats;
 
 public sealed partial class LoomAdlibAudio
 {
-    private static byte[] RenderEffectWave(byte[] data, CancellationToken cancellationToken)
+    private static byte[] RenderEffectWave(byte[] data, AdlibEmulation emulation, CancellationToken cancellationToken)
     {
-        var player = new EffectPlayer(data);
+        var player = new EffectPlayer(data, emulation);
         var samples = new List<short>();
         int remainder = 0, quiet = 0, release = 0;
         for (int callback = 0; callback < CallbackRate * MaxSeconds; callback++)
@@ -42,12 +42,13 @@ public sealed partial class LoomAdlibAudio
         private readonly byte[] _registers = new byte[256];
         private readonly List<Channel> _channels = [];
         private int _timer = 4, _random = 1;
-        public MameOpl2 Chip { get; } = new(SampleRate);
+        public IOplChip Chip { get; }
         public bool Active => _channels.Any(channel => channel.State != 0);
         public bool LoopBoundaryReached { get; private set; }
 
-        public EffectPlayer(byte[] data)
+        public EffectPlayer(byte[] data, AdlibEmulation emulation)
         {
+            Chip = NukedOplChip.Create(emulation, SampleRate);
             _data = data; Write(1, 0x20); Write(0xBD, 0); Write(8, 0);
             _channels.Add(new Channel(0, 2));
             int position = 2;
