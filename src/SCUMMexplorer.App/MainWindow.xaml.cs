@@ -1051,7 +1051,7 @@ public partial class MainWindow : Window
         scene is null
             ? "Background only: the room's entry script could not run. Bobbin, interaction and room routes are not read yet for the CD game."
             : "The room as its entry script leaves it (first visit)" +
-              (scene.Snapshot.Picks.Count > 0 ? $"; where the script branches on a random value, the explorer picked one ({scene.Snapshot.Picks.Count} seeded picks, listed in the session notes)" : "") +
+              (scene.Snapshot.Picks is { Count: > 0 } ? $"; where the script branches on a random value, the explorer picked one ({scene.Snapshot.Picks.Count} seeded picks, listed in the session notes)" : "") +
               (scene.Actors.Any(actor => actor.Number == 1 && actor.Room == scene.Snapshot.RoomId)
                   ? "; Bobbin stands where an assumed arrival would bring him (an estimate: the route to the room was not played)" : "") +
               ". Interaction and room routes are not read yet for the CD game.";
@@ -4360,7 +4360,7 @@ public partial class MainWindow : Window
         if (snapshot.RoomId is int reached && reached != playback.SourceRoom.ResourceId)
         {
             if (_currentRoomResource?.ResourceId != reached && _playbackRequestedRoom != reached &&
-                _game.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } target)
+                _game?.Rooms.FirstOrDefault(item => item.ResourceId == reached) is { } target)
                 EnterPlaybackRoom(target);
             else if (_currentRoomResource is { } shown && shown.ResourceId == reached && _currentRoom is not null)
             {

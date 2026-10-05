@@ -12,7 +12,7 @@ public interface IGameFileSource
 
 public sealed class FolderFileSource(string folder) : IGameFileSource
 {
-    public string Location { get; } = folder;
+    public string Location => folder;
     public IReadOnlyList<string> FileNames { get; } = Directory.EnumerateFiles(folder).Select(Path.GetFileName).OfType<string>().ToArray();
     public bool Exists(string name) => File.Exists(Path.Combine(folder, name));
     public byte[] ReadAllBytes(string name) => File.ReadAllBytes(Path.Combine(folder, name));

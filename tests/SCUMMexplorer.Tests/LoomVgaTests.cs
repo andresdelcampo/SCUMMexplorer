@@ -195,7 +195,7 @@ public sealed class LoomVgaTests
         {
             var snapshot = session.VisitRoom(room);
             Assert.True(room.ResourceId == snapshot.RoomId, $"visiting room {room.ResourceId} ended in room {snapshot.RoomId}");
-            if (snapshot.StatesSetInRoom.Count > 0) withStates++;
+            if (snapshot.StatesSetInRoom is { Count: > 0 }) withStates++;
         }
         // The index gives every object state 0; rooms show what their entry script sets.
         Assert.True(withStates >= 15, $"{withStates} rooms set object states");
@@ -227,7 +227,7 @@ public sealed class LoomVgaTests
         var truncated = new List<int>();
         foreach (var room in game.Rooms)
         {
-            var read = data.ReadRoom(room.ResourceId.Value);
+            var read = data.ReadRoom(room.ResourceId!.Value);
             if (read.WalkBoxes is null) { Assert.Contains("no BX", read.WalkBoxError); continue; }
             Assert.Null(read.WalkBoxError);
             if (read.WalkBoxes.MatrixTruncated) truncated.Add(room.ResourceId.Value);
@@ -364,7 +364,7 @@ public sealed class LoomVgaTests
             var rows = new char[16][];
             for (var y = 0; y < rows.Length; y++) rows[y] = Enumerable.Repeat('.', 16).ToArray();
             charset.DrawGlyph('A', (x, y, v) => { if (x >= 0 && x < 16 && y + 4 >= 0 && y + 4 < 16) rows[y + 4][x] = (char)('0' + v); });
-            Assert.True(rows.SelectMany(r => r).Any(c => c != '.'));
+            Assert.Contains(rows.SelectMany(r => r), c => c != '.');
             File.AppendAllText(Path.Combine(Path.GetTempPath(), "charset-glyphs.txt"),
                 $"charset {number} height {charset.FontHeight} glyphs {charset.GlyphCount} A width {charset.CharWidth('A')} colours {Convert.ToHexString(charset.ColorMap)}" + Environment.NewLine + string.Join(Environment.NewLine, rows.Select(r => new string(r))) + Environment.NewLine);
         }
@@ -533,6 +533,6 @@ public sealed class LoomVgaCharsetPerMessageTests
         Assert.False(session.GameStatus.StaffHeld);
         // 017 starts 019, which runs on the next frames, as in the app.
         for (var frame = 0; frame < 5; frame++) session.AdvanceFrame();
-        Assert.Empty(session.VerbArea().Items.Where(item => item.VerbId is >= 1 and <= 8));
+        Assert.DoesNotContain(session.VerbArea().Items, item => item.VerbId is >= 1 and <= 8);
     }
 }
