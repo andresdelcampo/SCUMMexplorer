@@ -25,7 +25,12 @@ public sealed class NukedOplChip : IOplChip
 
     public NukedOplChip(int sampleRate) => _chip.Reset((uint)sampleRate);
 
-    public void WriteRegister(ushort register, byte value) => _chip.WriteRegister(register, value);
+    /// <summary>
+    /// Buffered, as Nuked provides for it: each write takes effect two samples after the previous one, like the real
+    /// chip's write latency. The driver sets up a note's registers between its key-off and key-on; written all at
+    /// one instant, the key-off never registers and the note never re-attacks (the envelope just keeps decaying).
+    /// </summary>
+    public void WriteRegister(ushort register, byte value) => _chip.WriteRegisterBuffered(register, value);
 
     public void GenerateStream(short[] stereo) => _chip.GenerateStream(stereo);
 

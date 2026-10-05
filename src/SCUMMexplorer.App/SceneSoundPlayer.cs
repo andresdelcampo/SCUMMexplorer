@@ -25,8 +25,8 @@ public sealed class SceneSoundPlayer
     /// <summary>The OPL emulation behind AdLib: the hardware chip (Nuked) or ScummVM's MAME core.</summary>
     public AdlibEmulation Emulation { get; private set; } = AdlibEmulation.Hardware;
 
-    /// <summary>The level that makes the emulations about equally loud: ScummVM at its default volume (192 of 255) is about 9 dB below the hardware chip with +6 dB.</summary>
-    public static double DefaultGainDb(AdlibEmulation emulation) => emulation == AdlibEmulation.Hardware ? 6 : 9;
+    /// <summary>The level that makes the emulations about equally loud: ScummVM at its default volume (192 of 255) is about 10 dB below the hardware chip with +6 dB.</summary>
+    public static double DefaultGainDb(AdlibEmulation emulation) => emulation == AdlibEmulation.Hardware ? 6 : 10;
 
     /// <summary>The MT-32 ROM images the Roland device needs (the user's own files); null until a folder with them is known.</summary>
     public Mt32RomSet? Roms { get; set; }
