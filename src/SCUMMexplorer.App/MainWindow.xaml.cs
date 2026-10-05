@@ -4451,7 +4451,7 @@ public partial class MainWindow : Window
     private BitmapSource? _verbMessageBitmap;
 
     /// <summary>The interactive LOOM mode, where the room and the verb screen are drawn as the game's one screen.</summary>
-    private bool OneGameScreen() => _currentRoom is not null && GameClickActive && _game?.Id == GameId.Loom;
+    private bool OneGameScreen() => _currentRoom is not null && GameClickActive && IsLoomGame;
 
     /// <summary>The game's camera left edge in room pixels (ScummVM <c>virtscr[0].xstart</c>).</summary>
     private int GameCameraLeft(RoomImage room)
@@ -4760,7 +4760,7 @@ public partial class MainWindow : Window
     }
 
     private bool VerbStripShown() =>
-        GameClickActive && _game?.Id == GameId.Loom && _currentRoom is not null;
+        GameClickActive && IsLoomGame && _currentRoom is not null;
 
     /// <summary>
     /// The interactive verb strip: a presentation of the session's verb slots
@@ -4770,7 +4770,7 @@ public partial class MainWindow : Window
     // The verb screen is shown for the strip, or for text a script printed there (rows 144–199).
     // In the interactive LOOM mode it is always shown, so the room keeps its size when a script prints there or clears it.
     private bool VerbScreenShown() => VerbStripShown() ||
-        _currentRoom is not null && (_verbMessageBitmap is not null || GameClickActive && _game?.Id == GameId.Loom);
+        _currentRoom is not null && (_verbMessageBitmap is not null || GameClickActive && IsLoomGame);
 
     private void UpdateVerbStrip()
     {

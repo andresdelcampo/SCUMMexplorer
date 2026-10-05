@@ -55,7 +55,9 @@ internal static class Program
                     var all = new List<(string, SCUMMexplorer.Core.Formats.LoomScriptDisassembly?)>();
                     foreach (var id in cd.GlobalScriptIds()) all.Add(($"global {id}", cd.GlobalScript(id)));
                     foreach (var r in game.Rooms.Select(r => r.ResourceId!.Value)) { all.Add(($"room {r} entry", cd.RoomEntryScript(r))); foreach (var id in cd.RoomLocalScriptIds(r)) all.Add(($"room {r} local {id}", cd.RoomLocalScript(r, id))); }
-                    foreach (var (name, sc) in all) if (sc is not null) foreach (var ins in sc.Instructions) if (ins.Operation == "cursorCommand" && ins.Operands.StartsWith("charset")) report.Add($"   {name} +{ins.Offset:X4} {ins.Operands}");
+                    // CD_OPS=verbOps lists every use of that operation instead of the charset switches.
+                    var op = Environment.GetEnvironmentVariable("CD_OPS");
+                    foreach (var (name, sc) in all) if (sc is not null) foreach (var ins in sc.Instructions) if (op is null ? ins.Operation == "cursorCommand" && ins.Operands.StartsWith("charset") : ins.Operation == op) report.Add($"   {name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}");
                 }
                 var rooms = args.Length > 2 ? args[2].Split(',').Select(int.Parse).ToArray() : new[] { 4, 10, 16, 35 };
                 foreach (var number in rooms)

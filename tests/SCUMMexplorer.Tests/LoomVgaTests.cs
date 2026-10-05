@@ -371,6 +371,26 @@ public sealed class LoomVgaTests
     }
 
     [Fact]
+    public void TheCdDraftVerbsDrawInTheVerbAreaFromRoomOneImages()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        session.VisitRoom(game.Rooms.First(item => item.ResourceId == 1));
+        session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
+        Assert.Empty(session.VerbArea().Items);
+        // What script 018 does when the distaff is held (the CD game has its own staff variables, so the explorer's state edit is not used here).
+        var run = typeof(LoomExplorationSession).GetMethod("RunStartedScript", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        var runtime = typeof(LoomExplorationSession).GetField("_runtime", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
+        runtime.GetType().GetMethod("SetGlobalVariable")!.Invoke(runtime, ["var[0x0AC]", (ushort)8]);
+        run.Invoke(session, System.Reflection.BindingFlags.Default, Type.DefaultBinder, [18, 0, new Dictionary<string, ushort> { ["local[0x000]"] = 2 }, 0, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing], null);
+        var area = session.VerbArea();
+        Assert.Contains(area.Items, item => item.VerbId == 0x01 && item.ImageRoom == 1);
+        Assert.True(area.Items.Count(item => item.VerbId is >= 1 and <= 8) == 8);
+        Assert.Contains(area.Pixels, pixel => pixel != 0);
+    }
+
+    [Fact]
     public void ATalkLineDrawsInTheCdCharset()
     {
         if (Folder("loom vga en") is not { } folder) return;
