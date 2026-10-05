@@ -15,7 +15,9 @@ public enum GameId
 {
     Unknown,
     Loom,
-    IndianaJones3
+    IndianaJones3,
+    /// <summary>LOOM on CD (SCUMM v4, VGA): DISK01.LEC, read from a folder or a disc image.</summary>
+    LoomVga
 }
 
 public enum ResourceKind
@@ -54,6 +56,9 @@ public sealed record GameLibrary(
     GameId Id = GameId.Unknown,
     bool IsDemo = false)
 {
+    /// <summary>The CD game's archive (rooms read from DISK01.LEC); null for every other game.</summary>
+    public Formats.LoomVgaArchive? Vga { get; init; }
+
     public IEnumerable<GameResource> Rooms => Resources.Where(r => r.Kind == ResourceKind.Room);
     /// <summary>The rooms worth showing as scenes: LOOM's dummy sound-bank rooms (82-85) are left out.</summary>
     public IEnumerable<GameResource> Scenes => Id == GameId.Loom ? Rooms.Where(r => !Rendering.LoomRoomKinds.IsResourceBank(r, flatBackgroundCounts: IsDemo)) : Rooms;

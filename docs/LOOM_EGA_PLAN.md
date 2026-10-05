@@ -88,7 +88,7 @@ None of these has the Roland files (no `82.LFL`), so they are plain-sound editio
 
 Decided (user, 5 October): **C**, a game file source that is a folder or a disc image. **CD audio comes last**, after picture, scripts and cutscenes. The user picks a folder (or image) and the app identifies the game and edition itself, as it does today; VGA is a different edition, so detection must recognise it (internal game id and edition naming are an implementation detail, not a new menu choice).
 
-**Also in `Games/`:** `loom vga en kixx` (another `LOOM.bin`/`LOOM.cue` of the CD, probably the budget re-release; compare it with `loom vga en` in the probe). **Deferred:** Indy3 EGA (until the user moves its data from `Games/FUTURE/` to `Games/`; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion.
+**Also in `Games/`:** `loom vga en kixx` (`LOOMCD.BIN`/`LOOMCD.CUE`, another dump of the CD, probably the budget re-release; compare it with `loom vga en` in the probe). **Deferred:** Indy3 EGA (until the user moves its data from `Games/FUTURE/` to `Games/`; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion.
 
 ## Evidence rules
 

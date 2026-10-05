@@ -2,6 +2,7 @@ using System.Globalization;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.Core.Rendering;
+using SCUMMexplorer.Core.Storage;
 
 namespace SCUMMexplorer.Core.Discovery;
 
@@ -18,6 +19,7 @@ public sealed class GameFolderScanner
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(folderPath);
         var fullPath = Path.GetFullPath(folderPath);
+        if (TryScanCd(fullPath) is { } cd) return cd;
         if (!Directory.Exists(fullPath))
             throw new DirectoryNotFoundException($"Game folder not found: {fullPath}");
 
@@ -127,6 +129,40 @@ public sealed class GameFolderScanner
         };
 
         return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo);
+    }
+
+    /// <summary>
+    /// The LOOM CD game: a .cue, .iso or .bin file, a folder holding one, or a folder with the files copied off the disc
+    /// (000.LFL and DISK01.LEC). Null when the path is none of these, so the folder scan goes on.
+    /// </summary>
+    private static GameLibrary? TryScanCd(string path)
+    {
+        IGameFileSource source;
+        if (File.Exists(path))
+        {
+            if (!DiscImage.IsImageFile(path)) return null;
+            source = new DiscFileSource(path);
+        }
+        else if (Directory.Exists(path))
+        {
+            var folder = new FolderFileSource(path);
+            if (LoomVgaArchive.IsVga(folder)) source = folder;
+            else if (folder.FileNames.Any(n => n.Equals("00.LFL", StringComparison.OrdinalIgnoreCase)) || DiscImage.FindImageIn(path) is null) return null;
+            else
+            {
+                try { source = new DiscFileSource(path); }
+                catch (Exception ex) when (ex is InvalidDataException or IOException) { return null; }
+            }
+        }
+        else return null;
+        if (!LoomVgaArchive.IsVga(source)) return null;
+
+        var archive = LoomVgaArchive.Load(source);
+        var resources = archive.Rooms.Select(room => new GameResource($"Room {room.Number:00}", ResourceKind.Room, source.Location,
+            room.Number, string.IsNullOrEmpty(room.Name) ? "LOOM CD room (DISK01.LEC)." : $"LOOM CD room \"{room.Name}\" (DISK01.LEC).",
+            1, room.Offset)).ToList();
+        const string note = "LOOM CD (SCUMM v4, VGA) read from its disc image or files: 000.LFL and DISK01.LEC. Room backgrounds are supported; scripts, objects, actors and CD audio are not read yet.";
+        return new GameLibrary("LOOM (CD)", source.Location, ScummVersion.V4, "CD (VGA)", resources, note, GameId.LoomVga) { Vga = archive };
     }
 
     /// <summary>
