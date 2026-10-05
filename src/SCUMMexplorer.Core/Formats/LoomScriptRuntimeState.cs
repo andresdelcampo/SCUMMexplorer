@@ -195,6 +195,11 @@ public sealed class LoomScriptRuntimeState
     /// above 0 (<c>checkExecVerbs</c>). It starts at 0.
     /// </summary>
     private int userPut;
+    /// <summary>
+    /// The charset <c>cursorCommand charsetSet</c> last chose (ScummVM <c>_string[0].charset</c>), or null before any did.
+    /// A message keeps the charset that was set when its <c>print</c> ran (<see cref="LoomMessage.Charset"/>).
+    /// </summary>
+    public int? Charset { get; set; }
     public int UserPut
     {
         get => userPut;

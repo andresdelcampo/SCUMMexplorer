@@ -752,6 +752,16 @@ public sealed class LoomBoundedScriptExecutor
             {
                 // o5_cursorCommand: userInputOn/Off set _userPut to 1/0; the soft forms add or take one.
                 var command = instruction.Operands.Split(',', StringSplitOptions.TrimEntries)[0];
+                if (command == "charsetSet")
+                {
+                    // o5_cursorCommand case 13 (charsetSet): a literal number sets the charset the next prints use.
+                    var number = instruction.Operands.Split(',', StringSplitOptions.TrimEntries).ElementAtOrDefault(1);
+                    runtime.Charset = number is not null && number.StartsWith("0x", StringComparison.Ordinal)
+                        ? int.Parse(number.AsSpan(2), System.Globalization.NumberStyles.HexNumber) : null;
+                    trace.Add($"charset {(runtime.Charset?.ToString() ?? "unknown (a variable)")} (charsetSet at +0x{instruction.Offset:X4})");
+                    pc = next;
+                    continue;
+                }
                 var before = runtime.UserPut;
                 runtime.UserPut = command switch
                 {

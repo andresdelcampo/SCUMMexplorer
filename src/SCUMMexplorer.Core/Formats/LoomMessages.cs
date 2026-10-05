@@ -35,6 +35,9 @@ public sealed record LoomMessage(
 
     /// <summary>Boxes (<c>drawBox</c>) drawn over this string after it: its pixels inside them are covered.</summary>
     public IReadOnlyList<LoomScreenBox> ErasedBy { get; init; } = [];
+
+    /// <summary>The charset chosen by <c>charsetSet</c> when the <c>print</c> ran, or null if none was (the game's default then).</summary>
+    public int? Charset { get; init; }
 }
 
 /// <summary>A <c>drawBox</c> rectangle in screen coordinates, corners inclusive.</summary>
@@ -105,6 +108,7 @@ public sealed class LoomMessageTable
     private int _color = 15;
     private LoomPrintRequest? _source;
     private string? _estimate;
+    private int? _charset;
 
     internal Action? NativeMutation { get; set; }
 
@@ -263,6 +267,7 @@ public sealed class LoomMessageTable
         _buffer.AddRange(buffer);
         _bufferPos = 0;
         _source = request;
+        _charset = runtime.Charset;
         _estimate = estimates.Count == 0 ? null : string.Join("; ", estimates.Distinct());
         _slotCopy = slot.Copy();
         TalkDelay = 0;
@@ -302,7 +307,7 @@ public sealed class LoomMessageTable
         var message = new LoomMessage(LoomMessageKind.Drawn, request.ActorToPrintFor, 1,
             lines.Select(line => line.ToArray()).ToArray(), slot.X, slot.Y, slot.Center, slot.Height, slot.Right, slot.Color,
             request.RoomId, request.SourceLabel, request.Offset, 0,
-            estimates.Count == 0 ? null : string.Join("; ", estimates.Distinct()));
+            estimates.Count == 0 ? null : string.Join("; ", estimates.Distinct())) { Charset = runtime.Charset };
         // drawString paints into the persistent screen, not a bounded message queue.
         // A new print cannot evict an unrelated score/staff glyph. Coalesce only
         // identical glyph geometry that this print completely paints again; different
@@ -470,7 +475,7 @@ public sealed class LoomMessageTable
         if (estimates.Count > 0) estimate = string.Join("; ", new[] { estimate }.Concat(estimates).Where(item => item is not null).Distinct());
         Talk = new LoomMessage(LoomMessageKind.Talk, source.ActorToPrintFor == NoActor ? NoActor : TalkingActor, 0,
             _shown.Select(line => line.ToArray()).ToArray(), _slotCopy.X, _slotCopy.Y, _slotCopy.Center, _slotCopy.Height,
-            _slotCopy.Right, _color, source.RoomId, source.SourceLabel, source.Offset, TalkDelay, estimate);
+            _slotCopy.Right, _color, source.RoomId, source.SourceLabel, source.Offset, TalkDelay, estimate) { Charset = _charset };
         _log.Add(Talk);
     }
 

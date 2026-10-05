@@ -10,11 +10,16 @@ namespace SCUMMexplorer.Core.Rendering;
 /// </summary>
 public static class LoomVgaMessageRenderer
 {
-    public static LoomMessageLayer Render(IEnumerable<LoomMessage> messages, LoomVgaCharset charset)
+    public static LoomMessageLayer Render(IEnumerable<LoomMessage> messages, LoomVgaCharset charset) =>
+        Render(messages, _ => charset);
+
+    /// <summary>Each message in the charset it was printed with (<see cref="LoomMessage.Charset"/>, null when none was set).</summary>
+    public static LoomMessageLayer Render(IEnumerable<LoomMessage> messages, Func<int?, LoomVgaCharset> charsetFor)
     {
         var layer = new Layer();
         foreach (var message in messages)
         {
+            var charset = charsetFor(message.Charset);
             layer.ErasedBy = message.ErasedBy;
             var top = message.Y;
             for (var index = 0; index < message.LineGlyphs.Count; index++)
@@ -49,6 +54,8 @@ public static class LoomVgaMessageRenderer
     }
 
     public static LoomMessageLayer Render(LoomMessage message, LoomVgaCharset charset) => Render([message], charset);
+
+    public static LoomMessageLayer Render(LoomMessage message, Func<int?, LoomVgaCharset> charsetFor) => Render([message], charsetFor);
 
     private static byte ColorOf(LoomVgaCharset charset, int value) => charset.ColorMap[value - 1];
 

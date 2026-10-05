@@ -79,6 +79,20 @@ public partial class MainWindow : Window
     private string? _charsetError;
     // The CD game's charset 2, the one script 001 sets when the intro ends (+0x015E); script 044 sets 4 for a while.
     private LoomVgaCharset? _cdCharset;
+    private readonly Dictionary<int, LoomVgaCharset?> _cdCharsets = [];
+
+    /// <summary>The CD charset a message was printed with (script 044 sets 4 for one title line); the default (2) when none was set or one cannot be read.</summary>
+    private LoomVgaCharset CdCharset(int? number, LoomVgaCharset fallback)
+    {
+        if (number is not int n || n == 2 || _game?.Vga is not { } vga) return fallback;
+        if (!_cdCharsets.TryGetValue(n, out var charset))
+        {
+            try { charset = vga.ReadCharset(n); }
+            catch (InvalidDataException) { charset = null; }
+            _cdCharsets[n] = charset;
+        }
+        return charset ?? fallback;
+    }
     private int? _selectedObject;
     private string? _audioFile;
     private byte[]? _adlibBaseWave;
@@ -253,6 +267,7 @@ public partial class MainWindow : Window
         if (_session is not null && cdIndexed is null) _sceneSound.Attach(game, _session);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
+        _cdCharsets.Clear();
         try { _cdCharset = game.Vga?.ReadCharset(2); }
         catch (InvalidDataException error) { _cdCharset = null; _charsetError = $"charset 2 could not be read: {error.Message}"; }
         _actorCostumes.Clear();
@@ -4496,11 +4511,11 @@ public partial class MainWindow : Window
             }
             else if (_cdCharset is { } cdCharset)
             {
-                var layer = LoomVgaMessageRenderer.Render(messages, cdCharset);
+                var layer = LoomVgaMessageRenderer.Render(messages, number => CdCharset(number, cdCharset));
                 RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
                 _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
                 if (session!.Messages.Talk is { Y: < LoomMessageRenderer.VerbScreenTop } talk &&
-                    LoomVgaMessageRenderer.Render(talk, cdCharset).Bounds is { } bounds)
+                    LoomVgaMessageRenderer.Render(talk, number => CdCharset(number, cdCharset)).Bounds is { } bounds)
                     _talkTextRect = (bounds.Left + left, bounds.Top - LoomMessageRenderer.RoomScreenTop,
                         bounds.Right + left, bounds.Bottom - LoomMessageRenderer.RoomScreenTop);
             }

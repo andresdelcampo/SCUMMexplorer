@@ -404,3 +404,27 @@ public sealed class LoomVgaTests
         Assert.InRange(layer.Bounds!.Value.Left, 100, 160);
     }
 }
+
+public sealed class LoomVgaCharsetPerMessageTests
+{
+    [Fact]
+    public void AMessageKeepsTheCharsetSetWhenItsPrintRan()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
+        // Script 044 (the intro) +0x0210 sets charset 4, prints the company line, then sets charset 2 for the copyright line.
+        var run = typeof(LoomExplorationSession).GetMethod("RunStartedScript", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        run.Invoke(session, System.Reflection.BindingFlags.Default, Type.DefaultBinder,
+            [44, 0x210, new Dictionary<string, ushort>(), 0, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing], null);
+        var drawn = session.Messages.OnScreen.ToArray();
+        // The talk slot holds one line, so the company line is already replaced on screen; the log keeps it.
+        Assert.Contains(session.Messages.Log, message => message.Text == "LucasArts Entertainment Company" && message.Charset == 4);
+        Assert.Contains(drawn, message => message.Text.Contains("All rights reserved", StringComparison.Ordinal) && message.Charset == 2);
+        var archive = game.Vga!;
+        var layer = LoomVgaMessageRenderer.Render(drawn, number => archive.ReadCharset(number ?? 2)!);
+        Assert.NotNull(layer.Bounds);
+    }
+}
