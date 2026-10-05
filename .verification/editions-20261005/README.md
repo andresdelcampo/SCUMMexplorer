@@ -40,3 +40,5 @@ Not yet checked: sounds degrading cleanly without files 82–85 in the real wind
 - **Replay catalog:** `LoomReplayCatalog.Load` fingerprints the files it was generated from (SHA-256), so on every edition other than the reference the catalog is empty with a note and only the four established starts remain. That is graceful, not a failure. The sequence tests in `LoomReplaySequenceTests` pin boundaries by offset (`endCutscene at Script 85 +0x05A8`; plain en has it at `+0x05AB`), so they fail on the plain editions by construction. Making cutscene replay work on a plain edition means rerunning the discovery pipeline on it (`replay-coverage-20261001/`, `english-catalog-20261004/`) and shipping a second catalog: not done.
 
 **Decision (user, 5 October): no replay-pipeline rerun for the other editions.** `loom ega mt32 en` is the only edition that gets the cutscene catalog and the replay tests; the other editions open, show rooms and texts, and keep the four established starts.
+
+**Keeping track (user, 5 October):** the list of verified editions lives in the main `README.md`, section "Verified editions"; add a bullet there whenever an edition is checked.

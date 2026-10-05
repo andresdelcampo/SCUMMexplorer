@@ -6,6 +6,22 @@ An audio-visual, interactive explorer for classic SCUMM adventures. Walk through
 
 Game files are not included and never committed: you open a folder you own.
 
+## Verified editions
+
+Checked by opening the folder in the app and running the room, text and glossary checks (record: [.verification/editions-20261005](.verification/editions-20261005/README.md)). "Full" means the cutscene catalog and replay tests too.
+
+- **LOOM EGA, English, with the Roland (MT-32) upgrade**: full (the reference edition, and the only one with the cutscene catalog).
+- **LOOM EGA, Spanish, with the Roland upgrade**: opens; used for comparison.
+- **LOOM EGA, English (plain DOS release)**: opens, rooms without gaps, texts extract, sounds fall back to AdLib and PC speaker.
+- **LOOM EGA, Spanish (plain DOS release)**: opens, rooms without gaps.
+- **LOOM EGA, French**: opens, rooms without gaps, texts extract.
+- **LOOM EGA, German**: opens, rooms without gaps.
+- **LOOM EGA v1.2, Spanish and German**: open, rooms without gaps (v1.2 German is byte-identical to the plain German release).
+- **LOOM self-running previews (short and long, English)**: open.
+- **Indiana Jones and the Last Crusade EGA, English**: room backgrounds and texts only.
+
+Not supported: the Hebrew release (dropped). Not yet read: LOOM VGA (CD).
+
 ## What you can do today (LOOM EGA)
 
 - **Pick a scene by its artwork** in the visual room picker, and see each room without black gaps. Room numbers and exit outlines are available on request.
