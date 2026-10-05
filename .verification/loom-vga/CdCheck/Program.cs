@@ -2,6 +2,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
@@ -37,18 +38,40 @@ internal static class Program
                 var game = (GameLibrary)Field("_game")!;
                 var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} ({string.Join(",", game.Rooms.Select(r => r.ResourceId))}) | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
                 // CD_INTRO=1 plays "The intro" from the Play a cutscene list on the playback clock and shoots it every CD_INTRO_STEP ms (default 4000) for CD_INTRO_MS (default 105000).
-                if (Environment.GetEnvironmentVariable("CD_INTRO") == "1")
+                // CD_CUT=room,object,verb (verb 0 = the room's entry) plays that derived cutscene instead; CD_ESCAPE_MS presses Escape (the window's own key handler) that many ms after the start.
+                var cut = Environment.GetEnvironmentVariable("CD_CUT");
+                if (Environment.GetEnvironmentVariable("CD_INTRO") == "1" || cut is not null)
                 {
                     var toggle = (System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle");
                     toggle.IsChecked = true;
                     await Task.Delay(1500);
                     var step = int.Parse(Environment.GetEnvironmentVariable("CD_INTRO_STEP") ?? "4000");
                     var total = int.Parse(Environment.GetEnvironmentVariable("CD_INTRO_MS") ?? "105000");
-                    Call("PlayCdIntro");
+                    if (cut is null) Call("PlayCdIntro");
+                    else
+                    {
+                        var want = cut.Split(',').Select(int.Parse).ToArray();
+                        var group = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>()
+                            .First(g => g.First.Room == want[0] && g.First.ObjectId == want[1] && (g.First.VerbId == want[2] || g.First.IsRoomEntry && want[2] == 0));
+                        report.Add($"cutscene room {group.First.Room} object {group.First.ObjectId} {group.First.ObjectName} {group.First.VerbLabel}, scene {group.IsScene}");
+                        Call("PlayCdCutscene", group);
+                    }
+                    var escapeMs = int.Parse(Environment.GetEnvironmentVariable("CD_ESCAPE_MS") ?? "-1");
+                    var escaped = false;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
                     for (var t = 0; t < total; t += step)
                     {
-                        await Task.Delay(step);
+                        if (escapeMs >= 0 && !escaped && t + step > escapeMs)
+                        {
+                            await Task.Delay(Math.Max(0, escapeMs - t));
+                            var source = PresentationSource.FromVisual(window);
+                            var key = new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Escape) { RoutedEvent = Keyboard.PreviewKeyDownEvent };
+                            window.RaiseEvent(key);
+                            escaped = true;
+                            report.Add($"+{clock.ElapsedMilliseconds} ms: Escape raised, handled {key.Handled}: {((TextBlock)window.FindName("StatusText")).Text}");
+                            await Task.Delay(Math.Max(0, step - (escapeMs - t)));
+                        }
+                        else await Task.Delay(step);
                         Shot($"intro-{t + step:000000}.png");
                         var session = Field("_session")!;
                         var snap = session.GetType().GetProperty("Snapshot")!.GetValue(session)!;
@@ -81,6 +104,17 @@ internal static class Program
                     var r35 = game.Rooms.First(r => r.ResourceId == 35);
                     Call("SelectResourceInTree", r35);
                     await Task.Delay(1500);
+                    // CD_STATUS_HELD=1 holds the staff first (Game Status's own edits: staff, 5 notes, draft 0 and 1 learned with notes) so the window shows the artwork of a held staff.
+                    if (Environment.GetEnvironmentVariable("CD_STATUS_HELD") == "1")
+                    {
+                        var s0 = Field("_session")!;
+                        void S(string name, params object[] a) => s0.GetType().GetMethod(name)!.Invoke(s0, a);
+                        S("UpdateStaffPossession", true); S("UpdateAvailableNotes", 5);
+                        S("UpdateDraftSequence", 0, new[] { 1, 2, 3, 4 }); S("UpdateDraftLearned", 0, true);
+                        S("UpdateDraftSequence", 1, new[] { 2, 3, 4, 5 }); S("UpdateDraftLearned", 1, true);
+                        for (var f = 0; f < 10; f++) S("AdvanceFrame");
+                        report.Add("staff held for the status window");
+                    }
                     var status = (Window)Call("BuildGameStatusWindow")!;
                     status.Show();
                     await Task.Delay(1500);

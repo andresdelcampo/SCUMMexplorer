@@ -263,6 +263,7 @@ public partial class MainWindow : Window
         // the intro (see LoomExplorationSession.ContinueCdBootAfterIntro) and has no sound or catalog yet.
         var cdIndexed = game is { Id: GameId.LoomVga, Vga: { } vga } ? vga.ReadIndexedObjects() : null;
         _cdData = cdIndexed is null ? null : ScummDataSources.For(game);
+        _cdCutsceneGroups = null;
         if (cdIndexed is not null) _indexedStates = cdIndexed.States;
         _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
             : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
@@ -3608,6 +3609,8 @@ public partial class MainWindow : Window
         public TimeSpan Credit { get; set; }
         // A LOOM demo's self-running preview: it runs until the user opens another room.
         public bool Preview { get; init; }
+        // A cutscene chosen from the CD game's derived list: the code may hold a branch that needs another state, so say so when none began.
+        public string? ExpectedCutscene { get; init; }
         public string? Note { get; set; }
         public string? FrameSignature { get; set; }
         public int? CameraX { get; set; }
@@ -3645,11 +3648,11 @@ public partial class MainWindow : Window
     /// load reached while playing opens that room, and playback goes on there.
     /// </summary>
     private void StartPlayback(string what, LoomObjectActionResult? action, GameResource sourceRoom,
-        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false)
+        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null)
     {
         _playback = new Playback
         {
-            What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom, Preview = preview,
+            What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom, Preview = preview, ExpectedCutscene = expectedCutscene,
             CameraX = _session?.CameraX,
             SceneBefore = sceneBefore ?? (_session?.CutscenesBegun ?? 0, _session?.EgoPuts ?? 0)
         };
@@ -3977,9 +3980,70 @@ public partial class MainWindow : Window
         StatusText.ToolTip = CdIntroNote + Environment.NewLine + string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
     }
 
+    private IReadOnlyList<LoomCdCutsceneGroup>? _cdCutsceneGroups;
+
+    /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="LoomCdCutsceneIndex"/>).</summary>
+    private IReadOnlyList<LoomCdCutsceneGroup> CdCutsceneGroups() =>
+        _cdCutsceneGroups ??= _game is { Id: GameId.LoomVga } && _cdData is not null
+            ? LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(_cdData, _game.Rooms.Select(r => r.ResourceId!.Value)))
+            : [];
+
+    private static string CdCutsceneTitle(LoomCdCutscene trigger)
+    {
+        var what = trigger.IsRoomEntry ? "entry" : (trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}") + $" ({trigger.VerbLabel})";
+        var text = trigger.FirstText.Length > 52 ? trigger.FirstText[..52].TrimEnd() + "…" : trigger.FirstText;
+        return LoomReplayTitle.Format(trigger.Room, what + (text.Length > 0 ? $": \"{text}\"" : ""));
+    }
+
+    private static string CdCutsceneNote(LoomCdCutsceneGroup group)
+    {
+        var first = group.First;
+        var others = group.Others.Count == 0 ? "" : " The same scripts are reached from " + string.Join(", ",
+            group.Others.Select(o => $"object {o.ObjectId}{(o.ObjectName.Length > 0 ? $" ({o.ObjectName})" : "")} {o.VerbLabel}")) + ".";
+        return $"Found in the CD scripts: {first.Room.ToString("00")} · {(first.IsRoomEntry ? "the room's entry script" : $"object {first.ObjectId}'s {first.VerbLabel}")} " +
+               $"reaches {string.Join(", ", first.Scripts)} (a cutscene ... endCutscene span of {first.SpanInstructions} instructions, {first.Texts} printed line(s), {first.RoomLoads} room load(s)). " +
+               "A branch can keep part of it from running, so the lines and loads are possible, not certain." + others + " " +
+               "Stated start: the running exploration session (state kept, a fresh post-boot session if none), the room opened from the catalog (Bobbin's arrival is assumed), " +
+               (first.IsRoomEntry ? "then the room's entry script plays on the clock. " :
+                $"then the object's verb 0x{first.VerbId:X2} run directly: an exploration action, not the game's click (Bobbin does not walk there, the object may be untouchable in this state, and a draft response does not simulate casting the draft). ") +
+               "The frames play on the playback clock at the game's frame rate; voices play from the disc as a click's would.";
+    }
+
+    private List<(string Id, CutscenePickerItem Item)> CdCutsceneItems(int? room = null) =>
+        CdCutsceneGroups().Where(group => room is null || group.First.Room == room || group.Others.Any(o => o.Room == room))
+            .Select(group => ($"cd-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}",
+                new CutscenePickerItem(CdCutsceneTitle(group.First), group.IsScene ? "Scenes" : "Dialogue and reactions", CdCutsceneNote(group), () => PlayCdCutscene(group)))).ToList();
+
+    /// <summary>Plays a CD cutscene from its stated start: the session's room visit, then the room's entry script or the object's verb run directly, on the playback clock.</summary>
+    private void PlayCdCutscene(LoomCdCutsceneGroup group)
+    {
+        var trigger = group.First;
+        if (_game is not { Id: GameId.LoomVga, Vga: { } vga } || !CanStartCutscene ||
+            _game.Rooms.FirstOrDefault(item => item.ResourceId == trigger.Room) is not { } room) return;
+        StopScenePlayback();
+        _cdVoice.Stop();
+        var session = _session is { BootRunning: false } ? _session : _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false);
+        _cdVoice.Attach(vga.Disc, session);
+        var before = (session.CutscenesBegun, session.EgoPuts);
+        session.VisitRoom(room);
+        var action = trigger.IsRoomEntry ? null : session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
+        var uncertainties = (action?.Uncertainties ?? session.Snapshot.Uncertainties).ToList();
+        if (_currentRoomResource?.ResourceId == room.ResourceId && _currentRoom is not null)
+        {
+            ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
+            UpdateRoomNavigationActions(room);
+            RefreshRoomPreview();
+        }
+        var title = CdCutsceneTitle(trigger);
+        StartPlayback(trigger.IsRoomEntry ? $"Room {trigger.Room:00}'s entry scripts" : $"Object {trigger.ObjectId}'s verb 0x{trigger.VerbId:X2} (run directly)", action, room, doorways: null, leftRoom: false,
+            sceneBefore: before, expectedCutscene: title);
+        StatusText.Text = $"Playing {title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
+        StatusText.ToolTip = CdCutsceneNote(group) + Environment.NewLine + string.Join(Environment.NewLine, uncertainties);
+    }
+
     private List<(string Id, CutscenePickerItem Item)> PlayableCutsceneItems()
     {
-        if (_game is { Id: GameId.LoomVga }) return [("cd-intro", CdIntroItem())];
+        if (_game is { Id: GameId.LoomVga }) return [("cd-intro", CdIntroItem()), .. CdCutsceneItems()];
         // A demo has no catalog of scenes: the full game's replays name its rooms, objects and scripts.
         if (_game is { IsDemo: true }) return [("demo-preview", DemoPreviewItem())];
         var items = new List<(string, CutscenePickerItem)> { ("opening", new(OpeningTitle, "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening)) };
@@ -3991,7 +4055,7 @@ public partial class MainWindow : Window
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
-        if (_game is { Id: GameId.LoomVga }) return [];
+        if (_game is { Id: GameId.LoomVga }) return CdCutsceneItems(roomId).Select(choice => choice.Item).ToList();
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
         return PlayableCutsceneItems().Where(choice => ids.Contains(choice.Id)).Select(choice => choice.Item).ToList();
     }
@@ -4467,6 +4531,12 @@ public partial class MainWindow : Window
             ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview();
+        }
+        if (playback.ExpectedCutscene is { } expected && session.CutscenesBegun == playback.SceneBefore.Cutscenes)
+        {
+            StatusText.Text = $"{expected}: no cutscene began from this start";
+            StatusText.ToolTip = "The code has a branch for this cutscene that this state does not take (a story state or held item the explorer did not set; Game Status can change it). " +
+                                 "What the script did run is shown." + (StatusText.ToolTip is string started ? Environment.NewLine + started : "") + note;
         }
         if (playback.Doorways is not { Count: > 0 } doorways || _currentRoomResource?.ResourceId != playback.SourceRoom.ResourceId)
             return;
