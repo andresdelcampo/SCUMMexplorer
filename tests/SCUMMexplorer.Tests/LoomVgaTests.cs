@@ -70,4 +70,36 @@ public sealed class LoomVgaTests
         Assert.Equal((320, 200), (archive.DecodeRoom(1).Width, archive.DecodeRoom(1).Height));
         Assert.Equal(960, archive.DecodeRoom(2).Width);
     }
+
+    [Fact]
+    public void EveryScriptOfTheCdGameDecodesWithTheV4Dialect()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+        var count = 0;
+        foreach (var room in game.Vga!.Rooms)
+            foreach (var script in game.Vga.ReadScripts(room.Number))
+            {
+                var decoded = reader.DecodeCode(script.Code, script.Number);
+                Assert.True(decoded.Issues is not { Count: > 0 } && decoded.DecodeNote is null,
+                    $"{script.Kind} {script.Number} in room {room.Number}: {decoded.Issues?.FirstOrDefault()?.Reason ?? decoded.DecodeNote}");
+                count++;
+            }
+        Assert.Equal(793, count);
+    }
+
+    [Theory]
+    [InlineData("33 02 05 00 0C 00", "roomOps", "roomColor, 0x0005, 0x000C")]
+    [InlineData("33 01 A0 00 40 01", "roomOps", "roomScroll, 0x00A0, 0x0140")]
+    [InlineData("30 01 02 03", "matrixOps", "setBoxFlags, 0x02, 0x03")]
+    [InlineData("4C 01 05 00 FF", "soundKludge", "[0x0005]")]
+    public void TheV4DialectReadsItsOwnOperandForms(string hex, string operation, string startsWith)
+    {
+        var code = Convert.FromHexString(hex.Replace(" ", ""));
+        var decoded = new LoomScriptReader(ScummScriptDialect.LoomCd).DecodeCode(code);
+        var first = decoded.Instructions.First();
+        Assert.Equal(operation, first.Operation);
+        Assert.StartsWith(startsWith, first.Operands, StringComparison.Ordinal);
+    }
 }

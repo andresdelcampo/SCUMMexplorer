@@ -36,3 +36,14 @@ Read-only. Scripts: `iso_extract.py <Loom.bin> <outdir>` (ISO 9660 over `MODE1/2
 - **`BM`:** the body is `u32` (the data size), then one `u32` offset per 8-pixel-wide strip (width / 8 entries; offsets are from the start of the body), then the strips. A strip begins with a code byte: `0x01` raw (8 columns of height bytes, column by column) or `0x0E`–`0x12` / `0x18`–`0x1C`, the ScummVM "basic" run-less bit codec, vertical (`0x0E`–`0x12`) or horizontal (`0x18`–`0x1C`); the code modulo 10 is the colour bit count (here always 8). Bits: `0` same colour, `10` read a new colour (that many bits), `110` colour += step, `111` reverse the step then colour += step; the step starts at -1. Only codes `0x01`, `0x12` and `0x1C` occur in this game.
 - A few rooms show black on the sheet (the dark rooms and the close-up boards); they may be fully dark or use features not decoded yet (`SP`, transparency or object-only rooms). Not checked.
 - Room sizes: 320 x 200 for the logo, 320 x 144 for scenes, up to 960 x 144 (scrolling).
+
+## Step 3: the scripts read with a v4 dialect (5 October)
+
+The CD game's bytecode is the **v5 operand set** (ScummVM `ScummEngine_v4` = `ScummEngine_v5` plus a few overrides; `ScummEngine_v3`, the LOOM EGA class, derives from v4 and overrides three opcodes). The existing disassembler already read 742 of 793 scripts without an issue as plain LOOM EGA; a new dialect `ScummScriptDialect.LoomCd` (`ScummScriptDialects.For(GameId.LoomVga)`) brings that to **all 793** (global `SC`, entry `EN`, exit `EX` and local `LS` scripts of the 78 rooms), checked by the test `EveryScriptOfTheCdGameDecodesWithTheV4Dialect`. What differs from the EGA dialect, from ScummVM `script_v5.cpp` (read as reference; the code is our own):
+
+- `roomOps` (0x33): the sub-opcode byte comes first and each operand's variable bit is read from it (the EGA game reads two operand words first). Sub 2 and 4 take two words (small-header blocks), 7 scale, 8 intensity, 9 save, 10 fade, 11 and 12 RGB, 13 and 14 file-name strings, 15 transform, 16 cycle speed.
+- 0x30 is `matrixOps` (set box flags, scale, scale slot, create box matrix) instead of `setBoxFlags`; 0x3B is `getActorScale` (a result and an actor) instead of the no-op `waitForActor`; 0x4C is `soundKludge` (a word list) instead of `waitForSentence`.
+- `print` sub-opcode 6 has no operand (left); `cursorCommand` 14 takes a word list.
+- Scripts are plain blocks, not `00.LFL` resources: `LoomVgaArchive.ReadScripts(room)` returns them and `LoomScriptReader.DecodeCode` reads the bytes.
+
+Decoding without an issue is not the same as understanding the scripts; the executor, glossary and variables of the CD game are untouched.

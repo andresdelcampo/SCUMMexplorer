@@ -6,6 +6,9 @@ using SCUMMexplorer.Core.Storage;
 namespace SCUMMexplorer.Core.Formats;
 
 /// <summary>One room of the CD game: its number, the name the index gives it (for example "logo") and where its LF block starts in the decoded DISK01.LEC.</summary>
+/// <summary>One script block: Kind is SC (global), EN (entry), EX (exit) or LS (local, with its number); Code is the bytecode only.</summary>
+public sealed record LoomVgaScript(string Kind, int Room, int Number, byte[] Code);
+
 public sealed record LoomVgaRoom(int Number, string Name, int Offset, int Length);
 
 /// <summary>
@@ -63,6 +66,24 @@ public sealed class LoomVgaArchive
             names[index[p]] = Encoding.Latin1.GetString(name).TrimEnd('\0');
         }
         return names;
+    }
+
+    /// <summary>The room's scripts in file order: SC blocks sit beside RO in the LF block; EN, EX and LS are inside RO. A local script's first body byte is its number.</summary>
+    public IReadOnlyList<LoomVgaScript> ReadScripts(int number)
+    {
+        if (!_rooms.TryGetValue(number, out var room)) throw new KeyNotFoundException($"Room {number} is not in DISK01.LEC.");
+        var scripts = new List<LoomVgaScript>();
+        foreach (var block in Blocks(_lec, room.Offset + 8, room.Offset + room.Length))
+        {
+            if (block.Tag == "SC") scripts.Add(new LoomVgaScript("SC", number, scripts.Count(s => s.Kind == "SC"), _lec.AsSpan(block.Start + 6, block.Size - 6).ToArray()));
+            else if (block.Tag == "RO")
+                foreach (var child in Blocks(_lec, block.Start + 6, block.Start + block.Size))
+                {
+                    if (child.Tag is "EN" or "EX") scripts.Add(new LoomVgaScript(child.Tag, number, 0, _lec.AsSpan(child.Start + 6, child.Size - 6).ToArray()));
+                    else if (child.Tag == "LS") scripts.Add(new LoomVgaScript("LS", number, _lec[child.Start + 6], _lec.AsSpan(child.Start + 7, child.Size - 7).ToArray()));
+                }
+        }
+        return scripts;
     }
 
     public RoomImage DecodeRoom(int number)

@@ -17,13 +17,16 @@ public sealed record LoomScriptDecodeIssue(int Offset, string Reason);
 public enum ScummScriptDialect
 {
     Loom,
-    Indy3
+    Indy3,
+    /// <summary>LOOM on CD (SCUMM v4): the v5 operand forms, which differ from the old-v3 ones in roomOps (sub-opcode first), the line-height print operand, charset cursor command and three opcodes (0x30, 0x3B, 0x4C).</summary>
+    LoomCd
 }
 
 public static class ScummScriptDialects
 {
     public static ScummScriptDialect For(GameId game) =>
-        game == GameId.IndianaJones3 ? ScummScriptDialect.Indy3 : ScummScriptDialect.Loom;
+        game == GameId.IndianaJones3 ? ScummScriptDialect.Indy3
+        : game == GameId.LoomVga ? ScummScriptDialect.LoomCd : ScummScriptDialect.Loom;
 }
 
 public sealed record LoomScriptDisassembly(
@@ -123,6 +126,15 @@ public sealed class LoomScriptReader(ScummScriptDialect dialect = ScummScriptDia
         var code = data.AsSpan(resourceOffset + ResourceHeaderLength, resourceLength - ResourceHeaderLength).ToArray();
         var decoded = LoomScriptDisassembler.Disassemble(code, Dialect);
         return new LoomScriptDisassembly(scriptId, container, resourceOffset, resourceLength, code.Length,
+            decoded.Instructions, decoded.Note, decoded.UndecodedOffset, decoded.UndecodedBytes, decoded.TrailingBytes,
+            Issues: decoded.Issues);
+    }
+
+    /// <summary>Disassembles script code that is already out of its container (the CD game keeps scripts in tagged blocks).</summary>
+    public LoomScriptDisassembly DecodeCode(byte[] code, int scriptId = 0)
+    {
+        var decoded = LoomScriptDisassembler.Disassemble(code, Dialect);
+        return new LoomScriptDisassembly(scriptId, 0, 0, code.Length, code.Length,
             decoded.Instructions, decoded.Note, decoded.UndecodedOffset, decoded.UndecodedBytes, decoded.TrailingBytes,
             Issues: decoded.Issues);
     }
@@ -477,11 +489,13 @@ internal static class LoomScriptDisassembler
         if (opcode == 0x2B) return ("delayVariable", ReadVar(cursor));
         // v3 maps 0x3B to o3_waitForActor: a LOOM no-op without operands, and
         // an Indy3 wait on a byte (or variable) actor operand.
+        if (cursor.Dialect == ScummScriptDialect.LoomCd && opcode is 0x3B or 0xBB)
+            return ("getActorScale", Join(ReadResult(cursor), ReadParam(cursor, 1, opcode, 0x80)));
         if (opcode is 0x3B or 0xBB)
             return cursor.Dialect == ScummScriptDialect.Indy3
                 ? ("waitForActor", ReadParam(cursor, 1, opcode, 0x80))
                 : ("waitForActor", "LOOM no-op");
-        if (opcode == 0x4C) return ("waitForSentence", "");
+        if (opcode == 0x4C) return cursor.Dialect == ScummScriptDialect.LoomCd ? ("soundKludge", ReadVarargList(cursor)) : ("waitForSentence", "");
         if (opcode == 0x58) return (cursor.ReadByte() == 0 ? "endOverride" : "beginOverride", "");
         if (opcode == 0x32 || opcode == 0xB2) return ("setCameraAt", ReadParam(cursor, 2, opcode, 0x80));
         if (opcode is 0x12 or 0x92) return ("panCameraTo", ReadParam(cursor, 2, opcode, 0x80));
@@ -501,6 +515,7 @@ internal static class LoomScriptDisassembler
 
         if (opcode == 0x27) return DecodeStringOps(cursor);
         if (opcode == 0x2C) return DecodeCursorCommand(cursor);
+        if (cursor.Dialect == ScummScriptDialect.LoomCd && opcode is 0x30 or 0xB0) return DecodeMatrixOps(cursor);
         if (opcode == 0x30 || opcode == 0xB0)
             return ("setBoxFlags", Join(ReadParam(cursor, 1, opcode, 0x80), $"0x{cursor.ReadByte():X2}"));
         if (Is(opcode, 0x3F, 0x7F, 0xBF, 0xFF)) return DecodeDrawBox(cursor, opcode);
@@ -619,7 +634,8 @@ internal static class LoomScriptDisassembler
             0x0B => Join("cursorHotspot", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40), ReadParam(cursor, 1, sub, 0x20)),
             0x0C => Join("cursorSet", ReadParam(cursor, 1, sub, 0x80)),
             0x0D => Join("charsetSet", ReadParam(cursor, 1, sub, 0x80)),
-            0x0E => Join("v3CharsetInit", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
+            0x0E => cursor.Dialect == ScummScriptDialect.LoomCd ? Join("charsetColors", ReadVarargList(cursor))
+                : Join("v3CharsetInit", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
             _ => throw new UnsupportedBytecodeException($"cursorCommand subopcode 0x{sub:X2} is not defined for DOS LOOM old-v3")
         };
         return ("cursorCommand", command);
@@ -841,8 +857,71 @@ internal static class LoomScriptDisassembler
         throw new UnsupportedBytecodeException("actorOps did not reach its 0xFF terminator within 128 subcommands");
     }
 
+    /// <summary>ScummVM o5_matrixOps (v4 and later; the old-v3 games have setBoxFlags at 0x30 instead).</summary>
+    private static (string, string) DecodeMatrixOps(Cursor cursor)
+    {
+        var sub = cursor.ReadByte();
+        return ("matrixOps", (sub & 0x1F) switch
+        {
+            0x01 => Join("setBoxFlags", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
+            0x02 => Join("setBoxScale", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
+            0x03 => Join("setBoxScaleSlot", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
+            0x04 => "createBoxMatrix",
+            _ => $"subopcode 0x{sub:X2} (no operands)"
+        });
+    }
+
+    /// <summary>ScummVM o5_roomOps for v4: the sub-opcode comes first, each operand's variable bit is in the sub-opcode byte (or the next one for the second group).</summary>
+    private static (string, string) DecodeRoomOpsCd(Cursor cursor)
+    {
+        var sub = cursor.ReadByte();
+        string Word(byte b, byte mask) => ReadParam(cursor, 2, b, mask);
+        string Byte(byte b, byte mask) => ReadParam(cursor, 1, b, mask);
+        var args = (sub & 0x1F) switch
+        {
+            0x01 => Join("roomScroll", Word(sub, 0x80), Word(sub, 0x40)),
+            // The CD game has small-header (two-letter) blocks, so ScummVM's GF_SMALL_HEADER branches apply: 2 and 4 take two words.
+            0x02 => Join("roomColor", Word(sub, 0x80), Word(sub, 0x40)),
+            0x03 => Join("setScreen", Word(sub, 0x80), Word(sub, 0x40)),
+            0x04 => Join("roomShadowPalette", Word(sub, 0x80), Word(sub, 0x40)),
+            0x05 => "shakeOn",
+            0x06 => "shakeOff",
+            0x07 => Join("setRoomScale", DecodeRoomScale(cursor, sub)),
+            0x08 => Join("roomIntensity", Byte(sub, 0x80), Byte(sub, 0x40), Byte(sub, 0x20)),
+            0x09 => Join("saveLoad", Byte(sub, 0x80), Byte(sub, 0x40)),
+            0x0A => Join("screenEffect", Word(sub, 0x80)),
+            0x0B or 0x0C => DecodeRoomRgb(cursor, sub, (sub & 0x1F) == 0x0B ? "setRgbRoomIntensity" : "setRoomShadow"),
+            0x0D => Join("saveString", Byte(sub, 0x80), ReadScummString(cursor)),
+            0x0E => Join("loadString", Byte(sub, 0x80), ReadScummString(cursor)),
+            0x0F => DecodeRoomTransform(cursor, sub),
+            0x10 => Join("cycleSpeed", Byte(sub, 0x80), Byte(sub, 0x40)),
+            _ => throw new UnsupportedBytecodeException($"roomOps subopcode 0x{sub:X2} is not defined")
+        };
+        return ("roomOps", args);
+    }
+
+    private static string DecodeRoomRgb(Cursor cursor, byte sub, string name)
+    {
+        var red = ReadParam(cursor, 2, sub, 0x80);
+        var green = ReadParam(cursor, 2, sub, 0x40);
+        var blue = ReadParam(cursor, 2, sub, 0x20);
+        var next = cursor.ReadByte();
+        return Join(name, red, green, blue, ReadParam(cursor, 1, next, 0x80), ReadParam(cursor, 1, next, 0x40));
+    }
+
+    private static string DecodeRoomTransform(Cursor cursor, byte sub)
+    {
+        var palette = ReadParam(cursor, 1, sub, 0x80);
+        var second = cursor.ReadByte();
+        var from = ReadParam(cursor, 1, second, 0x80);
+        var to = ReadParam(cursor, 1, second, 0x40);
+        var third = cursor.ReadByte();
+        return Join("roomTransform", palette, from, to, ReadParam(cursor, 1, third, 0x80));
+    }
+
     private static (string, string) DecodeRoomOps(Cursor cursor, byte opcode)
     {
+        if (cursor.Dialect == ScummScriptDialect.LoomCd) return DecodeRoomOpsCd(cursor);
         var first = ReadParam(cursor, 2, opcode, 0x80);
         var second = ReadParam(cursor, 2, opcode, 0x40);
         var sub = cursor.ReadByte();
@@ -902,7 +981,7 @@ internal static class LoomScriptDisassembler
                 0x03 => Join("erase", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x04 => "center",
                 // v3 reads the line height here (ScummVM decodeParseString, SO_LEFT for later versions).
-                0x06 => Join("height", ReadParam(cursor, 2, sub, 0x80)),
+                0x06 => cursor.Dialect == ScummScriptDialect.LoomCd ? "left" : Join("height", ReadParam(cursor, 2, sub, 0x80)),
                 0x07 => "overhead",
                 0x08 => Join("sayVoice", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x0F => Join("text", ReadScummString(cursor)),
