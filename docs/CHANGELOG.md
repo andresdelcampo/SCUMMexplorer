@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (night, very last): LOOM CD music timer, the intro as a scene, voice timing
+
+`var[0x0E]` follows the CD cue as ScummVM's CD timer does (zero at a cue's start, one per jiffy, a stop sets the variable to 0 but the timer goes on), so scripts 001 and 044 run on. "The intro" is in the CD game's Play a cutscene list: the skill screen (answer assumed after 3 s, labelled), the 83.9 s overture cue, the logo and copyright line, the fairy and Bobbin's lines, ending in Room 02 (978 frames; checked in the real window; the company line in charset 4 is replaced by the copyright line in the same frame, as ScummVM's order would). The CD playback tick makes up late frames so the scene stays with the audio. A click's voice lines start at the game time their prints ran (gaps are estimates); `sayVoice` operands are unsigned. Not heard by ear. Record: `.verification/loom-vga/README.md` step 16.
+
 ## 5 October (night, last): LOOM CD sounds and CD audio list, Game Status artwork
 
 The CD's 30 `SO` sounds (AdLib and PC speaker parts) are read and playable on demand; no CD script starts them (script 39 is a stub). The tree has a "CD audio" list of the 313 voice and music cues the scripts ask for, played from the disc's audio track. CD Game Status shows the staff and note artwork and named drafts. Build warnings fixed (0 now). The intro is blocked on the CD music timer `var[0x0E]` (not modelled). Record: `.verification/loom-vga/README.md` step 15.
