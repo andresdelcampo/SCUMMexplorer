@@ -63,10 +63,10 @@ Left, in order of value:
 **Steps once the way is chosen**
 1. **Feasibility probe** (read-only harness, record under `.verification/loom-vga/`): file list, `000.LFL` index structure, the `LECF`/`LFLF` block tree in `DISK01.LEC`, room and sound counts, the opcode set against the v3 reader (v4 differences: containers, room image format and palette, object and costume formats, the script dialect), and the audio track's role. Compare with ScummVM (`scummvm/`, same disc).
 2. **Source abstraction and image reader** (Core), tested against the user's `Loom.cue`.
-3. **Rooms and backgrounds first** (the VGA artwork is the visible gain), then scripts, objects and Bobbin, then speech and CD audio, then cutscenes, each checked in the real window as for EGA.
+3. **Rooms and backgrounds first** (the VGA artwork is the visible gain), then scripts, objects and Bobbin, then cutscenes, and speech and CD audio last, each checked in the real window as for EGA.
 4. Separate the LOOM-specific from the generic as VGA needs it: the ~40 `GameId.Loom` gates in `MainWindow.xaml.cs` (propose before changing), and the `Loom*` Core types (`LoomEgaStateFlags`, `loom-glossary.json`, `loom-replays.json`, `LoomDraftNames`, the catalog and setup planner). The VGA scripts differ from EGA, so the glossary, bits and ids must be rederived, never copied.
 
-Open decisions for the user: A, B or C above; whether the CD audio track (speech and music) is in scope from the start or comes after the picture; whether VGA gets its own game id and picker entry (assumed yes).
+Decided (user, 5 October): **C**, a game file source that is a folder or a disc image. **CD audio comes last**, after picture, scripts and cutscenes. The user picks a folder (or image) and the app identifies the game and edition itself, as it does today; VGA is a different edition, so detection must recognise it (internal game id and edition naming are an implementation detail, not a new menu choice).
 
 **After that:** more languages of LOOM EGA (later; Spanish and English work, others when the data arrives; each checked as English was, with `GlossaryCheck` and `ScriptDump`, never keyed on offsets). **Deferred:** Indy3 EGA (until the user moves its data from `Games/FUTURE/` to `Games/`; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion.
 
