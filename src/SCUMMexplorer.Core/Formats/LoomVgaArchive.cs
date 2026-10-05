@@ -7,7 +7,21 @@ namespace SCUMMexplorer.Core.Formats;
 
 /// <summary>One room of the CD game: its number, the name the index gives it (for example "logo") and where its LF block starts in the decoded DISK01.LEC.</summary>
 /// <summary>One script block: Kind is SC (global), EN (entry), EX (exit) or LS (local, with its number); Code is the bytecode only.</summary>
-public sealed record LoomVgaScript(string Kind, int Room, int Number, byte[] Code);
+public sealed record LoomVgaScript(string Kind, int Room, int Number, byte[] Code, int BlockOffset)
+{
+    /// <summary>How the script reads in lists: "Global script", "Entry script", "Exit script" or "Local script 200".</summary>
+    public string Label => Kind switch { "SC" => $"Global script {Number}", "EN" => "Entry script", "EX" => "Exit script", _ => $"Local script {Number}" };
+}
+
+/// <summary>A verb entry of an object: the verb id (0xFF is the default entry) and where its code starts in the object's OC block.</summary>
+public sealed record LoomVgaVerb(int VerbId, int Offset);
+
+/// <summary>
+/// One OC block (the object's code header, verb table and name): the position fields read like the EGA directory's
+/// (x, y and width in 8-pixel units, the parent object's number and state, the walk-to point, the facing in the low bits of the height byte).
+/// </summary>
+public sealed record LoomVgaObject(int Id, int X, int Y, int Width, int Height, int Parent, int ParentState, int WalkX, int WalkY, int Direction,
+    string Name, IReadOnlyList<LoomVgaVerb> Verbs, byte[] Block, int BlockOffset);
 
 public sealed record LoomVgaRoom(int Number, string Name, int Offset, int Length);
 
@@ -75,15 +89,52 @@ public sealed class LoomVgaArchive
         var scripts = new List<LoomVgaScript>();
         foreach (var block in Blocks(_lec, room.Offset + 8, room.Offset + room.Length))
         {
-            if (block.Tag == "SC") scripts.Add(new LoomVgaScript("SC", number, scripts.Count(s => s.Kind == "SC"), _lec.AsSpan(block.Start + 6, block.Size - 6).ToArray()));
+            if (block.Tag == "SC") scripts.Add(new LoomVgaScript("SC", number, scripts.Count(s => s.Kind == "SC"), _lec.AsSpan(block.Start + 6, block.Size - 6).ToArray(), block.Start));
             else if (block.Tag == "RO")
                 foreach (var child in Blocks(_lec, block.Start + 6, block.Start + block.Size))
                 {
-                    if (child.Tag is "EN" or "EX") scripts.Add(new LoomVgaScript(child.Tag, number, 0, _lec.AsSpan(child.Start + 6, child.Size - 6).ToArray()));
-                    else if (child.Tag == "LS") scripts.Add(new LoomVgaScript("LS", number, _lec[child.Start + 6], _lec.AsSpan(child.Start + 7, child.Size - 7).ToArray()));
+                    if (child.Tag is "EN" or "EX") scripts.Add(new LoomVgaScript(child.Tag, number, 0, _lec.AsSpan(child.Start + 6, child.Size - 6).ToArray(), child.Start));
+                    else if (child.Tag == "LS") scripts.Add(new LoomVgaScript("LS", number, _lec[child.Start + 6], _lec.AsSpan(child.Start + 7, child.Size - 7).ToArray(), child.Start));
                 }
         }
         return scripts;
+    }
+
+    /// <summary>
+    /// The room's objects from its OC blocks. Layout, from the data (the verb offsets land exactly on the code that follows the name):
+    /// block offset 6 the id (u16), 9 x/8, 10 y/8 (bit 7: the parent state), 11 width/8, 12 the parent object, 13 and 15 the walk-to
+    /// point (words), 17 height and facing, 18 the name's offset, 19 the verb table (a verb byte and a word offset each, ended by a
+    /// zero verb), then the zero-ended name and the code.
+    /// </summary>
+    public IReadOnlyList<LoomVgaObject> ReadObjects(int number)
+    {
+        if (!_rooms.TryGetValue(number, out var room)) throw new KeyNotFoundException($"Room {number} is not in DISK01.LEC.");
+        var objects = new List<LoomVgaObject>();
+        var ro = Blocks(_lec, room.Offset + 8, room.Offset + room.Length).FirstOrDefault(b => b.Tag == "RO");
+        if (ro is null) return objects;
+        foreach (var oc in Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).Where(b => b.Tag == "OC"))
+        {
+            if (oc.Size < 21) continue;
+            var block = _lec.AsSpan(oc.Start, oc.Size).ToArray();
+            var verbs = new List<LoomVgaVerb>();
+            var p = 19;
+            while (p + 3 <= block.Length && block[p] != 0)
+            {
+                verbs.Add(new LoomVgaVerb(block[p], BinaryPrimitives.ReadUInt16LittleEndian(block.AsSpan(p + 1))));
+                p += 3;
+            }
+            var nameStart = block[18];
+            var name = "";
+            if (nameStart < block.Length)
+            {
+                var end = Array.IndexOf(block, (byte)0, nameStart);
+                name = Encoding.Latin1.GetString(block, nameStart, (end < 0 ? block.Length : end) - nameStart);
+            }
+            objects.Add(new LoomVgaObject(BinaryPrimitives.ReadUInt16LittleEndian(block.AsSpan(6)), block[9] * 8, (block[10] & 0x7F) * 8, block[11] * 8,
+                block[17] & 0xF8, block[12], block[10] >> 7, BinaryPrimitives.ReadUInt16LittleEndian(block.AsSpan(13)), BinaryPrimitives.ReadUInt16LittleEndian(block.AsSpan(15)),
+                block[17] & 7, name, verbs, block, oc.Start));
+        }
+        return objects;
     }
 
     public RoomImage DecodeRoom(int number)

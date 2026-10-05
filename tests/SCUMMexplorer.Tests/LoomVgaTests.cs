@@ -102,4 +102,29 @@ public sealed class LoomVgaTests
         Assert.Equal(operation, first.Operation);
         Assert.StartsWith(startsWith, first.Operands, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void TheCdGamesObjectsHaveNamesAndVerbsThatLandOnCode()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var archive = new GameFolderScanner().Scan(folder).Vga!;
+        var owl = archive.ReadObjects(4).Single(o => o.Name == "owl");
+        Assert.Equal(100, owl.Id);
+        Assert.Equal([0x36, 0x39, 0x56], owl.Verbs.Select(v => v.VerbId).Order());
+        Assert.All(owl.Verbs, v => Assert.InRange(v.Offset, 20, owl.Block.Length - 1));
+    }
+
+    [Fact]
+    public void TheCdGamesTextsAreExtractedFromItsScriptsAndObjects()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var extraction = new LoomTextExtractor().Extract(game);
+        Assert.Equal(0, extraction.UnresolvedPaths);
+        Assert.Equal(0, extraction.ResourcesSkipped);
+        Assert.Contains(extraction.Entries, e => e.Text.Trim((char)0x19) == "The day the sky is opened." && e.RoomId == 4);
+        Assert.Contains(extraction.Entries, e => e.Kind == "Object name" && e.Text == "owl" && e.ObjectId == 100);
+        Assert.Contains(extraction.Entries, e => e.Text == "That draft isn't working on the bell." && e.ObjectId == 294);
+        Assert.True(extraction.Entries.Count > 1000);
+    }
 }

@@ -131,10 +131,10 @@ public sealed class LoomScriptReader(ScummScriptDialect dialect = ScummScriptDia
     }
 
     /// <summary>Disassembles script code that is already out of its container (the CD game keeps scripts in tagged blocks).</summary>
-    public LoomScriptDisassembly DecodeCode(byte[] code, int scriptId = 0)
+    public LoomScriptDisassembly DecodeCode(byte[] code, int scriptId = 0, int container = 0, int offset = 0)
     {
         var decoded = LoomScriptDisassembler.Disassemble(code, Dialect);
-        return new LoomScriptDisassembly(scriptId, 0, 0, code.Length, code.Length,
+        return new LoomScriptDisassembly(scriptId, container, offset, code.Length, code.Length,
             decoded.Instructions, decoded.Note, decoded.UndecodedOffset, decoded.UndecodedBytes, decoded.TrailingBytes,
             Issues: decoded.Issues);
     }

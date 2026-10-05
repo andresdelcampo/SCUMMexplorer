@@ -161,6 +161,41 @@ public sealed class LoomTextExtractor
                 $"{script.ContainerFileNumber:00}:{script.ResourceOffset:X4}:choices");
         }
 
+        if (game.Vga is { } vga)
+        {
+            // The CD game keeps its scripts in tagged blocks of DISK01.LEC: every block is one script (conversation ids use the block's offset).
+            foreach (var room in vga.Rooms)
+                foreach (var script in vga.ReadScripts(room.Number))
+                {
+                    var source = $"Room {room.Number:00} / {script.Label}";
+                    try { Add(scripts.DecodeCode(script.Code, script.Number, 1, script.BlockOffset) with { Context = source }, room.Number, sourceOverride: source); }
+                    catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source, ex); }
+                }
+            foreach (var room in vga.Rooms)
+            {
+                var objects = vga.ReadObjects(room.Number);
+                var names = objects.Where(o => o.Name.Length > 0).GroupBy(o => o.Id).ToDictionary(g => g.Key, g => g.First().Name);
+                foreach (var obj in objects)
+                {
+                    if (HasUsefulText(obj.Name))
+                        entries.Add(new LoomTextEntry(obj.Name, "Object name", $"Room {room.Number:00} / Object {obj.Id}", room.Number, obj.Id, null, null,
+                            obj.BlockOffset, obj.Name));
+                    foreach (var verb in obj.Verbs)
+                    {
+                        var label = verb.VerbId == 0xFF ? "Fallback verb" : $"Verb 0x{verb.VerbId:X2}";
+                        var source = $"Room {room.Number:00} / Object {obj.Id} / {label}";
+                        try
+                        {
+                            Add(scripts.DecodeCode(obj.Block[verb.Offset..], obj.Id, 1, obj.BlockOffset + verb.Offset) with { Context = source }, room.Number, obj.Id,
+                                verb.VerbId, source, obj.Name.Length > 0 ? obj.Name : null, names);
+                        }
+                        catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source, ex); }
+                    }
+                }
+            }
+            return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics, leftovers);
+        }
+
         foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
         {
             if (chains.FindLeftover(game, resource) is { } leftover)
