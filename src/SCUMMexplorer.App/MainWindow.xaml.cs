@@ -35,6 +35,7 @@ public partial class MainWindow : Window
     private readonly MediaPlayer _audioPlayer = new();
     // The sounds the scripts start while the playback clock runs (cutscenes); separate from the room music panel.
     private readonly SceneSoundPlayer _sceneSound = new();
+    private readonly CdVoicePlayer _cdVoice = new();
     private readonly DispatcherTimer _audioTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private readonly DispatcherTimer _idleFrameTimer = new() { Interval = TimeSpan.FromMilliseconds(15) };
     private readonly DispatcherTimer _roomPanTimer =new() { Interval = TimeSpan.FromMilliseconds(75) };
@@ -248,6 +249,7 @@ public partial class MainWindow : Window
         _indexedStates = indexedSnapshot?.States ?? new Dictionary<int, byte>();
         StopScenePlayback();
         _sceneSound.StopAll("another game was opened");
+        _cdVoice.Stop();
         // The Roland device needs the upgrade's sounds in this folder; another folder falls back to AdLib.
         if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && !(SceneSoundPlayer.HasRolandSounds(game) && (_sceneSound.Roms ??= FindMt32Roms(game)) is not null))
         {
@@ -265,6 +267,7 @@ public partial class MainWindow : Window
         _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
             : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
         if (_session is not null && cdIndexed is null) _sceneSound.Attach(game, _session);
+        else if (_session is not null && game.Vga is { } cdGame) _cdVoice.Attach(cdGame.Disc, _session);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
         _cdCharsets.Clear();
@@ -416,8 +419,9 @@ public partial class MainWindow : Window
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         // Game Status needs the session, not a room: show it as soon as the game is loaded (the header then stays still).
         GameStatusButton.Visibility = game.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
-        // The CD game has no sound read yet (its music and speech are CD audio, last in the plan): no device to choose.
+        // The CD game has no music device to choose (its music has not been read); its voices come from the disc's audio track (Voices).
         SoundModeCombo.Visibility = game.Id == GameId.LoomVga ? Visibility.Collapsed : Visibility.Visible;
+        VoiceCheck.Visibility = game is { Id: GameId.LoomVga, Vga.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
         GameStatusButton.IsEnabled = _session is not null;
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
@@ -1252,6 +1256,7 @@ public partial class MainWindow : Window
         _session?.SetPointer(null);
         StopScenePlayback();
         if (SessionModeToggle.IsChecked != true) _sceneSound.StopAll("the interactive mode was turned off");
+        if (SessionModeToggle.IsChecked != true) _cdVoice.Stop();
         if (_currentRoomResource is not { } room || _currentRoom is null) return;
         ApplyRoomState(room, _currentRoomObjectRecords, _objects,
             visit: SessionModeToggle.IsChecked == true && !_restoringInteractiveView);
@@ -3249,6 +3254,7 @@ public partial class MainWindow : Window
                             _sceneSound.SetMode(mode);
                             SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
                             break;
+                        case "voices": VoiceCheck.IsChecked = parts[1] != "0"; _cdVoice.Enabled = VoiceCheck.IsChecked == true; break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
                         case "readable": _readableScripts = parts[1] != "0"; ScriptReadableToggle.IsChecked = _readableScripts; ScriptBytesToggle.IsEnabled = !_readableScripts; break;
                     }
@@ -3266,7 +3272,7 @@ public partial class MainWindow : Window
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
-            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}", $"sound={_sceneSound.Mode}"]);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}", $"sound={_sceneSound.Mode}", $"voices={(VoiceCheck.IsChecked == true ? 1 : 0)}"]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
@@ -4189,11 +4195,21 @@ public partial class MainWindow : Window
     {
         if (GameClickActive && _game is { Id: not GameId.LoomVga } && _session is not null && !_sceneSound.Follows(_session))
             _sceneSound.Attach(_game, _session);
+        else if (GameClickActive && _game is { Id: GameId.LoomVga, Vga: { } vga } && _session is not null && !_cdVoice.Follows(_session))
+            _cdVoice.Attach(vga.Disc, _session);
     }
 
     private void UpdateSessionSound()
     {
         if (GameClickActive && !_playbackBatch && _game?.Id != GameId.LoomVga) _sceneSound.Update();
+        else if (GameClickActive && !_playbackBatch && _game?.Id == GameId.LoomVga) _cdVoice.Update();
+    }
+
+    private void VoiceCheck_Changed(object sender, RoutedEventArgs e)
+    {
+        _cdVoice.Enabled = VoiceCheck.IsChecked == true;
+        if (!_cdVoice.Enabled) _cdVoice.Stop();
+        SaveViewOptions();
     }
 
     private void PlaybackTimer_Tick(object? sender, EventArgs e)

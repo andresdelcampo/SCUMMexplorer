@@ -61,6 +61,9 @@ public sealed class LoomVgaArchive
 
     public IReadOnlyList<LoomVgaRoom> Rooms { get; }
 
+    /// <summary>The disc image the game was read from (its CD audio track carries the voices), or null for a folder of files.</summary>
+    public Storage.DiscImage? Disc { get; private init; }
+
     public static bool IsVga(IGameFileSource source) => source.Exists(IndexFile) && source.Exists(ArchiveFile);
 
     public static LoomVgaArchive Load(IGameFileSource source)
@@ -78,7 +81,7 @@ public sealed class LoomVgaArchive
             var number = BinaryPrimitives.ReadUInt16LittleEndian(lec.AsSpan(block.Start + 6));
             rooms.Add(new LoomVgaRoom(number, names.GetValueOrDefault(number, ""), block.Start, block.Size));
         }
-        var archive = new LoomVgaArchive(lec, index, rooms);
+        var archive = new LoomVgaArchive(lec, index, rooms) { Disc = (source as Storage.DiscFileSource)?.Image };
         for (var number = 1; number <= 4; number++)
             if (source.Exists($"90{number}.LFL")) archive._charsets[number] = source.ReadAllBytes($"90{number}.LFL");
         return archive;

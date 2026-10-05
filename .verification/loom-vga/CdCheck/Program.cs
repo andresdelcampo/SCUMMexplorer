@@ -89,6 +89,8 @@ internal static class Program
                         { var msgs = session.GetType().GetProperty("Messages")!.GetValue(session)!; var on = (System.Collections.IEnumerable)msgs.GetType().GetProperty("OnScreen")!.GetValue(msgs)!; foreach (var m in on) report.Add("   message " + m); }
                         if (ms == 5000 && Environment.GetEnvironmentVariable("CD_TRACE") == "1") foreach (var line in (IEnumerable<string>)session.GetType().GetProperty("SessionTrace")!.GetValue(session)!) if (line.Contains("object 11") || line.Contains("object 12")) report.Add("   T " + line);
                         if (ms == 5000) { var snap = session.GetType().GetProperty("Snapshot")!.GetValue(session)!; var states = (System.Collections.IDictionary)snap.GetType().GetProperty("ObjectStates")!.GetValue(snap)!; var imgs = cd.ReadObjectImages(number); foreach (var o in data.Objects) report.Add($"   obj {o.Id} at {o.X},{o.Y} {o.Width}x{o.Height} state {(states.Contains(o.Id) ? states[o.Id] : "-")} image {imgs.Any(i => i.Id == o.Id)}"); }
+                        if (ms == 5000) { var sess = Field("_session")!; var msgs2 = sess.GetType().GetProperty("Messages")!.GetValue(sess)!; foreach (var cue in (System.Collections.IEnumerable)msgs2.GetType().GetProperty("VoiceEvents")!.GetValue(msgs2)!) report.Add("   cue " + cue); }
+                        { var voice = Field("_cdVoice"); foreach (var line in (IEnumerable<string>)voice!.GetType().GetProperty("Log")!.GetValue(voice)!) report.Add("   voice " + line); }
                         report.Add($"click room {number} object {target.Id} at {x},{y} +{ms} ms: {((TextBlock)window.FindName("StatusText")).Text}");
                     }
                 }

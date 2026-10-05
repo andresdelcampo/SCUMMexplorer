@@ -444,5 +444,30 @@ public sealed class LoomVgaCharsetPerMessageTests
         Assert.Equal(new LoomVoiceCue(0x1DAA, 0x1B), line.Voice);
         Assert.Equal(759.4, line.Voice!.Value.DiscSeconds, 1);
         Assert.DoesNotContain("sayVoice", line.Estimate ?? "");
+        Assert.Contains(new LoomVoiceCue(0x1DAA, 0x1B), session.Messages.VoiceEvents);
+    }
+
+    [Fact]
+    public void AVoiceCueMapsToFramesOfTheAudioTrackAndTheDiscHoldsThem()
+    {
+        var cue = new LoomVoiceCue(0x1DAA, 0x1B);
+        // ScummVM: offset * 7.5 frames from the disc start, less the first track (22,500) and the two-second lead-in (150).
+        Assert.Equal(34305, cue.TrackStartFrame);
+        Assert.Equal(207, cue.TrackFrameCount);
+        Assert.True(new LoomVoiceCue(0, 0).IsStop);
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var disc = DiscImage.Open(folder);
+        Assert.Equal(22335, disc.AudioStartSector);
+        var pcm = disc.ReadAudio(cue.TrackStartFrame, cue.TrackFrameCount);
+        Assert.Equal(cue.TrackFrameCount * DiscImage.AudioSectorBytes, pcm.Length);
+        // Speech, not silence: some 16-bit samples are far from zero.
+        var loud = 0;
+        for (var i = 0; i + 1 < pcm.Length; i += 2) if (Math.Abs(BitConverter.ToInt16(pcm, i)) > 2000) loud++;
+        Assert.True(loud > 1000, $"{loud} loud samples");
+        var wave = disc.ReadAudioWave(cue.TrackStartFrame, cue.TrackFrameCount);
+        Assert.Equal("RIFF", System.Text.Encoding.ASCII.GetString(wave, 0, 4));
+        Assert.Equal(pcm.Length + 44, wave.Length);
+        Assert.Empty(disc.ReadAudio(10_000_000, 10));
     }
 }

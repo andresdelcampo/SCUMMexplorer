@@ -82,6 +82,49 @@ public sealed class DiscImage
         return (bin, audio);
     }
 
+    public const int AudioSectorBytes = 2352;
+    public const int AudioSampleRate = 44100;
+
+    /// <summary>
+    /// Raw CD audio (44.1 kHz, 16-bit, stereo, little-endian) from the first audio track: <paramref name="frames"/> sectors of
+    /// 1/75 s starting <paramref name="startFrame"/> frames after the track's INDEX 01. Empty when the cue names no audio track
+    /// or the position is past the end of the image; a request that runs past the end is cut short.
+    /// </summary>
+    public byte[] ReadAudio(int startFrame, int frames)
+    {
+        if (AudioStartSector is not { } start || startFrame < 0 || frames <= 0) return [];
+        using var stream = new FileStream(BinPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var offset = (long)(start + startFrame) * AudioSectorBytes;
+        if (_sectorSize != AudioSectorBytes || offset >= stream.Length) return [];
+        var count = (int)Math.Min(frames, (stream.Length - offset) / AudioSectorBytes);
+        var data = new byte[count * AudioSectorBytes];
+        stream.Seek(offset, SeekOrigin.Begin);
+        stream.ReadExactly(data);
+        return data;
+    }
+
+    /// <summary>The same audio as a WAV file's bytes (see <see cref="ReadAudio"/>), or empty.</summary>
+    public byte[] ReadAudioWave(int startFrame, int frames)
+    {
+        var pcm = ReadAudio(startFrame, frames);
+        if (pcm.Length == 0) return [];
+        var wave = new byte[44 + pcm.Length];
+        Encoding.ASCII.GetBytes("RIFF").CopyTo(wave, 0);
+        BinaryPrimitives.WriteInt32LittleEndian(wave.AsSpan(4), 36 + pcm.Length);
+        Encoding.ASCII.GetBytes("WAVEfmt ").CopyTo(wave, 8);
+        BinaryPrimitives.WriteInt32LittleEndian(wave.AsSpan(16), 16);
+        BinaryPrimitives.WriteInt16LittleEndian(wave.AsSpan(20), 1);
+        BinaryPrimitives.WriteInt16LittleEndian(wave.AsSpan(22), 2);
+        BinaryPrimitives.WriteInt32LittleEndian(wave.AsSpan(24), AudioSampleRate);
+        BinaryPrimitives.WriteInt32LittleEndian(wave.AsSpan(28), AudioSampleRate * 4);
+        BinaryPrimitives.WriteInt16LittleEndian(wave.AsSpan(32), 4);
+        BinaryPrimitives.WriteInt16LittleEndian(wave.AsSpan(34), 16);
+        Encoding.ASCII.GetBytes("data").CopyTo(wave, 36);
+        BinaryPrimitives.WriteInt32LittleEndian(wave.AsSpan(40), pcm.Length);
+        pcm.CopyTo(wave, 44);
+        return wave;
+    }
+
     private byte[] ReadSectors(int first, int count)
     {
         using var stream = new FileStream(BinPath, FileMode.Open, FileAccess.Read, FileShare.Read);

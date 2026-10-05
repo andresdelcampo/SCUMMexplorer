@@ -54,6 +54,18 @@ public readonly record struct LoomVoiceCue(int Offset, int Length)
     public bool IsStop => Offset == 0 && Length == 0;
     public double DiscSeconds => Offset / 10.0;
     public double Seconds => Length / 10.0;
+
+    /// <summary>
+    /// CD frames (75 per second, 7.5 per unit) between the start of the disc and the cue. ScummVM subtracts the first track's 22,500
+    /// frames and the two-second lead-in (150 frames) to get the position in the audio track.
+    /// </summary>
+    public int TrackStartFrame => Math.Max(0, (int)(Offset * 7.5 - DataTrackFrames - LeadInFrames));
+
+    /// <summary>The voice's run time in CD frames, five frames (a twentieth of a second) longer than the cue says, as ScummVM plays it.</summary>
+    public int TrackFrameCount => (int)(Length * 7.5 + 5);
+
+    public const int DataTrackFrames = 22500;
+    public const int LeadInFrames = 150;
 }
 
 /// <summary>A <c>drawBox</c> rectangle in screen coordinates, corners inclusive.</summary>
@@ -126,6 +138,7 @@ public sealed class LoomMessageTable
     private string? _estimate;
     private int? _charset;
     private LoomVoiceCue? _voice, _talkVoice;
+    private readonly List<LoomVoiceCue> _voiceEvents = [];
 
     internal Action? NativeMutation { get; set; }
 
@@ -150,6 +163,9 @@ public sealed class LoomMessageTable
 
     /// <summary>Every message chunk that reached the screen, in order.</summary>
     public IReadOnlyList<LoomMessage> Log => _log;
+
+    /// <summary>Every <c>sayVoice</c> a reached print issued, in order (the game starts or stops the voice when the print is decoded, text or not).</summary>
+    public IReadOnlyList<LoomVoiceCue> VoiceEvents => _voiceEvents;
 
     /// <summary>Everything on the screen now: drawn strings, then the talk message.</summary>
     public IReadOnlyList<LoomMessage> OnScreen => Talk is null ? _drawn.ToArray() : [.. _drawn, Talk];
@@ -219,7 +235,11 @@ public sealed class LoomMessageTable
                     slot.Overhead = true;
                     break;
                 case "sayVoice":
-                    if (operation.First is int voiceOffset && operation.Second is int voiceLength) _voice = new LoomVoiceCue(voiceOffset, voiceLength);
+                    if (operation.First is int voiceOffset && operation.Second is int voiceLength)
+                    {
+                        _voice = new LoomVoiceCue(voiceOffset, voiceLength);
+                        _voiceEvents.Add(_voice.Value);
+                    }
                     else estimates.Add("the print's voice operands could not be read");
                     break;
                 default:
