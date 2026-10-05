@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (night, final): LOOM CD voices and status
+
+CD audio: `DiscImage.ReadAudio`/`ReadAudioWave` cut the audio track (44.1 kHz, 16-bit, stereo); a voice cue (`LoomVoiceCue`) maps to track frames as ScummVM does (offset x 7.5 minus the first track's 22,500 frames and the 150-frame lead-in; run time x 7.5 + 5), and `LoomMessageTable.VoiceEvents` lists every `sayVoice` a reached print issued. The app's `CdVoicePlayer` queues a click's lines one after the other, a stop alone silences the voice, cues a room visit issued are skipped, and a Voices checkbox (saved with the view options) turns it off. The CD status schema (`LoomStatusSchema.Read` with a data source) is derived from scripts 010, 017, 018, 022, 023, 025, 026 and 034, so Game Status works for the CD game and its staff and note edits show the draft verbs. Record: `.verification/loom-vga/README.md` step 14.
+
 ## 5 October (night, last): LOOM CD verb strip, per-message charset, voice cues
 
 The verb strip and the one-screen layout now serve the CD game (the draft verbs draw from room 1's images once script 018 turns them on; the CD staff/draft state needs its own schema, not done). A message keeps the charset set when its print ran (script 044 sets 4 for one intro line) and `print` sub 8 (`sayVoice`) is read as a voice cue (disc offset and length in tenths of a second) with no "not modelled" estimate. Double-click checks in rooms 3 to 20 draw their descriptions. Record: `.verification/loom-vga/README.md` step 13. CD audio is the remaining CD item.
