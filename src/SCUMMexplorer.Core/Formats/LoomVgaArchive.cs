@@ -26,6 +26,9 @@ public sealed record LoomVgaObject(int Id, int X, int Y, int Width, int Height, 
 /// <summary>A costume block (CO): its number from the index, the room that stores it and its bytes (the body, without the block header).</summary>
 public sealed record LoomVgaCostume(int Id, int Room, byte[] Body);
 
+/// <summary>One decoded OI image of a room object: the object's id, its size from the OC block and the picture as palette indices (the room's PA palette).</summary>
+public sealed record LoomVgaObjectImage(int Id, int X, int Y, int Width, int Height, byte[] Pixels);
+
 public sealed record LoomVgaRoom(int Number, string Name, int Offset, int Length);
 
 /// <summary>
@@ -160,6 +163,94 @@ public sealed class LoomVgaArchive
             if (room == 0 || !_rooms.TryGetValue(room, out var owner)) continue;
             yield return (id, room, owner.Offset + 8 + (int)BinaryPrimitives.ReadUInt32LittleEndian(_index.AsSpan(body + 3 + id * 5)));
         }
+    }
+
+    /// <summary>
+    /// The number a room's local scripts start from. The index's "0S" table lists 199 slots, but every local script of the data is
+    /// numbered 200 or higher, so 200 is the boundary the session uses between global and local numbers.
+    /// </summary>
+    public const int LocalScriptBase = 200;
+
+    /// <summary>The numbered global script's bytecode, found through the "0S" directory (room and offset), or null when the index has none.</summary>
+    public LoomVgaScript? ReadGlobalScript(int number)
+    {
+        foreach (var (id, room, block) in ReadDirectory("0S"))
+        {
+            if (id != number) continue;
+            if (block + 6 > _lec.Length || Encoding.Latin1.GetString(_lec, block + 4, 2) != "SC") return null;
+            var size = (int)BinaryPrimitives.ReadUInt32LittleEndian(_lec.AsSpan(block));
+            if (size < 6 || block + size > _lec.Length) return null;
+            return new LoomVgaScript("SC", room, number, _lec.AsSpan(block + 6, size - 6).ToArray(), block);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// The room's OI object images. An OI block is the object id (u16) and a BM-like body: a size dword, one dword offset per 8-pixel strip
+    /// (counted from the size field), then the strips (the codecs of the room background). The width and height come from the object's OC
+    /// block, which must exist; an image that does not decode is left out. The same object may have several OI blocks (its states, in file order).
+    /// </summary>
+    public IReadOnlyList<LoomVgaObjectImage> ReadObjectImages(int number)
+    {
+        if (!_rooms.TryGetValue(number, out var room)) throw new KeyNotFoundException($"Room {number} is not in DISK01.LEC.");
+        var ro = Blocks(_lec, room.Offset + 8, room.Offset + room.Length).FirstOrDefault(b => b.Tag == "RO");
+        if (ro is null) return [];
+        var objects = ReadObjects(number).GroupBy(o => o.Id).ToDictionary(g => g.Key, g => g.First());
+        var images = new List<LoomVgaObjectImage>();
+        foreach (var oi in Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).Where(b => b.Tag == "OI"))
+        {
+            if (oi.Size < 14) continue;
+            var id = BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(oi.Start + 6));
+            if (!objects.TryGetValue(id, out var owner) || owner.Width < 8 || owner.Height < 1) continue;
+            var body = oi.Start + 8;
+            var end = oi.Start + oi.Size;
+            var pixels = new byte[owner.Width * owner.Height];
+            try
+            {
+                for (var strip = 0; strip < owner.Width / 8; strip++)
+                {
+                    var offset = BinaryPrimitives.ReadUInt32LittleEndian(_lec.AsSpan(body + 4 + strip * 4));
+                    if (body + offset >= end) throw new InvalidDataException("strip outside the image");
+                    DecodeStrip(_lec, (int)(body + offset), end, pixels, owner.Width, owner.Height, strip * 8);
+                }
+            }
+            catch (Exception ex) when (ex is InvalidDataException or ArgumentOutOfRangeException or IndexOutOfRangeException) { continue; }
+            images.Add(new LoomVgaObjectImage(id, owner.X, owner.Y, owner.Width, owner.Height, pixels));
+        }
+        return images;
+    }
+
+    /// <summary>
+    /// The index's object table ("0O"): per object four bytes, three of class bits (little endian) and one packing the state (high nibble)
+    /// and the owner (low nibble), as the EGA index does. Every room object starts with owner 0xF and state 0.
+    /// </summary>
+    public LoomIndexedObjectSnapshot ReadIndexedObjects()
+    {
+        var states = new Dictionary<int, byte>();
+        var owners = new Dictionary<int, byte>();
+        var classes = new Dictionary<int, uint>();
+        var block = Blocks(_index, 0, _index.Length).FirstOrDefault(b => b.Tag == "0O");
+        if (block is null) return new LoomIndexedObjectSnapshot(states, owners, classes);
+        var count = BinaryPrimitives.ReadUInt16LittleEndian(_index.AsSpan(block.Start + 6));
+        for (var id = 0; id < count && block.Start + 8 + (id + 1) * 4 <= block.Start + block.Size; id++)
+        {
+            var entry = block.Start + 8 + id * 4;
+            states[id] = (byte)(_index[entry + 3] >> 4);
+            owners[id] = (byte)(_index[entry + 3] & 0x0F);
+            classes[id] = (uint)(_index[entry] | _index[entry + 1] << 8 | _index[entry + 2] << 16);
+        }
+        return new LoomIndexedObjectSnapshot(states, owners, classes);
+    }
+
+    /// <summary>The room's size from its HD block.</summary>
+    public (int Width, int Height) ReadRoomSize(int number)
+    {
+        if (!_rooms.TryGetValue(number, out var room)) throw new KeyNotFoundException($"Room {number} is not in DISK01.LEC.");
+        var ro = Blocks(_lec, room.Offset + 8, room.Offset + room.Length).FirstOrDefault(b => b.Tag == "RO")
+            ?? throw new InvalidDataException($"Room {number} has no RO block.");
+        var hd = Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).FirstOrDefault(b => b.Tag == "HD")
+            ?? throw new InvalidDataException($"Room {number} has no HD block.");
+        return (BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(hd.Start + 6)), BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(hd.Start + 8)));
     }
 
     /// <summary>The costumes the index lists (those whose block is a CO block).</summary>

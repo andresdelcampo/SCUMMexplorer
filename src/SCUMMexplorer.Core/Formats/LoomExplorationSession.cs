@@ -118,8 +118,8 @@ public sealed partial class LoomExplorationSession
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
-        if (game.Version != ScummVersion.V3)
-            throw new InvalidDataException("Only old-v3 LOOM has a session interpreter.");
+        if (game.Version != ScummVersion.V3 && game.Id != GameId.LoomVga)
+            throw new InvalidDataException("Only old-v3 LOOM and the LOOM CD game have a session interpreter.");
         _game = game;
         _demoPreview = demoPreview;
         _observer = observer;

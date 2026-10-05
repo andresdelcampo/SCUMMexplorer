@@ -144,4 +144,59 @@ public sealed class LoomVgaTests
             Assert.All(poses, p => Assert.True(p.Image.IsValid));
         }
     }
+
+    [Fact]
+    public void TheCdDataSourceReadsScriptsObjectsAndImagesThroughTheSeam()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var data = ScummDataSources.For(game);
+        Assert.IsType<LoomCdDataSource>(data);
+        Assert.Equal(LoomVgaArchive.LocalScriptBase, data.GlobalScriptCount);
+        var globals = Enumerable.Range(0, data.GlobalScriptCount).Count(n => data.GlobalScript(n) is not null);
+        Assert.Equal(122, globals);
+        Assert.Null(data.GlobalScript(data.GlobalScriptCount + 50));
+
+        var logo = data.ReadRoom(1);
+        Assert.Equal((320, 200), (logo.Width, logo.Height));
+        Assert.Equal(61, logo.Objects.Count);
+        Assert.Equal(61, data.ReadObjectImages(1).Count);
+        Assert.NotNull(data.RoomEntryScript(1));
+        Assert.Contains(200, data.RoomLocalScriptIds(1));
+        Assert.NotNull(data.RoomLocalScript(1, 200));
+        Assert.Null(data.RoomLocalScript(1, 5));
+
+        // Room 4's owl: the object's verb table and the code behind it read through the same seam.
+        var owl = data.ReadRoom(4).Objects.First(o => data.ReadObjectVerbs(4, [o]).TryGetValue(o.Id, out var verbs) && verbs.Any(v => v.VerbId == 0x36));
+        var script = data.ReadObjectVerb(4, owl, 0x36, out var entry);
+        Assert.NotEmpty(script.Instructions);
+        Assert.Equal(owl.Id, entry.ObjectId);
+
+        foreach (var room in game.Rooms)
+        {
+            var number = room.ResourceId!.Value;
+            var objects = data.ReadRoom(number);
+            var images = data.ReadObjectImages(number);
+            Assert.All(images, image => Assert.Equal(image.Width * image.Height, image.Pixels.Length));
+            Assert.All(images, image => Assert.Contains(objects.Objects, o => o.Id == image.Id));
+            foreach (var id in data.RoomLocalScriptIds(number)) Assert.NotNull(data.RoomLocalScript(number, id));
+        }
+    }
+
+    [Fact]
+    public void TheSessionRunsTheCdGamesEntryScriptsRoomByRoom()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var withStates = 0;
+        foreach (var room in game.Rooms)
+        {
+            var snapshot = session.VisitRoom(room);
+            Assert.True(room.ResourceId == snapshot.RoomId, $"visiting room {room.ResourceId} ended in room {snapshot.RoomId}");
+            if (snapshot.StatesSetInRoom.Count > 0) withStates++;
+        }
+        // The index gives every object state 0; rooms show what their entry script sets.
+        Assert.True(withStates >= 15, $"{withStates} rooms set object states");
+    }
 }

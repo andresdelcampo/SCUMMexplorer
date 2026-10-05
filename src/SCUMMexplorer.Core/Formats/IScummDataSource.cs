@@ -18,7 +18,7 @@ public sealed record ScummRoomData(
 /// <summary>
 /// Where the session and its script executor get game data: scripts (entry, exit, local, global), a room's objects,
 /// images and verb code. Rooms are numbers. The EGA game reads the old-v3 LFL files (<see cref="LoomEgaDataSource"/>),
-/// the CD game its DISK01.LEC blocks. Methods throw <see cref="IOException"/> or
+/// the CD game its DISK01.LEC blocks (<see cref="LoomCdDataSource"/>). Methods throw <see cref="IOException"/> or
 /// <see cref="InvalidDataException"/> for data they cannot read, as the readers they replace did.
 /// </summary>
 public interface IScummDataSource
@@ -54,10 +54,10 @@ public interface IScummDataSource
 
 public static class ScummDataSources
 {
-    /// <summary>The data source for a game: the LFL files (the CD archive joins with its own source).</summary>
+    /// <summary>The data source for a game: the CD archive for <see cref="GameId.LoomVga"/>, the LFL files otherwise.</summary>
     public static IScummDataSource For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
-        return new LoomEgaDataSource(game);
+        return game.Id == GameId.LoomVga ? new LoomCdDataSource(game) : new LoomEgaDataSource(game);
     }
 }
