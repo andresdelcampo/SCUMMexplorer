@@ -167,6 +167,23 @@ public sealed class LoomMessageTable
     /// <summary>Every <c>sayVoice</c> a reached print issued, in order (the game starts or stops the voice when the print is decoded, text or not).</summary>
     public IReadOnlyList<LoomVoiceCue> VoiceEvents => _voiceEvents;
 
+    private const string MusicTimerVariable = "var[0x00E]";
+
+    /// <summary>
+    /// ScummVM's <c>_cdMusicTimer</c> (soundcd.cpp): zero when a voice or music cue starts, then one more every fourth tick of a 240 Hz
+    /// timer, which is one per jiffy (1/60 s). A stop does not reset it; the timer only runs once a first cue has started.
+    /// </summary>
+    public int CdMusicTimer { get; private set; }
+
+    /// <summary>True from the first cue on (the CD timer is installed by <c>playCDTrack</c>).</summary>
+    public bool CdTimerRunning { get; private set; }
+
+    /// <summary>The frame's share of the CD timer; the session then copies it into <c>VAR_MUSIC_TIMER</c> (<c>Sound::updateMusicTimer</c>).</summary>
+    internal void AdvanceCdTimer(int jiffies)
+    {
+        if (CdTimerRunning) CdMusicTimer += jiffies;
+    }
+
     /// <summary>Everything on the screen now: drawn strings, then the talk message.</summary>
     public IReadOnlyList<LoomMessage> OnScreen => Talk is null ? _drawn.ToArray() : [.. _drawn, Talk];
 
@@ -239,6 +256,10 @@ public sealed class LoomMessageTable
                     {
                         _voice = new LoomVoiceCue(voiceOffset, voiceLength);
                         _voiceEvents.Add(_voice.Value);
+                        // ScummVM (script_v5 decodeParseString case 8): a stop sets VAR_MUSIC_TIMER to 0; a start goes through
+                        // playCDTrack, which zeroes the variable and restarts the CD timer from 0.
+                        runtime.SetGlobalVariable(MusicTimerVariable, 0);
+                        if (voiceOffset != 0 || voiceLength != 0) { CdMusicTimer = 0; CdTimerRunning = true; }
                     }
                     else estimates.Add("the print's voice operands could not be read");
                     break;

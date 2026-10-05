@@ -158,9 +158,20 @@ public sealed partial class LoomExplorationSession
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
         {
-            RunIndexedScript(1, 0, null, 0);
             // playCdIntro leaves script 001 where the intro begins: the frames play the logo and the intro, then the game's start.
-            if (game.Id == GameId.LoomVga && !playCdIntro) ContinueCdBootAfterIntro();
+            var playIntro = game.Id == GameId.LoomVga && playCdIntro;
+            if (playIntro) { _dispatchScope++; _booting = true; }
+            try { RunIndexedScript(1, 0, null, 0); }
+            finally { if (playIntro) _dispatchScope--; }
+            if (playIntro)
+            {
+                DispatchRequestedLoads("during the CD intro");
+                // The frames play the rest as a boot (BootRunning): the skill screen, the assumed answer, the overture and the opening.
+                _playingBoot = true;
+                _cdIntro = true;
+                LastAction = null;
+            }
+            else if (game.Id == GameId.LoomVga) ContinueCdBootAfterIntro();
             return;
         }
         _booting = true;
@@ -285,21 +296,7 @@ public sealed partial class LoomExplorationSession
             _booting = false;
             return;
         }
-        if (FindAwaitedInput() is { } input)
-        {
-            _uncertainties.Add(input.Note);
-            _visitTrace.Add($"boot: starts Room {_currentRoom.ResourceId:00} local script {input.LocalScript} as the player's answer would");
-            _dispatchScope++;
-            try
-            {
-                RunStartedScript(input.LocalScript, 0, null, 0);
-            }
-            finally
-            {
-                _dispatchScope--;
-            }
-            DispatchRequestedLoads("during the boot");
-        }
+        AssumeBootAnswer();
         var frames = 0;
         while (frames < BootFrameLimit && BootGoesOn)
         {
@@ -318,8 +315,39 @@ public sealed partial class LoomExplorationSession
         FinishBoot(frames);
     }
 
+    /// <summary>
+    /// The boot's skill screen (Room 69) waits for the player: script 001 waits on a bit that one local script of the room sets once an
+    /// answer is given. This starts that script as the player's answer would and returns the note that says so (an estimate: the choice
+    /// is not simulated), or null when the boot is not waiting for such an input.
+    /// </summary>
+    public string? AssumeBootAnswer()
+    {
+        if (FindAwaitedInput() is not { } input || _currentRoom is null) return null;
+        _uncertainties.Add(input.Note);
+        _visitTrace.Add($"boot: starts Room {_currentRoom.ResourceId:00} local script {input.LocalScript} as the player's answer would");
+        _dispatchScope++;
+        try
+        {
+            RunStartedScript(input.LocalScript, 0, null, 0);
+        }
+        finally
+        {
+            _dispatchScope--;
+        }
+        DispatchRequestedLoads("during the boot");
+        return input.Note;
+    }
+
     // True while a boot stopped at the opening is played frame by frame; the frames of the boot so far.
     private bool _playingBoot;
+    private bool _cdIntro;
+
+    /// <summary>
+    /// The CD intro's skill screen (Room 69) waits for the player. Playing it unattended, the preview answers
+    /// (<see cref="AssumeBootAnswer"/>) this many frames in, 3 s at the game's 6 jiffies a frame, after the spoken line "Please choose your
+    /// skill level" (2.4 s). The moment is an estimate.
+    /// </summary>
+    public const int CdIntroAnswerFrame = 30;
     private int _bootFramesPlayed;
 
     /// <summary>After a frame of a boot stopped at the opening: ends the boot where the constructor would have.</summary>
@@ -327,6 +355,7 @@ public sealed partial class LoomExplorationSession
     {
         if (!_playingBoot) return;
         _bootFramesPlayed++;
+        if (_cdIntro && _bootFramesPlayed == CdIntroAnswerFrame) AssumeBootAnswer();
         if (_bootFramesPlayed < BootFrameLimit && BootGoesOn) return;
         _playingBoot = false;
         FinishBoot(_bootFramesPlayed);
@@ -1641,6 +1670,14 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     private void UpdateMusicTimer()
     {
+        if (_game.Id == GameId.LoomVga)
+        {
+            // The CD game's timer follows the disc cue (Sound::updateMusicTimer with GF_AUDIOTRACKS): see LoomMessageTable.CdMusicTimer.
+            _runtime.Messages.AdvanceCdTimer(FrameJiffies);
+            if (_runtime.Messages.CdTimerRunning)
+                _runtime.SetGlobalVariable(MusicTimerVariable, (ushort)Math.Min(_runtime.Messages.CdMusicTimer, ushort.MaxValue));
+            return;
+        }
         var timer = _soundClock.MusicTimer();
         if (timer == 0 && _musicTimer == 0) return;
         _musicTimer = timer;

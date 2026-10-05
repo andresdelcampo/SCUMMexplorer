@@ -552,3 +552,57 @@ public sealed class LoomVgaCharsetPerMessageTests
         Assert.DoesNotContain(session.VerbArea().Items, item => item.VerbId is >= 1 and <= 8);
     }
 }
+
+public sealed class LoomVgaIntroTests
+{
+    [Fact]
+    public void TheCdMusicTimerRestartsWithEachCueAndCountsOneAJiffyUntilTheNext()
+    {
+        var table = new LoomMessageTable();
+        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        Assert.False(table.CdTimerRunning);
+        table.AdvanceCdTimer(6);
+        Assert.Equal(0, table.CdMusicTimer);
+        var print = new LoomPrintRequest(0xFF, [new("sayVoice", 3023, 24)], null, "test", 0, null, null);
+        table.Print(print, runtime);
+        Assert.True(table.CdTimerRunning);
+        table.AdvanceCdTimer(6);
+        table.AdvanceCdTimer(6);
+        Assert.Equal(12, table.CdMusicTimer);
+        // A stop zeroes the variable for the script but not the CD timer, which the next frame copies back (ScummVM keeps counting).
+        table.Print(new LoomPrintRequest(0xFF, [new("sayVoice", 0, 0)], null, "test", 0, null, null), runtime);
+        Assert.Equal(0, runtime.GlobalVariables["var[0x00E]"]);
+        Assert.Equal(12, table.CdMusicTimer);
+        table.Print(print, runtime);
+        Assert.Equal(0, table.CdMusicTimer);
+    }
+
+    [Fact]
+    public void TheCdIntroPlaysFromTheSkillScreenThroughTheOvertureToTheGameStart()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
+        Assert.True(session.BootRunning);
+        Assert.Equal(69, session.Snapshot.RoomId);
+        var frames = 0;
+        var timerMax = 0;
+        while (session.BootRunning && frames++ < LoomExplorationSession.BootFrameLimit)
+        {
+            session.AdvanceFrame();
+            if (session.Snapshot.KnownGlobalVariables.TryGetValue("var[0x00E]", out var timer)) timerMax = Math.Max(timerMax, timer);
+        }
+        Assert.False(session.BootRunning);
+        Assert.True(frames < 1500, $"{frames} frames");
+        Assert.Equal(2, session.Snapshot.RoomId);
+        var log = session.Messages.Log;
+        Assert.Contains(log, m => m.Text == "Please choose your skill level.");
+        Assert.Contains(log, m => m.Text == "LucasArts Entertainment Company" && m.Charset == 4);
+        Assert.Contains(log, m => m.Text == "Rise, son of Cygna.");
+        // The overture (3029.2 s, 83.9 s long) is one of the cues, and the timer ran past the values script 044 waits for.
+        Assert.Contains(session.Messages.VoiceEvents, cue => cue.Offset == 30292 && cue.Length == 839);
+        Assert.True(timerMax > 1200, $"timer {timerMax}");
+        Assert.Contains(session.Snapshot.Uncertainties, note => note.StartsWith("Player input assumed", StringComparison.Ordinal));
+    }
+}
