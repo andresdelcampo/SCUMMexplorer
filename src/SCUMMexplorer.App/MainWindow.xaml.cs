@@ -220,12 +220,12 @@ public partial class MainWindow : Window
             UpdateRoomNavigationActions(room);
             RefreshRoomPreview(); UpdateActorLayer(); UpdateVerbArea(); UpdatePlaybackControls();
         }
-    }, _game, () => IsAdvancedMode, LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
+    }, _game, () => IsAdvancedMode, _game?.Id == GameId.LoomVga ? null : LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
 
 
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {
-        if (_game?.Id == GameId.Loom && _session is not null) BuildGameStatusWindow().ShowDialog();
+        if (_game?.Id is GameId.Loom or GameId.LoomVga && _session is not null) BuildGameStatusWindow().ShowDialog();
     }
 
     private void OpenGameFolder(string folder)
@@ -418,7 +418,7 @@ public partial class MainWindow : Window
         StatusText.Text = "Ready";
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         // Game Status needs the session, not a room: show it as soon as the game is loaded (the header then stays still).
-        GameStatusButton.Visibility = game.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
+        GameStatusButton.Visibility = game.Id is GameId.Loom or GameId.LoomVga && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         // The CD game has no music device to choose (its music has not been read); its voices come from the disc's audio track (Voices).
         SoundModeCombo.Visibility = game.Id == GameId.LoomVga ? Visibility.Collapsed : Visibility.Visible;
         VoiceCheck.Visibility = game is { Id: GameId.LoomVga, Vga.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
@@ -3739,7 +3739,7 @@ public partial class MainWindow : Window
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
     {
-        GameStatusButton.Visibility = _game?.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
+        GameStatusButton.Visibility = _game?.Id is GameId.Loom or GameId.LoomVga && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         GameStatusButton.IsEnabled = _session is not null; // Inspection is available during playback too; editing stays guarded.
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         var active = GameClickActive && IsLoomGame;

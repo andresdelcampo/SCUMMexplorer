@@ -50,6 +50,25 @@ internal static class Program
                 var cd = (SCUMMexplorer.Core.Formats.IScummDataSource)Field("_cdData")!;
                 if (Environment.GetEnvironmentVariable("CD_DUMP2") == "1")
                     foreach (var id in cd.GlobalScriptIds()) { var sc = cd.GlobalScript(id); if (sc is not null) foreach (var ins in sc.Instructions) if (ins.Operation is "drawObject" or "setState" or "startObject") report.Add($"   global {id} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
+                // CD_STATUS=1 opens the Game Status window on room 35 and saves a picture of it.
+                if (Environment.GetEnvironmentVariable("CD_STATUS") == "1")
+                {
+                    var r35 = game.Rooms.First(r => r.ResourceId == 35);
+                    Call("SelectResourceInTree", r35);
+                    await Task.Delay(1500);
+                    var status = (Window)Call("BuildGameStatusWindow")!;
+                    status.Show();
+                    await Task.Delay(1500);
+                    var rtb = new RenderTargetBitmap((int)status.ActualWidth, (int)status.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                    rtb.Render(status);
+                    var enc = new PngBitmapEncoder(); enc.Frames.Add(BitmapFrame.Create(rtb));
+                    using (var fs = File.Create(Path.Combine(output, "status.png"))) enc.Save(fs);
+                    report.Add("status window shown");
+                    status.Close();
+                }
+                // CD_PRINT=17,18 lists every instruction of those global scripts.
+                if (Environment.GetEnvironmentVariable("CD_PRINT") is { } printIds)
+                    foreach (var id in printIds.Split(',').Select(int.Parse)) { report.Add($"== script {id}"); if (cd.GlobalScript(id) is { } sc) foreach (var ins in sc.Instructions) report.Add($"   {id:000} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
                 if (Environment.GetEnvironmentVariable("CD_DUMP3") == "1")
                 {
                     var all = new List<(string, SCUMMexplorer.Core.Formats.LoomScriptDisassembly?)>();

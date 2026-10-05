@@ -15,21 +15,24 @@ public sealed record LoomGameStatus(bool Supported, string Evidence, bool CanEdi
 /// lengths, and the English one lacks the Spanish bit 0xD62 and numbers the bits from 0xD63 on one lower, so the bits are read from the scripts too.
 /// </summary>
 internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, int DraftBase, int DraftCount, int InitialNotes, string CheckpointKey, int CheckpointNotes,
-    string DraftStartKey, string DraftPlayKey, int BitShift, string Evidence)
+    string DraftStartKey, string DraftPlayKey, int BitShift, string Evidence, string LookKey = "", string CostumeKey = "")
 {
     /// <summary>The Spanish release's learned-draft bit; the edition's bit minus this is <see cref="BitShift"/>.</summary>
     private const int SpanishLearnedBit = 0xD69;
 
-    public static LoomStatusSchema Read(GameLibrary game)
+    public static LoomStatusSchema Read(GameLibrary game, IScummDataSource? data = null)
     {
-        if (game.Id != GameId.Loom || game.Version != ScummVersion.V3) throw new InvalidDataException("Game status fields have only been established for LOOM old-v3.");
+        var cd = game.Id == GameId.LoomVga;
+        if (!cd && (game.Id != GameId.Loom || game.Version != ScummVersion.V3)) throw new InvalidDataException("Game status fields have only been established for LOOM old-v3 and LOOM on CD.");
+        if (cd && data is null) throw new InvalidDataException("The CD game's scripts are read through its data source.");
         var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
         var scripts = new Dictionary<int, IReadOnlyList<LoomScriptInstruction>>();
         int scriptCount = game.Resources.Count(r => r.Kind == ResourceKind.Script);
         IReadOnlyList<LoomScriptInstruction> Code(int id)
         {
             if (!scripts.TryGetValue(id, out var code))
-                scripts[id] = code = reader.Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == id)).Instructions.ToList();
+                scripts[id] = code = (cd ? data!.GlobalScript(id) ?? throw new InvalidDataException($"Loaded script {id:000} is missing.")
+                    : reader.Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == id))).Instructions.ToList();
             return code;
         }
         InvalidDataException Fail(string where) => new($"Loaded script {where} does not establish the status contract.");
@@ -44,8 +47,20 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
         int Number(string bit) => int.Parse(bit.AsSpan(6, bit.Length - 7), NumberStyles.HexNumber);
 
         // 017: the instruction before "var[0x072] = 8" tests the staff bit; zero selects the without-staff animations.
-        var (staffTest, staffMove) = Pair(Code(17), "017", "move", "var[0x072] = 0x0008");
-        if (staffTest.Operation != "equalZero") throw Fail("017");
+        // On CD it is the bit whose test decides between starting 018 with 2 (the note controls, staff held) and 019 (they go away).
+        LoomScriptInstruction staffTest, staffMove;
+        if (!cd)
+        {
+            (staffTest, staffMove) = Pair(Code(17), "017", "move", "var[0x072] = 0x0008");
+            if (staffTest.Operation != "equalZero") throw Fail("017");
+        }
+        else
+        {
+            var c17 = Code(17);
+            var at = c17.ToList().FindIndex(i => i.Operation == "startScript" && i.Operands == "0x12, [0x0002]");
+            if (at < 2 || c17[at - 1].Operation != "isNotEqual" || !c17[at - 1].Operands.Contains(", 0x0002,", StringComparison.Ordinal) || c17[at - 2].Operation != "notEqualZero") throw Fail("017");
+            (staffTest, staffMove) = (c17[at - 2], c17[at]);
+        }
         var staff = Key(staffTest.Operands, @"bit\[0x[0-9A-F]+\]");
         // 010: old-v3 tests limit < ID; IDs above the limit are refused (chain 0x0B).
         var (limitTest, limitChain) = Pair(Code(10), "010", "chainScript", "0x0B, []");
@@ -80,7 +95,23 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
         if (learnedScript.Count == 0 || learnedScript[0].Operands != $"{learned} = 0x0001" || !learnedScript.Any(i => i.Operation == "or" && i.Operands == "local[0x002] |= 0x2000") ||
             lastScript.Count == 0 || lastScript[0].Operands != $"{lastNote} = 0x0001" || !lastScript.Any(i => i.Operation == "or" && i.Operands == "local[0x002] |= 0x4000")) throw Fail("025/034");
         // 018 puts the note controls on screen.
-        if (!Code(18).Any(i => i.Operation == "verbOps" && i.Operands == "0x08, [at, 0x00C0, local[0x004]; image, 0x008E; on]")) throw Fail("018");
+        if (!Code(18).Any(i => i.Operation == "verbOps" && Regex.IsMatch(i.Operands, @"^0x08, \[at, 0x00C0, local\[0x004\]; image, 0x[0-9A-F]+; on\]$") && (cd || i.Operands.Contains("image, 0x008E;", StringComparison.Ordinal)))) throw Fail("018");
+        if (cd)
+        {
+            // 017 keeps its two arguments, the look and the costume, in two variables; running it again with them redraws Bobbin.
+            var c17All = Code(17);
+            string Stored(string local) => c17All.Where(i => i.Operation == "move").Select(i => Regex.Match(i.Operands, @"^(var\[0x[0-9A-F]+\]) = " + Regex.Escape(local) + "$")).FirstOrDefault(m => m.Success)?.Groups[1].Value
+                ?? throw Fail("017");
+            var lookKey = Stored("local[0x000]"); var costumeKey = Stored("local[0x001]");
+            // On CD, 017 also stores the look (var 0x0AE) and 018 the layout (var 0x0AD, 0 to 2 and above) that the note controls follow. The browsing floor of the
+            // EGA catalog (its initial notes and checkpoint) has no counterpart established here: none is applied.
+            return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 0, "", 0, startKey, playKey, 0,
+                $"Loaded CD scripts 017 +0x{staffTest.Offset:X4}/+0x{staffMove.Offset:X4}: {staff}=1 means held (it starts 018 with 2, else 019); 010 +0x{limitTest.Offset:X4}/+0x{limitChain.Offset:X4}: note IDs 1..8 up to and including {noteLimit} are available. " +
+                $"023: two words per draft, four 3-bit notes +1; flags 0x2000 learned ({learned})/0x1000 reverse ({reverse})/0x4000 last-note knowledge ({lastNote}). " +
+                "022 searches slots 0..15 inclusively. 026 refuses matched unlearned drafts before target dispatch; 022 skips reverse matching without 0x1000. " +
+                "Staff edits refresh the look through 017 and the note controls through 018/019. " +
+                "These explicit edits are exploration choices, not source-established pickups or learning.", lookKey, costumeKey);
+        }
         var init = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 1), 211, scriptCount);
         var checkpoint = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 46), 204, scriptCount);
         if (init is null || !init.Instructions.Any(i => i.Operation == "move" && i.Operands == "var[0x07A] = 0x0003") || checkpoint is null)
@@ -112,7 +143,7 @@ public sealed partial class LoomExplorationSession
         get
         {
             if (_statusSchema is null && _statusSchemaFailure is null)
-                try { _statusSchema = LoomStatusSchema.Read(_game); }
+                try { _statusSchema = LoomStatusSchema.Read(_game, _data); }
                 catch (Exception ex) when (ex is InvalidDataException or InvalidOperationException or IOException) { _statusSchemaFailure = ex.Message; }
             return _statusSchema;
         }
@@ -184,7 +215,15 @@ public sealed partial class LoomExplorationSession
         // Only the normal appearance managed by017 can be refreshed through017.
         // A boat/disguise/close-up costume is left to its source room scripts.
         var ego = Actors.FirstOrDefault(a => a.Number == 1);
-        if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault("var[0x07D]") && ego?.Look.Costume > 0)
+        if (schema.LookKey.Length > 0)
+        {
+            // CD: 017 takes the look and the costume it stored last. It starts 018 or 019 itself only while its own flag (bit 0x00E)
+            // is set, which a first-visit session may not have, so the note controls are refreshed explicitly as well.
+            if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) && ego?.Look.Costume > 0)
+                RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables.GetValueOrDefault(schema.LookKey), ["local[0x001]"] = (ushort)ego.Look.Costume }, 0);
+            RefreshStatusNotes(held);
+        }
+        else if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault("var[0x07D]") && ego?.Look.Costume > 0)
             RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables["var[0x07C]"], ["local[0x001]"] = (ushort)ego.Look.Costume }, 0);
         else RefreshStatusNotes(held);
     }

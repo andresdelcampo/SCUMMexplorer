@@ -470,4 +470,38 @@ public sealed class LoomVgaCharsetPerMessageTests
         Assert.Equal(pcm.Length + 44, wave.Length);
         Assert.Empty(disc.ReadAudio(10_000_000, 10));
     }
+
+    [Fact]
+    public void TheCdStatusSchemaIsReadFromTheScriptsAndItsEditsShowTheDraftVerbs()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        session.VisitRoom(game.Rooms.First(item => item.ResourceId == 1));
+        session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
+        var status = session.GameStatus;
+        Assert.True(status.Supported, status.Evidence);
+        Assert.Equal(16, status.Drafts.Count);
+        Assert.Contains("bit[0x001]", status.Evidence);
+        Assert.Contains("var[0x0AC]", status.Evidence);
+        Assert.Contains("bit[0x009]", status.Evidence);
+        Assert.True(status.CanEdit);
+        session.UpdateStaffPossession(true);
+        session.UpdateAvailableNotes(5);
+        Assert.True(session.GameStatus.StaffHeld);
+        Assert.Equal(5, session.GameStatus.AvailableNoteCount);
+        session.UpdateDraftSequence(0, [1, 2, 3, 4]);
+        session.UpdateDraftLearned(0, true);
+        var first = session.GameStatus.Drafts[0];
+        Assert.Equal([1, 2, 3, 4], first.Notes);
+        Assert.True(first.Learned);
+        var area = session.VerbArea();
+        Assert.True(area.Items.Count(item => item.VerbId is >= 1 and <= 8) >= 5, string.Join(",", area.Items.Select(i => i.VerbId)));
+        session.UpdateStaffPossession(false);
+        Assert.False(session.GameStatus.StaffHeld);
+        // 017 starts 019, which runs on the next frames, as in the app.
+        for (var frame = 0; frame < 5; frame++) session.AdvanceFrame();
+        Assert.Empty(session.VerbArea().Items.Where(item => item.VerbId is >= 1 and <= 8));
+    }
 }

@@ -45,6 +45,7 @@ public partial class GameStatusWindow : Window
     private bool? _staffHeld;
     private int? _noteCount;
     private bool _loadingRows;
+    private readonly bool _named;
     private readonly List<DraftRow> _rows = [];
 
     public sealed class DraftRow : INotifyPropertyChanged
@@ -66,9 +67,11 @@ public partial class GameStatusWindow : Window
         public event PropertyChangedEventHandler? PropertyChanged;
         private void Set<T>(ref T field, T value, [CallerMemberName] string? name = null)
         { if (EqualityComparer<T>.Default.Equals(field, value)) return; field = value; PropertyChanged?.Invoke(this, new(name)); }
+        /// <summary>False for the CD game: the draft names were checked against the DOS EGA verbs only, so its drafts are numbered.</summary>
+        public bool Named { get; init; } = true;
         public void Load(LoomDraftStatus draft)
         {
-            Title = LoomDraftNames.Title(draft); PropertyChanged?.Invoke(this, new(nameof(Title)));
+            Title = Named ? LoomDraftNames.Title(draft) : $"Draft {draft.Slot + 1}"; PropertyChanged?.Invoke(this, new(nameof(Title)));
             Note1 = draft.Notes.ElementAtOrDefault(0); Note2 = draft.Notes.ElementAtOrDefault(1);
             Note3 = draft.Notes.ElementAtOrDefault(2); Note4 = draft.Notes.ElementAtOrDefault(3);
             Learned = draft.Learned; Reversible = draft.Reversible; Origin = draft.Origin;
@@ -79,7 +82,7 @@ public partial class GameStatusWindow : Window
     public GameStatusWindow(Func<LoomExplorationSession?> session, Func<bool> canEdit, Action refreshRoom,
         GameLibrary? game = null, Func<bool>? advanced = null, FlagSource? flags = null)
     {
-        _flagSource = flags;
+        _flagSource = flags; _named = game?.Id != GameId.LoomVga;
         InitializeComponent(); _session = session; _canEdit = canEdit; _refreshRoom = refreshRoom; _advanced = advanced ?? (() => false);
         _artwork = game is null ? null : LoomStatusArtwork.TryLoad(game, out _artworkError);
         double noteHeight = (_artwork?.Notes[0].PixelHeight ?? 20) * 2;
@@ -130,7 +133,7 @@ public partial class GameStatusWindow : Window
             _baseline = status; _staffHeld = status.StaffHeld; _noteCount = status.AvailableNoteCount;
             if (_rows.Count != status.Drafts.Count)
             {
-                _rows.Clear(); _rows.AddRange(status.Drafts.Select(d => new DraftRow { Slot = d.Slot }));
+                _rows.Clear(); _rows.AddRange(status.Drafts.Select(d => new DraftRow { Slot = d.Slot, Named = _named }));
                 foreach (var row in _rows) row.PropertyChanged += (_, _) => { if (!_loadingRows) UpdateControls(); };
                 DraftGrid.ItemsSource = _rows;
             }
