@@ -155,6 +155,17 @@ public sealed class LoomScriptRuntimeState
     public (int Min, int Max)? CameraRange { get; set; }
     /// <summary>Half a screen from each edge of the current room: the widest camera limits (<c>cameraMoved</c>).</summary>
     public (int Min, int Max)? RoomCameraBounds { get; set; }
+
+    /// <summary>
+    /// The shadow palette (ScummVM <c>_shadowPalette</c>, set by <c>roomOps roomPalette a, b</c> in old-v3 games): colour slot b is shown as
+    /// colour a. Identity at room entry. The opening's title fades by stepping one slot through the EGA colours.
+    /// </summary>
+    public byte[] ShadowPalette { get; } = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
+
+    public void ResetShadowPalette()
+    {
+        for (var i = 0; i < ShadowPalette.Length; i++) ShadowPalette[i] = (byte)i;
+    }
     /// <summary>
     /// The virtual mouse the session put in <c>var[0x014]</c>/<c>var[0x015]</c>
     /// (ScummVM <c>VAR_VIRT_MOUSE_X/Y</c>) this frame, and the input assumption

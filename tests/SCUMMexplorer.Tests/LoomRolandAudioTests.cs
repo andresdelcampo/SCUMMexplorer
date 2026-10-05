@@ -154,14 +154,21 @@ public sealed class LoomRolandAudioTests
         var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
         var session = new LoomExplorationSession(game, snapshot, stopAtOpening: true, soundCard: LoomExplorationSession.RolandSoundCard);
         var rooms = new List<int>();
+        var slot15 = new List<byte>();
         for (var frame = 0; frame < 6000 && session.BootRunning; frame++)
         {
             session.AdvanceFrame();
+            if (slot15.Count == 0 || slot15[^1] != session.ShadowPalette[15]) slot15.Add(session.ShadowPalette[15]);
             if (session.Snapshot.RoomId is int room && (rooms.Count == 0 || rooms[^1] != room)) rooms.Add(room);
         }
         // Script 044 times its fades on the music timer (var[0x00E]) that the overture's markers drive; without it the opening never left Room 69.
         Assert.False(session.BootRunning, "The opening did not finish.");
         Assert.Contains(1, rooms);
         Assert.Equal(2, session.Snapshot.RoomId);
+        // The title fades by stepping colour slot 15 (roomOps roomPalette a, 15): 1, 9, 11, 15 on the way in, then 11, 9, 1, 0 out.
+        Assert.Contains(slot15.ToArray(), value => value == 0);
+        var text = string.Join(",", slot15);
+        Assert.Contains("1,9,11,15", text);
+        Assert.Contains("11,9,1,0", text);
     }
 }

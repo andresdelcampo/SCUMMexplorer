@@ -2828,8 +2828,8 @@ public partial class MainWindow : Window
             ? "No room depth mask was stored."
             : $"Highlight {depthMask.Pixels.ToArray().Count(value => value != 0):N0} marked pixels in the room mask.";
         RoomPreview.Source = RoomMaskToggle.IsChecked == true && depthMask is not null
-            ? CreateMaskOverlayBitmap(room.Width, room.Height, pixels, room.Palette, depthMask.Pixels.ToArray())
-            : CreateBitmap(room.Width, room.Height, pixels, room.Palette);
+            ? CreateMaskOverlayBitmap(room.Width, room.Height, pixels, DisplayPalette(room), depthMask.Pixels.ToArray())
+            : CreateBitmap(room.Width, room.Height, pixels, DisplayPalette(room));
         RefreshWalkBoxOverlay();
         UpdateVerbArea();
         UpdateActorLayer();
@@ -4049,7 +4049,7 @@ public partial class MainWindow : Window
             AdvanceIdleReachedRoom(reached);
             return;
         }
-        var signature = FrameSignature(snapshot);
+        var signature = FrameSignature(snapshot, session);
         if (signature != _idleSignature)
         {
             var first = _idleSignature is null;
@@ -4139,7 +4139,7 @@ public partial class MainWindow : Window
         if (_session is not { } session || _playback is not { } playback || !ViewShowsSessionRoom() ||
             _currentRoomResource is not { } room) return;
         var snapshot = session.Snapshot;
-        var signature = FrameSignature(snapshot);
+        var signature = FrameSignature(snapshot, session);
         if (signature != playback.FrameSignature)
         {
             var first = playback.FrameSignature is null;
@@ -4162,7 +4162,21 @@ public partial class MainWindow : Window
         UpdatePlaybackControls();
     }
 
-    private static string FrameSignature(LoomSessionSnapshot snapshot) =>
+    /// <summary>The room's palette as the game shows it now: the colour slots a script faded (the opening's title) show other colours.</summary>
+    private IReadOnlyList<uint> DisplayPalette(RoomImage room)
+    {
+        if (_session is not { } session || room.Palette.Count > 256) return room.Palette;
+        var shadow = session.ShadowPalette;
+        var identity = true;
+        for (var i = 0; i < room.Palette.Count && identity; i++) identity = shadow[i] == i;
+        if (identity) return room.Palette;
+        var shown = new uint[room.Palette.Count];
+        for (var i = 0; i < shown.Length; i++) shown[i] = shadow[i] < room.Palette.Count ? room.Palette[shadow[i]] : room.Palette[i];
+        return shown;
+    }
+
+    private static string FrameSignature(LoomSessionSnapshot snapshot, LoomExplorationSession session) =>
+        string.Join("", session.ShadowPalette.Take(16)) + "|" +
         string.Join(",", snapshot.ObjectStates.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value}")) + "|" +
         string.Join(",", snapshot.ObjectPositions.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value.X},{pair.Value.Y}")) + "|" +
         string.Join(",", snapshot.DrawOrder);
@@ -4288,11 +4302,12 @@ public partial class MainWindow : Window
             return;
         }
         var pixels = new byte[room.Width * room.Height * 4];
+        var shown = DisplayPalette(room);
         for (var i = 0; i < layer.Pixels.Length; i++)
         {
             var index = layer.Pixels[i];
             if (index == LoomActorRenderer.Transparent) continue;
-            SetBgra(pixels, i * 4, index < room.Palette.Count ? room.Palette[index] : 0xFF000000u);
+            SetBgra(pixels, i * 4, index < shown.Count ? shown[index] : 0xFF000000u);
         }
         RoomActorOverlay.Source = FrozenBgra(room.Width, room.Height, pixels);
         RoomActorOverlay.Visibility = Visibility.Visible;

@@ -905,6 +905,23 @@ public sealed class LoomBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "roomOps" && runtime is not null && instruction.Operands.StartsWith("roomPalette,", StringComparison.Ordinal))
+            {
+                // o5_roomOps SO_ROOM_PALETTE (small header): _shadowPalette[b] = a. Display only; a speculative route does not touch it.
+                var shade = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (shade.Length == 3 && TryReadValue(shade[1], knownVariables, out var shadeColor, out _) &&
+                    TryReadValue(shade[2], knownVariables, out var shadeSlot, out _))
+                {
+                    if (!onEstimatedPath)
+                    {
+                        runtime.ShadowPalette[shadeSlot & 0xFF] = (byte)shadeColor;
+                        trace.Add($"colour slot {shadeSlot & 0xFF} shows colour {shadeColor & 0xFF} (roomPalette)");
+                    }
+                    pc = next;
+                    continue;
+                }
+            }
+
             if (instruction.Operation == "roomOps" && runtime?.RoomCameraBounds is { } bounds &&
                 instruction.Operands.StartsWith("roomScroll,", StringComparison.Ordinal))
             {

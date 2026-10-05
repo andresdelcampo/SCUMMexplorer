@@ -200,6 +200,9 @@ public sealed partial class LoomExplorationSession
     public const int RolandSoundCard = 4;
 
     /// <summary>The sound card the game's scripts see. Changing it takes effect at the scripts' next read, as it would in the game.</summary>
+    /// <summary>The shadow palette of the room on screen: slot i is shown as colour <c>ShadowPalette[i]</c> (identity unless a script faded something).</summary>
+    public IReadOnlyList<byte> ShadowPalette => _runtime.ShadowPalette;
+
     public int SoundCard
     {
         get => _runtime.GlobalVariables.GetValueOrDefault(SoundCardVariable);
@@ -835,6 +838,7 @@ public sealed partial class LoomExplorationSession
         // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
         var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
         _runtime.RoomCameraBounds = _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
+        _runtime.ResetShadowPalette();
         _runtime.SetGlobalVariable(CameraVariable, 160);
         _runtime.EstimatedVariables.Remove(CameraVariable);
         _runtime.Camera.Reset(160);
