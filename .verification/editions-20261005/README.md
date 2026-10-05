@@ -31,7 +31,7 @@ Not yet checked: sounds degrading cleanly without files 82–85 in the real wind
 - **v1.2 de is byte-identical to plain `loom ega de`** (all 80 files, `LOOM.EXE` included): nothing to compare.
 - **v1.2 es differs from plain `loom ega es` in two files** (same sizes), and adds `INSTALL.BAT`/`INSTALL2.BAT`:
   - `00.LFL`: 75 bytes in the room-to-disk table (for example disks 2 become 1): the installer's disk layout, no effect on the data the app reads.
-  - `15.LFL`: two bytes, 0x90 to 0x00, inside a repeating `90 ff ff 00 01 00` pattern (room 15 image or similar data); not decoded further, no script or text involved.
+  - `15.LFL`: two bytes, 0x90 to 0x00, inside a repeating `90 ff ff 00 01 00` pattern (room 15 image or similar data); **decoded afterwards: they are in the room's depth mask** (the data after the image). See the next paragraph.
 - `LOOM.EXE` is the same file in both. So v1.2 changes nothing the app shows; no per-edition handling needed.
 
 ## Correction to the first-pass glossary numbers, and the replay catalog (5 October)
@@ -42,3 +42,7 @@ Not yet checked: sounds degrading cleanly without files 82–85 in the real wind
 **Decision (user, 5 October): no replay-pipeline rerun for the other editions.** `loom ega mt32 en` is the only edition that gets the cutscene catalog and the replay tests; the other editions open, show rooms and texts, and keep the four established starts.
 
 **Keeping track (user, 5 October):** the list of verified editions lives in the main `README.md`, section "Verified editions"; add a bullet there whenever an edition is checked.
+
+## What the two room-15 bytes do (5 October)
+
+Decoding room 15 of both es folders with the app's own readers (`LoomWalkBoxReader`, `LoomEgaRoomDecoder`): walk boxes (10) and box matrix are equal, the picture is pixel-identical, **but the depth mask differs in 145 pixels**, all in the bottom rows (y 130 to 143, x 64 to 207 of the 424 x 144 room). So v1.2 changed the room's foreground masking (what hides an actor standing behind the front objects) and nothing else; it reads as a small correction to that mask, but with no release notes this is an inference, not a documented fix. The app already reads the mask from the data, so no code change is needed. Not viewed with an actor on screen.
