@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Rendering;
 
@@ -70,6 +70,13 @@ public sealed record LoomBoundedScriptResult(
 /// </summary>
 public sealed class LoomBoundedScriptExecutor
 {
+    /// <summary>
+    /// A marker key (in the variables and in the estimated set) for a game whose bit variables are a separate array: ScummVM aliases a bit onto its
+    /// variable word only for versions up to 3 (readVar), and the CD game (v4) keeps <c>_bitVars</c> apart, so a write to <c>var[0]</c> or the camera
+    /// must not change <c>bit[0x00E]</c> or <c>bit[0x025]</c>. Present, it turns every alias off.
+    /// </summary>
+    public const string SeparateBitStorage = "var[0xFFFF]";
+
     private const int DefaultInstructionLimit = 4096;
 
     /// <summary>
@@ -2159,7 +2166,7 @@ public sealed class LoomBoundedScriptExecutor
         if (index is { Value: null }) return new(role, operand, null, null, null, index,
             ArgumentIndex: argument, UnresolvedReason: "unresolved index");
         string? key = TryNormalizeKey(operand, variables, out var normalized) ? normalized : null;
-        var backing = key is not null && key.StartsWith("bit[", StringComparison.Ordinal)
+        var backing = key is not null && key.StartsWith("bit[", StringComparison.Ordinal) && !variables.ContainsKey(SeparateBitStorage)
             ? $"var[0x{int.Parse(VariablePattern.Match(key).Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >> 4:X3}]" : null;
         if (key is not null && (!include(key) || backing is not null && !include(backing)))
             return new(role, operand, key, null, null, index, backing, argument, "filtered operand");
@@ -2332,8 +2339,8 @@ public sealed class LoomBoundedScriptExecutor
     private static bool IsEstimated(string key, IReadOnlySet<string> estimated)
     {
         if (estimated.Contains(key)) return true;
-        // A bit reads its backing global word.
-        return key.StartsWith("bit[0x", StringComparison.Ordinal) &&
+        // A bit reads its backing global word (not in a game whose bits are stored apart from the variables).
+        return key.StartsWith("bit[0x", StringComparison.Ordinal) && !estimated.Contains(SeparateBitStorage) &&
                int.TryParse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var bit) &&
                estimated.Contains($"var[0x{bit >> 4:X3}]");
     }
@@ -2355,6 +2362,7 @@ public sealed class LoomBoundedScriptExecutor
         if (value) estimated.Add(key);
         else estimated.Remove(key);
         // A word written as a whole replaces what its bits held.
+        if (estimated.Contains(SeparateBitStorage)) return;
         if (!key.StartsWith("var[0x", StringComparison.Ordinal) ||
             !int.TryParse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var word)) return;
         for (var bit = 0; bit < 16; bit++) estimated.Remove($"bit[0x{word * 16 + bit:X3}]");
@@ -2510,7 +2518,7 @@ public sealed class LoomBoundedScriptExecutor
             var backingKey = $"var[0x{bitIndex >> 4:X3}]";
             var bitValue = (ushort)(right == 0 ? 0 : 1);
             variables[variableKey] = bitValue;
-            if (variables.TryGetValue(backingKey, out var backingValue))
+            if (!variables.ContainsKey(SeparateBitStorage) && variables.TryGetValue(backingKey, out var backingValue))
                 variables[backingKey] = bitValue == 0
                     ? (ushort)(backingValue & ~(1 << (bitIndex & 15)))
                     : (ushort)(backingValue | (1 << (bitIndex & 15)));
@@ -2555,6 +2563,7 @@ public sealed class LoomBoundedScriptExecutor
 
     private static void RefreshBitAliases(string variableKey, IDictionary<string, ushort> variables)
     {
+        if (variables.ContainsKey(SeparateBitStorage)) return;
         if (!variableKey.StartsWith("var[0x", StringComparison.Ordinal) ||
             !int.TryParse(variableKey.AsSpan(6, variableKey.Length - 7), NumberStyles.HexNumber,
                 CultureInfo.InvariantCulture, out var wordIndex)) return;
@@ -2740,6 +2749,12 @@ public sealed class LoomBoundedScriptExecutor
             if (match.Groups[1].Value == "bit")
             {
                 var bitIndex = int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                if (variables.ContainsKey(SeparateBitStorage))
+                {
+                    value = 0; // the engine starts with every bit clear
+                    detail = "known bit, nothing has set it";
+                    return true;
+                }
                 if (variables.TryGetValue($"var[0x{bitIndex >> 4:X3}]", out var word))
                 {
                     value = (ushort)((word >> (bitIndex & 15)) & 1);

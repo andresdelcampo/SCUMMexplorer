@@ -185,6 +185,12 @@ public sealed class LoomMessageTable
     /// <summary>True from the first cue on (the CD timer is installed by <c>playCDTrack</c>).</summary>
     public bool CdTimerRunning { get; private set; }
 
+    /// <summary>
+    /// A session that did not play the intro: in the game the intro's cues have started the timer by the time anything else happens, and it counts on
+    /// from the last cue's start. How long ago that was is not known here, so it starts at 0 (an estimate; the longest wait a script can have for it).
+    /// </summary>
+    internal void AssumeCdTimerRunning() => CdTimerRunning = true;
+
     /// <summary>The frame's share of the CD timer; the session then copies it into <c>VAR_MUSIC_TIMER</c> (<c>Sound::updateMusicTimer</c>).</summary>
     internal void AdvanceCdTimer(int jiffies)
     {

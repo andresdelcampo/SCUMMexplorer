@@ -154,6 +154,11 @@ public sealed partial class LoomExplorationSession
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
             _runtime.SetGlobalVariable(timer, 0);
+        if (game.Id == GameId.LoomVga)
+        {
+            _runtime.GlobalVariables[LoomBoundedScriptExecutor.SeparateBitStorage] = 1;
+            _runtime.EstimatedVariables.Add(LoomBoundedScriptExecutor.SeparateBitStorage);
+        }
         if (soundCard != 0) _runtime.SetGlobalVariable(SoundCardVariable, (ushort)soundCard);
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
@@ -228,12 +233,38 @@ public sealed partial class LoomExplorationSession
         _pending.RemoveAll(item => item.ScriptNumber == 1);
         _requestedLoad = null;
         _visitTrace.Add($"boot: the intro was not played; script 001 ran on from +0x{target:X4}, where the intro ends, to the room load that opens the game");
+        RunCdBootTail(boot!, target);
+        _runtime.Messages.AssumeCdTimerRunning();
+        _uncertainties.Add("The CD intro was not played, so no disc cue has started the music timer (var[0x00E]) in this session. In the game the intro's cues have, and it counts on from the last cue's start; here it counts from 0 at the start of the session (an estimate, the longest wait for scripts that wait on it).");
         if (_runtime.UserPut <= 0)
         {
             // The intro's own cursorCommand calls (input on once the opening ends) were skipped with it; a game that has started takes clicks.
             _runtime.UserPut = 1;
             _runtime.UserPutEstimate = "the CD game's intro, which turns user input on when it ends, was not played";
         }
+    }
+
+    /// <summary>
+    /// What script 001 does once the opening is over: the code after its room loads and the wait for the opening script ends the override, unfreezes
+    /// the scripts, sets the camera on the ego, and clears the start-up lock (<c>bit[0x00E]</c>, set a few instructions before the room loads, which
+    /// the entry scripts of many rooms test before they start their monitors) before it chains to the input loop. A start that skips the opening
+    /// dropped all of that, so bit 0x00E stayed set and those monitors never started. This runs the tail from its <c>endOverride</c> (the first one
+    /// after the room loads, found in the code); the chained input loop is not kept, since this session takes clicks itself.
+    /// </summary>
+    private void RunCdBootTail(LoomScriptDisassembly boot, int target)
+    {
+        var ins = boot.Instructions;
+        var load = ins.FirstOrDefault(i => i.Offset >= target && i.Operation is "loadRoom" or "loadRoomWithEgo");
+        var tail = load is null ? null : ins.FirstOrDefault(i => i.Offset > load.Offset && i.Operation == "endOverride");
+        if (tail is null)
+        {
+            _uncertainties.Add("The CD boot's tail (after the opening) was not found in script 001, so the start-up lock (bit[0x00E]) was left as the intro sets it.");
+            return;
+        }
+        RunIndexedScript(1, tail.Offset, new Dictionary<string, ushort> { ["local[0x000]"] = 0 }, 0);
+        _pending.RemoveAll(item => item.ScriptNumber is 1 or 6);
+        _requestedLoad = null;
+        _visitTrace.Add($"boot: the opening was skipped; script 001's tail from +0x{tail.Offset:X4} (after the opening's wait) ran: scripts unfrozen, start-up lock cleared, input on");
     }
 
     /// <summary>
