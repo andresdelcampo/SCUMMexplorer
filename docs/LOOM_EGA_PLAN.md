@@ -10,7 +10,7 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 
 ## What is really left for LOOM EGA
 
-**1. M5, the secrets guide** (back in scope, 4 October; decisions made; **on hold since 5 October** while MT-32 was built). The only unbuilt LOOM EGA feature. See below; the proposal of kinds and entry schema from 5 October awaits the user's answers (plain exits out? reactions in? a played-set in the session?).
+**1. M5, the secrets guide: shelved (user, 5 October).** It would mostly be another route to things the cutscene picker and the inspections already reach; build it only if a real value that they lack is shown, never as a shortcut around the app experience. Nothing of it is built; the section below stays as the old specification.
 
 **2. Needs the user (on-screen or ScummVM checks)**
 - Staff scenes in Room 43, El Muerto and Room 17 sizes, actor 4 placement.
@@ -27,7 +27,7 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 **4. Housekeeping**
 - 17 historical git worktrees under `.claude/worktrees/` and the open proposals in [CLEANUP_REVIEW.md](CLEANUP_REVIEW.md).
 
-## M5. Secrets and guide (in scope again, 4 October)
+## M5. Secrets and guide (shelved 5 October; old specification)
 
 Build a discoverable, filterable index of secrets from verified triggers and outcomes, with source links. Raw material: the 235 audited cutscene sites (`loom-replays.json`, `LoomSceneSetupPlanner`), the 90 story-event bits and the glossary, the draft table, and the script map. Every entry carries its evidence level (`verified`, `preview`, `unresolved`).
 
@@ -47,13 +47,13 @@ Decisions (user, 4 October):
 The user put M5 on hold on 5 October and asked for MT-32 first. Built and checked (record: [.verification/mt32/README.md](../.verification/mt32/README.md)): the Roland upgrade's sounds 33–64 are tagless MIDI-like streams (`LoomRolandSong`) that the game's scripts choose when `var[0x030]` is 4; `LoomMt32Audio` renders them through Munt (`mt32emu` via Mt32emu.net 1.0.0, LGPL-2.1+; the user's own ROMs from `Games/mt32`, `Mt32RomSet`); the app has a fourth device, "Roland MT-32", that sets the session's sound card to 4 (`LoomExplorationSession.SoundCard`, also a constructor argument) so the scripts pick the Roland sounds, as decided. Local material: the MT-32 and CM-32L ROM images in `Games/mt32/` (copyrighted, never committed or shipped; the app finds them via `SCUMM_MT32_ROM_ROOT`, the saved folder, a `mt32` folder beside the game folder, or asks).
 
 Left, in order of value:
-1. **The user listens**: A/B of the rendered samples (`Exe/mt32-samples/*.wav`, or the device in the app) against the bundled ScummVM with the same ROMs. Known possible differences: ScummVM's IMuse scales channel volume and may allocate parts; the app passes the stream through unchanged, as the original driver did.
-2. Decide on the Mt32emu.net dependency (single third-party author with a prebuilt DLL) or build `mt32emu` from the Munt sources.
+1. **The user listens** (confirmed 5 October: the device is in the sound dropdown, and the Roland card adds the new overture to the opening while the other cards skip it, which is how the game behaves): A/B of the rendered samples (`Exe/mt32-samples/*.wav`, or the device in the app) against the bundled ScummVM with the same ROMs. Known possible differences: ScummVM's IMuse scales channel volume and may allocate parts; the app passes the stream through unchanged, as the original driver did.
+2. The Mt32emu.net dependency is accepted (user, 5 October).
 3. Optional: a General MIDI fallback for users without ROMs (labelled as a different sound); the room sounds menu's possible-sound list shown per card; 48–50, 60 and 63 are longer or shorter than their AdLib twins (not examined).
 
 ## Then: LOOM VGA and more languages (user, 4 October; Indy3 is deferred)
 
-Order: M5 (on hold), MT-32 (built, awaiting the listening check), then these. `Games/loom vga en` is now in `Games/` (5 October): the feasibility probe can start. Indy3 is on hold until the user moves its data from `Games/FUTURE/` back to `Games/`.
+Order: MT-32 (built, awaiting the listening check), then these (M5 is shelved). `Games/loom vga en` is now in `Games/` (5 October): the feasibility probe can start. Indy3 is on hold until the user moves its data from `Games/FUTURE/` back to `Games/`.
 
 1. **LOOM VGA (CD, SCUMM v4).** The data is not in `Games/` yet. Once there: a feasibility probe of the resource container and opcode set before any app work.
 2. **More languages of LOOM EGA** (later; Spanish and English work, others when the data arrives). Each language is checked the way English was: compare the glossary, bits, ids and offsets across editions with `GlossaryCheck` and `ScriptDump`, never key code on offsets (see CLAUDE.md, "Editions differ in data").
