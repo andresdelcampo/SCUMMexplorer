@@ -21,7 +21,7 @@ Checked by opening the folder in the app and running the room, text and glossary
 - **LOOM CD (VGA), English, both dumps**: opens from the folder, the `.cue` or the `.bin`; all 78 room backgrounds; nothing else yet.
 - **Indiana Jones and the Last Crusade EGA, English**: room backgrounds and texts only.
 
-Not supported: the Hebrew release (dropped). Not yet read beyond backgrounds: LOOM VGA (CD).
+Not supported: the Hebrew release (dropped).
 
 ## What you can do today (LOOM EGA)
 
