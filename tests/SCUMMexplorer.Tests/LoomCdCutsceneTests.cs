@@ -192,8 +192,14 @@ public sealed class LoomCdCutsceneTests
         Assert.Contains(planner.Derive(groups.First(g => g.First.Room == 2 && g.First.IsRoomEntry).First).After, s => s.Kind == "box");
         // A story state another scene's script sets: that scene runs first, unseen.
         Assert.Contains(planner.Derive(groups.First(g => g.First.Room == 25 && g.First.ObjectId == 373).First).Before, s => s.Kind == "scene");
-        // A scene whose only writers are its own code or code nothing starts says so.
-        var blocked = planner.Derive(groups.First(g => g.First.Room == 34 && g.First.ObjectId == 485).First);
-        Assert.False(blocked.Plays);
-        Assert.Contains("this scene's own script", blocked.Notes[0]);
-    }}
+        // A story bit that only the scene's own script (a toggle) and code nothing starts assign: another trigger that runs the toggle's script,
+        // played twice (the first run changes what the second does), sets it.
+        var disguise = planner.Derive(groups.First(g => g.First.Room == 34 && g.First.ObjectId == 485).First);
+        Assert.True(disguise.Plays);
+        Assert.Equal([487, 487], disguise.Before.Select(s => s.ObjectId));
+        // A monitor of a one-frame change between two boxes that are not neighbours says so.
+        var crossing = planner.Derive(groups.First(g => g.First.Room == 34 && g.First.IsRoomEntry).First);
+        Assert.False(crossing.Plays);
+        Assert.Contains("not neighbours", crossing.Notes[0]);
+    }
+}

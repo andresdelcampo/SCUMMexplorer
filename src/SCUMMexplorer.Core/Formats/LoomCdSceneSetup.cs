@@ -211,10 +211,10 @@ public sealed partial class LoomCdSceneSetupPlanner
     }
 
     /// <summary>The step that would make <paramref name="w"/>'s assignment happen first, or null: an object verb, a room entry, or the scene whose script it is.</summary>
-    private LoomCdSetupStep? StepFor(LoomStateSource w, string tested, HashSet<string> chain, int depth, HashSet<(int, int, int)> stack, bool broad = false, int pick = 0)
+    private LoomCdSetupStep? StepFor(LoomStateSource w, string tested, HashSet<string> chain, int depth, HashSet<(int, int, int)> stack, bool broad = false, int pick = 0, bool ownChain = false)
     {
         var label = ScriptLabel(w);
-        if (label is not null && chain.Contains(label)) return null;
+        if (label is not null && chain.Contains(label) && !ownChain) return null; // the scene's own script: only another trigger that runs it can have set the state first
         if (w.ObjectId is int obj && w.VerbId is int verb)
             return new("verb", w.Room, obj, verb, 0, w.Where,
                 tested + $"The game's own {w.Where.Split(" +")[0]} (object {obj}, verb 0x{verb:X2}) assigns it, so it runs first, unseen, as an exploration action (not the game's click; which earlier scene really left the state was not executed).");
@@ -257,7 +257,7 @@ public sealed partial class LoomCdSceneSetupPlanner
                         candidates.Add(step);
         }
         foreach (var step in candidates.Take(12))
-            if (Trial(t, [step], [], mustEnd: true)) return new([step], [], [step.Reason + "That state is an estimate: the game's own way to it was not executed."], true);
+            if (Trial(t, [step], [], mustEnd: true)) return new([step], [], [step.Reason + " That state is an estimate: the game's own way to it was not executed."], true);
         return null;
     }
 
@@ -336,7 +336,7 @@ public sealed partial class LoomCdSceneSetupPlanner
             var tested = $"The scene's code tests {g.Subject} ({g.Script} +0x{g.Offset:X4}, it must be {wanted}) and a fresh game has it otherwise. ";
             foreach (var w in _scanner.FindConstantWriters(g.Subject, wanted).OrderBy(WriterRank).ThenBy(w => w.Room).Take(40))
             {
-                var step = StepFor(w, tested, chain, depth, stack);
+                var step = StepFor(w, tested, chain, depth, stack) ?? StepFor(w, tested, chain, depth, stack, ownChain: true);
                 if (step is not null && !states.Any(s => s.Kind == step.Kind && s.Room == step.Room && s.ObjectId == step.ObjectId && s.VerbId == step.VerbId)) states.Add(step);
                 if (states.Count >= 12) break;
             }
@@ -351,6 +351,8 @@ public sealed partial class LoomCdSceneSetupPlanner
             for (var i = 0; i < boxSteps.Count; i++)
                 for (var j = 0; j < boxSteps.Count; j++) if (i != j) yield return [boxSteps[i], boxSteps[j]];
             foreach (var s in states) yield return [s];
+            // The same scene twice: the first run changes what the second does (Room 34's object 487 draft verb runs a long scene the first time and the disguise change after that).
+            foreach (var s in states.Where(s => s.Kind == "scene")) yield return [s, s];
             for (var i = 0; i < states.Count; i++)
                 for (var j = 0; j < states.Count; j++) if (i != j) yield return [states[i], states[j]];
             foreach (var s in states) foreach (var b in boxSteps) yield return [s, b];
@@ -364,7 +366,12 @@ public sealed partial class LoomCdSceneSetupPlanner
             if (trials >= MaxTrials) break;
             var before = set.Where(s => s.Kind != "box").ToList();
             var after = set.Where(s => s.Kind == "box").ToList();
-            if (Try(before, after)) return new(before, after, set.Select(s => s.Reason).ToList(), true);
+            if (Try(before, after))
+            {
+                var notes = set.Select(s => s.Reason).Distinct().ToList();
+                if (set.Count == 2 && set[0] == set[1]) notes.Add("The scene is run twice: the first run changes what the second does.");
+                return new(before, after, notes, true);
+            }
         }
 
         // Who else assigns what the code tests, for the note: the scene's own code, or code no scene or verb starts.
@@ -382,14 +389,32 @@ public sealed partial class LoomCdSceneSetupPlanner
             }).ToList();
             writerNotes.Add($"{g.Subject} = {wanted} is assigned by " + (all.Count == 0 ? "no code at all" : string.Join(", ", all)));
         }
+        // A monitor that wants the ego to change from one box straight into another that is not its neighbour is not met by walking.
+        var gaps = new List<string>();
+        if (probe.CurrentWalkBoxes is { } boxSet)
+            foreach (var from in boxes) foreach (var to in boxes.Where(b => b.Box > from.Box))
+            {
+                var route = new List<int> { from.Box };
+                for (var hop = 0; hop < 24 && route[^1] != to.Box; hop++)
+                {
+                    var next = boxSet.GetNextBox(route[^1], to.Box);
+                    if (next < 0 || route.Contains(next)) break;
+                    route.Add(next);
+                }
+                if (route.Count > 2 && route[^1] == to.Box)
+                    gaps.Add($"boxes {from.Box} and {to.Box} are not neighbours (a walk between them passes box {string.Join(", ", route.Skip(1).SkipLast(1))}), so a walking ego changes box one neighbour at a time and the code's one-frame change between them needs a script that places the ego");
+            }
         var unmetText = unmet.Where(x => x.v != LoomCdGuardVerdict.Satisfied).Select(x => x.g).DistinctBy(g => (g.Script, g.Offset)).Take(6).ToList();
         return new([], [], [$"Not started from the fresh state, and no derived setup began it ({trials} headless trials). The code's tests it fails or cannot read here: " +
             (unmetText.Count == 0 ? "none of its tests failed in the fresh state, so something else (a wait, an item, an actor) keeps it from starting" :
                 string.Join("; ", unmetText.Select(g => $"{g.Script} +0x{g.Offset:X4} {g.Operation} {g.Operands.Split(", branch")[0]} must {(g.MustHold ? "hold" : "fail")}"))) + ". " +
             (states.Count == 0 && boxes.Count == 0 ? "No object verb, room entry or scene that assigns the needed state, and no walk-box monitor, was found in the scripts" + (writerNotes.Count > 0 ? $" ({string.Join("; ", writerNotes)})." : ".") :
-             "The game's own writers of that state (and the walk boxes) were tried alone and in combination and did not begin it; the scene may need an earlier part of the story, an item or a draft that this explorer does not model.")], false);
+             "The game's own writers of that state (and the walk boxes) were tried alone and in combination and did not begin it; " +
+             (gaps.Count > 0 ? string.Join("; ", gaps.Take(1)) + "; none was run here." : "the scene may need an earlier part of the story, an item or a draft that this explorer does not model."))], false);
     }
 }
+
+
 
 
 
