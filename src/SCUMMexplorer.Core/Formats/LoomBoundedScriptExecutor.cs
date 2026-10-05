@@ -131,7 +131,7 @@ public sealed class LoomBoundedScriptExecutor
         if (estimatedLocals is not null) estimated.UnionWith(estimatedLocals);
         var onEstimatedPath = pathEstimated;
         var picks = new List<LoomRandomPick>();
-        var instructions = script.Instructions;
+        var instructions = NormalizeMatrixOps(script.Instructions);
         var indexByOffset = instructions.Select((instruction, index) => (instruction.Offset, index))
             .ToDictionary(item => item.Offset, item => item.index);
         var pc = startOffset;
@@ -2666,8 +2666,21 @@ public sealed class LoomBoundedScriptExecutor
         return false;
     }
 
+    /// <summary>
+    /// The CD game's <c>matrixOps</c> sub-opcode 1 is ScummVM's <c>setBoxFlags</c> (o5_matrixOps), the same call the old-v3
+    /// opcode makes: it runs as one. The scale sub-opcodes and <c>createBoxMatrix</c> change no state the preview models.
+    /// </summary>
+    private static IReadOnlyList<LoomScriptInstruction> NormalizeMatrixOps(IReadOnlyList<LoomScriptInstruction> instructions)
+    {
+        const string prefix = "setBoxFlags, ";
+        if (!instructions.Any(item => item.Operation == "matrixOps" && item.Operands.StartsWith(prefix, StringComparison.Ordinal)))
+            return instructions;
+        return instructions.Select(item => item.Operation == "matrixOps" && item.Operands.StartsWith(prefix, StringComparison.Ordinal)
+            ? item with { Operation = "setBoxFlags", Operands = item.Operands[prefix.Length..] } : item).ToArray();
+    }
+
     private static bool IsPresentationOperation(string operation) => operation is
-        "roomOps" or "actorOps" or "setClass" or "animateActor" or "putActor" or "putActorInRoom" or
+        "matrixOps" or "roomOps" or "actorOps" or "setClass" or "animateActor" or "putActor" or "putActorInRoom" or
         "faceActor" or "walkActorTo" or "walkActorToActor" or "walkActorToObject" or "putActorAtObject" or
         "setCameraAt" or "panCameraTo" or "lights" or "resourceRoutines" or "print" or "printEgo" or
         "startScript" or "chainScript" or "startObject" or "startMusic" or "stopMusic" or "startSound" or

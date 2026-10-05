@@ -327,4 +327,26 @@ public sealed class LoomVgaTests
         // His feet are at his place, inside the room.
         Assert.InRange(drawn.Bounds!.Value.Bottom, bobbin.Y!.Value - 1, bobbin.Y.Value + 1);
     }
+
+    [Fact]
+    public void MatrixOpsRunsInTheExecutorAsAWalkBoxFlagChange()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var data = new LoomCdDataSource(game);
+        var matrixScripts = 0;
+        foreach (var room in game.Rooms.Select(item => item.ResourceId!.Value))
+        {
+            var records = data.ReadRoom(room).Objects;
+            var states = records.ToDictionary(record => record.Id, _ => (byte)0);
+            foreach (var id in data.RoomLocalScriptIds(room))
+            {
+                if (data.RoomLocalScript(room, id) is not { } script || !script.Instructions.Any(item => item.Operation == "matrixOps")) continue;
+                matrixScripts++;
+                var run = new LoomBoundedScriptExecutor().Execute(script, states, records);
+                Assert.DoesNotContain("matrixOps", run.UnresolvedReason ?? "");
+            }
+        }
+        Assert.True(matrixScripts > 0);
+    }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (night): LOOM CD click check, no EGA artwork estimate, matrixOps
+
+`CdCheck` clicks several rooms: Bobbin walks (room 4's cutscene, room 16), room loads are reached (rooms 5 to 8). The purple artifact at the top left of room 4 after its cutscene was the EGA artwork estimate (`FillGaps`) painting a stored 48 x 40 image over a live CD room; the CD game takes no estimate now (`CreateSessionRoomSelection`). `matrixOps` sub 1 runs in the executor as `setBoxFlags`; scale sub-opcodes and `createBoxMatrix` are presentation operations (test `MatrixOpsRunsInTheExecutorAsAWalkBoxFlagChange`). Record: `.verification/loom-vga/README.md` steps 10 and 11. Texts the session produces are not drawn yet (charsets 901 to 904 next).
+
 ## 5 October (late night, last): LOOM CD live session and clicks
 
 The CD game gets a live `LoomExplorationSession` in the app (`MainWindow.OpenGameFolder`, `IsLoomGame` gate for keys, talk-stop and the playback bar; EGA-only readers such as Game Status, glossary, catalog and sound stay on `GameId.Loom`). A click reaches scripts 005 to 007 as on EGA (verb 0x37 walk-to, 0x38, double click 0x36); the CD boot now turns user input on (labelled estimate, the intro that does it is skipped). Room 4's click starts its cutscene (script 002) in the real window (`CdCheck`: `click-04.png`). Record: `.verification/loom-vga/README.md` step 9.
