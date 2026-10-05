@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October: LOOM CD (VGA) opens, room backgrounds only
+
+The app opens `Games/loom vga en` (a folder holding the `.cue`, the `.cue` or `.bin` itself, or a folder with `000.LFL` and `DISK01.LEC` copied off the disc) and shows all 78 room backgrounds with their 256-colour palettes in the room picker and the scene view (`GameId.LoomVga`, a new game id, so the EGA features stay off). New in Core: `Storage/` (`IGameFileSource` with a folder and a disc-image implementation; `DiscImage`: cue sheet, MODE1/2352 or plain ISO sectors, ISO 9660 listing) and `Formats/LoomVgaArchive` (the `.LEC` XOR 0x69 block tree, the `RN` room names, the strip decoder). Record: [.verification/loom-vga](../.verification/loom-vga/README.md). The kixx dump carries identical rooms. Rooms 61, 65 and 69 have an all-black background (carrier rooms). No objects, scripts, actors or sound for the CD game yet; the sound device menu is hidden for it. Tests: `LoomVgaTests` (do nothing without the folders).
+
 ## 5 October: Games folders renamed (the Roland copy says so)
 
 `Games/loom ega en`/`es` (Roland upgrade installed) became `loom ega mt32 en`/`es`; the former `loom ega ibm en`/`es` (plain game) became `loom ega en`/`es`. `loom ega mt32 en` stays the reference edition: `TestGames`, `run-verify.cmd`, the harness scripts, the README, CLAUDE.md and the golden folders `.verification/readable-scripts/loom ega mt32 en|es` use the new names. Older entries below name the folders as they were called then.

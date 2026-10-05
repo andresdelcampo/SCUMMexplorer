@@ -18,9 +18,10 @@ Checked by opening the folder in the app and running the room, text and glossary
 - **LOOM EGA, German**: opens, rooms without gaps.
 - **LOOM EGA v1.2, Spanish and German**: open, rooms without gaps (v1.2 German is byte-identical to the plain German release).
 - **LOOM self-running previews (short and long, English)**: open.
+- **LOOM CD (VGA), English, both dumps**: opens from the folder, the `.cue` or the `.bin`; all 78 room backgrounds; nothing else yet.
 - **Indiana Jones and the Last Crusade EGA, English**: room backgrounds and texts only.
 
-Not supported: the Hebrew release (dropped). Not yet read: LOOM VGA (CD).
+Not supported: the Hebrew release (dropped). Not yet read beyond backgrounds: LOOM VGA (CD).
 
 ## What you can do today (LOOM EGA)
 
