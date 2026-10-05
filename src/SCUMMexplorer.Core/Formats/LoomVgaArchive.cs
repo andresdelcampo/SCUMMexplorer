@@ -26,6 +26,13 @@ public sealed record LoomVgaObject(int Id, int X, int Y, int Width, int Height, 
 /// <summary>A costume block (CO): its number from the index, the room that stores it and its bytes (the body, without the block header).</summary>
 public sealed record LoomVgaCostume(int Id, int Room, byte[] Body);
 
+/// <summary>A CD sound: <see cref="Speaker"/> is the whole <c>WA</c> block (6-byte header), <see cref="Adlib"/> the <c>AD</c> body; a part is null when the block has none.</summary>
+public sealed record LoomVgaSound(int Id, int Room, byte[]? Speaker, byte[]? Adlib)
+{
+    /// <summary>AdLib music starts with 0x80 at byte 2; the rest are effects.</summary>
+    public bool IsMusic => Adlib is { Length: >= 3 } ad && ad[2] == 0x80;
+}
+
 /// <summary>One decoded OI image of a room object: the object's id, its size from the OC block and the picture as palette indices (the room's PA palette).</summary>
 public sealed record LoomVgaObjectImage(int Id, int X, int Y, int Width, int Height, byte[] Pixels)
 {
@@ -297,6 +304,30 @@ public sealed class LoomVgaArchive
             costumes.Add(new LoomVgaCostume(id, room, _lec.AsSpan(block + 6, size - 6).ToArray()));
         }
         return costumes;
+    }
+
+    /// <summary>
+    /// The sounds the "0N" directory places in an SO block (30 here; the directory's entries for 24 and 32 point at something
+    /// else and are left out). An SO block holds a <c>WA</c> block (PC speaker, whole block kept: the channel pointers count
+    /// from its start) and an <c>AD</c> block (AdLib, body only), the same two parts as the EGA bundle.
+    /// </summary>
+    public IReadOnlyList<LoomVgaSound> ReadSounds()
+    {
+        var sounds = new List<LoomVgaSound>();
+        foreach (var (id, room, block) in ReadDirectory("0N"))
+        {
+            if (block + 6 > _lec.Length || Encoding.Latin1.GetString(_lec, block + 4, 2) != "SO") continue;
+            var size = (int)BinaryPrimitives.ReadUInt32LittleEndian(_lec.AsSpan(block));
+            if (size < 6 || block + size > _lec.Length) continue;
+            byte[]? speaker = null, adlib = null;
+            foreach (var part in Blocks(_lec, block + 6, block + size))
+            {
+                if (part.Tag == "WA") speaker ??= _lec.AsSpan(part.Start, part.Size).ToArray();
+                else if (part.Tag == "AD") adlib ??= _lec.AsSpan(part.Start + 6, part.Size - 6).ToArray();
+            }
+            sounds.Add(new LoomVgaSound(id, room, speaker, adlib));
+        }
+        return sounds.OrderBy(s => s.Id).ToArray();
     }
 
     /// <summary>The costume with this number, or null.</summary>

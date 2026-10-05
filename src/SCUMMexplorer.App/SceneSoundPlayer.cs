@@ -240,7 +240,16 @@ public sealed class SceneSoundPlayer
                 {
                     bool music;
                     byte[] wave;
-                    if (mode == SoundMode.Roland)
+                    if (_game?.Vga is { } vga)
+                    {
+                        // The CD game's sounds hold an AdLib and a PC speaker part; it has no Roland data.
+                        if (mode == SoundMode.Roland || vga.ReadSounds().FirstOrDefault(item => item.Id == id) is not { } cdSound) return (null, false);
+                        music = cdSound.IsMusic;
+                        wave = mode == SoundMode.Adlib
+                            ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("No AdLib part.")), AdlibGainDb)
+                            : _speaker.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("No PC speaker part."), 6);
+                    }
+                    else if (mode == SoundMode.Roland)
                     {
                         // Only the upgrade's own sounds have a Roland rendition; the scripts choose them when the sound card is 4.
                         if (Roms is not { } roms || !LoomRolandSong.IsRoland(resource)) return (null, false);

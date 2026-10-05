@@ -472,6 +472,37 @@ public sealed class LoomVgaCharsetPerMessageTests
     }
 
     [Fact]
+    public void TheCdSoundsAreReadFromTheDiscAndRenderThroughTheEgaPlayers()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var archive = LoomVgaArchive.Load(new DiscFileSource(folder));
+        var sounds = archive.ReadSounds();
+        Assert.Equal(30, sounds.Count);
+        Assert.Equal(8, sounds.Count(s => s.Room == 1));
+        Assert.DoesNotContain(sounds, s => s.Id is 24 or 32);
+        Assert.All(sounds, s => { Assert.NotNull(s.Speaker); Assert.NotNull(s.Adlib); });
+        Assert.Equal(18, sounds.Count(s => s.IsMusic));
+        var adlib = new LoomAdlibAudio();
+        var speaker = new LoomPcSpeakerAudio();
+        // Sound 9 (room 11) is a music track; sound 1 an effect. Both parts of each render real audio.
+        foreach (var id in new[] { 1, 9, 19 })
+        {
+            var sound = sounds.First(s => s.Id == id);
+            AssertLoud(adlib.RenderWave(sound.Adlib!));
+            AssertLoud(speaker.RenderWave(sound.Speaker!, 6));
+        }
+    }
+
+    private static void AssertLoud(byte[] wave)
+    {
+        Assert.Equal("RIFF", System.Text.Encoding.ASCII.GetString(wave, 0, 4));
+        var loud = 0;
+        for (var i = 44; i + 1 < wave.Length; i += 2) if (Math.Abs(BitConverter.ToInt16(wave, i)) > 500) loud++;
+        Assert.True(loud > 500, $"{loud} loud samples in {wave.Length} bytes");
+    }
+
+    [Fact]
     public void TheCdStatusSchemaIsReadFromTheScriptsAndItsEditsShowTheDraftVerbs()
     {
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));

@@ -84,7 +84,18 @@ public sealed class LoomPcSpeakerAudio
             data[8] != 0 || data[9] != 0 || data[10] != 0 || data[11] != 0)
             throw new NotSupportedException("This sound uses a different LOOM music encoding. PC speaker playback is available for the old-bundle tracks.");
 
-        var player = new Player(data);
+        return RenderWave(data, 4, cancellationToken);
+    }
+
+    /// <summary>
+    /// Renders PC speaker data given directly. <paramref name="headerLength"/> is the resource header the data starts with:
+    /// 4 in the old bundle (a word length), 6 in the CD game's <c>WA</c> block (a dword length and the tag). The channel
+    /// pointers follow the header and a word; they count from the start of the data.
+    /// </summary>
+    public byte[] RenderWave(byte[] data, int headerLength, CancellationToken cancellationToken = default)
+    {
+        if (data.Length < headerLength + 10) throw new InvalidDataException("The PC speaker resource is too short.");
+        var player = new Player(data, headerLength);
         var samples = new List<short>();
         var hadSound = false;
         for (var tick = 0; tick < MaxTicks && player.Playing; tick++)
@@ -139,12 +150,12 @@ public sealed class LoomPcSpeakerAudio
         private int _timerCount;
         private bool _timerOutput;
 
-        public Player(byte[] data)
+        public Player(byte[] data, int headerLength)
         {
             _data = data;
             for (var i = 0; i < 4; i++)
             {
-                _channels[i][NextCmd] = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(6 + 2 * i, 2));
+                _channels[i][NextCmd] = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(headerLength + 2 + 2 * i, 2));
                 if (_channels[i][NextCmd] != 0) _channels[i][TimeLeft] = 1;
             }
             // Adapt _decay to the sample rate; it is squared when the rate halves.

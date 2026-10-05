@@ -66,6 +66,17 @@ internal static class Program
                     report.Add("status window shown");
                     status.Close();
                 }
+                // CD_SOUND=1,9,16 selects those sounds in the tree and reports what the audio panel says (AdLib by default).
+                if (Environment.GetEnvironmentVariable("CD_SOUND") is { } soundIds)
+                    foreach (var id in soundIds.Split(',').Select(int.Parse))
+                    {
+                        var sound = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Sound && r.ResourceId == id);
+                        if (sound is null) { report.Add($"sound {id}: not listed"); continue; }
+                        Call("SelectResourceInTree", sound);
+                        for (var n = 0; n < 100 && ((TextBlock)window.FindName("AudioTime")).Text.StartsWith("Preparing"); n++) await Task.Delay(200);
+                        await Task.Delay(300);
+                        report.Add($"sound {id}: {((TextBlock)window.FindName("AudioDescription")).Text} | {((TextBlock)window.FindName("AudioTime")).Text} | {((TextBlock)window.FindName("StatusText")).Text}");
+                    }
                 // CD_PRINT=17,18 lists every instruction of those global scripts.
                 if (Environment.GetEnvironmentVariable("CD_PRINT") is { } printIds)
                     foreach (var id in printIds.Split(',').Select(int.Parse)) { report.Add($"== script {id}"); if (cd.GlobalScript(id) is { } sc) foreach (var ins in sc.Instructions) report.Add($"   {id:000} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
@@ -73,10 +84,13 @@ internal static class Program
                 {
                     var all = new List<(string, SCUMMexplorer.Core.Formats.LoomScriptDisassembly?)>();
                     foreach (var id in cd.GlobalScriptIds()) all.Add(($"global {id}", cd.GlobalScript(id)));
-                    foreach (var r in game.Rooms.Select(r => r.ResourceId!.Value)) { all.Add(($"room {r} entry", cd.RoomEntryScript(r))); foreach (var id in cd.RoomLocalScriptIds(r)) all.Add(($"room {r} local {id}", cd.RoomLocalScript(r, id))); }
+                    foreach (var r in game.Rooms.Select(r => r.ResourceId!.Value)) { all.Add(($"room {r} entry", cd.RoomEntryScript(r))); all.Add(($"room {r} exit", cd.RoomExitScript(r)));
+                        { var rd = cd.ReadRoom(r); foreach (var (oid, list) in cd.ReadObjectVerbs(r, rd.Objects)) { var rec = rd.Objects.First(o => o.Id == oid); foreach (var v in list) { try { all.Add(($"room {r} object {oid} verb 0x{v.VerbId:X2}", cd.ReadObjectVerb(r, rec, v.VerbId, out _))); } catch (Exception) { } } } } foreach (var id in cd.RoomLocalScriptIds(r)) all.Add(($"room {r} local {id}", cd.RoomLocalScript(r, id))); }
                     // CD_OPS=verbOps lists every use of that operation instead of the charset switches.
                     var op = Environment.GetEnvironmentVariable("CD_OPS");
-                    foreach (var (name, sc) in all) if (sc is not null) foreach (var ins in sc.Instructions) if (op is null ? ins.Operation == "cursorCommand" && ins.Operands.StartsWith("charset") : ins.Operation == op) report.Add($"   {name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}");
+                    var grep = Environment.GetEnvironmentVariable("CD_GREP"); // CD_GREP=text lists every instruction whose text contains it
+                    if (Environment.GetEnvironmentVariable("CD_ISSUES") == "1") foreach (var (name, sc) in all) if (sc?.Issues is { Count: > 0 } issues) report.Add($"   ISSUES {name}: {sc.DecodedBytes}/{sc.CodeLength} bytes, {string.Join(" | ", issues.Take(3).Select(i => i.ToString()))}");
+                    foreach (var (name, sc) in all) if (sc is not null) foreach (var ins in sc.Instructions) if (grep is not null ? $"{ins.Operation} {ins.Operands}".Contains(grep) : op is null ? ins.Operation == "cursorCommand" && ins.Operands.StartsWith("charset") : ins.Operation == op) report.Add($"   {name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}");
                 }
                 var rooms = args.Length > 2 ? args[2].Split(',').Select(int.Parse).ToArray() : new[] { 4, 10, 16, 35 };
                 foreach (var number in rooms)
@@ -111,6 +125,7 @@ internal static class Program
                         if (ms == 5000) { var snap = session.GetType().GetProperty("Snapshot")!.GetValue(session)!; var states = (System.Collections.IDictionary)snap.GetType().GetProperty("ObjectStates")!.GetValue(snap)!; var imgs = cd.ReadObjectImages(number); foreach (var o in data.Objects) report.Add($"   obj {o.Id} at {o.X},{o.Y} {o.Width}x{o.Height} state {(states.Contains(o.Id) ? states[o.Id] : "-")} image {imgs.Any(i => i.Id == o.Id)}"); }
                         if (ms == 5000) { var sess = Field("_session")!; var msgs2 = sess.GetType().GetProperty("Messages")!.GetValue(sess)!; foreach (var cue in (System.Collections.IEnumerable)msgs2.GetType().GetProperty("VoiceEvents")!.GetValue(msgs2)!) report.Add("   cue " + cue); }
                         { var voice = Field("_cdVoice"); foreach (var line in (IEnumerable<string>)voice!.GetType().GetProperty("Log")!.GetValue(voice)!) report.Add("   voice " + line); }
+                        { var ss = Field("_sceneSound")!; foreach (var e in (System.Collections.IEnumerable)ss.GetType().GetProperty("Log")!.GetValue(ss)!) report.Add("   sound " + e); }
                         report.Add($"click room {number} object {target.Id} at {x},{y} +{ms} ms: {((TextBlock)window.FindName("StatusText")).Text}");
                     }
                 }

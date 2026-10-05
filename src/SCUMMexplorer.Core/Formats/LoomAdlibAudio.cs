@@ -45,9 +45,19 @@ public sealed partial class LoomAdlibAudio
     /// <summary>Native driver status lifetime, excluding PCM envelope release and preview truncation.</summary>
     public LoomSoundLifetime ReadLifetime(GameResource resource)
     {
+        try { return ReadDataLifetime(ReadTrack(resource)); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+        {
+            return new(LoomSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
+    }
+
+    /// <summary>The same for AdLib data given directly (the part after the resource header; the CD game's <c>AD</c> block body).</summary>
+    public LoomSoundLifetime ReadDataLifetime(byte[] data)
+    {
         try
         {
-            var data = ReadTrack(resource);
+            if (data.Length < 3) throw new InvalidDataException("The AdLib resource is too short.");
             if (data[2] == 0x80)
             {
                 var player = new MusicPlayer(data);
@@ -80,13 +90,17 @@ public sealed partial class LoomAdlibAudio
         }
     }
 
-    public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
+    public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default) =>
+        RenderWave(ReadTrack(resource), cancellationToken);
+
+    /// <summary>Renders AdLib data given directly: the bytes after the resource header (old bundle: after 4 bytes; the CD game's <c>AD</c> block body).</summary>
+    public byte[] RenderWave(byte[] data, CancellationToken cancellationToken = default)
     {
-        var data = ReadTrack(resource);
+        if (data.Length < 3) throw new InvalidDataException("The AdLib resource is too short.");
         if (data[2] != 0x80) return RenderEffectWave(data, cancellationToken);
         if (data.Length < 0x94) throw new InvalidDataException("AdLib music header is incomplete.");
         var player = new MusicPlayer(data);
-        var lifetime = ReadLifetime(resource);
+        var lifetime = ReadDataLifetime(data);
         var maxCallbacks = lifetime.Kind == LoomSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxSeconds;
         var samples = new List<short>();
         var frameRemainder = 0;
