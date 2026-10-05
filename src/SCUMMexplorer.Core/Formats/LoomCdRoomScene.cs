@@ -5,7 +5,8 @@ namespace SCUMMexplorer.Core.Formats;
 
 /// <summary>A CD room as the game's own entry script leaves it: the background, the object records and images, the session snapshot and the picture selection built from it.</summary>
 public sealed record LoomCdScene(RoomImage Room, IReadOnlyList<LoomRoomObjectRecord> Records, IReadOnlyList<RoomObjectImage> Images,
-    LoomSessionSnapshot Snapshot, RoomObjectSelection Selection, int CameraX)
+    LoomSessionSnapshot Snapshot, RoomObjectSelection Selection, int CameraX,
+    IReadOnlyList<LoomActorSnapshot> Actors, LoomWalkBoxSet? WalkBoxes, Func<int, LoomCostume?> Costumes)
 {
     /// <summary>The room's pixels with the objects the entry script made visible painted over the background.</summary>
     public byte[] Compose() => Selection.Compose(Room);
@@ -32,6 +33,6 @@ public static class LoomCdRoomScene
         var images = data.ReadObjectImages(roomId);
         var room = vga.DecodeRoom(roomId);
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions, records, room, indexed.States, snapshot.DrawOrder);
-        return new LoomCdScene(room, records, images, snapshot, selection, session.CameraX ?? 0);
+        return new LoomCdScene(room, records, images, snapshot, selection, session.CameraX ?? 0, session.Actors, session.CurrentWalkBoxes, session.ReadCostume);
     }
 }

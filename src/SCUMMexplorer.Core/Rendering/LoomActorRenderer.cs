@@ -11,7 +11,15 @@ public sealed record LoomDrawnActor(int Number, int Costume, int X, int Y, int E
 }
 
 /// <summary>The actors of the current room as an indexed layer the size of the room (<see cref="LoomActorRenderer.Transparent"/> where no actor is).</summary>
-public sealed record LoomActorLayer(byte[] Pixels, int Width, int Height, IReadOnlyList<LoomDrawnActor> Actors, IReadOnlyList<string> Skipped);
+public sealed record LoomActorLayer(byte[] Pixels, int Width, int Height, IReadOnlyList<LoomDrawnActor> Actors, IReadOnlyList<string> Skipped,
+    bool[]? Coverage = null)
+{
+    /// <summary>
+    /// Whether an actor pixel is at this index of <see cref="Pixels"/>. The CD game's costumes use every palette index (255 as well),
+    /// so its coverage is kept apart from the <see cref="LoomActorRenderer.Transparent"/> value.
+    /// </summary>
+    public bool IsDrawn(int index) => Coverage is not null ? Coverage[index] : Pixels[index] != LoomActorRenderer.Transparent;
+}
 
 /// <summary>
 /// Draws the actors in the current room as ScummVM's <c>processActors</c> does for v3: the actors in the room are
@@ -52,6 +60,7 @@ public static class LoomActorRenderer
     {
         var pixels = new byte[width * height];
         Array.Fill(pixels, Transparent);
+        var coverage = new bool[width * height];
         var drawn = new List<LoomDrawnActor>();
         var skipped = new List<string>();
         foreach (var actor in SortForDrawing(actors, currentRoom))
@@ -84,7 +93,7 @@ public static class LoomActorRenderer
                 actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1) : 0;
             var boxNote = depthMask is not null && !forceClip && !neverClip && actor.WalkBox is null
                 ? "walk box unknown: drawn in front of the depth mask" : null;
-            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 0 ? depthMask : null);
+            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 0 ? depthMask : null, coverage);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
                 x + cels.Min(cel => cel.Left), top + cels.Min(cel => cel.Top),
                 x + cels.Max(cel => cel.Left + cel.Width), top + cels.Max(cel => cel.Top + cel.Height));
@@ -92,6 +101,6 @@ public static class LoomActorRenderer
             drawn.Add(new LoomDrawnActor(actor.Number, costumeId, x, y, elevation, look.Frame ?? -1, direction, bounds,
                 written, estimate.Length == 0 ? null : estimate) { ZPlane = zPlane });
         }
-        return new LoomActorLayer(pixels, width, height, drawn, skipped);
+        return new LoomActorLayer(pixels, width, height, drawn, skipped, coverage);
     }
 }

@@ -40,6 +40,8 @@ public sealed class LoomEgaDataSource : IScummDataSource
     public LoomScriptDisassembly? RoomLocalScript(int room, int number) =>
         _reader.DecodeRoomLocalScript(Room(room), number, GlobalScriptCount);
 
+    public LoomCostume? ReadCostume(int id) => LoomCostume.Load(_game, id);
+
     public ScummRoomData ReadRoom(int room)
     {
         var bytes = File.ReadAllBytes(Room(room).FilePath);

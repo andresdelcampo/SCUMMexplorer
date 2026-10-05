@@ -57,6 +57,8 @@ public partial class MainWindow : Window
     private RoomImage? _currentRoom;
     private GameResource? _currentRoomResource;
     private LoomWalkBoxSet? _currentWalkBoxes;
+    /// <summary>The CD game's first-visit scene of the room shown (its actors are drawn from it); null for other games.</summary>
+    private LoomCdScene? _cdScene;
     private IReadOnlyList<LoomRoomObjectRecord> _currentRoomObjectRecords = [];
     private IReadOnlyDictionary<int, string> _roomObjectNames = new Dictionary<int, string>();
     private IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> _roomVerbs =
@@ -893,6 +895,7 @@ public partial class MainWindow : Window
         _objectSelection = new([]);
         _currentRoomResource = null;
         _currentWalkBoxes = null;
+        _cdScene = null;
         _currentRoomObjectRecords = [];
         _roomObjectNames = new Dictionary<int, string>();
         _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
@@ -928,7 +931,8 @@ public partial class MainWindow : Window
                 catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
             }
             var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.Vga!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
-            _currentWalkBoxes = isCd ? null : TryReadWalkBoxes(bytes);
+            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes : TryReadWalkBoxes(bytes);
+            _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.LoomVga)
             {
                 if (token.IsCancellationRequested) return;
@@ -949,6 +953,7 @@ public partial class MainWindow : Window
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
                 UpdateRoomNavigationActions(resource);
                 RefreshRoomPreview();
+                UpdateActorLayer();
                 UpdateCurrentRoomCardThumbnail();
                 RoomDisplayLayout.Visibility = Visibility.Visible;
                 UpdateRoomViewportLayout();
@@ -1008,10 +1013,12 @@ public partial class MainWindow : Window
 
     private static string CdSceneNote(LoomCdScene? scene) =>
         scene is null
-            ? "Background only: the room's entry script could not run. Interaction, Bobbin, walk boxes and room routes are not read yet for the CD game."
+            ? "Background only: the room's entry script could not run. Bobbin, interaction and room routes are not read yet for the CD game."
             : "The room as its entry script leaves it (first visit)" +
               (scene.Snapshot.Picks.Count > 0 ? $"; where the script branches on a random value, the explorer picked one ({scene.Snapshot.Picks.Count} seeded picks, listed in the session notes)" : "") +
-              ". Interaction, Bobbin, walk boxes and room routes are not read yet for the CD game.";
+              (scene.Actors.Any(actor => actor.Number == 1 && actor.Room == scene.Snapshot.RoomId)
+                  ? "; Bobbin stands where an assumed arrival would bring him (an estimate: the route to the room was not played)" : "") +
+              ". Interaction and room routes are not read yet for the CD game.";
 
     private void ApplyRoomState(GameResource resource, IReadOnlyList<LoomRoomObjectRecord> records,
         IReadOnlyList<RoomObjectImage> images, bool visit)
@@ -4346,6 +4353,11 @@ public partial class MainWindow : Window
     private void UpdateActorLayer()
     {
         var room = _currentRoom;
+        if (_cdScene is { } cdScene && room is not null && cdScene.Snapshot.RoomId == _currentRoomResource?.ResourceId)
+        {
+            UpdateCdActorLayer(cdScene, room);
+            return;
+        }
         if (!GameClickActive || room is null || _game is not { } game ||
             _session!.Snapshot.RoomId is not int roomId || roomId != _currentRoomResource?.ResourceId)
         {
@@ -4356,7 +4368,7 @@ public partial class MainWindow : Window
         var layer = LoomActorRenderer.Render(_session.Actors, roomId, room.Width, room.Height, id =>
         {
             if (_actorCostumes.TryGetValue(id, out var costume)) return costume;
-            try { costume = LoomCostume.Load(game, id); }
+            try { costume = _session.ReadCostume(id); }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
             return _actorCostumes[id] = costume;
         }, _objectSelection.ComposeDepthMask(room), _session.CurrentWalkBoxes, _session.ObjectClasses);
@@ -4371,8 +4383,39 @@ public partial class MainWindow : Window
         for (var i = 0; i < layer.Pixels.Length; i++)
         {
             var index = layer.Pixels[i];
-            if (index == LoomActorRenderer.Transparent) continue;
+            if (!layer.IsDrawn(i)) continue;
             SetBgra(pixels, i * 4, index < shown.Count ? shown[index] : 0xFF000000u);
+        }
+        RoomActorOverlay.Source = FrozenBgra(room.Width, room.Height, pixels);
+        RoomActorOverlay.Visibility = Visibility.Visible;
+    }
+
+    /// <summary>
+    /// The CD game's actors over its first-visit room: the actors the entry script put in the room, Bobbin where an assumed arrival
+    /// (a catalog visit) stands him. Costume colours go through each costume's own table into the room palette. The CD data has
+    /// no depth mask read yet, so every actor is drawn in front.
+    /// </summary>
+    private void UpdateCdActorLayer(LoomCdScene scene, RoomImage room)
+    {
+        var layer = LoomActorRenderer.Render(scene.Actors, scene.Snapshot.RoomId!.Value, room.Width, room.Height, id =>
+        {
+            if (_actorCostumes.TryGetValue(id, out var costume)) return costume;
+            try { costume = scene.Costumes(id); }
+            catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
+            return _actorCostumes[id] = costume;
+        }, null, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
+        if (layer.Actors.Count == 0)
+        {
+            RoomActorOverlay.Source = null;
+            RoomActorOverlay.Visibility = Visibility.Collapsed;
+            return;
+        }
+        var pixels = new byte[room.Width * room.Height * 4];
+        for (var i = 0; i < layer.Pixels.Length; i++)
+        {
+            if (!layer.IsDrawn(i)) continue;
+            var index = layer.Pixels[i];
+            SetBgra(pixels, i * 4, index < room.Palette.Count ? room.Palette[index] : 0xFF000000u);
         }
         RoomActorOverlay.Source = FrozenBgra(room.Width, room.Height, pixels);
         RoomActorOverlay.Visibility = Visibility.Visible;

@@ -2,6 +2,7 @@ using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.Core.Storage;
+using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -240,5 +241,41 @@ public sealed class LoomVgaTests
         Assert.Equal(5, boxes.Count);
         Assert.Equal(new LoomBoxPoint(208, 132), boxes.Boxes[0].UpperLeft);
         Assert.Equal(new LoomBoxPoint(664, 134), boxes.Boxes[0].LowerRight);
+    }
+
+    [Fact]
+    public void EveryCdCostumeReadsAsAnAnimatedCostume()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var archive = new GameFolderScanner().Scan(folder).Vga!;
+        var drawn = 0;
+        foreach (var costume in archive.ReadCostumes())
+        {
+            var read = LoomCostume.ReadVga(costume.Body, costume.Id);
+            Assert.True(read.IsVga);
+            var state = new LoomCostumeAnimationState();
+            for (var direction = 0; direction < 4; direction++)
+                if (read.DecodeAnimation(state, 1, direction) && read.Draw(state, direction).Count > 0) { drawn++; break; }
+        }
+        Assert.True(drawn > 100, $"{drawn} costumes drew a first animation");
+    }
+
+    [Fact]
+    public void TheCdSessionHasTheEgoAndShowsBobbinInTheRoomsHeEnters()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        // Room 35 (Room 36 and Room 34 lead into it): an assumed arrival puts actor 1, whom script 001 names as the ego, in the room.
+        var scene = LoomCdRoomScene.FirstVisit(game, 35);
+        Assert.Equal((ushort)1, scene.Snapshot.KnownGlobalVariables["var[0x001]"]);
+        var bobbin = scene.Actors.Single(actor => actor.Number == 1 && actor.Room == 35);
+        Assert.True(bobbin.Visible);
+        Assert.True(bobbin.Look.Costume > 0);
+        Assert.Contains(scene.Snapshot.Uncertainties, note => note.Contains("Assumed arrival", StringComparison.Ordinal));
+        var layer = LoomActorRenderer.Render(scene.Actors, 35, scene.Room.Width, scene.Room.Height, scene.Costumes, null, scene.WalkBoxes);
+        var drawn = layer.Actors.Single(item => item.Number == 1);
+        Assert.True(drawn.Pixels > 100);
+        // His feet are at his place, inside the room.
+        Assert.InRange(drawn.Bounds!.Value.Bottom, bobbin.Y!.Value - 1, bobbin.Y.Value + 1);
     }
 }

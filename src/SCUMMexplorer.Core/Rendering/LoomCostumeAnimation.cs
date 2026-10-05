@@ -57,12 +57,19 @@ public sealed record LoomCostumeCel(int Limb, int Left, int Top, int Width, int 
 /// <c>increaseAnim</c> steps a limb's command index per frame (looping, or holding at the end when the
 /// start's extra byte has 0x80), and <c>ClassicCostumeRenderer::drawLimb</c> draws limbs 0–15 with the
 /// shared x/y move. Offsets are relative to the resource start (ScummVM's <c>_baseptr</c> for GF_OLD_BUNDLE).
+/// The LOOM CD game's costumes (SCUMM v4, <see cref="ReadVga"/>) share the animation logic; they differ in the header
+/// (a 16-entry colour table to the room palette), the limb and animation tables, and a word for each limb's start command.
 /// </summary>
 public sealed class LoomCostume
 {
     private const int FrameOffsetsStart = 9;
     private const int AnimationOffsetsStart = 41;
+    /// <summary>The CD costume's block header (size dword and tag), which its stored offsets count from; the body follows it.</summary>
+    private const int VgaHeader = 6;
     private readonly byte[] _resource;
+    private readonly int _frameOffsetsStart = FrameOffsetsStart;
+    private readonly int _animationOffsetsStart = AnimationOffsetsStart;
+    private readonly byte[]? _colorTable;
 
     public int Id { get; }
     /// <summary>The highest animation index (ScummVM <c>_numAnim</c>).</summary>
@@ -87,6 +94,31 @@ public sealed class LoomCostume
         if (AnimationCommandsOffset >= resource.Length || AnimationOffsetsStart + (AnimationLimit + 1) * 2 > resource.Length)
             throw new InvalidDataException("The costume tables are outside the resource.");
     }
+
+    private LoomCostume(int id, byte[] body, bool vga)
+    {
+        // The stored offsets count from the CO block's start, so the body sits behind the 6-byte header.
+        _resource = new byte[VgaHeader + body.Length];
+        body.CopyTo(_resource, VgaHeader);
+        Id = id;
+        _frameOffsetsStart = VgaHeader + 20;
+        _animationOffsetsStart = VgaHeader + 52;
+        if (body.Length < 52 + 2) throw new InvalidDataException("The costume is too short.");
+        AnimationLimit = body[0];
+        var format = body[1] & 0x7F;
+        if (format != 0x58) throw new NotSupportedException($"Costume format 0x{format:X2} is not the 16-colour format 0x58.");
+        Mirror = (body[1] & 0x80) != 0;
+        _colorTable = body.AsSpan(2, 16).ToArray();
+        AnimationCommandsOffset = ReadWord(VgaHeader + 18);
+        if (AnimationCommandsOffset >= _resource.Length || _animationOffsetsStart + (AnimationLimit + 1) * 2 > _resource.Length)
+            throw new InvalidDataException("The costume tables are outside the resource.");
+    }
+
+    /// <summary>A LOOM CD costume from the body of its CO block (colour 0 is transparent; the other colours go through the costume's table into the room palette).</summary>
+    public static LoomCostume ReadVga(byte[] blockBody, int id = 0) => new(id, blockBody, vga: true);
+
+    /// <summary>True for a CD costume, whose colours are room palette indices (up to 255) rather than EGA colours.</summary>
+    public bool IsVga => _colorTable is not null;
 
     public static LoomCostume Read(ReadOnlySpan<byte> decodedContainer, int resourceOffset, int id = 0)
     {
@@ -128,7 +160,7 @@ public sealed class LoomCostume
     {
         var animation = direction + frame * 4;
         if (frame < 0 || animation > AnimationLimit) return false;
-        var cursor = ReadWord(AnimationOffsetsStart + animation * 2);
+        var cursor = ReadWord(_animationOffsetsStart + animation * 2);
         if (cursor == 0) return false;
 
         var mask = (uint)ReadWord(cursor);
@@ -136,8 +168,9 @@ public sealed class LoomCostume
         for (var limb = 0; (mask & 0xFFFF) != 0; limb++, useMask <<= 1, mask <<= 1)
         {
             if ((mask & 0x8000) == 0) continue;
-            int command = Byte(cursor++);
-            if (command == 0xFF) command = LoomCostumeAnimationState.None;
+            int command;
+            if (IsVga) { command = ReadWord(cursor); cursor += 2; }
+            else { command = Byte(cursor++); if (command == 0xFF) command = LoomCostumeAnimationState.None; }
             if ((useMask & 0x8000) != 0)
             {
                 if (command == LoomCostumeAnimationState.None)
@@ -227,8 +260,9 @@ public sealed class LoomCostume
     public IReadOnlyList<LoomCostumeCel> Draw(LoomCostumeAnimationState state, int direction)
     {
         var drawToRight = direction != 0 || Mirror;
-        var xMove = -72;
-        var yMove = -100;
+        // The old bundle starts the move at (-72, -100); the later formats (the CD game) at the actor's point.
+        var xMove = IsVga ? 0 : -72;
+        var yMove = IsVga ? 0 : -100;
         var cels = new List<LoomCostumeCel>();
         for (var limb = 0; limb < 16; limb++)
         {
@@ -237,7 +271,7 @@ public sealed class LoomCostume
             var code = Command(position & 0x7FFF) & 0x7F;
             if (code == 0x7B) continue;
 
-            var frameTable = ReadWord(FrameOffsetsStart + limb * 2);
+            var frameTable = ReadWord(_frameOffsetsStart + limb * 2);
             if (frameTable + code * 2 + 2 > _resource.Length) continue;
             var cel = ReadWord(frameTable + code * 2);
             if (cel == 0 || cel + 12 > _resource.Length) continue;
@@ -265,6 +299,7 @@ public sealed class LoomCostume
     /// the lights on): entry c of the actor's palette, except the costume's palette colour, which draws entry 0.
     /// </summary>
     public byte MapColor(byte color, IReadOnlyList<byte>? actorPalette) =>
+        _colorTable is not null ? _colorTable[color & 15] :
         actorPalette is null
             ? color == PaletteColor ? (byte)0 : color
             : color == PaletteColor ? actorPalette[0] : actorPalette[color & 15];
@@ -274,7 +309,7 @@ public sealed class LoomCostume
     /// (costume colour 0) are skipped. Returns the number of pixels written.
     /// </summary>
     public int Compose(IReadOnlyList<LoomCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
-        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null)
+        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null, bool[]? coverage = null)
     {
         // mask: the z-plane the actor is drawn behind (same size as the target); a set pixel hides the actor's pixel
         // (ScummVM byleRLEDecode: masked when mask[0] & maskbit).
@@ -292,6 +327,7 @@ public sealed class LoomCostume
                 if (color == 0) continue;
                 if (mask is not null && mask[ty * targetWidth + tx] != 0) continue;
                 target[ty * targetWidth + tx] = MapColor(color, actorPalette);
+                if (coverage is not null) coverage[ty * targetWidth + tx] = true;
                 written++;
             }
         }

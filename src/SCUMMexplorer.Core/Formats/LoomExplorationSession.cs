@@ -146,7 +146,7 @@ public sealed partial class LoomExplorationSession
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.SoundRunning = _soundClock.Status;
         _runtime.OverrideChanged = RecordOverride;
-        _runtime.Actors.CostumeSource = id => LoomCostume.Load(game, id);
+        _runtime.Actors.CostumeSource = _data.ReadCostume;
         _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
@@ -157,6 +157,7 @@ public sealed partial class LoomExplorationSession
         if (!completeBoot)
         {
             RunIndexedScript(1, 0, null, 0);
+            if (game.Id == GameId.LoomVga) ContinueCdBootAfterIntro();
             return;
         }
         _booting = true;
@@ -185,6 +186,34 @@ public sealed partial class LoomExplorationSession
         }
         CompleteBoot(stopAtOpening);
         LastAction = null;
+    }
+
+    /// <summary>
+    /// The CD game's script 001 plays the logo and intro first (local[0] = 0), then falls into the code a start with a room
+    /// argument jumps to: the ego (<c>var[0x001]</c>), its costume numbers, the starting vars, then the first room load.
+    /// A first-visit session does not play the intro, so after the intro's first room load it drops that paused run and runs
+    /// the script from the jump target of its <c>equalZero local[0x000]</c> (found in the code, not by a fixed offset), which
+    /// stops at the room load that opens the game. The vars the game has when the intro ends are then in place.
+    /// </summary>
+    private void ContinueCdBootAfterIntro()
+    {
+        LoomScriptDisassembly? boot;
+        try { boot = _data.GlobalScript(1); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException) { return; }
+        var skip = boot?.Instructions.FirstOrDefault(item => item.Operation == "equalZero" && item.Operands.StartsWith("local[0x000], branch ", StringComparison.Ordinal));
+        var arrow = skip?.Operands.LastIndexOf("-> 0x", StringComparison.Ordinal) ?? -1;
+        if (skip is null || arrow < 0 ||
+            !int.TryParse(skip.Operands.AsSpan(arrow + 5), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var target))
+        {
+            _uncertainties.Add("The CD boot's jump past the intro was not found in script 001, so the ego and the starting variables were not set.");
+            return;
+        }
+        _pending.RemoveAll(item => item.ScriptNumber == 1);
+        _requestedLoad = null;
+        RunIndexedScript(1, target, new Dictionary<string, ushort> { ["local[0x000]"] = 0 }, 0);
+        _pending.RemoveAll(item => item.ScriptNumber == 1);
+        _requestedLoad = null;
+        _visitTrace.Add($"boot: the intro was not played; script 001 ran on from +0x{target:X4}, where the intro ends, to the room load that opens the game");
     }
 
     /// <summary>
@@ -774,6 +803,9 @@ public sealed partial class LoomExplorationSession
 
     /// <summary>Actor rooms, positions and walk boxes as reached code left them (actors 1–12).</summary>
     public IReadOnlyList<LoomActorSnapshot> Actors => _runtime.Actors.Snapshot();
+
+    /// <summary>The game's costume with this number (EGA or CD data), or null when it is not indexed.</summary>
+    public LoomCostume? ReadCostume(int id) => _data.ReadCostume(id);
 
     private LoomActorTable.Placement CurrentPlacement() =>
         new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses);

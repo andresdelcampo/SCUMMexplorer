@@ -26,9 +26,10 @@ public sealed class LoomCdDataSource : IScummDataSource
 
     public IReadOnlyList<int> GlobalScriptIds() => _archive.GlobalScriptNumbers();
 
+    /// <summary>A global script carries no context, as on EGA: the session treats a script without one as global (it survives a room load).</summary>
     public LoomScriptDisassembly? GlobalScript(int number) =>
         _archive.ReadGlobalScript(number) is { } script
-            ? _reader.DecodeCode(script.Code, number, Container, script.BlockOffset) with { Context = $"Global script {number}" }
+            ? _reader.DecodeCode(script.Code, number, Container, script.BlockOffset)
             : null;
 
     public LoomScriptDisassembly? RoomEntryScript(int room) => RoomScript(room, "EN", "entry script");
@@ -45,6 +46,8 @@ public sealed class LoomCdDataSource : IScummDataSource
             ? _reader.DecodeCode(script.Code, number, Container, script.BlockOffset) with { Context = $"Room {room:00} local script {number:00}" }
             : null;
     }
+
+    public LoomCostume? ReadCostume(int id) => _archive.FindCostume(id) is { } costume ? LoomCostume.ReadVga(costume.Body, id) : null;
 
     public ScummRoomData ReadRoom(int room)
     {

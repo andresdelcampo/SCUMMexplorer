@@ -37,7 +37,7 @@ internal static class Program
                 var game = (GameLibrary)Field("_game")!;
                 var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
                 // First-visit scenes (the entry script's objects over the background), a few rooms; cards need a moment to render too.
-                foreach (var number in new[] { 1, 4, 13, 31, 53, 86 })
+                foreach (var number in new[] { 1, 4, 10, 13, 16, 31, 35, 40, 53, 86 })
                 {
                     var room = game.Rooms.First(r => r.ResourceId == number);
                     Call("SelectResourceInTree", room);

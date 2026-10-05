@@ -45,6 +45,9 @@ public interface IScummDataSource
 
     ScummRoomData ReadRoom(int room);
 
+    /// <summary>The costume with this number, or null when the game does not index it.</summary>
+    LoomCostume? ReadCostume(int id);
+
     /// <summary>The room's object images, in the game's palette indices (what <see cref="LoomRoomObjects"/> returns for EGA).</summary>
     IReadOnlyList<RoomObjectImage> ReadObjectImages(int room);
 
