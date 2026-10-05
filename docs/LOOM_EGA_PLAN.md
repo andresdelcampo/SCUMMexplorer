@@ -67,6 +67,8 @@ New order: the editions of LOOM EGA first, then LOOM VGA. Reason: the folder nam
 - `loom ega v1.2 es` and `loom ega v1.2 de` (version 1.2 of the game; check what 1.2 changed in scripts, text and room files against the plain editions).
 None of these has the Roland files (no `82.LFL`), so they are plain-sound editions. For each: does the folder open and get identified, are the rooms right, do the cutscene catalog, Game Status and glossary hold or need per-edition entries, do the texts extract. Fix what breaks only where it changes what the user sees.
 
+**Result (5 October, [record](../.verification/editions-20261005/README.md)):** the plain en/es, fr, de and v1.2 es/de editions open with no room gaps and the glossary holds against `loom ega es`; v1.2 de equals plain de and v1.2 es differs in two files (the disk table and two bytes of room 15, no visible change); Hebrew dropped (user). **Decided (user, 5 October): the cutscene catalog and replay tests stay on `loom ega mt32 en` only; no pipeline rerun for the others.**
+
 **3. Then LOOM VGA** (next section).
 
 ## Then: LOOM VGA (CD, SCUMM v4) (user, 5 October; Indy3 deferred, M5 shelved, MT-32 built)
