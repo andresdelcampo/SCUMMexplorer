@@ -3,7 +3,7 @@
 param([string]$Demo, [string]$Out, [int[]]$Rooms)
 $root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $exe = Join-Path $root "Exe\WindowCheck\Debug\net10.0-windows\WindowCheck.exe"
-$folder = Join-Path $root "Games\loom ega $Demo demo en"
+$folder = Join-Path $root "Games\loom demo $Demo ega en"
 if (Test-Path $Out) { Remove-Item $Out -Recurse -Force }
 $stdout = "$Out.stdout.txt"; $stderr = "$Out.stderr.txt"
 $arguments = @("`"$folder`"", "`"$Out`"") + ($Rooms | ForEach-Object { "$_" })

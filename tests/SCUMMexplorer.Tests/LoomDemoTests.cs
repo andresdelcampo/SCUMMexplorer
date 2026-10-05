@@ -5,12 +5,12 @@ using SCUMMexplorer.Core.Formats;
 namespace SCUMMexplorer.Tests;
 
 /// <summary>
-/// The two LOOM self-running previews (<c>Games/loom ega short demo en</c> and <c>long demo en</c>). Their 00.LFL lists resources
+/// The two LOOM self-running previews (<c>Games/loom demo short ega en</c> and <c>long demo en</c>). Their 00.LFL lists resources
 /// their folders lack; the scanner keeps the others. Without the folders these tests do nothing.
 /// </summary>
 public sealed class LoomDemoTests
 {
-    public static IEnumerable<object[]> Demos() => [["loom ega short demo en", 16], ["loom ega long demo en", 32]];
+    public static IEnumerable<object[]> Demos() => [["loom demo short ega en", 16], ["loom demo long ega en", 32]];
 
     private static string? Folder(string name)
     {

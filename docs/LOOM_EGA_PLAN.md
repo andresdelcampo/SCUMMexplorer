@@ -64,7 +64,7 @@ New order: the editions of LOOM EGA first, then LOOM VGA. Reason: the folder nam
 **2. Try the plain editions and the new languages**, each as English was tried (open it, then compare with `GlossaryCheck` and `ScriptDump`; never key code on offsets, bits or object ids; record under `.verification/editions-<date>/`):
 - the new `loom ega en` and `loom ega es` (the plain game, the former `ibm` folders; their indexes still point sounds 33–64 at files 82–85 that are not there, so sounds must degrade cleanly);
 - `loom ega fr`, `loom ega de`, `loom ega hebrew` (already in `Games/`; the Hebrew copy has its own `Go.bat`, `README.TXT` and `VGA.PIC`, so check the text and font handling and whether it is a right-to-left or patched build);
-- `Loom v1.2 ega es` and `Loom v1.2 ega de` (version 1.2 of the game; check what 1.2 changed in scripts, text and room files against the plain editions).
+- `loom ega v1.2 es` and `loom ega v1.2 de` (version 1.2 of the game; check what 1.2 changed in scripts, text and room files against the plain editions).
 None of these has the Roland files (no `82.LFL`), so they are plain-sound editions. For each: does the folder open and get identified, are the rooms right, do the cutscene catalog, Game Status and glossary hold or need per-edition entries, do the texts extract. Fix what breaks only where it changes what the user sees.
 
 **3. Then LOOM VGA** (next section).

@@ -1,6 +1,6 @@
 # LOOM demos (4 October 2026)
 
-`Games/loom ega short demo en` (18 `.LFL` files, 16 rooms) and `Games/loom ega long demo en` (34 files, 32 rooms): LOOM's self-running previews (`LOOMDEMO.EXE`, "Demo IBM - 03/20/90" and "Demo - 02/01/90", copyright 1990). Tools: `.verification/DemoProbe` (`<folder>` summary, `index`, `texts`, `play <frames>`, `idle <frames>`), `ScriptDump`, `WindowCheck` (through `run-windowcheck.ps1`) and `DemoPreviewCheck` (this folder's `preview-short/`, `preview-long/`).
+`Games/loom demo short ega en` (18 `.LFL` files, 16 rooms) and `Games/loom demo long ega en` (34 files, 32 rooms): LOOM's self-running previews (`LOOMDEMO.EXE`, "Demo IBM - 03/20/90" and "Demo - 02/01/90", copyright 1990). Tools: `.verification/DemoProbe` (`<folder>` summary, `index`, `texts`, `play <frames>`, `idle <frames>`), `ScriptDump`, `WindowCheck` (through `run-windowcheck.ps1`) and `DemoPreviewCheck` (this folder's `preview-short/`, `preview-long/`).
 
 ## What the demos are
 
