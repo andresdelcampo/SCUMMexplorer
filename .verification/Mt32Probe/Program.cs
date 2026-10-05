@@ -4,6 +4,32 @@ using SCUMMexplorer.Core.Domain;
 
 // Mt32Probe <gamefolder>: the Roland ("RO") streams of sounds 33..64: events, channels, programs, length in ticks.
 var game = new GameFolderScanner().Scan(args[0]);
+if (args.Length > 2 && args[1] == "activity")
+{
+    // Mt32Probe <game> activity <sound>: notes started and channels used per 5 s window, and the markers in it.
+    var res = game.Resources.First(r => r.Kind == ResourceKind.Sound && r.ResourceId == int.Parse(args[2]));
+    var song = SCUMMexplorer.Core.Formats.LoomRolandSong.Read(res);
+    var spt = SCUMMexplorer.Core.Formats.LoomRolandSong.SecondsPerTick;
+    for (int w = 0; w * 5 < song.Duration.TotalSeconds + 5; w++)
+    {
+        var ev = song.Events.Where(e => e.Tick * spt >= w * 5 && e.Tick * spt < w * 5 + 5).ToList();
+        var notes = ev.Count(e => e.Command == 9 && e.Data2 > 0);
+        var mk = song.MarkerTicks.Count(t => t * spt >= w * 5 && t * spt < w * 5 + 5);
+        var progs = string.Join(",", ev.Where(e => e.Command == 0xC).Select(e => $"{e.Channel}:{e.Data1}"));
+        Console.WriteLine($"{w * 5,4}s notes {notes,3} ch {string.Join("", ev.Where(e => e.Command == 9).Select(e => e.Channel).Distinct().OrderBy(c => c))} markers {mk} {progs}");
+    }
+    return;
+}
+if (args.Length > 2 && args[1] == "markers")
+{
+    // Mt32Probe <game> markers <sound>: where the song's markers fall (the game's music timer counts them).
+    var res = game.Resources.First(r => r.Kind == ResourceKind.Sound && r.ResourceId == int.Parse(args[2]));
+    var song = SCUMMexplorer.Core.Formats.LoomRolandSong.Read(res);
+    Console.WriteLine($"{song.MarkerTicks.Count} markers, song {song.Duration.TotalSeconds:F1}s ({song.Ticks} ticks)");
+    foreach (var n in new[] { 1, 4, 5, 50, 100, 150, 198, 199, 204, 205, 250, song.MarkerTicks.Count })
+        if (n >= 1 && n <= song.MarkerTicks.Count) Console.WriteLine($"marker {n}: tick {song.MarkerTicks[n - 1]} = {song.MarkerTicks[n - 1] * SCUMMexplorer.Core.Formats.LoomRolandSong.SecondsPerTick:F1}s");
+    return;
+}
 if (args.Length > 1 && args[1] == "timing")
 {
     // Mt32Probe <game> timing: how long a fresh session and the first visit of Room 1 take.
@@ -27,11 +53,16 @@ if (args.Length > 2 && args[1] == "opening")
     var card = int.Parse(args[2]); int limit = args.Length > 3 ? int.Parse(args[3]) : 6000;
     var snap = new SCUMMexplorer.Core.Formats.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
     var session = new SCUMMexplorer.Core.Formats.LoomExplorationSession(game, snap, stopAtOpening: true, soundCard: card);
-    int lastRoom = -1;
+    int lastRoom = -1, shown = 0;
     for (int frame = 1; frame <= limit; frame++)
     {
         session.AdvanceFrame();
         var sn = session.Snapshot;
+        while (shown < session.SoundEvents.Count)
+        {
+            var ev = session.SoundEvents[shown++].Event;
+            Console.WriteLine($"frame {frame}: SOUND {ev.Kind} {ev.TargetId} <- {ev.SourceLabel} +0x{ev.Offset:X4} {ev.Operation} {ev.Operands}");
+        }
         if (sn.RoomId != lastRoom || frame % 200 == 0)
         {
             lastRoom = sn.RoomId ?? -1;
