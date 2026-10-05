@@ -36,11 +36,16 @@ internal static class Program
                 Call("OpenGameFolder", args[0]);
                 var game = (GameLibrary)Field("_game")!;
                 var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
-                var room = game.Rooms.First(r => r.ResourceId == 11);
-                Call("SelectResourceInTree", room);
-                for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
-                await Task.Delay(500);
-                Shot("room-11.png");
+                // First-visit scenes (the entry script's objects over the background), a few rooms; cards need a moment to render too.
+                foreach (var number in new[] { 1, 4, 13, 31, 53, 86 })
+                {
+                    var room = game.Rooms.First(r => r.ResourceId == number);
+                    Call("SelectResourceInTree", room);
+                    for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
+                    await Task.Delay(500);
+                    Shot($"room-{number:00}.png");
+                    report.Add($"room {number}: {((IReadOnlyCollection<object>)((System.Collections.IEnumerable)Field("_objects")!).Cast<object>().ToList()).Count} object images");
+                }
                 var costumesTab = (RadioButton)window.FindName("CostumesTab");
                 costumesTab.IsChecked = true;
                 Call("NormalCatalogTab_Click", costumesTab, new RoutedEventArgs());

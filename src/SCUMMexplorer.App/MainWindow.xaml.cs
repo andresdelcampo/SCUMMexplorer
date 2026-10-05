@@ -548,8 +548,17 @@ public partial class MainWindow : Window
         cancellationToken.ThrowIfCancellationRequested();
         if (game is { Id: GameId.LoomVga, Vga: { } vga })
         {
-            var cdRoom = vga.DecodeRoom(roomResource.ResourceId!.Value);
-            return CreateRoomCardBitmap(cdRoom, cdRoom.Pixels.ToArray(), 0);
+            // First-visit state: the room's entry script run in a fresh session; the plain background where that cannot run.
+            try
+            {
+                var cdScene = LoomCdRoomScene.FirstVisit(game, roomResource.ResourceId!.Value);
+                return CreateRoomCardBitmap(cdScene.Room, cdScene.Compose(), cdScene.CameraX);
+            }
+            catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException)
+            {
+                var cdRoom = vga.DecodeRoom(roomResource.ResourceId!.Value);
+                return CreateRoomCardBitmap(cdRoom, cdRoom.Pixels.ToArray(), 0);
+            }
         }
         var bytes = File.ReadAllBytes(roomResource.FilePath);
         var decoder = new OldV3EgaRoomDecoder();
@@ -911,7 +920,14 @@ public partial class MainWindow : Window
         {
             // The CD game's rooms come out of DISK01.LEC (no per-room file); the others read their LFL file.
             var bytes = isCd ? [] : await File.ReadAllBytesAsync(resource.FilePath, token);
-            var room = isCd ? await Task.Run(() => _game!.Vga!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes);
+            LoomCdScene? cdScene = null;
+            if (isCd)
+            {
+                var cdGame = _game!;
+                try { cdScene = await Task.Run(() => LoomCdRoomScene.FirstVisit(cdGame, resource.ResourceId!.Value), token); }
+                catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
+            }
+            var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.Vga!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
             _currentWalkBoxes = isCd ? null : TryReadWalkBoxes(bytes);
             if (_game?.Id is GameId.IndianaJones3 or GameId.LoomVga)
             {
@@ -919,15 +935,15 @@ public partial class MainWindow : Window
                 _currentRoom = room;
                 _currentRoomResource = resource;
                 _lastViewedRoomResource = resource;
-                _currentRoomObjectRecords = [];
+                _currentRoomObjectRecords = cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
-                _objects = [];
-                _objectSelection = new RoomObjectSelection([], background: room);
+                _objects = cdScene?.Images ?? [];
+                _objectSelection = cdScene?.Selection ?? new RoomObjectSelection([], background: room);
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
                 ClearObjectList();
-                ObjectsNote.Text = isCd ? "Background preview only. The CD game's object art, scripts and room routes are not read yet." : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
+                ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
                 ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
@@ -989,6 +1005,13 @@ public partial class MainWindow : Window
             }
         }
     }
+
+    private static string CdSceneNote(LoomCdScene? scene) =>
+        scene is null
+            ? "Background only: the room's entry script could not run. Interaction, Bobbin, walk boxes and room routes are not read yet for the CD game."
+            : "The room as its entry script leaves it (first visit)" +
+              (scene.Snapshot.Picks.Count > 0 ? $"; where the script branches on a random value, the explorer picked one ({scene.Snapshot.Picks.Count} seeded picks, listed in the session notes)" : "") +
+              ". Interaction, Bobbin, walk boxes and room routes are not read yet for the CD game.";
 
     private void ApplyRoomState(GameResource resource, IReadOnlyList<LoomRoomObjectRecord> records,
         IReadOnlyList<RoomObjectImage> images, bool visit)

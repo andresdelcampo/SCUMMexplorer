@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (night): data-source seam; LOOM CD first-visit object states
+
+`IScummDataSource` (Core) is what the exploration session and `LoomSceneDrawBatches.Build` ask for: global, entry, exit and local scripts, a room's object records, names, walk boxes and size, object images and verb code. Two implementations: `LoomEgaDataSource` (the old `GameResource.FilePath` reads, behaviour unchanged; the filtered session, scene, first-visit and demo tests pass on `loom ega mt32 en`) and `LoomCdDataSource` over `LoomVgaArchive` (new there: `ReadGlobalScript` through the `0S` directory, `ReadObjectImages` for the `OI` blocks, `ReadRoomSize`, `ReadIndexedObjects` for `0O`). The session now accepts the CD game, runs its boot script and each room's entry script, and `LoomCdRoomScene.FirstVisit` builds the room as that script leaves it; the app's CD room view and room cards use it (no artwork gap filling: the CD backgrounds carry the permanent scenery, and where an entry script branches on a random value the session's seeded pick is labelled). `OI` images decode exactly: the images the entry scripts draw in rooms 13 and 17 equal the background pixels under them. Not yet read for the CD game: walk boxes, Bobbin and costumes inside the session, verbs in the UI. Tests in `LoomVgaTests` (source reads, a session visit of all 78 rooms, first-visit pictures). Record: [.verification/loom-vga](../.verification/loom-vga/README.md), step 6.
+
 ## 5 October (evening): LOOM CD costumes
 
 The 165 costumes of the CD game decode (`LoomVgaCostumeRenderer`: the 16-colour classic format with block-relative offsets) and show in the app's Costumes tab and pose gallery (new real-window harness `.verification/loom-vga/CdCheck`). Test `EveryCostumeOfTheCdGameDrawsAtLeastOnePose`. Record: [.verification/loom-vga](../.verification/loom-vga/README.md), step 5.

@@ -199,4 +199,20 @@ public sealed class LoomVgaTests
         // The index gives every object state 0; rooms show what their entry script sets.
         Assert.True(withStates >= 15, $"{withStates} rooms set object states");
     }
+
+    [Fact]
+    public void EveryCdRoomComposesItsFirstVisitPicture()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var painted = 0;
+        foreach (var room in game.Rooms)
+        {
+            var scene = LoomCdRoomScene.FirstVisit(game, room.ResourceId!.Value);
+            var pixels = scene.Compose();
+            Assert.Equal(scene.Room.Pixels.Length, pixels.Length);
+            if (!pixels.AsSpan().SequenceEqual(scene.Room.Pixels.Span)) painted++;
+        }
+        Assert.True(painted >= 10, $"{painted} rooms show objects over their background");
+    }
 }
