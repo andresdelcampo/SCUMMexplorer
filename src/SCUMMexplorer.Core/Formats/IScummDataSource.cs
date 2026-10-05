@@ -26,6 +26,9 @@ public interface IScummDataSource
     /// <summary>Scripts below this number are global; local scripts of a room are numbered from it.</summary>
     int GlobalScriptCount { get; }
 
+    /// <summary>The numbers of the game's global scripts, ascending.</summary>
+    IReadOnlyList<int> GlobalScriptIds();
+
     /// <summary>The numbered global script, or null when the game has none under that number.</summary>
     LoomScriptDisassembly? GlobalScript(int number);
 

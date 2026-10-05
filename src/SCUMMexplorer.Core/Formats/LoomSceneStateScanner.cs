@@ -41,7 +41,7 @@ public sealed record LoomStateSource(int Room, int? ObjectId, int? VerbId, strin
 public sealed partial class LoomSceneStateScanner
 {
     private readonly GameLibrary _game;
-    private readonly LoomScriptReader _reader;
+    private readonly IScummDataSource _data;
     private readonly int _globalScriptCount;
     private readonly Dictionary<int, LoomScriptDisassembly?> _globals = [];
     private readonly Dictionary<(int Room, int Script), LoomScriptDisassembly?> _locals = [];
@@ -55,9 +55,8 @@ public sealed partial class LoomSceneStateScanner
     public LoomSceneStateScanner(GameLibrary game)
     {
         _game = game;
-        _reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
-        var index = Path.Combine(game.FolderPath, "00.LFL");
-        _globalScriptCount = File.Exists(index) ? new LflIndexReader().ReadDeclaredScriptCount(index) : 0;
+        _data = ScummDataSources.For(game);
+        _globalScriptCount = _data.GlobalScriptCount;
     }
 
     public static bool IsSystemCode(string where) =>
@@ -75,21 +74,18 @@ public sealed partial class LoomSceneStateScanner
 
     private void ForEachCodeUnit(Action<LoomScriptDisassembly?, int, int?, int?, string> visit)
     {
-        var verbs = new LoomObjectVerbReader(ScummScriptDialects.For(_game.Id));
-        var directory = new LoomRoomObjectDirectory();
         var rooms = _game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r.ResourceId).ToArray();
         foreach (var room in rooms)
         {
             var id = room.ResourceId!.Value;
             try
             {
-                var bytes = File.ReadAllBytes(room.FilePath);
-                var records = directory.Decode(bytes);
-                var tables = verbs.ReadAll(bytes, records);
+                var records = _data.ReadRoom(id).Objects;
+                var tables = _data.ReadObjectVerbs(id, records);
                 foreach (var record in records)
                     if (tables.TryGetValue(record.Id, out var entries))
                         foreach (var group in entries.GroupBy(item => item.ScriptOffset))
-                            visit(verbs.Decode(room, record, group.First().VerbId), id, record.Id, group.First().VerbId,
+                            visit(_data.ReadObjectVerb(id, record, group.First().VerbId, out _), id, record.Id, group.First().VerbId,
                                 $"Room {id:00} object {record.Id} verb {(group.First().IsFallback ? "fallback" : $"0x{group.First().VerbId:X2}")}");
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
@@ -100,7 +96,7 @@ public sealed partial class LoomSceneStateScanner
             visit(Entry(id), id, null, null, $"Room {id:00} entry");
             try
             {
-                foreach (var local in LoomScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(room.FilePath), _globalScriptCount))
+                foreach (var local in _data.RoomLocalScriptIds(id))
                     visit(Script(id, local), id, null, null, $"Room {id:00} local {local}");
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException) { }
@@ -299,10 +295,9 @@ public sealed partial class LoomSceneStateScanner
     {
         try
         {
-            var resource = _game.Rooms.FirstOrDefault(r => r.ResourceId == room);
-            if (resource is null) return null;
-            var record = new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(resource.FilePath)).FirstOrDefault(r => r.Id == objectId);
-            return record is null ? null : new LoomObjectVerbReader(ScummScriptDialects.For(_game.Id)).Decode(resource, record, verbId);
+            if (_game.Rooms.All(r => r.ResourceId != room)) return null;
+            var record = _data.ReadRoom(room).Objects.FirstOrDefault(r => r.Id == objectId);
+            return record is null ? null : _data.ReadObjectVerb(room, record, verbId, out _);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { return null; }
     }
@@ -324,12 +319,10 @@ public sealed partial class LoomSceneStateScanner
             if (id < _globalScriptCount)
             {
                 if (_globals.TryGetValue(id, out var cached)) return cached;
-                var resource = _game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Script && r.ResourceId == id);
-                return _globals[id] = resource is null ? null : _reader.Decode(resource);
+                return _globals[id] = _data.GlobalScript(id);
             }
             if (_locals.TryGetValue((room, id), out var local)) return local;
-            var resourceRoom = _game.Rooms.FirstOrDefault(r => r.ResourceId == room);
-            return _locals[(room, id)] = resourceRoom is null ? null : _reader.DecodeRoomLocalScript(resourceRoom, id, _globalScriptCount);
+            return _locals[(room, id)] = _game.Rooms.Any(r => r.ResourceId == room) ? _data.RoomLocalScript(room, id) : null;
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException) { return null; }
     }
@@ -339,8 +332,7 @@ public sealed partial class LoomSceneStateScanner
         if (_entries.TryGetValue(room, out var cached)) return cached;
         try
         {
-            var resourceRoom = _game.Rooms.FirstOrDefault(r => r.ResourceId == room);
-            return _entries[room] = resourceRoom is null ? null : _reader.DecodeRoomEntry(resourceRoom);
+            return _entries[room] = _game.Rooms.Any(r => r.ResourceId == room) ? _data.RoomEntryScript(room) : null;
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException) { return _entries[room] = null; }
     }

@@ -171,6 +171,11 @@ public sealed class LoomVgaArchive
     /// </summary>
     public const int LocalScriptBase = 200;
 
+    /// <summary>The numbers of the global scripts the "0S" directory places in an SC block, ascending.</summary>
+    public IReadOnlyList<int> GlobalScriptNumbers() =>
+        ReadDirectory("0S").Where(entry => entry.Block + 6 <= _lec.Length && Encoding.Latin1.GetString(_lec, entry.Block + 4, 2) == "SC")
+            .Select(entry => entry.Id).Where(id => id < LocalScriptBase).Order().ToArray();
+
     /// <summary>The numbered global script's bytecode, found through the "0S" directory (room and offset), or null when the index has none.</summary>
     public LoomVgaScript? ReadGlobalScript(int number)
     {

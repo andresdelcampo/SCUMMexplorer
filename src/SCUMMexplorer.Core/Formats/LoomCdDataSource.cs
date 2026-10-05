@@ -24,6 +24,8 @@ public sealed class LoomCdDataSource : IScummDataSource
 
     public int GlobalScriptCount => LoomVgaArchive.LocalScriptBase;
 
+    public IReadOnlyList<int> GlobalScriptIds() => _archive.GlobalScriptNumbers();
+
     public LoomScriptDisassembly? GlobalScript(int number) =>
         _archive.ReadGlobalScript(number) is { } script
             ? _reader.DecodeCode(script.Code, number, Container, script.BlockOffset) with { Context = $"Global script {number}" }

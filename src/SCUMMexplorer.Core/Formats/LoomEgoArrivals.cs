@@ -127,10 +127,7 @@ public sealed class LoomEgoArrivalIndex
     private static LoomEgoArrivalIndex Build(GameLibrary game, int globalScriptCount)
     {
         var index = new LoomEgoArrivalIndex();
-        var dialect = ScummScriptDialects.For(game.Id);
-        var reader = new LoomScriptReader(dialect);
-        var verbs = new LoomObjectVerbReader(dialect);
-        var directory = new LoomRoomObjectDirectory();
+        var data = ScummDataSources.For(game);
         var objectsByRoom = new Dictionary<int, HashSet<int>>();
         var found = new List<LoomEgoArrival>();
 
@@ -176,34 +173,33 @@ public sealed class LoomEgoArrivalIndex
             }
         }
 
-        foreach (var script in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
-                     .OrderBy(item => item.ResourceId))
-            Scan($"Script {script.ResourceId:000}", null, () => reader.Decode(script));
+        foreach (var number in data.GlobalScriptIds())
+            Scan($"Script {number:000}", null, () => data.GlobalScript(number));
         foreach (var room in game.Rooms.Where(item => item.ResourceId.HasValue).OrderBy(item => item.ResourceId))
         {
             var id = room.ResourceId!.Value;
-            byte[] bytes;
             IReadOnlyList<LoomRoomObjectRecord> records;
+            IReadOnlyList<int> localIds;
             try
             {
-                bytes = File.ReadAllBytes(room.FilePath);
-                records = directory.Decode(bytes);
+                records = data.ReadRoom(id).Objects;
+                localIds = data.RoomLocalScriptIds(id);
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { continue; }
             objectsByRoom[id] = records.Select(item => item.Id).ToHashSet();
-            Scan($"Room {id:00} entry", id, () => reader.DecodeRoomEntry(room));
-            Scan($"Room {id:00} exit", id, () => reader.DecodeRoomExit(room));
-            foreach (var local in LoomScriptReader.ReadRoomLocalScriptIds(bytes, globalScriptCount))
-                Scan($"Room {id:00} local script {local}", id, () => reader.DecodeRoomLocalScript(room, local, globalScriptCount));
+            Scan($"Room {id:00} entry", id, () => data.RoomEntryScript(id));
+            Scan($"Room {id:00} exit", id, () => data.RoomExitScript(id));
+            foreach (var local in localIds)
+                Scan($"Room {id:00} local script {local}", id, () => data.RoomLocalScript(id, local));
             IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> tables;
-            try { tables = verbs.ReadAll(bytes, records); }
+            try { tables = data.ReadObjectVerbs(id, records); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { continue; }
             foreach (var record in records)
                 if (tables.TryGetValue(record.Id, out var entries))
                     foreach (var group in entries.GroupBy(item => item.ScriptOffset))
                     {
                         var label = string.Join("/", group.Select(item => item.IsFallback ? "fallback" : $"0x{item.VerbId:X2}"));
-                        Scan($"Room {id:00} Object {record.Id} Verb {label}", id, () => verbs.Decode(room, record, group.First().VerbId));
+                        Scan($"Room {id:00} Object {record.Id} Verb {label}", id, () => data.ReadObjectVerb(id, record, group.First().VerbId, out _));
                     }
         }
 

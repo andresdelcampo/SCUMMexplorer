@@ -22,6 +22,10 @@ public sealed class LoomEgaDataSource : IScummDataSource
 
     public int GlobalScriptCount { get; }
 
+    public IReadOnlyList<int> GlobalScriptIds() =>
+        _game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
+            .Select(item => item.ResourceId!.Value).Distinct().Order().ToArray();
+
     public LoomScriptDisassembly? GlobalScript(int number) =>
         _game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script && item.ResourceId == number) is { } resource
             ? _reader.Decode(resource) : null;
