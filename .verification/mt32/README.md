@@ -1,6 +1,6 @@
 # MT-32 (Roland upgrade) support: record of 5 October 2026
 
-Tools: `.verification/Mt32Probe` (`<game>` lists the Roland streams; `compare` sets Roland lengths against the AdLib twins; `render <game> <roms> <out> <ids>` writes WAVs), `.verification/RolandCheck` (the real window). Data: `Games/loom ega en`, ROMs in `Games/mt32` (`MT32_CONTROL.ROM` + `MT32_PCM.ROM`). Outputs here: `roland-streams.txt`, `roland-vs-adlib.txt`, `roland-check.txt`. Rendered samples (not committed): `Exe/mt32-samples/sound-{33,41,45,53,56}.wav`.
+Tools: `.verification/Mt32Probe` (`<game>` lists the Roland streams; `compare` sets Roland lengths against the AdLib twins; `render <game> <roms> <out> <ids>` writes WAVs), `.verification/RolandCheck` (the real window). Data: `Games/loom ega mt32 en`, ROMs in `Games/mt32` (`MT32_CONTROL.ROM` + `MT32_PCM.ROM`). Outputs here: `roland-streams.txt`, `roland-vs-adlib.txt`, `roland-check.txt`. Rendered samples (not committed): `Exe/mt32-samples/sound-{33,41,45,53,56}.wav`.
 
 ## What the data is (checked on the files)
 

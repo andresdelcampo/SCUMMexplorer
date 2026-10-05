@@ -10,8 +10,9 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 - `docs/`: `docs/README.md` is the index. Top level holds the live files: `docs/LOOM_EGA_PLAN.md` (what is left, M5, next games), `docs/CURRENT_WORK.md` (rules), `docs/NEXT_SESSION_PROMPT.md` (hand-off for the next session) and `docs/CHANGELOG.md` (finished work with links to its validation). `docs/loom/` and `docs/indy3/` hold per-game reference and plans (`docs/loom/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do), `docs/engine/` holds generic SCUMM notes, and `docs/archive/` holds finished plans, audits and history.
 - `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. Evidence from the Spanish-edition work (27 September to 4 October 2026) is in `.verification/archive/`; `.verification/README.md` says what is live and what is a record. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
 - `Games/`: the local game data. Never commit it.
-  - `Games/loom ega en`: DOS LOOM EGA, **English**. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
-  - `Games/loom ega es`: DOS LOOM EGA, Spanish. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
+  - `Games/loom ega mt32 en`: DOS LOOM EGA, **English**, with the Roland (MT-32) upgrade installed. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
+  - `Games/loom ega mt32 es`: DOS LOOM EGA, Spanish, Roland upgrade installed. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
+  - `Games/loom ega en`, `loom ega es`: the plain DOS releases (no Roland files 82–85). Also `loom ega fr`, `de`, `hebrew`, `Loom v1.2 ega es`/`de`, and the two demos; being tried edition by edition (plan section "LOOM EGA editions, before VGA").
   - `Games/loom vga en`: LOOM CD (VGA, SCUMM v4) as `Loom.cue` + `Loom.bin` (ISO 9660 data track plus one CD audio track). Not yet read by the app; see the plan.
   - `Games/mt32`: the user's MT-32/CM-32L ROM images for the Roland sound device. Never commit.
   - `Games/indy3 ega en`: Indy3 EGA, **English**. The Indy tests expect this one (`SCUMM_INDY3_EGA_TEST_ROOT`).
@@ -25,12 +26,12 @@ From the repository root (Windows, .NET 10 SDK):
 
 ```powershell
 dotnet build SCUMMexplorer.slnx
-$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom ega en"
+$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom ega mt32 en"
 $env:SCUMM_INDY3_EGA_TEST_ROOT = "$PWD\Games\indy3 ega en"
 dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 ```
 
-`.verification\run-verify.cmd` does the same and writes `.verification\verify.log`. The README uses `rtk proxy dotnet …`; RTK is optional. The LOOM data tests find `Games/loom ega en` (then `loom ega es`) relative to the test binary; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip silently.
+`.verification\run-verify.cmd` does the same and writes `.verification\verify.log`. The README uses `rtk proxy dotnet …`; RTK is optional. The LOOM data tests find `Games/loom ega mt32 en` (then `loom ega mt32 es`) relative to the test binary; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip silently.
 
 ## Engine facts that matter here (checked against ScummVM `engines/scumm`)
 

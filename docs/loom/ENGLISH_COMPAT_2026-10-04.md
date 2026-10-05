@@ -1,6 +1,6 @@
 # English LOOM EGA compatibility worklist (4 October 2026)
 
-The user added the English DOS EGA release as `Games/loom ega en` ("fully compatible" at a glance) and asked that the tests use it by default: the failures are the list of places where the code or the tests assume the Spanish release (`Games/loom`, to be renamed `Games/loom ega es`). The helper `tests/SCUMMexplorer.Tests/TestGames.cs` picks the folder (`loom ega en`, then `loom ega es`, then `loom`); `SCUMM_LOOM_TEST_ROOT` overrides it with a full path (set it to the Spanish folder to get the old baseline: 703 passed, 5 skipped, before the sphere and interaction changes of 4 October).
+The user added the English DOS EGA release as `Games/loom ega mt32 en` ("fully compatible" at a glance) and asked that the tests use it by default: the failures are the list of places where the code or the tests assume the Spanish release (`Games/loom`, to be renamed `Games/loom ega mt32 es`). The helper `tests/SCUMMexplorer.Tests/TestGames.cs` picks the folder (`loom ega mt32 en`, then `loom ega mt32 es`, then `loom`); `SCUMM_LOOM_TEST_ROOT` overrides it with a full path (set it to the Spanish folder to get the old baseline: 703 passed, 5 skipped, before the sphere and interaction changes of 4 October).
 
 **Run on English data:** 710 tests, 642 passed, 63 failed, 5 skipped (after Game Status was fixed: 42 failed of 710; triage at the end of this file). Nothing here is triaged beyond the first look below; do not assume a failure is a test problem or an app problem before reading it.
 
@@ -15,13 +15,13 @@ The user added the English DOS EGA release as `Games/loom ega en` ("fully compat
 ## Suggested order
 
 1. Make Game Status work on English: derive the draft-table contract from the instruction pattern of script 023/026 (an app fix), then re-run `LoomGameStatusTests`.
-2. Run the app on `Games/loom ega en`: boot, the room picker, a few rooms, texts (charset), a click and a cutscene; note what looks wrong.
+2. Run the app on `Games/loom ega mt32 en`: boot, the room picker, a few rooms, texts (charset), a click and a cutscene; note what looks wrong.
 3. Triage the remaining failures into test-only (Spanish text, offsets: make the assertion edition-neutral or give each edition its own golden) and app issues.
 4. Decide how the catalog and glossary data are made per edition (generated at open time, or one file per edition).
 
 ## Findings and triage (4 October, later the same day)
 
-Evidence: `ScriptDump` (`.verification/ScriptDump`, a disassembler: `ScriptDump <folder> <script ids>` or `ScriptDump <folder> room <room> <local id>`) on both folders, the failing assertions, and UiShots on `Games/loom ega en` (`.verification/english-compat-20261004/uishots`: rooms, English texts, verbs, "Last leaf of the year." play on the English data).
+Evidence: `ScriptDump` (`.verification/ScriptDump`, a disassembler: `ScriptDump <folder> <script ids>` or `ScriptDump <folder> room <room> <local id>`) on both folders, the failing assertions, and UiShots on `Games/loom ega mt32 en` (`.verification/english-compat-20261004/uishots`: rooms, English texts, verbs, "Last leaf of the year." play on the English data).
 
 **The English release is not a translation of the same code.** Same scripts, other lengths, and other numbering:
 
@@ -58,13 +58,13 @@ Room 03: the test comment says Script 1 sets `bit[0xD62]` (Spanish "full animati
 
 ## Migration to English (decided by the user, 4 October, later)
 
-The tests, harness drivers and the replay catalog now use the English release; Spanish stays only as a comparison folder (`Games/loom ega es`, renamed by the user; ScriptDump `objmap` compares object ids side by side).
+The tests, harness drivers and the replay catalog now use the English release; Spanish stays only as a comparison folder (`Games/loom ega mt32 es`, renamed by the user; ScriptDump `objmap` compares object ids side by side).
 
 - **Tests:** all 711 unit tests pass on English (706 passed, 5 skipped diagnostics). The expectations were rewritten for English text, bits, offsets and object ids; two tests changed meaning: the Room 69 challenge test (the English boot has no copy-protection challenge: Room 69 local 205 only sets the bit, no random picks; the Spanish local 203's "wrong answer" branches are absent) and the script index test (in English every script decodes; scripts 0 and 116 sit off the resource chain inside another resource, Spanish had four).
 - **Correction to the first triage:** the English bit layout lacks the Spanish `bit[0xD62]` ("full animation", set by its boot, read by script 046/005 and Room 03's entry) and numbers every Spanish bit from 0xD63 on one lower, not from 0xD65 (script 006 proves it: the Spanish 0xD63/0xD64 pair is 0xD62/0xD63). The glossary shift now starts at the Spanish 0xD63. In English Room 03's entry always starts script 0x2A.
 - **Object numbers:** the English Room 33 has one more object (id 557, no name), so every later object id is one higher than in Spanish (599 is 600, 876 is 877, 925 is 926). Class numbers move with them.
 - **Catalog:** regenerated with the unchanged pipeline (record in `.verification/english-catalog-20261004/validation.md`): 332 starts, 169/235 sites. `MainWindow.KnownCutscenes` and `FirewoodSteps` carry the English ids and offsets.
-- **Not migrated:** about 95 older harness scripts and evidence folders still name `Games\loom` in their text; they are historical records. The living drivers (`run-verify.cmd`, `harness-review-20261004/run-all.ps1`) point to `Games\loom ega en`. The glossary's variable/script/room/actor names are still unchecked against English beyond the bits. CLAUDE.md still names `Games/loom` (needs approval).
+- **Not migrated:** about 95 older harness scripts and evidence folders still name `Games\loom` in their text; they are historical records. The living drivers (`run-verify.cmd`, `harness-review-20261004/run-all.ps1`) point to `Games\loom ega mt32 en`. The glossary's variable/script/room/actor names are still unchecked against English beyond the bits. CLAUDE.md still names `Games/loom` (needs approval).
 
 ## Glossary and story flags checked against the English data (4 October, night)
 
@@ -74,4 +74,4 @@ Tool: `.verification/GlossaryCheck` (English folder, Spanish reference, output `
 - **Variables and bits** (names with decoded/engine/reading evidence) all hold on English; the Spanish `bit[0xD62]` has no English counterpart (English `bit[0xD62]` is the Spanish 0xD63, as `LoomGlossary.Bit` maps it).
 - **Actors were wrong in the table, not only unchecked.** The lines of script 091 and 093 (the Room 43 cage scene) are spoken by actors 2 and 3, whom Bobbin and the others call "Mandible" and "Cob"; the table named them Elders. Script 098's actor 3 is "Rusty" (Bobbin: "Rusty?"), script 086's actor 5 is "Mr. Stoke", and Room 09's actor 4 (costume 0x82 from Room 09 local 217, lines in local 221 and script 105) is the Dead One, not an Elder. Scoped entries now say so, each with its evidence ("reading": the name comes from the text); the trial's Elders keep the unscoped names. `LoomSpeakerNames.Display(LoomTextEntry)` uses the same scopes in the Game Texts browser. Spanish quotes in the actor sources were replaced by the English lines.
 - **LoomEgaStateFlags**: English has 88 story bits set by code (first 0xD71); 23 are named by a scene of the English catalog, 65 show their setter's script. Each named flag matches the Spanish flag one bit higher with the same scene title. No flag name was invented.
-- **Goldens per edition**: `RealScriptsMatchTheirGoldenOutput` reads `.verification/readable-scripts/<game folder>/`; the Spanish files moved to `loom ega es/`, the English ones were generated on the first run (script 91 looked through; 6 and 17 not yet reviewed by hand).
+- **Goldens per edition**: `RealScriptsMatchTheirGoldenOutput` reads `.verification/readable-scripts/<game folder>/`; the Spanish files moved to `loom ega mt32 es/`, the English ones were generated on the first run (script 91 looked through; 6 and 17 not yet reviewed by hand).

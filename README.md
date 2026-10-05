@@ -44,12 +44,12 @@ From the repository root, with the .NET 10 SDK:
 
 ```powershell
 dotnet build SCUMMexplorer.slnx
-$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom ega en"
+$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom ega mt32 en"
 $env:SCUMM_INDY3_EGA_TEST_ROOT = "$PWD\Games\indy3 ega en"
 dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 ```
 
-The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. The LOOM tests find `Games/loom ega en` (then `loom ega es`) next to the repository, or the folder in `SCUMM_LOOM_TEST_ROOT`; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip. Tests that need the demo folders skip when they are absent.
+The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. The LOOM tests find `Games/loom ega mt32 en` (then `loom ega mt32 es`) next to the repository, or the folder in `SCUMM_LOOM_TEST_ROOT`; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip. Tests that need the demo folders skip when they are absent.
 
 ## Roland MT-32 music (optional)
 
@@ -60,7 +60,7 @@ Choose **Roland MT-32** in the sound menu to hear the LOOM Roland upgrade's musi
    - `MT32_CONTROL.ROM` and `MT32_PCM.ROM` (a Roland MT-32), or
    - `CM32L_CONTROL.ROM` and `CM32L_PCM.ROM` (a CM-32L, the LAPC-1's sound; the MT-32 pair is preferred when both are present).
 
-   The app looks for that folder in this order: the `SCUMM_MT32_ROM_ROOT` environment variable; the folder you chose the last time; a folder named `mt32` beside the game folder (for example `Games/mt32` next to `Games/loom ega en`). If it finds none it asks for the folder once and remembers it (`%LOCALAPPDATA%\SCUMMexplorer\mt32-rom-folder.txt`).
+   The app looks for that folder in this order: the `SCUMM_MT32_ROM_ROOT` environment variable; the folder you chose the last time; a folder named `mt32` beside the game folder (for example `Games/mt32` next to `Games/loom ega mt32 en`). If it finds none it asks for the folder once and remembers it (`%LOCALAPPDATA%\SCUMMexplorer\mt32-rom-folder.txt`).
 
 Choosing Roland also tells the game it runs on a Roland card, so its own scripts pick the Roland sounds; the other devices keep the game as it was. The first time a long piece is needed it is rendered (the overture takes about 10 seconds); the scene waits for it, then the music starts with the scene. If the saved choice cannot be used for a folder (no upgrade, no ROMs), that session plays on AdLib and the choice is kept.
 

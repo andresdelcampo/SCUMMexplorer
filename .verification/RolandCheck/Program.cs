@@ -8,7 +8,7 @@ using SCUMMexplorer.Core.Formats;
 
 // The Roland MT-32 device through the real window: the combo, the sound card the session reports, the sound panel for a Roland sound and
 // for its AdLib twin, the refusal on another device, and the opening's sound commands under the Roland card.
-// Arguments: <Games\loom ega en> <output folder>; the ROMs come from SCUMM_MT32_ROM_ROOT (else the folder beside the game folder: ..\mt32).
+// Arguments: <Games\loom ega mt32 en> <output folder>; the ROMs come from SCUMM_MT32_ROM_ROOT (else the folder beside the game folder: ..\mt32).
 internal static class Program
 {
     const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;

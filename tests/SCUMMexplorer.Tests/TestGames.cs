@@ -1,8 +1,8 @@
 namespace SCUMMexplorer.Tests;
 
 /// <summary>
-/// Where the local LOOM data lives. The tests run against the English DOS EGA release in <c>Games/loom ega en</c> (since 4 October;
-/// the Spanish release in <c>Games/loom ega es</c>, once called <c>Games/loom</c>, was the reference before). Set
+/// Where the local LOOM data lives. The tests run against the English DOS EGA release in <c>Games/loom ega mt32 en</c> (since 4 October;
+/// the Spanish release in <c>Games/loom ega mt32 es</c>, once called <c>Games/loom</c>, was the reference before). Set
 /// <c>SCUMM_LOOM_TEST_ROOT</c> to a full folder path to run them against another edition; assertions that name edition-specific
 /// text (object names, dialogue) then show what differs.
 /// </summary>
@@ -15,7 +15,7 @@ internal static class TestGames
     {
         if (Environment.GetEnvironmentVariable("SCUMM_LOOM_TEST_ROOT") is { Length: > 0 } overridden) return overridden;
         const string up = "../../../../Games/";
-        foreach (var name in new[] { "loom ega en", "loom ega es", "loom" })
+        foreach (var name in new[] { "loom ega mt32 en", "loom ega mt32 es", "loom" })
             if (File.Exists(Path.Combine(AppContext.BaseDirectory, up + name, "00.LFL"))) return up + name;
         return up + "loom";
     }

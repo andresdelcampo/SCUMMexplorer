@@ -2,7 +2,7 @@
 
 Question (user): Bobbin disappears on the walk from Room 02 to the village before reaching box 14's end; is the explorer using the wrong costume size, or a wrong mask?
 
-Checked on the **English** release (`Games/loom ega en`) with `.verification/DemoProbe` (`walk 2 377 9 mask`, `adjust`, `objects`, `verbs`, `shot`) and the bundled ScummVM (`scummvm/`, debugger commands `actors`, `box`, `objects`).
+Checked on the **English** release (`Games/loom ega mt32 en`) with `.verification/DemoProbe` (`walk 2 377 9 mask`, `adjust`, `objects`, `verbs`, `shot`) and the bundled ScummVM (`scummvm/`, debugger commands `actors`, `box`, `objects`).
 
 - **Size is right.** On the exit walk the ego wears costume 2 in boxes 5–10 and costume 3 from box 12 on (script 045 starts script 017 per box). Costume 3 draws about 24 opaque pixels, and the mask clipping counts the pixels the renderer draws, so the drawn size and the clipped size are the same.
 - **Box data is identical.** ScummVM's `box` table equals ours for all 15 boxes (corners, mask, flags). Boxes 0-2 mask 0, boxes 3-14 mask 1; box 14 is a line from (540,108) to (568,114).

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October: Games folders renamed (the Roland copy says so)
+
+`Games/loom ega en`/`es` (Roland upgrade installed) became `loom ega mt32 en`/`es`; the former `loom ega ibm en`/`es` (plain game) became `loom ega en`/`es`. `loom ega mt32 en` stays the reference edition: `TestGames`, `run-verify.cmd`, the harness scripts, the README, CLAUDE.md and the golden folders `.verification/readable-scripts/loom ega mt32 en|es` use the new names. Older entries below name the folders as they were called then.
+
 ## 5 October: AdLib notes re-attack (the chip's register write latency)
 
 Some AdLib instruments sounded low or different from ScummVM in the title music, and the spell effect with the stars (sound 23) faded away. The cause was ours: the driver writes a note's registers between its key-off and key-on, and the Nuked chip received them all at one instant, so the key-off never registered and nothing re-attacked. `NukedOplChip` now uses Nuked's buffered writes (the real chip's write latency); the result sounds almost the same as ScummVM's MAME OPL core. A C# port of that core and a second "AdLib (ScummVM)" device were built and verified, then shelved: [archive](../.verification/archive/audio-accuracy-20261003/mame-opl-port/README.md), [validation](../.verification/archive/audio-accuracy-20261003/validation.md).

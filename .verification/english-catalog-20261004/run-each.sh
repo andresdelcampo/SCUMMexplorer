@@ -7,7 +7,7 @@ mkdir -p "$base"
 i=0
 for id in "$@"; do
   out="$base/s$i"; mkdir -p "$out"
-  timeout $((cap + 90)) Exe/SceneShots/Debug/net10.0-windows/SceneShots.exe "$PWD/Games/loom ega en" "$out" "$cap" 10000 "$id"
+  timeout $((cap + 90)) Exe/SceneShots/Debug/net10.0-windows/SceneShots.exe "$PWD/Games/loom ega mt32 en" "$out" "$cap" 10000 "$id"
   i=$((i+1))
 done
 echo done > "$base/finished"

@@ -55,7 +55,7 @@ Left, in order of value:
 
 New order: the editions of LOOM EGA first, then LOOM VGA. Reason: the folder named `loom ega en` is the Roland-upgraded copy (see the MT-32 section), so the names should say so, and more editions are now in `Games/`.
 
-**1. Rename the game folders (user's instruction; do it first, as its own commit).**
+**1. Rename the game folders (done 5 October, own commit; all references updated).**
 - `Games/loom ega en` → `Games/loom ega mt32 en`, and `loom ega es` → `loom ega mt32 es` (the Roland upgrade installed).
 - Then `Games/loom ega ibm en` → `Games/loom ega en`, and `loom ega ibm es` → `loom ega es` (the plain game, no upgrade).
 - Do the two renames in this order (the old names are taken until the first pair has moved). Games/ is not in git, so the rename is a filesystem move that the user or the session does; everything that names the folders changes in the same step: `tests/SCUMMexplorer.Tests/TestGames.cs` (lookup list `"loom ega en", "loom ega es", "loom"`), `SCUMM_SOUND_TEST_ROOT` and `SCUMM_LOOM_TEST_ROOT` in CLAUDE.md, `.verification/run-verify.cmd`, `.verification/harness-review-20261004/*.ps1`, harness drivers and `loom-replays.json` sources, README, docs, and the memory note `english-reference-edition`. Run `git grep -n "loom ega"` for the full list (about 20 tracked files outside the archives).

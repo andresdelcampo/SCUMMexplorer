@@ -8,7 +8,7 @@ MT-32 is done and committed (not pushed): [.verification/mt32/README.md](../.ver
 
 ## State (end of the 4 October late session)
 
-LOOM EGA English (`Games/loom ega en`) is the reference edition. Build clean (0 warnings); the filtered tests of each change pass. Not pushed.
+LOOM EGA English (`Games/loom ega mt32 en`) is the reference edition. Build clean (0 warnings); the filtered tests of each change pass. Not pushed.
 
 Done in the demos session (records: [.verification/demos-20261004/README.md](../.verification/demos-20261004/README.md), [.verification/room02-mountain-20261004/README.md](../.verification/room02-mountain-20261004/README.md)):
 
@@ -20,7 +20,7 @@ Done in the demos session (records: [.verification/demos-20261004/README.md](../
 
 ## Decided with the user
 
-- Order (5 October): MT-32 is built, M5 is shelved. **Next, before VGA: (1) rename the game folders** (`loom ega en`/`es` → `loom ega mt32 en`/`es`, then `loom ega ibm en`/`es` → `loom ega en`/`es`) and update tests, scripts, docs and CLAUDE.md in the same step; **(2) try the plain editions and the new languages** (`loom ega en`/`es` plain, `fr`, `de`, `hebrew`, `Loom v1.2 ega es`/`de`), **(3) then LOOM VGA** (`Games/loom vga en` and `loom vga en kixx`, `.cue`/`.bin` images; decided: a folder or a disc image behind one game file source; CD audio last; the app auto-identifies the edition). **Indy3 is on hold** until the user moves its data from `Games/FUTURE/` to `Games/`.
+- Order (5 October): MT-32 is built, M5 is shelved. **Next, before VGA: (1) rename the game folders** (`loom ega mt32 en`/`es` → `loom ega mt32 en`/`es`, then `loom ega ibm en`/`es` → `loom ega mt32 en`/`es`) and update tests, scripts, docs and CLAUDE.md in the same step; **(2) try the plain editions and the new languages** (`loom ega mt32 en`/`es` plain, `fr`, `de`, `hebrew`, `Loom v1.2 ega es`/`de`), **(3) then LOOM VGA** (`Games/loom vga en` and `loom vga en kixx`, `.cue`/`.bin` images; decided: a folder or a disc image behind one game file source; CD audio last; the app auto-identifies the edition). **Indy3 is on hold** until the user moves its data from `Games/FUTURE/` to `Games/`.
 - A demo plays both ways: rooms explorable, the preview as a cutscene, no new button.
 - Harness review: obsolete harnesses removed, three repaired; archive folders are records, not harnesses. Room17Check's interrupted walk is expected.
 

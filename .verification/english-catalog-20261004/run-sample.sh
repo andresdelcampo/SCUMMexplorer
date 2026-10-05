@@ -10,9 +10,9 @@ while IFS= read -r line; do
   set -- "$@" "$line"; n=$((n+1))
   if [ $n -eq 6 ]; then
     out="$base/b$batch"; mkdir -p "$out"
-    timeout 400 Exe/SceneShots/Debug/net10.0-windows/SceneShots.exe "$PWD/Games/loom ega en" "$out" 30 4000 "$@"
+    timeout 400 Exe/SceneShots/Debug/net10.0-windows/SceneShots.exe "$PWD/Games/loom ega mt32 en" "$out" 30 4000 "$@"
     batch=$((batch+1)); n=0; set --
   fi
 done < "$base/sample.txt"
-if [ $n -gt 0 ]; then out="$base/b$batch"; mkdir -p "$out"; timeout 400 Exe/SceneShots/Debug/net10.0-windows/SceneShots.exe "$PWD/Games/loom ega en" "$out" 30 4000 "$@"; fi
+if [ $n -gt 0 ]; then out="$base/b$batch"; mkdir -p "$out"; timeout 400 Exe/SceneShots/Debug/net10.0-windows/SceneShots.exe "$PWD/Games/loom ega mt32 en" "$out" 30 4000 "$@"; fi
 echo done > "$base/finished"

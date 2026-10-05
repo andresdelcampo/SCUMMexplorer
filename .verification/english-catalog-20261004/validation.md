@@ -1,8 +1,8 @@
 # English replay catalog (4 October 2026)
 
-Decided with the user: the tests, harnesses and the replay catalog move to the English DOS EGA release (`Games/loom ega en`); the Spanish catalog is replaced (it stays in git history: `git log -- src/SCUMMexplorer.App/loom-replays.json`).
+Decided with the user: the tests, harnesses and the replay catalog move to the English DOS EGA release (`Games/loom ega mt32 en`); the Spanish catalog is replaced (it stays in git history: `git log -- src/SCUMMexplorer.App/loom-replays.json`).
 
-Pipeline (the one in docs/loom/LOOM_CUTSCENE_DISCOVERY.md, unchanged), run on `Games/loom ega en`:
+Pipeline (the one in docs/loom/LOOM_CUTSCENE_DISCOVERY.md, unchanged), run on `Games/loom ega mt32 en`:
 
 1. `CodeDump` -> `code.tsv` (25 138 lines), `discover_replays.py` -> 362 literal object/entry roots, 218 candidate owners, 128 unresolved edges (Spanish: 363 roots).
 2. `ReplayAudit` (Release; restored from git history, it had been removed in the 4 October harness review) -> 362 probes in 4 min 13 s.
