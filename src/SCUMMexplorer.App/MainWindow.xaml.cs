@@ -259,7 +259,7 @@ public partial class MainWindow : Window
         {
             if (!File.Exists(LastFolderFile)) return;
             var folder = File.ReadAllText(LastFolderFile).Trim();
-            if (Directory.Exists(folder))
+            if (Directory.Exists(folder) || File.Exists(folder))
             {
                 // Only reopening the last game may reuse the saved room thumbnails; the Open button rebuilds them.
                 _roomCardsMayUseCache = true;
@@ -387,6 +387,8 @@ public partial class MainWindow : Window
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         // Game Status needs the session, not a room: show it as soon as the game is loaded (the header then stays still).
         GameStatusButton.Visibility = game.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
+        // The CD game has no sound read yet (its music and speech are CD audio, last in the plan): no device to choose.
+        SoundModeCombo.Visibility = game.Id == GameId.LoomVga ? Visibility.Collapsed : Visibility.Visible;
         GameStatusButton.IsEnabled = _session is not null;
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
@@ -544,6 +546,11 @@ public partial class MainWindow : Window
         LoomSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (game is { Id: GameId.LoomVga, Vga: { } vga })
+        {
+            var cdRoom = vga.DecodeRoom(roomResource.ResourceId!.Value);
+            return CreateRoomCardBitmap(cdRoom, cdRoom.Pixels.ToArray(), 0);
+        }
         var bytes = File.ReadAllBytes(roomResource.FilePath);
         var decoder = new OldV3EgaRoomDecoder();
         var room = decoder.Decode(bytes);
@@ -892,8 +899,9 @@ public partial class MainWindow : Window
         StatusText.Text = $"Opening {resource.Name}…";
         StatusText.ToolTip = resource.FilePath;
 
-        if (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 } ||
-            !_roomDecoder.CanDecode(resource.FilePath, 3))
+        var isCd = _game is { Id: GameId.LoomVga, Vga: not null };
+        if (!isCd && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 } ||
+            !_roomDecoder.CanDecode(resource.FilePath, 3)))
         {
             PreviewDescription.Text = "This room format is not supported yet.";
             return;
@@ -901,10 +909,11 @@ public partial class MainWindow : Window
 
         try
         {
-            var bytes = await File.ReadAllBytesAsync(resource.FilePath, token);
-            var room = _roomDecoder.Decode(bytes);
-            _currentWalkBoxes = TryReadWalkBoxes(bytes);
-            if (_game?.Id == GameId.IndianaJones3)
+            // The CD game's rooms come out of DISK01.LEC (no per-room file); the others read their LFL file.
+            var bytes = isCd ? [] : await File.ReadAllBytesAsync(resource.FilePath, token);
+            var room = isCd ? await Task.Run(() => _game!.Vga!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes);
+            _currentWalkBoxes = isCd ? null : TryReadWalkBoxes(bytes);
+            if (_game?.Id is GameId.IndianaJones3 or GameId.LoomVga)
             {
                 if (token.IsCancellationRequested) return;
                 _currentRoom = room;
@@ -918,7 +927,7 @@ public partial class MainWindow : Window
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
                 ClearObjectList();
-                ObjectsNote.Text = "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
+                ObjectsNote.Text = isCd ? "Background preview only. The CD game's object art, scripts and room routes are not read yet." : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
                 ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
