@@ -47,3 +47,10 @@ The CD game's bytecode is the **v5 operand set** (ScummVM `ScummEngine_v4` = `Sc
 - Scripts are plain blocks, not `00.LFL` resources: `LoomVgaArchive.ReadScripts(room)` returns them and `LoomScriptReader.DecodeCode` reads the bytes.
 
 Decoding without an issue is not the same as understanding the scripts; the executor, glossary and variables of the CD game are untouched.
+
+## Step 4: objects and texts (5 October)
+
+- **`OC` object blocks** (`LoomVgaArchive.ReadObjects`): id at block offset 6, x/8 at 9, y/8 at 10 (bit 7 the parent state), width/8 at 11, parent at 12, walk-to point words at 13 and 15, height and facing at 17, the name's offset at 18, then the verb table (verb byte and word offset, ended by a zero verb; 0xFF is the fallback verb), the zero-ended name and the code. The verb offsets land exactly on the code that follows the name (room 3 object 0x5F: verb 0x37 at 24, name at 23 is empty); room 4's "owl" has verbs 0x36, 0x39 and 0x56.
+- **`OI` object images**: the object id (u16), then a `BM`-like body (size u32, one u32 offset per 8-pixel strip counted from the size field, strips); the width is the object's, the height comes from the `OC` block. Not decoded in Core yet. **The index's `0O` table gives every room object the same initial state (owner 0xF, state 0)**, so what a room shows at first visit comes from running its entry script (EN), as on EGA; the backgrounds already carry the permanent scenery.
+- **Texts** (`LoomTextExtractor`, CD branch): 1,196 entries from 1,470 scripts (the 793 script blocks plus the object verb scripts): 1,042 spoken lines, 134 object names, 20 stored lines, nothing skipped or unresolved. The Game Texts window opens with them (room pictures from the CD data); `TextGalleryCheck` passes its first three checks (the fourth expects EGA room 3 text). The harness's search term was a hard-coded Spanish word, which is why it failed on every non-Spanish edition; it now takes a word that occurs in several texts.
+- The spoken lines start and end with the control character 0x19 (the "keep text up" marker); the EGA extraction treats markers the same way.

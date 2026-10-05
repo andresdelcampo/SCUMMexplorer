@@ -71,7 +71,7 @@ internal static class Program
                 var list = Named<ListBox>("TextList");
                 var search = Named<TextBox>("SearchBox");
                 Check(list.Items.Count == extraction.Entries.Count && list.Items.Count > 0, "Gallery exposes every extracted entry");
-                search.Text = "acantilado";
+                search.Text = extraction.Entries.SelectMany(entry => System.Text.RegularExpressions.Regex.Matches(entry.Text, "[A-Za-z]{6,}").Select(m => m.Value)).GroupBy(w => w, StringComparer.OrdinalIgnoreCase).Where(g => g.Count() > 1).OrderBy(g => g.Count()).First().Key; // a word in several texts, whatever the language (it was a Spanish word)
                 Check(list.Items.Count > 0 && list.Items.Count < extraction.Entries.Count, "Search narrows to matching original text");
                 var rooms = Named<ComboBox>("RoomFilter");
                 rooms.SelectedItem = rooms.Items.OfType<ComboBoxItem>().First(i => i.Tag is int id && id == 3);
