@@ -64,6 +64,7 @@ internal static class Program
                     var enc = new PngBitmapEncoder(); enc.Frames.Add(BitmapFrame.Create(rtb));
                     using (var fs = File.Create(Path.Combine(output, "status.png"))) enc.Save(fs);
                     report.Add("status window shown");
+                    { var sess = Field("_session")!; var gs = sess.GetType().GetProperty("GameStatus")!.GetValue(sess)!; foreach (var d in (System.Collections.IEnumerable)gs.GetType().GetProperty("Drafts")!.GetValue(gs)!) report.Add("   draft " + d); }
                     status.Close();
                 }
                 // CD_SOUND=1,9,16 selects those sounds in the tree and reports what the audio panel says (AdLib by default).

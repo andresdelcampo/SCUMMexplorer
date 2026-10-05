@@ -20,13 +20,35 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
     public static LoomStatusArtwork? TryLoad(GameLibrary game, out string? error)
     {
         error = null;
-        if (game.Id != GameId.Loom) return null;
+        if (game.Id is not (GameId.Loom or GameId.LoomVga)) return null;
         try
         {
-            var script = new LoomScriptReader(ScummScriptDialects.For(game.Id)).Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == 18));
-            var bytes = File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 1).FilePath);
-            var objects = new LoomRoomObjects().Decode(bytes);
-            var palette = new OldV3EgaRoomDecoder().Decode(bytes).Palette;
+            // Script 018 draws the staff and the notes from room 1's object images in both games; only where the pieces come from differs.
+            LoomScriptDisassembly script;
+            IReadOnlyList<RoomObjectImage> objects;
+            IReadOnlyList<uint> palette;
+            Func<IReadOnlyList<LoomMessage>, LoomMessageLayer> render;
+            if (game.Id == GameId.LoomVga)
+            {
+                var data = ScummDataSources.For(game);
+                script = data.GlobalScript(18) ?? throw new InvalidDataException("The game has no script 18.");
+                objects = data.ReadObjectImages(1);
+                palette = game.Vga!.ReadPalette(1);
+                // The strip's text uses the game's first charset for messages, as the room view does.
+                var cdCharset = game.Vga.ReadCharset(2);
+                if (cdCharset is null) { error = "Native charset unavailable."; return null; }
+                render = messages => LoomVgaMessageRenderer.Render(messages, cdCharset);
+            }
+            else
+            {
+                script = new LoomScriptReader(ScummScriptDialects.For(game.Id)).Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == 18));
+                var bytes = File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 1).FilePath);
+                objects = new LoomRoomObjects().Decode(bytes);
+                palette = new OldV3EgaRoomDecoder().Decode(bytes).Palette;
+                var egaCharset = LoomCharset.TryLoad(game.FolderPath, 0, out _);
+                if (egaCharset is null) { error = "Native charset unavailable."; return null; }
+                render = messages => LoomMessageRenderer.Render(messages, egaCharset);
+            }
             var staffPixels = new byte[224 * 24];
             int note = 0, color = 8;
             var notes = new List<BitmapSource>();
@@ -35,8 +57,6 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
             var notePixels = new byte[224 * 32];
             int scoreX = 0, letterColor = 7;
             var scoreMessages = new List<LoomMessage>();
-            var charset = LoomCharset.TryLoad(game.FolderPath, 0, out _);
-            if (charset is null) { error = "Native charset unavailable."; return null; }
             foreach (var instruction in script.Instructions)
             {
                 if (instruction.Operation == "verbOps" && note < 8)
@@ -80,7 +100,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                 scoreMessages.Add(message);
                 if (musical)
                 {
-                    var layer = LoomMessageRenderer.Render([message], charset);
+                    var layer = render([message]);
                     for (int y = 0; y < 32; y++) for (int x = 0; x < 224; x++)
                     {
                         byte p = layer.Pixels[(168 + y) * 320 + 16 + x];
@@ -88,9 +108,10 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                     }
                 }
             }
-            var scoreLayer = LoomMessageRenderer.Render(scoreMessages, charset);
+            var scoreLayer = scoreMessages.Count == 0 ? null : render(scoreMessages);
             for (int y = 0; y < 32; y++) for (int x = 0; x < 224; x++)
             {
+                if (scoreLayer is null) break;
                 byte p = scoreLayer.Pixels[(168 + y) * 320 + 16 + x];
                 if (p != LoomMessageRenderer.Transparent) scorePixels[y * 224 + x] = p;
             }

@@ -6,7 +6,10 @@ internal static class LoomDraftNames
 {
     // Shared display associations already used by Game Status. They do not supply spell prerequisites or change the
     // source verb selected by a replay. The slot order is the game's draft table; the names were checked on 3 October
-    // against what each verb does to the objects that answer it (docs/loom/LOOM_SCRIPT_MAP.md, "Draft verb names"). Evidence per entry:
+    // against what each verb does to the objects that answer it (docs/loom/LOOM_SCRIPT_MAP.md, "Draft verb names"). The CD game
+    // (5 October) uses the same verb numbers in the same slot pairs, and its object verb tables put each verb on the objects of the same
+    // rooms (0x3A/0x3B on rooms 2, 4, 6, 13; 0x3C/0x3D on 25, 28, 38; 0x43/0x44 on 28 and 34; 0x4A/0x4B on 41; 0x52 on 9; 0x54 on 66, ...),
+    // so the names serve it too. Evidence per entry:
     private static readonly (int Forward, int Reverse, string Title)[] Names =
     [
         // Room 02 "cielo" 0x3A starts script 049, 0x3B answers "Parece que se ha cerrado."; "agujero", "puerta", "jaula" open and close.
