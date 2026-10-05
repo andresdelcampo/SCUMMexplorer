@@ -74,6 +74,9 @@ public sealed class SceneSoundPlayer
     /// </summary>
     public bool IsPreparing => _voices.Any(voice => voice.Preparing && !voice.Stopped);
 
+    /// <summary>Raised on the UI thread when <see cref="IsPreparing"/> may have changed, so the window can show that it is working.</summary>
+    public event Action? PreparingChanged;
+
     /// <summary>Raised when a reached <c>startSound</c> is about to play, so the app's other player can stop.</summary>
     public event Action? Starting;
 
@@ -157,10 +160,13 @@ public sealed class SceneSoundPlayer
 
     private void End(Voice voice)
     {
+        var wasPreparing = voice.Preparing;
+        voice.Preparing = false;
         voice.Stopped = true;
         voice.Player?.Stop();
         voice.Player?.Close();
         _voices.Remove(voice);
+        if (wasPreparing) PreparingChanged?.Invoke();
     }
 
     private async void Start(int id, string source, bool estimated)
@@ -177,9 +183,15 @@ public sealed class SceneSoundPlayer
         var render = Render(id, mode);
         // A track that is not rendered yet holds the game (IsPreparing); its clock starts when the sound is ready.
         voice.Preparing = !render.IsCompleted;
+        if (voice.Preparing) PreparingChanged?.Invoke();
         (string? Path, bool Music) rendered;
         try { rendered = render.IsCompleted ? render.Result : await render; }
-        finally { voice.Preparing = false; }
+        finally
+        {
+            var wasPreparing = voice.Preparing;
+            voice.Preparing = false;
+            if (wasPreparing) PreparingChanged?.Invoke();
+        }
         var (path, music) = rendered;
         voice.StartedAt = _clock.ElapsedMilliseconds;
         var device = DeviceName(mode);

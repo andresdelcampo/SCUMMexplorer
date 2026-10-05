@@ -4,6 +4,23 @@ using SCUMMexplorer.Core.Domain;
 
 // Mt32Probe <gamefolder>: the Roland ("RO") streams of sounds 33..64: events, channels, programs, length in ticks.
 var game = new GameFolderScanner().Scan(args[0]);
+if (args.Length > 1 && args[1] == "timing")
+{
+    // Mt32Probe <game> timing: how long a fresh session and the first visit of Room 1 take.
+    var snap = new SCUMMexplorer.Core.Formats.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var sw = System.Diagnostics.Stopwatch.StartNew();
+    var card = args.Length > 2 ? int.Parse(args[2]) : 0;
+    var session = new SCUMMexplorer.Core.Formats.LoomExplorationSession(game, snap, soundCard: card);
+    Console.WriteLine($"new session (boot completed): {sw.ElapsedMilliseconds} ms, room {session.Snapshot.RoomId}");
+    sw.Restart();
+    var room = game.Rooms.First(r => r.ResourceId == 1);
+    session.VisitRoom(room);
+    Console.WriteLine($"VisitRoom(1): {sw.ElapsedMilliseconds} ms");
+    sw.Restart();
+    var s2 = new SCUMMexplorer.Core.Formats.LoomExplorationSession(game, snap, stopAtOpening: true);
+    Console.WriteLine($"new session stopAtOpening: {sw.ElapsedMilliseconds} ms");
+    return;
+}
 if (args.Length > 2 && args[1] == "opening")
 {
     // Mt32Probe <game> opening <card> [frames]: the opening under a sound card, state every 100 frames, until it has run its course.

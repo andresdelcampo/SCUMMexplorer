@@ -52,13 +52,15 @@ internal static class Program
                 await Panel("Roland, its AdLib twin", 21);
                 await Panel("Roland, slot 24 (its twin 56 is the overture, which no other edition has)", 24);
 
+                // Opening a scene shows the wait cursor and a text at once, and takes them away when the room is there.
+                string Busy() => $"cursor {System.Windows.Input.Mouse.OverrideCursor?.ToString() ?? "normal"}, badge {Find<Border>("BusyBadge").Visibility} \"{Find<TextBlock>("BusyBadgeText").Text}\"";
                 // The opening under the Roland card: fresh session, the game's own sound commands.
                 typeof(MainWindow).GetMethod("PlayOpening", Private)!.Invoke(window, null);
                 // The overture is still being rendered (about 9 s): the scene must hold, then run with the music from its start.
                 for (var second = 1; second <= 14; second++)
                 {
                     await Task.Delay(1000);
-                    report.Add($"  t={second,2}s: preparing {sceneSound.IsPreparing}, room {session().Snapshot.RoomId}, cutscene frames run {session().CutscenesBegun}, log {string.Join("/", sceneSound.Log.Where(e => e.Action != "mode").Select(e => e.Action))}");
+                    report.Add($"  t={second,2}s: preparing {sceneSound.IsPreparing}, playback {(Field("_playback") is null ? "none" : "yes")}, running {typeof(MainWindow).GetProperty("PlaybackRunning", Private)!.GetValue(window)}, boot frames {session().BootFrames}, room {session().Snapshot.RoomId}, cutscene frames run {session().CutscenesBegun}, log {string.Join("/", sceneSound.Log.Where(e => e.Action != "mode").Select(e => e.Action))}; {Busy()}");
                 }
                 var log = sceneSound.Log.Where(e => e.Action != "mode").Take(12).Select(e => $"frame {e.Frame} {e.Action} sound {e.SoundId} {e.Kind}").ToList();
                 report.Add($"opening: session sound card {session().SoundCard}; sound log: {(log.Count == 0 ? "(empty)" : string.Join(" | ", log))}");
@@ -76,6 +78,12 @@ internal static class Program
                 await Task.Delay(300);
                 report.Add($"back on AdLib: mode {sceneSound.Mode}, session sound card {session().SoundCard}");
                 await Panel("AdLib, Roland-only", 53);
+                var room1 = game.Resources.First(r => r.Kind == ResourceKind.Room && r.ResourceId == 1);
+                typeof(MainWindow).GetMethod("SelectResourceInTree", Private)!.Invoke(window, [room1]);
+                report.Add($"just after choosing Room 01: {Busy()}");
+                await Task.Delay(8000);
+                report.Add($"8 s later: {Busy()}; room shown {Find<Grid>("RoomDisplayLayout").Visibility}");
+
             }
             catch (Exception ex) { report.Add("FAILED: " + ex); }
             File.WriteAllLines(Path.Combine(args[1], "roland-check.txt"), report);

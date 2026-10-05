@@ -113,6 +113,7 @@ public partial class MainWindow : Window
         _roomPanTimer.Tick += RoomPanTimer_Tick;
         _audioTimer.Tick += (_, _) => UpdateAudioTime();
         _idleFrameTimer.Tick += IdleFrameTimer_Tick;
+        _sceneSound.PreparingChanged += SceneSound_PreparingChanged;
         _idleFrameTimer.Start();
         _adlibGainDebounceTimer.Tick += async (_, _) =>
         {
@@ -644,6 +645,68 @@ public partial class MainWindow : Window
     }
 
     private async void ResourceTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+        // Opening a scene can take seconds (a new game session runs the boot scripts, the first visit runs the room's): show it.
+        if (e.NewValue is not TreeViewItem { Tag: GameResource { Kind: ResourceKind.Room } })
+        {
+            await ResourceTree_SelectedItemChangedCore(sender, e);
+            return;
+        }
+        using var busy = BeginBusy("Loading the scene…");
+        // Paint the wait text now, before the blocking work below. A synchronous render pass keeps the body running as one call:
+        // playback enters rooms through this handler and relies on that (it sets _playbackEnteringRoom around the call).
+        Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
+        await ResourceTree_SelectedItemChangedCore(sender, e);
+    }
+
+    private int _busyCount;
+    private IDisposable? _musicBusy;
+
+    /// <summary>The wait cursor and a short text over the room until the returned scope is disposed.</summary>
+    private IDisposable BeginBusy(string text)
+    {
+        _busyCount++;
+        Mouse.OverrideCursor = Cursors.Wait;
+        BusyBadgeText.Text = text;
+        BusyBadge.Visibility = Visibility.Visible;
+        return new BusyScope(this);
+    }
+
+    private void EndBusy()
+    {
+        if (--_busyCount > 0) return;
+        _busyCount = 0;
+        Mouse.OverrideCursor = null;
+        BusyBadge.Visibility = Visibility.Collapsed;
+    }
+
+    private sealed class BusyScope(MainWindow window) : IDisposable
+    {
+        private bool _done;
+        public void Dispose()
+        {
+            if (_done) return;
+            _done = true;
+            window.EndBusy();
+        }
+    }
+
+    /// <summary>A track the game started is still being rendered and the game waits for it (see <see cref="SceneSoundPlayer.IsPreparing"/>).</summary>
+    private void SceneSound_PreparingChanged()
+    {
+        if (_sceneSound.IsPreparing)
+        {
+            _musicBusy ??= BeginBusy(_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland
+                ? "Initialising the Roland MT-32 and preparing its music…" : "Preparing the music…");
+        }
+        else
+        {
+            _musicBusy?.Dispose();
+            _musicBusy = null;
+        }
+    }
+
+    private async Task ResourceTree_SelectedItemChangedCore(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         // Opening another view stops the playback clock, unless the playback itself entered the room.
         if (!_playbackEnteringRoom)
@@ -4040,11 +4103,7 @@ public partial class MainWindow : Window
         }
         playback.WaitTicks = 0;
         // The music the last frame started is still being prepared: the scene waits so the music starts with it.
-        if (_sceneSound.IsPreparing)
-        {
-            StatusText.Text = "Preparing the music…";
-            return;
-        }
+        if (_sceneSound.IsPreparing) return;
         if (!PlaybackStep())
         {
             FinishPlayback();

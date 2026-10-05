@@ -462,6 +462,11 @@
                             <TextBlock x:Name="PreviewTitle" Text="Your game will appear here" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,10,0,6"/>
                             <TextBlock x:Name="PreviewDescription" Text="Walk through rooms, trigger cutscenes, change objects and discover the game's secrets." TextWrapping="Wrap" TextAlignment="Center" Foreground="#AAB4BA"/>
                         </StackPanel>
+                        <!-- Shown with the wait cursor while the app works and nothing else on screen moves (opening a scene, preparing music). -->
+                        <Border x:Name="BusyBadge" Visibility="Collapsed" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
+                                Padding="18,9" Background="#E60B1117" BorderBrush="#B78442" BorderThickness="1" CornerRadius="4">
+                            <TextBlock x:Name="BusyBadgeText" Foreground="#E7E0D2" FontSize="15"/>
+                        </Border>
                     </Grid>
                 </Border>
                 <TextBlock Grid.Row="2" x:Name="StatusText" Text="Ready" Foreground="#9B927F" Margin="0,6,0,0"/>
