@@ -97,8 +97,11 @@ public sealed partial class LoomCdSceneSetupPlanner
     /// <summary>Applies the steps that run once the scene's room is entered (the ego into a walk box), after a few frames so the room's monitors have started.</summary>
     public static void ApplyAfter(LoomExplorationSession session, IEnumerable<LoomCdSetupStep> steps)
     {
-        foreach (var step in steps)
+        var all = steps.ToList();
+        foreach (var step in all)
         {
+            // What the previous box set going (a monitor's scene) finishes before the next box.
+            if (step != all[0]) Settle(session);
             for (var i = 0; i < 20; i++) session.AdvanceFrame();
             if (session.CurrentWalkBoxes?.Coordinates(step.Box) is not { } box) continue;
             var x = box.Corners.Sum(c => c.X) / 4;
@@ -129,6 +132,7 @@ public sealed partial class LoomCdSceneSetupPlanner
                 break;
             }
         }
+        if (all.Count > 1) Settle(session);
     }
 
     /// <summary>
@@ -144,7 +148,11 @@ public sealed partial class LoomCdSceneSetupPlanner
             var earlier = session.CutscenesBegun; // the setup's own scenes do not count
             session.VisitRoom(RoomOf(_game, t.Room));
             ApplyAfter(session, after);
-            if (!t.IsRoomEntry) session.ActivateObjectVerb(t.ObjectId, t.VerbId);
+            if (!t.IsRoomEntry)
+            {
+                earlier = session.CutscenesBegun; // scenes the setup's own walk set going (a box monitor's) are not this scene
+                session.ActivateObjectVerb(t.ObjectId, t.VerbId);
+            }
             var begun = false;
             for (var i = 0; i < (mustEnd ? EndFrames : TrialFrames); i++)
             {
@@ -286,6 +294,33 @@ public sealed partial class LoomCdSceneSetupPlanner
         return null;
     }
 
+    /// <summary>The room's local scripts that read the ego's walk box (<c>getActorWalkBox v, 1</c>) and compare it with constants: the script and those boxes, in code order.</summary>
+    private IEnumerable<(int Script, List<int> Boxes)> MonitorBoxes(int room)
+    {
+        foreach (var id in _data.RoomLocalScriptIds(room))
+        {
+            if (LoadLabel(room, $"Room {room} local script {id}") is not { } script) continue;
+            var readInto = new HashSet<string>();
+            var boxes = new List<int>();
+            foreach (var i in script.Instructions)
+            {
+                if (i.Operation == "getActorWalkBox" && i.Operands.Split(", ") is [var dst, "0x01"]) readInto.Add(dst);
+                else if (i.Operation == "isEqual" && i.Operands.Split(", ") is [var left, var right, ..] && readInto.Contains(left)
+                    && right.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(right.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var box) && !boxes.Contains(box))
+                    boxes.Add(box);
+            }
+            if (boxes.Count is >= 2 and <= 4) yield return (id, boxes);
+        }
+    }
+
+    private static IEnumerable<List<int>> Permutations(List<int> items)
+    {
+        if (items.Count <= 1) { yield return [.. items]; yield break; }
+        for (var i = 0; i < items.Count; i++)
+            foreach (var rest in Permutations([.. items.Where((_, j) => j != i)]))
+                yield return [items[i], .. rest];
+    }
+
     private readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int, int), HashSet<string>> _started = [];
 
     /// <summary>The scripts a scene's cutscene scripts run (one step: what they start or chain to), with the cutscene scripts themselves.</summary>
@@ -373,6 +408,19 @@ public sealed partial class LoomCdSceneSetupPlanner
                 return new(before, after, notes, true);
             }
         }
+
+        // The room's own walk-box monitor (a local script that reads the ego's box and starts other scripts per box) sets the story bits the code tests when
+        // the ego has been through its boxes in an order; the order is tried, each box settled before the next (the monitor's scenes run unseen).
+        if (unmet.Any(x => x.v == LoomCdGuardVerdict.Unsatisfied && (x.g.Subject.StartsWith("bit[", StringComparison.Ordinal) || x.g.Subject.StartsWith("var[", StringComparison.Ordinal))))
+            foreach (var (script, monitored) in MonitorBoxes(t.Room))
+                foreach (var order in Permutations(monitored))
+                {
+                    var steps = order.Select(b => new LoomCdSetupStep("box", t.Room, 0, 0, b, $"Room {t.Room} local script {script}",
+                        $"Room {t.Room}'s local script {script} watches the ego's walk box and starts other scripts as he enters boxes {string.Join(", ", monitored.Order())}; the code tested here needs what they set, so the ego is placed in boxes {string.Join(", ", order)} in turn, each scene it starts left to finish (in the game Bobbin walks there; the order and the point in each box are estimates).")).ToList();
+                    if (trials++ >= MaxTrials + 30) break;
+                    if (Trial(t, [], steps))
+                        return new([], steps, [steps[0].Reason], true);
+                }
 
         // Who else assigns what the code tests, for the note: the scene's own code, or code no scene or verb starts.
         var writerNotes = new List<string>();

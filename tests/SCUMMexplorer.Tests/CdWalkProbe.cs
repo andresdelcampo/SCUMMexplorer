@@ -34,3 +34,36 @@ public sealed class CdWalkProbe
         File.WriteAllLines(outPath, lines);
     }
 }
+
+/// <summary>Discovery only (env CD_BOXSEQ_OUT, CD_BOXSEQ=room,box,box,...,object,verb): enters the room, puts the ego into each box in turn (settling in between) and runs the object verb; logs whether a cutscene began.</summary>
+public sealed class CdBoxSequenceProbe
+{
+    [Fact]
+    public void Sequence()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var outPath = Environment.GetEnvironmentVariable("CD_BOXSEQ_OUT");
+        var spec = Environment.GetEnvironmentVariable("CD_BOXSEQ");
+        if (outPath is null || spec is null || !Directory.Exists(folder)) return;
+        var p = spec.Split(',').Select(int.Parse).ToArray();
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        session.VisitRoom(game.Rooms.First(r => r.ResourceId == p[0]));
+        LoomCdSceneSetupPlanner.Settle(session);
+        var lines = new List<string>();
+        string Bits() => string.Join(" ", new[] { "bit[0x032]", "bit[0x033]", "bit[0x046]", "bit[0x05B]" }.Select(k => k + "=" + (session.Snapshot.KnownGlobalVariables.TryGetValue(k, out var v) ? v : 0)));
+        lines.Add("start " + Bits());
+        foreach (var box in p.Skip(1).Take(p.Length - 3))
+        {
+            LoomCdSceneSetupPlanner.ApplyAfter(session, [new LoomCdSetupStep("box", p[0], 0, 0, box, "probe")]);
+            LoomCdSceneSetupPlanner.Settle(session);
+            lines.Add($"box {box}: ego box {session.Actors.First(a => a.Number == 1).WalkBox}, begun {session.CutscenesBegun}, {Bits()}");
+        }
+        var before = session.CutscenesBegun;
+        session.ActivateObjectVerb(p[^2], p[^1]);
+        for (var i = 0; i < 600; i++) session.AdvanceFrame();
+        var ego = session.Actors.First(a => a.Number == 1);
+        lines.Add($"verb: begun {session.CutscenesBegun - before}, {Bits()}, room {session.Snapshot.RoomId}, ego box {ego.WalkBox} at {ego.X},{ego.Y}, camera {session.CameraX}");
+        File.WriteAllLines(outPath, lines);
+    }
+}

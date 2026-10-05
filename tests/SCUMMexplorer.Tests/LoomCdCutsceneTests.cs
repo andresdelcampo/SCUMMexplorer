@@ -175,6 +175,31 @@ public sealed class LoomCdCutsceneTests
         Assert.True(Frames(started) > 0);
     }
 
+    /// <summary>Room 25 object 372 verb 0x37 starts script 208 only when bits 032, 033 and 046 are set and bit 05B is clear; local script 200 sets them as the ego enters boxes 4, 3 and 2 in that order.</summary>
+    [Fact]
+    public void TheShepherdSceneNeedsTheEgoThroughBoxesFourThreeAndTwoInOrder()
+    {
+        if (Game() is not { } game) return;
+        var data = ScummDataSources.For(game);
+        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var scene = triggers.First(t => t is { Room: 25, ObjectId: 372, VerbId: 0x37 });
+        var setup = new LoomCdSceneSetupPlanner(game, triggers, data).Derive(scene);
+        Assert.True(setup.Plays, string.Join(" ", setup.Notes));
+        Assert.Equal([4, 3, 2], setup.After.Select(s => s.Box));
+
+        var session = Fresh(game);
+        session.VisitRoom(game.Rooms.First(r => r.ResourceId == 25));
+        LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
+        var known = session.Snapshot.KnownGlobalVariables;
+        Assert.Equal(1, known["bit[0x032]"]);
+        Assert.Equal(1, known["bit[0x033]"]);
+        Assert.Equal(1, known["bit[0x046]"]);
+        var before = session.CutscenesBegun;
+        session.ActivateObjectVerb(372, 0x37);
+        for (var i = 0; i < 60; i++) session.AdvanceFrame();
+        Assert.True(session.CutscenesBegun > before); // script 208
+    }
+
     [Fact]
     public void EveryCdSceneEitherPlaysFromADerivedSetupOrSaysWhyNot()
     {
@@ -201,5 +226,6 @@ public sealed class LoomCdCutsceneTests
         var crossing = planner.Derive(groups.First(g => g.First.Room == 34 && g.First.IsRoomEntry).First);
         Assert.False(crossing.Plays);
         Assert.Contains("not neighbours", crossing.Notes[0]);
+        Assert.Equal(1, setups.Count(x => !x.s.Plays));
     }
 }

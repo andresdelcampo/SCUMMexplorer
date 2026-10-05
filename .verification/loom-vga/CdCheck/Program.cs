@@ -39,6 +39,26 @@ internal static class Program
                 var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} ({string.Join(",", game.Rooms.Select(r => r.ResourceId))}) | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
                 // CD_INTRO=1 plays "The intro" from the Play a cutscene list on the playback clock and shoots it every CD_INTRO_STEP ms (default 4000) for CD_INTRO_MS (default 105000).
                 // CD_CUT=room,object,verb (verb 0 = the room's entry) plays that derived cutscene instead; CD_ESCAPE_MS presses Escape (the window's own key handler) that many ms after the start.
+                // CD_ROOMBTN=1,4,35 reports the per-room "Play Cutscene" button (visibility, enabled, content) in a live session after selecting each room; shoots room-btn-<n>.png.
+                if (Environment.GetEnvironmentVariable("CD_ROOMBTN") is { } roomList)
+                {
+                    ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle")).IsChecked = true;
+                    await Task.Delay(1500);
+                    var button = (Button)window.FindName("RoomCutsceneButton");
+                    foreach (var number in roomList.Split(',').Select(int.Parse))
+                    {
+                        var room = game.Rooms.First(r => r.ResourceId == number);
+                        Call("SelectResourceInTree", room);
+                        for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
+                        await Task.Delay(1500);
+                        var items = (System.Collections.ICollection)Call("RoomCutsceneItems", number)!;
+                        report.Add($"room {number}: items {items.Count}, button {button.Visibility} enabled {button.IsEnabled} '{button.Content}' | bar {((UIElement)window.FindName("PlaybackBar")).Visibility} | session {(Field("_session") is null ? "none" : "live")}");
+                        Shot($"room-btn-{number:00}.png");
+                    }
+                    File.WriteAllLines(Path.Combine(output, "report.txt"), report);
+                    window.Close();
+                    return;
+                }
                 var cut = Environment.GetEnvironmentVariable("CD_CUT");
                 if (Environment.GetEnvironmentVariable("CD_INTRO") == "1" || cut is not null)
                 {
@@ -54,6 +74,8 @@ internal static class Program
                         var group = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>()
                             .First(g => g.First.Room == want[0] && g.First.ObjectId == want[1] && (g.First.VerbId == want[2] || g.First.IsRoomEntry && want[2] == 0));
                         report.Add($"cutscene room {group.First.Room} object {group.First.ObjectId} {group.First.ObjectName} {group.First.VerbLabel}, scene {group.IsScene}");
+                        { var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Formats.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!; var setup = planner.Derive(group.First);
+                          report.Add($"setup: plays {setup.Plays}, before {setup.Before.Count}, after [{string.Join(",", setup.After.Select(s => s.Kind + s.Box))}]"); }
                         Call("PlayCdCutscene", group);
                     }
                     var escapeMs = int.Parse(Environment.GetEnvironmentVariable("CD_ESCAPE_MS") ?? "-1");

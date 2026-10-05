@@ -118,6 +118,7 @@ public sealed class CdLocalDisasm
                 var room = int.Parse(parts[0]); var id = int.Parse(parts[1]);
                 script = id == 0 ? data.RoomEntryScript(room) : id == -1 ? data.RoomExitScript(room) : data.RoomLocalScript(room, id);
             }
+            if (script is null) { lines.Add("=== " + one + " (none)"); continue; }
             lines.Add("=== " + one);
             var opc = Environment.GetEnvironmentVariable("CD_LDIS_OPC") == "1"; // also print each opcode byte
             lines.AddRange(script!.Instructions.Select(i => $"{i.Offset:X4} {(opc ? i.Opcode.ToString("X2") + " " : "")}{i.Operation} {i.Operands}"));
