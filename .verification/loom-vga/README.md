@@ -93,3 +93,10 @@ In the app: the **Costumes** tab and the pose gallery work for the CD game (`.ve
 - Seen, not fixed: a small purple artifact at the top left of room 4 during the cutscene; text uses the fallback UI font (charsets 901-904 later).
 - Not done: `matrixOps`, charsets, CD audio, a verb strip for the CD game.
 
+
+## Step 10: the CD click in several rooms (5 October, night)
+
+`CdCheck <disc> <out> [rooms]` now clicks (or double-clicks, `CD_DOUBLE=1`) the first object with verb 0x38 (0x36 for a double click) in each room and shoots at 0.8, 2.5 and 5 s; it prints the room's actors, the session's on-screen messages and the last action's uncertainties (`CD_DUMP=1` lists the room's `drawObject` calls, `CD_DUMP2=1` the global ones). Screenshots stay local (`window-check-step10*`).
+- **Room 4's top-left artifact is explained and fixed.** It was not an actor or a game draw: after the click the session is not "faithful" (its seeded picks are uncertainties), and the app then ran the EGA artwork estimate (`FillGaps`) over the CD room, which painted the first stored image of the nine 48 x 40 images at (0, 0) (objects 115 to 123, colour-0 black around a crescent). The CD game has no cut-out gaps (its backgrounds carry the scenery), so `CreateSessionRoomSelection` takes `estimateArtwork: false` for the CD game. Checked in the real window: room 4 after the cutscene is clean.
+- **Bobbin walks:** room 4's click starts the cutscene and Bobbin goes from x 186 to 288 over five seconds; room 16 walks from 494 to 420 on a double click. Rooms 5, 6, 7 and 8 clicks reach room loads ("entered Room 05").
+- **Texts:** the session produces them (room 35, double click on object 522: a Talk message by actor 1 and a Drawn one by actor 254) but nothing is drawn: the message layer needs the EGA charset 0. That is step (3), the charsets 901 to 904.

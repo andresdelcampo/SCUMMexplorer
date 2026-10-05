@@ -1046,7 +1046,7 @@ public partial class MainWindow : Window
             var snapshot = visit ? _session.VisitRoom(resource, preserveStaffLevel: !_playbackEnteringRoom && _replaySequence is null) : _session.Snapshot;
             var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
-                _indexedStates, sceneBatches);
+                _indexedStates, sceneBatches, estimateArtwork: _game?.Id != GameId.LoomVga);
             _objectSelection = initialized.Selection;
             _artworkEstimates = initialized.Estimates;
             _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
@@ -1161,11 +1161,13 @@ public partial class MainWindow : Window
     private static (RoomObjectSelection Selection, IReadOnlyList<RoomArtworkEstimate> Estimates) CreateSessionRoomSelection(
         GameResource resource, RoomImage room, IReadOnlyList<LoomRoomObjectRecord> records,
         IReadOnlyList<RoomObjectImage> images, LoomSessionSnapshot snapshot,
-        IReadOnlyDictionary<int, byte> indexedStates, LoomSceneDrawBatches sceneBatches)
+        IReadOnlyDictionary<int, byte> indexedStates, LoomSceneDrawBatches sceneBatches, bool estimateArtwork = true)
     {
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates,
             snapshot.ObjectPositions, records, room, indexedStates, snapshot.DrawOrder);
-        IReadOnlyList<RoomArtworkEstimate> estimates = snapshot.IsFaithful
+        // The CD game's backgrounds carry their scenery and have no cut-out gaps; an estimate would only paint a
+        // stored image the game did not draw (the 48 x 40 frames at the top left of room 4 after its cutscene).
+        IReadOnlyList<RoomArtworkEstimate> estimates = snapshot.IsFaithful || !estimateArtwork
             ? Array.Empty<RoomArtworkEstimate>()
             : FillArtworkGaps(selection, resource, images, snapshot.ArtworkStateIds(), sceneBatches);
         return (selection, estimates);
