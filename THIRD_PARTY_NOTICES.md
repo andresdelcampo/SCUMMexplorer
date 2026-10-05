@@ -20,14 +20,15 @@ The AdLib event decoder is also based on the behavior documented by ScummVM's
 
 The GNU GPL version 3 is included in [licenses/GPL-3.0.txt](licenses/GPL-3.0.txt).
 
-## NukedOPL3Sharp 1.3.1
+## ScummVM's MAME OPL core (AdLib)
 
-The AdLib synthesizer uses NukedOPL3Sharp, copyright 2025-2026 Stefan Hueg and
-nukeykt, licensed under LGPL-2.1-only.
+The AdLib synthesizer in `src/SCUMMexplorer.Core/Formats/MameOpl2.cs` is a C# port of ScummVM's
+`audio/softsynth/opl/mame.cpp`, its default OPL2 emulation, which is itself a modified
+version of MAME's `fmopl` by Tatsuyuki Satoh and others. Copyright the ScummVM contributors;
+licensed under GPL-3.0-or-later (see above). ScummVM plays LOOM's AdLib music through it, and
+the port is verified sample for sample against the C++ code.
 
-- [Source](https://github.com/codengine/NukedOPL3Sharp/tree/c6171530c68403fa05ec659e155b8f382bb979d0)
-- [License](licenses/NukedOPL3Sharp-LGPL-2.1.txt)
-- [Upstream notices](licenses/NukedOPL3Sharp-NOTICES.md)
+- [mame.cpp](https://github.com/scummvm/scummvm/blob/master/audio/softsynth/opl/mame.cpp)
 
 ## Munt mt32emu and Mt32emu.net 1.0.0
 

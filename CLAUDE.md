@@ -4,7 +4,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 
 ## Layout
 
-- `src/SCUMMexplorer.Core`: parsing, rendering and bounded script execution (net10.0). It covers LFL/index readers, the old-v3 disassembler (`Formats/LoomScriptReader.cs`), the bounded executor and session, object selection and painting (`Rendering/RoomObjectSelection.cs`), the text extractor, and audio (PC speaker, AdLib via NukedOPL3Sharp).
+- `src/SCUMMexplorer.Core`: parsing, rendering and bounded script execution (net10.0). It covers LFL/index readers, the old-v3 disassembler (`Formats/LoomScriptReader.cs`), the bounded executor and session, object selection and painting (`Rendering/RoomObjectSelection.cs`), the text extractor, and audio (PC speaker, AdLib through a port of ScummVM's MAME OPL core).
 - `src/SCUMMexplorer.App`: the WPF desktop UI (net10.0-windows). `MainWindow.xaml.cs` holds most of the UI logic; `TextGalleryWindow` is the Game Texts browser.
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
 - `docs/`: `docs/README.md` is the index. Top level holds the live files: `docs/LOOM_EGA_PLAN.md` (what is left, M5, next games), `docs/CURRENT_WORK.md` (rules), `docs/NEXT_SESSION_PROMPT.md` (hand-off for the next session) and `docs/CHANGELOG.md` (finished work with links to its validation). `docs/loom/` and `docs/indy3/` hold per-game reference and plans (`docs/loom/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do), `docs/engine/` holds generic SCUMM notes, and `docs/archive/` holds finished plans, audits and history.

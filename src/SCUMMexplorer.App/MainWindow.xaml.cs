@@ -2507,7 +2507,7 @@ public partial class MainWindow : Window
             var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
             var wave = await RenderAudioWaveAsync(sound, adlib, token);
             if (token.IsCancellationRequested) return;
-            if (adlib) wave = LoomAdlibAudio.ApplyOutputGain(wave, 6);
+            // The AdLib rendition is at ScummVM's own level; the room panel's slider can raise it.
             var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
             await File.WriteAllBytesAsync(path, wave, token);
             if (token.IsCancellationRequested)

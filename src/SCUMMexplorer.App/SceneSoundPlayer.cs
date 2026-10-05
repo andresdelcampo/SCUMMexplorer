@@ -249,7 +249,7 @@ public sealed class SceneSoundPlayer
                     {
                         music = _adlib.HasMusic(resource);
                         wave = mode == SoundMode.Adlib
-                            ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), 6)
+                            ? _adlib.RenderWave(resource)
                             : _speaker.RenderWave(resource);
                     }
                     var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");

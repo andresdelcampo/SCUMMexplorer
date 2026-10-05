@@ -410,9 +410,9 @@
                             <StackPanel x:Name="AdlibGainPanel" Visibility="Collapsed" Margin="12,0,12,12">
                                 <DockPanel LastChildFill="True">
                                     <TextBlock Text="AdLib level" Foreground="#E7E0D2" VerticalAlignment="Center"/>
-                                    <TextBlock x:Name="AdlibGainValue" Text="+6.0 dB" Foreground="#B8AA8C" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                                    <TextBlock x:Name="AdlibGainValue" Text="+0.0 dB" Foreground="#B8AA8C" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
                                 </DockPanel>
-                                <Slider x:Name="AdlibGainSlider" Minimum="0" Maximum="24" Value="6" TickFrequency="3"
+                                <Slider x:Name="AdlibGainSlider" Minimum="0" Maximum="24" Value="0" TickFrequency="3"
                                         IsSnapToTickEnabled="False" ValueChanged="AdlibGainSlider_ValueChanged"
                                         ToolTip="AdLib playback gain. Peaks are kept below clipping; some tracks may reach their safe maximum before 24 dB."/>
                             </StackPanel>

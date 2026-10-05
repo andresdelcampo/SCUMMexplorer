@@ -1,7 +1,6 @@
 // AdLib effect state machine adapted from ScummVM Player_AD (ScummVM developers).
 // https://github.com/scummvm/scummvm/blob/master/engines/scumm/players/player_ad.cpp
-// GPL-3.0-or-later; see licenses/GPL-3.0.txt. OPL synthesis uses NukedOPL3Sharp.
-using NukedOPL3Sharp;
+// GPL-3.0-or-later; see licenses/GPL-3.0.txt. OPL synthesis is the MameOpl2 port of ScummVM's MAME OPL core.
 
 namespace SCUMMexplorer.Core.Formats;
 
@@ -43,13 +42,13 @@ public sealed partial class LoomAdlibAudio
         private readonly byte[] _registers = new byte[256];
         private readonly List<Channel> _channels = [];
         private int _timer = 4, _random = 1;
-        public Opl3Chip Chip { get; } = new();
+        public MameOpl2 Chip { get; } = new(SampleRate);
         public bool Active => _channels.Any(channel => channel.State != 0);
         public bool LoopBoundaryReached { get; private set; }
 
         public EffectPlayer(byte[] data)
         {
-            _data = data; Chip.Reset(SampleRate); Write(1, 0x20); Write(0xBD, 0); Write(8, 0);
+            _data = data; Write(1, 0x20); Write(0xBD, 0); Write(8, 0);
             _channels.Add(new Channel(0, 2));
             int position = 2;
             for (int commands = 0; commands < data.Length; commands++)
@@ -190,7 +189,7 @@ public sealed partial class LoomAdlibAudio
             Write(register, (_registers[register] & ~Masks[parameter]) | (unchecked((byte)value) << (parameter == 1 ? 1 : 0)));
         }
         private void Retrigger(Channel channel) { int r = 0xB0 + channel.Number, v = _registers[r]; Write(r, v & 0xDF); Write(r, v | 32); }
-        private void Write(int register, int value) { _registers[register] = unchecked((byte)value); Chip.WriteRegister((ushort)register, ChipValue(register, unchecked((byte)value))); }
+        private void Write(int register, int value) { _registers[register] = unchecked((byte)value); Chip.WriteRegister((ushort)register, unchecked((byte)value)); }
         private int Read(int position) => position >= 0 && position < _data.Length ? _data[position] : throw new InvalidDataException("AdLib effect extends past its resource.");
         private void Require(int position, int length) { if (position < 0 || position > _data.Length - length) throw new InvalidDataException("Truncated AdLib effect command."); }
         private sealed class Channel(int number, int start)

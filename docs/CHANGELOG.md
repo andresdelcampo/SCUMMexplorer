@@ -1,8 +1,8 @@
 # Changelog
 
-## 5 October: AdLib key scale level as ScummVM plays it
+## 5 October: AdLib through a port of ScummVM's MAME OPL core
 
-Instruments in the title music sounded low or different against ScummVM. The driver and chip were exact; ScummVM's MAME OPL core reads the key scale level values 1 and 2 the other way round from the YM3812 documentation (and from Nuked). The chip now receives them exchanged (`LoomAdlibAudio.ChipValue`), always on, so the music sounds as ScummVM plays it. Not changed: MAME's louder attack and vibrato differences, and the +6 dB level (the app's gain). [validation](../.verification/archive/audio-accuracy-20261003/validation.md)
+Instruments in the title music sounded low or different from ScummVM. The driver already wrote the same registers as ScummVM's `Player_AD`; the difference was the chip: ScummVM plays AdLib through its MAME OPL2 core (a different level, a swapped key scale level 1/2, faster slow attacks, other vibrato). `MameOpl2` is now a C# port of that core and replaces NukedOPL3Sharp for music and effects; it matches the C++ sample for sample. The default AdLib gain is 0 dB (was +6 dB, which the louder core makes up for). [validation](../.verification/archive/audio-accuracy-20261003/validation.md)
 
 ## 5 October: Roland MT-32 device (the LOOM Roland upgrade's music)
 
