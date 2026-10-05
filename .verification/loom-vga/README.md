@@ -6,7 +6,7 @@ Read-only. Scripts: `iso_extract.py <Loom.bin> <outdir>` (ISO 9660 over `MODE1/2
 
 | | `Games/loom vga en` | `Games/loom vga en kixx` |
 |---|---|---|
-| Image | `Loom.bin` + `Loom.cue` | `LOOM.bin` + `LOOM.cue` (the cue names `LOOMCD.BIN`, so it must be fixed or the cue ignored) |
+| Image | `Loom.bin` + `Loom.cue` | `LOOMCD.BIN` + `LOOMCD.CUE` (renamed back, 5 October, so the cue matches its bin) |
 | Volume label | `LOOM` | `LOOMCD` |
 | Track 2 (CD audio) starts | 04:57:60, pregap 2 s | 04:58:00, pregap 2 s |
 | Data files | `000.LFL`, `901`–`904.LFL`, `DISK01.LEC`, `LOOM.EXE` | the same seven |
@@ -27,3 +27,12 @@ Read-only. Scripts: `iso_extract.py <Loom.bin> <outdir>` (ISO 9660 over `MODE1/2
 - Reading the files is straightforward: the `.LEC` XOR and block tree are simple, and the index is small. The **disc image reader** is the easy part (a few dozen lines; the user data of a Mode 1 sector is bytes 16 to 2063).
 - **Not decoded yet** (the next steps of the plan, none of it touched): the `BM` strip codec (v4 VGA bitmap, to take from ScummVM `engines/scumm` `gfx.cpp` `drawStripComplex`/`drawStripBasicV` family and compare with the `scummvm/` build), `OI` object images, the v4 script dialect (the EGA `LoomScriptReader` is v3), costumes and sounds (30 `SO`; the music and speech are CD audio on track 2), `SP` and `CC`.
 - The Game Status, glossary and replay catalog are EGA-derived and are not reused for VGA (the plan says to rederive, never copy); VGA starts with rooms and backgrounds.
+
+## Step 2: the room background decodes (5 October)
+
+`decode_rooms.py` (Python, scratch-only; the Core port comes next) decodes **all 78 room backgrounds** without an error, checked by eye on the contact sheet [all-rooms-contact-sheet.png](all-rooms-contact-sheet.png) and on [room01.png](room01.png) (the LucasArts logo) and [room02.png](room02.png) (960 x 144 scrolling mountain view).
+
+- **Palette:** `PA` body = `u16 768`, then 256 RGB triples (8-bit, used as they stand), then 6 trailing bytes.
+- **`BM`:** the body is `u32` (the data size), then one `u32` offset per 8-pixel-wide strip (width / 8 entries; offsets are from the start of the body), then the strips. A strip begins with a code byte: `0x01` raw (8 columns of height bytes, column by column) or `0x0E`–`0x12` / `0x18`–`0x1C`, the ScummVM "basic" run-less bit codec, vertical (`0x0E`–`0x12`) or horizontal (`0x18`–`0x1C`); the code modulo 10 is the colour bit count (here always 8). Bits: `0` same colour, `10` read a new colour (that many bits), `110` colour += step, `111` reverse the step then colour += step; the step starts at -1. Only codes `0x01`, `0x12` and `0x1C` occur in this game.
+- A few rooms show black on the sheet (the dark rooms and the close-up boards); they may be fully dark or use features not decoded yet (`SP`, transparency or object-only rooms). Not checked.
+- Room sizes: 320 x 200 for the logo, 320 x 144 for scenes, up to 960 x 144 (scrolling).
