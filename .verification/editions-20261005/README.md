@@ -25,3 +25,16 @@ Not yet checked: sounds degrading cleanly without files 82–85 in the real wind
 - **Open defect (Game Texts window only):** `LoomScummTextDecoder` decodes bytes of 0x80 and up as CP437, so Hebrew entries show as Latin accents and box characters. A fix needs (a) detecting a Hebrew edition (a text-run heuristic is possible, the ratio is about 11 to 1, but nothing in the index names the language) and (b) a decision on order: Hebrew builds usually store the text in visual (reversed) order, and WPF's bidi would flip it again. Not changed; waiting for the user's call before touching the shared static decoder.
 
 **Decision (user, 5 October): the Hebrew version is dropped.** The Game Texts decoding defect above stays unfixed on purpose; the folder is left in `Games/`.
+
+## v1.2 against the plain editions (5 October; byte comparison of all files)
+
+- **v1.2 de is byte-identical to plain `loom ega de`** (all 80 files, `LOOM.EXE` included): nothing to compare.
+- **v1.2 es differs from plain `loom ega es` in two files** (same sizes), and adds `INSTALL.BAT`/`INSTALL2.BAT`:
+  - `00.LFL`: 75 bytes in the room-to-disk table (for example disks 2 become 1): the installer's disk layout, no effect on the data the app reads.
+  - `15.LFL`: two bytes, 0x90 to 0x00, inside a repeating `90 ff ff 00 01 00` pattern (room 15 image or similar data); not decoded further, no script or text involved.
+- `LOOM.EXE` is the same file in both. So v1.2 changes nothing the app shows; no per-edition handling needed.
+
+## Correction to the first-pass glossary numbers, and the replay catalog (5 October)
+
+- The first pass compared every edition with `loom ega mt32 en` as the "reference", but `GlossaryCheck` treats the reference as Spanish-numbered and applies the measured bit shift to the other folder. The measured shift is **0 for plain en, es, fr, de, v1.2** (they number story bits like the Spanish release) and **-1 only for the Roland copy** `loom ega mt32 en`. So the Roland upgrade is what moved the bit numbers, not "English". The comparison that means something is against `loom ega es`: `glossary-vs-es-en.md` (107 same, 7 moved: Script 5, the input script, is 212 instructions in plain en against 162, and Script 51 and Script 5 use a few variables more), `glossary-vs-es-fr.md` (115 same, 0 moved) and `glossary-vs-es-de.md` (116 same, 0 moved). The 143 entries not counted are engine-side or not applicable. The `glossary-loom-ega-*.md` files of the first pass are kept but their "moved" counts are an artefact of the wrong reference.
+- **Replay catalog:** `LoomReplayCatalog.Load` fingerprints the files it was generated from (SHA-256), so on every edition other than the reference the catalog is empty with a note and only the four established starts remain. That is graceful, not a failure. The sequence tests in `LoomReplaySequenceTests` pin boundaries by offset (`endCutscene at Script 85 +0x05A8`; plain en has it at `+0x05AB`), so they fail on the plain editions by construction. Making cutscene replay work on a plain edition means rerunning the discovery pipeline on it (`replay-coverage-20261001/`, `english-catalog-20261004/`) and shipping a second catalog: not done.
