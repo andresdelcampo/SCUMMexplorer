@@ -54,7 +54,12 @@ internal static class Program
 
                 // The opening under the Roland card: fresh session, the game's own sound commands.
                 typeof(MainWindow).GetMethod("PlayOpening", Private)!.Invoke(window, null);
-                await Task.Delay(20000);
+                // The overture is still being rendered (about 9 s): the scene must hold, then run with the music from its start.
+                for (var second = 1; second <= 14; second++)
+                {
+                    await Task.Delay(1000);
+                    report.Add($"  t={second,2}s: preparing {sceneSound.IsPreparing}, room {session().Snapshot.RoomId}, cutscene frames run {session().CutscenesBegun}, log {string.Join("/", sceneSound.Log.Where(e => e.Action != "mode").Select(e => e.Action))}");
+                }
                 var log = sceneSound.Log.Where(e => e.Action != "mode").Take(12).Select(e => $"frame {e.Frame} {e.Action} sound {e.SoundId} {e.Kind}").ToList();
                 report.Add($"opening: session sound card {session().SoundCard}; sound log: {(log.Count == 0 ? "(empty)" : string.Join(" | ", log))}");
                 var started = session().SoundEvents.Select(e => e.Event.TargetId).OfType<int>().Distinct().OrderBy(i => i).ToList();

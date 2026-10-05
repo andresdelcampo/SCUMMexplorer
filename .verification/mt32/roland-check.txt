@@ -6,6 +6,20 @@ after choosing Roland: mode Roland, ROMs MT-32, session sound card 4, combo "Rol
 Roland, Roland sound sound 53: time "0:00 / 0:11", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
 Roland, its AdLib twin sound 21: time "0:00 / 0:11", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
 Roland, slot 24 (its twin 56 is the overture, which no other edition has) sound 24: time "0:00 / 2:36", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
+  t= 1s: preparing True, room 69, cutscene frames run 0, log 
+  t= 2s: preparing True, room 69, cutscene frames run 0, log 
+  t= 3s: preparing True, room 69, cutscene frames run 0, log 
+  t= 4s: preparing True, room 69, cutscene frames run 0, log 
+  t= 5s: preparing True, room 69, cutscene frames run 0, log 
+  t= 6s: preparing True, room 69, cutscene frames run 0, log 
+  t= 7s: preparing True, room 69, cutscene frames run 0, log 
+  t= 8s: preparing True, room 69, cutscene frames run 0, log 
+  t= 9s: preparing True, room 69, cutscene frames run 0, log 
+  t=10s: preparing False, room 69, cutscene frames run 0, log start/opened
+  t=11s: preparing False, room 69, cutscene frames run 0, log start/opened
+  t=12s: preparing False, room 69, cutscene frames run 0, log start/opened
+  t=13s: preparing False, room 69, cutscene frames run 0, log start/opened
+  t=14s: preparing False, room 69, cutscene frames run 0, log start/opened
 opening: session sound card 4; sound log: frame 3 start sound 56 music (Roland MT-32) | frame 3 opened sound 56 music (Roland MT-32)
 sound ids the scripts started: 56
 device change while the opening plays: mode Roland (refused until the scene is over)

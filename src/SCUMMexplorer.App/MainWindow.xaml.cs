@@ -227,10 +227,13 @@ public partial class MainWindow : Window
         StopScenePlayback();
         _sceneSound.StopAll("another game was opened");
         // The Roland device needs the upgrade's sounds in this folder; another folder falls back to AdLib.
-        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && !SceneSoundPlayer.HasRolandSounds(game))
+        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && !(SceneSoundPlayer.HasRolandSounds(game) && (_sceneSound.Roms ??= FindMt32Roms(game)) is not null))
         {
+            // Not saved: the choice stays for a folder with the upgrade and the ROMs.
             _sceneSound.SetMode(SceneSoundPlayer.SoundMode.Adlib);
+            _soundModeFallback = true;
             SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.Adlib;
+            _soundModeFallback = false;
         }
         _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
         if (_session is not null) _sceneSound.Attach(game, _session);
@@ -2497,6 +2500,20 @@ public partial class MainWindow : Window
     /// <summary>The sound card number the scripts see for the selected device (see <see cref="SceneSoundPlayer.SoundCardFor"/>).</summary>
     private int SoundCard => SceneSoundPlayer.SoundCardFor(_sceneSound.Mode);
 
+    // True while opening a folder switches the device back to AdLib on its own (the user's choice is not saved then).
+    private bool _soundModeFallback;
+
+    /// <summary>The MT-32 ROM images without asking: an environment override, the saved folder, a <c>mt32</c> folder beside the game folder.</summary>
+    private static Mt32RomSet? FindMt32Roms(GameLibrary game)
+    {
+        string? saved = null;
+        try { if (File.Exists(Mt32FolderFile)) saved = File.ReadAllText(Mt32FolderFile).Trim(); }
+        catch (IOException) { }
+        var beside = Path.GetDirectoryName(game.FolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        return Mt32RomSet.Find(Environment.GetEnvironmentVariable("SCUMM_MT32_ROM_ROOT")) ?? Mt32RomSet.Find(saved) ??
+            (beside is null ? null : Mt32RomSet.Find(Path.Combine(beside, "mt32")));
+    }
+
     private static readonly string Mt32FolderFile = Path.Combine(Path.GetDirectoryName(LastFolderFile)!, "mt32-rom-folder.txt");
 
     /// <summary>
@@ -2512,12 +2529,7 @@ public partial class MainWindow : Window
             return false;
         }
         if (_sceneSound.Roms is not null) return true;
-        string? saved = null;
-        try { if (File.Exists(Mt32FolderFile)) saved = File.ReadAllText(Mt32FolderFile).Trim(); }
-        catch (IOException) { }
-        var beside = Path.GetDirectoryName(_game.FolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-        var roms = Mt32RomSet.Find(Environment.GetEnvironmentVariable("SCUMM_MT32_ROM_ROOT")) ?? Mt32RomSet.Find(saved) ??
-            (beside is null ? null : Mt32RomSet.Find(Path.Combine(beside, "mt32")));
+        var roms = FindMt32Roms(_game);
         if (roms is null)
         {
             var picker = new OpenFolderDialog
@@ -2566,6 +2578,7 @@ public partial class MainWindow : Window
         _sceneSound.SetMode(requested);
         // The game's scripts read the sound card when they choose a sound, so the new device applies from the next one on.
         if (_session is not null) _session.SoundCard = SoundCard;
+        if (!_soundModeFallback) SaveViewOptions();
         if (surface == AudioSurface.Resource && selected is not null)
             await ShowAudio(selected, preserveFormat: true);
         else if (surface == AudioSurface.Room)
@@ -3062,6 +3075,11 @@ public partial class MainWindow : Window
                     {
                         case "doorways": (parts[1] == "Always" ? DoorwaysAlways : parts[1] == "Hover" ? DoorwaysHover : DoorwaysNever).IsChecked = true; break;
                         case "framing": NormalRoomWidthToggle.IsChecked = parts[1] != "0"; break;
+                        case "sound" when Enum.TryParse<SceneSoundPlayer.SoundMode>(parts[1], out var mode):
+                            // Restored as it was left; the ROM images of a Roland choice are looked for when a game opens.
+                            _sceneSound.SetMode(mode);
+                            SoundModeCombo.SelectedIndex = (int)mode;
+                            break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
                         case "readable": _readableScripts = parts[1] != "0"; ScriptReadableToggle.IsChecked = _readableScripts; ScriptBytesToggle.IsEnabled = !_readableScripts; break;
                     }
@@ -3079,7 +3097,7 @@ public partial class MainWindow : Window
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
-            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}"]);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}", $"sound={_sceneSound.Mode}"]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
@@ -3954,7 +3972,7 @@ public partial class MainWindow : Window
             return;
         var now = DateTime.UtcNow;
         if (!ReferenceEquals(_idleSession, session)) { _idleSession = session; _idleSignature = null; _idleNextFrame = now; }
-        if (now < _idleNextFrame) return;
+        if (now < _idleNextFrame || _sceneSound.IsPreparing) return;
         // Count on from the due time, not from now: the timer ticks every 15 ms, so the frames keep the game's rate (a tick
         // arriving just before the due time used to cost a whole extra tick, which made the idle frames about half as fast
         // as the playback clock). After a long stall, start over rather than catching up in a burst.
@@ -4021,6 +4039,12 @@ public partial class MainWindow : Window
             return;
         }
         playback.WaitTicks = 0;
+        // The music the last frame started is still being prepared: the scene waits so the music starts with it.
+        if (_sceneSound.IsPreparing)
+        {
+            StatusText.Text = "Preparing the music…";
+            return;
+        }
         if (!PlaybackStep())
         {
             FinishPlayback();

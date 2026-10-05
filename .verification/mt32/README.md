@@ -32,3 +32,8 @@ Combo lists four devices; Roland sets the card to 4; sound 53 shows 0:11 (twin 2
 - Rooms' static "possible sounds" menu still lists the sound ids the other cards use (rendered through the twin on Roland).
 - ROM versions: `Games/mt32` also has `rev0/` (an older MT-32); only the top-level pair is used. The CM-32L pair is accepted as a fallback.
 - No General MIDI fallback (planned as optional, labelled as a different sound).
+
+## Follow-up, 5 October (user)
+
+- **Hold until rendered.** A track the game starts that is not rendered yet (the overture takes about 9 s the first time) now holds the game's frames (`SceneSoundPlayer.IsPreparing`; the playback and idle loops wait, status "Preparing the music…") and the music starts from its beginning with the scene, instead of being cut by the time the rendering took. Later plays use the cache. `RolandCheck` shows `preparing True` for 9 s, then the log `start/opened`.
+- **The device choice is remembered** in `%LOCALAPPDATA%\SCUMMexploreriew-options.txt` (`sound=`). A saved Roland choice looks for the ROMs when a game opens; a folder without the upgrade, or without ROMs, falls back to AdLib for that session without overwriting the saved choice. Checked: a file with `sound=Roland` starts the app on Roland with card 4.

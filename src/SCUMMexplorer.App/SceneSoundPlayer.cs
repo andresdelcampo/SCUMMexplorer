@@ -48,8 +48,10 @@ public sealed class SceneSoundPlayer
     private sealed class Voice
     {
         public required int SoundId { get; init; }
-        public required long StartedAt { get; init; }
+        public required long StartedAt { get; set; }
         public MediaPlayer? Player { get; set; }
+        /// <summary>True while the track is still being rendered; the game's frames wait for it (see <see cref="IsPreparing"/>).</summary>
+        public bool Preparing { get; set; }
         public bool Stopped { get; set; }
     }
 
@@ -65,6 +67,12 @@ public sealed class SceneSoundPlayer
     private bool _paused;
 
     public List<Entry> Log { get; } = [];
+
+    /// <summary>
+    /// True while a track the game just started is still being rendered. The caller holds the game's frames until it is false, so the
+    /// music starts from its beginning, in step with the scene, instead of being cut by the time the rendering took.
+    /// </summary>
+    public bool IsPreparing => _voices.Any(voice => voice.Preparing && !voice.Stopped);
 
     /// <summary>Raised when a reached <c>startSound</c> is about to play, so the app's other player can stop.</summary>
     public event Action? Starting;
@@ -167,7 +175,13 @@ public sealed class SceneSoundPlayer
         _voices.Add(voice);
         var frame = _frames;
         var render = Render(id, mode);
-        var (path, music) = render.IsCompleted ? render.Result : await render;
+        // A track that is not rendered yet holds the game (IsPreparing); its clock starts when the sound is ready.
+        voice.Preparing = !render.IsCompleted;
+        (string? Path, bool Music) rendered;
+        try { rendered = render.IsCompleted ? render.Result : await render; }
+        finally { voice.Preparing = false; }
+        var (path, music) = rendered;
+        voice.StartedAt = _clock.ElapsedMilliseconds;
         var device = DeviceName(mode);
         var kind = path is null ? $"unavailable ({device})" : $"{(music ? "music" : "effect")} ({device})";
         Log.Add(new(frame, voice.StartedAt, estimated ? "preview start" : "start", id, kind, source));
