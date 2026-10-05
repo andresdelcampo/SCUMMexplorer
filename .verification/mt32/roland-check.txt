@@ -1,30 +1,31 @@
-combo items: No Sound, PC Speaker, AdLib, Roland MT-32; selected Roland MT-32
+at start: message Visible "Choose a room" / "Pick a room to explore the game from there."
+combo items: No Sound, PC Speaker, AdLib (hardware), AdLib (ScummVM), Roland MT-32; selected AdLib (hardware)
 game has Roland sounds: True
-AdLib: session sound card 4
-AdLib, Roland-only sound 53: time "0:00 / 0:11", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
-after choosing Roland: mode Roland, ROMs MT-32, session sound card 4, combo "Roland MT-32"
-Roland, Roland sound sound 53: time "0:00 / 0:11", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
-Roland, its AdLib twin sound 21: time "0:00 / 0:11", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
-Roland, slot 24 (its twin 56 is the overture, which no other edition has) sound 24: time "0:00 / 2:36", Play enabled True; "DOS Roland MT-32 rendition · select Play to listen"
-  t= 1s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 2s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 3s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 4s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 5s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 6s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 7s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 8s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t= 9s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t=10s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t=11s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t=12s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t=13s: preparing True, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log ; cursor Wait, badge Visible "Initialising the Roland MT-32 and preparing its music…"
-  t=14s: preparing False, playback yes, running True, boot frames 0, room 69, cutscene frames run 0, log start; cursor normal, badge Collapsed "Initialising the Roland MT-32 and preparing its music…"
-opening: session sound card 4; sound log: frame 3 start sound 56 music (Roland MT-32)
-sound ids the scripts started: 56
-device change while the opening plays: mode Roland (refused until the scene is over)
-after Restart: session sound card 4
+AdLib: session sound card 0
+AdLib, Roland-only sound 53: time "No playable audio", Play enabled False; "This sound exists only for the Roland MT-32. Choose that device to hear it."
+after choosing Roland: mode Adlib, ROMs , session sound card 0, combo "AdLib (ScummVM)"
+Roland, Roland sound sound 53: time "No playable audio", Play enabled False; "This sound exists only for the Roland MT-32. Choose that device to hear it."
+Roland, its AdLib twin sound 21: time "0:00 / 0:08", Play enabled True; "DOS AdLib FM rendition · select Play to listen"
+Roland, slot 24 (its twin 56 is the overture, which no other edition has) sound 24: time "No playable audio", Play enabled False; "No DOS PC speaker / AdLib bundle at this sound index."
+  t= 1s: preparing True, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log ; cursor Wait, badge Visible "Preparing the music…"
+  t= 2s: preparing True, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log ; cursor Wait, badge Visible "Preparing the music…"
+  t= 3s: preparing True, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log ; cursor Wait, badge Visible "Preparing the music…"
+  t= 4s: preparing True, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log ; cursor Wait, badge Visible "Preparing the music…"
+  t= 5s: preparing True, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log ; cursor Wait, badge Visible "Preparing the music…"
+  t= 6s: preparing True, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log ; cursor Wait, badge Visible "Preparing the music…"
+  t= 7s: preparing False, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+  t= 8s: preparing False, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+  t= 9s: preparing False, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+  t=10s: preparing False, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+  t=11s: preparing False, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+  t=12s: preparing False, playback yes, running True, boot frames 0, room 2, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+  t=13s: preparing False, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+  t=14s: preparing False, playback yes, running True, boot frames 0, room 1, cutscene frames run 0, log start/opened; cursor normal, badge Collapsed "Preparing the music…"
+opening: session sound card 0; sound log: frame 2 start sound 25 music (AdLib) | frame 2 opened sound 25 music (AdLib)
+sound ids the scripts started: 25
+device change while the opening plays: mode Adlib (refused until the scene is over)
+after Restart: session sound card 0
 back on AdLib: mode Adlib, session sound card 0
 AdLib, Roland-only sound 53: time "No playable audio", Play enabled False; "This sound exists only for the Roland MT-32. Choose that device to hear it."
-just after choosing Room 01: cursor Wait, badge Visible "Loading the scene…"
-8 s later: cursor normal, badge Collapsed "Loading the scene…"; room shown Visible
+just after choosing Room 04: cursor Wait, badge Collapsed "Preparing the music…"; message Visible "Scene" / "Loading the scene…"
+8 s later: cursor normal, badge Collapsed "Preparing the music…"; room shown Visible; message Collapsed "Scene" / "Loading the scene…"; status "Scene ready"; current room Room 04; audio panel Collapsed

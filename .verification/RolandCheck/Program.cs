@@ -29,6 +29,7 @@ internal static class Program
                 typeof(MainWindow).GetMethod("OpenGameFolder", Private)!.Invoke(window, [args[0]]);
                 await Task.Delay(1500);
                 var game = (GameLibrary)Field("_game")!;
+                report.Add($"at start: message {Find<StackPanel>("PreviewMessage").Visibility} \"{Find<TextBlock>("PreviewTitle").Text}\" / \"{Find<TextBlock>("PreviewDescription").Text}\"");
                 var sceneSound = (SceneSoundPlayer)Field("_sceneSound")!;
                 var combo = Find<ComboBox>("SoundModeCombo");
                 report.Add($"combo items: {string.Join(", ", combo.Items.Cast<object>())}; selected {combo.SelectedItem}");
@@ -78,11 +79,12 @@ internal static class Program
                 await Task.Delay(300);
                 report.Add($"back on AdLib: mode {sceneSound.Mode}, session sound card {session().SoundCard}");
                 await Panel("AdLib, Roland-only", 53);
-                var room1 = game.Resources.First(r => r.Kind == ResourceKind.Room && r.ResourceId == 1);
+                var room1 = game.Resources.First(r => r.Kind == ResourceKind.Room && r.ResourceId == 4);
                 typeof(MainWindow).GetMethod("SelectResourceInTree", Private)!.Invoke(window, [room1]);
-                report.Add($"just after choosing Room 01: {Busy()}");
+                string Welcome() => $"message {Find<StackPanel>("PreviewMessage").Visibility} \"{Find<TextBlock>("PreviewTitle").Text}\" / \"{Find<TextBlock>("PreviewDescription").Text}\"";
+                report.Add($"just after choosing Room 04: {Busy()}; {Welcome()}");
                 await Task.Delay(8000);
-                report.Add($"8 s later: {Busy()}; room shown {Find<Grid>("RoomDisplayLayout").Visibility}");
+                report.Add($"8 s later: {Busy()}; room shown {Find<Grid>("RoomDisplayLayout").Visibility}; {Welcome()}; status \"{Find<TextBlock>("StatusText").Text}\"; current room {(Field("_currentRoomResource") as GameResource)?.Name ?? "none"}; audio panel {Find<StackPanel>("AudioPanel").Visibility}");
 
             }
             catch (Exception ex) { report.Add("FAILED: " + ex); }

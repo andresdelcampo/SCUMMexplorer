@@ -51,3 +51,7 @@ Heard in the app: the title graphics appear while the overture is still playing,
 ## The title fades out (user, 5 October)
 
 ScummVM shows the overture's title dimming in colour and then going; the explorer made it vanish at once. `roomOps roomPalette a, b` (small-header games) sets `_shadowPalette[b] = a`: colour slot b is shown as colour a. Script 044 steps slot 15 (the title) through 1, 9, 11, 15 on the way in and 11, 9, 1, 0 on the way out, on the music timer. The executor skipped the instruction. Now `LoomScriptRuntimeState.ShadowPalette` (identity at room entry; a speculative route does not touch it), `LoomExplorationSession.ShadowPalette`, and the window draws the room and the actors through it and redraws when it changes (`DisplayPalette`). The test follows slot 15 through the Roland opening. This is general, not Roland-only: every script that fades with `roomPalette` now fades on screen.
+
+## Room loading text (user, 5 October)
+
+The welcome text "Choose a room" stayed on screen while a room loaded, because the "Scene / Reading the room background…" swap came only after the blocking session start. Choosing a room now swaps it at once (title "Scene", text "Loading the scene…", old room hidden, wait cursor) before the blocking work; the badge is kept for music preparation only. `roland-check.txt`: "at start" shows "Choose a room", "just after choosing Room 04" shows the wait cursor and "Scene / Loading the scene…".
