@@ -9,7 +9,7 @@ public sealed class CdCutsceneSweep
 {
     private sealed record Run(int Frames, bool Skippable, int Lines, int Rooms, int Voices, bool Began, string? Error);
 
-    private static Run Play(GameLibrary game, LoomCdCutsceneGroup group, bool escape)
+    private static Run Play(GameLibrary game, LoomCdCutsceneGroup group, bool escape, LoomCdSceneSetupPlanner planner)
     {
         var t = group.First;
         var frames = 0; var skippable = false; var rooms = 0; var began = false;
@@ -17,7 +17,11 @@ public sealed class CdCutsceneSweep
         {
             var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
             var room = game.Rooms.First(r => r.ResourceId == t.Room);
+            var setup = planner.Derive(t);
+            var useSetup = setup is { Plays: true, HasSteps: true };
+            if (useSetup) LoomCdSceneSetupPlanner.ApplyBefore(session, game, setup.Before);
             session.VisitRoom(room);
+            if (useSetup) LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
             if (!t.IsRoomEntry) session.ActivateObjectVerb(t.ObjectId, t.VerbId);
             var last = session.Snapshot.RoomId;
             var quiet = 0;
@@ -44,12 +48,14 @@ public sealed class CdCutsceneSweep
         var outPath = Environment.GetEnvironmentVariable("CD_SWEEP_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
-        var groups = LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value)));
+        var triggers = LoomCdCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var groups = LoomCdCutsceneIndex.Group(triggers);
+        var planner = new LoomCdSceneSetupPlanner(game, triggers);
         var lines = new List<string>();
         foreach (var g in groups)
         {
-            var plain = Play(game, g, false);
-            var esc = plain.Skippable ? Play(game, g, true) : null;
+            var plain = Play(game, g, false, planner);
+            var esc = plain.Skippable ? Play(game, g, true, planner) : null;
             lines.Add($"{(g.IsScene ? "SCENE" : "react")} room {g.First.Room:00} obj {g.First.ObjectId} {g.First.ObjectName} {g.First.VerbLabel}: frames {plain.Frames} cutscene {plain.Began} skippable {plain.Skippable} lines {plain.Lines} roomChanges {plain.Rooms} voices {plain.Voices}"
                       + (esc is null ? "" : $" | escape: frames {esc.Frames} rooms {esc.Rooms} {esc.Error}") + (plain.Error is null ? "" : $" | ERROR {plain.Error}"));
         }

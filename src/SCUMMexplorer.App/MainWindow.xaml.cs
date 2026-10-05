@@ -264,6 +264,7 @@ public partial class MainWindow : Window
         var cdIndexed = game is { Id: GameId.LoomVga, Vga: { } vga } ? vga.ReadIndexedObjects() : null;
         _cdData = cdIndexed is null ? null : ScummDataSources.For(game);
         _cdCutsceneGroups = null;
+        StartCdSetupDerivation(game);
         if (cdIndexed is not null) _indexedStates = cdIndexed.States;
         _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
             : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
@@ -3981,6 +3982,32 @@ public partial class MainWindow : Window
     }
 
     private IReadOnlyList<LoomCdCutsceneGroup>? _cdCutsceneGroups;
+    private Lazy<LoomCdSceneSetupPlanner>? _cdSetupPlanner;
+
+    /// <summary>
+    /// The CD scenes that a fresh start does not begin get a start setup derived from the scripts (<see cref="LoomCdSceneSetupPlanner"/>). It works on its own data
+    /// source and sessions, off the UI thread, from the moment the game opens, so the picker's notes have it by the time the list is opened.
+    /// </summary>
+    private void StartCdSetupDerivation(GameLibrary game)
+    {
+        if (game is not { Id: GameId.LoomVga }) { _cdSetupPlanner = null; return; }
+        var planner = new Lazy<LoomCdSceneSetupPlanner>(() =>
+        {
+            var data = ScummDataSources.For(game);
+            return new LoomCdSceneSetupPlanner(game, LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList()), data);
+        });
+        _cdSetupPlanner = planner;
+        _ = Task.Run(() =>
+        {
+            try { foreach (var group in LoomCdCutsceneIndex.Group(planner.Value.Triggers)) planner.Value.Derive(group.First); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException) { }
+        });
+    }
+
+    private string CdSetupNote(LoomCdCutscene trigger) =>
+        _cdSetupPlanner is not { IsValueCreated: true } lazy || !lazy.Value.TryGet(trigger, out var setup)
+            ? "Whether a fresh start begins it is still being checked (open the list again in a few seconds). "
+            : setup == LoomCdStartSetup.None ? "A fresh start begins its cutscene (checked by a headless run). " : setup.Describe() + " ";
 
     /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="LoomCdCutsceneIndex"/>).</summary>
     private IReadOnlyList<LoomCdCutsceneGroup> CdCutsceneGroups() =>
@@ -3995,7 +4022,7 @@ public partial class MainWindow : Window
         return LoomReplayTitle.Format(trigger.Room, what + (text.Length > 0 ? $": \"{text}\"" : ""));
     }
 
-    private static string CdCutsceneNote(LoomCdCutsceneGroup group)
+    private string CdCutsceneNote(LoomCdCutsceneGroup group)
     {
         var first = group.First;
         var others = group.Others.Count == 0 ? "" : " The same scripts are reached from " + string.Join(", ",
@@ -4003,7 +4030,8 @@ public partial class MainWindow : Window
         return $"Found in the CD scripts: {first.Room.ToString("00")} · {(first.IsRoomEntry ? "the room's entry script" : $"object {first.ObjectId}'s {first.VerbLabel}")} " +
                $"reaches {string.Join(", ", first.Scripts)} (a cutscene ... endCutscene span of {first.SpanInstructions} instructions, {first.Texts} printed line(s), {first.RoomLoads} room load(s)). " +
                "A branch can keep part of it from running, so the lines and loads are possible, not certain." + others + " " +
-               "Stated start: the running exploration session (state kept, a fresh post-boot session if none), the room opened from the catalog (Bobbin's arrival is assumed), " +
+               CdSetupNote(first) +
+               "Stated start: the running exploration session (state kept, a fresh post-boot session if none; always a fresh one when a setup is derived above), the room opened from the catalog (Bobbin's arrival is assumed), " +
                (first.IsRoomEntry ? "then the room's entry script plays on the clock. " :
                 $"then the object's verb 0x{first.VerbId:X2} run directly: an exploration action, not the game's click (Bobbin does not walk there, the object may be untouchable in this state, and a draft response does not simulate casting the draft). ") +
                "The frames play on the playback clock at the game's frame rate; voices play from the disc as a click's would.";
@@ -4022,10 +4050,15 @@ public partial class MainWindow : Window
             _game.Rooms.FirstOrDefault(item => item.ResourceId == trigger.Room) is not { } room) return;
         StopScenePlayback();
         _cdVoice.Stop();
-        var session = _session is { BootRunning: false } ? _session : _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false);
+        // A scene a fresh start does not begin starts from its derived setup (unseen steps, then the room), on a fresh session.
+        var setup = _cdSetupPlanner?.Value.Derive(trigger) ?? LoomCdStartSetup.None;
+        var useSetup = setup is { Plays: true, HasSteps: true };
+        var session = !useSetup && _session is { BootRunning: false } ? _session : _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false);
+        if (useSetup) LoomCdSceneSetupPlanner.ApplyBefore(session, _game, setup.Before);
         _cdVoice.Attach(vga.Disc, session);
         var before = (session.CutscenesBegun, session.EgoPuts);
         session.VisitRoom(room);
+        if (useSetup) LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
         var action = trigger.IsRoomEntry ? null : session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
         var uncertainties = (action?.Uncertainties ?? session.Snapshot.Uncertainties).ToList();
         if (_currentRoomResource?.ResourceId == room.ResourceId && _currentRoom is not null)

@@ -77,6 +77,9 @@ public sealed class LoomBoundedScriptExecutor
     /// </summary>
     public const string SeparateBitStorage = "var[0xFFFF]";
 
+    /// <summary>In such a game the variables from this number up are written only by scripts, so one nothing has set reads 0 (the engine starts them at 0).</summary>
+    public const int FirstScriptOnlyVariable = 0x100;
+
     private const int DefaultInstructionLimit = 4096;
 
     /// <summary>
@@ -2744,6 +2747,14 @@ public sealed class LoomBoundedScriptExecutor
             if (variables.TryGetValue(key, out value))
             {
                 detail = "known value";
+                return true;
+            }
+            if (match.Groups[1].Value == "var" && variables.ContainsKey(SeparateBitStorage) &&
+                int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) >= FirstScriptOnlyVariable)
+            {
+                // The engine starts with every variable at 0, and only scripts write the high ones (the engine's own are the low numbers).
+                value = 0;
+                detail = "known value, nothing has set it";
                 return true;
             }
             if (match.Groups[1].Value == "bit")

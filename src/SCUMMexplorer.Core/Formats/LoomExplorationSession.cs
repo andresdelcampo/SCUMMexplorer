@@ -1613,6 +1613,23 @@ public sealed partial class LoomExplorationSession
     }
 
     /// <summary>
+    /// A labelled setup edit: the ego starts a walk to (<paramref name="x"/>, <paramref name="y"/>) in the current room as the game's <c>walkActorTo</c>
+    /// does, stepped by the frames along the walk boxes' route (unlike a click, whose walk ends at once), so a script that watches the ego's box sees
+    /// every box on the way. Where the walk began is where the room's entry or the arrival left the ego. Needs a settled session, like <see cref="PlaceEgo"/>.
+    /// </summary>
+    public void WalkEgoTo(int x, int y)
+    {
+        if (!StatusEditable) throw new InvalidOperationException("Finish the current scene, draft, movement or dialogue before walking the ego.");
+        if (_currentRoom?.ResourceId is not int room || !_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
+            throw new InvalidOperationException("Visit a room with a known ego before walking it.");
+        _uncertainties.StartStep();
+        var label = $"Explorer setup (explicit): the ego walks to ({x}, {y}) in Room {room:00}; the walk starts where the room's entry left him";
+        _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), label);
+        _uncertainties.Add(label + ".");
+        _visitTrace.Add(label);
+    }
+
+    /// <summary>
     /// A labelled setup edit: brings <paramref name="actor"/> into the current room, as <c>putActorInRoom</c> then
     /// <c>putActor</c> (or <c>putActorAtObject</c>, the object's walk point) in the game's own code at <paramref name="basis"/>
     /// does, for a scene whose lines or moves need that actor present (<c>actorTalk</c> shows nothing for an actor outside
@@ -2509,8 +2526,21 @@ public sealed partial class LoomExplorationSession
             var arg = arguments[index];
             if (arg.StartsWith("var[", StringComparison.Ordinal))
             {
-                if (!globals.TryGetValue(arg, out var dynamicValue)) { locals = values; return false; }
+                if (!globals.TryGetValue(arg, out var dynamicValue))
+                {
+                    var highScriptVariable = globals.ContainsKey(LoomBoundedScriptExecutor.SeparateBitStorage) &&
+                        int.TryParse(arg.AsSpan(6, arg.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var number) && number >= LoomBoundedScriptExecutor.FirstScriptOnlyVariable;
+                    if (!highScriptVariable) { locals = values; return false; }
+                    dynamicValue = 0;
+                }
                 values[$"local[0x{index:X3}]"] = dynamicValue;
+            }
+            else if (arg.StartsWith("bit[", StringComparison.Ordinal))
+            {
+                // A bit variable: its own value, or in a game whose bits are kept apart from the variables (the CD game) 0 until something sets it.
+                if (globals.TryGetValue(arg, out var bitValue)) values[$"local[0x{index:X3}]"] = bitValue;
+                else if (globals.ContainsKey(LoomBoundedScriptExecutor.SeparateBitStorage)) values[$"local[0x{index:X3}]"] = 0;
+                else { locals = values; return false; }
             }
             else if (arg.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
                      ushort.TryParse(arg.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var literal))

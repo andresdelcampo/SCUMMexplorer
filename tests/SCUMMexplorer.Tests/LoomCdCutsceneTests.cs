@@ -76,4 +76,85 @@ public sealed class LoomCdCutsceneTests
         Assert.Equal(2, session.Snapshot.RoomId);
         Assert.True(frames < 600, $"{presses} Escape presses, {frames} frames; the whole intro takes 978");
     }
-}
+
+    private static LoomExplorationSession Fresh(GameLibrary game) => new(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+
+    private static ushort Known(LoomExplorationSession session, string key) =>
+        session.Snapshot.KnownGlobalVariables.TryGetValue(key, out var value) ? value : (ushort)0;
+
+    [Fact]
+    public void TheCdBitsAreKeptApartFromTheVariableWordsAndTheStartUpLockIsClear()
+    {
+        if (Game() is not { } game) return;
+        var session = Fresh(game);
+        // ScummVM aliases a bit onto a variable word only up to version 3; the camera (var[0x002], 176 here) must not set bit[0x024] or bit[0x025].
+        session.VisitRoom(game.Rooms.First(r => r.ResourceId == 4));
+        Assert.NotEqual(0, Known(session, "var[0x002]"));
+        Assert.Equal(0, Known(session, "bit[0x025]"));
+        // Script 001's tail clears the start-up lock the intro sets, which the entry scripts of many rooms test before they start their monitors.
+        Assert.Equal(0, Known(session, "bit[0x00E]"));
+    }
+
+    [Fact]
+    public void TheMusicTimerCountsInASessionThatSkippedTheIntro()
+    {
+        if (Game() is not { } game) return;
+        var session = Fresh(game);
+        for (var i = 0; i < 30; i++) session.AdvanceFrame();
+        Assert.True(Known(session, "var[0x00E]") >= 30, $"timer {Known(session, "var[0x00E]")}");
+        Assert.Contains(session.Snapshot.Uncertainties, u => u.Contains("music timer", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData(9, 199, 0x38)]   // the feather: script 105 waits for the timer
+    [InlineData(24, 359, 0x3E)]  // the sheep: script 70 waits for the timer
+    public void ScenesThatWaitForTheMusicTimerEnd(int room, int obj, int verb)
+    {
+        if (Game() is not { } game) return;
+        var session = Fresh(game);
+        session.VisitRoom(game.Rooms.First(r => r.ResourceId == room));
+        session.ActivateObjectVerb(obj, verb);
+        var begun = false;
+        for (var frames = 0; frames < 3000; frames++)
+        {
+            begun |= session.InCutscene;
+            if (session.CutsceneSkippable) session.PressKey(0x1B);
+            session.AdvanceFrame();
+        }
+        Assert.True(begun);
+        Assert.False(session.InCutscene);
+    }
+
+    [Fact]
+    public void TheGuardsOfAWalkBoxMonitorNameTheBoxesAndTheEgo()
+    {
+        if (Game() is not { } game) return;
+        var data = ScummDataSources.For(game);
+        var paths = LoomCdSceneGuards.Find(data, 15, data.RoomEntryScript(15)!, "root");
+        var boxes = paths.SelectMany(p => p.Guards).Where(g => g.WalkBoxOfActor == 1).Select(g => g.Constant).ToHashSet();
+        Assert.Contains(3, boxes);
+        Assert.Contains(5, boxes);
+    }
+
+    [Fact]
+    public void EveryCdSceneEitherPlaysFromADerivedSetupOrSaysWhyNot()
+    {
+        if (Game() is not { } game) return;
+        var data = ScummDataSources.For(game);
+        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
+        var groups = LoomCdCutsceneIndex.Group(triggers);
+        var setups = groups.Select(g => (g, s: planner.Derive(g.First))).Where(x => x.s != LoomCdStartSetup.None).ToList();
+        Assert.InRange(setups.Count, 12, 30);
+        Assert.All(setups, x => Assert.NotEmpty(x.s.Notes));
+        Assert.All(setups.Where(x => !x.s.Plays), x => Assert.Contains("tests it fails", x.s.Notes[0]));
+        Assert.True(setups.Count(x => x.s.Plays) >= 14, $"{setups.Count(x => x.s.Plays)} of {setups.Count} play");
+        // A monitor of the ego's walk box: the ego goes into the box after the room's monitors have started.
+        Assert.Contains(planner.Derive(groups.First(g => g.First.Room == 2 && g.First.IsRoomEntry).First).After, s => s.Kind == "box");
+        // A story state another scene's script sets: that scene runs first, unseen.
+        Assert.Contains(planner.Derive(groups.First(g => g.First.Room == 25 && g.First.ObjectId == 373).First).Before, s => s.Kind == "scene");
+        // A scene whose only writers are its own code or code nothing starts says so.
+        var blocked = planner.Derive(groups.First(g => g.First.Room == 34 && g.First.ObjectId == 485).First);
+        Assert.False(blocked.Plays);
+        Assert.Contains("this scene's own script", blocked.Notes[0]);
+    }}
