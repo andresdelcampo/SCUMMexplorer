@@ -11,7 +11,7 @@ Game files are not included and never committed: you open a folder you own.
 - **Pick a scene by its artwork** in the visual room picker, and see each room without black gaps. Room numbers and exit outlines are available on request.
 - **Click the world.** A click walks Bobbin to an object and uses it through the game's own scripts; a double click also looks at it; exits lead on to the next room. Bobbin, the other actors and their costumes are drawn and animated, with the camera following, and room animations keep running as in the game.
 - **Cutscenes and drafts play.** About 335 cutscene starts (generated from the game's own code, plus a few hand-built sequences) can be launched from **Play Cutscene**, each with a start setup derived from the scene's code; drafts and the staff go through the game's scripts. **Game Status** lets you set the staff, notes, learned drafts and story events yourself. Every assumption a start makes is shown in the picker's note.
-- **Hear it.** Music and effects through AdLib (NukedOPL3Sharp), PC speaker, or No Sound; sounds and a room's music cues can be played on demand.
+- **Hear it.** Music and effects through AdLib (NukedOPL3Sharp), PC speaker, Roland MT-32 (see below) or No Sound; sounds and a room's music cues can be played on demand. The chosen device is remembered between runs.
 - **Read the games' texts** in the searchable **Game Texts** gallery (Advanced): extracted dialogue, object names and stored text with the original room artwork, and links that play the cutscene a text belongs to.
 - **Open a LOOM demo.** The rooms are explorable like the full game's, and **The preview** (in Play Cutscene) plays the demo's own self-running tour until you open another room. A demo is another build of the game, not a subset: its scripts, rooms and index differ, so full-game names and scene catalogs are not applied to it.
 - **Advanced mode** shows the raw resource tree, readable and raw script views with a glossary, the last action's timeline, hotspot lists, depth and walk-box overlays, and resource links.
@@ -51,6 +51,19 @@ dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 
 The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. The LOOM tests find `Games/loom ega en` (then `loom ega es`) next to the repository, or the folder in `SCUMM_LOOM_TEST_ROOT`; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip. Tests that need the demo folders skip when they are absent.
 
+## Roland MT-32 music (optional)
+
+Choose **Roland MT-32** in the sound menu to hear the LOOM Roland upgrade's music, including the overture that the opening plays only with this card. It needs two things that are not part of this program:
+
+1. **A game folder with the LOOM Roland upgrade installed.** It has `82.LFL` to `85.LFL` (the upgrade disk's `READ.ME` describes it). Without them the Roland entry says so and the previous device stays.
+2. **Your own MT-32 ROM images.** The emulator ([Munt](https://github.com/munt/munt)) plays the real instrument samples, which live in the ROM. The ROMs are copyrighted, so they are neither shipped nor committed. Put these files together in one folder:
+   - `MT32_CONTROL.ROM` and `MT32_PCM.ROM` (a Roland MT-32), or
+   - `CM32L_CONTROL.ROM` and `CM32L_PCM.ROM` (a CM-32L, the LAPC-1's sound; the MT-32 pair is preferred when both are present).
+
+   The app looks for that folder in this order: the `SCUMM_MT32_ROM_ROOT` environment variable; the folder you chose the last time; a folder named `mt32` beside the game folder (for example `Games/mt32` next to `Games/loom ega en`). If it finds none it asks for the folder once and remembers it (`%LOCALAPPDATA%\SCUMMexplorer\mt32-rom-folder.txt`).
+
+Choosing Roland also tells the game it runs on a Roland card, so its own scripts pick the Roland sounds; the other devices keep the game as it was. The first time a long piece is needed it is rendered (the overture takes about 10 seconds); the scene waits for it, then the music starts with the scene. If the saved choice cannot be used for a folder (no upgrade, no ROMs), that session plays on AdLib and the choice is kept.
+
 ## Audio and third-party notices
 
-AdLib rendering uses the separate [NukedOPL3Sharp](https://www.nuget.org/packages/NukedOPL3Sharp/) library, licensed under LGPL 2.1; [source and license](https://github.com/codengine/NukedOPL3Sharp) are available from its author. PC speaker rendering follows the SCUMM driver's envelopes and pitch modulation, with a filtered square wave integrated over each audio sample. See [third-party audio notices](THIRD_PARTY_NOTICES.md) for ScummVM references and licenses.
+AdLib rendering uses the separate [NukedOPL3Sharp](https://www.nuget.org/packages/NukedOPL3Sharp/) library, licensed under LGPL 2.1; [source and license](https://github.com/codengine/NukedOPL3Sharp) are available from its author. PC speaker rendering follows the SCUMM driver's envelopes and pitch modulation, with a filtered square wave integrated over each audio sample. Roland MT-32 rendering uses [Munt](https://github.com/munt/munt)'s `mt32emu` (LGPL-2.1-or-later) through the [Mt32emu.net](https://github.com/gregdivis/mt32emu.net) wrapper, loaded as a separate library. See [third-party audio notices](THIRD_PARTY_NOTICES.md) for ScummVM references and licenses.

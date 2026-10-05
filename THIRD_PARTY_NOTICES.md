@@ -28,3 +28,18 @@ nukeykt, licensed under LGPL-2.1-only.
 - [Source](https://github.com/codengine/NukedOPL3Sharp/tree/c6171530c68403fa05ec659e155b8f382bb979d0)
 - [License](licenses/NukedOPL3Sharp-LGPL-2.1.txt)
 - [Upstream notices](licenses/NukedOPL3Sharp-NOTICES.md)
+
+## Munt mt32emu and Mt32emu.net 1.0.0
+
+The Roland MT-32 device renders through Munt's `mt32emu` emulator (copyright the
+Munt team, licensed under LGPL-2.1-or-later) using the Mt32emu.net 1.0.0 NuGet
+package by Greg Divis (LGPL-2.1-or-later), which bundles the native
+`libmt32emu` build. Both are separate libraries that the program loads at run
+time; the program contains none of their code. The emulator needs the user's own
+MT-32 or CM-32L ROM images, which are not part of this project. The
+decoding of the Roland sound streams follows the behavior of ScummVM's
+`midiparser_ro.cpp` and `sound.cpp` (see above for ScummVM's license).
+
+- [Munt source](https://github.com/munt/munt)
+- [Mt32emu.net source](https://github.com/gregdivis/mt32emu.net)
+- The LGPL 2.1 text is in [licenses/NukedOPL3Sharp-LGPL-2.1.txt](licenses/NukedOPL3Sharp-LGPL-2.1.txt).
