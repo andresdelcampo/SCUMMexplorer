@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (night, last): LOOM CD verb strip, per-message charset, voice cues
+
+The verb strip and the one-screen layout now serve the CD game (the draft verbs draw from room 1's images once script 018 turns them on; the CD staff/draft state needs its own schema, not done). A message keeps the charset set when its print ran (script 044 sets 4 for one intro line) and `print` sub 8 (`sayVoice`) is read as a voice cue (disc offset and length in tenths of a second) with no "not modelled" estimate. Double-click checks in rooms 3 to 20 draw their descriptions. Record: `.verification/loom-vga/README.md` step 13. CD audio is the remaining CD item.
+
 ## 5 October (night, later): LOOM CD text on screen
 
 The CD charsets (`901` to `904.LFL`, 1 and 2 bits per pixel, per-glyph offsets) decode (`LoomVgaCharset`, `LoomVgaArchive.ReadCharset`) and `LoomVgaMessageRenderer` draws the session's talk and drawn strings in the app (charset 2, black outline from the colour table). The CD room screen is 144 rows, as on EGA. Record: `.verification/loom-vga/README.md` step 12.
