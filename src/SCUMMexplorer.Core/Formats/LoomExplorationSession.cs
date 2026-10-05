@@ -83,11 +83,9 @@ public sealed partial class LoomExplorationSession
     private const int MaxNestedScripts = 8;
     private readonly GameLibrary _game;
     private readonly LoomSoundClock _soundClock;
-    private readonly LoomScriptReader _reader;
+    private readonly IScummDataSource _data;
     private readonly LoomBoundedScriptExecutor _executor = new();
     private readonly LoomScriptObserver? _observer;
-    private readonly LoomRoomObjectDirectory _objects = new();
-    private readonly LoomObjectVerbReader _verbs;
     private readonly LoomScriptRuntimeState _runtime;
     private readonly bool _demoPreview;
     private readonly int _globalScriptCount;
@@ -116,7 +114,7 @@ public sealed partial class LoomExplorationSession
     /// </param>
     public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
         bool completeBoot = true, bool stopAtOpening = false, bool stopAtBootInput = false,
-        LoomScriptObserver? observer = null, bool demoPreview = false, int soundCard = 0)
+        LoomScriptObserver? observer = null, bool demoPreview = false, int soundCard = 0, IScummDataSource? data = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -138,14 +136,13 @@ public sealed partial class LoomExplorationSession
                     : new(LoomSoundLifetimeKind.Unknown, null, false, "no indexed native sound resource");
             return lifetime;
         });
-        _reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
-        _verbs = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
+        _data = data ?? ScummDataSources.For(game);
         _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes)
         {
             Random = new LoomSeededRandom(randomSeed),
             MutationObserver = observer
         };
-        _globalScriptCount = ReadGlobalScriptCount(game);
+        _globalScriptCount = _data.GlobalScriptCount;
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.SoundRunning = _soundClock.Status;
         _runtime.OverrideChanged = RecordOverride;
@@ -360,7 +357,7 @@ public sealed partial class LoomExplorationSession
         for (var local = _globalScriptCount; local < 256; local++)
         {
             LoomScriptDisassembly? script;
-            try { script = _reader.DecodeRoomLocalScript(_currentRoom, local, _globalScriptCount); }
+            try { script = _data.RoomLocalScript(_currentRoom.ResourceId!.Value, local); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
             if (script is null) continue;
             foreach (var item in script.Instructions)
@@ -714,11 +711,11 @@ public sealed partial class LoomExplorationSession
             var set = index.MovesTo(EgoSizeVariable).Where(m => m.Source == other.Source && m.Offset < other.Offset).OrderByDescending(m => m.Offset).FirstOrDefault();
             if (set is not null) samples.Add(new(other.WalkY, set.Value, $"{other.Source} +0x{other.Offset:X4} walks to ({other.WalkX}, {other.WalkY}) after {EgoSizeVariable} = {set.Value}"));
         }
-        if (_game.Rooms.FirstOrDefault(r => r.ResourceId == roomId) is { } room)
-            foreach (var id in LoomScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(room.FilePath), _globalScriptCount))
+        if (_game.Rooms.Any(r => r.ResourceId == roomId))
+            foreach (var id in _data.RoomLocalScriptIds(roomId))
             {
                 LoomScriptDisassembly? script;
-                try { script = _reader.DecodeRoomLocalScript(room, id, _globalScriptCount); }
+                try { script = _data.RoomLocalScript(roomId, id); }
                 catch (Exception ex) when (ex is InvalidDataException or IOException) { continue; }
                 if (script is null) continue;
                 int? size = null; var since = 0;
@@ -821,22 +818,19 @@ public sealed partial class LoomExplorationSession
         _runtime.Actors.HideAll();
         // startScene stops the talk and the room redraw erases drawn strings.
         _runtime.Messages.RoomEntered(_runtime);
-        var roomBytes = File.ReadAllBytes(room.FilePath);
-        _currentObjects = _objects.Decode(roomBytes);
+        var roomData = _data.ReadRoom(room.ResourceId!.Value);
+        _currentObjects = roomData.Objects;
         // getObjOrActorName for text code 6: the stored names of this room's objects.
-        var objectNames = LoomTextExtractor.ReadObjectNameBytes(LflEncoding.DecodeXorFF(roomBytes), _currentObjects);
+        var objectNames = roomData.ObjectNames;
         _runtime.ObjectName = id => objectNames.TryGetValue(id, out var name) ? name : null;
         _runtime.WalkBoxFlagsUnknown = null;
-        try { _runtime.WalkBoxes = LoomWalkBoxReader.Read(roomBytes); }
-        catch (InvalidDataException ex)
-        {
-            _runtime.WalkBoxes = null;
-            _uncertainties.Add($"Room {room.ResourceId:00} walk boxes could not be read: {ex.Message}");
-        }
+        _runtime.WalkBoxes = roomData.WalkBoxes;
+        if (roomData.WalkBoxError is not null)
+            _uncertainties.Add($"Room {room.ResourceId:00} walk boxes could not be read: {roomData.WalkBoxError}");
         // showActors: actors whose room is the new one are shown, adjusted into its boxes.
         _runtime.Actors.ShowActorsIn(CurrentPlacement());
         // startScene centres the camera on the first screen (VAR_CAMERA_POS_X = 160).
-        var roomWidth = (roomBytes[4] ^ 0xFF) | ((roomBytes[5] ^ 0xFF) << 8);
+        var roomWidth = roomData.Width;
         _runtime.RoomCameraBounds = _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
         _runtime.ResetShadowPalette();
         _runtime.SetGlobalVariable(CameraVariable, 160);
@@ -850,7 +844,7 @@ public sealed partial class LoomExplorationSession
         foreach (var item in _currentObjects)
             _runtime.TryAddObjectPosition(item.Id, new RoomObjectPosition(item.X, item.Y));
         _runtime.SetGlobalVariable("var[0x004]", (ushort)room.ResourceId!.Value);
-        _roomSize = (roomWidth, (roomBytes[6] ^ 0xFF) | ((roomBytes[7] ^ 0xFF) << 8));
+        _roomSize = (roomWidth, roomData.Height);
         _pointer = null;
         PlaceVirtualMouse();
         _uncertainties.Add(arrival);
@@ -1118,8 +1112,7 @@ public sealed partial class LoomExplorationSession
     {
         if (!_verbImageRooms.TryGetValue(roomId, out var images))
         {
-            var resource = _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId);
-            try { images = resource is null ? [] : new LoomRoomObjects().Decode(File.ReadAllBytes(resource.FilePath)); }
+            try { images = _data.ReadObjectImages(roomId); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { images = []; }
             _verbImageRooms[roomId] = images;
         }
@@ -1439,7 +1432,7 @@ public sealed partial class LoomExplorationSession
         _entersRoomLoads++;
         try
         {
-            script = _verbs.Decode(_currentRoom, record, verbId);
+            script = _data.ReadObjectVerb(_currentRoom.ResourceId!.Value, record, verbId, out _);
             run = RunScript(script, _currentObjects, 0, null, 0);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
@@ -1910,7 +1903,7 @@ public sealed partial class LoomExplorationSession
         LoomScriptDisassembly? script;
         try
         {
-            script = exit ? _reader.DecodeRoomExit(room) : _reader.DecodeRoomEntry(room);
+            script = exit ? _data.RoomExitScript(room.ResourceId!.Value) : _data.RoomEntryScript(room.ResourceId!.Value);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -1928,15 +1921,14 @@ public sealed partial class LoomExplorationSession
         IReadOnlyCollection<string>? estimatedLocals = null, bool pathEstimated = false,
         ScriptFrame? frame = null)
     {
-        var resource = _game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script && item.ResourceId == scriptId);
-        if (resource is null)
-        {
-            _uncertainties.Add($"Indexed script {scriptId:00} is absent from the parsed resource list.");
-            return null;
-        }
         try
         {
-            return RunScript(_reader.Decode(resource), _currentObjects, startOffset, locals, depth, scriptId,
+            if (_data.GlobalScript(scriptId) is not { } indexed)
+            {
+                _uncertainties.Add($"Indexed script {scriptId:00} is absent from the parsed resource list.");
+                return null;
+            }
+            return RunScript(indexed, _currentObjects, startOffset, locals, depth, scriptId,
                 estimatedLocals, pathEstimated, frame);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
@@ -1975,7 +1967,7 @@ public sealed partial class LoomExplorationSession
         }
         try
         {
-            var script = _reader.DecodeRoomLocalScript(_currentRoom, scriptId, _globalScriptCount);
+            var script = _data.RoomLocalScript(_currentRoom.ResourceId!.Value, scriptId);
             if (script is null)
             {
                 _uncertainties.Add($"Room {_currentRoom.ResourceId:00} has no local script {scriptId:00}.");
@@ -2021,7 +2013,7 @@ public sealed partial class LoomExplorationSession
         }
         LoomScriptDisassembly script;
         LoomObjectVerbEntry selectedEntry;
-        try { script = _verbs.Decode(_currentRoom, record, verbId, out selectedEntry); }
+        try { script = _data.ReadObjectVerb(_currentRoom.ResourceId!.Value, record, verbId, out selectedEntry); }
         catch (InvalidDataException ex) when (ex.Message.Contains("has no verb", StringComparison.Ordinal))
         {
             _visitTrace.Add($"{source}: object {objectId} has no verb 0x{verbId:X2} and no fallback, so startObject does nothing");
@@ -2039,15 +2031,6 @@ public sealed partial class LoomExplorationSession
             EstimatedArguments(scriptEvent),
             scriptEvent.Certainty != LoomScriptEventCertainty.Reached,
             new ScriptFrame { OriginRoom = parent?.OriginRoom, ObservationCall = _observer?.CurrentCall });
-    }
-
-    private static int ReadGlobalScriptCount(GameLibrary game)
-    {
-        var indexPath = Path.Combine(game.FolderPath, "00.LFL");
-        if (File.Exists(indexPath))
-            return new LflIndexReader().ReadDeclaredScriptCount(indexPath);
-        return game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
-                   .Select(item => item.ResourceId!.Value).DefaultIfEmpty(-1).Max() + 1;
     }
 
     private LoomBoundedScriptResult RunScript(LoomScriptDisassembly script,

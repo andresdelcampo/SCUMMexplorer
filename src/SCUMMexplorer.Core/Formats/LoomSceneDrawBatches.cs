@@ -66,31 +66,27 @@ public sealed class LoomSceneDrawBatches
     public IReadOnlyList<RoomDrawBatch> ForRoom(int roomId) =>
         _byRoom.TryGetValue(roomId, out var batches) ? batches : [];
 
-    public static LoomSceneDrawBatches Build(GameLibrary game)
+    public static LoomSceneDrawBatches Build(GameLibrary game, IScummDataSource? data = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         if (game.Version != ScummVersion.V3) return Empty;
-        var dialect = ScummScriptDialects.For(game.Id);
-        var reader = new LoomScriptReader(dialect);
-        var verbReader = new LoomObjectVerbReader(dialect);
-        var directory = new LoomRoomObjectDirectory();
+        data ??= ScummDataSources.For(game);
 
         var roomByObject = new Dictionary<int, int>();
-        var roomRecords = new Dictionary<int, (GameResource Room, IReadOnlyList<LoomRoomObjectRecord> Records, byte[] Bytes)>();
+        var roomRecords = new Dictionary<int, IReadOnlyList<LoomRoomObjectRecord>>();
         foreach (var room in game.Rooms.Where(item => item.ResourceId.HasValue))
         {
             try
             {
-                var bytes = File.ReadAllBytes(room.FilePath);
-                var records = directory.Decode(bytes);
-                roomRecords[room.ResourceId!.Value] = (room, records, bytes);
+                var records = data.ReadRoom(room.ResourceId!.Value).Objects;
+                roomRecords[room.ResourceId!.Value] = records;
                 foreach (var record in records) roomByObject.TryAdd(record.Id, room.ResourceId.Value);
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
         }
 
         var rectByObject = new Dictionary<int, (int X, int Y, int Width, int Height)>();
-        foreach (var (_, (_, records, _)) in roomRecords)
+        foreach (var records in roomRecords.Values)
             foreach (var record in records)
                 rectByObject.TryAdd(record.Id, (record.X, record.Y, record.Width, record.Height));
 
@@ -115,17 +111,16 @@ public sealed class LoomSceneDrawBatches
 
         foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
         {
-            try { Scan(reader.Decode(resource), OtherScriptPriority, $"script {resource.ResourceId:00}"); }
+            try { Scan(data.GlobalScript(resource.ResourceId!.Value), OtherScriptPriority, $"script {resource.ResourceId:00}"); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
         }
 
-        var globalCount = ReadGlobalScriptCount(game);
         var entryStates = new Dictionary<int, IReadOnlyDictionary<int, RoomStateEvidence>>();
-        foreach (var (roomId, (room, records, bytes)) in roomRecords)
+        foreach (var (roomId, records) in roomRecords)
         {
             try
             {
-                var entry = reader.DecodeRoomEntry(room);
+                var entry = data.RoomEntryScript(roomId);
                 Scan(entry, EntryScriptPriority, $"Room {roomId:00} entry script");
                 if (entry is not null)
                 {
@@ -134,21 +129,21 @@ public sealed class LoomSceneDrawBatches
                 }
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
-            foreach (var localId in ReadLocalScriptIds(bytes, globalCount))
+            foreach (var localId in data.RoomLocalScriptIds(roomId))
             {
-                try { Scan(reader.DecodeRoomLocalScript(room, localId, globalCount), OtherScriptPriority,
+                try { Scan(data.RoomLocalScript(roomId, localId), OtherScriptPriority,
                     $"Room {roomId:00} local script {localId}"); }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
             }
             IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> tables;
-            try { tables = verbReader.ReadAll(bytes, records); }
+            try { tables = data.ReadObjectVerbs(roomId, records); }
             catch (Exception ex) when (ex is InvalidDataException or ArgumentException) { continue; }
             foreach (var record in records)
             {
                 if (!tables.TryGetValue(record.Id, out var verbs)) continue;
                 foreach (var verb in verbs.DistinctBy(item => item.ScriptOffset))
                 {
-                    try { Scan(verbReader.Decode(room, record, verb.VerbId), OtherScriptPriority,
+                    try { Scan(data.ReadObjectVerb(roomId, record, verb.VerbId, out _), OtherScriptPriority,
                         $"Room {roomId:00} object {record.Id} {verb.Label}"); }
                     catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
                 }
@@ -649,33 +644,5 @@ public sealed class LoomSceneDrawBatches
         var match = Literal.Match(text.Trim());
         return match.Success && int.TryParse(match.Groups["value"].Value, NumberStyles.HexNumber,
             CultureInfo.InvariantCulture, out value);
-    }
-
-    private static int ReadGlobalScriptCount(GameLibrary game)
-    {
-        var indexPath = Path.Combine(game.FolderPath, "00.LFL");
-        try
-        {
-            if (File.Exists(indexPath)) return new LflIndexReader().ReadDeclaredScriptCount(indexPath);
-        }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException) { }
-        return game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
-                   .Select(item => item.ResourceId!.Value).DefaultIfEmpty(-1).Max() + 1;
-    }
-
-    internal static IReadOnlyList<int> ReadLocalScriptIds(byte[] encoded, int globalScriptCount)
-    {
-        var data = LflEncoding.DecodeXorFF(encoded);
-        if (data.Length < 29) return [];
-        var roomEnd = data[0] | data[1] << 8;
-        var cursor = 29 + data[20] * 4 + data[23] + data[24];
-        if (roomEnd > data.Length || cursor >= roomEnd) return [];
-        var found = new List<int>();
-        while (cursor < roomEnd - 2 && data[cursor] != 0)
-        {
-            if (data[cursor] >= globalScriptCount) found.Add(data[cursor]);
-            cursor += 3;
-        }
-        return found.Distinct().ToArray();
     }
 }
