@@ -26,4 +26,4 @@ Read-only. Scripts: `iso_extract.py <Loom.bin> <outdir>` (ISO 9660 over `MODE1/2
 
 - Reading the files is straightforward: the `.LEC` XOR and block tree are simple, and the index is small. The **disc image reader** is the easy part (a few dozen lines; the user data of a Mode 1 sector is bytes 16 to 2063).
 - **Not decoded yet** (the next steps of the plan, none of it touched): the `BM` strip codec (v4 VGA bitmap, to take from ScummVM `engines/scumm` `gfx.cpp` `drawStripComplex`/`drawStripBasicV` family and compare with the `scummvm/` build), `OI` object images, the v4 script dialect (the EGA `LoomScriptReader` is v3), costumes and sounds (30 `SO`; the music and speech are CD audio on track 2), `SP` and `CC`.
-- The Game Status, glossary and replay catalog are EGA-derived and stay EGA-only (user decision); VGA starts with rooms and backgrounds.
+- The Game Status, glossary and replay catalog are EGA-derived and are not reused for VGA (the plan says to rederive, never copy); VGA starts with rooms and backgrounds.
