@@ -50,6 +50,13 @@ internal static class Program
                 var cd = (SCUMMexplorer.Core.Formats.IScummDataSource)Field("_cdData")!;
                 if (Environment.GetEnvironmentVariable("CD_DUMP2") == "1")
                     foreach (var id in cd.GlobalScriptIds()) { var sc = cd.GlobalScript(id); if (sc is not null) foreach (var ins in sc.Instructions) if (ins.Operation is "drawObject" or "setState" or "startObject") report.Add($"   global {id} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
+                if (Environment.GetEnvironmentVariable("CD_DUMP3") == "1")
+                {
+                    var all = new List<(string, SCUMMexplorer.Core.Formats.LoomScriptDisassembly?)>();
+                    foreach (var id in cd.GlobalScriptIds()) all.Add(($"global {id}", cd.GlobalScript(id)));
+                    foreach (var r in game.Rooms.Select(r => r.ResourceId!.Value)) { all.Add(($"room {r} entry", cd.RoomEntryScript(r))); foreach (var id in cd.RoomLocalScriptIds(r)) all.Add(($"room {r} local {id}", cd.RoomLocalScript(r, id))); }
+                    foreach (var (name, sc) in all) if (sc is not null) foreach (var ins in sc.Instructions) if (ins.Operation == "cursorCommand" && ins.Operands.StartsWith("charset")) report.Add($"   {name} +{ins.Offset:X4} {ins.Operands}");
+                }
                 var rooms = args.Length > 2 ? args[2].Split(',').Select(int.Parse).ToArray() : new[] { 4, 10, 16, 35 };
                 foreach (var number in rooms)
                 {
@@ -69,13 +76,14 @@ internal static class Program
                     if (target is null) { report.Add($"click room {number}: no clickable object"); continue; }
                     var x = target.X + target.Width / 2; var y = target.Y + Math.Max(1, target.Height) / 2;
                     Call("HandleRoomPoint", x, y, Environment.GetEnvironmentVariable("CD_DOUBLE") == "1");
-                    foreach (var ms in new[] { 800, 2500, 5000 })
+                    foreach (var ms in new[] { 400, 800, 1300, 2500, 5000 })
                     {
-                        await Task.Delay(ms == 800 ? 800 : ms == 2500 ? 1700 : 2500);
+                        await Task.Delay(ms == 400 ? 400 : ms == 800 ? 400 : ms == 1300 ? 500 : ms == 2500 ? 1200 : 2500);
                         Shot($"click-{number:00}-{ms}.png");
                         var session = Field("_session")!; var actors = (System.Collections.IEnumerable)session.GetType().GetProperty("Actors")!.GetValue(session)!;
                         foreach (var a in actors) { var t = a.GetType(); var room2 = t.GetProperty("Room")!.GetValue(a); if (room2 is int r2 && r2 == number) { var look = t.GetProperty("Look")!.GetValue(a)!; report.Add($"   actor {t.GetProperty("Number")!.GetValue(a)} x {t.GetProperty("X")!.GetValue(a)} y {t.GetProperty("Y")!.GetValue(a)} visible {t.GetProperty("Visible")!.GetValue(a)} look {look}"); } }
                         { var la = session.GetType().GetProperty("LastAction")!.GetValue(session); if (la is not null) { foreach (var u in (IEnumerable<string>)la.GetType().GetProperty("Uncertainties")!.GetValue(la)!) report.Add("   U " + u); } report.Add("   evidence " + la?.GetType().GetProperty("Evidence")!.GetValue(la)); }
+                        { var ov = (Image)window.FindName("RoomMessageOverlay"); report.Add($"   overlay {ov.Visibility} source {(ov.Source is null ? "none" : ov.Source.Width + "x" + ov.Source.Height)} actual {ov.ActualWidth}x{ov.ActualHeight}"); }
                         { var msgs = session.GetType().GetProperty("Messages")!.GetValue(session)!; var on = (System.Collections.IEnumerable)msgs.GetType().GetProperty("OnScreen")!.GetValue(msgs)!; foreach (var m in on) report.Add("   message " + m); }
                         if (ms == 5000 && Environment.GetEnvironmentVariable("CD_TRACE") == "1") foreach (var line in (IEnumerable<string>)session.GetType().GetProperty("SessionTrace")!.GetValue(session)!) if (line.Contains("object 11") || line.Contains("object 12")) report.Add("   T " + line);
                         if (ms == 5000) { var snap = session.GetType().GetProperty("Snapshot")!.GetValue(session)!; var states = (System.Collections.IDictionary)snap.GetType().GetProperty("ObjectStates")!.GetValue(snap)!; var imgs = cd.ReadObjectImages(number); foreach (var o in data.Objects) report.Add($"   obj {o.Id} at {o.X},{o.Y} {o.Width}x{o.Height} state {(states.Contains(o.Id) ? states[o.Id] : "-")} image {imgs.Any(i => i.Id == o.Id)}"); }

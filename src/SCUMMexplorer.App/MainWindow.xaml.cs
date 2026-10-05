@@ -77,6 +77,8 @@ public partial class MainWindow : Window
     // Costumes read for the actor layer (M2c), by id; null when a costume cannot be read.
     private readonly Dictionary<int, LoomCostume?> _actorCostumes = [];
     private string? _charsetError;
+    // The CD game's charset 2, the one script 001 sets when the intro ends (+0x015E); script 044 sets 4 for a while.
+    private LoomVgaCharset? _cdCharset;
     private int? _selectedObject;
     private string? _audioFile;
     private byte[]? _adlibBaseWave;
@@ -251,6 +253,8 @@ public partial class MainWindow : Window
         if (_session is not null && cdIndexed is null) _sceneSound.Attach(game, _session);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
+        try { _cdCharset = game.Vga?.ReadCharset(2); }
+        catch (InvalidDataException error) { _cdCharset = null; _charsetError = $"charset 2 could not be read: {error.Message}"; }
         _actorCostumes.Clear();
         ShowGame(game);
         StartRelationshipIndexBuild(game);
@@ -2157,7 +2161,7 @@ public partial class MainWindow : Window
     /// ports); LOOM's boot (script 001 +0x0000, <c>roomOps setScreen 0, 144</c>) calls <c>initScreens(0, 144)</c>,
     /// so LOOM shows all 144 rows of its rooms from screen row 0. Indy3 keeps the default (not checked).
     /// </summary>
-    private int RoomScreenRows => _game?.Id == GameId.Loom ? LoomVerbArea.Top - LoomMessageRenderer.RoomScreenTop : 128;
+    private int RoomScreenRows => _game?.Id is GameId.Loom or GameId.LoomVga ? LoomVerbArea.Top - LoomMessageRenderer.RoomScreenTop : 128;
 
     private int ShownRoomRows(RoomImage room) => Math.Min(room.Height, RoomScreenRows);
 
@@ -4487,6 +4491,16 @@ public partial class MainWindow : Window
                 _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
                 if (session!.Messages.Talk is { Y: < LoomMessageRenderer.VerbScreenTop } talk &&
                     LoomMessageRenderer.Render(talk, charset).Bounds is { } bounds)
+                    _talkTextRect = (bounds.Left + left, bounds.Top - LoomMessageRenderer.RoomScreenTop,
+                        bounds.Right + left, bounds.Bottom - LoomMessageRenderer.RoomScreenTop);
+            }
+            else if (_cdCharset is { } cdCharset)
+            {
+                var layer = LoomVgaMessageRenderer.Render(messages, cdCharset);
+                RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
+                _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
+                if (session!.Messages.Talk is { Y: < LoomMessageRenderer.VerbScreenTop } talk &&
+                    LoomVgaMessageRenderer.Render(talk, cdCharset).Bounds is { } bounds)
                     _talkTextRect = (bounds.Left + left, bounds.Top - LoomMessageRenderer.RoomScreenTop,
                         bounds.Right + left, bounds.Bottom - LoomMessageRenderer.RoomScreenTop);
             }

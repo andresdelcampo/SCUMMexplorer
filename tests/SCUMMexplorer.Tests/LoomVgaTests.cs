@@ -349,4 +349,38 @@ public sealed class LoomVgaTests
         }
         Assert.True(matrixScripts > 0);
     }
+
+    [Fact]
+    public void TheFourCharsetsReadAndDrawLegibleGlyphs()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var archive = new GameFolderScanner().Scan(folder).Vga!;
+        foreach (var number in new[] { 1, 2, 3, 4 })
+        {
+            var charset = archive.ReadCharset(number)!;
+            Assert.NotNull(charset);
+            Assert.True(charset.BitsPerPixel is 1 or 2);
+            Assert.True(charset.CharWidth('A') > 0, $"charset {number} has no A");
+            var rows = new char[16][];
+            for (var y = 0; y < rows.Length; y++) rows[y] = Enumerable.Repeat('.', 16).ToArray();
+            charset.DrawGlyph('A', (x, y, v) => { if (x >= 0 && x < 16 && y + 4 >= 0 && y + 4 < 16) rows[y + 4][x] = (char)('0' + v); });
+            Assert.True(rows.SelectMany(r => r).Any(c => c != '.'));
+            File.AppendAllText(Path.Combine(Path.GetTempPath(), "charset-glyphs.txt"),
+                $"charset {number} height {charset.FontHeight} glyphs {charset.GlyphCount} A width {charset.CharWidth('A')} colours {Convert.ToHexString(charset.ColorMap)}" + Environment.NewLine + string.Join(Environment.NewLine, rows.Select(r => new string(r))) + Environment.NewLine);
+        }
+    }
+
+    [Fact]
+    public void ATalkLineDrawsInTheCdCharset()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var charset = new GameFolderScanner().Scan(folder).Vga!.ReadCharset(2)!;
+        var text = System.Text.Encoding.Latin1.GetBytes("It's locked.");
+        var message = new LoomMessage(LoomMessageKind.Talk, 1, 0, [text], 160, 100, true, 0, 319, 15, 35, "test", 0, 120, null);
+        var layer = LoomVgaMessageRenderer.Render(message, charset);
+        Assert.NotNull(layer.Bounds);
+        Assert.Contains((byte)15, layer.Pixels);
+        Assert.Contains((byte)0, layer.Pixels);
+        Assert.InRange(layer.Bounds!.Value.Left, 100, 160);
+    }
 }

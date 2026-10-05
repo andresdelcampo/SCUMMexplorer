@@ -1,8 +1,12 @@
 # Changelog
 
+## 5 October (night, later): LOOM CD text on screen
+
+The CD charsets (`901` to `904.LFL`, 1 and 2 bits per pixel, per-glyph offsets) decode (`LoomVgaCharset`, `LoomVgaArchive.ReadCharset`) and `LoomVgaMessageRenderer` draws the session's talk and drawn strings in the app (charset 2, black outline from the colour table). The CD room screen is 144 rows, as on EGA. Record: `.verification/loom-vga/README.md` step 12.
+
 ## 5 October (night): LOOM CD click check, no EGA artwork estimate, matrixOps
 
-`CdCheck` clicks several rooms: Bobbin walks (room 4's cutscene, room 16), room loads are reached (rooms 5 to 8). The purple artifact at the top left of room 4 after its cutscene was the EGA artwork estimate (`FillGaps`) painting a stored 48 x 40 image over a live CD room; the CD game takes no estimate now (`CreateSessionRoomSelection`). `matrixOps` sub 1 runs in the executor as `setBoxFlags`; scale sub-opcodes and `createBoxMatrix` are presentation operations (test `MatrixOpsRunsInTheExecutorAsAWalkBoxFlagChange`). Record: `.verification/loom-vga/README.md` steps 10 and 11. Texts the session produces are not drawn yet (charsets 901 to 904 next).
+`CdCheck` clicks several rooms: Bobbin walks (room 4's cutscene, room 16), room loads are reached (rooms 5 to 8). The purple artifact at the top left of room 4 after its cutscene was the EGA artwork estimate (`FillGaps`) painting a stored 48 x 40 image over a live CD room; the CD game takes no estimate now (`CreateSessionRoomSelection`). `matrixOps` sub 1 runs in the executor as `setBoxFlags`; scale sub-opcodes and `createBoxMatrix` are presentation operations (test `MatrixOpsRunsInTheExecutorAsAWalkBoxFlagChange`). Record: `.verification/loom-vga/README.md` steps 10 and 11. Texts: see the next entry.
 
 ## 5 October (late night, last): LOOM CD live session and clicks
 

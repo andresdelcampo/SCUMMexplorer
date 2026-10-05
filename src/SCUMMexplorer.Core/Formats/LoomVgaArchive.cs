@@ -49,6 +49,7 @@ public sealed class LoomVgaArchive
     private readonly byte[] _lec;
     private readonly byte[] _index;
     private readonly Dictionary<int, LoomVgaRoom> _rooms;
+    private readonly Dictionary<int, byte[]> _charsets = [];
 
     private LoomVgaArchive(byte[] lec, byte[] index, IReadOnlyList<LoomVgaRoom> rooms)
     {
@@ -77,8 +78,15 @@ public sealed class LoomVgaArchive
             var number = BinaryPrimitives.ReadUInt16LittleEndian(lec.AsSpan(block.Start + 6));
             rooms.Add(new LoomVgaRoom(number, names.GetValueOrDefault(number, ""), block.Start, block.Size));
         }
-        return new LoomVgaArchive(lec, index, rooms);
+        var archive = new LoomVgaArchive(lec, index, rooms);
+        for (var number = 1; number <= 4; number++)
+            if (source.Exists($"90{number}.LFL")) archive._charsets[number] = source.ReadAllBytes($"90{number}.LFL");
+        return archive;
     }
+
+    /// <summary>Charset 1 to 4 (<c>901.LFL</c> to <c>904.LFL</c>), or null when the disc has no such file.</summary>
+    public Rendering.LoomVgaCharset? ReadCharset(int number) =>
+        _charsets.TryGetValue(number, out var file) ? Rendering.LoomVgaCharset.Parse(file, number) : null;
 
     /// <summary>The RN block: room number (one plain byte), a 9-byte name (XOR 0xFF); a zero room number ends the list.</summary>
     private static Dictionary<int, string> ReadRoomNames(byte[] index)
