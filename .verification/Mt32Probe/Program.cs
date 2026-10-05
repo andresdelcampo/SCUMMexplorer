@@ -4,6 +4,19 @@ using SCUMMexplorer.Core.Domain;
 
 // Mt32Probe <gamefolder>: the Roland ("RO") streams of sounds 33..64: events, channels, programs, length in ticks.
 var game = new GameFolderScanner().Scan(args[0]);
+if (args.Length > 1 && args[1] == "instruction")
+{
+    // Mt32Probe <game> instruction <text>: every script, room script and object verb with an instruction whose operation or operands contain the text.
+    var needle = args.Length > 2 ? args[2] : "roomPalette";
+    new SCUMMexplorer.Core.Formats.LoomSceneStateScanner(game).VisitCodeUnits((code, room, obj, verb, where) =>
+    {
+        if (code is null) return;
+        var hits = code.Instructions.Where(i => (i.Operation + " " + i.Operands).Contains(needle, StringComparison.Ordinal)).ToList();
+        if (hits.Count == 0) return;
+        Console.WriteLine($"room {room,2} {where}{(obj is null ? "" : $" object {obj} verb 0x{verb:X2}")}: {string.Join("; ", hits.Select(h => $"+0x{h.Offset:X4} {h.Operands}"))}");
+    });
+    return;
+}
 if (args.Length > 2 && args[1] == "activity")
 {
     // Mt32Probe <game> activity <sound>: notes started and channels used per 5 s window, and the markers in it.
