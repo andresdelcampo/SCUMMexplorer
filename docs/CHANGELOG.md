@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (evening): LOOM CD costumes
+
+The 165 costumes of the CD game decode (`LoomVgaCostumeRenderer`: the 16-colour classic format with block-relative offsets) and show in the app's Costumes tab and pose gallery (new real-window harness `.verification/loom-vga/CdCheck`). Test `EveryCostumeOfTheCdGameDrawsAtLeastOnePose`. Record: [.verification/loom-vga](../.verification/loom-vga/README.md), step 5.
+
 ## 5 October (later): LOOM CD scripts, objects and texts
 
 `ScummScriptDialect.LoomCd` (the v5 operand forms: `roomOps` with its sub-opcode first, `matrixOps`, `getActorScale`, `soundKludge`, the line-height-free print and the charset colours) reads all 793 scripts of the CD game without an issue (it was 742 as EGA). `LoomVgaArchive` now returns each room's scripts (`ReadScripts`) and objects (`ReadObjects`: position, parent, walk point, name, verb table). The text extractor has a CD branch: 1,196 texts (1,042 spoken lines, 134 object names), and the Game Texts window opens for the CD game. `TextGalleryCheck` no longer searches for a hard-coded Spanish word. Record: [.verification/loom-vga](../.verification/loom-vga/README.md).

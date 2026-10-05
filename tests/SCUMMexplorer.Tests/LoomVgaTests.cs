@@ -127,4 +127,21 @@ public sealed class LoomVgaTests
         Assert.Contains(extraction.Entries, e => e.Text == "That draft isn't working on the bell." && e.ObjectId == 294);
         Assert.True(extraction.Entries.Count > 1000);
     }
+
+    [Fact]
+    public void EveryCostumeOfTheCdGameDrawsAtLeastOnePose()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var archive = game.Vga!;
+        var costumes = archive.ReadCostumes();
+        Assert.Equal(165, costumes.Count);
+        Assert.Equal(165, game.Resources.Count(r => r.Kind == ResourceKind.Costume));
+        foreach (var costume in costumes)
+        {
+            var poses = archive.DecodeCostumePoses(costume);
+            Assert.True(poses.Count > 0, $"Costume {costume.Id} has no decodable pose");
+            Assert.All(poses, p => Assert.True(p.Image.IsValid));
+        }
+    }
 }

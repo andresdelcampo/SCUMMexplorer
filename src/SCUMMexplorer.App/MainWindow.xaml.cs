@@ -354,7 +354,7 @@ public partial class MainWindow : Window
             (ResourceKind.Sound, "Sounds & music"), (ResourceKind.Executable, "Game files")
         })
         {
-            if (game.Id != GameId.Loom && kind != ResourceKind.Executable) continue;
+            if (game.Id != GameId.Loom && !(game.Id == GameId.LoomVga && kind == ResourceKind.Costume) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -1949,6 +1949,24 @@ public partial class MainWindow : Window
 
         try
         {
+            if (_game is { Id: GameId.LoomVga, Vga: { } vga })
+            {
+                var costume = vga.FindCostume(resource.ResourceId ?? -1) ?? throw new InvalidDataException("This costume has no data.");
+                var poses = vga.DecodeCostumePoses(costume);
+                foreach (var (index, pose) in poses) CostumePoseGallery.Children.Add(CreateCostumePoseCard(index, pose));
+                if (poses.Count > 0)
+                {
+                    CostumeMessage.Visibility = Visibility.Collapsed;
+                    CostumePoseScrollViewer.Dispatcher.BeginInvoke(ApplyCostumePoseScale, DispatcherPriority.Loaded);
+                    StatusText.Text = $"{resource.Name} · {poses.Count} stored poses";
+                }
+                else
+                {
+                    CostumeMessage.Text = "No stored pose data is available for this costume.";
+                    StatusText.Text = $"{resource.Name} · no picture available";
+                }
+                return;
+            }
             if (_game is not { Id: GameId.Loom, Version: ScummVersion.V3 } || resource.Offset is not int resourceOffset)
                 throw new NotSupportedException("This costume has no supported DOS LOOM resource offset.");
 
@@ -1962,32 +1980,7 @@ public partial class MainWindow : Window
                 {
                     var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index);
                     if (pose is null) continue;
-                    var poseCard = new StackPanel
-                    {
-                        Margin = new Thickness(16, 14, 16, 22),
-                        HorizontalAlignment = HorizontalAlignment.Center
-                    };
-                    poseCard.Children.Add(new TextBlock
-                    {
-                        Text = $"POSE {slot.Index:00}",
-                        Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)),
-                        FontSize = 11,
-                        FontWeight = FontWeights.Bold,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        Margin = new Thickness(0, 0, 0, 8)
-                    });
-                    var poseImage = new Image
-                    {
-                        Source = CreateCostumeBitmap(pose.Width, pose.Height, pose.Pixels.ToArray(), pose.Palette),
-                        Width = pose.Width,
-                        Height = pose.Height,
-                        Stretch = Stretch.Uniform,
-                        SnapsToDevicePixels = true,
-                        ToolTip = $"Pose {slot.Index:00} · {pose.Width} × {pose.Height} pixels"
-                    };
-                    RenderOptions.SetBitmapScalingMode(poseImage, BitmapScalingMode.NearestNeighbor);
-                    poseCard.Children.Add(poseImage);
-                    CostumePoseGallery.Children.Add(poseCard);
+                    CostumePoseGallery.Children.Add(CreateCostumePoseCard(slot.Index, pose));
                     availableCount++;
                 }
                 catch (InvalidDataException)
@@ -2015,6 +2008,36 @@ public partial class MainWindow : Window
             CostumeMessage.Visibility = Visibility.Visible;
             StatusText.Text = $"{resource.Name} · picture unavailable";
         }
+    }
+
+    private StackPanel CreateCostumePoseCard(int index, RoomImage pose)
+    {
+    var poseCard = new StackPanel
+    {
+        Margin = new Thickness(16, 14, 16, 22),
+        HorizontalAlignment = HorizontalAlignment.Center
+    };
+    poseCard.Children.Add(new TextBlock
+    {
+        Text = $"POSE {index:00}",
+        Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)),
+        FontSize = 11,
+        FontWeight = FontWeights.Bold,
+        HorizontalAlignment = HorizontalAlignment.Center,
+        Margin = new Thickness(0, 0, 0, 8)
+    });
+    var poseImage = new Image
+    {
+        Source = CreateCostumeBitmap(pose.Width, pose.Height, pose.Pixels.ToArray(), pose.Palette),
+        Width = pose.Width,
+        Height = pose.Height,
+        Stretch = Stretch.Uniform,
+        SnapsToDevicePixels = true,
+        ToolTip = $"Pose {index:00} · {pose.Width} × {pose.Height} pixels"
+    };
+    RenderOptions.SetBitmapScalingMode(poseImage, BitmapScalingMode.NearestNeighbor);
+    poseCard.Children.Add(poseImage);
+        return poseCard;
     }
 
     private static string CostumeErrorMessage(Exception exception)

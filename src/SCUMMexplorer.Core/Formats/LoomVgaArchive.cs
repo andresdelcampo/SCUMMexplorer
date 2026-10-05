@@ -23,6 +23,9 @@ public sealed record LoomVgaVerb(int VerbId, int Offset);
 public sealed record LoomVgaObject(int Id, int X, int Y, int Width, int Height, int Parent, int ParentState, int WalkX, int WalkY, int Direction,
     string Name, IReadOnlyList<LoomVgaVerb> Verbs, byte[] Block, int BlockOffset);
 
+/// <summary>A costume block (CO): its number from the index, the room that stores it and its bytes (the body, without the block header).</summary>
+public sealed record LoomVgaCostume(int Id, int Room, byte[] Body);
+
 public sealed record LoomVgaRoom(int Number, string Name, int Offset, int Length);
 
 /// <summary>
@@ -37,11 +40,13 @@ public sealed class LoomVgaArchive
     private const byte Xor = 0x69;
 
     private readonly byte[] _lec;
+    private readonly byte[] _index;
     private readonly Dictionary<int, LoomVgaRoom> _rooms;
 
-    private LoomVgaArchive(byte[] lec, IReadOnlyList<LoomVgaRoom> rooms)
+    private LoomVgaArchive(byte[] lec, byte[] index, IReadOnlyList<LoomVgaRoom> rooms)
     {
         _lec = lec;
+        _index = index;
         Rooms = rooms;
         _rooms = rooms.ToDictionary(r => r.Number);
     }
@@ -55,7 +60,8 @@ public sealed class LoomVgaArchive
         if (!IsVga(source)) throw new InvalidDataException("000.LFL and DISK01.LEC are both needed.");
         var lec = source.ReadAllBytes(ArchiveFile);
         for (var i = 0; i < lec.Length; i++) lec[i] ^= Xor;
-        var names = ReadRoomNames(source.ReadAllBytes(IndexFile));
+        var index = source.ReadAllBytes(IndexFile);
+        var names = ReadRoomNames(index);
         var top = Blocks(lec, 0, lec.Length).FirstOrDefault(b => b.Tag == "LE")
             ?? throw new InvalidDataException("DISK01.LEC has no LE block.");
         var rooms = new List<LoomVgaRoom>();
@@ -64,7 +70,7 @@ public sealed class LoomVgaArchive
             var number = BinaryPrimitives.ReadUInt16LittleEndian(lec.AsSpan(block.Start + 6));
             rooms.Add(new LoomVgaRoom(number, names.GetValueOrDefault(number, ""), block.Start, block.Size));
         }
-        return new LoomVgaArchive(lec, rooms);
+        return new LoomVgaArchive(lec, index, rooms);
     }
 
     /// <summary>The RN block: room number (one plain byte), a 9-byte name (XOR 0xFF); a zero room number ends the list.</summary>
@@ -135,6 +141,70 @@ public sealed class LoomVgaArchive
                 block[17] & 7, name, verbs, block, oc.Start));
         }
         return objects;
+    }
+
+    /// <summary>
+    /// A resource directory of 000.LFL ("0S" scripts, "0N" sounds, "0C" costumes): a count word, then per resource number a room byte and a
+    /// dword offset (counted from the first block inside that room's LF block, which is 8 bytes after the LF block's start). Room 0 means
+    /// the resource does not exist.
+    /// </summary>
+    private IEnumerable<(int Id, int Room, int Block)> ReadDirectory(string tag)
+    {
+        var block = Blocks(_index, 0, _index.Length).FirstOrDefault(b => b.Tag == tag);
+        if (block is null) yield break;
+        var body = block.Start + 6;
+        var count = BinaryPrimitives.ReadUInt16LittleEndian(_index.AsSpan(body));
+        for (var id = 0; id < count && body + 2 + (id + 1) * 5 <= block.Start + block.Size; id++)
+        {
+            var room = _index[body + 2 + id * 5];
+            if (room == 0 || !_rooms.TryGetValue(room, out var owner)) continue;
+            yield return (id, room, owner.Offset + 8 + (int)BinaryPrimitives.ReadUInt32LittleEndian(_index.AsSpan(body + 3 + id * 5)));
+        }
+    }
+
+    /// <summary>The costumes the index lists (those whose block is a CO block).</summary>
+    public IReadOnlyList<LoomVgaCostume> ReadCostumes()
+    {
+        var costumes = new List<LoomVgaCostume>();
+        foreach (var (id, room, block) in ReadDirectory("0C"))
+        {
+            if (block + 6 > _lec.Length || Encoding.Latin1.GetString(_lec, block + 4, 2) != "CO") continue;
+            var size = (int)BinaryPrimitives.ReadUInt32LittleEndian(_lec.AsSpan(block));
+            if (size < 6 || block + size > _lec.Length) continue;
+            costumes.Add(new LoomVgaCostume(id, room, _lec.AsSpan(block + 6, size - 6).ToArray()));
+        }
+        return costumes;
+    }
+
+    /// <summary>The costume with this number, or null.</summary>
+    public LoomVgaCostume? FindCostume(int id) => ReadCostumes().FirstOrDefault(c => c.Id == id);
+
+    /// <summary>Every stored pose of a costume that decodes (pose index and picture, in the palette of the room that stores the costume).</summary>
+    public IReadOnlyList<(int Pose, RoomImage Image)> DecodeCostumePoses(LoomVgaCostume costume)
+    {
+        var palette = ReadPalette(costume.Room);
+        var poses = new List<(int, RoomImage)>();
+        foreach (var pose in LoomVgaCostumeRenderer.PosesWithData(costume.Body))
+        {
+            try
+            {
+                if (LoomVgaCostumeRenderer.DecodePose(costume.Body, pose, palette) is { } image) poses.Add((pose, image));
+            }
+            catch (InvalidDataException) { }
+        }
+        return poses;
+    }
+
+    /// <summary>A room's 256-colour palette (the PA block), for things drawn in that room.</summary>
+    public IReadOnlyList<uint> ReadPalette(int number)
+    {
+        if (!_rooms.TryGetValue(number, out var room)) throw new KeyNotFoundException($"Room {number} is not in DISK01.LEC.");
+        var ro = Blocks(_lec, room.Offset + 8, room.Offset + room.Length).First(b => b.Tag == "RO");
+        var pa = Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).First(b => b.Tag == "PA").Start + 6;
+        var palette = new uint[256];
+        for (var i = 0; i < 256; i++)
+            palette[i] = 0xFF000000u | (uint)(_lec[pa + 2 + i * 3] << 16) | (uint)(_lec[pa + 3 + i * 3] << 8) | _lec[pa + 4 + i * 3];
+        return palette;
     }
 
     public RoomImage DecodeRoom(int number)
