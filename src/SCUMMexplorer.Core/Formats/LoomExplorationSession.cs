@@ -214,6 +214,12 @@ public sealed partial class LoomExplorationSession
         _pending.RemoveAll(item => item.ScriptNumber == 1);
         _requestedLoad = null;
         _visitTrace.Add($"boot: the intro was not played; script 001 ran on from +0x{target:X4}, where the intro ends, to the room load that opens the game");
+        if (_runtime.UserPut <= 0)
+        {
+            // The intro's own cursorCommand calls (input on once the opening ends) were skipped with it; a game that has started takes clicks.
+            _runtime.UserPut = 1;
+            _runtime.UserPutEstimate = "the CD game's intro, which turns user input on when it ends, was not played";
+        }
     }
 
     /// <summary>

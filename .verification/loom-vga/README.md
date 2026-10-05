@@ -86,3 +86,10 @@ In the app: the **Costumes** tab and the pose gallery work for the CD game (`.ve
 - **Camera:** the CD room view starts at `LoomCdScene.CameraX` (`_pendingCameraX`); room 4 shows Bobbin at x 580. `CdCheck` now reports the view offset (`dotnet build .verification/loom-vga/CdCheck` first: it is not in the solution).
 - **Not done:** `matrixOps` in the executor; verbs and clicks (gate proposal pending the user); charsets; CD audio.
 
+## Step 9: live session and clicks for the CD game (5 October, late night)
+
+- Scripts 005, 006, 007 of the CD game are the EGA input scripts (class 0x81 objects, verb 0x37 walk-to, 0x38 use, 0x36 look); `var[0x020]` = 5 after the boot. Input was off because the skipped intro turns it on, so the CD boot sets `UserPut` = 1 with an estimate note.
+- App: `OpenGameFolder` builds the CD session; the room view reads records, images, verbs, names and boxes through `IScummDataSource` (`_cdData`) and goes through `ApplyRoomState` like EGA; the old static scene remains only when no session exists. Sound, music panel and scene sound are skipped for the CD game. Verified: filtered tests (40 passed), `CdCheck` clicks in rooms 4 and 35 (room 4's object 95 starts the cutscene; room 35 object 513 has no verb 0x37, as the data says).
+- Seen, not fixed: a small purple artifact at the top left of room 4 during the cutscene; text uses the fallback UI font (charsets 901-904 later).
+- Not done: `matrixOps`, charsets, CD audio, a verb strip for the CD game.
+

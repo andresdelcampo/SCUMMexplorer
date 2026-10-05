@@ -59,6 +59,8 @@ public partial class MainWindow : Window
     private LoomWalkBoxSet? _currentWalkBoxes;
     /// <summary>The CD game's first-visit scene of the room shown (its actors are drawn from it); null for other games.</summary>
     private LoomCdScene? _cdScene;
+    // The CD game's data source for the room view (null for the other games).
+    private IScummDataSource? _cdData;
     private IReadOnlyList<LoomRoomObjectRecord> _currentRoomObjectRecords = [];
     private IReadOnlyDictionary<int, string> _roomObjectNames = new Dictionary<int, string>();
     private IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> _roomVerbs =
@@ -239,8 +241,14 @@ public partial class MainWindow : Window
             SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.Adlib;
             _soundModeFallback = false;
         }
-        _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
-        if (_session is not null) _sceneSound.Attach(game, _session);
+        // The CD game gets a live session as well (clicks, walks, verbs); its entry points are the same scripts 005-007. It starts past
+        // the intro (see LoomExplorationSession.ContinueCdBootAfterIntro) and has no sound or catalog yet.
+        var cdIndexed = game is { Id: GameId.LoomVga, Vga: { } vga } ? vga.ReadIndexedObjects() : null;
+        _cdData = cdIndexed is null ? null : ScummDataSources.For(game);
+        if (cdIndexed is not null) _indexedStates = cdIndexed.States;
+        _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
+            : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
+        if (_session is not null && cdIndexed is null) _sceneSound.Attach(game, _session);
         _charsetError = null;
         _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
         _actorCostumes.Clear();
@@ -924,16 +932,18 @@ public partial class MainWindow : Window
             // The CD game's rooms come out of DISK01.LEC (no per-room file); the others read their LFL file.
             var bytes = isCd ? [] : await File.ReadAllBytesAsync(resource.FilePath, token);
             LoomCdScene? cdScene = null;
-            if (isCd)
+            if (isCd && _session is null)
             {
                 var cdGame = _game!;
                 try { cdScene = await Task.Run(() => LoomCdRoomScene.FirstVisit(cdGame, resource.ResourceId!.Value), token); }
                 catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
             }
             var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.Vga!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
-            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes : TryReadWalkBoxes(bytes);
+            ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
+                ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
+            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
-            if (_game?.Id is GameId.IndianaJones3 or GameId.LoomVga)
+            if (_game?.Id is GameId.IndianaJones3 || isCd && cdRoom is null)
             {
                 if (token.IsCancellationRequested) return;
                 _currentRoom = room;
@@ -971,15 +981,16 @@ public partial class MainWindow : Window
                 StatusText.ToolTip = "Room background read from the game's own data.";
                 return;
             }
-            var objectRecords = _objectDirectory.Decode(bytes);
-            var objects = _objectDecoder.Decode(bytes);
+            var objectRecords = cdRoom?.Objects ?? _objectDirectory.Decode(bytes);
+            var objects = cdRoom is null ? _objectDecoder.Decode(bytes) : _cdData!.ReadObjectImages(resource.ResourceId!.Value);
             if (token.IsCancellationRequested) return;
             _currentRoom = room;
             _currentRoomResource = resource;
             _lastViewedRoomResource = resource;
             _currentRoomObjectRecords = objectRecords;
-            _roomVerbs = _verbReader.ReadAll(bytes, objectRecords);
-            _roomObjectNames = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), objectRecords);
+            _roomVerbs = cdRoom is null ? _verbReader.ReadAll(bytes, objectRecords) : _cdData!.ReadObjectVerbs(resource.ResourceId!.Value, objectRecords);
+            _roomObjectNames = cdRoom is null ? LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), objectRecords)
+                : cdRoom.ObjectNames.ToDictionary(pair => pair.Key, pair => System.Text.Encoding.Latin1.GetString(pair.Value));
             _objects = objects;
             ApplyRoomState(resource, objectRecords, objects, visit: true);
             UpdateRoomNavigationActions(resource);
@@ -2360,7 +2371,7 @@ public partial class MainWindow : Window
     // ScummVM), never while typing in a text box. Script 005 reads the note rows q-i and c-C, < and > (text speed),
     // F5 (save screen), F6 (music and effects), F7 (animation), Ctrl+V (version) and Escape.
     private bool GameKeysActive => SessionModeToggle.IsChecked == true &&
-                                   _session is not null && _currentRoomResource is not null && _game?.Id == GameId.Loom &&
+                                   _session is not null && _currentRoomResource is not null && IsLoomGame &&
                                    Keyboard.FocusedElement is not (TextBox or ComboBox);
 
     /// <summary>
@@ -2412,7 +2423,7 @@ public partial class MainWindow : Window
         // '.' is the engine's talk-stop key (processKeyboard; v3 has no VAR_TALKSTOP_KEY, so it is always on):
         // it ends the current text's delay and never reaches the scripts. It works whenever the interactive
         // session runs, also while a cutscene changes rooms.
-        if (e.Text == "." && GameClickActive && _game?.Id == GameId.Loom && Keyboard.FocusedElement is not (TextBox or ComboBox))
+        if (e.Text == "." && GameClickActive && IsLoomGame && Keyboard.FocusedElement is not (TextBox or ComboBox))
         {
             e.Handled = true;
             if (!SkipTalk("the game's talk-stop key '.'"))
@@ -3370,6 +3381,9 @@ public partial class MainWindow : Window
     /// In the explore mode every room click is the game's click (decided 28 September):
     /// it goes through the input scripts (005–007). Inspection mode cycles artwork instead.
     /// </summary>
+    /// <summary>LOOM on EGA or on CD: the click path (scripts 005-007) is the same; what reads EGA-only files stays on <c>GameId.Loom</c>.</summary>
+    private bool IsLoomGame => _game?.Id is GameId.Loom or GameId.LoomVga;
+
     private bool GameClickActive => SessionModeToggle.IsChecked == true && _session is not null;
 
     // The game's click: a single click waits for the system double-click time before it is sent.
@@ -3701,7 +3715,7 @@ public partial class MainWindow : Window
         GameStatusButton.Visibility = _game?.Id == GameId.Loom && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         GameStatusButton.IsEnabled = _session is not null; // Inspection is available during playback too; editing stays guarded.
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
-        var active = GameClickActive && _game?.Id == GameId.Loom;
+        var active = GameClickActive && IsLoomGame;
         UpdateInteractButton();
         // Step plays one frame of a paused scene; with nothing paused there is nothing to step.
         AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
@@ -4152,13 +4166,13 @@ public partial class MainWindow : Window
 
     private void FollowSessionSound()
     {
-        if (GameClickActive && _game is not null && _session is not null && !_sceneSound.Follows(_session))
+        if (GameClickActive && _game is { Id: not GameId.LoomVga } && _session is not null && !_sceneSound.Follows(_session))
             _sceneSound.Attach(_game, _session);
     }
 
     private void UpdateSessionSound()
     {
-        if (GameClickActive && !_playbackBatch) _sceneSound.Update();
+        if (GameClickActive && !_playbackBatch && _game?.Id != GameId.LoomVga) _sceneSound.Update();
     }
 
     private void PlaybackTimer_Tick(object? sender, EventArgs e)
@@ -5259,7 +5273,7 @@ public partial class MainWindow : Window
         RoomMusicPanel.Visibility = Visibility.Collapsed;
         _roomSoundChoices = [];
         RoomSoundsButton.Visibility = Visibility.Collapsed;
-        if (_game is null || _currentRoomResource is not { } room) return;
+        if (_game is null || _game.Id == GameId.LoomVga || _currentRoomResource is not { } room) return;
         // The interactive LOOM mode plays the music the game's scripts start (SceneSoundPlayer), so the panel's own
         // player would only duplicate it (the user's choice, 30 Sep; .verification/room-music-analysis). Inspection mode keeps it.
         // The Sounds menu (every music and effect the room may start, played on demand) serves both modes.

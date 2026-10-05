@@ -46,6 +46,18 @@ internal static class Program
                     Shot($"room-{number:00}.png");
                     report.Add($"room {number}: {((IReadOnlyCollection<object>)((System.Collections.IEnumerable)Field("_objects")!).Cast<object>().ToList()).Count} object images, view offset {((ScrollViewer)window.FindName("RoomViewport")).HorizontalOffset:0} of {((ScrollViewer)window.FindName("RoomViewport")).ScrollableWidth:0}, pending camera {Field("_pendingCameraX")}");
                 }
+                // The game's click in the live CD session: room 4's object 95 (verb 0x37 starts a cutscene) and a walk in room 35.
+                foreach (var (number, x, y) in new[] { (4, 328, 72), (35, 150, 100) })
+                {
+                    var room = game.Rooms.First(r => r.ResourceId == number);
+                    Call("SelectResourceInTree", room);
+                    for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
+                    await Task.Delay(500);
+                    Call("HandleRoomPoint", x, y, false);
+                    await Task.Delay(4000);
+                    Shot($"click-{number:00}.png");
+                    report.Add($"click room {number} at {x},{y}: {((TextBlock)window.FindName("StatusText")).Text} | {((TextBlock)window.FindName("StatusText")).ToolTip}");
+                }
                 var costumesTab = (RadioButton)window.FindName("CostumesTab");
                 costumesTab.IsChecked = true;
                 Call("NormalCatalogTab_Click", costumesTab, new RoutedEventArgs());

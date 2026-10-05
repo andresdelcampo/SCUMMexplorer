@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (late night, last): LOOM CD live session and clicks
+
+The CD game gets a live `LoomExplorationSession` in the app (`MainWindow.OpenGameFolder`, `IsLoomGame` gate for keys, talk-stop and the playback bar; EGA-only readers such as Game Status, glossary, catalog and sound stay on `GameId.Loom`). A click reaches scripts 005 to 007 as on EGA (verb 0x37 walk-to, 0x38, double click 0x36); the CD boot now turns user input on (labelled estimate, the intro that does it is skipped). Room 4's click starts its cutscene (script 002) in the real window (`CdCheck`: `click-04.png`). Record: `.verification/loom-vga/README.md` step 9.
+
 ## 5 October (late night, later): LOOM CD depth masks and camera
 
 The CD data carries the depth mask (z-plane 1) after the strips of each `BM` and `OI` body: the size field counts the strips, then a length word, one offset word per strip and the EGA mask's run coding. `LoomVgaArchive` reads it (`RoomImage.DepthMask`, `RoomObjectImage.Mask`); the room view hides an actor in a masked walk box behind it, with the drawn objects' masks as on EGA (rooms 4, 16, 18, 22, 35, 66 and others clip a Bobbin or actor, tests `LoomVgaTests`). The CD room view starts at the camera the entry script left (room 4's Bobbin stands in view). Record: `.verification/loom-vga/README.md` step 8.
