@@ -22,11 +22,8 @@ public sealed class SceneSoundPlayer
     public enum SoundMode { None, PcSpeaker, Adlib, Roland }
     public SoundMode Mode { get; private set; } = SoundMode.Adlib;
 
-    /// <summary>The OPL emulation behind AdLib: the hardware chip (Nuked) or ScummVM's MAME core.</summary>
-    public AdlibEmulation Emulation { get; private set; } = AdlibEmulation.Hardware;
-
-    /// <summary>The level that makes the emulations about equally loud: ScummVM at its default volume (192 of 255) is about 10 dB below the hardware chip with +6 dB.</summary>
-    public static double DefaultGainDb(AdlibEmulation emulation) => emulation == AdlibEmulation.Hardware ? 6 : 10;
+    /// <summary>The AdLib rendition's default level; the room panel's slider can change it.</summary>
+    public const double AdlibGainDb = 6;
 
     /// <summary>The MT-32 ROM images the Roland device needs (the user's own files); null until a folder with them is known.</summary>
     public Mt32RomSet? Roms { get; set; }
@@ -41,16 +38,12 @@ public sealed class SceneSoundPlayer
     public static string DeviceName(SoundMode mode) => mode switch { SoundMode.Adlib => "AdLib", SoundMode.Roland => "Roland MT-32", _ => "PC speaker" };
 
     /// <summary>Changing device stops current voices; subsequent script commands use the new device.</summary>
-    public void SetMode(SoundMode mode) => SetDevice(mode, Emulation);
-
-    /// <summary>Like <see cref="SetMode"/>, with the emulation AdLib uses.</summary>
-    public void SetDevice(SoundMode mode, AdlibEmulation emulation)
+    public void SetMode(SoundMode mode)
     {
-        if (Mode == mode && Emulation == emulation) return;
+        if (Mode == mode) return;
         StopAll("sound mode changed");
         Mode = mode;
-        Emulation = emulation;
-        Log.Add(new(_frames, _clock.ElapsedMilliseconds, "mode", null, mode == SoundMode.Adlib ? $"{mode} ({emulation})" : mode.ToString(), ""));
+        Log.Add(new(_frames, _clock.ElapsedMilliseconds, "mode", null, mode.ToString(), ""));
     }
     /// <summary>One line of what the player did, for the harness: the frame count, the time and the sound.</summary>
     public sealed record Entry(int Frame, long Milliseconds, string Action, int? SoundId, string Kind, string Source);
@@ -65,10 +58,9 @@ public sealed class SceneSoundPlayer
         public bool Stopped { get; set; }
     }
 
-    private readonly LoomAdlibAudio _adlib = new(AdlibEmulation.Hardware);
-    private readonly LoomAdlibAudio _adlibScummVm = new(AdlibEmulation.ScummVm);
+    private readonly LoomAdlibAudio _adlib = new();
     private readonly LoomPcSpeakerAudio _speaker = new();
-    private readonly Dictionary<(SoundMode Mode, AdlibEmulation Emulation, int Id), Task<(string? Path, bool Music)>> _renders = [];
+    private readonly Dictionary<(SoundMode Mode, int Id), Task<(string? Path, bool Music)>> _renders = [];
     private readonly List<Voice> _voices = [];
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private GameLibrary? _game;
@@ -238,8 +230,7 @@ public sealed class SceneSoundPlayer
 
     private Task<(string? Path, bool Music)> Render(int id, SoundMode mode)
     {
-        var emulation = mode == SoundMode.Adlib ? Emulation : AdlibEmulation.Hardware;
-        if (_renders.TryGetValue((mode, emulation, id), out var cached)) return cached;
+        if (_renders.TryGetValue((mode, id), out var cached)) return cached;
         var resource = _game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == id);
         var task = resource is null
             ? Task.FromResult<(string?, bool)>((null, false))
@@ -260,12 +251,9 @@ public sealed class SceneSoundPlayer
                     else
                     {
                         music = _adlib.HasMusic(resource);
-                        if (mode == SoundMode.Adlib)
-                        {
-                            wave = (emulation == AdlibEmulation.ScummVm ? _adlibScummVm : _adlib).RenderWave(resource);
-                            if (DefaultGainDb(emulation) > 0) wave = LoomAdlibAudio.ApplyOutputGain(wave, DefaultGainDb(emulation));
-                        }
-                        else wave = _speaker.RenderWave(resource);
+                        wave = mode == SoundMode.Adlib
+                            ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), AdlibGainDb)
+                            : _speaker.RenderWave(resource);
                     }
                     var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");
                     File.WriteAllBytes(path, wave);
@@ -277,7 +265,7 @@ public sealed class SceneSoundPlayer
                     return (null, false);
                 }
             });
-        _renders[(mode, emulation, id)] = task;
+        _renders[(mode, id)] = task;
         return task;
     }
 }

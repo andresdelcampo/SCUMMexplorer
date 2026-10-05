@@ -30,29 +30,7 @@ public partial class MainWindow : Window
     private readonly LoomBoundedScriptExecutor _scriptExecutor = new();
     private readonly LoomRelationshipIndexer _relationshipIndexer = new();
     private readonly LoomPcSpeakerAudio _audioDecoder = new();
-    private readonly LoomAdlibAudio _adlibDecoder = new(AdlibEmulation.Hardware);
-    private readonly LoomAdlibAudio _adlibScummVmDecoder = new(AdlibEmulation.ScummVm);
-    private LoomAdlibAudio AdlibDecoder => _sceneSound.Emulation == AdlibEmulation.ScummVm ? _adlibScummVmDecoder : _adlibDecoder;
-
-    // One dropdown: No Sound, PC Speaker, AdLib (hardware), AdLib (ScummVM), Roland MT-32.
-    private static int SoundComboIndex(SceneSoundPlayer.SoundMode mode, AdlibEmulation emulation) => mode switch
-    {
-        SceneSoundPlayer.SoundMode.None => 0,
-        SceneSoundPlayer.SoundMode.PcSpeaker => 1,
-        SceneSoundPlayer.SoundMode.Adlib => emulation == AdlibEmulation.Hardware ? 2 : 3,
-        _ => 4
-    };
-
-    private static (SceneSoundPlayer.SoundMode Mode, AdlibEmulation Emulation) SoundFromComboIndex(int index) => index switch
-    {
-        0 => (SceneSoundPlayer.SoundMode.None, AdlibEmulation.Hardware),
-        1 => (SceneSoundPlayer.SoundMode.PcSpeaker, AdlibEmulation.Hardware),
-        2 => (SceneSoundPlayer.SoundMode.Adlib, AdlibEmulation.Hardware),
-        3 => (SceneSoundPlayer.SoundMode.Adlib, AdlibEmulation.ScummVm),
-        _ => (SceneSoundPlayer.SoundMode.Roland, AdlibEmulation.Hardware)
-    };
-
-    private int CurrentSoundComboIndex => SoundComboIndex(_sceneSound.Mode, _sceneSound.Emulation);
+    private readonly LoomAdlibAudio _adlibDecoder = new();
 
     private readonly MediaPlayer _audioPlayer = new();
     // The sounds the scripts start while the playback clock runs (cutscenes); separate from the room music panel.
@@ -256,7 +234,7 @@ public partial class MainWindow : Window
             // Not saved: the choice stays for a folder with the upgrade and the ROMs.
             _sceneSound.SetMode(SceneSoundPlayer.SoundMode.Adlib);
             _soundModeFallback = true;
-            SoundModeCombo.SelectedIndex = SoundComboIndex(SceneSoundPlayer.SoundMode.Adlib, _sceneSound.Emulation);
+            SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.Adlib;
             _soundModeFallback = false;
         }
         _session = indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
@@ -2508,7 +2486,7 @@ public partial class MainWindow : Window
                 return new LoomMt32Audio(roms).RenderWave(resource, token);
             }
             if (LoomRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
-            return adlib ? AdlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
+            return adlib ? _adlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
         }, token);
 
     private async void RoomCuePlay_Click(object sender, RoutedEventArgs e) => await PlayRoomCueAsync();
@@ -2539,7 +2517,7 @@ public partial class MainWindow : Window
             var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
             var wave = await RenderAudioWaveAsync(sound, adlib, token);
             if (token.IsCancellationRequested) return;
-            if (adlib && SceneSoundPlayer.DefaultGainDb(_sceneSound.Emulation) is var gainDb and > 0) wave = LoomAdlibAudio.ApplyOutputGain(wave, gainDb);
+            if (adlib) wave = LoomAdlibAudio.ApplyOutputGain(wave, SceneSoundPlayer.AdlibGainDb);
             var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
             await File.WriteAllBytesAsync(path, wave, token);
             if (token.IsCancellationRequested)
@@ -2651,27 +2629,26 @@ public partial class MainWindow : Window
         return true;
     }
 
-    private const string SoundModeToolTip = "Music and effects. AdLib (hardware) is the OPL chip as it behaves; AdLib (ScummVM) is the emulation ScummVM uses. Changing device stops current audio; the next sound command uses the selected device.";
+    private const string SoundModeToolTip = "Music and effects. Changing device stops current audio; the next sound command uses the selected device.";
 
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || SoundModeCombo.SelectedIndex < 0) return;
         if (SessionInScene)
         {
-            SoundModeCombo.SelectedIndex = CurrentSoundComboIndex;
+            SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
             return;
         }
-        var (requested, requestedEmulation) = SoundFromComboIndex(SoundModeCombo.SelectedIndex);
+        var requested = (SceneSoundPlayer.SoundMode)SoundModeCombo.SelectedIndex;
         if (requested == SceneSoundPlayer.SoundMode.Roland && !PrepareRoland())
         {
-            SoundModeCombo.SelectedIndex = CurrentSoundComboIndex;
+            SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
             return;
         }
         var surface = _audioSurface;
         var selected = _selectedSound;
         StopAudio();
-        _sceneSound.SetDevice(requested, requestedEmulation);
-        if (requested == SceneSoundPlayer.SoundMode.Adlib) AdlibGainSlider.Value = SceneSoundPlayer.DefaultGainDb(requestedEmulation);
+        _sceneSound.SetMode(requested);
         // The game's scripts read the sound card when they choose a sound, so the new device applies from the next one on.
         if (_session is not null) _session.SoundCard = SoundCard;
         if (!_soundModeFallback) SaveViewOptions();
@@ -3174,12 +3151,7 @@ public partial class MainWindow : Window
                         case "sound" when Enum.TryParse<SceneSoundPlayer.SoundMode>(parts[1], out var mode):
                             // Restored as it was left; the ROM images of a Roland choice are looked for when a game opens.
                             _sceneSound.SetMode(mode);
-                            SoundModeCombo.SelectedIndex = CurrentSoundComboIndex;
-                            break;
-                        case "adlib" when Enum.TryParse<AdlibEmulation>(parts[1], out var emulation):
-                            _sceneSound.SetDevice(_sceneSound.Mode, emulation);
-                            SoundModeCombo.SelectedIndex = CurrentSoundComboIndex;
-                            AdlibGainSlider.Value = SceneSoundPlayer.DefaultGainDb(emulation);
+                            SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
                             break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
                         case "readable": _readableScripts = parts[1] != "0"; ScriptReadableToggle.IsChecked = _readableScripts; ScriptBytesToggle.IsEnabled = !_readableScripts; break;
@@ -3198,7 +3170,7 @@ public partial class MainWindow : Window
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
-            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}", $"sound={_sceneSound.Mode}", $"adlib={_sceneSound.Emulation}"]);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}", $"sound={_sceneSound.Mode}"]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
