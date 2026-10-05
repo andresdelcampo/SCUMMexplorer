@@ -60,6 +60,7 @@ dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 
 ## Workflow notes
 
+- **End every session with a current ready-to-copy prompt** at the top of `docs/NEXT_SESSION_PROMPT.md` (state, next task, standing rules), replacing the old one, and give it to the user in the final reply so they only confirm it. Never leave the old prompt in place.
 - Verification executables include `.verification/HarnessFailurePolicy.cs` through `Directory.Build.targets`: rebuild old harnesses before running them. Fatal exceptions log under `Exe/HarnessFailures/` (or `SCUMM_HARNESS_FAILURE_LOG`) and exit 1 without Windows crash/debug UI. The shipped app is unaffected.
 
 - The repository is on git (`master`). Commit each finished task separately; `Games/` stays out of git.

@@ -8,6 +8,8 @@ LOOM EGA exploration is functionally complete for the user's three priorities (o
 
 ## Rules the user has set
 
+- **End every session with a current ready-to-copy prompt** at the top of `docs/NEXT_SESSION_PROMPT.md` (state, next task, standing rules), replacing the old one, and give it to the user in the final reply so they only confirm it. Never leave the old prompt in place.
+
 Room state (3 October). Rooms start in the earliest game state. A room moves to a late state only after the user triggers the late cutscene that causes it (the session then carries that state on). No scene is chained after other scenes to show a later branch (the Room 44/652, Room 45/655, Room 41/633 question is closed: fresh branch). The staff rule for scenes outside the island (decided 3 October) is its own explicit exception: scenes whose code clears or reads bit D61 start with the distaff held through the game's own pickup (Room 09 object 271), run unseen, when the scene is outside the LOOM island (Room 11 on); island scenes keep the fresh state. Every assumption is shown in the picker note.
 
 State control (3 October). The user controls the game state (Game Status: staff, notes, drafts, story events) and can change it freely. The app only raises the state to the minimum the chosen room or cutscene needs, and keeps a later state if the session already has one. A single cutscene picked from the menu keeps the running session (`PlayKnownCutscene`); `LoomSceneSetupPlanner.Adapt` drops the staff pickup when the session already holds it; stated sequences start fresh; Restart returns to the boot. Story-event checkboxes need no presetting: the real pickups and scenes set their bits. The LOOM-specific flag list is `LoomEgaStateFlags` (App); the window is generic.
