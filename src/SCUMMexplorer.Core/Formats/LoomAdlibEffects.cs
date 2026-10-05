@@ -190,7 +190,7 @@ public sealed partial class LoomAdlibAudio
             Write(register, (_registers[register] & ~Masks[parameter]) | (unchecked((byte)value) << (parameter == 1 ? 1 : 0)));
         }
         private void Retrigger(Channel channel) { int r = 0xB0 + channel.Number, v = _registers[r]; Write(r, v & 0xDF); Write(r, v | 32); }
-        private void Write(int register, int value) { _registers[register] = unchecked((byte)value); Chip.WriteRegister((ushort)register, unchecked((byte)value)); }
+        private void Write(int register, int value) { _registers[register] = unchecked((byte)value); Chip.WriteRegister((ushort)register, ChipValue(register, unchecked((byte)value))); }
         private int Read(int position) => position >= 0 && position < _data.Length ? _data[position] : throw new InvalidDataException("AdLib effect extends past its resource.");
         private void Require(int position, int length) { if (position < 0 || position > _data.Length - length) throw new InvalidDataException("Truncated AdLib effect command."); }
         private sealed class Channel(int number, int start)

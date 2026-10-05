@@ -19,6 +19,20 @@ public sealed partial class LoomAdlibAudio
     private static readonly int[] RhythmOperators = [0, 0, 20, 18, 21, 17];
     private static readonly int[] RhythmChannels = [0, 0, 7, 8, 8, 7];
 
+    /// <summary>
+    /// The value the chip receives. ScummVM plays AdLib through its MAME OPL2 core, which reads the key scale level
+    /// (bits 7-6 of registers 0x40-0x55) as 1 = 1.5 dB/octave and 2 = 3 dB/octave; the YM3812 documents the opposite
+    /// (1 = 3, 2 = 1.5). The music is meant to be heard as ScummVM plays it, so values 1 and 2 are exchanged before the
+    /// Nuked core, which implements the documented behaviour. The driver's own register state is untouched.
+    /// See .verification/audio-accuracy-20261003 and the 5 October addendum.
+    /// </summary>
+    private static byte ChipValue(int register, byte value)
+    {
+        if (register is < 0x40 or > 0x55) return value;
+        var ksl = value >> 6;
+        return ksl is 1 or 2 ? (byte)((value & 0x3F) | ((3 - ksl) << 6)) : value;
+    }
+
     public bool HasMusic(GameResource resource)
     {
         try { return ReadTrack(resource) is { Length: >= 0x94 } track && track[2] == 0x80; }
@@ -394,7 +408,7 @@ public sealed partial class LoomAdlibAudio
 
         private void Write(int register, int value)
         {
-            Chip.WriteRegister((ushort)register, (byte)value);
+            Chip.WriteRegister((ushort)register, ChipValue(register, (byte)value));
             if (register is >= 0xb0 and <= 0xb8) _voices[register - 0xb0].B0 = value;
         }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October: AdLib key scale level as ScummVM plays it
+
+Instruments in the title music sounded low or different against ScummVM. The driver and chip were exact; ScummVM's MAME OPL core reads the key scale level values 1 and 2 the other way round from the YM3812 documentation (and from Nuked). The chip now receives them exchanged (`LoomAdlibAudio.ChipValue`), always on, so the music sounds as ScummVM plays it. Not changed: MAME's louder attack and vibrato differences, and the +6 dB level (the app's gain). [validation](../.verification/archive/audio-accuracy-20261003/validation.md)
+
 ## 5 October: Roland MT-32 device (the LOOM Roland upgrade's music)
 
 Sounds 33–64 of the EGA folders with the Roland upgrade are tagless MIDI-like streams (`F0/F1` waits, 120 ticks per quarter at 500000 us, program numbers only, MIDI channels 1–9), and the game's scripts choose them when the sound card `var[0x030]` is 4 (script 001, 039, 040, 044, 046, 095, 104; Roland id = other id + 32). New: `LoomRolandSong`, `LoomMt32Audio` + `Mt32RomSet` (Munt through Mt32emu.net 1.0.0, LGPL-2.1+; the user's own ROMs), `LoomExplorationSession.SoundCard`, and a fourth sound device "Roland MT-32" that sets the card to 4 so the scripts pick the Roland sounds (the opening then starts the overture, sound 56). Tests `LoomRolandAudioTests` (10); tools `Mt32Probe`, `RolandCheck`; record [.verification/mt32/README.md](../.verification/mt32/README.md). Not yet listened to by the user. Same day: the game holds while a track is still rendering (the overture's first seconds were being skipped), and the sound device is remembered between runs (`view-options.txt`, `sound=`). The Roland opening no longer hangs (the music timer `var[0x00E]` now follows the song's markers), and opening a scene or preparing music shows the wait cursor and a text over the room.
