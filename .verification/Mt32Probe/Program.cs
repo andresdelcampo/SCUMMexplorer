@@ -4,6 +4,26 @@ using SCUMMexplorer.Core.Domain;
 
 // Mt32Probe <gamefolder>: the Roland ("RO") streams of sounds 33..64: events, channels, programs, length in ticks.
 var game = new GameFolderScanner().Scan(args[0]);
+if (args.Length > 2 && args[1] == "opening")
+{
+    // Mt32Probe <game> opening <card> [frames]: the opening under a sound card, state every 100 frames, until it has run its course.
+    var card = int.Parse(args[2]); int limit = args.Length > 3 ? int.Parse(args[3]) : 6000;
+    var snap = new SCUMMexplorer.Core.Formats.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var session = new SCUMMexplorer.Core.Formats.LoomExplorationSession(game, snap, stopAtOpening: true, soundCard: card);
+    int lastRoom = -1;
+    for (int frame = 1; frame <= limit; frame++)
+    {
+        session.AdvanceFrame();
+        var sn = session.Snapshot;
+        if (sn.RoomId != lastRoom || frame % 200 == 0)
+        {
+            lastRoom = sn.RoomId ?? -1;
+            Console.WriteLine($"frame {frame}: room {sn.RoomId}, boot {session.BootRunning}, cutscene {session.InCutscene}, pending {sn.PendingScripts}, sound a3 {sn.KnownGlobalVariables.GetValueOrDefault("var[0x0A3]")}, jiffies {session.FrameJiffies}");
+        }
+        if (!session.BootRunning && !session.InCutscene && sn.PendingScripts == 0) { Console.WriteLine($"frame {frame}: quiet (boot over, no cutscene, nothing pending) in room {sn.RoomId}"); break; }
+    }
+    return;
+}
 if (args.Length > 1 && args[1] == "compare")
 {
     // Roland length against the AdLib sound 32 lower (script 039/040 add 0x20 to the id on a Roland card).

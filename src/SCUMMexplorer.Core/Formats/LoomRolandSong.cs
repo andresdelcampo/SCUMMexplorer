@@ -28,10 +28,13 @@ public sealed class LoomRolandSong
     public long Ticks { get; }
     public bool Loops { get; }
     public bool HasEndMarker { get; }
+    /// <summary>The ticks of the song's <c>Ax</c> markers, in order. The game's music timer (<c>var[0x00E]</c>) counts the markers passed.</summary>
+    public IReadOnlyList<long> MarkerTicks { get; }
     public TimeSpan Duration => TimeSpan.FromSeconds(Ticks * SecondsPerTick);
 
-    private LoomRolandSong(IReadOnlyList<LoomRolandEvent> events, long ticks, bool loops, bool hasEnd)
+    private LoomRolandSong(IReadOnlyList<LoomRolandEvent> events, long ticks, bool loops, bool hasEnd, IReadOnlyList<long> markers)
     {
+        MarkerTicks = markers;
         Events = events;
         Ticks = ticks;
         Loops = loops;
@@ -63,8 +66,9 @@ public sealed class LoomRolandSong
         try
         {
             var song = Read(resource);
-            if (song.Loops) return new(LoomSoundLifetimeKind.Looping, null, true);
-            return new(LoomSoundLifetimeKind.Finite, Math.Max(1, (int)Math.Round(song.Ticks * SecondsPerTick * 472)), song.Duration.TotalSeconds > 3);
+            var markers = song.MarkerTicks.ToArray();
+            if (song.Loops) return new(LoomSoundLifetimeKind.Looping, null, true, MarkerTicks: markers);
+            return new(LoomSoundLifetimeKind.Finite, Math.Max(1, (int)Math.Round(song.Ticks * SecondsPerTick * 472)), song.Duration.TotalSeconds > 3, MarkerTicks: markers);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
         {
@@ -88,6 +92,7 @@ public sealed class LoomRolandSong
     public static LoomRolandSong Parse(ReadOnlySpan<byte> data)
     {
         var events = new List<LoomRolandEvent>();
+        var markers = new List<long>();
         long tick = 0;
         var loops = false;
         var ended = false;
@@ -96,7 +101,7 @@ public sealed class LoomRolandSong
             var status = data[p++];
             if (status == 0) { ended = true; break; }
             if (status == 0xFF) { ended = true; loops = true; break; }
-            if (status >> 4 == 0xA) continue;
+            if (status >> 4 == 0xA) { markers.Add(tick); continue; }
             if (status is 0xF0 or 0xF1)
             {
                 if (p >= data.Length) throw new InvalidDataException("A Roland wait has no length.");
@@ -109,7 +114,7 @@ public sealed class LoomRolandSong
             events.Add(new LoomRolandEvent(tick, status, data[p], count == 2 ? data[p + 1] : (byte)0));
             p += count;
         }
-        return new LoomRolandSong(events, tick, loops, ended);
+        return new LoomRolandSong(events, tick, loops, ended, markers);
     }
 
     private static byte[] ReadFile(GameResource resource)

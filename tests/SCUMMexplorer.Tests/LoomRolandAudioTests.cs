@@ -125,4 +125,43 @@ public sealed class LoomRolandAudioTests
         Assert.NotEmpty(plain);
         Assert.All(plain, id => Assert.InRange(id, 1, 32));
     }
+
+    [Fact]
+    public void MarkersGiveTheGamesMusicTimer()
+    {
+        // markers at ticks 0, 8 and 8 (two in a row), none after the last wait
+        var song = LoomRolandSong.Parse([0xA0, 0xF0, 0x08, 0xA1, 0xA2, 0xF0, 0x08]);
+        Assert.Equal([0L, 8, 8], song.MarkerTicks);
+        // The clock counts 60 jiffies a second and a Roland tick lasts 1/240 s: four ticks a jiffy.
+        var clock = new LoomSoundClock(_ => new(LoomSoundLifetimeKind.Finite, 10_000, true, MarkerTicks: song.MarkerTicks.ToArray()));
+        Assert.Equal(0, clock.MusicTimer());
+        clock.Start(40, estimated: false);
+        Assert.Equal(1, clock.MusicTimer());
+        clock.Advance(1);
+        Assert.Equal(1, clock.MusicTimer());
+        clock.Advance(1);
+        Assert.Equal(3, clock.MusicTimer());
+        clock.Stop(40);
+        Assert.Equal(0, clock.MusicTimer());
+    }
+
+    [Fact]
+    public void TheOpeningUnderTheRolandCardRunsItsCourseAndEndsInRoom02()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_SOUND_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder) || !File.Exists(Path.Combine(folder, "82.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
+        var session = new LoomExplorationSession(game, snapshot, stopAtOpening: true, soundCard: LoomExplorationSession.RolandSoundCard);
+        var rooms = new List<int>();
+        for (var frame = 0; frame < 6000 && session.BootRunning; frame++)
+        {
+            session.AdvanceFrame();
+            if (session.Snapshot.RoomId is int room && (rooms.Count == 0 || rooms[^1] != room)) rooms.Add(room);
+        }
+        // Script 044 times its fades on the music timer (var[0x00E]) that the overture's markers drive; without it the opening never left Room 69.
+        Assert.False(session.BootRunning, "The opening did not finish.");
+        Assert.Contains(1, rooms);
+        Assert.Equal(2, session.Snapshot.RoomId);
+    }
 }

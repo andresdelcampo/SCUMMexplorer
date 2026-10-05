@@ -1595,6 +1595,22 @@ public sealed partial class LoomExplorationSession
         return Snapshot;
     }
 
+    private int _musicTimer;
+
+    /// <summary>
+    /// scummLoop's <c>updateMusicTimer</c>: <c>VAR_MUSIC_TIMER</c> (var[0x00E]) follows the markers of the playing Roland music, which the opening
+    /// (script 044) waits on to time its fades. Cards whose sounds carry no markers leave the variable alone.
+    /// </summary>
+    private void UpdateMusicTimer()
+    {
+        var timer = _soundClock.MusicTimer();
+        if (timer == 0 && _musicTimer == 0) return;
+        _musicTimer = timer;
+        _runtime.SetGlobalVariable(MusicTimerVariable, (ushort)timer);
+    }
+
+    private const string MusicTimerVariable = "var[0x00E]";
+
     private LoomSessionSnapshot AdvanceOneFrame()
     {
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
@@ -1607,6 +1623,7 @@ public sealed partial class LoomExplorationSession
             _runtime.ActiveSounds.Remove(sound);
             _visitTrace.Add($"Sound {sound:00} completed on its native AdLib resource clock.");
         }
+        UpdateMusicTimer();
         _runtime.Messages.StartFrame(FrameJiffies, _runtime);
         PlaceVirtualMouse();
         var beforeEvents = _visitEvents.Count;
