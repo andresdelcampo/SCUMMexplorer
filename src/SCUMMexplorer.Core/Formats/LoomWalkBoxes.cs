@@ -11,7 +11,7 @@ public readonly record struct LoomBoxPoint(int X, int Y);
 /// mask and the flags bytes.
 /// </summary>
 public sealed record LoomWalkBox(int Index, LoomBoxPoint UpperLeft, LoomBoxPoint UpperRight,
-    LoomBoxPoint LowerRight, LoomBoxPoint LowerLeft, byte Mask, byte Flags)
+    LoomBoxPoint LowerRight, LoomBoxPoint LowerLeft, byte Mask, byte Flags, int Scale = 0)
 {
     /// <summary>ScummVM <c>kBoxInvisible</c>: <c>adjustXYToBeInBox</c> skips the box.</summary>
     public const byte InvisibleFlag = 0x80;
@@ -375,6 +375,29 @@ public readonly record struct BoxAdjustment(int X, int Y, int Box, int LastValid
 public static class LoomWalkBoxReader
 {
     public const int BoxSize = 18;
+    /// <summary>The CD game's (SCUMM v4/v5) box: the 18 bytes above plus a scale word.</summary>
+    public const int BoxSizeV5 = 20;
+
+    /// <summary>
+    /// Reads the body of a v4/v5 BX block (ScummVM <c>BOXD</c>): a count byte, then 20-byte boxes (four signed corner pairs, mask, flags,
+    /// scale word), then the box matrix to the end of the block, in the same triplet rows as the old-v3 game.
+    /// </summary>
+    public static LoomWalkBoxSet ReadBlockBody(byte[] body)
+    {
+        if (body.Length < 1) throw new InvalidDataException("The BX block is empty.");
+        var count = body[0];
+        var matrixStart = 1 + count * BoxSizeV5;
+        if (matrixStart > body.Length) throw new InvalidDataException($"{count} walk boxes run past the end of the BX block.");
+        var boxes = new List<LoomWalkBox>(count);
+        for (var index = 0; index < count; index++)
+        {
+            var at = 1 + index * BoxSizeV5;
+            LoomBoxPoint Point(int offset) => new(SignedWord(body, at + offset), SignedWord(body, at + offset + 2));
+            boxes.Add(new LoomWalkBox(index, Point(0), Point(4), Point(8), Point(12), body[at + 16], body[at + 17], Word(body, at + 18)));
+        }
+        var matrix = body.AsSpan(matrixStart).ToArray();
+        return new LoomWalkBoxSet(boxes, matrix, 0, !MatrixFits(matrix, count));
+    }
 
     public static LoomWalkBoxSet Read(ReadOnlySpan<byte> encodedRoom) => ReadPlain(LflEncoding.DecodeXorFF(encodedRoom));
 

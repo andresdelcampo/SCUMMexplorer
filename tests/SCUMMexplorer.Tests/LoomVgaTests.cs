@@ -215,4 +215,30 @@ public sealed class LoomVgaTests
         }
         Assert.True(painted >= 10, $"{painted} rooms show objects over their background");
     }
+
+    [Fact]
+    public void EveryCdRoomReadsItsWalkBoxesThroughTheSeam()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var data = ScummDataSources.For(game);
+        var withBoxes = 0;
+        var truncated = new List<int>();
+        foreach (var room in game.Rooms)
+        {
+            var read = data.ReadRoom(room.ResourceId.Value);
+            if (read.WalkBoxes is null) { Assert.Contains("no BX", read.WalkBoxError); continue; }
+            Assert.Null(read.WalkBoxError);
+            if (read.WalkBoxes.MatrixTruncated) truncated.Add(room.ResourceId.Value);
+            withBoxes++;
+        }
+        Assert.True(withBoxes > 60);
+        // Room 16's matrix lacks the closing row of its last box (the data, as with Indy3 Room 46 on EGA); ScummVM reads on regardless.
+        Assert.True(truncated.Count <= 2, string.Join(",", truncated));
+        // Room 4: five boxes, the first a strip at y 132 to 134 from x 208 to 664.
+        var boxes = data.ReadRoom(4).WalkBoxes!;
+        Assert.Equal(5, boxes.Count);
+        Assert.Equal(new LoomBoxPoint(208, 132), boxes.Boxes[0].UpperLeft);
+        Assert.Equal(new LoomBoxPoint(664, 134), boxes.Boxes[0].LowerRight);
+    }
 }

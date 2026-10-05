@@ -7,7 +7,7 @@ namespace SCUMMexplorer.Core.Formats;
 /// <summary>
 /// The CD game's data (SCUMM v4, DISK01.LEC) behind <see cref="IScummDataSource"/>: scripts and objects as <see cref="LoomVgaArchive"/>
 /// reads them, decoded with the <see cref="ScummScriptDialect.LoomCd"/> dialect. Offsets in the records it returns count from the start
-/// of the object's OC block (the EGA game's count from the room). Walk boxes (BX) are not read yet.
+/// of the object's OC block (the EGA game's count from the room). Walk boxes come from the room's BX block.
 /// </summary>
 public sealed class LoomCdDataSource : IScummDataSource
 {
@@ -58,7 +58,15 @@ public sealed class LoomCdDataSource : IScummDataSource
             if (o.Name.Length > 0) names[o.Id] = Encoding.Latin1.GetBytes(o.Name);
         }
         var (width, height) = _archive.ReadRoomSize(room);
-        return new ScummRoomData(objects, names, null, "the CD game's walk boxes (BX) are not read yet", width, height);
+        LoomWalkBoxSet? boxes = null;
+        string? boxError = null;
+        try
+        {
+            if (_archive.ReadWalkBoxBlock(room) is { } block) boxes = LoomWalkBoxReader.ReadBlockBody(block);
+            else boxError = $"Room {room:00} has no BX block";
+        }
+        catch (InvalidDataException ex) { boxError = ex.Message; }
+        return new ScummRoomData(objects, names, boxes, boxError, width, height);
     }
 
     public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) =>
