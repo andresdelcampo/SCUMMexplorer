@@ -1,6 +1,6 @@
 # LOOM VGA (CD) feasibility probe, step 1 (5 October 2026)
 
-Read-only. Scripts: `iso_extract.py <Loom.bin> <outdir>` (ISO 9660 over `MODE1/2352` raw sectors: user data at byte 16 of each 2352-byte sector) and `probe.py <outdir>` (block tree). Extracted files go to a scratch folder, never into the repository.
+**Pictures** (contact sheets, room01/room02, `window-check/*.png`) are made locally and are not in git (`.gitignore` skips `.verification/**/*.png`); rerun `decode_rooms.py` and `CdCheck` to recreate them. Read-only. Scripts: `iso_extract.py <Loom.bin> <outdir>` (ISO 9660 over `MODE1/2352` raw sectors: user data at byte 16 of each 2352-byte sector) and `probe.py <outdir>` (block tree). Extracted files go to a scratch folder, never into the repository.
 
 ## The two discs
 
