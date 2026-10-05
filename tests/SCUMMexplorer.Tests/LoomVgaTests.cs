@@ -494,6 +494,22 @@ public sealed class LoomVgaCharsetPerMessageTests
         }
     }
 
+    [Fact]
+    public void TheCdAudioListHoldsEveryCueTheScriptsAskForAndTheDiscPlaysThem()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var cues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
+        Assert.True(cues.Count > 200, $"{cues.Count} cues");
+        // The 84 s overture (a blank line) and a spoken line are both there.
+        Assert.Contains(cues, c => c.Cue.Offset == 0x7654 && c.Cue.Length == 0x347 && c.IsMusicOrNarration);
+        Assert.Contains(cues, c => c.Text.StartsWith("Not so fast") && !c.IsMusicOrNarration);
+        var overture = cues.First(c => c.Cue.Offset == 0x7654 && c.Cue.Length == 0x347).Cue;
+        var wave = game.Vga!.Disc!.ReadAudioWave(overture.TrackStartFrame, overture.TrackFrameCount);
+        Assert.True(wave.Length > 44 + 44100 * 4 * 80, $"{wave.Length} bytes");
+    }
+
     private static void AssertLoud(byte[] wave)
     {
         Assert.Equal("RIFF", System.Text.Encoding.ASCII.GetString(wave, 0, 4));

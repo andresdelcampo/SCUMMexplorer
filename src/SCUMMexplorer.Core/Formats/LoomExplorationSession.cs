@@ -107,6 +107,7 @@ public sealed partial class LoomExplorationSession
     /// </param>
     /// <param name="stopAtBootInput">With completeBoot, enters the native intro and awaits actual input,
     /// before the explorer's assumed challenge answer. Frames continue the waiting boot after input.</param>
+    /// <param name="playCdIntro">The CD game only, with <paramref name="completeBoot"/> false: keep script 001 paused where it starts the logo and intro, so <see cref="AdvanceFrame"/> plays them.</param>
     /// <param name="demoPreview">
     /// A LOOM demo's boot (script 001, then Room 01's entry) starts a director script that shows the rooms in turn and
     /// starts over. A demo session leaves it stopped, so the rooms can be explored like the full game's, unless this is
@@ -114,7 +115,8 @@ public sealed partial class LoomExplorationSession
     /// </param>
     public LoomExplorationSession(GameLibrary game, LoomIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
         bool completeBoot = true, bool stopAtOpening = false, bool stopAtBootInput = false,
-        LoomScriptObserver? observer = null, bool demoPreview = false, int soundCard = 0, IScummDataSource? data = null)
+        LoomScriptObserver? observer = null, bool demoPreview = false, int soundCard = 0, IScummDataSource? data = null,
+        bool playCdIntro = false)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -157,7 +159,8 @@ public sealed partial class LoomExplorationSession
         if (!completeBoot)
         {
             RunIndexedScript(1, 0, null, 0);
-            if (game.Id == GameId.LoomVga) ContinueCdBootAfterIntro();
+            // playCdIntro leaves script 001 where the intro begins: the frames play the logo and the intro, then the game's start.
+            if (game.Id == GameId.LoomVga && !playCdIntro) ContinueCdBootAfterIntro();
             return;
         }
         _booting = true;

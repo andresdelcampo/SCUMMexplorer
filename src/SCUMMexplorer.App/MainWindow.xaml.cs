@@ -395,6 +395,27 @@ public partial class MainWindow : Window
             ResourceTree.Items.Add(node);
         }
 
+        if (game.Id == GameId.LoomVga && game.Vga is { Disc: not null } cdArchive)
+        {
+            // The disc's audio track: every stretch a script asks for with sayVoice. Long ones and those without a line are the music and narration.
+            _cdCues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
+            var cueNode = new TreeViewItem { Header = $"CD audio  ({_cdCues.Count})", IsExpanded = false };
+            for (var i = 0; i < _cdCues.Count; i++)
+            {
+                var cue = _cdCues[i];
+                var kind = cue.IsMusicOrNarration ? "music / narration" : "voice";
+                var resource = new GameResource($"CD audio {i + 1:000}", ResourceKind.Sound, game.FolderPath, CdCueIdBase + i,
+                    $"{kind}, {cue.Cue.Seconds:0.#} s at disc second {cue.Cue.DiscSeconds:0.#}; first asked for by {cue.Source}.", 1, null);
+                var snippet = cue.Text.Length > 40 ? cue.Text[..40] + "…" : cue.Text;
+                cueNode.Items.Add(new TreeViewItem
+                {
+                    Header = $"{(cue.IsMusicOrNarration ? "♪ " : "")}{resource.Name} · {cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}",
+                    ToolTip = resource.Description, Tag = resource
+                });
+            }
+            ResourceTree.Items.Add(cueNode);
+        }
+
         PopulateRoomCards(game);
         PopulateCostumeCards(game);
         UpdateAdvancedMode();
@@ -2485,6 +2506,10 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
+    private IReadOnlyList<LoomCdCue> _cdCues = [];
+    private const int CdCueIdBase = 1000;
+    private bool IsCdCue(GameResource resource) => _game?.Vga is not null && resource.ResourceId >= CdCueIdBase;
+
     private async Task ShowAudio(GameResource resource, bool preserveFormat = false, bool autoPlay = false)
     {
         StopAudio();
@@ -2495,9 +2520,10 @@ public partial class MainWindow : Window
         RoomObjectPanel.Visibility = Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, 2);
         _selectedSound = resource;
-        var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
-        var roland = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
-        var format = adlib ? "AdLib FM" : roland ? "Roland MT-32" : "PC speaker";
+        var cdCue = IsCdCue(resource);
+        var adlib = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
+        var roland = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
+        var format = cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : "PC speaker";
         AdlibGainPanel.Visibility = adlib ? Visibility.Visible : Visibility.Collapsed;
         _previewCancellation?.Cancel();
         RoomPreview.Visibility = Visibility.Collapsed;
@@ -2524,7 +2550,7 @@ public partial class MainWindow : Window
         PauseButton.IsEnabled = false;
         StopButton.IsEnabled = false;
         AdlibGainSlider.IsEnabled = false;
-        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.None)
+        if (!cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.None)
         {
             _audioTimeNote = AudioTime.Text = "Muted";
             AudioDescription.Text = "No Sound selected";
@@ -2536,7 +2562,7 @@ public partial class MainWindow : Window
         var token = _audioCancellation.Token;
         try
         {
-            var wave = await RenderAudioWaveAsync(resource, adlib, token);
+            var wave = cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
             if (token.IsCancellationRequested) return;
             _adlibBaseWave = adlib ? wave : null;
             if (adlib) wave = LoomAdlibAudio.ApplyOutputGain(wave, AdlibGainSlider.Value);
@@ -2549,7 +2575,7 @@ public partial class MainWindow : Window
             }
             _audioFile = path;
             _playWhenReady = autoPlay;
-            _audioKnownDuration = WaveDuration(wave, adlib);
+            _audioKnownDuration = cdCue ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4)) : WaveDuration(wave, adlib);
             _audioPlayer.Open(new Uri(path));
             _audioReady = true;
             PlayButton.IsEnabled = true;
@@ -2558,6 +2584,7 @@ public partial class MainWindow : Window
             AdlibGainSlider.IsEnabled = adlib;
             AudioDescription.Text = !roland && wave.Length >= 44 + (adlib ? 49716 * 4 : 22050 * 2) * 179
                 ? $"DOS {format} rendition · preview limited to three minutes"
+                : cdCue ? $"{resource.Description} Straight from the disc's audio track · select Play to listen"
                 : $"DOS {format} rendition · select Play to listen";
             StatusText.Text = $"{resource.Name} · {format} track ready";
             UpdateAudioTime();
@@ -2570,6 +2597,15 @@ public partial class MainWindow : Window
             _audioTimeNote = AudioTime.Text = "No playable audio";
             StatusText.Text = $"{resource.Name} · playback unavailable";
         }
+    }
+
+    /// <summary>The cue's stretch of the disc's audio track, as the voice player would play it (the real recording, not a rendition).</summary>
+    private byte[] ReadCdCueWave(GameResource resource)
+    {
+        var cue = _cdCues[resource.ResourceId!.Value - CdCueIdBase].Cue;
+        var wave = _game!.Vga!.Disc!.ReadAudioWave(cue.TrackStartFrame, cue.TrackFrameCount);
+        if (wave.Length <= 44) throw new InvalidDataException("The disc holds no audio at this position.");
+        return wave;
     }
 
     private Task<byte[]> RenderAudioWaveAsync(GameResource resource, bool adlib,

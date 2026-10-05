@@ -67,11 +67,13 @@ internal static class Program
                     { var sess = Field("_session")!; var gs = sess.GetType().GetProperty("GameStatus")!.GetValue(sess)!; foreach (var d in (System.Collections.IEnumerable)gs.GetType().GetProperty("Drafts")!.GetValue(gs)!) report.Add("   draft " + d); }
                     status.Close();
                 }
+                { var cues = ((System.Collections.IEnumerable)Field("_cdCues")!).Cast<object>().ToList(); report.Add($"CD audio cues: {cues.Count}"); var longest = cues.OrderByDescending(c => (int)c.GetType().GetProperty("Cue")!.GetValue(c)!.GetType().GetProperty("Length")!.GetValue(c.GetType().GetProperty("Cue")!.GetValue(c))!).Take(4); foreach (var c in longest) report.Add("   long cue " + c); }
                 // CD_SOUND=1,9,16 selects those sounds in the tree and reports what the audio panel says (AdLib by default).
                 if (Environment.GetEnvironmentVariable("CD_SOUND") is { } soundIds)
                     foreach (var id in soundIds.Split(',').Select(int.Parse))
                     {
-                        var sound = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Sound && r.ResourceId == id);
+                        var sound = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Sound && r.ResourceId == id)
+                            ?? ((TreeView)window.FindName("ResourceTree")).Items.OfType<TreeViewItem>().SelectMany(g => g.Items.OfType<TreeViewItem>()).Select(i => i.Tag).OfType<GameResource>().FirstOrDefault(r => r.ResourceId == id); // the CD audio list lives in the tree only
                         if (sound is null) { report.Add($"sound {id}: not listed"); continue; }
                         Call("SelectResourceInTree", sound);
                         for (var n = 0; n < 100 && ((TextBlock)window.FindName("AudioTime")).Text.StartsWith("Preparing"); n++) await Task.Delay(200);
