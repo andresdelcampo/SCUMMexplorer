@@ -326,6 +326,11 @@ public sealed class CdSetupProbe
         var groups = LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
         var planner = new LoomCdSceneSetupPlanner(game, LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
         var lines = new List<string>();
+        var results = groups.Select(g => planner.Derive(g.First)).ToList();
+        var fresh = results.Count(s => s == LoomCdStartSetup.None);
+        var derived = results.Count(s => s != LoomCdStartSetup.None && s.Plays);
+        var enabled = fresh + derived;
+        lines.Add($"SUMMARY scenes {groups.Count()}: {fresh} begin from a fresh start, {derived} from a derived setup, {results.Count - enabled} without a start; {100.0 * enabled / results.Count:F1}% enabled");
         foreach (var g in groups)
         {
             var s = planner.Derive(g.First);

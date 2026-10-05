@@ -20,6 +20,7 @@ public sealed class CdCutsceneSweep
             var setup = planner.Derive(t);
             var useSetup = setup is { Plays: true, HasSteps: true };
             if (useSetup) LoomCdSceneSetupPlanner.ApplyBefore(session, game, setup.Before);
+            var earlier = session.CutscenesBegun; // the setup's own scenes do not count as the scene beginning
             session.VisitRoom(room);
             if (useSetup) LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
             if (!t.IsRoomEntry) session.ActivateObjectVerb(t.ObjectId, t.VerbId);
@@ -36,7 +37,7 @@ public sealed class CdCutsceneSweep
                 session.AdvanceFrame(); frames++;
                 if (session.Snapshot.RoomId != last) { rooms++; last = session.Snapshot.RoomId; }
             }
-            return new(frames, skippable, session.Messages.Log.Count, rooms, session.Messages.VoiceEvents.Count, began || session.CutscenesBegun > 0, null);
+            return new(frames, skippable, session.Messages.Log.Count, rooms, session.Messages.VoiceEvents.Count, began || session.CutscenesBegun > earlier, null);
         }
         catch (Exception ex) { return new(frames, skippable, 0, rooms, 0, began, ex.GetType().Name + ": " + ex.Message); }
     }
