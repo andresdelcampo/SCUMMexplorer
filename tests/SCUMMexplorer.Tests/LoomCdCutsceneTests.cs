@@ -136,6 +136,45 @@ public sealed class LoomCdCutsceneTests
         Assert.Contains(5, boxes);
     }
 
+    /// <summary>The sword scene (Room 41 object 559 verb 0x41) stops script 207 and clears bit 077, which only 207 sets; the room's hammer loop (206, started by a fresh entry) cues the CD every 27 frames and resets the timer its waits read.</summary>
+    [Fact]
+    public void TheSwordSceneStallsFromAFreshStartAndEndsAfterTheForemanScene()
+    {
+        if (Game() is not { } game) return;
+        var data = ScummDataSources.For(game);
+        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var sword = triggers.First(t => t is { Room: 41, ObjectId: 559, VerbId: 0x41 });
+
+        int Frames(LoomExplorationSession session)
+        {
+            for (var frames = 0; frames < 6000; frames++)
+            {
+                if (frames > 5 && session.CutscenesBegun > 0 && !session.InCutscene && session.Messages.HaveMsg == 0) return frames;
+                session.AdvanceFrame();
+            }
+            return -1;
+        }
+
+        var fresh = Fresh(game);
+        fresh.VisitRoom(game.Rooms.First(r => r.ResourceId == 41));
+        fresh.ActivateObjectVerb(559, 0x41);
+        Assert.Equal(-1, Frames(fresh)); // the hammer loop's cue keeps resetting the timer
+
+        var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
+        var setup = planner.Derive(sword);
+        Assert.True(setup.Plays, string.Join(" ", setup.Notes));
+        var step = Assert.Single(setup.Before);
+        Assert.Equal("scene", step.Kind);
+        Assert.Equal(41, step.Room);
+        Assert.Contains("never ends", setup.Notes[0], StringComparison.Ordinal);
+
+        var started = Fresh(game);
+        LoomCdSceneSetupPlanner.ApplyBefore(started, game, setup.Before);
+        started.VisitRoom(game.Rooms.First(r => r.ResourceId == 41));
+        started.ActivateObjectVerb(559, 0x41);
+        Assert.True(Frames(started) > 0);
+    }
+
     [Fact]
     public void EveryCdSceneEitherPlaysFromADerivedSetupOrSaysWhyNot()
     {

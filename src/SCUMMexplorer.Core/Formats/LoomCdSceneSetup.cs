@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Domain;
 
@@ -37,6 +37,7 @@ public sealed record LoomCdStartSetup(IReadOnlyList<LoomCdSetupStep> Before, IRe
 public sealed partial class LoomCdSceneSetupPlanner
 {
     private const int TrialFrames = 600;
+    private const int EndFrames = 6000;
     private const int SettleFrameLimit = 4000;
     private const int MaxTrials = 120;
     private const int MaxDepth = 2;
@@ -130,18 +131,26 @@ public sealed partial class LoomCdSceneSetupPlanner
         }
     }
 
-    private bool Trial(LoomCdCutscene t, IReadOnlyList<LoomCdSetupStep> before, IReadOnlyList<LoomCdSetupStep> after)
+    /// <summary>
+    /// Runs the scene headless from the given start. Without <paramref name="mustEnd"/> it is enough that a cutscene begins; with it the cutscene must also
+    /// end by itself (no Escape) within <see cref="EndFrames"/> frames, which tells a scene that plays from one that stalls on the state around it.
+    /// </summary>
+    private bool Trial(LoomCdCutscene t, IReadOnlyList<LoomCdSetupStep> before, IReadOnlyList<LoomCdSetupStep> after, bool mustEnd = false)
     {
         try
         {
             var session = NewSession();
             ApplyBefore(session, _game, before);
+            var earlier = session.CutscenesBegun; // the setup's own scenes do not count
             session.VisitRoom(RoomOf(_game, t.Room));
             ApplyAfter(session, after);
             if (!t.IsRoomEntry) session.ActivateObjectVerb(t.ObjectId, t.VerbId);
-            for (var i = 0; i < TrialFrames; i++)
+            var begun = false;
+            for (var i = 0; i < (mustEnd ? EndFrames : TrialFrames); i++)
             {
-                if (session.InCutscene || session.CutscenesBegun > 0) return true;
+                if (session.InCutscene || session.CutscenesBegun > earlier) begun = true;
+                if (begun && !mustEnd) return true;
+                if (begun && !session.InCutscene && session.Messages.HaveMsg == 0) return true;
                 session.AdvanceFrame();
             }
             return false;
@@ -201,11 +210,104 @@ public sealed partial class LoomCdSceneSetupPlanner
         return result;
     }
 
+    /// <summary>The step that would make <paramref name="w"/>'s assignment happen first, or null: an object verb, a room entry, or the scene whose script it is.</summary>
+    private LoomCdSetupStep? StepFor(LoomStateSource w, string tested, HashSet<string> chain, int depth, HashSet<(int, int, int)> stack, bool broad = false, int pick = 0)
+    {
+        var label = ScriptLabel(w);
+        if (label is not null && chain.Contains(label)) return null;
+        if (w.ObjectId is int obj && w.VerbId is int verb)
+            return new("verb", w.Room, obj, verb, 0, w.Where,
+                tested + $"The game's own {w.Where.Split(" +")[0]} (object {obj}, verb 0x{verb:X2}) assigns it, so it runs first, unseen, as an exploration action (not the game's click; which earlier scene really left the state was not executed).");
+        if (label is null && w.Where.Contains(" entry ", StringComparison.Ordinal))
+            return new("entry", w.Room, 0, 0, 0, w.Where, tested + $"The game's own {w.Where.Split(" +")[0]} assigns it, so Room {w.Room:00} is entered first, unseen.");
+        if (label is null || depth >= MaxDepth) return null;
+        var scene = _triggers.Where(c => (c.Scripts.Contains(label) || broad && Started(c).Contains(label)) && !stack.Contains(Key(c))).OrderBy(Rank).ThenBy(c => c.ObjectId).ThenBy(c => c.VerbId).Skip(pick).FirstOrDefault();
+        if (scene is null) return null;
+        var inner = Derive(scene, depth + 1, stack);
+        if (!inner.Plays) return null;
+        return new("scene", scene.Room, scene.ObjectId, scene.VerbId, 0, w.Where,
+            tested + $"The game's own {label} ({w.Where.Split(" +")[1].Insert(0, "+")}) assigns it, and the scene {(scene.IsRoomEntry ? $"Room {scene.Room:00}'s entry" : $"object {scene.ObjectId}'s verb 0x{scene.VerbId:X2} in Room {scene.Room:00}")} runs that script, so it is played first, unseen, as an exploration action" +
+            (inner.HasSteps ? $", after its own setup ({string.Join(" ", inner.Notes)})." : "."), inner);
+    }
+
+    [GeneratedRegex(@"^(bit\[0x[0-9A-Fa-f]+\]) = 0x0+$")]
+    private static partial Regex ClearsBit();
+
+    /// <summary>
+    /// A scene that begins from the fresh state but never ends there. A scene's code that clears a story bit (<c>bit[k] = 0</c>) which other code
+    /// of the game sets (<c>bit[k] = 1</c>) is written for the state in which that bit is set; so the code that sets it is the candidate, run first (an
+    /// object verb, an entry, or the scene that runs it) and kept if the scene then ends by itself. Null when no candidate makes it end.
+    /// </summary>
+    private LoomCdStartSetup? DeriveStall(LoomCdCutscene t, int depth, HashSet<(int, int, int)> stack)
+    {
+        var paths = Paths(t);
+        var chain = paths.SelectMany(p => p.Chain).ToHashSet();
+        var scripts = new List<(string Label, LoomScriptDisassembly Script)>();
+        foreach (var label in chain)
+            if (LoadLabel(t.Room, label == "root" ? (t.IsRoomEntry ? $"Room {t.Room} entry" : $"Room {t.Room} object {t.ObjectId} verb 0x{t.VerbId:X2}") : label) is { } script) scripts.Add((label, script));
+        var cleared = scripts.SelectMany(s => s.Script.Instructions.Where(i => i.Operation == "move" && ClearsBit().IsMatch(i.Operands)).Select(i => (s.Label, i.Offset, Bit: ClearsBit().Match(i.Operands).Groups[1].Value)))
+            .DistinctBy(x => x.Bit).ToList();
+        var candidates = new List<LoomCdSetupStep>();
+        foreach (var (label, offset, bit) in cleared)
+        {
+            var tested = $"The scene's code ({label} +0x{offset:X4}) clears {bit}, which other code sets, so it is written for the state in which {bit} is set; started from a fresh game it begins but never ends. ";
+            foreach (var w in _scanner.FindConstantWriters(bit, 1).OrderBy(WriterRank).ThenBy(w => w.Room).Take(12))
+                for (var pick = 0; pick < 4; pick++) // several scenes can run the same script (a room entry may only test the bit)
+                    if (StepFor(w, tested, chain, depth, stack, broad: true, pick) is { } step && !candidates.Any(c => c.Kind == step.Kind && c.Room == step.Room && c.ObjectId == step.ObjectId && c.VerbId == step.VerbId))
+                        candidates.Add(step);
+        }
+        foreach (var step in candidates.Take(12))
+            if (Trial(t, [step], [], mustEnd: true)) return new([step], [], [step.Reason + "That state is an estimate: the game's own way to it was not executed."], true);
+        return null;
+    }
+
+    [GeneratedRegex(@"^(?:Room \d+ local script (\d+)|global script (\d+))$")]
+    private static partial Regex ScriptNumber();
+
+    [GeneratedRegex(@"^Room (\d+) object (\d+) verb 0x([0-9A-Fa-f]+)$")]
+    private static partial Regex ObjectVerbLabel();
+
+    [GeneratedRegex(@"^0x([0-9A-Fa-f]+)")]
+    private static partial Regex FirstLiteral();
+
+    /// <summary>The script a label names (as <see cref="LoomCdCutscene.Scripts"/> and the guard paths write it), or null.</summary>
+    private LoomScriptDisassembly? LoadLabel(int room, string label)
+    {
+        try
+        {
+            if (label == $"Room {room} entry") return _data.RoomEntryScript(room);
+            if (ObjectVerbLabel().Match(label) is { Success: true } o)
+                return _data.ReadObjectVerb(room, _data.ReadRoom(room).Objects.First(x => x.Id == int.Parse(o.Groups[2].Value, CultureInfo.InvariantCulture)),
+                    int.Parse(o.Groups[3].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture), out _);
+            if (ScriptNumber().Match(label) is { Success: true } m)
+                return m.Groups[1].Success ? _data.RoomLocalScript(room, int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture)) : _data.GlobalScript(int.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture));
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException) { }
+        return null;
+    }
+
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int, int), HashSet<string>> _started = [];
+
+    /// <summary>The scripts a scene's cutscene scripts run (one step: what they start or chain to), with the cutscene scripts themselves.</summary>
+    private HashSet<string> Started(LoomCdCutscene c) => _started.GetOrAdd(Key(c), _ =>
+    {
+        var set = new HashSet<string>(c.Scripts);
+        foreach (var label in c.Scripts)
+            if (LoadLabel(c.Room, label) is { } script)
+                foreach (var call in script.Instructions.Where(i => i.Operation is "startScript" or "chainScript"))
+                    if (FirstLiteral().Match(call.Operands) is { Success: true } m)
+                    {
+                        var id = int.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                        set.Add(id >= _data.GlobalScriptCount ? $"Room {c.Room} local script {id}" : $"global script {id}");
+                    }
+        return set;
+    });
     private LoomCdStartSetup DeriveOnce(LoomCdCutscene t, int depth, HashSet<(int, int, int)> stack)
     {
         var trials = 0;
         bool Try(IReadOnlyList<LoomCdSetupStep> b, IReadOnlyList<LoomCdSetupStep> a) { trials++; return Trial(t, b, a); }
-        if (Try([], [])) return LoomCdStartSetup.None;
+        if (Try([], []))
+            return depth > 0 || Trial(t, [], [], mustEnd: true) ? LoomCdStartSetup.None : DeriveStall(t, depth, stack) ?? LoomCdStartSetup.None;
 
         var paths = Paths(t);
         if (paths.Count == 0)
@@ -234,24 +336,7 @@ public sealed partial class LoomCdSceneSetupPlanner
             var tested = $"The scene's code tests {g.Subject} ({g.Script} +0x{g.Offset:X4}, it must be {wanted}) and a fresh game has it otherwise. ";
             foreach (var w in _scanner.FindConstantWriters(g.Subject, wanted).OrderBy(WriterRank).ThenBy(w => w.Room).Take(40))
             {
-                var label = ScriptLabel(w);
-                if (label is not null && chain.Contains(label)) continue;
-                LoomCdSetupStep? step = null;
-                if (w.ObjectId is int obj && w.VerbId is int verb)
-                    step = new("verb", w.Room, obj, verb, 0, w.Where,
-                        tested + $"The game's own {w.Where.Split(" +")[0]} (object {obj}, verb 0x{verb:X2}) assigns it, so it runs first, unseen, as an exploration action (not the game's click; which earlier scene really left the state was not executed).");
-                else if (label is null && w.Where.Contains(" entry ", StringComparison.Ordinal))
-                    step = new("entry", w.Room, 0, 0, 0, w.Where, tested + $"The game's own {w.Where.Split(" +")[0]} assigns it, so Room {w.Room:00} is entered first, unseen.");
-                else if (label is not null && depth < MaxDepth)
-                {
-                    var scene = _triggers.Where(c => c.Scripts.Contains(label) && !stack.Contains(Key(c))).OrderBy(Rank).ThenBy(c => c.ObjectId).ThenBy(c => c.VerbId).FirstOrDefault();
-                    if (scene is null) continue;
-                    var inner = Derive(scene, depth + 1, stack);
-                    if (!inner.Plays) continue;
-                    step = new("scene", scene.Room, scene.ObjectId, scene.VerbId, 0, w.Where,
-                        tested + $"The game's own {label} ({w.Where.Split(" +")[1].Insert(0, "+")}) assigns it, and the scene {(scene.IsRoomEntry ? $"Room {scene.Room:00}'s entry" : $"object {scene.ObjectId}'s verb 0x{scene.VerbId:X2} in Room {scene.Room:00}")} runs that script, so it is played first, unseen, as an exploration action" +
-                        (inner.HasSteps ? $", after its own setup ({string.Join(" ", inner.Notes)})." : "."), inner);
-                }
+                var step = StepFor(w, tested, chain, depth, stack);
                 if (step is not null && !states.Any(s => s.Kind == step.Kind && s.Room == step.Room && s.ObjectId == step.ObjectId && s.VerbId == step.VerbId)) states.Add(step);
                 if (states.Count >= 12) break;
             }
@@ -305,3 +390,9 @@ public sealed partial class LoomCdSceneSetupPlanner
              "The game's own writers of that state (and the walk boxes) were tried alone and in combination and did not begin it; the scene may need an earlier part of the story, an item or a draft that this explorer does not model.")], false);
     }
 }
+
+
+
+
+
+

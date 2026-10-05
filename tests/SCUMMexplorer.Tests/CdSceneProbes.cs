@@ -21,6 +21,19 @@ public sealed class CdStuckProbe
         var frames = int.TryParse(Environment.GetEnvironmentVariable("CD_STUCK_FRAMES"), out var f) ? f : 1500;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        if (Environment.GetEnvironmentVariable("CD_STUCK_FORCE") is { } force) // comma list of key=value, e.g. bit[0x077]=1
+        {
+            var runtime = typeof(LoomExplorationSession).GetField("_runtime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(session)!;
+            var set = runtime.GetType().GetMethod("SetGlobalVariable", [typeof(string), typeof(ushort)])!;
+            foreach (var kv in force.Split(',').Select(x => x.Split('='))) set.Invoke(runtime, [kv[0], ushort.Parse(kv[1])]);
+        }
+        if (Environment.GetEnvironmentVariable("CD_STUCK_PRE") is { } pre) // room,object,verb;... run first, unseen, then settled
+            foreach (var one in pre.Split(';').Select(x => x.Split(',').Select(int.Parse).ToArray()))
+            {
+                session.VisitRoom(game.Rooms.First(r => r.ResourceId == one[0]));
+                if (one[1] != 0) session.ActivateObjectVerb(one[1], one[2]);
+                LoomCdSceneSetupPlanner.Settle(session);
+            }
         session.VisitRoom(game.Rooms.First(r => r.ResourceId == p[0]));
         if (p[1] != 0) session.ActivateObjectVerb(p[1], p[2]);
         var log = new List<string>();
@@ -78,10 +91,26 @@ public sealed class CdLocalDisasm
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
         var lines = new List<string>();
+        if (spec == "allglobals") // every global script, for searches
+            spec = string.Join(';', data.GlobalScriptIds().OrderBy(i => i).Select(i => "g:" + i));
         foreach (var one in spec.Split(';'))
         {
             var parts = one.Split(':');
             LoomScriptDisassembly? script;
+            if (parts[0] == "objects") // every verb script of every object of a room
+            {
+                var room = int.Parse(parts[1]);
+                foreach (var obj in data.ReadRoom(room).Objects)
+                    for (var verb = 0; verb < 0x80; verb++)
+                    {
+                        LoomScriptDisassembly? found = null;
+                        try { found = data.ReadObjectVerb(room, obj, verb, out _); } catch (Exception) { }
+                        if (found is null) continue;
+                        lines.Add($"=== object {obj.Id} verb 0x{verb:X2}");
+                        lines.AddRange(found.Instructions.Select(i => $"{i.Offset:X4} {i.Operation} {i.Operands}"));
+                    }
+                continue;
+            }
             if (parts[0] == "g") script = data.GlobalScript(int.Parse(parts[1]));
             else if (parts[0] == "o") { var room = int.Parse(parts[1]); script = data.ReadObjectVerb(room, data.ReadRoom(room).Objects.First(o => o.Id == int.Parse(parts[2])), Convert.ToInt32(parts[3], 16), out _); }
             else
@@ -90,7 +119,8 @@ public sealed class CdLocalDisasm
                 script = id == 0 ? data.RoomEntryScript(room) : id == -1 ? data.RoomExitScript(room) : data.RoomLocalScript(room, id);
             }
             lines.Add("=== " + one);
-            lines.AddRange(script!.Instructions.Select(i => $"{i.Offset:X4} {i.Operation} {i.Operands}"));
+            var opc = Environment.GetEnvironmentVariable("CD_LDIS_OPC") == "1"; // also print each opcode byte
+            lines.AddRange(script!.Instructions.Select(i => $"{i.Offset:X4} {(opc ? i.Opcode.ToString("X2") + " " : "")}{i.Operation} {i.Operands}"));
         }
         File.WriteAllLines(outPath, lines);
     }
