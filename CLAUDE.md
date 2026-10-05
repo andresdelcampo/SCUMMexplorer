@@ -12,6 +12,8 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 - `Games/`: the local game data. Never commit it.
   - `Games/loom ega en`: DOS LOOM EGA, **English**. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
   - `Games/loom ega es`: DOS LOOM EGA, Spanish. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
+  - `Games/loom vga en`: LOOM CD (VGA, SCUMM v4) as `Loom.cue` + `Loom.bin` (ISO 9660 data track plus one CD audio track). Not yet read by the app; see the plan.
+  - `Games/mt32`: the user's MT-32/CM-32L ROM images for the Roland sound device. Never commit.
   - `Games/indy3 ega en`: Indy3 EGA, **English**. The Indy tests expect this one (`SCUMM_INDY3_EGA_TEST_ROOT`).
   - `Games/indy3 ega es`, `indy3 vga es`, `indy3 demo en`, `monkey1`, `mmansion`: other local data, not used by the tests.
 - `scummvm/`: a ScummVM Windows build for comparing behaviour at runtime. It contains no source code.

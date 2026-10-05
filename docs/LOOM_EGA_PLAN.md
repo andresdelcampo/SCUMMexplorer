@@ -51,14 +51,24 @@ Left, in order of value:
 2. The Mt32emu.net dependency is accepted (user, 5 October).
 3. Optional: a General MIDI fallback for users without ROMs (labelled as a different sound); the room sounds menu's possible-sound list shown per card; 48–50, 60 and 63 are longer or shorter than their AdLib twins (not examined).
 
-## Then: LOOM VGA and more languages (user, 4 October; Indy3 is deferred)
+## Next: LOOM VGA (CD, SCUMM v4), then more languages (user, 5 October; Indy3 deferred, M5 shelved, MT-32 built)
 
-Order: MT-32 (built, awaiting the listening check), then these (M5 is shelved). `Games/loom vga en` is now in `Games/` (5 October): the feasibility probe can start. Indy3 is on hold until the user moves its data from `Games/FUTURE/` back to `Games/`.
+**What is in `Games/loom vga en`** (read from the files on 5 October, nothing decoded yet): `Loom.cue` + `Loom.bin`, 630 MB, `MODE1/2352` raw sectors with an ISO 9660 volume "LOOM" (268,245 sectors). Track 1 is the data track; track 2 is one CD audio track that starts at 04:57:60 (pregap 2 s) and fills the rest of the disc, about 54 minutes. The data track's root holds only `000.LFL` (index, 8 KB), `901.LFL`–`904.LFL` (2–4 KB each, probably charsets), `DISK01.LEC` (4 MB, the resource file) and `LOOM.EXE`. That is the SCUMM v4 layout: an index plus one `.LEC` container instead of the per-room `NN.LFL` files of the EGA game. The audio track probably carries the spoken dialogue and the music that the scripts start by position (not checked; ScummVM's Loom CD support is the reference).
 
-1. **LOOM VGA (CD, SCUMM v4).** The data is not in `Games/` yet. Once there: a feasibility probe of the resource container and opcode set before any app work.
-2. **More languages of LOOM EGA** (later; Spanish and English work, others when the data arrives). Each language is checked the way English was: compare the glossary, bits, ids and offsets across editions with `GlossaryCheck` and `ScriptDump`, never key code on offsets (see CLAUDE.md, "Editions differ in data").
-3. **Separate the LOOM-specific from the generic**, as far as VGA and the languages need it. About 40 `GameId.Loom` gates in `MainWindow.xaml.cs`; propose which become generic before changing them.
-4. **Deferred:** Indy3 EGA (backgrounds, texts, dialogue choices, verbs 120–125; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion, whose formats are not decoded.
+**How to read it (not decided).** Options:
+- **A. Read the image itself.** A small ISO 9660 reader for 2352-byte raw sectors (and plain `.iso` at 2048), driven by the `.cue`; the audio track is read straight from the same `.bin` by sector range. The user's files work as they are, and later formats (`.iso`, split `track01.bin`/`track02.bin` sets, `.img/.ccd/.sub`, `.mdf/.mds`; `.chd` only if a decoder is worth it) become more readers behind one interface.
+- **B. Require an extracted folder** (files copied out, audio ripped to `.wav`/`.ogg`). Least code, most work for users, loses the exact audio positions.
+- **C. Both:** a `game file source` abstraction (folder or disc image), the folder as the first implementation (what exists today), the image reader second. Recommended: it keeps the current code working, avoids extraction, and gives every later edition the same entry point.
+
+**Steps once the way is chosen**
+1. **Feasibility probe** (read-only harness, record under `.verification/loom-vga/`): file list, `000.LFL` index structure, the `LECF`/`LFLF` block tree in `DISK01.LEC`, room and sound counts, the opcode set against the v3 reader (v4 differences: containers, room image format and palette, object and costume formats, the script dialect), and the audio track's role. Compare with ScummVM (`scummvm/`, same disc).
+2. **Source abstraction and image reader** (Core), tested against the user's `Loom.cue`.
+3. **Rooms and backgrounds first** (the VGA artwork is the visible gain), then scripts, objects and Bobbin, then speech and CD audio, then cutscenes, each checked in the real window as for EGA.
+4. Separate the LOOM-specific from the generic as VGA needs it: the ~40 `GameId.Loom` gates in `MainWindow.xaml.cs` (propose before changing), and the `Loom*` Core types (`LoomEgaStateFlags`, `loom-glossary.json`, `loom-replays.json`, `LoomDraftNames`, the catalog and setup planner). The VGA scripts differ from EGA, so the glossary, bits and ids must be rederived, never copied.
+
+Open decisions for the user: A, B or C above; whether the CD audio track (speech and music) is in scope from the start or comes after the picture; whether VGA gets its own game id and picker entry (assumed yes).
+
+**After that:** more languages of LOOM EGA (later; Spanish and English work, others when the data arrives; each checked as English was, with `GlossaryCheck` and `ScriptDump`, never keyed on offsets). **Deferred:** Indy3 EGA (until the user moves its data from `Games/FUTURE/` to `Games/`; [INDY3_CONVERSATIONS_PLAN.md](indy3/INDY3_CONVERSATIONS_PLAN.md)), then Monkey Island and Maniac Mansion.
 
 ## Evidence rules
 
