@@ -75,7 +75,7 @@ public sealed class LoomCdDataSource : IScummDataSource
     }
 
     public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) =>
-        _archive.ReadObjectImages(room).Select(i => new RoomObjectImage(i.Id, i.X, i.Y, i.Width, i.Height, i.Pixels)).ToArray();
+        _archive.ReadObjectImages(room).Select(i => new RoomObjectImage(i.Id, i.X, i.Y, i.Width, i.Height, i.Pixels) { Mask = i.Mask }).ToArray();
 
     public IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> ReadObjectVerbs(int room, IReadOnlyList<LoomRoomObjectRecord> records)
     {

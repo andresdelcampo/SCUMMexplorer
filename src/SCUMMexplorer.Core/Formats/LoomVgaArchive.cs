@@ -27,7 +27,11 @@ public sealed record LoomVgaObject(int Id, int X, int Y, int Width, int Height, 
 public sealed record LoomVgaCostume(int Id, int Room, byte[] Body);
 
 /// <summary>One decoded OI image of a room object: the object's id, its size from the OC block and the picture as palette indices (the room's PA palette).</summary>
-public sealed record LoomVgaObjectImage(int Id, int X, int Y, int Width, int Height, byte[] Pixels);
+public sealed record LoomVgaObjectImage(int Id, int X, int Y, int Width, int Height, byte[] Pixels)
+{
+    /// <summary>The image's own depth mask (one byte per pixel, 0 or 1), or null when it carries none.</summary>
+    public byte[]? Mask { get; init; }
+}
 
 public sealed record LoomVgaRoom(int Number, string Name, int Offset, int Length);
 
@@ -220,7 +224,10 @@ public sealed class LoomVgaArchive
                 }
             }
             catch (Exception ex) when (ex is InvalidDataException or ArgumentOutOfRangeException or IndexOutOfRangeException) { continue; }
-            images.Add(new LoomVgaObjectImage(id, owner.X, owner.Y, owner.Width, owner.Height, pixels));
+            images.Add(new LoomVgaObjectImage(id, owner.X, owner.Y, owner.Width, owner.Height, pixels)
+            {
+                Mask = ReadMaskPlane(_lec, body, end, owner.Width, owner.Height)
+            });
         }
         return images;
     }
@@ -340,7 +347,56 @@ public sealed class LoomVgaArchive
             if (body + offset >= end) throw new InvalidDataException($"Room {number} strip {strip} starts outside its bitmap.");
             DecodeStrip(_lec, (int)(body + offset), end, pixels, width, height, strip * 8);
         }
-        return new RoomImage(width, height, pixels, palette);
+        var mask = ReadMaskPlane(_lec, body, end, width, height);
+        return new RoomImage(width, height, pixels, palette) { DepthMask = mask is null ? null : new RoomDepthMask(width, height, mask) };
+    }
+
+    /// <summary>
+    /// The depth mask (z-plane 1) a BM or OI body carries after its strips: the body's size field counts the strips, and what follows is a
+    /// word (the length of the mask block, itself included), one word per 8-pixel strip (offset from the block's start; 0 = nothing masked),
+    /// and per strip run-length rows of 8 mask bits, the EGA mask's coding (a code with bit 7: repeat the next byte; otherwise copy that many
+    /// bytes; 0 means 256). Null when the bitmap has no mask block (the size field reaches the end) or the block does not read.
+    /// One byte per pixel, 0 or 1.
+    /// </summary>
+    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height)
+    {
+        var strips = width / 8;
+        var start = body + (int)BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(body));
+        if (start + 2 + strips * 2 > end) return null;
+        var blockEnd = Math.Min(end, start + BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(start)));
+        var pixels = new byte[width * height];
+        for (var strip = 0; strip < strips; strip++)
+        {
+            var offset = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(start + 2 + strip * 2));
+            if (offset == 0) continue;
+            var pos = start + offset;
+            if (offset < 2 + strips * 2 || pos >= blockEnd) return null;
+            for (var row = 0; row < height;)
+            {
+                if (pos >= blockEnd) return null;
+                var command = data[pos++];
+                var run = command & 0x7F;
+                if (run == 0) run = 256;
+                var rows = Math.Min(run, height - row);
+                if ((command & 0x80) != 0)
+                {
+                    if (pos >= blockEnd) return null;
+                    var value = data[pos++];
+                    for (var i = 0; i < rows; i++) WriteMaskRow(pixels, width, strip, row++, value);
+                }
+                else
+                {
+                    if (pos + rows > blockEnd) return null;
+                    for (var i = 0; i < rows; i++) WriteMaskRow(pixels, width, strip, row++, data[pos++]);
+                }
+            }
+        }
+        return pixels;
+    }
+
+    private static void WriteMaskRow(byte[] pixels, int width, int strip, int row, byte bits)
+    {
+        for (var x = 0; x < 8; x++) pixels[row * width + strip * 8 + x] = (byte)((bits & (0x80 >> x)) != 0 ? 1 : 0);
     }
 
     /// <summary>

@@ -956,6 +956,8 @@ public partial class MainWindow : Window
                 UpdateActorLayer();
                 UpdateCurrentRoomCardThumbnail();
                 RoomDisplayLayout.Visibility = Visibility.Visible;
+                // The view starts where the entry script left the camera (room 4's Bobbin stands at x 580).
+                if (cdScene is not null) _pendingCameraX = cdScene.CameraX;
                 UpdateRoomViewportLayout();
                 StatusText.HorizontalAlignment = HorizontalAlignment.Center;
                 StatusText.Visibility = Visibility.Collapsed;
@@ -4392,8 +4394,8 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// The CD game's actors over its first-visit room: the actors the entry script put in the room, Bobbin where an assumed arrival
-    /// (a catalog visit) stands him. Costume colours go through each costume's own table into the room palette. The CD data has
-    /// no depth mask read yet, so every actor is drawn in front.
+    /// (a catalog visit) stands him. Costume colours go through each costume's own table into the room palette. An actor in a walk box with
+    /// a mask is hidden where the room's depth mask (with the drawn objects' masks) is set, as on EGA.
     /// </summary>
     private void UpdateCdActorLayer(LoomCdScene scene, RoomImage room)
     {
@@ -4403,7 +4405,7 @@ public partial class MainWindow : Window
             try { costume = scene.Costumes(id); }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
             return _actorCostumes[id] = costume;
-        }, null, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
+        }, _objectSelection.ComposeDepthMask(room), scene.WalkBoxes, scene.Snapshot.ObjectClasses);
         if (layer.Actors.Count == 0)
         {
             RoomActorOverlay.Source = null;

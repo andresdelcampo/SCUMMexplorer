@@ -44,7 +44,7 @@ internal static class Program
                     for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
                     await Task.Delay(500);
                     Shot($"room-{number:00}.png");
-                    report.Add($"room {number}: {((IReadOnlyCollection<object>)((System.Collections.IEnumerable)Field("_objects")!).Cast<object>().ToList()).Count} object images");
+                    report.Add($"room {number}: {((IReadOnlyCollection<object>)((System.Collections.IEnumerable)Field("_objects")!).Cast<object>().ToList()).Count} object images, view offset {((ScrollViewer)window.FindName("RoomViewport")).HorizontalOffset:0} of {((ScrollViewer)window.FindName("RoomViewport")).ScrollableWidth:0}, pending camera {Field("_pendingCameraX")}");
                 }
                 var costumesTab = (RadioButton)window.FindName("CostumesTab");
                 costumesTab.IsChecked = true;

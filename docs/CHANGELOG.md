@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (late night, later): LOOM CD depth masks and camera
+
+The CD data carries the depth mask (z-plane 1) after the strips of each `BM` and `OI` body: the size field counts the strips, then a length word, one offset word per strip and the EGA mask's run coding. `LoomVgaArchive` reads it (`RoomImage.DepthMask`, `RoomObjectImage.Mask`); the room view hides an actor in a masked walk box behind it, with the drawn objects' masks as on EGA (rooms 4, 16, 18, 22, 35, 66 and others clip a Bobbin or actor, tests `LoomVgaTests`). The CD room view starts at the camera the entry script left (room 4's Bobbin stands in view). Record: `.verification/loom-vga/README.md` step 8.
+
 ## 5 October (late night): LOOM CD walk boxes, Bobbin on screen
 
 `BX` walk boxes read for the CD game (`LoomWalkBoxReader.ReadBlockBody`); `LoomEgoArrivalIndex` and `LoomSceneStateScanner` read through the data-source seam (`GlobalScriptIds`, `ReadCostume`); the CD costumes drive the actor table (`LoomCostume.ReadVga`, 16-entry colour table into the room palette, `LoomActorLayer.IsDrawn` because Bobbin uses palette index 255); the CD boot continues past the intro so the ego exists (`var[0x001] = 1` from script 001's own code), and an assumed arrival places Bobbin as in EGA catalog visits (labelled). Found and fixed: the CD data source gave global scripts a context text, which the session reads as "room-owned", so script 001 never survived its room load. The CD room view draws Bobbin and the entry script's actors (rooms 35, 16 checked in the real window). Record: [.verification/loom-vga](../.verification/loom-vga/README.md), step 7. Tests: `LoomVgaTests` (walk boxes, costumes, Bobbin in room 35); 113 filtered tests passed on `loom ega mt32 en`.

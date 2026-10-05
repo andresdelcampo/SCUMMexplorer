@@ -244,6 +244,55 @@ public sealed class LoomVgaTests
     }
 
     [Fact]
+    public void TheCdRoomsCarryDepthMasksInTheTailOfTheirBackgroundAndObjectImages()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var vga = game.Vga!;
+        var withMask = new List<int>();
+        var objectMasks = 0;
+        foreach (var room in game.Rooms)
+        {
+            var id = room.ResourceId!.Value;
+            var image = vga.DecodeRoom(id);
+            if (image.DepthMask is { } mask)
+            {
+                Assert.True(mask.IsValid);
+                Assert.Equal(image.Width * image.Height, mask.Pixels.Length);
+                if (mask.Pixels.Span.IndexOf((byte)1) >= 0) withMask.Add(id);
+            }
+            objectMasks += vga.ReadObjectImages(id).Count(item => item.Mask is not null);
+        }
+        Assert.Contains(4, withMask);
+        Assert.True(withMask.Count >= 10, $"only {withMask.Count} rooms carry a depth mask");
+        Assert.True(objectMasks > 0);
+    }
+
+    [Fact]
+    public void TheDepthMaskHidesPartOfAnActorBehindSceneryInSomeCdRoom()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var clipped = new List<string>();
+        foreach (var room in game.Rooms)
+        {
+            var id = room.ResourceId!.Value;
+            LoomCdScene scene;
+            try { scene = LoomCdRoomScene.FirstVisit(game, id); }
+            catch (Exception ex) when (ex is InvalidDataException or InvalidOperationException) { continue; }
+            var mask = scene.Selection.ComposeDepthMask(scene.Room);
+            if (mask is null) continue;
+            var open = LoomActorRenderer.Render(scene.Actors, id, scene.Room.Width, scene.Room.Height, scene.Costumes, null, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
+            var masked = LoomActorRenderer.Render(scene.Actors, id, scene.Room.Width, scene.Room.Height, scene.Costumes, mask, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
+            var hidden = open.Actors.Sum(a => a.Pixels) - masked.Actors.Sum(a => a.Pixels);
+            Assert.True(hidden >= 0);
+            if (hidden > 0) clipped.Add($"{id}:{hidden}");
+        }
+        Assert.True(clipped.Count > 0, "no room clips an actor");
+        Console.WriteLine("rooms where the mask hides actor pixels: " + string.Join(" ", clipped));
+    }
+
+    [Fact]
     public void EveryCdCostumeReadsAsAnAnimatedCostume()
     {
         if (Folder("loom vga en") is not { } folder) return;
