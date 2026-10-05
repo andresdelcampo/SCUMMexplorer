@@ -139,6 +139,13 @@ public sealed class LoomMessageTable
     private int? _charset;
     private LoomVoiceCue? _voice, _talkVoice;
     private readonly List<LoomVoiceCue> _voiceEvents = [];
+    private readonly List<long> _voiceJiffies = [];
+
+    /// <summary>The frames' jiffies (1/60 s of game time, as the session clocks them) since the table was made.</summary>
+    public long Jiffies { get; private set; }
+
+    /// <summary>For each <see cref="VoiceEvents"/> entry, <see cref="Jiffies"/> when its print ran: the game time between two cues of one click.</summary>
+    public IReadOnlyList<long> VoiceEventJiffies => _voiceJiffies;
 
     internal Action? NativeMutation { get; set; }
 
@@ -254,8 +261,10 @@ public sealed class LoomMessageTable
                 case "sayVoice":
                     if (operation.First is int voiceOffset && operation.Second is int voiceLength)
                     {
-                        _voice = new LoomVoiceCue(voiceOffset, voiceLength);
+                        _voice = new LoomVoiceCue(voiceOffset & 0xFFFF, voiceLength & 0xFFFF); // ScummVM reads both as uint16 (a script variable can hold more than 32,767)
+                        voiceOffset = _voice.Value.Offset; voiceLength = _voice.Value.Length;
                         _voiceEvents.Add(_voice.Value);
+                        _voiceJiffies.Add(Jiffies);
                         // ScummVM (script_v5 decodeParseString case 8): a stop sets VAR_MUSIC_TIMER to 0; a start goes through
                         // playCDTrack, which zeroes the variable and restarts the CD timer from 0.
                         runtime.SetGlobalVariable(MusicTimerVariable, 0);
@@ -445,6 +454,7 @@ public sealed class LoomMessageTable
     {
         NativeMutation?.Invoke();
         delta = Math.Clamp(delta, 1, MaxFrameDelta);
+        Jiffies += delta;
         TalkDelay = Math.Max(0, TalkDelay - delta);
         DisplayDialog(runtime);
         runtime.SetGlobalVariable(HaveMsgVariable, (ushort)HaveMsg);

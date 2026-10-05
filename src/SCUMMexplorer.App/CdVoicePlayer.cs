@@ -17,7 +17,7 @@ public sealed class CdVoicePlayer
     private int _seen;
     private MediaPlayer? _player;
     private string? _file;
-    private readonly Queue<LoomVoiceCue> _queue = new();
+    private readonly Queue<(LoomVoiceCue Cue, DateTime Due)> _queue = new();
     private bool _busy;
     private int _generation;
     private bool _paused;
@@ -58,16 +58,24 @@ public sealed class CdVoicePlayer
         // A click runs its whole interaction at once, so its lines and the stops after them (the game's own, issued when the text ends)
         // arrive together, without the time between them. The lines play one after the other, each for its own length; stops after a
         // line in the batch are left to that length, and a batch of stops alone silences the voice.
+        // The lines of a batch start at the game time their prints ran (LoomVoiceSchedule: an estimate, the session's text delays), after the line before.
         var first = _seen;
-        var started = false;
-        for (; _seen < cues.Count; _seen++)
+        _seen = cues.Count;
+        if (_seen > first)
         {
-            if (cues[_seen].IsStop) continue;
-            started = true;
-            if (Enabled && _disc is not null) _queue.Enqueue(cues[_seen]);
-            else Log.Add($"skipped {cues[_seen].Offset}/{cues[_seen].Length}");
+            var plan = LoomVoiceSchedule.Plan([.. cues.Skip(first)], [.. session.Messages.VoiceEventJiffies.Skip(first)]);
+            if (plan.Count == 0) { Stop(); Log.Add("stop"); return; }
+            var now = DateTime.UtcNow;
+            foreach (var start in plan)
+            {
+                if (Enabled && _disc is not null)
+                {
+                    _queue.Enqueue((start.Cue, now + TimeSpan.FromSeconds(start.StartSeconds)));
+                    if (start.GapSeconds > 0.05) Log.Add($"gap {start.GapSeconds:0.0} s (estimate) before {start.Cue.Offset}/{start.Cue.Length}");
+                }
+                else Log.Add($"skipped {start.Cue.Offset}/{start.Cue.Length}");
+            }
         }
-        if (_seen > first && !started) { Stop(); Log.Add("stop"); return; }
         if (!_busy && _queue.Count > 0) PlayNext();
     }
 
@@ -91,20 +99,26 @@ public sealed class CdVoicePlayer
 
     private void PlayNext()
     {
-        if (_queue.Count > 0) Play(_queue.Dequeue());
+        if (_queue.Count > 0) { var next = _queue.Dequeue(); Play(next.Cue, next.Due); }
     }
 
-    private async void Play(LoomVoiceCue cue)
+    private async void Play(LoomVoiceCue cue, DateTime due)
     {
         End();
         _busy = true;
         var generation = _generation;
         var disc = _disc!;
+        // The audio is read first, so the wait for the line's game time starts from a ready wave.
         byte[] wave;
         try { wave = await Task.Run(() => disc.ReadAudioWave(cue.TrackStartFrame, cue.TrackFrameCount)); }
         catch (IOException ex) { Log.Add($"failed {ex.Message}"); return; }
         if (generation != _generation) return;
         if (wave.Length == 0) { Log.Add($"no audio at frame {cue.TrackStartFrame}"); PlayNext(); return; }
+        if (DateTime.UtcNow < due)
+        {
+            await Task.Delay(due - DateTime.UtcNow);
+            if (generation != _generation) return;
+        }
         var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-voice-{Guid.NewGuid():N}.wav");
         await File.WriteAllBytesAsync(path, wave);
         if (generation != _generation) { File.Delete(path); return; }

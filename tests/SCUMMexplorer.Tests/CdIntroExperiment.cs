@@ -55,3 +55,36 @@ public sealed class CdIntroDisasm
         File.WriteAllLines(outPath, script.Instructions.Where(i => i.Offset >= from && i.Offset <= to).Select(i => $"{i.Offset:X4} {i.Operation} {i.Operands}"));
     }
 }
+
+public sealed class CdVoiceTimingDump
+{
+    // CD_VOICE_ROOMS=18,8,6 with CD_INTRO_OUT: the voice plan of each room's description click (double click, verb 0x36).
+    [Fact]
+    public void Dump()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var rooms = Environment.GetEnvironmentVariable("CD_VOICE_ROOMS");
+        var outPath = Environment.GetEnvironmentVariable("CD_INTRO_OUT");
+        if (rooms is null || outPath is null || !Directory.Exists(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var cd = ScummDataSources.For(game);
+        var log = new List<string>();
+        foreach (var number in rooms.Split(',').Select(int.Parse))
+        {
+            var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+            session.VisitRoom(game.Rooms.First(item => item.ResourceId == number));
+            var data = cd.ReadRoom(number);
+            var verbs = cd.ReadObjectVerbs(number, data.Objects);
+            var target = data.Objects.FirstOrDefault(o => verbs.TryGetValue(o.Id, out var list) && list.Any(v => v.VerbId == 0x36) && o.Width > 0);
+            if (target is null) { log.Add($"room {number}: no description"); continue; }
+            var before = session.Messages.VoiceEvents.Count;
+            session.ActivateObjectVerb(target.Id, 0x36);
+            for (var frame = 0; frame < 900 && session.Snapshot.PendingScripts > 0; frame++) session.AdvanceFrame();
+            var cues = session.Messages.VoiceEvents.Skip(before).ToList();
+            var times = session.Messages.VoiceEventJiffies.Skip(before).ToList();
+            log.Add($"room {number} object {target.Id}: " + string.Join(" ", cues.Select((c, i) => $"[{c.Offset}/{c.Length} at {times[i]}]")));
+            foreach (var s in LoomVoiceSchedule.Plan(cues, times)) log.Add($"   {s.Cue.Offset}/{s.Cue.Length} starts {s.StartSeconds:0.00} s, gap {s.GapSeconds:0.00} s, plays {s.Cue.TrackFrameCount / 75.0:0.00} s");
+        }
+        File.WriteAllLines(outPath, log);
+    }
+}

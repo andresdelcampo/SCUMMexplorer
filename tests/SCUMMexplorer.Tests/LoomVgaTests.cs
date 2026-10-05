@@ -606,3 +606,51 @@ public sealed class LoomVgaIntroTests
         Assert.Contains(session.Snapshot.Uncertainties, note => note.StartsWith("Player input assumed", StringComparison.Ordinal));
     }
 }
+
+public sealed class LoomVgaVoiceTimingTests
+{
+    [Fact]
+    public void ALineStartsWhenTheLineBeforeEndsOrWhenItsPrintRanWhicheverIsLater()
+    {
+        var a = new LoomVoiceCue(9715, 22);
+        var b = new LoomVoiceCue(9745, 15);
+        // Printed 30 jiffies after the first, which lasts 22 * 7.5 + 5 frames = 2.3 s: it waits for it (no gap).
+        var plan = LoomVoiceSchedule.Plan([a, new LoomVoiceCue(0, 0), b], [100, 110, 130]);
+        Assert.Equal(2, plan.Count);
+        Assert.Equal(0, plan[0].StartSeconds);
+        Assert.Equal(170 / 75.0, plan[1].StartSeconds, 3);
+        Assert.Equal(0, plan[1].GapSeconds, 3);
+        // Printed 4 s after the first: the game's own wait leaves 4 - 2.27 s of silence, an estimate of the text delay.
+        plan = LoomVoiceSchedule.Plan([a, b], [100, 340]);
+        Assert.Equal(4.0, plan[1].StartSeconds, 3);
+        Assert.Equal(4.0 - 170 / 75.0, plan[1].GapSeconds, 3);
+        Assert.Empty(LoomVoiceSchedule.Plan([new LoomVoiceCue(0, 0)], [5]));
+    }
+
+    [Fact]
+    public void AClicksVoiceLinesCarryTheGameTimeOfTheirPrints()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var cd = ScummDataSources.For(game);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        // Room 18's description (double click): two lines, 9715/22 and 9745/15, then the game's own stop.
+        var room = game.Rooms.First(item => item.ResourceId == 18);
+        session.VisitRoom(room);
+        var data = cd.ReadRoom(18);
+        var verbs = cd.ReadObjectVerbs(18, data.Objects);
+        var target = data.Objects.First(o => verbs.TryGetValue(o.Id, out var list) && list.Any(v => v.VerbId == 0x36) && o.Width > 0);
+        var before = session.Messages.VoiceEvents.Count;
+        session.ActivateObjectVerb(target.Id, 0x36);
+        for (var frame = 0; frame < 900 && session.Snapshot.PendingScripts > 0; frame++) session.AdvanceFrame();
+        var cues = session.Messages.VoiceEvents.Skip(before).ToList();
+        var times = session.Messages.VoiceEventJiffies.Skip(before).ToList();
+        Assert.True(cues.Count(c => !c.IsStop) >= 2, string.Join(", ", cues));
+        Assert.Equal(cues.Count, times.Count);
+        Assert.True(times.Zip(times.Skip(1)).All(pair => pair.Second >= pair.First));
+        var plan = LoomVoiceSchedule.Plan(cues, times);
+        Assert.True(plan[1].StartSeconds > 0);
+        Assert.All(session.Messages.VoiceEvents, cue => Assert.True(cue.Offset >= 0 && cue.Length >= 0));
+    }
+}
