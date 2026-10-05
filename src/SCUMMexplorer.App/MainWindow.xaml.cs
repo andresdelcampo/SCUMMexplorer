@@ -3603,6 +3603,9 @@ public partial class MainWindow : Window
         public int IdleFrames { get; set; }
         public int CutsceneFrames { get; set; }
         public int WaitTicks { get; set; }
+        // The CD game's scenes keep time with its disc audio, which plays in real time: frames the timer was late for are made up (see PlaybackTimer_Tick).
+        public long LastTickAt { get; set; }
+        public TimeSpan Credit { get; set; }
         // A LOOM demo's self-running preview: it runs until the user opens another room.
         public bool Preview { get; init; }
         public string? Note { get; set; }
@@ -3654,7 +3657,7 @@ public partial class MainWindow : Window
         _playbackPaused = false;
         // The scene opens where the game's camera is, whatever the view showed before (a replay can start in a wide room).
         if (_session?.CameraX is int startCamera && ViewShowsSessionRoom()) ScrollToGameCamera(startCamera);
-        if (_game is not null && _session is not null && !_sceneSound.Follows(_session)) _sceneSound.Attach(_game, _session);
+        if (_game is { Id: not GameId.LoomVga } && _session is not null && !_sceneSound.Follows(_session)) _sceneSound.Attach(_game, _session);
         if (_playInstantly || instant)
         {
             _playbackTimer?.Stop();
@@ -3948,8 +3951,35 @@ public partial class MainWindow : Window
         StatusText.ToolTip = DemoPreviewNote + Environment.NewLine + string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
     }
 
+    private const string CdIntroTitle = "The intro";
+
+    private const string CdIntroNote =
+        "LOOM CD's start (script 001 from the beginning): Room 69's skill screen with the spoken line, then script 044 over the 84-second " +
+        "overture cue on the disc's audio track (the logo, \"LucasArts Entertainment Company\", Room 53's fairy and Bobbin on the cliff), ending in Room 02. " +
+        "Stated start: a fresh session (seed 0). The skill screen waits for the player in the game; here the answer is assumed (an estimate) " +
+        "3 seconds in, and the draft question is not simulated. The overture's timer (var[0x0E]) counts one a jiffy from the cue's start, as ScummVM's CD timer does, " +
+        "so the cutscene's fades follow it on the playback clock; whether they match the original's moment by moment has not been compared. The current exploration state is replaced.";
+
+    private CutscenePickerItem CdIntroItem() => new(CdIntroTitle, "Scenes", CdIntroNote, PlayCdIntro);
+
+    /// <summary>Plays the CD game's intro: a fresh session whose script 001 starts from the beginning, the frames on the playback clock, the voice and overture from the disc.</summary>
+    private void PlayCdIntro()
+    {
+        if (_game is not { Id: GameId.LoomVga, Vga: { } vga } || !CanStartCutscene) return;
+        StopScenePlayback();
+        _cdVoice.Stop();
+        _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
+        _cdVoice.Attach(vga.Disc, _session);
+        if (_session.Snapshot.RoomId is not int roomId || _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } room)
+            return;
+        StartPlayback(CdIntroTitle, null, room, doorways: null, leftRoom: false);
+        StatusText.Text = $"Playing {CdIntroTitle} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
+        StatusText.ToolTip = CdIntroNote + Environment.NewLine + string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
+    }
+
     private List<(string Id, CutscenePickerItem Item)> PlayableCutsceneItems()
     {
+        if (_game is { Id: GameId.LoomVga }) return [("cd-intro", CdIntroItem())];
         // A demo has no catalog of scenes: the full game's replays name its rooms, objects and scripts.
         if (_game is { IsDemo: true }) return [("demo-preview", DemoPreviewItem())];
         var items = new List<(string, CutscenePickerItem)> { ("opening", new(OpeningTitle, "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening)) };
@@ -3961,6 +3991,7 @@ public partial class MainWindow : Window
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
+        if (_game is { Id: GameId.LoomVga }) return [];
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
         return PlayableCutsceneItems().Where(choice => ids.Contains(choice.Id)).Select(choice => choice.Item).ToList();
     }
@@ -4274,10 +4305,26 @@ public partial class MainWindow : Window
         playback.WaitTicks = 0;
         // The music the last frame started is still being prepared: the scene waits so the music starts with it.
         if (_sceneSound.IsPreparing) return;
-        if (!PlaybackStep())
+        // The CD game's audio (voice, overture) runs on the real clock; a frame that took longer than its jiffies (drawing, a room's load) is
+        // made up by running the frames it was late for, up to four a tick, so the scene stays with the music.
+        var catchUp = 0;
+        if (_game.Id == GameId.LoomVga)
         {
-            FinishPlayback();
-            return;
+            var now = System.Diagnostics.Stopwatch.GetTimestamp();
+            if (playback.LastTickAt != 0)
+                playback.Credit += System.Diagnostics.Stopwatch.GetElapsedTime(playback.LastTickAt, now) - PlaybackFrameInterval();
+            playback.LastTickAt = now;
+            // Time the app could not follow (a pause, a long load) is not made up.
+            playback.Credit = TimeSpan.FromTicks(Math.Clamp(playback.Credit.Ticks, 0, TimeSpan.FromMilliseconds(400).Ticks));
+            while (catchUp < 4 && playback.Credit >= PlaybackFrameInterval()) { playback.Credit -= PlaybackFrameInterval(); catchUp++; }
+        }
+        for (var frame = 0; frame <= catchUp; frame++)
+        {
+            if (!PlaybackStep())
+            {
+                FinishPlayback();
+                return;
+            }
         }
         _playbackTimer!.Interval = PlaybackFrameInterval();
         ShowPlaybackFrame();

@@ -36,6 +36,31 @@ internal static class Program
                 Call("OpenGameFolder", args[0]);
                 var game = (GameLibrary)Field("_game")!;
                 var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} ({string.Join(",", game.Rooms.Select(r => r.ResourceId))}) | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
+                // CD_INTRO=1 plays "The intro" from the Play a cutscene list on the playback clock and shoots it every CD_INTRO_STEP ms (default 4000) for CD_INTRO_MS (default 105000).
+                if (Environment.GetEnvironmentVariable("CD_INTRO") == "1")
+                {
+                    var toggle = (System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle");
+                    toggle.IsChecked = true;
+                    await Task.Delay(1500);
+                    var step = int.Parse(Environment.GetEnvironmentVariable("CD_INTRO_STEP") ?? "4000");
+                    var total = int.Parse(Environment.GetEnvironmentVariable("CD_INTRO_MS") ?? "105000");
+                    Call("PlayCdIntro");
+                    var clock = System.Diagnostics.Stopwatch.StartNew();
+                    for (var t = 0; t < total; t += step)
+                    {
+                        await Task.Delay(step);
+                        Shot($"intro-{t + step:000000}.png");
+                        var session = Field("_session")!;
+                        var snap = session.GetType().GetProperty("Snapshot")!.GetValue(session)!;
+                        var msgs = session.GetType().GetProperty("Messages")!.GetValue(session)!;
+                        var on = string.Join(" / ", ((System.Collections.IEnumerable)msgs.GetType().GetProperty("OnScreen")!.GetValue(msgs)!).Cast<object>().Select(m => m.GetType().GetProperty("Text")!.GetValue(m)!.ToString()!.Replace("\n", "|")));
+                        report.Add($"+{clock.ElapsedMilliseconds} ms: room {snap.GetType().GetProperty("RoomId")!.GetValue(snap)} boot {session.GetType().GetProperty("BootRunning")!.GetValue(session)} timer {msgs.GetType().GetProperty("CdMusicTimer")!.GetValue(msgs)} | {on} | {((TextBlock)window.FindName("StatusText")).Text}");
+                    }
+                    { var voice = Field("_cdVoice"); foreach (var line in (IEnumerable<string>)voice!.GetType().GetProperty("Log")!.GetValue(voice)!) report.Add("voice " + line); }
+                    File.WriteAllLines(Path.Combine(output, "report.txt"), report);
+                    window.Close();
+                    return;
+                }
                 // First-visit scenes (the entry script's objects over the background), a few rooms; cards need a moment to render too.
                 foreach (var number in new[] { 1, 4, 10, 13, 16, 31, 35, 40, 53, 86 })
                 {
