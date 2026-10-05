@@ -1067,6 +1067,7 @@ public partial class MainWindow : Window
             if (visit) FollowSessionSound();
             if (visit) _issueBaseline = _session.Snapshot.Uncertainties.Count;
             var snapshot = visit ? _session.VisitRoom(resource, preserveStaffLevel: !_playbackEnteringRoom && _replaySequence is null) : _session.Snapshot;
+            if (visit && _game?.Id == GameId.LoomVga && _cdVoice.Follows(_session)) _cdVoice.SkipPending();
             var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
                 _indexedStates, sceneBatches, estimateArtwork: _game?.Id != GameId.LoomVga);
@@ -4129,7 +4130,7 @@ public partial class MainWindow : Window
         _replaySequence?.FrameAdvanced();
         if (session.Snapshot.RoomId != room) playback.LeftRoom = true;
         // The sounds the frame's scripts started or stopped (instant playback has no frames to wait for).
-        if (!_playbackBatch) _sceneSound.Update();
+        if (!_playbackBatch) { _sceneSound.Update(); if (_game?.Id == GameId.LoomVga) _cdVoice.Update(); }
         return true;
     }
 
@@ -4334,6 +4335,7 @@ public partial class MainWindow : Window
         _replaySequence = null;
         UpdatePlaybackControls();
         _sceneSound.Update();
+        if (_game?.Id == GameId.LoomVga) _cdVoice.Update();
         var snapshot = session.Snapshot;
         var note = playback.Note is null ? "" : Environment.NewLine + playback.Note;
         if (sequenceFailure is not null)

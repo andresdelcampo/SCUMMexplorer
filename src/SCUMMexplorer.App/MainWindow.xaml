@@ -195,7 +195,7 @@
                             Padding="13,8" Margin="0,9,8,9" ToolTip="Inspect or explicitly edit this exploration session's staff, notes and drafts."/>
                     <!-- Fixed group at the right edge (sound, Advanced, Open): the buttons that come and go sit to its left,
                          so these never move when a game opens or Advanced changes. -->
-                    <CheckBox x:Name="VoiceCheck" Content="Voices" IsChecked="True" Visibility="Collapsed" VerticalAlignment="Center" Margin="0,0,14,0"
+                    <CheckBox x:Name="VoiceCheck" Content="Voices" Foreground="#E7E0D2" IsChecked="True" Visibility="Collapsed" VerticalAlignment="Center" Margin="0,0,14,0"
                               Checked="VoiceCheck_Changed" Unchecked="VoiceCheck_Changed"
                               ToolTip="Play the spoken lines of LOOM on CD from the disc's audio track."/>
                     <ComboBox x:Name="SoundModeCombo" Width="166" MinHeight="32" VerticalAlignment="Center" Margin="0,0,14,0"

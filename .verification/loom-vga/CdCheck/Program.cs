@@ -35,7 +35,7 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 var game = (GameLibrary)Field("_game")!;
-                var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
+                var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} ({string.Join(",", game.Rooms.Select(r => r.ResourceId))}) | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
                 // First-visit scenes (the entry script's objects over the background), a few rooms; cards need a moment to render too.
                 foreach (var number in new[] { 1, 4, 10, 13, 16, 31, 35, 40, 53, 86 })
                 {
@@ -81,7 +81,8 @@ internal static class Program
                 var rooms = args.Length > 2 ? args[2].Split(',').Select(int.Parse).ToArray() : new[] { 4, 10, 16, 35 };
                 foreach (var number in rooms)
                 {
-                    var room = game.Rooms.First(r => r.ResourceId == number);
+                    var room = game.Rooms.FirstOrDefault(r => r.ResourceId == number);
+                    if (room is null) { report.Add($"room {number}: not on the disc"); continue; }
                     Call("SelectResourceInTree", room);
                     for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
                     await Task.Delay(500);

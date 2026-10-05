@@ -38,6 +38,17 @@ public sealed class CdVoicePlayer
         _seen = session.Messages.VoiceEvents.Count;
     }
 
+    /// <summary>
+    /// Drops the cues issued so far without playing them: a room entered from the catalog runs its entry script (and the CD boot's tail)
+    /// as a state preview, which the player did not do, so its lines are not spoken.
+    /// </summary>
+    public void SkipPending()
+    {
+        if (_session is not { } session) return;
+        if (session.Messages.VoiceEvents.Count > _seen) Log.Add($"skipped {session.Messages.VoiceEvents.Count - _seen} cue(s) issued by a room visit");
+        _seen = session.Messages.VoiceEvents.Count;
+    }
+
     /// <summary>Starts or stops the voice for the cues the session issued since the last call.</summary>
     public void Update()
     {
