@@ -38,6 +38,22 @@ public sealed record LoomMessage(
 
     /// <summary>The charset chosen by <c>charsetSet</c> when the <c>print</c> ran, or null if none was (the game's default then).</summary>
     public int? Charset { get; init; }
+
+    /// <summary>The voice line that went with the print (CD game, <c>sayVoice</c>), or null.</summary>
+    public LoomVoiceCue? Voice { get; init; }
+}
+
+/// <summary>
+/// The CD game's <c>print</c> sub-opcode 8 (<c>sayVoice</c>): where the spoken line lies on the disc and how long it runs, both
+/// in tenths of a second (ScummVM turns them into CD frames with 7.5 frames per unit, 75 frames per second). The offset counts from
+/// the start of the disc, so the audio track starts at <see cref="DiscSeconds"/> minus the data tracks. Offset 0 with length 0
+/// stops the voice. The message's own timing is not changed by it: the line waits as long as its text says.
+/// </summary>
+public readonly record struct LoomVoiceCue(int Offset, int Length)
+{
+    public bool IsStop => Offset == 0 && Length == 0;
+    public double DiscSeconds => Offset / 10.0;
+    public double Seconds => Length / 10.0;
 }
 
 /// <summary>A <c>drawBox</c> rectangle in screen coordinates, corners inclusive.</summary>
@@ -109,6 +125,7 @@ public sealed class LoomMessageTable
     private LoomPrintRequest? _source;
     private string? _estimate;
     private int? _charset;
+    private LoomVoiceCue? _voice, _talkVoice;
 
     internal Action? NativeMutation { get; set; }
 
@@ -163,6 +180,7 @@ public sealed class LoomMessageTable
         var slot = _slots[index];
         slot.LoadDefault();
         var estimates = new List<string>();
+        _voice = null;
         if (request.Estimate is not null) estimates.Add(request.Estimate);
         foreach (var operation in request.Operations)
         {
@@ -199,6 +217,10 @@ public sealed class LoomMessageTable
                     break;
                 case "overhead":
                     slot.Overhead = true;
+                    break;
+                case "sayVoice":
+                    if (operation.First is int voiceOffset && operation.Second is int voiceLength) _voice = new LoomVoiceCue(voiceOffset, voiceLength);
+                    else estimates.Add("the print's voice operands could not be read");
                     break;
                 default:
                     estimates.Add($"print subcommand {operation.Name} is not modelled");
@@ -268,6 +290,7 @@ public sealed class LoomMessageTable
         _bufferPos = 0;
         _source = request;
         _charset = runtime.Charset;
+        _talkVoice = _voice;
         _estimate = estimates.Count == 0 ? null : string.Join("; ", estimates.Distinct());
         _slotCopy = slot.Copy();
         TalkDelay = 0;
@@ -307,7 +330,7 @@ public sealed class LoomMessageTable
         var message = new LoomMessage(LoomMessageKind.Drawn, request.ActorToPrintFor, 1,
             lines.Select(line => line.ToArray()).ToArray(), slot.X, slot.Y, slot.Center, slot.Height, slot.Right, slot.Color,
             request.RoomId, request.SourceLabel, request.Offset, 0,
-            estimates.Count == 0 ? null : string.Join("; ", estimates.Distinct())) { Charset = runtime.Charset };
+            estimates.Count == 0 ? null : string.Join("; ", estimates.Distinct())) { Charset = runtime.Charset, Voice = _voice };
         // drawString paints into the persistent screen, not a bounded message queue.
         // A new print cannot evict an unrelated score/staff glyph. Coalesce only
         // identical glyph geometry that this print completely paints again; different
@@ -475,7 +498,7 @@ public sealed class LoomMessageTable
         if (estimates.Count > 0) estimate = string.Join("; ", new[] { estimate }.Concat(estimates).Where(item => item is not null).Distinct());
         Talk = new LoomMessage(LoomMessageKind.Talk, source.ActorToPrintFor == NoActor ? NoActor : TalkingActor, 0,
             _shown.Select(line => line.ToArray()).ToArray(), _slotCopy.X, _slotCopy.Y, _slotCopy.Center, _slotCopy.Height,
-            _slotCopy.Right, _color, source.RoomId, source.SourceLabel, source.Offset, TalkDelay, estimate) { Charset = _charset };
+            _slotCopy.Right, _color, source.RoomId, source.SourceLabel, source.Offset, TalkDelay, estimate) { Charset = _charset, Voice = _talkVoice };
         _log.Add(Talk);
     }
 

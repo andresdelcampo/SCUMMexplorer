@@ -427,4 +427,22 @@ public sealed class LoomVgaCharsetPerMessageTests
         var layer = LoomVgaMessageRenderer.Render(drawn, number => archive.ReadCharset(number ?? 2)!);
         Assert.NotNull(layer.Bounds);
     }
+
+    [Fact]
+    public void ASpokenLineKeepsItsVoiceCueAndNoLongerCountsAsUnmodelled()
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
+        // Script 022 +0x001F: "It's too noisy to spin any drafts in here!", sayVoice 0x1DAA, 0x001B.
+        var run = typeof(LoomExplorationSession).GetMethod("RunStartedScript", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        run.Invoke(session, System.Reflection.BindingFlags.Default, Type.DefaultBinder,
+            [22, 0x1F, new Dictionary<string, ushort>(), 0, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing], null);
+        var line = session.Messages.Log.Last(message => message.Text.StartsWith("It's too noisy", StringComparison.Ordinal));
+        Assert.Equal(new LoomVoiceCue(0x1DAA, 0x1B), line.Voice);
+        Assert.Equal(759.4, line.Voice!.Value.DiscSeconds, 1);
+        Assert.DoesNotContain("sayVoice", line.Estimate ?? "");
+    }
 }
