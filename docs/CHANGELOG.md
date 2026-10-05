@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 October (night, last): LOOM CD sounds and CD audio list, Game Status artwork
+
+The CD's 30 `SO` sounds (AdLib and PC speaker parts) are read and playable on demand; no CD script starts them (script 39 is a stub). The tree has a "CD audio" list of the 313 voice and music cues the scripts ask for, played from the disc's audio track. CD Game Status shows the staff and note artwork and named drafts. Build warnings fixed (0 now). The intro is blocked on the CD music timer `var[0x0E]` (not modelled). Record: `.verification/loom-vga/README.md` step 15.
+
 ## 5 October (night, final): LOOM CD voices and status
 
 CD audio: `DiscImage.ReadAudio`/`ReadAudioWave` cut the audio track (44.1 kHz, 16-bit, stereo); a voice cue (`LoomVoiceCue`) maps to track frames as ScummVM does (offset x 7.5 minus the first track's 22,500 frames and the 150-frame lead-in; run time x 7.5 + 5), and `LoomMessageTable.VoiceEvents` lists every `sayVoice` a reached print issued. The app's `CdVoicePlayer` queues a click's lines one after the other, a stop alone silences the voice, cues a room visit issued are skipped, and a Voices checkbox (saved with the view options) turns it off. The CD status schema (`LoomStatusSchema.Read` with a data source) is derived from scripts 010, 017, 018, 022, 023, 025, 026 and 034, so Game Status works for the CD game and its staff and note edits show the draft verbs. Record: `.verification/loom-vga/README.md` step 14.

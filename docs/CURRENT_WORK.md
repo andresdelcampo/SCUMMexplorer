@@ -8,7 +8,7 @@ LOOM EGA exploration is functionally complete for the user's three priorities (o
 
 ## Rules the user has set
 
-- **End every session with a current ready-to-copy prompt** at the top of `docs/NEXT_SESSION_PROMPT.md` (state, next task, standing rules), replacing the old one, and give it to the user in the final reply so they only confirm it. Never leave the old prompt in place.
+- **End every session by starting the next one as a task**: update the plan and `docs/NEXT_SESSION_PROMPT.md` (state and details only, never the prompt text itself), then launch the next session with the `spawn_task` tool and a self-contained prompt (state, next task, standing rules), and tell the user what it says. Never keep a prompt in the prompt file.
 
 Room state (3 October). Rooms start in the earliest game state. A room moves to a late state only after the user triggers the late cutscene that causes it (the session then carries that state on). No scene is chained after other scenes to show a later branch (the Room 44/652, Room 45/655, Room 41/633 question is closed: fresh branch). The staff rule for scenes outside the island (decided 3 October) is its own explicit exception: scenes whose code clears or reads bit D61 start with the distaff held through the game's own pickup (Room 09 object 271), run unseen, when the scene is outside the LOOM island (Room 11 on); island scenes keep the fresh state. Every assumption is shown in the picker note.
 
