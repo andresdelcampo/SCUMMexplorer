@@ -4679,7 +4679,7 @@ public partial class MainWindow : Window
             try { costume = _session.ReadCostume(id); }
             catch (Exception error) when (error is InvalidDataException or NotSupportedException or IOException) { costume = null; }
             return _actorCostumes[id] = costume;
-        }, _objectSelection.ComposeDepthMask(room), _session.CurrentWalkBoxes, _session.ObjectClasses);
+        }, _objectSelection.ComposeDepthMask(room), _session.CurrentWalkBoxes, _session.ObjectClasses, room.ExtraDepthMasks.Select(plane => plane.Pixels.ToArray()).ToArray());
         if (layer.Actors.Count == 0)
         {
             RoomActorOverlay.Source = null;

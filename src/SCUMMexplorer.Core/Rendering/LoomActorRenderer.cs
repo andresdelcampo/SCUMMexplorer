@@ -56,7 +56,7 @@ public static class LoomActorRenderer
 
     public static LoomActorLayer Render(IEnumerable<LoomActorSnapshot> actors, int currentRoom, int width, int height,
         Func<int, LoomCostume?> costumes, byte[]? depthMask = null, LoomWalkBoxSet? boxes = null,
-        IReadOnlyDictionary<int, uint>? classes = null)
+        IReadOnlyDictionary<int, uint>? classes = null, IReadOnlyList<byte[]>? extraMasks = null)
     {
         var pixels = new byte[width * height];
         Array.Fill(pixels, Transparent);
@@ -90,13 +90,13 @@ public static class LoomActorRenderer
             var forceClip = LoomObjectClasses.Has(actorClasses, AlwaysClipClass);
             var neverClip = !forceClip && LoomObjectClasses.Has(actorClasses, NeverClipClass);
             var zPlane = depthMask is null || neverClip ? 0 : forceClip ? 1 :
-                actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1) : 0;
+                actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1 + (extraMasks?.Count ?? 0)) : 0;
             var boxNote = depthMask is not null && !forceClip && !neverClip && actor.WalkBox is null
                 ? "walk box unknown: drawn in front of the depth mask" : null;
             // CD game: a box with a scale of its own (word or slot) sets it where the actor stands, else the actor's own (actorOps scale) holds.
             var scale = Math.Clamp((actor.WalkBox is int scaleBox && !actor.IgnoreBoxes.GetValueOrDefault() ? boxes?.BoxScale(scaleBox, y) : null) ?? look.Scale, 1, 255);
             int Scaled(int value) => scale < 255 ? (int)Math.Floor(value * (double)scale / 255) : value;
-            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 0 ? depthMask : null, coverage, scale);
+            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 1 ? extraMasks![zPlane - 2] : zPlane > 0 ? depthMask : null, coverage, scale);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
                 x + Scaled(cels.Min(cel => cel.Left)), top + Scaled(cels.Min(cel => cel.Top)),
                 x + Scaled(cels.Max(cel => cel.Left + cel.Width)), top + Scaled(cels.Max(cel => cel.Top + cel.Height)));

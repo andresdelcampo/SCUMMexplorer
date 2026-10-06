@@ -5,6 +5,9 @@ public sealed record RoomImage(int Width, int Height, ReadOnlyMemory<byte> Pixel
 {
     public RoomDepthMask? DepthMask { get; init; }
 
+    /// <summary>Mask planes 2 and up (the CD game's rooms carry several; a walk box's mask byte picks the plane that hides an actor standing in it).</summary>
+    public IReadOnlyList<RoomDepthMask> ExtraDepthMasks { get; init; } = [];
+
     public bool IsValid => Width > 0 && Height > 0 && Pixels.Length == Width * Height && Palette.Count > 0 &&
                            (DepthMask is null || DepthMask.IsValid && DepthMask.Width == Width && DepthMask.Height == Height);
 }

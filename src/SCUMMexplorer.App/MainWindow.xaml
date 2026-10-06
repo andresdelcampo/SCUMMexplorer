@@ -349,9 +349,10 @@
                                 <StackPanel.Style><Style TargetType="StackPanel"><Style.Triggers>
                                     <DataTrigger Binding="{Binding Visibility, ElementName=RoomMusicPanel}" Value="Visible"><Setter Property="MinHeight" Value="108"/></DataTrigger>
                                 </Style.Triggers></Style></StackPanel.Style>
-                                <StackPanel x:Name="SceneInteractionCard" MaxWidth="520" HorizontalAlignment="Center" Margin="8,0,8,8">
+                                <!-- Wide enough for the playback and room buttons in one row (Advanced adds Step); the texts keep their own narrower width. -->
+                                <StackPanel x:Name="SceneInteractionCard" MaxWidth="880" HorizontalAlignment="Center" Margin="8,0,8,8">
                                     <DockPanel x:Name="SceneSessionBar" LastChildFill="False" HorizontalAlignment="Center" Margin="0,0,0,5">
-                                        <TextBlock x:Name="SessionStatusText" Foreground="#B8AA8C" TextWrapping="Wrap"
+                                        <TextBlock x:Name="SessionStatusText" Foreground="#B8AA8C" TextWrapping="Wrap" MaxWidth="520"
                                                    VerticalAlignment="Center" Margin="0,0,10,0"/>
                                         <StackPanel x:Name="SessionActions" Visibility="Collapsed" Orientation="Horizontal">
                                         </StackPanel>
@@ -382,9 +383,9 @@
                                                 ToolTip="Music and sound effects this room's scripts may start. Pick one to hear it; the game does not necessarily play all of them."/>
                                         </StackPanel>
                                     </WrapPanel>
-                                    <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center"/>
+                                    <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="520"/>
                                     <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,3,0,0">
-                                        <TextBlock x:Name="ObjectActionNote" Foreground="#D2C7B5" TextWrapping="Wrap" TextAlignment="Center"/>
+                                        <TextBlock x:Name="ObjectActionNote" Foreground="#D2C7B5" TextWrapping="Wrap" MaxWidth="520" TextAlignment="Center"/>
                                         <StackPanel x:Name="ObjectVerbButtons" Margin="0,5,0,0" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </StackPanel>

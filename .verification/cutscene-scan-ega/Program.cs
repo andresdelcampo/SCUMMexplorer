@@ -30,6 +30,32 @@ if (args.Length > 2 && args[2] == "script") // CutsceneScanCompare <folder> - sc
     }
     return;
 }
+if (args.Length > 2 && args[2] == "boxes") // CutsceneScanCompare <folder> - boxes <room>...: walk boxes with mask and flags
+{
+    foreach (var room in args.Skip(3).Select(int.Parse))
+        foreach (var b in data.ReadRoom(room).WalkBoxes?.Boxes ?? [])
+            Console.WriteLine($"room {room} box {b.Index}: ({b.UpperLeft.X},{b.UpperLeft.Y}) ({b.UpperRight.X},{b.UpperRight.Y}) ({b.LowerRight.X},{b.LowerRight.Y}) ({b.LowerLeft.X},{b.LowerLeft.Y}) mask {b.Mask} flags 0x{b.Flags:X2} scale {b.Scale}");
+    return;
+}
+if (args.Length > 2 && args[2] == "maskmap") // CutsceneScanCompare <CD folder> - maskmap <room>: the depth mask at 1/4 scale (# masked)
+{
+    var im = game.Vga!.DecodeRoom(int.Parse(args[3]));
+    var px = (args.Length > 4 ? im.ExtraDepthMasks[int.Parse(args[4]) - 2] : im.DepthMask!).Pixels.ToArray();
+    Console.WriteLine($"{im.Width}x{im.Height}");
+    for (var y = 0; y < im.Height; y += 4)
+        Console.WriteLine($"{y,3} " + string.Concat(Enumerable.Range(0, im.Width / 4).Select(x => px[y * im.Width + x * 4] != 0 ? '#' : '.')));
+    return;
+}
+if (args.Length > 2 && args[2] == "masks") // CutsceneScanCompare <CD folder> - masks: rooms whose depth mask is missing, empty or set
+{
+    foreach (var room in rooms)
+    {
+        var image = game.Vga!.DecodeRoom(room);
+        var set = image.DepthMask is { } m ? m.Pixels.Span.ToArray().Count(b => b != 0) : -1;
+        Console.WriteLine($"room {room}: mask pixels {(set < 0 ? "none (block missing or unreadable)" : set.ToString())}, extra planes {image.ExtraDepthMasks.Count}");
+    }
+    return;
+}
 using var doc = JsonDocument.Parse(File.ReadAllText(args[1]));
 var catalog = doc.RootElement.GetProperty("replays").EnumerateArray()
     .Select(e => (Room: e.GetProperty("room").GetInt32(), Obj: e.GetProperty("objectId").GetInt32(), Verb: e.GetProperty("verb").GetInt32(), Id: e.GetProperty("id").GetString()!)).ToList();

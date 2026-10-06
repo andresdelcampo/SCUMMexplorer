@@ -398,8 +398,11 @@ public sealed class LoomVgaArchive
             if (body + offset >= end) throw new InvalidDataException($"Room {number} strip {strip} starts outside its bitmap.");
             DecodeStrip(_lec, (int)(body + offset), end, pixels, width, height, strip * 8);
         }
-        var mask = ReadMaskPlane(_lec, body, end, width, height);
-        return new RoomImage(width, height, pixels, palette) { DepthMask = mask is null ? null : new RoomDepthMask(width, height, mask) };
+        var mask = ReadMaskPlane(_lec, body, end, width, height, out var next);
+        // More z-planes follow the first, each the same block (length word, strip offsets, rows): Room 25's house is plane 2.
+        var extra = new List<RoomDepthMask>();
+        while (mask is not null && next > 0 && ReadMaskPlane(_lec, body, end, width, height, out next, next) is { } more) extra.Add(new RoomDepthMask(width, height, more));
+        return new RoomImage(width, height, pixels, palette) { DepthMask = mask is null ? null : new RoomDepthMask(width, height, mask), ExtraDepthMasks = extra };
     }
 
     /// <summary>
@@ -409,12 +412,17 @@ public sealed class LoomVgaArchive
     /// bytes; 0 means 256). Null when the bitmap has no mask block (the size field reaches the end) or the block does not read.
     /// One byte per pixel, 0 or 1.
     /// </summary>
-    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height)
+    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height) => ReadMaskPlane(data, body, end, width, height, out _);
+
+    /// <summary>The plane at <paramref name="at"/> (the first plane when 0); <paramref name="next"/> is where a further plane would start (0 when the block ends the body).</summary>
+    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height, out int next, int at = 0)
     {
+        next = 0;
         var strips = width / 8;
-        var start = body + (int)BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(body));
+        var start = at > 0 ? at : body + (int)BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(body));
         if (start + 2 + strips * 2 > end) return null;
         var blockEnd = Math.Min(end, start + BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(start)));
+        if (blockEnd - start >= 2 + strips * 2 && end - blockEnd >= 2 + strips * 2) next = blockEnd;
         var pixels = new byte[width * height];
         for (var strip = 0; strip < strips; strip++)
         {
