@@ -3562,6 +3562,14 @@ public partial class MainWindow : Window
     {
         _lastDoorwayFallback = null;
         _lastDoorwayHeld = null;
+        if (SessionModeToggle.IsChecked == true && _session is not null && _session.WaitingForSkillClick)
+        {
+            // The CD intro's skill screen: a press on a button is the game's click; the intro's own playback goes on from there.
+            var action = _session.ClickSkillScreen(x, y);
+            StatusText.Text = _session.WaitingForSkillClick ? "Press one of the three skill buttons." : "Skill chosen (assumed input; the draft question that follows in the game is not simulated).";
+            StatusText.ToolTip = action.Evidence + Environment.NewLine + string.Join(Environment.NewLine, action.Uncertainties);
+            return;
+        }
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
             SendInputToGame(() => _session.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click", DoorwaysAt(x, y));
@@ -3978,6 +3986,8 @@ public partial class MainWindow : Window
         StopScenePlayback();
         _cdVoice.Stop();
         _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
+        // The skill screen waits for a press on one of its buttons (SCUMM_CD_INTRO_AUTOANSWER=1 lets the harnesses run it unattended).
+        _session.WaitForSkillClick = Environment.GetEnvironmentVariable("SCUMM_CD_INTRO_AUTOANSWER") != "1";
         _cdVoice.Attach(vga.Disc, _session);
         if (_session.Snapshot.RoomId is not int roomId || _game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } room)
             return;
@@ -4497,7 +4507,9 @@ public partial class MainWindow : Window
         {
             var first = playback.FrameSignature is null;
             playback.FrameSignature = signature;
-            if (!first)
+            // The first frame of a room entered during a playback may already differ from the state the room's view was built with (the CD skill
+            // screen's buttons are drawn a few frames in, before the first frame shows), so the CD game refreshes on it too.
+            if (!first || _game?.Id == GameId.LoomVga)
             {
                 ApplyRoomState(room, _currentRoomObjectRecords, _objects, visit: false);
                 UpdateRoomNavigationActions(room);

@@ -410,6 +410,30 @@ public sealed partial class LoomExplorationSession
     /// skill level" (2.4 s). The moment is an estimate.
     /// </summary>
     public const int CdIntroAnswerFrame = 30;
+
+    /// <summary>
+    /// Set by a window that lets the player press a skill button on the CD intro's Room 69 screen: the screen then stays until a click, instead of
+    /// answering by itself at <see cref="CdIntroAnswerFrame"/>.
+    /// </summary>
+    public bool WaitForSkillClick { get; set; }
+    private int? _skillClickFrame;
+    private const int SkillAnswerDelayFrames = 20;
+
+    /// <summary>True while the CD intro's skill screen waits for the player's click (see <see cref="WaitForSkillClick"/>).</summary>
+    public bool WaitingForSkillClick => WaitForSkillClick && _playingBoot && _cdIntro && _skillClickFrame is null && _bootFramesPlayed >= 2 &&
+        _currentRoom is not null && FindAwaitedInput() is not null;
+
+    /// <summary>
+    /// A click on the skill screen: it goes through the game's input script as any click does (the button objects' own code runs). The challenge
+    /// that follows a skill choice in the game is not simulated: the answer is assumed a moment after a click that started a script.
+    /// </summary>
+    public LoomObjectActionResult ClickSkillScreen(int x, int y)
+    {
+        var before = _pending.Count;
+        var result = Click(x, y);
+        if (_pending.Count > before && !result.Uncertainties.Any(line => line.Contains("not sent, because", StringComparison.Ordinal))) _skillClickFrame = _bootFramesPlayed;
+        return result;
+    }
     private int _bootFramesPlayed;
 
     /// <summary>After a frame of a boot stopped at the opening: ends the boot where the constructor would have.</summary>
@@ -417,7 +441,9 @@ public sealed partial class LoomExplorationSession
     {
         if (!_playingBoot) return;
         _bootFramesPlayed++;
-        if (_cdIntro && _bootFramesPlayed == CdIntroAnswerFrame) AssumeBootAnswer();
+        if (_cdIntro && !WaitForSkillClick && _bootFramesPlayed == CdIntroAnswerFrame) AssumeBootAnswer();
+        // With the player's click awaited, the answer follows the click (the game would ask a draft question next; that is not simulated).
+        if (_skillClickFrame is int clicked && _bootFramesPlayed == clicked + SkillAnswerDelayFrames) AssumeBootAnswer();
         if (_bootFramesPlayed < BootFrameLimit && BootGoesOn) return;
         _playingBoot = false;
         FinishBoot(_bootFramesPlayed);

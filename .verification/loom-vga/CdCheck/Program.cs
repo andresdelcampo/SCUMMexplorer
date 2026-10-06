@@ -145,11 +145,21 @@ internal static class Program
                           report.Add($"setup: plays {setup.Plays}, before {setup.Before.Count}, after [{string.Join(",", setup.After.Select(s => s.Kind + s.Box))}]"); }
                         Call("PlayCdCutscene", group);
                     }
+                    // CD_SKILL_CLICK_MS=<ms>:<x>,<y> clicks the room at that point that many ms after the start (the CD intro's skill screen waits for a press).
+                    var skillClick = Environment.GetEnvironmentVariable("CD_SKILL_CLICK_MS");
+                    var clicked = false;
                     var escapeMs = int.Parse(Environment.GetEnvironmentVariable("CD_ESCAPE_MS") ?? "-1");
                     var escaped = false;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
                     for (var t = 0; t < total; t += step)
                     {
+                        if (skillClick is not null && !clicked && t >= int.Parse(skillClick.Split(':')[0]))
+                        {
+                            var at = skillClick.Split(':')[1].Split(',').Select(int.Parse).ToArray();
+                            Call("HandleRoomPoint", at[0], at[1], false);
+                            clicked = true;
+                            report.Add($"+{clock.ElapsedMilliseconds} ms: skill screen clicked at ({at[0]}, {at[1]}): {((TextBlock)window.FindName("StatusText")).Text}");
+                        }
                         if (escapeMs >= 0 && !escaped && t + step > escapeMs)
                         {
                             await Task.Delay(Math.Max(0, escapeMs - t));
@@ -166,7 +176,7 @@ internal static class Program
                         var snap = session.GetType().GetProperty("Snapshot")!.GetValue(session)!;
                         var msgs = session.GetType().GetProperty("Messages")!.GetValue(session)!;
                         var on = string.Join(" / ", ((System.Collections.IEnumerable)msgs.GetType().GetProperty("OnScreen")!.GetValue(msgs)!).Cast<object>().Select(m => m.GetType().GetProperty("Text")!.GetValue(m)!.ToString()!.Replace("\n", "|")));
-                        report.Add($"+{clock.ElapsedMilliseconds} ms: room {snap.GetType().GetProperty("RoomId")!.GetValue(snap)} boot {session.GetType().GetProperty("BootRunning")!.GetValue(session)} timer {msgs.GetType().GetProperty("CdMusicTimer")!.GetValue(msgs)} | {on} | {((TextBlock)window.FindName("StatusText")).Text}");
+                        report.Add($"+{clock.ElapsedMilliseconds} ms: room {snap.GetType().GetProperty("RoomId")!.GetValue(snap)} boot {session.GetType().GetProperty("BootRunning")!.GetValue(session)} timer {msgs.GetType().GetProperty("CdMusicTimer")!.GetValue(msgs)} | {on} | {((TextBlock)window.FindName("StatusText")).Text} | view objects {((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Rendering.RoomObjectImage>().Count()} (808 present {((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Rendering.RoomObjectImage>().Any(o => o.Id == 808)}), current room {((GameResource?)Field("_currentRoomResource"))?.ResourceId} | selection active 808: {(Field("_objectSelection") is SCUMMexplorer.Core.Rendering.RoomObjectSelection sel ? ((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Rendering.RoomObjectImage>().Where(o => o.Id == 808).Select(o => sel.IsActive(o).ToString()).FirstOrDefault() : "no selection")}");
                     }
                     { var voice = Field("_cdVoice"); foreach (var line in (IEnumerable<string>)voice!.GetType().GetProperty("Log")!.GetValue(voice)!) report.Add("voice " + line); }
                     File.WriteAllLines(Path.Combine(output, "report.txt"), report);

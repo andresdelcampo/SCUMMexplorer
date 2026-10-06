@@ -342,6 +342,24 @@ public sealed class LoomVgaTests
     }
 
     [Fact]
+    public void TheCdIntrosSkillScreenWaitsForAPressOnAButtonWhenAsked()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true) { WaitForSkillClick = true };
+        for (var frame = 0; frame < 150; frame++) session.AdvanceFrame();
+        // Room 69's three buttons are drawn and stay while nobody presses (without the wait the assumed answer comes at frame 30).
+        Assert.Equal(69, session.Snapshot.RoomId);
+        Assert.True(session.WaitingForSkillClick);
+        Assert.All(new[] { 808, 809, 810 }, id => Assert.Equal(1, session.Snapshot.ObjectStates[id]));
+        // A press on a button is the game's click on its object; the boot then goes on to the opening.
+        session.ClickSkillScreen(160, 72);
+        Assert.False(session.WaitingForSkillClick);
+        for (var frame = 0; frame < 120; frame++) session.AdvanceFrame();
+        Assert.NotEqual(69, session.Snapshot.RoomId);
+    }
+
+    [Fact]
     public void MatrixOpsRunsInTheExecutorAsAWalkBoxFlagChange()
     {
         if (Folder("loom vga en") is not { } folder) return;
