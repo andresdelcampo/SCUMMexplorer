@@ -229,6 +229,7 @@ public sealed partial class LoomExplorationSession
         }
         _pending.RemoveAll(item => item.ScriptNumber == 1);
         _requestedLoad = null;
+        AssumeCdLayoutVariable(boot!, target);
         RunIndexedScript(1, target, new Dictionary<string, ushort> { ["local[0x000]"] = 0 }, 0);
         _pending.RemoveAll(item => item.ScriptNumber == 1);
         _requestedLoad = null;
@@ -242,6 +243,36 @@ public sealed partial class LoomExplorationSession
             _runtime.UserPut = 1;
             _runtime.UserPutEstimate = "the CD game's intro, which turns user input on when it ends, was not played";
         }
+        // The room load the boot ends on (Room 01) was dropped above, and Room 01's entry is what starts the game's set-up (local 211 creates the verb
+        // slots, the staff notes among them): without it a room visited first has no staff to draw or edit. Enter it as the game's first load.
+        if (_runtime.Verbs.Snapshot().Count == 0 && _game.Rooms.FirstOrDefault(room => room.ResourceId == 1) is { } first)
+        {
+            VisitRoom(first);
+            _visitTrace.Add("boot: Room 01 was entered as the game's first load (its entry starts local 211, which creates the verb slots)");
+        }
+    }
+
+    /// <summary>
+    /// The staff's layout variable (0x0AD in the CD scripts; script 018 draws the staff 8 pixels lower unless it is 2, and the note letters at fixed rows)
+    /// is set by script 001 before the intro (to the standard layout) and by the skill screen's answer; the jump past the intro skips both, so it stayed 0
+    /// and the staff came out 8 pixels off its notes. The variable is found in script 018 (the one tested before it adds 8 to the staff's row) and the
+    /// value in script 001's own move into it before the jump target: the standard skill, as the Room 69 answer is assumed elsewhere.
+    /// </summary>
+    private void AssumeCdLayoutVariable(LoomScriptDisassembly boot, int target)
+    {
+        LoomScriptDisassembly? staff;
+        try { staff = _data.GlobalScript(18); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException) { return; }
+        var code = staff?.Instructions;
+        var add = code?.ToList().FindIndex(item => item.Operation == "add" && item.Operands == "local[0x004] += 0x0008") ?? -1;
+        if (code is null || add < 1 || code[add - 1].Operation != "isEqual" || System.Text.RegularExpressions.Regex.Match(code[add - 1].Operands, @"^(var[0x[0-9A-F]+]), 0x0002,") is not { Success: true } layout) return;
+        var variable = layout.Groups[1].Value;
+        var set = boot.Instructions.FirstOrDefault(item => item.Offset < target && item.Operation == "move" &&
+            System.Text.RegularExpressions.Regex.IsMatch(item.Operands, "^" + System.Text.RegularExpressions.Regex.Escape(variable) + @" = 0x[0-9A-F]+$"));
+        if (set is null || !ushort.TryParse(set.Operands.AsSpan(set.Operands.LastIndexOf("0x", StringComparison.Ordinal) + 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value)) return;
+        _runtime.SetGlobalVariable(variable, value);
+        _runtime.EstimatedVariables.Add(variable);
+        _uncertainties.Add($"The CD intro and its skill screen were not played: the staff's layout ({variable}) is {value}, the value script 001 +0x{set.Offset:X4} gives it before the intro (the standard skill; the skill screen's answer is assumed).");
     }
 
     /// <summary>

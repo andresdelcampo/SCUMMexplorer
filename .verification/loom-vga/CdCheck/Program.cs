@@ -61,6 +61,19 @@ internal static class Program
                         Call("SelectResourceInTree", room);
                         for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
                         await Task.Delay(2500);
+                        // CD_LOOK_STAFF=1 gives Bobbin the staff through Game Status's own call (as the window's edit does), then shoots again.
+                        if (Environment.GetEnvironmentVariable("CD_LOOK_STAFF") == "1" && Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession status)
+                        {
+                            Shot($"look-{number:00}-before.png");
+                            var gs = status.GameStatus;
+                            Console.WriteLine($"room {number}: status supported {gs.Supported}, can edit {gs.CanEdit}, staff {gs.StaffHeld}, {gs.Evidence[..Math.Min(120, gs.Evidence.Length)]}");
+                            try { status.UpdateStaffPossession(true); } catch (Exception ex) { Console.WriteLine("edit failed: " + ex.Message); }
+                            Call("RefreshRoomPreview"); Call("UpdateActorLayer"); Call("UpdateVerbArea");
+                            await Task.Delay(1500);
+                            var area = status.VerbArea();
+                            Console.WriteLine($"verb area items {area.Items.Count}: " + string.Join("; ", area.Items.Select(i => $"verb {i.VerbId} mode {i.Mode} at ({i.X},{i.Y}) {i.Width}x{i.Height} obj {i.ImageObject} room {i.ImageRoom}")) + " | notes: " + string.Join("; ", area.Notes));
+                            foreach (var v in status.Verbs) Console.WriteLine($"  slot {v.Slot} verb {v.VerbId} mode {v.Mode} at ({v.X},{v.Y}) image {v.ImageObject}/{v.ImageRoom} name {v.Name}");
+                        }
                         Shot($"look-{number:00}.png");
                     }
                     window.Close();
