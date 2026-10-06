@@ -648,6 +648,7 @@ public sealed partial class LoomExplorationSession
         if (closedScenes.Count > 0) EndClosedScenes(room.ResourceId.Value, closedScenes);
         CatalogEnter(room);
         ApplyBrowsingStaffFloor();
+        _staffVerbSyncFrames = StaffVerbSyncWindow;
         return Snapshot;
     }
 
@@ -1780,6 +1781,7 @@ public sealed partial class LoomExplorationSession
     public LoomSessionSnapshot AdvanceFrame()
     {
         var snapshot = AdvanceOneFrame();
+        if (_staffVerbSyncFrames > 0) { _staffVerbSyncFrames--; SyncStaffVerbs(); }
         if (_browsingStaffFloor.HasValue) { ApplyBrowsingStaffFloor(); snapshot = Snapshot; }
         if (!_playingBoot) return snapshot;
         ContinuePlayedBoot();
@@ -1787,6 +1789,23 @@ public sealed partial class LoomExplorationSession
     }
 
     private int _musicTimer;
+
+    private const int StaffVerbSyncWindow = 32;
+    private int _staffVerbSyncFrames;
+
+    /// <summary>
+    /// After a catalog visit the staff in the verb area follows the staff bit, as the ego's staff animation does (script 017 picks it from
+    /// the same bit): a room that was entered without script 018 or 019 running left the note verbs off with the staff held, or on without it.
+    /// It waits while a cutscene runs (scenes hide and show the verbs themselves).
+    /// </summary>
+    private void SyncStaffVerbs()
+    {
+        if (InCutscene || !StatusEditable || GameStatus.StaffHeld is not bool held) return;
+        var notesOn = _runtime.Verbs.Snapshot().Any(verb => verb.VerbId is >= 1 and <= 8 && verb.Mode is 1 or 2);
+        if (held == notesOn) return;
+        _uncertainties.Add($"Room entered from the catalog: the staff verbs were {(notesOn ? "on" : "off")} while the staff is {(held ? "held" : "not held")}; they follow the staff bit (explorer adjustment).");
+        RefreshStatusNotes(held);
+    }
 
     /// <summary>
     /// scummLoop's <c>updateMusicTimer</c>: <c>VAR_MUSIC_TIMER</c> (var[0x00E]) follows the markers of the playing Roland music, which the opening

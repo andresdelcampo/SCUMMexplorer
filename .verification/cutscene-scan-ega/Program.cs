@@ -10,6 +10,26 @@ var rooms = game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceI
 var scan = LoomCdCutsceneIndex.Scan(data, rooms);
 var groups = LoomCdCutsceneIndex.Group(scan);
 var scanned = scan.Select(t => (t.Room, t.ObjectId, t.VerbId)).ToHashSet();
+if (args.Length > 2 && args[2] == "verbs") // CutsceneScanCompare <folder> - verbs <room>...: every object verb of those rooms, with whether the scan found a cutscene in it
+{
+    foreach (var room in args.Skip(3).Select(int.Parse))
+    {
+        var rd = data.ReadRoom(room);
+        foreach (var (oid, list) in data.ReadObjectVerbs(room, rd.Objects))
+            foreach (var v in list)
+                Console.WriteLine($"room {room} object {oid} verb 0x{v.VerbId:X2}: " + (scanned.Contains((room, oid, v.VerbId)) ? "SCAN" : "-"));
+    }
+    return;
+}
+if (args.Length > 2 && args[2] == "script") // CutsceneScanCompare <folder> - script <id>...: global scripts listed
+{
+    foreach (var id in args.Skip(3).Select(int.Parse))
+    {
+        Console.WriteLine($"== script {id}");
+        foreach (var ins in data.GlobalScript(id)?.Instructions ?? []) Console.WriteLine($"{ins.Offset:X4} {ins.Operation} {ins.Operands}");
+    }
+    return;
+}
 using var doc = JsonDocument.Parse(File.ReadAllText(args[1]));
 var catalog = doc.RootElement.GetProperty("replays").EnumerateArray()
     .Select(e => (Room: e.GetProperty("room").GetInt32(), Obj: e.GetProperty("objectId").GetInt32(), Verb: e.GetProperty("verb").GetInt32(), Id: e.GetProperty("id").GetString()!)).ToList();
