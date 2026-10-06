@@ -4053,10 +4053,11 @@ public partial class MainWindow : Window
             0x36 => "Look at",
             0x37 => "Walk to",
             0x38 => "Use",
-            var v => LoomDraftNames.ForVerb(v)?.Name ?? "Verb"
+            // A draft verb the table does not name (0x56 is the generic "that spell does nothing here") reads as the EGA titles do.
+            var v => LoomDraftNames.ForVerb(v)?.Name.Replace("(reversed)", "(reverse)") ?? "Other draft response"
         };
         var target = trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}";
-        var what = trigger.IsRoomEntry ? "Entry" : $"{verb} {target}" + (IsAdvancedMode ? $" (verb 0x{trigger.VerbId:X2})" : "");
+        var what = trigger.IsRoomEntry ? "Entry" : $"{verb} {(trigger.VerbId is 0x36 or 0x37 or 0x38 ? "" : "at ")}{target}" + (IsAdvancedMode ? $" (verb 0x{trigger.VerbId:X2})" : "");
         return LoomReplayTitle.Format(trigger.Room, what);
     }
 

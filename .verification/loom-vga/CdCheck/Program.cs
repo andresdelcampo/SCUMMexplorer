@@ -66,6 +66,7 @@ internal static class Program
                         {
                             Shot($"look-{number:00}-before.png");
                             var gs = status.GameStatus;
+                            foreach (var d in gs.Drafts) Console.WriteLine($"DRAFT slot {d.Slot} fwd {d.ForwardVerb:X} rev {d.ReverseVerb:X} packed {d.Packed}");
                             Console.WriteLine($"room {number}: status supported {gs.Supported}, can edit {gs.CanEdit}, staff {gs.StaffHeld}, {gs.Evidence[..Math.Min(120, gs.Evidence.Length)]}");
                             try { status.UpdateStaffPossession(true); } catch (Exception ex) { Console.WriteLine("edit failed: " + ex.Message); }
                             Call("RefreshRoomPreview"); Call("UpdateActorLayer"); Call("UpdateVerbArea");
@@ -78,6 +79,9 @@ internal static class Program
                             foreach (var v in status.Verbs) Console.WriteLine($"  slot {v.Slot} verb {v.VerbId} mode {v.Mode} at ({v.X},{v.Y}) image {v.ImageObject}/{v.ImageRoom} name {v.Name}");
                         }
                         Shot($"look-{number:00}.png");
+                        if (Environment.GetEnvironmentVariable("CD_VERBS") == "1" && number == 5)
+                            foreach (var g in (System.Collections.Generic.IEnumerable<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>)Call("CdCutsceneGroups")!)
+                                if (g.First.VerbId is not (0x36 or 0x37 or 0x38) && !g.First.IsRoomEntry) Console.WriteLine($"VERBID room {g.First.Room} obj {g.First.ObjectId} {g.First.ObjectName} verb 0x{g.First.VerbId:X2}");
                         if (Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession sm) Console.WriteLine($"VERBTEXT room {number}: {sm.Messages.OnScreen.Count(m => m.Y >= 144)} string(s) on the verb screen");
                         if (Environment.GetEnvironmentVariable("CD_IMG") == "1")
                             foreach (var im in ((SCUMMexplorer.Core.Formats.IScummDataSource)Field("_cdData")!).ReadObjectImages(1).Where(i => new[]{17,23,29,35,41,47,53,59,65,66,70,71,72,73,74,75,76,77}.Contains(i.Id)))
