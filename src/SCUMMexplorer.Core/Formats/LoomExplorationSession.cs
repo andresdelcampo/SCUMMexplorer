@@ -1280,7 +1280,7 @@ public sealed partial class LoomExplorationSession
     /// verb's rectangle from its object's image in the room it was taken from
     /// (<see cref="LoomVerbArea.Compose"/>).
     /// </summary>
-    public LoomVerbAreaPicture VerbArea() => LoomVerbArea.Compose(_runtime.Verbs.Snapshot(), VerbImage, _runtime.Verbs.Erases());
+    public LoomVerbAreaPicture VerbArea() => LoomVerbArea.Compose(_runtime.Verbs.Snapshot(), VerbImage, _runtime.Verbs.Erases(), alignRows: _game.Id == GameId.LoomVga);
 
     private readonly Dictionary<int, IReadOnlyList<RoomObjectImage>> _verbImageRooms = [];
 

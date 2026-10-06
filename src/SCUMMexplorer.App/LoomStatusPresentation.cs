@@ -95,7 +95,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                     objects.FirstOrDefault(p => p.Id == noteObject) is { } noteHead)
                 {
                     int headX = placed.Groups[2].Value.StartsWith("0x", StringComparison.Ordinal) ? Hex(placed.Groups[2].Value[2..]) : scoreX;
-                    int left = headX / 8 * 8 - 16, top = Hex(placed.Groups[3].Value) - 0xA8;
+                    int left = headX / 8 * 8 - 16, top = Hex(placed.Groups[3].Value) / 8 * 8 - 0xA8; // whole 8-row strips, as the verb area draws them
                     for (int y = 0; y < noteHead.Height; y++)
                         for (int x = 0; x < noteHead.Width; x++)
                         {

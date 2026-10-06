@@ -49,10 +49,11 @@ public static class LoomVerbArea
     /// verbs over a distaff note and the last one drawn is what the game shows.
     /// <paramref name="image"/> returns an object's image from a room (the room
     /// the verb's image was taken from). <see cref="LoomVerbAreaPicture.Items"/>
-    /// stay in slot order.
+    /// stay in slot order. <paramref name="alignRows"/> (the CD game) puts an image on whole 8-row strips as it does on 8-column ones:
+    /// the note heads of LOOM CD carry their own staff lines and sit at y values 0xAB to 0xAF, which only line up with the staff at 0xA8.
     /// </summary>
     public static LoomVerbAreaPicture Compose(IEnumerable<LoomVerbSnapshot> verbs, Func<int, int, RoomObjectImage?> image,
-        IEnumerable<LoomVerbErase>? erases = null)
+        IEnumerable<LoomVerbErase>? erases = null, bool alignRows = false)
     {
         ArgumentNullException.ThrowIfNull(verbs);
         ArgumentNullException.ThrowIfNull(image);
@@ -93,6 +94,7 @@ public static class LoomVerbArea
             var drawnWidth = picture.Width / 8 * 8;
             var drawnHeight = picture.Height / 8 * 8;
             var left = x / 8 * 8;
+            if (alignRows) y = y / 8 * 8;
             var top = y - Top;
             paints.Add((verb.DrawOrder, verb.Slot, () =>
             {

@@ -4047,10 +4047,17 @@ public partial class MainWindow : Window
 
     private string CdCutsceneTitle(LoomCdCutscene trigger)
     {
-        // The verb byte is a technical detail: only Advanced names it.
-        var what = trigger.IsRoomEntry ? "entry" : (trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}") + (IsAdvancedMode ? $" ({trigger.VerbLabel})" : "");
-        var text = trigger.FirstText.Length > 52 ? trigger.FirstText[..52].TrimEnd() + "…" : trigger.FirstText;
-        return LoomReplayTitle.Format(trigger.Room, what + (text.Length > 0 ? $": \"{text}\"" : ""));
+        // As the EGA titles read ("Look at leaf", "Opening at sky"): the verb as a word. The verb byte is a technical detail: only Advanced adds it.
+        var verb = trigger.VerbId switch
+        {
+            0x36 => "Look at",
+            0x37 => "Walk to",
+            0x38 => "Use",
+            var v => LoomDraftNames.ForVerb(v)?.Name ?? "Verb"
+        };
+        var target = trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}";
+        var what = trigger.IsRoomEntry ? "Entry" : $"{verb} {target}" + (IsAdvancedMode ? $" (verb 0x{trigger.VerbId:X2})" : "");
+        return LoomReplayTitle.Format(trigger.Room, what);
     }
 
     private string CdCutsceneNote(LoomCdCutsceneGroup group)

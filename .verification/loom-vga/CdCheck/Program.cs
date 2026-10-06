@@ -72,9 +72,16 @@ internal static class Program
                             await Task.Delay(1500);
                             var area = status.VerbArea();
                             Console.WriteLine($"verb area items {area.Items.Count}: " + string.Join("; ", area.Items.Select(i => $"verb {i.VerbId} mode {i.Mode} at ({i.X},{i.Y}) {i.Width}x{i.Height} obj {i.ImageObject} room {i.ImageRoom}")) + " | notes: " + string.Join("; ", area.Notes));
+                            { var pal = ((dynamic)Field("_currentRoom")!).Palette; var wb = new WriteableBitmap(area.Width, area.Height, 96, 96, PixelFormats.Bgra32, null); var px = new uint[area.Width * area.Height];
+                              for (var i = 0; i < px.Length; i++) px[i] = (uint)pal[area.Pixels[i]] | 0xFF000000u; wb.WritePixels(new Int32Rect(0, 0, area.Width, area.Height), px, area.Width * 4, 0);
+                              var en = new PngBitmapEncoder(); en.Frames.Add(BitmapFrame.Create(wb)); using (var fs2 = File.Create(Path.Combine(output, "strip.png"))) en.Save(fs2); }
                             foreach (var v in status.Verbs) Console.WriteLine($"  slot {v.Slot} verb {v.VerbId} mode {v.Mode} at ({v.X},{v.Y}) image {v.ImageObject}/{v.ImageRoom} name {v.Name}");
                         }
                         Shot($"look-{number:00}.png");
+                        if (Environment.GetEnvironmentVariable("CD_IMG") == "1")
+                            foreach (var im in ((SCUMMexplorer.Core.Formats.IScummDataSource)Field("_cdData")!).ReadObjectImages(1).Where(i => new[]{17,23,29,35,41,47,53,59,65,66,70,71,72,73,74,75,76,77}.Contains(i.Id)))
+                                { if (im.Id is 65 or 70 or 71 or 72 or 73 or 74 or 75 or 76 or 77) for (var r = 0; r < im.Height; r++) Console.WriteLine($"ROW {im.Id} {r,2} " + string.Concat(Enumerable.Range(0, Math.Min(im.Width, 40)).Select(c => im.Pixels[r*im.Width+c] == 0 ? '.' : '#')));
+                                Console.WriteLine($"IMG {im.Id} xy=({im.X},{im.Y}) {im.Width}x{im.Height} rows-with-pixels: " + string.Join(",", Enumerable.Range(0, im.Height).Where(r => Enumerable.Range(0, im.Width).Any(c => im.Pixels[r*im.Width+c] != 0)))); }
                         if (Environment.GetEnvironmentVariable("CD_STATUS") == "1")
                         {
                             var win = (Window)Call("BuildGameStatusWindow")!;
