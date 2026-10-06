@@ -1468,6 +1468,8 @@ public sealed class LoomBoundedScriptExecutor
                     else if (item.StartsWith("talkColor,", StringComparison.Ordinal) &&
                              TryReadValue(item["talkColor,".Length..].Trim(), variables, out var talkColor, out _))
                         actors.SetTalkColor(number, talkColor & 0xFF);
+                    else if (item.StartsWith("scale,", StringComparison.Ordinal) && ReadItem(item, 1) is int scaleValue)
+                        actors.SetScale(number, scaleValue & 0xFF);
                     else if (item.StartsWith("elevation,", StringComparison.Ordinal))
                         actors.SetElevation(number, ReadItem(item, 1) is int elevation ? (short)elevation : null);
                     else if (item.StartsWith("walkSpeed,", StringComparison.Ordinal) && ReadItem(item, 1) is int speedX && ReadItem(item, 2) is int speedY)

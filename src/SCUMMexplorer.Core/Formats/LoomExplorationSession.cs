@@ -745,28 +745,30 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     private void EstimateEgoSize(int roomId, LoomEgoArrival arrival)
     {
-        if (_game.Id != GameId.Loom) return;
+        if (_game.Id is not (GameId.Loom or GameId.LoomVga)) return;
         var index = LoomEgoArrivalIndex.For(_game, _globalScriptCount);
         var starts = index.StartsOf(EgoSizeScript).ToArray();
+        var sizeVariable = SizeVariableOf(starts);
+        if (sizeVariable is null) return;
         // Only rooms whose entry keeps the size of the room before read it; the others set their own.
-        if (!starts.Any(item => item.IsRoomEntry && item.SourceRoom == roomId && item.FirstArgument == EgoSizeVariable)) return;
+        if (!starts.Any(item => item.IsRoomEntry && item.SourceRoom == roomId && item.FirstArgument == sizeVariable)) return;
         var (size, how, own) = SizeOnRoute(arrival);
         // No size of its own on the arrival: the size left by rooms further back says nothing about the depth the ego
         // arrives at. The room's own samples (a size and the place it comes with) do: take the nearest in depth.
-        if (!own && arrival.WalkX != -1 && NearestDepthSample(roomId, arrival, index, starts) is { } sample)
+        if (!own && arrival.WalkX != -1 && NearestDepthSample(roomId, arrival, index, starts, sizeVariable) is { } sample)
         {
             size = sample.Size;
             how = $"the arrival stands at y {arrival.WalkY}; the room's own nearest sample in depth is size {sample.Size} at y {sample.Y} ({sample.Source}); the size carried from other rooms was not used";
         }
-        _runtime.EstimatedVariables.Add(EgoSizeVariable);
+        _runtime.EstimatedVariables.Add(sizeVariable);
         if (size is int value)
         {
-            _runtime.SetGlobalVariable(EgoSizeVariable, (ushort)value);
-            _visitTrace.Add($"catalog visit to Room {roomId:00}: {EgoSizeVariable} = {value} (estimate, {how})");
-            _uncertainties.Add($"Room {roomId:00} was selected from the catalog: the ego's size ({EgoSizeVariable}, script {EgoSizeScript:000}) is estimated as {value} from the assumed arrival's route: {how}.");
+            _runtime.SetGlobalVariable(sizeVariable, (ushort)value);
+            _visitTrace.Add($"catalog visit to Room {roomId:00}: {sizeVariable} = {value} (estimate, {how})");
+            _uncertainties.Add($"Room {roomId:00} was selected from the catalog: the ego's size ({sizeVariable}, script {EgoSizeScript:000}) is estimated as {value} from the assumed arrival's route: {how}.");
         }
         else
-            _uncertainties.Add($"Room {roomId:00} was selected from the catalog: no literal size for the ego ({EgoSizeVariable}, script {EgoSizeScript:000}) is on the assumed arrival's route, so the size left by the room shown before is kept and is unknown.");
+            _uncertainties.Add($"Room {roomId:00} was selected from the catalog: no literal size for the ego ({sizeVariable}, script {EgoSizeScript:000}) is on the assumed arrival's route, so the size left by the room shown before is kept and is unknown.");
 
         (int? Size, string How, bool Own) SizeOnRoute(LoomEgoArrival first)
         {
@@ -774,8 +776,8 @@ public sealed partial class LoomExplorationSession
             // Room 16's six give 0, 1 or 2), then the entries of the rooms it came through.
             var own = starts.Where(item => item.Source == first.Source && item.Offset < first.Offset && Literal(item) is not null)
                 .Select(item => (item.Offset, Size: Literal(item)!.Value, How: $"{item.Source} +0x{item.Offset:X4} startScript {EgoSizeScript:000}, [{item.FirstArgument}] before the load"))
-                .Concat(index.MovesTo(EgoSizeVariable).Where(item => item.Source == first.Source && item.Offset < first.Offset)
-                    .Select(item => (item.Offset, Size: item.Value, How: $"{item.Source} +0x{item.Offset:X4} sets {EgoSizeVariable} = {item.Value} before the load")))
+                .Concat(index.MovesTo(sizeVariable).Where(item => item.Source == first.Source && item.Offset < first.Offset)
+                    .Select(item => (item.Offset, Size: item.Value, How: $"{item.Source} +0x{item.Offset:X4} sets {sizeVariable} = {item.Value} before the load")))
                 .OrderByDescending(item => item.Offset).ToArray();
             if (own.Length > 0) return (own[0].Size, own[0].How, true);
             var queue = new Queue<(int Room, string Path)>();
@@ -788,7 +790,7 @@ public sealed partial class LoomExplorationSession
                 if (entry is null) continue;
                 if (Literal(entry) is int literal)
                     return (literal, $"{path}, whose entry sets it (Room {room:00} entry +0x{entry.Offset:X4} startScript {EgoSizeScript:000}, [{entry.FirstArgument}])", false);
-                if (entry.FirstArgument != EgoSizeVariable) continue;
+                if (entry.FirstArgument != sizeVariable) continue;
                 foreach (var before in index.Into(room))
                     if (before.SourceRoom is int earlier && seen.Add(earlier))
                         queue.Enqueue((earlier, $"{path}, which keeps the size of the room before it; a route came through Room {earlier:00}"));
@@ -801,6 +803,14 @@ public sealed partial class LoomExplorationSession
             int.TryParse(argument.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value) ? value : null;
     }
 
+    /// <summary>
+    /// The variable script 017 is started with by the room entries that keep the size of the room before (var 0x07C in the EGA game, 0x0AE
+    /// on the CD): the one most room entries pass, found in the code and not by number.
+    /// </summary>
+    private static string? SizeVariableOf(LoomScriptStart[] starts) =>
+        starts.Where(item => item.IsRoomEntry && item.FirstArgument is { } argument && argument.StartsWith("var[", StringComparison.Ordinal))
+            .GroupBy(item => item.FirstArgument!).OrderByDescending(group => group.Count()).Select(group => group.Key).FirstOrDefault();
+
     private sealed record DepthSample(int Y, int Size, string Source);
 
     /// <summary>
@@ -809,13 +819,13 @@ public sealed partial class LoomExplorationSession
     /// size and then <c>putActor</c> the ego (the walk-box watchers' jumps, as Room 17's local 200). Returns the sample
     /// nearest in y to the arrival (the smaller size on a tie), or null when the room has none.
     /// </summary>
-    private DepthSample? NearestDepthSample(int roomId, LoomEgoArrival arrival, LoomEgoArrivalIndex index, LoomScriptStart[] starts)
+    private DepthSample? NearestDepthSample(int roomId, LoomEgoArrival arrival, LoomEgoArrivalIndex index, LoomScriptStart[] starts, string sizeVariable)
     {
         var samples = new List<DepthSample>();
         foreach (var other in index.Into(roomId).Where(a => a.WalkX != -1 && a.PlacementKey != arrival.PlacementKey))
         {
-            var set = index.MovesTo(EgoSizeVariable).Where(m => m.Source == other.Source && m.Offset < other.Offset).OrderByDescending(m => m.Offset).FirstOrDefault();
-            if (set is not null) samples.Add(new(other.WalkY, set.Value, $"{other.Source} +0x{other.Offset:X4} walks to ({other.WalkX}, {other.WalkY}) after {EgoSizeVariable} = {set.Value}"));
+            var set = index.MovesTo(sizeVariable).Where(m => m.Source == other.Source && m.Offset < other.Offset).OrderByDescending(m => m.Offset).FirstOrDefault();
+            if (set is not null) samples.Add(new(other.WalkY, set.Value, $"{other.Source} +0x{other.Offset:X4} walks to ({other.WalkX}, {other.WalkY}) after {sizeVariable} = {set.Value}"));
         }
         if (_game.Rooms.Any(r => r.ResourceId == roomId))
             foreach (var id in _data.RoomLocalScriptIds(roomId))
@@ -873,7 +883,6 @@ public sealed partial class LoomExplorationSession
 
     /// <summary>LOOM's script 017 (the ego's costume size) and the size it keeps (decoded).</summary>
     private const int EgoSizeScript = 0x11;
-    private const string EgoSizeVariable = "var[0x07C]";
 
     /// <summary>ScummVM <c>VAR_EGO</c>.</summary>
     private const string EgoVariable = "var[0x001]";

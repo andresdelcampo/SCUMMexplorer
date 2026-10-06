@@ -292,6 +292,15 @@ public sealed class LoomVgaArchive
         return bx is null ? null : _lec.AsSpan(bx.Start + 6, bx.Size - 6).ToArray();
     }
 
+    /// <summary>The room's SA block body (the scale slots: scale, y, scale, y per slot), or null when the room has none.</summary>
+    public byte[]? ReadScaleSlotBlock(int number)
+    {
+        if (!_rooms.TryGetValue(number, out var room)) throw new KeyNotFoundException($"Room {number} is not in DISK01.LEC.");
+        var ro = Blocks(_lec, room.Offset + 8, room.Offset + room.Length).FirstOrDefault(b => b.Tag == "RO");
+        var sa = ro is null ? null : Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).FirstOrDefault(b => b.Tag == "SA");
+        return sa is null ? null : _lec.AsSpan(sa.Start + 6, sa.Size - 6).ToArray();
+    }
+
     /// <summary>The costumes the index lists (those whose block is a CO block).</summary>
     public IReadOnlyList<LoomVgaCostume> ReadCostumes()
     {

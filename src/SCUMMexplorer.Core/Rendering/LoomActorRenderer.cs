@@ -93,10 +93,13 @@ public static class LoomActorRenderer
                 actor.WalkBox is int box ? Math.Min((int)(boxes?.GetMask(box) ?? 0), 1) : 0;
             var boxNote = depthMask is not null && !forceClip && !neverClip && actor.WalkBox is null
                 ? "walk box unknown: drawn in front of the depth mask" : null;
-            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 0 ? depthMask : null, coverage);
+            // CD game: a box with a scale of its own (word or slot) sets it where the actor stands, else the actor's own (actorOps scale) holds.
+            var scale = Math.Clamp((actor.WalkBox is int scaleBox && !actor.IgnoreBoxes.GetValueOrDefault() ? boxes?.BoxScale(scaleBox, y) : null) ?? look.Scale, 1, 255);
+            int Scaled(int value) => scale < 255 ? (int)Math.Floor(value * (double)scale / 255) : value;
+            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 0 ? depthMask : null, coverage, scale);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
-                x + cels.Min(cel => cel.Left), top + cels.Min(cel => cel.Top),
-                x + cels.Max(cel => cel.Left + cel.Width), top + cels.Max(cel => cel.Top + cel.Height));
+                x + Scaled(cels.Min(cel => cel.Left)), top + Scaled(cels.Min(cel => cel.Top)),
+                x + Scaled(cels.Max(cel => cel.Left + cel.Width)), top + Scaled(cels.Max(cel => cel.Top + cel.Height)));
             var estimate = string.Join("; ", new[] { actor.Estimate, look.Estimate, boxNote }.Where(text => text is not null));
             drawn.Add(new LoomDrawnActor(actor.Number, costumeId, x, y, elevation, look.Frame ?? -1, direction, bounds,
                 written, estimate.Length == 0 ? null : estimate) { ZPlane = zPlane });

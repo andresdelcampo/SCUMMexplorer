@@ -329,6 +329,19 @@ public sealed class LoomVgaTests
     }
 
     [Fact]
+    public void ACatalogVisitToTheCdPathRoomEstimatesBobbinsSizeFromTheCodesOwnVariable()
+    {
+        if (Folder("loom vga en") is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        // Room 02's entry keeps the size of the room before (startScript 017 with a variable); on the CD that variable is var[0x0AE], not the EGA game's.
+        var scene = LoomCdRoomScene.FirstVisit(game, 2);
+        var note = scene.Snapshot.Uncertainties.FirstOrDefault(text => text.Contains("the ego's size (", StringComparison.Ordinal));
+        Assert.NotNull(note);
+        Assert.Contains("var[0x0AE]", note);
+        Assert.Contains(scene.Actors, actor => actor.Number == 1 && actor.Room == 2 && actor.Look.Costume > 0);
+    }
+
+    [Fact]
     public void MatrixOpsRunsInTheExecutorAsAWalkBoxFlagChange()
     {
         if (Folder("loom vga en") is not { } folder) return;

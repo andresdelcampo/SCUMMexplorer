@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Text;
 using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Rendering;
@@ -67,7 +68,14 @@ public sealed class LoomCdDataSource : IScummDataSource
         string? boxError = null;
         try
         {
-            if (_archive.ReadWalkBoxBlock(room) is { } block) boxes = LoomWalkBoxReader.ReadBlockBody(block);
+            if (_archive.ReadWalkBoxBlock(room) is { } block)
+            {
+                boxes = LoomWalkBoxReader.ReadBlockBody(block);
+                if (_archive.ReadScaleSlotBlock(room) is { Length: >= 8 } sa)
+                    boxes.ScaleSlots = Enumerable.Range(0, sa.Length / 8).Select(i =>
+                        ((int)BinaryPrimitives.ReadUInt16LittleEndian(sa.AsSpan(i * 8)), (int)BinaryPrimitives.ReadUInt16LittleEndian(sa.AsSpan(i * 8 + 2)),
+                         (int)BinaryPrimitives.ReadUInt16LittleEndian(sa.AsSpan(i * 8 + 4)), (int)BinaryPrimitives.ReadUInt16LittleEndian(sa.AsSpan(i * 8 + 6)))).ToArray();
+            }
             else boxError = $"Room {room:00} has no BX block";
         }
         catch (InvalidDataException ex) { boxError = ex.Message; }

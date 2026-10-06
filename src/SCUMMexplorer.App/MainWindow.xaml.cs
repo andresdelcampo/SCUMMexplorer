@@ -442,9 +442,9 @@ public partial class MainWindow : Window
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         // Game Status needs the session, not a room: show it as soon as the game is loaded (the header then stays still).
         GameStatusButton.Visibility = game.Id is GameId.Loom or GameId.LoomVga && _session is not null ? Visibility.Visible : Visibility.Collapsed;
-        // The CD game has no music device to choose (its music has not been read); its voices come from the disc's audio track (Voices).
+        // The CD game has no music device to choose (its music has not been read); its voices come from the disc's audio track (the CD Audio choice of its own sound box).
         SoundModeCombo.Visibility = game.Id == GameId.LoomVga ? Visibility.Collapsed : Visibility.Visible;
-        VoiceCheck.Visibility = game is { Id: GameId.LoomVga, Vga.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
+        CdSoundCombo.Visibility = game is { Id: GameId.LoomVga, Vga.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
         GameStatusButton.IsEnabled = _session is not null;
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
@@ -3301,7 +3301,7 @@ public partial class MainWindow : Window
                             _sceneSound.SetMode(mode);
                             SoundModeCombo.SelectedIndex = (int)_sceneSound.Mode;
                             break;
-                        case "voices": VoiceCheck.IsChecked = parts[1] != "0"; _cdVoice.Enabled = VoiceCheck.IsChecked == true; break;
+                        case "voices": CdSoundCombo.SelectedIndex = parts[1] != "0" ? 1 : 0; _cdVoice.Enabled = parts[1] != "0"; break;
                         case "bytecode": _showScriptBytes = parts[1] != "0"; ScriptBytesToggle.IsChecked = _showScriptBytes; break;
                         case "readable": _readableScripts = parts[1] != "0"; ScriptReadableToggle.IsChecked = _readableScripts; ScriptBytesToggle.IsEnabled = !_readableScripts; break;
                     }
@@ -3319,7 +3319,7 @@ public partial class MainWindow : Window
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ViewOptionsFile)!);
-            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}", $"sound={_sceneSound.Mode}", $"voices={(VoiceCheck.IsChecked == true ? 1 : 0)}"]);
+            File.WriteAllLines(ViewOptionsFile, [$"doorways={DoorwayMode}", $"bytecode={(_showScriptBytes ? 1 : 0)}", $"readable={(_readableScripts ? 1 : 0)}", $"framing={(NormalRoomWidthToggle.IsChecked == true ? 1 : 0)}", $"optionsOpen={(RoomOptionsExpander.IsExpanded ? 1 : 0)}", $"sound={_sceneSound.Mode}", $"voices={(CdSoundCombo.SelectedIndex == 1 ? 1 : 0)}"]);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
@@ -3800,6 +3800,7 @@ public partial class MainWindow : Window
         AdvanceFrameButton.IsEnabled = _playback is not null && _playbackPaused;
         PlaybackBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         SoundModeCombo.IsEnabled = !SessionInScene;
+        CdSoundCombo.IsEnabled = !SessionInScene;
         RoomSoundsButton.IsEnabled = !SessionInScene;
         SoundModeCombo.ToolTip = SessionInScene ? "The sound device can be changed when the scene is over." : SoundModeToolTip;
         AdlibGainPanel.IsEnabled = !SessionInScene;
@@ -4411,9 +4412,10 @@ public partial class MainWindow : Window
         else if (GameClickActive && !_playbackBatch && _game?.Id == GameId.LoomVga) _cdVoice.Update();
     }
 
-    private void VoiceCheck_Changed(object sender, RoutedEventArgs e)
+    private void CdSoundCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        _cdVoice.Enabled = VoiceCheck.IsChecked == true;
+        if (!IsLoaded || CdSoundCombo.SelectedIndex < 0) return;
+        _cdVoice.Enabled = CdSoundCombo.SelectedIndex == 1;
         if (!_cdVoice.Enabled) _cdVoice.Stop();
         SaveViewOptions();
     }

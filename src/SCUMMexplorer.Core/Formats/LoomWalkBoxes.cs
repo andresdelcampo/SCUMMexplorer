@@ -60,7 +60,26 @@ public sealed class LoomWalkBoxSet
     public bool MatrixTruncated { get; }
     public int Count => Boxes.Count;
 
-    public LoomWalkBoxSet Clone() => new(Boxes, _matrix, TableOffset, MatrixTruncated);
+    /// <summary>The CD room's scale slots (SA block; ScummVM <c>_scaleSlots</c>): scale and y at two points, interpolated between them.</summary>
+    public IReadOnlyList<(int Scale1, int Y1, int Scale2, int Y2)> ScaleSlots { get; internal set; } = [];
+
+    public LoomWalkBoxSet Clone() => new(Boxes, _matrix, TableOffset, MatrixTruncated) { ScaleSlots = ScaleSlots };
+
+    /// <summary>
+    /// The scale the box gives an actor at <paramref name="y"/> (ScummVM <c>setupActorScale</c>: the box's scale word, or with bit 15 set the
+    /// slot it names, <c>getScaleFromSlot</c>); null when the box leaves the actor's own scale (255, or no such slot).
+    /// </summary>
+    public int? BoxScale(int box, int y)
+    {
+        if (Resolve(box) is not int index) return null;
+        var word = Boxes[index].Scale;
+        if ((word & 0x8000) == 0) return word is > 0 and < 255 ? word : null;
+        var slot = word & 0x7FFF;
+        if (slot >= ScaleSlots.Count) return null;
+        var (scale1, y1, scale2, y2) = ScaleSlots[slot];
+        if (y1 == y2) return null;
+        return Math.Clamp((scale2 - scale1) * (y - y1) / (y2 - y1) + scale1, 1, 255);
+    }
 
     /// <summary>
     /// ScummVM <c>getBoxBaseAddr</c> for version 3: 255 is no box, and a box one

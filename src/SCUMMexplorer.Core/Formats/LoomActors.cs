@@ -33,6 +33,9 @@ public sealed record LoomActorLook(int? Costume, int? Elevation, int? Facing, in
     /// <summary>Uncertainty in palette writes, independent of position, facing and movement.</summary>
     public string? PaletteEstimate { get; init; }
 
+    /// <summary>ScummVM <c>_scalex</c> (255 is full size): set by actorOps <c>scale</c> on the CD game; the EGA game has no scaling.</summary>
+    public int Scale { get; init; } = 255;
+
     public static LoomActorLook Initial { get; } = new(0, 0, 180, 0, 1, 2, 3, 4, 5, 8, 2, new byte[16],
         new LoomCostumeAnimationState(), null);
 
@@ -219,6 +222,10 @@ public sealed class LoomActorTable
         AdjustPosition(actor, place, show: true);
         ShowCostume(actor, place);
     }
+
+    /// <summary>actorOps <c>scale</c> (ScummVM <c>setScale</c>, CD game): 255 is full size.</summary>
+    public void SetScale(int number, int scale)
+    { _actors[number].Scale = scale; Notify(number); }
 
     /// <summary>actorOps <c>elevation</c> (ScummVM <c>setElevation</c>); null is unknown.</summary>
     public void SetElevation(int number, int? elevation)
@@ -966,6 +973,7 @@ public sealed class LoomActorTable
         // Costume state (initActor(-1), Actor::initActor and setActorCostume for v3).
         public int? Costume { get; set; } = 0;
         public int? Elevation { get; set; } = 0;
+        public int Scale { get; set; } = 255;
         public int? Facing { get; set; } = 180;
         public int? Frame { get; set; } = 0;
         public int InitFrame { get; set; } = 1;
@@ -1029,7 +1037,7 @@ public sealed class LoomActorTable
                 Moving = Moving,
                 Look = new LoomActorLook(Costume, Elevation, Facing, Frame, InitFrame, WalkFrame, StandFrame,
                     TalkStartFrame, TalkStopFrame, WalkSpeedX, WalkSpeedY, Palette.ToArray(), Animation.Clone(), LookEstimate)
-                { PaletteEstimate = PaletteEstimate }
+                { PaletteEstimate = PaletteEstimate, Scale = Scale }
             };
     }
 }

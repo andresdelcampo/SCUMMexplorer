@@ -309,8 +309,9 @@ public sealed class LoomCostume
     /// (costume colour 0) are skipped. Returns the number of pixels written.
     /// </summary>
     public int Compose(IReadOnlyList<LoomCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
-        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null, bool[]? coverage = null)
+        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null, bool[]? coverage = null, int scale = 255)
     {
+        if (scale < 255) return ComposeScaled(cels, target, targetWidth, targetHeight, x, y, actorPalette, mask, coverage, scale);
         // mask: the z-plane the actor is drawn behind (same size as the target); a set pixel hides the actor's pixel
         // (ScummVM byleRLEDecode: masked when mask[0] & maskbit).
         var written = 0;
@@ -329,6 +330,40 @@ public sealed class LoomCostume
                 target[ty * targetWidth + tx] = MapColor(color, actorPalette);
                 if (coverage is not null) coverage[ty * targetWidth + tx] = true;
                 written++;
+            }
+        }
+        return written;
+    }
+
+    /// <summary>
+    /// A scaled actor (CD game): each cel's offset and size shrink by scale / 255 from the actor's point, with edges rounded the same way for
+    /// neighbouring cels so limbs still meet; pixels are taken nearest-neighbour. An estimate of ScummVM's scale table drawing.
+    /// </summary>
+    private int ComposeScaled(IReadOnlyList<LoomCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
+        int x, int y, IReadOnlyList<byte>? actorPalette, byte[]? mask, bool[]? coverage, int scale)
+    {
+        var written = 0;
+        foreach (var cel in cels)
+        {
+            int Edge(int value) => (int)Math.Floor(value * (double)scale / 255);
+            var left = Edge(cel.Left); var right = Edge(cel.Left + cel.Width);
+            var top = Edge(cel.Top); var bottom = Edge(cel.Top + cel.Height);
+            for (var ty = top; ty < bottom; ty++)
+            {
+                var py = y + ty;
+                if (py < 0 || py >= targetHeight) continue;
+                var row = Math.Min(cel.Height - 1, (ty - top) * cel.Height / (bottom - top));
+                for (var tx = left; tx < right; tx++)
+                {
+                    var px = x + tx;
+                    if (px < 0 || px >= targetWidth) continue;
+                    var color = cel.Pixels[row * cel.Width + Math.Min(cel.Width - 1, (tx - left) * cel.Width / (right - left))];
+                    if (color == 0) continue;
+                    if (mask is not null && mask[py * targetWidth + px] != 0) continue;
+                    target[py * targetWidth + px] = MapColor(color, actorPalette);
+                    if (coverage is not null) coverage[py * targetWidth + px] = true;
+                    written++;
+                }
             }
         }
         return written;
