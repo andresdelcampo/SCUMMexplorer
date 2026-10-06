@@ -6,7 +6,7 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT
 
 ## State (6 October, later): the room button's lists are saved between launches
 
-Committed (not pushed), record `.verification/loom-vga/README.md` step 22, changelog row. `CdRoomScenesCache` keeps the per-room scene lists between launches (reopen of the last game uses it; the Open button re-derives); a first launch shows the button disabled with a tooltip. Local `master` was fast-forwarded to the branch so the user's main checkout builds it (the user's earlier "no button" was an old exe). To look at by hand: the first-launch placeholder and the instant reopen. 18 rooms show no button (kept hidden). 203 of 204 (99.5 %) enabled. Not heard by ear.
+Committed (not pushed), record `.verification/loom-vga/README.md` step 22, changelog row. `CdRoomScenesCache` keeps the per-room scene lists between launches (reopen of the last game uses it; the Open button re-derives); a first launch shows the button disabled with a tooltip. Local `master` was fast-forwarded to the branch so the user's main checkout builds it (the user's earlier "no button" was an old exe). Checked by `CdCheck` in the real window (`CD_USECACHE`, `CD_FIRSTLOOK`, record step 22, second look): first launch = disabled button with tooltip, reopen = enabled at once; the cache stamp was fixed for `.cue` paths. Only the user's own look by hand is left. 18 rooms show no button (kept hidden). 203 of 204 (99.5 %) enabled. Not heard by ear.
 
 ## State at a glance (6 October)
 

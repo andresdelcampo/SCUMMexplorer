@@ -34,7 +34,11 @@ internal static class Program
         {
             try
             {
-                Call("OpenGameFolder", args[0]);
+                // CD_USECACHE=1 opens as "reopen the last game" does (saved room lists and thumbnails may be used); the default is the Open button.
+                var useCache = Environment.GetEnvironmentVariable("CD_USECACHE") == "1";
+                var cacheFlag = typeof(MainWindow).GetField("_roomCardsMayUseCache", Private)!;
+                if (useCache) cacheFlag.SetValue(window, true);
+                try { Call("OpenGameFolder", args[0]); } finally { cacheFlag.SetValue(window, false); }
                 var game = (GameLibrary)Field("_game")!;
                 var report = new List<string> { $"{game.Title} | {game.Id} | rooms {game.Rooms.Count()} ({string.Join(",", game.Rooms.Select(r => r.ResourceId))}) | costumes {game.Resources.Count(r => r.Kind == ResourceKind.Costume)}" };
                 // CD_INTRO=1 plays "The intro" from the Play a cutscene list on the playback clock and shoots it every CD_INTRO_STEP ms (default 4000) for CD_INTRO_MS (default 105000).
@@ -44,6 +48,17 @@ internal static class Program
                 {
                     ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle")).IsChecked = true;
                     await Task.Delay(1500);
+                    // CD_FIRSTLOOK=<room> reports that room's button right away, before the background lists are ready (first-launch placeholder / instant reopen).
+                    if (Environment.GetEnvironmentVariable("CD_FIRSTLOOK") is { } firstLook)
+                    {
+                        var first = game.Rooms.First(r => r.ResourceId == int.Parse(firstLook));
+                        Call("SelectResourceInTree", first);
+                        for (var n = 0; n < 100 && !ReferenceEquals(Field("_currentRoomResource"), first); n++) await Task.Delay(100);
+                        await Task.Delay(500);
+                        var early = (Button)window.FindName("RoomCutsceneButton");
+                        report.Add($"FIRST LOOK room {firstLook}: button {early.Visibility} enabled {early.IsEnabled} '{early.Content}' tooltip '{early.ToolTip}' | lists done {Field("_cdRoomListsDone")}");
+                        Shot($"first-look-{firstLook}.png");
+                    }
                     // The rooms each scene plays out in are derived in the background; wait for the last one (up to 8 minutes).
                     {
                         var groups = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>().ToList();

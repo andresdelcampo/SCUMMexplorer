@@ -3813,7 +3813,7 @@ public partial class MainWindow : Window
         var listing = _game is { Id: GameId.LoomVga } && !_cdRoomListsDone && _cdSavedRoomLists is null && roomChoices.Count == 0;
         RoomCutsceneButton.Visibility = active && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.IsEnabled = active && CanStartCutscene && !listing;
-        RoomCutsceneButton.Content = roomChoices.Count == 1 ? "Play Cutscene" : "Play Cutscene ▴";
+        RoomCutsceneButton.Content = roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴";
         RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)." : !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
             roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
         if (!active) return;

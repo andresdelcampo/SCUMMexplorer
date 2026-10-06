@@ -29,7 +29,9 @@ internal static class CdRoomScenesCache
     private static string Stamp(string gameFolder)
     {
         var core = typeof(GameLibrary).Assembly.Location;
-        var files = System.IO.Directory.Exists(gameFolder) ? new DirectoryInfo(gameFolder).GetFiles() : [];
+        // A disc image is opened through its .cue file: the stamp then covers the files beside it (the .bin).
+        var folder = File.Exists(gameFolder) ? Path.GetDirectoryName(Path.GetFullPath(gameFolder)) : gameFolder;
+        var files = folder is not null && System.IO.Directory.Exists(folder) ? new DirectoryInfo(folder).GetFiles() : [];
         return $"v1|{(File.Exists(core) ? File.GetLastWriteTimeUtc(core).Ticks : 0)}|" +
                string.Join('|', files.OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase).Select(f => $"{f.Name}:{f.Length}:{f.LastWriteTimeUtc.Ticks}"));
     }
