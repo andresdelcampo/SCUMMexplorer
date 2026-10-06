@@ -28,6 +28,16 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
             IReadOnlyList<RoomObjectImage> objects;
             IReadOnlyList<uint> palette;
             Func<IReadOnlyList<LoomMessage>, LoomMessageLayer> render;
+            // The CD game draws the quarter notes as image verbs (verbOps <verb>, [at, x, y; on]) whose images Room 1's local script 211 assigned
+            // (verbOps <verb>, [new; ...; image, n; off]); the EGA game prints a musical glyph instead.
+            var noteImages = new Dictionary<int, int>();
+            if (game.Id == GameId.LoomVga)
+            {
+                var init = ScummDataSources.For(game).RoomLocalScript(1, 211);
+                foreach (var item in init?.Instructions ?? [])
+                    if (item.Operation == "verbOps" && Regex.Match(item.Operands, @"^0x([0-9A-F]+), \[new; at, 0x[0-9A-F]+, 0x[0-9A-F]+; image, 0x([0-9A-F]+); off\]$") is { Success: true } assigned)
+                        noteImages[Hex(assigned.Groups[1].Value)] = Hex(assigned.Groups[2].Value);
+            }
             if (game.Id == GameId.LoomVga)
             {
                 var data = ScummDataSources.For(game);
@@ -78,6 +88,22 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                     if (m.Success && Hex(m.Groups[1].Value) != 8) letterColor = Hex(m.Groups[1].Value);
                     m = Regex.Match(instruction.Operands, @"^local\[0x003\] = 0x([0-9A-F]+)$");
                     if (m.Success) scoreX = Hex(m.Groups[1].Value);
+                }
+                if (instruction.Operation == "verbOps" && noteImages.Count > 0 &&
+                    Regex.Match(instruction.Operands, @"^0x([0-9A-F]+), \[at, (local\[0x003\]|0x[0-9A-F]+), 0x([0-9A-F]+); on\]$") is { Success: true } placed &&
+                    noteImages.TryGetValue(Hex(placed.Groups[1].Value), out var noteObject) && Hex(placed.Groups[1].Value) >= 0x5A &&
+                    objects.FirstOrDefault(p => p.Id == noteObject) is { } noteHead)
+                {
+                    int headX = placed.Groups[2].Value.StartsWith("0x", StringComparison.Ordinal) ? Hex(placed.Groups[2].Value[2..]) : scoreX;
+                    int left = headX / 8 * 8 - 16, top = Hex(placed.Groups[3].Value) - 0xA8;
+                    for (int y = 0; y < noteHead.Height; y++)
+                        for (int x = 0; x < noteHead.Width; x++)
+                        {
+                            int toX = left + x, toY = top + y;
+                            if (toX < 0 || toX >= 224 || toY < 0 || toY >= 32 || noteHead.Pixels[y * noteHead.Width + x] == 0) continue;
+                            scorePixels[toY * 224 + toX] = noteHead.Pixels[y * noteHead.Width + x];
+                            notePixels[toY * 224 + toX] = noteHead.Pixels[y * noteHead.Width + x];
+                        }
                 }
                 var scoreImage = Regex.Match(instruction.Operands, @"^0x(?:31|32), \[at, 0x([0-9A-F]+), 0x00A8; image, 0x([0-9A-F]+); on\]$");
                 if (instruction.Operation == "verbOps" && scoreImage.Success)

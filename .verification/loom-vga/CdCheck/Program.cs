@@ -75,6 +75,15 @@ internal static class Program
                             foreach (var v in status.Verbs) Console.WriteLine($"  slot {v.Slot} verb {v.VerbId} mode {v.Mode} at ({v.X},{v.Y}) image {v.ImageObject}/{v.ImageRoom} name {v.Name}");
                         }
                         Shot($"look-{number:00}.png");
+                        if (Environment.GetEnvironmentVariable("CD_STATUS") == "1")
+                        {
+                            var win = (Window)Call("BuildGameStatusWindow")!;
+                            win.Show(); win.UpdateLayout(); await Task.Delay(1500); win.UpdateLayout();
+                            var bmp = new RenderTargetBitmap((int)win.ActualWidth, (int)win.ActualHeight, 96, 96, PixelFormats.Pbgra32); bmp.Render(win);
+                            var enc = new PngBitmapEncoder(); enc.Frames.Add(BitmapFrame.Create(bmp));
+                            using (var fs = File.Create(Path.Combine(output, $"status-{number:00}.png"))) enc.Save(fs);
+                            win.Close();
+                        }
                     }
                     window.Close();
                     return;
