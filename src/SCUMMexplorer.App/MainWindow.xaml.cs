@@ -5371,7 +5371,7 @@ public partial class MainWindow : Window
             foreach (var verb in verbs)
             {
                 LoomScriptDisassembly script;
-                try { script = _verbReader.Decode(room, record, verb.VerbId); }
+                try { script = _game.Id == GameId.LoomVga ? _cdData!.ReadObjectVerb(room.ResourceId!.Value, record, verb.VerbId, out _) : _verbReader.Decode(room, record, verb.VerbId); }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
                 // Follow started room-local and global scripts too: many exits
                 // (for example Room 03's town and cemetery paths) load the room there.

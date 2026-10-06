@@ -44,6 +44,28 @@ internal static class Program
                 // CD_INTRO=1 plays "The intro" from the Play a cutscene list on the playback clock and shoots it every CD_INTRO_STEP ms (default 4000) for CD_INTRO_MS (default 105000).
                 // CD_CUT=room,object,verb (verb 0 = the room's entry) plays that derived cutscene instead; CD_ESCAPE_MS presses Escape (the window's own key handler) that many ms after the start.
                 // CD_ROOMBTN=1,4,35 reports the per-room "Play Cutscene" button (visibility, enabled, content) in a live session after selecting each room; shoots room-btn-<n>.png.
+                // CD_LOOK=2,4,69 shoots each room in the live session at once (no waiting for the background runs); CD_LOOK_ADV=1 turns Advanced on and opens Options first.
+                if (Environment.GetEnvironmentVariable("CD_LOOK") is { } lookList)
+                {
+                    ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle")).IsChecked = true;
+                    if (Environment.GetEnvironmentVariable("CD_LOOK_ADV") == "1")
+                    {
+                        ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("AdvancedModeToggle")).IsChecked = true;
+                        Call("AdvancedModeToggle_Click", window.FindName("AdvancedModeToggle")!, new RoutedEventArgs());
+                        ((Expander)window.FindName("RoomOptionsExpander")).IsExpanded = true;
+                    }
+                    await Task.Delay(1500);
+                    foreach (var number in lookList.Split(',').Select(int.Parse))
+                    {
+                        var room = game.Rooms.First(r => r.ResourceId == number);
+                        Call("SelectResourceInTree", room);
+                        for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
+                        await Task.Delay(2500);
+                        Shot($"look-{number:00}.png");
+                    }
+                    window.Close();
+                    return;
+                }
                 if (Environment.GetEnvironmentVariable("CD_ROOMBTN") is { } roomList)
                 {
                     ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle")).IsChecked = true;

@@ -25,12 +25,20 @@ public sealed class LoomDoorwayFinder
     private readonly GameLibrary _game;
     private readonly LoomScriptReader _reader;
     private readonly int _globalScriptCount;
+    /// <summary>The CD game keeps its scripts in the disc archive, not in LFL files: its scripts come from this source.</summary>
+    private readonly IScummDataSource? _cdData;
     private readonly Dictionary<string, LoomScriptDisassembly?> _cache = [];
 
     public LoomDoorwayFinder(GameLibrary game)
     {
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+        if (game.Id == GameId.LoomVga)
+        {
+            _cdData = ScummDataSources.For(game);
+            _globalScriptCount = _cdData.GlobalScriptCount;
+            return;
+        }
         var indexPath = Path.Combine(game.FolderPath, "00.LFL");
         try
         {
@@ -91,7 +99,9 @@ public sealed class LoomDoorwayFinder
         LoomScriptDisassembly? script = null;
         try
         {
-            if (isLocal) script = _reader.DecodeRoomLocalScript(room, scriptId, _globalScriptCount);
+            if (_cdData is not null)
+                script = isLocal ? _cdData.RoomLocalScript(room.ResourceId!.Value, scriptId) : _cdData.GlobalScript(scriptId);
+            else if (isLocal) script = _reader.DecodeRoomLocalScript(room, scriptId, _globalScriptCount);
             else if (_game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script &&
                          item.ResourceId == scriptId) is { } resource)
                 script = _reader.Decode(resource);
