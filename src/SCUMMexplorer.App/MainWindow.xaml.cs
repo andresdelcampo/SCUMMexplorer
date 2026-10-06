@@ -3707,6 +3707,7 @@ public partial class MainWindow : Window
         _playbackTimer?.Stop();
         _playbackPaused = true;
         _sceneSound.Pause();
+        _cdVoice.Pause();
         StatusText.Text = "Paused. Play (or space) goes on.";
         StatusText.ToolTip = "The scene's frames wait while paused. The game's own pause key (space, VAR_PAUSE_KEY) stops ScummVM's frame loop the same way.";
         UpdatePlaybackControls();
@@ -3717,6 +3718,7 @@ public partial class MainWindow : Window
         if (_playback is null || !_playbackPaused) return;
         _playbackPaused = false;
         _sceneSound.Resume();
+        _cdVoice.Resume();
         _playbackTimer ??= CreatePlaybackTimer();
         _playbackTimer.Interval = PlaybackFrameInterval();
         _playbackTimer.Start();
@@ -4033,9 +4035,10 @@ public partial class MainWindow : Window
             ? LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(_cdData, _game.Rooms.Select(r => r.ResourceId!.Value)))
             : [];
 
-    private static string CdCutsceneTitle(LoomCdCutscene trigger)
+    private string CdCutsceneTitle(LoomCdCutscene trigger)
     {
-        var what = trigger.IsRoomEntry ? "entry" : (trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}") + $" ({trigger.VerbLabel})";
+        // The verb byte is a technical detail: only Advanced names it.
+        var what = trigger.IsRoomEntry ? "entry" : (trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}") + (IsAdvancedMode ? $" ({trigger.VerbLabel})" : "");
         var text = trigger.FirstText.Length > 52 ? trigger.FirstText[..52].TrimEnd() + "…" : trigger.FirstText;
         return LoomReplayTitle.Format(trigger.Room, what + (text.Length > 0 ? $": \"{text}\"" : ""));
     }
