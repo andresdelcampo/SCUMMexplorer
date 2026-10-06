@@ -4,6 +4,10 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT
 
 > The prompt itself is not kept here: the session that ends starts the next one as a task (`spawn_task`). This file holds the details of the project state the prompt points to.
 
+## State (6 October, late night): CD doorways, Sounds button, staff
+
+Committed and merged into master (not pushed), record `.verification/loom-vga/README.md` step 24 (it lists the VGA-vs-EGA gaps). Open from the user's list: Room 69's skill screen after the Room 1 cutscene (frames missing, no wait for a press), Room 04's scroll arrows (camera limits 480..480 after the assumed arrival through Room 03 local 200), note-head height on the staff (unverified), then the gap list. Share unchanged: 203 of 204 (99.5 %).
+
 ## State (6 October, night): CD sound dropdown, Room 02 size
 
 Committed (not pushed), record `.verification/loom-vga/README.md` step 23. The CD game has a sound dropdown (No Sound / CD Audio) instead of the Voices checkbox. Bobbin's size in catalog visits now works for the CD (size variable found in the code, `var[0x0AE]`). Open: the user's Room 69 report (difficulty button frames missing after playing the Room 1 cutscene and then turning to Room 69); a fresh visit in `CdCheck` shows the frames, so ask for the exact path or reproduce with `CD_CUT` then selecting Room 69. Share unchanged: 203 of 204 (99.5 %).
