@@ -78,6 +78,7 @@ internal static class Program
                             foreach (var v in status.Verbs) Console.WriteLine($"  slot {v.Slot} verb {v.VerbId} mode {v.Mode} at ({v.X},{v.Y}) image {v.ImageObject}/{v.ImageRoom} name {v.Name}");
                         }
                         Shot($"look-{number:00}.png");
+                        if (Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession sm) Console.WriteLine($"VERBTEXT room {number}: {sm.Messages.OnScreen.Count(m => m.Y >= 144)} string(s) on the verb screen");
                         if (Environment.GetEnvironmentVariable("CD_IMG") == "1")
                             foreach (var im in ((SCUMMexplorer.Core.Formats.IScummDataSource)Field("_cdData")!).ReadObjectImages(1).Where(i => new[]{17,23,29,35,41,47,53,59,65,66,70,71,72,73,74,75,76,77}.Contains(i.Id)))
                                 { if (im.Id is 65 or 70 or 71 or 72 or 73 or 74 or 75 or 76 or 77) for (var r = 0; r < im.Height; r++) Console.WriteLine($"ROW {im.Id} {r,2} " + string.Concat(Enumerable.Range(0, Math.Min(im.Width, 40)).Select(c => im.Pixels[r*im.Width+c] == 0 ? '.' : '#')));

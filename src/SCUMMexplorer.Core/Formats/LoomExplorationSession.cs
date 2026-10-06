@@ -157,6 +157,7 @@ public sealed partial class LoomExplorationSession
         if (game.Id == GameId.LoomVga)
         {
             _runtime.GlobalVariables[LoomBoundedScriptExecutor.SeparateBitStorage] = 1;
+            _runtime.Messages.KeepVerbScreenOnRoomEntry = true;
             _runtime.EstimatedVariables.Add(LoomBoundedScriptExecutor.SeparateBitStorage);
         }
         if (soundCard != 0) _runtime.SetGlobalVariable(SoundCardVariable, (ushort)soundCard);

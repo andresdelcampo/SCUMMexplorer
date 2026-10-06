@@ -485,12 +485,18 @@ public sealed class LoomMessageTable
 
     private bool _useTalkAnims;
 
-    /// <summary><c>startScene</c>: <c>stopTalk</c>, and the room redraw erases drawn strings.</summary>
+    /// <summary>
+    /// Whether a room change leaves the strings printed on the verb screen (rows 144 and down) alone, as it does the verbs: the CD game prints
+    /// the note letters once (script 018) and does not print them again in the next room. The EGA game's letters are redrawn by its scripts.
+    /// </summary>
+    public bool KeepVerbScreenOnRoomEntry { get; set; }
+
+    /// <summary><c>startScene</c>: <c>stopTalk</c>, and the room redraw erases drawn strings (the verb screen's too unless <see cref="KeepVerbScreenOnRoomEntry"/>).</summary>
     public void RoomEntered(LoomScriptRuntimeState runtime)
     {
         NativeMutation?.Invoke();
         StopTalk();
-        _drawn.Clear();
+        _drawn.RemoveAll(message => !KeepVerbScreenOnRoomEntry || message.Y < LoomVerbArea.Top);
         runtime.SetGlobalVariable(HaveMsgVariable, 0);
     }
 
