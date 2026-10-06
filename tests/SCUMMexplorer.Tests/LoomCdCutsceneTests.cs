@@ -175,6 +175,24 @@ public sealed class LoomCdCutsceneTests
         Assert.True(Frames(started) > 0);
     }
 
+    /// <summary>A scene is listed in the rooms it plays out in as well as in its trigger's room: the sword scene (Room 41) ends in Room 42, and the intro is in Rooms 01 and 02.</summary>
+    [Fact]
+    public void AScenePlaysOutInTheRoomsItLoadsAndTheIntroIsInRoomsOneAndTwo()
+    {
+        if (Game() is not { } game) return;
+        var data = ScummDataSources.For(game);
+        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
+        var sword = triggers.First(t => t is { Room: 41, ObjectId: 559, VerbId: 0x41 });
+        var rooms = planner.VisitedRooms(sword);
+        Assert.Equal(41, rooms[0]);
+        Assert.Contains(42, rooms);
+        Assert.True(planner.TryGetVisitedRooms(sword, out _));
+        var intro = planner.IntroRooms();
+        Assert.Contains(1, intro);
+        Assert.Contains(2, intro);
+    }
+
     /// <summary>Room 25 object 372 verb 0x37 starts script 208 only when bits 032, 033 and 046 are set and bit 05B is clear; local script 200 sets them as the ego enters boxes 4, 3 and 2 in that order.</summary>
     [Fact]
     public void TheShepherdSceneNeedsTheEgoThroughBoxesFourThreeAndTwoInOrder()

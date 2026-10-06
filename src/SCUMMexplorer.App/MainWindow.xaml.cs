@@ -3999,7 +3999,15 @@ public partial class MainWindow : Window
         _cdSetupPlanner = planner;
         _ = Task.Run(() =>
         {
-            try { foreach (var group in LoomCdCutsceneIndex.Group(planner.Value.Triggers)) planner.Value.Derive(group.First); }
+            try
+            {
+                var groups = LoomCdCutsceneIndex.Group(planner.Value.Triggers);
+                foreach (var group in groups) planner.Value.Derive(group.First);
+                // Then the rooms each scene plays out in, so the room's own "Play Cutscene" list has them (the EGA list does, through the catalog's membership).
+                planner.Value.IntroRooms();
+                foreach (var group in groups) planner.Value.VisitedRooms(group.First);
+                Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) UpdatePlaybackControls(); });
+            }
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException) { }
         });
     }
@@ -4038,9 +4046,18 @@ public partial class MainWindow : Window
     }
 
     private List<(string Id, CutscenePickerItem Item)> CdCutsceneItems(int? room = null) =>
-        CdCutsceneGroups().Where(group => room is null || group.First.Room == room || group.Others.Any(o => o.Room == room))
+        CdCutsceneGroups().Where(group => room is null || group.First.Room == room || group.Others.Any(o => o.Room == room) || CdPlaysIn(group, room.Value))
             .Select(group => ($"cd-{group.First.Room}-{group.First.ObjectId}-{group.First.VerbId}",
-                new CutscenePickerItem(CdCutsceneTitle(group.First), group.IsScene ? "Scenes" : "Dialogue and reactions", CdCutsceneNote(group), () => PlayCdCutscene(group)))).ToList();
+                new CutscenePickerItem(CdCutsceneTitle(group.First) + (room is int shown && group.First.Room != shown && group.Others.All(o => o.Room != shown) ? $" (played from Room {group.First.Room:00})" : ""),
+                    group.IsScene ? "Scenes" : "Dialogue and reactions", CdCutsceneNote(group), () => PlayCdCutscene(group)))).ToList();
+
+    /// <summary>Whether a headless run of the scene from its start (already derived in the background) was in this room at some point.</summary>
+    private bool CdPlaysIn(LoomCdCutsceneGroup group, int room) =>
+        _cdSetupPlanner is { IsValueCreated: true } lazy && lazy.Value.TryGetVisitedRooms(group.First, out var rooms) && rooms.Contains(room);
+
+    /// <summary>The intro's own list entry for a room it is in while it plays (the skill screen, Rooms 01 and 02, the fairy, the cliff); false until the background run is done.</summary>
+    private bool CdIntroPlaysIn(int room) =>
+        _cdSetupPlanner is { IsValueCreated: true } lazy && lazy.Value.IntroRoomsIfKnown?.Contains(room) == true;
 
     /// <summary>Plays a CD cutscene from its stated start: the session's room visit, then the room's entry script or the object's verb run directly, on the playback clock.</summary>
     private void PlayCdCutscene(LoomCdCutsceneGroup group)
@@ -4088,7 +4105,12 @@ public partial class MainWindow : Window
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
-        if (_game is { Id: GameId.LoomVga }) return CdCutsceneItems(roomId).Select(choice => choice.Item).ToList();
+        if (_game is { Id: GameId.LoomVga })
+        {
+            var items = CdCutsceneItems(roomId).Select(choice => choice.Item).ToList();
+            if (CdIntroPlaysIn(roomId)) items.Insert(0, CdIntroItem());
+            return items;
+        }
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
         return PlayableCutsceneItems().Where(choice => ids.Contains(choice.Id)).Select(choice => choice.Item).ToList();
     }

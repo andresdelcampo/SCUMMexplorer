@@ -44,6 +44,14 @@ internal static class Program
                 {
                     ((System.Windows.Controls.Primitives.ToggleButton)window.FindName("SessionModeToggle")).IsChecked = true;
                     await Task.Delay(1500);
+                    // The rooms each scene plays out in are derived in the background; wait for the last one (up to 8 minutes).
+                    {
+                        var groups = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>().ToList();
+                        var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Formats.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!;
+                        var wait = System.Diagnostics.Stopwatch.StartNew();
+                        while (wait.Elapsed < TimeSpan.FromMinutes(8) && !(planner.IntroRoomsIfKnown is not null && groups.All(g => planner.TryGetVisitedRooms(g.First, out _)))) await Task.Delay(1000);
+                        report.Add($"visited rooms ready after {wait.Elapsed.TotalSeconds:0} s");
+                    }
                     var button = (Button)window.FindName("RoomCutsceneButton");
                     foreach (var number in roomList.Split(',').Select(int.Parse))
                     {

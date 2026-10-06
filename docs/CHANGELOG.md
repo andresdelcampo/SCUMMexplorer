@@ -1,5 +1,9 @@
 # Changelog
 
+## 6 October: CD scenes listed in the rooms they play out in, the intro in Rooms 01 and 02
+
+The room's "Play Cutscene" list for the CD game also holds scenes that play out in the room (a headless run of each scene from its derived setup records the rooms it loads; "(played from Room NN)") and "The intro" in the rooms it is in (69, 2, 53, 1). The button is now in 60 of 78 rooms (was 44; checked in the real window). The user said no room showed it; it shows in this build, so an older build is the likely cause (estimate). 203 of 204 scenes (99.5 %) still enabled. Record: `.verification/loom-vga/README.md` step 21.
+
 ## 5 October (night, the shepherd): Room 25 object 372 enabled, 203 of 204 CD scenes (99.5 %)
 
 Room 25 object 372 verb 0x37 (the shepherds' "Go forth, Wizard!" scene) needs `bit[0x032]`, `bit[0x033]` and `bit[0x046]` set and `bit[0x05B]` clear; the room's walk-box monitor (local 200) sets them as the ego enters boxes 4, 3, 2 in that order. `LoomCdSceneSetupPlanner` now finds such monitors (a local script that reads the ego's box and compares it with constants) and tries the orders of their boxes, settling between boxes; a trial for an object verb counts only scenes begun after the setup. Seen in the real window (the scene prints, then Room 24 is entered; box placement and order are estimates). Room 34's entry stays without a start: the only script that puts the ego at box 6's line (global 97) leaves him in box 5, and a walk cannot skip box 7. The user's check (walk-triggered scenes, CD music in Advanced) found nothing wrong; the per-room "Play Cutscene" button is in the build (44 of 78 CD rooms have scenes of their own; 34 show none), the user said they missed it: open question. Record: `.verification/loom-vga/README.md` step 20. Not heard by ear.

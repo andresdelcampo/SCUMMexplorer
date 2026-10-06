@@ -203,6 +203,74 @@ public sealed partial class LoomCdSceneSetupPlanner
     /// <summary>The derived setup when it has been derived already (so a caller on the UI thread can ask without waiting).</summary>
     public bool TryGet(LoomCdCutscene t, out LoomCdStartSetup setup) => _cache.TryGetValue(Key(t), out setup!);
 
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int, int), IReadOnlyList<int>> _visited = [];
+
+    /// <summary>The rooms a trigger's scene has been seen to play in, when they have been derived already (so a caller on the UI thread can ask without waiting).</summary>
+    public bool TryGetVisitedRooms(LoomCdCutscene t, out IReadOnlyList<int> rooms) => _visited.TryGetValue(Key(t), out rooms!);
+
+    /// <summary>
+    /// The rooms the scene is in while it runs, from a headless run of its derived start setup (the way the app plays it): the trigger's own room first, then every
+    /// other room the session loads until the cutscene and its lines are over (no Escape, so a scene is not cut short). A branch the run did not take is not seen,
+    /// so the list is what this run did, not every room the code could load. Cached; one run at a time.
+    /// </summary>
+    public IReadOnlyList<int> VisitedRooms(LoomCdCutscene t)
+    {
+        if (_visited.TryGetValue(Key(t), out var cached)) return cached;
+        lock (_gate)
+        {
+            var setup = Derive(t);
+            var rooms = new List<int> { t.Room };
+            try
+            {
+                var session = NewSession();
+                if (setup is { Plays: true, HasSteps: true }) ApplyBefore(session, _game, setup.Before);
+                session.VisitRoom(RoomOf(_game, t.Room));
+                if (setup is { Plays: true, HasSteps: true }) ApplyAfter(session, setup.After);
+                var earlier = session.CutscenesBegun;
+                var mark = session.RoomsEntered.Count; // rooms the setup entered are not the scene's
+                if (!t.IsRoomEntry) session.ActivateObjectVerb(t.ObjectId, t.VerbId);
+                var begun = false;
+                for (var i = 0; i < EndFrames; i++)
+                {
+                    if (session.InCutscene || session.CutscenesBegun > earlier) begun = true;
+                    if (begun && !session.InCutscene && session.Messages.HaveMsg == 0) break;
+                    if (!begun && i >= TrialFrames) break;
+                    session.AdvanceFrame();
+                }
+                rooms.AddRange(session.RoomsEntered.Skip(mark).Where(r => !rooms.Contains(r)).Distinct());
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException) { }
+            return _visited[Key(t)] = rooms;
+        }
+    }
+
+    private IReadOnlyList<int>? _introRooms;
+
+    /// <summary>The intro's rooms when <see cref="IntroRooms"/> has run already (so a caller on the UI thread can ask without waiting).</summary>
+    public IReadOnlyList<int>? IntroRoomsIfKnown => _introRooms;
+
+    /// <summary>The rooms the CD intro is in while it plays (a headless run of the boot from the skill screen to the game start), in the order it loads them.</summary>
+    public IReadOnlyList<int> IntroRooms()
+    {
+        if (_introRooms is { } cached) return cached;
+        lock (_gate)
+        {
+            var rooms = new List<int>();
+            try
+            {
+                var session = new LoomExplorationSession(_game, _game.Vga!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
+                for (var i = 0; i < EndFrames; i++)
+                {
+                    if (i > 5 && !session.BootRunning) break;
+                    session.AdvanceFrame();
+                }
+                rooms.AddRange(session.RoomsEntered.Distinct());
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException) { }
+            return _introRooms = rooms;
+        }
+    }
+
     /// <summary>Derives (once, then cached) the setup of one trigger; one derivation runs at a time, since they share the scanner's data source.</summary>
     public LoomCdStartSetup Derive(LoomCdCutscene t)
     {

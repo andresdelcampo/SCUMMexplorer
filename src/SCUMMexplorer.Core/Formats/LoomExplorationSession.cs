@@ -520,6 +520,14 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomWalkBoxSet? CurrentWalkBoxes => _runtime.WalkBoxes;
 
+    /// <summary>The room the session is in now (the room the game last loaded), without building a snapshot.</summary>
+    public int? CurrentRoomId => _runtime.CurrentRoom;
+
+    private readonly List<int> _roomsEntered = [];
+
+    /// <summary>Every room the session has loaded, in order (a room a script enters and leaves within one frame is here too).</summary>
+    public IReadOnlyList<int> RoomsEntered => _roomsEntered;
+
     /// <summary>The current class bits per object or actor number (a live view; the snapshot holds a copy).</summary>
     public IReadOnlyDictionary<int, uint> ObjectClasses => _runtime.ObjectClasses;
     public LoomBoundedScriptResult? LastEntryRun { get; private set; }
@@ -910,6 +918,7 @@ public sealed partial class LoomExplorationSession
 
         _currentRoom = room;
         _runtime.CurrentRoom = room.ResourceId;
+        if (room.ResourceId is int enteredRoom) _roomsEntered.Add(enteredRoom);
         RoomEntrySequence = _visitEvents.Count;
         // startScene clears the draw queue before the entry scripts run.
         _runtime.DrawQueue.Clear();
