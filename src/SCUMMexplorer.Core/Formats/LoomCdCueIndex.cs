@@ -16,7 +16,10 @@ public static partial class LoomCdCueIndex
     [GeneratedRegex(@"sayVoice, 0x([0-9A-F]+), 0x([0-9A-F]+)(?:; text, ""(.*?)""\])?")]
     private static partial Regex CuePattern();
 
-    public static IReadOnlyList<LoomCdCue> Scan(IScummDataSource data, IEnumerable<int> rooms)
+    /// <summary>The cues the scripts of one room ask for (its entry, exit, local scripts and object verbs; not the global scripts they start), in disc order.</summary>
+    public static IReadOnlyList<LoomCdCue> ScanRoom(IScummDataSource data, int room) => Scan(data, [room], includeGlobal: false);
+
+    public static IReadOnlyList<LoomCdCue> Scan(IScummDataSource data, IEnumerable<int> rooms, bool includeGlobal = true)
     {
         var found = new Dictionary<LoomVoiceCue, LoomCdCue>();
         void Look(string source, LoomScriptDisassembly? script)
@@ -33,7 +36,7 @@ public static partial class LoomCdCueIndex
                 found[cue] = new LoomCdCue(cue, text, source);
             }
         }
-        foreach (var id in data.GlobalScriptIds()) Look($"global script {id}", Try(() => data.GlobalScript(id)));
+        if (includeGlobal) foreach (var id in data.GlobalScriptIds()) Look($"global script {id}", Try(() => data.GlobalScript(id)));
         foreach (var room in rooms)
         {
             Look($"room {room} entry", Try(() => data.RoomEntryScript(room)));

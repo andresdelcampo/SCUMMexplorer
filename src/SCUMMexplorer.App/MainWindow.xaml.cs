@@ -4416,6 +4416,7 @@ public partial class MainWindow : Window
     {
         if (!IsLoaded || CdSoundCombo.SelectedIndex < 0) return;
         _cdVoice.Enabled = CdSoundCombo.SelectedIndex == 1;
+        RoomSoundsButton.Visibility = _game?.Id == GameId.LoomVga && _cdRoomCues.Count > 0 && _cdVoice.Enabled ? Visibility.Visible : Visibility.Collapsed;
         if (!_cdVoice.Enabled) _cdVoice.Stop();
         SaveViewOptions();
     }
@@ -5551,6 +5552,14 @@ public partial class MainWindow : Window
         RoomMusicPanel.Visibility = Visibility.Collapsed;
         _roomSoundChoices = [];
         RoomSoundsButton.Visibility = Visibility.Collapsed;
+        if (_game is { Id: GameId.LoomVga, Vga.Disc: not null } && _currentRoomResource is { ResourceId: int cdRoomId })
+        {
+            // The CD game: the disc's audio the room's own scripts ask for (music or narration first, then the spoken lines), played on demand.
+            try { _cdRoomCues = LoomCdCueIndex.ScanRoom(_cdData ?? ScummDataSources.For(_game), cdRoomId).OrderByDescending(cue => cue.IsMusicOrNarration).ThenBy(cue => cue.Cue.Offset).ToArray(); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException) { _cdRoomCues = []; }
+            RoomSoundsButton.Visibility = _cdRoomCues.Count > 0 && _cdVoice.Enabled ? Visibility.Visible : Visibility.Collapsed;
+            return;
+        }
         if (_game is null || _game.Id == GameId.LoomVga || _currentRoomResource is not { } room) return;
         // The interactive LOOM mode plays the music the game's scripts start (SceneSoundPlayer), so the panel's own
         // player would only duplicate it (the user's choice, 30 Sep; .verification/room-music-analysis). Inspection mode keeps it.
@@ -5670,8 +5679,26 @@ public partial class MainWindow : Window
 
     private List<(GameResource Resource, bool Music, TimeSpan? Duration, string Evidence)> _roomSoundChoices = [];
 
+    private IReadOnlyList<LoomCdCue> _cdRoomCues = [];
+
+    /// <summary>The CD game's Sounds menu: the disc audio this room's scripts ask for, played on demand (an exploration action).</summary>
+    private void CdRoomSounds_Click()
+    {
+        if (_cdRoomCues.Count == 0 || SessionInScene || _game?.Vga?.Disc is not { } disc) return;
+        var entries = new List<(string Label, string? Tip, Action Run)> { ("■ Stop", null, _cdVoice.Stop) };
+        foreach (var cue in _cdRoomCues)
+        {
+            var picked = cue;
+            var snippet = cue.Text.Length > 36 ? cue.Text[..36] + "…" : cue.Text;
+            var label = $"▶ {(cue.IsMusicOrNarration ? "♪ " : "")}{cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}";
+            entries.Add((label, IsAdvancedMode ? $"disc second {cue.Cue.DiscSeconds:0.#}; asked for by {cue.Source}" : null, () => _cdVoice.PlayNow(disc, picked.Cue)));
+        }
+        OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
+    }
+
     private void RoomSounds_Click(object sender, RoutedEventArgs e)
     {
+        if (_game?.Id == GameId.LoomVga) { CdRoomSounds_Click(); return; }
         if (_roomSoundChoices.Count == 0 || SessionInScene) return;
         var entries = new List<(string Label, string? Tip, Action Run)>();
         if (_audioSurface == AudioSurface.Room) entries.Add(("■ Stop", null, StopAudio));

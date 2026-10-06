@@ -79,6 +79,15 @@ public sealed class CdVoicePlayer
         if (!_busy && _queue.Count > 0) PlayNext();
     }
 
+    /// <summary>Plays one stretch of the disc's audio track now (picked from a room's sounds list), replacing what plays; not the game's own voice.</summary>
+    public void PlayNow(DiscImage disc, LoomVoiceCue cue)
+    {
+        Stop();
+        _disc = disc;
+        _queue.Enqueue((cue, DateTime.UtcNow));
+        PlayNext();
+    }
+
     public void Pause() { _paused = true; _player?.Pause(); }
 
     public void Resume() { _paused = false; _player?.Play(); }
