@@ -1,5 +1,9 @@
 # Changelog
 
+## 6 October (later): the room's CD cutscene button no longer waits for the background runs
+
+The room's "Play Cutscene" button for the CD game appeared only after the background runs (many seconds, reported by the user) had listed every scene's rooms. Now `CdRoomScenesCache` (App) keeps those lists (rooms per trigger and the intro's rooms) as JSON under `%LOCALAPPDATA%SCUMMexploreroom-cache`, one file per game folder, stamped with the Core assembly's build time and the game folder's file sizes and times; reopening the last game uses it at once, while opening a folder with the button derives the lists again (as the room thumbnails do) and overwrites it. On a first launch (no saved lists) the button shows disabled with a tooltip ("Looking for the scenes that happen in this room…") until the runs finish, then settles (hidden in the rooms with none). The user's older exe (main checkout on master) was why the button was missing earlier: master now holds the branch. Checked: the cache file is written by a `CdCheck` run (rooms 1, 2); the first launch's placeholder and the reopen path were not looked at in the window by hand. Not heard by ear. Share unchanged: 203 of 204 (99.5 %).
+
 ## 6 October: CD scenes listed in the rooms they play out in, the intro in Rooms 01 and 02
 
 The room's "Play Cutscene" list for the CD game also holds scenes that play out in the room (a headless run of each scene from its derived setup records the rooms it loads; "(played from Room NN)") and "The intro" in the rooms it is in (69, 2, 53, 1). The button is now in 60 of 78 rooms (was 44; checked in the real window). The user said no room showed it; it shows in this build, so an older build is the likely cause (estimate). 203 of 204 scenes (99.5 %) still enabled. Record: `.verification/loom-vga/README.md` step 21.

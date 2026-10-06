@@ -201,3 +201,10 @@ The CD game's `matrixOps` (0x30) stopped any script that used it ("not modeled")
 - **Checked in the window** (`CdCheck` with `CD_ROOMBTN` = all 78 rooms, `setup-check/roombtn-visited1`, local; the run waits for the background derivation): the button is visible in **60 of 78 rooms** (was 44); Room 01: 1 entry (the intro), Room 02: 7, Room 42: 1 (the sword scene), Room 53: 1, Room 69: 1 (disabled while the intro's boot runs). 18 rooms still show none because no scene is triggered from them or plays in them: 5, 39, 40, 52, 54-58, 60, 61, 67, 68, 79, 81, 87, 91, 95.
 - **Test.** `AScenePlaysOutInTheRoomsItLoadsAndTheIntroIsInRoomsOneAndTwo` (LoomCdCutscene). Build 0 warnings. Not heard by ear.
 - **Share.** Unchanged: 203 of 204 scenes (99.5 %) enabled.
+
+## Step 22: the room button's lists are kept between launches (6 October, after step 21)
+
+- **Why.** The user's exe was an older build (main checkout, `master` before the fast-forward), and once rebuilt the button appeared "after many seconds": the room lists come from the headless runs.
+- **What.** `CdRoomScenesCache` (App) saves `LoomCdSceneSetupPlanner.ExportRoomLists()` (rooms per "room,object,verb" and "intro") per game folder under `%LOCALAPPDATA%SCUMMexploreroom-cache` (`SCUMM_ROOM_CACHE_DIR` overrides it), stamped by the Core assembly's build time and the folder's file sizes and times. Only the automatic reopen of the last game loads it (`_roomCardsMayUseCache`, as the thumbnails); the Open button derives again. Until the runs finish with no saved lists the button is shown disabled with a tooltip.
+- **Checked.** `CdCheck` (`CD_ROOMBTN=1,2`, private `SCUMM_ROOM_CACHE_DIR`, `setup-check/cache-test`, local) wrote the cache files with the expected lists. Not looked at by hand: the placeholder on a first launch and the instant button on a reopen. Build 0 warnings (the CdCheck project has 3 old CS0252 warnings). Not heard by ear.
+- **Share.** Unchanged: 203 of 204 scenes (99.5 %) enabled.

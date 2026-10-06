@@ -244,6 +244,14 @@ public sealed partial class LoomCdSceneSetupPlanner
         }
     }
 
+    /// <summary>The derived room lists, keyed "room,object,verb", for saving between runs (the intro's rooms under "intro").</summary>
+    public Dictionary<string, int[]> ExportRoomLists()
+    {
+        var lists = _visited.ToDictionary(p => $"{p.Key.Item1},{p.Key.Item2},{p.Key.Item3}", p => p.Value.ToArray());
+        if (_introRooms is { } intro) lists["intro"] = intro.ToArray();
+        return lists;
+    }
+
     private IReadOnlyList<int>? _introRooms;
 
     /// <summary>The intro's rooms when <see cref="IntroRooms"/> has run already (so a caller on the UI thread can ask without waiting).</summary>

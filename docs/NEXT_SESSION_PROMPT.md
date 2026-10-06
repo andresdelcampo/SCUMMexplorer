@@ -4,6 +4,10 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT
 
 > The prompt itself is not kept here: the session that ends starts the next one as a task (`spawn_task`). This file holds the details of the project state the prompt points to.
 
+## State (6 October, later): the room button's lists are saved between launches
+
+Committed (not pushed), record `.verification/loom-vga/README.md` step 22, changelog row. `CdRoomScenesCache` keeps the per-room scene lists between launches (reopen of the last game uses it; the Open button re-derives); a first launch shows the button disabled with a tooltip. Local `master` was fast-forwarded to the branch so the user's main checkout builds it (the user's earlier "no button" was an old exe). To look at by hand: the first-launch placeholder and the instant reopen. 18 rooms show no button (kept hidden). 203 of 204 (99.5 %) enabled. Not heard by ear.
+
 ## State (6 October): CD scenes in the rooms they play out in
 
 Committed (not pushed), record `.verification/loom-vga/README.md` step 21, changelog row. `LoomCdSceneSetupPlanner.VisitedRooms`/`IntroRooms` (headless, from the derived setup, cached, background) feed `RoomCutsceneItems` for the CD game; the button is in 60 of 78 rooms, 18 have none (5, 39, 40, 52, 54-58, 60, 61, 67, 68, 79, 81, 87, 91, 95). The user said no room showed the button even before; the window shows it, an older build is the likely cause (ask them to rebuild from this branch). 203 of 204 scenes enabled. Nothing heard by ear. Next: whatever the user chooses (next game; see the plan).

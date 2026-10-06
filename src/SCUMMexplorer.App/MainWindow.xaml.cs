@@ -3809,10 +3809,12 @@ public partial class MainWindow : Window
         SkipCutsceneButton.IsEnabled = active && SessionInScene && _session?.CutsceneSkippable == true;
         CutsceneMenuButton.IsEnabled = active && CanStartCutscene;
         var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
-        RoomCutsceneButton.Visibility = active && roomChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        RoomCutsceneButton.IsEnabled = active && CanStartCutscene;
+        // Until the background runs have listed the scenes that play out in rooms, a first launch shows the button disabled (nothing is known yet).
+        var listing = _game is { Id: GameId.LoomVga } && !_cdRoomListsDone && _cdSavedRoomLists is null && roomChoices.Count == 0;
+        RoomCutsceneButton.Visibility = active && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
+        RoomCutsceneButton.IsEnabled = active && CanStartCutscene && !listing;
         RoomCutsceneButton.Content = roomChoices.Count == 1 ? "Play Cutscene" : "Play Cutscene ▴";
-        RoomCutsceneButton.ToolTip = !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
+        RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)." : !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
             roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
         if (!active) return;
         CutsceneMenuButton.Content = "Play Cutscene";
@@ -3983,6 +3985,9 @@ public partial class MainWindow : Window
 
     private IReadOnlyList<LoomCdCutsceneGroup>? _cdCutsceneGroups;
     private Lazy<LoomCdSceneSetupPlanner>? _cdSetupPlanner;
+    /// <summary>Room lists saved by an earlier run (same build and game data), used until the background runs finish.</summary>
+    private Dictionary<string, int[]>? _cdSavedRoomLists;
+    private bool _cdRoomListsDone;
 
     /// <summary>
     /// The CD scenes that a fresh start does not begin get a start setup derived from the scripts (<see cref="LoomCdSceneSetupPlanner"/>). It works on its own data
@@ -3990,13 +3995,16 @@ public partial class MainWindow : Window
     /// </summary>
     private void StartCdSetupDerivation(GameLibrary game)
     {
-        if (game is not { Id: GameId.LoomVga }) { _cdSetupPlanner = null; return; }
+        if (game is not { Id: GameId.LoomVga }) { _cdSetupPlanner = null; _cdSavedRoomLists = null; return; }
+        // As with the thumbnails, only reopening the last game reuses the saved lists; the Open button derives them again.
+        _cdSavedRoomLists = _roomCardsMayUseCache ? CdRoomScenesCache.Load(game.FolderPath) : null;
         var planner = new Lazy<LoomCdSceneSetupPlanner>(() =>
         {
             var data = ScummDataSources.For(game);
             return new LoomCdSceneSetupPlanner(game, LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList()), data);
         });
         _cdSetupPlanner = planner;
+        _cdRoomListsDone = false;
         _ = Task.Run(() =>
         {
             try
@@ -4006,7 +4014,8 @@ public partial class MainWindow : Window
                 // Then the rooms each scene plays out in, so the room's own "Play Cutscene" list has them (the EGA list does, through the catalog's membership).
                 planner.Value.IntroRooms();
                 foreach (var group in groups) planner.Value.VisitedRooms(group.First);
-                Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) UpdatePlaybackControls(); });
+                CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
+                Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) { _cdRoomListsDone = true; UpdatePlaybackControls(); } });
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException) { }
         });
@@ -4053,10 +4062,12 @@ public partial class MainWindow : Window
 
     /// <summary>Whether a headless run of the scene from its start (already derived in the background) was in this room at some point.</summary>
     private bool CdPlaysIn(LoomCdCutsceneGroup group, int room) =>
+        _cdSavedRoomLists is { } saved && saved.TryGetValue($"{group.First.Room},{group.First.ObjectId},{group.First.VerbId}", out var savedRooms) && savedRooms.Contains(room) ||
         _cdSetupPlanner is { IsValueCreated: true } lazy && lazy.Value.TryGetVisitedRooms(group.First, out var rooms) && rooms.Contains(room);
 
     /// <summary>The intro's own list entry for a room it is in while it plays (the skill screen, Rooms 01 and 02, the fairy, the cliff); false until the background run is done.</summary>
     private bool CdIntroPlaysIn(int room) =>
+        _cdSavedRoomLists is { } saved && saved.TryGetValue("intro", out var savedRooms) && savedRooms.Contains(room) ||
         _cdSetupPlanner is { IsValueCreated: true } lazy && lazy.Value.IntroRoomsIfKnown?.Contains(room) == true;
 
     /// <summary>Plays a CD cutscene from its stated start: the session's room visit, then the room's entry script or the object's verb run directly, on the playback clock.</summary>
