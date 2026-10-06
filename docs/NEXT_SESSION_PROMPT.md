@@ -4,6 +4,10 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT
 
 > The prompt itself is not kept here: the session that ends starts the next one as a task (`spawn_task`). This file holds the details of the project state the prompt points to.
 
+## State (6 October, late night, second pass): skill screen waits, notes in Game Status
+
+Merged into master (not pushed), record README step 25. Done from the user's second list: skill screen frames and wait, Game Status quarter notes, pause pauses disc audio, Play Cutscene titles without the verb outside Advanced. Open: note-head height on the staff (about 3 to 4 source px higher than the user's reference; unverified against the real game), the gap list in step 24. Room 04's arrows are the game's own camera lock (explained in the changelog).
+
 ## State (6 October, late night): CD doorways, Sounds button, staff
 
 Committed and merged into master (not pushed), record `.verification/loom-vga/README.md` step 24 (it lists the VGA-vs-EGA gaps). Open from the user's list: Room 69's skill screen after the Room 1 cutscene (frames missing, no wait for a press), Room 04's scroll arrows (camera limits 480..480 after the assumed arrival through Room 03 local 200), note-head height on the staff (unverified), then the gap list. Share unchanged: 203 of 204 (99.5 %).
