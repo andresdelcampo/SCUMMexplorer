@@ -1,0 +1,1249 @@
+[
+  {
+    "id": 1,
+    "name": "boot",
+    "evidence": "decoded",
+    "source": "CD Script 01 in DISK01.LEC: +0x02DD print, +0x031C loadRoom, +0x0327 print, +0x033C print; reviewed decoded instruction stream; compared with EGA Script 01 (boot), CD differences retained",
+    "fingerprint": "5F1DA9ECB1B0837E3C3CFCF87769D7AA72BFD317BE7F105E7528786785E971E5",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 1,
+        "name": "Bobbin",
+        "evidence": "decoded",
+        "source": "CD Script 01 +0x0392 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "cutscene start hook",
+    "evidence": "decoded",
+    "source": "CD Script 02 in DISK01.LEC: +0x0000 cursorCommand, +0x0002 cursorCommand, +0x0004 freezeScripts; reviewed decoded instruction stream; compared with EGA Script 02 (cutscene start hook), CD differences retained",
+    "fingerprint": "3A64FA40A7D1DC210C11B24D8D046D6EF42C2326C341A4BFEE7749BA9FDFF191",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 14,
+        "name": "a cutscene is running",
+        "evidence": "decoded",
+        "source": "CD Script 02 +0x0006 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "cutscene end hook",
+    "evidence": "decoded",
+    "source": "CD Script 03 in DISK01.LEC: +0x0000 isEqual, +0x0007 notEqualZero, +0x000C startScript; reviewed decoded instruction stream; compared with EGA Script 03 (cutscene end hook), CD differences retained",
+    "fingerprint": "76409114D487E2827D90235DA91FEBFB464F956AAF254AE59FE00BB150DD28C9",
+    "names": []
+  },
+  {
+    "id": 4,
+    "name": "yield once and return (CD stub)",
+    "evidence": "decoded",
+    "source": "CD Script 04 in DISK01.LEC: +0x0000 breakHere, +0x0001 stopObjectCode; reviewed decoded instruction stream; compared with EGA Script 04 (save screen (F5)), CD differences retained",
+    "fingerprint": "D42493F91F8844684E89393DBB39CFDE0544F1F315F74F37BD010C4FFF2C0747",
+    "names": []
+  },
+  {
+    "id": 5,
+    "name": "input script",
+    "evidence": "decoded",
+    "source": "CD Script 05 in DISK01.LEC: +0x0018 print, +0x0037 chainScript, +0x0053 print, +0x0083 print; reviewed decoded instruction stream; compared with EGA Script 05 (input script), CD differences retained",
+    "fingerprint": "FC295965A860AB8038CBCF96DA2820E0955CDD56C97487C203D46B1435EAC46D",
+    "names": []
+  },
+  {
+    "id": 6,
+    "name": "click handler (input loop)",
+    "evidence": "decoded",
+    "source": "CD Script 06 in DISK01.LEC: +0x0106 startObject, +0x0182 startObject; reviewed decoded instruction stream; compared with EGA Script 06 (click handler (input loop)), CD differences retained",
+    "fingerprint": "6EB33C672902C7DABF62677D15C0B45886EEA9C9855B566479CD1B12D1AB6F67",
+    "names": [
+      {
+        "kind": "var",
+        "id": 163,
+        "name": "exit the player arrived through",
+        "evidence": "decoded",
+        "source": "CD Script 06 +0x00F7 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 3,
+        "name": "an object's verb 0x37 is running",
+        "evidence": "decoded",
+        "source": "CD Script 06 +0x00FC in DISK01.LEC: move; reviewed role",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 4,
+        "name": "the walk and the sentence were stopped",
+        "evidence": "decoded",
+        "source": "CD Script 06 +0x0101 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "run a sentence (verb on an object)",
+    "evidence": "decoded",
+    "source": "CD Script 07 in DISK01.LEC: +0x001E print, +0x002E startObject, +0x004C chainScript; reviewed decoded instruction stream; compared with EGA Script 07 (run a sentence (verb on an object)), CD differences retained",
+    "fingerprint": "7C206ABC384783C682A7735FAD44D9B60B4797A775F4078F5EBE102D7D65872E",
+    "names": []
+  },
+  {
+    "id": 8,
+    "name": "show or hide the close-up in the verb area",
+    "evidence": "decoded",
+    "source": "CD Script 08 in DISK01.LEC: +0x0025 startObject, +0x0050 print; reviewed decoded instruction stream; compared with EGA Script 08 (show or hide the close-up in the verb area), CD differences retained",
+    "fingerprint": "84CA0B698B3CDCD28076867F3A9CACB80B2E4F45A3F31857A394B38F43DC98CB",
+    "names": []
+  },
+  {
+    "id": 9,
+    "name": "hint button (practice mode)",
+    "evidence": "reading",
+    "source": "CD Script 09 in DISK01.LEC: +0x000C chainScript, +0x001D chainScript; reviewed decoded instruction stream; compared with EGA Script 09 (hint button (practice mode)), CD differences retained",
+    "fingerprint": "7AACCF9C005EE3424DD93C2C08AEF59A4FA204900C39FA3270BC49834734CA18",
+    "names": []
+  },
+  {
+    "id": 10,
+    "name": "a distaff note was played",
+    "evidence": "decoded",
+    "source": "CD Script 10 in DISK01.LEC: +0x000C chainScript, +0x001D chainScript, +0x0027 chainScript, +0x004F chainScript; reviewed decoded instruction stream; compared with EGA Script 10 (a distaff note was played), CD differences retained",
+    "fingerprint": "133C69B964D26EED53F1E476584D8FAE67F13DC6A8DE5CB6C8D27086ACA03CD9",
+    "names": []
+  },
+  {
+    "id": 11,
+    "name": "\"That thread's too high for me.\"",
+    "evidence": "decoded",
+    "source": "CD Script 11 in DISK01.LEC: +0x0025 print; reviewed decoded instruction stream; compared with EGA Script 11 (\"that thread is too high for me\"), CD differences retained",
+    "fingerprint": "F74529642899D19A5F3F6057377DE1CEF5EB147841DF07B1D0502CD31CBFE1B3",
+    "names": []
+  },
+  {
+    "id": 12,
+    "name": "\"Maybe I should stand a bit closer.\"",
+    "evidence": "decoded",
+    "source": "CD Script 12 in DISK01.LEC: +0x001E print; reviewed decoded instruction stream; compared with EGA Script 12 (\"I should get closer\"), CD differences retained",
+    "fingerprint": "2123A6267B574ED2F85D03802D6CFFA56E4B08B15B0225A85A06C90D657038FF",
+    "names": []
+  },
+  {
+    "id": 13,
+    "name": "\"It might help to point at something first\"",
+    "evidence": "decoded",
+    "source": "CD Script 13 in DISK01.LEC: +0x001B print; reviewed decoded instruction stream; compared with EGA Script 13 (\"I should aim at something first\"), CD differences retained",
+    "fingerprint": "4C743E6844090986DEACD6F0A7133B329D29C051D12E0DA2057B0B71D73233BA",
+    "names": []
+  },
+  {
+    "id": 14,
+    "name": "after-entry hook",
+    "evidence": "decoded",
+    "source": "CD Script 14 in DISK01.LEC: +0x0000 equalZero, +0x0005 notEqualZero, +0x000A isEqual; reviewed decoded instruction stream; compared with EGA Script 14 (after-entry hook), CD differences retained",
+    "fingerprint": "B9F473511F714EEDEAB66D0F6D6A0610E1A06B94968694FCADA594A3E4A71A10",
+    "names": []
+  },
+  {
+    "id": 15,
+    "name": "before-exit hook",
+    "evidence": "decoded",
+    "source": "CD Script 15 in DISK01.LEC: +0x0024 print; reviewed decoded instruction stream; compared with EGA Script 15 (before-exit hook), CD differences retained",
+    "fingerprint": "02D07A72B6989CDA0787E33019471F6DC18F996DF7BBA012319AF1295B5AD54C",
+    "names": []
+  },
+  {
+    "id": 16,
+    "name": "set the text line",
+    "evidence": "decoded",
+    "source": "CD Script 16 in DISK01.LEC: +0x0005 print; reviewed decoded instruction stream; compared with EGA Script 16 (set the text line), CD differences retained",
+    "fingerprint": "A3D3ED098B54F5DABC95679ACB4FAC9890CF3EBF174792B79A6B516D15156220",
+    "names": []
+  },
+  {
+    "id": 17,
+    "name": "give the ego a costume (by size)",
+    "evidence": "decoded",
+    "source": "CD Script 17 in DISK01.LEC: +0x00BE actorOps, +0x00E3 actorOps; reviewed decoded instruction stream; compared with EGA Script 17 (give the ego a costume (by size)), CD differences retained",
+    "fingerprint": "B04C54CD2B565B221D9EDCA069EBBAF28B7E29FA9240F53BD4B0164F449C453D",
+    "names": []
+  },
+  {
+    "id": 18,
+    "name": "show the distaff",
+    "evidence": "decoded",
+    "source": "CD Script 18 in DISK01.LEC: +0x00D1 print, +0x010F print, +0x014D print, +0x018B print; reviewed decoded instruction stream; compared with EGA Script 18 (show the distaff), CD differences retained",
+    "fingerprint": "445E4C589F54C1E570A1094BE66802EEA59A2DF37399B62EE6986335EB5CB598",
+    "names": []
+  },
+  {
+    "id": 19,
+    "name": "hide the distaff verbs",
+    "evidence": "decoded",
+    "source": "CD Script 19 in DISK01.LEC: +0x0000 move, +0x0005 verbOps, +0x000A increment; reviewed decoded instruction stream; compared with EGA Script 19 (hide the distaff verbs), CD differences retained",
+    "fingerprint": "8FE0C9F7EBC2C308DD7A8BD9912494D05C14552096FADC28E49A3B6CC3B75C8B",
+    "names": []
+  },
+  {
+    "id": 20,
+    "name": "play the draft back",
+    "evidence": "reading",
+    "source": "CD Script 20 in DISK01.LEC: +0x0005 print, +0x004F actorOps, +0x005C actorOps, +0x0069 actorOps; reviewed decoded instruction stream; compared with EGA Script 20 (play the draft back), CD differences retained",
+    "fingerprint": "481FD25227F7612698036D9E8D1F9643E0919D8DAB1BABE06008B79EC8A1A511",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 16,
+        "name": "drafts are blocked by noise",
+        "evidence": "reading",
+        "source": "CD Script 20 +0x0000 in DISK01.LEC: notEqualZero; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "end the draft playback",
+    "evidence": "decoded",
+    "source": "CD Script 21 in DISK01.LEC: +0x001B actorOps, +0x0024 actorOps; reviewed decoded instruction stream; compared with EGA Script 21 (end the draft playback), CD differences retained",
+    "fingerprint": "0B06FC030DB2CE50C22A1B44653D94BB2C437EFD06EFF55C674C0270C804F8AD",
+    "names": []
+  },
+  {
+    "id": 22,
+    "name": "compare the played draft with the known ones",
+    "evidence": "reading",
+    "source": "CD Script 22 in DISK01.LEC: +0x001F print, +0x00BA chainScript, +0x011C chainScript, +0x014E print; reviewed decoded instruction stream; compared with EGA Script 22 (compare the played draft with the known ones), CD differences retained",
+    "fingerprint": "99986E1E73693425288F804CB0B68ED1002B77D31C7CEF337BFC061D65AC2196",
+    "names": []
+  },
+  {
+    "id": 23,
+    "name": "load draft N",
+    "evidence": "decoded",
+    "source": "CD Script 23 in DISK01.LEC: +0x0000 multiply, +0x0005 move, +0x000C increment; reviewed decoded instruction stream; compared with EGA Script 23 (load draft N), CD differences retained",
+    "fingerprint": "5743139E54168ED33DF1207AD685FFDF931C42D28B51AC733DB703A7AB010DFC",
+    "names": []
+  },
+  {
+    "id": 24,
+    "name": "check whether draft N is learned",
+    "evidence": "decoded",
+    "source": "CD Script 24 in DISK01.LEC: +0x0000 move, +0x0005 multiply, +0x000A move; reviewed decoded instruction stream",
+    "fingerprint": "6A843D8AD4F2E43CE7E9E7DC5F4CC24594C409694F654ED5CE3999F7ED5CCAC8",
+    "names": []
+  },
+  {
+    "id": 25,
+    "name": "mark draft N as learned",
+    "evidence": "decoded",
+    "source": "CD Script 25 in DISK01.LEC: +0x0000 move, +0x0005 move, +0x000A multiply; reviewed decoded instruction stream",
+    "fingerprint": "EA20B6FB7EFF5FAE6F998602A4ED57CDDFC895232F40761DA946CCBE7C2B4D5C",
+    "names": []
+  },
+  {
+    "id": 26,
+    "name": "run the matched draft on the aimed object",
+    "evidence": "reading",
+    "source": "CD Script 26 in DISK01.LEC: +0x0019 print, +0x00B1 print; reviewed decoded instruction stream",
+    "fingerprint": "4BC79F7D2E866E2CAE2D6AB9543F4AEF0B084552DE2CB2B4F27094DCD37DC804",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 8,
+        "name": "the draft response was refused or consumed",
+        "evidence": "reading",
+        "source": "CD Script 26 +0x0067 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "name": "mark a note in the verb area",
+    "evidence": "reading",
+    "source": "CD Script 27 in DISK01.LEC: +0x003C print, +0x0052 print, +0x0068 print, +0x007E print; reviewed decoded instruction stream; compared with EGA Script 27 (mark a note in the verb area), CD differences retained",
+    "fingerprint": "0B8B9CAF3CD3963C941FC6C6FA64DDA1E637B90C3633C0DDEF04BFE937CA204E",
+    "names": []
+  },
+  {
+    "id": 28,
+    "name": "clear the draft buffer",
+    "evidence": "decoded",
+    "source": "CD Script 28 in DISK01.LEC: +0x0000 isEqual, +0x0007 isNotEqual, +0x000E startScript; reviewed decoded instruction stream; compared with EGA Script 28 (clear the draft buffer), CD differences retained",
+    "fingerprint": "F1AB17DA4D1D52FC457C3649365357CC707EA6873EDFA3D9E17B68CCD97BDBE7",
+    "names": []
+  },
+  {
+    "id": 29,
+    "name": "learning glow",
+    "evidence": "reading",
+    "source": "CD Script 29 in DISK01.LEC: +0x0031 actorOps, +0x006D print; reviewed decoded instruction stream; compared with EGA Script 29 (learning glow), CD differences retained",
+    "fingerprint": "EDB0574782AA127C96D9B32F1A9BF2CA18ABF12CFBE22FDEB2965EE15888FB0E",
+    "names": []
+  },
+  {
+    "id": 30,
+    "name": "play one note of a draft on an object",
+    "evidence": "decoded",
+    "source": "CD Script 30 in DISK01.LEC: +0x0012 chainScript; reviewed decoded instruction stream; compared with EGA Script 30 (play one note of a draft on an object), CD differences retained",
+    "fingerprint": "569F352F0323C0BA69E2A473592460A629C8A5D2AAFBA5354D6F8376D45CF4FC",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 12,
+        "name": "play a note on an object",
+        "evidence": "decoded",
+        "source": "CD Script 30 +0x0000 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "name": "animate and sound one note",
+    "evidence": "decoded",
+    "source": "CD Script 31 in DISK01.LEC: +0x0054 print, +0x0095 print, +0x00D6 print, +0x0117 print; reviewed decoded instruction stream; compared with EGA Script 31 (animate and sound one note), CD differences retained",
+    "fingerprint": "2717848603ECE0314DACE53B4806AC18813C28189313C13B3C902D698F40F80F",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 7,
+        "name": "a note is playing",
+        "evidence": "decoded",
+        "source": "CD Script 31 +0x0000 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "name": "recolour an actor's palette",
+    "evidence": "decoded",
+    "source": "CD Script 32 in DISK01.LEC: +0x0005 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "41605729B345D56E8D64BA0A4F141C980527F01B66DF5E838AE3A6B2D76A1471",
+    "names": []
+  },
+  {
+    "id": 33,
+    "name": "restore an actor's palette",
+    "evidence": "decoded",
+    "source": "CD Script 33 in DISK01.LEC: +0x0005 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "A81747990B707C5A059455EE5CC1893AB8B76C587E74E7EAFDE1B2E1E4F36A26",
+    "names": []
+  },
+  {
+    "id": 34,
+    "name": "mark draft N's last-note knowledge",
+    "evidence": "reading",
+    "source": "CD Script 34 in DISK01.LEC: +0x0000 move, +0x0005 move, +0x000A multiply; reviewed decoded instruction stream",
+    "fingerprint": "0343815CCA5756DF505C19AE31D68BB389E2C3FCA3573EBE911E2C3FE7C46248",
+    "names": []
+  },
+  {
+    "id": 35,
+    "name": "reject a draft response",
+    "evidence": "reading",
+    "source": "CD Script 35 in DISK01.LEC: +0x0016 print; reviewed decoded instruction stream",
+    "fingerprint": "9EF922A27678D1B5E839879A116B37C9489FDC0F7752FC01FFF30B9679894C5B",
+    "names": []
+  },
+  {
+    "id": 36,
+    "name": "restore the note letters",
+    "evidence": "decoded",
+    "source": "CD Script 36 in DISK01.LEC: +0x0024 print, +0x003B print, +0x0052 print, +0x0069 print; reviewed decoded instruction stream",
+    "fingerprint": "FDD24F7246AA95A6193ED50A87D0CBE1CB79D79C6B76E08BFD435C02F178C728",
+    "names": []
+  },
+  {
+    "id": 37,
+    "name": "play the queued sound and wait",
+    "evidence": "decoded",
+    "source": "CD Script 37 in DISK01.LEC: +0x0000 notEqualZero, +0x0005 breakHere, +0x0006 move; reviewed decoded instruction stream",
+    "fingerprint": "7BF347A4653728E4B773CDBB38B8DD4716FFD1A0B80F634CA93E3FBC19B7DC2E",
+    "names": []
+  },
+  {
+    "id": 38,
+    "name": "stop queued and current sounds",
+    "evidence": "decoded",
+    "source": "CD Script 38 in DISK01.LEC: +0x0000 notEqualZero, +0x0005 stopSound, +0x0008 notEqualZero; reviewed decoded instruction stream",
+    "fingerprint": "18868E3041190D7F35EC854F658C26F40DF732302441CC10DA5C12865B507351",
+    "names": []
+  },
+  {
+    "id": 39,
+    "name": "return immediately (CD stub)",
+    "evidence": "decoded",
+    "source": "CD Script 39 in DISK01.LEC: +0x0000 stopObjectCode; reviewed decoded instruction stream; compared with EGA Script 39 (play a sound (music)), CD differences retained",
+    "fingerprint": "8252F5F031F7600CD54D17D2B08D2BFCC50F5D298BF93331E2E3E2E0820FA8B4",
+    "names": []
+  },
+  {
+    "id": 40,
+    "name": "play a CD effect cue",
+    "evidence": "decoded",
+    "source": "CD Script 40 in DISK01.LEC: +0x0007 print, +0x0016 print; reviewed decoded instruction stream; compared with EGA Script 40 (play a sound (effect)), CD differences retained",
+    "fingerprint": "89F32C355CDDCE3BA84F1FC9338BF9FA2350D28BD27BA073E3FE1BE9693FDF06",
+    "names": []
+  },
+  {
+    "id": 41,
+    "name": "spell visual at a point",
+    "evidence": "reading",
+    "source": "CD Script 41 in DISK01.LEC: +0x001F actorOps, +0x008C actorOps; reviewed decoded instruction stream; compared with EGA Script 41 (spell visual at a point), CD differences retained",
+    "fingerprint": "9E3F4DC7FE8A576620FAFCC1AE5F498BC09F1A9644F16F3A38905C588242C20F",
+    "names": []
+  },
+  {
+    "id": 42,
+    "name": "Room 03's flying actor",
+    "evidence": "decoded",
+    "source": "CD Script 42 in DISK01.LEC: +0x000D actorOps; reviewed decoded instruction stream; compared with EGA Script 42 (Room 03's flying actor), CD differences retained",
+    "fingerprint": "C074FDF17350C4BF4810DB15DE7B804049EF1C3DEFE4308C8E8E9DA5861D6A7B",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 26,
+        "name": "script 042's actor is on screen",
+        "evidence": "decoded",
+        "source": "CD Script 42 +0x0058 in DISK01.LEC: move; reviewed role",
+        "scope": null
+      },
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "flying actor of Room 03",
+        "evidence": "decoded",
+        "source": "CD Script 42 +0x000D in DISK01.LEC: actorOps; reviewed role",
+        "scope": "script:42"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "name": "\"You cannot save a demonstration game.\"",
+    "evidence": "decoded",
+    "source": "CD Script 43 in DISK01.LEC: +0x0000 print; reviewed decoded instruction stream",
+    "fingerprint": "14F9BCD4110CBA66A2FFB82D02AE9292D091EC036F4129B3D1CB443B4DCCB20B",
+    "names": []
+  },
+  {
+    "id": 44,
+    "name": "opening cutscene",
+    "evidence": "decoded",
+    "source": "CD Script 44 in DISK01.LEC: +0x008F loadRoom, +0x00B4 actorOps, +0x0107 print, +0x0163 loadRoom; reviewed decoded instruction stream; compared with EGA Script 44 (opening cutscene), CD differences retained",
+    "fingerprint": "7A5455BC792C4002067CF03220BF0F53A42E05960097972DB014F69420A9F376",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "fairy",
+        "evidence": "reading",
+        "source": "CD Script 44 +0x0345 in DISK01.LEC: actorOps; reviewed role",
+        "scope": "script:44"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "name": "Room 02 walk-box watcher",
+    "evidence": "decoded",
+    "source": "CD Script 45 in DISK01.LEC: +0x0000 breakHere, +0x0001 getActorWalkBox, +0x0005 breakHere; reviewed decoded instruction stream; compared with EGA Script 45 (Room 02 walk-box watcher), CD differences retained",
+    "fingerprint": "0EC988C59F834646D94C0FB3441128932292DD6A54C28C7246AE573271F5ABBB",
+    "names": []
+  },
+  {
+    "id": 46,
+    "name": "the Elders' trial",
+    "evidence": "decoded",
+    "source": "CD Script 46 in DISK01.LEC: +0x00B1 print, +0x0127 actorOps, +0x014C print, +0x0199 print; reviewed decoded instruction stream; compared with EGA Script 46 (the Elders' trial), CD differences retained",
+    "fingerprint": "D6DDEC6B0BF6E2DC06827B035B79B9585EDE6717E3B4BE872ECDECECD7284BC7",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Elder (actor 2)",
+        "evidence": "reading",
+        "source": "CD Script 46 +0x014C in DISK01.LEC: print; reviewed role",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Elder (actor 3)",
+        "evidence": "reading",
+        "source": "CD Script 46 +0x05ED in DISK01.LEC: print; reviewed role",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "Elder (actor 4)",
+        "evidence": "reading",
+        "source": "CD Script 46 +0x0320 in DISK01.LEC: print; reviewed role",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "CD Script 46 +0x02CD in DISK01.LEC: print; reviewed role",
+        "scope": "script:46"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "name": "Hetchel speaks after the trial",
+    "evidence": "reading",
+    "source": "CD Script 47 in DISK01.LEC: +0x004B actorOps, +0x0095 actorOps, +0x011A print, +0x013D print; reviewed decoded instruction stream",
+    "fingerprint": "AE87EF7EB7C446D5DF443667DD0136F75F607FA5C0FA3B4431505EBFF4F28660",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "CD Script 47 +0x01E9 in DISK01.LEC: print; reviewed role",
+        "scope": "script:47"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "name": "Room 63 to Room 62 transition",
+    "evidence": "reading",
+    "source": "CD Script 48 in DISK01.LEC: +0x0040 actorOps, +0x00BB loadRoom, +0x00C0 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "7936997DB3CD473F4208C3526CF0E6A6F3AB9CACC1BCEFBF8BD023FF95B7C40B",
+    "names": []
+  },
+  {
+    "id": 49,
+    "name": "whirlwind scene (Rooms 02 and 11)",
+    "evidence": "reading",
+    "source": "CD Script 49 in DISK01.LEC: +0x000A print, +0x00A9 actorOps, +0x00EB print, +0x0106 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "CB51029EC77FADBC4A3B0A69A6C8837868B0F443B019FF2B831FFC25D241C1C8",
+    "names": []
+  },
+  {
+    "id": 50,
+    "name": "Room 03 to Room 10 transition",
+    "evidence": "decoded",
+    "source": "CD Script 50 in DISK01.LEC: +0x0000 loadRoom, +0x0015 actorOps, +0x003C loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "F67A648901CE18FEAF5A66D91571367F25B3B512D59A0781F39343539048BB39",
+    "names": []
+  },
+  {
+    "id": 52,
+    "name": "Room 10 to Room 13 cutscene",
+    "evidence": "decoded",
+    "source": "CD Script 52 in DISK01.LEC: +0x0013 actorOps, +0x0045 loadRoom, +0x0070 actorOps, +0x00A9 actorOps; reviewed decoded instruction stream; compared with EGA Script 52 (Room 10 to Room 13 cutscene), CD differences retained",
+    "fingerprint": "CEB5494AA1FC72ACBB25FB875E3AE07D31AB120E5E671372A6B96EE9F9CE2761",
+    "names": []
+  },
+  {
+    "id": 53,
+    "name": "Room 13 scene with actors 8 and 9",
+    "evidence": "decoded",
+    "source": "CD Script 53 in DISK01.LEC: +0x003A actorOps, +0x0061 actorOps, +0x007D print, +0x0111 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "FCA56F318A18C1EF21A80AB2002B2BAEDFF3CCDBEEC7719FDC2AB827DB247938",
+    "names": []
+  },
+  {
+    "id": 54,
+    "name": "Room 15 arrival and learning glow",
+    "evidence": "decoded",
+    "source": "CD Script 54 in DISK01.LEC: +0x000A loadRoom, +0x0020 actorOps, +0x0038 actorOps, +0x0056 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "769E25D19015B9930F1BE571B955F7170266CF3CE37F2D924E394EC58D178100",
+    "names": []
+  },
+  {
+    "id": 56,
+    "name": "transition into Room 20",
+    "evidence": "decoded",
+    "source": "CD Script 56 in DISK01.LEC: +0x0012 print, +0x0036 loadRoom, +0x003B chainScript; reviewed decoded instruction stream",
+    "fingerprint": "E56AA62C398C0400045BF3F9BBA49AB7DD98190790BF742961E871020E388EE6",
+    "names": []
+  },
+  {
+    "id": 57,
+    "name": "room-local transition through scripts 200 and 207",
+    "evidence": "decoded",
+    "source": "CD Script 57 in DISK01.LEC: +0x002A chainScript; reviewed decoded instruction stream",
+    "fingerprint": "C8F48F805DF6CA959E7DD86A5FECB4BDE35FB67F1B179E92A40A81916209DFFC",
+    "names": []
+  },
+  {
+    "id": 58,
+    "name": "room-local transition through scripts 200 and 59",
+    "evidence": "decoded",
+    "source": "CD Script 58 in DISK01.LEC: +0x0019 chainScript; reviewed decoded instruction stream",
+    "fingerprint": "479645E25EEC63643108F77F928F6C83ACA94BBECDAC701BC0755016E0E58430",
+    "names": []
+  },
+  {
+    "id": 59,
+    "name": "transition into Room 18",
+    "evidence": "decoded",
+    "source": "CD Script 59 in DISK01.LEC: +0x000A loadRoom, +0x0016 print; reviewed decoded instruction stream",
+    "fingerprint": "6C4FECA314C8113221D2EF449879DA587B7A9938912A2C5A4B7BC55BDC68CED8",
+    "names": []
+  },
+  {
+    "id": 60,
+    "name": "room-local transition through scripts 201 and 61",
+    "evidence": "decoded",
+    "source": "CD Script 60 in DISK01.LEC: +0x0019 chainScript; reviewed decoded instruction stream",
+    "fingerprint": "246C59E6B53991DEB1CA19C9C78A04E8FD983147DC0917C9CBB86A96039AEE4F",
+    "names": []
+  },
+  {
+    "id": 61,
+    "name": "Room 18 arrival through local 203",
+    "evidence": "decoded",
+    "source": "CD Script 61 in DISK01.LEC: +0x000A loadRoom, +0x0016 print; reviewed decoded instruction stream",
+    "fingerprint": "B7AE2C07F39F69FAB6DFD4055F770A817A2EC376E7CFAC44F88F87FC4DF1C536",
+    "names": []
+  },
+  {
+    "id": 62,
+    "name": "transition into Room 20 through script 63",
+    "evidence": "decoded",
+    "source": "CD Script 62 in DISK01.LEC: +0x0005 print, +0x0029 loadRoom, +0x002E chainScript; reviewed decoded instruction stream",
+    "fingerprint": "B3A75EB73B83955A7BC744E8009140F2A96DB1F8F7C2F84B2F85D8DF94090620",
+    "names": []
+  },
+  {
+    "id": 63,
+    "name": "room-local transition through scripts 201 and 207",
+    "evidence": "decoded",
+    "source": "CD Script 63 in DISK01.LEC: +0x001D chainScript; reviewed decoded instruction stream",
+    "fingerprint": "8734D4D7EDC9BB7DB0371B2C8F47848240C8209B4E8EE726D9F9C85800BAC830",
+    "names": []
+  },
+  {
+    "id": 64,
+    "name": "\"Huh! A glass bell!\"",
+    "evidence": "reading",
+    "source": "CD Script 64 in DISK01.LEC: +0x0009 print, +0x002D print; reviewed decoded instruction stream",
+    "fingerprint": "D9EECD5C3166FE92ED1D38BC35F972AF8300A2A798F9F28ECCBF5B267988B56B",
+    "names": []
+  },
+  {
+    "id": 65,
+    "name": "Room 19 spell scene",
+    "evidence": "reading",
+    "source": "CD Script 65 in DISK01.LEC: +0x0015 loadRoom, +0x002B actorOps, +0x0091 actorOps, +0x00A9 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "A3A48FC5BC646B0E4C62A290D21F389FE4F1C9D6A61F0FBC98C4625DB3F0017B",
+    "names": []
+  },
+  {
+    "id": 66,
+    "name": "Goodmold conversation in Room 17",
+    "evidence": "reading",
+    "source": "CD Script 66 in DISK01.LEC: +0x001F actorOps, +0x003C actorOps, +0x0042 actorOps, +0x0048 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "1CC255875B7C5D5968F48F65CBEA6CC4368AB5607C7D1DE92FF81D9A8DB1E5A5",
+    "names": []
+  },
+  {
+    "id": 67,
+    "name": "Goodmold conversation in Room 22",
+    "evidence": "reading",
+    "source": "CD Script 67 in DISK01.LEC: +0x0095 loadRoom, +0x009D print, +0x00B1 chainScript; reviewed decoded instruction stream",
+    "fingerprint": "648D64ABCAB4279A32803C5DD6E85A197F991209F1D79231822E1EE0A9D735D9",
+    "names": []
+  },
+  {
+    "id": 68,
+    "name": "Master Goodmold's greeting",
+    "evidence": "reading",
+    "source": "CD Script 68 in DISK01.LEC: +0x002B print, +0x0064 actorOps, +0x0077 print, +0x00E8 print; reviewed decoded instruction stream",
+    "fingerprint": "3B174F7A21FFD5B92D2BEAB39AE358E64DDD439B35BA00712D97A0BC96427D81",
+    "names": []
+  },
+  {
+    "id": 69,
+    "name": "Fleece's greeting and the sheep problem",
+    "evidence": "reading",
+    "source": "CD Script 69 in DISK01.LEC: +0x003F print, +0x0083 print, +0x00BA actorOps, +0x0100 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "CADA3E7EEEA9BCDF1F4FFC1FF683F18AB28AA1BA3423B589DD36E3F0924023CD",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Fleece",
+        "evidence": "reading",
+        "source": "CD Script 69 +0x0180 in DISK01.LEC: print; reviewed role",
+        "scope": "script:69"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "name": "Room 24 sheep scene",
+    "evidence": "decoded",
+    "source": "CD Script 70 in DISK01.LEC: +0x0039 actorOps, +0x00C1 actorOps, +0x00E8 actorOps, +0x00EF print; reviewed decoded instruction stream",
+    "fingerprint": "15E8569F64D8BCF4F5F8AF4D91F1C21662852F37283ED2DBED3FA50C50079E4F",
+    "names": []
+  },
+  {
+    "id": 71,
+    "name": "\"I'm dizzy!\"",
+    "evidence": "reading",
+    "source": "CD Script 71 in DISK01.LEC: +0x0014 print; reviewed decoded instruction stream",
+    "fingerprint": "EC30E33C597C58A8DBDD798759B1F66F3A625EA17F0069C90422A99F47988F92",
+    "names": []
+  },
+  {
+    "id": 72,
+    "name": "Room 65 to Room 30 transition",
+    "evidence": "decoded",
+    "source": "CD Script 72 in DISK01.LEC: +0x0024 loadRoom, +0x004B loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "FCE77D1A2F095F5ECE7EDB2AA1DC11859CE98A71FED0A4068C997EF017D87D1C",
+    "names": []
+  },
+  {
+    "id": 73,
+    "name": "walk actor 8 across Room 24",
+    "evidence": "decoded",
+    "source": "CD Script 73 in DISK01.LEC: +0x000D actorOps, +0x0030 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "5A4A49BE293191D717009AF32DD3EE77EF137146F7C295B0F3A09479F093700B",
+    "names": []
+  },
+  {
+    "id": 74,
+    "name": "dragon's arrival greeting (Room 28)",
+    "evidence": "reading",
+    "source": "CD Script 74 in DISK01.LEC: +0x000C loadRoom, +0x0012 print, +0x0041 actorOps, +0x0047 print; reviewed decoded instruction stream",
+    "fingerprint": "543A7305E600BF69D957AB483EB8D32647E7C291642894D5B46D58DFA40C8F65",
+    "names": []
+  },
+  {
+    "id": 75,
+    "name": "conversation with the hungry dragon",
+    "evidence": "reading",
+    "source": "CD Script 75 in DISK01.LEC: +0x0009 actorOps, +0x000F print, +0x0059 actorOps, +0x0069 print; reviewed decoded instruction stream",
+    "fingerprint": "4F0EE2685DBEC10FF3DA3F53549786AE216C8BC7115CE47B9A248965B870111E",
+    "names": []
+  },
+  {
+    "id": 76,
+    "name": "dragon leaves Room 27",
+    "evidence": "reading",
+    "source": "CD Script 76 in DISK01.LEC: +0x0002 loadRoom, +0x0014 actorOps, +0x0034 print, +0x00A2 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "334FECB172905628001CAD64479D69490360C692710920B9A5FAE99A3C6C64E1",
+    "names": []
+  },
+  {
+    "id": 77,
+    "name": "Room 28 arrival and object classes",
+    "evidence": "decoded",
+    "source": "CD Script 77 in DISK01.LEC: +0x0009 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "3DE2142BBC5CA7A19846AC33473A336AE80DCBED368390DD6DE5BF69835815E1",
+    "names": []
+  },
+  {
+    "id": 78,
+    "name": "Room 65 scene and arrival in Room 30",
+    "evidence": "decoded",
+    "source": "CD Script 78 in DISK01.LEC: +0x0028 actorOps, +0x00AA actorOps, +0x00E2 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "F74A157983FA6C69AC7ADDD225221409697CEF9E87ACD40239C50EF2AEA716CD",
+    "names": []
+  },
+  {
+    "id": 79,
+    "name": "Room 32 arrival and walk-box changes",
+    "evidence": "decoded",
+    "source": "CD Script 79 in DISK01.LEC: +0x001C loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "17132E18C1FEBB5BDF6DB58A5532B075F5F6A2229F93E3FD84F07719BA4A79BA",
+    "names": []
+  },
+  {
+    "id": 80,
+    "name": "Room 32 arrival",
+    "evidence": "decoded",
+    "source": "CD Script 80 in DISK01.LEC: +0x0026 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "C9227EAA6BD92134B605282723BA84DBDD149B2DAA01C26E6283A3DA8A28FDAF",
+    "names": []
+  },
+  {
+    "id": 81,
+    "name": "Room 30 arrival and lighting",
+    "evidence": "decoded",
+    "source": "CD Script 81 in DISK01.LEC: +0x0019 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "6D5F3C04EF5CF6EF561FBA32B7BBB91336C79EDC8CC1DCD135CCD472DAFCCAC5",
+    "names": []
+  },
+  {
+    "id": 82,
+    "name": "arrival in Room 31 and blocked return",
+    "evidence": "reading",
+    "source": "CD Script 82 in DISK01.LEC: +0x0005 print, +0x000D actorOps, +0x0031 print, +0x0049 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "7BA487B0B6C71119EEF6B942C5B51416CDBF23FD1CF34B011B50D05E24668B92",
+    "names": []
+  },
+  {
+    "id": 83,
+    "name": "Room 30 arrival",
+    "evidence": "decoded",
+    "source": "CD Script 83 in DISK01.LEC: +0x0019 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "C5214D5A59A4AC38D5B670083FD91B57DE1C1D8568858DFF905698DF6E6B6A8F",
+    "names": []
+  },
+  {
+    "id": 84,
+    "name": "Room 31 arrival",
+    "evidence": "decoded",
+    "source": "CD Script 84 in DISK01.LEC: +0x0019 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "749B9FE5DB4727DCF3AB3E478A0034E153BDB86D86A5357596B4F1475407811B",
+    "names": []
+  },
+  {
+    "id": 85,
+    "name": "Rusty Nailbender's greeting",
+    "evidence": "reading",
+    "source": "CD Script 85 in DISK01.LEC: +0x0032 print, +0x004C print, +0x008B print, +0x009B print; reviewed decoded instruction stream",
+    "fingerprint": "0443EEF422521083060986B38198464ABCCB5B57EA45341DA79A5DE0E2F08A3F",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty",
+        "evidence": "reading",
+        "source": "CD Script 85 +0x013A in DISK01.LEC: print; reviewed role",
+        "scope": "script:85"
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "name": "firewood scene",
+    "evidence": "reading",
+    "source": "CD Script 86 in DISK01.LEC: +0x0043 print, +0x0097 print, +0x0130 print, +0x019B print; reviewed decoded instruction stream; compared with EGA Script 86 (firewood scene), CD differences retained",
+    "fingerprint": "C569C5B284CF9FB7447C4904BD8047A36C4A0A7717A5B1A279E37E24BB8EC23B",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Mr. Stoke",
+        "evidence": "reading",
+        "source": "CD Script 86 +0x0043 in DISK01.LEC: print; reviewed role",
+        "scope": "script:86"
+      }
+    ]
+  },
+  {
+    "id": 87,
+    "name": "ghost scene (with CD close-up in Room 96)",
+    "evidence": "reading",
+    "source": "CD Script 87 in DISK01.LEC: +0x006A loadRoom, +0x0078 print, +0x00DD actorOps, +0x00F8 print; reviewed decoded instruction stream; compared with EGA Script 87 (ghost scene), CD differences retained",
+    "fingerprint": "074644758F962A98251862DFD6FDFE25914161E035AD3492C02F9F884AF3AA6D",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Mr. Stoke",
+        "evidence": "reading",
+        "source": "CD Script 87 +0x0381 in DISK01.LEC: print; reviewed role",
+        "scope": "script:87"
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "name": "Room 34 scene with actors 3, 5 and 6",
+    "evidence": "decoded",
+    "source": "CD Script 88 in DISK01.LEC: +0x0000 loadRoom, +0x0021 actorOps, +0x0049 actorOps, +0x00E9 print; reviewed decoded instruction stream",
+    "fingerprint": "47A5B2F5BA2DBE26D4512FAF962B15D8F6E98E8F5CDBC0B3CA832C0F7CEB20E6",
+    "names": []
+  },
+  {
+    "id": 89,
+    "name": "Room 11 scene with actor 4",
+    "evidence": "decoded",
+    "source": "CD Script 89 in DISK01.LEC: +0x0010 loadRoom, +0x0025 actorOps, +0x0041 print, +0x007D loadRoomWithEgo; reviewed decoded instruction stream",
+    "fingerprint": "5808E6EFA6F54ADB34558A18F24071B0C49E8434E3D50306095F2796701A7CE3",
+    "names": []
+  },
+  {
+    "id": 90,
+    "name": "Room 42 flashes and Mandible's introduction",
+    "evidence": "reading",
+    "source": "CD Script 90 in DISK01.LEC: +0x0005 loadRoom, +0x001D actorOps, +0x00D2 loadRoom, +0x00E2 print; reviewed decoded instruction stream; compared with EGA Script 90 (Room 42 flashes), CD differences retained",
+    "fingerprint": "8BFCF7E6099297146F7CCE2CB429C4C8AC5CC39F82D9E1E613CE9CC87B6633B9",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "CD Script 90 +0x0176 in DISK01.LEC: print; reviewed role",
+        "scope": "script:90"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "CD Script 90 +0x02AD in DISK01.LEC: print; reviewed role",
+        "scope": "script:90"
+      }
+    ]
+  },
+  {
+    "id": 91,
+    "name": "Room 43 cage scene",
+    "evidence": "reading",
+    "source": "CD Script 91 in DISK01.LEC: +0x000A print, +0x0045 actorOps, +0x00DC actorOps, +0x00F9 actorOps; reviewed decoded instruction stream; compared with EGA Script 91 (Room 43 cage scene), CD differences retained",
+    "fingerprint": "2A0EFA90EC20BF13A4E01B6D9D9A7C2B76208E28DF1D0503658FEF45D0EE6143",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "CD Script 91 +0x0132 in DISK01.LEC: print; reviewed role",
+        "scope": "script:91"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "CD Script 91 +0x0A02 in DISK01.LEC: print; reviewed role",
+        "scope": "script:91"
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "name": "Room 43 arrival",
+    "evidence": "decoded",
+    "source": "CD Script 92 in DISK01.LEC: +0x0005 loadRoom, +0x0025 actorOps, +0x005B actorOps; reviewed decoded instruction stream",
+    "fingerprint": "29A471D42866523581ABB60305325B354EF34AEC76B204F1802D7D6593D1531E",
+    "names": []
+  },
+  {
+    "id": 93,
+    "name": "Room 43 cage scene, second part",
+    "evidence": "reading",
+    "source": "CD Script 93 in DISK01.LEC: +0x0045 actorOps, +0x0051 print, +0x0096 print, +0x00D3 print; reviewed decoded instruction stream; compared with EGA Script 93 (Room 43 cage scene, second part), CD differences retained",
+    "fingerprint": "84360DA016FF8D34E821DF3A9D2DA1F7A706D7FABEB637CBB1E4881D847800ED",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "CD Script 93 +0x0051 in DISK01.LEC: print; reviewed role",
+        "scope": "script:93"
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "name": "Room 19 scene with actors 2 and 3",
+    "evidence": "decoded",
+    "source": "CD Script 94 in DISK01.LEC: +0x0015 loadRoom, +0x002B actorOps, +0x009F actorOps, +0x00EE actorOps; reviewed decoded instruction stream",
+    "fingerprint": "F2CD0A6C81DA37DBF1A181347377AE9FAD16308E999349D8DCF88B0437D1741E",
+    "names": []
+  },
+  {
+    "id": 95,
+    "name": "Mandible opens the Pattern",
+    "evidence": "reading",
+    "source": "CD Script 95 in DISK01.LEC: +0x0075 print, +0x00B5 print, +0x0100 print, +0x0122 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "BBCC270000608AFCC78BF7AA4882E9D5ECA9170E178D36CDEC89E3DA991C287C",
+    "names": []
+  },
+  {
+    "id": 96,
+    "name": "Room 45 fall",
+    "evidence": "decoded",
+    "source": "CD Script 96 in DISK01.LEC: +0x0010 actorOps, +0x0036 loadRoom, +0x005D print, +0x0092 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "B7FCC263F35CBC7896EC82DB32175837E8E885B064F66EFFA8FE331F37FE946E",
+    "names": []
+  },
+  {
+    "id": 97,
+    "name": "Room 34 arrival",
+    "evidence": "decoded",
+    "source": "CD Script 97 in DISK01.LEC: +0x0013 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "FF02E850021BDD1E4E659F09A503843D5E13844B5DE8AC279E319FF0D0F4B6BD",
+    "names": []
+  },
+  {
+    "id": 98,
+    "name": "Room 34 ghost walk",
+    "evidence": "reading",
+    "source": "CD Script 98 in DISK01.LEC: +0x0060 print, +0x007D print, +0x00BF print, +0x0100 print; reviewed decoded instruction stream; compared with EGA Script 98 (Room 34 ghost walk), CD differences retained",
+    "fingerprint": "949C1A090864EA6E39996D52AA4EDBEF18D239B9F4D8D5783D9C4628FC157E7A",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty (ghost)",
+        "evidence": "reading",
+        "source": "CD Script 98 +0x00BF in DISK01.LEC: print; reviewed role",
+        "scope": "script:98"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "name": "Goodmold's aftermath and Room 20 objects",
+    "evidence": "reading",
+    "source": "CD Script 99 in DISK01.LEC: +0x0073 print, +0x00A8 actorOps, +0x00AF print, +0x00DF actorOps; reviewed decoded instruction stream; compared with EGA Script 99 (draws Room 20's objects), CD differences retained",
+    "fingerprint": "197ADB5319AB5A76633FE250AFB2A1F76C9AD543998D4CBB45018A1DA7700F0F",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Master Goodmold",
+        "evidence": "reading",
+        "source": "CD Script 99 +0x00AF in DISK01.LEC: print; reviewed role",
+        "scope": "script:99"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "name": "Bobbin speaks with his mother",
+    "evidence": "reading",
+    "source": "CD Script 100 in DISK01.LEC: +0x0013 print, +0x0040 print, +0x0072 print, +0x00A5 print; reviewed decoded instruction stream",
+    "fingerprint": "CCA2B386B83385B4341EDF5326E2F679D5BEE3D5395D832FD6CE1548510584B0",
+    "names": []
+  },
+  {
+    "id": 101,
+    "name": "Hetchel confronts the Dead One",
+    "evidence": "reading",
+    "source": "CD Script 101 in DISK01.LEC: +0x0034 actorOps, +0x0051 actorOps, +0x008F print, +0x00C8 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "D6D697CC08F61E19A148FAACBE2D2E6661D456E1538F1AB6D10F239D9C9C4B74",
+    "names": []
+  },
+  {
+    "id": 102,
+    "name": "departure to Room 66",
+    "evidence": "decoded",
+    "source": "CD Script 102 in DISK01.LEC: +0x0018 actorOps, +0x0027 print, +0x00A2 loadRoom, +0x00D2 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "5D355735CA932ED83EAB603D00A035E72043431C93169F5E76FB5F5B82B7684E",
+    "names": []
+  },
+  {
+    "id": 103,
+    "name": "\"That side of the Pattern is now beyond the reach of our threads.\"",
+    "evidence": "reading",
+    "source": "CD Script 103 in DISK01.LEC: +0x001B print; reviewed decoded instruction stream",
+    "fingerprint": "9E64348A94967045D6FDA28BD7C812E7C93D8E43B36650E87F8BEF1B9BDE5A52",
+    "names": []
+  },
+  {
+    "id": 104,
+    "name": "Room 51 scene with actors 1, 3 and 4",
+    "evidence": "decoded",
+    "source": "CD Script 104 in DISK01.LEC: +0x007B print, +0x0094 actorOps, +0x00C6 actorOps, +0x00D5 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "7C2440DF0B13B9AA488547C5EEE7A1017FDCB8D0B4AE38FDEBF1CE2C44D0F571",
+    "names": []
+  },
+  {
+    "id": 105,
+    "name": "Hetchel's feather and the Dead One",
+    "evidence": "reading",
+    "source": "CD Script 105 in DISK01.LEC: +0x0047 print, +0x00C0 print, +0x0130 print, +0x0186 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "99C74E5F063121D0F5E286C70E29FE53ABA4A4348BE5823FEC1EA7E7868ED3BB",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "CD Script 105 +0x00C0 in DISK01.LEC: print; reviewed role",
+        "scope": "script:105"
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "name": "ending in Room 66",
+    "evidence": "reading",
+    "source": "CD Script 106 in DISK01.LEC: +0x0051 actorOps, +0x00B7 actorOps, +0x00DC actorOps, +0x012B print; reviewed decoded instruction stream",
+    "fingerprint": "4B79670736BFC8885CA5D70DC58825CEE9A92B0DD68F0FCB7EB7E99C1C1D77A4",
+    "names": []
+  },
+  {
+    "id": 107,
+    "name": "Room 10 arrival and object classes",
+    "evidence": "decoded",
+    "source": "CD Script 107 in DISK01.LEC: +0x0005 loadRoom, +0x0080 actorOps, +0x0098 actorOps, +0x00D0 chainScript; reviewed decoded instruction stream",
+    "fingerprint": "A20638D6BE7101CDEA3BD3AFC711A1294E05A41B6450DE0D46005AF9F49C24BA",
+    "names": []
+  },
+  {
+    "id": 108,
+    "name": "glassmakers scene",
+    "evidence": "reading",
+    "source": "CD Script 108 in DISK01.LEC: +0x0053 print, +0x00B2 print, +0x011A print, +0x0189 print; reviewed decoded instruction stream; compared with EGA Script 108 (glassmakers scene), CD differences retained",
+    "fingerprint": "F51794DA174CF6B2622E4A9B9CD161A700879B4B48250343A76BC555BFCA0D97",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 6,
+        "name": "Glassmaker",
+        "evidence": "reading",
+        "source": "CD Script 108 +0x011A in DISK01.LEC: print; reviewed role",
+        "scope": "script:108"
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "name": "dragon's gold conversation",
+    "evidence": "reading",
+    "source": "CD Script 109 in DISK01.LEC: +0x000F print, +0x0069 actorOps, +0x006F print, +0x00B2 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "196B6C5C19229AEE94C3381AFDADA537C4F7EA1C76A14BA2075C590B3B625425",
+    "names": []
+  },
+  {
+    "id": 110,
+    "name": "Room 49 arrival and object classes",
+    "evidence": "decoded",
+    "source": "CD Script 110 in DISK01.LEC: +0x0016 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "34BC71B9A4B5905766D94511535D6707F40EA620F03D236AF7DB0F8E78EAD8D1",
+    "names": []
+  },
+  {
+    "id": 111,
+    "name": "Bishop Mandible scene in Room 86",
+    "evidence": "reading",
+    "source": "CD Script 111 in DISK01.LEC: +0x0015 loadRoom, +0x002B actorOps, +0x00DD print, +0x0124 loadRoom; reviewed decoded instruction stream",
+    "fingerprint": "373DABC27A7D5A44ABF47B3FA6B4648619657143A2D3BAFEBE5BADF847277483",
+    "names": []
+  },
+  {
+    "id": 112,
+    "name": "\"He's fast asleep.\"",
+    "evidence": "reading",
+    "source": "CD Script 112 in DISK01.LEC: +0x0005 print, +0x003B loadRoom, +0x0040 loadRoom, +0x0047 print; reviewed decoded instruction stream",
+    "fingerprint": "FD80651197089183D61FADA375D801800D9BE8E85056BB067D82B5C0583BB46B",
+    "names": []
+  },
+  {
+    "id": 113,
+    "name": "ambient actors during the intro",
+    "evidence": "decoded",
+    "source": "CD Script 113 in DISK01.LEC: +0x0010 actorOps; reviewed decoded instruction stream; compared with EGA Script 113 (ambient actors during the intro), CD differences retained",
+    "fingerprint": "BB1B4C00E0E1594E264E3ED9C783E272A64EDC5F35E4A02CC74417E05B65FFC9",
+    "names": []
+  },
+  {
+    "id": 114,
+    "name": "ambient actors during the intro",
+    "evidence": "decoded",
+    "source": "CD Script 114 in DISK01.LEC: +0x0010 actorOps; reviewed decoded instruction stream; compared with EGA Script 114 (ambient actors during the intro), CD differences retained",
+    "fingerprint": "D8DB64C85CA331858ABDC67A9556C61A0DD17B2795E979327A520EDD40AE477F",
+    "names": []
+  },
+  {
+    "id": 115,
+    "name": "return immediately (CD stub)",
+    "evidence": "decoded",
+    "source": "CD Script 115 in DISK01.LEC: +0x0000 stopObjectCode; reviewed decoded instruction stream",
+    "fingerprint": "8252F5F031F7600CD54D17D2B08D2BFCC50F5D298BF93331E2E3E2E0820FA8B4",
+    "names": []
+  },
+  {
+    "id": 117,
+    "name": "debug display of the music flag",
+    "evidence": "decoded",
+    "source": "CD Script 117 in DISK01.LEC: +0x0000 print; reviewed decoded instruction stream",
+    "fingerprint": "17407238288356666FEA0B0C04B721079B59B12EABD0539916782115C46DD893",
+    "names": [
+      {
+        "kind": "var",
+        "id": 14,
+        "name": "music flag / CD cue timer",
+        "evidence": "reading",
+        "source": "CD Script 117 +0x0000 in DISK01.LEC: print; reviewed role",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 118,
+    "name": "animate actor 3 in Room 45",
+    "evidence": "decoded",
+    "source": "CD Script 118 in DISK01.LEC: +0x000D actorOps; reviewed decoded instruction stream",
+    "fingerprint": "820A9D319661947C7D00654658D927E016EF987B26957F22A8F9E59A89EAF2E2",
+    "names": []
+  },
+  {
+    "id": 119,
+    "name": "choose a random failed-draft reply",
+    "evidence": "reading",
+    "source": "CD Script 119 in DISK01.LEC: +0x000F print, +0x0037 print, +0x0071 print, +0x00A2 print; reviewed decoded instruction stream",
+    "fingerprint": "4C69BE036D59C58CFAD05004AC615627D3888A5AA1B21EF8B2C7993FE9A755F7",
+    "names": []
+  },
+  {
+    "id": 120,
+    "name": "set up a game from a passcode",
+    "evidence": "decoded",
+    "source": "CD Script 120 in DISK01.LEC: +0x0094 loadRoom, +0x06E4 chainScript, +0x0943 chainScript; reviewed decoded instruction stream",
+    "fingerprint": "DD5FFE3DCEFBA4D63CB3ED218A9482AB37077C8F0DA437E8CD574A021D7954E1",
+    "names": []
+  },
+  {
+    "id": 121,
+    "name": "assign draft patterns for a passcode",
+    "evidence": "decoded",
+    "source": "CD Script 121 in DISK01.LEC: +0x0000 print; reviewed decoded instruction stream",
+    "fingerprint": "EC01A65A19D982E94E25CB782EC8C9B2220D6F182A86C7024BC5DC2FCECF0C4A",
+    "names": []
+  },
+  {
+    "id": 122,
+    "name": "the Bishop's sphere order",
+    "evidence": "reading",
+    "source": "CD Script 122 in DISK01.LEC: +0x000A loadRoom, +0x0018 print, +0x002B loadRoom, +0x0033 print; reviewed decoded instruction stream",
+    "fingerprint": "7AA85EBA79163A4A5E491BA23CE942B1BA6041132C4B631AE2B706E929BE88A9",
+    "names": []
+  },
+  {
+    "id": 123,
+    "name": "walk actor 11 across Room 16",
+    "evidence": "decoded",
+    "source": "CD Script 123 in DISK01.LEC: +0x000D actorOps, +0x0030 actorOps; reviewed decoded instruction stream",
+    "fingerprint": "1AB565484CB8A0F39870AAFDDE9EF92F867D879C096BA4015842D3FB2814BAEC",
+    "names": []
+  },
+  {
+    "id": 124,
+    "name": "keep drawing random numbers",
+    "evidence": "decoded",
+    "source": "CD Script 124 in DISK01.LEC: +0x0000 getRandomNr, +0x0004 getRandomNr, +0x0009 breakHere; reviewed decoded instruction stream",
+    "fingerprint": "BE5A68E86A8B90EF1D91962CC0063F3E16C8B4A2A04255429BCD51DBA3C6DE60",
+    "names": []
+  },
+  {
+    "id": 125,
+    "name": "split the passcode into decimal digits",
+    "evidence": "decoded",
+    "source": "CD Script 125 in DISK01.LEC: +0x0000 print; reviewed decoded instruction stream",
+    "fingerprint": "25AF3E01F7F966C3603824C482B3631673A558825BCCA9FA5B34E56F710ED5EF",
+    "names": []
+  }
+]

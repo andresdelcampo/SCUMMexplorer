@@ -1,5 +1,9 @@
 # Changelog
 
+## 7 October: individual VGA Advanced Scripts review
+
+Compared all 122 CD globals with EGA and expanded the eight titled globals to 122 individually reviewed titles. Ported established input/draft flags and scoped actors, repaired the clicked-object matcher and Script 16's readable layout, and enabled CD Used by / Explore links with room-scoped local targets and actual disc source offsets. CD stubs, changed scenes and dialogue retain their edition-specific meanings. All 1,470 CD blocks still format readably; focused tests, unchanged EGA goldens and the real WPF Script 5/7/16 comparison/link navigation passed. Clean build; [review and validation](../.verification/advanced-scripts/README.md). No full suite or push.
+
 ## 7 October final clarification: all VGA Readable scripts and The Intro
 
 The CD glossary now names source-verified difficulty, distaff, input, note/draft, costume/animation, room and sound variables throughout all script kinds. The shared presenter names established indexed arrays and explains the remaining decoded operations, including walk boxes, lighting, room effects, object renaming, unstructured branches and CD voice cues. A decoding-only check covers all 1,470 supplied CD blocks without raw-operation fallbacks; unestablished story roles retain numeric IDs and evidence levels remain visible. Focused checks passed, including three unchanged EGA script goldens and a bounded Script 28 UI comparison. Both editions call the introductory sequence **The Intro**, leaving the Opening spell unchanged. Clean solution build; [record](../.verification/loom-parity/README.md). No full suite or push.

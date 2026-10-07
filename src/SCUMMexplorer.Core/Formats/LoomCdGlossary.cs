@@ -8,6 +8,7 @@ public sealed partial class LoomGlossary
     private void ReadCdNames(GameLibrary game)
     {
         var data = ScummDataSources.For(game);
+        ReadCdReviewedNames(data);
         void Add(string kind, int id, string name, string source, int? to = null, GlossaryEvidence evidence = GlossaryEvidence.Decoded)
         {
             if (!_byKind.TryGetValue(kind, out var rows)) _byKind[kind] = rows = [];
@@ -76,11 +77,11 @@ public sealed partial class LoomGlossary
             if (Script(scriptId) is not { } script) return;
             var matches = script.Instructions.Where(i => i.Operation == operation)
                 .Select(i => (Instruction: i, Match: System.Text.RegularExpressions.Regex.Match(i.Operands, pattern)))
-                .Where(x => x.Match.Success).Select(x => (x.Instruction, Id: Convert.ToInt32(x.Match.Groups["id"].Value, 16))).ToArray();
+                .Where(x => x.Match.Success).Select(x => (x.Instruction, Id: Convert.ToInt32(x.Match.Groups["id"].Value, 16)))
+                .Where(x => corroborates is null || corroborates(x.Id)).ToArray();
             // An ambiguous pattern establishes no name. Repeated reads of the same variable are fine.
             if (matches.Length == 0 || matches.Select(x => x.Id).Distinct().Count() != 1) return;
             var first = matches[0];
-            if (corroborates is not null && !corroborates(first.Id)) return;
             add(first.Id, name, $"CD Script {scriptId:00} +0x{first.Instruction.Offset:X4} in {script.ContainerName}: {first.Instruction.Operation} {first.Instruction.Operands}", count, evidence);
         }
         bool Has(int id, string operation, string operands) => Script(id)?.Instructions.Any(i => i.Operation == operation && i.Operands == operands) == true;
@@ -106,7 +107,8 @@ public sealed partial class LoomGlossary
         Role(23, "move", "^" + variable + @" = var\[0x[0-9A-F]+\+local\[0x000\]\]$", "current draft response word");
         Role(8, "move", "^" + variable + @" = local\[0x000\]$", "object whose close-up is shown");
         Role(8, "verbOps", @"image, " + variable + @"; on\]$", "close-up image object");
-        Role(8, "getDist", @"^local\[0x001\], var\[0x001\], " + variable + "$", "object under the pointer or clicked");
+        Role(6, "move", "^" + variable + @" = local\[0x002\]$", "object under the pointer or clicked", corroborates:
+            id => Has(7, "move", $"var[0x{id:X3}] = 0x0000") && Has(10, "getDist", $"local[0x001], var[0x001], var[0x{id:X3}]"));
         Role(16, "move", "^" + variable + @" = local\[0x000\]$", "text line y");
         Role(15, "move", "^" + variable + @" = var\[0x004\]$", "previous room");
         Role(6, "isLessEqual", @"^var\[0x014\], " + variable + ",", "last click x");
@@ -117,6 +119,12 @@ public sealed partial class LoomGlossary
         Role(6, "walkActorTo", @"^var\[0x001\], " + variable + @", var\[0x[0-9A-F]+\]$", "walk target x");
         Role(6, "walkActorTo", @"^var\[0x001\], var\[0x[0-9A-F]+\], " + variable + "$", "walk target y");
         Role(6, "increment", "^" + variable + "$", "click-recorded flag (double-click test)");
+        Role(6, "move", "^" + variable + @" = local\[0x002\]$", "exit the player arrived through", corroborates:
+            id => Script(6)!.Instructions.Any(i => i.Operation == "loadRoomWithEgo" && i.Operands.StartsWith($"var[0x{id:X3}],", StringComparison.Ordinal)));
+        Role(42, "move", @"^local\[0x003\] = var\[0x(?<id>[0-9A-F]+)\+local\[0x002\]\]$", "flying actor x positions", 5,
+            corroborates: id => Script(44)?.Instructions.Any(i => i.Operation == "setVarRange" && i.Operands.StartsWith($"var[0x{id:X3}], count=5,", StringComparison.Ordinal)) == true);
+        Role(42, "move", @"^local\[0x004\] = var\[0x(?<id>[0-9A-F]+)\+local\[0x002\]\]$", "flying actor y positions", 5,
+            corroborates: id => Script(44)?.Instructions.Any(i => i.Operation == "setVarRange" && i.Operands.StartsWith($"var[0x{id:X3}], count=5,", StringComparison.Ordinal)) == true);
         Role(37, "startSound", "^" + variable + "$", "queued sound");
         Role(37, "move", "^" + variable + @" = var\[0x[0-9A-F]+\]$", "sound currently playing");
         var costume = Script(17)?.Instructions ?? [];

@@ -23,7 +23,7 @@ public sealed record LoomRelationship(
     string Evidence,
     LoomRelationshipStatus Status);
 
-/// <summary>An immutable index of relationships established by the supported LOOM v3 readers.</summary>
+/// <summary>An immutable index of source relationships established by the supported LOOM readers.</summary>
 public sealed class LoomRelationshipIndex
 {
     public static LoomRelationshipIndex Empty { get; } = new([]);
@@ -45,7 +45,7 @@ public sealed class LoomRelationshipIndex
 /// Connects indexed LOOM resources, room-local object records, embedded entry-script pointers,
 /// and literal targets from the currently recognized script instructions.
 /// </summary>
-public sealed class LoomRelationshipIndexer
+public sealed partial class LoomRelationshipIndexer
 {
     private const int EntryScriptPointerOffset = 0x1B;
     private static readonly Regex LiteralNumber = new(@"^0x(?<value>[0-9A-Fa-f]+)(?:$|[\s,])", RegexOptions.CultureInvariant);
@@ -57,6 +57,7 @@ public sealed class LoomRelationshipIndexer
     public LoomRelationshipIndex Build(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
+        if (game.Id == GameId.LoomVga) return BuildCd(game);
         if (game.Version != ScummVersion.V3) return LoomRelationshipIndex.Empty;
         var dialect = ScummScriptDialects.For(game.Id);
         _scriptReader = new LoomScriptReader(dialect);

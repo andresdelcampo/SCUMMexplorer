@@ -237,7 +237,7 @@ public partial class MainWindow : Window
         _game = game;
         _glossary = game.Id is GameId.Loom or GameId.LoomVga ? LoomGlossary.Load(game) : LoomGlossary.Default;
         _usageIndex = LoomUsageIndex.Empty;
-        if (game.Id == GameId.Loom) _ = BuildUsageIndexAsync(game);
+        if (game.Id is GameId.Loom or GameId.LoomVga) _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
         if (game.Id == GameId.Loom) _ = NameStoryBitsAsync(game, _glossary, _replayCatalog.Replays);
         _setupPlanner = null;
@@ -884,7 +884,7 @@ public partial class MainWindow : Window
             ScriptPanel.Visibility = Visibility.Visible;
             ShowPageHeader(true);
             PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
-            PageSubtitle.Text = _game?.Id == GameId.LoomVga ? "LOOM CD script · SCUMM v4" : LoomResourceNames.Entry(_glossary, resource) is { } named
+            PageSubtitle.Text = _game?.Id == GameId.LoomVga ? "LOOM CD script · SCUMM v4" + (LoomResourceNames.Entry(_glossary, resource) is { } cdNamed ? $" · name: {cdNamed.EvidenceLabel}" : "") : LoomResourceNames.Entry(_glossary, resource) is { } named
                 ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : "Indexed script resource · DOS LOOM old-v3";
             PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
@@ -1569,6 +1569,8 @@ public partial class MainWindow : Window
             var counts = others.GroupBy(item => item.Kind switch
             {
                 LoomScriptEventKind.CharacterAction => "character action",
+                LoomScriptEventKind.Dialogue when !item.Operands.Contains("text, ", StringComparison.Ordinal) =>
+                    item.Operands.Contains("sayVoice, ", StringComparison.Ordinal) ? "CD audio cue" : "text layout",
                 LoomScriptEventKind.Dialogue => "line of dialogue",
                 LoomScriptEventKind.ObjectStateChanged => "object change",
                 LoomScriptEventKind.CutsceneStarted or LoomScriptEventKind.CutsceneEnded => "cutscene mark",
@@ -1652,7 +1654,7 @@ public partial class MainWindow : Window
     private void StartRelationshipIndexBuild(GameLibrary game)
     {
         var generation = Interlocked.Increment(ref _relationshipBuildGeneration);
-        if (game.Id != GameId.Loom || game.Version != ScummVersion.V3)
+        if (game.Id != GameId.LoomVga && (game.Id != GameId.Loom || game.Version != ScummVersion.V3))
         {
             _relationshipIndex = LoomRelationshipIndex.Empty;
             UpdateConnectionsButton();
@@ -1718,13 +1720,13 @@ public partial class MainWindow : Window
     private void UpdateScriptUsedBy(GameResource resource)
     {
         ScriptUsedByList.Children.Clear();
-        if (resource.Kind != ResourceKind.Script || resource.ResourceId is not int id || _game?.Id != GameId.Loom || !IsAdvancedMode)
+        if (resource.Kind != ResourceKind.Script || resource.ResourceId is not int id || _game?.Id is not (GameId.Loom or GameId.LoomVga) || !IsAdvancedMode)
         {
             ScriptUsedByExpander.Visibility = Visibility.Collapsed;
             return;
         }
         ScriptUsedByExpander.Visibility = Visibility.Visible;
-        var uses = _usageIndex.UsedBy(LoomUsageTarget.Script, id);
+        var uses = _usageIndex.UsedBy(LoomUsageTarget.Script, id, resource.ScriptRoom);
         ScriptUsedByExpander.Header = uses.Count == 0
             ? "Used by · no literal reference (a hook, a click or a variable starts it)"
             : $"Used by · {uses.Count}";
@@ -1843,7 +1845,8 @@ public partial class MainWindow : Window
     private void UpdateConnectionsButton()
     {
         UpdateBackToSceneButton();
-        if (!IsAdvancedMode || _selectedResource is null || _game is not { Id: GameId.Loom, Version: ScummVersion.V3 })
+        if (!IsAdvancedMode || _selectedResource is null ||
+            (_game?.Id != GameId.LoomVga && _game is not { Id: GameId.Loom, Version: ScummVersion.V3 }))
         {
             ConnectionsButton.Visibility = Visibility.Collapsed;
             return;
@@ -1880,7 +1883,7 @@ public partial class MainWindow : Window
         var relationships = _relationshipIndex.ForResource(selected);
         var window = new Window
         {
-            Title = $"Connections · {selected.Name}",
+            Title = $"Connections · {LoomResourceNames.Label(_glossary, selected)}",
             Owner = this,
             Width = 620,
             Height = 620,
@@ -1919,7 +1922,7 @@ public partial class MainWindow : Window
         {
             var isOutgoing = relationship.SourceResource == selected;
             var otherResource = isOutgoing ? relationship.TargetResource : relationship.SourceResource;
-            var heading = $"{relationship.SourceResource.Name}  →  {relationship.Relationship}  →  {relationship.TargetLabel}";
+            var heading = $"{LoomResourceNames.Label(_glossary, relationship.SourceResource)}  →  {relationship.Relationship}  →  {LoomResourceNames.NameScripts(_glossary, relationship.TargetLabel)}";
             var content = new StackPanel { Margin = new Thickness(2) };
             content.Children.Add(new TextBlock
             {

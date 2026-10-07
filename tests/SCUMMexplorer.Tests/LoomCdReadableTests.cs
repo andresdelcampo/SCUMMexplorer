@@ -63,7 +63,7 @@ public sealed class LoomCdReadableTests
         Assert.Contains("var[0x0AD]", script.Format(false));
         Assert.Null(glossary.Variable(0x063)); // EGA's address must not acquire the CD hint-counter role.
         Assert.Null(glossary.Bit(0xD61));
-        Assert.Null(glossary.Script(91)); // No unverified EGA story title by matching ID.
+        Assert.Contains("CD Script 91", glossary.Script(91)!.Source); // Its own reviewed CD code, not an EGA ID import.
 
         var note = new LoomScriptPresenter(glossary).Present(data.GlobalScript(10)!);
         Assert.Contains("notes the player has played", note);

@@ -6,6 +6,8 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT
 
 ## State (7 October)
 
+Latest task: the [individual VGA Advanced Scripts review](../.verification/advanced-scripts/README.md) compares all 122 CD globals with EGA; each now has a source-reviewed title. `loom-cd-glossary.json` guards labels/scoped actors/flags with the reviewed CD instruction fingerprint. Script 7's clicked-object role and Script 16's layout are readable. CD Used by / Explore links now use CD data and offsets, preserving room-local namespaces and unresolved current-room targets. Focused tests and real WPF Script 5/7/16 comparisons/link navigation passed; the EGA readable goldens remain unchanged. Remaining unestablished story roles stay numeric.
+
 Everything is committed on `master` (not pushed); the latest feedback record is [.verification/loom-parity/README.md](../.verification/loom-parity/README.md), earlier CD work is `.verification/loom-vga/README.md` (steps 25 and 26), and finished work is in [CHANGELOG.md](CHANGELOG.md). LOOM CD (`Games/loom vga en`) opens with rooms, a live session, voice, Game Status, "CD audio", "Sounds & music" (never remove), "The Intro" and the cutscenes derived from the CD scripts.
 
 The user's 7 October issue list and follow-up clarifications are addressed; waiting for their viewing check or next changes:

@@ -448,8 +448,13 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
             }
         }
         var spoken = Literal(a[0]) is 0xFF or 0xFE ? who + ":" : who + " says:";
-        return text is null ? voice is not null ? $"{who}: {string.Join(", ", extras)}" : $"{who}: {string.Join(", ", Items(a[1]))}"
-            : $"{spoken} {text}{(extras.Count > 0 ? $"  ({string.Join(", ", extras)})" : "")}";
+        if (text is null)
+        {
+            var settings = Items(a[1]).Where(x => !x.StartsWith("position, ", StringComparison.Ordinal) &&
+                !x.StartsWith("color, ", StringComparison.Ordinal) && !x.StartsWith("sayVoice, ", StringComparison.Ordinal));
+            return $"{who}: {(voice is null ? "set text layout " : "")}{string.Join(", ", settings.Concat(extras))}";
+        }
+        return $"{spoken} {text}{(extras.Count > 0 ? $"  ({string.Join(", ", extras)})" : "")}";
     }
 
     private static string CleanText(string quoted)

@@ -6,7 +6,10 @@ namespace SCUMMexplorer.Core.Formats;
 public enum LoomUsageTarget { Script, Object, Room, Sound }
 
 /// <summary>One place in the game's code that names a script, object, room or sound with a literal number.</summary>
-public sealed record LoomUsage(string Where, int Room, int? ObjectId, int Offset, string Operation, LoomUsageTarget Target, int TargetId, int? TargetVerb);
+public sealed record LoomUsage(string Where, int Room, int? ObjectId, int Offset, string Operation, LoomUsageTarget Target, int TargetId, int? TargetVerb)
+{
+    public int? ScriptRoom { get; init; }
+}
 
 /// <summary>
 /// "Used by": which code starts a script, runs an object's verb, loads a room or plays a sound with a literal number (the
@@ -15,16 +18,17 @@ public sealed record LoomUsage(string Where, int Room, int? ObjectId, int Offset
 /// </summary>
 public sealed class LoomUsageIndex
 {
-    private readonly Dictionary<(LoomUsageTarget, int), List<LoomUsage>> _uses;
+    private readonly Dictionary<(LoomUsageTarget, int, int?), List<LoomUsage>> _uses;
 
-    private LoomUsageIndex(Dictionary<(LoomUsageTarget, int), List<LoomUsage>> uses) => _uses = uses;
+    private LoomUsageIndex(Dictionary<(LoomUsageTarget, int, int?), List<LoomUsage>> uses) => _uses = uses;
 
     public static LoomUsageIndex Empty { get; } = new([]);
 
     public static LoomUsageIndex Build(GameLibrary game)
     {
-        var uses = new Dictionary<(LoomUsageTarget, int), List<LoomUsage>>();
-        new LoomSceneStateScanner(game).VisitCodeUnits((script, room, objectId, _, label) =>
+        var uses = new Dictionary<(LoomUsageTarget, int, int?), List<LoomUsage>>();
+        var data = ScummDataSources.For(game);
+        void Visit(LoomScriptDisassembly? script, int room, int? objectId, int? _, string label)
         {
             if (script is null) return;
             foreach (var ins in script.Instructions)
@@ -33,7 +37,11 @@ public sealed class LoomUsageIndex
                 switch (ins.Operation)
                 {
                     case "startScript" or "chainScript" when Literal(args, 0) is int id:
-                        Add(uses, new(label, room, objectId, ins.Offset, ins.Operation, LoomUsageTarget.Script, id, null));
+                        // A literal local ID belongs to the caller's room. A global with no known room cannot
+                        // establish which local 200 it starts, so it must not appear as a use of every room's 200.
+                        if (id < data.GlobalScriptCount || room > 0)
+                            Add(uses, new(label, room, objectId, ins.Offset, ins.Operation, LoomUsageTarget.Script, id, null)
+                                { ScriptRoom = id >= data.GlobalScriptCount ? room : null });
                         break;
                     case "startObject" when Literal(args, 0) is int obj:
                         Add(uses, new(label, room, objectId, ins.Offset, ins.Operation, LoomUsageTarget.Object, obj, Literal(args, 1)));
@@ -49,12 +57,18 @@ public sealed class LoomUsageIndex
                         break;
                 }
             }
-        });
+        }
+        new LoomSceneStateScanner(game).VisitCodeUnits(Visit);
+        foreach (var resource in game.Rooms.Where(r => r.ResourceId.HasValue))
+        {
+            int room = resource.ResourceId!.Value;
+            Visit(data.RoomExitScript(room), room, null, null, $"Room {room:00} exit");
+        }
         return new LoomUsageIndex(uses);
     }
 
-    public IReadOnlyList<LoomUsage> UsedBy(LoomUsageTarget target, int id) =>
-        _uses.TryGetValue((target, id), out var list) ? list : [];
+    public IReadOnlyList<LoomUsage> UsedBy(LoomUsageTarget target, int id, int? scriptRoom = null) =>
+        _uses.TryGetValue((target, id, target == LoomUsageTarget.Script ? scriptRoom : null), out var list) ? list : [];
 
     /// <summary>One line per use, in plain language, with names from the glossary.</summary>
     public static string Describe(LoomUsage use, LoomGlossary glossary, Func<int, string?>? verbLabel = null)
@@ -75,9 +89,10 @@ public sealed class LoomUsageIndex
         return $"{where} +0x{use.Offset:X4} {verb}";
     }
 
-    private static void Add(Dictionary<(LoomUsageTarget, int), List<LoomUsage>> uses, LoomUsage use)
+    private static void Add(Dictionary<(LoomUsageTarget, int, int?), List<LoomUsage>> uses, LoomUsage use)
     {
-        if (!uses.TryGetValue((use.Target, use.TargetId), out var list)) uses[(use.Target, use.TargetId)] = list = [];
+        var key = (use.Target, use.TargetId, use.ScriptRoom);
+        if (!uses.TryGetValue(key, out var list)) uses[key] = list = [];
         list.Add(use);
     }
 
