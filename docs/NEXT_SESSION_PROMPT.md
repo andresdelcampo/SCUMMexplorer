@@ -4,25 +4,22 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT
 
 > The prompt itself is not kept here: the session that ends starts the next one as a task (`spawn_task`). This file holds the details of the project state the prompt points to.
 
-## State (6 October, late night, second pass): skill screen waits, notes in Game Status
+## State (7 October)
 
-Merged into master (not pushed), record README step 25. Done from the user's second list: skill screen frames and wait, Game Status quarter notes, pause pauses disc audio, Play Cutscene titles without the verb outside Advanced. Open: note-head height on the staff (about 3 to 4 source px higher than the user's reference; unverified against the real game), the gap list in step 24. Room 04's arrows are the game's own camera lock (explained in the changelog).
+Everything is committed on `master` (not pushed); the CD record is `.verification/loom-vga/README.md` (steps 25 and 26), the finished work is in [CHANGELOG.md](CHANGELOG.md). LOOM CD (`Games/loom vga en`) opens with rooms, a live session, voice, Game Status, "CD audio", "Sounds & music" (never remove), "The intro" and the cutscenes derived from the CD scripts.
 
-## State (6 October, late night): CD doorways, Sounds button, staff
+Waiting for the user's next list of changes. Not yet seen on screen by the user, so expect feedback on them:
 
-Committed and merged into master (not pushed), record `.verification/loom-vga/README.md` step 24 (it lists the VGA-vs-EGA gaps). Open from the user's list: Room 69's skill screen after the Room 1 cutscene (frames missing, no wait for a press), Room 04's scroll arrows (camera limits 480..480 after the assumed arrival through Room 03 local 200), note-head height on the staff (unverified), then the gap list. Share unchanged: 203 of 204 (99.5 %).
+- Room control buttons stay in one row (card width 880); Room 66 EGA Sounds button no longer blinks.
+- Staff: after a catalog visit the verb staff follows the staff bit (32 frames, `SyncStaffVerbs`, reasoned, not reproduced); on the CD, Game Status switches Bobbin's costume with the staff (0xAB without, 0xAC with, read from the scripts).
+- Sounds lists: normal mode names the kind or the line, Advanced the technical form (both games).
 
-## State (6 October, night): CD sound dropdown, Room 02 size
+Open, not done:
 
-Committed (not pushed), record `.verification/loom-vga/README.md` step 23. The CD game has a sound dropdown (No Sound / CD Audio) instead of the Voices checkbox. Bobbin's size in catalog visits now works for the CD (size variable found in the code, `var[0x0AE]`). Open: the user's Room 69 report (difficulty button frames missing after playing the Room 1 cutscene and then turning to Room 69); a fresh visit in `CdCheck` shows the frames, so ask for the exact path or reproduce with `CD_CUT` then selecting Room 69. Share unchanged: 203 of 204 (99.5 %).
-
-## State (6 October, later): the room button's lists are saved between launches
-
-Committed (not pushed), record `.verification/loom-vga/README.md` step 22, changelog row. `CdRoomScenesCache` keeps the per-room scene lists between launches (reopen of the last game uses it; the Open button re-derives); a first launch shows the button disabled with a tooltip. Local `master` was fast-forwarded to the branch so the user's main checkout builds it (the user's earlier "no button" was an old exe). Checked by `CdCheck` in the real window (`CD_USECACHE`, `CD_FIRSTLOOK`, record step 22, second look): first launch = disabled button with tooltip, reopen = enabled at once; the cache stamp was fixed for `.cue` paths. Only the user's own look by hand is left. 18 rooms show no button (kept hidden). 203 of 204 (99.5 %) enabled. Not heard by ear.
-
-## State at a glance (6 October)
-
-LOOM CD (`Games/loom vga en`) opens with rooms, a live session, voice, Game Status, "CD audio" and "Sounds & music" (never remove), "The intro" and 204 cutscenes derived from the CD scripts; 203 of 204 (99.5 %) are enabled (Room 34's entry is unreachable). The room's "Play Cutscene" button is in 60 of 78 rooms; the 18 without a scene stay hidden. Per-step detail: [.verification/loom-vga/README.md](../.verification/loom-vga/README.md) and [CHANGELOG.md](CHANGELOG.md); the state sections of earlier sessions are in [HANDOFF_HISTORY_2026-10.md](archive/HANDOFF_HISTORY_2026-10.md).
+- Compare the CD's starting-state planner with the EGA catalog (the script scan alone already finds all 328 catalogued EGA replays; `.verification/cutscene-scan-ega`, whose modes `verbs`, `script`, `grep`, `boxes`, `masks`, `maskmap` also read the CD).
+- Why EGA's room cards and start take longer than the CD's (read from the code, not timed: EGA renders cards through the scene logic and starts two background indexes).
+- Scenes that do not use the `cutscene` opcode (the Room 66 ending, script 106) are only Interact actions, on both games.
+- The CD gap list in step 24; note-head height (now strip-aligned, not compared with the original game).
 
 ## Decided with the user
 
