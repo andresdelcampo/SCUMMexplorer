@@ -179,7 +179,7 @@ public partial class GameStatusWindow : Window
         NoteButtons.IsEnabled = editable && _noteCount.HasValue && _staffHeld.HasValue;
         DraftGrid.IsReadOnly = !editable;
         FlagList.IsEnabled = editable;
-        ApplyButton.IsEnabled = editable && PendingChanges && !stale;
+        ApplyButton.IsEnabled = !PendingChanges || editable && !stale;
         if (PendingChanges) EditMessage.Text = stale ? "Game status changed. Close and reopen to inspect the new values before applying." :
             editable ? "Unapplied changes" : "Unapplied changes. Finish playback, dialogue or movement to apply.";
         else if (!editable) EditMessage.Text = "Finish playback, dialogue or movement to edit.";
@@ -214,6 +214,7 @@ public partial class GameStatusWindow : Window
     private void Apply_Click(object sender, RoutedEventArgs e)
     {
         DraftGrid.CommitEdit(DataGridEditingUnit.Cell, true); DraftGrid.CommitEdit(DataGridEditingUnit.Row, true);
+        if (!PendingChanges) { Close(); return; }
         if (!_canEdit() || _session() is not { } session || !ReferenceEquals(session, _editedSession) || _baseline is null) { Refresh(); return; }
         if (!SameState(session.GameStatus, _baseline)) { EditMessage.Text = "Game status changed. Close and reopen before applying."; UpdateControls(); return; }
         if (_staffHeld is not bool held || _noteCount is not int count || _rows.Any(r => !r.Resolved)) return;
@@ -229,7 +230,7 @@ public partial class GameStatusWindow : Window
             if (held != _baseline.StaffHeld) session.UpdateStaffPossession(held);
             if (count != _baseline.AvailableNoteCount) session.UpdateAvailableNotes(count);
             foreach (var flag in flagChanges) { _flagSource!.Write(session, flag.Key, flag.Checked); flag.Baseline = flag.Checked; }
-            _baseline = null; EditMessage.Text = "Changes applied"; _refreshRoom(); Refresh();
+            _baseline = null; _refreshRoom(); Close();
         }
         catch (InvalidOperationException ex) { EditMessage.Text = ex.Message; }
     }

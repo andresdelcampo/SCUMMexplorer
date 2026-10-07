@@ -139,8 +139,8 @@
             <TextBlock x:Name="EditMessage" Foreground="#C6B99F" TextWrapping="Wrap" Margin="0,0,0,8"/>
             <DockPanel LastChildFill="False">
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                    <Button x:Name="ApplyButton" Content="Apply Changes" Click="Apply_Click" Padding="12,6" Margin="0,0,8,0"/>
-                    <Button x:Name="CloseButton" Content="Close" Click="Close_Click" Padding="12,6"/>
+                    <Button x:Name="ApplyButton" Content="Apply and close" Click="Apply_Click" Padding="12,6" Margin="0,0,8,0"/>
+                    <Button x:Name="CloseButton" Content="Cancel" Click="Close_Click" Padding="12,6" IsCancel="True"/>
                 </StackPanel>
                 <Expander x:Name="SourceExpander" DockPanel.Dock="Left" Header="Source and dependencies" Foreground="#9FABAE" Visibility="Collapsed" MaxWidth="500" Margin="0,0,12,0">
                     <ScrollViewer MaxHeight="48" VerticalScrollBarVisibility="Auto"><TextBlock x:Name="SourceEvidence" TextWrapping="Wrap" FontSize="11"/></ScrollViewer>
