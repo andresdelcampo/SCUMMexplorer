@@ -29,7 +29,8 @@ internal static class RoomThumbnailCache
     {
         var core = typeof(GameLibrary).Assembly.Location;
         var index = new FileInfo(Path.Combine(gameFolder, "00.LFL"));
-        return $"v1|{(File.Exists(core) ? File.GetLastWriteTimeUtc(core).Ticks : 0)}|" +
+        var app = typeof(RoomThumbnailCache).Assembly.Location;
+        return $"v2|{(File.Exists(core) ? File.GetLastWriteTimeUtc(core).Ticks : 0)}|{File.GetLastWriteTimeUtc(app).Ticks}|" +
                $"{(index.Exists ? index.Length : 0)}|{(index.Exists ? index.LastWriteTimeUtc.Ticks : 0)}";
     }
 

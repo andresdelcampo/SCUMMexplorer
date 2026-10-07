@@ -30,7 +30,7 @@ public sealed class LoomCdDataSource : IScummDataSource
     /// <summary>A global script carries no context, as on EGA: the session treats a script without one as global (it survives a room load).</summary>
     public LoomScriptDisassembly? GlobalScript(int number) =>
         _archive.ReadGlobalScript(number) is { } script
-            ? _reader.DecodeCode(script.Code, number, Container, script.BlockOffset)
+            ? Decode(script, number)
             : null;
 
     public LoomScriptDisassembly? RoomEntryScript(int room) => RoomScript(room, "EN", "entry script");
@@ -44,7 +44,7 @@ public sealed class LoomCdDataSource : IScummDataSource
     {
         if (number < GlobalScriptCount) return null;
         return Scripts(room).FirstOrDefault(s => s.Kind == "LS" && s.Number == number) is { } script
-            ? _reader.DecodeCode(script.Code, number, Container, script.BlockOffset) with { Context = $"Room {room:00} local script {number:00}" }
+            ? Decode(script, number) with { Context = $"Room {room:00} local script {number:00}" }
             : null;
     }
 
@@ -105,7 +105,8 @@ public sealed class LoomCdDataSource : IScummDataSource
         selectedEntry = entry;
         var code = o.Block.AsSpan(entry.ScriptOffset).ToArray();
         return _reader.DecodeCode(code, room, Container, o.BlockOffset + entry.ScriptOffset)
-            with { Context = $"Room {room:00} Object {record.Id} {entry.Label}" };
+            with { Context = $"Room {room:00} Object {record.Id} {entry.Label}", ContainerName = "DISK01.LEC",
+                CodeFileOffset = o.BlockOffset + entry.ScriptOffset };
     }
 
     private static LoomObjectVerbEntry[] VerbEntries(LoomVgaObject o) =>
@@ -113,8 +114,16 @@ public sealed class LoomCdDataSource : IScummDataSource
 
     private LoomScriptDisassembly? RoomScript(int room, string kind, string label) =>
         Scripts(room).FirstOrDefault(s => s.Kind == kind) is { } script
-            ? _reader.DecodeCode(script.Code, room, Container, script.BlockOffset) with { Context = $"Room {room:00} {label}" }
+            ? Decode(script, room) with { Context = $"Room {room:00} {label}" }
             : null;
+
+    private LoomScriptDisassembly Decode(LoomVgaScript script, int id) =>
+        _reader.DecodeCode(script.Code, id, Container, script.BlockOffset) with
+        {
+            ContainerName = "DISK01.LEC",
+            CodeFileOffset = script.BlockOffset + (script.Kind == "LS" ? 7 : 6),
+            ResourceLength = script.Code.Length + (script.Kind == "LS" ? 7 : 6)
+        };
 
     private IReadOnlyList<LoomVgaScript> Scripts(int room)
     {

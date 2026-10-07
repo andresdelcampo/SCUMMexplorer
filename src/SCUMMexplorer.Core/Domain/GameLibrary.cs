@@ -44,7 +44,8 @@ public sealed record GameResource(
     int? ContainerFileNumber = null,
     int? Offset = null,
     int? IndexDirectoryOffset = null,
-    int? ContainerNumberOffset = null);
+    int? ContainerNumberOffset = null,
+    int? ScriptRoom = null);
 
 public sealed record GameLibrary(
     string Title,

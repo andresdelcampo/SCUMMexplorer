@@ -10,6 +10,8 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 
 ## What is really left for LOOM EGA
 
+**7 October feedback:** the staff/verb-area disconnect, EGA missing note letters after room changes, Room 69 staff suppression, Advanced sound details, Room 68 thumbnail palette, doorway labels, Advanced picker verb IDs, VGA opening title and VGA entry-script links are fixed. Shared LOOM reconciliation and doorway finding retain edition-specific costume/animation and script data. Evidence and the focused validation scope: [.verification/loom-parity/README.md](../.verification/loom-parity/README.md). Await the user's viewing check; the parked items below remain parked.
+
 **1. M5, the secrets guide: shelved (user, 5 October).** It would mostly be another route to things the cutscene picker and the inspections already reach; build it only if a real value that they lack is shown, never as a shortcut around the app experience. Nothing of it is built; the section below stays as the old specification.
 
 **2. Needs the user (on-screen or ScummVM checks)**

@@ -8,6 +8,7 @@ public sealed record LoomCdScene(RoomImage Room, IReadOnlyList<LoomRoomObjectRec
     LoomSessionSnapshot Snapshot, RoomObjectSelection Selection, int CameraX,
     IReadOnlyList<LoomActorSnapshot> Actors, LoomWalkBoxSet? WalkBoxes, Func<int, LoomCostume?> Costumes)
 {
+    public IReadOnlyList<byte>? ShadowPalette { get; init; }
     /// <summary>The room's pixels with the objects the entry script made visible painted over the background.</summary>
     public byte[] Compose() => Selection.Compose(Room);
 }
@@ -33,6 +34,7 @@ public static class LoomCdRoomScene
         var images = data.ReadObjectImages(roomId);
         var room = vga.DecodeRoom(roomId);
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions, records, room, indexed.States, snapshot.DrawOrder);
-        return new LoomCdScene(room, records, images, snapshot, selection, session.CameraX ?? 0, session.Actors, session.CurrentWalkBoxes, session.ReadCostume);
+        return new LoomCdScene(room, records, images, snapshot, selection, session.CameraX ?? 0, session.Actors, session.CurrentWalkBoxes, session.ReadCostume)
+            { ShadowPalette = session.ShadowPalette.ToArray() };
     }
 }

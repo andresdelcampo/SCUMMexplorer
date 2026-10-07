@@ -41,7 +41,9 @@ public sealed record LoomScriptDisassembly(
     byte[] UndecodedBytes,
     byte[] TrailingBytes,
     string? Context = null,
-    IReadOnlyList<LoomScriptDecodeIssue>? Issues = null)
+    IReadOnlyList<LoomScriptDecodeIssue>? Issues = null,
+    string? ContainerName = null,
+    int? CodeFileOffset = null)
 {
     public int DecodedBytes => Instructions.Sum(instruction =>
         instruction.Bytes.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length);
@@ -51,11 +53,12 @@ public sealed record LoomScriptDisassembly(
     public string Format(bool showBytes = true)
     {
         var output = new StringBuilder();
+        var container = ContainerName ?? $"{ContainerFileNumber:00}.LFL";
         output.AppendLine(Context is null
-            ? $"Script {ScriptId:00}  ·  {ContainerFileNumber:00}.LFL  ·  resource 0x{ResourceOffset:X4}"
-            : $"{Context}  ·  {ContainerFileNumber:00}.LFL  ·  file offset 0x{ResourceOffset:X4}");
+            ? $"Script {ScriptId:00}  ·  {container}  ·  resource 0x{ResourceOffset:X4}"
+            : $"{Context}  ·  {container}  ·  file offset 0x{ResourceOffset:X4}");
         output.AppendLine(Context is null
-            ? $"Resource length {ResourceLength} bytes  ·  bytecode {CodeLength} bytes  ·  code starts at file offset 0x{ResourceOffset + 4:X4}"
+            ? $"Resource length {ResourceLength} bytes  ·  bytecode {CodeLength} bytes  ·  code starts at file offset 0x{CodeFileOffset ?? ResourceOffset + 4:X4}"
             : $"Embedded bytecode {CodeLength} bytes");
         output.AppendLine($"Control-flow decode: {Instructions.Count} instructions, {DecodedBytes}/{CodeLength} resource bytes; " +
                           $"{Issues?.Count ?? (DecodeNote is null ? 0 : 1)} unresolved paths. Undecoded bytes may be data or unreachable code.");

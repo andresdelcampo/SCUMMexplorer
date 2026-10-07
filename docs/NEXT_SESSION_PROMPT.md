@@ -6,13 +6,18 @@ Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT
 
 ## State (7 October)
 
-Everything is committed on `master` (not pushed); the CD record is `.verification/loom-vga/README.md` (steps 25 and 26), the finished work is in [CHANGELOG.md](CHANGELOG.md). LOOM CD (`Games/loom vga en`) opens with rooms, a live session, voice, Game Status, "CD audio", "Sounds & music" (never remove), "The intro" and the cutscenes derived from the CD scripts.
+Everything is committed on `master` (not pushed); the latest feedback record is [.verification/loom-parity/README.md](../.verification/loom-parity/README.md), earlier CD work is `.verification/loom-vga/README.md` (steps 25 and 26), and finished work is in [CHANGELOG.md](CHANGELOG.md). LOOM CD (`Games/loom vga en`) opens with rooms, a live session, voice, Game Status, "CD audio", "Sounds & music" (never remove), "The Opening" and the cutscenes derived from the CD scripts.
 
-Waiting for the user's next list of changes. Not yet seen on screen by the user, so expect feedback on them:
+The user's 7 October issue list is addressed; waiting for their viewing check or next changes:
 
 - Room control buttons stay in one row (card width 880); Room 66 EGA Sounds button no longer blinks.
-- Staff: after a catalog visit the verb staff follows the staff bit (32 frames, `SyncStaffVerbs`, reasoned, not reproduced); on the CD, Game Status switches Bobbin's costume with the staff (0xAB without, 0xAC with, read from the scripts).
-- Sounds lists: normal mode names the kind or the line, Advanced the technical form (both games).
+- Staff: reconciliation waits until catalog entry settles and counts 32 editable frames; real input stops it. EGA note letters are rebuilt even with note verbs already on. CD Game Status updates the normal large-costume default even while Bobbin wears a small look (0xAB without, 0xAC with, read from scripts). Room 69 never draws the staff or stale note letters, while possession is retained. Reproduced and fixed in focused state tests and WPF renders.
+- Sounds lists: normal mode names the kind or line; EGA Advanced adds the script source path and measured duration, with other references in the tooltip. Shared popup rows wrap long labels.
+- Room 68's EGA thumbnail follows the same script shadow palette as its view. The thumbnail stamp includes the App build too.
+- Cutscene doorway titles are concise Reached Room labels; VGA reuses the room-hotspot finder, EGA strips redundant response wording. Both pickers add verb IDs in Advanced. VGA's intro is The Opening, without a misleading single-room prefix.
+- VGA Room entry has links to its own global/local scripts; they open via the CD data source with correct container/code offsets, without applying EGA script glossary names. Local script IDs are scoped by room.
+
+Latest app build: `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. Six distinct focused test cases and the bounded `ParityCheck` passed; no full suite or long replay harness. Physical-input/listening confirmation remains the user's check. Keep EGA/VGA behavior shared at the proper generic SCUMM / generic LOOM / edition-specific level; preserve working behavior when refactoring.
 
 Open, not done:
 

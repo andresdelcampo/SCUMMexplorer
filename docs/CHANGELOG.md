@@ -1,5 +1,9 @@
 # Changelog
 
+## 7 October: staff and presentation parity from user feedback
+
+Catalog room changes keep the distaff appearance and note controls together on EGA and VGA; EGA reprints its note letters, and VGA updates its large-costume default while Bobbin wears a smaller look. Room 69 suppresses the staff while preserving possession. Advanced Sounds has readable source details on EGA; Room 68's thumbnail uses the same script palette as the room view. Doorway titles use concise Reached Room labels, both pickers show verb numbers in Advanced, and VGA's intro is The Opening. VGA Room entry links now open global and room-local v4 scripts with correct DISK01.LEC source headers. Validation: six focused test cases and one bounded WPF harness, rerun only for the discovered failures; [record](../.verification/loom-parity/README.md). No push.
+
 ## 7 October: CD note heads, titles, mask planes, staff costume, Sounds lists
 
 Image verbs on the CD sit on 8-row strips (note heads carry their own staff lines; verb area and Game Status). Play Cutscene titles name the verb as a word like EGA's ("Look at leaf", "Opening at sky", "Other draft response at myself"); the byte only in Advanced; draft verbs are separate groups (the sword's Sharpening and its reverse). A room change keeps the verb screen's strings (the note letters). The CD's rooms carry several mask planes (Rooms 23 and 25); a walk box's mask byte picks the plane. Staff verbs follow the staff bit after a catalog visit; on the CD, Game Status switches Bobbin's costume with the staff. Room 66 EGA: the Sounds button and music panel no longer blink. Sounds lists: normal and Advanced forms on both games. The CD's script scan run on EGA finds all 328 catalogued replays (`.verification/cutscene-scan-ega`).
