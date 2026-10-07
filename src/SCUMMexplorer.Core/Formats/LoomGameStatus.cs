@@ -219,13 +219,70 @@ public sealed partial class LoomExplorationSession
         {
             // CD: 017 takes the look and the costume it stored last. It starts 018 or 019 itself only while its own flag (bit 0x00E)
             // is set, which a first-visit session may not have, so the note controls are refreshed explicitly as well.
-            if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) && ego?.Look.Costume > 0)
+            // The CD game has one Bobbin costume with the distaff and one without, where EGA changes the animations of one costume:
+            // the scripts set the ego's costume variable together with the staff bit, so the edit does the same.
+            var staffCostume = StaffCostumes(schema) is { } pair ? (held ? pair.With : pair.Without) : (ushort?)null;
+            if (staffCostume is ushort newCostume && ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) && ego?.Look.Costume > 0
+                && _runtime.GlobalVariables.GetValueOrDefault(StaffCostumeVariable(schema)) == ego.Look.Costume)
+            {
+                _runtime.SetGlobalVariable(StaffCostumeVariable(schema), newCostume);
+                RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables.GetValueOrDefault(schema.LookKey), ["local[0x001]"] = newCostume }, 0);
+            }
+            else if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) && ego?.Look.Costume > 0)
                 RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables.GetValueOrDefault(schema.LookKey), ["local[0x001]"] = (ushort)ego.Look.Costume }, 0);
             RefreshStatusNotes(held);
         }
         else if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault("var[0x07D]") && ego?.Look.Costume > 0)
             RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables["var[0x07C]"], ["local[0x001]"] = (ushort)ego.Look.Costume }, 0);
         else RefreshStatusNotes(held);
+    }
+
+    private (ushort With, ushort Without)? _staffCostumes;
+    private bool _staffCostumesRead;
+
+    /// <summary>The variable script 017 reads Bobbin's own costume from (its look-0 branch: <c>local[1] = var[X]</c>).</summary>
+    private string StaffCostumeVariable(LoomStatusSchema schema)
+    {
+        var read = ScummDataSources.For(_game).GlobalScript(17)?.Instructions
+            .Select(i => System.Text.RegularExpressions.Regex.Match(i.Operation + " " + i.Operands, @"^move local\[0x001\] = (var\[0x[0-9A-F]+\])$"))
+            .FirstOrDefault(m => m.Success);
+        return read?.Groups[1].Value ?? "";
+    }
+
+    /// <summary>
+    /// The costumes the CD scripts give Bobbin with and without the distaff: wherever a script sets the staff bit and, within the next
+    /// three instructions, the ego costume variable to a literal, that literal goes with that bit value (the most common one wins). Null when the scripts do not show both.
+    /// </summary>
+    private (ushort With, ushort Without)? StaffCostumes(LoomStatusSchema schema)
+    {
+        if (_staffCostumesRead) return _staffCostumes;
+        _staffCostumesRead = true;
+        var variable = StaffCostumeVariable(schema);
+        if (variable.Length == 0) return null;
+        var data = ScummDataSources.For(_game);
+        var votes = new Dictionary<(int Value, ushort Costume), int>();
+        foreach (var id in data.GlobalScriptIds())
+        {
+            var code = data.GlobalScript(id)?.Instructions;
+            if (code is null) continue;
+            for (var i = 0; i < code.Count; i++)
+            {
+                var set = System.Text.RegularExpressions.Regex.Match(code[i].Operation + " " + code[i].Operands, @"^move " + System.Text.RegularExpressions.Regex.Escape(schema.StaffKey) + @" = 0x([0-9A-F]+)$");
+                if (!set.Success) continue;
+                var value = int.Parse(set.Groups[1].Value, NumberStyles.HexNumber);
+                if (value is not (0 or 1)) continue;
+                for (var j = i + 1; j < Math.Min(code.Count, i + 4); j++)
+                {
+                    var costume = System.Text.RegularExpressions.Regex.Match(code[j].Operation + " " + code[j].Operands, @"^move " + System.Text.RegularExpressions.Regex.Escape(variable) + @" = 0x([0-9A-F]+)$");
+                    if (!costume.Success) continue;
+                    var key = (value, (ushort)int.Parse(costume.Groups[1].Value, NumberStyles.HexNumber));
+                    votes[key] = votes.GetValueOrDefault(key) + 1;
+                    break;
+                }
+            }
+        }
+        ushort? Best(int value) => votes.Where(v => v.Key.Value == value).OrderByDescending(v => v.Value).Select(v => (ushort?)v.Key.Costume).FirstOrDefault();
+        return Best(1) is ushort with && Best(0) is ushort without && with != without ? _staffCostumes = (with, without) : null;
     }
 
     private void RefreshStatusNotes(bool held)
