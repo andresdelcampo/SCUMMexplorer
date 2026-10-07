@@ -212,6 +212,13 @@ public sealed partial class LoomExplorationSession
         var value = _runtime.GlobalVariables[key];
         SetStatusWord(key, held ? (ushort)(value | mask) : (ushort)(value & ~mask), mask);
         _statusEdits[schema.StaffKey] = ((ushort)(held ? 1 : 0), 1, "Explicit user edit");
+        RefreshStatusEgo(held);
+        RefreshStatusNotes(held && !IsStaffMenu);
+    }
+
+    private void RefreshStatusEgo(bool held)
+    {
+        if (StatusSchema is not { } schema) return;
         // Only the normal appearance managed by017 can be refreshed through017.
         // A boat/disguise/close-up costume is left to its source room scripts.
         var ego = Actors.FirstOrDefault(a => a.Number == 1);
@@ -222,19 +229,24 @@ public sealed partial class LoomExplorationSession
             // The CD game has one Bobbin costume with the distaff and one without, where EGA changes the animations of one costume:
             // the scripts set the ego's costume variable together with the staff bit, so the edit does the same.
             var staffCostume = StaffCostumes(schema) is { } pair ? (held ? pair.With : pair.Without) : (ushort?)null;
-            if (staffCostume is ushort newCostume && ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) && ego?.Look.Costume > 0
-                && _runtime.GlobalVariables.GetValueOrDefault(StaffCostumeVariable(schema)) == ego.Look.Costume)
+            var variable = StaffCostumeVariable(schema);
+            var defaultCostume = _runtime.GlobalVariables.GetValueOrDefault(variable);
+            // The large costume is also the default for a later room's look-0 entry, even when Bobbin currently wears a smaller look.
+            if (staffCostume is ushort newCostume && StaffCostumes(schema) is { } normal &&
+                (defaultCostume == normal.With || defaultCostume == normal.Without))
             {
-                _runtime.SetGlobalVariable(StaffCostumeVariable(schema), newCostume);
-                RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables.GetValueOrDefault(schema.LookKey), ["local[0x001]"] = newCostume }, 0);
+                _runtime.SetGlobalVariable(variable, newCostume);
+                if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) &&
+                    (ego.Look.Costume == normal.With || ego.Look.Costume == normal.Without))
+                    RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables.GetValueOrDefault(schema.LookKey), ["local[0x001]"] = newCostume }, 0);
+                else if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) && ego.Look.Costume > 0)
+                    RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables.GetValueOrDefault(schema.LookKey), ["local[0x001]"] = (ushort)ego.Look.Costume }, 0);
             }
             else if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault(schema.CostumeKey) && ego?.Look.Costume > 0)
                 RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables.GetValueOrDefault(schema.LookKey), ["local[0x001]"] = (ushort)ego.Look.Costume }, 0);
-            RefreshStatusNotes(held);
         }
         else if (ego?.Look.Costume == _runtime.GlobalVariables.GetValueOrDefault("var[0x07D]") && ego?.Look.Costume > 0)
             RunStartedScript(17, 0, new Dictionary<string, ushort> { ["local[0x000]"] = _runtime.GlobalVariables["var[0x07C]"], ["local[0x001]"] = (ushort)ego.Look.Costume }, 0);
-        else RefreshStatusNotes(held);
     }
 
     private (ushort With, ushort Without)? _staffCostumes;
@@ -288,7 +300,7 @@ public sealed partial class LoomExplorationSession
     private void RefreshStatusNotes(bool held)
     {
         RunStartedScript(19, 0, null, 0); // Source clears any partial input as part of this explicit edit.
-        if (held) RunStartedScript(18, 0, new Dictionary<string, ushort> { ["local[0x000]"] = 2 }, 0);
+        if (held && !IsStaffMenu) RunStartedScript(18, 0, new Dictionary<string, ushort> { ["local[0x000]"] = 2 }, 0);
     }
 
     private IReadOnlyList<LoomStoryEvent>? _storyEvents;

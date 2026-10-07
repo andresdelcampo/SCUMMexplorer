@@ -649,6 +649,8 @@ public sealed partial class LoomExplorationSession
         CatalogEnter(room);
         ApplyBrowsingStaffFloor();
         _staffVerbSyncFrames = StaffVerbSyncWindow;
+        _staffDisplayNeedsRefresh = true;
+        SyncStaffVerbs();
         return Snapshot;
     }
 
@@ -996,6 +998,9 @@ public sealed partial class LoomExplorationSession
         _runtime.Actors.HideAll();
         // startScene stops the talk and the room redraw erases drawn strings.
         _runtime.Messages.RoomEntered(_runtime);
+        // CD keeps verb-screen strings across room loads. This menu must also erase the previous room's note letters,
+        // before its own entry prints the skill choices; the possession bit is preserved.
+        if (IsStaffMenu) _runtime.Messages.VerbDrawn(new LoomScreenBox(0, LoomVerbArea.Top, 319, 199, 0));
         var roomData = _data.ReadRoom(room.ResourceId!.Value);
         _currentObjects = roomData.Objects;
         // getObjOrActorName for text code 6: the stored names of this room's objects.
@@ -1223,6 +1228,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomObjectActionResult Click(int x, int y, bool doubleClick = false)
     {
+        _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null; // Subsequent input belongs to gameplay, beyond catalog arrival.
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before clicking in it.");
@@ -1282,7 +1288,12 @@ public sealed partial class LoomExplorationSession
     /// verb's rectangle from its object's image in the room it was taken from
     /// (<see cref="LoomVerbArea.Compose"/>).
     /// </summary>
-    public LoomVerbAreaPicture VerbArea() => LoomVerbArea.Compose(_runtime.Verbs.Snapshot(), VerbImage, _runtime.Verbs.Erases(), alignRows: _game.Id == GameId.LoomVga);
+    // Product rule: the skill menu never displays the distaff; possession is kept for the next room.
+    private bool IsStaffMenu => _currentRoom?.ResourceId == 69 && !_game.IsDemo;
+
+    public LoomVerbAreaPicture VerbArea() => LoomVerbArea.Compose(
+        _runtime.Verbs.Snapshot().Where(v => !IsStaffMenu || !(v.VerbId is >= 1 and <= 8 or >= 0x31 and <= 0x35 or >= 0x5A and <= 0x61)),
+        VerbImage, _runtime.Verbs.Erases(), alignRows: _game.Id == GameId.LoomVga);
 
     private readonly Dictionary<int, IReadOnlyList<RoomObjectImage>> _verbImageRooms = [];
 
@@ -1313,6 +1324,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomObjectActionResult ClickVerbArea(int x, int y)
     {
+        _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before clicking in the verb area.");
@@ -1417,6 +1429,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomObjectActionResult PressKey(int key)
     {
+        _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before pressing a key.");
@@ -1593,6 +1606,7 @@ public sealed partial class LoomExplorationSession
 
     public LoomObjectActionResult ActivateObjectVerb(int objectId, int verbId)
     {
+        _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before activating an object verb.");
@@ -1668,6 +1682,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public void PlaceEgo(int x, int y)
     {
+        _staffVerbSyncFrames = 0;
         if (!StatusEditable) throw new InvalidOperationException("Finish the current scene, draft, movement or dialogue before placing the ego.");
         if (_currentRoom?.ResourceId is not int room || !_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
             throw new InvalidOperationException("Visit a room with a known ego before placing it.");
@@ -1696,6 +1711,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public void WalkEgoTo(int x, int y)
     {
+        _staffVerbSyncFrames = 0;
         if (!StatusEditable) throw new InvalidOperationException("Finish the current scene, draft, movement or dialogue before walking the ego.");
         if (_currentRoom?.ResourceId is not int room || !_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !LoomActorTable.IsValid(ego))
             throw new InvalidOperationException("Visit a room with a known ego before walking it.");
@@ -1750,6 +1766,7 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public LoomObjectActionResult RunLocalScriptAt(int scriptId, int offset)
     {
+        _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
         if (_currentRoom?.ResourceId is not int sourceRoomId)
             throw new InvalidOperationException("Visit a room before starting one of its scripts.");
@@ -1781,7 +1798,7 @@ public sealed partial class LoomExplorationSession
     public LoomSessionSnapshot AdvanceFrame()
     {
         var snapshot = AdvanceOneFrame();
-        if (_staffVerbSyncFrames > 0) { _staffVerbSyncFrames--; SyncStaffVerbs(); }
+        if (_staffVerbSyncFrames > 0 && StatusEditable) { SyncStaffVerbs(); _staffVerbSyncFrames--; snapshot = Snapshot; }
         if (_browsingStaffFloor.HasValue) { ApplyBrowsingStaffFloor(); snapshot = Snapshot; }
         if (!_playingBoot) return snapshot;
         ContinuePlayedBoot();
@@ -1792,6 +1809,7 @@ public sealed partial class LoomExplorationSession
 
     private const int StaffVerbSyncWindow = 32;
     private int _staffVerbSyncFrames;
+    private bool _staffDisplayNeedsRefresh;
 
     /// <summary>
     /// After a catalog visit the staff in the verb area follows the staff bit, as the ego's staff animation does (script 017 picks it from
@@ -1801,7 +1819,18 @@ public sealed partial class LoomExplorationSession
     private void SyncStaffVerbs()
     {
         if (InCutscene || !StatusEditable || GameStatus.StaffHeld is not bool held) return;
+        if (IsStaffMenu) return;
         var notesOn = _runtime.Verbs.Snapshot().Any(verb => verb.VerbId is >= 1 and <= 8 && verb.Mode is 1 or 2);
+        // startScene erases printed note letters while leaving the image verb slots on.
+        // Rebuild once after entry has settled, even if those slots already agree with possession.
+        if (_staffDisplayNeedsRefresh)
+        {
+            _staffDisplayNeedsRefresh = false;
+            _uncertainties.Add("Room entered from the catalog: the distaff appearance and note controls are refreshed through scripts 017–019 from the current possession state (explorer adjustment; the route was not played).");
+            RefreshStatusEgo(held);
+            RefreshStatusNotes(held);
+            return;
+        }
         if (held == notesOn) return;
         _uncertainties.Add($"Room entered from the catalog: the staff verbs were {(notesOn ? "on" : "off")} while the staff is {(held ? "held" : "not held")}; they follow the staff bit (explorer adjustment).");
         RefreshStatusNotes(held);
