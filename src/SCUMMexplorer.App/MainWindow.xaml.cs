@@ -5569,12 +5569,21 @@ public partial class MainWindow : Window
         HotspotHighlightOverlay.Children.Add(bounds);
     }
 
+    private int? _roomMusicActionsRoom;
+
     private async void UpdateRoomMusicActions()
     {
         var generation = ++_roomMusicUpdateGeneration;
-        RoomMusicPanel.Visibility = Visibility.Collapsed;
-        _roomSoundChoices = [];
-        RoomSoundsButton.Visibility = Visibility.Collapsed;
+        // Called again while the room stays (a scene plays, the view refreshes): hiding the music panel and the Sounds button until the list is
+        // rebuilt made them blink and the row of buttons shake, so they stay as they are and are replaced when the list is ready.
+        var sameRoom = _roomMusicActionsRoom == _currentRoomResource?.ResourceId && _currentRoomResource is not null;
+        _roomMusicActionsRoom = _currentRoomResource?.ResourceId;
+        if (!sameRoom)
+        {
+            RoomMusicPanel.Visibility = Visibility.Collapsed;
+            _roomSoundChoices = [];
+            RoomSoundsButton.Visibility = Visibility.Collapsed;
+        }
         if (_game is { Id: GameId.LoomVga, Vga.Disc: not null } && _currentRoomResource is { ResourceId: int cdRoomId })
         {
             // The CD game: the disc's audio the room's own scripts ask for (music or narration first, then the spoken lines), played on demand.
@@ -5650,7 +5659,7 @@ public partial class MainWindow : Window
             .OrderBy(item => item.Resource.ResourceId)
             .ToList();
         RoomSoundsButton.Visibility = _roomSoundChoices.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        if (interactive) return;
+        if (interactive) { RoomMusicPanel.Visibility = Visibility.Collapsed; return; }
         bool IsMusic(int id) => scannedTracks.TryGetValue(id, out var result) && result.IsMusic;
         var reached = session is not null
             ? LoomSoundCueResolver.ResolveForRoom(events, room.ResourceId!.Value, entrySequence, IsMusic)

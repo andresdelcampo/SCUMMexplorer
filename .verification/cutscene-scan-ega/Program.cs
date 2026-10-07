@@ -56,6 +56,13 @@ if (args.Length > 2 && args[2] == "masks") // CutsceneScanCompare <CD folder> - 
     }
     return;
 }
+if (args.Length > 2 && args[2] == "grep") // CutsceneScanCompare <folder> - grep <text>: instructions of global, entry and local scripts containing the text
+{
+    void Scan(string name, LoomScriptDisassembly? d) { foreach (var ins in d?.Instructions ?? []) if ($"{ins.Operation} {ins.Operands}".Contains(args[3])) Console.WriteLine($"{name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
+    foreach (var id in data.GlobalScriptIds()) Scan($"global {id}", data.GlobalScript(id));
+    foreach (var room in rooms) { Scan($"room {room} entry", data.RoomEntryScript(room)); foreach (var id in data.RoomLocalScriptIds(room)) Scan($"room {room} local {id}", data.RoomLocalScript(room, id)); }
+    return;
+}
 using var doc = JsonDocument.Parse(File.ReadAllText(args[1]));
 var catalog = doc.RootElement.GetProperty("replays").EnumerateArray()
     .Select(e => (Room: e.GetProperty("room").GetInt32(), Obj: e.GetProperty("objectId").GetInt32(), Verb: e.GetProperty("verb").GetInt32(), Id: e.GetProperty("id").GetString()!)).ToList();
