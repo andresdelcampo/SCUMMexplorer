@@ -5713,8 +5713,11 @@ public partial class MainWindow : Window
         {
             var picked = cue;
             var snippet = cue.Text.Length > 36 ? cue.Text[..36] + "…" : cue.Text;
-            var label = $"▶ {(cue.IsMusicOrNarration ? "♪ " : "")}{cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}";
-            entries.Add((label, IsAdvancedMode ? $"disc second {cue.Cue.DiscSeconds:0.#}; asked for by {cue.Source}" : null, () => _cdVoice.PlayNow(disc, picked.Cue)));
+            // Normal: what it is (a line's text, or music). Advanced: the technical form, as the EGA list gives it (where it is from, and its length).
+            var label = IsAdvancedMode
+                ? $"▶ {cue.Source} · disc second {cue.Cue.DiscSeconds:0.#} · {cue.Cue.Seconds:0.#} s"
+                : $"▶ {(cue.IsMusicOrNarration ? "♪ " : "")}{cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}";
+            entries.Add((label, IsAdvancedMode ? (snippet.Length > 0 ? $"\"{cue.Text}\"" : null) : null, () => _cdVoice.PlayNow(disc, picked.Cue)));
         }
         OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
     }
@@ -5725,10 +5728,13 @@ public partial class MainWindow : Window
         if (_roomSoundChoices.Count == 0 || SessionInScene) return;
         var entries = new List<(string Label, string? Tip, Action Run)>();
         if (_audioSurface == AudioSurface.Room) entries.Add(("■ Stop", null, StopAudio));
+        int music = 0, effects = 0;
         foreach (var choice in _roomSoundChoices)
         {
             var picked = choice;
-            var label = $"▶ {picked.Resource.Name}" + (picked.Duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
+            // Normal: the kind of sound, numbered within its kind (the game gives sounds no titles); Advanced: the resource's own name.
+            var kind = picked.Music ? $"♪ Music {++music}" : $"Sound effect {++effects}";
+            var label = $"▶ {(IsAdvancedMode ? picked.Resource.Name : kind)}" + (picked.Duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
             entries.Add((label, IsAdvancedMode ? picked.Evidence : null, () => _ = AuditionRoomSoundAsync(picked)));
         }
         OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);

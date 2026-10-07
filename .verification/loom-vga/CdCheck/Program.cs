@@ -82,6 +82,15 @@ internal static class Program
                         if (Environment.GetEnvironmentVariable("CD_VERBS") == "1" && number == 5)
                             foreach (var g in (System.Collections.Generic.IEnumerable<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>)Call("CdCutsceneGroups")!)
                                 if (g.First.VerbId is not (0x36 or 0x37 or 0x38) && !g.First.IsRoomEntry) Console.WriteLine($"VERBID room {g.First.Room} obj {g.First.ObjectId} {g.First.ObjectName} verb 0x{g.First.VerbId:X2}");
+                        if (Environment.GetEnvironmentVariable("CD_CYCLE") == "1" && Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession cy)
+                        {
+                            void Ego(string what) { var e = cy.Actors.First(x => x.Number == 1); Console.WriteLine($"CYCLE room {number} {what}: held {cy.GameStatus.StaffHeld} costume {e.Look.Costume} frame {e.Look.Frame} notes-on {cy.Verbs.Count(v => v.VerbId is >= 1 and <= 8 && v.Mode is 1 or 2)}"); }
+                            int Overlay() { Call("UpdateActorLayer"); var src = ((System.Windows.Controls.Image)window.FindName("RoomActorOverlay")).Source as System.Windows.Media.Imaging.BitmapSource; if (src is null) return -1; var px = new byte[src.PixelWidth * src.PixelHeight * 4]; src.CopyPixels(px, src.PixelWidth * 4, 0); var n = 0; for (var i = 3; i < px.Length; i += 4) if (px[i] != 0) n++; return n; }
+                            void Refresh() { Call("RefreshRoomPreview"); Call("UpdateActorLayer"); Call("UpdateVerbArea"); }
+                            Ego("arrival"); Console.WriteLine($"CYCLE overlay arrival {Overlay()}");
+                            cy.UpdateStaffPossession(true); Refresh(); Ego("give"); await Task.Delay(500); Console.WriteLine($"CYCLE overlay give {Overlay()}");
+                            cy.UpdateStaffPossession(false); Refresh(); Ego("remove"); await Task.Delay(500); Console.WriteLine($"CYCLE overlay remove {Overlay()}");
+                        }
                         if (Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession sm) Console.WriteLine($"STAFFSYNC room {number}: held {sm.GameStatus.StaffHeld}, ego costume {sm.Actors.FirstOrDefault(x => x.Number == 1)?.Look.Costume}, verbs on {sm.Verbs.Count(v => v.Mode is 1 or 2)} (notes 1-8 on {sm.Verbs.Count(v => v.VerbId is >= 1 and <= 8 && v.Mode is 1 or 2)}); verb 0x31 mode {sm.Verbs.FirstOrDefault(v => v.VerbId == 0x31)?.Mode}");
                         if (Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession sm2) Console.WriteLine($"VERBTEXT room {number}: {sm2.Messages.OnScreen.Count(m => m.Y >= 144)} string(s) on the verb screen");
                         if (Environment.GetEnvironmentVariable("CD_IMG") == "1")
