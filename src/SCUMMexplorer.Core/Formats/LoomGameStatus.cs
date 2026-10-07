@@ -103,12 +103,15 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
             string Stored(string local) => c17All.Where(i => i.Operation == "move").Select(i => Regex.Match(i.Operands, @"^(var\[0x[0-9A-F]+\]) = " + Regex.Escape(local) + "$")).FirstOrDefault(m => m.Success)?.Groups[1].Value
                 ?? throw Fail("017");
             var lookKey = Stored("local[0x000]"); var costumeKey = Stored("local[0x001]");
-            // On CD, 017 also stores the look (var 0x0AE) and 018 the layout (var 0x0AD, 0 to 2 and above) that the note controls follow. The browsing floor of the
-            // EGA catalog (its initial notes and checkpoint) has no counterpart established here: none is applied.
-            return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 0, "", 0, startKey, playKey, 0,
+            // Read the CD's initial three-note limit from its own opening initialization, as for EGA.
+            var initial = data!.RoomLocalScriptIds(1).Select(id => data.RoomLocalScript(1, id))
+                .FirstOrDefault(s => s?.Instructions.Any(i => i.Operation == "move" && i.Operands == $"{noteLimit} = 0x0003") == true)
+                ?? throw Fail("Room 01 initial notes");
+            return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 3, "", 0, startKey, playKey, 0,
                 $"Loaded CD scripts 017 +0x{staffTest.Offset:X4}/+0x{staffMove.Offset:X4}: {staff}=1 means held (it starts 018 with 2, else 019); 010 +0x{limitTest.Offset:X4}/+0x{limitChain.Offset:X4}: note IDs 1..8 up to and including {noteLimit} are available. " +
                 $"023: two words per draft, four 3-bit notes +1; flags 0x2000 learned ({learned})/0x1000 reverse ({reverse})/0x4000 last-note knowledge ({lastNote}). " +
                 "022 searches slots 0..15 inclusively. 026 refuses matched unlearned drafts before target dispatch; 022 skips reverse matching without 0x1000. " +
+                $"{initial.Context} sets {noteLimit}=3, the initial browsing floor while the staff is held. " +
                 "Staff edits refresh the look through 017 and the note controls through 018/019. " +
                 "These explicit edits are exploration choices, not source-established pickups or learning.", lookKey, costumeKey);
         }
@@ -348,14 +351,15 @@ public sealed partial class LoomExplorationSession
     private void ApplyBrowsingStaffFloor()
     {
         if (_browsingStaffFloor is not int previous || StatusSchema is not { } schema) return;
-        if (!StatusEditable) { _browsingStaffQuietFrames = 0; return; }
+        if (InCutscene || DraftPlaying) { _browsingStaffQuietFrames = 0; return; }
         var current = GameStatus;
         int floor = Math.Max(previous, current.StaffHeld == true ? schema.InitialNotes : 0);
         // This flag records the native seven-note checkpoint, not a guessed room-number range.
         if (current.StaffHeld == true && _runtime.GlobalVariables.GetValueOrDefault(schema.CheckpointKey) == 1 &&
             !_runtime.EstimatedVariables.Contains(schema.CheckpointKey) && !_runtime.EstimatedVariables.Contains("var[0x0DC]"))
             floor = Math.Max(floor, schema.CheckpointNotes);
-        if (++_browsingStaffQuietFrames >= 32) _browsingStaffFloor = null;
+        if (StatusEditable) { if (++_browsingStaffQuietFrames >= 32) _browsingStaffFloor = null; }
+        else _browsingStaffQuietFrames = 0;
         if (current.AvailableNoteCount is not int count || count >= floor) return;
         SetStatusWord(schema.NoteLimitKey, (ushort)floor, origin: "Explorer room browsing adjustment");
         RefreshStatusNotes(current.StaffHeld == true);

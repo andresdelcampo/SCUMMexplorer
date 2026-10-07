@@ -1818,16 +1818,18 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     private void SyncStaffVerbs()
     {
-        if (InCutscene || !StatusEditable || GameStatus.StaffHeld is not bool held) return;
+        if (InCutscene || DraftPlaying || GameStatus.StaffHeld is not bool held) return;
         if (IsStaffMenu) return;
         var notesOn = _runtime.Verbs.Snapshot().Any(verb => verb.VerbId is >= 1 and <= 8 && verb.Mode is 1 or 2);
         // startScene erases printed note letters while leaving the image verb slots on.
-        // Rebuild once after entry has settled, even if those slots already agree with possession.
+        // Rebuild on entry even if those slots already agree with possession.
         if (_staffDisplayNeedsRefresh)
         {
-            _staffDisplayNeedsRefresh = false;
+            // The strip is independent of entry walks/camera motion. Refresh it before returning the catalog visit;
+            // the ego's costume can wait until entry movement has settled.
+            _staffDisplayNeedsRefresh = !StatusEditable;
             _uncertainties.Add("Room entered from the catalog: the distaff appearance and note controls are refreshed through scripts 017–019 from the current possession state (explorer adjustment; the route was not played).");
-            RefreshStatusEgo(held);
+            if (StatusEditable) RefreshStatusEgo(held);
             RefreshStatusNotes(held);
             return;
         }

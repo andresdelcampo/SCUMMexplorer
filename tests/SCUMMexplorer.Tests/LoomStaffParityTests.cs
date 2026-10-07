@@ -17,14 +17,18 @@ public sealed class LoomStaffParityTests
         var session = new LoomExplorationSession(game, indexed);
         void Visit(int room)
         {
-            session.VisitRoomById(room);
+            session.VisitRoom(game.Rooms.Single(r => r.ResourceId == room), preserveStaffLevel: true);
+            if (session.GameStatus.StaffHeld == true && room != 69 && !session.InCutscene)
+                Assert.True(NoteText(), $"{edition}: note letters must be present before any entry frames in Room {room}");
             for (var f = 0; f < 600 && (!session.GameStatus.CanEdit || f < 40); f++) session.AdvanceFrame();
         }
         bool NoteText() => session.Messages.OnScreen.Any(m => m.Y >= 144 && m.Source.StartsWith("Script 18 +", StringComparison.Ordinal));
         Visit(3);
         session.UpdateStaffPossession(true);
+        session.UpdateAvailableNotes(1);
         Visit(5);
         Assert.True(session.GameStatus.StaffHeld);
+        Assert.Equal(3, session.GameStatus.AvailableNoteCount);
         Assert.Equal(8, session.VerbArea().Items.Count(v => v.VerbId is >= 1 and <= 8));
         Assert.True(NoteText(), string.Join("; ", session.Messages.OnScreen.Select(m => $"{m.Source} ({m.X},{m.Y})")));
         var held = session.Actors.Single(a => a.Number == 1).Look;
@@ -36,14 +40,31 @@ public sealed class LoomStaffParityTests
         Assert.False(session.GameStatus.StaffHeld);
         Assert.DoesNotContain(session.VerbArea().Items, v => v.VerbId is >= 1 and <= 8);
         session.UpdateStaffPossession(true);
+        session.UpdateAvailableNotes(8);
         Visit(69);
         Assert.True(session.GameStatus.StaffHeld);
+        Assert.Equal(8, session.GameStatus.AvailableNoteCount);
         Assert.DoesNotContain(session.VerbArea().Items, v => v.VerbId is >= 1 and <= 8 or >= 0x31 and <= 0x35 or >= 0x5A and <= 0x61);
         Assert.False(NoteText());
         Visit(3);
         Assert.True(session.GameStatus.StaffHeld);
         Assert.True(NoteText());
         Assert.Equal(8, session.VerbArea().Items.Count(v => v.VerbId is >= 1 and <= 8));
+    }
+
+    [Theory]
+    [InlineData("loom ega mt32 en")]
+    [InlineData("loom vga en")]
+    public void AutomaticCatalogStaffUsesTheInitialThreeNotes(string edition)
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", edition));
+        var game = new GameFolderScanner().Scan(folder);
+        var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
+        var session = new LoomExplorationSession(game, indexed);
+        session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 26), preserveStaffLevel: true);
+        for (int f = 0; f < 600 && (!session.GameStatus.CanEdit || f < 40); f++) session.AdvanceFrame();
+        Assert.True(session.GameStatus.StaffHeld);
+        Assert.Equal(3, session.GameStatus.AvailableNoteCount);
     }
 
 }
