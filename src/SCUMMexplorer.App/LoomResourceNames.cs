@@ -8,7 +8,7 @@ internal static class LoomResourceNames
 {
     public static GlossaryEntry? Entry(LoomGlossary glossary, GameResource resource) => resource.ResourceId is not int id ? null : resource.Kind switch
     {
-        ResourceKind.Script => glossary.Script(id),
+        ResourceKind.Script => resource.ScriptRoom is null ? glossary.Script(id) : null,
         ResourceKind.Sound => null, // sounds stay plain "Sound NN": a name or a music/effect guess was not reliable enough (user, 4 October)
         ResourceKind.Room => glossary.Room(id),
         _ => null

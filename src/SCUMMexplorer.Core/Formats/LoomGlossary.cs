@@ -34,7 +34,7 @@ public sealed record GlossaryEntry(string Name, GlossaryEvidence Evidence, strin
 /// file <c>loom-glossary.json</c> (seeded from docs/loom/LOOM_SCRIPT_MAP.md); object names come from the game's own data. Anything
 /// not listed stays unnamed: callers show the raw form (<c>var[0x0D1]</c>) rather than a guess.
 /// </summary>
-public sealed class LoomGlossary
+public sealed partial class LoomGlossary
 {
     private sealed record Row(string Kind, string Key, string? To, string Name, string Evidence, string? Source, string? Scope = null);
     private sealed record File(List<Row> Entries);
@@ -63,7 +63,9 @@ public sealed class LoomGlossary
         // The table's script, bit, actor and sound names were checked on the full game's data. A demo is another build
         // (its script 045 directs the preview), so those numbers are not named there; variables and rooms are kept.
         var demo = game is { IsDemo: true };
-        foreach (var row in file.Entries.Where(row => !demo || row.Kind is not ("script" or "bit" or "actor" or "sound")))
+        var cd = game?.Id == GameId.LoomVga;
+        foreach (var row in file.Entries.Where(row => cd ? row.Kind == "var" && row.Evidence == "engine"
+            : !demo || row.Kind is not ("script" or "bit" or "actor" or "sound")))
         {
             var from = ParseNumber(row.Key);
             var to = row.To is null ? from : ParseNumber(row.To);
@@ -76,6 +78,7 @@ public sealed class LoomGlossary
             glossary.ReadObjects(game);
             if (!demo) glossary._bitShift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
         }
+        if (cd) glossary.ReadCdNames(game!);
         return glossary;
     }
 

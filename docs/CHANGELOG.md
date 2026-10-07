@@ -1,5 +1,9 @@
 # Changelog
 
+## 7 October follow-up: shared sound rows, immediate notes, live thumbnails and dialog exit
+
+Advanced EGA/VGA sound rows share resource, kind, initiating source and duration; full paths/precise CD timing stay in tooltips. Room 68's selected/live thumbnail now keeps the shadow palette. Both room cutscene lists identify the start room when it differs from the viewed room. VGA's intro is Opening and its scripts use the shared Readable presenter, correct CD container headers and source-verified helper names. CD browsing reads its initial three-note floor from its own opening initialization; EGA note letters no longer wait for entry camera/walk completion. Game Status has Apply and close / Cancel, with one-click exit. Four focused staff cases and bounded UI checks passed; [follow-up record](../.verification/loom-parity/README.md). No full suite or push.
+
 ## 7 October: staff and presentation parity from user feedback
 
 Catalog room changes keep the distaff appearance and note controls together on EGA and VGA; EGA reprints its note letters, and VGA updates its large-costume default while Bobbin wears a smaller look. Room 69 suppresses the staff while preserving possession. Advanced Sounds has readable source details on EGA; Room 68's thumbnail uses the same script palette as the room view. Doorway titles use concise Reached Room labels, both pickers show verb numbers in Advanced, and VGA's intro is The Opening. VGA Room entry links now open global and room-local v4 scripts with correct DISK01.LEC source headers. Validation: six focused test cases and one bounded WPF harness, rerun only for the discovered failures; [record](../.verification/loom-parity/README.md). No push.

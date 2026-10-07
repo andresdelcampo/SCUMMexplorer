@@ -29,7 +29,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
         _scope = script.Context is null ? $"script:{script.ScriptId}" : null;
         _roomScope = RoomScope(script.Context);
         var output = new StringBuilder();
-        output.AppendLine(script.Context is null ? ScriptTitle(script) : $"{script.Context}  ·  {script.ContainerFileNumber:00}.LFL");
+        output.AppendLine(script.Context is null ? ScriptTitle(script) : $"{script.Context}  ·  {script.ContainerName ?? $"{script.ContainerFileNumber:00}.LFL"}");
         output.AppendLine("Readable view: the decoded instructions in plain language. Static paths, not proof of execution. " +
                           "Names carry their evidence (listed at the end); anything unnamed keeps its raw form. Switch to Raw for the instructions as decoded.");
         output.AppendLine();
@@ -65,7 +65,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
     private string ScriptTitle(LoomScriptDisassembly script)
     {
         var named = glossary.Script(script.ScriptId);
-        return $"Script {script.ScriptId:00}" + (named is null ? "" : $" · {named.Name}") + $"  ·  {script.ContainerFileNumber:00}.LFL";
+        return $"Script {script.ScriptId:00}" + (named is null ? "" : $" · {named.Name}") + $"  ·  {script.ContainerName ?? $"{script.ContainerFileNumber:00}.LFL"}";
     }
 
     // ---- structure -------------------------------------------------------------------------------------------------

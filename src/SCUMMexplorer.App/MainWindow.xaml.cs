@@ -235,7 +235,7 @@ public partial class MainWindow : Window
             ? _stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
             : null;
         _game = game;
-        _glossary = game.Id == GameId.Loom ? LoomGlossary.Load(game) : LoomGlossary.Default;
+        _glossary = game.Id is GameId.Loom or GameId.LoomVga ? LoomGlossary.Load(game) : LoomGlossary.Default;
         _usageIndex = LoomUsageIndex.Empty;
         if (game.Id == GameId.Loom) _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
@@ -393,8 +393,8 @@ public partial class MainWindow : Window
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
             foreach (var item in group)
-                node.Items.Add(new TreeViewItem { Header = game.Id == GameId.LoomVga ? item.Name : LoomResourceNames.Label(_glossary, item),
-                    ToolTip = game.Id == GameId.LoomVga ? item.Description : LoomResourceNames.Evidence(_glossary, item), Tag = item });
+                node.Items.Add(new TreeViewItem { Header = LoomResourceNames.Label(_glossary, item),
+                    ToolTip = LoomResourceNames.Evidence(_glossary, item) ?? item.Description, Tag = item });
             ResourceTree.Items.Add(node);
         }
 
@@ -883,10 +883,10 @@ public partial class MainWindow : Window
             PreviewMessage.Visibility = Visibility.Collapsed;
             ScriptPanel.Visibility = Visibility.Visible;
             ShowPageHeader(true);
-            PageTitle.Text = _game?.Id == GameId.LoomVga ? resource.Name : LoomResourceNames.Label(_glossary, resource);
+            PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
             PageSubtitle.Text = _game?.Id == GameId.LoomVga ? "LOOM CD script · SCUMM v4" : LoomResourceNames.Entry(_glossary, resource) is { } named
                 ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : "Indexed script resource · DOS LOOM old-v3";
-            PageTitle.ToolTip = _game?.Id == GameId.LoomVga ? resource.Description : LoomResourceNames.Evidence(_glossary, resource);
+            PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
             ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : "Reading DOS LOOM old-v3 bytecode…";
@@ -1266,7 +1266,7 @@ public partial class MainWindow : Window
             var liveCameraX = SessionModeToggle.IsChecked == true && _session is not null
                 ? _session.CameraX ?? 0
                 : _pendingCameraX ?? 0;
-            bitmap = CreateRoomCardBitmap(liveRoom, _objectSelection.Compose(liveRoom), liveCameraX);
+            bitmap = CreateRoomCardBitmap(liveRoom, _objectSelection.Compose(liveRoom), liveCameraX, DisplayPalette(liveRoom));
         }
         var card = RoomCardList.Children.OfType<Button>().FirstOrDefault(item => Equals(item.Tag, resource));
         if (card is null) return;
@@ -1548,7 +1548,7 @@ public partial class MainWindow : Window
         }
         foreach (var (target, verb, certainty, count) in rows)
         {
-            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {(_game?.Id == GameId.LoomVga ? target.Name : LoomResourceNames.Label(_glossary, target))}{(count > 1 ? $" ×{count}" : "")}";
+            var label = $"{(certainty.Length > 0 ? certainty + " " : "")}{verb} {LoomResourceNames.Label(_glossary, target)}{(count > 1 ? $" ×{count}" : "")}";
             var button = new Button
             {
                 Content = label,
@@ -1759,7 +1759,7 @@ public partial class MainWindow : Window
         if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
     }
 
-    private string FormatScript(LoomScriptDisassembly script) => _readableScripts && _game?.Id == GameId.Loom
+    private string FormatScript(LoomScriptDisassembly script) => _readableScripts && _game?.Id is GameId.Loom or GameId.LoomVga
         ? new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull).Present(script)
         : script.Format(_showScriptBytes);
 
@@ -3983,7 +3983,7 @@ public partial class MainWindow : Window
         StatusText.ToolTip = DemoPreviewNote + Environment.NewLine + string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
     }
 
-    private const string CdIntroTitle = "The Opening";
+    private const string CdIntroTitle = "Opening";
 
     private const string CdIntroNote =
         "LOOM CD's start (script 001 from the beginning): Room 69's skill screen with the spoken line, then script 044 over the 84-second " +
@@ -4175,7 +4175,11 @@ public partial class MainWindow : Window
             return items;
         }
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
-        return PlayableCutsceneItems().Where(choice => ids.Contains(choice.Id)).Select(choice => choice.Item).ToList();
+        var starts = (_replayCatalog?.Membership ?? []).ToDictionary(m => m.Id, m => m.StartRoom);
+        return PlayableCutsceneItems().Where(choice => ids.Contains(choice.Id)).Select(choice =>
+            starts.TryGetValue(choice.Id, out var start) && start != roomId
+                ? choice.Item with { Title = choice.Item.Title + $" (played from Room {start:00})" }
+                : choice.Item).ToList();
     }
 
     private void RoomCutscene_Click(object sender, RoutedEventArgs e)
@@ -5750,23 +5754,32 @@ public partial class MainWindow : Window
     private static string SoundSourceSummary(string evidence)
     {
         var references = evidence.Split(["\r\n", "\n"], StringSplitOptions.RemoveEmptyEntries).Distinct().ToArray();
-        return references.FirstOrDefault() + (references.Length > 1 ? $" (+{references.Length - 1} other references)" : "");
+        // Both editions show the initiating source on the row; full call paths belong in its tooltip.
+        var source = (references.FirstOrDefault() ?? "").Split('→')[0].Trim();
+        source = System.Text.RegularExpressions.Regex.Replace(source, @"\broom (\d+)\b", m => $"Room {int.Parse(m.Groups[1].Value):00}", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return System.Text.RegularExpressions.Regex.Replace(source, @"\bverb\b", "Verb", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
+
+    private string RoomSoundLabel(string resource, string kind, string source, TimeSpan? duration) =>
+        $"▶ {(IsAdvancedMode ? resource + " · " + kind + " · " + SoundSourceSummary(source) : kind)}" +
+        (duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
 
     /// <summary>The CD game's Sounds menu: the disc audio this room's scripts ask for, played on demand (an exploration action).</summary>
     private void CdRoomSounds_Click()
     {
         if (_cdRoomCues.Count == 0 || SessionInScene || _game?.Vga?.Disc is not { } disc) return;
         var entries = new List<(string Label, string? Tip, Action Run)> { ("■ Stop", null, _cdVoice.Stop) };
+        int music = 0, voices = 0;
         foreach (var cue in _cdRoomCues)
         {
             var picked = cue;
             var snippet = cue.Text.Length > 36 ? cue.Text[..36] + "…" : cue.Text;
-            // Normal: what it is (a line's text, or music). Advanced: the technical form, as the EGA list gives it (where it is from, and its length).
+            var kind = cue.IsMusicOrNarration ? $"♪ Music / narration {++music}" : $"Voice {++voices}";
             var label = IsAdvancedMode
-                ? $"▶ {SoundSourceSummary(cue.Source)} · disc second {cue.Cue.DiscSeconds:0.#} · {cue.Cue.Seconds:0.#} s"
+                ? RoomSoundLabel($"CD cue {cue.Cue.DiscSeconds:0.#}", kind, cue.Source, TimeSpan.FromSeconds(cue.Cue.Seconds))
                 : $"▶ {(cue.IsMusicOrNarration ? "♪ " : "")}{cue.Cue.Seconds:0.#} s{(snippet.Length > 0 ? " · " + snippet : "")}";
-            entries.Add((label, IsAdvancedMode ? (snippet.Length > 0 ? $"\"{cue.Text}\"" : null) : null, () => _cdVoice.PlayNow(disc, picked.Cue)));
+            entries.Add((label, IsAdvancedMode ? $"{cue.Source}\nDisc second {cue.Cue.DiscSeconds:0.#} · {cue.Cue.Seconds:0.#} s" +
+                (cue.Text.Length > 0 ? $"\n\"{cue.Text}\"" : "") : null, () => _cdVoice.PlayNow(disc, picked.Cue)));
         }
         OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);
     }
@@ -5783,7 +5796,7 @@ public partial class MainWindow : Window
             var picked = choice;
             // Normal: the kind of sound, numbered within its kind (the game gives sounds no titles); Advanced: the resource's own name.
             var kind = picked.Music ? $"♪ Music {++music}" : $"Sound effect {++effects}";
-            var label = $"▶ {(IsAdvancedMode ? picked.Resource.Name + " · " + kind + " · " + SoundSourceSummary(picked.Evidence) : kind)}" + (picked.Duration is TimeSpan length ? $" · {FormatRoomCueDuration(length)}" : "");
+            var label = RoomSoundLabel(picked.Resource.Name, kind, picked.Evidence, picked.Duration);
             entries.Add((label, IsAdvancedMode ? picked.Evidence : null, () => _ = AuditionRoomSoundAsync(picked)));
         }
         OpenPopupMenu(RoomSoundsButton, System.Windows.Controls.Primitives.PlacementMode.Top, "SOUNDS IN THIS ROOM", entries);

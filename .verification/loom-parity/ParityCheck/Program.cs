@@ -23,6 +23,12 @@ internal static class Program
         object? Call(string n, params object?[] a) => typeof(MainWindow).GetMethod(n, Private)!.Invoke(window, a);
         var report = new List<string>();
         void Check(bool ok, string detail) { report.Add((ok ? "PASS " : "FAIL ") + detail); }
+        IEnumerable<T> Descendants<T>(DependencyObject node) where T : DependencyObject
+        {
+            if (node is T found) yield return found;
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(node); i++)
+                foreach (var child in Descendants<T>(VisualTreeHelper.GetChild(node, i))) yield return child;
+        }
         void Save(FrameworkElement element, string name)
         {
             element.UpdateLayout();
@@ -60,6 +66,20 @@ internal static class Program
                     Call("RefreshRoomPreview"); Call("UpdateActorLayer"); Call("UpdateMessageLayer"); Call("UpdateVerbArea");
                     Check(session.GameStatus.StaffHeld == true && session.VerbArea().Items.Count(v => v.VerbId is >= 1 and <= 8) == 8, prefix + " staff survives 03 to 05");
                     Save(window, prefix + "-staff05");
+                    var statusWindow = new GameStatusWindow(() => session, () => session.GameStatus.CanEdit,
+                        () => { }, game, () => true) { Owner = window, Resources = window.Resources };
+                    statusWindow.Show();
+                    ((Button)statusWindow.FindName("StaffButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    Save(statusWindow, prefix + "-status");
+                    ((Button)statusWindow.FindName("ApplyButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    Check(!statusWindow.IsVisible && session.GameStatus.StaffHeld == false, prefix + " Apply and close takes one click and applies");
+                    var cancelWindow = new GameStatusWindow(() => session, () => session.GameStatus.CanEdit,
+                        () => { }, game) { Owner = window, Resources = window.Resources };
+                    cancelWindow.Show();
+                    ((Button)cancelWindow.FindName("StaffButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    ((Button)cancelWindow.FindName("CloseButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    Check(!cancelWindow.IsVisible && session.GameStatus.StaffHeld == false, prefix + " Cancel takes one click and discards");
+                    session.UpdateStaffPossession(true);
                     await Visit(69);
                     Check(session.GameStatus.StaffHeld == true && !session.VerbArea().Items.Any(v => v.VerbId is >= 1 and <= 8 or >= 0x31 and <= 0x35), prefix + " menu hides staff and keeps possession");
                     Save(window, prefix + "-menu69");
@@ -68,6 +88,18 @@ internal static class Program
                     Check(buttons.Any(b => b.Content.ToString()!.Contains("Script", StringComparison.OrdinalIgnoreCase)), prefix + " Room 02 entry script links: " + buttons.Count);
                     ((Expander)window.FindName("RoomEntryTraceExpander")).IsExpanded = true;
                     Save(window, prefix + "-entry02");
+                    Call("UpdateRoomMusicActions");
+                    for (int i = 0; i < 60 && !cd && ((System.Collections.ICollection)Field("_roomSoundChoices")!).Count == 0; i++) await Task.Delay(50);
+                    Call("RoomSounds_Click", window.FindName("RoomSoundsButton"), new RoutedEventArgs());
+                    await Task.Delay(50);
+                    var popupRoot = PresentationSource.CurrentSources.Cast<PresentationSource>().Select(p => p.RootVisual)
+                        .OfType<FrameworkElement>().FirstOrDefault(root => Descendants<TextBlock>(root).Any(t => t.Text == "SOUNDS IN THIS ROOM") &&
+                            Descendants<TextBlock>(root).Any(t => t.Text.StartsWith(cd ? "▶ CD cue " : "▶ Sound ")));
+                    var soundRows = popupRoot is null ? [] : Descendants<TextBlock>(popupRoot).Select(t => t.Text).Where(t => t.StartsWith("▶")).ToArray();
+                    Check(soundRows.Length > 0 && soundRows.All(r => r.Split(" · ").Length == 4 && !r.Contains('→') && r.StartsWith(cd ? "▶ CD cue " : "▶ Sound ")), prefix + " Advanced sound rows share resource / kind / source / duration: " + string.Join("; ", soundRows.Take(2)));
+                    if (popupRoot is not null) Save(popupRoot, prefix + "-sounds");
+                    // Close the popup by moving focus back to the main window before the next view.
+                    window.Activate();
                     var formatted = typeof(MainWindow).Assembly.GetType("SCUMMexplorer.App.LoomReplayTitle")!.GetMethod("Format")!.Invoke(null, [2, "Room 02 · Use response · Reached Room 03"]);
                     Check((string)formatted! == "Room 02 · Reached Room 03", prefix + " concise doorway title");
                     Check((string)Call("PickerVerbTitle", formatted, 0x38)! == "Room 02 · Reached Room 03 (verb 0x38)", prefix + " advanced verb title");
@@ -80,8 +112,13 @@ internal static class Program
                         var target = (GameResource)Call("FindEventTarget", entry)!;
                         Call("SelectResourceInTree", target); await Task.Delay(100);
                         var scriptText = ((TextBox)window.FindName("ScriptOutput")).Text;
-                        Check(scriptText.Contains("actorOps") || scriptText.Contains("costume"), "VGA entry link opens decoded v4 script: " + scriptText[..Math.Min(scriptText.Length, 600)]);
+                        Check(scriptText.Contains("Readable view:") && scriptText.Contains("give the ego a costume (by size)") && scriptText.Contains("DISK01.LEC") && !scriptText.Contains("00.LFL"), "VGA entry link opens readable v4 script with verified title and correct container");
+                        ((CheckBox)window.FindName("ScriptReadableToggle")).IsChecked = false;
+                        Check(((TextBox)window.FindName("ScriptOutput")).Text.Contains("actorOps"), "VGA Raw toggle still shows decoded instructions");
+                        ((CheckBox)window.FindName("ScriptReadableToggle")).IsChecked = true;
                         Save(window, "vga-script17");
+                        var intro = Call("CdIntroItem")!;
+                        Check((string)intro.GetType().GetProperty("Title")!.GetValue(intro)! == "Opening", "VGA opening title");
                     }
                     else
                     {
@@ -91,8 +128,16 @@ internal static class Program
                         var thumb = (BitmapSource)typeof(MainWindow).GetMethod("RenderRoomCardThumbnail", BindingFlags.Static | BindingFlags.NonPublic)!
                             .Invoke(null, [game, resource, Field("_indexedObjectSnapshot"), Field("_indexedStates"), batches, CancellationToken.None])!;
                         Check(thumb.Palette!.Colors[9] == thumb.Palette.Colors[11] && thumb.Palette.Colors[15] == thumb.Palette.Colors[11], "EGA Room 68 thumbnail uses script palette");
+                        Call("SetRoomCardThumbnail", resource, thumb);
+                        Call("UpdateCurrentRoomCardThumbnail");
+                        var card = ((Panel)window.FindName("RoomCardList")).Children.OfType<Button>().Single(b => Equals(b.Tag, resource));
+                        var actualThumb = (BitmapSource)((Image)card.Content).Source;
+                        Check(actualThumb.Palette!.Colors[9] == actualThumb.Palette.Colors[11] && actualThumb.Palette.Colors[15] == actualThumb.Palette.Colors[11], "EGA Room 68 selected card retains palette after background and live updates");
                         Save(window, "ega-room68");
                         var enc = new PngBitmapEncoder(); enc.Frames.Add(BitmapFrame.Create(thumb)); using var fs = File.Create(Path.Combine(args[1], "ega-thumb68.png")); enc.Save(fs);
+                        var scenes = (System.Collections.IEnumerable)Call("RoomCutsceneItems", 3)!;
+                        var titles = scenes.Cast<object>().Select(s => (string)s.GetType().GetProperty("Title")!.GetValue(s)!).ToArray();
+                        Check(titles.Any(t => t.Contains("played from Room 02")), "EGA Room 03 list identifies scenes played from Room 02");
                     }
                 }
             }
