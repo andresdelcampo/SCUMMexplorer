@@ -1,5 +1,9 @@
 # Changelog
 
+## 7 October final clarification: all VGA Readable scripts and The Intro
+
+The CD glossary now names source-verified difficulty, distaff, input, note/draft, costume/animation, room and sound variables throughout all script kinds. The shared presenter names established indexed arrays and explains the remaining decoded operations, including walk boxes, lighting, room effects, object renaming, unstructured branches and CD voice cues. A decoding-only check covers all 1,470 supplied CD blocks without raw-operation fallbacks; unestablished story roles retain numeric IDs and evidence levels remain visible. Focused checks passed, including three unchanged EGA script goldens and a bounded Script 28 UI comparison. Both editions call the introductory sequence **The Intro**, leaving the Opening spell unchanged. Clean solution build; [record](../.verification/loom-parity/README.md). No full suite or push.
+
 ## 7 October follow-up: shared sound rows, immediate notes, live thumbnails and dialog exit
 
 Advanced EGA/VGA sound rows share resource, kind, initiating source and duration; full paths/precise CD timing stay in tooltips. Room 68's selected/live thumbnail now keeps the shadow palette. Both room cutscene lists identify the start room when it differs from the viewed room. VGA's intro is Opening and its scripts use the shared Readable presenter, correct CD container headers and source-verified helper names. CD browsing reads its initial three-note floor from its own opening initialization; EGA note letters no longer wait for entry camera/walk completion. Game Status has Apply and close / Cancel, with one-click exit. Four focused staff cases and bounded UI checks passed; [follow-up record](../.verification/loom-parity/README.md). No full suite or push.

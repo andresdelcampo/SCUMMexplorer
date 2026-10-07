@@ -12,6 +12,25 @@ User feedback after the 7 October first pass. Staff-state changes and their evid
 
 ## Validation and commands
 
+### Final clarification: all scripts, source names and The Intro
+
+The user's Script 28 comparison exposed the gap between sharing readable instruction structure and naming the CD operands. The expanded CD glossary now binds input/pointer/walk coordinates, difficulty, distaff use, note/draft buffers and flags, costume defaults/animations, previous room and sound roles to the CD's own decoded operands. Ambiguous patterns establish no name. Entries retain their decoded/reading evidence and instruction source; unestablished story roles remain numeric. These names apply throughout globals, room entry/exit, locals and object responses, not just Script 28. Its title is now **clear the draft buffer**, and the verified note-letter helper has a name too.
+
+The shared presenter renders established array bases with named indexes, preserving unknown/interior-base addresses. Previous-room comparison roles follow the glossary instead of an EGA-specific address. Remaining CD opcode families now have readable phrases: walk-box updates, room effects, lighting, system operations, object renaming, unstructured conditional jumps and CD voice cues. Original addresses/bytecode remain available through Raw. Generic changes passed the existing EGA reference outputs for scripts 6, 17 and 91 without updating their goldens.
+
+A decoding-only test formatted **all 1,470 supplied CD script blocks**: 122 globals, 78 entries, 78 exits, 515 locals and 677 object verbs. No decoded operation fell back to a `[raw]` line. This scan takes about 350 ms and does not execute scenes. Its counts are in ignored `readable-library.txt`. Source-role tests also check that EGA-only story addresses/titles are not imported into the CD glossary.
+
+The bounded `READABLE_ONLY=1` UI mode opens Script 28 on both editions, checks meaningful symbols and the Raw toggle, and verifies the shared intro title. It completed within its 30-second process limit. Inspected `ui-readable-final/vga-script28.png`; the CD now shows the same distaff/difficulty/wrong-tries meanings as EGA, its named draft buffer and source evidence. Both introductory sequences are **The Intro**; the Opening spell is unchanged.
+
+Final solution build passed with 0 warnings/errors. Focused repair checks passed: CD named-role/full-library tests, readable operation cases (including invariant CD seconds), named-array boundaries, and three EGA script goldens. The final filter was:
+
+```powershell
+dotnet build SCUMMexplorer.slnx --no-restore --verbosity quiet
+dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-restore --filter 'FullyQualifiedName~LoomCdReadableTests|FullyQualifiedName~RealScriptsMatchTheirGoldenOutput' --verbosity quiet
+```
+
+Five tests passed in that final filter. Earlier bounded operation/presenter checks were rerun only to repair the discovered CD decimal-culture failure. No full suite, replay harness, audio rendering or listening check. Temporary inspection sources were removed; decoded CD role evidence remains in ignored `cd-readable-roles.txt`.
+
 ### Follow-up clarification pass
 
 - Advanced rows now use the same formatter: resource / kind / initiating source / minutes:seconds duration. EGA's full call paths and alternate references stay in the tooltip; CD's exact disc time and spoken text stay in its tooltip. Inspected the actual popup captures `ui-followup-02/ega-sounds.png` and `ui-followup-vga/vga-sounds.png`.

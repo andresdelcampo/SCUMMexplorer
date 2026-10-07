@@ -3983,7 +3983,8 @@ public partial class MainWindow : Window
         StatusText.ToolTip = DemoPreviewNote + Environment.NewLine + string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
     }
 
-    private const string CdIntroTitle = "Opening";
+    private const string IntroTitle = "The Intro";
+    private const string CdIntroTitle = IntroTitle;
 
     private const string CdIntroNote =
         "LOOM CD's start (script 001 from the beginning): Room 69's skill screen with the spoken line, then script 044 over the 84-second " +
@@ -4222,7 +4223,7 @@ public partial class MainWindow : Window
         return (list.Count == 1 ? "Room " : "Rooms ") + string.Join(", ", list);
     }
 
-    private static readonly string OpeningTitle = LoomReplayTitle.Format(1, "Opening");
+    private const string OpeningTitle = IntroTitle;
 
     private const string OpeningSource =
         "Script 001 +0x021A starts script 044 and waits for it (+0x021D): Rooms 01, 02, 01, 02, 53 and 02, with the copyright " +

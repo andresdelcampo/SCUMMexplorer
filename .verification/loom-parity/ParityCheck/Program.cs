@@ -48,6 +48,22 @@ internal static class Program
                     ((ToggleButton)window.FindName("AdvancedModeToggle")).IsChecked = true;
                     Call("AdvancedModeToggle_Click", window.FindName("AdvancedModeToggle"), new RoutedEventArgs());
                     var game = (GameLibrary)Field("_game")!;
+                    if (Environment.GetEnvironmentVariable("READABLE_ONLY") == "1")
+                    {
+                        Call("SelectResourceInTree", game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == 28 && r.ScriptRoom is null));
+                        ((CheckBox)window.FindName("ScriptReadableToggle")).IsChecked = true;
+                        for (int i = 0; i < 60 && !((TextBox)window.FindName("ScriptOutput")).Text.Contains("clear the draft buffer"); i++) await Task.Delay(50);
+                        var text = ((TextBox)window.FindName("ScriptOutput")).Text;
+                        Check(text.Contains("Readable view:") && text.Contains("distaff in use (2 when held)") && text.Contains("difficulty (0 practice, 1 standard, 2 expert)") && text.Contains("wrong tries = 0"), prefix + " Script 28 readable symbols match their meanings");
+                        Check(!cd || text.Contains("fill draft buffer with 4 values"), prefix + " named CD draft buffer");
+                        Save(window, prefix + "-script28");
+                        ((CheckBox)window.FindName("ScriptReadableToggle")).IsChecked = false;
+                        Check(((TextBox)window.FindName("ScriptOutput")).Text.Contains(cd ? "var[0x096]" : "var[0x064]"), prefix + " Raw retains original variable addresses");
+                        ((CheckBox)window.FindName("ScriptReadableToggle")).IsChecked = true;
+                        var title = (string)typeof(MainWindow).GetField(cd ? "CdIntroTitle" : "OpeningTitle", BindingFlags.Static | BindingFlags.NonPublic)!.GetRawConstantValue()!;
+                        Check(title == "The Intro", prefix + " introductory sequence is The Intro");
+                        continue;
+                    }
                     async Task Visit(int number)
                     {
                         Call("SelectResourceInTree", game.Rooms.Single(r => r.ResourceId == number));
@@ -118,7 +134,7 @@ internal static class Program
                         ((CheckBox)window.FindName("ScriptReadableToggle")).IsChecked = true;
                         Save(window, "vga-script17");
                         var intro = Call("CdIntroItem")!;
-                        Check((string)intro.GetType().GetProperty("Title")!.GetValue(intro)! == "Opening", "VGA opening title");
+                        Check((string)intro.GetType().GetProperty("Title")!.GetValue(intro)! == "The Intro", "VGA intro title");
                     }
                     else
                     {
