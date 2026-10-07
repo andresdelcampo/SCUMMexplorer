@@ -52,6 +52,22 @@ public sealed class LoomScriptPresenterTests
     }
 
     [Fact]
+    public void NamedArraysUseTheirEstablishedBaseAndLeaveUnknownOffsetsRaw()
+    {
+        var instructions = new[]
+        {
+            new LoomScriptInstruction(0, 0, "move", "var[0x032+local[0x000]] = 0x0001", ""),
+            new LoomScriptInstruction(1, 0, "move", "var[0x033+local[0x000]] = 0x0001", ""),
+            new LoomScriptInstruction(2, 0, "move", "var[0x0D1+var[0x002]] = 0x0001", "")
+        };
+        var script = new LoomScriptDisassembly(1, 1, 0, 3, 3, instructions, null, null, [], []);
+        var text = new LoomScriptPresenter(LoomGlossary.Default).Present(script);
+        Assert.Contains("draft table (pattern words)[local 0] = 1", text);
+        Assert.Contains("var[0x033+local[0x000]] = 1", text);
+        Assert.Contains("var[0x0D1+var[0x002]] = 1", text);
+    }
+
+    [Fact]
     public void PrintNamesTheSpeakerAndStartScriptNamesTheScript()
     {
         // print actor 1 [text "Hi"], startScript 17 [0]
@@ -91,6 +107,13 @@ public sealed class LoomScriptPresenterTests
     [InlineData("stringOps", "loadString, 0x04, \"Pausa.\"", "string 4 = “Pausa.”")]
     [InlineData("stringOps", "getStringChar, local[0x007], local[0x005], local[0x006]", "local 7 = character local 6 of string local 5")]
     [InlineData("doSentence", "0xFE, 0x0000, 0x0000", "cancel the pending sentence")]
+    [InlineData("matrixOps", "setBoxScale, 0x02, 0x80", "walk box 2: scale 128")]
+    [InlineData("matrixOps", "createBoxMatrix", "rebuild the walk-box connections")]
+    [InlineData("oldRoomEffect", "switchEffect, 0x81", "room transition effect 129")]
+    [InlineData("lights", "0x0B, 0x00, 0x00", "set lighting (11, 0, 0)")]
+    [InlineData("systemOps", "restart", "restart the game")]
+    [InlineData("setObjectName", "0x9A, \"leaf\"", "rename object 154 to “leaf”")]
+    [InlineData("print", "0x0B, [sayVoice, 0x1BD4, 0x0014]", "play CD audio from disc second 712.4 for 2 s")]
     public void RoomStringAndSentenceOperationsGetPlainPhrases(string operation, string operands, string expected)
     {
         var instructions = new[] { new LoomScriptInstruction(0, 0, operation, operands, "") };

@@ -101,6 +101,11 @@ public sealed partial class LoomGlossary
 
     public GlossaryEntry? Variable(int index) => Find("var", index);
 
+    /// <summary>An established array base, rather than an arbitrary address somewhere within a named range.</summary>
+    internal GlossaryEntry? IndexedVariable(int index) => _byKind.TryGetValue("var", out var rows)
+        ? rows.Where(row => row.From == index && row.To > index && row.Scope is null).Select(row => row.Entry).FirstOrDefault()
+        : null;
+
     /// <summary>Bits from 0xD63 on are numbered <see cref="_bitShift"/> higher in this edition than in the Spanish release the table was written for (0 for it); the Spanish 0xD62 ("full animation", set by its boot) has no counterpart in the English scripts, where 0xD62 is the Spanish 0xD63.</summary>
     private int _bitShift;
     private const int SpanishShiftedFrom = 0xD63;

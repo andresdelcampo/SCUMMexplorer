@@ -138,7 +138,8 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
                 i += 2;
                 continue;
             }
-            lines.Add(Line(ins.Offset, depth, Phrase(ins)));
+            lines.Add(Line(ins.Offset, depth, IsConditional(ins.Operation) && TryBranch(ins, out var branch)
+                ? $"if {Condition(ins, negate: true)}, go to {branch:X4}" : Phrase(ins)));
             i++;
         }
     }
@@ -184,7 +185,13 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
         if (negate) relation = relation switch { "==" => "!=", "!=" => "==", "<" => ">=", "<=" => ">", ">" => "<=", _ => "<" };
         if (args.Count >= 2 && VarKind(args[0]) == "bit" && Literal(args[1]) is 0 or 1 && relation is "==" or "!=")
             return Truth(args[0], (Literal(args[1]) == 1) == (relation == "=="));  // relation was already negated when asked to
-        var role = VarIndex(args[0]) switch { 0x004 or 0x070 => Role.Room, 0x001 => Role.Actor, _ => Role.Number };
+        var role = VarIndex(args[0]) switch
+        {
+            0x004 => Role.Room,
+            0x001 => Role.Actor,
+            int id when glossary.Variable(id)?.Name == "previous room" => Role.Room,
+            _ => Role.Number
+        };
         return $"{Value(args[0])} {relation} {Value(args[1], role)}";
     }
 
@@ -219,6 +226,18 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
                 case "beginOverride": return "begin the skippable part (if the player skips, the game jumps to the end of the cutscene)";
                 case "endOverride": return "end of the skippable part";
                 case "stopMusic": return "stop the music";
+                case "systemOps": return a[0] switch { "restart" => "restart the game", "pause" => "pause the game", "quit" => "quit the game", _ => Raw(ins) };
+                case "oldRoomEffect": return a[0] == "switchEffect" ? $"room transition effect {Value(a[1])}" : Raw(ins);
+                case "lights": return $"set lighting ({string.Join(", ", a.Select(x => Value(x)))})";
+                case "matrixOps": return a[0] switch
+                {
+                    "setBoxFlags" => $"walk box {Value(a[1])}: flags {Value(a[2])}",
+                    "setBoxScale" => $"walk box {Value(a[1])}: scale {Value(a[2])}",
+                    "setBoxScaleSlot" => $"walk box {Value(a[1])}: scale slot {Value(a[2])}",
+                    "createBoxMatrix" => "rebuild the walk-box connections",
+                    _ => Raw(ins)
+                };
+                case "setObjectName": return $"rename {Value(a[0], Role.Object)} to {CleanText(a[1])}";
                 case "jumpRelative": return TryBranch(ins, out var target) ? (target <= ins.Offset ? $"go back to {target:X4}" : $"go to {target:X4}") : Raw(ins);
                 case "startScript": return $"start {Value(a[0], Role.Script)}{With(a[1])}";
                 case "chainScript": return $"continue in {Value(a[0], Role.Script)}{With(a[1])} (this script ends)";
@@ -412,6 +431,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
             _ => Value(a[0], Role.Actor)
         };
         string? text = null;
+        string? voice = null;
         var extras = new List<string>();
         foreach (var item in Items(a[1]))
         {
@@ -419,9 +439,17 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
             else if (item.StartsWith("position, ", StringComparison.Ordinal))
                 extras.Add("at " + string.Join(", ", Split(item["position, ".Length..], ',').Select(x => Value(x))));
             else if (item.StartsWith("color, ", StringComparison.Ordinal)) extras.Add("colour " + Value(item["color, ".Length..]));
+            else if (item.StartsWith("sayVoice, ", StringComparison.Ordinal) && Split(item, ',') is { Count: 3 } cue &&
+                Literal(cue[1]) is int offset && Literal(cue[2]) is int length)
+            {
+                var audio = new LoomVoiceCue(offset, length);
+                voice = audio.IsStop ? "stop CD audio" : $"play CD audio from disc second {audio.DiscSeconds.ToString("0.#", CultureInfo.InvariantCulture)} for {audio.Seconds.ToString("0.#", CultureInfo.InvariantCulture)} s";
+                extras.Add(voice);
+            }
         }
         var spoken = Literal(a[0]) is 0xFF or 0xFE ? who + ":" : who + " says:";
-        return text is null ? $"{who}: {string.Join(", ", Items(a[1]))}" : $"{spoken} {text}{(extras.Count > 0 ? $"  ({string.Join(", ", extras)})" : "")}";
+        return text is null ? voice is not null ? $"{who}: {string.Join(", ", extras)}" : $"{who}: {string.Join(", ", Items(a[1]))}"
+            : $"{spoken} {text}{(extras.Count > 0 ? $"  ({string.Join(", ", extras)})" : "")}";
     }
 
     private static string CleanText(string quoted)
@@ -538,6 +566,9 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
             }
             return value.ToString(CultureInfo.InvariantCulture);
         }
+        var indexed = IndexedVariableRegex().Match(token);
+        if (indexed.Success && glossary.IndexedVariable(int.Parse(indexed.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture)) is { } array)
+            return $"{Use(array, "var[0x" + indexed.Groups[1].Value + "]")}[{Value(indexed.Groups[2].Value)}]";
         var match = VariableRegex().Match(token);
         if (!match.Success) return token;
         var kind = match.Groups[1].Value;
@@ -620,6 +651,9 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
 
     [GeneratedRegex(@"^(var|bit|local)\[0x([0-9A-Fa-f]+)\]$")]
     private static partial Regex VariableRegex();
+
+    [GeneratedRegex(@"^var\[0x([0-9A-Fa-f]+)\+(.+)\]$")]
+    private static partial Regex IndexedVariableRegex();
 
     [GeneratedRegex(@"^0x[0-9A-Fa-f]+$")]
     private static partial Regex LiteralRegex();
