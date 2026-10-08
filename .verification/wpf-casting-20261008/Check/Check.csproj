@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <AssemblyName>LoomWpfCastingCheck</AssemblyName>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\out-build\</BaseOutputPath>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../../../src/SCUMMexplorer.App/SCUMMexplorer.App.csproj" /></ItemGroup>
+</Project>

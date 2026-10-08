@@ -4,6 +4,7 @@ Updated 8 October 2026. Rebuild a harness before running it so it includes the c
 
 ## Current checkpoint entry points
 
+- [wpf-casting-20261008](wpf-casting-20261008/README.md): 12 whole-draft casts through routed WPF text and scaled staff-strip clicks across three editions; 168 assertions, private profile, no OS/native input or timing claim.
 - [source-gaps-20261008](source-gaps-20261008/README.md): own-source Silence chain, Shaping terminology limit and 11/11/8 dynamic call sites; 33 source assertions, no behavior change.
 - [sky-input-20261008](sky-input-20261008/README.md): prepared VGA sky forward/reverse casts from the source opening's arrival; 24 input assertions, no physical/native/audio claim.
 - [catalog-return-20261008](catalog-return-20261008/README.md): fresh English Room 46 → 34 Rusty correction, approved source prerequisites; raw reproduction, 32 focused Core checks, 18 WPF assertions and real ghost picture. Its UI harness uses a private profile.

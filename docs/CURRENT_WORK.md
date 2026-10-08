@@ -4,7 +4,7 @@ Reconciled 8 October 2026. Current priorities are in [the plan](LOOM_EGA_PLAN.md
 
 ## Current state
 
-Local master includes `ebdf3b2` (closed/conditional portals), `0243a5a` (Sharpening / Blunting and real-note input evidence), `9de8193` (source preparation for Rusty's catalog return), `e9cdb24` (documentation reconciliation), `2a51c06` (remaining source checks) and the separate sky input checkpoint. No push is authorized.
+Local master includes `ebdf3b2` (closed/conditional portals), `0243a5a` (Sharpening / Blunting and real-note input evidence), `9de8193` (source preparation for Rusty's catalog return), `e9cdb24` (documentation reconciliation), `2a51c06` (remaining source checks), `5486af1` (prepared sky input) and the separate whole-draft WPF checkpoint. No push is authorized.
 
 **Fixed in `9de8193`:** previously, a fresh English EGA Room 46 catalog selection → Room 34 return left Rusty in sleeping-boy costume 112 during Script 98's movement. Actual Core click dispatch and inspected renderer output reproduce it. Room 46 sets late D7A; the skipped dream route never establishes ghost D9C. A source-prepared ghost path retains costume 120. The user approved real source-prerequisite preparation for direct late-room selection. The fingerprinted English Room 46 recipe now runs missing Awakening/Reflection/Firewood/dream stages in the running session; it preserves existing ghost/restored state, skips completed stages and cancels the target visit on failure. The real WPF route now shows ghost costume 120; the early closed portal remains unchanged. [Reproduction, correction and validation](../.verification/catalog-return-20261008/README.md). No story bit/costume patch or native takeover.
 
@@ -13,6 +13,8 @@ Local master includes `ebdf3b2` (closed/conditional portals), `0243a5a` (Sharpen
 Original-game actor/staff, physical casting-route and listening comparisons remain open. Six prepared Room 04 forward/reverse casts pass real Explorer note input across English EGA, Spanish EGA and VGA. Two prepared VGA Room 02 sky casts now pass after the source opening's arrival; the earlier failed catalog-arrival packets retain their limit. Silence now has an own-source causative chain in each edition; Shaping's canonical label and exact reverse names remain uncertain. The 11/11/8 nonliteral call sites are source-classified, with input-dependent and incomplete-data limits retained. [Sky checkpoint](../.verification/sky-input-20261008/README.md), [remaining-source checkpoint](../.verification/source-gaps-20261008/README.md), [draft checkpoint](../.verification/draft-input-20261008/README.md), [exact comparison dossier](loom/FINAL_GAPS_HANDOFF.md).
 
 ## Established validation
+
+The three original-game comparison areas remain open. The easiest remaining Explorer integration item is now closed: whole-draft WPF text/staff-strip input passes 168 assertions in 12 prepared cases. Physical focus/mouse delivery, player-acquired prerequisites and native cadence still require observation; these are not demonstrated regressions.
 
 | Checkpoint | Result and scope |
 | --- | --- |
@@ -26,6 +28,7 @@ Original-game actor/staff, physical casting-route and listening comparisons rema
 | [Draft/source checkpoint](../.verification/draft-input-20261008/README.md) | Six real-note casts, three profile-free Game Status renders, clean build. No whole-game/native audiovisual claim. |
 | [Remaining-source checkpoint](../.verification/source-gaps-20261008/README.md) | 33 source assertions: Silence causality, Shaping effect/name limit and 11/11/8 dynamic call-site classification. No behavior change or native comparison. |
 | [Sky input checkpoint](../.verification/sky-input-20261008/README.md) | 24 input assertions, two prepared VGA source-opening sky casts; isolated solution build with zero warnings/errors. All 377 relative links in nine changed Markdown files resolve. Earlier catalog failures preserved; no earned/native/physical/audio claim. |
+| [Whole-draft WPF input](../.verification/wpf-casting-20261008/README.md) | 168 assertions, 12 independent Room 04 casts via routed text and scaled staff-strip clicks across three editions; isolated build with zero warnings/errors. Explorer integration closed; original-game physical input, acquired prerequisites and timing remain open. |
 
 ## Standing product rules
 

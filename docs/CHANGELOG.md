@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current capability and remaining work are in [CURRENT_WORK](CURRENT_WORK.md) and [the live plan](LOOM_EGA_PLAN.md).
 
+## 8 October: close whole-draft WPF input integration
+
+Twelve independent prepared Room 04 casts use four routed text-input events or scaled staff-strip clicks through the real MainWindow, across English EGA, Spanish EGA and CD/VGA. All 168 assertions pass: source target/direction, response text, balanced scopes and settled state. The offscreen window never activates; audio is off and profile/cache/build outputs are private. The failed first harness attempt is retained with its timing/edition-ID mistakes; no App/Core behavior changed. This closes the previously untested whole-draft WPF integration item. Original-game actor/staff, physical input/earned routes and listening comparisons remain open. [Evidence and reproduction](../.verification/wpf-casting-20261008/README.md).
+
 ## 8 October: qualify prepared VGA sky input after the source opening
 
 Two independent detached CD sessions play the source opening to Bobbin's Room 02 arrival (828,61), then use the disclosed staff/eight-note controls, one ordinary sky click and four note keys. Bobbin reaches (808,59), retains aim 81 with source distance zero, and dispatches 3A/3B: one balanced Opening scene and the fresh-state Closing refusal. All 24 input assertions pass. Earlier failed catalog-arrival packets remain failed; no earned-prerequisite, physical WPF, native-picture or listening claim. New probes have separate ignored build outputs. The live dossier now specifies the exact remaining original-game comparison phases and measurements. [Evidence and reproduction](../.verification/sky-input-20261008/README.md).
