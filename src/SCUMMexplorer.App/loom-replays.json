@@ -313,6 +313,55 @@
       "sha256": "047F2BFAFF476A815AEA30E32C1B2453051FBBA56B8606228E070BAFD51E4810"
     }
   ],
+  "catalogStarts": [
+    {
+      "room": 46,
+      "establishedBits": ["bit[0xD9C]", "bit[0xDC7]"],
+      "note": "Room 46 is a late-story catalog start. When Rusty's ghost/restoration state is absent, the earlier Awakening, Reflection, Firewood and dream scenes run unseen in the running session; their source scripts establish his state. Already established stages are kept. Direct verbs, catalog hops and the supported staff-held edit are explicit preview preparation, not an original-game route. Approved by the user on 8 October 2026.",
+      "stages": [
+        {
+          "skipVariable": "var[0x0D1]", "skipValue": 1,
+          "steps": [
+            {"kind":"visit","objectId":34},
+            {"kind":"verb","objectId":562,"verb":68},
+            {"kind":"scene","endBoundary":"endCutscene at Script 85 +0x05A8","expectedRoom":34}
+          ]
+        },
+        {
+          "skipVariable": "var[0x07D]", "skipValue": 103,
+          "steps": [
+            {"kind":"visit","objectId":34},
+            {"kind":"verb","objectId":562,"verb":76},
+            {"kind":"scene","endBoundary":"endCutscene at Room 34 local script 202 +0x015F","expectedRoom":34}
+          ]
+        },
+        {
+          "skipVariable": "bit[0xD99]", "skipValue": 1,
+          "steps": [
+            {"kind":"visit","objectId":36},
+            {"kind":"staff","objectId":1},
+            {"kind":"frames","frames":8},
+            {"kind":"verb","objectId":600,"verb":56},
+            {"kind":"frames","frames":32},
+            {"kind":"click","x":109,"y":102},
+            {"kind":"scene","endBoundary":"endCutscene at Script 86 +0x0536","expectedRoom":38}
+          ]
+        },
+        {
+          "skipVariable": "bit[0xD9C]", "skipValue": 1,
+          "steps": [
+            {"kind":"visit","objectId":38},
+            {"kind":"verb","objectId":611,"verb":54},
+            {"kind":"scene","endBoundary":"endCutscene at Script 87 +0x0984","expectedRoom":38},
+            {"kind":"visit","objectId":35},
+            {"kind":"frames","frames":8},
+            {"kind":"visit","objectId":34},
+            {"kind":"frames","frames":40}
+          ]
+        }
+      ]
+    }
+  ],
   "replays": [
     {
       "id": "Room 02 object 153 Verb 0x38",

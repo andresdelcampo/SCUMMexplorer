@@ -41,11 +41,13 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _roomPanTimer =new() { Interval = TimeSpan.FromMilliseconds(75) };
     private readonly DispatcherTimer _adlibGainDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private static readonly string LastFolderFile = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "SCUMMexplorer", "last-folder.txt");
+        Environment.GetEnvironmentVariable("SCUMM_EXPLORER_PROFILE_ROOT") ?? Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SCUMMexplorer"),
+        "last-folder.txt");
     private GameLibrary? _game;
     private LoomReplayCatalog? _replayCatalog;
     private LoomSceneSetupPlanner? _setupPlanner;
+    private string? _pendingCatalogPreparation;
     private readonly Dictionary<string, LoomStartSetup> _startSetups = [];
     private LoomRelationshipIndex? _relationshipIndex;
     private GameResource? _selectedResource;
@@ -1041,6 +1043,17 @@ public partial class MainWindow : Window
             var objectRecords = cdRoom?.Objects ?? _objectDirectory.Decode(bytes);
             var objects = cdRoom is null ? _objectDecoder.Decode(bytes) : _cdData!.ReadObjectImages(resource.ResourceId!.Value);
             if (token.IsCancellationRequested) return;
+            var catalogStart = PrepareCatalogStart(resource);
+            if (catalogStart?.Failure is { } setupFailure)
+            {
+                _session!.RecordCatalogPreparation($"Preparation stopped: {setupFailure}. {catalogStart.Note}");
+                PreviewTitle.Text = "Could not prepare this scene";
+                PreviewDescription.Text = "The earlier story scene did not finish. Choose another room or restart the session.";
+                PreviewMessage.Visibility = Visibility.Visible;
+                StatusText.Text = "Story preparation stopped";
+                StatusText.ToolTip = setupFailure;
+                return; // A failed source stage must not be followed by the late-room visit.
+            }
             _currentRoom = room;
             _currentRoomResource = resource;
             _lastViewedRoomResource = resource;
@@ -1090,6 +1103,20 @@ public partial class MainWindow : Window
                   ? "; Bobbin stands where an assumed arrival would bring him (an estimate: the route to the room was not played)" : "") +
               ". Interaction and room routes are not read yet for the CD game.";
 
+    private LoomCatalogStartResult? PrepareCatalogStart(GameResource resource)
+    {
+        _pendingCatalogPreparation = null;
+        if (SessionModeToggle.IsChecked != true || _session is null || _playbackEnteringRoom || _replaySequence is not null ||
+            _replayCatalog?.CatalogStarts.FirstOrDefault(start => start.Room == resource.ResourceId) is not { } recipe)
+            return null;
+        // Human-approved source scenes; edition-specific operands are in fingerprinted recipe data.
+        _sceneSound.StopAll("catalog story preparation runs unseen");
+        var result = LoomCatalogStartPreparer.Prepare(_session, recipe);
+        _sceneSound.Attach(_game!, _session);
+        if (result.Prepared) _pendingCatalogPreparation = result.Note;
+        return result;
+    }
+
     private void ApplyRoomState(GameResource resource, IReadOnlyList<LoomRoomObjectRecord> records,
         IReadOnlyList<RoomObjectImage> images, bool visit)
     {
@@ -1101,6 +1128,12 @@ public partial class MainWindow : Window
             if (visit) FollowSessionSound();
             if (visit) _issueBaseline = _session.Snapshot.Uncertainties.Count;
             var snapshot = visit ? _session.VisitRoom(resource, preserveStaffLevel: !_playbackEnteringRoom && _replaySequence is null) : _session.Snapshot;
+            if (visit && _pendingCatalogPreparation is { } preparation)
+            {
+                _pendingCatalogPreparation = null;
+                _session.RecordCatalogPreparation(preparation);
+                snapshot = _session.Snapshot;
+            }
             if (visit && _game?.Id == GameId.LoomVga && _cdVoice.Follows(_session)) _cdVoice.SkipPending();
             var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,

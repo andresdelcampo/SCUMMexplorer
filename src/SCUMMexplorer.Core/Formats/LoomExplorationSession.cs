@@ -633,6 +633,14 @@ public sealed partial class LoomExplorationSession
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
         : [];
 
+    /// <summary>Discloses a reviewed catalog prelude after the target visit; supplies no game state.</summary>
+    public void RecordCatalogPreparation(string note)
+    {
+        var description = "Catalog preparation (explicit): " + note;
+        _uncertainties.Add(description);
+        _visitTrace.Add(description);
+    }
+
     public LoomSessionSnapshot VisitRoom(GameResource room, LoomObjectActionResult? reachedAction = null, bool preserveStaffLevel = false)
     {
         ArgumentNullException.ThrowIfNull(room);

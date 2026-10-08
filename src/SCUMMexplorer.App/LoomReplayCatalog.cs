@@ -16,6 +16,9 @@ internal sealed record ReplayMembership(string Id, int StartRoom, int[] Rooms, i
 internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayRecipe[] Replays,
     ReplayCoverage[] Coverage, string Summary, ReplayMembership[] Membership)
 {
+    /// <summary>Reviewed starts enabled only after this catalog's source fingerprints match.</summary>
+    public LoomCatalogStartRecipe[] CatalogStarts { get; init; } = [];
+
     public static LoomReplayCatalog Load(GameLibrary game)
     {
         if (game.Id != GameId.Loom) return Empty("Cutscene replay is available for LOOM EGA.");
