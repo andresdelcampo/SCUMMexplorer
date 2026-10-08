@@ -76,7 +76,11 @@ public sealed partial class LoomGlossary
         if (game is not null && game.Id == GameId.Loom)
         {
             glossary.ReadObjects(game);
-            if (!demo) glossary._bitShift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
+            if (!demo)
+            {
+                glossary._bitShift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
+                glossary.ReadEgaReviewedNames(ScummDataSources.For(game));
+            }
         }
         if (cd) glossary.ReadCdNames(game!);
         return glossary;
@@ -112,6 +116,7 @@ public sealed partial class LoomGlossary
 
     public GlossaryEntry? Bit(int index)
     {
+        if (_reviewedBits.TryGetValue(index, out var reviewed)) return reviewed;
         if (_bitShift != 0 && index >= SpanishShiftedFrom + _bitShift)
         {
             // The table names the Spanish numbering; the same role is read here one bit lower, and the entry says so.

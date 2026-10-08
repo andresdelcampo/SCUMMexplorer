@@ -1,5 +1,9 @@
 # Changelog
 
+## 8 October: port VGA annotation findings back to EGA
+
+Reviewed English and Spanish EGA globals against the VGA work, adding 70 EGA titles (116 valid English globals and 113 Spanish globals now titled), missing draft/note flags, pointer/buffer/animation/sound/flying-array meanings and scoped actor roles. Labels require their own EGA instruction fingerprints; invalid script entries stay unresolved. Corrected incomplete EGA 90/99 titles and the earlier comparison notes: both editions already contain the Bishop introduction and Goodmold aftermath. Refreshed readable goldens for both languages, including Spanish snapshots that had contained English data. Clean build, 42 focused Core checks and 126 real WPF assertions; [individual review and validation](../.verification/advanced-scripts/README-EGA.md). No interpreter changes, full suite or push.
+
 ## 7 October: individual VGA Advanced Scripts review
 
 Compared all 122 CD globals with EGA and expanded the eight titled globals to 122 individually reviewed titles. Ported established input/draft flags and scoped actors, repaired the clicked-object matcher and Script 16's readable layout, and enabled CD Used by / Explore links with room-scoped local targets and actual disc source offsets. CD stubs, changed scenes and dialogue retain their edition-specific meanings. All 1,470 CD blocks still format readably; focused tests, unchanged EGA goldens and the real WPF Script 5/7/16 comparison/link navigation passed. Clean build; [review and validation](../.verification/advanced-scripts/README.md). No full suite or push.

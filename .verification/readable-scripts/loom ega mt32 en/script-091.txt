@@ -1,7 +1,7 @@
 Script 91 · Room 43 cage scene  ·  43.LFL
 Readable view: the decoded instructions in plain language. Static paths, not proof of execution. Names carry their evidence (listed at the end); anything unnamed keeps its raw form. Switch to Raw for the instructions as decoded.
 
-0000  set: bit[0xD67]
+0000  set: the draft response was refused or consumed
 0005  if bit[0xD95]
 000A      Bobbin says: “I already opened it.”
 0023      stop this script
@@ -14,7 +14,7 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 0040  start Script 28 · clear the draft buffer
 0043  object under the pointer or clicked = 0
 0048  start Script 08 · show or hide the close-up in the verb area with 0
-004E  start Script 34 with 0
+004E  start Script 34 · mark draft N's last-note knowledge with 0
 0054  pause until the next frame
 0055  actor 11: elevation 100
 005B  put actor 11 in Room 43
@@ -174,7 +174,7 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 03E5          pause until the next frame
 03E6          local 1 = walk box of Mandible
 03EA      until local 1 == 0
-03F1      start Script 32 with 2, 8
+03F1      start Script 32 · recolour an actor's palette with 2, 8
 03FA      wait until Mandible stops walking
 03FD      wait until the message is gone
 03FF      Cob: faces towards the screen
@@ -339,18 +339,18 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 0A74      Bobbin: faces right
 0A77      put Bobbin in Room 43
 0A7A      place Bobbin at (142, 93)
-0A80      start Script 32 with 1, 8
+0A80      start Script 32 · recolour an actor's palette with 1, 8
 0A89      Bobbin: palette, 0x09, 0x09
 0A8F      Mandible: clear all classes
 0A96      Mandible: faces right
 0A99      put Mandible in Room 43
 0A9C      place Mandible at (142, 93)
-0AA2      start Script 32 with 2, 8
+0AA2      start Script 32 · recolour an actor's palette with 2, 8
 0AAB      Cob: clear all classes
 0AB2      Cob: faces right
 0AB5      put Cob in Room 43
 0AB8      place Cob at (142, 93)
-0ABE      start Script 32 with 3, 8
+0ABE      start Script 32 · recolour an actor's palette with 3, 8
 0AC7      pause until the next frame
 0AC8      Mandible walks to object 641 “sphere”
 0ACC      pause until the next frame
@@ -359,7 +359,7 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 0B19          pause until the next frame
 0B1A          local 1 = walk box of Mandible
 0B1E      until local 1 != 0
-0B23      start Script 33 with 2
+0B23      start Script 33 · restore an actor's palette with 2
 0B29      start Script 215
 0B2C      wait until Mandible stops walking
 0B2F      start Script 216
@@ -418,7 +418,7 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 0CD4          pause until the next frame
 0CD5          local 1 = walk box of Mandible
 0CD9      until local 1 == 0
-0CE0      start Script 32 with 2, 8
+0CE0      start Script 32 · recolour an actor's palette with 2, 8
 0CE9      wait until Mandible stops walking
 0CEC      put Mandible in Room 00
 0CEF      wait until the message is gone
@@ -470,7 +470,7 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 0DE1          Mandible: stops and stands facing away from the screen
 0DE4          put Mandible in Room 00
 0DE7          Cob: stops and stands facing away from the screen
-0DEA          start Script 33 with 3
+0DEA          start Script 33 · restore an actor's palette with 3
 0DF0          Cob: faces towards the screen
 0DF3          put Cob in Room 43
 0DF6          place Cob at (170, 95)
@@ -506,18 +506,22 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 
 Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
   actor 1          Bobbin  [decoded]  the ego, var[0x001]
-  actor 2          Mandible  [reading]  script 091 (Room 43 cage scene): Bobbin answers actor 2's lines with "Mandible! That distaff will never ..." (English text); not an Elder
-  actor 3          Cob  [reading]  script 091: actor 2 says "You see, Cob?" and actor 3 answers for "His Excellence" (English text)
+  actor 2          Mandible  [reading]  English EGA Script 91 +0x0139 in 43.LFL: print; Mandible
+  actor 3          Cob  [reading]  English EGA Script 91 +0x0237 in 43.LFL: print; Cob
   bit[0xD61]       the distaff (staff) is held  [decoded]  script 003 starts script 018 unless it is set; script 017 picks the costume frames by it; the pickup in Room 09 object 271 sets it
   bit[0xD64]       the notes played so far are being collected  [reading]  script 010 stores notes while it is set; script 021 clears it; Spanish release's bit 0xD65, this edition numbers it 0xD64 (same position in the shifted layout, not checked entry by entry)
   bit[0xD65]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set; Spanish release's bit 0xD66, this edition numbers it 0xD65 (same position in the shifted layout, not checked entry by entry)
   bit[0xD66]       a note is playing  [reading]  script 031 sets it while the note sounds; callers wait on it; Spanish release's bit 0xD67, this edition numbers it 0xD66 (same position in the shifted layout, not checked entry by entry)
+  bit[0xD67]       the draft response was refused or consumed  [reading]  English EGA Script 35 +0x0000 in 01.LFL: move; the draft response was refused or consumed; Script 26 clears and checks it after running the object response
   object 641       sphere  [decoded]  the name stored in Room 43's data
-  script 17        give the ego a costume (by size)  [decoded]  argument 0, 1 or 2 picks the size; uses the staff bit for the frames
-  script 19        hide the distaff verbs  [reading]  script 002 starts it; the counterpart of 018
-  script 28        clear the draft buffer  [decoded]
-  script 40        play a sound (effect)  [decoded]
-  script 8         show or hide the close-up in the verb area  [decoded]
+  script 17        give the ego a costume (by size)  [decoded]  English EGA Script 17 in 01.LFL: +0x009B actorOps, +0x00C0 actorOps; reviewed EGA instruction stream; compared with CD Script 17, EGA differences retained
+  script 19        hide the distaff verbs  [reading]  English EGA Script 19 in 01.LFL: +0x0000 move, +0x0005 verbOps, +0x000A increment; reviewed EGA instruction stream; compared with CD Script 19, EGA differences retained
+  script 28        clear the draft buffer  [decoded]  English EGA Script 28 in 01.LFL: +0x0000 isEqual, +0x0007 isNotEqual, +0x000E startScript; reviewed EGA instruction stream; compared with CD Script 28, EGA differences retained
+  script 32        recolour an actor's palette  [decoded]  English EGA Script 32 in 01.LFL: +0x0005 actorOps; reviewed EGA instruction stream; compared with CD Script 32, EGA differences retained
+  script 33        restore an actor's palette  [decoded]  English EGA Script 33 in 01.LFL: +0x0005 actorOps; reviewed EGA instruction stream; compared with CD Script 33, EGA differences retained
+  script 34        mark draft N's last-note knowledge  [reading]  English EGA Script 34 in 01.LFL: +0x0016 or; reviewed EGA instruction stream; compared with CD Script 34, EGA differences retained
+  script 40        play a sound (effect)  [decoded]  English EGA Script 40 in 01.LFL: +0x0038 startSound; reviewed EGA instruction stream; compared with CD Script 40, EGA differences retained
+  script 8         show or hide the close-up in the verb area  [decoded]  English EGA Script 08 in 01.LFL: +0x004E print; reviewed EGA instruction stream; compared with CD Script 08, EGA differences retained
   var[0x003]       message-on-screen flag  [engine]  VAR_HAVE_MSG
   var[0x004]       current room  [engine]  VAR_ROOM
   var[0x005]       cutscene skipped  [engine]  VAR_OVERRIDE: 1 when the player skipped a cutscene

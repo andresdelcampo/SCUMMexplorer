@@ -9,6 +9,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Formats\loom-glossary.json" LogicalName="SCUMMexplorer.Core.loom-glossary.json" />
     <EmbeddedResource Include="Formats\loom-cd-glossary.json" LogicalName="SCUMMexplorer.Core.loom-cd-glossary.json" />
+    <EmbeddedResource Include="Formats\loom-ega-reviewed-glossary.json" LogicalName="SCUMMexplorer.Core.loom-ega-reviewed-glossary.json" />
   </ItemGroup>
 
   <ItemGroup>

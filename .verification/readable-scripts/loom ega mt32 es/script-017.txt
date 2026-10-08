@@ -27,19 +27,19 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
       end if
 005A  ego size = local 0
 005F  ego costume = local 1
-0064  var[0x072] = 1
-0069  var[0x073] = 2
-006E  var[0x074] = 3
-0073  var[0x075] = 4
-0078  var[0x076] = 5
+0064  ego initial animation = 1
+0069  ego walk animation = 2
+006E  ego standing animation = 3
+0073  ego talk-start animation = 4
+0078  ego talk-stop animation = 5
 007D  if not (the distaff (staff) is held)
-0082      var[0x072] = 8
-0087      var[0x073] = 9
-008C      var[0x074] = 10
-0091      var[0x075] = 14
-0096      var[0x076] = 15
+0082      ego initial animation = 8
+0087      ego walk animation = 9
+008C      ego standing animation = 10
+0091      ego talk-start animation = 14
+0096      ego talk-stop animation = 15
       end if
-009B  Bobbin: costume local 1; walk speed local 2, local 3; elevation 0; init animation var[0x072]; walk animation var[0x073]; stand animation var[0x074]; talk animation var[0x075], var[0x076]; talk colour 143
+009B  Bobbin: costume local 1; walk speed local 2, local 3; elevation 0; init animation ego initial animation; walk animation ego walk animation; stand animation ego standing animation; talk animation ego talk-start animation, ego talk-stop animation; talk colour 143
 00B9  if video mode == 4
 00C0      Bobbin: palette, 0x08, 0x00; palette, 0x07, 0x0F
       end if
@@ -60,11 +60,16 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
   actor 1          Bobbin  [decoded]  the ego, var[0x001]
   bit[0xD61]       the distaff (staff) is held  [decoded]  script 003 starts script 018 unless it is set; script 017 picks the costume frames by it; the pickup in Room 09 object 271 sets it
-  bit[0xD6D]       a cutscene is running  [reading]  script 002 sets it, script 003 clears it; Spanish release's bit 0xD6E, this edition numbers it 0xD6D (same position in the shifted layout, not checked entry by entry)
-  script 18        show the distaff  [decoded]  turns the note verbs on and prints the note letters
-  script 19        hide the distaff verbs  [reading]  script 002 starts it; the counterpart of 018
+  bit[0xD6E]       a cutscene is running  [decoded]  script 002 sets it, script 003 clears it
+  script 18        show the distaff  [decoded]  Spanish EGA Script 18 in 01.LFL: +0x00B7 print, +0x00C4 print, +0x00D1 print, +0x00FE print, +0x010B print; reviewed EGA instruction stream; compared with CD Script 18, EGA differences retained
+  script 19        hide the distaff verbs  [reading]  Spanish EGA Script 19 in 01.LFL: +0x0000 move, +0x0005 verbOps, +0x000A increment; reviewed EGA instruction stream; compared with CD Script 19, EGA differences retained
   var[0x031]       video mode  [decoded]  VAR_VIDEOMODE: 4 is CGA, 13 EGA; script 044 and 017 pick CGA palettes on 4
   var[0x064]       distaff in use (2 when held)  [decoded]  script 018 sets it from its argument; scripts 009/010 require 2
+  var[0x072]       ego initial animation  [decoded]  Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego initial animation
+  var[0x073]       ego walk animation  [decoded]  Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego walk animation
+  var[0x074]       ego standing animation  [decoded]  Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego standing animation
+  var[0x075]       ego talk-start animation  [decoded]  Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego talk-start animation
+  var[0x076]       ego talk-stop animation  [decoded]  Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego talk-stop animation
   var[0x077]       ego costume for size 0 (large)  [decoded]  script 001 +0x0189; script 017 argument 0
   var[0x078]       ego costume for size 1 (middle)  [decoded]  script 001; script 017 argument 1
   var[0x079]       ego costume for size 2 (small)  [decoded]  script 001; script 017 argument 2

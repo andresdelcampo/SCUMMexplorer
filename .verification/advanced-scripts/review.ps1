@@ -190,7 +190,7 @@ Add-Name 108 actor 6 'Glassmaker' reading print '0x06, [center;' 'script:108'
 $review | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $repo 'src/SCUMMexplorer.Core/Formats/loom-cd-glossary.json') -Encoding utf8
 $lines = @('# VGA Advanced Scripts review, 7 October 2026', '',
     'Every supplied CD global is reviewed below against its decoded instructions and the EGA reference. Names describe static code, not proof that a branch runs. Character/story readings retain the reading evidence level. The runtime accepts reviewed labels only when the decoded instruction fingerprint matches; another build remains unnamed until checked.', '',
-    'CD differences: 4 yields once, 39 and 115 return immediately; 40 plays CD effect cues; 90 includes Mandible''s introduction after the Room 42 flashes; 99 adds Goodmold''s aftermath before the Room 20 object draws. The EGA save/music titles are not copied onto CD stubs. CD 51/55/116 are absent; 117-125 are CD additions.', '',
+    'CD differences: 4 yields once, 39 and 115 return immediately; 40 plays CD effect cues. The EGA save/music titles are not copied onto CD stubs. CD 51/55/116 are absent; 117-125 are CD additions. Correction from the 8 October reverse review: EGA 90/99 also contain Mandible''s introduction after the Room 42 flashes and Goodmold''s aftermath before the Room 20 object draws; their old EGA titles described only part of the routines.', '',
     '| CD script | EGA instructions / CD instructions | Title | Evidence | Source |',
     '| --- | --- | --- | --- | --- |')
 foreach ($row in $review) {

@@ -1,0 +1,2967 @@
+[
+  {
+    "id": 1,
+    "name": "boot",
+    "evidence": "decoded",
+    "source": "English EGA Script 01 in 01.LFL: +0x0158 loadRoom, +0x0241 chainScript; reviewed EGA instruction stream; compared with CD Script 01, EGA differences retained",
+    "fingerprint": "1B9AC3B231320C36BEEB8595EBE2A8FBB00781F510A184822DE5A314B589C04E",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 2,
+    "name": "cutscene start hook",
+    "evidence": "decoded",
+    "source": "English EGA Script 02 in 01.LFL: +0x0000 cursorCommand, +0x0002 cursorCommand, +0x0004 freezeScripts; reviewed EGA instruction stream; compared with CD Script 02, EGA differences retained",
+    "fingerprint": "6D0651EB6A8FAC649041ED0B76F51FF68071DB5B3AAC5ECBA67C39B3EA668D10",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 3,
+    "name": "cutscene end hook",
+    "evidence": "decoded",
+    "source": "English EGA Script 03 in 01.LFL: +0x0000 isEqual, +0x0007 notEqualZero, +0x000C startScript; reviewed EGA instruction stream; compared with CD Script 03, EGA differences retained",
+    "fingerprint": "575F86F09231D09E8194ED48EC67795AF07C56B9C00738284414DFC7A11D238C",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 4,
+    "name": "save screen (F5)",
+    "evidence": "reading",
+    "source": "English EGA Script 04 in 70.LFL: +0x0079 loadRoom, +0x0200 chainScript; reviewed EGA instruction stream; compared with CD Script 04, EGA differences retained",
+    "fingerprint": "E02ABA5062DF09C914F01A29068A3CA26222117BC296B4C0448AE2BAF6C5674D",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 5,
+    "name": "input script",
+    "evidence": "decoded",
+    "source": "English EGA Script 05 in 01.LFL: +0x000C chainScript, +0x0211 print, +0x026A print, +0x02B0 print, +0x02E9 print; reviewed EGA instruction stream; compared with CD Script 05, EGA differences retained",
+    "fingerprint": "86384DB8F299B855BD321E304E793B887BB12C3878D5B5E4E7E6C935C4714788",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 6,
+    "name": "click handler (input loop)",
+    "evidence": "decoded",
+    "source": "English EGA Script 06 in 01.LFL: +0x0000 move, +0x0005 notEqualZero, +0x000A isGreater; reviewed EGA instruction stream; compared with CD Script 06, EGA differences retained",
+    "fingerprint": "F744038B7F2A81C7FB0FB647510EA8F78BBEA25E7B063BC5675B5A9B04C88BD6",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 108,
+        "name": "pointer x",
+        "evidence": "decoded",
+        "source": "English EGA Script 06 +0x0096 in 01.LFL: findObject; pointer x",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 109,
+        "name": "pointer y",
+        "evidence": "decoded",
+        "source": "English EGA Script 06 +0x0096 in 01.LFL: findObject; pointer y",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "run a sentence (verb on an object)",
+    "evidence": "decoded",
+    "source": "English EGA Script 07 in 01.LFL: +0x001E print, +0x004C chainScript; reviewed EGA instruction stream; compared with CD Script 07, EGA differences retained",
+    "fingerprint": "17B42542BF0062BA3F4AECFC131939743423A8046FC7C6F803C04329CFF77681",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 8,
+    "name": "show or hide the close-up in the verb area",
+    "evidence": "decoded",
+    "source": "English EGA Script 08 in 01.LFL: +0x004E print; reviewed EGA instruction stream; compared with CD Script 08, EGA differences retained",
+    "fingerprint": "91A7F41501B0C0DF3EF3FC576251E457CA7A5A3223D8A65E1EC9B46F96C387FD",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 9,
+    "name": "hint button (practice mode)",
+    "evidence": "reading",
+    "source": "English EGA Script 09 in 01.LFL: +0x000C chainScript, +0x001D chainScript; reviewed EGA instruction stream; compared with CD Script 09, EGA differences retained",
+    "fingerprint": "C38A1F4BDFD8780ACE6B8741A74BD2D8CF91879C9FB0FFA8485E2E57EF0F5B0D",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 10,
+    "name": "a distaff note was played",
+    "evidence": "decoded",
+    "source": "English EGA Script 10 in 01.LFL: +0x000C chainScript, +0x001D chainScript, +0x0027 chainScript, +0x004F chainScript; reviewed EGA instruction stream; compared with CD Script 10, EGA differences retained",
+    "fingerprint": "D012CA5315E564A8F997019AC6E9139C5A03F88273ACA045AEDEF5067B89026F",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 11,
+    "name": "\"that thread is too high for me\"",
+    "evidence": "decoded",
+    "source": "English EGA Script 11 in 01.LFL: +0x0025 print; reviewed EGA instruction stream; compared with CD Script 11, EGA differences retained",
+    "fingerprint": "63E004948CF9EC8636826B2C44028E276AB5590F20279AA81DA0B32B1BD87D3C",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 12,
+    "name": "\"I should get closer\"",
+    "evidence": "decoded",
+    "source": "English EGA Script 12 in 01.LFL: +0x001E print; reviewed EGA instruction stream; compared with CD Script 12, EGA differences retained",
+    "fingerprint": "03DAFA09C63FD68A8E38200D6BC2D8438E92CED984B0892DD63C9BD287B84BCA",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 13,
+    "name": "\"I should aim at something first\"",
+    "evidence": "decoded",
+    "source": "English EGA Script 13 in 01.LFL: +0x001B print; reviewed EGA instruction stream; compared with CD Script 13, EGA differences retained",
+    "fingerprint": "F65346BABD3865FFB019306873C9E396B1FEC7A4F7DAE6538F02866FAF4A7D99",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 14,
+    "name": "after-entry hook",
+    "evidence": "decoded",
+    "source": "English EGA Script 14 in 01.LFL: +0x0000 equalZero, +0x0005 notEqualZero, +0x000A isEqual; reviewed EGA instruction stream; compared with CD Script 14, EGA differences retained",
+    "fingerprint": "C59D3B4A1A8A4A77386E35327BDEC13312D08B4251FFDB9D2386007348F6897D",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 15,
+    "name": "before-exit hook",
+    "evidence": "decoded",
+    "source": "English EGA Script 15 in 01.LFL: +0x0000 move, +0x0005 move, +0x000A stopScript; reviewed EGA instruction stream; compared with CD Script 15, EGA differences retained",
+    "fingerprint": "57CFA8B16C60DB43A3336ADBFC3DE7FA998651933F686A795F87BC82280447BD",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 16,
+    "name": "set the text line",
+    "evidence": "decoded",
+    "source": "English EGA Script 16 in 01.LFL: +0x0005 print; reviewed EGA instruction stream; compared with CD Script 16, EGA differences retained",
+    "fingerprint": "C664C091E28404554102D65747FC69D64602B92B28CA4429EB9E30097EC7E7CA",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 17,
+    "name": "give the ego a costume (by size)",
+    "evidence": "decoded",
+    "source": "English EGA Script 17 in 01.LFL: +0x009B actorOps, +0x00C0 actorOps; reviewed EGA instruction stream; compared with CD Script 17, EGA differences retained",
+    "fingerprint": "411A5B1A50EB0B85E890F73109B1B33BDD69C7B709C2B11732CB8E2D24BA426A",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 114,
+        "name": "ego initial animation",
+        "evidence": "decoded",
+        "source": "English EGA Script 17 +0x009B in 01.LFL: actorOps; ego initial animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 115,
+        "name": "ego walk animation",
+        "evidence": "decoded",
+        "source": "English EGA Script 17 +0x009B in 01.LFL: actorOps; ego walk animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 116,
+        "name": "ego standing animation",
+        "evidence": "decoded",
+        "source": "English EGA Script 17 +0x009B in 01.LFL: actorOps; ego standing animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 117,
+        "name": "ego talk-start animation",
+        "evidence": "decoded",
+        "source": "English EGA Script 17 +0x009B in 01.LFL: actorOps; ego talk-start animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 118,
+        "name": "ego talk-stop animation",
+        "evidence": "decoded",
+        "source": "English EGA Script 17 +0x009B in 01.LFL: actorOps; ego talk-stop animation",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "show the distaff",
+    "evidence": "decoded",
+    "source": "English EGA Script 18 in 01.LFL: +0x00B7 print, +0x00C4 print, +0x00D1 print, +0x00FE print, +0x010B print; reviewed EGA instruction stream; compared with CD Script 18, EGA differences retained",
+    "fingerprint": "5C11012AA1288E12D9612861B2148DB652C8C2763AC3A05BF8A90AC116579A32",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 19,
+    "name": "hide the distaff verbs",
+    "evidence": "reading",
+    "source": "English EGA Script 19 in 01.LFL: +0x0000 move, +0x0005 verbOps, +0x000A increment; reviewed EGA instruction stream; compared with CD Script 19, EGA differences retained",
+    "fingerprint": "1B4D5D9973BBC837EEB7592766E42BECDF48F75C59BEB576E8344CF08DC8BEED",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 20,
+    "name": "play the draft back",
+    "evidence": "reading",
+    "source": "English EGA Script 20 in 01.LFL: +0x000F actorOps, +0x004A chainScript, +0x0054 chainScript, +0x006A chainScript; reviewed EGA instruction stream; compared with CD Script 20, EGA differences retained",
+    "fingerprint": "2BD18905241B21B6BC216F2FA58F1E50911C4197695FAC65932E7589596763C8",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 21,
+    "name": "end the draft playback",
+    "evidence": "decoded",
+    "source": "English EGA Script 21 in 01.LFL: +0x0017 actorOps, +0x0020 actorOps; reviewed EGA instruction stream; compared with CD Script 21, EGA differences retained",
+    "fingerprint": "927C7559C4F21E36C125DA8D4FFF54CC8CE2FB4B714A363B9469E4CB3C44A4B6",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 22,
+    "name": "compare the played draft with the known ones",
+    "evidence": "reading",
+    "source": "English EGA Script 22 in 01.LFL: +0x001F print, +0x00BA chainScript, +0x011C chainScript, +0x0149 print; reviewed EGA instruction stream; compared with CD Script 22, EGA differences retained",
+    "fingerprint": "86CFF6C9307552A1728EF0F37991E212737A350C868061944548E0104215C636",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 23,
+    "name": "load draft N",
+    "evidence": "decoded",
+    "source": "English EGA Script 23 in 01.LFL: +0x001B and, +0x002A and, +0x0039 and, +0x0048 and, +0x005C and; reviewed EGA instruction stream; compared with CD Script 23, EGA differences retained",
+    "fingerprint": "5343D1C935E0FAD4056750B8379727A7ED0C0611E6E8F80EABC1E08F739FD192",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 101,
+        "name": "current draft response word",
+        "evidence": "decoded",
+        "source": "English EGA Script 23 +0x000F in 01.LFL: move; current draft response word",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 3432,
+        "name": "the current draft is learned",
+        "evidence": "decoded",
+        "source": "English EGA Script 23 +0x0020 in 01.LFL: move; the current draft is learned; mask 0x2000",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 3433,
+        "name": "the current draft can be reversed",
+        "evidence": "decoded",
+        "source": "English EGA Script 23 +0x002F in 01.LFL: move; the current draft can be reversed; mask 0x1000",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 3434,
+        "name": "the current draft has last-note knowledge",
+        "evidence": "decoded",
+        "source": "English EGA Script 23 +0x003E in 01.LFL: move; the current draft has last-note knowledge; mask 0x4000",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "check whether draft N is learned",
+    "evidence": "decoded",
+    "source": "English EGA Script 24 in 01.LFL: +0x0016 and; reviewed EGA instruction stream; compared with CD Script 24, EGA differences retained",
+    "fingerprint": "5403D68CE21D7C66D7A71C2EF7CE68011B2321CF6BED052E407D7A2E6B5FFC05",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 25,
+    "name": "mark draft N as learned",
+    "evidence": "decoded",
+    "source": "English EGA Script 25 in 01.LFL: +0x0016 or; reviewed EGA instruction stream; compared with CD Script 25, EGA differences retained",
+    "fingerprint": "862983F7249005779F2C7C20E58FC43466F6B6B289A8DED31354B0C5B28793A6",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 26,
+    "name": "run the matched draft on the aimed object",
+    "evidence": "reading",
+    "source": "English EGA Script 26 in 01.LFL: +0x0019 print, +0x0056 and, +0x0063 and, +0x00B2 print; reviewed EGA instruction stream; compared with CD Script 26, EGA differences retained",
+    "fingerprint": "82316A2EFFDF811234C4FBB3D9C14518BD14AA7AD4A05F0C75DD62E255F979F0",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 27,
+    "name": "mark a note in the verb area",
+    "evidence": "reading",
+    "source": "English EGA Script 27 in 01.LFL: +0x003C print, +0x0052 print, +0x0068 print, +0x007E print, +0x0094 print; reviewed EGA instruction stream; compared with CD Script 27, EGA differences retained",
+    "fingerprint": "02DB694A8F958FEB55EF9CD8A4E56C1CA6DC40A53C5088972683DDB94A1289E7",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 28,
+    "name": "clear the draft buffer",
+    "evidence": "decoded",
+    "source": "English EGA Script 28 in 01.LFL: +0x0000 isEqual, +0x0007 isNotEqual, +0x000E startScript; reviewed EGA instruction stream; compared with CD Script 28, EGA differences retained",
+    "fingerprint": "D89E98BA467656DFE86A654E1B0D9FBBA7D1FA2842A924A261112E67E1906DF3",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 90,
+        "name": "draft buffer / displayed note letters",
+        "evidence": "decoded",
+        "source": "English EGA Script 28 +0x0021 in 01.LFL: setVarRange; draft buffer / displayed note letters",
+        "scope": null,
+        "to": 93
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "name": "learning glow",
+    "evidence": "decoded",
+    "source": "English EGA Script 29 in 01.LFL: +0x0031 actorOps, +0x004B putActorInRoom, +0x00B8 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 29, EGA differences retained",
+    "fingerprint": "9721773D3AE23FF53825B2730ACED46411E09C11F0EDFE4ED506EFE72C727A07",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 30,
+    "name": "play one note of a draft on an object",
+    "evidence": "decoded",
+    "source": "English EGA Script 30 in 01.LFL: +0x0012 chainScript; reviewed EGA instruction stream; compared with CD Script 30, EGA differences retained",
+    "fingerprint": "1D55C3C4DA81BE8AA730D438467BC33374DE2C1BC20CC6249B3D8BA4A22CF500",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 3435,
+        "name": "play a note on an object",
+        "evidence": "decoded",
+        "source": "English EGA Script 30 +0x0000 in 01.LFL: move; play a note on an object",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "name": "animate and sound one note",
+    "evidence": "decoded",
+    "source": "English EGA Script 31 in 01.LFL: +0x01D7 actorOps, +0x01FD putActorInRoom, +0x0212 actorOps, +0x0254 actorOps, +0x0271 actorOps; reviewed EGA instruction stream; compared with CD Script 31, EGA differences retained",
+    "fingerprint": "5FA92539FC13BFD52024DF10DD9347ECC43E78F52DDACAD9FFD5A3FA6C2F6529",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 32,
+    "name": "recolour an actor's palette",
+    "evidence": "decoded",
+    "source": "English EGA Script 32 in 01.LFL: +0x0005 actorOps; reviewed EGA instruction stream; compared with CD Script 32, EGA differences retained",
+    "fingerprint": "41605729B345D56E8D64BA0A4F141C980527F01B66DF5E838AE3A6B2D76A1471",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 33,
+    "name": "restore an actor's palette",
+    "evidence": "decoded",
+    "source": "English EGA Script 33 in 01.LFL: +0x0005 actorOps; reviewed EGA instruction stream; compared with CD Script 33, EGA differences retained",
+    "fingerprint": "A81747990B707C5A059455EE5CC1893AB8B76C587E74E7EAFDE1B2E1E4F36A26",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 34,
+    "name": "mark draft N's last-note knowledge",
+    "evidence": "reading",
+    "source": "English EGA Script 34 in 01.LFL: +0x0016 or; reviewed EGA instruction stream; compared with CD Script 34, EGA differences retained",
+    "fingerprint": "BF6E7F9FD549C2B066F42E71C9D979281370C2EBB0F6688D1B1B4360E4C700E4",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 35,
+    "name": "reject a draft response",
+    "evidence": "reading",
+    "source": "English EGA Script 35 in 01.LFL: +0x0016 print, +0x004F print; reviewed EGA instruction stream; compared with CD Script 35, EGA differences retained",
+    "fingerprint": "4B19FC991CA5361C14BD42C2866258E336C5F4A89616731E30139C524788DB6A",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 3431,
+        "name": "the draft response was refused or consumed",
+        "evidence": "reading",
+        "source": "English EGA Script 35 +0x0000 in 01.LFL: move; the draft response was refused or consumed; Script 26 clears and checks it after running the object response",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "name": "restore the note letters",
+    "evidence": "decoded",
+    "source": "English EGA Script 36 in 01.LFL: +0x0024 print, +0x003B print, +0x0052 print, +0x0069 print, +0x0080 print; reviewed EGA instruction stream; compared with CD Script 36, EGA differences retained",
+    "fingerprint": "D19D58C13955D5015A6FE72C75F59811A61A56B9C139872554FD57AFCCF65A66",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 37,
+    "name": "play the queued sound and wait",
+    "evidence": "decoded",
+    "source": "English EGA Script 37 in 01.LFL: +0x000B startSound; reviewed EGA instruction stream; compared with CD Script 37, EGA differences retained",
+    "fingerprint": "CABE53BC10CBDDD0E6D6D6E1175A22F5ECC26BB4485844D6DF780E93E3E51631",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 163,
+        "name": "queued or last-started sound",
+        "evidence": "decoded",
+        "source": "English EGA Script 37 +0x000B in 01.LFL: startSound; queued or last-started sound",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 164,
+        "name": "sound currently playing",
+        "evidence": "decoded",
+        "source": "English EGA Script 37 +0x0006 in 01.LFL: move; sound currently playing",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "name": "stop queued and current sounds",
+    "evidence": "decoded",
+    "source": "English EGA Script 38 in 01.LFL: +0x0000 notEqualZero, +0x0005 stopSound, +0x0008 notEqualZero; reviewed EGA instruction stream; compared with CD Script 38, EGA differences retained",
+    "fingerprint": "015EEE2F39E665F474885CEED29D5A716FF0F04B9423060F2F3EF88C4EE0A5DE",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 39,
+    "name": "play a sound (music)",
+    "evidence": "decoded",
+    "source": "English EGA Script 39 in 01.LFL: +0x0038 startSound; reviewed EGA instruction stream; compared with CD Script 39, EGA differences retained",
+    "fingerprint": "02C7DE82C531125859713A09944698E440821F5D75CBEC2B27810A1C10C34E18",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 40,
+    "name": "play a sound (effect)",
+    "evidence": "decoded",
+    "source": "English EGA Script 40 in 01.LFL: +0x0038 startSound; reviewed EGA instruction stream; compared with CD Script 40, EGA differences retained",
+    "fingerprint": "597415D29EEEB6B7D954B3AFCC46A48318B3908EF78C69480C9D687F1F7804BA",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 41,
+    "name": "spell visual at a point",
+    "evidence": "reading",
+    "source": "English EGA Script 41 in 01.LFL: +0x001F actorOps, +0x003A putActorInRoom, +0x0088 putActorInRoom, +0x008C actorOps; reviewed EGA instruction stream; compared with CD Script 41, EGA differences retained",
+    "fingerprint": "CFA6D674D90D099D36FB752DCCB9C196C403E1457C7430A0ED7352C037627B3B",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 42,
+    "name": "Room 03's flying actor",
+    "evidence": "decoded",
+    "source": "English EGA Script 42 in 01.LFL: +0x000D actorOps, +0x0045 putActorInRoom, +0x008D putActorInRoom; reviewed EGA instruction stream; compared with CD Script 42, EGA differences retained",
+    "fingerprint": "A1930393F7814227DC13B97C9A818DB79498D934499114BDA909A652E8A2C3D4",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 179,
+        "name": "flying actor x positions",
+        "evidence": "decoded",
+        "source": "English EGA Script 42 +0x0037 in 01.LFL: move; flying actor x positions; Script 44 initializes five entries",
+        "scope": null,
+        "to": 183
+      },
+      {
+        "kind": "var",
+        "id": 187,
+        "name": "flying actor y positions",
+        "evidence": "decoded",
+        "source": "English EGA Script 42 +0x003E in 01.LFL: move; flying actor y positions; Script 44 initializes five entries",
+        "scope": null,
+        "to": 191
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "name": "cannot save a game in demo mode",
+    "evidence": "decoded",
+    "source": "English EGA Script 43 in 01.LFL: +0x0000 print; reviewed EGA instruction stream; compared with CD Script 43, EGA differences retained",
+    "fingerprint": "48CEC1A970C703F7F3CD6F9F6E600E966B4B784EA4EB3CA2A0BD3A1073ACD73F",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 44,
+    "name": "opening cutscene",
+    "evidence": "decoded",
+    "source": "English EGA Script 44 in 02.LFL: +0x00B9 loadRoom, +0x00C2 loadRoom, +0x00DD actorOps, +0x0130 print, +0x0231 loadRoom; reviewed EGA instruction stream; compared with CD Script 44, EGA differences retained",
+    "fingerprint": "9823D773D8826B73EB038C9E17941021892E4E271E4AED8A7D912F905D44B21A",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 45,
+    "name": "Room 02 walk-box watcher",
+    "evidence": "decoded",
+    "source": "English EGA Script 45 in 02.LFL: +0x0000 breakHere, +0x0001 getActorWalkBox, +0x0005 breakHere; reviewed EGA instruction stream; compared with CD Script 45, EGA differences retained",
+    "fingerprint": "7F8B9065F0E6C7FD06D003C8FC6662023A93998C9D9583FEAC59C00186B57271",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 46,
+    "name": "the Elders' trial",
+    "evidence": "decoded",
+    "source": "English EGA Script 46 in 08.LFL: +0x002F print, +0x005C print, +0x00AC print, +0x00F3 print, +0x0120 loadRoom; reviewed EGA instruction stream; compared with CD Script 46, EGA differences retained",
+    "fingerprint": "5AD5DD5AB6A9C0E16E7435038141A6B72446051164052FBFAB3E12955D0CAC90",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Elder (actor 2)",
+        "evidence": "reading",
+        "source": "English EGA Script 46 +0x00AC in 08.LFL: print; Elder (actor 2)",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Elder (actor 3)",
+        "evidence": "reading",
+        "source": "English EGA Script 46 +0x0313 in 08.LFL: print; Elder (actor 3)",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "Elder (actor 4)",
+        "evidence": "reading",
+        "source": "English EGA Script 46 +0x02AC in 08.LFL: print; Elder (actor 4)",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "English EGA Script 46 +0x024A in 08.LFL: print; Hetchel",
+        "scope": "script:46"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "name": "Hetchel speaks after the trial",
+    "evidence": "reading",
+    "source": "English EGA Script 47 in 09.LFL: +0x0041 actorOps, +0x0071 actorOps, +0x0086 putActorInRoom, +0x00CE putActorInRoom, +0x00E8 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 47, EGA differences retained",
+    "fingerprint": "206600FACE1D54E1AB0F12210D42BA1832ADDD70EAE2E2101A12D061F5AF451F",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "English EGA Script 47 +0x0102 in 09.LFL: print; Hetchel",
+        "scope": "script:47"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "name": "Room 63 to Room 62 transition",
+    "evidence": "decoded",
+    "source": "English EGA Script 48 in 63.LFL: +0x0040 actorOps, +0x004B putActorInRoom, +0x0093 putActorInRoom, +0x00A6 putActorInRoom, +0x00B3 loadRoom; reviewed EGA instruction stream; compared with CD Script 48, EGA differences retained",
+    "fingerprint": "0C603CC110E2F9C216851B4D2B059FAB90FE0E9A7931B98EB50B39A2B86FABE5",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 49,
+    "name": "whirlwind scene (Rooms 02 and 11)",
+    "evidence": "decoded",
+    "source": "English EGA Script 49 in 11.LFL: +0x000A print, +0x0091 actorOps, +0x009C putActorInRoom, +0x00EA actorOps, +0x010C loadRoom; reviewed EGA instruction stream; compared with CD Script 49, EGA differences retained",
+    "fingerprint": "47B8989C3CD15C2BE4B880ABF63FDCBA4F230E4169456461263ADB16BFC6BF47",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 50,
+    "name": "Room 03 to Room 10 transition",
+    "evidence": "decoded",
+    "source": "English EGA Script 50 in 10.LFL: +0x0000 loadRoom, +0x0015 actorOps, +0x0029 putActorInRoom, +0x003C loadRoom; reviewed EGA instruction stream; compared with CD Script 50, EGA differences retained",
+    "fingerprint": "FCFE37FC20D4536BDEE2CE602F3592586BE59453B2E783A09AFF62783420BAB7",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 51,
+    "name": "Room 11 actor procession and arrival in Room 13",
+    "evidence": "decoded",
+    "source": "English EGA Script 51 in 11.LFL: +0x0013 actorOps, +0x0045 loadRoom, +0x006B actorOps, +0x00A4 actorOps, +0x00AF putActorInRoom; reviewed EGA instruction stream",
+    "fingerprint": "3691AFC4ACC6415A86181EEA1ECE5A8886AEA614FEF0255E9EA3E567B5D97575",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 52,
+    "name": "Room 10 to Room 13 cutscene",
+    "evidence": "decoded",
+    "source": "English EGA Script 52 in 11.LFL: +0x0013 actorOps, +0x0045 loadRoom, +0x006B actorOps, +0x00A4 actorOps, +0x00AF putActorInRoom; reviewed EGA instruction stream; compared with CD Script 52, EGA differences retained",
+    "fingerprint": "3691AFC4ACC6415A86181EEA1ECE5A8886AEA614FEF0255E9EA3E567B5D97575",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 53,
+    "name": "Room 13 scene with actors 8 and 9",
+    "evidence": "decoded",
+    "source": "English EGA Script 53 in 13.LFL: +0x002A putActorInRoom, +0x003A actorOps, +0x004B putActorInRoom, +0x0061 actorOps, +0x0072 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 53, EGA differences retained",
+    "fingerprint": "54A5F9BBC2A621A79CE8D626752A313244747EE1434988CC2631DDBA2091803B",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 54,
+    "name": "Room 15 arrival and learning glow",
+    "evidence": "decoded",
+    "source": "English EGA Script 54 in 15.LFL: +0x000A loadRoom, +0x0020 actorOps, +0x0038 actorOps, +0x0044 putActorInRoom, +0x0056 actorOps; reviewed EGA instruction stream; compared with CD Script 54, EGA differences retained",
+    "fingerprint": "769E25D19015B9930F1BE571B955F7170266CF3CE37F2D924E394EC58D178100",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 55,
+    "name": "glass bell scene and transition into Room 20",
+    "evidence": "decoded",
+    "source": "English EGA Script 55 in 18.LFL: +0x002B loadRoom, +0x0030 chainScript; reviewed EGA instruction stream",
+    "fingerprint": "96C49DF76C62D195BAD3BCECED80E482F141650C8B17CD8183B271AE3EFD4B29",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 56,
+    "name": "transition into Room 20",
+    "evidence": "decoded",
+    "source": "English EGA Script 56 in 18.LFL: +0x002B loadRoom, +0x0030 chainScript; reviewed EGA instruction stream; compared with CD Script 56, EGA differences retained",
+    "fingerprint": "96C49DF76C62D195BAD3BCECED80E482F141650C8B17CD8183B271AE3EFD4B29",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 57,
+    "name": "room-local transition through scripts 200 and 207",
+    "evidence": "decoded",
+    "source": "English EGA Script 57 in 20.LFL: +0x002A chainScript; reviewed EGA instruction stream; compared with CD Script 57, EGA differences retained",
+    "fingerprint": "C8F48F805DF6CA959E7DD86A5FECB4BDE35FB67F1B179E92A40A81916209DFFC",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 58,
+    "name": "room-local transition through scripts 200 and 59",
+    "evidence": "decoded",
+    "source": "English EGA Script 58 in 20.LFL: +0x0019 chainScript; reviewed EGA instruction stream; compared with CD Script 58, EGA differences retained",
+    "fingerprint": "479645E25EEC63643108F77F928F6C83ACA94BBECDAC701BC0755016E0E58430",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 59,
+    "name": "transition into Room 18",
+    "evidence": "decoded",
+    "source": "English EGA Script 59 in 18.LFL: +0x000A loadRoom; reviewed EGA instruction stream; compared with CD Script 59, EGA differences retained",
+    "fingerprint": "A27AC4D2B6EB15B64B690F399830F6BFD254799822F4DF503209D29F8C67C6B9",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 60,
+    "name": "room-local transition through scripts 201 and 61",
+    "evidence": "decoded",
+    "source": "English EGA Script 60 in 20.LFL: +0x0019 chainScript; reviewed EGA instruction stream; compared with CD Script 60, EGA differences retained",
+    "fingerprint": "246C59E6B53991DEB1CA19C9C78A04E8FD983147DC0917C9CBB86A96039AEE4F",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 61,
+    "name": "Room 18 arrival through local 203",
+    "evidence": "decoded",
+    "source": "English EGA Script 61 in 18.LFL: +0x000A loadRoom; reviewed EGA instruction stream; compared with CD Script 61, EGA differences retained",
+    "fingerprint": "650CA52F213E0C11235CA173349EE5E18936442F0397FEAE66846B4E6721D129",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 62,
+    "name": "transition into Room 20 through script 63",
+    "evidence": "decoded",
+    "source": "English EGA Script 62 in 18.LFL: +0x001E loadRoom, +0x0023 chainScript; reviewed EGA instruction stream; compared with CD Script 62, EGA differences retained",
+    "fingerprint": "163487C9F116C67474D5D44F1AE79ED3B8657EB3DD8B9362B214CA44DA4BA149",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 63,
+    "name": "room-local transition through scripts 201 and 207",
+    "evidence": "decoded",
+    "source": "English EGA Script 63 in 20.LFL: +0x001D chainScript; reviewed EGA instruction stream; compared with CD Script 63, EGA differences retained",
+    "fingerprint": "8734D4D7EDC9BB7DB0371B2C8F47848240C8209B4E8EE726D9F9C85800BAC830",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 64,
+    "name": "the little glass bell reply",
+    "evidence": "reading",
+    "source": "English EGA Script 64 in 18.LFL: +0x0009 print, +0x0035 print; reviewed EGA instruction stream; compared with CD Script 64, EGA differences retained",
+    "fingerprint": "44085B4A5963F9AAA159391CB1312825822D54F3AF100BEB1B44C6EB08BED4DE",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 65,
+    "name": "Room 19 spell scene",
+    "evidence": "reading",
+    "source": "English EGA Script 65 in 19.LFL: +0x0015 loadRoom, +0x002B actorOps, +0x0036 putActorInRoom, +0x0091 actorOps, +0x00A9 actorOps; reviewed EGA instruction stream; compared with CD Script 65, EGA differences retained",
+    "fingerprint": "DCEEC8A574B38312C96746135C8072C41DD7020BB0791CB4C32E3644D3F41398",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 66,
+    "name": "Goodmold conversation in Room 17",
+    "evidence": "reading",
+    "source": "English EGA Script 66 in 17.LFL: +0x001F actorOps, +0x003F actorOps, +0x0045 actorOps, +0x004B actorOps, +0x006C putActorInRoom; reviewed EGA instruction stream; compared with CD Script 66, EGA differences retained",
+    "fingerprint": "E16E17FF428A6DCADF93C51642726520659FC0FD6D8343588ECF06E24FF9A8A8",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Master Goodmold",
+        "evidence": "reading",
+        "source": "English EGA Script 66 +0x008B in 17.LFL: print; Master Goodmold; Script 68 receives actor 3 and identifies Goodmold",
+        "scope": "script:66"
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "name": "Goodmold conversation in Room 22",
+    "evidence": "reading",
+    "source": "English EGA Script 67 in 22.LFL: +0x002F print, +0x0098 print, +0x00CE putActorInRoom, +0x00E2 putActorInRoom, +0x00EC loadRoom; reviewed EGA instruction stream; compared with CD Script 67, EGA differences retained",
+    "fingerprint": "F5FAA479084C9BC6C579AD2BB7CD6ED3FBF45B7571D39A405A5AF5FCF3CB1598",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 6,
+        "name": "Master Goodmold",
+        "evidence": "reading",
+        "source": "English EGA Script 67 +0x002F in 22.LFL: print; Master Goodmold; Script 68 receives actor 6 and identifies Goodmold",
+        "scope": "script:67"
+      }
+    ]
+  },
+  {
+    "id": 68,
+    "name": "Master Goodmold's greeting",
+    "evidence": "reading",
+    "source": "English EGA Script 68 in 56.LFL: +0x0000 print, +0x0025 print, +0x0074 print, +0x009D print, +0x00EE loadRoom; reviewed EGA instruction stream; compared with CD Script 68, EGA differences retained",
+    "fingerprint": "F665E2E54D5F91BFF9D747D67562C9E8716A9B7662F48B3BB233B8F9FEAA824E",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 69,
+    "name": "Fleece's greeting and the sheep problem",
+    "evidence": "reading",
+    "source": "English EGA Script 69 in 25.LFL: +0x015B print, +0x000D print, +0x0047 print, +0x0062 print; reviewed EGA instruction stream; compared with CD Script 69, EGA differences retained",
+    "fingerprint": "4375575105391347EFB2A47BA6704831B971C91E53919E8333BE337D02118023",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Fleece",
+        "evidence": "reading",
+        "source": "English EGA Script 69 +0x000D in 25.LFL: print; Fleece",
+        "scope": "script:69"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "name": "sheep scene in Rooms 24 and 27",
+    "evidence": "reading",
+    "source": "English EGA Script 70 in 24.LFL: +0x0039 actorOps, +0x0050 putActorInRoom, +0x0059 putActorInRoom, +0x0062 putActorInRoom, +0x00A2 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 70, EGA differences retained",
+    "fingerprint": "EFC74932DDFB94E507CC4ABCAFBB0D3F1E8D67617694BAA24EA73D91E1D35911",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 71,
+    "name": "the dizzy reply",
+    "evidence": "reading",
+    "source": "English EGA Script 71 in 18.LFL: +0x0014 print; reviewed EGA instruction stream; compared with CD Script 71, EGA differences retained",
+    "fingerprint": "EF4FA84472DB0CBC792E1605ECA32EFDAD74C02CFDDAF34835F49E3D2E3B91E8",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 72,
+    "name": "Room 65 to Room 30 transition",
+    "evidence": "decoded",
+    "source": "English EGA Script 72 in 28.LFL: +0x0024 loadRoom, +0x0038 putActorInRoom, +0x004B loadRoom, +0x0063 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 72, EGA differences retained",
+    "fingerprint": "162D1B862211AC570117E84E6EE1D18692437ABB2B73098D10D8452201D463EA",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 73,
+    "name": "walk actor 8 across Room 24",
+    "evidence": "decoded",
+    "source": "English EGA Script 73 in 24.LFL: +0x000D actorOps, +0x001E putActorInRoom, +0x0030 actorOps, +0x0040 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 73, EGA differences retained",
+    "fingerprint": "5A4A49BE293191D717009AF32DD3EE77EF137146F7C295B0F3A09479F093700B",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 74,
+    "name": "dragon's arrival greeting (Room 28)",
+    "evidence": "reading",
+    "source": "English EGA Script 74 in 28.LFL: +0x0000 putActorInRoom, +0x000C loadRoom, +0x0012 print, +0x0034 print, +0x006B print; reviewed EGA instruction stream; compared with CD Script 74, EGA differences retained",
+    "fingerprint": "D3900AC2C848819AD0F33B85146FE9ED7EB4632C8A3F51D9A60A5F94B7E55513",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "dragon",
+        "evidence": "reading",
+        "source": "English EGA Script 74 +0x0012 in 28.LFL: print; dragon",
+        "scope": "script:74"
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "name": "conversation with the hungry dragon",
+    "evidence": "reading",
+    "source": "English EGA Script 75 in 28.LFL: +0x0009 print, +0x0043 print, +0x008A print, +0x00A7 print, +0x00DD print; reviewed EGA instruction stream; compared with CD Script 75, EGA differences retained",
+    "fingerprint": "EAB239E91FB4D70EA87AD5A278802414C779F8A21101DCCB3663A8E6E6E134D8",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "dragon",
+        "evidence": "reading",
+        "source": "English EGA Script 75 +0x0009 in 28.LFL: print; dragon",
+        "scope": "script:75"
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "name": "dragon leaves Room 27",
+    "evidence": "reading",
+    "source": "English EGA Script 76 in 28.LFL: +0x0002 loadRoom, +0x0014 actorOps, +0x0025 putActorInRoom, +0x0040 putActorInRoom, +0x0049 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 76, EGA differences retained",
+    "fingerprint": "90678D4AEFA9DE25E634DF6C858A1AA5CC10763480ED905067E2064A5091C614",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 77,
+    "name": "Room 28 arrival and object classes",
+    "evidence": "decoded",
+    "source": "English EGA Script 77 in 30.LFL: +0x0009 loadRoom, +0x001F putActorInRoom; reviewed EGA instruction stream; compared with CD Script 77, EGA differences retained",
+    "fingerprint": "D44589C35522E2DC78CDE0CEFEEDFFC8130DCB62666FAB7B748475AC5FD9B5EB",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 78,
+    "name": "Room 65 scene and arrival in Room 30",
+    "evidence": "decoded",
+    "source": "English EGA Script 78 in 65.LFL: +0x0028 actorOps, +0x0045 putActorInRoom, +0x008D putActorInRoom, +0x009E putActorInRoom, +0x00B4 loadRoom; reviewed EGA instruction stream; compared with CD Script 78, EGA differences retained",
+    "fingerprint": "0C9D9E4A53CEFB9D2A2FF2BBEFE807BD5C7F7A3A617AC471B5AB263217074911",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 79,
+    "name": "Room 32 arrival and walk-box changes",
+    "evidence": "decoded",
+    "source": "English EGA Script 79 in 32.LFL: +0x001C loadRoom, +0x0038 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 79, EGA differences retained",
+    "fingerprint": "887B25258AF517910B05A5C27E969960DFC723929A2C5EFA9A5E3A404F2565F7",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 80,
+    "name": "Room 32 arrival",
+    "evidence": "decoded",
+    "source": "English EGA Script 80 in 32.LFL: +0x0026 loadRoom, +0x0032 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 80, EGA differences retained",
+    "fingerprint": "39AE1E7572F865F14DCAA0A4B9D935AC8868DFFF2D0591C431416E5594F8DD35",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 81,
+    "name": "Room 30 arrival and lighting",
+    "evidence": "decoded",
+    "source": "English EGA Script 81 in 30.LFL: +0x0019 loadRoom, +0x0035 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 81, EGA differences retained",
+    "fingerprint": "D52E2747E2BAA6C6A07E0DB1683A6F01392B76551D7BF127F19DE037A796E145",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 82,
+    "name": "arrival in Room 31 and blocked return",
+    "evidence": "decoded",
+    "source": "English EGA Script 82 in 31.LFL: +0x0005 actorOps, +0x0021 putActorInRoom, +0x0029 loadRoom, +0x0034 putActorInRoom, +0x0054 print; reviewed EGA instruction stream; compared with CD Script 82, EGA differences retained",
+    "fingerprint": "58FF214F9CB835647EFC7C6E3D86E2AE5408BF60BF66BDE869703721D1E3B8BE",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 83,
+    "name": "Room 30 arrival",
+    "evidence": "decoded",
+    "source": "English EGA Script 83 in 31.LFL: +0x0019 loadRoom, +0x0025 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 83, EGA differences retained",
+    "fingerprint": "84706C411263F31966D66B19373D5AFF9911E3BBC812F99BF07928EE48485CA1",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 84,
+    "name": "Room 31 arrival",
+    "evidence": "decoded",
+    "source": "English EGA Script 84 in 31.LFL: +0x0019 loadRoom, +0x0025 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 84, EGA differences retained",
+    "fingerprint": "5432C6B9FFF67DE7CB789F7EBF2A9E25CB193E6AF3AACAE08698897996AE3B33",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 85,
+    "name": "Rusty Nailbender's greeting",
+    "evidence": "reading",
+    "source": "English EGA Script 85 in 34.LFL: +0x01A7 print, +0x0291 print, +0x003A print, +0x006B print, +0x0095 print; reviewed EGA instruction stream; compared with CD Script 85, EGA differences retained",
+    "fingerprint": "F12C568606F94F6B0170296F78812337104B33BA5C4F0638A3B00371812FC3A2",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty",
+        "evidence": "reading",
+        "source": "English EGA Script 85 +0x003A in 34.LFL: print; Rusty",
+        "scope": "script:85"
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "name": "firewood scene",
+    "evidence": "decoded",
+    "source": "English EGA Script 86 in 37.LFL: +0x0028 print, +0x0064 print, +0x00BC print, +0x00D9 print, +0x010B print; reviewed EGA instruction stream; compared with CD Script 86, EGA differences retained",
+    "fingerprint": "789CD1D31692CDA4DC21F46008741D685CAF89E53A64C747599015C515C63F0B",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Mr. Stoke",
+        "evidence": "reading",
+        "source": "English EGA Script 86 +0x0028 in 37.LFL: print; Mr. Stoke",
+        "scope": "script:86"
+      }
+    ]
+  },
+  {
+    "id": 87,
+    "name": "ghost scene",
+    "evidence": "reading",
+    "source": "English EGA Script 87 in 38.LFL: +0x0019 print, +0x0056 print, +0x0063 print, +0x009C print, +0x00D1 actorOps; reviewed EGA instruction stream; compared with CD Script 87, EGA differences retained",
+    "fingerprint": "F46839771D03DDFBA79F71C94E0CD5CE547938F49689E84249594218CCFD0013",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Mr. Stoke",
+        "evidence": "reading",
+        "source": "English EGA Script 87 +0x0471 in 38.LFL: print; Mr. Stoke",
+        "scope": "script:87"
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "name": "Rusty's ghost and Hetchel's return (Room 34)",
+    "evidence": "reading",
+    "source": "English EGA Script 88 in 34.LFL: +0x0000 loadRoom, +0x0021 actorOps, +0x002C putActorInRoom, +0x0049 actorOps, +0x0061 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 88, EGA differences retained",
+    "fingerprint": "E262B1EDE1A0787F7FB189DC56F4C5004F53B0FAA539D40260F927B935D337D8",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty (ghost)",
+        "evidence": "reading",
+        "source": "English EGA Script 88 +0x00E9 in 34.LFL: print; Rusty (ghost); Rusty dialogue / Hetchel bird costume 0x34 as in Script 47",
+        "scope": "script:88"
+      },
+      {
+        "kind": "actor",
+        "id": 11,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "English EGA Script 88 +0x01FF in 34.LFL: print; Hetchel; Rusty dialogue / Hetchel bird costume 0x34 as in Script 47",
+        "scope": "script:88"
+      }
+    ]
+  },
+  {
+    "id": 89,
+    "name": "Room 11 scene with actor 4",
+    "evidence": "decoded",
+    "source": "English EGA Script 89 in 11.LFL: +0x0010 loadRoom, +0x0025 actorOps, +0x0035 putActorInRoom, +0x0075 loadRoomWithEgo; reviewed EGA instruction stream; compared with CD Script 89, EGA differences retained",
+    "fingerprint": "D2943BDC31E4ADF9F242A24468706D6CB4C9C0B471B51A4CAE24A66904AD06F6",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 90,
+    "name": "Room 42 flashes and Mandible's introduction",
+    "evidence": "reading",
+    "source": "English EGA Script 90 in 43.LFL: +0x0107 print, +0x0005 loadRoom, +0x001D actorOps, +0x0031 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 90, EGA differences retained",
+    "fingerprint": "ADDC15F2BF7615A8D91F02EA6D87442FAC9278DDF0B567E8359933D996167B2B",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "English EGA Script 90 +0x00D6 in 43.LFL: print; Mandible",
+        "scope": "script:90"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "English EGA Script 90 +0x01A1 in 43.LFL: print; Cob",
+        "scope": "script:90"
+      }
+    ]
+  },
+  {
+    "id": 91,
+    "name": "Room 43 cage scene",
+    "evidence": "reading",
+    "source": "English EGA Script 91 in 43.LFL: +0x000A print, +0x0055 actorOps, +0x005B putActorInRoom, +0x0093 putActorInRoom, +0x00C9 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 91, EGA differences retained",
+    "fingerprint": "E70B1EB4EC55F4523EDAF3E25704FCCD58E7C04951D2E7ED058FAA8C09A27645",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "English EGA Script 91 +0x0139 in 43.LFL: print; Mandible",
+        "scope": "script:91"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "English EGA Script 91 +0x0237 in 43.LFL: print; Cob",
+        "scope": "script:91"
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "name": "Room 43 arrival",
+    "evidence": "decoded",
+    "source": "English EGA Script 92 in 43.LFL: +0x0005 loadRoom, +0x0017 putActorInRoom, +0x0029 actorOps; reviewed EGA instruction stream; compared with CD Script 92, EGA differences retained",
+    "fingerprint": "096839D4C3646ABE05FD6348B8EB6D0ED391D0D371A82B7D31DE8FED32DFCA0C",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 93,
+    "name": "Room 43 cage scene, second part",
+    "evidence": "reading",
+    "source": "English EGA Script 93 in 43.LFL: +0x003D actorOps, +0x0053 print, +0x0089 print, +0x00BB print, +0x00F9 print; reviewed EGA instruction stream; compared with CD Script 93, EGA differences retained",
+    "fingerprint": "D8D47612F4DE4F43329D94CDA3F3D51E7CA7DA38BD42F11E0E121B7270157195",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "English EGA Script 93 +0x0053 in 43.LFL: print; Cob",
+        "scope": "script:93"
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "name": "Room 19 scene with actors 2 and 3",
+    "evidence": "decoded",
+    "source": "English EGA Script 94 in 19.LFL: +0x0015 loadRoom, +0x002B actorOps, +0x0036 putActorInRoom, +0x009F actorOps, +0x00AA putActorInRoom; reviewed EGA instruction stream; compared with CD Script 94, EGA differences retained",
+    "fingerprint": "91B1C8B68DBBD46574C0DA2328AFFF216EFDAF61FA828D18394CE21658B16863",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 95,
+    "name": "Mandible opens the Pattern",
+    "evidence": "reading",
+    "source": "English EGA Script 95 in 44.LFL: +0x0033 print, +0x0065 print, +0x00B2 print, +0x00E6 print, +0x0132 print; reviewed EGA instruction stream; compared with CD Script 95, EGA differences retained",
+    "fingerprint": "B1AA6A760F30C9619A305004188E480A9FA2D3174ABCACB112EA6FF9872069F3",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "English EGA Script 95 +0x0033 in 44.LFL: print; Mandible",
+        "scope": "script:95"
+      }
+    ]
+  },
+  {
+    "id": 96,
+    "name": "Room 45 fall",
+    "evidence": "decoded",
+    "source": "English EGA Script 96 in 45.LFL: +0x0017 actorOps, +0x0037 putActorInRoom, +0x0049 loadRoom, +0x0051 putActorInRoom, +0x0070 print; reviewed EGA instruction stream; compared with CD Script 96, EGA differences retained",
+    "fingerprint": "44DA8227589666534110F3314C936E63E2B0DD2535CE7E317B4A7AECDDDA46B6",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 97,
+    "name": "Room 34 arrival",
+    "evidence": "decoded",
+    "source": "English EGA Script 97 in 34.LFL: +0x0013 loadRoom, +0x0018 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 97, EGA differences retained",
+    "fingerprint": "6540B1CCF179DE0950A6F09C7753BBEF89826AC26294EFB8AE9FC3DD19076912",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 98,
+    "name": "Room 34 ghost walk",
+    "evidence": "reading",
+    "source": "English EGA Script 98 in 34.LFL: +0x0015 putActorInRoom, +0x0040 print, +0x0090 print, +0x00A3 print, +0x00D7 print; reviewed EGA instruction stream; compared with CD Script 98, EGA differences retained",
+    "fingerprint": "437BC3F869F03894B52AA441F17475B688192D63FA9B617FBCB333863369A92F",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty (ghost)",
+        "evidence": "reading",
+        "source": "English EGA Script 98 +0x0040 in 34.LFL: print; Rusty (ghost)",
+        "scope": "script:98"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "name": "Goodmold's aftermath and Room 20 objects",
+    "evidence": "reading",
+    "source": "English EGA Script 99 in 49.LFL: +0x0062 print, +0x00B5 print, +0x0010 print, +0x0062 print, +0x008B print; reviewed EGA instruction stream; compared with CD Script 99, EGA differences retained",
+    "fingerprint": "C71368CC95873B3790A21F010FC9744BB455E9043B9D0140C2D211C3189F5F99",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Master Goodmold",
+        "evidence": "reading",
+        "source": "English EGA Script 99 +0x0010 in 49.LFL: print; Master Goodmold",
+        "scope": "script:99"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "name": "Bobbin speaks with his mother",
+    "evidence": "reading",
+    "source": "English EGA Script 100 in 47.LFL: +0x0329 print, +0x000B print, +0x003D print, +0x0067 print; reviewed EGA instruction stream; compared with CD Script 100, EGA differences retained",
+    "fingerprint": "74B2CA39B8AECFC1027CD39B4305E86E9449E255EBF6CBD40D0F25D8A9868A3C",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "English EGA Script 100 +0x000B in 47.LFL: print; Cygna (Bobbin's mother)",
+        "scope": "script:100"
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "name": "Hetchel confronts the Dead One",
+    "evidence": "reading",
+    "source": "English EGA Script 101 in 09.LFL: +0x001A actorOps, +0x0037 actorOps, +0x004D putActorInRoom, +0x0085 print, +0x00A0 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 101, EGA differences retained",
+    "fingerprint": "5195E43A7C4DD7FC9031BD035A021B07E63B6619E1A02667C9620D37E0DE4078",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "English EGA Script 101 +0x01E4 in 09.LFL: print; Hetchel",
+        "scope": "script:101"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "English EGA Script 101 +0x0276 in 09.LFL: print; the Dead One (El Muerto)",
+        "scope": "script:101"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "name": "departure to Room 66",
+    "evidence": "decoded",
+    "source": "English EGA Script 102 in 51.LFL: +0x0018 actorOps, +0x0027 print, +0x006A loadRoom, +0x007C putActorInRoom, +0x009A actorOps; reviewed EGA instruction stream; compared with CD Script 102, EGA differences retained",
+    "fingerprint": "8219916DAC2FD489840765987053EC6339BB6983FDE26D961BEA0C1DB0A489B7",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 103,
+    "name": "the far side of the Pattern is out of reach",
+    "evidence": "reading",
+    "source": "English EGA Script 103 in 51.LFL: +0x001B print; reviewed EGA instruction stream; compared with CD Script 103, EGA differences retained",
+    "fingerprint": "9C2650953ED1133E57DD310836E95F3635F2B28A943165D4CDAF0A3ECC2BFE1D",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "English EGA Script 103 +0x001B in 51.LFL: print; Cygna (Bobbin's mother); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:103"
+      }
+    ]
+  },
+  {
+    "id": 104,
+    "name": "Room 51 scene with actors 1, 3 and 4",
+    "evidence": "reading",
+    "source": "English EGA Script 104 in 51.LFL: +0x0067 actorOps, +0x0072 putActorInRoom, +0x009D actorOps, +0x00AC actorOps, +0x00CA actorOps; reviewed EGA instruction stream; compared with CD Script 104, EGA differences retained",
+    "fingerprint": "FF47F221A912C97DAFF702E165C71E60A36DCE1138AD18FEEF6B04A2BC37F172",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "English EGA Script 104 +0x0193 in 51.LFL: print; Cygna (Bobbin's mother); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:104"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "English EGA Script 104 +0x01EE in 51.LFL: print; the Dead One (El Muerto); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:104"
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "name": "Hetchel's feather and the Dead One",
+    "evidence": "reading",
+    "source": "English EGA Script 105 in 09.LFL: +0x0025 print, +0x0079 print, +0x00C9 putActorInRoom, +0x00D1 print, +0x0116 actorOps; reviewed EGA instruction stream; compared with CD Script 105, EGA differences retained",
+    "fingerprint": "85B82288DCC6DBECDA1696193EC3C83760D972776FAD00C6CD930055427FEC71",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "English EGA Script 105 +0x0079 in 09.LFL: print; the Dead One (El Muerto)",
+        "scope": "script:105"
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "name": "ending sequence from Room 66",
+    "evidence": "reading",
+    "source": "English EGA Script 106 in 66.LFL: +0x0051 actorOps, +0x0069 putActorInRoom, +0x00B1 putActorInRoom, +0x00B5 actorOps, +0x00DA actorOps; reviewed EGA instruction stream; compared with CD Script 106, EGA differences retained",
+    "fingerprint": "9ED4D0534F45CE19621B0FCC2B5F83F58ADC7D16C84572556D84E0B66D8EF4F5",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "English EGA Script 106 +0x01A3 in 66.LFL: print; Cygna (Bobbin's mother); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:106"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "English EGA Script 106 +0x0129 in 66.LFL: print; the Dead One (El Muerto); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:106"
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "name": "Room 10 arrival and object classes",
+    "evidence": "decoded",
+    "source": "English EGA Script 107 in 10.LFL: +0x0005 loadRoom, +0x007E putActorInRoom, +0x0087 actorOps, +0x009F actorOps, +0x00D7 chainScript; reviewed EGA instruction stream; compared with CD Script 107, EGA differences retained",
+    "fingerprint": "ACD947523D61EF8020B8B92A3E8AE629632A84DDAC4831DDCAADC1915B6A8709",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 108,
+    "name": "glassmakers scene",
+    "evidence": "decoded",
+    "source": "English EGA Script 108 in 22.LFL: +0x000F print, +0x005E print, +0x009E print, +0x00F3 print, +0x0135 print; reviewed EGA instruction stream; compared with CD Script 108, EGA differences retained",
+    "fingerprint": "D2056F0844BA095B7D0CD294AFD155CF1AB53EAFEA38532D4389372D11FE995E",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 6,
+        "name": "Glassmaker",
+        "evidence": "reading",
+        "source": "English EGA Script 108 +0x005E in 22.LFL: print; Glassmaker",
+        "scope": "script:108"
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "name": "dragon's gold conversation",
+    "evidence": "reading",
+    "source": "English EGA Script 109 in 28.LFL: +0x0000 print, +0x0033 print, +0x0083 loadRoom, +0x0089 print, +0x0160 print; reviewed EGA instruction stream; compared with CD Script 109, EGA differences retained",
+    "fingerprint": "3D93E01B123C1C73E600DD8EFA54BFDFA4450B1155D52EBC1A49200E06FB1C5B",
+    "edition": "English EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "dragon",
+        "evidence": "reading",
+        "source": "English EGA Script 109 +0x0033 in 28.LFL: print; dragon",
+        "scope": "script:109"
+      }
+    ]
+  },
+  {
+    "id": 110,
+    "name": "Room 49 arrival and object classes",
+    "evidence": "decoded",
+    "source": "English EGA Script 110 in 49.LFL: +0x0016 loadRoom, +0x0028 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 110, EGA differences retained",
+    "fingerprint": "42BCABC6E302F8861667CAD075033185E73B18B0F8CD06DD82423FB263DDE7B4",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 111,
+    "name": "Room 86 spell visual and return to Room 31",
+    "evidence": "decoded",
+    "source": "English EGA Script 111 in 86.LFL: +0x0015 loadRoom, +0x002B actorOps, +0x0036 putActorInRoom, +0x00E4 loadRoom, +0x00EF print; reviewed EGA instruction stream; compared with CD Script 111, EGA differences retained",
+    "fingerprint": "FF86CD95AD543B353D6867D4B49F9A24DDC378530F1066076FEA64C3409355FF",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 112,
+    "name": "Rusty is still napping",
+    "evidence": "reading",
+    "source": "English EGA Script 112 in 34.LFL: +0x0005 print, +0x0029 loadRoom, +0x0035 print, +0x006A loadRoom, +0x0071 print; reviewed EGA instruction stream; compared with CD Script 112, EGA differences retained",
+    "fingerprint": "1EE624335908FDE45CB94836F6D41111B6821C37BA414806CA67CDD2CB074476",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 113,
+    "name": "ambient actors during the intro",
+    "evidence": "decoded",
+    "source": "English EGA Script 113 in 02.LFL: +0x0010 actorOps, +0x0055 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 113, EGA differences retained",
+    "fingerprint": "D41DBBC085F9EBB1C4CEB0484813A5477120631A064A6ECA7CC3B7758E6D4D05",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 114,
+    "name": "ambient actors during the intro",
+    "evidence": "decoded",
+    "source": "English EGA Script 114 in 02.LFL: +0x0010 actorOps, +0x0065 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 114, EGA differences retained",
+    "fingerprint": "1F2543DF47BF369B4F2B25462180268AA9971E90BDB9AAEFA04A85824624F7ED",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 115,
+    "name": "save-screen input hook",
+    "evidence": "decoded",
+    "source": "English EGA Script 115 in 66.LFL: +0x0000 isEqual, +0x0007 isEqual, +0x000E drawBox; reviewed EGA instruction stream; compared with CD Script 115, EGA differences retained",
+    "fingerprint": "7C08999B97AE7CB9D9BDAC271C10135EA1206D13A36D80F7EFF728E7C088F27E",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 116,
+    "name": "animate actor 11 at random argument positions",
+    "evidence": "decoded",
+    "source": "English EGA Script 116 in 02.LFL: +0x0035 putActorInRoom; reviewed EGA instruction stream",
+    "fingerprint": "DC0CA14814081D0A6DCD95216F1B059512CFC96B26A57311BF4BC0E9E5D9D3DD",
+    "edition": "English EGA",
+    "names": []
+  },
+  {
+    "id": 1,
+    "name": "boot",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 01 in 01.LFL: +0x0160 loadRoom, +0x0249 chainScript; reviewed EGA instruction stream; compared with CD Script 01, EGA differences retained",
+    "fingerprint": "51854D743F5CF2EB970E9391DFD2990FBCEEA6B5E92A1894B517C7F246AE973D",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 2,
+    "name": "cutscene start hook",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 02 in 01.LFL: +0x0000 cursorCommand, +0x0002 cursorCommand, +0x0004 freezeScripts; reviewed EGA instruction stream; compared with CD Script 02, EGA differences retained",
+    "fingerprint": "1311B2180252B60ED582A6A556E28122DB613990E76C00468D2FA80BF1DB9428",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 3,
+    "name": "cutscene end hook",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 03 in 01.LFL: +0x0000 isEqual, +0x0007 notEqualZero, +0x000C startScript; reviewed EGA instruction stream; compared with CD Script 03, EGA differences retained",
+    "fingerprint": "2765C4112CBFAC6EA5EFF813137773CC2B489DF78FE0A34ACE6D90436DBACD43",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 4,
+    "name": "save screen (F5)",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 04 in 70.LFL: +0x0079 loadRoom, +0x020B chainScript; reviewed EGA instruction stream; compared with CD Script 04, EGA differences retained",
+    "fingerprint": "0F16028FE17C05841FDAFF725321DC8A725242C0710447F46D808026D3B85DF6",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 5,
+    "name": "input script",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 05 in 01.LFL: +0x000C chainScript, +0x0211 print, +0x026F print, +0x02B8 print, +0x02EA print; reviewed EGA instruction stream; compared with CD Script 05, EGA differences retained",
+    "fingerprint": "086AE20F237DEE2F04454A50C18FD460AE494DA5CE2CE19109F5F962DF4335F0",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 6,
+    "name": "click handler (input loop)",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 06 in 01.LFL: +0x0000 move, +0x0005 notEqualZero, +0x000A isGreater; reviewed EGA instruction stream; compared with CD Script 06, EGA differences retained",
+    "fingerprint": "D7DF0607B63C42A03F59A752C15941A62C86F8108CCAB03CCB749CF75FD15AE8",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 108,
+        "name": "pointer x",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 06 +0x0096 in 01.LFL: findObject; pointer x",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 109,
+        "name": "pointer y",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 06 +0x0096 in 01.LFL: findObject; pointer y",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "run a sentence (verb on an object)",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 07 in 01.LFL: +0x001E print, +0x004C chainScript; reviewed EGA instruction stream; compared with CD Script 07, EGA differences retained",
+    "fingerprint": "C5ECA154F77EAFC394D1CB7AA5661BC79BEF53FFAB6FAF3500F49A95403D6A62",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 8,
+    "name": "show or hide the close-up in the verb area",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 08 in 01.LFL: +0x004E print; reviewed EGA instruction stream; compared with CD Script 08, EGA differences retained",
+    "fingerprint": "9BB819E88FA08A3639EBBB457180B8E9D744FD059AA12DC7635A2C76C21EDC9C",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 9,
+    "name": "hint button (practice mode)",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 09 in 01.LFL: +0x000C chainScript, +0x001D chainScript; reviewed EGA instruction stream; compared with CD Script 09, EGA differences retained",
+    "fingerprint": "0260A7362CC0422C5FFB1DE5B0437549024F7CDE4536682D456639E2F413CE79",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 10,
+    "name": "a distaff note was played",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 10 in 01.LFL: +0x000C chainScript, +0x001D chainScript, +0x0027 chainScript, +0x004F chainScript; reviewed EGA instruction stream; compared with CD Script 10, EGA differences retained",
+    "fingerprint": "D67E81E46534B38F56C74E1DA846C3CA9CD9AAA4A795088B378ABA98FE8EB075",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 11,
+    "name": "\"that thread is too high for me\"",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 11 in 01.LFL: +0x0025 print; reviewed EGA instruction stream; compared with CD Script 11, EGA differences retained",
+    "fingerprint": "986759DAC6584CC79F5DDD9FA2397E6C0989AB8F7900FB9D61B92F848C832465",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 12,
+    "name": "\"I should get closer\"",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 12 in 01.LFL: +0x001E print; reviewed EGA instruction stream; compared with CD Script 12, EGA differences retained",
+    "fingerprint": "1CB14B4B6818F4889320E4D31F5AD60583FC11E6075C437966959597BF5CBFFA",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 13,
+    "name": "\"I should aim at something first\"",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 13 in 01.LFL: +0x001B print; reviewed EGA instruction stream; compared with CD Script 13, EGA differences retained",
+    "fingerprint": "A1BB1ABA3FC7B887D9AFA1769B10D7FFDCB7EA2F0454EA1B91658AE7B7D16466",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 14,
+    "name": "after-entry hook",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 14 in 01.LFL: +0x0000 equalZero, +0x0005 notEqualZero, +0x000A isEqual; reviewed EGA instruction stream; compared with CD Script 14, EGA differences retained",
+    "fingerprint": "768939B9F47F2D34F9504C29A196E8EFA507F05290766FCBAC39747A3F360410",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 15,
+    "name": "before-exit hook",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 15 in 01.LFL: +0x0000 move, +0x0005 move, +0x000A stopScript; reviewed EGA instruction stream; compared with CD Script 15, EGA differences retained",
+    "fingerprint": "2DE532DA5879DDD33227939A2B457954BDEAA78846CEC5164E45F60F6E57A790",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 16,
+    "name": "set the text line",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 16 in 01.LFL: +0x0005 print; reviewed EGA instruction stream; compared with CD Script 16, EGA differences retained",
+    "fingerprint": "C664C091E28404554102D65747FC69D64602B92B28CA4429EB9E30097EC7E7CA",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 17,
+    "name": "give the ego a costume (by size)",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 17 in 01.LFL: +0x009B actorOps, +0x00C0 actorOps; reviewed EGA instruction stream; compared with CD Script 17, EGA differences retained",
+    "fingerprint": "43FE196165317422AD0D2AEE98D7FACB6EBFFAB7D4D4D28CC8E5DB8B6E0296DC",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 114,
+        "name": "ego initial animation",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego initial animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 115,
+        "name": "ego walk animation",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego walk animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 116,
+        "name": "ego standing animation",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego standing animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 117,
+        "name": "ego talk-start animation",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego talk-start animation",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 118,
+        "name": "ego talk-stop animation",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 17 +0x009B in 01.LFL: actorOps; ego talk-stop animation",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "show the distaff",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 18 in 01.LFL: +0x00B7 print, +0x00C4 print, +0x00D1 print, +0x00FE print, +0x010B print; reviewed EGA instruction stream; compared with CD Script 18, EGA differences retained",
+    "fingerprint": "9A31162B00306994E2947E1F07828FA58ED6F439465C17D37DF63294B06CF967",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 19,
+    "name": "hide the distaff verbs",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 19 in 01.LFL: +0x0000 move, +0x0005 verbOps, +0x000A increment; reviewed EGA instruction stream; compared with CD Script 19, EGA differences retained",
+    "fingerprint": "520E514F8558CF75E21B058ABB47D9BE2907D0AC42A03071AC93B6267DE84085",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 20,
+    "name": "play the draft back",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 20 in 01.LFL: +0x000F actorOps, +0x004A chainScript, +0x0054 chainScript, +0x006A chainScript; reviewed EGA instruction stream; compared with CD Script 20, EGA differences retained",
+    "fingerprint": "A01F75B2565C79E66F7245E8960FF224008BE9F14D150A082424E32F8471E29B",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 21,
+    "name": "end the draft playback",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 21 in 01.LFL: +0x0017 actorOps, +0x0020 actorOps; reviewed EGA instruction stream; compared with CD Script 21, EGA differences retained",
+    "fingerprint": "690FA2282C482D6D838064BC5CA2518DFAE6915F388C1BFF2A1A449B26A3A778",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 22,
+    "name": "compare the played draft with the known ones",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 22 in 01.LFL: +0x001F print, +0x00C3 chainScript, +0x0125 chainScript, +0x0152 print; reviewed EGA instruction stream; compared with CD Script 22, EGA differences retained",
+    "fingerprint": "52FF6C21B57D291D4963FE27CF7A329958F22C2C2BEA95E617BD335FE14998ED",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 23,
+    "name": "load draft N",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 23 in 01.LFL: +0x001B and, +0x002A and, +0x0039 and, +0x0048 and, +0x005C and; reviewed EGA instruction stream; compared with CD Script 23, EGA differences retained",
+    "fingerprint": "2A1678C6FC3866985E3EC35DF8055A64F37FC2089083A6EB77CDCE3B5C70A4D0",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 101,
+        "name": "current draft response word",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 23 +0x000F in 01.LFL: move; current draft response word",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 3433,
+        "name": "the current draft is learned",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 23 +0x0020 in 01.LFL: move; the current draft is learned; mask 0x2000",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 3434,
+        "name": "the current draft can be reversed",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 23 +0x002F in 01.LFL: move; the current draft can be reversed; mask 0x1000",
+        "scope": null
+      },
+      {
+        "kind": "bit",
+        "id": 3435,
+        "name": "the current draft has last-note knowledge",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 23 +0x003E in 01.LFL: move; the current draft has last-note knowledge; mask 0x4000",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "check whether draft N is learned",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 24 in 01.LFL: +0x0016 and; reviewed EGA instruction stream; compared with CD Script 24, EGA differences retained",
+    "fingerprint": "E298272FD556A61D091786D9C622334FA426461A840B7BDE3E39737756043545",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 25,
+    "name": "mark draft N as learned",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 25 in 01.LFL: +0x0016 or; reviewed EGA instruction stream; compared with CD Script 25, EGA differences retained",
+    "fingerprint": "FB6076EA9AE19E57D1F54869CDC92FE8B9BE9230CDCCE0C7B9519A3616857A19",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 26,
+    "name": "run the matched draft on the aimed object",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 26 in 01.LFL: +0x0019 print, +0x005A and, +0x0067 and, +0x00B6 print; reviewed EGA instruction stream; compared with CD Script 26, EGA differences retained",
+    "fingerprint": "58623FD3C37369F55FE5998665A768A725F259E56C207E4191AA6CA9BA2CCBFD",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 27,
+    "name": "mark a note in the verb area",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 27 in 01.LFL: +0x003C print, +0x0052 print, +0x0068 print, +0x007E print, +0x0094 print; reviewed EGA instruction stream; compared with CD Script 27, EGA differences retained",
+    "fingerprint": "0BD0642E53B91CC2246647BFDD29989FEA9980B67B2EEF99F6A11E1CB1DF5D8A",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 28,
+    "name": "clear the draft buffer",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 28 in 01.LFL: +0x0000 isEqual, +0x0007 isNotEqual, +0x000E startScript; reviewed EGA instruction stream; compared with CD Script 28, EGA differences retained",
+    "fingerprint": "D89E98BA467656DFE86A654E1B0D9FBBA7D1FA2842A924A261112E67E1906DF3",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 90,
+        "name": "draft buffer / displayed note letters",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 28 +0x0021 in 01.LFL: setVarRange; draft buffer / displayed note letters",
+        "scope": null,
+        "to": 93
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "name": "learning glow",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 29 in 01.LFL: +0x0031 actorOps, +0x004B putActorInRoom, +0x00B8 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 29, EGA differences retained",
+    "fingerprint": "2D1CD6B120DAE03E140A5190D2AD48D2798461C00F1C6A53CA2C23A5DC48DCD2",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 30,
+    "name": "play one note of a draft on an object",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 30 in 01.LFL: +0x0012 chainScript; reviewed EGA instruction stream; compared with CD Script 30, EGA differences retained",
+    "fingerprint": "CEED756781EFEA68BA1A8D05476B873759AF892198BAFD3B861AEE3E56E90FEF",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 3436,
+        "name": "play a note on an object",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 30 +0x0000 in 01.LFL: move; play a note on an object",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "name": "animate and sound one note",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 31 in 01.LFL: +0x01D7 actorOps, +0x01FD putActorInRoom, +0x0212 actorOps, +0x0254 actorOps, +0x0271 actorOps; reviewed EGA instruction stream; compared with CD Script 31, EGA differences retained",
+    "fingerprint": "930F8FC72A9759C91D1A7B1B5B2244E6AD15AACDDC95B291382436C6EF722B3C",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 32,
+    "name": "recolour an actor's palette",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 32 in 01.LFL: +0x0005 actorOps; reviewed EGA instruction stream; compared with CD Script 32, EGA differences retained",
+    "fingerprint": "41605729B345D56E8D64BA0A4F141C980527F01B66DF5E838AE3A6B2D76A1471",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 33,
+    "name": "restore an actor's palette",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 33 in 01.LFL: +0x0005 actorOps; reviewed EGA instruction stream; compared with CD Script 33, EGA differences retained",
+    "fingerprint": "A81747990B707C5A059455EE5CC1893AB8B76C587E74E7EAFDE1B2E1E4F36A26",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 34,
+    "name": "mark draft N's last-note knowledge",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 34 in 01.LFL: +0x0016 or; reviewed EGA instruction stream; compared with CD Script 34, EGA differences retained",
+    "fingerprint": "26F4431DD4EB73086C8E4F2E922F979FE836527F0230B8CDD4C7611F1862CB70",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 35,
+    "name": "reject a draft response",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 35 in 01.LFL: +0x0016 print, +0x0056 print; reviewed EGA instruction stream; compared with CD Script 35, EGA differences retained",
+    "fingerprint": "259C692F462CBDFCE8F7C113BF468B4EDA8320B6047B664ED249ECE36F26BE0A",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "bit",
+        "id": 3432,
+        "name": "the draft response was refused or consumed",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 35 +0x0000 in 01.LFL: move; the draft response was refused or consumed; Script 26 clears and checks it after running the object response",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "name": "restore the note letters",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 36 in 01.LFL: +0x0024 print, +0x003B print, +0x0052 print, +0x0069 print, +0x0080 print; reviewed EGA instruction stream; compared with CD Script 36, EGA differences retained",
+    "fingerprint": "D19D58C13955D5015A6FE72C75F59811A61A56B9C139872554FD57AFCCF65A66",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 37,
+    "name": "play the queued sound and wait",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 37 in 01.LFL: +0x000B startSound; reviewed EGA instruction stream; compared with CD Script 37, EGA differences retained",
+    "fingerprint": "CABE53BC10CBDDD0E6D6D6E1175A22F5ECC26BB4485844D6DF780E93E3E51631",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 163,
+        "name": "queued or last-started sound",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 37 +0x000B in 01.LFL: startSound; queued or last-started sound",
+        "scope": null
+      },
+      {
+        "kind": "var",
+        "id": 164,
+        "name": "sound currently playing",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 37 +0x0006 in 01.LFL: move; sound currently playing",
+        "scope": null
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "name": "stop queued and current sounds",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 38 in 01.LFL: +0x0000 notEqualZero, +0x0005 stopSound, +0x0008 notEqualZero; reviewed EGA instruction stream; compared with CD Script 38, EGA differences retained",
+    "fingerprint": "015EEE2F39E665F474885CEED29D5A716FF0F04B9423060F2F3EF88C4EE0A5DE",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 39,
+    "name": "play a sound (music)",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 39 in 01.LFL: +0x0038 startSound; reviewed EGA instruction stream; compared with CD Script 39, EGA differences retained",
+    "fingerprint": "02C7DE82C531125859713A09944698E440821F5D75CBEC2B27810A1C10C34E18",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 40,
+    "name": "play a sound (effect)",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 40 in 01.LFL: +0x0038 startSound; reviewed EGA instruction stream; compared with CD Script 40, EGA differences retained",
+    "fingerprint": "597415D29EEEB6B7D954B3AFCC46A48318B3908EF78C69480C9D687F1F7804BA",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 41,
+    "name": "spell visual at a point",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 41 in 01.LFL: +0x001F actorOps, +0x003A putActorInRoom, +0x0088 putActorInRoom, +0x008C actorOps; reviewed EGA instruction stream; compared with CD Script 41, EGA differences retained",
+    "fingerprint": "20EE6E6BB7BAA8C8781245FF6275B096226D8ED2C74BA261E02ECE6A239F0F14",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 42,
+    "name": "Room 03's flying actor",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 42 in 01.LFL: +0x000D actorOps, +0x0045 putActorInRoom, +0x008D putActorInRoom; reviewed EGA instruction stream; compared with CD Script 42, EGA differences retained",
+    "fingerprint": "51EBE119474ACD586814514E1434150FB4B09ABEB73161FACB6D77438F8A39D4",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "var",
+        "id": 179,
+        "name": "flying actor x positions",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 42 +0x0037 in 01.LFL: move; flying actor x positions; Script 44 initializes five entries",
+        "scope": null,
+        "to": 183
+      },
+      {
+        "kind": "var",
+        "id": 187,
+        "name": "flying actor y positions",
+        "evidence": "decoded",
+        "source": "Spanish EGA Script 42 +0x003E in 01.LFL: move; flying actor y positions; Script 44 initializes five entries",
+        "scope": null,
+        "to": 191
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "name": "cannot save a game in demo mode",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 43 in 01.LFL: +0x0000 print; reviewed EGA instruction stream; compared with CD Script 43, EGA differences retained",
+    "fingerprint": "C5FC71EAAF81038504A9C025801BB39EB757EC743C66CB92B74925060751084D",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 44,
+    "name": "opening cutscene",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 44 in 02.LFL: +0x00B9 loadRoom, +0x00C2 loadRoom, +0x00DD actorOps, +0x0130 print, +0x023F loadRoom; reviewed EGA instruction stream; compared with CD Script 44, EGA differences retained",
+    "fingerprint": "E4763CD623B2CC0D9A9F3608FBCC541D7C34B87CE95067CF9715C66025AEC922",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 45,
+    "name": "Room 02 walk-box watcher",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 45 in 02.LFL: +0x0000 breakHere, +0x0001 getActorWalkBox, +0x0005 breakHere; reviewed EGA instruction stream; compared with CD Script 45, EGA differences retained",
+    "fingerprint": "7F8B9065F0E6C7FD06D003C8FC6662023A93998C9D9583FEAC59C00186B57271",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 46,
+    "name": "the Elders' trial",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 46 in 08.LFL: +0x002F print, +0x0063 print, +0x00AE print, +0x00EF print, +0x0114 loadRoom; reviewed EGA instruction stream; compared with CD Script 46, EGA differences retained",
+    "fingerprint": "CEDCAA1093E2687D9E0BAE63587A2DDFFFBA666598489A25801E674015AEB552",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Elder (actor 2)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 46 +0x00AE in 08.LFL: print; Elder (actor 2)",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Elder (actor 3)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 46 +0x030F in 08.LFL: print; Elder (actor 3)",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "Elder (actor 4)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 46 +0x02AB in 08.LFL: print; Elder (actor 4)",
+        "scope": "script:46"
+      },
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 46 +0x0243 in 08.LFL: print; Hetchel",
+        "scope": "script:46"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "name": "Hetchel speaks after the trial",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 47 in 09.LFL: +0x0041 actorOps, +0x0071 actorOps, +0x0086 putActorInRoom, +0x00CE putActorInRoom, +0x00E8 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 47, EGA differences retained",
+    "fingerprint": "51A1FF3455739FC34288DC4922208ABD7B77B25A07964AF95ACC67D2244D611D",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 47 +0x0102 in 09.LFL: print; Hetchel",
+        "scope": "script:47"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "name": "Room 63 to Room 62 transition",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 48 in 63.LFL: +0x0040 actorOps, +0x004B putActorInRoom, +0x0093 putActorInRoom, +0x00A6 putActorInRoom, +0x00B3 loadRoom; reviewed EGA instruction stream; compared with CD Script 48, EGA differences retained",
+    "fingerprint": "6BABD4F6CB1A41D49A4D54C359EC094FCF55CE078F0620DB651EBE2C58C41E8F",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 49,
+    "name": "whirlwind scene (Rooms 02 and 11)",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 49 in 11.LFL: +0x000A print, +0x0094 actorOps, +0x009F putActorInRoom, +0x00ED actorOps, +0x010F loadRoom; reviewed EGA instruction stream; compared with CD Script 49, EGA differences retained",
+    "fingerprint": "45B204B5A037C3F3E47F3FA6AE3AF022F0FCC3750C38F4B18FF1E2DF25287815",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 50,
+    "name": "Room 03 to Room 10 transition",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 50 in 10.LFL: +0x0000 loadRoom, +0x0015 actorOps, +0x0029 putActorInRoom, +0x003C loadRoom; reviewed EGA instruction stream; compared with CD Script 50, EGA differences retained",
+    "fingerprint": "40AC574419D1DA22078CDF3048471DD37372CA355D369F80E0C69EAAE4A0A1F6",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 52,
+    "name": "Room 10 to Room 13 cutscene",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 52 in 11.LFL: +0x0013 actorOps, +0x0045 loadRoom, +0x0070 actorOps, +0x00A9 actorOps, +0x00B4 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 52, EGA differences retained",
+    "fingerprint": "0A8725B885B8FCCB01D39CEAE41E882584E64B9C8F3AB5AF77F24807BF8D6F2C",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 53,
+    "name": "Room 13 scene with actors 8 and 9",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 53 in 13.LFL: +0x002A putActorInRoom, +0x003A actorOps, +0x004B putActorInRoom, +0x0061 actorOps, +0x0072 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 53, EGA differences retained",
+    "fingerprint": "54A5F9BBC2A621A79CE8D626752A313244747EE1434988CC2631DDBA2091803B",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 54,
+    "name": "Room 15 arrival and learning glow",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 54 in 15.LFL: +0x000A loadRoom, +0x0020 actorOps, +0x0038 actorOps, +0x0044 putActorInRoom, +0x0056 actorOps; reviewed EGA instruction stream; compared with CD Script 54, EGA differences retained",
+    "fingerprint": "769E25D19015B9930F1BE571B955F7170266CF3CE37F2D924E394EC58D178100",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 56,
+    "name": "transition into Room 20",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 56 in 18.LFL: +0x002B loadRoom, +0x0030 chainScript; reviewed EGA instruction stream; compared with CD Script 56, EGA differences retained",
+    "fingerprint": "7697485293AF6D9B0E586484C2A310F6436F487669CA2A7D9E481322FC031039",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 57,
+    "name": "room-local transition through scripts 200 and 207",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 57 in 20.LFL: +0x002A chainScript; reviewed EGA instruction stream; compared with CD Script 57, EGA differences retained",
+    "fingerprint": "C8F48F805DF6CA959E7DD86A5FECB4BDE35FB67F1B179E92A40A81916209DFFC",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 58,
+    "name": "room-local transition through scripts 200 and 59",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 58 in 20.LFL: +0x0019 chainScript; reviewed EGA instruction stream; compared with CD Script 58, EGA differences retained",
+    "fingerprint": "479645E25EEC63643108F77F928F6C83ACA94BBECDAC701BC0755016E0E58430",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 59,
+    "name": "transition into Room 18",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 59 in 18.LFL: +0x000A loadRoom; reviewed EGA instruction stream; compared with CD Script 59, EGA differences retained",
+    "fingerprint": "A27AC4D2B6EB15B64B690F399830F6BFD254799822F4DF503209D29F8C67C6B9",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 60,
+    "name": "room-local transition through scripts 201 and 61",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 60 in 20.LFL: +0x0019 chainScript; reviewed EGA instruction stream; compared with CD Script 60, EGA differences retained",
+    "fingerprint": "246C59E6B53991DEB1CA19C9C78A04E8FD983147DC0917C9CBB86A96039AEE4F",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 61,
+    "name": "Room 18 arrival through local 203",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 61 in 18.LFL: +0x000A loadRoom; reviewed EGA instruction stream; compared with CD Script 61, EGA differences retained",
+    "fingerprint": "650CA52F213E0C11235CA173349EE5E18936442F0397FEAE66846B4E6721D129",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 62,
+    "name": "transition into Room 20 through script 63",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 62 in 18.LFL: +0x001E loadRoom, +0x0023 chainScript; reviewed EGA instruction stream; compared with CD Script 62, EGA differences retained",
+    "fingerprint": "CA5D290DCF640EF0ED585B01C43EB54BEFE203B8C9C41CECEAB5C0EB608D5071",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 63,
+    "name": "room-local transition through scripts 201 and 207",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 63 in 20.LFL: +0x001D chainScript; reviewed EGA instruction stream; compared with CD Script 63, EGA differences retained",
+    "fingerprint": "8734D4D7EDC9BB7DB0371B2C8F47848240C8209B4E8EE726D9F9C85800BAC830",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 64,
+    "name": "the little glass bell reply",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 64 in 18.LFL: +0x0009 print, +0x003B print; reviewed EGA instruction stream; compared with CD Script 64, EGA differences retained",
+    "fingerprint": "DF15955ED9A5378DBDCB76EADDABCF4EF3B994A10AC7B5C0FEC14839D1436152",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 65,
+    "name": "Room 19 spell scene",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 65 in 19.LFL: +0x0015 loadRoom, +0x002B actorOps, +0x0036 putActorInRoom, +0x0091 actorOps, +0x00A9 actorOps; reviewed EGA instruction stream; compared with CD Script 65, EGA differences retained",
+    "fingerprint": "FD0E8E2D1B2666C9BFEB25EE0CBC7341E8E49DCB60E5B43287D096943A0B104F",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 66,
+    "name": "Goodmold conversation in Room 17",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 66 in 17.LFL: +0x001F actorOps, +0x003F actorOps, +0x0045 actorOps, +0x004B actorOps, +0x006C putActorInRoom; reviewed EGA instruction stream; compared with CD Script 66, EGA differences retained",
+    "fingerprint": "7F2BBB6E85CA526196DEFCEB39D75CA1B99CD8F565FA99E43C02F89139E80D83",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Master Goodmold",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 66 +0x008B in 17.LFL: print; Master Goodmold; Script 68 receives actor 3 and identifies Goodmold",
+        "scope": "script:66"
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "name": "Goodmold conversation in Room 22",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 67 in 22.LFL: +0x002F print, +0x0098 print, +0x00CF putActorInRoom, +0x00E3 putActorInRoom, +0x00ED loadRoom; reviewed EGA instruction stream; compared with CD Script 67, EGA differences retained",
+    "fingerprint": "8EC7EEAC4D8AD0310C734C7870495CC37123EE6D3DF77EDE93CA196069308818",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 6,
+        "name": "Master Goodmold",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 67 +0x002F in 22.LFL: print; Master Goodmold; Script 68 receives actor 6 and identifies Goodmold",
+        "scope": "script:67"
+      }
+    ]
+  },
+  {
+    "id": 68,
+    "name": "Master Goodmold's greeting",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 68 in 56.LFL: +0x0000 print, +0x0027 print, +0x007F print, +0x00AC print, +0x00FE loadRoom; reviewed EGA instruction stream; compared with CD Script 68, EGA differences retained",
+    "fingerprint": "E29DE708ECE6F05588854FCA8E1BC042AB41772919D3DFF8FDD9E125E9B422EB",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 69,
+    "name": "Fleece's greeting and the sheep problem",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 69 in 25.LFL: +0x0179 print, +0x000D print, +0x004C print, +0x006D print; reviewed EGA instruction stream; compared with CD Script 69, EGA differences retained",
+    "fingerprint": "43439BFB8350068B247005D7A48A8A7A73912344AEA61F5669A6E7A2A771D4F2",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Fleece",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 69 +0x000D in 25.LFL: print; Fleece",
+        "scope": "script:69"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "name": "sheep scene in Rooms 24 and 27",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 70 in 24.LFL: +0x0039 actorOps, +0x0050 putActorInRoom, +0x0059 putActorInRoom, +0x0062 putActorInRoom, +0x00A2 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 70, EGA differences retained",
+    "fingerprint": "4219EB30511947AF00157D28C83B74984B08BECE9EDC1EFE59312B0492F5D7B6",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 71,
+    "name": "the dizzy reply",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 71 in 18.LFL: +0x0014 print; reviewed EGA instruction stream; compared with CD Script 71, EGA differences retained",
+    "fingerprint": "B6CFCF61EFB9EAC2AC555FE2D66F16E27CCD7CB344F1A8FED851589036C1A38E",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 72,
+    "name": "Room 65 to Room 30 transition",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 72 in 28.LFL: +0x0024 loadRoom, +0x0038 putActorInRoom, +0x004B loadRoom, +0x0063 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 72, EGA differences retained",
+    "fingerprint": "E0C50F02D0A1C4844080E51F2A7D42217405CC641F7560112823A9AD3E4FC314",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 73,
+    "name": "walk actor 8 across Room 24",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 73 in 24.LFL: +0x000D actorOps, +0x001E putActorInRoom, +0x0030 actorOps, +0x0040 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 73, EGA differences retained",
+    "fingerprint": "5A4A49BE293191D717009AF32DD3EE77EF137146F7C295B0F3A09479F093700B",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 74,
+    "name": "dragon's arrival greeting (Room 28)",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 74 in 28.LFL: +0x0000 putActorInRoom, +0x000C loadRoom, +0x0012 print, +0x002D print, +0x005E print; reviewed EGA instruction stream; compared with CD Script 74, EGA differences retained",
+    "fingerprint": "98EAA70DD8901A524A1377DA085E45E34301F607FD1926894B9F89338642FD04",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "dragon",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 74 +0x0012 in 28.LFL: print; dragon",
+        "scope": "script:74"
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "name": "conversation with the hungry dragon",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 75 in 28.LFL: +0x0009 print, +0x0043 print, +0x0099 print, +0x00C6 print, +0x00F9 print; reviewed EGA instruction stream; compared with CD Script 75, EGA differences retained",
+    "fingerprint": "FFF08F071B44634BF8A64EF015C18971EE32D802F8EE2E2EBF12FAC6EB9B794B",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "dragon",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 75 +0x0009 in 28.LFL: print; dragon",
+        "scope": "script:75"
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "name": "dragon leaves Room 27",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 76 in 28.LFL: +0x0002 loadRoom, +0x0014 actorOps, +0x0025 putActorInRoom, +0x0040 putActorInRoom, +0x0049 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 76, EGA differences retained",
+    "fingerprint": "1B611735679C24861457B82443F17B6EEF6BD61CCD795FC11997430A662EBA02",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 77,
+    "name": "Room 28 arrival and object classes",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 77 in 30.LFL: +0x0009 loadRoom, +0x001F putActorInRoom; reviewed EGA instruction stream; compared with CD Script 77, EGA differences retained",
+    "fingerprint": "D44589C35522E2DC78CDE0CEFEEDFFC8130DCB62666FAB7B748475AC5FD9B5EB",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 78,
+    "name": "Room 65 scene and arrival in Room 30",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 78 in 65.LFL: +0x0028 actorOps, +0x0045 putActorInRoom, +0x008D putActorInRoom, +0x009E putActorInRoom, +0x00B4 loadRoom; reviewed EGA instruction stream; compared with CD Script 78, EGA differences retained",
+    "fingerprint": "B756263990244F32487580A648FFBD245A21F1B66EB9D28C45A5EF5E2FD6EF8A",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 79,
+    "name": "Room 32 arrival and walk-box changes",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 79 in 32.LFL: +0x001C loadRoom, +0x003C putActorInRoom; reviewed EGA instruction stream; compared with CD Script 79, EGA differences retained",
+    "fingerprint": "1D0F4B4FB2A8EF9A28009A6B831C578A377583035B25F00028B9634F7432EF57",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 80,
+    "name": "Room 32 arrival",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 80 in 32.LFL: +0x0026 loadRoom, +0x0032 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 80, EGA differences retained",
+    "fingerprint": "39AE1E7572F865F14DCAA0A4B9D935AC8868DFFF2D0591C431416E5594F8DD35",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 81,
+    "name": "Room 30 arrival and lighting",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 81 in 30.LFL: +0x0019 loadRoom, +0x0035 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 81, EGA differences retained",
+    "fingerprint": "D52E2747E2BAA6C6A07E0DB1683A6F01392B76551D7BF127F19DE037A796E145",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 82,
+    "name": "arrival in Room 31 and blocked return",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 82 in 31.LFL: +0x0005 actorOps, +0x0021 putActorInRoom, +0x0029 loadRoom, +0x0034 putActorInRoom, +0x0054 print; reviewed EGA instruction stream; compared with CD Script 82, EGA differences retained",
+    "fingerprint": "85CDFFAD8D715F81828E67AE8DBADF39BD0F30F02D982257B13B91624A5FE0B4",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 83,
+    "name": "Room 30 arrival",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 83 in 31.LFL: +0x0019 loadRoom, +0x0025 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 83, EGA differences retained",
+    "fingerprint": "84706C411263F31966D66B19373D5AFF9911E3BBC812F99BF07928EE48485CA1",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 84,
+    "name": "Room 31 arrival",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 84 in 31.LFL: +0x0019 loadRoom, +0x0025 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 84, EGA differences retained",
+    "fingerprint": "5432C6B9FFF67DE7CB789F7EBF2A9E25CB193E6AF3AACAE08698897996AE3B33",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 85,
+    "name": "Rusty Nailbender's greeting",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 85 in 34.LFL: +0x01C1 print, +0x02AA print, +0x003A print, +0x0076 print, +0x00A8 print; reviewed EGA instruction stream; compared with CD Script 85, EGA differences retained",
+    "fingerprint": "DD0582EDF2D9C26BC50F1209229B408075BDE0222B2EE0782256AB19F789667B",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 85 +0x003A in 34.LFL: print; Rusty",
+        "scope": "script:85"
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "name": "firewood scene",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 86 in 37.LFL: +0x0028 print, +0x0064 print, +0x00CE print, +0x00EE print, +0x011F print; reviewed EGA instruction stream; compared with CD Script 86, EGA differences retained",
+    "fingerprint": "E80541661EC9E6A28EC11CE7EF5B180EE1C01799542C21A2AEE79177EA7BED3C",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Mr. Stoke",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 86 +0x0028 in 37.LFL: print; Mr. Stoke",
+        "scope": "script:86"
+      }
+    ]
+  },
+  {
+    "id": 87,
+    "name": "ghost scene",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 87 in 38.LFL: +0x0019 print, +0x0055 print, +0x0064 print, +0x00A3 print, +0x00DE actorOps; reviewed EGA instruction stream; compared with CD Script 87, EGA differences retained",
+    "fingerprint": "7633DDC4795AC18D5421B60829757E4D7E0A275611CACB6BAEAA816FA9B1565A",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Mr. Stoke",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 87 +0x0487 in 38.LFL: print; Mr. Stoke",
+        "scope": "script:87"
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "name": "Rusty's ghost and Hetchel's return (Room 34)",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 88 in 34.LFL: +0x0000 loadRoom, +0x0021 actorOps, +0x002C putActorInRoom, +0x0049 actorOps, +0x0061 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 88, EGA differences retained",
+    "fingerprint": "D17CBE125ED117675AFD6484C236B669E1D69CDBB9949100846E07E39790421B",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty (ghost)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 88 +0x00E9 in 34.LFL: print; Rusty (ghost); Rusty dialogue / Hetchel bird costume 0x34 as in Script 47",
+        "scope": "script:88"
+      },
+      {
+        "kind": "actor",
+        "id": 11,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 88 +0x01F4 in 34.LFL: print; Hetchel; Rusty dialogue / Hetchel bird costume 0x34 as in Script 47",
+        "scope": "script:88"
+      }
+    ]
+  },
+  {
+    "id": 89,
+    "name": "Room 11 scene with actor 4",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 89 in 11.LFL: +0x0010 loadRoom, +0x0025 actorOps, +0x0035 putActorInRoom, +0x0075 loadRoomWithEgo; reviewed EGA instruction stream; compared with CD Script 89, EGA differences retained",
+    "fingerprint": "F842D9E25B3F1EB6B3A1B3DE241FD9AA05316547F00AD250FDBA42E57461A5EB",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 90,
+    "name": "Room 42 flashes and Mandible's introduction",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 90 in 43.LFL: +0x0109 print, +0x0005 loadRoom, +0x001D actorOps, +0x0031 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 90, EGA differences retained",
+    "fingerprint": "DDADD3EAB5676AD2F0F5773D2A0D3D91AAAB7AD6D20695B41EFFA96B4DB01DE3",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 90 +0x00DB in 43.LFL: print; Mandible",
+        "scope": "script:90"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 90 +0x01A1 in 43.LFL: print; Cob",
+        "scope": "script:90"
+      }
+    ]
+  },
+  {
+    "id": 91,
+    "name": "Room 43 cage scene",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 91 in 43.LFL: +0x000A print, +0x0052 actorOps, +0x0058 putActorInRoom, +0x0090 putActorInRoom, +0x00C6 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 91, EGA differences retained",
+    "fingerprint": "8D622F8AA8F96F999C0C6EE8E611DF9F2CAD8515B50C8510F0DC6E2ED0BACD6D",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 91 +0x0136 in 43.LFL: print; Mandible",
+        "scope": "script:91"
+      },
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 91 +0x022B in 43.LFL: print; Cob",
+        "scope": "script:91"
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "name": "Room 43 arrival",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 92 in 43.LFL: +0x0005 loadRoom, +0x0017 putActorInRoom, +0x0029 actorOps; reviewed EGA instruction stream; compared with CD Script 92, EGA differences retained",
+    "fingerprint": "096839D4C3646ABE05FD6348B8EB6D0ED391D0D371A82B7D31DE8FED32DFCA0C",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 93,
+    "name": "Room 43 cage scene, second part",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 93 in 43.LFL: +0x003D actorOps, +0x0053 print, +0x008F print, +0x00BE print, +0x00FD print; reviewed EGA instruction stream; compared with CD Script 93, EGA differences retained",
+    "fingerprint": "128B6BC0739F66311D797C192FF31F52AF64A6DE097CF0755D978FDB8275D73C",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cob",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 93 +0x0053 in 43.LFL: print; Cob",
+        "scope": "script:93"
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "name": "Room 19 scene with actors 2 and 3",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 94 in 19.LFL: +0x0015 loadRoom, +0x002B actorOps, +0x0036 putActorInRoom, +0x009F actorOps, +0x00AA putActorInRoom; reviewed EGA instruction stream; compared with CD Script 94, EGA differences retained",
+    "fingerprint": "91B1C8B68DBBD46574C0DA2328AFFF216EFDAF61FA828D18394CE21658B16863",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 95,
+    "name": "Mandible opens the Pattern",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 95 in 44.LFL: +0x0033 print, +0x006C print, +0x00BF print, +0x00EB print, +0x0131 print; reviewed EGA instruction stream; compared with CD Script 95, EGA differences retained",
+    "fingerprint": "264547D1F956104E6A01EF847465727371A831617E508BD89571F4146325E751",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "Mandible",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 95 +0x0033 in 44.LFL: print; Mandible",
+        "scope": "script:95"
+      }
+    ]
+  },
+  {
+    "id": 96,
+    "name": "Room 45 fall",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 96 in 45.LFL: +0x0017 actorOps, +0x0037 putActorInRoom, +0x0049 loadRoom, +0x0051 putActorInRoom, +0x0070 print; reviewed EGA instruction stream; compared with CD Script 96, EGA differences retained",
+    "fingerprint": "B825502E614046D0FF9E88A58273FD7CC6A5C1E63CFB828B6F52F83CAC6A4AC1",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 97,
+    "name": "Room 34 arrival",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 97 in 34.LFL: +0x0013 loadRoom, +0x0018 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 97, EGA differences retained",
+    "fingerprint": "B562462C362E520D2521E1E515C980AF5C7E58335BBD64508488DAE43B17C401",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 98,
+    "name": "Room 34 ghost walk",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 98 in 34.LFL: +0x0015 putActorInRoom, +0x0040 print, +0x0095 print, +0x00A9 print, +0x00E1 print; reviewed EGA instruction stream; compared with CD Script 98, EGA differences retained",
+    "fingerprint": "4A16E2CCB023B154A76243389246D709D0155C2F98C572355F5130896B285B14",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Rusty (ghost)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 98 +0x0040 in 34.LFL: print; Rusty (ghost)",
+        "scope": "script:98"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "name": "Goodmold's aftermath and Room 20 objects",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 99 in 49.LFL: +0x0064 print, +0x00B2 print, +0x0010 print, +0x0064 print, +0x008A print; reviewed EGA instruction stream; compared with CD Script 99, EGA differences retained",
+    "fingerprint": "03834A7D070DC9FDE12AB279F12674212C89F7C91578EA6923CE9B050C17453C",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Master Goodmold",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 99 +0x0010 in 49.LFL: print; Master Goodmold",
+        "scope": "script:99"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "name": "Bobbin speaks with his mother",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 100 in 47.LFL: +0x0347 print, +0x000B print, +0x003F print, +0x0066 print; reviewed EGA instruction stream; compared with CD Script 100, EGA differences retained",
+    "fingerprint": "E24444C9C5A4937CEB2D5557398B5EC0966756FA448EB689E70B17481527E432",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 100 +0x000B in 47.LFL: print; Cygna (Bobbin's mother)",
+        "scope": "script:100"
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "name": "Hetchel confronts the Dead One",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 101 in 09.LFL: +0x001A actorOps, +0x0037 actorOps, +0x004D putActorInRoom, +0x0085 print, +0x00A3 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 101, EGA differences retained",
+    "fingerprint": "594A120E4E8559DCEF6A223DAA611D7B0B66A6E33A0BD889F8211622D10DA197",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 5,
+        "name": "Hetchel",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 101 +0x01E8 in 09.LFL: print; Hetchel",
+        "scope": "script:101"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 101 +0x0285 in 09.LFL: print; the Dead One (El Muerto)",
+        "scope": "script:101"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "name": "departure to Room 66",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 102 in 51.LFL: +0x0018 actorOps, +0x0027 print, +0x0074 loadRoom, +0x0086 putActorInRoom, +0x00A4 actorOps; reviewed EGA instruction stream; compared with CD Script 102, EGA differences retained",
+    "fingerprint": "7C8CD22D004F4A25C31AF754CA11DCEDDAE119671D71F51142B0428E6953477E",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 103,
+    "name": "the far side of the Pattern is out of reach",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 103 in 51.LFL: +0x001B print; reviewed EGA instruction stream; compared with CD Script 103, EGA differences retained",
+    "fingerprint": "689CBEF6F932412437CAB9B0C10756BD0E87F31C48639AABAC16B61E6DBB037B",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 103 +0x001B in 51.LFL: print; Cygna (Bobbin's mother); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:103"
+      }
+    ]
+  },
+  {
+    "id": 104,
+    "name": "Room 51 scene with actors 1, 3 and 4",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 104 in 51.LFL: +0x0067 actorOps, +0x0072 putActorInRoom, +0x009D actorOps, +0x00AC actorOps, +0x00CA actorOps; reviewed EGA instruction stream; compared with CD Script 104, EGA differences retained",
+    "fingerprint": "68521A9FD79DD657E8250F2E5B490AAE27218687E79A1FAE24C3A6624210D90B",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 104 +0x0193 in 51.LFL: print; Cygna (Bobbin's mother); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:104"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 104 +0x01F1 in 51.LFL: print; the Dead One (El Muerto); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:104"
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "name": "Hetchel's feather and the Dead One",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 105 in 09.LFL: +0x0025 print, +0x0076 print, +0x00CC putActorInRoom, +0x00D4 print, +0x011C actorOps; reviewed EGA instruction stream; compared with CD Script 105, EGA differences retained",
+    "fingerprint": "DF45FC8BF65839C48748241471E575EB9653DDC337AA5F99C67AE986EB7C707B",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 105 +0x0076 in 09.LFL: print; the Dead One (El Muerto)",
+        "scope": "script:105"
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "name": "ending sequence from Room 66",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 106 in 66.LFL: +0x0051 actorOps, +0x0069 putActorInRoom, +0x00B1 putActorInRoom, +0x00B5 actorOps, +0x00DA actorOps; reviewed EGA instruction stream; compared with CD Script 106, EGA differences retained",
+    "fingerprint": "39DC69A4306D4AA58EAB5098CD6F9806510701BA3731A3F91239DEB5F35A3DF2",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 3,
+        "name": "Cygna (Bobbin's mother)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 106 +0x01A9 in 66.LFL: print; Cygna (Bobbin's mother); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:106"
+      },
+      {
+        "kind": "actor",
+        "id": 4,
+        "name": "the Dead One (El Muerto)",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 106 +0x0129 in 66.LFL: print; the Dead One (El Muerto); speaker continuation of Script 100, which identifies Cygna",
+        "scope": "script:106"
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "name": "Room 10 arrival and object classes",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 107 in 10.LFL: +0x0005 loadRoom, +0x007E putActorInRoom, +0x0087 actorOps, +0x009F actorOps, +0x00D7 chainScript; reviewed EGA instruction stream; compared with CD Script 107, EGA differences retained",
+    "fingerprint": "6B45742CA38ECD4226852790720E34D33426D7D5A97145C5861B414C514BE0EA",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 108,
+    "name": "glassmakers scene",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 108 in 22.LFL: +0x000F print, +0x006B print, +0x00AA print, +0x0103 print, +0x0143 print; reviewed EGA instruction stream; compared with CD Script 108, EGA differences retained",
+    "fingerprint": "A6F04E3976EA02733715E5F3C8F75B469C8781C91AF13455A5CA95013A692D1B",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 6,
+        "name": "Glassmaker",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 108 +0x006B in 22.LFL: print; Glassmaker",
+        "scope": "script:108"
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "name": "dragon's gold conversation",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 109 in 28.LFL: +0x0000 print, +0x0036 print, +0x0091 loadRoom, +0x0097 print, +0x016E print; reviewed EGA instruction stream; compared with CD Script 109, EGA differences retained",
+    "fingerprint": "DF16BA16CC80946A0940DE6E5CD82605E115374846F0ACA84BBAB7F3004DA016",
+    "edition": "Spanish EGA",
+    "names": [
+      {
+        "kind": "actor",
+        "id": 2,
+        "name": "dragon",
+        "evidence": "reading",
+        "source": "Spanish EGA Script 109 +0x0036 in 28.LFL: print; dragon",
+        "scope": "script:109"
+      }
+    ]
+  },
+  {
+    "id": 110,
+    "name": "Room 49 arrival and object classes",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 110 in 49.LFL: +0x0016 loadRoom, +0x0028 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 110, EGA differences retained",
+    "fingerprint": "B37D4077900A2B7E35FDDB6E85822962FC0A09489A0583B5DC81C1E8726ABE16",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 111,
+    "name": "Room 86 spell visual and return to Room 31",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 111 in 86.LFL: +0x0015 loadRoom, +0x002B actorOps, +0x0036 putActorInRoom, +0x00E4 loadRoom, +0x00EF print; reviewed EGA instruction stream; compared with CD Script 111, EGA differences retained",
+    "fingerprint": "EDFB0414C4D23ECD5F2B2EEA2F11C280D09877979DAB5FA192EA44CB3FE0D7A4",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 112,
+    "name": "Rusty is still napping",
+    "evidence": "reading",
+    "source": "Spanish EGA Script 112 in 34.LFL: +0x0005 print, +0x0035 loadRoom, +0x0041 print, +0x007D loadRoom, +0x0084 print; reviewed EGA instruction stream; compared with CD Script 112, EGA differences retained",
+    "fingerprint": "913F972004DE4E820D37E59141A39154FF7A3D6355FB9C7F056556BE1AA96B34",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 113,
+    "name": "ambient actors during the intro",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 113 in 02.LFL: +0x0010 actorOps, +0x0055 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 113, EGA differences retained",
+    "fingerprint": "D41DBBC085F9EBB1C4CEB0484813A5477120631A064A6ECA7CC3B7758E6D4D05",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 114,
+    "name": "ambient actors during the intro",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 114 in 02.LFL: +0x0010 actorOps, +0x0065 putActorInRoom; reviewed EGA instruction stream; compared with CD Script 114, EGA differences retained",
+    "fingerprint": "1F2543DF47BF369B4F2B25462180268AA9971E90BDB9AAEFA04A85824624F7ED",
+    "edition": "Spanish EGA",
+    "names": []
+  },
+  {
+    "id": 115,
+    "name": "save-screen input hook",
+    "evidence": "decoded",
+    "source": "Spanish EGA Script 115 in 66.LFL: +0x0000 isEqual, +0x0007 isEqual, +0x000E drawBox; reviewed EGA instruction stream; compared with CD Script 115, EGA differences retained",
+    "fingerprint": "7C08999B97AE7CB9D9BDAC271C10135EA1206D13A36D80F7EFF728E7C088F27E",
+    "edition": "Spanish EGA",
+    "names": []
+  }
+]

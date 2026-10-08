@@ -36,16 +36,22 @@ internal static class Program
         {
             try
             {
-                foreach (var edition in new[] { "loom ega mt32 en", "loom vga en" })
+                foreach (var edition in new[] { "loom ega mt32 en", "loom ega mt32 es", "loom vga en" })
                 {
-                    bool cd = edition.Contains("vga"); string prefix = cd ? "vga" : "ega";
-                    Call("OpenGameFolder", Path.Combine(args[0], edition));
+                    bool cd = edition.Contains("vga"); string prefix = cd ? "vga" : edition.EndsWith("es") ? "ega-es" : "ega";
+                    var folder = Path.Combine(args[0], edition);
+                    if (!Directory.Exists(folder)) folder = Path.Combine(args[0], "ALTERNATIVE LOOMS", edition);
+                    Call("OpenGameFolder", folder);
                     Find<ToggleButton>("AdvancedModeToggle").IsChecked = true;
                     Call("AdvancedModeToggle_Click", Find<ToggleButton>("AdvancedModeToggle"), new RoutedEventArgs());
                     var game = (GameLibrary)Field("_game")!;
                     for (int i = 0; i < 200 && ((LoomUsageIndex)Field("_usageIndex")!).UsedBy(LoomUsageTarget.Script, 16).Count == 0; i++) await Task.Delay(25);
                     for (int i = 0; i < 200 && ((LoomRelationshipIndex?)Field("_relationshipIndex"))?.Relationships.Count is null or 0; i++) await Task.Delay(25);
-                    foreach (var (id, expected) in new[] { (5, "input script"), (7, "run a sentence (verb on an object)"), (16, "set the text line") })
+                    var pages = new[] { (5, "input script"), (7, "run a sentence (verb on an object)"), (16, "set the text line") }.ToList();
+                    if (!cd) pages.AddRange([(24, "check whether draft N is learned"), (26, "run the matched draft on the aimed object"),
+                        (37, "play the queued sound and wait"), (69, "Fleece's greeting and the sheep problem"),
+                        (100, "Bobbin speaks with his mother"), (111, "Room 86 spell visual and return to Room 31")]);
+                    foreach (var (id, expected) in pages)
                     {
                         var resource = game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == id && r.ScriptRoom is null);
                         Call("SelectResourceInTree", resource);
@@ -62,6 +68,11 @@ internal static class Program
                         if (id == 7) Check(text.Contains("object under the pointer or clicked"), prefix + " Script 07 clicked-object role");
                         if (id == 16) Check(text.Contains("Bobbin") && text.Contains("at 160, text line y"), prefix + " Script 16 readable actor and layout");
                         if (id == 16) Check(Find<StackPanel>("ScriptUsedByList").Children.Count > 0, prefix + " Script 16 references populated");
+                        if (id == 24) Check(text.Contains("the current draft is learned"), prefix + " Script 24 learned-draft flag");
+                        if (id == 26) Check(text.Contains("the draft response was refused or consumed"), prefix + " Script 26 response flag");
+                        if (id == 37) Check(text.Contains("queued or last-started sound") && text.Contains("sound currently playing"), prefix + " Script 37 sound roles");
+                        if (id == 69) Check(text.Contains("Fleece says:"), prefix + " Script 69 Fleece speaker");
+                        if (id == 100) Check(text.Contains("Cygna (Bobbin's mother) says:"), prefix + " Script 100 Cygna speaker");
                         if (cd && id == 16) Check(Find<StackPanel>("ScriptEventButtons").Children.OfType<TextBlock>().Any(t => t.Text.Contains("text layout")),
                             "vga Script 16 layout is not counted as spoken dialogue");
                         Save($"{prefix}-script{id:00}");

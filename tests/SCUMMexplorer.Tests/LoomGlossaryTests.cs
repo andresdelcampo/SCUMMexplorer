@@ -71,7 +71,14 @@ public sealed class LoomGlossaryTests
     public void ActorNamesAreScopedBecauseNumbersAreReused()
     {
         var glossary = LoomGlossary.Default;
-        Assert.Equal("Elder (actor 2)", glossary.Actor(2)!.Name);
+        Assert.Null(glossary.Actor(2));
+        Assert.Null(glossary.Actor(3));
+        Assert.Null(glossary.Actor(4));
+        Assert.Null(glossary.Actor(5));
+        Assert.Null(glossary.Actor(6));
+        Assert.Null(glossary.Actor(12));
+        Assert.Equal("learning glow", glossary.Actor(12, "script:29")!.Name);
+        Assert.Equal("Elder (actor 2)", glossary.Actor(2, "script:46")!.Name);
         Assert.Equal("Mandible", glossary.Actor(2, "script:91")!.Name);
         Assert.Equal("Cob", glossary.Actor(3, "script:91")!.Name);
         Assert.Equal("the Dead One (El Muerto)", glossary.Actor(4, "room:9")!.Name);

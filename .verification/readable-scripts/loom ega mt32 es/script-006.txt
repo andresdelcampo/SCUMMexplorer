@@ -33,10 +33,10 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 0077      click-recorded flag (double-click test) += 1
       end if
 007A  if not (a draft is playing back)
-0082      var[0x06D] = mouse y
-0087      if var[0x06D] >= 0
-0091          var[0x06C] = mouse x
-0096          local 2 = the object at (var[0x06C], var[0x06D])
+0082      pointer y = mouse y
+0087      if pointer y >= 0
+0091          pointer x = mouse x
+0096          local 2 = the object at (pointer x, pointer y)
 009D          if local 2 is in class 1
 00A6              if local 0 != 0
 00AB                  object under the pointer or clicked = local 2
@@ -90,8 +90,8 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 0186                          start Script 07 · run a sentence (verb on an object) with local 2, 54
                           end if
                       else
-0192                      walk target x = var[0x06C]
-0197                      walk target y = var[0x06D]
+0192                      walk target x = pointer x
+0197                      walk target y = pointer y
 019C                      Bobbin walks to (walk target x, walk target y)
 01A3                      wait until Bobbin stops walking
                       end if
@@ -110,11 +110,11 @@ Readable view: the decoded instructions in plain language. Static paths, not pro
 01C0  go back to 007A
 
 Names used (evidence: decoded = read from instructions or game data, engine = ScummVM, reading = interpretation, play = seen in play):
-  bit[0xD62]       an object's verb 0x37 is running  [reading]  script 006; Spanish release's bit 0xD63, this edition numbers it 0xD62 (same position in the shifted layout, not checked entry by entry)
-  bit[0xD63]       the walk and the sentence were stopped  [reading]  set by a verb 0x37 that refuses; script 006 +0x00E4; Spanish release's bit 0xD64, this edition numbers it 0xD63 (same position in the shifted layout, not checked entry by entry)
-  bit[0xD65]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set; Spanish release's bit 0xD66, this edition numbers it 0xD65 (same position in the shifted layout, not checked entry by entry)
-  script 7         run a sentence (verb on an object)  [decoded]  starts the object's verb when the ego is within 3 of it
-  script 8         show or hide the close-up in the verb area  [decoded]
+  bit[0xD63]       an object's verb 0x37 is running  [decoded]  script 006
+  bit[0xD64]       the walk and the sentence were stopped  [decoded]  set by a verb 0x37 that refuses; script 006 +0x00E4
+  bit[0xD66]       a draft is playing back  [reading]  script 020 sets it; script 005 Escape cancels the draft only while it is set
+  script 7         run a sentence (verb on an object)  [decoded]  Spanish EGA Script 07 in 01.LFL: +0x001E print, +0x004C chainScript; reviewed EGA instruction stream; compared with CD Script 07, EGA differences retained
+  script 8         show or hide the close-up in the verb area  [decoded]  Spanish EGA Script 08 in 01.LFL: +0x004E print; reviewed EGA instruction stream; compared with CD Script 08, EGA differences retained
   var[0x00C]       timer 2  [engine]  VAR_TMR_2; script 006 uses it for the double-click time
   var[0x014]       mouse x  [engine]  VAR_VIRT_MOUSE_X
   var[0x015]       mouse y  [engine]  VAR_VIRT_MOUSE_Y
@@ -123,6 +123,8 @@ Names used (evidence: decoded = read from instructions or game data, engine = Sc
   var[0x069]       click-recorded flag (double-click test)  [decoded]  script 006 +0x0077
   var[0x06A]       walk target x  [decoded]  script 006: the clicked object's walk point, or the clicked point
   var[0x06B]       walk target y  [decoded]  script 006
+  var[0x06C]       pointer x  [decoded]  Spanish EGA Script 06 +0x0096 in 01.LFL: findObject; pointer x
+  var[0x06D]       pointer y  [decoded]  Spanish EGA Script 06 +0x0096 in 01.LFL: findObject; pointer y
   var[0x06E]       last click x  [decoded]  script 006 +0x006D
   var[0x06F]       last click y  [decoded]  script 006 +0x006D
   var[0x071]       exit the player arrived through  [decoded]  script 006 sets it for class-2 objects (exit hotspots)
