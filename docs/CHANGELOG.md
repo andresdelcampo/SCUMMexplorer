@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current capability and remaining work are in [CURRENT_WORK](CURRENT_WORK.md) and [the live plan](LOOM_EGA_PLAN.md).
 
+## 8 October: resolve Silence's source association and classify dynamic operands
+
+Each edition's Script 101 names Silence/Silencio and plays slot 12 through local 212/Script 23; its response word maps to 4E/4F, and Hetchel's reverse restores speech. Shaping's form-changing chain is correlated, but its canonical label and the reverse names remain uncertain. The 11/11/8 nonliteral first-operand call sites are classified as input dispatch, bounded loops or caller-selected helpers; no new engine defect is demonstrated. All 33 source assertions pass. Display names and runtime behavior remain unchanged; no native input or broad audit rerun. [Evidence and reproduction](../.verification/source-gaps-20261008/README.md).
+
 ## 8 October: prepare Rusty's fresh catalog return from source (`9de8193`)
 
 After rebuilding/reopening English EGA, direct Room 46 selection followed by the hole return to Room 34 retained sleeping costume 112 during the ghost conversation. Room 46 establishes late D7A but does not supply the skipped dream history that establishes ghost D9C. With the user's explicit approval, a fingerprinted catalog-start recipe now runs missing real Awakening/Reflection/Firewood/dream stages in the existing session. It preserves ghost/restored state, skips completed stages and cancels the target visit on failure; it assigns no story bits or costumes. Existing closed portals remain closed. Validation: 32 focused Core checks, 18 real WPF assertions using an isolated profile, inspected ghost image and a clean solution build. [Source, reproduction and correction](../.verification/catalog-return-20261008/README.md).

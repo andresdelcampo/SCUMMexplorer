@@ -38,9 +38,12 @@ internal static class LoomDraftNames
         (0x4C, 0, "Reflection"),
         // Room 26 "pastores" 0x4D starts script 202 (the shepherds healed, seen in play); Room 09 Hetchel: "Eso no ayudo. Debe estar bajo la influencia de algun hechizo."
         (0x4D, 0, "Healing"),
-        // No object answers 0x4E; Room 09 Hetchel answers 0x4F. Reading only: the manual order.
+        // Each edition's Script 101 says Silence/Silencio and local 212 plays slot 12 through Script 23;
+        // its own response word is 4E/4F, and Hetchel's 4F restores speech through local 223.
+        // The reverse's canonical name remains uncertain. See .verification/source-gaps-20261008/README.md.
         (0x4E, 0x4F, "Silence"),
-        // Only Room 09 Hetchel answers 0x51 (0x50 has no object). Reading only: the manual order.
+        // Room 09 local 223 plays slot 13 before local 227's form change; Hetchel's 51 restores
+        // costume 34 through local 224. The effect supports this association; the exact name is still a reading.
         (0x50, 0x51, "Shaping"),
         // Room 09 "telar" (the loom) 0x52 starts script 104.
         (0x52, 0x53, "Unmaking"),

@@ -14,7 +14,8 @@ The human explicitly approved real source prerequisites for late-room selection.
 
 - Documentation is reconciled across live guides and recent packets; seven complete historical snapshots preserve prior research. 31 files / 688 relative links checked with no missing targets; whitespace check passes.
 - Local master: `ebdf3b2` portal correction, `0243a5a` [draft/source checkpoint](../.verification/draft-input-20261008/README.md), and `9de8193` [catalog return correction](../.verification/catalog-return-20261008/README.md). No push.
-- Six prepared English EGA/Spanish EGA/VGA Room 04 note-input casts pass; three profile-free status renders inspected; clean build. VGA Room 02 sky remains unqualified. Stronger Silence/Shaping names remain uncertain.
+- Six prepared English EGA/Spanish EGA/VGA Room 04 note-input casts pass; three profile-free status renders inspected; clean build. VGA Room 02 sky remains unqualified.
+- [Remaining-source checkpoint](../.verification/source-gaps-20261008/README.md): 33 source assertions pass. Script 101's Silence/Silencio → local 212 [12] → Script 23 and the own-edition response word support Silence beyond manual order. Shaping's form-change effect is correlated; canonical label and exact reverse names remain uncertain. The 11/11/8 dynamic first-operand sites are classified; input-dependent targets and incomplete data remain limits. No runtime/display-name change or native interaction.
 - Next active work is in [the gap dossier](loom/FINAL_GAPS_HANDOFF.md): original-game actor/staff sizes/placement, source-earned casting routes, CD picture/voice/music timing, and specific Roland discrepancies if any.
 - Historical full baseline: 833 tests pass/five diagnostic skips, 328 EGA and 222/223 VGA normal/Escape recipe completions. Later VGA walker comparison/rerun is separately scoped. Avoid broad repeats absent a relevant change.
 

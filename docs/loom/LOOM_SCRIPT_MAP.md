@@ -251,9 +251,9 @@ Evidence for the verb -> draft table (`LoomDraftNames`), from the object verbs 0
 | 0x4A / 0x4B | Sharpening / Blunting | Room 41 sword: 4A starts refusal local 205; 4B starts local 204 [0], whose zero branch says the edge was blunted (English +00F6; Spanish +00F9). VGA retains these callbacks/argument with shortened dialogue. [Source comparison and input checks](../../.verification/draft-input-20261008/README.md). |
 | 0x4C | Reflection | reading: Room 34 Rusty "Yech. Ahora no quiero parecerme a el."; "chico" 0x4C starts local 202, the only writer of the disguise costume 0x67. play: swapped with Healing after the shepherds were healed by 0x4D |
 | 0x4D | Healing | play and reading: Room 26 "pastores" 0x4D; Room 09 Hetchel "Eso no ayudo. Debe estar bajo la influencia de algun hechizo." |
-| 0x4E / 0x4F | Silence | manual order: no object answers 0x4E, Room 09 Hetchel answers 0x4F |
-| 0x50 / 0x51 | Shaping | manual order: no object answers 0x50, Room 09 Hetchel answers 0x51 |
+| 0x4E / 0x4F | Silence | own-source causative scene: Script 101 says Silence/Silencio and plays slot 12 through local 212/Script 23; the slot's response word is 4E/4F, and Hetchel's 4F restores speech through local 223. [Three-edition chain](../../.verification/source-gaps-20261008/README.md). |
+| 0x50 / 0x51 | Shaping | association: local 223 plays slot 13 before local 227's form change; 51 restores Hetchel's costume through local 224. The exact name is not printed by that sequence. [Source limits](../../.verification/source-gaps-20261008/README.md). |
 | 0x52 / 0x53 | Unmaking | reading: Room 09 "telar" (the loom) 0x52 starts script 104 |
 | 0x54 | Transcend | reading: Room 66 object 833 "Bobbin" 0x54 starts script 106 (the ending) |
 
-Still unverified: stronger source names for Silence, Shaping and their reverses. Sharpening/Blunting's EGA direction is now established; VGA preserves the corresponding callback structure, with its shorter text and native visual comparison limits retained.
+Silence's association is now supported beyond manual order. Exact reverse names and Shaping's canonical label remain unverified. Sharpening/Blunting's EGA direction is established; VGA preserves the corresponding callback structure, with its shorter text and native visual comparison limits retained. The [remaining-source checkpoint](../../.verification/source-gaps-20261008/README.md) also classifies the 11/11/8 nonliteral first-operand call sites without treating them as engine failures.

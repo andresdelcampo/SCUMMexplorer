@@ -4,6 +4,7 @@ Updated 8 October 2026. Rebuild a harness before running it so it includes the c
 
 ## Current checkpoint entry points
 
+- [source-gaps-20261008](source-gaps-20261008/README.md): own-source Silence chain, Shaping terminology limit and 11/11/8 dynamic call sites; 33 source assertions, no behavior change.
 - [catalog-return-20261008](catalog-return-20261008/README.md): fresh English Room 46 → 34 Rusty correction, approved source prerequisites; raw reproduction, 32 focused Core checks, 18 WPF assertions and real ghost picture. Its UI harness uses a private profile.
 - [portal-state-20261008](portal-state-20261008/README.md): closed/conditional portal navigation, source refusal and prepared ghost/restoration; the separate catalog return is corrected above.
 - [draft-input-20261008](draft-input-20261008/README.md): six prepared actual-note casts, Blunting source direction and three profile-free status renders.

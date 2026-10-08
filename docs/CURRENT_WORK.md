@@ -10,7 +10,7 @@ Local master includes `ebdf3b2` (closed/conditional portals), `0243a5a` (Sharpen
 
 **Parked:** the standalone Room 34 local-200 fortress reveal. The user separated it from the ghost conversation's local-206 pan and parked further investigation. Save, console and close assists are fulfilled. The ordinary native eastward route left DCF clear; intermediate boxes were not sampled. The user later reported returning to Room 34, then stopped Computer Use with physical Escape before a refreshed picture returned. Current native screen/state is unverified. Do not resume native control without a direct human request. [Native history and identity](../.verification/room34-state-20261008/NATIVE_SESSION.md).
 
-Original-game actor/staff, physical casting-route and listening comparisons remain open. Six prepared Room 04 forward/reverse casts pass real Explorer note input across English EGA, Spanish EGA and VGA. VGA Room 02 sky remains unqualified. Silence/Shaping's stronger names remain uncertain. [Draft checkpoint](../.verification/draft-input-20261008/README.md), [gap dossier](loom/FINAL_GAPS_HANDOFF.md).
+Original-game actor/staff, physical casting-route and listening comparisons remain open. Six prepared Room 04 forward/reverse casts pass real Explorer note input across English EGA, Spanish EGA and VGA. VGA Room 02 sky remains unqualified. Silence now has an own-source causative chain in each edition; Shaping's canonical label and exact reverse names remain uncertain. The 11/11/8 nonliteral call sites are source-classified, with input-dependent and incomplete-data limits retained. [Remaining-source checkpoint](../.verification/source-gaps-20261008/README.md), [draft checkpoint](../.verification/draft-input-20261008/README.md), [gap dossier](loom/FINAL_GAPS_HANDOFF.md).
 
 ## Established validation
 
@@ -24,6 +24,7 @@ Original-game actor/staff, physical casting-route and listening comparisons rema
 | [Staff/source comparison](../.verification/staff-layout-20261008/README.md) | Existing VGA alignment confirmed; experimental edits withdrawn; 18 assertions and original buffer hashes. Native visual bounds unmeasured. |
 | [Catalog return correction](../.verification/catalog-return-20261008/README.md) | 32 focused Core checks, 18 isolated-profile WPF assertions, inspected ghost image and clean build. Fresh Room 46 return, later-state preservation, fingerprint exclusion and failure cancellation. |
 | [Draft/source checkpoint](../.verification/draft-input-20261008/README.md) | Six real-note casts, three profile-free Game Status renders, clean build. No whole-game/native audiovisual claim. |
+| [Remaining-source checkpoint](../.verification/source-gaps-20261008/README.md) | 33 source assertions: Silence causality, Shaping effect/name limit and 11/11/8 dynamic call-site classification. No behavior change or native comparison. |
 
 ## Standing product rules
 
