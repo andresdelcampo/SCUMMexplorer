@@ -1,5 +1,9 @@
 # Changelog
 
+## 8 October: EGA / VGA correctness audit
+
+Audited every script kind, the English EGA replay catalog, VGA derived groups, 1,320 isolated object callbacks and real WPF interaction/playback controls. Fixed native responses being overridden by static doorway possibilities (the grave could incorrectly jump to Room 64), generic draft reactions leaking into the VGA picker, and completing-start trials accepting unmatched cutscene scopes. VGA Room 20 now derives a labelled placement from the triggering object's own walk point. Final suite: 833 passed, five diagnostic tests skipped; clean solution build; 201 WPF assertions passed. All 328 EGA recipes and 222/223 VGA groups complete both normally and with Escape. Room 34 reachability, incomplete EGA resources and original-game fidelity remain unresolved; [audit and reproduction](../.verification/correctness-20261008/README.md). Local commit only; no push.
+
 ## 8 October: port VGA annotation findings back to EGA
 
 Reviewed English and Spanish EGA globals against the VGA work, adding 70 EGA titles (116 valid English globals and 113 Spanish globals now titled), missing draft/note flags, pointer/buffer/animation/sound/flying-array meanings and scoped actor roles. Labels require their own EGA instruction fingerprints; invalid script entries stay unresolved. Corrected incomplete EGA 90/99 titles and the earlier comparison notes: both editions already contain the Bishop introduction and Goodmold aftermath. Refreshed readable goldens for both languages, including Spanish snapshots that had contained English data. Clean build, 42 focused Core checks and 126 real WPF assertions; [individual review and validation](../.verification/advanced-scripts/README-EGA.md). No interpreter changes, full suite or push.

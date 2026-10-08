@@ -3534,6 +3534,7 @@ public partial class MainWindow : Window
         var playing = PlaybackRunning;
         FollowSessionSound();
         var sceneBefore = (_session.CutscenesBegun, _session.EgoPuts);
+        var sentencesBefore = _session.ObjectSentencesBegun;
         var action = send();
         if (!_playInstantly) UpdateSessionSound();
         var refused = action.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
@@ -3557,7 +3558,8 @@ public partial class MainWindow : Window
         RefreshRoomPreview();
         // Refused input changes nothing on screen, so the frames that follow run at once
         // and a doorway's fallback is not delayed.
-        StartPlayback(what, action, sourceRoom, doorways, leftRoom: false, instant: refused is not null, sceneBefore);
+        StartPlayback(what, action, sourceRoom, doorways, leftRoom: false, instant: refused is not null, sceneBefore,
+            sentencesBefore: sentencesBefore);
         return _session.Snapshot.RoomId != sourceRoom.ResourceId;
     }
 
@@ -3644,6 +3646,7 @@ public partial class MainWindow : Window
         // The session's cutscene and ego-put counts before the input: a cutscene that put the ego
         // somewhere since then is a change of scene, the game's answer to the input.
         public (int Cutscenes, int EgoPuts) SceneBefore { get; init; }
+        public int SentencesBefore { get; init; }
     }
 
     private Playback? _playback;
@@ -3675,13 +3678,14 @@ public partial class MainWindow : Window
     /// load reached while playing opens that room, and playback goes on there.
     /// </summary>
     private void StartPlayback(string what, LoomObjectActionResult? action, GameResource sourceRoom,
-        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null)
+        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null, int? sentencesBefore = null)
     {
         _playback = new Playback
         {
             What = what, Action = action, SourceRoom = sourceRoom, Doorways = doorways, LeftRoom = leftRoom, Preview = preview, ExpectedCutscene = expectedCutscene,
             CameraX = _session?.CameraX,
-            SceneBefore = sceneBefore ?? (_session?.CutscenesBegun ?? 0, _session?.EgoPuts ?? 0)
+            SceneBefore = sceneBefore ?? (_session?.CutscenesBegun ?? 0, _session?.EgoPuts ?? 0),
+            SentencesBefore = sentencesBefore ?? _session?.ObjectSentencesBegun ?? 0
         };
         _playbackRequestedRoom = null;
         _playbackPaused = false;
@@ -4674,6 +4678,9 @@ public partial class MainWindow : Window
         }
         if (playback.Doorways is not { Count: > 0 } doorways || _currentRoomResource?.ResourceId != playback.SourceRoom.ResourceId)
             return;
+        // A look/use sentence can legitimately choose not to load a room (the grave's look needs Reading).
+        // Once native input reached the sentence, replaying another verb or opening a merely possible target would override that answer.
+        if (session.ObjectSentencesBegun > playback.SentencesBefore) return;
         var cutscenes = session.CutscenesBegun - playback.SceneBefore.Cutscenes;
         var egoPuts = session.EgoPuts - playback.SceneBefore.EgoPuts;
         if (cutscenes > 0 && egoPuts > 0)
@@ -5313,6 +5320,11 @@ public partial class MainWindow : Window
     private IReadOnlyList<LoomRoomObjectRecord> DoorwaysAt(int x, int y)
     {
         if (_session?.Snapshot is not { } snapshot) return [];
+        var (selected, unknown) = LoomObjectHitTest.Find(_currentRoomObjectRecords, snapshot.ObjectStates,
+            snapshot.ObjectPositions, snapshot.ObjectClasses, x, y);
+        // A non-doorway object can overlap a doorway's rectangle. Its native click must not turn into navigation.
+        // An untouchable doorway remains available as an explicitly labelled exploration fallback when no object is selected.
+        if (unknown is not null || selected != 0 && !_roomNavigationCandidates.Any(candidate => candidate.Object.Id == selected)) return [];
         return VisibleDoorways(snapshot).Where(record =>
         {
             var position = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)

@@ -26,7 +26,7 @@ internal static class Program
         var output = args[1];
         Directory.CreateDirectory(output);
         var app = new Application();
-        var window = new MainWindow { Width = 1400, Height = 900 };
+        var window = new MainWindow { Width = 1400, Height = 900, ShowActivated = false, Left = -2000 };
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
         T Find<T>(string name) => (T)window.FindName(name);
@@ -119,6 +119,7 @@ internal static class Program
                 Check(Shown() == 3 && Session().LastAction is { IsGameInput: true } && Field("_lastDoorwayFallback") is null,
                     $"the third click reaches the walk point, runs verb 0x38 and enters Room 03 through the game's click: view Room {Shown():00}; status \"{Status()}\"");
                 report.Add($"Failures: {failures}");
+                Environment.ExitCode = failures == 0 ? 0 : 1;
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }
             finally

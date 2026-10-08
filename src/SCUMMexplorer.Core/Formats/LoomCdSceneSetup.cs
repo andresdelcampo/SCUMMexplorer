@@ -7,10 +7,11 @@ namespace SCUMMexplorer.Core.Formats;
 /// <summary>
 /// One thing run before a CD scene starts. <see cref="Kind"/> is <c>verb</c> (visit <see cref="Room"/> and run object <see cref="ObjectId"/>'s verb
 /// <see cref="VerbId"/> as an exploration action, unseen), <c>entry</c> (visit <see cref="Room"/>, whose entry script then runs), <c>scene</c> (another
-/// CD scene, the room's entry when <see cref="ObjectId"/> is 0 or that object's verb, run unseen after its own <see cref="Inner"/> setup) or <c>box</c>
-/// (after the scene's room is entered, put the ego into walk box <see cref="Box"/>, or walk him across it).
+/// CD scene, the room's entry when <see cref="ObjectId"/> is 0 or that object's verb, run unseen after its own <see cref="Inner"/> setup), <c>box</c>
+/// (after the scene's room is entered, put the ego into walk box <see cref="Box"/>, or walk him across it), or <c>place</c>
+/// (the triggering object's own walk point, when a scene reads the ego's otherwise unknown coordinates).
 /// </summary>
-public sealed record LoomCdSetupStep(string Kind, int Room, int ObjectId, int VerbId, int Box, string Where, string Reason = "", LoomCdStartSetup? Inner = null);
+public sealed record LoomCdSetupStep(string Kind, int Room, int ObjectId, int VerbId, int Box, string Where, string Reason = "", LoomCdStartSetup? Inner = null, int? X = null, int? Y = null);
 
 /// <summary>
 /// The start a CD scene needs, derived from its scripts and checked by running it: <see cref="Before"/> runs unseen before the room is entered,
@@ -103,6 +104,11 @@ public sealed partial class LoomCdSceneSetupPlanner
             // What the previous box set going (a monitor's scene) finishes before the next box.
             if (step != all[0]) Settle(session);
             for (var i = 0; i < 20; i++) session.AdvanceFrame();
+            if (step.Kind == "place" && step.X is int px && step.Y is int py)
+            {
+                session.PlaceEgo(px, py);
+                continue;
+            }
             if (session.CurrentWalkBoxes?.Coordinates(step.Box) is not { } box) continue;
             var x = box.Corners.Sum(c => c.X) / 4;
             var y = box.Corners.Sum(c => c.Y) / 4;
@@ -146,19 +152,25 @@ public sealed partial class LoomCdSceneSetupPlanner
             var session = NewSession();
             ApplyBefore(session, _game, before);
             var earlier = session.CutscenesBegun; // the setup's own scenes do not count
+            var trace = session.SessionTrace.Count;
             session.VisitRoom(RoomOf(_game, t.Room));
             ApplyAfter(session, after);
+            var targetBaseline = earlier;
             if (!t.IsRoomEntry)
             {
-                earlier = session.CutscenesBegun; // scenes the setup's own walk set going (a box monitor's) are not this scene
+                targetBaseline = session.CutscenesBegun; // setup/entry scopes are balanced too, but do not count as the target beginning
                 session.ActivateObjectVerb(t.ObjectId, t.VerbId);
             }
-            var begun = false;
+            var begun = false; var ended = 0; var quiet = 0;
             for (var i = 0; i < (mustEnd ? EndFrames : TrialFrames); i++)
             {
-                if (session.InCutscene || session.CutscenesBegun > earlier) begun = true;
+                if (session.CutscenesBegun > targetBaseline) begun = true;
                 if (begun && !mustEnd) return true;
-                if (begun && !session.InCutscene && session.Messages.HaveMsg == 0) return true;
+                for (; trace < session.SessionTrace.Count; trace++)
+                    if (session.SessionTrace[trace].StartsWith("endCutscene at ", StringComparison.Ordinal)) ended++;
+                var idle = !session.InCutscene && session.Messages.HaveMsg == 0 && !session.EgoMoving && !session.CameraMoving;
+                quiet = idle ? quiet + 1 : 0;
+                if (begun && quiet >= 30 && ended == session.CutscenesBegun - earlier) return true;
                 session.AdvanceFrame();
             }
             return false;
@@ -329,6 +341,23 @@ public sealed partial class LoomCdSceneSetupPlanner
         var scripts = new List<(string Label, LoomScriptDisassembly Script)>();
         foreach (var label in chain)
             if (LoadLabel(t.Room, label == "root" ? (t.IsRoomEntry ? $"Room {t.Room} entry" : $"Room {t.Room} object {t.ObjectId} verb 0x{t.VerbId:X2}") : label) is { } script) scripts.Add((label, script));
+        var positionRead = scripts.SelectMany(s => s.Script.Instructions
+            .Where(i => i.Operation is "getActorX" or "getActorY" && i.Operands.Split(", ").Last() is "0x01" or "0x0001")
+            .Select(i => $"{s.Label} +0x{i.Offset:X4}")).FirstOrDefault();
+        if (!t.IsRoomEntry && positionRead is not null)
+        {
+            var probe = NewSession(); probe.VisitRoom(RoomOf(_game, t.Room));
+            var ego = probe.Actors.First(a => a.Number == 1);
+            var room = _data.ReadRoom(t.Room);
+            var obj = room.Objects.First(o => o.Id == t.ObjectId);
+            if ((ego.X is null || ego.Y is null) && obj.WalkX >= 0 && obj.WalkX < room.Width && obj.WalkY >= 0 && obj.WalkY < room.Height)
+            {
+                var reason = $"The scene reads Bobbin's coordinates ({positionRead}), but his catalog arrival is unknown. " +
+                    $"The triggering object's own walk point ({obj.WalkX}, {obj.WalkY}) is used before the direct verb, as a labelled placement estimate; the game's input walk was not executed.";
+                var place = new LoomCdSetupStep("place", t.Room, t.ObjectId, t.VerbId, 0, positionRead, reason, X: obj.WalkX, Y: obj.WalkY);
+                if (Trial(t, [], [place], mustEnd: true)) return new([], [place], [reason], true);
+            }
+        }
         var cleared = scripts.SelectMany(s => s.Script.Instructions.Where(i => i.Operation == "move" && ClearsBit().IsMatch(i.Operands)).Select(i => (s.Label, i.Offset, Bit: ClearsBit().Match(i.Operands).Groups[1].Value)))
             .DistinctBy(x => x.Bit).ToList();
         var candidates = new List<LoomCdSetupStep>();

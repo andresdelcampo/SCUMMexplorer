@@ -95,9 +95,13 @@ public static partial class LoomCdCutsceneIndex
     {
         // A draft verb (0x39 and up) is its own scene even when another verb of the object reaches the same scripts: the EGA catalog lists
         // each spell (Twisting, Sharpening, its reverse) separately, and the player casts them one by one.
-        static string Key(LoomCdCutscene c) => string.Join("|", c.Scripts) + (c.IsRoomEntry || c.VerbId < 0x39 ? "" : $"#{c.VerbId}");
+        static string ScriptsKey(LoomCdCutscene c) => string.Join("|", c.Scripts);
+        static string Key(LoomCdCutscene c) => ScriptsKey(c) + (c.IsRoomEntry || c.VerbId < 0x39 ? "" : $"#{c.VerbId}");
         static int Rank(LoomCdCutscene c) => c.IsRoomEntry ? 0 : c.VerbId switch { 0x38 => 1, 0x37 => 2, 0x36 => 3, _ => 4 };
-        return triggers.GroupBy(Key).Where(g => g.Count() <= SharedHelperTriggers)
+        // Count uses before separating draft verbs: a generic response reached by many spells is still a shared helper.
+        var helpers = triggers.GroupBy(ScriptsKey).Where(g => g.Count() > SharedHelperTriggers)
+            .Select(g => g.Key).ToHashSet(StringComparer.Ordinal);
+        return triggers.Where(c => !helpers.Contains(ScriptsKey(c))).GroupBy(Key)
             .Select(g =>
             {
                 var ordered = g.OrderBy(Rank).ThenBy(c => c.VerbId).ThenBy(c => c.ObjectId).ToArray();

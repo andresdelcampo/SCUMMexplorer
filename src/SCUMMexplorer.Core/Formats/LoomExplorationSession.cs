@@ -546,6 +546,9 @@ public sealed partial class LoomExplorationSession
     /// </summary>
     public int CutscenesBegun { get; private set; }
 
+    /// <summary>Look/use sentences actually started by startObject (input script 007), excluding the preliminary walk-to verb.</summary>
+    public int ObjectSentencesBegun { get; private set; }
+
     /// <summary>
     /// How many times a script has put the ego at a point (<see cref="LoomActorTable.EgoPuts"/>). With
     /// <see cref="CutscenesBegun"/> it marks a change of scene: Room 02's script 045 begins a cutscene and
@@ -2279,6 +2282,7 @@ public sealed partial class LoomExplorationSession
         var parent = _executing.Count > 0 ? _executing[^1] : null;
         _observer?.ObjectCalleeSelected(objectId, verbId, selectedEntry, script);
         _visitTrace.Add($"{source}: startObject runs object {objectId} verb 0x{verbId:X2}");
+        if (verbId is 0x36 or 0x38) ObjectSentencesBegun++;
         RunScript(script, _currentObjects, 0, locals, depth + 1, null,
             EstimatedArguments(scriptEvent),
             scriptEvent.Certainty != LoomScriptEventCertainty.Reached,

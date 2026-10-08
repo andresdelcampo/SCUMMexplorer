@@ -246,4 +246,29 @@ public sealed class LoomCdCutsceneTests
         Assert.Contains("not neighbours", crossing.Notes[0]);
         Assert.Equal(1, setups.Count(x => !x.s.Plays));
     }
+
+    [Fact]
+    public void ASceneReadingUnknownEgoCoordinatesUsesItsObjectsOwnWalkPointAndClosesItsScope()
+    {
+        if (Game() is not { } game) return;
+        var data = ScummDataSources.For(game);
+        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
+        var t = triggers.Single(t => t.Room == 20 && t.ObjectId == 315 && t.VerbId == 0x48);
+        var setup = new LoomCdSceneSetupPlanner(game, triggers, data).Derive(t);
+        var placement = Assert.Single(setup.After);
+        var obj = data.ReadRoom(20).Objects.Single(o => o.Id == 315);
+        Assert.Equal("place", placement.Kind);
+        Assert.Equal(obj.WalkX, placement.X); Assert.Equal(obj.WalkY, placement.Y);
+        Assert.Contains("placement estimate", setup.Describe());
+        var session = Fresh(game); session.VisitRoomById(20);
+        LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
+        var begun = session.CutscenesBegun; var trace = session.SessionTrace.Count;
+        session.ActivateObjectVerb(315, 0x48);
+        var frame = 0;
+        while (frame++ < 600 && (session.InCutscene || session.Messages.HaveMsg != 0 || frame < 10)) session.AdvanceFrame();
+        Assert.True(session.CutscenesBegun > begun);
+        Assert.Equal(session.CutscenesBegun - begun, session.SessionTrace.Skip(trace).Count(t => t.StartsWith("endCutscene at ")));
+        Assert.False(session.InCutscene);
+        Assert.DoesNotContain(session.Snapshot.Uncertainties, t => t.Contains("whose position the preview does not know"));
+    }
 }

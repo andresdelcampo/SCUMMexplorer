@@ -18,7 +18,7 @@ internal static class Program
         Directory.CreateDirectory(args[1]);
         Environment.SetEnvironmentVariable("SCUMM_ROOM_CACHE_DIR", Path.Combine(args[1], "cache"));
         var app = new App(); app.InitializeComponent();
-        var window = new MainWindow { Width = 1400, Height = 950 };
+        var window = new MainWindow { Width = 1400, Height = 950, ShowActivated = false, Left = -2000 };
         object? Field(string n) => typeof(MainWindow).GetField(n, Private)!.GetValue(window);
         object? Call(string n, params object?[] a) => typeof(MainWindow).GetMethod(n, Private)!.Invoke(window, a);
         var report = new List<string>();

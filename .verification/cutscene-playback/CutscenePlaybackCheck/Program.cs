@@ -25,7 +25,7 @@ internal static class Program
         var output = args[1];
         Directory.CreateDirectory(output);
         var app = new Application();
-        var window = new MainWindow { Width = 1400, Height = 900 };
+        var window = new MainWindow { Width = 1400, Height = 900, ShowActivated = false, Left = -2000 };
         object? Field(string name) => typeof(MainWindow).GetField(name, Private)!.GetValue(window);
         object? Call(string name, params object?[] values) => typeof(MainWindow).GetMethod(name, Private)!.Invoke(window, values);
         T Find<T>(string name) => (T)window.FindName(name);
@@ -207,6 +207,7 @@ internal static class Program
                     $"the trial skips at {trialSkip} ms and its playback ends in Room {Session().Snapshot.RoomId:00} after {trial.Ms} ms");
                 Save("trial-after-skip-app.png");
                 report.Add($"Failures: {failures}");
+                Environment.ExitCode = failures == 0 ? 0 : 1;
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }
             finally

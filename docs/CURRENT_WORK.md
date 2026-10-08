@@ -4,7 +4,7 @@ Rewritten 4 October 2026 (the old route-priority and observer-hardening text, an
 
 ## Where the work stands
 
-LOOM EGA exploration is functionally complete for the user's three priorities (object interactions, cutscenes and animation, on-screen text). 234 of 235 cutscene sites are audited as reached; the one left (Room 34 local200 +0035) looks unreachable. The next phase is support for other versions (see the plan). The checks of 4 October are in [HARNESS_REVIEW_2026-10-04.md](archive/HARNESS_REVIEW_2026-10-04.md).
+The [8 October correctness audit](../.verification/correctness-20261008/README.md) completes all 328 English EGA replay recipes and 222/223 VGA groups normally and with Escape. It fixes native responses being overridden by static navigation, generic draft-helper grouping, and a VGA Room 20 start that lost its cutscene scope on unknown coordinates. The full suite passes (833 tests, five diagnostic skips), with clean builds and 201 WPF assertions. This is bounded-preview validation, not a claim that every original-game route is final: Room 34 reachability, incomplete EGA resources and independent ScummVM/listening checks remain open. The older 234/235 EGA source-site record and 4 October checks are in [HARNESS_REVIEW_2026-10-04.md](archive/HARNESS_REVIEW_2026-10-04.md).
 
 ## Rules the user has set
 
