@@ -4,6 +4,8 @@ State and evidence for the next session, prepared 8 October 2026. The user's nex
 
 ## Current entry points
 
+- [Final-gap investigation](../.verification/final-gaps-20261008/README.md): Room 70 operand correction, complete EGA helper decodes, interior global entries, successful Firewood/straw prerequisite route, and the distinct native VGA actor walker. Generated packet/traces remain ignored locally. An optional request for an existing ScummVM save near Room 46's return to Rusty's outdoor area is pending; no replay/new save was requested. Initial handoff counts below are historical.
+
 - [FINAL_GAPS_HANDOFF.md](loom/FINAL_GAPS_HANDOFF.md): detailed gap dossier, facts versus hypotheses, investigation order, completion criteria and conditional user needs.
 - [8 October correctness audit](../.verification/correctness-20261008/README.md): exact results, product fixes, reproduction and ignored local evidence.
 - [CURRENT_WORK.md](CURRENT_WORK.md): standing product/workflow rules.

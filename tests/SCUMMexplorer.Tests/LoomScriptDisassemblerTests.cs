@@ -4,6 +4,50 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class LoomScriptDisassemblerTests
 {
+    [Theory]
+    [InlineData(1, "save")]
+    [InlineData(2, "load")]
+    public void SaveLoadVarsConsumesFilenameAndStringRangeBeforeClosing(int mode, string action)
+    {
+        // Room 70's locals 203/204 use this grammar. The string range ends at
+        // 0x14 (20), which used to be misread as a truncated print opcode.
+        byte[] code = [0xA7, (byte)mode, 0x03, .. "savegame.___"u8.ToArray(), 0x00, 0x02, 0x09, 0x14, 0xFF, 0xA0];
+        var result = LoomScriptDisassembler.Disassemble(code);
+
+        Assert.Empty(result.Issues);
+        Assert.Equal([0, 20], result.Instructions.Select(i => i.Offset));
+        Assert.Equal(["saveLoadVars", "stopObjectCode"], result.Instructions.Select(i => i.Operation));
+        Assert.Equal($"{action}, [openFile, \"savegame.___\"; strings, 0x09, 0x14; closeFile]", result.Instructions[0].Operands);
+        Assert.Equal(20, result.Instructions[0].Bytes.Split(' ').Length);
+    }
+
+    [Theory]
+    [InlineData(0x00)]
+    [InlineData(0x04)]
+    [InlineData(0x1F)]
+    public void SaveLoadVarsReadsVariableRangesAndStopsAtEachNativeTerminator(byte terminator)
+    {
+        byte[] code = [0xA7, 0x01, 0x01, 0x01, 0x00, 0x02, 0x40, 0xC2, 0x03, 0x00, 0x04, 0x40, terminator, 0xA0];
+        var result = LoomScriptDisassembler.Disassemble(code);
+
+        Assert.Empty(result.Issues);
+        Assert.Equal([0, 13], result.Instructions.Select(i => i.Offset));
+        Assert.Contains("variables, var[0x001], local[0x002]", result.Instructions[0].Operands);
+        Assert.Contains("strings, var[0x003], local[0x004]", result.Instructions[0].Operands);
+    }
+
+    [Theory]
+    [InlineData(new byte[] { 0xA7, 0x02, 0x03, 0x61 })]
+    [InlineData(new byte[] { 0xA7, 0x01, 0x02, 0x09 })]
+    [InlineData(new byte[] { 0xA7, 0x01, 0x01, 0x00 })]
+    public void SaveLoadVarsRetainsGenuineTruncatedOperandDiagnostics(byte[] code)
+    {
+        var result = LoomScriptDisassembler.Disassemble(code);
+
+        Assert.NotEmpty(result.Issues);
+        Assert.Contains(result.Issues, issue => issue.Offset == 0 && issue.Reason.Contains("truncated", StringComparison.Ordinal));
+    }
+
     [Fact]
     public void Indy3WaitHasNoSubopcode()
     {

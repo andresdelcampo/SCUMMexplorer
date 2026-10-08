@@ -309,7 +309,7 @@ public sealed partial class LoomScriptPresenter(LoomGlossary glossary, Func<int,
                 case "getStringWidth": return $"{Value(a[0])} = width of string {Value(a[1])}";
                 case "getInventoryCount": return $"{Value(a[0])} = how many objects {Value(a[1], Role.Actor)} holds";
                 case "saveLoadGame": return $"{Value(a[0])} = result of save/load command {Value(a[1])}";
-                case "saveLoadVars": return $"save/load variables ({a[0]})";
+                case "saveLoadVars": return $"{a[0]} variables ({string.Join("; ", Items(a[1]))})";
                 case "doSentence": return DoSentence(a);
                 default: return Raw(ins);
             }

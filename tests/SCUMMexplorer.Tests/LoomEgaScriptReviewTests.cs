@@ -5,6 +5,26 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class LoomEgaScriptReviewTests
 {
+    [Theory]
+    [InlineData("en", 203, 21)]
+    [InlineData("en", 204, 72)]
+    [InlineData("es", 203, 21)]
+    [InlineData("es", 204, 72)]
+    public void Room70SaveNameHelpersDecodeThroughTheirRealEnd(string language, int id, int length)
+    {
+        var data = ScummDataSources.For(Game(language));
+        var script = Assert.IsType<LoomScriptDisassembly>(data.RoomLocalScript(70, id));
+
+        Assert.Equal(length, script.CodeLength);
+        Assert.True(script.HasCompleteControlFlow);
+        Assert.Equal(length, script.DecodedBytes);
+        Assert.Equal(length - 1, script.Instructions[^1].Offset);
+        Assert.Equal("stopObjectCode", script.Instructions[^1].Operation);
+        var command = Assert.Single(script.Instructions, i => i.Operation == "saveLoadVars");
+        Assert.Contains("\"savegame.___\"", command.Operands);
+        Assert.Contains("strings, 0x09, 0x14; closeFile", command.Operands);
+    }
+
     private static SCUMMexplorer.Core.Domain.GameLibrary Game(string language)
     {
         var games = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games"));

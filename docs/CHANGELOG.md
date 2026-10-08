@@ -1,5 +1,9 @@
 # Changelog
 
+## 8 October: correct Room 70 save/load operand decoding
+
+Resolved both languages' apparent Room 70 local 203/204 truncations: the reader now consumes the nested `saveLoadVars` filename/range commands instead of interpreting their bytes as opcodes. Readable output retains those operands; native save-file I/O remains outside the bounded executor. Five local EGA comparison copies have identical helper bytes. All 67 focused Core checks pass; all-script formatting now reaches 1,426/1,427 English EGA, 1,419/1,419 Spanish EGA (four interior-resource read errors retained), and unchanged 1,470/1,470 VGA. [Focused evidence, resource boundaries and Rusty prerequisite trace](../.verification/final-gaps-20261008/README.md). The previous full replay audit was not rerun.
+
 ## 8 October: prepare the final-gap session
 
 Prepared a [detailed EGA/VGA gap dossier](loom/FINAL_GAPS_HANDOFF.md) with verified audit results, exact resource errors, Room 34 research, residual callback classifications, original-game comparison limits, completion criteria and conditional user needs. Replaced superseded live handoff status while preserving the previous file as a dated archive. Questions and work on the gaps are deferred to the requested next session. Documentation only; checked local evidence, paths and Markdown links; no runtime changes or test rerun.

@@ -6,6 +6,15 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class LoomScriptPresenterTests
 {
+    [Fact]
+    public void SaveLoadVariableCommandsKeepTheirFilenameAndRangesInReadableOutput()
+    {
+        var text = Present([0xA7, 0x02, 0x03, .. "savegame.___"u8.ToArray(), 0x00, 0x02, 0x09, 0x14, 0xFF, 0xA0]);
+
+        Assert.Contains("load variables (openFile, \"savegame.___\"; strings, 0x09, 0x14; closeFile)", text);
+        Assert.DoesNotContain("unresolved", text, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static string Present(byte[] code)
     {
         var decoded = LoomScriptDisassembler.Disassemble(code);

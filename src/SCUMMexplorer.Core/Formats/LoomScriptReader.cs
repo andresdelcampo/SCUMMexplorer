@@ -512,7 +512,7 @@ internal static class LoomScriptDisassembler
         if (opcode is 0x14 or 0x94 or 0xD8) return DecodePrint(cursor, opcode);
         if (opcode is 0x0C or 0x8C) return DecodeResourceRoutines(cursor);
         if (opcode is 0x5C or 0xDC) return DecodeOldRoomEffect(cursor);
-        if (opcode == 0xA7) return ("saveLoadVars", $"subopcode 0x{cursor.ReadByte():X2}");
+        if (opcode == 0xA7) return DecodeSaveLoadVars(cursor);
         if (opcode == 0xAB) return DecodeSaveRestoreVerbs(cursor);
         if (opcode is 0x1F or 0x5F or 0x9F or 0xDF) return DecodeActorInBox(cursor, opcode);
 
@@ -966,6 +966,32 @@ internal static class LoomScriptDisassembler
         var blue = ReadParam(cursor, 2, sub, 0x20);
         var next = cursor.ReadByte();
         return Join("setRgbRoomIntensity", prefix, blue, ReadParam(cursor, 1, next, 0x80), ReadParam(cursor, 1, next, 0x40));
+    }
+
+    // ScummVM v3 inherits o4_saveLoadVars. Its filename and range commands
+    // belong to this instruction; decoding them as opcodes creates false paths.
+    private static (string, string) DecodeSaveLoadVars(Cursor cursor)
+    {
+        var mode = cursor.ReadByte() == 1 ? "save" : "load";
+        var operations = new List<string>();
+        for (var count = 0; count < 128; count++)
+        {
+            var sub = cursor.ReadByte();
+            if (sub == 0) return ("saveLoadVars", Join(mode, $"[{string.Join("; ", operations)}]"));
+            var item = (sub & 0x1F) switch
+            {
+                0x01 => Join("variables", ReadResult(cursor), ReadResult(cursor)),
+                0x02 => Join("strings", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
+                0x03 => Join("openFile", ReadScummString(cursor)),
+                0x04 => "end",
+                0x1F => "closeFile",
+                _ => $"ignored subopcode 0x{sub:X2}"
+            };
+            operations.Add(item);
+            if ((sub & 0x1F) is 0x04 or 0x1F)
+                return ("saveLoadVars", Join(mode, $"[{string.Join("; ", operations)}]"));
+        }
+        throw new UnsupportedBytecodeException("saveLoadVars did not reach its terminator within 128 subcommands");
     }
 
     private static (string, string) DecodePrint(Cursor cursor, byte opcode)

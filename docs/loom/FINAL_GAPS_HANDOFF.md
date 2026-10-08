@@ -4,6 +4,8 @@ Prepared 8 October 2026, after local correctness-audit commit `62e1f43`. This se
 
 ## Established baseline
 
+**Investigation update, 8 October:** see the [focused follow-up](../../.verification/final-gaps-20261008/README.md). Room 70 locals 203/204 are now complete in both languages after correcting nested `saveLoadVars` operand decoding. Post-fix script counts are English 1,427/1,426 complete, Spanish 1,419/1,419 plus four read errors, and VGA 1,470/1,470. Global 0 and the four invalid Spanish entries are interior index entries; ScummVM refuses to run script 0. English Roland 116 is also an interior entry despite an accidentally complete decode and requires annotation protection. The raw EGA straw-look stall is explained by the missing Firewood prelude; the existing sequence followed by look completes Script 87 with 1/1 target boundaries. Room 34 remains unresolved: each edition's `+0035` site is now checked, and the native VGA actor-walking algorithm differs from the explorer's shared v3 implementation. The tables below preserve the original audit observations.
+
 | Area | Checked result | What it does not establish |
 | --- | --- | --- |
 | English EGA replay catalog | 328/328 recipes complete normally and with Escape; source-file hashes match | Reachability of uncatalogued source sites, every native route, or Spanish replay parity |
