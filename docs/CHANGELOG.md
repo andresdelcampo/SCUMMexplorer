@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current capability and remaining work are in [CURRENT_WORK](CURRENT_WORK.md) and [the live plan](LOOM_EGA_PLAN.md).
 
+## 8 October: qualify prepared VGA sky input after the source opening
+
+Two independent detached CD sessions play the source opening to Bobbin's Room 02 arrival (828,61), then use the disclosed staff/eight-note controls, one ordinary sky click and four note keys. Bobbin reaches (808,59), retains aim 81 with source distance zero, and dispatches 3A/3B: one balanced Opening scene and the fresh-state Closing refusal. All 24 input assertions pass. Earlier failed catalog-arrival packets remain failed; no earned-prerequisite, physical WPF, native-picture or listening claim. New probes have separate ignored build outputs. The live dossier now specifies the exact remaining original-game comparison phases and measurements. [Evidence and reproduction](../.verification/sky-input-20261008/README.md).
+
 ## 8 October: resolve Silence's source association and classify dynamic operands
 
 Each edition's Script 101 names Silence/Silencio and plays slot 12 through local 212/Script 23; its response word maps to 4E/4F, and Hetchel's reverse restores speech. Shaping's form-changing chain is correlated, but its canonical label and the reverse names remain uncertain. The 11/11/8 nonliteral first-operand call sites are classified as input dispatch, bounded loops or caller-selected helpers; no new engine defect is demonstrated. All 33 source assertions pass. Display names and runtime behavior remain unchanged; no native input or broad audit rerun. [Evidence and reproduction](../.verification/source-gaps-20261008/README.md).
