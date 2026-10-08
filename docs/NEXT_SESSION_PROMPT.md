@@ -4,6 +4,7 @@ State and evidence for the next session, updated 8 October 2026 after the Room 3
 
 ## Current entry points
 
+- [Staff/Room 17 source comparison](../.verification/staff-layout-20261008/README.md): the complete native `o5_verbOps` adjustment confirms the existing working VGA note alignment; 18 final assertions pass, original EGA/VGA buffer hashes restored, no retained runtime edit, clean rebuilt solution. Earlier partial-reference outputs are withdrawn. Room 17's EGA costume/pose/scale contracts are recorded without claiming native visual agreement.
 - [Room 34 state comparison](../.verification/room34-state-20261008/README.md): three-edition guards, flag/box/camera writers, source scheduling semantics, 24 passing prepared-state assertions, limitations and reproduction. Probe outputs are ignored under `out*/`.
 - [Supplied native session](../.verification/room34-state-20261008/NATIVE_SESSION.md): English Roland EGA, ScummVM 2.2.0, matching Room 34 resource; untouched existing slot 13 `Rusty`, exact save hash. One ordinary ground walk responded. Automated letters work but Enter does not; user corrected the shortcut to Ctrl+Alt+D and supplied screenshots of the requested queries. Active local 200: status 2/type 3, slot 4, native resource offset `0a127`; camera `(160,100)`; actor 1 `(148,90)`, box 2, settled; box 6 hidden `80`, boxes 7/8 enabled `00`; words 214/215/220 = 1923/34848/25089 (`0783/8820/6201` hex). D71/D7A/D6D/DC6/DC7/DCF are all zero. This sample is the early state; camera range and previous observed box are unread. Both save and console requests are fulfilled. Preserve the game/save and never infer a crossing from the Explorer trace.
 
@@ -20,6 +21,12 @@ State and evidence for the next session, updated 8 October 2026 after the Room 3
 The superseded handoff is preserved as [HANDOFF_2026-10-08_BEFORE_FINAL_GAPS.md](archive/HANDOFF_2026-10-08_BEFORE_FINAL_GAPS.md). Older handoffs and research remain records; statements such as "VGA step 3", "no full suite" and the old step-24 missing-feature list do not describe the current implementation.
 
 ## Verified state
+
+Local diagnostic commit `5b45fee` records the staff/Room 17 comparison and follow-up native input limit; it changes no runtime code. No push.
+
+The working staff alignment is preserved. ScummVM 2.2.0 `o5_verbOps` adjusts VGA note verbs 90..97 upward by 7/7/6/4/3/1/0/5 pixels before `drawVerbBitmap`; each supplied Script 18 note therefore ends at y=168. Do not remove this behavior by considering the drawing routine or raw script coordinates alone. The final 18-check source/artwork harness passes; it shares resource decoding and is not a full native renderer capture. The experimental runtime patch and incorrect regression were withdrawn, and the original application rebuilt cleanly. Room 17 source adds no reason to change EGA actor scaling; native pose/bounds comparison remains open.
+
+The continuation inspected the submitted native console results and tried one Escape to close it before an ordinary route. Escape was ignored; the console remains open. No walk, room change, slot reload or new debugger query was performed. The exact save hash still matches the recorded original. Both prior user requests are fulfilled; do not repeat failed automated keys or ask for a new save/whole-game replay. A future short route requires the console to be closed through working input first.
 
 Room 34 source comparison: after its initial entry gate, local 200 starts only when late/completion/input are all zero: English EGA D7A/DCF/D6D, Spanish D7B/DD0/D6E, VGA 01B/070/00E. That early branch hides box 6. Script 85 +000A stops 200 before +000C marks completion. Late Room 46 entry sets the late flag; global 97 return hides 6 and locks the EGA camera to 160 while the ghost flag is clear. Global 98's ghost conversation opens the camera and boxes 10/11, reloads 34 enabling 6, but never restarts 200 or clears completion. Bones/local 209 restoration enables 6 after the monitor is absent. Literal-reference scans do not exhaust aliases or dynamic callers; no dead-code proof.
 

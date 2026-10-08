@@ -94,6 +94,8 @@ The earlier timeouts that completed at the longer bound are not remaining failur
 
 ## 4. Original-game visual, input and audio comparison
 
+**Targeted source follow-up (8 October).** [Staff/Room 17 comparison](../../.verification/staff-layout-20261008/README.md) confirms the existing working VGA note placement through the complete native path: `o5_verbOps` first moves note verbs 90..97 upward by 7/7/6/4/3/1/0/5 pixels, then the drawing routine retains those adjusted coordinates. Raw Script 18 coordinates or `drawVerbBitmap` alone are an incomplete reference. An experimental contrary patch was withdrawn; all 18 final source/artwork assertions pass, original EGA/VGA hashes are restored, and the original application is rebuilt. This is not an independent native renderer capture, so the perceptual limitation below remains. Room 17 EGA source keeps actor scale 255 and derives its own costume/animation choices; native visual bounds remain unmeasured. No production correction is retained.
+
 Automated coverage verifies bounded execution and presentation paths; it does not settle the remaining perceptual checks. The existing plan records these user-viewing items:
 
 - Room 43 staff scenes; El Muerto and Room 17 actor sizes; actor 4 placement. These are prior open checks, not newly reproduced regressions.
