@@ -37,10 +37,10 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 **2. Needs the user (on-screen or ScummVM checks)**
 - Staff scenes in Room 43, El Muerto and Room 17 sizes, actor 4 placement.
 - Draft verbs: confirm on screen that they show their text and animation (M4 runs them through the game's scripts; the draft table is a seeded estimate until each draft is learnt through a route).
-- Room 34 local200 +0035: reachability unresolved. The save, console assist and manual close are fulfilled; the user reports returning to Room 34, but stopped Computer Use before a new capture/walk. Await their direct request to resume before the short ordinary walk. Unused code remains a hypothesis (see the final-gap dossier).
+- Room 34 local200 +0035: reachability unresolved and investigation parked by the user. Save, console and close assists are fulfilled. No further native route is pending under the current scope; unused code remains a hypothesis. The separate closed-portal bug was fixed in `ebdf3b2`.
 
 **3. Evidence-bound polish** (only when it changes what the user sees)
-- Draft names: Silence (0x4E/0x4F) and Shaping (0x50/0x51) follow the manual order; Sharpening's two verbs are not told apart. Verb labels outside known ranges show as `Verb 0x..`. M5 will expose these gaps.
+- Draft names: Silence (0x4E/0x4F) and Shaping (0x50/0x51) retain their uncertain associations. Sharpening / Blunting is now distinguished through the Room 41 EGA text and the corresponding VGA callbacks. [Source/input evidence](../.verification/draft-input-20261008/README.md). Verb labels outside known ranges show as `Verb 0x..`.
 - Glossary growth: story bits not set by a catalog scene show as `bit[0x...]`; actor names are scoped by scene; "Used by" lists literal references only; some operations keep a raw line in the readable view.
 - 17 gallery costumes point at no data (no script uses them).
 - Stored-text coverage: Room 70 locals 203 and 204 now decode completely; unreachable code is not exhaustively scanned for strings.
@@ -151,3 +151,7 @@ Status words: `verified` means source-backed and demonstrated in the app; `previ
 - [Object states](engine/SCUMM_OBJECT_STATES.md): the rendering and state contract.
 - [Harness review](archive/HARNESS_REVIEW_2026-10-04.md): what passes, what is stale, what can go.
 - Historical: [research](engine/RESEARCH.md) (23 Sep), [script coverage](archive/LOOM_SCRIPT_COVERAGE.md) (25 Sep), [exploration audit](archive/EXPLORATION_AUDIT.md) (25–26 Sep), [rendering and Indy3 audit](archive/AUDIT_2026-09-27.md) (27 Sep), [cutscene discovery](loom/LOOM_CUTSCENE_DISCOVERY.md), [readable scripts plan](archive/READABLE_SCRIPTS_PLAN.md).
+
+## Autonomous source/input checkpoint — 8 October 2026
+
+The standalone Room 34 fortress reveal is parked at the user's request; the separately committed portal fix `ebdf3b2` is the current baseline. No native interaction resumed. The [draft checkpoint](../.verification/draft-input-20261008/README.md) verifies six forward/reverse casts through actual Explorer note input on source-selected Room 04 targets across English EGA, Spanish EGA and VGA. Staff/eight-note settings and catalog arrival are explicit preparation; no story or placement edits. Source text now identifies EGA 4B as Blunting; the corresponding display label is updated and all three real Game Status renders inspected. Clean build, no broad rerun. The VGA Room 02 sky attempt remains unqualified. Original-game actor/staff, casting-route and audiovisual comparisons remain open; no new runtime defect was established.

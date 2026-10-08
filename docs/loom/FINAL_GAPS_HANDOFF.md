@@ -118,7 +118,7 @@ These remain in the plan/script map, but must be checked against current code be
 
 | Item | Established limit and next-session treatment |
 | --- | --- |
-| Silence (`4E`/`4F`), Shaping (`50`/`51`), Sharpening direction (`4A`/`4B`) | The [script map](LOOM_SCRIPT_MAP.md) records manual-order or text-based readings and unresolved direction. Compare each edition's own text/actions and authentic supporting material before strengthening labels. |
+| Silence (`4E`/`4F`), Shaping (`50`/`51`), Sharpening direction (`4A`/`4B`) | Silence/Shaping's stronger source names remain uncertain. The [draft checkpoint](../../.verification/draft-input-20261008/README.md) resolves EGA 4B as Blunting through its zero-argument Room 41 text; VGA retains the corresponding callbacks with shorter dialogue. Six prepared real-note-input casts pass. Original-game visual/casting-route limits remain. |
 | Numeric story bits and actor roles | Unknown meanings remain numeric; actor identities stay scene-scoped. Extend the glossary only where own code/text establishes a visible improvement, with fingerprint guards. |
 | Used by / Explore links | Literal references are candidates. Dynamic script/current-room targets remain unresolved; a title does not make a static link proof of execution. |
 | 17 EGA costume gallery entries without data | Previously recorded as unused by scripts. Recheck references if relevant; do not synthesize missing artwork or call empty index entries decoding failures without evidence. |

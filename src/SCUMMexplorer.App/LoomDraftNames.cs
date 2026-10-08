@@ -30,8 +30,10 @@ internal static class LoomDraftNames
         (0x47, 0x48, "Invisibility"),
         // Room 24 "ovejas" 0x49: "Son demasiado listas para asustarse tan facilmente"; Room 23 "pastores" and Room 28 dragons start fear scripts.
         (0x49, 0, "Terror"),
-        // Room 41 "espada" (sword): 0x4A / 0x4B (the only objects with them). Reading: no text says which direction is which.
-        (0x4A, 0x4B, "Sharpening"),
+        // Room 41 sword 0x4B starts local 204 [0] in each edition. EGA's zero branch explicitly says the edge
+        // was blunted (English +0x00F6, Spanish +0x00F9); 0x4A starts refusal local 205. The CD edition preserves
+        // these distinct callbacks but shortens their dialogue. See .verification/draft-input-20261008/README.md.
+        (0x4A, 0x4B, "Sharpening / Blunting"),
         // Room 34 Rusty 0x4C: "Yech. Ahora no quiero parecerme a el."; "chico" 0x4C starts local 202, the only writer of the ego costume 0x67 (a disguise). Swapped with Healing on 3 October.
         (0x4C, 0, "Reflection"),
         // Room 26 "pastores" 0x4D starts script 202 (the shepherds healed, seen in play); Room 09 Hetchel: "Eso no ayudo. Debe estar bajo la influencia de algun hechizo."

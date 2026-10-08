@@ -35,3 +35,7 @@ Interface (3 October). Technical text (traces, assumptions, raw bytecode, source
 Testing. Run only the checks a change needs (filtered unit tests; UiShots, SceneShots or StatusShots for UI); the user retests at the end. The 4 and 8 October full runs were requested audits. Do not delete `%LOCALAPPDATA%\SCUMMexplorer` (saved game state) after harness runs unless asked.
 
 Workflow. Commit each finished task separately, no push. Another session may work in the same tree: stage files by explicit path. Ask before editing CLAUDE.md.
+
+## Autonomous draft/source checkpoint — 8 October 2026
+
+The user parked the standalone Room 34 fortress reveal. Portal fix `ebdf3b2` is the current baseline. The [draft/source checkpoint](../.verification/draft-input-20261008/README.md) verifies six forward/reverse casts through the actual Explorer note-input scripts on Room 04 targets across English EGA, Spanish EGA and VGA, with explicit catalog/staff/eight-note setup. EGA Room 41 text establishes 4B as Blunting; the corresponding display label now reads Sharpening / Blunting. Three profile-free Game Status renders were inspected; the solution builds cleanly. No native takeover, story/placement changes, broad rerun or new runtime defect. Original-game visual/listening checks remain open. The separate VGA Room 02 sky attempt was rejected by the source aim guard and remains unqualified.
