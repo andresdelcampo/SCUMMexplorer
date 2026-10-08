@@ -1,5 +1,11 @@
 # Changelog
 
+## 8 October: trace Room 34 state and Rusty's camera prerequisite
+
+Compared English EGA, Spanish EGA and VGA entry guards, literal flag writers and box/camera helpers. Script 85 stops the crossing monitor before marking it complete; the late ghost conversation opens the camera range and boxes 10/11 without restarting it. A prepared English EGA source Room 46 return reproduces the camera lock, then a ghost conversation permits an eastward public walk. Box 6 becomes enabled after the monitor has been stopped or skipped. All 24 focused source/state diagnostic assertions pass; clean solution build. This is a source-supported candidate explanation for the user's caveated debugger observation, not its confirmed state or dead-code proof. No production change or broad suite rerun. [Evidence, edition mappings, limits and reproduction](../.verification/room34-state-20261008/README.md).
+
+The user subsequently supplied existing slot 13 `Rusty` and a running English Roland EGA ScummVM 2.2.0 session. Its Room 34 resource matches the source packet. A short ground walk responds, but automated Enter does not submit debugger queries; native state readings are pending, with a small console assist requested. Save/configuration remain untouched. [Native identity, exact limits and pending queries](../.verification/room34-state-20261008/NATIVE_SESSION.md).
+
 ## 8 October: use native v4 walking for VGA
 
 VGA now uses its own source-derived gate selection, fixed-point movement and direction interpolation; EGA keeps its v3 walker. All 11 bounded kinematic traces match unchanged ScummVM 2.2.0 C++ method bodies frame for frame. The actual Room 46 return and a live Room 34 monitor trace still do not establish the crossing: the former skips the monitor in its entry state, and the latter reads previous box 7 when current box becomes 8. The picker retains an unresolved note without claiming every native frame must visit one neighbour. Validation: 51 focused Core tests, 30 real WPF assertions, clean build; 222/223 VGA groups complete normally and with Escape, with Room 34 still the sole `no-scene` group. [Reference, traces, limits and reproduction](../.verification/native-walk-20261008/README.md). No full EGA/Core audit rerun or push.
