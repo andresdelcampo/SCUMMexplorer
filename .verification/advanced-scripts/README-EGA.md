@@ -1,5 +1,7 @@
 # EGA reverse annotations, 8 October 2026
 
+**Later boundary correction:** the [final-gap investigation](../final-gaps-20261008/README.md) establishes that English Roland 116 points 48 bytes into Script 114 despite decoding completely. Reviewed labels now exclude interior resource entries even when the instruction fingerprint matches. Current accepted counts are **115 English Roland / 113 Spanish**; the 229 historical review records below remain intact. Advanced retains the numeric interior entry, original decode and containing-resource note. The original review/counts below describe the earlier check.
+
 The VGA review supplied the starting point for an individual review of the English and Spanish EGA globals. English EGA grows from **46 to 116 titled globals**: 70 additional titles, plus fuller existing titles for 90/99. All **113 valid Spanish globals** are titled too. The [complete EGA table](REVIEW-EGA.md) includes instruction counts and sources. This changes Advanced presentation; no interpreter or gameplay behavior is changed.
 
 `loom-ega-reviewed-glossary.json` contains 229 review records (116 English, 113 Spanish), accepted only when the game's decoded operation/operand fingerprint matches. Each valid global has its own EGA source references. Matching the CD's script number alone never imports a label. The common review reader retains the CD manifest and behavior.

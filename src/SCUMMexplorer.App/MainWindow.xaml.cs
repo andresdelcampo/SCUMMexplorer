@@ -890,6 +890,10 @@ public partial class MainWindow : Window
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
             ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : "Reading DOS LOOM old-v3 bytecode…";
+            var interior = _game is { Id: GameId.Loom } egaGame
+                ? new LflResourceChain().FindLeftover(egaGame, resource) : null;
+            var boundaryNote = interior is null ? "" : interior.Describe() +
+                " This entry does not establish a standalone script.\n";
             try
             {
                 var disassembly = _game?.Id == GameId.LoomVga && _cdData is not null
@@ -906,7 +910,7 @@ public partial class MainWindow : Window
                     .Cast<LoomScriptEvent>()
                     .ToArray();
                 ShowScriptEvents(ScriptEventButtons, events);
-                ScriptNote.Text = $"Control-flow decode: {disassembly.DecodedBytes}/{disassembly.CodeLength} resource bytes, " +
+                ScriptNote.Text = boundaryNote + $"Control-flow decode: {disassembly.DecodedBytes}/{disassembly.CodeLength} resource bytes, " +
                     $"{disassembly.Issues?.Count ?? 0} unresolved paths. Event links are static candidates; branch choices and script order are not executed in this view.";
                 StatusText.Text = $"{resource.Name} · {disassembly.Instructions.Count} instructions · " +
                     $"{disassembly.Issues?.Count ?? 0} decode issues";
@@ -915,7 +919,7 @@ public partial class MainWindow : Window
             {
                 _scriptShown = null;
                 ScriptPlayButton.Visibility = Visibility.Collapsed;
-                ScriptNote.Text = "This indexed script resource could not be decoded.";
+                ScriptNote.Text = boundaryNote + "This indexed script resource could not be decoded.";
                 ScriptOutput.Text = ex.Message;
                 StatusText.Text = $"{resource.Name} · bytecode unavailable";
             }

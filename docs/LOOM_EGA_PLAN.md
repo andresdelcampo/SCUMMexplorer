@@ -10,7 +10,7 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 
 ## What is really left for LOOM EGA
 
-**Final-gap investigation (8 October):** Room 70's apparent truncations were a `saveLoadVars` operand-decoding defect, now fixed in both languages. Resource-chain comparisons classify the suspicious globals as interior index entries, including English Roland 116 (its annotation still needs protection). The EGA straw look completes after the existing Firewood sequence; its raw stall is a prerequisite diagnostic. Room 34 remains open, with a newly identified native VGA/v3 walking-model difference to compare. [Focused evidence](../.verification/final-gaps-20261008/README.md); 67 focused Core checks and refreshed all-script coverage, with the old full replay audit retained as baseline.
+**Final-gap investigation (8 October):** Room 70's apparent truncations were a `saveLoadVars` operand-decoding defect, fixed in both languages (local commit `d873d31`). Suspicious globals are interior index entries; reviewed labels now exclude those entries even when their fingerprints match, leaving 115 English Roland / 113 Spanish standalone titles. Advanced retains numeric interior entries and their raw diagnostics. The EGA straw look completes after Firewood; Room 20 completes with an explicit object walk-point estimate; VGA Room 64/93 raw cases are entry-input overlaps or ordinary non-scene responses. Room 34 remains open, with a concrete native VGA/v3 walking-model difference to compare. [Focused evidence](../.verification/final-gaps-20261008/README.md): 67 operand-fix Core checks, 25 boundary-review Core checks, 13 WPF assertions, clean build and refreshed script coverage. The old full replay audit remains the baseline.
 
 **Next session prepared (8 October):** the [final-gap dossier](loom/FINAL_GAPS_HANDOFF.md) details the known source/probe evidence, competing explanations, focused investigation order, completion criteria and possible user help for each remaining correctness gap. Initial resource comparisons and source/trace work can use the local files. The user's explanation and any save/viewing/listening requests belong to the next session. The previous handoff is preserved as a dated archive; preparation makes no runtime changes.
 
@@ -33,7 +33,7 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 - Draft names: Silence (0x4E/0x4F) and Shaping (0x50/0x51) follow the manual order; Sharpening's two verbs are not told apart. Verb labels outside known ranges show as `Verb 0x..`. M5 will expose these gaps.
 - Glossary growth: story bits not set by a catalog scene show as `bit[0x...]`; actor names are scoped by scene; "Used by" lists literal references only; some operations keep a raw line in the readable view.
 - 17 gallery costumes point at no data (no script uses them).
-- Stored-text coverage: Room 70 locals 203 and 204 are truncated; unreachable code is not scanned.
+- Stored-text coverage: Room 70 locals 203 and 204 now decode completely; unreachable code is not exhaustively scanned for strings.
 - Engine gaps, only if a route needs them: `stopObjectScript`, inventory object code, `killScriptsAndResources` ending other room-owned scripts at a room load; the Room 69 difficulty and draft answer are assumed, not simulated; the Room 03 town and cemetery labels are unidentified.
 
 **4. Housekeeping**

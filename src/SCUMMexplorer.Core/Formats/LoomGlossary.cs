@@ -79,7 +79,7 @@ public sealed partial class LoomGlossary
             if (!demo)
             {
                 glossary._bitShift = LoomStoryEvents.FirstBitFor(game) - LoomStoryEvents.FirstBit;
-                glossary.ReadEgaReviewedNames(ScummDataSources.For(game));
+                glossary.ReadEgaReviewedNames(game);
             }
         }
         if (cd) glossary.ReadCdNames(game!);

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Formats;
 
@@ -16,9 +17,16 @@ public sealed partial class LoomGlossary
     // Each edition must match its reviewed instructions before receiving labels; a matching script ID is not enough.
     private void ReadCdReviewedNames(IScummDataSource data) => ReadReviewedNames(data, "loom-cd-glossary.json", false);
 
-    private void ReadEgaReviewedNames(IScummDataSource data) => ReadReviewedNames(data, "loom-ega-reviewed-glossary.json", true);
+    private void ReadEgaReviewedNames(GameLibrary game)
+    {
+        var chain = new LflResourceChain();
+        var interior = game.Resources.Where(r => r.Kind == ResourceKind.Script && r.ResourceId.HasValue &&
+                                                 chain.FindLeftover(game, r) is not null)
+            .Select(r => r.ResourceId!.Value).ToHashSet();
+        ReadReviewedNames(ScummDataSources.For(game), "loom-ega-reviewed-glossary.json", true, interior);
+    }
 
-    private void ReadReviewedNames(IScummDataSource data, string resource, bool ega)
+    private void ReadReviewedNames(IScummDataSource data, string resource, bool ega, IReadOnlySet<int>? interior = null)
     {
         using var stream = typeof(LoomGlossary).Assembly.GetManifestResourceStream("SCUMMexplorer.Core." + resource)
             ?? throw new InvalidOperationException("The script glossary review is missing from the assembly.");
@@ -27,7 +35,9 @@ public sealed partial class LoomGlossary
         var applied = new HashSet<int>();
         foreach (var row in reviewed.OrderBy(row => ega && row.Edition == (_bitShift == 0 ? "Spanish EGA" : "English EGA") ? 0 : 1))
         {
-            if (applied.Contains(row.Id)) continue;
+            // Bytes inside another resource can accidentally decode completely and
+            // match a review fingerprint. They do not establish a standalone script.
+            if (applied.Contains(row.Id) || interior?.Contains(row.Id) == true) continue;
             if (!scripts.TryGetValue(row.Id, out var script))
             {
                 try { script = data.GlobalScript(row.Id); }

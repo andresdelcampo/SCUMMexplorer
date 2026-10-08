@@ -60,6 +60,41 @@ if (args.Length > 1 && args[1] == "entry-callbacks")
     return;
 }
 
+if (args.Length > 1 && args[1] == "room20-placement")
+{
+    var rows = new List<object>();
+    foreach (var (name, folder) in new[] { editions[0], editions[^1] })
+    {
+        var game = new GameFolderScanner().Scan(folder);
+        var data = ScummDataSources.For(game);
+        foreach (var obj in game.Id == GameId.Loom ? new[] { 390, 391 } : new[] { 315, 316 })
+        {
+            var record = data.ReadRoom(20).Objects.Single(o => o.Id == obj);
+            var s = new LoomExplorationSession(game, game.Vga?.ReadIndexedObjects() ??
+                new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")), completeBoot: game.Id == GameId.Loom);
+            s.VisitRoomById(20);
+            for (var entryFrame = 0; entryFrame < 6000 && Prop(s, "StatusEditable") is not true; entryFrame++) s.AdvanceFrame();
+            if (Prop(s, "StatusEditable") is not true) throw new InvalidDataException("Room 20 entry never becomes editable; no placement applied.");
+            s.PlaceEgo(record.WalkX, record.WalkY); // Explicit source-derived preview estimate.
+            var marker = s.SessionTrace.Count;
+            var starts = s.CutscenesBegun;
+            s.ActivateObjectVerb(obj, 0x48);
+            var quiet = 0; var frames = 0;
+            for (; frames < 6000 && quiet < 90; frames++)
+            {
+                s.AdvanceFrame();
+                quiet = s.InCutscene || s.Messages.HaveMsg != 0 || s.EgoMoving || s.CameraMoving ? 0 : quiet + 1;
+            }
+            var boundaries = s.SessionTrace.Skip(marker).Where(t => t.StartsWith("cutscene at ") || t.StartsWith("endCutscene at ")).ToArray();
+            rows.Add(new { name, obj, record.WalkX, record.WalkY, estimate = "placement at the triggering object's own walk point",
+                frames, starts = s.CutscenesBegun - starts, ends = boundaries.Count(t => t.StartsWith("endCutscene at ")), s.InCutscene, boundaries });
+            Console.WriteLine($"{name} Room 20/{obj}: {s.CutscenesBegun-starts} starts / {boundaries.Count(t => t.StartsWith("endCutscene at "))} ends; open {s.InCutscene}");
+        }
+    }
+    Save("room20-placement", rows);
+    return;
+}
+
 foreach (var (name, folder) in editions.Where(_ => args.Length == 1))
 {
     var game = new GameFolderScanner().Scan(folder);
@@ -90,7 +125,26 @@ foreach (var (name, folder) in editions.Where(_ => args.Length == 1))
             .Select(i => new { b.Place, i.Offset, i.Operation, i.Operands })).ToArray()
     });
     var room34 = data.ReadRoom(34);
+    object source34;
+    if (game.Vga is { } vga)
+    {
+        var room = vga.Rooms.Single(r => r.Number == 34);
+        var decoded = ((byte[])Field(vga, "_lec")!).AsSpan(room.Offset, room.Length).ToArray();
+        source34 = new { container = "DISK01.LEC", room.Offset, room.Length, decodedSha256 = Hash(decoded),
+            encodedSha256 = Hash(decoded.Select(b => (byte)(b ^ 0x69)).ToArray()),
+            scripts = vga.ReadScripts(34).Where(s => s.Kind is "EN" or "EX" || s.Number == 200)
+                .Select(s => new { s.Kind, s.Number, s.BlockOffset, length = s.Code.Length, sha256 = Hash(s.Code) }).ToArray() };
+    }
+    else
+    {
+        var r = game.Rooms.Single(r => r.ResourceId == 34);
+        var encoded = File.ReadAllBytes(r.FilePath);
+        var decoded = LflEncoding.DecodeXorFF(encoded);
+        source34 = new { container = "34.LFL", encodedSha256 = Hash(encoded), decodedSha256 = Hash(decoded),
+            local200Sha256 = Hash(decoded.AsSpan(data.RoomLocalScript(34, 200)!.ResourceOffset, data.RoomLocalScript(34, 200)!.CodeLength).ToArray()) };
+    }
     Save(name + "-room34", new { room34.Width, room34.Height, room34.Objects, room34.WalkBoxes,
+        source34,
         names = room34.ObjectNames.ToDictionary(p => p.Key, p => System.Text.Encoding.Latin1.GetString(p.Value)) });
     foreach (var room in new[] { 37, 38, 46 })
     {

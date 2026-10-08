@@ -1,5 +1,9 @@
 # Changelog
 
+## 8 October: guard EGA reviewed names with resource boundaries
+
+English Roland index entry 116 points into Script 114 but happens to decode completely. Reviewed EGA titles and scoped names now exclude interior resource entries even when their instruction fingerprint matches; historical review records are preserved. Advanced keeps numeric interior entries, raw decode/length diagnostics and a containing-resource note. Current standalone title counts: 115 English, 113 Spanish, 122 VGA. All 25 focused Core checks and 13 real WPF assertions pass; clean solution build. The focused traces also classify the residual Room 20 callbacks (explicit object walk-point estimate), EGA straw look (Firewood prerequisite) and VGA Room 64/93 callbacks (entry-input overlap or ordinary non-scene response). [Evidence and reproduction](../.verification/final-gaps-20261008/README.md). Room 34 and independent original-game comparisons remain open; no full replay rerun or push.
+
 ## 8 October: correct Room 70 save/load operand decoding
 
 Resolved both languages' apparent Room 70 local 203/204 truncations: the reader now consumes the nested `saveLoadVars` filename/range commands instead of interpreting their bytes as opcodes. Readable output retains those operands; native save-file I/O remains outside the bounded executor. Five local EGA comparison copies have identical helper bytes. All 67 focused Core checks pass; all-script formatting now reaches 1,426/1,427 English EGA, 1,419/1,419 Spanish EGA (four interior-resource read errors retained), and unchanged 1,470/1,470 VGA. [Focused evidence, resource boundaries and Rusty prerequisite trace](../.verification/final-gaps-20261008/README.md). The previous full replay audit was not rerun.

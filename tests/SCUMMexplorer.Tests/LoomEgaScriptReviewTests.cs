@@ -34,14 +34,17 @@ public sealed class LoomEgaScriptReviewTests
     }
 
     [Theory]
-    [InlineData("en", 116)]
+    [InlineData("en", 115)]
     [InlineData("es", 113)]
-    public void EveryVerifiedEgaGlobalHasItsOwnReviewedTitle(string language, int expected)
+    public void EveryStandaloneCompleteEgaGlobalHasItsOwnReviewedTitle(string language, int expected)
     {
         var game = Game(language); var data = ScummDataSources.For(game); var glossary = LoomGlossary.Load(game);
         var valid = new List<int>();
+        var chain = new LflResourceChain();
         foreach (var id in data.GlobalScriptIds())
         {
+            var resource = game.Resources.Single(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && r.ResourceId == id);
+            if (chain.FindLeftover(game, resource) is not null) { Assert.Null(glossary.Script(id)); continue; }
             LoomScriptDisassembly? code;
             try { code = data.GlobalScript(id); }
             catch (InvalidDataException) { Assert.Null(glossary.Script(id)); continue; }
@@ -57,6 +60,19 @@ public sealed class LoomEgaScriptReviewTests
         Assert.Null(glossary.Script(200));
         Assert.Equal("check whether draft N is learned", glossary.Script(24)!.Name);
         Assert.Equal("restore an actor's palette", glossary.Script(33)!.Name);
+    }
+
+    [Fact]
+    public void AnInteriorIndexEntryGetsNoReviewedTitleEvenIfItsBytesDecodeCompletely()
+    {
+        var game = Game("en");
+        var resource = game.Resources.Single(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && r.ResourceId == 116);
+        var leftover = Assert.IsType<LflLeftoverIndexEntry>(new LflResourceChain().FindLeftover(game, resource));
+
+        Assert.Equal(114, leftover.Owner!.ResourceId);
+        Assert.Equal(48, resource.Offset!.Value - leftover.Container.Start);
+        Assert.True(ScummDataSources.For(game).GlobalScript(116)!.HasCompleteControlFlow);
+        Assert.Null(LoomGlossary.Load(game).Script(116));
     }
 
     [Theory]
