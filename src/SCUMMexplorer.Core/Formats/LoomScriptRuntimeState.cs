@@ -7,11 +7,12 @@ public sealed class LoomScriptRuntimeState
 {
     public LoomScriptRuntimeState(IReadOnlyDictionary<int, byte> initialStates,
         IReadOnlyDictionary<int, byte>? initialOwners = null,
-        IReadOnlyDictionary<int, uint>? initialClasses = null)
+        IReadOnlyDictionary<int, uint>? initialClasses = null, bool useV4Walking = false)
     {
         ObjectStates = new Dictionary<int, byte>(initialStates);
         ObjectOwners = initialOwners is null ? [] : new Dictionary<int, byte>(initialOwners);
         ObjectClasses = initialClasses is null ? [] : new Dictionary<int, uint>(initialClasses);
+        Actors = new LoomActorTable(useV4Walking);
         Actors.NativeMutation = NotifyNativeMutation;
         Messages.NativeMutation = () => NotifyNativeMutation("message");
         Camera.NativeMutation = () => NotifyNativeMutation("camera");
@@ -178,7 +179,7 @@ public sealed class LoomScriptRuntimeState
     /// <summary>Why the current room's box flags are unknown (a <c>setBoxFlags</c> with an unknown box), or null.</summary>
     public string? WalkBoxFlagsUnknown { get; set; }
     /// <summary>Actor rooms, positions and walk boxes as reached code left them.</summary>
-    public LoomActorTable Actors { get; } = new();
+    public LoomActorTable Actors { get; }
     /// <summary>The camera's mode, followed actor and destination (its x is <c>var[0x002]</c>).</summary>
     public LoomCamera Camera { get; } = new();
     /// <summary>The stored name of an object of the current room (text code 6), or null; set by the session at each room entry.</summary>

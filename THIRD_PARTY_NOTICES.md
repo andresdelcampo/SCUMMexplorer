@@ -20,6 +20,13 @@ The AdLib event decoder is also based on the behavior documented by ScummVM's
 
 The GNU GPL version 3 is included in [licenses/GPL-3.0.txt](licenses/GPL-3.0.txt).
 
+The separate VGA/v4 actor walker in `src/SCUMMexplorer.Core/Formats/LoomActors.V4.cs`
+adapts ScummVM 2.2.0's [actor.cpp](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/actor.cpp)
+and [boxes.cpp](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/boxes.cpp),
+copyright the ScummVM contributors, licensed under GPL-2.0-or-later. The diagnostic
+native-walk harness extracts unchanged method bodies from a local copy of those
+files; generated source and binaries are not shipped.
+
 ## NukedOPL3Sharp 1.3.1
 
 The AdLib synthesizer uses NukedOPL3Sharp, copyright 2025-2026 Stefan Hueg and

@@ -139,7 +139,8 @@ public sealed partial class LoomExplorationSession
             return lifetime;
         });
         _data = data ?? ScummDataSources.For(game);
-        _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes)
+        _runtime = new LoomScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes,
+            useV4Walking: game.Id == GameId.LoomVga)
         {
             Random = new LoomSeededRandom(randomSeed),
             MutationObserver = observer

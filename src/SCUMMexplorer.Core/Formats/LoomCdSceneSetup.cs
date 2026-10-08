@@ -542,7 +542,8 @@ public sealed partial class LoomCdSceneSetupPlanner
             }).ToList();
             writerNotes.Add($"{g.Subject} = {wanted} is assigned by " + (all.Count == 0 ? "no code at all" : string.Join(", ", all)));
         }
-        // A monitor that wants the ego to change from one box straight into another that is not its neighbour is not met by walking.
+        // The matrix describes an intervening box, not every possible per-frame sample.
+        // Native v4 can finish multiple short legs in a frame. Keep failed trials unresolved.
         var gaps = new List<string>();
         if (probe.CurrentWalkBoxes is { } boxSet)
             foreach (var from in boxes) foreach (var to in boxes.Where(b => b.Box > from.Box))
@@ -555,7 +556,7 @@ public sealed partial class LoomCdSceneSetupPlanner
                     route.Add(next);
                 }
                 if (route.Count > 2 && route[^1] == to.Box)
-                    gaps.Add($"boxes {from.Box} and {to.Box} are not neighbours (a walk between them passes box {string.Join(", ", route.Skip(1).SkipLast(1))}), so a walking ego changes box one neighbour at a time and the code's one-frame change between them needs a script that places the ego");
+                    gaps.Add($"boxes {from.Box} and {to.Box} are not neighbours (the decoded route passes box {string.Join(", ", route.Skip(1).SkipLast(1))}); these trials did not reproduce the required one-frame sample change, and the original-game trigger remains unresolved");
             }
         var unmetText = unmet.Where(x => x.v != LoomCdGuardVerdict.Satisfied).Select(x => x.g).DistinctBy(g => (g.Script, g.Offset)).Take(6).ToList();
         return new([], [], [$"Not started from the fresh state, and no derived setup began it ({trials} headless trials). The code's tests it fails or cannot read here: " +

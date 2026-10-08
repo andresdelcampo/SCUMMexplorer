@@ -1,5 +1,9 @@
 # Changelog
 
+## 8 October: use native v4 walking for VGA
+
+VGA now uses its own source-derived gate selection, fixed-point movement and direction interpolation; EGA keeps its v3 walker. All 11 bounded kinematic traces match unchanged ScummVM 2.2.0 C++ method bodies frame for frame. The actual Room 46 return and a live Room 34 monitor trace still do not establish the crossing: the former skips the monitor in its entry state, and the latter reads previous box 7 when current box becomes 8. The picker retains an unresolved note without claiming every native frame must visit one neighbour. Validation: 51 focused Core tests, 30 real WPF assertions, clean build; 222/223 VGA groups complete normally and with Escape, with Room 34 still the sole `no-scene` group. [Reference, traces, limits and reproduction](../.verification/native-walk-20261008/README.md). No full EGA/Core audit rerun or push.
+
 ## 8 October: guard EGA reviewed names with resource boundaries
 
 English Roland index entry 116 points into Script 114 but happens to decode completely. Reviewed EGA titles and scoped names now exclude interior resource entries even when their instruction fingerprint matches; historical review records are preserved. Advanced keeps numeric interior entries, raw decode/length diagnostics and a containing-resource note. Current standalone title counts: 115 English, 113 Spanish, 122 VGA. All 25 focused Core checks and 13 real WPF assertions pass; clean solution build. The focused traces also classify the residual Room 20 callbacks (explicit object walk-point estimate), EGA straw look (Firewood prerequisite) and VGA Room 64/93 callbacks (entry-input overlap or ordinary non-scene response). [Evidence and reproduction](../.verification/final-gaps-20261008/README.md). Room 34 and independent original-game comparisons remain open; no full replay rerun or push.

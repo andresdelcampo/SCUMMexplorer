@@ -51,8 +51,9 @@ public sealed record LoomActorLook(int? Costume, int? Elevation, int? Facing, in
 /// frame (<c>walkActor</c>, see <see cref="StepWalks"/>); only a walk from an
 /// unknown start is taken to end at its destination at once, labelled as an estimate.
 /// </summary>
-public sealed class LoomActorTable
+public sealed partial class LoomActorTable(bool useV4Walking = false)
 {
+    private readonly bool _useV4Walking = useV4Walking;
     /// <summary>ScummVM <c>_numActors</c> for this release family; actor 0 is not valid for scripts.</summary>
     public const int Count = 13;
     /// <summary>ScummVM <c>kObjectClassPlayer</c>: <c>Actor::isPlayer</c> for v3.</summary>
@@ -565,8 +566,8 @@ public sealed class LoomActorTable
     public const int MoveNewLeg = 1, MoveInLeg = 2, MoveTurn = 4, MoveLastLeg = 8;
 
     /// <summary>
-    /// ScummVM <c>walkActors</c> for one frame: <c>Actor_v3::walkActor</c> for every actor in the current room, in
-    /// actor order. A walk goes box by box (<c>getNextBox</c>, <c>findPathTowardsOld</c>'s gates), each leg with
+    /// ScummVM <c>walkActors</c> for one frame, in actor order: <c>Actor_v3::walkActor</c> for EGA/v3 and
+    /// <c>Actor::walkActor</c> for VGA/v4. Each uses its own gate selection and movement counters, with
     /// <c>calcMovementFactor</c> and <c>actorWalkStep</c> at the actor's walk speed; the walk frame starts at each
     /// leg, the stand frame at the end, then the actor turns to the walk's direction. A turn goes one step a frame.
     /// Returns the actors that walked or turned.
@@ -583,7 +584,8 @@ public sealed class LoomActorTable
                 actor.Moving = 0;
                 continue;
             }
-            WalkActor(actor, place);
+            if (_useV4Walking) WalkActorV4(actor, place);
+            else WalkActor(actor, place);
             moved.Add(actor.Number);
         }
         return moved;
@@ -990,6 +992,7 @@ public sealed class LoomActorTable
         public int DestDir { get; set; }
         public int CurBox { get; set; }
         public LoomBoxPoint Next { get; set; }
+        public LoomBoxPoint LegStart { get; set; }
         public LoomBoxPoint? Point3 { get; set; }
         public int StepX { get; set; } = 1;
         public int StepThreshold { get; set; }
