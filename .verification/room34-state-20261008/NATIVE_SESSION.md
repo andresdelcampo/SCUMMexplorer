@@ -17,9 +17,9 @@ The matching [save header source](https://github.com/scummvm/scummvm/blob/v2.2.0
 
 The computer-use skill was applied through its documented `sky` API. A single ground click near the middle of the clearing was accepted: the blue-cloaked staff-holding actor walked from the left toward that point. No room change or fortress scene was observed during that short movement. This was not the required 6-to-8 crossing, and does not establish the actor's numeric box or the current story phase. An earlier commentary description of the blue actor as Rusty's ghost was premature; the visible moving actor holds Bobbin's staff, and numeric identity/state remain to be read.
 
-The user corrected the debugger shortcut to **Ctrl+Alt+D** and opened the console. Automated letter keys can enter `help`; automated `type_text`, Return/Enter/keypad Enter did not submit it. Function-key menu attempts also produced no visible menu. No debugger command has executed, no flag/box/camera/actor assignment was made, and no save was overwritten. The console is left open with `help` entered but unsubmitted.
+During the initial automation attempt, the user corrected the debugger shortcut to **Ctrl+Alt+D** and opened the console. Automated letter keys could enter `help`; automated `type_text`, Return/Enter/keypad Enter did not submit it. Function-key menu attempts also produced no visible menu. At that point no debugger command had executed and the console was left with `help` unsubmitted. The user's later screenshots below supply the readings. No flag/box/camera/actor assignment was made, and no save was overwritten.
 
-A concise console assist is pending: submit `help`, then the following **read-only** commands, one at a time. Leave the console open for screenshots/scrolling.
+The user fulfilled the console assist by supplying two screenshots of the following **read-only** queries. The submission problem was with automation; the native console itself accepts these commands.
 
 ```text
 scripts
@@ -33,4 +33,34 @@ scumm_vars[220]
 
 Matching [ScummVM debugger source](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/debugger.cpp) registers these queries; [array query syntax](https://github.com/scummvm/scummvm/blob/v2.2.0/gui/debugger.cpp) permits `scumm_vars[index]` with no second argument. **Do not add a value**: a second argument is a write. For this EGA resource, backing word 214 contains D6D (input), 215 contains D71/D7A (entry gate/late state), and 220 contains DC6/DC7/DCF (ghost/restoration/completion). Decode those bits by their own masks; raw word values are not themselves boolean flags. `scripts` must distinguish active local 200 from stale/inactive slot numbers.
 
-Native monitor, box flags, camera range and flag values remain **unread**. The save's suitability and the reason its first attempt showed no fortress remain unresolved. Do not promote the Explorer preparation trace to this native save's state. After obtaining the readings, a short ordinary walk or an existing-slot reload may be useful; retain the save hash and record the exact route. Never force flags, actor placement, boxes or a cutscene to manufacture eligibility.
+## Native readings supplied by the user
+
+The screenshots are retained locally as ignored `out/native-console-scripts-camera-actors.png` and `out/native-console-boxes-vars.png`. They establish the live state at the user's query time, after the short ground walk; they do not independently deserialize slot 13 or establish its earlier history.
+
+| Query | Native result |
+| --- | --- |
+| `scripts` | Slot 1: global 6, offset `001bf`, status 2, type 2; slot 4: local 200, offset `0a127`, status 2, type 3. Both have freeze/recursive/freeze-count/cutscene columns zero. |
+| `camera` | Current/destination/last `(160,100)`, acceleration `(0,0)`. This does not read the minimum/maximum camera range. |
+| `actors`, actor 1 | `(148,90)`, width 24, height 45, elevation 0, costume 1, box 2, moving 0, z-plane 0, frame 3, scale 255, direction 90, class `0x00400000`. |
+| `actors`, actor 3 | `(72,106)`, width 24, height 10, elevation 0, costume 112, box 255, moving 0, frame 3, scale 255, direction 180, class `0x00280000`. |
+| `box 6` | `(246,64)` to `(246,80)` vertical line; flags `80`, mask 1, scale 255. Hidden. |
+| `box 7` | `(248,82)` to `(296,82)` horizontal line; flags `00`, mask 1, scale 255. |
+| `box 8` | `(298,82)` to `(332,79)` line; flags `00`, mask 1, scale 255. |
+| `scumm_vars[214]` | 1923 = `0783` hex. |
+| `scumm_vars[215]` | 34848 = `8820` hex. |
+| `scumm_vars[220]` | 25089 = `6201` hex. |
+
+Matching [script status enum](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/script.h#L80-L85) gives status 2 = running; [script location enum](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/object.h#L315-L316) gives type 2 = global, 3 = local. Local 200 is therefore active, not merely a stale numbered slot. Its displayed offset is a native resource-relative instruction pointer, not the diagnostic local-code offset `+0020`.
+
+| English EGA role | Backing word / bit | Native value |
+| --- | --- | --- |
+| Entry gate D71 | 215 / 1 | 0 |
+| Late state D7A | 215 / 10 | 0 |
+| Crossing complete DCF | 220 / 15 | 0 |
+| Input/cutscene guard D6D | 214 / 13 | 0 |
+| Ghost conversation DC6 | 220 / 6 | 0 |
+| Restoration DC7 | 220 / 7 | 0 |
+
+This is a native example of the **early eligible monitor with box 6 hidden**, matching the prepared fresh-room/source result. It rules out the late-ghost camera branch as the explanation for this particular sample. It does not reveal the monitor's preceding observed box, demonstrate a 6-to-8 transition, establish the camera range, explain the user's earlier attempt, or prove the fortress scene unused. All three monitor guards are clear, but the actor is presently settled in box 2, not at the crossing.
+
+The remaining useful native check is a short ordinary route with box/monitor sampling, or reloading the existing slot to compare its initial state. Never force flags, actor placement, boxes or a cutscene to manufacture eligibility. Original saves/configuration remain untouched.

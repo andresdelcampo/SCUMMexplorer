@@ -40,7 +40,9 @@ Counts describe different populations: 328 EGA recipes, 223 current VGA groups, 
 
 **Completion criterion.** Either demonstrate a source-supported reachable route and retain it as a reproducible scene start, or document enough original-game/source evidence to classify the branch as unused/unreachable for a particular edition. If neither is proved, keep the unresolved picker note. Artificial box assignments or a forced cutscene would not answer this question.
 
-**User help/status.** The existing-save request is fulfilled by slot 13 `Rusty`; do not repeat it or ask for a whole-game replay. A console-submission assist is pending because the automation's Enter is ignored. Read-only commands and EGA backing-word masks are recorded in the native packet. Do not change values, overwrite saves or infer this save's phase from the Explorer preparation. Independent targeted actor/staff comparisons can continue while the console readings are unavailable.
+**User help/status.** The existing-save request is fulfilled by slot 13 `Rusty`; do not repeat it or ask for a whole-game replay. Automated Enter is ignored, but the user fulfilled the console assist with the screenshots described below. Read-only commands and EGA backing-word masks are recorded in the native packet. Do not change values, overwrite saves or infer this save's phase from the Explorer preparation. Independent targeted actor/staff comparisons can continue.
+
+**Native console update.** The user has now supplied the readings: local 200 active, camera x=160, actor 1 settled in box 2, box 6 hidden and all three monitor guards zero. This confirms the early-state pairing independently of the Explorer preview, and rules out the late-ghost branch for this sample. The console assist is fulfilled; do not repeat it. Camera range and the previous observed monitor box remain unread; no crossing or dead-code proof follows. The [native packet](../../.verification/room34-state-20261008/NATIVE_SESSION.md) records exact word values, bit masks, script status semantics and geometry.
 
 ## 2. Incomplete EGA resources: boundaries, unused data or damaged data?
 
