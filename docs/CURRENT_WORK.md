@@ -4,6 +4,8 @@ Rewritten 4 October 2026 (the old route-priority and observer-hardening text, an
 
 ## Where the work stands
 
+The next session is prepared in [FINAL_GAPS_HANDOFF.md](loom/FINAL_GAPS_HANDOFF.md): current evidence for Room 34, incomplete EGA resources, residual raw callbacks and original-game comparisons, with completion criteria and conditional user needs. The user requested that the explanation and any questions happen in that next session. The preparation adds no runtime changes or new test claims.
+
 The [8 October correctness audit](../.verification/correctness-20261008/README.md) completes all 328 English EGA replay recipes and 222/223 VGA groups normally and with Escape. It fixes native responses being overridden by static navigation, generic draft-helper grouping, and a VGA Room 20 start that lost its cutscene scope on unknown coordinates. The full suite passes (833 tests, five diagnostic skips), with clean builds and 201 WPF assertions. This is bounded-preview validation, not a claim that every original-game route is final: Room 34 reachability, incomplete EGA resources and independent ScummVM/listening checks remain open. The older 234/235 EGA source-site record and 4 October checks are in [HARNESS_REVIEW_2026-10-04.md](archive/HARNESS_REVIEW_2026-10-04.md).
 
 ## Rules the user has set
@@ -22,6 +24,6 @@ Object interaction (28 September). A single click walks Bobbin to the object and
 
 Interface (3 October). Technical text (traces, assumptions, raw bytecode, source details) belongs to Advanced mode and must be digestible there; normal mode shows the scene, the game's own text and a few clear controls. One short subtitle per window; no sentence that repeats another.
 
-Testing. Run only the checks a change needs (filtered unit tests; UiShots, SceneShots or StatusShots for UI); the user retests at the end. The 4 October full run is the exception, done on request. Do not delete `%LOCALAPPDATA%\SCUMMexplorer` (saved game state) after harness runs unless asked.
+Testing. Run only the checks a change needs (filtered unit tests; UiShots, SceneShots or StatusShots for UI); the user retests at the end. The 4 and 8 October full runs were requested audits. Do not delete `%LOCALAPPDATA%\SCUMMexplorer` (saved game state) after harness runs unless asked.
 
 Workflow. Commit each finished task separately, no push. Another session may work in the same tree: stage files by explicit path. Ask before editing CLAUDE.md.

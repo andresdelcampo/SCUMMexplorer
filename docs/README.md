@@ -5,6 +5,7 @@ Top level: what you need right now.
 - [CURRENT_WORK.md](CURRENT_WORK.md): the rules the user has set and where the work stands.
 - [LOOM_EGA_PLAN.md](LOOM_EGA_PLAN.md): what is left for LOOM EGA (M5), and the order of the next games.
 - [NEXT_SESSION_PROMPT.md](NEXT_SESSION_PROMPT.md): hand-off for the next session.
+- [FINAL_GAPS_HANDOFF.md](loom/FINAL_GAPS_HANDOFF.md): EGA/VGA correctness gaps, established evidence, next investigations and conditional user needs.
 - [CHANGELOG.md](CHANGELOG.md): finished work, with links to its validation.
 - [CLEANUP_REVIEW.md](CLEANUP_REVIEW.md): open cleanup proposals.
 

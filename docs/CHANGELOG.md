@@ -1,5 +1,9 @@
 # Changelog
 
+## 8 October: prepare the final-gap session
+
+Prepared a [detailed EGA/VGA gap dossier](loom/FINAL_GAPS_HANDOFF.md) with verified audit results, exact resource errors, Room 34 research, residual callback classifications, original-game comparison limits, completion criteria and conditional user needs. Replaced superseded live handoff status while preserving the previous file as a dated archive. Questions and work on the gaps are deferred to the requested next session. Documentation only; checked local evidence, paths and Markdown links; no runtime changes or test rerun.
+
 ## 8 October: EGA / VGA correctness audit
 
 Audited every script kind, the English EGA replay catalog, VGA derived groups, 1,320 isolated object callbacks and real WPF interaction/playback controls. Fixed native responses being overridden by static doorway possibilities (the grave could incorrectly jump to Room 64), generic draft reactions leaking into the VGA picker, and completing-start trials accepting unmatched cutscene scopes. VGA Room 20 now derives a labelled placement from the triggering object's own walk point. Final suite: 833 passed, five diagnostic tests skipped; clean solution build; 201 WPF assertions passed. All 328 EGA recipes and 222/223 VGA groups complete both normally and with Escape. Room 34 reachability, incomplete EGA resources and original-game fidelity remain unresolved; [audit and reproduction](../.verification/correctness-20261008/README.md). Local commit only; no push.

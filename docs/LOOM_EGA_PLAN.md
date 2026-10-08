@@ -10,6 +10,8 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 
 ## What is really left for LOOM EGA
 
+**Next session prepared (8 October):** the [final-gap dossier](loom/FINAL_GAPS_HANDOFF.md) details the known source/probe evidence, competing explanations, focused investigation order, completion criteria and possible user help for each remaining correctness gap. Initial resource comparisons and source/trace work can use the local files. The user's explanation and any save/viewing/listening requests belong to the next session. The previous handoff is preserved as a dated archive; preparation makes no runtime changes.
+
 **8 October correctness audit:** all 328 English EGA recipes and 222/223 VGA groups complete normally and with Escape. Fixed conditional native responses being overridden by static room possibilities, shared draft-response grouping, and incomplete VGA start validation; Room 20 now uses a source-derived, labelled object walk-point setup. Full suite: 833 passed, five diagnostic skips; clean build and 201 WPF assertions. Room 34 reachability, invalid/truncated EGA resources and original-game fidelity remain open. See [audit and exact reproduction](../.verification/correctness-20261008/README.md); do not equate completed bounded previews with a final original-game implementation.
 
 **8 October EGA reverse review:** the VGA findings fill 70 missing EGA titles: 116 valid English globals and 113 Spanish globals now have individual EGA review records. Added draft/note flags, pointer/buffer/animation/sound/flying-array meanings and scoped actors; reused actor slots no longer receive a global scene identity. EGA-specific code/text, distance thresholds and invalid index entries stay distinct. EGA 90/99's fuller titles now cover their existing dialogue too. Clean build, 42 focused Core checks and 126 WPF assertions; [review and validation](../.verification/advanced-scripts/README-EGA.md).
@@ -23,7 +25,7 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 **2. Needs the user (on-screen or ScummVM checks)**
 - Staff scenes in Room 43, El Muerto and Room 17 sizes, actor 4 placement.
 - Draft verbs: confirm on screen that they show their text and animation (M4 runs them through the game's scripts; the draft table is a seeded estimate until each draft is learnt through a route).
-- Room 34 local200 +0035: probably dead code; only a real ScummVM save could show otherwise. May be left.
+- Room 34 local200 +0035: reachability unresolved. Compare each edition's own monitor/box data and the original ScummVM route; unused code is a hypothesis. A pre-transition save may help after local source work (see the final-gap dossier).
 
 **3. Evidence-bound polish** (only when it changes what the user sees)
 - Draft names: Silence (0x4E/0x4F) and Shaping (0x50/0x51) follow the manual order; Sharpening's two verbs are not told apart. Verb labels outside known ranges show as `Verb 0x..`. M5 will expose these gaps.
