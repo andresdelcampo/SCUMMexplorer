@@ -1350,7 +1350,7 @@ public partial class MainWindow : Window
         RefreshRoomPreview();
     }
 
-    /// <summary>Frames an exit click may continue outside a cutscene before falling back to browsing.</summary>
+    /// <summary>Frames an exit click may continue outside a cutscene before retrying an eligible doorway verb.</summary>
     /// <remarks>
     /// Delays and actor waits take one session frame; a message lasts its talk
     /// delay. Frames inside a cutscene do not count: the session follows it until
@@ -3611,15 +3611,12 @@ public partial class MainWindow : Window
         if (_session is null) return;
         var why = StatusText.Text;
         var refused = _session.LastAction?.Uncertainties.FirstOrDefault(line => line.Contains("not sent, because", StringComparison.Ordinal));
-        _lastDoorwayFallback = refused ?? $"{why}: {_session.LastAction?.Evidence}";
-        // Among doorways at this point, the first touchable one in directory
-        // order is the one ScummVM's findObject picks. Untouchable doorways
-        // stay reachable as labelled exploration actions.
+        // Only a doorway eligible for native hit selection may be retried.
+        // Closed/untouchable exits remain browsable through the Advanced room list.
         var live = doorways.Where(record => !_session.Snapshot.IsUntouchable(record.Id)).ToArray();
-        if (live.Length > 0) FollowDoorway(live[0]);
-        else if (doorways.Count == 1) FollowDoorway(doorways[0]);
-        else ShowDoorwayMenu(doorways.Select(record => (DoorwayLabel(record), DoorwayToolTip(record),
-            (Action)(() => FollowDoorway(record)))).ToArray());
+        if (live.Length == 0) return;
+        _lastDoorwayFallback = refused ?? $"{why}: {_session.LastAction?.Evidence}";
+        FollowDoorway(live[0]);
         StatusText.ToolTip = $"{why}. The doorway's verb then ran directly, an exploration action, not the game's click." +
                              (StatusText.ToolTip is string tip ? Environment.NewLine + tip : "");
     }
@@ -5326,21 +5323,17 @@ public partial class MainWindow : Window
         if (_session?.Snapshot is not { } snapshot) return [];
         var (selected, unknown) = LoomObjectHitTest.Find(_currentRoomObjectRecords, snapshot.ObjectStates,
             snapshot.ObjectPositions, snapshot.ObjectClasses, x, y);
-        // A non-doorway object can overlap a doorway's rectangle. Its native click must not turn into navigation.
-        // An untouchable doorway remains available as an explicitly labelled exploration fallback when no object is selected.
-        if (unknown is not null || selected != 0 && !_roomNavigationCandidates.Any(candidate => candidate.Object.Id == selected)) return [];
-        return VisibleDoorways(snapshot).Where(record =>
-        {
-            var position = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
-                ? current : new RoomObjectPosition(record.X, record.Y);
-            return x >= position.X && x < position.X + record.Width && y >= position.Y && y < position.Y + record.Height;
-        }).ToArray();
+        // Native hit selection already excludes untouchable exits and mismatched parents.
+        // A ground click or a different overlapping object must never open a static candidate.
+        if (unknown is not null || selected == 0) return [];
+        return VisibleDoorways(snapshot).Where(record => record.Id == selected).ToArray();
     }
 
     private IEnumerable<LoomRoomObjectRecord> VisibleDoorways(LoomSessionSnapshot snapshot) =>
         _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
             .Where(record => record.Width > 0 && record.Height > 0 &&
                              snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
+                             !snapshot.IsUntouchable(record.Id) &&
                              ParentStateMatches(record, snapshot))
             .OrderBy(record => record.LocalIndex);
 
@@ -5355,32 +5348,23 @@ public partial class MainWindow : Window
     {
         var targets = DoorwayTargets(record);
         var text = $"Object {record.Id}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))}. " +
-                   "Clicking runs its verb and follows the room load it reaches; if none is reached, the room opens for browsing.";
+                   "Clicking follows a room load reached by its script. If none is reached, the current room stays open. " +
+                   "The Advanced doorway buttons open possible destinations directly for browsing.";
         return _session?.Snapshot.IsUntouchable(record.Id) == true
             ? text + " This hotspot is untouchable in the current preview (class 24), so the game would not select it here; " +
-              "the click is an exploration action."
+              "a room click cannot follow it."
             : text;
     }
 
     /// <summary>
-    /// Runs a doorway's verb and continues pending scripts. When no room load
-    /// is reached, opens its only possible room, or offers its possible rooms.
+    /// Runs an eligible doorway's verb and continues pending scripts. A static
+    /// possible destination cannot override the script's conditional answer.
     /// </summary>
     private void FollowDoorway(LoomRoomObjectRecord record)
     {
         var routes = _roomNavigationCandidates.Where(candidate => candidate.Object.Id == record.Id).ToArray();
         if (routes.Length == 0) return;
         if (ActivateObjectVerb(record, routes[0].Verb) || ContinueToReachedRoom()) return;
-        var targets = routes.DistinctBy(candidate => candidate.TargetRoomId).OrderBy(candidate => candidate.TargetRoomId).ToArray();
-        if (targets.Length == 1)
-        {
-            OpenRoomDestination(targets[0]);
-            return;
-        }
-        ShowDoorwayMenu(targets.Select(candidate => ($"Room {candidate.TargetRoomId:00}",
-            $"No room load was reached. Open Room {candidate.TargetRoomId:00} directly for exploration; " +
-            $"object {candidate.Object.Id}'s script can load it ({candidate.Path}).",
-            (Action)(() => OpenRoomDestination(candidate)))).ToArray());
     }
 
     private ContextMenu? _doorwayMenu;
