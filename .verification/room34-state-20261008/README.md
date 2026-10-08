@@ -1,8 +1,12 @@
 # Room 34 state, Rusty and camera — 8 October 2026
 
+**Current scope:** the standalone local-200 fortress reveal is parked by the user. Save, console and close assists are fulfilled. Physical Escape stopped Computer Use after the user reported returning to Room 34; no refreshed native state was captured. Do not resume native control without a direct human request. The later sleeping-Rusty catalog-return defect is a separate path, corrected and validated in [the catalog checkpoint](../catalog-return-20261008/README.md). The source and native observations below remain historical evidence.
+
 The source explains a late-state camera prerequisite consistent with the user's [provisional EGA observation](../final-gaps-20261008/USER_OBSERVATIONS.md). It does **not** establish which state that debugger run had, a normal route to the crossing, or dead code. No production correction is justified by this investigation. The unresolved picker note stays in place.
 
 The [native VGA walking correction](../native-walk-20261008/README.md) remains valid. This investigation checks the next question: whether source-established transitions pair an enabled box 6 with an eligible Room 34 local 200 monitor. The checked transitions do not demonstrate that pairing.
+
+**Two different camera events:** the unresolved standalone local-200 reveal pans to x=464 after its 6-to-8 condition, marks DCF and later pans back to 376. Rusty's later ghost conversation separately starts local 206, whose `+0029` pans to the same x=464 viewpoint within that conversation. The English prepared trace reaches that later pan, but the user explicitly clarified that it is a different scene. It does not resolve the standalone walking-triggered reveal. [Native route, source offsets and distinction](NATIVE_SESSION.md).
 
 ## Edition-specific entry guards
 
@@ -54,11 +58,11 @@ All **24 focused source/state assertions pass**: 14 English EGA and five each Sp
 
 This provides a candidate explanation for the user's earlier camera observation **if their debugger visit selected the late ghost state**. That earlier visit's state and precise callback remain unknown, and its observation file is preserved unchanged. The user subsequently supplied an existing save and a running English Roland EGA ScummVM 2.2.0 session; [native session identity, actions and supplied console readings](NATIVE_SESSION.md) are recorded separately. Its Room 34 hash matches this source packet. The user's screenshots establish active local 200, box 6 hidden, camera x=160, actor 1 settled in box 2, and all three monitor guards clear. This native sample is the early state, so the late-ghost camera branch does not explain this particular sample.
 
-## Evidence limits and next checks
+## Evidence limits at this checkpoint
 
-The source-supported transitions checked here enable box 6 after the early monitor has been stopped or skipped. No reachable eligible 6-to-8 sample was demonstrated. The earlier corrected native geometry still observes box 7 between 6 and 8. These facts narrow the question but do not prove unused code, every native placement/input path or full original-game reachability. Keep the unresolved note. The existing-save request is fulfilled; use the supplied slot and running game, without requesting a whole-game replay.
+The source-supported transitions checked here enable box 6 after the early monitor has been stopped or skipped. No reachable eligible 6-to-8 sample was demonstrated. The earlier corrected native geometry still observes box 7 between 6 and 8. These facts narrow the question but do not prove unused code, every native placement/input path or full original-game reachability. Keep the unresolved note. The existing-save request is fulfilled; saves and the running game are preserved. No further native route is active in this parked investigation.
 
-There is no new demonstrated product picture/audio/input discrepancy. The user fulfilled the console assist; the next native check is ordinary movement with box/monitor sampling or an existing-slot reload, preserving the save. Camera range and previous observed box remain unread. Automated console submission remains unavailable. Other perceptual checks should select at most one or two exact comparisons from the remaining source-backed actor/staff/input cases in [the dossier](../../docs/loom/FINAL_GAPS_HANDOFF.md).
+This standalone-reveal investigation did not establish a new product picture/audio/input discrepancy; the separately reported fresh catalog-return defect was subsequently reproduced and corrected. The user fulfilled the console assist. A first ordinary native eastward route, including a grave-selection walk, reached the next screen without setting DCF: word 220 stayed 25089 (`6201` hex). The early fortress reveal did not run its normal start sequence on this route. Numerical intermediate boxes, camera range and previous observed box remain unread. A later native return/monitor sample or a brief native box trace was proposed at this checkpoint, but further investigation is now parked; the separate ghost-conversation pan is not the missing scene. Automated console submission remains unavailable. Preserve the existing saves and avoid a broad replay. Other perceptual checks should select at most one or two exact comparisons from the remaining source-backed actor/staff/input cases in [the dossier](../../docs/loom/FINAL_GAPS_HANDOFF.md).
 
 ## Identity and reproduction
 

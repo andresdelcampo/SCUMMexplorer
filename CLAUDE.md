@@ -1,22 +1,22 @@
 # SCUMMexplorer
 
-An audio-visual, interactive explorer for old SCUMM games. It is not meant as a technical SCUMM viewer. Users walk through rooms, trigger cutscenes, change objects and discover the games' secrets. **LOOM EGA (DOS) is the main focus.** Indiana Jones and the Last Crusade EGA is supported only for backgrounds and texts, including dialogue choices.
+An audio-visual, interactive explorer for old SCUMM games. It is not meant as a technical SCUMM viewer. Users walk through rooms, trigger cutscenes, change objects and discover the games' secrets. **LOOM EGA (DOS) is the reference; LOOM CD/VGA also has live interaction, actors, scripts, scene playback, Game Status and CD audio.** Indiana Jones and the Last Crusade EGA is supported only for backgrounds and texts, including dialogue choices.
 
 ## Layout
 
-- `src/SCUMMexplorer.Core`: parsing, rendering and bounded script execution (net10.0). It covers LFL/index readers, the old-v3 disassembler (`Formats/LoomScriptReader.cs`), the bounded executor and session, object selection and painting (`Rendering/RoomObjectSelection.cs`), the text extractor, and audio (PC speaker, AdLib via NukedOPL3Sharp).
+- `src/SCUMMexplorer.Core`: parsing, rendering and bounded script execution (net10.0). It covers LFL/index readers, the old-v3 disassembler (`Formats/LoomScriptReader.cs`), the bounded executor and session, object selection and painting (`Rendering/RoomObjectSelection.cs`), the text extractor, and audio (PC speaker, AdLib via NukedOPL3Sharp, Roland via Munt and CD voice/music cue timing).
 - `src/SCUMMexplorer.App`: the WPF desktop UI (net10.0-windows). `MainWindow.xaml.cs` holds most of the UI logic; `TextGalleryWindow` is the Game Texts browser.
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
-- `docs/`: `docs/README.md` is the index. Top level holds the live files: `docs/LOOM_EGA_PLAN.md` (what is left, M5, next games), `docs/CURRENT_WORK.md` (rules), `docs/NEXT_SESSION_PROMPT.md` (hand-off for the next session) and `docs/CHANGELOG.md` (finished work with links to its validation). `docs/loom/` and `docs/indy3/` hold per-game reference and plans (`docs/loom/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do), `docs/engine/` holds generic SCUMM notes, and `docs/archive/` holds finished plans, audits and history.
+- `docs/`: `docs/README.md` is the index. Top level holds the live files: `docs/LOOM_EGA_PLAN.md` (current EGA/VGA work and parked tasks), `docs/CURRENT_WORK.md` (rules), `docs/NEXT_SESSION_PROMPT.md` (hand-off for the next session) and `docs/CHANGELOG.md` (finished work with links to its validation). `docs/loom/` and `docs/indy3/` hold per-game reference and plans (`docs/loom/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do), `docs/engine/` holds generic SCUMM notes, and `docs/archive/` holds finished plans, audits and history.
 - `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. Evidence from the Spanish-edition work (27 September to 4 October 2026) is in `.verification/archive/`; `.verification/README.md` says what is live and what is a record. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
 - `Games/`: the local game data. Never commit it.
   - `Games/loom ega mt32 en`: DOS LOOM EGA, **English**, with the Roland (MT-32) upgrade installed. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
-  - `Games/loom ega mt32 es`: DOS LOOM EGA, Spanish, Roland upgrade installed. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
-  - `Games/loom ega en`, `loom ega es`: the plain DOS releases (no Roland files 82–85). Also `loom ega fr`, `de`, `hebrew`, `loom ega v1.2 es`/`de`, and the two demos (`loom demo short|long ega en`); `loom ega hebrew` is dropped, not supported; being tried edition by edition (plan section "LOOM EGA editions, before VGA").
-  - `Games/loom vga en`: LOOM CD (VGA, SCUMM v4) as `Loom.cue` + `Loom.bin` (ISO 9660 data track plus one CD audio track). Not yet read by the app; see the plan.
+  - `Games/ALTERNATIVE LOOMS/loom ega mt32 es`: DOS LOOM EGA, Spanish, Roland upgrade installed. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
+  - Plain English/Italian EGA folders are under Games; other comparison editions and the short/long demos are under `Games/ALTERNATIVE LOOMS/`. English/Spanish/French/German and v1.2 comparison records are dated; current available folders may differ from that inventory. Hebrew support is dropped. Do not move/delete game data during documentation cleanup.
+  - `Games/loom vga en`: LOOM CD (VGA, SCUMM v4) as `Loom.cue` + `Loom.bin` (ISO 9660 data track plus one CD audio track). Read directly by the app, including live v4 session, object/actor rendering, Readable scripts, source-derived scenes and CD voice/music. See the live plan for comparison limitations.
   - `Games/mt32`: the user's MT-32/CM-32L ROM images for the Roland sound device. Never commit.
-  - `Games/indy3 ega en`: Indy3 EGA, **English**. The Indy tests expect this one (`SCUMM_INDY3_EGA_TEST_ROOT`).
-  - `Games/indy3 ega es`, `indy3 vga es`, `indy3 demo en`, `monkey1`, `mmansion`: other local data, not used by the tests.
+  - `Games/FUTURE/indy3 ega en`: Indy3 EGA, **English**. Set `SCUMM_INDY3_EGA_TEST_ROOT` to this absolute folder for Indy checks.
+  - Other Indy editions/demo, Monkey Island and enhanced Maniac Mansion folders are under `Games/FUTURE/`; they are deferred comparison data.
 - `scummvm/`: a ScummVM Windows build for comparing behaviour at runtime. It contains no source code.
 - Build output goes to `Exe/<Project>/…` (see `Directory.Build.props`).
 
@@ -25,13 +25,11 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 From the repository root (Windows, .NET 10 SDK):
 
 ```powershell
-dotnet build SCUMMexplorer.slnx
-$env:SCUMM_SOUND_TEST_ROOT = "$PWD\Games\loom ega mt32 en"
-$env:SCUMM_INDY3_EGA_TEST_ROOT = "$PWD\Games\indy3 ega en"
-dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet build SCUMMexplorer.slnx
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build
 ```
 
-`.verification\run-verify.cmd` does the same and writes `.verification\verify.log`. The README uses `rtk proxy dotnet …`; RTK is optional. The LOOM data tests find `Games/loom ega mt32 en` (then `loom ega mt32 es`) relative to the test binary; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip silently.
+All shell and child commands must use RTK, including PowerShell; `C:\Users\adelc\.codex\RTK.md` is mandatory. `.verification/run-verify.cmd` is a full-audit driver, not a routine check. LOOM tests prefer `Games/loom ega mt32 en`; legacy Spanish/`loom` fallback names remain in TestGames. For the moved Spanish comparison use `SCUMM_LOOM_TEST_ROOT` with its absolute path. Set `SCUMM_SOUND_TEST_ROOT` and `SCUMM_INDY3_EGA_TEST_ROOT` when those checks are needed; Indy checks skip without their data setting.
 
 ## Engine facts that matter here (checked against ScummVM `engines/scumm`)
 
@@ -53,15 +51,15 @@ dotnet test tests\SCUMMexplorer.Tests\SCUMMexplorer.Tests.csproj --no-build
 
 - Tie every exit, action, state change, cue, scene or secret to the resource, script and instruction that support it.
 - A decoded branch or room load is a **possible** outcome. Calling a verb directly is an **exploration action**. A partial session is a **state preview**. Label estimates as estimates.
-- Do not add room-specific hacks or invent states. The user's product rules are:
+- Do not add room-specific engine/renderer hacks or invent states. On 8 October the user approved direct late-room catalog starts running reviewed actual source prerequisites when missing, while preserving later state. The fingerprinted English Room 46 recipe implements this exception; operands remain in source-reviewed recipe data. The user's product rules are:
   - Rooms should show no gaps and should show their first-visit state. When in doubt, pick at random and label the pick.
   - Objects respond as in the game, with Bobbin on screen (decided 28 September). A single click walks Bobbin to the object and uses it (scripts 005–007, verb 0x38; exits lead on). A double click also looks at it (verb 0x36: the description). Cycling an object's stored images belongs only to the inspection mode, and the mode's text says so. There is no hidden modifier gesture such as Alt+click. Hiding an object is allowed only if the background behind it has no gap.
   - Room hotspots navigate between rooms.
 
 ## Workflow notes
 
-- **End every session by starting the next one as a task**: update the plan and `docs/NEXT_SESSION_PROMPT.md` (state and details only, never the prompt text itself), then launch the next session with the `spawn_task` tool and a self-contained prompt (state, next task, standing rules), and tell the user what it says. Never keep a prompt in the prompt file.
-- Verification executables include `.verification/HarnessFailurePolicy.cs` through `Directory.Build.targets`: rebuild old harnesses before running them. Fatal exceptions log under `Exe/HarnessFailures/` (or `SCUMM_HARNESS_FAILURE_LOG`) and exit 1 without Windows crash/debug UI. The shipped app is unaffected.
+- **End every session by starting the next one as a task**: update the plan and `docs/NEXT_SESSION_PROMPT.md` (state and details only, never the prompt text itself), then launch the next session with the `create_thread` tool and a self-contained prompt (state, next task, standing rules), and tell the user what it says. Never keep a prompt in the prompt file. Reuse an already prepared waiting chat when suitable; do not create recursive idle continuations. Messaging another chat requires human authorization.
+- Verification executables include `.verification/HarnessFailurePolicy.cs` through `Directory.Build.targets`: rebuild old harnesses before running them. Fatal exceptions log under `Exe/HarnessFailures/` (or `SCUMM_HARNESS_FAILURE_LOG`) and exit 1 without Windows crash/debug UI. The shipped app is unaffected. WPF harnesses can set `SCUMM_EXPLORER_PROFILE_ROOT` to a private output/profile directory before constructing MainWindow; otherwise the normal user profile is used and must be preserved.
 
 - The repository is on git (`master`). Commit each finished task separately; `Games/` stays out of git.
 - Record verification for each milestone under `.verification/<topic>/`, and update `docs/LOOM_EGA_PLAN.md` with its status and next task, and add a row to `docs/CHANGELOG.md`.

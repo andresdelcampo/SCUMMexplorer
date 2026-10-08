@@ -1,4 +1,6 @@
-# English LOOM EGA compatibility worklist (4 October 2026)
+# English LOOM EGA compatibility audit (4 October 2026)
+
+**Historical migration record; status reconciled 8 October.** English Roland EGA is now the replay/test reference. The initial failure counts and worklist below describe the first migration checkpoint, before subsequent triage and corrections. They are not current unresolved failures. Current results and remaining EGA/VGA comparisons are in [CURRENT_WORK](../CURRENT_WORK.md) and [the plan](../LOOM_EGA_PLAN.md). Spanish comparison files now reside in `Games/ALTERNATIVE LOOMS/loom ega mt32 es`; environment overrides select that edition without changing English defaults.
 
 The user added the English DOS EGA release as `Games/loom ega mt32 en` ("fully compatible" at a glance) and asked that the tests use it by default: the failures are the list of places where the code or the tests assume the Spanish release (`Games/loom`, to be renamed `Games/loom ega mt32 es`). The helper `tests/SCUMMexplorer.Tests/TestGames.cs` picks the folder (`loom ega mt32 en`, then `loom ega mt32 es`, then `loom`); `SCUMM_LOOM_TEST_ROOT` overrides it with a full path (set it to the Spanish folder to get the old baseline: 703 passed, 5 skipped, before the sphere and interaction changes of 4 October).
 

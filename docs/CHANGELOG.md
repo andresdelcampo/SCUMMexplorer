@@ -1,8 +1,24 @@
 # Changelog
 
+Entries describe the state at their dated checkpoint. Current capability and remaining work are in [CURRENT_WORK](CURRENT_WORK.md) and [the live plan](LOOM_EGA_PLAN.md).
+
+## 8 October: prepare Rusty's fresh catalog return from source (`9de8193`)
+
+After rebuilding/reopening English EGA, direct Room 46 selection followed by the hole return to Room 34 retained sleeping costume 112 during the ghost conversation. Room 46 establishes late D7A but does not supply the skipped dream history that establishes ghost D9C. With the user's explicit approval, a fingerprinted catalog-start recipe now runs missing real Awakening/Reflection/Firewood/dream stages in the existing session. It preserves ghost/restored state, skips completed stages and cancels the target visit on failure; it assigns no story bits or costumes. Existing closed portals remain closed. Validation: 32 focused Core checks, 18 real WPF assertions using an isolated profile, inspected ghost image and a clean solution build. [Source, reproduction and correction](../.verification/catalog-return-20261008/README.md).
+
+## 8 October: reconcile live documentation
+
+The plan, current work, handoff, gap dossier, script map and discovery guide now distinguish completed corrections, remaining native/input/audio comparisons and the parked standalone fortress reveal. Seven complete previous versions are retained in `docs/archive/`; original native route readings and concurrent evidence are preserved. Root guides now reflect implemented VGA support, current game folders, required RTK commands, profile isolation and the approved source-prerequisite exception. Dated compatibility/cleanup/Indy/parser records are identified as historical; the object-state reference now describes real Interactive input. Documentation validation: 31 files / 688 relative links, no missing targets, whitespace check passes. No runtime test rerun for these text-only changes.
+
+## 8 October: Blunting and real draft input (`0243a5a`)
+
+Room 41's own callbacks/text establish Sharpening / Blunting across EGA, with corresponding VGA callbacks and shorter dialogue. Six prepared Room 04 forward/reverse Opening casts complete through real Explorer note input across English EGA, Spanish EGA and VGA. Profile-free Game Status renders and a clean build preserve the edition-specific artwork. VGA Room 02 sky remains unqualified; original-game route/animation/listening comparisons and stronger Silence/Shaping names remain open. [Source and input checkpoint](../.verification/draft-input-20261008/README.md).
+
 ## 8 October: trace Room 34 state and Rusty's camera prerequisite
 
 Subsequent user console screenshots establish the native early state: local 200 active, camera x=160, actor 1 settled in box 2, box 6 hidden and all three monitor guards clear. The late-ghost branch therefore does not explain this particular sample. Native crossing, camera range and prior observed box remain unresolved. Exact values/masks are added to the native packet; original saves/configuration remain untouched. Documentation only; no test rerun.
+
+The first ordinary native eastward route now reaches the next screen without setting DCF: the user's post-walk word-220 query stays 25089 (`6201` hex). Intermediate boxes were not sampled. Separately, the late ghost conversation calls local 206's x=464 pan in all three editions, corroborated by the existing English prepared trace; the user clarified that this is a different scene, so it does not resolve the missing standalone local-200 reveal. [Exact route, source offsets and evidence limits](../.verification/room34-state-20261008/NATIVE_SESSION.md). No production change.
 
 Compared English EGA, Spanish EGA and VGA entry guards, literal flag writers and box/camera helpers. Script 85 stops the crossing monitor before marking it complete; the late ghost conversation opens the camera range and boxes 10/11 without restarting it. A prepared English EGA source Room 46 return reproduces the camera lock, then a ghost conversation permits an eastward public walk. Box 6 becomes enabled after the monitor has been stopped or skipped. All 24 focused source/state diagnostic assertions pass; clean solution build. This is a source-supported candidate explanation for the user's caveated debugger observation, not its confirmed state or dead-code proof. No production change or broad suite rerun. [Evidence, edition mappings, limits and reproduction](../.verification/room34-state-20261008/README.md).
 

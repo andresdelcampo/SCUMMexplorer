@@ -1,5 +1,7 @@
 # EGA / VGA correctness audit — 8 October 2026
 
+**Historical full-audit baseline:** subsequent focused work corrected Room 70 operands/resource boundaries, VGA v4 walking, closed portal traversal and the fresh English Rusty catalog return. The standalone fortress reveal is parked; remaining original-game comparisons are listed in [CURRENT_WORK](../../docs/CURRENT_WORK.md). Counts and raw callback classifications below belong to this audit's checkpoint.
+
 The audit found and fixed three product issues. The checked replay catalogs are usable, but **the project cannot yet be described as fully final or proved faithful to the original game**. Room 34 reachability, incomplete EGA resources, and original-game comparison remain open.
 
 ## Fixes

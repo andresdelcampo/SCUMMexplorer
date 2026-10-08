@@ -1,8 +1,10 @@
 # Construction cleanup review
 
-30 September 2026. Review only: nothing below has been deleted. Paths are relative to the repository root. Preserve game data, source findings and reproducible checks.
+Historical review, 30 September 2026. Status note added 8 October: live plan/script-map/discovery/handoff consolidation is complete, with original records retained in `docs/archive/`. Removal/worktree proposals remain unapproved and have not been re-audited. The checkout, counts and paths below describe the original review.
 
-## Verified checkout
+Review only: nothing below has been deleted. Paths are relative to the repository root. Preserve game data, source findings and reproducible checks.
+
+## Historical 30 September checkout snapshot
 
 `master` started at `45fedaf`. Tracked files were clean; the unrelated untracked `.verification/object-click-room17/`, `.verification/room-object-interaction/` and `tests/SCUMMexplorer.Tests/LoomObjectLookAuditTests.cs` remain untouched. All 16 registered Claude worktrees have clean tracked/untracked status and their HEADs are ancestors of master. `git log master.. --all` is empty. Exact paths and commit IDs: [inventory](../.verification/archive/cleanup-review-20260930/inventory.txt).
 
@@ -21,7 +23,7 @@ Main Release solution rebuilt successfully: zero warnings/errors. The main app i
 | `.verification/before/`, `.verification/after/` | Early Room 03/17 before/after snapshots and reports. | Historical visual evidence; generic folder names hide their context. | Keep until their provenance is recorded alongside the relevant validation; consolidate rather than silently discard. |
 | `.verification/wpf-checks.ps1` | Broad runner; forcibly stops the user's app, runs all doorway cases, and assumes every harness's second argument is a folder. DoorwayClickCheck now expects a file. | Referenced by old validations and `NEXT_SESSION_PROMPT.md`; no current task should invoke it wholesale. | Keep harnesses; replace runner instructions with focused invocations and remove the forced process stop in a separate reviewed tooling change. |
 | `.verification/verb-area/VerbAreaCheck/Program.cs` introductory comment | Describes removed Show verb area and Click as game input toggles despite current assertions. | Current focused harness remains valuable. | Update comment to current interactive/inspection behaviour when modifying this check. Keep code and evidence. |
-| `docs/LOOM_EGA_PLAN.md` completed M1–M3 construction narrative; `docs/CHANGELOG.md` | Accumulated implementation chronology obscures present behaviour and open issues. Some earlier completion claims are superseded. | Links to validations carry useful evidence; `LOOM_SCRIPT_MAP.md` carries durable script knowledge. | Keep source findings in the script map and evidence at their paths; reduce the plan to current capabilities, open tasks and concise milestone status. Proposed consolidation, not wholesale deletion of history. |
+| `docs/LOOM_EGA_PLAN.md` completed M1–M3 construction narrative; `docs/CHANGELOG.md` | Accumulated implementation chronology obscures present behaviour and open issues. Some earlier completion claims are superseded. | Links to validations carry useful evidence; `LOOM_SCRIPT_MAP.md` carries durable script knowledge. | Keep source findings in the script map and evidence at their paths; reduce the plan to current capabilities, open tasks and concise milestone status. Completed 8 October: live plan/map/discovery/handoff reconciled; full prior versions retained in `docs/archive/`. Changelog remains dated history. No deletion. |
 | Historical CameraPanCheck links in `docs/LOOM_EGA_PLAN.md` and `.verification/*/validation.md` | The harness was already removed with the entry-pan feature. Historical pass counts describe old checks. | Current handoff explicitly forbids restoring the harness. | Keep dated historical evidence; remove wording that suggests it is a runnable current check. |
 | All 16 `.claude/worktrees/` paths listed in the inventory | Already merged historical checkouts, all clean, no commits outside master. | Registered Git worktrees; check ignored files/junctions and chat ownership before removal. Ancestor status alone does not establish disposability. | Potential archive candidates, pending explicit review. No worktree or branch removal now. |
 

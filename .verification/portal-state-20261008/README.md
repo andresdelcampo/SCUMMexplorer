@@ -1,5 +1,7 @@
 # Closed Room 34 portal and invalid Rusty return
 
+**Checkpoint scope, reconciled 8 October:** `ebdf3b2` correctly blocks closed/untouchable portal traversal and preserves prepared ghost/restoration state. It did not supply missing story history for a fresh direct Room 46 catalog selection. The user's subsequent fresh 46 → 34 report is separately corrected in `9de8193` by approved actual source prerequisites; see [catalog return validation](../catalog-return-20261008/README.md). The standalone fortress reveal remains parked. Instructions and counts below describe this earlier portal checkpoint.
+
 The user reported ordinary SCUMMexplorer traversal from Room 34 through the visually closed portal to Room 46 and back. Sleeping Rusty then spoke and walked as the ghost; subsequent appearances used the wrong story state. The standalone fortress-reveal investigation is parked at the user's request. This packet concerns the unintended portal traversal only. Plan, prompt and handoff files were left untouched by this fix.
 
 ## Reproduction and source explanation

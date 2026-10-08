@@ -1,5 +1,7 @@
 # Final-gap investigation — 8 October 2026
 
+**Subsequent status:** native v4 VGA walking was corrected in [the walking checkpoint](../native-walk-20261008/README.md); the standalone Room 34 fortress reveal is parked. The separate fresh English Room 46 → 34 ghost-return defect was corrected with user-approved source prerequisites in [the catalog checkpoint](../catalog-return-20261008/README.md). Current remaining work is in [the live plan](../../docs/LOOM_EGA_PLAN.md). The findings/counts below describe this earlier investigation.
+
 This is a focused follow-up to the [correctness audit](../correctness-20261008/README.md). Its baseline remains historical evidence, not a rerun of every replay. All commands run from `D:\Documents\Personal\Code Projects\SCUMMexplorer` through the required RTK wrapper. Game bytes, user saves and ROMs are unchanged.
 
 ## Room 70: corrected operand grammar
@@ -53,7 +55,7 @@ The callback probe records entry and target boundaries separately. Placement is 
 
 English EGA, Spanish EGA and VGA each independently retain the same monitor offsets: current-box test `+0x0020`, previous-box test `+0x0027`, camera test `+0x002E`, cutscene `+0x0035`. Their written story bits differ: English `DCF`, Spanish `DD0`, VGA `070`. The EGA historical offset is now checked against both actual language resources.
 
-The matching ScummVM [actor factory](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/scumm.cpp) selects `Actor_v3` only for version 3, and `Actor` for ordinary version 4. Their [walking/path/step algorithms](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/actor.cpp) differ. The explorer currently uses the old-v3 walker for both editions. This is a concrete comparison gap relevant to the VGA crossing; it does not establish that changing the walker will trigger the branch. Do not classify the source branch as unused before comparing native v4 behavior.
+The matching ScummVM [actor factory](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/scumm.cpp) selects `Actor_v3` only for version 3, and `Actor` for ordinary version 4. Their [walking/path/step algorithms](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/actor.cpp) differ. At this checkpoint the explorer used the old-v3 walker for both editions; the subsequent native-v4 correction resolves that implementation gap. It does not prove that the standalone reveal is reachable or unused; that investigation remains parked.
 
 The packet includes entry/local/exit/object code, object names, room geometry and literal/dynamic caller operands. VGA object 610 in Room 46 is named `hole`; its look starts global 97, which returns to Room 34 at `(246,64)`. Room 34's named objects include Rusty, boy and grave. No LOOM saves were found in repository game/bundled folders or the usual local ScummVM save locations. The bundled ini and roaming configuration have old paths; they were not modified. The user was asked only whether an existing save is available near this return route, not to replay the game.
 
