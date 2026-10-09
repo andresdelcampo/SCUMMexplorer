@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: complete the source-earned seven-note excursion chain
+
+The English reference now returns from Room 46's actual Room 49/26/34 excursions and casts Closing on all four holes through loaded note input. The ghost-history Room 34 portal requires actual Healing restoration: the chain earns Healing from the pasture, five notes from crystal Use and six through reverse dragon-gold input before the approved source ghost preparation. All 25 assertions pass with 26/26 balanced scopes and Script 29(7). No direct Closing/Healing callbacks, status edits or catalog excursion returns; failed raw/incomplete chains retained. Clean isolated helper build, source/packet hashes and documentation links verified. No production change, full playthrough, physical/native/audio claim or push; original actor inventory remains unchanged/uncommitted. [Complete route and evidence](../.verification/earned-progression-20261009/ROUTES.md#complete-english-seven-note-chain).
+
 ## 9 October: earn the three remaining lesson slots
 
 Slots 3/7/11 now earn through the actual owlet/wolves observations, Room 23 monitor approach and Room 24 → 25 pasture arrival/introduction. Seven unique new English/Spanish EGA and CD learning checks plus an actual Script 106 control pass 37 assertions; packed words change only the learned mask and scopes balance. The source review corrects reversed guard descriptions: Script 106's completion bit and the pasture-completed bit suppress the early lessons. CD's approach uses its own different geometry. Clean isolated helper build and packet/source hashes verified; no production change, broad replay, physical input or native/audio claim. Original uncommitted actor inventory preserved. [Routes and evidence](../.verification/earned-progression-20261009/ROUTES.md).

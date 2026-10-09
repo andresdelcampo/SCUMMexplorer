@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Formats;
+using SCUMMexplorer.App;
 
 var output = Path.GetFullPath(args[1]);
 if (Directory.Exists(output)) throw new IOException("Use a fresh evidence directory.");
@@ -103,6 +104,21 @@ void PastureLesson()
     WalkBox(4); WalkBox(3);
     Use(25, Roots(25, 0x36, "startScript", "0xCC,").Single(), 0x36, "lamb-lesson");
 }
+void Cast(int room, int id, int verb, string stage)
+{
+    if (session.CurrentRoomId != room) throw new InvalidOperationException(stage + ": wrong room");
+    var target = data.ReadRoom(room).Objects.Single(o => o.Id == id);
+    session.Click(target.X + target.Width / 2, target.Y + target.Height / 2); Settle(stage + "-aim");
+    var draft = session.GameStatus.Drafts.Single(d => d.ForwardVerb == verb || d.ReverseVerb == verb);
+    bool reverse = draft.ReverseVerb == verb;
+    bool available = draft.Learned == true && (!reverse || draft.Reversible == true) && draft.Notes.Max() <= session.GameStatus.AvailableNoteCount;
+    Check(available, stage + ": draft source-available before input");
+    if (!available) throw new InvalidOperationException(stage + ": source prerequisite missing");
+    int start = session.SessionTrace.Count;
+    foreach (int note in reverse ? draft.Notes.Reverse() : draft.Notes) { session.PressKey("qwertyui"[note - 1]); for (int f = 0; f < 8; f++) Advance(); }
+    Settle(stage);
+    Check(session.SessionTrace.Skip(start).Any(t => t.Contains($"startObject runs object {id} verb 0x{verb:X2}")), stage + ": input dispatched own response");
+}
 void SaveRoom(int room)
 {
     SaveSource($"room-{room}-entry", data.RoomEntryScript(room));
@@ -159,6 +175,67 @@ try
     {
         PastureLesson();
         Lesson(11);
+    }
+    else if (route == "seven")
+    {
+        // Source-earned Healing and six notes are needed to restore Rusty on
+        // the Room 34 excursion. Catalog requests are explicit bounded starts.
+        PastureLesson(); Lesson(11);
+        session.VisitRoomById(13); Settle("crystal-arrival"); SaveRoom(13);
+        Use(13, Roots(13, 0x38, "startScript", "0x36,").First(), 0x38, "actual-crystal-use");
+        Check(session.GameStatus.AvailableNoteCount == 5, "actual crystal Use earns five notes");
+        session.VisitRoomById(62); Settle("gold-arrival"); SaveRoom(62);
+        Use(62, Roots(62, 0x36, "startScript", "0xC8,").First(), 0x36, "gold-lesson");
+        session.VisitRoomById(28); Settle("dragon-gold-arrival"); SaveRoom(28);
+        Cast(28, Roots(28, 0x3D, "startScript", "0xC8,").First(), 0x3D, "reverse-dragon-gold");
+        Check(session.GameStatus.AvailableNoteCount == 6, "actual reverse-gold input earns six notes");
+        if (session.GameStatus.AvailableNoteCount != 6) throw new InvalidOperationException("six-note prerequisite was not earned");
+        var recipe = LoomReplayCatalog.Load(game).CatalogStarts.SingleOrDefault(r => r.Room == 46);
+        if (recipe is not null)
+        {
+            // A real pickup already supplied the staff. Omit the catalog's
+            // redundant status-edit step; keep its reviewed source scenes.
+            if (session.GameStatus.StaffHeld != true) throw new InvalidOperationException("actual staff pickup absent");
+            recipe = recipe with { Stages = recipe.Stages.Select(stage => stage with { Steps = stage.Steps.Where(step => step.Kind != "staff").ToArray() }).ToArray() };
+            var result = LoomCatalogStartPreparer.Prepare(session, recipe);
+            if (result.Failure is not null) throw new InvalidOperationException(result.Failure);
+            Record("approved-source-catalog-prefix");
+        }
+        session.VisitRoomById(46); Settle("late-catalog-start");
+        SaveRoom(46);
+        var rd = data.ReadRoom(46);
+        var holes = data.ReadObjectVerbs(46, rd.Objects).Where(p => p.Value.Any(v => v.VerbId == 0x3B && !v.IsFallback)).Select(p => p.Key).ToArray();
+        foreach (int id in holes)
+        {
+            Use(46, id, 0x36, "hole-excursion-" + id);
+            if (session.CurrentRoomId != 46)
+            {
+                int room = session.CurrentRoomId!.Value; SaveRoom(room);
+                var objects = data.ReadRoom(room).Objects;
+                var returns = data.ReadObjectVerbs(room, objects).Where(p => p.Value.Any(v => v.VerbId == 0x38 && !v.IsFallback)).Where(p =>
+                    data.ReadObjectVerb(room, objects.Single(o => o.Id == p.Key), 0x38, out _)!.Instructions.Any(i => i.Operation == "loadRoomWithEgo" && i.Operands.Split(", ")[1] == "0x2E")).Select(p => p.Key).ToArray();
+                if (returns.Length != 1) throw new InvalidOperationException($"Room {room}: actual source return needs review ({returns.Length} direct roots)");
+                var portal = objects.Single(o => o.Id == returns[0]);
+                SaveSource($"room-{room}-object-{portal.Id}-38", data.ReadObjectVerb(room, portal, 0x38, out _));
+                // Normal input also runs the Walk callback before Use. Rusty's
+                // portal first completes its conversation, then accepts a later click.
+                for (int attempt = 0; attempt < 2 && session.CurrentRoomId == room; attempt++)
+                {
+                    session.Click(portal.X + portal.Width / 2, portal.Y + portal.Height / 2);
+                    Settle($"actual-hole-return-{id}-click-{attempt + 1}");
+                    if (session.CurrentRoomId == room)
+                    {
+                        var healing = Roots(room, 0x4D, "startScript", "0xD1,");
+                        if (healing.Length == 1) Cast(room, healing[0], 0x4D, "earned-Healing-return");
+                    }
+                }
+            }
+            if (session.CurrentRoomId != 46) throw new InvalidOperationException("excursion did not return to Room 46");
+            Cast(46, id, 0x3B, "cast-Closing-" + id);
+            Check(session.ObjectClasses.TryGetValue(id, out var cls) && (cls & (1u << 23)) != 0, "actual input closes hole " + id);
+        }
+        Check(observations.Any(o => o.Site is { Script: 29, Offset: 0, Stage: "instruction" } && o.Values.GetValueOrDefault("local[0x000]") == 7), "observed actual Script 29(7)");
+        Check(session.GameStatus.AvailableNoteCount == 7, "four actual closures earn seven notes");
     }
     else throw new ArgumentException("Unknown route");
     Check(!session.InCutscene && session.GameStatus.CanEdit, "settled outside cutscene");

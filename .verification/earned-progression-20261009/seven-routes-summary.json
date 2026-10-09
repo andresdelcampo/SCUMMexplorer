@@ -1,0 +1,320 @@
+﻿{
+    "kind":  "seven",
+    "cases":  1,
+    "assertions":  25,
+    "results":  [
+                    {
+                        "edition":  "ega-en",
+                        "route":  "seven",
+                        "packet":  "out-seven-dragon-gold/packet.json",
+                        "sha256":  "18F826BA83F0960BD06A1EFD4AADCF6E482C0BAEE3E3C620D87E8AE262D980F7",
+                        "assertions":  25,
+                        "frames":  5870,
+                        "scopes":  26,
+                        "ended":  26,
+                        "slot":  null,
+                        "beforePacked":  null,
+                        "afterPacked":  null,
+                        "notesBefore":  3,
+                        "notesAfter":  7,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  25,
+                                            "sequence":  4941,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 exit script",
+                                            "container":  25,
+                                            "sequence":  5756,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  25,
+                                            "sequence":  5759,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 exit script",
+                                            "container":  25,
+                                            "sequence":  7455,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  25,
+                                            "sequence":  7458,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 Object 447 Verb 0x36",
+                                            "container":  25,
+                                            "sequence":  8238,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  11,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  9918,
+                                            "pathEstimated":  true
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 exit script",
+                                            "container":  25,
+                                            "sequence":  10572,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  29,
+                                            "argument":  5,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  11096,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  1,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  11884,
+                                            "pathEstimated":  true
+                                        },
+                                        {
+                                            "script":  29,
+                                            "argument":  6,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  12849,
+                                            "pathEstimated":  true
+                                        },
+                                        {
+                                            "script":  29,
+                                            "argument":  7,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  35578,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  74
+                                       },
+                                       {
+                                           "stage":  "outside-pasture",
+                                           "room":  24,
+                                           "notes":  3,
+                                           "frames":  116
+                                       },
+                                       {
+                                           "stage":  "actual-pasture-arrival",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  174
+                                       },
+                                       {
+                                           "stage":  "walk-box-4",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  256
+                                       },
+                                       {
+                                           "stage":  "walk-box-3",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  1461
+                                       },
+                                       {
+                                           "stage":  "lamb-lesson",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  2081
+                                       },
+                                       {
+                                           "stage":  "crystal-arrival",
+                                           "room":  13,
+                                           "notes":  3,
+                                           "frames":  2123
+                                       },
+                                       {
+                                           "stage":  "actual-crystal-use",
+                                           "room":  15,
+                                           "notes":  5,
+                                           "frames":  2229
+                                       },
+                                       {
+                                           "stage":  "gold-arrival",
+                                           "room":  62,
+                                           "notes":  5,
+                                           "frames":  2271
+                                       },
+                                       {
+                                           "stage":  "gold-lesson",
+                                           "room":  62,
+                                           "notes":  5,
+                                           "frames":  2345
+                                       },
+                                       {
+                                           "stage":  "dragon-gold-arrival",
+                                           "room":  28,
+                                           "notes":  5,
+                                           "frames":  2387
+                                       },
+                                       {
+                                           "stage":  "reverse-dragon-gold-aim",
+                                           "room":  28,
+                                           "notes":  5,
+                                           "frames":  2433
+                                       },
+                                       {
+                                           "stage":  "reverse-dragon-gold",
+                                           "room":  28,
+                                           "notes":  6,
+                                           "frames":  2735
+                                       },
+                                       {
+                                           "stage":  "approved-source-catalog-prefix",
+                                           "room":  34,
+                                           "notes":  6,
+                                           "frames":  2735
+                                       },
+                                       {
+                                           "stage":  "late-catalog-start",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  2777
+                                       },
+                                       {
+                                           "stage":  "hole-excursion-683",
+                                           "room":  49,
+                                           "notes":  6,
+                                           "frames":  2822
+                                       },
+                                       {
+                                           "stage":  "actual-hole-return-683-click-1",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  2883
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-683-aim",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  2929
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-683",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  3052
+                                       },
+                                       {
+                                           "stage":  "hole-excursion-684",
+                                           "room":  26,
+                                           "notes":  6,
+                                           "frames":  3102
+                                       },
+                                       {
+                                           "stage":  "actual-hole-return-684-click-1",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  3163
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-684-aim",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  3205
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-684",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  3328
+                                       },
+                                       {
+                                           "stage":  "hole-excursion-685",
+                                           "room":  34,
+                                           "notes":  6,
+                                           "frames":  3371
+                                       },
+                                       {
+                                           "stage":  "actual-hole-return-685-click-1",
+                                           "room":  34,
+                                           "notes":  6,
+                                           "frames":  4513
+                                       },
+                                       {
+                                           "stage":  "earned-Healing-return-aim",
+                                           "room":  34,
+                                           "notes":  6,
+                                           "frames":  4584
+                                       },
+                                       {
+                                           "stage":  "earned-Healing-return",
+                                           "room":  34,
+                                           "notes":  6,
+                                           "frames":  5236
+                                       },
+                                       {
+                                           "stage":  "actual-hole-return-685-click-2",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  5332
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-685-aim",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  5376
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-685",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  5499
+                                       },
+                                       {
+                                           "stage":  "hole-excursion-686",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  5580
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-686-aim",
+                                           "room":  46,
+                                           "notes":  6,
+                                           "frames":  5707
+                                       },
+                                       {
+                                           "stage":  "cast-Closing-686",
+                                           "room":  46,
+                                           "notes":  7,
+                                           "frames":  5870
+                                       }
+                                   ]
+                    }
+                ]
+}
