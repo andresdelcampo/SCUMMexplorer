@@ -6,6 +6,8 @@ Updated 9 October 2026. This is the single plan and session handoff. Completed w
 
 The requested bounded source work is complete: actor-state checks, slots 3/7/11 and the English seven-note excursion/Closing chain. Remaining native physical input, picture bounds and audio/timing are manual comparisons. Nothing has been pushed.
 
+Continuation review reconciled the comparison reference's stale progression checkpoint with the completed route evidence. No new production mismatch or straightforward source-only audio check is established; the manual comparison recipes remain open.
+
 LOOM EGA and CD/VGA have live interaction, actors, scripts, scene playback, Game Status and audio. English Roland EGA (`Games/loom ega mt32 en`) is the replay reference; derive comparison editions from their own data. Indy EGA supports backgrounds/text and conversation export; further gameplay is deferred.
 
 Room 43's checked arrivals and placement are accepted: the other two arrive after a couple of seconds, and the swordsman and Bobbin are correctly placed. Do not repeat this investigation. The English Rusty catalog-return correction and whole-draft WPF input checks are finished; their results are in the changelog, not new tasks.

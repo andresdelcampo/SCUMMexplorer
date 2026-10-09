@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: reconcile the remaining comparison checkpoint
+
+The comparison reference still listed slots 3/7/11 and seven-note progression as pending after their routes were completed. It now records the 40 unique lessons, 37 additional lesson/control assertions and the English seven-note chain's 25 assertions/26 balanced scopes, preserving the source-preparation and edition limits. The current handoff confirms that remaining picture/input/audio evidence is manual. Validation: all 318 relative links across three changed guides resolve; whitespace check passes. Documentation only; no runtime route rerun, native control or push. [Comparison reference](loom/FINAL_GAPS_HANDOFF.md).
+
 ## 9 October: complete the source-earned seven-note excursion chain
 
 The English reference now returns from Room 46's actual Room 49/26/34 excursions and casts Closing on all four holes through loaded note input. The ghost-history Room 34 portal requires actual Healing restoration: the chain earns Healing from the pasture, five notes from crystal Use and six through reverse dragon-gold input before the approved source ghost preparation. All 25 assertions pass with 26/26 balanced scopes and Script 29(7). No direct Closing/Healing callbacks, status edits or catalog excursion returns; failed raw/incomplete chains retained. Clean isolated helper build, source/packet hashes and documentation links verified. No production change, full playthrough, physical/native/audio claim or push; original actor inventory remains unchanged/uncommitted. [Complete route and evidence](../.verification/earned-progression-20261009/ROUTES.md#complete-english-seven-note-chain).
