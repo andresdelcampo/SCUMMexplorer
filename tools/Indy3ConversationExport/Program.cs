@@ -137,7 +137,7 @@ static bool IsIndirectTravelPicker(ScummScriptDisassembly? disassembly)
 
 static ScummScriptDisassembly? ReadSourceDisassembly(IReadOnlyList<LoomTextEntry> rows, int? scriptId, GameLibrary game)
 {
-    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
     try
     {
         if (scriptId is int indexed)
@@ -177,7 +177,7 @@ static Conversation[] LinkConversationMenus(Conversation[] groups, GameLibrary g
     var scripts = new Dictionary<int, ScummScriptDisassembly>();
     var resources = game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
         .ToDictionary(item => item.ResourceId!.Value);
-    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
     foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
     {
         try { scripts[resource.ResourceId!.Value] = reader.Decode(resource); }
@@ -387,7 +387,7 @@ static Conversation[] LinkConversationMenus(Conversation[] groups, GameLibrary g
 
 static Conversation[] TraceBranchReplies(Conversation[] groups, LoomTextExtraction extraction, GameLibrary game)
 {
-    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
     var resources = game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
         .ToDictionary(item => item.ResourceId!.Value);
     var updated = new List<Conversation>(groups.Length);
@@ -534,7 +534,7 @@ static Conversation[] TraceBranchReplies(Conversation[] groups, LoomTextExtracti
 
 static Conversation[] TraceOpeningLines(Conversation[] groups, LoomTextExtraction extraction, GameLibrary game)
 {
-    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
     var resources = game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
         .ToDictionary(item => item.ResourceId!.Value);
     var updated = new List<Conversation>(groups.Length);
@@ -615,7 +615,7 @@ static Conversation[] TraceOpeningLines(Conversation[] groups, LoomTextExtractio
 
 static Conversation[] ExpandConditionalOptions(Conversation[] groups, LoomTextExtraction extraction, GameLibrary game)
 {
-    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
     var scripts = new Dictionary<int, ScummScriptDisassembly>();
     foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
     {

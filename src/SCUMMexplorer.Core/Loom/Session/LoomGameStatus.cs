@@ -24,15 +24,12 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
     {
         var cd = game.Id == GameId.LoomVga;
         if (!cd && (game.Id != GameId.Loom || game.Version != ScummVersion.V3)) throw new InvalidDataException("Game status fields have only been established for LOOM old-v3 and LOOM on CD.");
-        if (cd && data is null) throw new InvalidDataException("The CD game's scripts are read through its data source.");
-        var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+        data ??= ScummDataSources.For(game);
         var scripts = new Dictionary<int, IReadOnlyList<ScummScriptInstruction>>();
-        int scriptCount = game.Resources.Count(r => r.Kind == ResourceKind.Script);
         IReadOnlyList<ScummScriptInstruction> Code(int id)
         {
             if (!scripts.TryGetValue(id, out var code))
-                scripts[id] = code = (cd ? data!.GlobalScript(id) ?? throw new InvalidDataException($"Loaded script {id:000} is missing.")
-                    : reader.Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == id))).Instructions.ToList();
+                scripts[id] = code = (data.GlobalScript(id) ?? throw new InvalidDataException($"Loaded script {id:000} is missing.")).Instructions.ToList();
             return code;
         }
         InvalidDataException Fail(string where) => new($"Loaded script {where} does not establish the status contract.");
@@ -115,8 +112,8 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
                 "Staff edits refresh the look through 017 and the note controls through 018/019. " +
                 "These explicit edits are exploration choices, not source-established pickups or learning.", lookKey, costumeKey);
         }
-        var init = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 1), 211, scriptCount);
-        var checkpoint = reader.DecodeRoomLocalScript(game.Rooms.Single(r => r.ResourceId == 46), 204, scriptCount);
+        var init = data.RoomLocalScript(1, 211);
+        var checkpoint = data.RoomLocalScript(46, 204);
         if (init is null || !init.Instructions.Any(i => i.Operation == "move" && i.Operands == "var[0x07A] = 0x0003") || checkpoint is null)
             throw new InvalidDataException("Loaded staff progression checkpoints are unresolved.");
         var cp = checkpoint.Instructions.ToList();

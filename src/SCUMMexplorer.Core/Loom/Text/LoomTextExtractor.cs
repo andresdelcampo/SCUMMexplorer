@@ -38,7 +38,7 @@ public sealed class LoomTextExtractor
     public LoomTextExtraction Extract(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
-        var dialect = ScummScriptDialects.For(game.Id);
+        var dialect = ScummProfile.For(game).Dialect;
         var scripts = new ScummScriptReader(dialect);
         var verbs = new ScummObjectVerbReader(dialect);
         var entries = new List<LoomTextEntry>();

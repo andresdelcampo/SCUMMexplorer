@@ -581,7 +581,7 @@ public sealed class ScummBoundedScriptExecutor
                     break;
                 }
                 runtime.SetObjectOwner(objectId, (byte)owner);
-                if (knownVariables.TryGetValue("var[0x001]", out var ego))
+                if (knownVariables.TryGetValue(ScummVars.Ego, out var ego))
                 {
                     if (owner == ego) runtime.AddInventoryObject(objectId);
                     else runtime.RemoveInventoryObject(objectId);
@@ -709,7 +709,7 @@ public sealed class ScummBoundedScriptExecutor
             }
 
             if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands == "camera" &&
-                knownVariables.TryGetValue("var[0x002]", out var cameraWaitX))
+                knownVariables.TryGetValue(ScummVars.CameraPosX, out var cameraWaitX))
             {
                 // o5_wait (SO_WAIT_FOR_CAMERA): breaks while the camera is not on its destination's strip.
                 if (cameraWaitX / 8 != runtime.Camera.DestX / 8)
@@ -881,16 +881,16 @@ public sealed class ScummBoundedScriptExecutor
                 if (instruction.Operation == "panCameraTo")
                 {
                     runtime.Camera.Mode = ScummCamera.Panning;
-                    if (cameraEstimated) MarkEstimated(estimated, "var[0x002]", true);
+                    if (cameraEstimated) MarkEstimated(estimated, ScummVars.CameraPosX, true);
                     trace.Add($"camera pans to x = {(short)cameraX} ({instruction.Operation} {instruction.Operands})");
                     pc = next;
                     continue;
                 }
                 runtime.Camera.Mode = ScummCamera.Normal;
                 var clamped = (ushort)Math.Clamp(cameraX, range.Min, range.Max);
-                knownVariables["var[0x002]"] = clamped;
-                RefreshBitAliases("var[0x002]", knownVariables);
-                MarkEstimated(estimated, "var[0x002]", cameraEstimated);
+                knownVariables[ScummVars.CameraPosX] = clamped;
+                RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
+                MarkEstimated(estimated, ScummVars.CameraPosX, cameraEstimated);
                 trace.Add($"camera x = {clamped} ({instruction.Operation} {instruction.Operands})");
                 pc = next;
                 continue;
@@ -952,22 +952,22 @@ public sealed class ScummBoundedScriptExecutor
                 {
                     var low = (ushort)Math.Clamp((int)scrollMin, bounds.Min, bounds.Max);
                     var high = (ushort)Math.Clamp((int)scrollMax, bounds.Min, bounds.Max);
-                    knownVariables["var[0x011]"] = low;
-                    knownVariables["var[0x012]"] = high;
-                    RefreshBitAliases("var[0x011]", knownVariables);
-                    RefreshBitAliases("var[0x012]", knownVariables);
-                    MarkEstimated(estimated, "var[0x011]", onEstimatedPath || OperandIsEstimated(scroll[1], estimated, knownVariables));
-                    MarkEstimated(estimated, "var[0x012]", onEstimatedPath || OperandIsEstimated(scroll[2], estimated, knownVariables));
+                    knownVariables[ScummVars.CameraMinX] = low;
+                    knownVariables[ScummVars.CameraMaxX] = high;
+                    RefreshBitAliases(ScummVars.CameraMinX, knownVariables);
+                    RefreshBitAliases(ScummVars.CameraMaxX, knownVariables);
+                    MarkEstimated(estimated, ScummVars.CameraMinX, onEstimatedPath || OperandIsEstimated(scroll[1], estimated, knownVariables));
+                    MarkEstimated(estimated, ScummVars.CameraMaxX, onEstimatedPath || OperandIsEstimated(scroll[2], estimated, knownVariables));
                     // setCameraAt and moveCamera clamp to the minimum, then the maximum,
                     // so the maximum wins if the limits cross.
                     runtime.CameraRange = (Math.Min(low, high), high);
                     trace.Add($"camera limits = {low}..{high} (roomScroll)");
-                    if (knownVariables.TryGetValue("var[0x002]", out var cameraNow) &&
+                    if (knownVariables.TryGetValue(ScummVars.CameraPosX, out var cameraNow) &&
                         (cameraNow < runtime.CameraRange.Value.Min || cameraNow > runtime.CameraRange.Value.Max))
                     {
                         var inside = (ushort)Math.Clamp((int)cameraNow, runtime.CameraRange.Value.Min, runtime.CameraRange.Value.Max);
-                        knownVariables["var[0x002]"] = inside;
-                        RefreshBitAliases("var[0x002]", knownVariables);
+                        knownVariables[ScummVars.CameraPosX] = inside;
+                        RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
                         trace.Add($"camera x = {inside}: moved inside the new limits");
                         limitations.Add($"timing not simulated: the camera moves 8 pixels a frame into its new limits and reaches x = {inside} at once (+0x{instruction.Offset:X4})");
                     }
@@ -993,12 +993,12 @@ public sealed class ScummBoundedScriptExecutor
                                         (actor.Unknown is null ? "" : $" ({actor.Unknown})");
                     else if (actor.Room != runtime.CurrentRoom)
                         cameraUnknown = $"it follows actor {followed} into Room {actor.Room:00}, which would load that room (not modelled)";
-                    else if (!knownVariables.TryGetValue("var[0x002]", out var cameraBefore))
+                    else if (!knownVariables.TryGetValue(ScummVars.CameraPosX, out var cameraBefore))
                         cameraUnknown = "the camera's position before it was unknown";
                     else
                     {
                         var strip = actorX / 8 - ScummCamera.ScreenStartStrip(cameraBefore);
-                        var wasEstimated = estimated.Contains("var[0x002]");
+                        var wasEstimated = estimated.Contains(ScummVars.CameraPosX);
                         runtime.Camera.Mode = ScummCamera.FollowActor;
                         runtime.Camera.Follows = followed;
                         if (strip is < ScummCamera.LeftTrigger or > ScummCamera.RightTrigger)
@@ -1009,14 +1009,14 @@ public sealed class ScummBoundedScriptExecutor
                             if (Math.Abs(actorX - cameraBefore) > 160)
                             {
                                 var clamped = (ushort)Math.Clamp(actorX, followRange.Min, followRange.Max);
-                                knownVariables["var[0x002]"] = clamped;
-                                RefreshBitAliases("var[0x002]", knownVariables);
+                                knownVariables[ScummVars.CameraPosX] = clamped;
+                                RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
                                 trace.Add($"camera x = {clamped}: it follows actor {followed} at x = {actorX} (actorFollowCamera)");
                             }
                             else trace.Add($"camera pans from x = {cameraBefore} to actor {followed} at x = {actorX} (actorFollowCamera)");
                         }
                         else trace.Add($"camera x stays {cameraBefore}: actor {followed} at x = {actorX} is within its triggers (actorFollowCamera)");
-                        MarkEstimated(estimated, "var[0x002]", onEstimatedPath || actor.Estimate is not null || wasEstimated ||
+                        MarkEstimated(estimated, ScummVars.CameraPosX, onEstimatedPath || actor.Estimate is not null || wasEstimated ||
                             OperandIsEstimated(operand, estimated, knownVariables));
                         if (actor.Estimate is not null)
                             limitations.Add($"camera x follows actor {followed}, whose position is an estimate ({actor.Estimate}) (+0x{instruction.Offset:X4})");
@@ -1024,9 +1024,9 @@ public sealed class ScummBoundedScriptExecutor
                 }
                 if (cameraUnknown is not null)
                 {
-                    knownVariables.Remove("var[0x002]");
-                    runtime.RemoveGlobalVariable("var[0x002]");
-                    estimated.Remove("var[0x002]");
+                    knownVariables.Remove(ScummVars.CameraPosX);
+                    runtime.RemoveGlobalVariable(ScummVars.CameraPosX);
+                    estimated.Remove(ScummVars.CameraPosX);
                     limitations.Add($"camera x (var[0x002]) is unknown after actorFollowCamera: {cameraUnknown} (+0x{instruction.Offset:X4})");
                 }
                 pc = next;
@@ -1330,7 +1330,7 @@ public sealed class ScummBoundedScriptExecutor
     {
         var actors = runtime.Actors;
         var place = PlacementOf(runtime);
-        int? ego = variables.TryGetValue("var[0x001]", out var egoValue) ? egoValue : null;
+        int? ego = variables.TryGetValue(ScummVars.Ego, out var egoValue) ? egoValue : null;
         var label = $"{instruction.Operation} at +0x{instruction.Offset:X4}";
         var operands = instruction.Operands;
         var parts = operands.Split(',', StringSplitOptions.TrimEntries);
@@ -1529,7 +1529,7 @@ public sealed class ScummBoundedScriptExecutor
             detail = $"print operands are not in the expected form ({operands})";
             return false;
         }
-        var actorOperand = instruction.Operation == "printEgo" ? "var[0x001]" : operands[..split].Trim();
+        var actorOperand = instruction.Operation == "printEgo" ? ScummVars.Ego : operands[..split].Trim();
         if (!TryReadValue(actorOperand, variables, out var actor, out _))
         {
             detail = $"print names an actor the preview cannot read ({actorOperand})";
@@ -1858,10 +1858,10 @@ public sealed class ScummBoundedScriptExecutor
                 picks.Add(pick);
                 trace.Add($"{randomDestination} = {pick.Value}: nested seeded pick of 0..{max} (seed {pick.Seed}, draw {pick.Draw})");
                 observe?.Invoke("nested-write", [("destination-after", randomDestination)], null);
-                observe?.Invoke("scratch-read", [("implicit-scratch", "var[0x000]")], null);
-                if (!TryReadValue("var[0x000]", variables, out var scratch, out _))
+                observe?.Invoke("scratch-read", [("implicit-scratch", ScummVars.Result)], null);
+                if (!TryReadValue(ScummVars.Result, variables, out var scratch, out _))
                 { detail = "nested expression opcode leaves var[0x000] unknown"; return false; }
-                stack.Push((unchecked((short)scratch), IsEstimated("var[0x000]", estimated)));
+                stack.Push((unchecked((short)scratch), IsEstimated(ScummVars.Result, estimated)));
             }
             else
             {
@@ -1954,7 +1954,7 @@ public sealed class ScummBoundedScriptExecutor
                 !short.TryParse(match.Groups[4].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var y)) return [];
             ScummScriptOperandBinding Coordinate(string role, short value, string original) =>
                 Bind(role, $"0x{unchecked((ushort)value):X4}") with { Operand = original };
-            return [Bind("implicit-ego", "var[0x001]"), Bind("target", match.Groups[1].Value), Bind("room", match.Groups[2].Value),
+            return [Bind("implicit-ego", ScummVars.Ego), Bind("target", match.Groups[1].Value), Bind("room", match.Groups[2].Value),
                 Coordinate("walk-x", x, match.Groups[3].Value), Coordinate("walk-y", y, match.Groups[4].Value)];
         }
         if (extended && op == "drawObject")
@@ -1971,7 +1971,7 @@ public sealed class ScummBoundedScriptExecutor
             // Keep the original explicit roles/order. The ego read drives the separate
             // inventory membership update; it supplies no owner or inventory provenance.
             return parts.Length == 2 ? [Bind("target", parts[0]), Bind("source", parts[1]),
-                Bind("implicit-ego", "var[0x001]")] : [];
+                Bind("implicit-ego", ScummVars.Ego)] : [];
         }
         if (extended && (IsActorQuery(op) || op is "getDist" or "findObject" or "isSoundRunning" or "isScriptRunning" or "getObjectOwner"))
         {
@@ -2030,7 +2030,7 @@ public sealed class ScummBoundedScriptExecutor
         if (extended && op == "waitFor")
         {
             if (text == "message") return [Bind("implicit-message", ScummMessageTable.HaveMsgVariable)];
-            if (text == "camera") return [Bind("implicit-camera", "var[0x002]")];
+            if (text == "camera") return [Bind("implicit-camera", ScummVars.CameraPosX)];
             var parts = text.Split(',', StringSplitOptions.TrimEntries);
             return parts.Length == 2 && parts[0] == "actor" ? [Bind("target", parts[1])] : [];
         }
@@ -2081,7 +2081,7 @@ public sealed class ScummBoundedScriptExecutor
             var open = text.IndexOf(", [", StringComparison.Ordinal);
             if (open < 0 || !text.EndsWith(']')) return [];
             var result = new List<ScummScriptOperandBinding> {
-                Bind(op == "printEgo" ? "implicit-ego" : "target", op == "printEgo" ? "var[0x001]" : text[..open])
+                Bind(op == "printEgo" ? "implicit-ego" : "target", op == "printEgo" ? ScummVars.Ego : text[..open])
             };
             var items = text[(open + 3)..^1].Split(';', StringSplitOptions.TrimEntries);
             if (items.Length > 128) return [];

@@ -22,7 +22,7 @@ public sealed class LoomScriptIndexTests
         if (!File.Exists(indexPath)) return;
         var index = new LflIndexReader().Read(indexPath);
         var game = new GameFolderScanner().Scan(Folder);
-        var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+        var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
 
         var failing = new List<int>();
         foreach (var script in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))

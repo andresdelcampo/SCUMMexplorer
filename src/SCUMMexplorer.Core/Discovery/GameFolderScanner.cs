@@ -181,7 +181,7 @@ public sealed class GameFolderScanner
     private static int DropUnreadableDemoResources(string folder, List<GameResource> resources)
     {
         var provisional = new GameLibrary("LOOM (demo)", folder, ScummVersion.V3, "DOS (inferred)", resources, "", GameId.Loom, true);
-        var scripts = new ScummScriptReader(ScummScriptDialects.For(GameId.Loom));
+        var scripts = new ScummScriptReader(ScummScriptDialect.V3);
         bool Reads(GameResource resource)
         {
             try

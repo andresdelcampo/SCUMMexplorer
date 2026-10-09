@@ -17,7 +17,7 @@ public sealed class LoomRoomSoundCandidates
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(room);
-        var dialect = ScummScriptDialects.For(game.Id);
+        var dialect = ScummProfile.For(game).Dialect;
         if (_scripts.Dialect != dialect)
         {
             _scripts = new ScummScriptReader(dialect);

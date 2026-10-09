@@ -17,8 +17,8 @@ internal sealed class ConversationRoomResolver
 
     public ConversationRoomResolver(GameLibrary game)
     {
-        var reader = new ScummScriptReader(ScummScriptDialect.Indy3);
-        var verbReader = new ScummObjectVerbReader(ScummScriptDialect.Indy3);
+        var reader = new ScummScriptReader(ScummScriptDialect.V3Indy3);
+        var verbReader = new ScummObjectVerbReader(ScummScriptDialect.V3Indy3);
         var directory = new ScummRoomObjectDirectory();
         var chains = new LflResourceChain();
         var globals = new Dictionary<int, Source>();

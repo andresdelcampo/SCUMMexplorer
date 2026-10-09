@@ -59,10 +59,10 @@ public interface IScummDataSource
 
 public static class ScummDataSources
 {
-    /// <summary>The data source for a game: the CD archive for <see cref="GameId.LoomVga"/>, the LFL files otherwise.</summary>
+    /// <summary>The data source for a game: the v4 archive for v4 games, the LFL files otherwise.</summary>
     public static IScummDataSource For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
-        return game.Id == GameId.LoomVga ? new ScummV4DataSource(game) : new ScummV3DataSource(game);
+        return ScummProfile.For(game).UsesV4Archive ? new ScummV4DataSource(game) : new ScummV3DataSource(game);
     }
 }

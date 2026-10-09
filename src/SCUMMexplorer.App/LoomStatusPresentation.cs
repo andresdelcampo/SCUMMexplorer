@@ -49,7 +49,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
             }
             else
             {
-                script = new ScummScriptReader(ScummScriptDialects.For(game.Id)).Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == 18));
+                script = new ScummScriptReader(ScummProfile.For(game).Dialect).Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == 18));
                 var bytes = File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 1).FilePath);
                 objects = new ScummRoomObjects().Decode(bytes);
                 palette = new ScummV3EgaRoomDecoder().Decode(bytes).Palette;

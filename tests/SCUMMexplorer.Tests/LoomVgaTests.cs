@@ -74,7 +74,7 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+        var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
         var count = 0;
         foreach (var room in game.V4Archive!.Rooms)
             foreach (var script in game.V4Archive.ReadScripts(room.Number))
@@ -95,7 +95,7 @@ public sealed class LoomVgaTests
     public void TheV4DialectReadsItsOwnOperandForms(string hex, string operation, string startsWith)
     {
         var code = Convert.FromHexString(hex.Replace(" ", ""));
-        var decoded = new ScummScriptReader(ScummScriptDialect.LoomCd).DecodeCode(code);
+        var decoded = new ScummScriptReader(ScummScriptDialect.V4).DecodeCode(code);
         var first = decoded.Instructions.First();
         Assert.Equal(operation, first.Operation);
         Assert.StartsWith(startsWith, first.Operands, StringComparison.Ordinal);

@@ -13,7 +13,7 @@ public sealed class ScummV3DataSource : IScummDataSource
     public ScummV3DataSource(GameLibrary game)
     {
         _game = game;
-        var dialect = ScummScriptDialects.For(game.Id);
+        var dialect = ScummProfile.For(game).Dialect;
         _reader = new ScummScriptReader(dialect);
         _verbs = new ScummObjectVerbReader(dialect);
         GlobalScriptCount = ReadGlobalScriptCount(game);

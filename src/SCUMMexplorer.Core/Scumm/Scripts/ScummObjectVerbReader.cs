@@ -12,7 +12,7 @@ public sealed record ScummObjectVerbEntry(int ObjectId, int VerbId, int CodeOffs
 }
 
 /// <summary>Reads the three-byte verb entries at OBCD+17 in old-bundle LOOM rooms.</summary>
-public sealed class ScummObjectVerbReader(ScummScriptDialect dialect = ScummScriptDialect.Loom)
+public sealed class ScummObjectVerbReader(ScummScriptDialect dialect = ScummScriptDialect.V3)
 {
     public IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> ReadAll(
         ReadOnlySpan<byte> encodedRoom, IReadOnlyList<ScummRoomObjectRecord> records)

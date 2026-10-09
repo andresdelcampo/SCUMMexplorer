@@ -23,33 +23,13 @@ public sealed class LoomDoorwayFinder
     private static readonly Regex Literal = new(@"^0x(?<value>[0-9A-Fa-f]+)$", RegexOptions.CultureInvariant);
     private static readonly Regex LocalVariable = new(@"^local\[0x(?<index>[0-9A-Fa-f]+)\]$", RegexOptions.CultureInvariant);
     private readonly GameLibrary _game;
-    private readonly ScummScriptReader _reader;
-    private readonly int _globalScriptCount;
-    /// <summary>The CD game keeps its scripts in the disc archive, not in LFL files: its scripts come from this source.</summary>
-    private readonly IScummDataSource? _cdData;
+    private readonly IScummDataSource _data;
     private readonly Dictionary<string, ScummScriptDisassembly?> _cache = [];
 
     public LoomDoorwayFinder(GameLibrary game)
     {
         _game = game ?? throw new ArgumentNullException(nameof(game));
-        _reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
-        if (game.Id == GameId.LoomVga)
-        {
-            _cdData = ScummDataSources.For(game);
-            _globalScriptCount = _cdData.GlobalScriptCount;
-            return;
-        }
-        var indexPath = Path.Combine(game.FolderPath, "00.LFL");
-        try
-        {
-            _globalScriptCount = File.Exists(indexPath)
-                ? new LflIndexReader().ReadDeclaredScriptCount(indexPath)
-                : DefaultScriptCount(game);
-        }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException)
-        {
-            _globalScriptCount = DefaultScriptCount(game);
-        }
+        _data = ScummDataSources.For(game);
     }
 
     public IReadOnlyList<LoomDoorwayTarget> Find(GameResource room, ScummScriptDisassembly verbScript)
@@ -81,7 +61,7 @@ public sealed class LoomDoorwayFinder
             var split = instruction.Operands.Split(',', 2, StringSplitOptions.TrimEntries);
             if (!TryResolve(split[0], locals, out var scriptId)) continue;
             var arguments = ReadArguments(split.ElementAtOrDefault(1), locals);
-            var isLocal = scriptId >= _globalScriptCount;
+            var isLocal = scriptId >= _data.GlobalScriptCount;
             var key = isLocal ? $"{room.ResourceId}:{scriptId}" : $"g:{scriptId}";
             if (!visiting.Add(key)) continue;
             var child = Load(room, scriptId, isLocal, key);
@@ -99,12 +79,7 @@ public sealed class LoomDoorwayFinder
         ScummScriptDisassembly? script = null;
         try
         {
-            if (_cdData is not null)
-                script = isLocal ? _cdData.RoomLocalScript(room.ResourceId!.Value, scriptId) : _cdData.GlobalScript(scriptId);
-            else if (isLocal) script = _reader.DecodeRoomLocalScript(room, scriptId, _globalScriptCount);
-            else if (_game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Script &&
-                         item.ResourceId == scriptId) is { } resource)
-                script = _reader.Decode(resource);
+            script = isLocal ? _data.RoomLocalScript(room.ResourceId!.Value, scriptId) : _data.GlobalScript(scriptId);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException)
         {
@@ -139,8 +114,4 @@ public sealed class LoomDoorwayFinder
                int.TryParse(local.Groups["index"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var index) &&
                locals.TryGetValue(index, out value);
     }
-
-    private static int DefaultScriptCount(GameLibrary game) =>
-        game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
-            .Select(item => item.ResourceId!.Value).DefaultIfEmpty(-1).Max() + 1;
 }

@@ -174,7 +174,7 @@ public sealed class ScummMessageTable
     /// <summary>Every <c>sayVoice</c> a reached print issued, in order (the game starts or stops the voice when the print is decoded, text or not).</summary>
     public IReadOnlyList<ScummVoiceCue> VoiceEvents => _voiceEvents;
 
-    private const string MusicTimerVariable = "var[0x00E]";
+    private const string MusicTimerVariable = ScummVars.MusicTimer;
 
     /// <summary>
     /// ScummVM's <c>_cdMusicTimer</c> (soundcd.cpp): zero when a voice or music cue starts, then one more every fourth tick of a 240 Hz
@@ -614,9 +614,9 @@ public sealed class ScummMessageTable
     }
 
     /// <summary><c>VAR_HAVE_MSG</c> (v3 var 3).</summary>
-    public const string HaveMsgVariable = "var[0x003]";
+    public const string HaveMsgVariable = ScummVars.HaveMsg;
     /// <summary><c>VAR_CHARINC</c> (v3 var 37): jiffies per character; script 001 +0x0012 sets 5.</summary>
-    public const string CharIncVariable = "var[0x025]";
+    public const string CharIncVariable = ScummVars.CharInc;
 
     private sealed class Slot
     {

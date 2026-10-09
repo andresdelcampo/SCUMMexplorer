@@ -27,7 +27,7 @@ public sealed class LoomDemoTests
         Assert.Equal(rooms, game.Rooms.Count());
         // The black carrier rooms (no objects, one flat colour) are no scenes: 2 of the short demo's 16, 10 of the long one's 32.
         Assert.Equal(rooms - (rooms == 16 ? 2 : 10), game.Scenes.Count());
-        var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+        var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
         foreach (var script in game.Resources.Where(r => r.Kind == ResourceKind.Script))
             Assert.NotEmpty(reader.Decode(script).Instructions);
         var chains = new LflResourceChain();

@@ -6,14 +6,14 @@ namespace SCUMMexplorer.Core.Scumm;
 
 /// <summary>
 /// The CD game's data (SCUMM v4, DISK01.LEC) behind <see cref="IScummDataSource"/>: scripts and objects as <see cref="ScummV4Archive"/>
-/// reads them, decoded with the <see cref="ScummScriptDialect.LoomCd"/> dialect. Offsets in the records it returns count from the start
+/// reads them, decoded with the <see cref="ScummScriptDialect.V4"/> dialect. Offsets in the records it returns count from the start
 /// of the object's OC block (the EGA game's count from the room). Walk boxes come from the room's BX block.
 /// </summary>
 public sealed class ScummV4DataSource : IScummDataSource
 {
     private const int Container = 1;
     private readonly ScummV4Archive _archive;
-    private readonly ScummScriptReader _reader = new(ScummScriptDialects.For(GameId.LoomVga));
+    private readonly ScummScriptReader _reader = new(ScummScriptDialect.V4);
     private readonly Dictionary<int, IReadOnlyList<ScummV4Script>> _scripts = [];
     private readonly Dictionary<int, IReadOnlyList<ScummV4Object>> _objects = [];
 

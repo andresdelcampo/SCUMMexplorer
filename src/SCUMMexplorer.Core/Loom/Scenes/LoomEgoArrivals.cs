@@ -292,7 +292,7 @@ public sealed class LoomEgoArrivalIndex
                 continue;
             var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
             var first = operation == "actorOps" ? instruction.Operands[..Math.Max(0, instruction.Operands.IndexOf(", [", StringComparison.Ordinal))] : parts[0];
-            int? number = first == "var[0x001]" ? 1 : LiteralValue(first);
+            int? number = first == ScummVars.Ego ? 1 : LiteralValue(first);
             if (number is null)
             {
                 // An actor the index cannot read could be the ego.

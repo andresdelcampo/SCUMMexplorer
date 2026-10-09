@@ -8,7 +8,7 @@ var game = new GameFolderScanner().Scan(Path.GetFullPath(folder));
 if (args.Length > 2 && args[1] == "--script" && int.TryParse(args[2], out var requestedScript))
 {
     var selected = game.Resources.First(r => r.Kind == ResourceKind.Script && r.ResourceId == requestedScript);
-    Console.WriteLine(new ScummScriptReader(ScummScriptDialect.Indy3).Decode(selected).Format());
+    Console.WriteLine(new ScummScriptReader(ScummScriptDialect.V3Indy3).Decode(selected).Format());
     return;
 }
 var extraction = new LoomTextExtractor().Extract(game);
@@ -54,8 +54,8 @@ var outsideLabels = extraction.Entries
     .Select(g => new { source = g.Key, labels = g.Select(e => new { e.ScriptId, e.RoomId, e.CodeOffset, e.Text }).ToArray() })
     .ToArray();
 
-var reader = new ScummScriptReader(ScummScriptDialect.Indy3);
-var verbReader = new ScummObjectVerbReader(ScummScriptDialect.Indy3);
+var reader = new ScummScriptReader(ScummScriptDialect.V3Indy3);
+var verbReader = new ScummObjectVerbReader(ScummScriptDialect.V3Indy3);
 var objectDirectory = new ScummRoomObjectDirectory();
 var scripts = new List<(string Source, int? Room, int? Script, ScummScriptDisassembly Data)>();
 foreach (var resource in game.Resources.Where(r => r.Kind == ResourceKind.Script && r.ResourceId.HasValue))

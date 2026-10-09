@@ -10,23 +10,16 @@ public sealed record ScummScriptInstruction(int Offset, byte Opcode, string Oper
 public sealed record ScummScriptDecodeIssue(int Offset, string Reason);
 
 /// <summary>
-/// Game-specific old-v3 operand rules. Indiana Jones and the Last Crusade
-/// (non-Macintosh) differs from LOOM in a few opcodes; see ScummVM
-/// <c>o5_wait</c>, <c>o5_getActorX/Y</c> and <c>o3_waitForActor</c>.
+/// Operand rules that differ between engine variants (chosen by <see cref="ScummProfile"/>): old v3, Indiana Jones and the Last Crusade
+/// (non-Macintosh) which differs from LOOM in a few old-v3 opcodes (ScummVM <c>o5_wait</c>, <c>o5_getActorX/Y</c>, <c>o3_waitForActor</c>),
+/// and v4.
 /// </summary>
 public enum ScummScriptDialect
 {
-    Loom,
-    Indy3,
-    /// <summary>LOOM on CD (SCUMM v4): the v5 operand forms, which differ from the old-v3 ones in roomOps (sub-opcode first), the line-height print operand, charset cursor command and three opcodes (0x30, 0x3B, 0x4C).</summary>
-    LoomCd
-}
-
-public static class ScummScriptDialects
-{
-    public static ScummScriptDialect For(GameId game) =>
-        game == GameId.IndianaJones3 ? ScummScriptDialect.Indy3
-        : game == GameId.LoomVga ? ScummScriptDialect.LoomCd : ScummScriptDialect.Loom;
+    V3,
+    V3Indy3,
+    /// <summary>SCUMM v4 (LOOM CD): the v5 operand forms, which differ from the old-v3 ones in roomOps (sub-opcode first), the line-height print operand, charset cursor command and three opcodes (0x30, 0x3B, 0x4C).</summary>
+    V4
 }
 
 public sealed record ScummScriptDisassembly(
@@ -98,7 +91,7 @@ public sealed record ScummScriptDisassembly(
 }
 
 /// <summary>Reads and conservatively disassembles indexed DOS LOOM old-v3 script resources.</summary>
-public sealed class ScummScriptReader(ScummScriptDialect dialect = ScummScriptDialect.Loom)
+public sealed class ScummScriptReader(ScummScriptDialect dialect = ScummScriptDialect.V3)
 {
     public ScummScriptDialect Dialect { get; } = dialect;
 
@@ -263,7 +256,7 @@ internal static class ScummScriptDisassembler
         byte[] TrailingBytes,
         IReadOnlyList<ScummScriptDecodeIssue> Issues);
 
-    public static Result Disassemble(byte[] code, ScummScriptDialect dialect = ScummScriptDialect.Loom)
+    public static Result Disassemble(byte[] code, ScummScriptDialect dialect = ScummScriptDialect.V3)
     {
         var instructions = new SortedDictionary<int, ScummScriptInstruction>();
         var issues = new List<ScummScriptDecodeIssue>();
@@ -397,9 +390,9 @@ internal static class ScummScriptDisassembler
             return ("findObject", Join(ReadResult(cursor), ReadParam(cursor, 1, opcode, 0x80), ReadParam(cursor, 1, opcode, 0x40)));
         // Indy3 (non-Macintosh) reads a byte actor operand; LOOM reads a word.
         if (Is(opcode, 0x43, 0xC3))
-            return ("getActorX", Join(ReadResult(cursor), ReadParam(cursor, cursor.Dialect == ScummScriptDialect.Indy3 ? 1 : 2, opcode, 0x80)));
+            return ("getActorX", Join(ReadResult(cursor), ReadParam(cursor, cursor.Dialect == ScummScriptDialect.V3Indy3 ? 1 : 2, opcode, 0x80)));
         if (Is(opcode, 0x23, 0xA3))
-            return ("getActorY", Join(ReadResult(cursor), ReadParam(cursor, cursor.Dialect == ScummScriptDialect.Indy3 ? 1 : 2, opcode, 0x80)));
+            return ("getActorY", Join(ReadResult(cursor), ReadParam(cursor, cursor.Dialect == ScummScriptDialect.V3Indy3 ? 1 : 2, opcode, 0x80)));
         if (Is(opcode, 0x63, 0xE3))
             return ("getActorFacing", Join(ReadResult(cursor), ReadParam(cursor, 1, opcode, 0x80)));
         if (Is(opcode, 0x68, 0xE8))
@@ -492,13 +485,13 @@ internal static class ScummScriptDisassembler
         if (opcode == 0x2B) return ("delayVariable", ReadVar(cursor));
         // v3 maps 0x3B to o3_waitForActor: a LOOM no-op without operands, and
         // an Indy3 wait on a byte (or variable) actor operand.
-        if (cursor.Dialect == ScummScriptDialect.LoomCd && opcode is 0x3B or 0xBB)
+        if (cursor.Dialect == ScummScriptDialect.V4 && opcode is 0x3B or 0xBB)
             return ("getActorScale", Join(ReadResult(cursor), ReadParam(cursor, 1, opcode, 0x80)));
         if (opcode is 0x3B or 0xBB)
-            return cursor.Dialect == ScummScriptDialect.Indy3
+            return cursor.Dialect == ScummScriptDialect.V3Indy3
                 ? ("waitForActor", ReadParam(cursor, 1, opcode, 0x80))
                 : ("waitForActor", "LOOM no-op");
-        if (opcode == 0x4C) return cursor.Dialect == ScummScriptDialect.LoomCd ? ("soundKludge", ReadVarargList(cursor)) : ("waitForSentence", "");
+        if (opcode == 0x4C) return cursor.Dialect == ScummScriptDialect.V4 ? ("soundKludge", ReadVarargList(cursor)) : ("waitForSentence", "");
         if (opcode == 0x58) return (cursor.ReadByte() == 0 ? "endOverride" : "beginOverride", "");
         if (opcode == 0x32 || opcode == 0xB2) return ("setCameraAt", ReadParam(cursor, 2, opcode, 0x80));
         if (opcode is 0x12 or 0x92) return ("panCameraTo", ReadParam(cursor, 2, opcode, 0x80));
@@ -518,7 +511,7 @@ internal static class ScummScriptDisassembler
 
         if (opcode == 0x27) return DecodeStringOps(cursor);
         if (opcode == 0x2C) return DecodeCursorCommand(cursor);
-        if (cursor.Dialect == ScummScriptDialect.LoomCd && opcode is 0x30 or 0xB0) return DecodeMatrixOps(cursor);
+        if (cursor.Dialect == ScummScriptDialect.V4 && opcode is 0x30 or 0xB0) return DecodeMatrixOps(cursor);
         if (opcode == 0x30 || opcode == 0xB0)
             return ("setBoxFlags", Join(ReadParam(cursor, 1, opcode, 0x80), $"0x{cursor.ReadByte():X2}"));
         if (Is(opcode, 0x3F, 0x7F, 0xBF, 0xFF)) return DecodeDrawBox(cursor, opcode);
@@ -637,7 +630,7 @@ internal static class ScummScriptDisassembler
             0x0B => Join("cursorHotspot", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40), ReadParam(cursor, 1, sub, 0x20)),
             0x0C => Join("cursorSet", ReadParam(cursor, 1, sub, 0x80)),
             0x0D => Join("charsetSet", ReadParam(cursor, 1, sub, 0x80)),
-            0x0E => cursor.Dialect == ScummScriptDialect.LoomCd ? Join("charsetColors", ReadVarargList(cursor))
+            0x0E => cursor.Dialect == ScummScriptDialect.V4 ? Join("charsetColors", ReadVarargList(cursor))
                 : Join("v3CharsetInit", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
             _ => throw new UnsupportedBytecodeException($"cursorCommand subopcode 0x{sub:X2} is not defined for DOS LOOM old-v3")
         };
@@ -709,7 +702,7 @@ internal static class ScummScriptDisassembler
     private static (string, string) DecodeWait(Cursor cursor)
     {
         // Indy3 (non-Macintosh) has no wait subopcode: it always waits for the message.
-        if (cursor.Dialect == ScummScriptDialect.Indy3) return ("waitFor", "message");
+        if (cursor.Dialect == ScummScriptDialect.V3Indy3) return ("waitFor", "message");
         var sub = cursor.ReadByte();
         var waitFor = (sub & 0x1F) switch
         {
@@ -924,7 +917,7 @@ internal static class ScummScriptDisassembler
 
     private static (string, string) DecodeRoomOps(Cursor cursor, byte opcode)
     {
-        if (cursor.Dialect == ScummScriptDialect.LoomCd) return DecodeRoomOpsCd(cursor);
+        if (cursor.Dialect == ScummScriptDialect.V4) return DecodeRoomOpsCd(cursor);
         var first = ReadParam(cursor, 2, opcode, 0x80);
         var second = ReadParam(cursor, 2, opcode, 0x40);
         var sub = cursor.ReadByte();
@@ -1010,7 +1003,7 @@ internal static class ScummScriptDisassembler
                 0x03 => Join("erase", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x04 => "center",
                 // v3 reads the line height here (ScummVM decodeParseString, SO_LEFT for later versions).
-                0x06 => cursor.Dialect == ScummScriptDialect.LoomCd ? "left" : Join("height", ReadParam(cursor, 2, sub, 0x80)),
+                0x06 => cursor.Dialect == ScummScriptDialect.V4 ? "left" : Join("height", ReadParam(cursor, 2, sub, 0x80)),
                 0x07 => "overhead",
                 0x08 => Join("sayVoice", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x0F => Join("text", ReadScummString(cursor)),
@@ -1118,7 +1111,7 @@ internal static class ScummScriptDisassembler
     private static string Join(params string[] values) => string.Join(", ", values.Where(value => !string.IsNullOrEmpty(value)));
     private static string FormatBytes(IEnumerable<byte> values) => string.Join(" ", values.Select(value => value.ToString("X2", CultureInfo.InvariantCulture)));
 
-    private sealed class Cursor(byte[] data, int start = 0, ScummScriptDialect dialect = ScummScriptDialect.Loom)
+    private sealed class Cursor(byte[] data, int start = 0, ScummScriptDialect dialect = ScummScriptDialect.V3)
     {
         public ScummScriptDialect Dialect { get; } = dialect;
 

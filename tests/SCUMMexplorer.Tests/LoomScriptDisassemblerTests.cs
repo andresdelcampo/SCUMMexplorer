@@ -52,7 +52,7 @@ public sealed class LoomScriptDisassemblerTests
     {
         // 0xAE is followed directly by breakHere and stopObjectCode in Indy3.
         byte[] code = [0xAE, 0x80, 0x00];
-        var indy = ScummScriptDisassembler.Disassemble(code, ScummScriptDialect.Indy3);
+        var indy = ScummScriptDisassembler.Disassemble(code, ScummScriptDialect.V3Indy3);
         var loom = ScummScriptDisassembler.Disassemble(code);
 
         Assert.Empty(indy.Issues);
@@ -65,7 +65,7 @@ public sealed class LoomScriptDisassemblerTests
     public void Indy3WaitForActorAndActorPositionReadByteOperands()
     {
         byte[] code = [0x3B, 0x05, 0x43, 0x01, 0x00, 0x05, 0x23, 0x02, 0x00, 0x06, 0x00];
-        var result = ScummScriptDisassembler.Disassemble(code, ScummScriptDialect.Indy3);
+        var result = ScummScriptDisassembler.Disassemble(code, ScummScriptDialect.V3Indy3);
 
         Assert.Empty(result.Issues);
         Assert.Equal(["waitForActor", "getActorX", "getActorY", "stopObjectCode"],
@@ -163,8 +163,8 @@ public sealed class LoomScriptDisassemblerTests
 
 
     [Theory]
-    [InlineData(ScummScriptDialect.Loom)]
-    [InlineData(ScummScriptDialect.Indy3)]
+    [InlineData(ScummScriptDialect.V3)]
+    [InlineData(ScummScriptDialect.V3Indy3)]
     public void ActorNameConsumesInlineStringBeforeFollowingSubcommands(ScummScriptDialect dialect)
     {
         // Compact actor op 15 maps to SO_ACTOR_NAME; 14 sets talk colour.
@@ -182,7 +182,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void EmptyActorNameStillConsumesItsTerminator()
     {
-        var result = ScummScriptDisassembler.Disassemble([0x13, 0x01, 0x0F, 0x00, 0xFF, 0x00], ScummScriptDialect.Indy3);
+        var result = ScummScriptDisassembler.Disassemble([0x13, 0x01, 0x0F, 0x00, 0xFF, 0x00], ScummScriptDialect.V3Indy3);
         Assert.Empty(result.Issues);
         Assert.Contains("actorName, \"\"", result.Instructions[0].Operands);
         Assert.Equal(5, result.Instructions[1].Offset);

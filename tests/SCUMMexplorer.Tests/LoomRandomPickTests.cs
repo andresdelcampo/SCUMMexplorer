@@ -126,7 +126,7 @@ public sealed class LoomRandomPickTests
         if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(Folder);
         var resource = game.Resources.Single(item => item.Kind == ResourceKind.Script && item.ResourceId == 42);
-        var script = new ScummScriptReader(ScummScriptDialects.For(game.Id)).Decode(resource);
+        var script = new ScummScriptReader(ScummProfile.For(game).Dialect).Decode(resource);
         var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>()) { Random = new ScummSeededRandom(1) };
         var executor = new ScummBoundedScriptExecutor();
         // Room 03 entry +0x0114 starts it as startScript 0x2A, [0x0005].

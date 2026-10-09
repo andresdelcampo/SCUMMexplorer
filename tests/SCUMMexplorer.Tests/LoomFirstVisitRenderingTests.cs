@@ -194,7 +194,7 @@ public sealed class LoomFirstVisitRenderingTests
         var room = data.Room(3);
         var bytes = File.ReadAllBytes(room.FilePath);
         var records = new ScummRoomObjectDirectory().Decode(bytes);
-        var verbReader = new ScummObjectVerbReader(ScummScriptDialects.For(data.Game.Id));
+        var verbReader = new ScummObjectVerbReader(ScummProfile.For(data.Game).Dialect);
         var finder = new LoomDoorwayFinder(data.Game);
         var targets = new SortedSet<int>();
         var tables = verbReader.ReadAll(bytes, records);

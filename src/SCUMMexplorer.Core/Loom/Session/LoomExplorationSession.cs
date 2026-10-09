@@ -139,7 +139,7 @@ public sealed partial class LoomExplorationSession
         });
         _data = data ?? ScummDataSources.For(game);
         _runtime = new ScummScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes,
-            useV4Walking: game.Id == GameId.LoomVga)
+            useV4Walking: ScummProfile.For(game).UsesV4Walking)
         {
             Random = new ScummSeededRandom(randomSeed),
             MutationObserver = observer
@@ -614,7 +614,7 @@ public sealed partial class LoomExplorationSession
         new Dictionary<int, byte>(_runtime.ObjectOwners),
         new Dictionary<string, ushort>(_runtime.GlobalVariables),
         KnownInventory(),
-        _runtime.GlobalVariables.ContainsKey("var[0x001]"),
+        _runtime.GlobalVariables.ContainsKey(ScummVars.Ego),
         _runtime.ActiveSounds.Order().ToArray(),
         _pending.Count,
         _uncertainties.ToArray(),
@@ -628,7 +628,7 @@ public sealed partial class LoomExplorationSession
     /// <summary>The message state: the talk message, its delay and <c>VAR_HAVE_MSG</c>, and drawn strings.</summary>
     public ScummMessageTable Messages => _runtime.Messages;
 
-    private int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue("var[0x001]", out var ego)
+    private int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue(ScummVars.Ego, out var ego)
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
         : [];
 
@@ -957,7 +957,7 @@ public sealed partial class LoomExplorationSession
     private const int EgoSizeScript = 0x11;
 
     /// <summary>ScummVM <c>VAR_EGO</c>.</summary>
-    private const string EgoVariable = "var[0x001]";
+    private const string EgoVariable = ScummVars.Ego;
 
     /// <summary>Actor rooms, positions and walk boxes as reached code left them (actors 1–12).</summary>
     public IReadOnlyList<ScummActorSnapshot> Actors => _runtime.Actors.Snapshot();
@@ -1031,10 +1031,10 @@ public sealed partial class LoomExplorationSession
         _runtime.EstimatedVariables.Remove(CameraVariable);
         _runtime.Camera.Reset(160);
         // startScene resets VAR_CAMERA_MIN_X and VAR_CAMERA_MAX_X (v3: vars 17 and 18).
-        _runtime.SetGlobalVariable("var[0x011]", 160);
-        _runtime.SetGlobalVariable("var[0x012]", (ushort)Math.Max(160, roomWidth - 160));
-        _runtime.EstimatedVariables.Remove("var[0x011]");
-        _runtime.EstimatedVariables.Remove("var[0x012]");
+        _runtime.SetGlobalVariable(ScummVars.CameraMinX, 160);
+        _runtime.SetGlobalVariable(ScummVars.CameraMaxX, (ushort)Math.Max(160, roomWidth - 160));
+        _runtime.EstimatedVariables.Remove(ScummVars.CameraMinX);
+        _runtime.EstimatedVariables.Remove(ScummVars.CameraMaxX);
         foreach (var item in _currentObjects)
             _runtime.TryAddObjectPosition(item.Id, new RoomObjectPosition(item.X, item.Y));
         _runtime.SetGlobalVariable("var[0x004]", (ushort)room.ResourceId!.Value);
@@ -1155,7 +1155,7 @@ public sealed partial class LoomExplorationSession
     }
 
     /// <summary>ScummVM <c>VAR_CAMERA_POS_X</c>.</summary>
-    private const string CameraVariable = "var[0x002]";
+    private const string CameraVariable = ScummVars.CameraPosX;
 
     // The current room's width and height in pixels.
     private (int Width, int Height)? _roomSize;
@@ -1173,20 +1173,20 @@ public sealed partial class LoomExplorationSession
         if (_roomSize is not { } size) return;
         if (_pointer is { } pointer)
         {
-            _runtime.SetGlobalVariable("var[0x014]", (ushort)pointer.X);
-            _runtime.SetGlobalVariable("var[0x015]", (ushort)pointer.Y);
-            _runtime.EstimatedVariables.Remove("var[0x014]");
-            _runtime.EstimatedVariables.Remove("var[0x015]");
+            _runtime.SetGlobalVariable(ScummVars.MouseX, (ushort)pointer.X);
+            _runtime.SetGlobalVariable(ScummVars.MouseY, (ushort)pointer.Y);
+            _runtime.EstimatedVariables.Remove(ScummVars.MouseX);
+            _runtime.EstimatedVariables.Remove(ScummVars.MouseY);
             _runtime.VirtualMouse = pointer;
             _runtime.VirtualMouseAssumption = $"assumed input: the pointer rests over the room at ({pointer.X}, {pointer.Y}), {_pointerNote}";
             return;
         }
         var x = CameraX ?? size.Width / 2;
         var y = size.Height;
-        _runtime.SetGlobalVariable("var[0x014]", (ushort)x);
-        _runtime.SetGlobalVariable("var[0x015]", (ushort)y);
-        _runtime.EstimatedVariables.Remove("var[0x014]");
-        _runtime.EstimatedVariables.Remove("var[0x015]");
+        _runtime.SetGlobalVariable(ScummVars.MouseX, (ushort)x);
+        _runtime.SetGlobalVariable(ScummVars.MouseY, (ushort)y);
+        _runtime.EstimatedVariables.Remove(ScummVars.MouseX);
+        _runtime.EstimatedVariables.Remove(ScummVars.MouseY);
         _runtime.VirtualMouse = (x, y);
         _runtime.VirtualMouseAssumption = $"assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at ({x}, {y})";
     }
@@ -1869,7 +1869,7 @@ public sealed partial class LoomExplorationSession
         _runtime.SetGlobalVariable(MusicTimerVariable, (ushort)timer);
     }
 
-    private const string MusicTimerVariable = "var[0x00E]";
+    private const string MusicTimerVariable = ScummVars.MusicTimer;
 
     private LoomSessionSnapshot AdvanceOneFrame()
     {
