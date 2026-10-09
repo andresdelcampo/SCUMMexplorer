@@ -4169,10 +4169,12 @@ public partial class MainWindow : Window
             _game.Rooms.FirstOrDefault(item => item.ResourceId == trigger.Room) is not { } room) return;
         StopScenePlayback();
         _cdVoice.Stop();
-        // A scene a fresh start does not begin starts from its derived setup (unseen steps, then the room), on a fresh session.
+        // Single scenes keep the running story/status, including later actor and staff state.
+        // Only missing source prerequisites run unseen; explicit sequences/restart own their fresh starts.
         var setup = _cdSetupPlanner?.Value.Derive(trigger) ?? LoomCdStartSetup.None;
+        var session = _session is { BootRunning: false } ? _session : _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false);
+        setup = LoomCdSceneSetupPlanner.Adapt(setup, session);
         var useSetup = setup is { Plays: true, HasSteps: true };
-        var session = !useSetup && _session is { BootRunning: false } ? _session : _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false);
         if (useSetup) LoomCdSceneSetupPlanner.ApplyBefore(session, _game, setup.Before);
         _cdVoice.Attach(vga.Disc, session);
         var before = (session.CutscenesBegun, session.EgoPuts);

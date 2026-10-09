@@ -11,7 +11,8 @@ namespace SCUMMexplorer.Core.Formats;
 /// (after the scene's room is entered, put the ego into walk box <see cref="Box"/>, or walk him across it), or <c>place</c>
 /// (the triggering object's own walk point, when a scene reads the ego's otherwise unknown coordinates).
 /// </summary>
-public sealed record LoomCdSetupStep(string Kind, int Room, int ObjectId, int VerbId, int Box, string Where, string Reason = "", LoomCdStartSetup? Inner = null, int? X = null, int? Y = null);
+public sealed record LoomCdSetupStep(string Kind, int Room, int ObjectId, int VerbId, int Box, string Where, string Reason = "", LoomCdStartSetup? Inner = null, int? X = null, int? Y = null,
+    string? ResultVariable = null, int? ResultValue = null);
 
 /// <summary>
 /// The start a CD scene needs, derived from its scripts and checked by running it: <see cref="Before"/> runs unseen before the room is entered,
@@ -85,7 +86,10 @@ public sealed partial class LoomCdSceneSetupPlanner
     /// <summary>Applies the steps that run before the scene's room is entered.</summary>
     public static void ApplyBefore(LoomExplorationSession session, GameLibrary game, IEnumerable<LoomCdSetupStep> steps)
     {
-        foreach (var step in steps)
+        // Filter against the state before this set starts. Repeated source scenes may deliberately
+        // need two executions; the first must not suppress the second during the same setup.
+        var missing = MissingSteps(session, steps);
+        foreach (var step in missing)
         {
             if (step.Kind == "scene" && step.Inner is { } inner) ApplyBefore(session, game, inner.Before);
             session.VisitRoom(RoomOf(game, step.Room));
@@ -93,6 +97,22 @@ public sealed partial class LoomCdSceneSetupPlanner
             if (step.Kind is "verb" or "scene" && step.ObjectId != 0) session.ActivateObjectVerb(step.ObjectId, step.VerbId);
             Settle(session);
         }
+    }
+
+    private static LoomCdSetupStep[] MissingSteps(LoomExplorationSession session, IEnumerable<LoomCdSetupStep> steps)
+    {
+        var variables = session.Snapshot.KnownGlobalVariables;
+        return steps.Where(s => s.ResultVariable is not { } key || s.ResultValue is not int value ||
+            !variables.TryGetValue(key, out var current) || current != value).ToArray();
+    }
+
+    /// <summary>Keep a running session's established state; omit only preludes whose own source assignment is already present.</summary>
+    public static LoomCdStartSetup Adapt(LoomCdStartSetup setup, LoomExplorationSession session)
+    {
+        var missing = MissingSteps(session, setup.Before);
+        if (missing.Length == setup.Before.Count) return setup;
+        return setup with { Before = missing, Notes = [..setup.Notes,
+            "The running session already has some source prerequisites, so their earlier scenes are not run again; later state is retained."] };
     }
 
     /// <summary>Applies the steps that run once the scene's room is entered (the ego into a walk box), after a few frames so the room's monitors have started.</summary>
@@ -309,21 +329,26 @@ public sealed partial class LoomCdSceneSetupPlanner
     /// <summary>The step that would make <paramref name="w"/>'s assignment happen first, or null: an object verb, a room entry, or the scene whose script it is.</summary>
     private LoomCdSetupStep? StepFor(LoomStateSource w, string tested, HashSet<string> chain, int depth, HashSet<(int, int, int)> stack, bool broad = false, int pick = 0, bool ownChain = false)
     {
+        // Carry the exact own-source result, rather than parsing explanatory prose at playback.
+        var assignment = w.Instruction["move ".Length..].Split(" = ", StringSplitOptions.None);
+        LoomCdSetupStep WithResult(LoomCdSetupStep step) => assignment is [var key, var literal] &&
+            literal.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(literal.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value)
+                ? step with { ResultVariable = key, ResultValue = value } : step;
         var label = ScriptLabel(w);
         if (label is not null && chain.Contains(label) && !ownChain) return null; // the scene's own script: only another trigger that runs it can have set the state first
         if (w.ObjectId is int obj && w.VerbId is int verb)
-            return new("verb", w.Room, obj, verb, 0, w.Where,
-                tested + $"The game's own {w.Where.Split(" +")[0]} (object {obj}, verb 0x{verb:X2}) assigns it, so it runs first, unseen, as an exploration action (not the game's click; which earlier scene really left the state was not executed).");
+            return WithResult(new("verb", w.Room, obj, verb, 0, w.Where,
+                tested + $"The game's own {w.Where.Split(" +")[0]} (object {obj}, verb 0x{verb:X2}) assigns it, so it runs first, unseen, as an exploration action (not the game's click; which earlier scene really left the state was not executed)."));
         if (label is null && w.Where.Contains(" entry ", StringComparison.Ordinal))
-            return new("entry", w.Room, 0, 0, 0, w.Where, tested + $"The game's own {w.Where.Split(" +")[0]} assigns it, so Room {w.Room:00} is entered first, unseen.");
+            return WithResult(new("entry", w.Room, 0, 0, 0, w.Where, tested + $"The game's own {w.Where.Split(" +")[0]} assigns it, so Room {w.Room:00} is entered first, unseen."));
         if (label is null || depth >= MaxDepth) return null;
         var scene = _triggers.Where(c => (c.Scripts.Contains(label) || broad && Started(c).Contains(label)) && !stack.Contains(Key(c))).OrderBy(Rank).ThenBy(c => c.ObjectId).ThenBy(c => c.VerbId).Skip(pick).FirstOrDefault();
         if (scene is null) return null;
         var inner = Derive(scene, depth + 1, stack);
         if (!inner.Plays) return null;
-        return new("scene", scene.Room, scene.ObjectId, scene.VerbId, 0, w.Where,
+        return WithResult(new("scene", scene.Room, scene.ObjectId, scene.VerbId, 0, w.Where,
             tested + $"The game's own {label} ({w.Where.Split(" +")[1].Insert(0, "+")}) assigns it, and the scene {(scene.IsRoomEntry ? $"Room {scene.Room:00}'s entry" : $"object {scene.ObjectId}'s verb 0x{scene.VerbId:X2} in Room {scene.Room:00}")} runs that script, so it is played first, unseen, as an exploration action" +
-            (inner.HasSteps ? $", after its own setup ({string.Join(" ", inner.Notes)})." : "."), inner);
+            (inner.HasSteps ? $", after its own setup ({string.Join(" ", inner.Notes)})." : "."), inner));
     }
 
     [GeneratedRegex(@"^(bit\[0x[0-9A-Fa-f]+\]) = 0x0+$")]

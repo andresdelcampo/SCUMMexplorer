@@ -4,7 +4,7 @@ Updated 9 October 2026. This is the single plan and session handoff. Completed w
 
 ## Status
 
-Current priority: finish bounded actor-state checks, then source-earned learning/progression. Nothing has been pushed.
+Current priority: finish source-earned learning/progression. Bounded actor-state checks are complete; native comparisons remain separate. Nothing has been pushed.
 
 LOOM EGA and CD/VGA have live interaction, actors, scripts, scene playback, Game Status and audio. English Roland EGA (`Games/loom ega mt32 en`) is the replay reference; derive comparison editions from their own data. Indy EGA supports backgrounds/text and conversation export; further gameplay is deferred.
 
@@ -14,7 +14,7 @@ Room 43's checked arrivals and placement are accepted: the other two arrive afte
 
 Take the easiest bounded checks first. Do not change behavior without a demonstrated mismatch and source evidence.
 
-1. **Cutscene actor state — final integration in progress.** The original inventory is reviewed and preserved uncommitted. The own-edition story range correction and 168 staff/Rusty/close-up assertions are complete; see [state checks](../.verification/actor-progression-20261009/STATE_CHECKS.md). Finish the separate CD single-scene preservation correction and its WPF checkpoint. Prepared state choices remain distinct from earned history and native actor bounds.
+1. **Bounded cutscene actor state — complete.** The original inventory is reviewed and preserved uncommitted. Own-edition story ranges, 168 staff/Rusty/close-up assertions and six real WPF single-CD-scene state assertions are complete; see [state checks](../.verification/actor-progression-20261009/STATE_CHECKS.md). CD scenes retain the running session and omit already established source preludes. Prepared state choices remain distinct from earned history and native actor bounds; do not repeat these checks without a new mismatch.
 2. **Source-earned learning/progression.** Check whether ordinary scripts earn drafts and notes while playing in Explorer. Review established routes first; prepared Game Status input is not proof of earned progression. Fix only demonstrated omissions.
 3. **Audio/timing, only if straightforward.** Use ScummVM as the fidelity reference; otherwise leave this for manual comparison. No broad audiovisual audit is requested.
 

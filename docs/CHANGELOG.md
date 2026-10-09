@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: preserve the running state for CD single scenes
+
+Starting a CD scene that needed derived preparation created a fresh session and lost chosen note/story state. It now keeps the session and omits source preludes whose exact assignment is already present. Unknown results and required repeated stages stay in the setup. The actual sword/Blunting trigger reproduced the reset; six isolated WPF assertions now preserve session identity, notes, draft choice and ghost state. The focused Core suite passes 64 tests with three existing diagnostic skips; 168 source actor assertions also pass. These prepared checks do not establish earned history or native audiovisual fidelity. [Evidence and reproduction](../.verification/actor-progression-20261009/STATE_CHECKS.md).
+
 ## 9 October: use each edition's story range for actor state
 
 VGA story controls rejected its own ghost/restoration bits because the range reader fell back to EGA D72 and the scanner used that literal threshold. Both now use the shift measured from the edition's loaded draft flags: English D71, Spanish D72, CD 012. Three edition regressions pass; a separate source-state matrix passes 168/168 assertions for staff branches, sleeping/ghost/restored Rusty and twelve balanced sphere/scythe close-ups with visible Bobbin afterwards. Earlier failed harness expectations are retained. No native picture/audio claim or renderer change. [Source, limits and reproduction](../.verification/actor-progression-20261009/STATE_CHECKS.md).

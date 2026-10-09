@@ -18,12 +18,27 @@ The failed `out-actors/` and `out-actors-after/` packets are retained. The first
 
 These checks qualify bounded source state and exploration starts. They do not measure native opaque bounds, physical input, inherited original-game history, or audio. Room 43 stays accepted; Room 09/17 native size comparisons remain in the final-gap reference.
 
+## CD single-scene preservation
+
+`PlayCdCutscene` replaced the session whenever a derived setup was needed. The own-source Room 41 sword/Blunting trigger demonstrates this: `out-ui-before/report.txt` fails session identity and retention of eight chosen notes. The correction keeps the running session and carries the exact variable/value assigned by each own-source prelude. An already established result omits that prelude, including nested setups. Repeated stages are filtered against the state before the set begins so a deliberate second source execution is retained when initially needed. Unknown results and placement/box estimates are preserved.
+
+The real nonactivating, muted WPF check passes **6/6 assertions** in `out-ui-final/report.txt`: settled preparation, actual derived sword setup, retained session, eight notes, explicitly unlearned Transcend and chosen ghost state. These are prepared choices for the actor/state test; they earn no progression credit. `out-ui-after/` preserves the first run that hit the separately corrected VGA story-edit rejection.
+
+Two Core regressions verify that the actual foreman conversation establishes its own prelude result, that already earned preparation is not repeated, and that later notes/draft choices survive. Missing repeated stages and unknown results remain. The combined focused suite passes **64 tests / 3 pre-existing diagnostic skips**, with no full replay audit rerun.
+
+The UI harness uses only its private `profile/` and `cache/`, opens an offscreen window without activation, and disables sound. It does not send OS input or operate ScummVM. The user's running applications and profile remain untouched.
+
 ## Reproduction
 
 Working directory: `D:\Documents\Personal\Code Projects\SCUMMexplorer`.
 
 ```powershell
 & 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy powershell -NoProfile -ExecutionPolicy Bypass -File .verification/actor-progression-20261009/run-check.ps1 -OutputName out-reproduction
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy powershell -NoProfile -ExecutionPolicy Bypass -File .verification/actor-progression-20261009/run-ui.ps1 -OutputName out-ui-reproduction
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy powershell -NoProfile -ExecutionPolicy Bypass -File .verification/actor-progression-20261009/run-regressions.ps1
+& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy powershell -NoProfile -ExecutionPolicy Bypass -File .verification/actor-progression-20261009/run-build.ps1
 ```
 
 The executable is `.verification/actor-progression-20261009/out-check-build/bin/debug/LoomActorStateCheck.exe`. Game data is read only. No App/user profile or native game is opened by this Core harness; build and trace outputs are private.
+
+The isolated Release solution build also succeeds with zero warnings/errors. `run-build.ps1` supplies private `BaseOutputPath` and `ArtifactsPath`; the resulting App is `out-solution-build/bin/release/SCUMMexplorer.App.exe`.
