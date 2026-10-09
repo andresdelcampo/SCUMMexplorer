@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: separate the SCUMM engine from LOOM in Core
+
+Core is now `Scumm/` (engine, any game; `V3/` and `V4/` for version-only readers), `Loom/` (all LOOM editions; `Cd/` and `Ega/` for edition code) plus shared `Domain/` and `Discovery/`; the engine cannot reference `Loom`. Generic types lost the `Loom` prefix (`ScummScriptReader`, `ScummActorTable`, `ScummWalkBoxSet`, ...), version-specific ones became `ScummV3*`/`ScummV4*`, and `GameLibrary.Vga` is `V4Archive`. The doorway finder and status schema read through `IScummDataSource` only; `ScummProfile` is the single game-to-engine-variant mapping and `ScummVars` names the engine script variables. No behaviour change (873 tests pass). Still separate by design: the EGA and CD scene-setup planners (different algorithms and outputs) and the `MainWindow` EGA/CD audio and edition branches (need UI verification).
+
 ## 9 October: show VGA Room 09 speakers in direct responses
 
 The user reproduced missing Hetchel/Dead One actors when selecting VGA Room 09 spell responses. CD picker and Interact starts now share EGA's source-derived actor-only setup, using each edition's data and preserving actors already present. A placement later in a response no longer suppresses the named target's initial preparation. Five failing picker cases were retained; ten corrected picker/Interact cases pass target visibility/pixel and state-retention checks. Validation: 55 VGA and four EGA WPF assertions, 24 focused Core tests/three existing diagnostic skips, and clean Release solution build. Both exact Room 13 Use picker routes also raise a fresh three-pitch session to five without Game Status edits. Physical EGA/VGA keyboard/mouse casting has the user's confirmation; CD audiovisual matching moves out of active work to their full manual run. Original actor inventory preserved, no native control or push. [Evidence, source anchors, short recipe and failed attempts](../.verification/room09-speakers-20261009/README.md).

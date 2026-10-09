@@ -40,7 +40,7 @@ Read [CLAUDE.md](../CLAUDE.md) for layout, engine facts and build instructions, 
 
 Preserve game data, ROMs, saves, running applications, the native session and `%LOCALAPPDATA%\SCUMMexplorer`. Use focused checks and isolated output/profile directories; do not repeat broad audits without a relevant failure. Keep failed evidence and uncertainty. [Verification index](../.verification/README.md).
 
-Commit finished tasks separately with explicit paths; preserve unrelated/unfinished work and do not push. Update this file for current state and CHANGELOG for completed results. Create or message another task only with direct human authorization; do not generate idle continuation chains. An existing waiting chat is `01a11cdb-3f40-78a2-a3a7-4ab351cefc34`; it must read the current handoff before continuing.
+Commit finished tasks separately with explicit paths; preserve unrelated/unfinished work. Update this file for current state and CHANGELOG for completed results. Create or message another task only with direct human authorization; do not generate idle continuation chains. An existing waiting chat is `01a11cdb-3f40-78a2-a3a7-4ab351cefc34`; it must read the current handoff before continuing.
 
 ## Separately parked
 
