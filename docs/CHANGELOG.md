@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: clarify version compatibility checks
+
+New and changed features consider available LOOM versions through focused compatibility checks where opening or feature behavior can actually differ. Reuse the existing edition analysis; Italian remains initially unreviewed. Shared code derives behavior from each version's data, with demonstrated differences isolated. This does not request every harness or another replay pipeline per edition. The engine guidance now distinguishes the English Roland bit shift from plain English numbering. No runtime behavior changed.
+
 ## 9 October: qualify source learning and later-level controls
 
 Reviewed the original actor inventory and earlier source-earned level-four/input routes before new checks. Actual lesson helpers earn eleven previously unlearned slots per edition across English Roland EGA, Spanish Roland EGA and English CD/VGA: 33 unique checks, with unchanged note/reverse/used bits. The reviewed late-story prefix now earns slots 12/13/14 without supplied learned flags. Nine source controls reach five/six/eight-note helpers; draft-response callbacks remain distinct from earned four-note input. Slots 3/7/11 and seven-note progression retain their source gates and required routes, with failed controls preserved. No progression engine change was justified. Audio remains manual comparison. [Evidence, packet hashes and remaining guards](../.verification/earned-progression-20261009/README.md).

@@ -19,7 +19,7 @@ public static class LoomStoryEvents
     /// <summary>First bit of the story range (bits below it belong to the engine, the staff, drafts and input).</summary>
     public const int FirstBit = 0xD72;
 
-    /// <summary>The first story bit of this edition, using its own learned-draft bit numbering. English EGA shifts by one; CD uses the separate low-numbered bit bank.</summary>
+    /// <summary>The first story bit of this edition, using its own learned-draft bit numbering. English Roland EGA shifts by one; CD uses the separate low-numbered bit bank.</summary>
     public static int FirstBitFor(GameLibrary game)
     {
         try { return FirstBit + LoomStatusSchema.Read(game, ScummDataSources.For(game)).BitShift; }

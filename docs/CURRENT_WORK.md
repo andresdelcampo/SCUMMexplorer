@@ -30,6 +30,7 @@ Shaping's canonical label, exact reverse draft names and unidentified story role
 - Single click walks/uses through source scripts; double click also looks. Stored-art cycling is inspection only. Source responses and touchability govern navigation, not static possible destinations.
 - Normal mode shows artwork, game text and concise controls. Technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches; keep window subtitles short.
 - Source execution, prepared Explorer/Core/WPF checks and original-game observation are distinct evidence. A scene completing does not prove correct actors, earned prerequisites, physical event delivery or timing.
+- Compatibility checks cover plausible version differences for the changed feature (opening/detection, formats/scripts, text/fonts, graphics or audio). Consider the existing plain/language/v1.2/demo/Kixx copies and reuse their [prior analysis](../.verification/editions-20261005/README.md); select relevant checks rather than every harness for every version. Italian at `Games/loom ega it` still needs its initial review when relevant. Keep shared changes driven by each version's data and isolate only demonstrated differences. The English Roland replay catalog stays the reference; no other-edition discovery pipeline is requested.
 
 ## Preservation and workflow
 
