@@ -48,7 +48,7 @@ All shell and child commands must use RTK, including PowerShell; `C:\Users\adelc
   - `0xAE` wait has no subopcode.
   - `0x3B`/`0xBB` is waitForActor with a byte parameter. In LOOM it is a no-op with no operands.
   - `getActorX`/`getActorY` take a byte parameter.
-  - Use `ScummScriptDialects.For(game.Id)` whenever you construct `ScummScriptReader` or `ScummObjectVerbReader`.
+  - Use `ScummProfile.For(game).Dialect` whenever you construct `ScummScriptReader` or `ScummObjectVerbReader`.
 - **Indy3 dialogue choices** use verbs 120–125, set with `verbOps(n, [on, name "…"])`. The script clears `Var[114]`, waits, then branches on `isEqual var[0x072], n`.
 
 ## Evidence rules

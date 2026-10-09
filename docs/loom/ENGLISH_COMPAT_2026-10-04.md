@@ -43,7 +43,7 @@ Test-only: the assertion names Spanish text, a bit number, an object or class id
 
 | Group | Tests | Why |
 |---|---|---|
-| Spanish text | LoomMessage x4 (sky, leaf), LoomCharset sky line, Glossary `ObjectNamesComeFromTheGameData`, RoomObjects `StoredObjectNamesLabelRoom17Hotspots`, SceneSetupScene El Muerto lines, ScriptPresenter goldens 6, 17, 91 (also bits and offsets) | "Amanecer.", "hoja", Spanish lines; English texts shown correctly in the app (UiShots) |
+| Spanish text | ScummMessage x4 (sky, leaf), ScummV3Charset sky line, Glossary `ObjectNamesComeFromTheGameData`, RoomObjects `StoredObjectNamesLabelRoom17Hotspots`, SceneSetupScene El Muerto lines, ScriptPresenter goldens 6, 17, 91 (also bits and offsets) | "Amanecer.", "hoja", Spanish lines; English texts shown correctly in the app (UiShots) |
 | Charset | `CharsetZeroIsReadFrom99Lfl` | English font has 128 glyphs, not 240 |
 | Bit numbers | LoomBoot x4, KeyInput `NoteLetters...`, Cutscene `CutsceneRuns...` and `GlobalScript...`, RandomPick Script 42, SceneSetupPlanner `StoryEvents...` and `TheScannerSees...` | D6B/D6E/D66/D7x/D9D/DB6 are one lower |
 | Offsets | Boot (`+0x015A` vs `+0x0162`, Script 44 `+0x041B`), KeyInput `EscapeSkipsScript052`, Room 03 doorway (Script 1 `+0x015B`), FirstVisitRendering Rooms 2, 18, 56, 58, 65 (`+0x03A0` is `+0x0395`; `+0x00DA` is `+0x00D5`), UsedBy, ScriptIndex and `LflResourceChain` leftover-script lists | script lengths |
