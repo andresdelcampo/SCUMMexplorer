@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: earn the three remaining lesson slots
+
+Slots 3/7/11 now earn through the actual owlet/wolves observations, Room 23 monitor approach and Room 24 → 25 pasture arrival/introduction. Seven unique new English/Spanish EGA and CD learning checks plus an actual Script 106 control pass 37 assertions; packed words change only the learned mask and scopes balance. The source review corrects reversed guard descriptions: Script 106's completion bit and the pasture-completed bit suppress the early lessons. CD's approach uses its own different geometry. Clean isolated helper build and packet/source hashes verified; no production change, broad replay, physical input or native/audio claim. Original uncommitted actor inventory preserved. [Routes and evidence](../.verification/earned-progression-20261009/ROUTES.md).
+
 ## 9 October: clarify version compatibility checks
 
 New and changed features consider available LOOM versions through focused compatibility checks where opening or feature behavior can actually differ. Reuse the existing edition analysis; Italian remains initially unreviewed. Shared code derives behavior from each version's data, with demonstrated differences isolated. This does not request every harness or another replay pipeline per edition. The engine guidance now distinguishes the English Roland bit shift from plain English numbering. No runtime behavior changed.

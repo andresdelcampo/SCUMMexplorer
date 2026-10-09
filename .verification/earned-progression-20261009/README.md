@@ -1,5 +1,7 @@
 # Source-earned learning and level review — 9 October 2026
 
+**Later lesson checkpoint:** slots 3/7/11 now earn in the reference; seven additional unique learning checks and a Script 106 guard control pass 37 assertions. [Actual routes, corrected guard directions and limits](ROUTES.md). The remaining seven-note excursion chain is separate from these completed lessons.
+
 English Roland EGA is the reference (`Games/loom ega mt32 en`); Spanish Roland EGA (`Games/ALTERNATIVE LOOMS/loom ega mt32 es`) and English CD/VGA (`Games/loom vga en`) use their own scripts, objects and bit banks. The existing actor inventory and its unreviewed outputs were read first and left unmodified/uncommitted. Additional source reads are in the separate actor `Review/` helper and ignored `out-review/`.
 
 ## Established evidence reviewed first
@@ -29,12 +31,12 @@ All new runtime mutations are catalog visits, actual object callbacks and frame 
 
 | Check | Established source guard | Result retained / next meaningful check |
 | --- | --- | --- |
-| Slot 3 | Room 04 local 200 requires its cumulative local counter to be 3 and the actual staff/input mode to be 2; local 201 also selects note playback against the pointer coordinate | Independent looks and eight cumulative looks do not earn it. Follow the actual owl/observation/input sequence; do not insert the learned flag. |
-| Slot 7 | Room 23 entry starts its monitors only after the own off-island story bit (D71/D72/012), written by actual Script 106. Local 201 then watches Bobbin's x threshold before chaining the lesson | A fresh catalog Room 23 is not that history. Establish the source departure and monitor approach before treating this as an omitted lesson. |
-| Slot 11 | Room 25 entry/Look require the own pasture/history bit (DBA/DBB/05B). Local 208 writes it; CD also has an actual Script 120 writer | Fresh lamb Look and room entry correctly stop before local 204's lesson. Check the actual pasture/arrival route, not a prepared status choice. |
+| Slot 3 — complete | Room 04 local 200 requires its cumulative local counter to be 3 and staff/input mode 2; local 201 selects note playback against camera x | Actual owlet/wolves local 202 fills the fourth hole; four cumulative Looks now reach Script 25(3). Pointer wording was incorrect. |
+| Slot 7 — complete | Room 23 entry requires the own Script 106 completion bit (D71/D72/012) **clear**; local 201 watches Bobbin's x threshold | Actual approach earns Script 25(7). Script 106 is a suppressing completion writer, confirmed by its separate actual-departure control; the earlier prerequisite interpretation was reversed. |
+| Slot 11 — complete | Room 25 entry/Look require the pasture-completed bit (DBA/DBB/05B) **clear**; local 208 writes it on departure | Actual Room 24 → 25 arrival, walking/introduction and lamb Look earn Script 25(11). Fresh isolated Looks missed walk history; the earlier set-bit prerequisite interpretation was reversed. |
 | Seven notes | Room 46 local 202 requires prior observation class 3; local 204 requires all four holes' closed class 24 | Raw Closing requests do not qualify. Hole Look starts Script 110 and an actual Room 49 excursion; the simple sequence stops there rather than substituting a catalog return. Complete those source excursions before an earned closure/level check. |
 
-No production progression defect is established by these fresh guarded requests. These four routes remain open; this checkpoint does not claim that all learning or earned input is finished. Room 43 and the standalone Room 34 reveal were not reopened. Physical keyboard/mouse/focus and same-state audio/timing remain the [manual original-game comparisons](../../docs/loom/FINAL_GAPS_HANDOFF.md).
+No production progression defect is established. Three lesson routes are now complete; the seven-note excursion chain remains separate. Independent learning does not claim a single playthrough or physical input. Room 43 and the standalone Room 34 reveal were not reopened. Physical keyboard/mouse/focus and same-state audio/timing remain the [manual original-game comparisons](../../docs/loom/FINAL_GAPS_HANDOFF.md).
 
 ## Preserved packets and harness limits
 

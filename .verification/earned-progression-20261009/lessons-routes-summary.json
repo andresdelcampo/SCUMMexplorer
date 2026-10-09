@@ -1,0 +1,560 @@
+﻿{
+    "kind":  "lessons",
+    "cases":  8,
+    "assertions":  37,
+    "results":  [
+                    {
+                        "edition":  "ega-en",
+                        "route":  "slot3",
+                        "packet":  "out-slot3-owlet/packet.json",
+                        "sha256":  "61839C5C852EF502A29E73FE57E12A97BAC7ACEB6AB83152A65E1EE7F4EE9B97",
+                        "assertions":  4,
+                        "frames":  596,
+                        "scopes":  6,
+                        "ended":  6,
+                        "slot":  3,
+                        "beforePacked":  0,
+                        "afterPacked":  8192,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  3,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  6496,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  74
+                                       },
+                                       {
+                                           "stage":  "arrival",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  116
+                                       },
+                                       {
+                                           "stage":  "owlet-and-wolves",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  318
+                                       },
+                                       {
+                                           "stage":  "owl-look-171",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  380
+                                       },
+                                       {
+                                           "stage":  "owl-look-172",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  443
+                                       },
+                                       {
+                                           "stage":  "owl-look-173",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  521
+                                       },
+                                       {
+                                           "stage":  "owl-look-174",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  596
+                                       }
+                                   ]
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "route":  "slot3",
+                        "packet":  "out-slot3-es/packet.json",
+                        "sha256":  "1F7C182A132AAACC1920F638FAB6E8C0E24ADED53B6B52B9A2CAA19D56F9ECD1",
+                        "assertions":  4,
+                        "frames":  601,
+                        "scopes":  6,
+                        "ended":  6,
+                        "slot":  3,
+                        "beforePacked":  0,
+                        "afterPacked":  8192,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  3,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  5564,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  74
+                                       },
+                                       {
+                                           "stage":  "arrival",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  116
+                                       },
+                                       {
+                                           "stage":  "owlet-and-wolves",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  317
+                                       },
+                                       {
+                                           "stage":  "owl-look-171",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  379
+                                       },
+                                       {
+                                           "stage":  "owl-look-172",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  442
+                                       },
+                                       {
+                                           "stage":  "owl-look-173",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  520
+                                       },
+                                       {
+                                           "stage":  "owl-look-174",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  601
+                                       }
+                                   ]
+                    },
+                    {
+                        "edition":  "vga",
+                        "route":  "slot3",
+                        "packet":  "out-slot3-vga/packet.json",
+                        "sha256":  "6E621DDD906A243129CC27E63EC44D6672E03CE0024FBA05CACFB3F6DE360BC0",
+                        "assertions":  4,
+                        "frames":  705,
+                        "scopes":  6,
+                        "ended":  6,
+                        "slot":  3,
+                        "beforePacked":  72,
+                        "afterPacked":  8264,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  3,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  21175,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  73
+                                       },
+                                       {
+                                           "stage":  "arrival",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  105
+                                       },
+                                       {
+                                           "stage":  "owlet-and-wolves",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  280
+                                       },
+                                       {
+                                           "stage":  "owl-look-96",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  358
+                                       },
+                                       {
+                                           "stage":  "owl-look-97",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  442
+                                       },
+                                       {
+                                           "stage":  "owl-look-98",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  576
+                                       },
+                                       {
+                                           "stage":  "owl-look-99",
+                                           "room":  4,
+                                           "notes":  3,
+                                           "frames":  705
+                                       }
+                                   ]
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "route":  "slot7",
+                        "packet":  "out-slot7-approach/packet.json",
+                        "sha256":  "C45194EB4F5FD7DAA8EC3254B74BD68307FE2C93EEAAFC6E849530DBD20DEB7E",
+                        "assertions":  5,
+                        "frames":  865,
+                        "scopes":  2,
+                        "ended":  2,
+                        "slot":  7,
+                        "beforePacked":  4356,
+                        "afterPacked":  12548,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  7,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  13463,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  74
+                                       },
+                                       {
+                                           "stage":  "arrival",
+                                           "room":  23,
+                                           "notes":  3,
+                                           "frames":  116
+                                       },
+                                       {
+                                           "stage":  "walk-box-3",
+                                           "room":  23,
+                                           "notes":  3,
+                                           "frames":  865
+                                       }
+                                   ]
+                    },
+                    {
+                        "edition":  "vga",
+                        "route":  "slot7",
+                        "packet":  "out-slot7-vga-geometry/packet.json",
+                        "sha256":  "C715A628C97C72C5B6B5620772E4BB2F0EDF1DB95A50B4C0F916A321E90EA25F",
+                        "assertions":  5,
+                        "frames":  1062,
+                        "scopes":  2,
+                        "ended":  2,
+                        "slot":  7,
+                        "beforePacked":  4612,
+                        "afterPacked":  12804,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  7,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  27923,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  73
+                                       },
+                                       {
+                                           "stage":  "arrival",
+                                           "room":  23,
+                                           "notes":  3,
+                                           "frames":  105
+                                       },
+                                       {
+                                           "stage":  "approach-monitor",
+                                           "room":  23,
+                                           "notes":  3,
+                                           "frames":  1062
+                                       }
+                                   ]
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "route":  "slot11",
+                        "packet":  "out-slot11-pasture/packet.json",
+                        "sha256":  "3D030C798BDE105249D4719055EC3700FA45410314A8320D971A2D8940532B04",
+                        "assertions":  5,
+                        "frames":  2081,
+                        "scopes":  4,
+                        "ended":  4,
+                        "slot":  11,
+                        "beforePacked":  2565,
+                        "afterPacked":  10757,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  25,
+                                            "sequence":  4941,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 exit script",
+                                            "container":  25,
+                                            "sequence":  5756,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  25,
+                                            "sequence":  5759,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 exit script",
+                                            "container":  25,
+                                            "sequence":  7455,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  25,
+                                            "sequence":  7458,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 Object 447 Verb 0x36",
+                                            "container":  25,
+                                            "sequence":  8238,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  11,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  9918,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  74
+                                       },
+                                       {
+                                           "stage":  "outside-pasture",
+                                           "room":  24,
+                                           "notes":  3,
+                                           "frames":  116
+                                       },
+                                       {
+                                           "stage":  "actual-pasture-arrival",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  174
+                                       },
+                                       {
+                                           "stage":  "walk-box-4",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  256
+                                       },
+                                       {
+                                           "stage":  "walk-box-3",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  1461
+                                       },
+                                       {
+                                           "stage":  "lamb-lesson",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  2081
+                                       }
+                                   ]
+                    },
+                    {
+                        "edition":  "vga",
+                        "route":  "slot11",
+                        "packet":  "out-slot11-vga/packet.json",
+                        "sha256":  "A9EF4E56817BFF54D76F3B81C2B57CCECEA053370A412AE0EDED2B8A2B6F78F1",
+                        "assertions":  5,
+                        "frames":  1249,
+                        "scopes":  4,
+                        "ended":  4,
+                        "slot":  11,
+                        "beforePacked":  2565,
+                        "afterPacked":  10757,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  1,
+                                            "sequence":  18969,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 exit script",
+                                            "container":  1,
+                                            "sequence":  20072,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 entry script",
+                                            "container":  1,
+                                            "sequence":  20075,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  0,
+                                            "context":  "Room 25 Object 373 Verb 0x36",
+                                            "container":  1,
+                                            "sequence":  22764,
+                                            "pathEstimated":  false
+                                        },
+                                        {
+                                            "script":  25,
+                                            "argument":  11,
+                                            "context":  null,
+                                            "container":  1,
+                                            "sequence":  23510,
+                                            "pathEstimated":  true
+                                        }
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  73
+                                       },
+                                       {
+                                           "stage":  "outside-pasture",
+                                           "room":  24,
+                                           "notes":  3,
+                                           "frames":  105
+                                       },
+                                       {
+                                           "stage":  "actual-pasture-arrival",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  160
+                                       },
+                                       {
+                                           "stage":  "walk-box-4",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  240
+                                       },
+                                       {
+                                           "stage":  "walk-box-3",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  945
+                                       },
+                                       {
+                                           "stage":  "lamb-lesson",
+                                           "room":  25,
+                                           "notes":  3,
+                                           "frames":  1249
+                                       }
+                                   ]
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "route":  "slot7-departure-control",
+                        "packet":  "out-slot7-departure-control/packet.json",
+                        "sha256":  "702A012A37F7EDE51E1CEF508777E29082E0237BFD38F33767B46DF222D61F31",
+                        "assertions":  5,
+                        "frames":  2273,
+                        "scopes":  1,
+                        "ended":  1,
+                        "slot":  null,
+                        "beforePacked":  null,
+                        "afterPacked":  null,
+                        "notesBefore":  3,
+                        "notesAfter":  3,
+                        "helpers":  [
+
+                                    ],
+                        "stages":  [
+                                       {
+                                           "stage":  "source-pickup",
+                                           "room":  9,
+                                           "notes":  3,
+                                           "frames":  74
+                                       },
+                                       {
+                                           "stage":  "departure-start",
+                                           "room":  66,
+                                           "notes":  3,
+                                           "frames":  116
+                                       },
+                                       {
+                                           "stage":  "actual-Script-106-control",
+                                           "room":  2,
+                                           "notes":  3,
+                                           "frames":  2199
+                                       },
+                                       {
+                                           "stage":  "post-departure-arrival",
+                                           "room":  23,
+                                           "notes":  3,
+                                           "frames":  2241
+                                       },
+                                       {
+                                           "stage":  "walk-box-3",
+                                           "room":  23,
+                                           "notes":  3,
+                                           "frames":  2273
+                                       }
+                                   ]
+                    }
+                ]
+}
