@@ -128,12 +128,13 @@ public sealed partial class LoomSceneStateScanner
     {
         var found = new List<LoomStateSource>();
         var tail = $" = 0x{value:X4}";
+        var firstStoryBit = LoomStoryEvents.FirstBitFor(_game);
         ForEachCodeUnit((script, room, obj, verb, label) =>
         {
             if (script is null) return;
             foreach (var ins in script.Instructions)
                 if (ins.Operation == "move" && ins.Operands.StartsWith("bit[0x", StringComparison.Ordinal) && ins.Operands.EndsWith(tail, StringComparison.Ordinal) &&
-                    int.TryParse(ins.Operands.AsSpan(6, ins.Operands.IndexOf(']') - 6), System.Globalization.NumberStyles.HexNumber, null, out var bit) && bit >= 0xD72)
+                    int.TryParse(ins.Operands.AsSpan(6, ins.Operands.IndexOf(']') - 6), System.Globalization.NumberStyles.HexNumber, null, out var bit) && bit >= firstStoryBit)
                     found.Add(new(room, obj, verb, $"{label} +0x{ins.Offset:X4}", $"move {ins.Operands}"));
         });
         return found;

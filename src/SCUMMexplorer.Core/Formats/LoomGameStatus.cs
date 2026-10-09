@@ -107,7 +107,7 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
             var initial = data!.RoomLocalScriptIds(1).Select(id => data.RoomLocalScript(1, id))
                 .FirstOrDefault(s => s?.Instructions.Any(i => i.Operation == "move" && i.Operands == $"{noteLimit} = 0x0003") == true)
                 ?? throw Fail("Room 01 initial notes");
-            return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 3, "", 0, startKey, playKey, 0,
+            return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 3, "", 0, startKey, playKey, Number(learned) - SpanishLearnedBit,
                 $"Loaded CD scripts 017 +0x{staffTest.Offset:X4}/+0x{staffMove.Offset:X4}: {staff}=1 means held (it starts 018 with 2, else 019); 010 +0x{limitTest.Offset:X4}/+0x{limitChain.Offset:X4}: note IDs 1..8 up to and including {noteLimit} are available. " +
                 $"023: two words per draft, four 3-bit notes +1; flags 0x2000 learned ({learned})/0x1000 reverse ({reverse})/0x4000 last-note knowledge ({lastNote}). " +
                 "022 searches slots 0..15 inclusively. 026 refuses matched unlearned drafts before target dispatch; 022 skips reverse matching without 0x1000. " +

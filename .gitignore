@@ -17,6 +17,7 @@ Exe/
 *.suo
 
 # Generated verification output
+.verification/actor-progression-20261009/out*/
 .verification/**/*.png
 .verification/**/*.bmp
 .verification/**/*.txt

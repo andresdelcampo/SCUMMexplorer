@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: use each edition's story range for actor state
+
+VGA story controls rejected its own ghost/restoration bits because the range reader fell back to EGA D72 and the scanner used that literal threshold. Both now use the shift measured from the edition's loaded draft flags: English D71, Spanish D72, CD 012. Three edition regressions pass; a separate source-state matrix passes 168/168 assertions for staff branches, sleeping/ghost/restored Rusty and twelve balanced sphere/scythe close-ups with visible Bobbin afterwards. Earlier failed harness expectations are retained. No native picture/audio claim or renderer change. [Source, limits and reproduction](../.verification/actor-progression-20261009/STATE_CHECKS.md).
+
 ## 9 October: consolidate the live documentation
 
 Merged CURRENT_WORK, LOOM_EGA_PLAN and NEXT_SESSION_PROMPT into one [current plan and handoff](CURRENT_WORK.md). Removed the two redundant files and updated their links. Completed results stay in this changelog; exact original-game recipes remain in the [comparison reference](loom/FINAL_GAPS_HANDOFF.md). Prior snapshots and verification evidence are preserved. Documentation link check: 814 relative links across 23 retained/new changed files resolve. No game behavior changed or runtime verification repeated.
