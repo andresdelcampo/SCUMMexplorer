@@ -1,8 +1,7 @@
 using System.IO.Compression;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Rendering;
 
-// Steps costume animations with LoomCostume (ScummVM ClassicCostumeLoader) and writes one PNG strip per
+// Steps costume animations with ScummCostume (ScummVM ClassicCostumeLoader) and writes one PNG strip per
 // (costume, frame, direction): step 0 is the frame just started, each later cell one increaseAnims call.
 // A cross marks the actor's point. Usage: CostumeAnimRender <game folder> <output folder> <costume> <steps> <frame>...
 var folder = args[0];
@@ -12,14 +11,14 @@ var steps = int.Parse(args[3]);
 var frames = args.Skip(4).Select(int.Parse).ToArray();
 Directory.CreateDirectory(output);
 var game = new GameFolderScanner().Scan(folder);
-var costume = LoomCostume.Load(game, id) ?? throw new InvalidOperationException($"Costume {id} is not indexed.");
+var costume = ScummCostume.Load(game, id) ?? throw new InvalidOperationException($"Costume {id} is not indexed.");
 var log = new List<string> { $"costume {id}: animations 0..{costume.AnimationLimit}, mirror {costume.Mirror}, palette colour {costume.PaletteColor}" };
 string[] names = ["left", "right", "down", "up"];
 const int CellW = 96, CellH = 112, OriginX = 48, OriginY = 104, Scale = 3;
 foreach (var frame in frames)
 for (var direction = 0; direction < 4; direction++)
 {
-    var state = new LoomCostumeAnimationState();
+    var state = new ScummCostumeAnimationState();
     if (!costume.DecodeAnimation(state, frame, direction))
     {
         log.Add($"frame {frame} {names[direction]}: animation {direction + frame * 4} is empty or beyond the costume");

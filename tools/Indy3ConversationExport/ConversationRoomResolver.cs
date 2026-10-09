@@ -1,8 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 /// <summary>Propagates possible room contexts along decoded calls and room changes.
 /// Resource container numbers are never used as execution-room evidence.</summary>
@@ -19,9 +17,9 @@ internal sealed class ConversationRoomResolver
 
     public ConversationRoomResolver(GameLibrary game)
     {
-        var reader = new LoomScriptReader(ScummScriptDialect.Indy3);
-        var verbReader = new LoomObjectVerbReader(ScummScriptDialect.Indy3);
-        var directory = new LoomRoomObjectDirectory();
+        var reader = new ScummScriptReader(ScummScriptDialect.Indy3);
+        var verbReader = new ScummObjectVerbReader(ScummScriptDialect.Indy3);
+        var directory = new ScummRoomObjectDirectory();
         var chains = new LflResourceChain();
         var globals = new Dictionary<int, Source>();
         var locals = new Dictionary<(int Room, int Script), Source>();
@@ -42,7 +40,7 @@ internal sealed class ConversationRoomResolver
         foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue))
         {
             var id = room.ResourceId!.Value;
-            void Add(LoomScriptDisassembly? data, string name)
+            void Add(ScummScriptDisassembly? data, string name)
             {
                 if (data is not null) roots.Add((new Source(name, null, data), id));
             }
@@ -51,7 +49,7 @@ internal sealed class ConversationRoomResolver
             TryRead(() =>
             {
                 var bytes = File.ReadAllBytes(room.FilePath);
-                foreach (var localId in LoomScriptReader.ReadRoomLocalScriptIds(bytes, globalCount))
+                foreach (var localId in ScummScriptReader.ReadRoomLocalScriptIds(bytes, globalCount))
                 {
                     var data = reader.DecodeRoomLocalScript(room, localId, globalCount);
                     if (data is null) continue;
@@ -158,11 +156,11 @@ internal sealed class ConversationRoomResolver
         int.TryParse(value.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var result) ? result : null;
 
     internal sealed record RoomContext(int RoomId, string Evidence);
-    private sealed class Source(string name, int? scriptId, LoomScriptDisassembly data)
+    private sealed class Source(string name, int? scriptId, ScummScriptDisassembly data)
     {
         public string Name { get; } = name;
         public int? ScriptId { get; } = scriptId;
-        public Dictionary<int, LoomScriptInstruction> Code { get; } = data.Instructions.ToDictionary(i => i.Offset);
+        public Dictionary<int, ScummScriptInstruction> Code { get; } = data.Instructions.ToDictionary(i => i.Offset);
     }
     private sealed record State(Source Source, int Offset, int Room, string Evidence);
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Formats\loom-glossary.json" LogicalName="SCUMMexplorer.Core.loom-glossary.json" />
-    <EmbeddedResource Include="Formats\loom-cd-glossary.json" LogicalName="SCUMMexplorer.Core.loom-cd-glossary.json" />
-    <EmbeddedResource Include="Formats\loom-ega-reviewed-glossary.json" LogicalName="SCUMMexplorer.Core.loom-ega-reviewed-glossary.json" />
+    <EmbeddedResource Include="Loom\Text\loom-glossary.json" LogicalName="SCUMMexplorer.Core.loom-glossary.json" />
+    <EmbeddedResource Include="Loom\Cd\loom-cd-glossary.json" LogicalName="SCUMMexplorer.Core.loom-cd-glossary.json" />
+    <EmbeddedResource Include="Loom\Ega\loom-ega-reviewed-glossary.json" LogicalName="SCUMMexplorer.Core.loom-ega-reviewed-glossary.json" />
+  </ItemGroup>
+
+  <!-- Layering: SCUMMexplorer.Core.Scumm (engine, any game) must not see SCUMMexplorer.Core.Loom (LOOM, all editions; Loom/Cd and Loom/Ega are edition code). -->
+  <ItemGroup>
+    <Using Include="SCUMMexplorer.Core.Scumm" />
+    <Using Include="SCUMMexplorer.Core.Domain" />
   </ItemGroup>
 
   <ItemGroup>

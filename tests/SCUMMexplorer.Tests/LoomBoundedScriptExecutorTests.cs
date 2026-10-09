@@ -1,5 +1,3 @@
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -9,10 +7,10 @@ public sealed class LoomBoundedScriptExecutorTests
     public void ExecutedEstimatedSoundKeepsConditionalCertainty()
     {
         var script = Script(new(0, 0, "startSound", "0x13", "1C 13"), new(2, 0, "stopObjectCode", "", "00"));
-        var run = new LoomBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), [], pathEstimated: true);
-        var sound = Assert.Single(run.Events, e => e.Kind == LoomScriptEventKind.SoundStarted);
+        var run = new ScummBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), [], pathEstimated: true);
+        var sound = Assert.Single(run.Events, e => e.Kind == ScummScriptEventKind.SoundStarted);
         Assert.True(sound.Executed);
-        Assert.Equal(LoomScriptEventCertainty.Conditional, sound.Certainty);
+        Assert.Equal(ScummScriptEventCertainty.Conditional, sound.Certainty);
         Assert.Equal(19, sound.TargetId);
     }
 
@@ -23,10 +21,10 @@ public sealed class LoomBoundedScriptExecutorTests
             new(0, 0, "isEqual", "var[0x123], 0x0001, branch +0x0003 -> 0x0008", "00 00 00 00 00"),
             new(5, 0, "startSound", "0x13", "1C 13 00"),
             new(8, 0, "stopObjectCode", "", "00"));
-        var run = new LoomBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), []);
-        var sound = Assert.Single(run.Events, e => e.Kind == LoomScriptEventKind.SoundStarted);
+        var run = new ScummBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), []);
+        var sound = Assert.Single(run.Events, e => e.Kind == ScummScriptEventKind.SoundStarted);
         Assert.False(sound.Executed);
-        Assert.Equal(LoomScriptEventCertainty.Conditional, sound.Certainty);
+        Assert.Equal(ScummScriptEventCertainty.Conditional, sound.Certainty);
     }
 
     [Theory]
@@ -42,8 +40,8 @@ public sealed class LoomBoundedScriptExecutorTests
             new(5, 0, "setState", "0x000A, 0x0001", "00 00 00 00 00"),
             new(10, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
-            new Dictionary<int, byte> { [10] = 0 }, Array.Empty<LoomRoomObjectRecord>());
+        var run = new ScummBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte> { [10] = 0 }, Array.Empty<ScummRoomObjectRecord>());
 
         Assert.Equal(appliesState ? (byte)1 : (byte)0, run.ObjectStates[10]);
         Assert.True(run.ReachedStop);
@@ -63,8 +61,8 @@ public sealed class LoomBoundedScriptExecutorTests
             new(25, 0, "setState", "0x000B, 0x0001", "00 00 00 00 00"),
             new(30, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
-            new Dictionary<int, byte> { [10] = 0, [11] = 0 }, Array.Empty<LoomRoomObjectRecord>());
+        var run = new ScummBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte> { [10] = 0, [11] = 0 }, Array.Empty<ScummRoomObjectRecord>());
 
         Assert.Null(run.UnresolvedReason);
         Assert.Equal((byte)1, run.ObjectStates[10]);
@@ -81,8 +79,8 @@ public sealed class LoomBoundedScriptExecutorTests
             new(10, 0, "setState", "0x000A, 0x0001", "00 00 00 00 00"),
             new(15, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
-            new Dictionary<int, byte> { [10] = 0 }, Array.Empty<LoomRoomObjectRecord>());
+        var run = new ScummBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte> { [10] = 0 }, Array.Empty<ScummRoomObjectRecord>());
 
         Assert.Equal((byte)1, run.ObjectStates[10]);
         Assert.True(run.ReachedStop);
@@ -101,8 +99,8 @@ public sealed class LoomBoundedScriptExecutorTests
             new(5, 0, "setState", "0x000A, 0x02", "00 00 00 00 00"),
             new(10, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
-            new Dictionary<int, byte> { [10] = initialState }, Array.Empty<LoomRoomObjectRecord>());
+        var run = new ScummBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte> { [10] = initialState }, Array.Empty<ScummRoomObjectRecord>());
 
         Assert.Equal(appliesState ? (byte)2 : initialState, run.ObjectStates[10]);
         Assert.Null(run.UnresolvedReason);
@@ -115,8 +113,8 @@ public sealed class LoomBoundedScriptExecutorTests
             new(0, 0, "jumpRelative", "+2 -> 0x0005", "18 02 00"),
             new(5, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
-            new Dictionary<int, byte>(), Array.Empty<LoomRoomObjectRecord>());
+        var run = new ScummBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte>(), Array.Empty<ScummRoomObjectRecord>());
 
         Assert.True(run.ReachedStop);
         Assert.Null(run.UnresolvedReason);
@@ -125,13 +123,13 @@ public sealed class LoomBoundedScriptExecutorTests
     [Fact]
     public void RuntimeCarriesGlobalsAndObjectStateAcrossFrameBoundary()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte> { [10] = 0 });
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte> { [10] = 0 });
         var script = Script(
             new(0, 0, "move", "var[0x002] = 0x0002", "00 00 00 00 00"),
             new(5, 0, "breakHere", "", "80"),
             new(6, 0, "setState", "0x000A, var[0x002]", "00 00 00 00 00"),
             new(11, 0, "stopObjectCode", "", "00"));
-        var executor = new LoomBoundedScriptExecutor();
+        var executor = new ScummBoundedScriptExecutor();
 
         var first = executor.Execute(script, runtime.ObjectStates, [], runtime: runtime);
         var second = executor.Execute(script, runtime.ObjectStates, [], runtime: runtime,
@@ -149,14 +147,14 @@ public sealed class LoomBoundedScriptExecutorTests
     {
         var records = new[]
         {
-            new LoomRoomObjectRecord(10, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, null),
-            new LoomRoomObjectRecord(11, 1, 16, 24, 8, 8, 0, 0, 0, 0, 0, 0, null)
+            new ScummRoomObjectRecord(10, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, null),
+            new ScummRoomObjectRecord(11, 1, 16, 24, 8, 8, 0, 0, 0, 0, 0, 0, null)
         };
         var script = Script(
             new(0, 0, "drawObject", "0x000A, at, 0x0002, 0x0003", "25 0A 00 02 00 03 00"),
             new(7, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
+        var run = new ScummBoundedScriptExecutor().Execute(script,
             new Dictionary<int, byte> { [10] = 0, [11] = 1 }, records);
 
         Assert.Null(run.UnresolvedReason);
@@ -175,7 +173,7 @@ public sealed class LoomBoundedScriptExecutorTests
             new(13, 0, "setState", "0x000A, 0x0001", "00 00 00 00 00"),
             new(18, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
+        var run = new ScummBoundedScriptExecutor().Execute(script,
             new Dictionary<int, byte> { [10] = 0 }, []);
 
         Assert.Null(run.UnresolvedReason);
@@ -193,15 +191,15 @@ public sealed class LoomBoundedScriptExecutorTests
             new(13, 0, "jumpRelative", "+8 -> 0x0018", "18 08 00"),
             new(16, 0, "loadRoomWithEgo", "0x00C9, 0x05, walkTo=(160, 120)", "24 C9 00 05 A0 00 78 00"),
             new(24, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var executor = new LoomBoundedScriptExecutor();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var executor = new ScummBoundedScriptExecutor();
 
         var first = executor.Execute(script, runtime.ObjectStates, [], runtime: runtime);
-        Assert.Equal(5, Assert.Single(first.Events, item => item.Kind == LoomScriptEventKind.RoomLoaded).TargetId);
+        Assert.Equal(5, Assert.Single(first.Events, item => item.Kind == ScummScriptEventKind.RoomLoaded).TargetId);
 
         runtime.GlobalVariables["var[0x0D7]"] = 1 << 11;
         var second = executor.Execute(script, runtime.ObjectStates, [], runtime: runtime);
-        Assert.Equal(50, Assert.Single(second.Events, item => item.Kind == LoomScriptEventKind.RoomLoaded).TargetId);
+        Assert.Equal(50, Assert.Single(second.Events, item => item.Kind == ScummScriptEventKind.RoomLoaded).TargetId);
     }
 
     [Fact]
@@ -212,8 +210,8 @@ public sealed class LoomBoundedScriptExecutorTests
             new(2, 0, "setState", "0x000A, 0x0001", "00 00 00 00"),
             new(6, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script,
-            new Dictionary<int, byte> { [10] = 0 }, Array.Empty<LoomRoomObjectRecord>());
+        var run = new ScummBoundedScriptExecutor().Execute(script,
+            new Dictionary<int, byte> { [10] = 0 }, Array.Empty<ScummRoomObjectRecord>());
 
         Assert.True(run.ReachedStop);
         Assert.Null(run.UnresolvedReason);
@@ -226,21 +224,21 @@ public sealed class LoomBoundedScriptExecutorTests
         var script = Script(
             new(0, 0, "stopScript", "0x2A", "62 2A"),
             new(2, 0, "stopObjectCode", "", "00"));
-        var executor = new LoomBoundedScriptExecutor();
+        var executor = new ScummBoundedScriptExecutor();
 
-        var alone = executor.Execute(script, new Dictionary<int, byte>(), Array.Empty<LoomRoomObjectRecord>());
+        var alone = executor.Execute(script, new Dictionary<int, byte>(), Array.Empty<ScummRoomObjectRecord>());
         Assert.Contains("needs a session", alone.UnresolvedReason, StringComparison.Ordinal);
 
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        LoomScriptEvent? stopped = null;
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        ScummScriptEvent? stopped = null;
         var handled = executor.Execute(script, runtime.ObjectStates, [], runtime: runtime,
             onEvent: (scriptEvent, _) => { stopped = scriptEvent; return ""; });
 
         Assert.True(handled.ReachedStop);
-        Assert.Equal(LoomScriptEventKind.ScriptStopped, stopped?.Kind);
+        Assert.Equal(ScummScriptEventKind.ScriptStopped, stopped?.Kind);
         Assert.Equal(0x2A, stopped?.TargetId);
     }
 
-    private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
+    private static ScummScriptDisassembly Script(params ScummScriptInstruction[] instructions) =>
         new(1, 1, 0, 32, 16, instructions, null, null, [], []);
 }

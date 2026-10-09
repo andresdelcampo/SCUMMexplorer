@@ -1,6 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -38,9 +36,9 @@ public sealed class LoomEstimatedRoomLoadTests
         session.AdvanceFrame();
 
         Assert.Equal(43, session.Snapshot.RoomId);
-        var load = Assert.IsType<LoomScriptEvent>(session.LastAction?.ReachedRoomLoad);
+        var load = Assert.IsType<ScummScriptEvent>(session.LastAction?.ReachedRoomLoad);
         Assert.True(load.Executed);
-        Assert.Equal(LoomScriptEventCertainty.Conditional, load.Certainty);
+        Assert.Equal(ScummScriptEventCertainty.Conditional, load.Certainty);
         Assert.Contains("estimated", session.LastAction!.Evidence, StringComparison.OrdinalIgnoreCase);
         Assert.False(session.Snapshot.IsFaithful);
         // Room-entry effects still inherit the estimated transition. Rendering
@@ -51,12 +49,12 @@ public sealed class LoomEstimatedRoomLoadTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         var game = new GameFolderScanner().Scan(folder);
         var bytes = File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 43).FilePath);
-        var background = new LoomEgaRoomDecoder().Decode(bytes);
-        var images = new LoomRoomObjects().Decode(bytes);
-        var batches = LoomSceneDrawBatches.Build(game);
+        var background = new ScummV3EgaRoomDecoder().Decode(bytes);
+        var images = new ScummRoomObjects().Decode(bytes);
+        var batches = ScummSceneDrawBatches.Build(game);
         var snapshot = session.Snapshot;
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions,
-            new LoomRoomObjectDirectory().Decode(bytes), background, drawQueue: snapshot.DrawOrder);
+            new ScummRoomObjectDirectory().Decode(bytes), background, drawQueue: snapshot.DrawOrder);
         selection.ExcludeInterfaceImages(batches.InterfaceImages.Keys);
         selection.FillGaps(batches.ForRoom(43), 43);
         if (!images.Any(selection.IsActive))
@@ -94,7 +92,7 @@ public sealed class LoomEstimatedRoomLoadTests
     {
         // Session globals normally start at zero. This test explicitly models a
         // missing value, not an ordinary known-zero game variable.
-        var runtime = (LoomScriptRuntimeState)typeof(LoomExplorationSession)
+        var runtime = (ScummScriptRuntimeState)typeof(LoomExplorationSession)
             .GetField("_runtime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(session)!;
         runtime.GlobalVariables.Remove("var[0x0F1]");
     }

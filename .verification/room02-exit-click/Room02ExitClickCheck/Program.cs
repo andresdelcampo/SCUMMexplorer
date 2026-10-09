@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // Room 02's exit click in the real MainWindow, on the playback clock. After the boot the
 // ego stands on the cliff (828, 60). A single click on the exit (object 153 at (450, 60))

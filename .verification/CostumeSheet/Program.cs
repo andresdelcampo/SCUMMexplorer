@@ -1,10 +1,9 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Rendering;
 
 // Usage: CostumeSheet <game folder> <costume id> <output .bmp>
 // Draws every animation (frame * 4 + direction) of a costume with the default EGA colours, for a look at what its limbs show.
 var game = new GameFolderScanner().Scan(args[0]);
-var costume = LoomCostume.Load(game, int.Parse(args[1]))!;
+var costume = ScummCostume.Load(game, int.Parse(args[1]))!;
 uint[] ega = [0x000000, 0x0000AA, 0x00AA00, 0x00AAAA, 0xAA0000, 0xAA00AA, 0xAA5500, 0xAAAAAA, 0x555555, 0x5555FF, 0x55FF55, 0x55FFFF, 0xFF5555, 0xFF55FF, 0xFFFF55, 0xFFFFFF];
 var limit = costume.AnimationLimit;
 const int cell = 96, columns = 8;
@@ -15,7 +14,7 @@ var buffer = new byte[width * height]; Array.Fill(buffer, (byte)0xFF);
 var notes = new List<string>();
 for (var animation = 0; animation <= limit; animation++)
 {
-    var state = new LoomCostumeAnimationState();
+    var state = new ScummCostumeAnimationState();
     var ok = costume.DecodeAnimation(state, animation / 4, animation % 4);
     var cels = ok ? costume.Draw(state, animation % 4) : [];
     notes.Add($"anim {animation} (frame {animation / 4} dir {animation % 4}): decoded={ok} limbs={string.Join(",", cels.Select(c => $"{c.Limb}:{c.Width}x{c.Height}"))}");

@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -22,17 +21,17 @@ public sealed class LoomCallerRestorationIdentityTests
                 session.AdvanceFrame(); session.AdvanceFrame();
             }, site: s => defect != "omitted-initialization" || s.Script != 2 || s.Stage != "begin" || s.Offset != 0,
             chronology: chronology);
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
-        var outgoing = chronology.OfType<LoomCallObservation>().Single(b => b.Stage == "dispatch" && b.Site.Script == 2).Call!;
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
+        var outgoing = chronology.OfType<ScummCallObservation>().Single(b => b.Stage == "dispatch" && b.Site.Script == 2).Call!;
         foreach (var item in chronology)
         {
-            if (item is LoomScriptObservation script) {
+            if (item is ScummScriptObservation script) {
                 if (defect == "cancelled" && script.Site is { Stage: "begin", Script: 2, Offset: 3 })
                     script = script with { Site = null, CancelledSlots = [outgoing.Slot] };
                 tracker.ObserveScript(script);
             }
-            else if (item is LoomCallObservation boundary)
+            else if (item is ScummCallObservation boundary)
             {
                 if (boundary.Stage == "resumed-locals" && boundary.Slot == outgoing.Slot)
                 {

@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 internal static class StateTransitions
 {
@@ -24,7 +23,7 @@ internal static class StateTransitions
             var checkpoints = new List<object>();
             var results = new List<object>();
             var checks = new List<string>();
-            var reached = new List<(string Phase, LoomScriptObservation Observation)>();
+            var reached = new List<(string Phase, ScummScriptObservation Observation)>();
             object? Field(object value, string key) => value.GetType().GetField(key, BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(value);
             object? Prop(object value, string key) => value.GetType().GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(value);
             string Backing(string key) => $"var[0x{Convert.ToInt32(key[6..^1], 16) >> 4:X3}]";
@@ -32,7 +31,7 @@ internal static class StateTransitions
             {
                 var values = session!.Snapshot.KnownGlobalVariables;
                 if (values.TryGetValue(key, out var value)) return value;
-                if (values.ContainsKey(LoomBoundedScriptExecutor.SeparateBitStorage)) return 0;
+                if (values.ContainsKey(ScummBoundedScriptExecutor.SeparateBitStorage)) return 0;
                 var bit = Convert.ToInt32(key[6..^1], 16);
                 return values.TryGetValue(Backing(key), out var word) ? (ushort)((word >> (bit & 15)) & 1) : null;
             }
@@ -41,8 +40,8 @@ internal static class StateTransitions
                 var s = session!;
                 var runtime = Field(s, "_runtime")!;
                 var pending = ((IEnumerable)Field(s, "_pending")!).Cast<object>().Where(p =>
-                    ((LoomScriptDisassembly)Prop(p, "Script")!).Context == "Room 34 local script 200").Select(p => new {
-                    script = ((LoomScriptDisassembly)Prop(p, "Script")!).Context ?? $"global {((LoomScriptDisassembly)Prop(p, "Script")!).ScriptId}",
+                    ((ScummScriptDisassembly)Prop(p, "Script")!).Context == "Room 34 local script 200").Select(p => new {
+                    script = ((ScummScriptDisassembly)Prop(p, "Script")!).Context ?? $"global {((ScummScriptDisassembly)Prop(p, "Script")!).ScriptId}",
                     offset = Prop(p, "Offset"), room = Prop(p, "RoomId"), number = Prop(p, "ScriptNumber")
                 }).ToArray();
                 var a = s.Actors.Single(a => a.Number == 1);
@@ -52,7 +51,7 @@ internal static class StateTransitions
                     bits = new[] { gate, seen, input }.ToDictionary(k => k, BitValue),
                     boxes = s.CurrentWalkBoxes?.Boxes.Select(b => new { b.Index, flags = s.CurrentWalkBoxes.GetFlags(b.Index) }).ToArray() };
             }
-            var observer = new LoomScriptObserver(o => {
+            var observer = new ScummScriptObserver(o => {
                 if (session is not null)
                 {
                     reached.Add((phase, o));
@@ -64,13 +63,13 @@ internal static class StateTransitions
                     "roomOps" or "matrixOps" or "setBoxFlags" or "putActor" or "walkActorTo" or "getActorWalkBox" ||
                     site.Operands?.Contains("bit[") == true || site.Context == "Room 34 local script 200"),
                 includeKey: k => new[] { gate, seen, input, Backing(gate), Backing(seen), Backing(input),
-                    LoomBoundedScriptExecutor.SeparateBitStorage, "var[0x002]", "var[0x011]", "var[0x012]", "var[0x102]" }.Contains(k) || k.StartsWith("local["),
+                    ScummBoundedScriptExecutor.SeparateBitStorage, "var[0x002]", "var[0x011]", "var[0x012]", "var[0x102]" }.Contains(k) || k.StartsWith("local["),
                 captureSourceAccess: true);
-            session = new LoomExplorationSession(game, game.Vga?.ReadIndexedObjects() ??
+            session = new LoomExplorationSession(game, game.V4Archive?.ReadIndexedObjects() ??
                 new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")),
                 completeBoot: game.Id == GameId.Loom, observer: observer);
             bool MonitorActive() => ((IEnumerable)Field(session, "_pending")!).Cast<object>()
-                .Any(p => ((LoomScriptDisassembly)Prop(p, "Script")!).Context == "Room 34 local script 200");
+                .Any(p => ((ScummScriptDisassembly)Prop(p, "Script")!).Context == "Room 34 local script 200");
             bool BitIs(string key, ushort expected) => BitValue(key) == expected;
             void Require(bool condition, string label)
             {

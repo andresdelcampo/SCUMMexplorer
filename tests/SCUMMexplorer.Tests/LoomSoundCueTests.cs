@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -8,11 +7,11 @@ public sealed class LoomSoundCueTests
     [Fact]
     public void ReachedStartSoundResolvesKnownScriptLocal()
     {
-        var script = new LoomScriptDisassembly(39, 1, 0, 3, 3,
-            [new LoomScriptInstruction(0, 0x9C, "startSound", "local[0x000]", "9C 00"),
-                new LoomScriptInstruction(2, 0, "stopObjectCode", "", "00")],
+        var script = new ScummScriptDisassembly(39, 1, 0, 3, 3,
+            [new ScummScriptInstruction(0, 0x9C, "startSound", "local[0x000]", "9C 00"),
+                new ScummScriptInstruction(2, 0, "stopObjectCode", "", "00")],
             null, null, [], []);
-        var run = new LoomBoundedScriptExecutor().Execute(script,
+        var run = new ScummBoundedScriptExecutor().Execute(script,
             new Dictionary<int, byte>(), [],
             initialLocals: new Dictionary<string, ushort> { ["local[0x000]"] = 31 });
 
@@ -22,13 +21,13 @@ public sealed class LoomSoundCueTests
     [Fact]
     public void ReachedStopRemovesInheritedCue()
     {
-        var start = Event(LoomScriptEventKind.SoundStarted, 31);
-        var effect = Event(LoomScriptEventKind.SoundStarted, 3);
-        var stop = Event(LoomScriptEventKind.SoundStopped, 31);
+        var start = Event(ScummScriptEventKind.SoundStarted, 31);
+        var effect = Event(ScummScriptEventKind.SoundStarted, 3);
+        var stop = Event(ScummScriptEventKind.SoundStopped, 31);
 
         Assert.Equal(31, LoomSoundCueResolver.Resolve([start, effect], id => id == 31).Start?.TargetId);
         Assert.Null(LoomSoundCueResolver.Resolve([start, effect, stop], id => id == 31).Start);
-        Assert.Null(LoomSoundCueResolver.Resolve([start, Event(LoomScriptEventKind.MusicStopped, null)],
+        Assert.Null(LoomSoundCueResolver.Resolve([start, Event(ScummScriptEventKind.MusicStopped, null)],
             id => id == 31).Start);
     }
 
@@ -36,7 +35,7 @@ public sealed class LoomSoundCueTests
     public void UnknownStopPreventsClaimingCurrentCue()
     {
         var resolved = LoomSoundCueResolver.Resolve(
-            [Event(LoomScriptEventKind.SoundStarted, 31), Event(LoomScriptEventKind.SoundStopped, null)],
+            [Event(ScummScriptEventKind.SoundStarted, 31), Event(ScummScriptEventKind.SoundStopped, null)],
             id => id == 31);
 
         Assert.Null(resolved.Start);
@@ -47,8 +46,8 @@ public sealed class LoomSoundCueTests
     public void RoomCueKeepsOnlyCuesStartedSinceEntryOrByTheRoomItself()
     {
         // Sound 25 started in Room 02 by a global chain (the intro); sound 30 by Room 16's code.
-        var intro = new LoomSessionSoundEvent(Event(LoomScriptEventKind.SoundStarted, 25), 0, 2, null);
-        var room16 = new LoomSessionSoundEvent(Event(LoomScriptEventKind.SoundStarted, 30), 5, 16, 16);
+        var intro = new LoomSessionSoundEvent(Event(ScummScriptEventKind.SoundStarted, 25), 0, 2, null);
+        var room16 = new LoomSessionSoundEvent(Event(ScummScriptEventKind.SoundStarted, 30), 5, 16, 16);
 
         Assert.Null(LoomSoundCueResolver.ResolveForRoom([intro], 2, 3, _ => true).Start);
         Assert.Equal(25, LoomSoundCueResolver.ResolveForRoom([intro], 2, 0, _ => true).Start?.TargetId);
@@ -65,7 +64,7 @@ public sealed class LoomSoundCueTests
         Assert.Null(LoomSoundCueResolver.ResolveForRoom([intro, room16], 17, 9, _ => true).Start);
 
         // An unresolved stop of a cue that is not shown does not make the room's cue uncertain.
-        var unknownStop = new LoomSessionSoundEvent(Event(LoomScriptEventKind.SoundStopped, null), 1, 2, null);
+        var unknownStop = new LoomSessionSoundEvent(Event(ScummScriptEventKind.SoundStopped, null), 1, 2, null);
         Assert.False(LoomSoundCueResolver.ResolveForRoom([intro, unknownStop, room16], 16, 4, _ => true)
             .HasUnknownSoundTarget);
         Assert.True(LoomSoundCueResolver.ResolveForRoom([intro, room16, unknownStop with { Sequence = 6 }], 16, 9,
@@ -107,7 +106,7 @@ public sealed class LoomSoundCueTests
         Assert.Null(Cue().Start);
     }
 
-    private static LoomScriptEvent Event(LoomScriptEventKind kind, int? id) =>
+    private static ScummScriptEvent Event(ScummScriptEventKind kind, int? id) =>
         new(39, "Script 39", 0, kind, kind.ToString(), "", null, id,
-            LoomScriptEventCertainty.Reached);
+            ScummScriptEventCertainty.Reached);
 }

@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 internal static class Program
 {

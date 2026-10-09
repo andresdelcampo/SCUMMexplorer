@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -13,7 +12,7 @@ public sealed class LoomEgaScriptReviewTests
     public void Room70SaveNameHelpersDecodeThroughTheirRealEnd(string language, int id, int length)
     {
         var data = ScummDataSources.For(Game(language));
-        var script = Assert.IsType<LoomScriptDisassembly>(data.RoomLocalScript(70, id));
+        var script = Assert.IsType<ScummScriptDisassembly>(data.RoomLocalScript(70, id));
 
         Assert.Equal(length, script.CodeLength);
         Assert.True(script.HasCompleteControlFlow);
@@ -45,7 +44,7 @@ public sealed class LoomEgaScriptReviewTests
         {
             var resource = game.Resources.Single(r => r.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && r.ResourceId == id);
             if (chain.FindLeftover(game, resource) is not null) { Assert.Null(glossary.Script(id)); continue; }
-            LoomScriptDisassembly? code;
+            ScummScriptDisassembly? code;
             try { code = data.GlobalScript(id); }
             catch (InvalidDataException) { Assert.Null(glossary.Script(id)); continue; }
             if (code is not { HasCompleteControlFlow: true }) { Assert.Null(glossary.Script(id)); continue; }

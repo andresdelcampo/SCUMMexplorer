@@ -1,16 +1,14 @@
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // DemoProbe <folder> walk <room> <x> <y> mask: per frame, the ego's visible pixels with the room's depth mask against the same pose unmasked.
 static class MaskSample
 {
     private static byte[]? _bytes;
     private static RoomImage? _room;
-    private static IReadOnlyList<LoomRoomObjectRecord>? _records;
+    private static IReadOnlyList<ScummRoomObjectRecord>? _records;
     private static IReadOnlyList<RoomObjectImage>? _images;
-    private static LoomWalkBoxSet? _boxes;
-    private static readonly Dictionary<int, LoomCostume?> Costumes = [];
+    private static ScummWalkBoxSet? _boxes;
+    private static readonly Dictionary<int, ScummCostume?> Costumes = [];
     private static bool _shot;
 
     public static void Print(GameLibrary game, LoomExplorationSession session, int roomId, int click, int frame)
@@ -18,10 +16,10 @@ static class MaskSample
         if (session.Snapshot.RoomId != roomId) return;
         var resource = game.Rooms.Single(r => r.ResourceId == roomId);
         _bytes ??= File.ReadAllBytes(resource.FilePath);
-        _room ??= new OldV3EgaRoomDecoder().Decode(_bytes);
-        _records ??= new LoomRoomObjectDirectory().Decode(_bytes);
-        _images ??= new LoomRoomObjects().Decode(_bytes);
-        _boxes ??= LoomWalkBoxReader.Read(_bytes);
+        _room ??= new ScummV3EgaRoomDecoder().Decode(_bytes);
+        _records ??= new ScummRoomObjectDirectory().Decode(_bytes);
+        _images ??= new ScummRoomObjects().Decode(_bytes);
+        _boxes ??= ScummWalkBoxReader.Read(_bytes);
         var snapshot = session.Snapshot;
         var states = snapshot.ObjectStates.ToDictionary(p => p.Key, p => p.Value);
         // DEMO_ACTIVATE=157 draws that object as an experiment (its image and mask), to see what its mask does for the walker.
@@ -34,7 +32,7 @@ static class MaskSample
             // Our frame for ScummVM's camera: room x 376..696 at scale 4 (ScummVM's window shows 320 x 144 rows at 3.5 x 4.2).
             _shot = true;
             var pixels = selection.Compose(_room);
-            var layer = LoomActorRenderer.Render(session.Actors, roomId, _room.Width, _room.Height, id => Costumes.TryGetValue(id, out var c) ? c : Costumes[id] = LoomCostume.Load(game, id), selection.ComposeDepthMask(_room), _boxes, session.ObjectClasses);
+            var layer = ScummActorRenderer.Render(session.Actors, roomId, _room.Width, _room.Height, id => Costumes.TryGetValue(id, out var c) ? c : Costumes[id] = ScummCostume.Load(game, id), selection.ComposeDepthMask(_room), _boxes, session.ObjectClasses);
             const int x0 = 376, width = 320, scale = 4;
             var bmp = new byte[width * scale * _room.Height * scale * 3];
             for (var y = 0; y < _room.Height * scale; y++)
@@ -42,7 +40,7 @@ static class MaskSample
                 {
                     var rx = x0 + x / scale; var ry = y / scale;
                     var index = layer.Pixels[ry * _room.Width + rx];
-                    var color = _room.Palette[index == LoomActorRenderer.Transparent ? pixels[ry * _room.Width + rx] : index];
+                    var color = _room.Palette[index == ScummActorRenderer.Transparent ? pixels[ry * _room.Width + rx] : index];
                     var o = ((_room.Height * scale - 1 - y) * width * scale + x) * 3;
                     bmp[o] = (byte)(color & 0xFF); bmp[o + 1] = (byte)(color >> 8 & 0xFF); bmp[o + 2] = (byte)(color >> 16 & 0xFF);
                 }
@@ -77,9 +75,9 @@ static class MaskSample
                     Console.WriteLine($"   object {o.Id} at ({p.X},{p.Y}) {o.Width}x{o.Height}, mask {(o.Mask is null ? "none" : "yes")}, active {selection.IsActive(o)}, state {snapshot.ObjectStates.GetValueOrDefault(o.Id)}{(near ? " NEAR the walk" : "")}");
             }
         }
-        LoomCostume? Costume(int id) => Costumes.TryGetValue(id, out var c) ? c : Costumes[id] = LoomCostume.Load(game, id);
-        var clipped = LoomActorRenderer.Render([ego], roomId, _room.Width, _room.Height, Costume, mask, _boxes, session.ObjectClasses).Actors.SingleOrDefault();
-        var plain = LoomActorRenderer.Render([ego], roomId, _room.Width, _room.Height, Costume).Actors.SingleOrDefault();
+        ScummCostume? Costume(int id) => Costumes.TryGetValue(id, out var c) ? c : Costumes[id] = ScummCostume.Load(game, id);
+        var clipped = ScummActorRenderer.Render([ego], roomId, _room.Width, _room.Height, Costume, mask, _boxes, session.ObjectClasses).Actors.SingleOrDefault();
+        var plain = ScummActorRenderer.Render([ego], roomId, _room.Width, _room.Height, Costume).Actors.SingleOrDefault();
         if (clipped is not null && plain is not null && plain.Pixels != clipped.Pixels)
             Console.WriteLine($"   mask: click {click} frame {frame} ego ({ego.X},{ego.Y}) box {ego.WalkBox} costume {ego.Look.Costume} z-plane {clipped.ZPlane}: {clipped.Pixels} of {plain.Pixels} pixels visible");
     }

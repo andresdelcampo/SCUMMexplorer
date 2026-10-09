@@ -3,7 +3,7 @@
 ## ScummVM
 
 The PC speaker envelope, modulation and synthesis implementation in
-`src/SCUMMexplorer.Core/Formats/LoomPcSpeakerAudio.cs` and the companion
+`src/SCUMMexplorer.Core/Scumm/Audio/ScummPcSpeakerAudio.cs` and the companion
 `LoomPcSpeakerModulationTable.cs` adapt the ScummVM
 SCUMM v2 player. Copyright the ScummVM contributors; licensed under
 GPL-3.0-or-later. The adaptations implement an offline C# WAV renderer for
@@ -20,7 +20,7 @@ The AdLib event decoder is also based on the behavior documented by ScummVM's
 
 The GNU GPL version 3 is included in [licenses/GPL-3.0.txt](licenses/GPL-3.0.txt).
 
-The separate VGA/v4 actor walker in `src/SCUMMexplorer.Core/Formats/LoomActors.V4.cs`
+The separate VGA/v4 actor walker in `src/SCUMMexplorer.Core/Scumm/V4/ScummActors.V4.cs`
 adapts ScummVM 2.2.0's [actor.cpp](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/actor.cpp)
 and [boxes.cpp](https://github.com/scummvm/scummvm/blob/v2.2.0/engines/scumm/boxes.cpp),
 copyright the ScummVM contributors, licensed under GPL-2.0-or-later. The diagnostic

@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 internal static class Program
 {
@@ -79,7 +78,7 @@ internal static class Program
                     var point = (X: -1, Y: -1);
                     for (var y = exit.Y; y < exit.Y + exit.Height && point.X < 0; y += 4)
                         for (var x = exit.X; x < exit.X + exit.Width && point.X < 0; x += 4)
-                            if (LoomObjectHitTest.Find(source.Objects, Session().Snapshot.ObjectStates, Session().Snapshot.ObjectPositions, Session().ObjectClasses, x, y).Found == exit.Id)
+                            if (ScummObjectHitTest.Find(source.Objects, Session().Snapshot.ObjectStates, Session().Snapshot.ObjectPositions, Session().ObjectClasses, x, y).Found == exit.Id)
                                 point = (x, y);
                     if (point.X < 0) throw new InvalidDataException("No native hit point for the Room 03 exit.");
                     Call("HandleRoomPoint", point.X, point.Y, false);

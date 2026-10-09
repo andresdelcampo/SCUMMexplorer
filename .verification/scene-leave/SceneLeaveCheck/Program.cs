@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // Leaving a conversation from the catalog, in the real MainWindow: the trial (script 046) is played from the cutscene
 // menu's entry on the playback clock; after a few seconds, Room 02 is picked in the resource tree while the scene plays.

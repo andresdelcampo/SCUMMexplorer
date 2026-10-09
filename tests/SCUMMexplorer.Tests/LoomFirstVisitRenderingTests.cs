@@ -1,7 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -18,7 +16,7 @@ public sealed class LoomFirstVisitRenderingTests
     public void Room56OpeningFrameIsTheFaceThenItsMouth()
     {
         if (Data.Value is not { } data) return;
-        var opening = data.Batches.ForRoom(56).Where(batch => batch.Priority == LoomSceneDrawBatches.OpeningFramePriority).ToArray();
+        var opening = data.Batches.ForRoom(56).Where(batch => batch.Priority == ScummSceneDrawBatches.OpeningFramePriority).ToArray();
         // Script 68 loads Room 56 twice; only its first load is an opening frame. Script 108's
         // cutscene body (after its beginOverride) opens the room on the same face and mouth.
         Assert.Equal(["opening frame of Room 56 in script 108 +0x0178", "opening frame of Room 56 in script 68 +0x00F3"],
@@ -39,7 +37,7 @@ public sealed class LoomFirstVisitRenderingTests
         if (Data.Value is not { } data) return;
         // Script 86's cutscene body lies after its beginOverride skip jump. Until the
         // disassembler followed beginOverride, no decoded code loaded Room 58.
-        var opening = Assert.Single(data.Batches.ForRoom(58), batch => batch.Priority == LoomSceneDrawBatches.OpeningFramePriority);
+        var opening = Assert.Single(data.Batches.ForRoom(58), batch => batch.Priority == ScummSceneDrawBatches.OpeningFramePriority);
         Assert.Equal("opening frame of Room 58 in script 86 +0x0172", opening.Source);
 
         var (selection, estimates, _) = data.FirstVisit(58);
@@ -195,8 +193,8 @@ public sealed class LoomFirstVisitRenderingTests
         if (Data.Value is not { } data) return;
         var room = data.Room(3);
         var bytes = File.ReadAllBytes(room.FilePath);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
-        var verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(data.Game.Id));
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
+        var verbReader = new ScummObjectVerbReader(ScummScriptDialects.For(data.Game.Id));
         var finder = new LoomDoorwayFinder(data.Game);
         var targets = new SortedSet<int>();
         var tables = verbReader.ReadAll(bytes, records);
@@ -254,7 +252,7 @@ public sealed class LoomFirstVisitRenderingTests
                 Assert.Equal(obj.Pixels[y * obj.Width + x], pixels[(position.Y + y) * background.Width + position.X + x]);
     }
 
-    private sealed record Fixture(GameLibrary Game, LoomIndexedObjectSnapshot Index, LoomSceneDrawBatches Batches)
+    private sealed record Fixture(GameLibrary Game, ScummIndexedObjectSnapshot Index, ScummSceneDrawBatches Batches)
     {
         public static Fixture? Load()
         {
@@ -262,23 +260,23 @@ public sealed class LoomFirstVisitRenderingTests
             if (!File.Exists(Path.Combine(folder, "00.LFL"))) return null;
             var game = new GameFolderScanner().Scan(folder);
             return new Fixture(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")),
-                LoomSceneDrawBatches.Build(game));
+                ScummSceneDrawBatches.Build(game));
         }
 
         public GameResource Room(int id) => Game.Rooms.Single(room => room.ResourceId == id);
 
         public IReadOnlyList<RoomObjectImage> Images(int id) =>
-            new LoomRoomObjects().Decode(File.ReadAllBytes(Room(id).FilePath));
+            new ScummRoomObjects().Decode(File.ReadAllBytes(Room(id).FilePath));
 
         public (RoomObjectSelection Selection, IReadOnlyList<RoomArtworkEstimate> Estimates, RoomImage Background) FirstVisit(int id)
         {
             var room = Room(id);
             var bytes = File.ReadAllBytes(room.FilePath);
-            var background = new LoomEgaRoomDecoder().Decode(bytes);
+            var background = new ScummV3EgaRoomDecoder().Decode(bytes);
             var snapshot = new LoomExplorationSession(Game, Index).VisitRoom(room);
-            var images = new LoomRoomObjects().Decode(bytes);
+            var images = new ScummRoomObjects().Decode(bytes);
             var selection = new RoomObjectSelection(images, snapshot.ObjectStates,
-                snapshot.ObjectPositions, new LoomRoomObjectDirectory().Decode(bytes), background, Index.States,
+                snapshot.ObjectPositions, new ScummRoomObjectDirectory().Decode(bytes), background, Index.States,
                 snapshot.DrawOrder);
             IReadOnlyList<RoomArtworkEstimate> estimates = [];
             if (!snapshot.IsFaithful)

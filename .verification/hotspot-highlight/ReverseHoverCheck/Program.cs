@@ -73,7 +73,7 @@ internal static class Program
                         var covered = pickedId != (int)button.Tag;
                         if (covered && pickedId is int other)
                             ok &= records.TakeWhile(r => Prop(r, "Id") != (int)button.Tag).Any(r => Prop(r, "Id") == other) ||
-                                  ((SCUMMexplorer.Core.Formats.LoomSessionSnapshot)Field("_session")!.GetType().GetProperty("Snapshot")!.GetValue(Field("_session"))!).IsUntouchable((int)button.Tag);
+                                  ((SCUMMexplorer.Core.Loom.LoomSessionSnapshot)Field("_session")!.GetType().GetProperty("Snapshot")!.GetValue(Field("_session"))!).IsUntouchable((int)button.Tag);
                         if (index == 0) Save($"room-{room:00}-hover-row-{index}.png");
                         Call("RoomPreview_MouseLeave", null, null);
                         window.UpdateLayout();

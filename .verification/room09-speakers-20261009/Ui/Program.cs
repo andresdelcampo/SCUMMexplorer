@@ -11,8 +11,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 internal static class Program
 {
@@ -66,7 +64,7 @@ internal static class Program
                 Save("placements", new[] { 4, 5 }.Select(a => new { actor = a, placements = scanner.FindActorPlacers(a, 9) }));
                 foreach (var id in new[] { 47, 101, 105 }) File.WriteAllText(Path.Combine(output, $"global-{id}.txt"), data.GlobalScript(id)?.Format());
                 foreach (var id in new[] { 209, 216, 217, 218, 221, 223, 224 }) File.WriteAllText(Path.Combine(output, $"local-{id}.txt"), data.RoomLocalScript(9, id)?.Format());
-                var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+                var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
                 if (game.Id == GameId.LoomVga)
                 {
                     var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
@@ -109,7 +107,7 @@ internal static class Program
                             if (shown.Room == 9 && shown.Visible == true && shown.Look.Costume is > 0)
                             {
                                 var room = data.ReadRoom(9);
-                                var layer = LoomActorRenderer.Render([shown], 9, room.Width, room.Height, data.ReadCostume);
+                                var layer = ScummActorRenderer.Render([shown], 9, room.Width, room.Height, data.ReadCostume);
                                 if (layer.Actors.Any(a => a.Number == actor && a.Pixels > 0))
                                 {
                                     Call("ShowPlaybackFrame");

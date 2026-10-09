@@ -2,15 +2,13 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 var folder = args.Length > 0 ? args[0] : "Games/indy3/EGA";
 var game = new GameFolderScanner().Scan(Path.GetFullPath(folder));
 if (args.Length > 2 && args[1] == "--script" && int.TryParse(args[2], out var requestedScript))
 {
     var selected = game.Resources.First(r => r.Kind == ResourceKind.Script && r.ResourceId == requestedScript);
-    Console.WriteLine(new LoomScriptReader(ScummScriptDialect.Indy3).Decode(selected).Format());
+    Console.WriteLine(new ScummScriptReader(ScummScriptDialect.Indy3).Decode(selected).Format());
     return;
 }
 var extraction = new LoomTextExtractor().Extract(game);
@@ -56,10 +54,10 @@ var outsideLabels = extraction.Entries
     .Select(g => new { source = g.Key, labels = g.Select(e => new { e.ScriptId, e.RoomId, e.CodeOffset, e.Text }).ToArray() })
     .ToArray();
 
-var reader = new LoomScriptReader(ScummScriptDialect.Indy3);
-var verbReader = new LoomObjectVerbReader(ScummScriptDialect.Indy3);
-var objectDirectory = new LoomRoomObjectDirectory();
-var scripts = new List<(string Source, int? Room, int? Script, LoomScriptDisassembly Data)>();
+var reader = new ScummScriptReader(ScummScriptDialect.Indy3);
+var verbReader = new ScummObjectVerbReader(ScummScriptDialect.Indy3);
+var objectDirectory = new ScummRoomObjectDirectory();
+var scripts = new List<(string Source, int? Room, int? Script, ScummScriptDisassembly Data)>();
 foreach (var resource in game.Resources.Where(r => r.Kind == ResourceKind.Script && r.ResourceId.HasValue))
 {
     try { scripts.Add(($"Indexed script {resource.ResourceId}", null, resource.ResourceId, reader.Decode(resource))); }
@@ -73,7 +71,7 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue))
     try
     {
         var encoded = File.ReadAllBytes(room.FilePath);
-        foreach (var local in LoomScriptReader.ReadRoomLocalScriptIds(encoded, globalCount))
+        foreach (var local in ScummScriptReader.ReadRoomLocalScriptIds(encoded, globalCount))
             if (reader.DecodeRoomLocalScript(room, local, globalCount) is { } data)
                 scripts.Add(($"Room {room.ResourceId} local {local}", room.ResourceId, local, data));
         var objects = objectDirectory.Decode(encoded);

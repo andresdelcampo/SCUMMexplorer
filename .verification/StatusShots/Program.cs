@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // Opens the real Game Status window on a LOOM session (Room 43 visited from the catalog), ticks a story event, applies it, saves captures.
 // Arguments: <Games\loom> <output folder>

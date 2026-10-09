@@ -1,7 +1,6 @@
 using System.Reflection;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -20,7 +19,7 @@ public sealed class CdStuckProbe
         var p = spec.Split(',').Select(int.Parse).ToArray();
         var frames = int.TryParse(Environment.GetEnvironmentVariable("CD_STUCK_FRAMES"), out var f) ? f : 1500;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         if (Environment.GetEnvironmentVariable("CD_STUCK_FORCE") is { } force) // comma list of key=value, e.g. bit[0x077]=1
         {
             var runtime = typeof(LoomExplorationSession).GetField("_runtime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(session)!;
@@ -51,7 +50,7 @@ public sealed class CdStuckProbe
         foreach (var item in pend)
         {
             var frame = Get(item, "Frame")!;
-            var script = (LoomScriptDisassembly)Get(item, "Script")!;
+            var script = (ScummScriptDisassembly)Get(item, "Script")!;
             var off = (int)Get(item, "Offset")!;
             log.Add($"PENDING {Get(frame, "Label")} #{Get(frame, "Number")} +0x{off:X4} delay {Get(frame, "Delay")} freeze {Get(frame, "FreezeCount")}");
             foreach (var ins in script.Instructions.Where(i => i.Offset >= off - 0x20 && i.Offset <= off + 0x10)) log.Add($"   {(ins.Offset == off ? ">>" : "  ")} {ins.Offset:X4} {ins.Operation} {ins.Operands}");
@@ -96,14 +95,14 @@ public sealed class CdLocalDisasm
         foreach (var one in spec.Split(';'))
         {
             var parts = one.Split(':');
-            LoomScriptDisassembly? script;
+            ScummScriptDisassembly? script;
             if (parts[0] == "objects") // every verb script of every object of a room
             {
                 var room = int.Parse(parts[1]);
                 foreach (var obj in data.ReadRoom(room).Objects)
                     for (var verb = 0; verb < 0x80; verb++)
                     {
-                        LoomScriptDisassembly? found = null;
+                        ScummScriptDisassembly? found = null;
                         try { found = data.ReadObjectVerb(room, obj, verb, out _); } catch (Exception) { }
                         if (found is null) continue;
                         lines.Add($"=== object {obj.Id} verb 0x{verb:X2}");
@@ -132,7 +131,7 @@ public sealed class CdNeedsProbe
 {
     private static bool Run(GameLibrary game, LoomCdCutscene t, IReadOnlyList<string> force, int frames = 400)
     {
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         var runtime = typeof(LoomExplorationSession).GetField("_runtime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(session)!;
         var set = runtime.GetType().GetMethod("SetGlobalVariable", [typeof(string), typeof(ushort)])!;
         foreach (var f in force) set.Invoke(runtime, [f, (ushort)1]);
@@ -192,7 +191,7 @@ public sealed class CdGuardProbe
         {
             var t = g.First;
             var room = data.ReadRoom(t.Room);
-            LoomScriptDisassembly? root = t.IsRoomEntry ? data.RoomEntryScript(t.Room) : data.ReadObjectVerb(t.Room, room.Objects.First(o => o.Id == t.ObjectId), t.VerbId, out _);
+            ScummScriptDisassembly? root = t.IsRoomEntry ? data.RoomEntryScript(t.Room) : data.ReadObjectVerb(t.Room, room.Objects.First(o => o.Id == t.ObjectId), t.VerbId, out _);
             if (root is null) continue;
             lines.Add($"## room {t.Room:00} obj {t.ObjectId} {t.ObjectName} {t.VerbLabel}");
             foreach (var p in LoomCdSceneGuards.Find(data, t.Room, root, "root"))
@@ -220,14 +219,14 @@ public sealed class CdGuardStateProbe
         foreach (var g in groups)
         {
             var t = g.First;
-            var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+            var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
             session.VisitRoom(game.Rooms.First(r => r.ResourceId == t.Room));
             var began = false;
             if (!t.IsRoomEntry) session.ActivateObjectVerb(t.ObjectId, t.VerbId);
             for (var i = 0; i < 300 && !began; i++) { began = session.InCutscene || session.CutscenesBegun > 0; if (!began) session.AdvanceFrame(); }
             if (began) continue;
             var room = data.ReadRoom(t.Room);
-            LoomScriptDisassembly root = t.IsRoomEntry ? data.RoomEntryScript(t.Room)! : data.ReadObjectVerb(t.Room, room.Objects.First(o => o.Id == t.ObjectId), t.VerbId, out _);
+            ScummScriptDisassembly root = t.IsRoomEntry ? data.RoomEntryScript(t.Room)! : data.ReadObjectVerb(t.Room, room.Objects.First(o => o.Id == t.ObjectId), t.VerbId, out _);
             var vars = session.Snapshot.KnownGlobalVariables;
             var classes = session.ObjectClasses;
             lines.Add($"## room {t.Room:00} obj {t.ObjectId} {t.ObjectName} {t.VerbLabel}");
@@ -262,7 +261,7 @@ public sealed class CdWritersProbe
             foreach (var w in scanner.FindWriters(v)) lines.Add($"   {w.Where}: {w.Instruction}");
         }
         File.WriteAllLines(outPath, lines);
-        var schema = typeof(LoomExplorationSession).Assembly.GetType("SCUMMexplorer.Core.Formats.LoomStatusSchema")!;
+        var schema = typeof(LoomExplorationSession).Assembly.GetType("SCUMMexplorer.Core.Loom.LoomStatusSchema")!;
         var read = schema.GetMethod("Read")!.Invoke(null, [game, ScummDataSources.For(game)]);
         File.AppendAllLines(outPath, ["SCHEMA " + read]);
     }
@@ -278,7 +277,7 @@ public sealed class CdBitWatch
         var key = Environment.GetEnvironmentVariable("CD_BITWATCH"); // bit[0x025]
         if (outPath is null || key is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         var lines = new List<string>();
         ushort Value() => session.Snapshot.KnownGlobalVariables.TryGetValue(key, out var v) ? v : (ushort)0;
         lines.Add($"after construct: {Value()}");
@@ -303,8 +302,8 @@ public sealed class CdBitWriter
         if (outPath is null || key is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
         var lines = new List<string>();
-        var observer = new LoomScriptObserver(o => { if (o.Values.TryGetValue(key, out var v)) lines.Add($"{key}={v} after script {o.Site?.Script} {o.Site?.Context} +{o.Site?.Offset:X4} {o.Site?.Operation} {o.Site?.Operands}"); }, includeKey: k => k == key);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false, observer: observer);
+        var observer = new ScummScriptObserver(o => { if (o.Values.TryGetValue(key, out var v)) lines.Add($"{key}={v} after script {o.Site?.Script} {o.Site?.Context} +{o.Site?.Offset:X4} {o.Site?.Operation} {o.Site?.Operands}"); }, includeKey: k => k == key);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false, observer: observer);
         foreach (var r in Environment.GetEnvironmentVariable("CD_BITWATCH_ROOMS")!.Split(',').Select(int.Parse))
         {
             lines.Add("-- visit " + r);
@@ -354,7 +353,7 @@ public sealed class CdBoxProbe
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;
         var p = spec.Split(',').Select(int.Parse).ToArray();
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         session.VisitRoom(game.Rooms.First(r => r.ResourceId == p[0]));
         for (var i = 0; i < 20; i++) session.AdvanceFrame();
         var lines = new List<string>();
@@ -384,7 +383,7 @@ public sealed class CdGrepScripts
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
         var lines = new List<string>();
-        void Look(string label, LoomScriptDisassembly? s) { if (s is null) return; foreach (var i in s.Instructions) if ((i.Operation + " " + i.Operands).Contains(needle)) lines.Add($"{label} +{i.Offset:X4} {i.Operation} {i.Operands}"); }
+        void Look(string label, ScummScriptDisassembly? s) { if (s is null) return; foreach (var i in s.Instructions) if ((i.Operation + " " + i.Operands).Contains(needle)) lines.Add($"{label} +{i.Offset:X4} {i.Operation} {i.Operands}"); }
         foreach (var id in data.GlobalScriptIds()) Look($"global {id}", data.GlobalScript(id));
         foreach (var r in game.Rooms.Select(x => x.ResourceId!.Value))
         {

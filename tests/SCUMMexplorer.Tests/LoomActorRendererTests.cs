@@ -1,6 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -18,7 +16,7 @@ public sealed class LoomActorRendererTests
         if (!HasGame) return;
         var game = new GameFolderScanner().Scan(Folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
-        var layer = LoomActorRenderer.Render(session.Actors, 2, 960, 144, id => LoomCostume.Load(game, id));
+        var layer = ScummActorRenderer.Render(session.Actors, 2, 960, 144, id => ScummCostume.Load(game, id));
 
         // Room 02 after the boot: the ego, the last leaf (actor 5, costume 8, Room 02 local 200 +0x002B), the entry's
         // actor 4 (costume 141 at (433, 129), ignoring boxes after setClass class 22) and the swans (costume 5).
@@ -33,12 +31,12 @@ public sealed class LoomActorRendererTests
         var (left, top, right, bottom) = ego.Bounds!.Value;
         Assert.InRange(bottom, 55, 64);
         Assert.True(left < 828 && right > 828 && top < 40, $"bounds {left},{top} - {right},{bottom}");
-        Assert.Contains(layer.Pixels, value => value != LoomActorRenderer.Transparent);
+        Assert.Contains(layer.Pixels, value => value != ScummActorRenderer.Transparent);
         // Nothing is drawn outside the drawn actors' bounds.
         var boxes = layer.Actors.Where(actor => actor.Bounds is not null).Select(actor => actor.Bounds!.Value).ToArray();
         for (var y = 0; y < 144; y++)
         for (var x = 0; x < 960; x++)
-            if (layer.Pixels[y * 960 + x] != LoomActorRenderer.Transparent)
+            if (layer.Pixels[y * 960 + x] != ScummActorRenderer.Transparent)
                 Assert.Contains(boxes, b => x >= b.Left && x < b.Right && y >= b.Top && y < b.Bottom);
     }
 
@@ -47,15 +45,15 @@ public sealed class LoomActorRendererTests
     {
         if (!HasGame) return;
         var game = new GameFolderScanner().Scan(Folder);
-        var boxes = LoomWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "02.LFL")));
+        var boxes = ScummWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "02.LFL")));
         Assert.Equal(1, boxes.GetFlags(1) & 7);
-        var table = new LoomActorTable { CostumeSource = id => LoomCostume.Load(game, id) };
-        var place = new LoomActorTable.Placement(2, boxes, null, null);
+        var table = new ScummActorTable { CostumeSource = id => ScummCostume.Load(game, id) };
+        var place = new ScummActorTable.Placement(2, boxes, null, null);
         table.CostumeChanged(3, 1, place);
         // adjustActorPos on box 1 (flags 0x01): turnToDirection(180) is remapped to 270 (remapDirection, standing).
         table.PutInRoom(3, 2, place, ego: 1);
         table.Put(3, 860, 70, place, ego: 1);
-        Assert.Equal(LoomActorTable.MoveTurn, table[3].Moving);
+        Assert.Equal(ScummActorTable.MoveTurn, table[3].Moving);
         // The locked box's direction is not interpolated: the next frame's walkActor takes it at once.
         table.StepWalks(place);
         Assert.Equal((1, 270), (table[3].WalkBox, table[3].Look.Facing));
@@ -68,12 +66,12 @@ public sealed class LoomActorRendererTests
     [Fact]
     public void ActorsAreSortedWithScummVmsExchangeSort()
     {
-        static LoomActorSnapshot Actor(int number, int y) => new(number, 5, 10, y, 0, true, false, null, null);
+        static ScummActorSnapshot Actor(int number, int y) => new(number, 5, 10, y, 0, true, false, null, null);
         // For each j, each i: swap when y[j] < y[i]. It sorts by ascending y, so lower actors are drawn later (on top).
-        var sorted = LoomActorRenderer.SortForDrawing([Actor(1, 90), Actor(2, 40), Actor(3, 60), Actor(4, 40)], 5);
+        var sorted = ScummActorRenderer.SortForDrawing([Actor(1, 90), Actor(2, 40), Actor(3, 60), Actor(4, 40)], 5);
         Assert.Equal([2, 4, 3, 1], sorted.Select(actor => actor.Number));
         // Actors in other rooms are left out.
-        Assert.Empty(LoomActorRenderer.SortForDrawing([Actor(1, 90)], 6));
+        Assert.Empty(ScummActorRenderer.SortForDrawing([Actor(1, 90)], 6));
     }
 
     [Fact]
@@ -84,11 +82,11 @@ public sealed class LoomActorRendererTests
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")), completeBoot: true);
         var boxes = session.CurrentWalkBoxes!;
         // Room 02's boxes 3 and up have mask 1, box 0 (where the boot leaves the ego) has 0; no box (255) reads as 1.
-        Assert.Equal((0, 1, 1), (boxes.GetMask(0), boxes.GetMask(4), boxes.GetMask(LoomWalkBoxSet.InvalidBox)));
+        Assert.Equal((0, 1, 1), (boxes.GetMask(0), boxes.GetMask(4), boxes.GetMask(ScummWalkBoxSet.InvalidBox)));
         var ego = session.Actors.Single(actor => actor.Number == 1);
         var full = Enumerable.Repeat((byte)1, 960 * 144).ToArray();
-        LoomDrawnActor Draw(LoomActorSnapshot actor, byte[]? mask) =>
-            LoomActorRenderer.Render([actor], 2, 960, 144, id => LoomCostume.Load(game, id), mask, boxes).Actors.Single();
+        ScummDrawnActor Draw(ScummActorSnapshot actor, byte[]? mask) =>
+            ScummActorRenderer.Render([actor], 2, 960, 144, id => ScummCostume.Load(game, id), mask, boxes).Actors.Single();
         var front = Draw(ego, full);
         Assert.Equal(0, front.ZPlane);
         Assert.True(front.Pixels > 100);
@@ -112,20 +110,20 @@ public sealed class LoomActorRendererTests
         // reads as 1) and class 20, NeverClip, which drawActorCostume honours before the box's mask.
         var sheep = session.Actors.Where(actor => actor.Room == 43 && actor.Visible == true && actor.IgnoreBoxes == true &&
             session.ObjectClasses.TryGetValue(actor.Number, out var bits) &&
-            LoomObjectClasses.Has(bits, LoomActorRenderer.NeverClipClass)).ToArray();
+            ScummObjectClasses.Has(bits, ScummActorRenderer.NeverClipClass)).ToArray();
         Assert.True(sheep.Length >= 2, $"{sheep.Length} never-clip actors in Room 43");
         const int width = 2048;
         var full = Enumerable.Repeat((byte)1, width * 144).ToArray();
-        var classed = LoomActorRenderer.Render(sheep, 43, width, 144, id => LoomCostume.Load(game, id), full,
+        var classed = ScummActorRenderer.Render(sheep, 43, width, 144, id => ScummCostume.Load(game, id), full,
             session.CurrentWalkBoxes, session.ObjectClasses);
         Assert.All(classed.Actors, actor => Assert.Equal(0, actor.ZPlane));
         Assert.All(classed.Actors, actor => Assert.True(actor.Pixels > 0));
         // Without the classes, box 255 would hide them behind the whole mask.
-        var unclassed = LoomActorRenderer.Render(sheep, 43, width, 144, id => LoomCostume.Load(game, id), full, session.CurrentWalkBoxes);
+        var unclassed = ScummActorRenderer.Render(sheep, 43, width, 144, id => ScummCostume.Load(game, id), full, session.CurrentWalkBoxes);
         Assert.All(unclassed.Actors, actor => Assert.Equal((1, 0), (actor.ZPlane, actor.Pixels)));
         // Class 21 (AlwaysClip) wins over NeverClip and over an unmasked box, as _forceClip does.
-        var forced = new Dictionary<int, uint>(session.ObjectClasses) { [sheep[0].Number] = 1u << (LoomActorRenderer.AlwaysClipClass - 1) };
-        var clipped = LoomActorRenderer.Render([sheep[0] with { WalkBox = 0 }], 43, width, 144, id => LoomCostume.Load(game, id), full,
+        var forced = new Dictionary<int, uint>(session.ObjectClasses) { [sheep[0].Number] = 1u << (ScummActorRenderer.AlwaysClipClass - 1) };
+        var clipped = ScummActorRenderer.Render([sheep[0] with { WalkBox = 0 }], 43, width, 144, id => ScummCostume.Load(game, id), full,
             session.CurrentWalkBoxes, forced).Actors.Single();
         Assert.Equal((1, 0), (clipped.ZPlane, clipped.Pixels));
     }
@@ -133,10 +131,10 @@ public sealed class LoomActorRendererTests
     [Fact]
     public void HiddenActorsAndActorsWithoutACostumeAreNotDrawn()
     {
-        var hidden = new LoomActorSnapshot(1, 5, 10, 20, 0, false, false, null, null) { Look = LoomActorLook.Initial with { Costume = 1 } };
-        var bare = new LoomActorSnapshot(2, 5, 10, 20, 0, true, false, null, null);
-        var layer = LoomActorRenderer.Render([hidden, bare], 5, 40, 40, _ => throw new InvalidOperationException("no costume is read"));
+        var hidden = new ScummActorSnapshot(1, 5, 10, 20, 0, false, false, null, null) { Look = ScummActorLook.Initial with { Costume = 1 } };
+        var bare = new ScummActorSnapshot(2, 5, 10, 20, 0, true, false, null, null);
+        var layer = ScummActorRenderer.Render([hidden, bare], 5, 40, 40, _ => throw new InvalidOperationException("no costume is read"));
         Assert.Empty(layer.Actors);
-        Assert.All(layer.Pixels, value => Assert.Equal(LoomActorRenderer.Transparent, value));
+        Assert.All(layer.Pixels, value => Assert.Equal(ScummActorRenderer.Transparent, value));
     }
 }

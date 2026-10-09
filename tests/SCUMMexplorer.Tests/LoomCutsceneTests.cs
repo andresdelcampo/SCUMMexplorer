@@ -1,6 +1,5 @@
 ﻿using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -24,10 +23,10 @@ public sealed class LoomCutsceneTests
         var script = Script(
             new(0, 0, operation, operands, "2E 3C 00 00"),
             new(4, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x0F1]"] = 13;
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         Assert.Equal(4, run.ResumeOffset);
         Assert.Equal(jiffies, run.Delay);
@@ -42,19 +41,19 @@ public sealed class LoomCutsceneTests
         var script = Script(
             new(0, 0, "waitFor", "actor, 0x03", "AE 01 03"),
             new(3, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var still = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var still = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
         Assert.Null(still.ResumeOffset);
         Assert.True(still.ReachedStop);
 
         var room = Path.Combine(Folder, "02.LFL");
         if (!File.Exists(room)) return;
         runtime.CurrentRoom = 2;
-        runtime.WalkBoxes = LoomWalkBoxReader.Read(File.ReadAllBytes(room));
-        var place = new LoomActorTable.Placement(2, runtime.WalkBoxes, null, null);
+        runtime.WalkBoxes = ScummWalkBoxReader.Read(File.ReadAllBytes(room));
+        var place = new ScummActorTable.Placement(2, runtime.WalkBoxes, null, null);
         runtime.Actors.Put(3, 820, 60, 2, place, ego: 1);
         runtime.Actors.Walk(3, 860, 125, place, "walk");
-        var walking = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var walking = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
         Assert.Equal(0, walking.ResumeOffset);
         Assert.Contains(walking.Trace, line => line.StartsWith("waiting for actor 3 to stop moving", StringComparison.Ordinal));
     }
@@ -66,9 +65,9 @@ public sealed class LoomCutsceneTests
         var script = Script(
             new(0, 0, "waitFor", "message", "AE 02"),
             new(2, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         Assert.Null(run.ResumeOffset);
         Assert.True(run.ReachedStop);
@@ -82,10 +81,10 @@ public sealed class LoomCutsceneTests
             new(4, 0, "isSoundRunning", "var[0x011], 0x1A", "7C 11 00 1A"),
             new(8, 0, "isSoundRunning", "var[0x012], 0x00", "7C 12 00 00"),
             new(12, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.ActiveSounds.Add(0x19);
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         Assert.True(run.ReachedStop);
         Assert.Equal((ushort)1, runtime.GlobalVariables["var[0x010]"]);
@@ -105,12 +104,12 @@ public sealed class LoomCutsceneTests
             new(0, 0, "isScriptRunning", "var[0x010], 0xD2", "68 10 00 D2"),
             new(4, 0, "isScriptRunning", "var[0x011], 0x05", "68 11 00 05"),
             new(8, 0, "stopObjectCode", "", "00"));
-        var executor = new LoomBoundedScriptExecutor();
+        var executor = new ScummBoundedScriptExecutor();
 
         var alone = executor.Execute(script, new Dictionary<int, byte>(), []);
         Assert.Contains("needs a session", alone.UnresolvedReason, StringComparison.Ordinal);
 
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>())
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>())
         {
             ScriptRunning = number => number == 0xD2 ? (true, null) : (false, "it ended at an unmodelled step")
         };
@@ -127,7 +126,7 @@ public sealed class LoomCutsceneTests
     public void BeginOverrideStepsOverItsSkipJump()
     {
         // beginOverride; jumpRelative +1 (the skip); breakHere; stopObjectCode.
-        var decoded = LoomScriptDisassembler.Disassemble([0x58, 0x01, 0x18, 0x01, 0x00, 0x80, 0x00]);
+        var decoded = ScummScriptDisassembler.Disassemble([0x58, 0x01, 0x18, 0x01, 0x00, 0x80, 0x00]);
         Assert.Equal([0, 2, 5, 6], decoded.Instructions.Select(item => item.Offset));
 
         var script = Script(
@@ -136,7 +135,7 @@ public sealed class LoomCutsceneTests
             new(5, 0x1A, "move", "local[0x000] = 0x0001", "1A 00 00 01 00"),
             new(10, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), []);
+        var run = new ScummBoundedScriptExecutor().Execute(script, new Dictionary<int, byte>(), []);
 
         Assert.True(run.ReachedStop);
         Assert.Null(run.UnresolvedReason);
@@ -288,16 +287,16 @@ public sealed class LoomCutsceneTests
         Assert.Equal(13, session.Snapshot.RoomId);
     }
 
-    private static LoomScriptDisassembly Freeze(string flag) => Script(
+    private static ScummScriptDisassembly Freeze(string flag) => Script(
         new(0, 0x60, "freezeScripts", flag, "60 00"),
         new(2, 0, "stopObjectCode", "", "00"));
 
-    private static (GameLibrary Game, LoomIndexedObjectSnapshot Index)? Load()
+    private static (GameLibrary Game, ScummIndexedObjectSnapshot Index)? Load()
     {
         if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return null;
         return (new GameFolderScanner().Scan(Folder), new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
     }
 
-    private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
+    private static ScummScriptDisassembly Script(params ScummScriptInstruction[] instructions) =>
         new(250, 1, 0, 32, 16, instructions, null, null, [], [], "Synthetic test script");
 }

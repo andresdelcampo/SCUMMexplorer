@@ -2,7 +2,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.App;
 

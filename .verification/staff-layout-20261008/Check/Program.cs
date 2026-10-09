@@ -7,8 +7,6 @@ using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 internal static class Program
 {
@@ -21,7 +19,7 @@ internal static class Program
             var game = new GameFolderScanner().Scan(Path.Combine(args[0], "loom ega mt32 en"));
             var data = ScummDataSources.For(game);
             var lines = new List<string>();
-            void Dump(string name, LoomScriptDisassembly? script)
+            void Dump(string name, ScummScriptDisassembly? script)
             {
                 lines.Add(name);
                 foreach (var i in script?.Instructions ?? []) lines.Add($"+{i.Offset:X4} {i.Operation} {i.Operands}");
@@ -43,7 +41,7 @@ internal static class Program
             var cd = game.Id == GameId.LoomVga;
             var prefix = cd ? "vga" : "ega";
             var data = ScummDataSources.For(game);
-            var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+            var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
             var session = new LoomExplorationSession(game, indexed);
             session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 3), preserveStaffLevel: true);
             for (int f = 0; f < 600 && (!session.GameStatus.CanEdit || f < 40); f++) session.AdvanceFrame();
@@ -58,7 +56,7 @@ internal static class Program
             int[] nativeOffsets = [7, 7, 6, 4, 3, 1, 0, 5];
             var referenceVerbs = session.Verbs.Select(v => cd && v.VerbId is >= 0x5A and <= 0x61
                 ? v with { Y = v.Y - nativeOffsets[v.VerbId - 0x5A] } : v).ToArray();
-            var reference = LoomVerbArea.Compose(referenceVerbs, Image);
+            var reference = ScummVerbArea.Compose(referenceVerbs, Image);
             var actual = session.VerbArea();
             Check(actual.Pixels.SequenceEqual(reference.Pixels), prefix + " live staff equals the complete native coordinate path");
             if (cd)
@@ -70,17 +68,17 @@ internal static class Program
                     Check(item.Y == expected, $"VGA verb {item.VerbId:X2}: Script 18 y={sourceY[i]}, native offset={nativeOffsets[i]}, click rectangle y={item.Y} (expected {expected})");
                 }
             }
-            var palette = cd ? game.Vga!.ReadPalette(1) : new OldV3EgaRoomDecoder().Decode(File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 1).FilePath)).Palette;
+            var palette = cd ? game.V4Archive!.ReadPalette(1) : new ScummV3EgaRoomDecoder().Decode(File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 1).FilePath)).Palette;
             var messages = session.Messages.OnScreen.Where(m => m.Source.StartsWith("Script 18 +", StringComparison.Ordinal)).ToArray();
-            var letters = cd ? LoomVgaMessageRenderer.Render(messages, game.Vga!.ReadCharset(2)!)
-                : LoomMessageRenderer.Render(messages, LoomCharset.TryLoad(game.FolderPath, 0, out _)!);
-            byte[] Crop(LoomVerbAreaPicture area)
+            var letters = cd ? ScummV4MessageRenderer.Render(messages, game.V4Archive!.ReadCharset(2)!)
+                : ScummV3MessageRenderer.Render(messages, ScummV3Charset.TryLoad(game.FolderPath, 0, out _)!);
+            byte[] Crop(ScummVerbAreaPicture area)
             {
                 var pixels = new byte[224 * 32];
                 for (int y = 0; y < 32; y++) for (int x = 0; x < 224; x++)
                 {
                     var p = letters.Pixels[(168 + y) * 320 + 16 + x];
-                    pixels[y * 224 + x] = p != LoomMessageRenderer.Transparent ? p : area.Pixels[(24 + y) * 320 + 16 + x];
+                    pixels[y * 224 + x] = p != ScummV3MessageRenderer.Transparent ? p : area.Pixels[(24 + y) * 320 + 16 + x];
                 }
                 return pixels;
             }

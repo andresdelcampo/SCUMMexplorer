@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.App;
 

@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -17,7 +16,7 @@ public sealed class LoomExpressionObservationTests
         Assert.All(steps, s => { Assert.Equal(2, s.InstructionSequence); Assert.Equal(4, s.Slot); Assert.Equal(3, s.ParentSlot); });
         Assert.Equal(Enumerable.Range(1, steps.Count), steps.Select(s => s.Step));
         Assert.Single(result.RandomPicks);
-        Assert.Throws<NotSupportedException>(() => ((IList<LoomScriptOperandBinding>)steps[0].Bindings).Clear());
+        Assert.Throws<NotSupportedException>(() => ((IList<ScummScriptOperandBinding>)steps[0].Bindings).Clear());
     }
 
     [Fact]
@@ -88,16 +87,16 @@ public sealed class LoomExpressionObservationTests
         Assert.Equal("expression observation step bound reached", steps[^1].Barrier);
     }
 
-    private static (LoomBoundedScriptResult, List<LoomScriptObservation>, List<LoomExpressionObservation>) Run(
-        string text, Func<string, bool>? key = null, Func<LoomScriptObservationSite, bool>? site = null, bool capture = true)
+    private static (ScummBoundedScriptResult, List<ScummScriptObservation>, List<ScummExpressionObservation>) Run(
+        string text, Func<string, bool>? key = null, Func<ScummScriptObservationSite, bool>? site = null, bool capture = true)
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.SetGlobalVariable("var[0x000]", 77);
-        var records = new List<LoomScriptObservation>();
-        var steps = new List<LoomExpressionObservation>();
-        var code = new LoomScriptDisassembly(2, 1, 0, 2, 2,
+        var records = new List<ScummScriptObservation>();
+        var steps = new List<ScummExpressionObservation>();
+        var code = new ScummScriptDisassembly(2, 1, 0, 2, 2,
             [new(0, 0, "expression", text, "00"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []);
-        var result = new LoomBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
+        var result = new ScummBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
             observation: new(new(records.Add, site, key, captureSourceAccess: true,
                 receiveExpression: capture ? steps.Add : null), 4, 3));
         return (result, records, steps);

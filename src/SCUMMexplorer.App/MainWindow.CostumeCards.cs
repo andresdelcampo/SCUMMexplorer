@@ -4,8 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.App;
 
@@ -74,7 +72,7 @@ public partial class MainWindow
                 (bitmap, detail) = await Task.Run(() =>
                 {
                     token.ThrowIfCancellationRequested();
-                    if (game.Vga is { } vga)
+                    if (game.V4Archive is { } vga)
                     {
                         // The CD game: the stored pose with the most visible pixels, in the palette of the room that holds the costume.
                         var costume = vga.FindCostume(resource.ResourceId!.Value) ?? throw new InvalidDataException("No costume block.");
@@ -87,7 +85,7 @@ public partial class MainWindow
                     if (resource.Offset is not int offset) throw new NotSupportedException();
                     if (!containers.TryGetValue(resource.FilePath, out var container))
                         containers[resource.FilePath] = container = LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath));
-                    var reader = new LoomCostumeReader(); var renderer = new LoomCostumeRenderer();
+                    var reader = new ScummV3CostumeReader(); var renderer = new ScummCostumeRenderer();
                     var slots = reader.Decode(container, offset).AnimationSlots.Where(s => s.HasData);
                     RoomImage? best = null; int bestPixels = 0, bestSlot = 0;
                     foreach (var slot in slots)

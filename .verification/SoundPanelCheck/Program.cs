@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // The sound panel's time text while a sound is prepared, once it is ready, and for a sound with no playable audio.
 // Arguments: <Games\loom> <output folder>
@@ -28,9 +27,9 @@ internal static class Program
                 typeof(MainWindow).GetMethod("OpenGameFolder", Private)!.Invoke(window, [args[0]]);
                 await Task.Delay(1500);
                 var game = (GameLibrary)Field("_game")!;
-                var audio = new LoomAdlibAudio();
+                var audio = new ScummAdlibAudio();
                 var sounds = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue).ToArray();
-                var unplayable = sounds.First(s => audio.ReadLifetime(s).Kind == LoomSoundLifetimeKind.Unknown && !s.Name.Contains('.'));
+                var unplayable = sounds.First(s => audio.ReadLifetime(s).Kind == ScummSoundLifetimeKind.Unknown && !s.Name.Contains('.'));
                 foreach (var sound in new[] { sounds.First(s => s.ResourceId == 28), unplayable })
                 {
                     var task = (Task)typeof(MainWindow).GetMethod("ShowAudio", Private)!.Invoke(window, [sound, false, false])!;

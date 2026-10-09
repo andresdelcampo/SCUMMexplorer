@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -7,8 +6,8 @@ public sealed class LoomWriterContinuityTests
     [Fact]
     public void TwoObservedResumptionsRetainTheirOwnResourceParentAndEstimates()
     {
-        var matches = new List<LoomCompletionRead>();
-        var tracker = new LoomRuntimeRelationTracker(new LoomCompletionObserver(matches.Add).Observe);
+        var matches = new List<ScummCompletionRead>();
+        var tracker = new ScummRuntimeRelationTracker(new ScummCompletionObserver(matches.Add).Observe);
         tracker.Observe(Write(1));
         tracker.Observe(Boundary(2, "instruction", 12));
         tracker.Observe(Boundary(3, "end", 12, resume: 8));
@@ -25,7 +24,7 @@ public sealed class LoomWriterContinuityTests
         Assert.All(match.ResumedTerminalContinuity.Boundaries, b => Assert.True(b.PathEstimated));
         Assert.False(match.Read.Observation.PathEstimated);
         Assert.True(match.Writer!.ValueEstimated);
-        Assert.Throws<NotSupportedException>(() => ((IList<LoomScriptObservation>)match.ResumedTerminalContinuity.Boundaries).Clear());
+        Assert.Throws<NotSupportedException>(() => ((IList<ScummScriptObservation>)match.ResumedTerminalContinuity.Boundaries).Clear());
         Assert.Contains(match.Limits, l => l.Contains("scheduler/callee"));
     }
 
@@ -41,8 +40,8 @@ public sealed class LoomWriterContinuityTests
     [InlineData("bound")]
     public void IncompleteOrForeignContinuityCannotDonateTerminalStatus(string gap)
     {
-        var matches = new List<LoomCompletionRead>();
-        var tracker = new LoomRuntimeRelationTracker(new LoomCompletionObserver(matches.Add, boundaryLimit: gap == "bound" ? 2 : 128).Observe);
+        var matches = new List<ScummCompletionRead>();
+        var tracker = new ScummRuntimeRelationTracker(new ScummCompletionObserver(matches.Add, boundaryLimit: gap == "bound" ? 2 : 128).Observe);
         tracker.Observe(Write(1));
         tracker.Observe(Boundary(2, "instruction", 12));
         if (gap != "missing-yield") tracker.Observe(Boundary(3, "end", 12, resume: 8));
@@ -76,8 +75,8 @@ public sealed class LoomWriterContinuityTests
     [InlineData("replacement")]
     public void CancellationOmissionsAndReplacementBreakTheObservedChain(string gap)
     {
-        var matches = new List<LoomCompletionRead>();
-        var tracker = new LoomRuntimeRelationTracker(new LoomCompletionObserver(matches.Add).Observe);
+        var matches = new List<ScummCompletionRead>();
+        var tracker = new ScummRuntimeRelationTracker(new ScummCompletionObserver(matches.Add).Observe);
         tracker.Observe(Write(1));
         tracker.Observe(Boundary(2, "instruction", 12));
         tracker.Observe(Boundary(3, "end", 12, resume: 8));
@@ -94,14 +93,14 @@ public sealed class LoomWriterContinuityTests
     [Fact]
     public void ActualExecutorResumeIsObservedSeparatelyFromTheEarlierZeroRead()
     {
-        var matches = new List<LoomCompletionRead>();
-        var records = new List<LoomScriptObservation>();
-        var observer = new LoomScriptObserver(records.Add,
-            runtimeRelations: new(new LoomCompletionObserver(matches.Add).Observe));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var matches = new List<ScummCompletionRead>();
+        var records = new List<ScummScriptObservation>();
+        var observer = new ScummScriptObserver(records.Add,
+            runtimeRelations: new(new ScummCompletionObserver(matches.Add).Observe));
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         var writer = Code(31, ("move", "var[0x060] = 0x0000"), ("breakHere", ""), ("stopObjectCode", ""));
         var reader = Code(20, ("equalZero", "var[0x060], branch +0 -> 0x0001"), ("stopObjectCode", ""));
-        var executor = new LoomBoundedScriptExecutor();
+        var executor = new ScummBoundedScriptExecutor();
         var yielded = executor.Execute(writer, runtime.ObjectStates, [], runtime: runtime, pathEstimated: true, observation: new(observer, 12, 8));
         executor.Execute(reader, runtime.ObjectStates, [], runtime: runtime, observation: new(observer, 8));
         executor.Execute(writer, runtime.ObjectStates, [], runtime: runtime, startOffset: yielded.ResumeOffset!.Value,
@@ -115,18 +114,18 @@ public sealed class LoomWriterContinuityTests
         Assert.True(matches[1].Writer!.ValueEstimated);
     }
 
-    private static LoomScriptObservation Write(long sequence) => Boundary(sequence, "instruction", 12) with {
+    private static ScummScriptObservation Write(long sequence) => Boundary(sequence, "instruction", 12) with {
         Site = Site("instruction", 0) with { Operation = "move" },
         OperandBindings = [new("destination-before", "var[0x060]", "var[0x060]", 0, true), new("source", "0x0000", null, 0, false)]
     };
-    private static LoomScriptObservation Boundary(long sequence, string stage, long invocation, int offset = 1, int? resume = null, bool stop = false) =>
+    private static ScummScriptObservation Boundary(long sequence, string stage, long invocation, int offset = 1, int? resume = null, bool stop = false) =>
         new(sequence, 12, 8, invocation, Site(stage, offset), new Dictionary<string, ushort> { ["var[0x060]"] = 0 }, ["var[0x060]"], true,
             ResumeOffset: resume, ReachedStop: stop, OperandBindings: stage == "instruction" ? [] : null);
-    private static LoomScriptObservation Read(long sequence) => Boundary(sequence, "instruction", 99) with {
+    private static ScummScriptObservation Read(long sequence) => Boundary(sequence, "instruction", 99) with {
         Slot = 8, ParentSlot = null, PathEstimated = false, Site = Site("instruction", 0) with { Script = 20, Operation = "equalZero" },
         OperandBindings = [new("condition", "var[0x060]", "var[0x060]", 0, true)]
     };
-    private static LoomScriptObservationSite Site(string stage, int offset) => new(31, null, 1, 0, stage, offset, "stopObjectCode", "");
-    private static LoomScriptDisassembly Code(int script, params (string Op, string Args)[] operations) => new(script, 1, 0, operations.Length, operations.Length,
-        operations.Select((p, i) => new LoomScriptInstruction(i, 0, p.Op, p.Args, "00")).ToArray(), null, null, [], []);
+    private static ScummScriptObservationSite Site(string stage, int offset) => new(31, null, 1, 0, stage, offset, "stopObjectCode", "");
+    private static ScummScriptDisassembly Code(int script, params (string Op, string Args)[] operations) => new(script, 1, 0, operations.Length, operations.Length,
+        operations.Select((p, i) => new ScummScriptInstruction(i, 0, p.Op, p.Args, "00")).ToArray(), null, null, [], []);
 }

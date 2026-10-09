@@ -1,7 +1,5 @@
 using System.Text;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // Renders every room's first-visit state the way MainWindow does in
 // exploration mode (fresh session per room, gap filling when the snapshot is
@@ -12,10 +10,10 @@ var detail = args.Skip(2).Select(int.Parse).ToHashSet();
 Directory.CreateDirectory(output);
 var game = new GameFolderScanner().Scan(folder);
 var index = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
-var batches = LoomSceneDrawBatches.Build(game);
+var batches = ScummSceneDrawBatches.Build(game);
 var doorways = new LoomDoorwayFinder(game);
 var dialect = ScummScriptDialects.For(game.Id);
-var verbReader = new LoomObjectVerbReader(dialect);
+var verbReader = new ScummObjectVerbReader(dialect);
 var report = new StringBuilder();
 var summary = new StringBuilder("room\tfaithful\tgapsBefore\tgapsAfter\tunfillable\testimates\tdoorways\n");
 int totalBefore = 0, totalAfter = 0, roomsWithGaps = 0;
@@ -26,9 +24,9 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
     try
     {
         var bytes = File.ReadAllBytes(room.FilePath);
-        var background = new LoomEgaRoomDecoder().Decode(bytes);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
-        var images = new LoomRoomObjects().Decode(bytes);
+        var background = new ScummV3EgaRoomDecoder().Decode(bytes);
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
+        var images = new ScummRoomObjects().Decode(bytes);
         var session = new LoomExplorationSession(game, index);
         var snapshot = session.VisitRoom(room);
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions,

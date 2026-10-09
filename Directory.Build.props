@@ -2,4 +2,11 @@
   <PropertyGroup>
     <BaseOutputPath>$(MSBuildThisFileDirectory)Exe\$(MSBuildProjectName)\</BaseOutputPath>
   </PropertyGroup>
+  <!-- Consumers of Core (app, tests, harnesses) see every layer; Core itself declares only the Scumm and Domain usings so the engine cannot depend on LOOM code. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'SCUMMexplorer.Core'">
+    <Using Include="SCUMMexplorer.Core.Scumm" />
+    <Using Include="SCUMMexplorer.Core.Loom" />
+    <Using Include="SCUMMexplorer.Core.Domain" />
+    <Using Include="SCUMMexplorer.Core.Discovery" />
+  </ItemGroup>
 </Project>

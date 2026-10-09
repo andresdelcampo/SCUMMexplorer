@@ -1,15 +1,13 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // Usage: ScriptDump <game folder> <global script id>...
 //        ScriptDump <game folder> room <room> <local id>
 //        ScriptDump <game folder> entry <room>
 //        ScriptDump <game folder> objmap <other game folder>   (room objects of both editions side by side, matched by directory position)
 var game = new GameFolderScanner().Scan(args[0]);
-var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
-void Dump(string title, LoomScriptDisassembly? d)
+var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+void Dump(string title, ScummScriptDisassembly? d)
 {
     Console.WriteLine($"== {title}");
     if (d is null) { Console.WriteLine("(none)"); return; }
@@ -21,7 +19,7 @@ Dictionary<int, List<(int Id, string Name)>> Objects(GameLibrary g)
     foreach (var room in g.Rooms.Where(r => r.ResourceId.HasValue))
     {
         var bytes = File.ReadAllBytes(room.FilePath);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
         var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
         result[room.ResourceId!.Value] = records.Select(r => (r.Id, names.GetValueOrDefault(r.Id, ""))).ToList();
     }

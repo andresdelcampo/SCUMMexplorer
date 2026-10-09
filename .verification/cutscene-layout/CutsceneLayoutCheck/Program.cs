@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // The room view's layout while cutscenes play, in the real MainWindow on the real playback clock.
 // Plays the opening (script 044: Rooms 01, 02, 01, 02, 53, 02) and the first 40 s of script 046 (the Elders' trial),

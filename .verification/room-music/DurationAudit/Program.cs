@@ -1,18 +1,16 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 var game = new GameFolderScanner().Scan(args[0]);
 var sounds = game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue)
     .GroupBy(r => r.ResourceId!.Value).ToDictionary(g => g.Key, g => g.First());
-var audio = new LoomAdlibAudio();
+var audio = new ScummAdlibAudio();
 var candidates = new LoomRoomSoundCandidates();
-var records = new LoomRoomObjectDirectory();
+var records = new ScummRoomObjectDirectory();
 var summary = new List<(int Room, string Tracks)>();
 foreach (var room in game.Rooms.OrderBy(r => r.ResourceId))
 {
-    IReadOnlyList<LoomRoomObjectRecord> roomRecords;
+    IReadOnlyList<ScummRoomObjectRecord> roomRecords;
     try { roomRecords = records.Decode(File.ReadAllBytes(room.FilePath)); }
     catch (Exception ex) when (ex is IOException or InvalidDataException) { roomRecords = []; }
     var tracks = new Dictionary<int, double>();

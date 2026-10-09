@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // Normal-mode layout, the corner full-screen button and the Advanced script view (Readable/Raw, names, bytecode toggle, play button) in the real MainWindow.
 // Arguments: <Games\loom> <output folder>

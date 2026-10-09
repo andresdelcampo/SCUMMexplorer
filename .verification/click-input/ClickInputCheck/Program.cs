@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // The game's click (the explore mode's default since 28 September): in the real
 // MainWindow, gives room points to the handler's own paths (HandleRoomPoint, which

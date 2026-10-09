@@ -1,9 +1,7 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // Renders the screen as the session leaves it after a step: the room at the camera (rows 0-143),
-// the verb screen left black, and the message layer drawn with charset 0 (LoomMessageRenderer).
+// the verb screen left black, and the message layer drawn with charset 0 (ScummV3MessageRenderer).
 // Usage: MessageRender <game folder> <output folder> <name> <step>...
 // Steps: v:obj:verb (direct verb), c:x,y / d:x,y (click / double click), f:n (n frames), t:"source" (frames until that message shows).
 var folder = args[0];
@@ -13,7 +11,7 @@ Directory.CreateDirectory(output);
 var game = new GameFolderScanner().Scan(folder);
 var index = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
 var session = new LoomExplorationSession(game, index);
-var charset = LoomCharset.TryLoad(folder, 0, out var error) ?? throw new InvalidDataException(error);
+var charset = ScummV3Charset.TryLoad(folder, 0, out var error) ?? throw new InvalidDataException(error);
 var log = new List<string>();
 foreach (var step in args.Skip(3))
 {
@@ -41,25 +39,25 @@ foreach (var step in args.Skip(3))
 
 var room = game.Rooms.Single(r => r.ResourceId == session.Snapshot.RoomId);
 var bytes = File.ReadAllBytes(room.FilePath);
-var background = new LoomEgaRoomDecoder().Decode(bytes);
+var background = new ScummV3EgaRoomDecoder().Decode(bytes);
 var snapshot = session.Snapshot;
-var selection = new RoomObjectSelection(new LoomRoomObjects().Decode(bytes), snapshot.ObjectStates, snapshot.ObjectPositions,
-    new LoomRoomObjectDirectory().Decode(bytes), background, index.States, snapshot.DrawOrder);
+var selection = new RoomObjectSelection(new ScummRoomObjects().Decode(bytes), snapshot.ObjectStates, snapshot.ObjectPositions,
+    new ScummRoomObjectDirectory().Decode(bytes), background, index.States, snapshot.DrawOrder);
 var roomPixels = selection.Compose(background);
 var cameraX = session.CameraX ?? background.Width / 2;
 var viewLeft = Math.Clamp(cameraX - 160, 0, Math.Max(0, background.Width - 320));
-var layer = LoomMessageRenderer.Render(snapshot.ScreenMessages, charset);
+var layer = ScummV3MessageRenderer.Render(snapshot.ScreenMessages, charset);
 var screen = new uint[320 * 200];
 for (var y = 0; y < 200; y++)
     for (var x = 0; x < 320; x++)
     {
         uint color = 0;
         // The boot's initScreens(0, 144): the room screen is rows 0–143, so screen row y shows room row y.
-        var roomY = y - LoomMessageRenderer.RoomScreenTop;
-        if (roomY >= 0 && y < LoomMessageRenderer.VerbScreenTop && roomY < background.Height && viewLeft + x < background.Width)
+        var roomY = y - ScummV3MessageRenderer.RoomScreenTop;
+        if (roomY >= 0 && y < ScummV3MessageRenderer.VerbScreenTop && roomY < background.Height && viewLeft + x < background.Width)
             color = background.Palette[roomPixels[roomY * background.Width + viewLeft + x]];
         var text = layer.Pixels[y * 320 + x];
-        if (text != LoomMessageRenderer.Transparent) color = background.Palette[text];
+        if (text != ScummV3MessageRenderer.Transparent) color = background.Palette[text];
         screen[y * 320 + x] = color;
     }
 WriteBmp(Path.Combine(output, $"{name}.bmp"), screen, 320, 200, 3);
@@ -68,7 +66,7 @@ foreach (var message in snapshot.ScreenMessages) log.Add($"on screen: {Describe(
 File.WriteAllLines(Path.Combine(output, $"{name}.txt"), log);
 foreach (var line in log) Console.WriteLine(line);
 
-static string Describe(LoomMessage? m) => m is null ? "none" :
+static string Describe(ScummMessage? m) => m is null ? "none" :
     $"\"{m.Text.Replace("\n", " / ")}\" {m.Kind} actor {m.Actor} at ({m.X}, {m.Y}){(m.Center ? " centred" : "")} colour 0x{m.Color:X2} line height {m.LineHeight} delay {m.TalkDelay} from {m.Source}{(m.Estimate is null ? "" : $" [estimate: {m.Estimate}]")}";
 
 static void WriteBmp(string path, uint[] pixels, int width, int height, int scale)

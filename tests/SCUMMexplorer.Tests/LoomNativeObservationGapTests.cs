@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -15,8 +14,8 @@ public sealed class LoomNativeObservationGapTests
     [InlineData("cancel-other", true)]
     public void OmittedObservationCannotPreserveNativeHistoryThroughEqualValues(string phase, bool gap)
     {
-        var updates = new List<LoomNativeDependencyUpdate>();
-        var tracker = new LoomNativeDependencyTracker(updates.Add);
+        var updates = new List<ScummNativeDependencyUpdate>();
+        var tracker = new ScummNativeDependencyTracker(updates.Add);
         var read = Read(41); // A selected stream can start at an arbitrary sequence.
         tracker.Observe(read);
         var history = Assert.Single(tracker.ActiveRelations);
@@ -38,8 +37,8 @@ public sealed class LoomNativeObservationGapTests
     [Fact]
     public void FreshCopiedReadAfterGapHasItsOwnIdentityAndCannotRevivePreviousHistory()
     {
-        var updates = new List<LoomNativeDependencyUpdate>();
-        var tracker = new LoomNativeDependencyTracker(updates.Add);
+        var updates = new List<ScummNativeDependencyUpdate>();
+        var tracker = new ScummNativeDependencyTracker(updates.Add);
         tracker.Observe(Read(1));
         var history = Assert.Single(tracker.ActiveRelations);
         tracker.Observe(Read(3));
@@ -58,10 +57,10 @@ public sealed class LoomNativeObservationGapTests
     [InlineData("object-owner")]
     public void ExplicitOpaqueMutationStillRetiresAllFamiliesWithoutAChangedValueClaim(string domain)
     {
-        var tracker = new LoomNativeDependencyTracker(_ => { });
+        var tracker = new ScummNativeDependencyTracker(_ => { });
         tracker.Observe(Read(1));
         var history = Assert.Single(tracker.ActiveRelations);
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         using (runtime.ObserveGlobalMutations(new(_ => { }, nativeDependencies: tracker)))
             runtime.NotifyNativeMutation(domain, 204);
         Assert.Empty(tracker.ActiveRelations);
@@ -75,16 +74,16 @@ public sealed class LoomNativeObservationGapTests
     [Fact]
     public void RepeatedObservationIsRejectedWithoutMutatingPublishedHistory()
     {
-        var tracker = new LoomNativeDependencyTracker(_ => { });
+        var tracker = new ScummNativeDependencyTracker(_ => { });
         tracker.Observe(Read(1));
         var history = Assert.Single(tracker.ActiveRelations);
         Assert.Throws<ArgumentException>(() => tracker.Observe(Read(1)));
         Assert.Equal(history, Assert.Single(tracker.ActiveRelations));
     }
 
-    private static LoomScriptObservation Read(long sequence)
+    private static ScummScriptObservation Read(long sequence)
     {
-        var selector = new LoomScriptOperandBinding("source", "0x01", null, 1, false);
+        var selector = new ScummScriptOperandBinding("source", "0x01", null, 1, false);
         return new(sequence, 8, 7, 1, new(2, null, 1, 0, "instruction", 0, "getActorRoom", ""),
             new Dictionary<string, ushort>(), [], true, SourceAccess: new([selector], null, [],
                 [new("getActorRoom", selector, 2, true, "copied native estimate")]));

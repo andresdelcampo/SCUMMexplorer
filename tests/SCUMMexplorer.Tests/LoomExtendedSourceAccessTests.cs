@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -122,7 +121,7 @@ public sealed class LoomExtendedSourceAccessTests
         Assert.All(dependencies, d => Assert.True(d.ValueEstimated));
         Assert.All(dependencies, d => Assert.False(d.Selector.ValueEstimated));
         Assert.False(records[0].PathEstimated);
-        Assert.Throws<NotSupportedException>(() => ((IList<LoomScriptNativeDependency>)Instruction(records).SourceAccess!.NativeDependencies!).Clear());
+        Assert.Throws<NotSupportedException>(() => ((IList<ScummScriptNativeDependency>)Instruction(records).SourceAccess!.NativeDependencies!).Clear());
     }
 
     [Fact]
@@ -173,14 +172,14 @@ public sealed class LoomExtendedSourceAccessTests
     [Fact]
     public void RawSameValueNotificationExpiresAliasesWithoutChangingStorageOrEstimates()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
-        var observer = new LoomScriptObserver(_ => { }, runtimeRelations: tracker);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
+        var observer = new ScummScriptObserver(_ => { }, runtimeRelations: tracker);
         var runtime = Runtime();
         runtime.EstimatedVariables.Add("var[0x0D6]");
         using (runtime.ObserveGlobalMutations(observer))
         {
-            new LoomBoundedScriptExecutor().Execute(Code(("equalZero", "bit[0xD67], branch +0 -> 0x0001")),
+            new ScummBoundedScriptExecutor().Execute(Code(("equalZero", "bit[0xD67], branch +0 -> 0x0001")),
                 runtime.ObjectStates, [], runtime: runtime, observation: new(observer, 1));
             Assert.Single(tracker.ActiveRelations);
             runtime.GlobalVariables["var[0x0D6]"] = 0;
@@ -195,23 +194,23 @@ public sealed class LoomExtendedSourceAccessTests
         Assert.Equal(count, updates.Count);
     }
 
-    private static LoomScriptRuntimeState Runtime() => new(new Dictionary<int, byte>());
-    private static LoomScriptObservation Instruction(List<LoomScriptObservation> records) =>
+    private static ScummScriptRuntimeState Runtime() => new(new Dictionary<int, byte>());
+    private static ScummScriptObservation Instruction(List<ScummScriptObservation> records) =>
         records.First(r => r.Site?.Stage == "instruction");
-    private static (LoomBoundedScriptResult, List<LoomScriptObservation>) Run(LoomScriptRuntimeState runtime,
+    private static (ScummBoundedScriptResult, List<ScummScriptObservation>) Run(ScummScriptRuntimeState runtime,
         params (string Op, string Args)[] operations) => Run(runtime, operations, _ => true);
-    private static (LoomBoundedScriptResult, List<LoomScriptObservation>) Run(LoomScriptRuntimeState runtime,
+    private static (ScummBoundedScriptResult, List<ScummScriptObservation>) Run(ScummScriptRuntimeState runtime,
         (string Op, string Args)[] operations, Func<string, bool> include)
     {
-        var records = new List<LoomScriptObservation>();
-        var result = new LoomBoundedScriptExecutor().Execute(Code(operations), runtime.ObjectStates, [], runtime: runtime,
+        var records = new List<ScummScriptObservation>();
+        var result = new ScummBoundedScriptExecutor().Execute(Code(operations), runtime.ObjectStates, [], runtime: runtime,
             observation: new(new(records.Add, includeKey: include, captureOperandBindings: true, captureSourceAccess: true), 1));
         return (result, records);
     }
-    private static LoomScriptDisassembly Code(params (string Op, string Args)[] operations)
+    private static ScummScriptDisassembly Code(params (string Op, string Args)[] operations)
     {
         var code = operations.Append((Op: "stopObjectCode", Args: "")).ToArray();
         return new(2, 1, 0, code.Length, code.Length,
-            code.Select((o, i) => new LoomScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
+            code.Select((o, i) => new ScummScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
     }
 }

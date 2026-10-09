@@ -1,7 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // Usage: DemoProbe <game folder> [index | play <frames>]
 if (args.Length > 1 && args[1] == "texts")
@@ -31,11 +29,11 @@ if (args.Length > 4 && args[1] == "adjust")
 {
     // DemoProbe <folder> adjust <room> <x> <y>: our Contains / ClosestPointOnBox / Adjust for a destination point, per box.
     var adGame = new GameFolderScanner().Scan(args[0]);
-    var adBoxes = LoomWalkBoxReader.Read(File.ReadAllBytes(adGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2])).FilePath));
+    var adBoxes = ScummWalkBoxReader.Read(File.ReadAllBytes(adGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2])).FilePath));
     int ax = int.Parse(args[3]), ay = int.Parse(args[4]);
     foreach (var box in adBoxes.Boxes.Where(b => b.Index >= 11))
     {
-        var closest = LoomWalkBoxSet.ClosestPointOnBox(box, ax, ay);
+        var closest = ScummWalkBoxSet.ClosestPointOnBox(box, ax, ay);
         Console.WriteLine($"box {box.Index}: contains {adBoxes.Contains(box.Index, ax, ay)}, closest ({closest.X},{closest.Y}) dist² {closest.Distance}");
     }
     var adjusted = adBoxes.Adjust(ax, ay, true, 551, 111);
@@ -48,8 +46,8 @@ if (args.Length > 3 && args[1] == "verbs")
     var vbGame = new GameFolderScanner().Scan(args[0]);
     var vbRoom = vbGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
     var vbBytes = File.ReadAllBytes(vbRoom.FilePath);
-    var vbRecord = new LoomRoomObjectDirectory().Decode(vbBytes).Single(r => r.Id == int.Parse(args[3]));
-    var vbReader = new LoomObjectVerbReader(ScummScriptDialects.For(vbGame.Id));
+    var vbRecord = new ScummRoomObjectDirectory().Decode(vbBytes).Single(r => r.Id == int.Parse(args[3]));
+    var vbReader = new ScummObjectVerbReader(ScummScriptDialects.For(vbGame.Id));
     foreach (var entry in vbReader.ReadAll(vbBytes, [vbRecord])[vbRecord.Id])
     {
         Console.WriteLine($"== {entry.Label} (code +0x{entry.ScriptOffset:X4})");
@@ -63,8 +61,8 @@ if (args.Length > 2 && args[1] == "objects")
     var obGame = new GameFolderScanner().Scan(args[0]);
     var obRoom = obGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
     var obBytes = File.ReadAllBytes(obRoom.FilePath);
-    var obNames = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(obBytes), new LoomRoomObjectDirectory().Decode(obBytes));
-    foreach (var r in new LoomRoomObjectDirectory().Decode(obBytes))
+    var obNames = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(obBytes), new ScummRoomObjectDirectory().Decode(obBytes));
+    foreach (var r in new ScummRoomObjectDirectory().Decode(obBytes))
         Console.WriteLine($"object {r.Id} \"{obNames.GetValueOrDefault(r.Id, "")}\": {System.Text.Json.JsonSerializer.Serialize(r)}");
     return;
 }
@@ -72,10 +70,10 @@ if (args.Length > 2 && args[1] == "findload")
 {
     // DemoProbe <folder> findload <room>: every loadRoom/loadRoomWithEgo in the room's local scripts and entry, with the lines before it.
     var flGame = new GameFolderScanner().Scan(args[0]);
-    var flReader = new LoomScriptReader(ScummScriptDialects.For(flGame.Id));
+    var flReader = new ScummScriptReader(ScummScriptDialects.For(flGame.Id));
     var flRoom = flGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
     var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(flGame.FolderPath, "00.LFL"));
-    foreach (var id in LoomScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(flRoom.FilePath), globalCount))
+    foreach (var id in ScummScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(flRoom.FilePath), globalCount))
     {
         var script = flReader.DecodeRoomLocalScript(flRoom, id, globalCount);
         if (script is null) continue;
@@ -123,7 +121,7 @@ if (args.Length > 1 && args[1] is "play" or "idle") { PlayDump.Run(args[0], args
 var game = new GameFolderScanner().Scan(args[0]);
 Console.WriteLine($"{game.Title}: id {game.Id}, version {game.Version}, rooms {game.Rooms.Count()}, resources {game.Resources.Count} ({string.Join(", ", game.Resources.GroupBy(r => r.Kind).Select(g => $"{g.Count()} {g.Key}"))})");
 var scripts = 0; var scriptFail = new List<string>();
-var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
 foreach (var r in game.Resources.Where(r => r.Kind == ResourceKind.Script))
 {
     try { reader.Decode(r); scripts++; } catch (Exception ex) { scriptFail.Add($"script {r.ResourceId}: {ex.GetType().Name}: {ex.Message}"); }

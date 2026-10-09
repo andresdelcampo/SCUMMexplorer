@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -13,8 +12,8 @@ public sealed class LoomCostumeAnimationTests
     private static readonly string Folder =
         Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
-    private static LoomCostume? EgoCostume() =>
-        File.Exists(Path.Combine(Folder, "00.LFL")) ? LoomCostume.Load(new GameFolderScanner().Scan(Folder), 1) : null;
+    private static ScummCostume? EgoCostume() =>
+        File.Exists(Path.Combine(Folder, "00.LFL")) ? ScummCostume.Load(new GameFolderScanner().Scan(Folder), 1) : null;
 
     [Fact]
     public void TheStandFrameHoldsStill()
@@ -23,7 +22,7 @@ public sealed class LoomCostumeAnimationTests
         if (costume is null) return;
         Assert.Equal((63, false, (byte)1), (costume.AnimationLimit, costume.Mirror, costume.PaletteColor));
 
-        var state = new LoomCostumeAnimationState();
+        var state = new ScummCostumeAnimationState();
         Assert.True(costume.DecodeAnimation(state, frame: 3, direction: 2));
         Assert.Equal([3, 4], state.Positions.Take(2));
         Assert.All(state.Positions.Skip(2), position => Assert.Equal(-1, position));
@@ -43,7 +42,7 @@ public sealed class LoomCostumeAnimationTests
     {
         var costume = EgoCostume();
         if (costume is null) return;
-        var state = new LoomCostumeAnimationState();
+        var state = new ScummCostumeAnimationState();
         Assert.True(costume.DecodeAnimation(state, frame: 2, direction: 2));
 
         var body = new List<int> { state.Positions[0] };
@@ -62,7 +61,7 @@ public sealed class LoomCostumeAnimationTests
     {
         var costume = EgoCostume();
         if (costume is null) return;
-        var left = new LoomCostumeAnimationState();
+        var left = new ScummCostumeAnimationState();
         costume.DecodeAnimation(left, frame: 3, direction: 0);
         var cels = costume.Draw(left, 0);
         Assert.Equal("L0(-16,-43 24x45) L1(-6,-41 12x10)", Describe(cels));
@@ -78,7 +77,7 @@ public sealed class LoomCostumeAnimationTests
     {
         var costume = EgoCostume();
         if (costume is null) return;
-        var state = new LoomCostumeAnimationState();
+        var state = new ScummCostumeAnimationState();
         costume.DecodeAnimation(state, 3, 2);
         var before = state.Positions.ToArray();
         Assert.False(costume.DecodeAnimation(state, frame: 16, direction: 0)); // animation 64 > 63
@@ -90,7 +89,7 @@ public sealed class LoomCostumeAnimationTests
     {
         var costume = EgoCostume();
         if (costume is null) return;
-        var state = new LoomCostumeAnimationState();
+        var state = new ScummCostumeAnimationState();
         costume.DecodeAnimation(state, 3, 2);
         var cels = costume.Draw(state, 2);
         var target = new byte[64 * 64];
@@ -110,6 +109,6 @@ public sealed class LoomCostumeAnimationTests
         Assert.DoesNotContain(recoloured, value => value == 7);
     }
 
-    private static string Describe(IEnumerable<LoomCostumeCel> cels) =>
+    private static string Describe(IEnumerable<ScummCostumeCel> cels) =>
         string.Join(" ", cels.Select(c => $"L{c.Limb}({c.Left},{c.Top} {c.Width}x{c.Height})"));
 }

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -8,8 +7,8 @@ public sealed class LoomCallCorrespondenceTests
     [Fact]
     public void ActualAssignmentsAndThreeImmediateBoundariesSupplyOnlyStructuralCorrespondence()
     {
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
         LoomCallObservationTests.WithSession(new() { [2] = [0] }, (session, _, _) => {
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")));
         }, correspondence: tracker);
@@ -24,15 +23,15 @@ public sealed class LoomCallCorrespondenceTests
         Assert.Equal("dispatch-ended", result.HostReturn!.Stage);
         Assert.Equal("caller-continued", result.CallerContinuation!.Stage);
         Assert.Contains(result.Limits, l => l.Contains("no callee-local numeric origins"));
-        Assert.Throws<NotSupportedException>(() => ((IList<LoomCalleeAssignment>)result.Binding.SuppliedAssignments).Clear());
+        Assert.Throws<NotSupportedException>(() => ((IList<ScummCalleeAssignment>)result.Binding.SuppliedAssignments).Clear());
         Assert.Equal(0, tracker.PendingCalls);
     }
 
     [Fact]
     public void YieldAndLaterRestorationKeepHostReturnAndImmediateCallerContinuationSeparate()
     {
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
         LoomCallObservationTests.WithSession(new() { [2] = [0x80, 0] }, (session, _, _) => {
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")));
             var yielded = updates.Last(u => u.CallerContinuation is not null);
@@ -51,7 +50,7 @@ public sealed class LoomCallCorrespondenceTests
     [Fact]
     public void FrozenCallerRequiresActualRestoredLocalsAndItsFirstResumedInstruction()
     {
-        var updates = new List<LoomCallCorrespondence>();
+        var updates = new List<ScummCallCorrespondence>();
         LoomCallObservationTests.WithSession(new() { [2] = [0x0A, 3, 0xFF, 0], [3] = [0x60, 1, 0x80, 0x60, 0, 0] }, (session, _, _) => {
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")));
             Assert.DoesNotContain(updates, u => u.CallerResumption is not null);
@@ -70,7 +69,7 @@ public sealed class LoomCallCorrespondenceTests
     [Fact]
     public void NonreturningChainKeepsItsDeferredBindingAndRejectsTheChainingParentAsATerminal()
     {
-        var updates = new List<LoomCallCorrespondence>();
+        var updates = new List<ScummCallCorrespondence>();
         LoomCallObservationTests.WithSession(new() { [2] = [0x42, 3, 1, 9, 0, 0xFF], [3] = [0] }, (session, _, _) => {
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, []"), ("stopObjectCode", "")));
         }, correspondence: new(updates.Add));
@@ -84,7 +83,7 @@ public sealed class LoomCallCorrespondenceTests
     [InlineData(true)]
     public void MissingOrPartialChildCannotBorrowHostReturnAsTermination(bool missing)
     {
-        var updates = new List<LoomCallCorrespondence>();
+        var updates = new List<ScummCallCorrespondence>();
         LoomCallObservationTests.WithSession(new() { [2] = [0xFF] }, (session, _, _) => {
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", missing ? "0x63, []" : "0x02, []"), ("stopObjectCode", "")));
         }, correspondence: new(updates.Add));
@@ -96,7 +95,7 @@ public sealed class LoomCallCorrespondenceTests
     [Fact]
     public void CancellationAndReplacementRetireCorrespondenceAndKeepHistoricalAssignments()
     {
-        var updates = new List<LoomCallCorrespondence>();
+        var updates = new List<ScummCallCorrespondence>();
         LoomCallObservationTests.WithSession(new() { [2] = [0x0A, 3, 0xFF, 0x80, 0], [3] = [0x62, 2, 0] }, (session, _, _) => {
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")));
         }, correspondence: new(updates.Add));
@@ -112,7 +111,7 @@ public sealed class LoomCallCorrespondenceTests
     [InlineData("end")]
     public void FilteredAssignmentsDispatchOrEndsCannotSupplyCorrespondence(string filter)
     {
-        var updates = new List<LoomCallCorrespondence>();
+        var updates = new List<ScummCallCorrespondence>();
         LoomCallObservationTests.WithSession(new() { [2] = [0] }, (session, _, _) => {
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")));
         }, site: s => (filter != "dispatch" || s.Operation != "startScript") && (filter != "end" || s.Stage != "end"),
@@ -133,29 +132,29 @@ public sealed class LoomCallCorrespondenceTests
     [InlineData("bound")]
     public void IncompleteChildChainsFailClosedDespiteEqualNumbers(string defect)
     {
-        var calls = new List<LoomCallObservation>();
-        var scripts = new List<LoomScriptObservation>();
+        var calls = new List<ScummCallObservation>();
+        var scripts = new List<ScummScriptObservation>();
         var chronology = new List<object>();
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var observer = new LoomScriptObserver(s => { scripts.Add(s); chronology.Add(s); }, receiveCall: c => { calls.Add(c); chronology.Add(c); });
-        var caller = new LoomObservedCall(1, 2, 1, null, 1, new(0, null, 0, 0, "instruction", 0, "startScript", "0x02, [0x0007]"),
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var observer = new ScummScriptObserver(s => { scripts.Add(s); chronology.Add(s); }, receiveCall: c => { calls.Add(c); chronology.Add(c); });
+        var caller = new ScummObservedCall(1, 2, 1, null, 1, new(0, null, 0, 0, "instruction", 0, "startScript", "0x02, [0x0007]"),
             [new("target", "0x02", null, 2, false), new("argument", "0x0007", null, 7, false, ArgumentIndex: 0)], false);
         // Capture genuine executor boundaries, then perturb only the copied evidence.
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")),
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")),
             runtime.ObjectStates, [], runtime: runtime, observation: new(observer, 1), onEvent: (_, _) => {
-                new LoomBoundedScriptExecutor().Execute(new(2, 0, 0, 2, 2, [new(0, 0x80, "breakHere", "", "80"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []),
+                new ScummBoundedScriptExecutor().Execute(new(2, 0, 0, 2, 2, [new(0, 0x80, "breakHere", "", "80"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []),
                     runtime.ObjectStates, [], runtime: runtime, initialLocals: new Dictionary<string, ushort> { ["local[0x000]"] = 7 }, observation: new(observer, 2, 1, caller));
                 return "";
             });
-        new LoomBoundedScriptExecutor().Execute(new(2, 0, 0, 2, 2, [new(1, 0, "stopObjectCode", "", "00")], null, null, [], []),
+        new ScummBoundedScriptExecutor().Execute(new(2, 0, 0, 2, 2, [new(1, 0, "stopObjectCode", "", "00")], null, null, [], []),
             runtime.ObjectStates, [], runtime: runtime, startOffset: 1, initialLocals: new Dictionary<string, ushort> { ["local[0x000]"] = 7 },
             observation: new(observer, 2, 1, caller, Resuming: true));
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add, boundaryLimit: defect == "bound" ? 2 : 128);
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add, boundaryLimit: defect == "bound" ? 2 : 128);
         foreach (var item in chronology)
         {
-            if (item is LoomScriptObservation s) tracker.ObserveScript(s);
-            else if (item is LoomCallObservation c)
+            if (item is ScummScriptObservation s) tracker.ObserveScript(s);
+            else if (item is ScummCallObservation c)
             {
                 if (defect == "missing-dispatch" && c.Stage == "dispatch" || defect == "missing-end" && c.Stage == "end" && c.Slot == 2 && c.ResumeOffset is not null) continue;
                 if (c.Stage == "resumed-locals")

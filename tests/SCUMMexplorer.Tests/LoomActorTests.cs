@@ -1,5 +1,4 @@
 ﻿using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -13,15 +12,15 @@ public sealed class LoomActorTests
     private static readonly string Folder =
         Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
-    private static LoomWalkBoxSet Room02Boxes() =>
-        LoomWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "02.LFL")));
+    private static ScummWalkBoxSet Room02Boxes() =>
+        ScummWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "02.LFL")));
 
     [Fact]
     public void PutInTheCurrentRoomAdjustsIntoABoxAndElsewhereKeepsTheRawPoint()
     {
         if (!File.Exists(Path.Combine(Folder, "02.LFL"))) return;
-        var table = new LoomActorTable();
-        var place = new LoomActorTable.Placement(2, Room02Boxes(), null, null);
+        var table = new ScummActorTable();
+        var place = new ScummActorTable.Placement(2, Room02Boxes(), null, null);
 
         // (820, 70) is 10 pixels below box 0's segment (811..830, y 60).
         table.Put(3, 820, 70, 2, place, ego: 1);
@@ -44,14 +43,14 @@ public sealed class LoomActorTests
     public void AWalkInTheCurrentRoomStepsAlongTheBoxPath()
     {
         if (!File.Exists(Path.Combine(Folder, "02.LFL"))) return;
-        var table = new LoomActorTable();
-        var place = new LoomActorTable.Placement(2, Room02Boxes(), null, null);
+        var table = new ScummActorTable();
+        var place = new ScummActorTable.Placement(2, Room02Boxes(), null, null);
         table.Put(1, 820, 60, 2, place, ego: 1);
 
         // Box 4 (837..888, y 118) is reached from box 0 along the chain. startWalkActor only
         // sets MF_NEW_LEG; each walkActor moves the actor by its walk speed (8, 2) at most.
         table.Walk(1, 860, 125, place, "walk");
-        Assert.Equal((820, 60, LoomActorTable.MoveNewLeg), (table[1].X, table[1].Y, table[1].Moving));
+        Assert.Equal((820, 60, ScummActorTable.MoveNewLeg), (table[1].X, table[1].Y, table[1].Moving));
         var points = new List<(int, int)>();
         for (var frame = 0; frame < 200 && table[1].Moving != 0; frame++)
         {

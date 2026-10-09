@@ -4,8 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // For every room with doorway boxes on the real MainWindow: browse to the room,
 // click (in-process HandleRoomPoint: the game's click, with the direct verb as a
@@ -36,7 +34,7 @@ internal static class Program
         {
             Call("SelectResourceInTree", room);
             for (var n = 0; n < 100 && (Displayed() != room.ResourceId ||
-                     ((IReadOnlyList<LoomRoomObjectRecord>)Field("_currentRoomObjectRecords")!).Count == 0); n++)
+                     ((IReadOnlyList<ScummRoomObjectRecord>)Field("_currentRoomObjectRecords")!).Count == 0); n++)
                 await Task.Delay(50);
             await Task.Delay(150);
             window.UpdateLayout();
@@ -55,13 +53,13 @@ internal static class Program
                 {
                     if (!await Browse(room)) { report.Add($"Room {room.ResourceId:00}: did not load"); continue; }
                     var candidates = ((System.Collections.IEnumerable)Field("_roomNavigationCandidates")!).Cast<object>().ToArray();
-                    var groups = candidates.GroupBy(c => Prop<LoomRoomObjectRecord>(c, "Object").Id).ToArray();
+                    var groups = candidates.GroupBy(c => Prop<ScummRoomObjectRecord>(c, "Object").Id).ToArray();
                     foreach (var group in groups)
                     {
-                        var record = Prop<LoomRoomObjectRecord>(group.First(), "Object");
+                        var record = Prop<ScummRoomObjectRecord>(group.First(), "Object");
                         if (record.Width <= 0 || record.Height <= 0) continue;
                         var targets = group.Select(c => Prop<int>(c, "TargetRoomId")).Distinct().Order().ToArray();
-                        var others = groups.Where(g => g.Key != group.Key).Select(g => Prop<LoomRoomObjectRecord>(g.First(), "Object")).ToArray();
+                        var others = groups.Where(g => g.Key != group.Key).Select(g => Prop<ScummRoomObjectRecord>(g.First(), "Object")).ToArray();
                         // A point of this box that no other doorway box covers, else its centre.
                         (int X, int Y)? own = null;
                         for (var y = record.Y; y < record.Y + record.Height && own is null; y += 4)
@@ -71,7 +69,7 @@ internal static class Program
                         var point = own ?? (record.X + record.Width / 2, record.Y + record.Height / 2);
                         if (!await Browse(room)) continue;
                         // Doorways the room does not hold now (owner or parent state) are not clickable.
-                        var present = ((System.Collections.IEnumerable)Call("DoorwaysAt", point.X, point.Y)!).Cast<LoomRoomObjectRecord>().ToArray();
+                        var present = ((System.Collections.IEnumerable)Call("DoorwaysAt", point.X, point.Y)!).Cast<ScummRoomObjectRecord>().ToArray();
                         if (present.All(item => item.Id != record.Id))
                         {
                             report.Add($"NOT PRESENT Room {room.ResourceId:00} object {record.Id} → targets {string.Join('/', targets.Select(t => t.ToString("00")))}");
@@ -114,7 +112,7 @@ internal static class Program
                         var picked = own is null && snapshot.IsUntouchable(record.Id)
                             ? present.FirstOrDefault(item => item.Id != record.Id && !snapshot.IsUntouchable(item.Id)) : null;
                         if (!ok && picked is not null && now is int reachedRoom &&
-                            candidates.Where(c => Prop<LoomRoomObjectRecord>(c, "Object").Id == picked.Id).Any(c => Prop<int>(c, "TargetRoomId") == reachedRoom))
+                            candidates.Where(c => Prop<ScummRoomObjectRecord>(c, "Object").Id == picked.Id).Any(c => Prop<int>(c, "TargetRoomId") == reachedRoom))
                         {
                             ok = true;
                             via += $" [overlapped and untouchable now: findObject picks object {picked.Id}, which leads there]";

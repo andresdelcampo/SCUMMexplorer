@@ -1,7 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 using Xunit.Abstractions;
 
 namespace SCUMMexplorer.Tests;
@@ -32,10 +30,10 @@ public sealed class LoomObjectLookAuditTests(ITestOutputHelper output)
             }
         }
         var bytes = File.ReadAllBytes(game.Rooms.Single(room => room.ResourceId == 17).FilePath);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
         var record = records.Single(item => item.Id == 357);
-        var verbs = new LoomObjectVerbReader().ReadAll(bytes, records);
-        foreach (var verb in verbs[357]) output.WriteLine($"VERB {verb.Label}: {new LoomObjectVerbReader().Decode(game.Rooms.Single(room => room.ResourceId == 17), record, verb.VerbId).Format()}");
+        var verbs = new ScummObjectVerbReader().ReadAll(bytes, records);
+        foreach (var verb in verbs[357]) output.WriteLine($"VERB {verb.Label}: {new ScummObjectVerbReader().Decode(game.Rooms.Single(room => room.ResourceId == 17), record, verb.VerbId).Format()}");
     }
 
     [Fact(Skip = "Diagnostic trace that prints and asserts nothing; run it by hand when auditing Look verbs.")]
@@ -44,8 +42,8 @@ public sealed class LoomObjectLookAuditTests(ITestOutputHelper output)
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(folder);
-        var directory = new LoomRoomObjectDirectory();
-        var verbs = new LoomObjectVerbReader();
+        var directory = new ScummRoomObjectDirectory();
+        var verbs = new ScummObjectVerbReader();
         foreach (var room in game.Rooms.Where(room => room.ResourceId is 2 or 3 or 4 or 10 or 17 or 22))
         {
             var bytes = File.ReadAllBytes(room.FilePath);

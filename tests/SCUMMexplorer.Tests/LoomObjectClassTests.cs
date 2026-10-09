@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -22,13 +21,13 @@ public sealed class LoomObjectClassTests
         var script = Script(
             new(0, 0, "setClass", $"0x0190, {classes}", "5D 90 01 98 FF"),
             new(5, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>(), null,
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>(), null,
             new Dictionary<int, uint> { [0x190] = initial });
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         Assert.True(run.ReachedStop);
-        Assert.Equal(untouchable, LoomObjectClasses.Has(runtime.ObjectClasses[0x190], LoomObjectClasses.Untouchable));
+        Assert.Equal(untouchable, ScummObjectClasses.Has(runtime.ObjectClasses[0x190], ScummObjectClasses.Untouchable));
         if (classes.StartsWith("[0x0000", StringComparison.Ordinal))
             Assert.Equal(1u << 23, runtime.ObjectClasses[0x190]);
     }
@@ -44,10 +43,10 @@ public sealed class LoomObjectClassTests
             new(0, 0, "ifClassOfIs", $"0x0190, {classes}, branch +0x0005 -> 0x000C", "00 00 00 00 00 00 00"),
             new(7, 0, "setState", "0x000A, 0x0001", "00 00 00 00 00"),
             new(12, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte> { [10] = 0 }, null,
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte> { [10] = 0 }, null,
             new Dictionary<int, uint> { [0x190] = 1u << 23 });
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         Assert.Null(run.UnresolvedReason);
         Assert.Equal(fallsThrough ? (byte)1 : (byte)0, run.ObjectStates[10]);
@@ -61,7 +60,7 @@ public sealed class LoomObjectClassTests
             new(7, 0, "setState", "0x000A, 0x0001", "00 00 00 00 00"),
             new(12, 0, "stopObjectCode", "", "00"));
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, new Dictionary<int, byte> { [10] = 0 }, []);
+        var run = new ScummBoundedScriptExecutor().Execute(script, new Dictionary<int, byte> { [10] = 0 }, []);
 
         Assert.Contains("classes", run.UnresolvedReason, StringComparison.Ordinal);
     }
@@ -90,12 +89,12 @@ public sealed class LoomObjectClassTests
         // Entry +0x00F9 starts local 212 when var[0x071] (the object clicked
         // to arrive) matches no known exit; 212 +0x002F/+0x003D set class 24
         // on 400 (to Room 17) and 402 (to Room 18), and +0x0021 clears it on 411.
-        Assert.Contains(session.LastVisitEvents, item => item.Kind == LoomScriptEventKind.ScriptStarted && item.TargetId == 0xD4);
+        Assert.Contains(session.LastVisitEvents, item => item.Kind == ScummScriptEventKind.ScriptStarted && item.TargetId == 0xD4);
         Assert.True(snapshot.IsUntouchable(400));
         Assert.True(snapshot.IsUntouchable(402));
         Assert.False(snapshot.IsUntouchable(411));
     }
 
-    private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
+    private static ScummScriptDisassembly Script(params ScummScriptInstruction[] instructions) =>
         new(1, 1, 0, 32, 32, instructions, null, null, [], []);
 }

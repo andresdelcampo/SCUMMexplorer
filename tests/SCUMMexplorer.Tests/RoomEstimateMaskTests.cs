@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -16,9 +15,9 @@ public sealed class RoomEstimateMaskTests
         var path = Path.Combine(folder, "02.LFL");
         if (!File.Exists(path)) return;
         var bytes = File.ReadAllBytes(path);
-        var room = new OldV3EgaRoomDecoder().Decode(bytes);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
-        var images = new LoomRoomObjects().Decode(bytes);
+        var room = new ScummV3EgaRoomDecoder().Decode(bytes);
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
+        var images = new ScummRoomObjects().Decode(bytes);
         if (images.All(image => image.Id != 157)) return; // another edition's numbering
         var states = images.ToDictionary(image => image.Id, _ => (byte)0);
         var selection = new RoomObjectSelection(images, states, null, records, room);

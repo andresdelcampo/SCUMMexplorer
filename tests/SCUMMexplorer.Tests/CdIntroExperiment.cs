@@ -1,7 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Storage;
 
 namespace SCUMMexplorer.Tests;
 
@@ -14,7 +12,7 @@ public sealed class CdIntroExperiment
         var outPath = Environment.GetEnvironmentVariable("CD_INTRO_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
-        var cd = game.Vga!.ReadIndexedObjects();
+        var cd = game.V4Archive!.ReadIndexedObjects();
         var session = new LoomExplorationSession(game, cd, completeBoot: false, stopAtOpening: Environment.GetEnvironmentVariable("CD_STOP") == "1", playCdIntro: true);
         var log = new List<string>();
         int? room = null; var seenMsg = new HashSet<string>(); var voices = 0; var logged = 0; var sounds = 0;
@@ -49,7 +47,7 @@ public sealed class CdIntroDisasm
         if (spec is null || outPath is null || !Directory.Exists(folder)) return;
         var parts = spec.Split(':');
         var game = new GameFolderScanner().Scan(folder);
-        var data = new LoomCdDataSource(game);
+        var data = new ScummV4DataSource(game);
         var script = data.GlobalScript(int.Parse(parts[0]))!;
         var from = Convert.ToInt32(parts[1], 16); var to = Convert.ToInt32(parts[2], 16);
         File.WriteAllLines(outPath, script.Instructions.Where(i => i.Offset >= from && i.Offset <= to).Select(i => $"{i.Offset:X4} {i.Operation} {i.Operands}"));
@@ -71,7 +69,7 @@ public sealed class CdVoiceTimingDump
         var log = new List<string>();
         foreach (var number in rooms.Split(',').Select(int.Parse))
         {
-            var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+            var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
             session.VisitRoom(game.Rooms.First(item => item.ResourceId == number));
             var data = cd.ReadRoom(number);
             var verbs = cd.ReadObjectVerbs(number, data.Objects);

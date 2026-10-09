@@ -7,7 +7,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // M3: the boot's opening cutscene (script 044) played in the real MainWindow, on the real playback clock.
 // 1. "Play a cutscene" → "The opening (script 044)": a fresh session whose boot stops where script 001 starts
@@ -58,7 +57,7 @@ internal static class Program
                 bool HasPlayback() => Field("_playback") is not null;
                 int? Shown() => (int?)Field("_currentRoomResource")?.GetType().GetProperty("ResourceId")?.GetValue(Field("_currentRoomResource"));
                 string Status() => Find<TextBlock>("StatusText").Text;
-                LoomActorSnapshot Ego(LoomExplorationSession session) => session.Actors.Single(actor => actor.Number == 1);
+                ScummActorSnapshot Ego(LoomExplorationSession session) => session.Actors.Single(actor => actor.Number == 1);
                 string Describe(LoomExplorationSession session)
                 {
                     var ego = Ego(session);
@@ -67,7 +66,7 @@ internal static class Program
                            $"var[0x071] = {(vars.TryGetValue("var[0x071]", out var v) ? v : -1)}, camera {session.CameraX}, boot frames {session.BootFrames}";
                 }
                 // The app's own boot, for the end state.
-                var booted = new LoomExplorationSession((GameLibrary)Field("_game")!, (LoomIndexedObjectSnapshot)Field("_indexedObjectSnapshot")!);
+                var booted = new LoomExplorationSession((GameLibrary)Field("_game")!, (ScummIndexedObjectSnapshot)Field("_indexedObjectSnapshot")!);
                 report.Add($"The app's boot (constructor): {Describe(booted)}");
                 for (var n = 0; n < 100 && Shown() is null; n++) await Task.Delay(100);
 

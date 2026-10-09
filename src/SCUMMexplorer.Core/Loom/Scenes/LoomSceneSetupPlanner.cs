@@ -1,0 +1,205 @@
+using SCUMMexplorer.Core.Domain;
+
+namespace SCUMMexplorer.Core.Loom;
+
+/// <summary>
+/// The start setup derived for one scene: leading replay steps to run unseen (real earlier scenes, a visit of the
+/// start room) and the labelled assumptions that go with it. <see cref="Steps"/> is empty when the fresh catalog
+/// visit is already the least labelled start.
+/// </summary>
+public sealed record LoomStartSetup(IReadOnlyList<LoomReplayStep> Steps, IReadOnlyList<string> Notes)
+{
+    public static readonly LoomStartSetup None = new([], []);
+    public bool HasSteps => Steps.Count > 0;
+
+    /// <summary>The setup as one paragraph for the picker note and the status tooltip (empty when there is nothing to say).</summary>
+    public string Describe() => Notes.Count == 0 ? "" : "Derived start setup (estimates): " + string.Join(" ", Notes);
+}
+
+/// <summary>
+/// Derives a scene's start setup from what its code reads (see <see cref="LoomSceneStateScanner"/>), not from a list of
+/// scenes. A state the scene needs and a fresh catalog visit lacks is established, where the game has a way to, by a
+/// real earlier scene that assigns it (found by <see cref="LoomSceneStateScanner.FindConstantWriters"/>) run unseen, then
+/// a catalog visit of the scene's room. Only when no real scene sets the state does a labelled edit remain, and no
+/// story flag is written by the explorer. Everything the derivation assumed is returned as notes.
+/// </summary>
+public sealed class LoomSceneSetupPlanner
+{
+    public const string StaffBit = "bit[0xD61]";
+    /// <summary>Tag on the steps that grant the staff (see <see cref="Adapt"/>).</summary>
+    public const string StaffGrant = "grant:staff";
+    private readonly int _firstStoryBit;
+    /// <summary>The first room beyond the LOOM island (an estimate of the user's "outside the island").</summary>
+    public const int FirstRoomOffTheIsland = 11;
+
+    private readonly LoomSceneStateScanner _scanner;
+    private readonly GameLibrary _game;
+    private readonly IScummDataSource _data;
+    private IReadOnlyList<LoomStateSource>? _staffHeldWriters;
+
+    public LoomSceneSetupPlanner(GameLibrary game)
+    {
+        _game = game;
+        _data = ScummDataSources.For(game);
+        _scanner = LoomSceneStateScanner.For(game);
+        _firstStoryBit = LoomStoryEvents.FirstBitFor(game);
+    }
+
+    /// <summary>The scan behind a scene (the scripts it names and what they call), for the audit and the tests.</summary>
+    public LoomSceneScan Scan(int startRoom, IEnumerable<int> scriptIds) => _scanner.Scan(startRoom, scriptIds);
+
+    /// <summary>Real places that set the staff bit to held, object verbs first and in room order.</summary>
+    public IReadOnlyList<LoomStateSource> StaffHeldWriters =>
+        _staffHeldWriters ??= _scanner.FindConstantWriters(StaffBit, 1)
+            .OrderBy(w => w.ObjectId is null).ThenBy(w => w.Room).ThenBy(w => w.ObjectId).ToArray();
+
+    /// <summary>
+    /// The setup for the scene that starts in <paramref name="startRoom"/> with the named scripts and, when
+    /// <paramref name="objectId"/> is not 0, that object's verb <paramref name="verbId"/>.
+    /// </summary>
+    public LoomStartSetup Derive(int startRoom, IReadOnlyCollection<int> scriptIds, int objectId = 0, int verbId = 0)
+    {
+        var scriptsOf = scriptIds.Where(id => id >= LoomSceneStateScanner.SystemScriptLimit).ToArray();
+        if (scriptsOf.Length == 0 && objectId == 0) return LoomStartSetup.None;
+        var scan = _scanner.Scan(startRoom, scriptsOf, objectId, verbId);
+        var steps = new List<LoomReplayStep>();
+        var notes = new List<string>();
+        var own = scan.OwnTouches.ToList();
+
+        // Bit D61 (the distaff). A scene whose own code clears it takes the distaff from Bobbin, so it presumes he
+        // holds it; a fresh game does not. Unless the scene itself sets the bit first, a real earlier scene that
+        // assigns 1 (the first object verb in room order) is run unseen.
+        // Only the scene's own global scripts count: the entry and local scripts of rooms it passes through reset
+        // the look for their own arrival (Room 10 local 203) or restore a saved copy (Room 10 local 200), which is not a presumption.
+        var clears = own.Where(t => t.Write && t.Variable == StaffBit && t.Where.StartsWith("Script ", StringComparison.Ordinal) &&
+                                    t.Instruction.EndsWith("= 0x0000", StringComparison.Ordinal)).ToList();
+        var sets = own.Where(t => t.Write && t.Variable == StaffBit && t.Instruction.EndsWith("= 0x0001", StringComparison.Ordinal)).ToList();
+        // The user's decision (3 October): outside the LOOM island Bobbin holds the distaff, so a scene that reads the bit
+        // in a room from FirstRoomOffTheIsland on starts with it held too. On the island (the opening rooms) the fresh state stays.
+        var reads = own.Where(t => !t.Write && t.Variable == StaffBit).ToList();
+        var presumesHeld = clears.Count > 0 || reads.Count > 0 && startRoom >= FirstRoomOffTheIsland;
+        if (presumesHeld && sets.Count == 0)
+        {
+            var writer = StaffHeldWriters.FirstOrDefault(w => w.ObjectId is not null && w.VerbId is not null);
+            var why = clears.Count > 0
+                ? $"The scene clears bit D61 ({string.Join(", ", clears.Select(t => t.Where).Distinct().Take(3))}), so it presumes Bobbin holds the distaff."
+                : $"The scene's own code reads bit D61 ({string.Join(", ", reads.Select(t => t.Where).Distinct().Take(3))}) and Room {startRoom:00} is outside the island, where Bobbin holds the distaff (decided with the user, 3 October).";
+            if (writer is { ObjectId: int obj, VerbId: int verb })
+            {
+                steps.Add(new("visit", writer.Room, EndBoundary: StaffGrant));
+                steps.Add(new("verb", obj, verb, EndBoundary: StaffGrant));
+                steps.Add(new("frames", Frames: 8, EndBoundary: StaffGrant));
+                notes.Add($"{why} A fresh game does not, so the game's own {writer.Where.Split(" +")[0]} (it sets D61 to 1) runs first, unseen, as an exploration action. " +
+                          $"Other places that set it: {string.Join(", ", StaffHeldWriters.Where(w => w != writer).Select(w => w.Where.Split(" +")[0]).Distinct().Take(4))}.");
+            }
+            else notes.Add($"{why} No object verb sets it; the Game Status edit \"staff held\" would be needed (not applied).");
+        }
+        else if (reads.Count > 0)
+            notes.Add($"The scene's own code reads bit D61 ({string.Join(", ", reads.Select(t => t.Where).Distinct().Take(3))}); Room {startRoom:00} is on the island, so the fresh state (distaff not held) is kept and its without-distaff branch is the one shown.");
+
+        if (steps.Count > 0 && steps[0].ObjectId != startRoom) steps.Add(new("visit", startRoom));
+
+        var actors = ActorSetup(startRoom, scan, objectId);
+        steps.AddRange(actors.Steps);
+        notes.AddRange(actors.Notes);
+
+        // The ego's costume variable: a scene that tests it is reached with the fresh value, the first-visit branch.
+        var costumeReads = own.Where(t => !t.Write && t.Variable == "var[0x07D]").Select(t => t.Where).Distinct().ToList();
+        if (costumeReads.Count > 0)
+            notes.Add($"The scene's own code tests the ego's costume variable var[0x07D] ({string.Join(", ", costumeReads.Take(2))}); the fresh value (Bobbin's own look) is kept.");
+
+        // Story bits: every read is first-visit (0) unless a setup step above changed it.
+        var storyReads = own.Where(t => !t.Write && IsStoryBit(t.Variable)).Select(t => t.Variable).Distinct().Order().ToList();
+        if (storyReads.Count > 0)
+            notes.Add($"Story bits read by the scene's own code ({string.Join(" ", storyReads)}) keep their first-visit value 0; no flag is set by the explorer.");
+
+        return notes.Count == 0 ? LoomStartSetup.None : new LoomStartSetup(steps, notes);
+    }
+
+    /// <summary>The own-source actor placements for a direct object verb, without staff or story preparation; works with EGA and CD data.</summary>
+    public LoomStartSetup DeriveActors(int startRoom, int objectId, int verbId) =>
+        ActorSetup(startRoom, _scanner.Scan(startRoom, [], objectId, verbId), objectId);
+
+    private LoomStartSetup ActorSetup(int startRoom, LoomSceneScan scan, int objectId)
+    {
+        var steps = new List<LoomReplayStep>();
+        var notes = new List<string>();
+        // Actors. A line printed for an actor who is not in the room shows nothing (ScummVM's actorTalk), and one that is told to walk or
+        // animate is not seen either, so a scene whose own code uses actor N without putting him in a room first needs him there. The game's own placement of him into
+        // this room (putActorInRoom then putActor / putActorAtObject) is taken as the labelled estimate; the first in the
+        // start room's own code, else the first in code order, and the others are listed.
+        // An actor shown as an object: the named object of an interaction is an actor when the game itself puts an actor at that
+        // object (putActorAtObject) or at a point inside its rectangle; he comes into the room with the interaction.
+        var tied = objectId == 0 ? [] : ActorsAtObject(startRoom, objectId);
+        // A target may be placed only later in its response (for example after changing form).
+        // Its source-backed object association still needs the actor present at the start.
+        foreach (var actor in scan.UsedActors.Except(scan.PlacedActors).Concat(tied.Keys).Distinct().Order())
+        {
+            var placers = ActorPlacers(actor, startRoom);
+            if (placers.Count == 0)
+            {
+                notes.Add($"The scene uses actor {actor}, who no code of the game puts into Room {startRoom:00}; if he is not there he is not shown (not applied).");
+                continue;
+            }
+            var chosen = tied.TryGetValue(actor, out var atObject) ? atObject
+                : placers.FirstOrDefault(p => p.Where.StartsWith($"Room {startRoom:00} ", StringComparison.Ordinal)) ?? placers[0];
+            steps.Add(new("actor", actor, Verb: chosen.AtObject ?? 0, X: chosen.X ?? 0, Y: chosen.Y ?? 0, EndBoundary: chosen.Where));
+            var why = tied.ContainsKey(actor)
+                ? $"Object {objectId} is an actor in the game's own placements (the game puts him {(chosen.AtObject == objectId ? "at the object" : $"at ({chosen.X}, {chosen.Y}), inside its rectangle")})"
+                : $"The scene uses actor {actor} (lines, walks or animations) without putting him into the room";
+            notes.Add($"{why}, and an actor outside the room is not shown. The game puts him into Room {startRoom:00} at {chosen.Where}" +
+                      $"{(chosen.AtObject is int o ? $" (at object {o}'s walk point)" : $" ({chosen.X}, {chosen.Y})")}, dressed as it dresses him; that placement is applied if he is not there already (estimate: which earlier scene left him there was not executed)." +
+                      (placers.Count > 1 ? $" Other placements: {string.Join(", ", placers.Where(p => p != chosen).Select(p => p.Where).Take(4))}." : ""));
+        }
+
+        return notes.Count == 0 ? LoomStartSetup.None : new LoomStartSetup(steps, notes);
+    }
+
+    /// <summary>
+    /// The setup for a running session: what the session already has is not granted again (a later state is kept; only the minimum the
+    /// scene needs and the session lacks is added). Today that is the staff.
+    /// </summary>
+    public LoomStartSetup Adapt(LoomStartSetup setup, LoomExplorationSession session)
+    {
+        if (!setup.Steps.Any(st => st.EndBoundary == StaffGrant) || session.GameStatus.StaffHeld != true) return setup;
+        var notes = setup.Notes.Where(n => !n.Contains("bit D61", StringComparison.Ordinal)).ToList();
+        notes.Insert(0, "Bobbin already holds the distaff in the running session, so the pickup is not run again.");
+        return new(setup.Steps.Where(st => st.EndBoundary != StaffGrant).ToArray(), notes);
+    }
+
+    /// <summary>
+    /// The actors the game puts at a named object of the room: <c>putActorAtObject</c> on it, or <c>putActor</c> to a literal point inside its
+    /// rectangle by the room's own code (other scenes stand their actors anywhere; an unnamed rectangle is no actor). The first placement in the room's own code wins.
+    /// </summary>
+    private Dictionary<int, LoomActorPlacer> ActorsAtObject(int room, int objectId)
+    {
+        var found = new Dictionary<int, LoomActorPlacer>();
+        try
+        {
+            if (_game.Rooms.All(r => r.ResourceId != room)) return found;
+            var data = _data.ReadRoom(room);
+            if (data.Objects.FirstOrDefault(r => r.Id == objectId) is not { } record) return found;
+            if (!data.ObjectNames.TryGetValue(objectId, out var name) ||
+                string.IsNullOrWhiteSpace(System.Text.Encoding.Latin1.GetString(name))) return found;
+            for (var actor = 2; actor < 13; actor++)
+            {
+                var hit = ActorPlacers(actor, room)
+                    .Where(p => p.AtObject == objectId ||
+                                p.Where.StartsWith($"Room {room:00} ", StringComparison.Ordinal) && p.X is int x && p.Y is int y && x >= record.X && x < record.X + record.Width && y >= record.Y && y < record.Y + record.Height)
+                    .OrderBy(p => p.Where.StartsWith($"Room {room:00} ", StringComparison.Ordinal) ? 0 : 1).FirstOrDefault();
+                if (hit is not null) found[actor] = hit;
+            }
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { }
+        return found;
+    }
+
+    private readonly Dictionary<(int, int), IReadOnlyList<LoomActorPlacer>> _placers = [];
+
+    private IReadOnlyList<LoomActorPlacer> ActorPlacers(int actor, int room) =>
+        _placers.TryGetValue((actor, room), out var cached) ? cached : _placers[(actor, room)] = _scanner.FindActorPlacers(actor, room);
+
+    private bool IsStoryBit(string variable) =>
+        variable.StartsWith("bit[0x", StringComparison.Ordinal) &&
+        int.TryParse(variable.AsSpan(6, variable.Length - 7), System.Globalization.NumberStyles.HexNumber, null, out var bit) && bit >= _firstStoryBit;
+}

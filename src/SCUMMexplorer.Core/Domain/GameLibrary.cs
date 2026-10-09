@@ -57,10 +57,8 @@ public sealed record GameLibrary(
     GameId Id = GameId.Unknown,
     bool IsDemo = false)
 {
-    /// <summary>The CD game's archive (rooms read from DISK01.LEC); null for every other game.</summary>
-    public Formats.LoomVgaArchive? Vga { get; init; }
+    /// <summary>The SCUMM v4 archive (DISK01.LEC; LOOM CD); null for every other game.</summary>
+    public ScummV4Archive? V4Archive { get; init; }
 
     public IEnumerable<GameResource> Rooms => Resources.Where(r => r.Kind == ResourceKind.Room);
-    /// <summary>The rooms worth showing as scenes: LOOM's dummy sound-bank rooms (82-85) are left out.</summary>
-    public IEnumerable<GameResource> Scenes => Id == GameId.Loom ? Rooms.Where(r => !Rendering.LoomRoomKinds.IsResourceBank(r, flatBackgroundCounts: IsDemo)) : Rooms;
 }

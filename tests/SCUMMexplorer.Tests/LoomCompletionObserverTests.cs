@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -151,29 +150,29 @@ public sealed class LoomCompletionObserverTests
         Assert.Equal("writer is not an observed literal zero move", match.Rejection);
     }
 
-    private static List<LoomCompletionRead> Capture(Action<LoomRuntimeRelationTracker> action)
+    private static List<ScummCompletionRead> Capture(Action<ScummRuntimeRelationTracker> action)
     {
-        var results = new List<LoomCompletionRead>();
-        var completion = new LoomCompletionObserver(results.Add);
+        var results = new List<ScummCompletionRead>();
+        var completion = new ScummCompletionObserver(results.Add);
         action(new(completion.Observe));
         return results;
     }
-    private static void Write(LoomRuntimeRelationTracker tracker, long sequence, long slot, long parent,
+    private static void Write(ScummRuntimeRelationTracker tracker, long sequence, long slot, long parent,
         ushort value = 0, bool path = false, bool literal = true) => tracker.Observe(
             LoomRuntimeRelationTests.Record(sequence, slot, slot, "move",
                 [new("destination-before", "bit[0xD67]", "bit[0xD67]", 0, false, BackingWord: "var[0x0D6]"),
                  new("source", literal ? $"0x{value:X4}" : "local[0x000]", literal ? null : "local[0x000]", value, false)],
                 ("var[0x0D6]", 0), ("bit[0xD67]", 0)) with { ParentSlot = parent, PathEstimated = path,
                     Site = new(31, null, 1, 0, "instruction", 0, "move", "") });
-    private static void Confirm(LoomRuntimeRelationTracker tracker, long sequence, long slot, ushort value = 0, bool estimated = false, long parent = 8) =>
+    private static void Confirm(ScummRuntimeRelationTracker tracker, long sequence, long slot, ushort value = 0, bool estimated = false, long parent = 8) =>
         tracker.Observe(LoomRuntimeRelationTests.Record(sequence, slot, slot, "stopObjectCode", [],
             ("var[0x0D6]", (ushort)(value << 7)), ("bit[0xD67]", value)) with {
                 ParentSlot = parent, Site = new(31, null, 1, 0, "instruction", 0, "stopObjectCode", ""),
                 Estimated = estimated ? ["bit[0xD67]"] : [] });
-    private static LoomScriptObservation End(long sequence, long slot) => new(sequence, slot, 8, slot,
+    private static ScummScriptObservation End(long sequence, long slot) => new(sequence, slot, 8, slot,
         new(31, null, 1, 0, "end", 0x322), new Dictionary<string, ushort> { ["var[0x0D6]"] = 0, ["bit[0xD67]"] = 0 },
         ["bit[0xD67]"], true, ReachedStop: true);
-    private static void Read(LoomRuntimeRelationTracker tracker, long sequence, long slot, bool estimated = false, bool path = false) =>
+    private static void Read(ScummRuntimeRelationTracker tracker, long sequence, long slot, bool estimated = false, bool path = false) =>
         tracker.Observe(LoomRuntimeRelationTests.Record(sequence, slot, slot, "equalZero",
             [new("condition", "bit[0xD67]", "bit[0xD67]", 0, estimated, BackingWord: "var[0x0D6]")],
             ("var[0x0D6]", 0), ("bit[0xD67]", 0)) with { PathEstimated = path, Estimated = estimated ? ["bit[0xD67]"] : [] });

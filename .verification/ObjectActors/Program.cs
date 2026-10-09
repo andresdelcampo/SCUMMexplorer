@@ -1,6 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // Usage: ObjectActors <game folder> <room>
 // For every room object: its rectangle and walk point, and the actors the game's code puts into the room at a point inside
@@ -9,7 +7,7 @@ var game = new GameFolderScanner().Scan(args[0]);
 var room = int.Parse(args[1]);
 var resource = game.Rooms.Single(r => r.ResourceId == room);
 var bytes = File.ReadAllBytes(resource.FilePath);
-var records = new LoomRoomObjectDirectory().Decode(bytes);
+var records = new ScummRoomObjectDirectory().Decode(bytes);
 var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
 var scanner = new LoomSceneStateScanner(game);
 for (var actor = 2; actor < 13; actor++)

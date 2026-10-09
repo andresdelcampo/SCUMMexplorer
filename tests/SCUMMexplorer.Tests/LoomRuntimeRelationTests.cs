@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -14,7 +13,7 @@ public sealed class LoomRuntimeRelationTests
         Assert.True(read.Binding.Index!.ValueEstimated);
         Assert.False(read.Binding.ValueEstimated);
         Assert.True(read.Observation.PathEstimated);
-        Assert.Contains(new LoomRuntimeDependency("var[0x060]", null), read.Dependencies);
+        Assert.Contains(new ScummRuntimeDependency("var[0x060]", null), read.Dependencies);
         Assert.Contains(updates.Single(u => u.Observation?.Site?.Offset == 1).Invalidated, i => i.Read == read.Id);
         var copy = updates.SelectMany(u => u.Writes).First(w => w.Destination.Key == "local[0x001]");
         Assert.Contains(read.Id, copy.SourceReads);
@@ -36,8 +35,8 @@ public sealed class LoomRuntimeRelationTests
     [Fact]
     public void ArgumentRelationsRetainOrderWholeBindingsAndExpireOnSourceWrites()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         var first = Record(1, 8, 1, "startScript", [new("target", "0x03", null, 3, false),
             new("argument", "var[0x034]", "var[0x034]", 17, true, ArgumentIndex: 0),
             new("argument", "0x0000", null, 0, false, ArgumentIndex: 1)]);
@@ -58,8 +57,8 @@ public sealed class LoomRuntimeRelationTests
             include: s => s.Operation != "debug");
         Assert.Contains(filtered, u => u.Barrier == "filtered source site");
         Assert.Null(filtered.SelectMany(u => u.Reads).Single(r => r.Binding.Key == "var[0x060]").ObservedOrigin);
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         tracker.Observe(Record(1, 1, 1, "equalZero", [new("condition", "var[0x060]", "var[0x060]", 0, false)]));
         tracker.Observe(Record(2, 2, 2, "unknownEffect", []));
         Assert.Empty(tracker.ActiveRelations);
@@ -69,8 +68,8 @@ public sealed class LoomRuntimeRelationTests
     [Fact]
     public void CancellationAndReplacementKeepLocalScopesDistinct()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         tracker.Observe(Record(1, 8, 1, "equalZero", [new("condition", "local[0x000]", "local[0x000]", 0, false)]));
         tracker.Observe(Record(2, 9, 2, "equalZero", [new("condition", "local[0x000]", "local[0x000]", 0, false)]));
         tracker.Observe(new(3, 1, null, 0, null, new Dictionary<string, ushort>(), [], false, CancelledNumber: 3, CancelledSlots: [8]));
@@ -82,8 +81,8 @@ public sealed class LoomRuntimeRelationTests
     [Fact]
     public void ChangedSnapshotsAndExplicitSameValueExternalEffectsInvalidateReads()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         tracker.Observe(Record(1, 8, 1, "equalZero", [new("condition", "var[0x060]", "var[0x060]", 0, false)], ("var[0x060]", 0)));
         tracker.Observe(Record(2, 9, 2, "debug", [], ("var[0x060]", 1)));
         Assert.Contains(updates[^1].Invalidated, i => i.Reason == "changed snapshot or external effect");
@@ -96,8 +95,8 @@ public sealed class LoomRuntimeRelationTests
     [Fact]
     public void BoundsAndUnresolvedIndexesNeverEstablishOrigins()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add, relationLimit: 2);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add, relationLimit: 2);
         for (var i = 1; i <= 3; i++) tracker.Observe(Record(i, 1, 1, "equalZero",
             [new("condition", "var[0x060]", "var[0x060]", 0, false)]));
         Assert.Contains(updates, u => u.Barrier == "relation bound reached");
@@ -111,8 +110,8 @@ public sealed class LoomRuntimeRelationTests
     [Fact]
     public void MissingSnapshotsAndAliasEstimateChangesExpireCorrespondence()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         var record = Record(1, 1, 1, "equalZero", [new("condition", "bit[0xD67]", "bit[0xD67]", 0, false)],
             ("var[0x0D6]", 0), ("bit[0xD67]", 0));
         tracker.Observe(record);
@@ -126,7 +125,7 @@ public sealed class LoomRuntimeRelationTests
     [Fact]
     public void LocalRelationSurvivesAResumptionButOutOfOrderRecordsAreRejected()
     {
-        var tracker = new LoomRuntimeRelationTracker(_ => { });
+        var tracker = new ScummRuntimeRelationTracker(_ => { });
         var record = Record(1, 8, 1, "equalZero", [new("condition", "local[0x000]", "local[0x000]", 0, false)], ("local[0x000]", 0));
         tracker.Observe(record);
         tracker.Observe(record with { Sequence = 2, Site = record.Site! with { Stage = "end" }, OperandBindings = null,
@@ -147,11 +146,11 @@ public sealed class LoomRuntimeRelationTests
         Assert.Equal(baseline.Select(r => (r.Sequence, r.Slot, r.Invocation, r.PathEstimated)),
             observed.Select(r => (r.Sequence, r.Slot, r.Invocation, r.PathEstimated)));
 
-        static (LoomBoundedScriptResult, List<LoomScriptObservation>) Execute(bool track)
+        static (ScummBoundedScriptResult, List<ScummScriptObservation>) Execute(bool track)
         {
-            var records = new List<LoomScriptObservation>();
+            var records = new List<ScummScriptObservation>();
             var runtime = Runtime();
-            var result = new LoomBoundedScriptExecutor().Execute(Code(("move", "local[0x001] = var[0x032+var[0x060]]"),
+            var result = new ScummBoundedScriptExecutor().Execute(Code(("move", "local[0x001] = var[0x032+var[0x060]]"),
                 ("stopObjectCode", "")), runtime.ObjectStates, [], runtime: runtime,
                 observation: new(new(records.Add, captureOperandBindings: true,
                     runtimeRelations: track ? new(_ => { }) : null), 1));
@@ -159,29 +158,29 @@ public sealed class LoomRuntimeRelationTests
         }
     }
 
-    private static LoomScriptRuntimeState Runtime()
+    private static ScummScriptRuntimeState Runtime()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x060]"] = 2;
         runtime.GlobalVariables["var[0x034]"] = 17;
         runtime.EstimatedVariables.Add("var[0x060]");
         return runtime;
     }
-    private static LoomScriptDisassembly Code(params (string Op, string Args)[] operations) =>
+    private static ScummScriptDisassembly Code(params (string Op, string Args)[] operations) =>
         new(2, 1, 0, operations.Length, operations.Length,
-            operations.Select((o, i) => new LoomScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
-    private static List<LoomRuntimeRelationUpdate> Run((string, string) first, (string, string) second, (string, string) third,
-        (string, string)? fourth = null, Func<LoomScriptObservationSite, bool>? include = null)
+            operations.Select((o, i) => new ScummScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
+    private static List<ScummRuntimeRelationUpdate> Run((string, string) first, (string, string) second, (string, string) third,
+        (string, string)? fourth = null, Func<ScummScriptObservationSite, bool>? include = null)
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
+        var updates = new List<ScummRuntimeRelationUpdate>();
         var runtime = Runtime();
-        new LoomBoundedScriptExecutor().Execute(Code(fourth is { } last ? [first, second, third, last] : [first, second, third]),
+        new ScummBoundedScriptExecutor().Execute(Code(fourth is { } last ? [first, second, third, last] : [first, second, third]),
             runtime.ObjectStates, [], runtime: runtime, pathEstimated: true,
             observation: new(new(_ => { }, includeSite: include, runtimeRelations: new(updates.Add)), 1));
         return updates;
     }
-    internal static LoomScriptObservation Record(long sequence, long slot, long run, string op,
-        IReadOnlyList<LoomScriptOperandBinding> bindings, params (string Key, ushort Value)[] values) =>
+    internal static ScummScriptObservation Record(long sequence, long slot, long run, string op,
+        IReadOnlyList<ScummScriptOperandBinding> bindings, params (string Key, ushort Value)[] values) =>
         new(sequence, slot, null, run, new(2, null, 1, 0, "instruction", 0, op, ""),
             values.ToDictionary(p => p.Key, p => p.Value), [], false, OperandBindings: bindings);
 }

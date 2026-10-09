@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -34,7 +33,7 @@ public sealed class LoomKeyInputTests
     // Script 018 [2] turns the distaff on; a room click on Room 02 object 156 (class 1) aims at it.
     private static void DistaffAimedAt156(LoomExplorationSession session)
     {
-        session.RunTopLevelScript(new LoomScriptDisassembly(250, 1, 0, 32, 16,
+        session.RunTopLevelScript(new ScummScriptDisassembly(250, 1, 0, 32, 16,
             [new(0, 0x0A, "startScript", "0x12, [0x0002]", "0A 12 02 00 FF"), new(5, 0, "stopObjectCode", "", "00")],
             null, null, [], [], "Synthetic test script"));
         session.Click(700, 40);
@@ -118,7 +117,7 @@ public sealed class LoomKeyInputTests
 
         // Script 002 (the cutscene start hook) turns user input off.
         var game = new GameFolderScanner().Scan(Folder);
-        session.RunTopLevelScript(new LoomScriptReader().Decode(game.Resources.Single(item =>
+        session.RunTopLevelScript(new ScummScriptReader().Decode(game.Resources.Single(item =>
             item.Kind == SCUMMexplorer.Core.Domain.ResourceKind.Script && item.ResourceId == 2)));
         Assert.Contains(session.PressKey('e').Uncertainties, line => line.Contains("user input is off", StringComparison.Ordinal));
     }
@@ -131,7 +130,7 @@ public sealed class LoomKeyInputTests
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 10));
         // Script 052 (Room 10 object 295's cutscene), started as that verb would.
-        session.RunTopLevelScript(new LoomScriptDisassembly(250, 1, 0, 32, 16,
+        session.RunTopLevelScript(new ScummScriptDisassembly(250, 1, 0, 32, 16,
             [new(0, 0x0A, "startScript", "0x34, []", "0A 34 FF"), new(3, 0, "stopObjectCode", "", "00")],
             null, null, [], [], "Synthetic test script"));
         Assert.True(session.InCutscene);

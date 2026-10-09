@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 var game=new GameFolderScanner().Scan(args[0]);
 var objects=new LflObjectStateReader().ReadSnapshot(Path.Combine(args[0],"00.LFL"));

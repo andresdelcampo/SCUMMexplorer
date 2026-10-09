@@ -1,7 +1,5 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -11,9 +9,9 @@ public sealed class LoomObjectVerbTests
     public void VerbTablePointsToCodeWithinObjectResource()
     {
         var encoded = BuildRoom6();
-        var record = new LoomRoomObjectDirectory().Decode(encoded).Single();
+        var record = new ScummRoomObjectDirectory().Decode(encoded).Single();
 
-        var entries = new LoomObjectVerbReader().ReadAll(encoded, [record])[204];
+        var entries = new ScummObjectVerbReader().ReadAll(encoded, [record])[204];
 
         var entry = Assert.Single(entries);
         Assert.Equal(0x38, entry.VerbId);
@@ -27,7 +25,7 @@ public sealed class LoomObjectVerbTests
         WithSyntheticRooms((game, room6) =>
         {
             var session = new LoomExplorationSession(game,
-                new LoomIndexedObjectSnapshot(new Dictionary<int, byte> { [204] = 0 },
+                new ScummIndexedObjectSnapshot(new Dictionary<int, byte> { [204] = 0 },
                     new Dictionary<int, byte> { [204] = 15 }));
             session.VisitRoom(room6);
 
@@ -69,7 +67,7 @@ public sealed class LoomObjectVerbTests
         WithSyntheticRooms((game, room6) =>
         {
             var session = new LoomExplorationSession(game,
-                new LoomIndexedObjectSnapshot(new Dictionary<int, byte> { [204] = 0 },
+                new ScummIndexedObjectSnapshot(new Dictionary<int, byte> { [204] = 0 },
                     new Dictionary<int, byte> { [204] = 15 }));
             session.VisitRoom(room6);
 

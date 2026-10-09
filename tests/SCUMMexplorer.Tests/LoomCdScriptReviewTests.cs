@@ -1,8 +1,6 @@
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Relationships;
 
 namespace SCUMMexplorer.Tests;
 

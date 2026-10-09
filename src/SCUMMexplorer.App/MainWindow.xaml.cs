@@ -9,28 +9,25 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Relationships;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.App;
 
 public partial class MainWindow : Window
 {
     private readonly GameFolderScanner _scanner = new();
-    private readonly OldV3EgaRoomDecoder _roomDecoder = new();
-    private readonly LoomRoomObjects _objectDecoder = new();
-    private readonly LoomRoomObjectDirectory _objectDirectory = new();
+    private readonly ScummV3EgaRoomDecoder _roomDecoder = new();
+    private readonly ScummRoomObjects _objectDecoder = new();
+    private readonly ScummRoomObjectDirectory _objectDirectory = new();
     private readonly LflObjectStateReader _stateReader = new();
-    private readonly LoomCostumeReader _costumeReader = new();
-    private readonly LoomCostumeRenderer _costumeRenderer = new();
-    private LoomScriptReader _scriptReader = new();
-    private LoomObjectVerbReader _verbReader = new();
+    private readonly ScummV3CostumeReader _costumeReader = new();
+    private readonly ScummCostumeRenderer _costumeRenderer = new();
+    private ScummScriptReader _scriptReader = new();
+    private ScummObjectVerbReader _verbReader = new();
     private readonly LoomRoomSoundCandidates _roomSoundCandidates = new();
-    private readonly LoomBoundedScriptExecutor _scriptExecutor = new();
+    private readonly ScummBoundedScriptExecutor _scriptExecutor = new();
     private readonly LoomRelationshipIndexer _relationshipIndexer = new();
-    private readonly LoomPcSpeakerAudio _audioDecoder = new();
-    private readonly LoomAdlibAudio _adlibDecoder = new();
+    private readonly ScummPcSpeakerAudio _audioDecoder = new();
+    private readonly ScummAdlibAudio _adlibDecoder = new();
 
     private readonly MediaPlayer _audioPlayer = new();
     // The sounds the scripts start while the playback clock runs (cutscenes); separate from the room music panel.
@@ -59,35 +56,35 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _previewCancellation;
     private RoomImage? _currentRoom;
     private GameResource? _currentRoomResource;
-    private LoomWalkBoxSet? _currentWalkBoxes;
+    private ScummWalkBoxSet? _currentWalkBoxes;
     /// <summary>The CD game's first-visit scene of the room shown (its actors are drawn from it); null for other games.</summary>
     private LoomCdScene? _cdScene;
     // The CD game's data source for the room view (null for the other games).
     private IScummDataSource? _cdData;
-    private IReadOnlyList<LoomRoomObjectRecord> _currentRoomObjectRecords = [];
+    private IReadOnlyList<ScummRoomObjectRecord> _currentRoomObjectRecords = [];
     private IReadOnlyDictionary<int, string> _roomObjectNames = new Dictionary<int, string>();
-    private IReadOnlyDictionary<int, IReadOnlyList<LoomObjectVerbEntry>> _roomVerbs =
-        new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
+    private IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> _roomVerbs =
+        new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
     private IReadOnlyList<RoomVerbDestination> _roomNavigationCandidates = [];
     private IReadOnlyList<RoomObjectImage> _objects = [];
     private RoomObjectSelection _objectSelection = new([]);
     private IReadOnlySet<int> _estimatedObjectIds = new HashSet<int>();
     private IReadOnlyDictionary<int, byte> _indexedStates = new Dictionary<int, byte>();
-    private LoomIndexedObjectSnapshot? _indexedObjectSnapshot;
+    private ScummIndexedObjectSnapshot? _indexedObjectSnapshot;
     private LoomExplorationSession? _session;
     // Charset 0 (99.LFL) for messages, or why it could not be read (then a labelled UI font is used).
-    private LoomCharset? _charset;
+    private ScummV3Charset? _charset;
     // Costumes read for the actor layer (M2c), by id; null when a costume cannot be read.
-    private readonly Dictionary<int, LoomCostume?> _actorCostumes = [];
+    private readonly Dictionary<int, ScummCostume?> _actorCostumes = [];
     private string? _charsetError;
     // The CD game's charset 2, the one script 001 sets when the intro ends (+0x015E); script 044 sets 4 for a while.
-    private LoomVgaCharset? _cdCharset;
-    private readonly Dictionary<int, LoomVgaCharset?> _cdCharsets = [];
+    private ScummV4Charset? _cdCharset;
+    private readonly Dictionary<int, ScummV4Charset?> _cdCharsets = [];
 
     /// <summary>The CD charset a message was printed with (script 044 sets 4 for one title line); the default (2) when none was set or one cannot be read.</summary>
-    private LoomVgaCharset CdCharset(int? number, LoomVgaCharset fallback)
+    private ScummV4Charset CdCharset(int? number, ScummV4Charset fallback)
     {
-        if (number is not int n || n == 2 || _game?.Vga is not { } vga) return fallback;
+        if (number is not int n || n == 2 || _game?.V4Archive is not { } vga) return fallback;
         if (!_cdCharsets.TryGetValue(n, out var charset))
         {
             try { charset = vga.ReadCharset(n); }
@@ -117,12 +114,12 @@ public partial class MainWindow : Window
     private readonly Dictionary<int, (bool IsMusic, TimeSpan? Duration)> _roomCueTrackCache = [];
     private int _roomMusicUpdateGeneration;
     private enum AudioSurface { None, Resource, Room }
-    private sealed record RoomVerbDestination(LoomRoomObjectRecord Object, LoomObjectVerbEntry Verb,
+    private sealed record RoomVerbDestination(ScummRoomObjectRecord Object, ScummObjectVerbEntry Verb,
         int TargetRoomId, int InstructionOffset, string Path = "direct");
-    private LoomSceneDrawBatches? _sceneBatches;
+    private ScummSceneDrawBatches? _sceneBatches;
     private LoomDoorwayFinder? _doorwayFinder;
     private IReadOnlyList<RoomArtworkEstimate> _artworkEstimates = [];
-    private sealed record RoomVerbChoice(LoomRoomObjectRecord Object, LoomObjectVerbEntry Verb);
+    private sealed record RoomVerbChoice(ScummRoomObjectRecord Object, ScummObjectVerbEntry Verb);
 
     public MainWindow()
     {
@@ -243,8 +240,8 @@ public partial class MainWindow : Window
         _replayCatalog = LoomReplayCatalog.Load(game);
         if (game.Id == GameId.Loom) _ = NameStoryBitsAsync(game, _glossary, _replayCatalog.Replays);
         _setupPlanner = null;
-        _scriptReader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
-        _verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
+        _scriptReader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+        _verbReader = new ScummObjectVerbReader(ScummScriptDialects.For(game.Id));
         _sceneBatches = null;
         _doorwayFinder = null;
         _indexedObjectSnapshot = indexedSnapshot;
@@ -263,7 +260,7 @@ public partial class MainWindow : Window
         }
         // The CD game gets a live session as well (clicks, walks, verbs); its entry points are the same scripts 005-007. It starts past
         // the intro (see LoomExplorationSession.ContinueCdBootAfterIntro) and has no sound or catalog yet.
-        var cdIndexed = game is { Id: GameId.LoomVga, Vga: { } vga } ? vga.ReadIndexedObjects() : null;
+        var cdIndexed = game is { Id: GameId.LoomVga, V4Archive: { } vga } ? vga.ReadIndexedObjects() : null;
         _cdData = cdIndexed is null ? null : ScummDataSources.For(game);
         _cdCutsceneGroups = null;
         StartCdSetupDerivation(game);
@@ -271,11 +268,11 @@ public partial class MainWindow : Window
         _session = cdIndexed is not null ? new LoomExplorationSession(game, cdIndexed, completeBoot: false)
             : indexedSnapshot is null ? null : new LoomExplorationSession(game, indexedSnapshot, soundCard: SoundCard);
         if (_session is not null && cdIndexed is null) _sceneSound.Attach(game, _session);
-        else if (_session is not null && game.Vga is { } cdGame) _cdVoice.Attach(cdGame.Disc, _session);
+        else if (_session is not null && game.V4Archive is { } cdGame) _cdVoice.Attach(cdGame.Disc, _session);
         _charsetError = null;
-        _charset = game.Id == GameId.Loom ? LoomCharset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
+        _charset = game.Id == GameId.Loom ? ScummV3Charset.TryLoad(game.FolderPath, 0, out _charsetError) : null;
         _cdCharsets.Clear();
-        try { _cdCharset = game.Vga?.ReadCharset(2); }
+        try { _cdCharset = game.V4Archive?.ReadCharset(2); }
         catch (InvalidDataException error) { _cdCharset = null; _charsetError = $"charset 2 could not be read: {error.Message}"; }
         _actorCostumes.Clear();
         ShowGame(game);
@@ -331,7 +328,7 @@ public partial class MainWindow : Window
         _currentRoom = null;
         _currentRoomResource = null;
         _currentRoomObjectRecords = [];
-        _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
+        _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
         _roomNavigationCandidates = [];
         _objects = [];
         _objectSelection = new([]);
@@ -400,7 +397,7 @@ public partial class MainWindow : Window
             ResourceTree.Items.Add(node);
         }
 
-        if (game.Id == GameId.LoomVga && game.Vga is { Disc: not null } cdArchive)
+        if (game.Id == GameId.LoomVga && game.V4Archive is { Disc: not null } cdArchive)
         {
             // The disc's audio track: every stretch a script asks for with sayVoice. Long ones and those without a line are the music and narration.
             _cdCues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
@@ -447,7 +444,7 @@ public partial class MainWindow : Window
         GameStatusButton.Visibility = game.Id is GameId.Loom or GameId.LoomVga && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         // The CD game has no music device to choose (its music has not been read); its voices come from the disc's audio track (the CD Audio choice of its own sound box).
         SoundModeCombo.Visibility = game.Id == GameId.LoomVga ? Visibility.Collapsed : Visibility.Visible;
-        CdSoundCombo.Visibility = game is { Id: GameId.LoomVga, Vga.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
+        CdSoundCombo.Visibility = game is { Id: GameId.LoomVga, V4Archive.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
         GameStatusButton.IsEnabled = _session is not null;
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
@@ -460,7 +457,7 @@ public partial class MainWindow : Window
         _roomCardCancellation = cancellation;
         var generation = ++_roomCardGeneration;
         var rooms = game.Scenes.ToArray();
-        var indexedSnapshot = _indexedObjectSnapshot is null ? null : new LoomIndexedObjectSnapshot(
+        var indexedSnapshot = _indexedObjectSnapshot is null ? null : new ScummIndexedObjectSnapshot(
             _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
             _indexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
             _indexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
@@ -516,20 +513,20 @@ public partial class MainWindow : Window
     }
 
     private async Task LoadRoomCardThumbnailsAsync(GameLibrary game, IReadOnlyList<GameResource> rooms,
-        LoomIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
+        ScummIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
         int generation, CancellationToken cancellationToken)
     {
-        var sceneBatches = LoomSceneDrawBatches.Empty;
+        var sceneBatches = ScummSceneDrawBatches.Empty;
         if (game.Id == GameId.Loom && game.Version == ScummVersion.V3 && indexedSnapshot is not null)
         {
             try
             {
-                sceneBatches = await Task.Run(() => LoomSceneDrawBatches.Build(game), cancellationToken);
+                sceneBatches = await Task.Run(() => ScummSceneDrawBatches.Build(game), cancellationToken);
             }
             catch (OperationCanceledException) { return; }
             catch (Exception)
             {
-                sceneBatches = LoomSceneDrawBatches.Empty;
+                sceneBatches = ScummSceneDrawBatches.Empty;
             }
         }
 
@@ -567,14 +564,14 @@ public partial class MainWindow : Window
         }
     }
 
-    private LoomSceneDrawBatches? _galleryBatches;
+    private ScummSceneDrawBatches? _galleryBatches;
 
     /// <summary>A room as the explorer first shows it (objects in their first-visit state, as on the room cards), at full size; null outside LOOM.</summary>
     private async Task<BitmapSource?> RenderFirstVisitRoomAsync(int roomId)
     {
         if (_game is not { Id: GameId.Loom, Version: ScummVersion.V3 } game || _indexedObjectSnapshot is null ||
             game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) is not { } resource) return null;
-        var snapshot = new LoomIndexedObjectSnapshot(
+        var snapshot = new ScummIndexedObjectSnapshot(
             _indexedObjectSnapshot.States.ToDictionary(pair => pair.Key, pair => pair.Value),
             _indexedObjectSnapshot.Owners.ToDictionary(pair => pair.Key, pair => pair.Value),
             _indexedObjectSnapshot.Classes?.ToDictionary(pair => pair.Key, pair => pair.Value));
@@ -584,11 +581,11 @@ public partial class MainWindow : Window
         {
             return await Task.Run(() =>
             {
-                batches ??= LoomSceneDrawBatches.Build(game);
+                batches ??= ScummSceneDrawBatches.Build(game);
                 var bytes = File.ReadAllBytes(resource.FilePath);
-                var room = new OldV3EgaRoomDecoder().Decode(bytes);
-                var records = new LoomRoomObjectDirectory().Decode(bytes);
-                var objects = new LoomRoomObjects().Decode(bytes);
+                var room = new ScummV3EgaRoomDecoder().Decode(bytes);
+                var records = new ScummRoomObjectDirectory().Decode(bytes);
+                var objects = new ScummRoomObjects().Decode(bytes);
                 var session = new LoomExplorationSession(game, snapshot);
                 var visited = session.VisitRoom(resource);
                 var initialized = CreateSessionRoomSelection(resource, room, records, objects, visited, states, batches);
@@ -601,11 +598,11 @@ public partial class MainWindow : Window
     }
 
     private static BitmapSource RenderRoomCardThumbnail(GameLibrary game, GameResource roomResource,
-        LoomIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
-        LoomSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
+        ScummIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
+        ScummSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (game is { Id: GameId.LoomVga, Vga: { } vga })
+        if (game is { Id: GameId.LoomVga, V4Archive: { } vga })
         {
             // First-visit state: the room's entry script run in a fresh session; the plain background where that cannot run.
             try
@@ -621,15 +618,15 @@ public partial class MainWindow : Window
             }
         }
         var bytes = File.ReadAllBytes(roomResource.FilePath);
-        var decoder = new OldV3EgaRoomDecoder();
+        var decoder = new ScummV3EgaRoomDecoder();
         var room = decoder.Decode(bytes);
         var pixels = room.Pixels.ToArray();
         var cameraX = 0;
         IReadOnlyList<uint> palette = room.Palette;
         if (game.Id == GameId.Loom && game.Version == ScummVersion.V3 && indexedSnapshot is not null)
         {
-            var records = new LoomRoomObjectDirectory().Decode(bytes);
-            var objects = new LoomRoomObjects().Decode(bytes);
+            var records = new ScummRoomObjectDirectory().Decode(bytes);
+            var objects = new ScummRoomObjects().Decode(bytes);
             var session = new LoomExplorationSession(game, indexedSnapshot);
             var snapshot = session.VisitRoom(roomResource);
             var initialized = CreateSessionRoomSelection(roomResource, room, records, objects,
@@ -836,7 +833,7 @@ public partial class MainWindow : Window
         RoomDisplayLayout.Visibility = Visibility.Collapsed;
         _currentRoomResource = null;
         _currentRoomObjectRecords = [];
-        _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
+        _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
         _roomNavigationCandidates = [];
         RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
         RoomEntryTraceOutput.Text = "";
@@ -906,10 +903,10 @@ public partial class MainWindow : Window
                 ScriptOutput.Text = FormatScript(disassembly);
                 ScriptPlayButton.Visibility = ScriptCutscene(resource.ResourceId) is null ? Visibility.Collapsed : Visibility.Visible;
                 var events = disassembly.Instructions
-                    .Select(instruction => LoomScriptEvent.FromInstruction(disassembly, instruction,
-                        LoomScriptEventCertainty.StaticPotential))
+                    .Select(instruction => ScummScriptEvent.FromInstruction(disassembly, instruction,
+                        ScummScriptEventCertainty.StaticPotential))
                     .Where(item => item is not null)
-                    .Cast<LoomScriptEvent>()
+                    .Cast<ScummScriptEvent>()
                     .ToArray();
                 ShowScriptEvents(ScriptEventButtons, events);
                 ScriptNote.Text = boundaryNote + $"Control-flow decode: {disassembly.DecodedBytes}/{disassembly.CodeLength} resource bytes, " +
@@ -965,7 +962,7 @@ public partial class MainWindow : Window
         _cdScene = null;
         _currentRoomObjectRecords = [];
         _roomObjectNames = new Dictionary<int, string>();
-        _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
+        _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
         _roomNavigationCandidates = [];
         RoomNavigationButtons.Children.Clear();
         RoomNavigationPanel.Visibility = Visibility.Collapsed;
@@ -978,7 +975,7 @@ public partial class MainWindow : Window
         StatusText.Text = $"Opening {resource.Name}…";
         StatusText.ToolTip = resource.FilePath;
 
-        var isCd = _game is { Id: GameId.LoomVga, Vga: not null };
+        var isCd = _game is { Id: GameId.LoomVga, V4Archive: not null };
         if (!isCd && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 } ||
             !_roomDecoder.CanDecode(resource.FilePath, 3)))
         {
@@ -997,7 +994,7 @@ public partial class MainWindow : Window
                 try { cdScene = await Task.Run(() => LoomCdRoomScene.FirstVisit(cdGame, resource.ResourceId!.Value), token); }
                 catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
             }
-            var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.Vga!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
+            var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
             _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : TryReadWalkBoxes(bytes);
@@ -1009,7 +1006,7 @@ public partial class MainWindow : Window
                 _currentRoomResource = resource;
                 _lastViewedRoomResource = resource;
                 _currentRoomObjectRecords = cdScene?.Records ?? [];
-                _roomVerbs = new Dictionary<int, IReadOnlyList<LoomObjectVerbEntry>>();
+                _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
                 _objects = cdScene?.Images ?? [];
                 _objectSelection = cdScene?.Selection ?? new RoomObjectSelection([], background: room);
@@ -1117,7 +1114,7 @@ public partial class MainWindow : Window
         return result;
     }
 
-    private void ApplyRoomState(GameResource resource, IReadOnlyList<LoomRoomObjectRecord> records,
+    private void ApplyRoomState(GameResource resource, IReadOnlyList<ScummRoomObjectRecord> records,
         IReadOnlyList<RoomObjectImage> images, bool visit)
     {
         _estimatedObjectIds = new HashSet<int>();
@@ -1135,7 +1132,7 @@ public partial class MainWindow : Window
                 snapshot = _session.Snapshot;
             }
             if (visit && _game?.Id == GameId.LoomVga && _cdVoice.Follows(_session)) _cdVoice.SkipPending();
-            var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? LoomSceneDrawBatches.Empty : EnsureSceneBatches();
+            var sceneBatches = snapshot.IsFaithful ? _sceneBatches ?? ScummSceneDrawBatches.Empty : EnsureSceneBatches();
             var initialized = CreateSessionRoomSelection(resource, _currentRoom!, records, images, snapshot,
                 _indexedStates, sceneBatches, estimateArtwork: _game?.Id != GameId.LoomVga);
             _objectSelection = initialized.Selection;
@@ -1234,25 +1231,25 @@ public partial class MainWindow : Window
     {
         EnsureSceneBatches();
         _artworkEstimates = FillArtworkGaps(_objectSelection, resource, images, statesSetByCode,
-            _sceneBatches ?? LoomSceneDrawBatches.Empty);
+            _sceneBatches ?? ScummSceneDrawBatches.Empty);
         _estimatedObjectIds = _artworkEstimates.Select(item => item.ObjectId).ToHashSet();
     }
 
-    private LoomSceneDrawBatches EnsureSceneBatches()
+    private ScummSceneDrawBatches EnsureSceneBatches()
     {
         if (_sceneBatches is not null) return _sceneBatches;
-        try { _sceneBatches = _game is null ? LoomSceneDrawBatches.Empty : LoomSceneDrawBatches.Build(_game); }
+        try { _sceneBatches = _game is null ? ScummSceneDrawBatches.Empty : ScummSceneDrawBatches.Build(_game); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
-            _sceneBatches = LoomSceneDrawBatches.Empty;
+            _sceneBatches = ScummSceneDrawBatches.Empty;
         }
         return _sceneBatches;
     }
 
     private static (RoomObjectSelection Selection, IReadOnlyList<RoomArtworkEstimate> Estimates) CreateSessionRoomSelection(
-        GameResource resource, RoomImage room, IReadOnlyList<LoomRoomObjectRecord> records,
+        GameResource resource, RoomImage room, IReadOnlyList<ScummRoomObjectRecord> records,
         IReadOnlyList<RoomObjectImage> images, LoomSessionSnapshot snapshot,
-        IReadOnlyDictionary<int, byte> indexedStates, LoomSceneDrawBatches sceneBatches, bool estimateArtwork = true)
+        IReadOnlyDictionary<int, byte> indexedStates, ScummSceneDrawBatches sceneBatches, bool estimateArtwork = true)
     {
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates,
             snapshot.ObjectPositions, records, room, indexedStates, snapshot.DrawOrder);
@@ -1266,7 +1263,7 @@ public partial class MainWindow : Window
 
     private static IReadOnlyList<RoomArtworkEstimate> FillArtworkGaps(RoomObjectSelection selection,
         GameResource resource, IReadOnlyList<RoomObjectImage> images,
-        IReadOnlyCollection<int>? statesSetByCode, LoomSceneDrawBatches sceneBatches)
+        IReadOnlyCollection<int>? statesSetByCode, ScummSceneDrawBatches sceneBatches)
     {
         var roomId = resource.ResourceId ?? 0;
         selection.ExcludeInterfaceImages(sceneBatches.InterfaceImages.Keys);
@@ -1520,7 +1517,7 @@ public partial class MainWindow : Window
         return notes;
     }
 
-    private bool ActivateObjectVerb(LoomRoomObjectRecord record, LoomObjectVerbEntry verb, bool play = false)
+    private bool ActivateObjectVerb(ScummRoomObjectRecord record, ScummObjectVerbEntry verb, bool play = false)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         FollowSessionSound();
@@ -1556,27 +1553,27 @@ public partial class MainWindow : Window
     /// The events a script or room entry causes, digestibly: one flat row per thing it starts or opens (grouped, with a count,
     /// and a click opens it), then one line that counts the rest (character actions, dialogue...) with the full list in its tooltip.
     /// </summary>
-    private void ShowScriptEvents(StackPanel container, IReadOnlyList<LoomScriptEvent> events)
+    private void ShowScriptEvents(StackPanel container, IReadOnlyList<ScummScriptEvent> events)
     {
         container.Children.Clear();
         var rows = new List<(GameResource Target, string Verb, string Certainty, int Count)>();
-        var others = new List<LoomScriptEvent>();
+        var others = new List<ScummScriptEvent>();
         foreach (var scriptEvent in events)
         {
             var target = FindEventTarget(scriptEvent);
             if (target is null) { others.Add(scriptEvent); continue; }
             var verb = scriptEvent.Kind switch
             {
-                LoomScriptEventKind.ScriptStarted or LoomScriptEventKind.ObjectScriptStarted => "starts",
-                LoomScriptEventKind.ScriptChained => "continues in",
-                LoomScriptEventKind.MusicStarted or LoomScriptEventKind.SoundStarted => "plays",
-                LoomScriptEventKind.RoomLoaded => "goes to",
+                ScummScriptEventKind.ScriptStarted or ScummScriptEventKind.ObjectScriptStarted => "starts",
+                ScummScriptEventKind.ScriptChained => "continues in",
+                ScummScriptEventKind.MusicStarted or ScummScriptEventKind.SoundStarted => "plays",
+                ScummScriptEventKind.RoomLoaded => "goes to",
                 _ => "uses"
             };
             var certainty = scriptEvent.Certainty switch
             {
-                LoomScriptEventCertainty.Reached => "",
-                LoomScriptEventCertainty.Conditional => "maybe",
+                ScummScriptEventCertainty.Reached => "",
+                ScummScriptEventCertainty.Conditional => "maybe",
                 _ => "possibly"
             };
             var index = rows.FindIndex(row => row.Target == target && row.Verb == verb && row.Certainty == certainty);
@@ -1605,13 +1602,13 @@ public partial class MainWindow : Window
         {
             var counts = others.GroupBy(item => item.Kind switch
             {
-                LoomScriptEventKind.CharacterAction => "character action",
-                LoomScriptEventKind.Dialogue when !item.Operands.Contains("text, ", StringComparison.Ordinal) =>
+                ScummScriptEventKind.CharacterAction => "character action",
+                ScummScriptEventKind.Dialogue when !item.Operands.Contains("text, ", StringComparison.Ordinal) =>
                     item.Operands.Contains("sayVoice, ", StringComparison.Ordinal) ? "CD audio cue" : "text layout",
-                LoomScriptEventKind.Dialogue => "line of dialogue",
-                LoomScriptEventKind.ObjectStateChanged => "object change",
-                LoomScriptEventKind.CutsceneStarted or LoomScriptEventKind.CutsceneEnded => "cutscene mark",
-                LoomScriptEventKind.ScriptsFrozen => "freeze",
+                ScummScriptEventKind.Dialogue => "line of dialogue",
+                ScummScriptEventKind.ObjectStateChanged => "object change",
+                ScummScriptEventKind.CutsceneStarted or ScummScriptEventKind.CutsceneEnded => "cutscene mark",
+                ScummScriptEventKind.ScriptsFrozen => "freeze",
                 _ => "other event"
             }).Select(group => $"{group.Count()} {group.Key}{(group.Count() > 1 ? "s" : "")}");
             container.Children.Add(new TextBlock
@@ -1673,7 +1670,7 @@ public partial class MainWindow : Window
         StateIssuesSection.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private GameResource? FindEventTarget(LoomScriptEvent scriptEvent)
+    private GameResource? FindEventTarget(ScummScriptEvent scriptEvent)
     {
         if (scriptEvent.TargetKind is not (ResourceKind.Sound or ResourceKind.Script or ResourceKind.Room) ||
             scriptEvent.TargetId is not int resourceId) return null;
@@ -1682,7 +1679,7 @@ public partial class MainWindow : Window
             (resource.ScriptRoom is null || resource.ScriptRoom == EventSourceRoom(scriptEvent)));
     }
 
-    private int? EventSourceRoom(LoomScriptEvent ev) =>
+    private int? EventSourceRoom(ScummScriptEvent ev) =>
         System.Text.RegularExpressions.Regex.Match(ev.SourceLabel, @"^Room (\d+)") is { Success: true } match
             ? int.Parse(match.Groups[1].Value) : _scriptShown?.Context is { } context &&
               System.Text.RegularExpressions.Regex.Match(context, @"^Room (\d+)") is { Success: true } scriptMatch
@@ -1777,7 +1774,7 @@ public partial class MainWindow : Window
         if (uses.Count > 60)
             ScriptUsedByList.Children.Add(new TextBlock { Text = $"… and {uses.Count - 60} more", Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11 });
     }
-    private LoomScriptDisassembly? _scriptShown;
+    private ScummScriptDisassembly? _scriptShown;
 
     private void ScriptBytesToggle_Changed(object sender, RoutedEventArgs e)
     {
@@ -1798,7 +1795,7 @@ public partial class MainWindow : Window
         if (_scriptShown is { } shown) ScriptOutput.Text = FormatScript(shown);
     }
 
-    private string FormatScript(LoomScriptDisassembly script) => _readableScripts && _game?.Id is GameId.Loom or GameId.LoomVga
+    private string FormatScript(ScummScriptDisassembly script) => _readableScripts && _game?.Id is GameId.Loom or GameId.LoomVga
         ? new LoomScriptPresenter(_glossary, LoomVerbNames.LabelOrNull).Present(script)
         : script.Format(_showScriptBytes);
 
@@ -2096,7 +2093,7 @@ public partial class MainWindow : Window
 
         try
         {
-            if (_game is { Id: GameId.LoomVga, Vga: { } vga })
+            if (_game is { Id: GameId.LoomVga, V4Archive: { } vga })
             {
                 var costume = vga.FindCostume(resource.ResourceId ?? -1) ?? throw new InvalidDataException("This costume has no data.");
                 var poses = vga.DecodeCostumePoses(costume);
@@ -2259,7 +2256,7 @@ public partial class MainWindow : Window
     /// ports); LOOM's boot (script 001 +0x0000, <c>roomOps setScreen 0, 144</c>) calls <c>initScreens(0, 144)</c>,
     /// so LOOM shows all 144 rows of its rooms from screen row 0. Indy3 keeps the default (not checked).
     /// </summary>
-    private int RoomScreenRows => _game?.Id is GameId.Loom or GameId.LoomVga ? LoomVerbArea.Top - LoomMessageRenderer.RoomScreenTop : 128;
+    private int RoomScreenRows => _game?.Id is GameId.Loom or GameId.LoomVga ? ScummVerbArea.Top - ScummV3MessageRenderer.RoomScreenTop : 128;
 
     private int ShownRoomRows(RoomImage room) => Math.Min(room.Height, RoomScreenRows);
 
@@ -2280,7 +2277,7 @@ public partial class MainWindow : Window
         var shownRows = ShownRoomRows(room);
         var oneScreen = OneGameScreen();
         _roomDisplayScale = Math.Min(availableWidth / visibleSourceWidth,
-            usableHeight / (shownRows + (verbStrip ? LoomVerbArea.Height : 0)));
+            usableHeight / (shownRows + (verbStrip ? ScummVerbArea.Height : 0)));
         _roomDisplayScale = Math.Max(0.1, _roomDisplayScale);
         RoomViewport.HorizontalScrollBarVisibility = normalSize
             ? ScrollBarVisibility.Hidden : ScrollBarVisibility.Disabled;
@@ -2292,8 +2289,8 @@ public partial class MainWindow : Window
         // The viewport shows the rows the game shows; the surface keeps the whole image, so every overlay keeps
         // the room's coordinates, and the viewport (no vertical scrolling) clips the rest.
         RoomViewport.Height = shownRows * _roomDisplayScale;
-        VerbStripImage.Width = LoomVerbArea.Width * _roomDisplayScale;
-        VerbStripImage.Height = LoomVerbArea.Height * _roomDisplayScale;
+        VerbStripImage.Width = ScummVerbArea.Width * _roomDisplayScale;
+        VerbStripImage.Height = ScummVerbArea.Height * _roomDisplayScale;
         VerbMessageOverlay.Width = VerbStripImage.Width;
         VerbMessageOverlay.Height = VerbStripImage.Height;
         // In the interactive LOOM mode the room and verb screens read as the game's one 200-row screen: no gap or rule.
@@ -2564,7 +2561,7 @@ public partial class MainWindow : Window
 
     private IReadOnlyList<LoomCdCue> _cdCues = [];
     private const int CdCueIdBase = 1000;
-    private bool IsCdCue(GameResource resource) => _game?.Vga is not null && resource.ResourceId >= CdCueIdBase;
+    private bool IsCdCue(GameResource resource) => _game?.V4Archive is not null && resource.ResourceId >= CdCueIdBase;
 
     private async Task ShowAudio(GameResource resource, bool preserveFormat = false, bool autoPlay = false)
     {
@@ -2621,7 +2618,7 @@ public partial class MainWindow : Window
             var wave = cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
             if (token.IsCancellationRequested) return;
             _adlibBaseWave = adlib ? wave : null;
-            if (adlib) wave = LoomAdlibAudio.ApplyOutputGain(wave, AdlibGainSlider.Value);
+            if (adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, AdlibGainSlider.Value);
             var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
             await File.WriteAllBytesAsync(path, wave, token);
             if (token.IsCancellationRequested)
@@ -2659,7 +2656,7 @@ public partial class MainWindow : Window
     private byte[] ReadCdCueWave(GameResource resource)
     {
         var cue = _cdCues[resource.ResourceId!.Value - CdCueIdBase].Cue;
-        var wave = _game!.Vga!.Disc!.ReadAudioWave(cue.TrackStartFrame, cue.TrackFrameCount);
+        var wave = _game!.V4Archive!.Disc!.ReadAudioWave(cue.TrackStartFrame, cue.TrackFrameCount);
         if (wave.Length <= 44) throw new InvalidDataException("The disc holds no audio at this position.");
         return wave;
     }
@@ -2667,7 +2664,7 @@ public partial class MainWindow : Window
     private Task<byte[]> RenderAudioWaveAsync(GameResource resource, bool adlib,
         CancellationToken token) => Task.Run(() =>
         {
-            if (_game?.Vga is { } vga)
+            if (_game?.V4Archive is { } vga)
             {
                 if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("The CD game has no MT-32 music. Choose AdLib or the PC speaker.");
                 var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in DISK01.LEC.");
@@ -2678,16 +2675,16 @@ public partial class MainWindow : Window
             if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland)
             {
                 if (_sceneSound.Roms is not { } roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
-                if (!LoomRolandSong.IsRoland(resource))
+                if (!ScummRolandSong.IsRoland(resource))
                 {
                     // The scripts of a Roland card choose the sound 32 higher for the same piece (scripts 001, 039, 040, 046, 095, 104).
                     var twin = _game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == resource.ResourceId + 32);
-                    if (twin is null || !LoomRolandSong.IsRoland(twin)) throw new NotSupportedException("This sound has no Roland version.");
+                    if (twin is null || !ScummRolandSong.IsRoland(twin)) throw new NotSupportedException("This sound has no Roland version.");
                     resource = twin;
                 }
-                return new LoomMt32Audio(roms).RenderWave(resource, token);
+                return new ScummMt32Audio(roms).RenderWave(resource, token);
             }
-            if (LoomRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
+            if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
             return adlib ? _adlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
         }, token);
 
@@ -2719,7 +2716,7 @@ public partial class MainWindow : Window
             var adlib = _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
             var wave = await RenderAudioWaveAsync(sound, adlib, token);
             if (token.IsCancellationRequested) return;
-            if (adlib) wave = LoomAdlibAudio.ApplyOutputGain(wave, SceneSoundPlayer.AdlibGainDb);
+            if (adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, SceneSoundPlayer.AdlibGainDb);
             var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
             await File.WriteAllBytesAsync(path, wave, token);
             if (token.IsCancellationRequested)
@@ -2878,7 +2875,7 @@ public partial class MainWindow : Window
         var gainDb = AdlibGainSlider.Value;
         try
         {
-            var wave = await Task.Run(() => LoomAdlibAudio.ApplyOutputGain(sourceWave, gainDb));
+            var wave = await Task.Run(() => ScummAdlibAudio.ApplyOutputGain(sourceWave, gainDb));
             if (request != _adlibGainRequest || !ReferenceEquals(sourceWave, _adlibBaseWave)) return;
 
             var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}.wav");
@@ -3166,9 +3163,9 @@ public partial class MainWindow : Window
 
     private void WalkBoxOverlay_SizeChanged(object sender, SizeChangedEventArgs e) => RefreshWalkBoxOverlay();
 
-    private static LoomWalkBoxSet? TryReadWalkBoxes(byte[] roomBytes)
+    private static ScummWalkBoxSet? TryReadWalkBoxes(byte[] roomBytes)
     {
-        try { return LoomWalkBoxReader.Read(roomBytes); }
+        try { return ScummWalkBoxReader.Read(roomBytes); }
         catch (InvalidDataException) { return null; }
     }
 
@@ -3184,7 +3181,7 @@ public partial class MainWindow : Window
     /// session's copy while it is in this room, since <c>setBoxFlags</c> can
     /// change their flags, otherwise the stored ones.
     /// </summary>
-    private LoomWalkBoxSet? DisplayedWalkBoxes() =>
+    private ScummWalkBoxSet? DisplayedWalkBoxes() =>
         SessionModeToggle.IsChecked == true && _session?.CurrentWalkBoxes is { } live &&
         _session.Snapshot.RoomId == _currentRoomResource?.ResourceId
             ? live : _currentWalkBoxes;
@@ -3214,7 +3211,7 @@ public partial class MainWindow : Window
 
         foreach (var box in boxes!.Boxes)
         {
-            var invisible = (boxes.GetFlags(box.Index) & LoomWalkBox.InvisibleFlag) != 0;
+            var invisible = (boxes.GetFlags(box.Index) & ScummWalkBox.InvisibleFlag) != 0;
             var accent = invisible ? Color.FromRgb(170, 170, 170) : Color.FromRgb(110, 235, 140);
             var shape = new System.Windows.Shapes.Polygon
             {
@@ -3281,7 +3278,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private string DescribeWalkBoxes(LoomWalkBoxSet boxes)
+    private string DescribeWalkBoxes(ScummWalkBoxSet boxes)
     {
         var lines = new List<string>
         {
@@ -3398,10 +3395,10 @@ public partial class MainWindow : Window
         HandleRoomPoint(x, y);
     }
 
-    private LoomRoomObjectRecord? _interactTarget;
+    private ScummRoomObjectRecord? _interactTarget;
 
     /// <summary>Selects the object the Interact menu acts on (null clears it).</summary>
-    private void SelectInteractTarget(LoomRoomObjectRecord? record)
+    private void SelectInteractTarget(ScummRoomObjectRecord? record)
     {
         _interactTarget = record;
         UpdateInteractButton();
@@ -3416,13 +3413,13 @@ public partial class MainWindow : Window
     }
 
     /// <summary>The verbs offered in the menu: look, use or go, and the drafts the object answers (the plumbing verbs stay in Advanced).</summary>
-    private IReadOnlyList<LoomObjectVerbEntry> InteractVerbs(LoomRoomObjectRecord record) =>
+    private IReadOnlyList<ScummObjectVerbEntry> InteractVerbs(ScummRoomObjectRecord record) =>
         _roomVerbs.TryGetValue(record.Id, out var verbs)
             ? verbs.Where(verb => verb.VerbId is 0x36 or 0x38 || LoomDraftNames.ForVerb(verb.VerbId) is not null)
                 .DistinctBy(verb => verb.VerbId).OrderBy(verb => LoomVerbNames.Order(verb.VerbId)).ToArray()
             : [];
 
-    private void OpenInteractMenu(LoomRoomObjectRecord record, FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement)
+    private void OpenInteractMenu(ScummRoomObjectRecord record, FrameworkElement target, System.Windows.Controls.Primitives.PlacementMode placement)
     {
         var heading = _roomObjectNames.TryGetValue(record.Id, out var name) ? name.ToUpperInvariant() : $"OBJECT {record.Id}";
         var entries = InteractVerbs(record).Select(verb => (LoomVerbNames.Label(verb.VerbId), (string?)null, (Action)(() =>
@@ -3559,7 +3556,7 @@ public partial class MainWindow : Window
     /// in another room so far (with the clock running, a later frame may still get there).
     /// </summary>
     private bool SendInputToGame(Func<LoomObjectActionResult> send, string what,
-        IReadOnlyList<LoomRoomObjectRecord>? doorways = null)
+        IReadOnlyList<ScummRoomObjectRecord>? doorways = null)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
         if (_playbackPaused)
@@ -3639,7 +3636,7 @@ public partial class MainWindow : Window
     /// The game's click on a doorway reached no room load: the doorway's verb runs
     /// directly, labelled as an exploration action, not the game's click.
     /// </summary>
-    private void FollowDoorwayFallback(IReadOnlyList<LoomRoomObjectRecord> doorways)
+    private void FollowDoorwayFallback(IReadOnlyList<ScummRoomObjectRecord> doorways)
     {
         if (_session is null) return;
         var why = StatusText.Text;
@@ -3662,7 +3659,7 @@ public partial class MainWindow : Window
         public required string What { get; init; }
         public LoomObjectActionResult? Action { get; init; }
         public required GameResource SourceRoom { get; init; }
-        public IReadOnlyList<LoomRoomObjectRecord>? Doorways { get; init; }
+        public IReadOnlyList<ScummRoomObjectRecord>? Doorways { get; init; }
         public bool LeftRoom { get; set; }
         public int IdleFrames { get; set; }
         public int CutsceneFrames { get; set; }
@@ -3700,7 +3697,7 @@ public partial class MainWindow : Window
 
     /// <summary>ScummVM's frame: <c>VAR_TIMER_NEXT</c> jiffies of 1/60 s (6 in LOOM: 10 frames a second).</summary>
     private TimeSpan PlaybackFrameInterval() =>
-        TimeSpan.FromSeconds(Math.Clamp(_session?.FrameJiffies ?? 6, 1, LoomMessageTable.MaxFrameDelta) / 60.0);
+        TimeSpan.FromSeconds(Math.Clamp(_session?.FrameJiffies ?? 6, 1, ScummMessageTable.MaxFrameDelta) / 60.0);
 
     /// <summary>
     /// Plays the frames after an input on a timer at the game's frame rate,
@@ -3712,7 +3709,7 @@ public partial class MainWindow : Window
     /// load reached while playing opens that room, and playback goes on there.
     /// </summary>
     private void StartPlayback(string what, LoomObjectActionResult? action, GameResource sourceRoom,
-        IReadOnlyList<LoomRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null, int? sentencesBefore = null)
+        IReadOnlyList<ScummRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null, int? sentencesBefore = null)
     {
         _playback = new Playback
         {
@@ -4039,7 +4036,7 @@ public partial class MainWindow : Window
     /// <summary>Plays the CD game's intro: a fresh session whose script 001 starts from the beginning, the frames on the playback clock, the voice and overture from the disc.</summary>
     private void PlayCdIntro()
     {
-        if (_game is not { Id: GameId.LoomVga, Vga: { } vga } || !CanStartCutscene) return;
+        if (_game is not { Id: GameId.LoomVga, V4Archive: { } vga } || !CanStartCutscene) return;
         StopScenePlayback();
         _cdVoice.Stop();
         _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
@@ -4165,7 +4162,7 @@ public partial class MainWindow : Window
     private void PlayCdCutscene(LoomCdCutsceneGroup group)
     {
         var trigger = group.First;
-        if (_game is not { Id: GameId.LoomVga, Vga: { } vga } || !CanStartCutscene ||
+        if (_game is not { Id: GameId.LoomVga, V4Archive: { } vga } || !CanStartCutscene ||
             _game.Rooms.FirstOrDefault(item => item.ResourceId == trigger.Room) is not { } room) return;
         StopScenePlayback();
         _cdVoice.Stop();
@@ -4502,7 +4499,7 @@ public partial class MainWindow : Window
     {
         if (GameClickActive && _game is { Id: not GameId.LoomVga } && _session is not null && !_sceneSound.Follows(_session))
             _sceneSound.Attach(_game, _session);
-        else if (GameClickActive && _game is { Id: GameId.LoomVga, Vga: { } vga } && _session is not null && !_cdVoice.Follows(_session))
+        else if (GameClickActive && _game is { Id: GameId.LoomVga, V4Archive: { } vga } && _session is not null && !_cdVoice.Follows(_session))
             _cdVoice.Attach(vga.Disc, _session);
     }
 
@@ -4759,7 +4756,7 @@ public partial class MainWindow : Window
             RoomActorOverlay.Visibility = Visibility.Collapsed;
             return;
         }
-        var layer = LoomActorRenderer.Render(_session.Actors, roomId, room.Width, room.Height, id =>
+        var layer = ScummActorRenderer.Render(_session.Actors, roomId, room.Width, room.Height, id =>
         {
             if (_actorCostumes.TryGetValue(id, out var costume)) return costume;
             try { costume = _session.ReadCostume(id); }
@@ -4791,7 +4788,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void UpdateCdActorLayer(LoomCdScene scene, RoomImage room)
     {
-        var layer = LoomActorRenderer.Render(scene.Actors, scene.Snapshot.RoomId!.Value, room.Width, room.Height, id =>
+        var layer = ScummActorRenderer.Render(scene.Actors, scene.Snapshot.RoomId!.Value, room.Width, room.Height, id =>
         {
             if (_actorCostumes.TryGetValue(id, out var costume)) return costume;
             try { costume = scene.Costumes(id); }
@@ -4828,7 +4825,7 @@ public partial class MainWindow : Window
     /// <summary>The game's camera left edge in room pixels (ScummVM <c>virtscr[0].xstart</c>).</summary>
     private int GameCameraLeft(RoomImage room)
     {
-        var visible = Math.Min(LoomMessageRenderer.ScreenWidth, room.Width);
+        var visible = Math.Min(ScummV3MessageRenderer.ScreenWidth, room.Width);
         return Math.Clamp((_session?.CameraX ?? visible / 2) - visible / 2, 0, room.Width - visible);
     }
 
@@ -4858,23 +4855,23 @@ public partial class MainWindow : Window
             var left = GameCameraLeft(room);
             if (_charset is { } charset)
             {
-                var layer = LoomMessageRenderer.Render(messages, charset);
+                var layer = ScummV3MessageRenderer.Render(messages, charset);
                 RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
                 _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
-                if (session!.Messages.Talk is { Y: < LoomMessageRenderer.VerbScreenTop } talk &&
-                    LoomMessageRenderer.Render(talk, charset).Bounds is { } bounds)
-                    _talkTextRect = (bounds.Left + left, bounds.Top - LoomMessageRenderer.RoomScreenTop,
-                        bounds.Right + left, bounds.Bottom - LoomMessageRenderer.RoomScreenTop);
+                if (session!.Messages.Talk is { Y: < ScummV3MessageRenderer.VerbScreenTop } talk &&
+                    ScummV3MessageRenderer.Render(talk, charset).Bounds is { } bounds)
+                    _talkTextRect = (bounds.Left + left, bounds.Top - ScummV3MessageRenderer.RoomScreenTop,
+                        bounds.Right + left, bounds.Bottom - ScummV3MessageRenderer.RoomScreenTop);
             }
             else if (_cdCharset is { } cdCharset)
             {
-                var layer = LoomVgaMessageRenderer.Render(messages, number => CdCharset(number, cdCharset));
+                var layer = ScummV4MessageRenderer.Render(messages, number => CdCharset(number, cdCharset));
                 RoomMessageOverlay.Source = MessageRoomBitmap(layer, room, left);
                 _verbMessageBitmap = MessageVerbBitmap(layer, room.Palette);
-                if (session!.Messages.Talk is { Y: < LoomMessageRenderer.VerbScreenTop } talk &&
-                    LoomVgaMessageRenderer.Render(talk, number => CdCharset(number, cdCharset)).Bounds is { } bounds)
-                    _talkTextRect = (bounds.Left + left, bounds.Top - LoomMessageRenderer.RoomScreenTop,
-                        bounds.Right + left, bounds.Bottom - LoomMessageRenderer.RoomScreenTop);
+                if (session!.Messages.Talk is { Y: < ScummV3MessageRenderer.VerbScreenTop } talk &&
+                    ScummV4MessageRenderer.Render(talk, number => CdCharset(number, cdCharset)).Bounds is { } bounds)
+                    _talkTextRect = (bounds.Left + left, bounds.Top - ScummV3MessageRenderer.RoomScreenTop,
+                        bounds.Right + left, bounds.Bottom - ScummV3MessageRenderer.RoomScreenTop);
             }
             else
             {
@@ -4893,18 +4890,18 @@ public partial class MainWindow : Window
         }
     }
 
-    private static BitmapSource MessageRoomBitmap(LoomMessageLayer layer, RoomImage room, int cameraLeft)
+    private static BitmapSource MessageRoomBitmap(ScummMessageLayer layer, RoomImage room, int cameraLeft)
     {
         var pixels = new byte[room.Width * room.Height * 4];
-        for (var screenY = LoomMessageRenderer.RoomScreenTop; screenY < LoomMessageRenderer.VerbScreenTop; screenY++)
+        for (var screenY = ScummV3MessageRenderer.RoomScreenTop; screenY < ScummV3MessageRenderer.VerbScreenTop; screenY++)
         {
-            var y = screenY - LoomMessageRenderer.RoomScreenTop;
+            var y = screenY - ScummV3MessageRenderer.RoomScreenTop;
             if (y >= room.Height) break;
             for (var x = 0; x < layer.Width; x++)
             {
                 var index = layer.Pixels[screenY * layer.Width + x];
                 var roomX = cameraLeft + x;
-                if (index == LoomMessageRenderer.Transparent || roomX >= room.Width) continue;
+                if (index == ScummV3MessageRenderer.Transparent || roomX >= room.Width) continue;
                 SetBgra(pixels, (y * room.Width + roomX) * 4, index < room.Palette.Count ? room.Palette[index] : 0xFF000000u);
             }
         }
@@ -4912,19 +4909,19 @@ public partial class MainWindow : Window
     }
 
     // The verb screen's text on a transparent 320 × 56 layer, or null when there is none.
-    private static BitmapSource? MessageVerbBitmap(LoomMessageLayer layer, IReadOnlyList<uint> palette)
+    private static BitmapSource? MessageVerbBitmap(ScummMessageLayer layer, IReadOnlyList<uint> palette)
     {
-        var pixels = new byte[LoomVerbArea.Width * LoomVerbArea.Height * 4];
+        var pixels = new byte[ScummVerbArea.Width * ScummVerbArea.Height * 4];
         var any = false;
-        for (var y = 0; y < LoomVerbArea.Height; y++)
-        for (var x = 0; x < LoomVerbArea.Width; x++)
+        for (var y = 0; y < ScummVerbArea.Height; y++)
+        for (var x = 0; x < ScummVerbArea.Width; x++)
         {
-            var index = layer.Pixels[(LoomVerbArea.Top + y) * layer.Width + x];
-            if (index == LoomMessageRenderer.Transparent) continue;
-            SetBgra(pixels, (y * LoomVerbArea.Width + x) * 4, index < palette.Count ? palette[index] : 0xFF000000u);
+            var index = layer.Pixels[(ScummVerbArea.Top + y) * layer.Width + x];
+            if (index == ScummV3MessageRenderer.Transparent) continue;
+            SetBgra(pixels, (y * ScummVerbArea.Width + x) * 4, index < palette.Count ? palette[index] : 0xFF000000u);
             any = true;
         }
-        return any ? FrozenBgra(LoomVerbArea.Width, LoomVerbArea.Height, pixels) : null;
+        return any ? FrozenBgra(ScummVerbArea.Width, ScummVerbArea.Height, pixels) : null;
     }
 
     private static void SetBgra(byte[] pixels, int at, uint argb)
@@ -4947,12 +4944,12 @@ public partial class MainWindow : Window
     /// at the message's position and EGA colour. It is not the game's font.
     /// </summary>
     private (BitmapSource Room, BitmapSource? Verb, (int, int, int, int)? Talk) FallbackMessageBitmaps(
-        IReadOnlyList<LoomMessage> messages, LoomMessage? talk, RoomImage room, int cameraLeft)
+        IReadOnlyList<ScummMessage> messages, ScummMessage? talk, RoomImage room, int cameraLeft)
     {
         var typeface = new Typeface("Consolas");
         var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         (int, int, int, int)? talkRect = null;
-        BitmapSource Draw(int width, int height, Func<LoomMessage, bool> include, int offsetX, int offsetY, bool keepTalk)
+        BitmapSource Draw(int width, int height, Func<ScummMessage, bool> include, int offsetX, int offsetY, bool keepTalk)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -4984,11 +4981,11 @@ public partial class MainWindow : Window
             bitmap.Freeze();
             return bitmap;
         }
-        var roomBitmap = Draw(room.Width, room.Height, message => message.Y < LoomMessageRenderer.VerbScreenTop,
-            cameraLeft, -LoomMessageRenderer.RoomScreenTop, keepTalk: true);
-        BitmapSource? verb = messages.Any(message => message.Y >= LoomMessageRenderer.VerbScreenTop)
-            ? Draw(LoomVerbArea.Width, LoomVerbArea.Height, message => message.Y >= LoomMessageRenderer.VerbScreenTop,
-                0, -LoomVerbArea.Top, keepTalk: false)
+        var roomBitmap = Draw(room.Width, room.Height, message => message.Y < ScummV3MessageRenderer.VerbScreenTop,
+            cameraLeft, -ScummV3MessageRenderer.RoomScreenTop, keepTalk: true);
+        BitmapSource? verb = messages.Any(message => message.Y >= ScummV3MessageRenderer.VerbScreenTop)
+            ? Draw(ScummVerbArea.Width, ScummVerbArea.Height, message => message.Y >= ScummV3MessageRenderer.VerbScreenTop,
+                0, -ScummVerbArea.Top, keepTalk: false)
             : null;
         return (roomBitmap, verb, talkRect);
     }
@@ -5136,7 +5133,7 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// The interactive verb strip: a presentation of the session's verb slots
-    /// (<see cref="LoomVerbArea.Compose"/>), drawn under the room at its scale.
+    /// (<see cref="ScummVerbArea.Compose"/>), drawn under the room at its scale.
     /// It shows game state; the drawing itself is not the game's.
     /// </summary>
     // The verb screen is shown for the strip, or for text a script printed there (rows 144–199).
@@ -5158,7 +5155,7 @@ public partial class MainWindow : Window
                         ? "Verb screen: the game's text there, with the verb slots it goes with (presentation of the slots)."
                         : "Verb screen (rows 144–199), kept under the room: the session's verb slots (presentation of the slots).",
                     _session?.Messages.OnScreen
-                        .Where(message => message.Y >= LoomVerbArea.Top)
+                        .Where(message => message.Y >= ScummVerbArea.Top)
                         .Select(message => $"\"{message.Text}\" at ({message.X}, {message.Y}) from {message.Source}") ?? []);
                 VerbStripPanel.Visibility = Visibility.Visible;
                 return;
@@ -5218,16 +5215,16 @@ public partial class MainWindow : Window
     private (int X, int Y)? VerbStripPoint(Point position)
     {
         if (VerbStripImage.ActualWidth <= 0 || VerbStripImage.ActualHeight <= 0) return null;
-        var x =(int)(position.X / VerbStripImage.ActualWidth * LoomVerbArea.Width);
-        var y = (int)(position.Y / VerbStripImage.ActualHeight * LoomVerbArea.Height);
-        if (x is < 0 or >= LoomVerbArea.Width || y is < 0 or >= LoomVerbArea.Height) return null;
-        return (x, LoomVerbArea.Top + y);
+        var x =(int)(position.X / VerbStripImage.ActualWidth * ScummVerbArea.Width);
+        var y = (int)(position.Y / VerbStripImage.ActualHeight * ScummVerbArea.Height);
+        if (x is < 0 or >= ScummVerbArea.Width || y is < 0 or >= ScummVerbArea.Height) return null;
+        return (x, ScummVerbArea.Top + y);
     }
 
     // With "Click as game input" on, only verbs whose slot is on (findVerbAtPos) react.
-    private LoomVerbAreaItem? ClickableVerbAt(Point position) =>
+    private ScummVerbAreaItem? ClickableVerbAt(Point position) =>
         GameClickActive && VerbStripShown() && VerbStripPoint(position) is { } point
-            ? LoomVerbArea.FindVerbAt(_session!.VerbArea().Items, point.X, point.Y) : null;
+            ? ScummVerbArea.FindVerbAt(_session!.VerbArea().Items, point.X, point.Y) : null;
 
     private void VerbStripImage_MouseMove(object sender, MouseEventArgs e)
     {
@@ -5286,7 +5283,7 @@ public partial class MainWindow : Window
     /// first listed object in directory order whose box (at its current position)
     /// contains the point, touchable objects before untouchable ones.
     /// </summary>
-    private LoomRoomObjectRecord? HotspotRowRecordAt(int x, int y)
+    private ScummRoomObjectRecord? HotspotRowRecordAt(int x, int y)
     {
         if (_session is null) return null;
         var listed = ObjectList.Children.OfType<Button>().Select(button => button.Tag).OfType<int>().ToHashSet();
@@ -5310,7 +5307,7 @@ public partial class MainWindow : Window
     /// Hovering the room highlights the hotspot row of the object under the
     /// pointer, scrolls it into view and outlines its box; null clears it.
     /// </summary>
-    private void ShowHoveredHotspotRow(LoomRoomObjectRecord? record)
+    private void ShowHoveredHotspotRow(ScummRoomObjectRecord? record)
     {
         // Inspection mode lists scene details with their own colours.
         if (SessionModeToggle.IsChecked != true || _hoveredHotspotRowId == record?.Id) return;
@@ -5345,7 +5342,7 @@ public partial class MainWindow : Window
         return choices;
     }
 
-    private bool IsVerbHotspotAvailable(LoomRoomObjectRecord record, LoomSessionSnapshot snapshot) =>
+    private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, LoomSessionSnapshot snapshot) =>
         record.Width > 0 && record.Height > 0 &&
         snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
         ParentStateMatches(record, snapshot);
@@ -5354,10 +5351,10 @@ public partial class MainWindow : Window
     /// Doorway hotspots at a room point that are present in the room (owned by
     /// it, parent state matching), in directory order.
     /// </summary>
-    private IReadOnlyList<LoomRoomObjectRecord> DoorwaysAt(int x, int y)
+    private IReadOnlyList<ScummRoomObjectRecord> DoorwaysAt(int x, int y)
     {
         if (_session?.Snapshot is not { } snapshot) return [];
-        var (selected, unknown) = LoomObjectHitTest.Find(_currentRoomObjectRecords, snapshot.ObjectStates,
+        var (selected, unknown) = ScummObjectHitTest.Find(_currentRoomObjectRecords, snapshot.ObjectStates,
             snapshot.ObjectPositions, snapshot.ObjectClasses, x, y);
         // Native hit selection already excludes untouchable exits and mismatched parents.
         // A ground click or a different overlapping object must never open a static candidate.
@@ -5365,7 +5362,7 @@ public partial class MainWindow : Window
         return VisibleDoorways(snapshot).Where(record => record.Id == selected).ToArray();
     }
 
-    private IEnumerable<LoomRoomObjectRecord> VisibleDoorways(LoomSessionSnapshot snapshot) =>
+    private IEnumerable<ScummRoomObjectRecord> VisibleDoorways(LoomSessionSnapshot snapshot) =>
         _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
             .Where(record => record.Width > 0 && record.Height > 0 &&
                              snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
@@ -5373,14 +5370,14 @@ public partial class MainWindow : Window
                              ParentStateMatches(record, snapshot))
             .OrderBy(record => record.LocalIndex);
 
-    private int[] DoorwayTargets(LoomRoomObjectRecord record) => _roomNavigationCandidates
+    private int[] DoorwayTargets(ScummRoomObjectRecord record) => _roomNavigationCandidates
         .Where(candidate => candidate.Object.Id == record.Id).Select(candidate => candidate.TargetRoomId)
         .Distinct().Order().ToArray();
 
-    private string DoorwayLabel(LoomRoomObjectRecord record) =>
+    private string DoorwayLabel(ScummRoomObjectRecord record) =>
         "Room " + string.Join(" / ", DoorwayTargets(record).Select(id => id.ToString("00")));
 
-    private string DoorwayToolTip(LoomRoomObjectRecord record)
+    private string DoorwayToolTip(ScummRoomObjectRecord record)
     {
         var targets = DoorwayTargets(record);
         var text = $"Object {record.Id}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))}. " +
@@ -5396,7 +5393,7 @@ public partial class MainWindow : Window
     /// Runs an eligible doorway's verb and continues pending scripts. A static
     /// possible destination cannot override the script's conditional answer.
     /// </summary>
-    private void FollowDoorway(LoomRoomObjectRecord record)
+    private void FollowDoorway(ScummRoomObjectRecord record)
     {
         var routes = _roomNavigationCandidates.Where(candidate => candidate.Object.Id == record.Id).ToArray();
         if (routes.Length == 0) return;
@@ -5425,7 +5422,7 @@ public partial class MainWindow : Window
         SelectResourceInTree(target);
     }
 
-    private bool ParentStateMatches(LoomRoomObjectRecord record, LoomSessionSnapshot snapshot)
+    private bool ParentStateMatches(ScummRoomObjectRecord record, LoomSessionSnapshot snapshot)
     {
         var checkedCount = 0;
         while (record.ParentLocalIndex != 0)
@@ -5472,7 +5469,7 @@ public partial class MainWindow : Window
             if (!_roomVerbs.TryGetValue(record.Id, out var verbs)) continue;
             foreach (var verb in verbs)
             {
-                LoomScriptDisassembly script;
+                ScummScriptDisassembly script;
                 try { script = _game.Id == GameId.LoomVga ? _cdData!.ReadObjectVerb(room.ResourceId!.Value, record, verb.VerbId, out _) : _verbReader.Decode(room, record, verb.VerbId); }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
                 // Follow started room-local and global scripts too: many exits
@@ -5591,7 +5588,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private LoomRoomObjectRecord? _highlightedHotspot;
+    private ScummRoomObjectRecord? _highlightedHotspot;
 
     private void HotspotHighlightOverlay_SizeChanged(object sender, SizeChangedEventArgs e) =>
         ShowHotspotHighlight(_highlightedHotspot);
@@ -5600,7 +5597,7 @@ public partial class MainWindow : Window
     /// Outlines a hotspot's box on the room image (at its current position in
     /// the session), or clears the outline when <paramref name="record"/> is null.
     /// </summary>
-    private void ShowHotspotHighlight(LoomRoomObjectRecord? record)
+    private void ShowHotspotHighlight(ScummRoomObjectRecord? record)
     {
         _highlightedHotspot = record;
         HotspotHighlightOverlay.Children.Clear();
@@ -5662,7 +5659,7 @@ public partial class MainWindow : Window
             _roomSoundChoices = [];
             RoomSoundsButton.Visibility = Visibility.Collapsed;
         }
-        if (_game is { Id: GameId.LoomVga, Vga.Disc: not null } && _currentRoomResource is { ResourceId: int cdRoomId })
+        if (_game is { Id: GameId.LoomVga, V4Archive.Disc: not null } && _currentRoomResource is { ResourceId: int cdRoomId })
         {
             // The CD game: the disc's audio the room's own scripts ask for (music or narration first, then the spoken lines), played on demand.
             try { _cdRoomCues = LoomCdCueIndex.ScanRoom(_cdData ?? ScummDataSources.For(_game), cdRoomId).OrderByDescending(cue => cue.IsMusicOrNarration).ThenBy(cue => cue.Cue.Offset).ToArray(); }
@@ -5694,7 +5691,7 @@ public partial class MainWindow : Window
         {
             scannedTracks = await Task.Run(() =>
             {
-                var decoder = new LoomAdlibAudio();
+                var decoder = new ScummAdlibAudio();
                 var results = new Dictionary<int, (bool IsMusic, TimeSpan? Duration)>(cachedTracks);
                 foreach (var id in idsToInspect)
                 {
@@ -5807,7 +5804,7 @@ public partial class MainWindow : Window
     /// <summary>The CD game's Sounds menu: the disc audio this room's scripts ask for, played on demand (an exploration action).</summary>
     private void CdRoomSounds_Click()
     {
-        if (_cdRoomCues.Count == 0 || SessionInScene || _game?.Vga?.Disc is not { } disc) return;
+        if (_cdRoomCues.Count == 0 || SessionInScene || _game?.V4Archive?.Disc is not { } disc) return;
         var entries = new List<(string Label, string? Tip, Action Run)> { ("■ Stop", null, _cdVoice.Stop) };
         int music = 0, voices = 0;
         foreach (var cue in _cdRoomCues)

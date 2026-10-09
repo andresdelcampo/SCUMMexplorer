@@ -1,5 +1,4 @@
 using System.Text.Json;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -11,8 +10,8 @@ public sealed class LoomInventoryDependencyTests
         var runtime = Runtime();
         runtime.Inventory.Add(204); // Deliberately differs from owner15 and ego1.
         runtime.EstimatedVariables.Add("var[0x001]");
-        var native = new LoomNativeDependencyTracker(_ => { });
-        var numeric = new LoomRuntimeRelationTracker(_ => { });
+        var native = new ScummNativeDependencyTracker(_ => { });
+        var numeric = new ScummRuntimeRelationTracker(_ => { });
         var observation = Capture(runtime, native: native, numeric: numeric);
         var access = observation.SourceAccess!;
         Assert.Equal(new[] { "target", "source", "implicit-ego" }, access.Bindings.Select(b => b.Role));
@@ -54,7 +53,7 @@ public sealed class LoomInventoryDependencyTests
         var runtime = Runtime();
         if (!remove) runtime.Inventory.Add(204);
         var tracker = SyntheticReads();
-        var history = tracker.ActiveRelations.First(r => r.Storage == new LoomNativeStorage("inventory", 204));
+        var history = tracker.ActiveRelations.First(r => r.Storage == new ScummNativeStorage("inventory", 204));
         using (runtime.ObserveGlobalMutations(new(_ => { }, nativeDependencies: tracker))) {
             Assert.False(remove ? runtime.RemoveInventoryObject(204) : runtime.AddInventoryObject(204));
         }
@@ -71,7 +70,7 @@ public sealed class LoomInventoryDependencyTests
     {
         var runtime = Runtime();
         if (member) runtime.Inventory.Add(204);
-        var updates = new List<LoomNativeDependencyUpdate>();
+        var updates = new List<ScummNativeDependencyUpdate>();
         Capture(runtime, owner: owner, native: new(updates.Add));
         Assert.Equal(member, runtime.Inventory.Contains(204));
         // One owner notification and one membership notification. These assert neither a
@@ -101,8 +100,8 @@ public sealed class LoomInventoryDependencyTests
     {
         string Run(bool tracked) {
             var runtime = Runtime();
-            var records = new List<LoomScriptObservation>();
-            var result = new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(
+            var records = new List<ScummScriptObservation>();
+            var result = new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(
                 ("setOwnerOf", "var[0x060], 0x01"), ("setOwnerOf", "var[0x060], 0x0F"), ("stopObjectCode", "")),
                 runtime.ObjectStates, [], runtime: runtime, observation: new(new(records.Add,
                     nativeDependencies: tracked ? new(_ => { }) : null), 1));
@@ -120,10 +119,10 @@ public sealed class LoomInventoryDependencyTests
     [InlineData("getStringChar, local[0x000], var[0x060], 0x02", 2)]
     public void AllStringFormsRetainOpaqueStorageAndCannotBorrowInventoryProvenance(string operands, int count)
     {
-        var records = new List<LoomScriptObservation>();
+        var records = new List<ScummScriptObservation>();
         var runtime = Runtime();
-        var tracker = new LoomNativeDependencyTracker(_ => { });
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("stringOps", operands)),
+        var tracker = new ScummNativeDependencyTracker(_ => { });
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("stringOps", operands)),
             runtime.ObjectStates, [], runtime: runtime, observation: new(new(records.Add, nativeDependencies: tracker), 1));
         var access = records.Single(r => r.Site?.Stage == "instruction").SourceAccess!;
         Assert.Equal(count, access.NativeDependencies!.Count);
@@ -132,31 +131,31 @@ public sealed class LoomInventoryDependencyTests
         Assert.Empty(tracker.ActiveRelations);
     }
 
-    private static LoomScriptRuntimeState Runtime()
+    private static ScummScriptRuntimeState Runtime()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>(), new Dictionary<int, byte> { [204] = 15 });
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>(), new Dictionary<int, byte> { [204] = 15 });
         runtime.SetGlobalVariable("var[0x001]", 1);
         runtime.SetGlobalVariable("var[0x060]", 204);
         runtime.EstimatedVariables.Add("var[0x060]");
         return runtime;
     }
 
-    private static LoomScriptObservation Capture(LoomScriptRuntimeState runtime, string target = "var[0x060]",
-        string owner = "0x01", Func<string, bool>? key = null, LoomNativeDependencyTracker? native = null,
-        LoomRuntimeRelationTracker? numeric = null)
+    private static ScummScriptObservation Capture(ScummScriptRuntimeState runtime, string target = "var[0x060]",
+        string owner = "0x01", Func<string, bool>? key = null, ScummNativeDependencyTracker? native = null,
+        ScummRuntimeRelationTracker? numeric = null)
     {
-        var records = new List<LoomScriptObservation>();
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("setOwnerOf", $"{target}, {owner}"), ("stopObjectCode", "")),
+        var records = new List<ScummScriptObservation>();
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("setOwnerOf", $"{target}, {owner}"), ("stopObjectCode", "")),
             runtime.ObjectStates, [], runtime: runtime, observation: new(new(records.Add, includeKey: key,
                 captureSourceAccess: true, nativeDependencies: native, runtimeRelations: numeric), 1));
         return records.First(r => r.Site?.Stage == "instruction");
     }
 
-    private static LoomNativeDependencyTracker SyntheticReads()
+    private static ScummNativeDependencyTracker SyntheticReads()
     {
-        var tracker = new LoomNativeDependencyTracker(_ => { });
+        var tracker = new ScummNativeDependencyTracker(_ => { });
         // Complete synthetic fields isolate mutation notification; actual membership provenance stays unknown.
-        var selector = new LoomScriptOperandBinding("target", "0x00CC", null, 204, false);
+        var selector = new ScummScriptOperandBinding("target", "0x00CC", null, 204, false);
         tracker.Observe(new(1, 1, null, 1, new(0, null, 0, 0, "instruction", 0, "debug"),
             new Dictionary<string, ushort>(), [], false, SourceAccess: new([], null, [], [
                 new("inventory-membership", selector, 1, true, "synthetic membership estimate"),

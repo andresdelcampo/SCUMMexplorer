@@ -1,8 +1,8 @@
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $inputFolder = Join-Path $PSScriptRoot 'before-ega/review-input'
-$oldNames = (Get-Content (Join-Path $repo 'src/SCUMMexplorer.Core/Formats/loom-glossary.json') -Raw | ConvertFrom-Json).entries
-$cd = Get-Content (Join-Path $repo 'src/SCUMMexplorer.Core/Formats/loom-cd-glossary.json') -Raw | ConvertFrom-Json
+$oldNames = (Get-Content (Join-Path $repo 'src/SCUMMexplorer.Core/Loom/Text/loom-glossary.json') -Raw | ConvertFrom-Json).entries
+$cd = Get-Content (Join-Path $repo 'src/SCUMMexplorer.Core/Loom/Cd/loom-cd-glossary.json') -Raw | ConvertFrom-Json
 $titles = @{}
 foreach ($row in $cd) { $titles[[int]$row.id] = $row.name }
 # Existing EGA titles retain their wording. This is a reverse review, not an ID-based CD import.
@@ -121,7 +121,7 @@ foreach ($edition in @(@{Prefix='ega';Name='English EGA'}, @{Prefix='ega-es';Nam
     }
     $review += $rows
 }
-$review | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $repo 'src/SCUMMexplorer.Core/Formats/loom-ega-reviewed-glossary.json') -Encoding utf8
+$review | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $repo 'src/SCUMMexplorer.Core/Loom/Ega/loom-ega-reviewed-glossary.json') -Encoding utf8
 $lines = @('# EGA reverse review, 8 October 2026','',
     'English and Spanish EGA globals were compared with the completed VGA review. Titles and roles below are accepted only for their reviewed EGA instruction fingerprints. Numeric scene descriptions remain where the story role is unestablished. Static code is not proof of execution. Existing EGA titles retain their wording, except 90/99 now describe their dialogue as well; all valid globals have their own EGA source references.','',
     'Script 00 remains unresolved: the English decode has invalid control-flow targets; the Spanish resource length is invalid. Spanish 51, 55 and 116 also point outside their containers and get no imported label. English 51, 55, 115 and 116 are reviewed from their own code. EGA 4/39/40/115 keep their EGA save/music behavior. Contrary to the earlier VGA comparison notes, both EGA and CD 90/99 contain the Bishop introduction and Goodmold aftermath; the old EGA titles described only part of them.','',

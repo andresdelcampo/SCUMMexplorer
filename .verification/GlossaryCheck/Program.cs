@@ -2,8 +2,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // Usage: GlossaryCheck <english game folder> <spanish game folder> <output .md>
 // Checks every glossary entry against the English data, using the Spanish release the table was written for as the reference.
@@ -13,7 +11,7 @@ using SCUMMexplorer.Core.Rendering;
 var en = Load(args[0]);
 var es = Load(args[1]);
 var shift = LoomStoryEvents.FirstBitFor(new GameFolderScanner().Scan(args[0])) - LoomStoryEvents.FirstBit;
-var glossary = JsonSerializer.Deserialize<GlossaryFile>(File.ReadAllText("src/SCUMMexplorer.Core/Formats/loom-glossary.json"),
+var glossary = JsonSerializer.Deserialize<GlossaryFile>(File.ReadAllText("src/SCUMMexplorer.Core/Loom/Text/loom-glossary.json"),
     new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
 var sb = new StringBuilder();
 sb.AppendLine("# Glossary check against the English LOOM EGA data");
@@ -186,11 +184,11 @@ static Data Load(string folder)
     var rooms = game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).ToHashSet();
     var counts = new Dictionary<int, int>();
     foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue))
-        counts[room.ResourceId!.Value] = new LoomRoomObjectDirectory().Decode(File.ReadAllBytes(room.FilePath)).Count;
+        counts[room.ResourceId!.Value] = new ScummRoomObjectDirectory().Decode(File.ReadAllBytes(room.FilePath)).Count;
     return new Data(units, rooms, counts);
 }
 
-record Unit(List<LoomScriptInstruction> Ops);
+record Unit(List<ScummScriptInstruction> Ops);
 record Data(Dictionary<string, Unit> Units, HashSet<int> Rooms, Dictionary<int, int> ObjectCounts);
 record GlossaryRow(string Kind, string Key, string Name, string Evidence, string? Source, string? Scope = null);
 record GlossaryFile(List<GlossaryRow> Entries);

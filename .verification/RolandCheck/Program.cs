@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // The Roland MT-32 device through the real window: the combo, the sound card the session reports, the sound panel for a Roland sound and
 // for its AdLib twin, the refusal on another device, and the opening's sound commands under the Roland card.

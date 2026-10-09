@@ -1,12 +1,10 @@
 using System.IO;
 using System.Windows.Media;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Storage;
 
 namespace SCUMMexplorer.App;
 
 /// <summary>
-/// Plays the voice lines of LOOM on CD: each <c>sayVoice</c> a session's reached prints issued (<see cref="LoomMessageTable.VoiceEvents"/>)
+/// Plays the voice lines of LOOM on CD: each <c>sayVoice</c> a session's reached prints issued (<see cref="ScummMessageTable.VoiceEvents"/>)
 /// is cut from the disc's audio track and played; a new line replaces the one still playing, and offset 0 with length 0 stops it.
 /// It follows one session at a time and plays what that session issued since it was attached.
 /// </summary>
@@ -17,7 +15,7 @@ public sealed class CdVoicePlayer
     private int _seen;
     private MediaPlayer? _player;
     private string? _file;
-    private readonly Queue<(LoomVoiceCue Cue, DateTime Due)> _queue = new();
+    private readonly Queue<(ScummVoiceCue Cue, DateTime Due)> _queue = new();
     private bool _busy;
     private int _generation;
     private bool _paused;
@@ -80,7 +78,7 @@ public sealed class CdVoicePlayer
     }
 
     /// <summary>Plays one stretch of the disc's audio track now (picked from a room's sounds list), replacing what plays; not the game's own voice.</summary>
-    public void PlayNow(DiscImage disc, LoomVoiceCue cue)
+    public void PlayNow(DiscImage disc, ScummVoiceCue cue)
     {
         Stop();
         _disc = disc;
@@ -111,7 +109,7 @@ public sealed class CdVoicePlayer
         if (_queue.Count > 0) { var next = _queue.Dequeue(); Play(next.Cue, next.Due); }
     }
 
-    private async void Play(LoomVoiceCue cue, DateTime due)
+    private async void Play(ScummVoiceCue cue, DateTime due)
     {
         End();
         _busy = true;

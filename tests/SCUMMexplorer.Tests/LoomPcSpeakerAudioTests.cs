@@ -1,6 +1,5 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.Core.Discovery;
 
 namespace SCUMMexplorer.Tests;
@@ -19,7 +18,7 @@ public sealed class LoomPcSpeakerAudioTests
         foreach (var id in Enumerable.Range(1, 32).Where(id => id != 24))
         {
             byte[] wave;
-            try { wave = new LoomPcSpeakerAudio().RenderWave(sounds[id]); }
+            try { wave = new ScummPcSpeakerAudio().RenderWave(sounds[id]); }
             catch (Exception ex) { throw new Xunit.Sdk.XunitException($"Sound {id}: {ex}"); }
             Assert.True(wave.Length > 44, $"Sound {id} did not render.");
             if (id >= 25)
@@ -47,7 +46,7 @@ public sealed class LoomPcSpeakerAudioTests
             File.WriteAllBytes(path, data.Select(value => (byte)(value ^ 0xFF)).ToArray());
             var resource = new GameResource("Sound 01", ResourceKind.Sound, path, 1, null, 1, 0);
 
-            var wave = new LoomPcSpeakerAudio().RenderWave(resource);
+            var wave = new ScummPcSpeakerAudio().RenderWave(resource);
 
             Assert.Equal("RIFF", System.Text.Encoding.ASCII.GetString(wave, 0, 4));
             Assert.True(wave.Length > 44);
@@ -84,7 +83,7 @@ public sealed class LoomPcSpeakerAudioTests
             File.WriteAllBytes(path, data.Select(value => (byte)(value ^ 0xFF)).ToArray());
             var resource = new GameResource("Modulated sound", ResourceKind.Sound, path, 1, null, 1, 0);
 
-            var wave = new LoomPcSpeakerAudio().RenderWave(resource);
+            var wave = new ScummPcSpeakerAudio().RenderWave(resource);
             var samples = Enumerable.Range(0, (wave.Length - 44) / 2)
                 .Select(i => BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(44 + i * 2, 2))).ToArray();
             var lowPitch = CountPositiveCrossings(samples, 4, 7);
@@ -115,7 +114,7 @@ public sealed class LoomPcSpeakerAudioTests
             File.WriteAllBytes(path, data.Select(value => (byte)(value ^ 0xFF)).ToArray());
             var resource = new GameResource("High speaker note", ResourceKind.Sound, path, 1, null, 1, 0);
 
-            var wave = new LoomPcSpeakerAudio().RenderWave(resource);
+            var wave = new ScummPcSpeakerAudio().RenderWave(resource);
             var samples = Enumerable.Range(0, (wave.Length - 44) / 2)
                 .Select(i => BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(44 + i * 2, 2))).ToArray();
             var fundamental = SpectralMagnitude(samples, 5965);
@@ -161,7 +160,7 @@ public sealed class LoomPcSpeakerAudioTests
             BinaryPrimitives.WriteUInt16LittleEndian(data.AsSpan(0, 2), (ushort)data.Length);
             File.WriteAllBytes(path, data.Select(value => (byte)(value ^ 0xFF)).ToArray());
             var resource = new GameResource("Sound 33", ResourceKind.Sound, path, 33, null, 1, 0);
-            Assert.Throws<NotSupportedException>(() => new LoomPcSpeakerAudio().RenderWave(resource));
+            Assert.Throws<NotSupportedException>(() => new ScummPcSpeakerAudio().RenderWave(resource));
         }
         finally { File.Delete(path); }
     }

@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // Measures (does not judge) the two music paths in the real MainWindow, for the room media player analysis (item I):
 // 1. a catalog visit to Room 16 (its entry starts sound 30): what the MUSIC panel shows, and when the scene sound

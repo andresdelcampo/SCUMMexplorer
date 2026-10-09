@@ -1,6 +1,5 @@
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 // Usage: CutsceneScanCompare <loom ega folder> <loom-replays.json>
 // Runs the CD's script scan (LoomCdCutsceneIndex) on the EGA data and compares its triggers with the hand-made catalog.
@@ -39,7 +38,7 @@ if (args.Length > 2 && args[2] == "boxes") // CutsceneScanCompare <folder> - box
 }
 if (args.Length > 2 && args[2] == "maskmap") // CutsceneScanCompare <CD folder> - maskmap <room>: the depth mask at 1/4 scale (# masked)
 {
-    var im = game.Vga!.DecodeRoom(int.Parse(args[3]));
+    var im = game.V4Archive!.DecodeRoom(int.Parse(args[3]));
     var px = (args.Length > 4 ? im.ExtraDepthMasks[int.Parse(args[4]) - 2] : im.DepthMask!).Pixels.ToArray();
     Console.WriteLine($"{im.Width}x{im.Height}");
     for (var y = 0; y < im.Height; y += 4)
@@ -50,7 +49,7 @@ if (args.Length > 2 && args[2] == "masks") // CutsceneScanCompare <CD folder> - 
 {
     foreach (var room in rooms)
     {
-        var image = game.Vga!.DecodeRoom(room);
+        var image = game.V4Archive!.DecodeRoom(room);
         var set = image.DepthMask is { } m ? m.Pixels.Span.ToArray().Count(b => b != 0) : -1;
         Console.WriteLine($"room {room}: mask pixels {(set < 0 ? "none (block missing or unreadable)" : set.ToString())}, extra planes {image.ExtraDepthMasks.Count}");
     }
@@ -58,7 +57,7 @@ if (args.Length > 2 && args[2] == "masks") // CutsceneScanCompare <CD folder> - 
 }
 if (args.Length > 2 && args[2] == "grep") // CutsceneScanCompare <folder> - grep <text>: instructions of global, entry and local scripts containing the text
 {
-    void Scan(string name, LoomScriptDisassembly? d) { foreach (var ins in d?.Instructions ?? []) if ($"{ins.Operation} {ins.Operands}".Contains(args[3])) Console.WriteLine($"{name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
+    void Scan(string name, ScummScriptDisassembly? d) { foreach (var ins in d?.Instructions ?? []) if ($"{ins.Operation} {ins.Operands}".Contains(args[3])) Console.WriteLine($"{name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
     foreach (var id in data.GlobalScriptIds()) Scan($"global {id}", data.GlobalScript(id));
     foreach (var room in rooms) { Scan($"room {room} entry", data.RoomEntryScript(room)); foreach (var id in data.RoomLocalScriptIds(room)) Scan($"room {room} local {id}", data.RoomLocalScript(room, id)); }
     return;

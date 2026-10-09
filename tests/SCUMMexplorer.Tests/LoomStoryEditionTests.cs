@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -14,7 +13,7 @@ public sealed class LoomStoryEditionTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", edition));
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
-        var index = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
+        var index = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
         var session = new LoomExplorationSession(game, index);
         Assert.Equal(first, LoomStoryEvents.FirstBitFor(game));
         Assert.Contains(session.StoryEvents, e => e.Key == ghost);

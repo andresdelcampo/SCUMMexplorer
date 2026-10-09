@@ -6,8 +6,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.App;
 
@@ -36,7 +34,7 @@ public partial class TextGalleryWindow : Window
     private readonly LoomTextExtraction _extraction;
     private readonly Action<int> _visitRoom;
     private readonly IReadOnlyDictionary<int, GalleryCutscene> _cutscenes;
-    private readonly LoomEgaRoomDecoder _roomDecoder = new();
+    private readonly ScummV3EgaRoomDecoder _roomDecoder = new();
     private LoomTextEntry? _selectedEntry;
 
     /// <param name="cutscenes">Known cutscenes by the indexed script that prints their texts (044, 046…).</param>
@@ -208,7 +206,7 @@ public partial class TextGalleryWindow : Window
         {
             BitmapSource? picture = _roomImage is null ? null : await _roomImage(roomId);
             if (picture is not null) return picture;
-            var decoded = _game.Vga is { } vga ? vga.DecodeRoom(roomId) : await _roomDecoder.DecodeAsync(room.FilePath);
+            var decoded = _game.V4Archive is { } vga ? vga.DecodeRoom(roomId) : await _roomDecoder.DecodeAsync(room.FilePath);
             return CreateBitmap(decoded.Width, decoded.Height, decoded.Pixels.ToArray(), decoded.Palette);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { return null; }

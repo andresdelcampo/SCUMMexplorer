@@ -1,6 +1,5 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -9,7 +8,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void IndexedBindingsSeparateSelectedValueIndexAndInheritedPath()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x060]"] = 0x1002; // Resolver masks the index to 12 bits.
         runtime.GlobalVariables["var[0x034]"] = 17;
         runtime.EstimatedVariables.Add("var[0x060]");
@@ -22,7 +21,7 @@ public sealed class LoomScriptObserverTests
         Assert.True(read.Index.ValueEstimated);
         Assert.True(records[1].PathEstimated);
         Assert.Contains("local[0x001]", records[^1].Estimated);
-        Assert.Throws<NotSupportedException>(() => ((IList<LoomScriptOperandBinding>)records[1].OperandBindings!).Clear());
+        Assert.Throws<NotSupportedException>(() => ((IList<ScummScriptOperandBinding>)records[1].OperandBindings!).Clear());
         runtime.GlobalVariables["var[0x060]"] = 4;
         Assert.Equal((ushort)0x1002, read.Index.Value);
     }
@@ -30,7 +29,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void UnknownAndFilteredIndexesNeverBindACellOrFabricateZero()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables.Remove("var[0x060]"); // Runtime initializes ordinary globals to zero.
         runtime.GlobalVariables["var[0x032]"] = 9;
         var unknown = ObserveOperands(runtime, "move", "local[0x001] = var[0x032+var[0x060]]")[1]
@@ -49,7 +48,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void BitBindingsKeepBackingWordAndItsEstimateWithoutClaimingAWriter()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x0D6]"] = 0x80;
         runtime.EstimatedVariables.Add("var[0x0D6]");
         var binding = ObserveOperands(runtime, "move", "local[0x001] = bit[0xD67]")[1]
@@ -66,7 +65,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void CallBindingsPreserveWholeArgumentOrderAndNestedIndexSelection()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x060]"] = 2;
         runtime.GlobalVariables["var[0x034]"] = 3;
         runtime.GlobalVariables["var[0x055]"] = 8;
@@ -88,7 +87,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void BindingCapturePreservesWritesResultsAndDefaultObservationSequence()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x060]"] = 0;
         var defaults = ObserveOperands(runtime, "move", "var[0x060] = 0x0002", capture: false);
         runtime.GlobalVariables["var[0x060]"] = 0;
@@ -102,13 +101,13 @@ public sealed class LoomScriptObserverTests
         Assert.Null(bound[^1].OperandBindings);
     }
 
-    private static List<LoomScriptObservation> ObserveOperands(LoomScriptRuntimeState runtime, string op,
+    private static List<ScummScriptObservation> ObserveOperands(ScummScriptRuntimeState runtime, string op,
         string operands, bool path = false, Func<string, bool>? include = null, bool capture = true)
     {
-        var records = new List<LoomScriptObservation>();
-        var code = new LoomScriptDisassembly(2, 1, 0, 2, 2,
+        var records = new List<ScummScriptObservation>();
+        var code = new ScummScriptDisassembly(2, 1, 0, 2, 2,
             [new(0, 0, op, operands, "00"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []);
-        new LoomBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
+        new ScummBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
             pathEstimated: path, observation: new(new(records.Add, includeKey: include, captureOperandBindings: capture), 1));
         return records;
     }
@@ -116,7 +115,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void SameTurnWriterAndReaderUseSequenceAndCausalSlotIdentity()
     {
-        var observations = new List<LoomScriptObservation>();
+        var observations = new List<ScummScriptObservation>();
         WithSession(new() {
             [2] = [0x0A, 3, 0xFF, 0x28, 0x67, 0x8D, 0, 0, 0], // Child, then equalZero D67.
             [3] = [0x1A, 0x67, 0x8D, 0, 0, 0] // Literal D670, then stop.
@@ -134,7 +133,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void ResumptionKeepsTheSlotWhileCancellationAndReplacementStayDistinct()
     {
-        var observations = new List<LoomScriptObservation>();
+        var observations = new List<ScummScriptObservation>();
         WithSession(new() {
             [2] = [0x80, 0x62, 3, 0x0A, 3, 0xFF, 0],
             [3] = [0x80, 0x46, 0xF1, 0, 0]
@@ -159,7 +158,7 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void ACancelledExecutingCallerHasNoFollowingSourceInstruction()
     {
-        var observations = new List<LoomScriptObservation>();
+        var observations = new List<ScummScriptObservation>();
         WithSession(new() {
             [2] = [0x0A, 3, 0xFF, 0x1A, 0xF1, 0, 1, 0, 0],
             [3] = [0x62, 2, 0]
@@ -172,12 +171,12 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void CopiesCannotMutateOrFollowLaterRuntimeWrites()
     {
-        var observations = new List<LoomScriptObservation>();
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var observations = new List<ScummScriptObservation>();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x0F1]"] = 9;
-        var code = new LoomScriptDisassembly(2, 1, 0, 2, 2,
+        var code = new ScummScriptDisassembly(2, 1, 0, 2, 2,
             [new(0, 0, "move", "var[0x0F1] = 0x0000", "00"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []);
-        var result = new LoomBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
+        var result = new ScummBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
             pathEstimated: true, observation: new(new(observations.Add), 1));
         Assert.True(result.PathEstimated);
         Assert.Contains("var[0x0F1]", runtime.EstimatedVariables);
@@ -195,12 +194,12 @@ public sealed class LoomScriptObserverTests
     [Fact]
     public void FilteredObservationsPreserveTheUnobservedAndObservedResults()
     {
-        var code = new LoomScriptDisassembly(2, 1, 0, 2, 2,
+        var code = new ScummScriptDisassembly(2, 1, 0, 2, 2,
             [new(0, 0, "move", "var[0x0F1] = 0x0001", "00"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []);
-        var records = new List<LoomScriptObservation>();
-        var first = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var second = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var executor = new LoomBoundedScriptExecutor();
+        var records = new List<ScummScriptObservation>();
+        var first = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var second = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var executor = new ScummBoundedScriptExecutor();
         var unobserved = executor.Execute(code, first.ObjectStates, [], runtime: first);
         var observed = executor.Execute(code, second.ObjectStates, [], runtime: second, observation: new(new(records.Add,
             site => site.Stage == "instruction", key => key == "var[0x0F1]"), 1));
@@ -211,11 +210,11 @@ public sealed class LoomScriptObserverTests
         Assert.Equal(first.EstimatedVariables, second.EstimatedVariables);
     }
 
-    private static LoomScriptDisassembly Driver(params int[] numbers) => new(0, 1, 0, numbers.Length + 1, numbers.Length + 1,
-        numbers.Select((id, offset) => new LoomScriptInstruction(offset, 0x0A, "startScript", $"0x{id:X2}, []", "00"))
+    private static ScummScriptDisassembly Driver(params int[] numbers) => new(0, 1, 0, numbers.Length + 1, numbers.Length + 1,
+        numbers.Select((id, offset) => new ScummScriptInstruction(offset, 0x0A, "startScript", $"0x{id:X2}, []", "00"))
             .Append(new(numbers.Length, 0, "stopObjectCode", "", "00")).ToArray(), null, null, [], []);
 
-    private static void WithSession(Dictionary<int, byte[]> programs, LoomScriptObserver observer, Action<LoomExplorationSession> check)
+    private static void WithSession(Dictionary<int, byte[]> programs, ScummScriptObserver observer, Action<LoomExplorationSession> check)
     {
         var directory = Path.Combine(Path.GetTempPath(), "loom-observer-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);

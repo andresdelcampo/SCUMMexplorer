@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 var output = Path.GetFullPath(args[0]);
 Directory.CreateDirectory(output);
@@ -32,7 +31,7 @@ if (args.Length > 1 && args[1] == "entry-callbacks")
     foreach (var (room, obj, verb) in new[] { (64, 757, 0x36), (64, 757, 0x38), (93, 899, 0x36), (93, 899, 0x38), (93, 900, 0x36), (93, 900, 0x39) })
     foreach (var settle in new[] { false, true })
     {
-        var s = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var s = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         s.VisitRoomById(room);
         var entryFrames = 0;
         if (settle) for (; entryFrames < 6000 && (s.InCutscene || s.Messages.HaveMsg != 0 || s.EgoMoving || s.CameraMoving); entryFrames++) s.AdvanceFrame();
@@ -70,7 +69,7 @@ if (args.Length > 1 && args[1] == "room20-placement")
         foreach (var obj in game.Id == GameId.Loom ? new[] { 390, 391 } : new[] { 315, 316 })
         {
             var record = data.ReadRoom(20).Objects.Single(o => o.Id == obj);
-            var s = new LoomExplorationSession(game, game.Vga?.ReadIndexedObjects() ??
+            var s = new LoomExplorationSession(game, game.V4Archive?.ReadIndexedObjects() ??
                 new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")), completeBoot: game.Id == GameId.Loom);
             s.VisitRoomById(20);
             for (var entryFrame = 0; entryFrame < 6000 && Prop(s, "StatusEditable") is not true; entryFrame++) s.AdvanceFrame();
@@ -99,9 +98,9 @@ foreach (var (name, folder) in editions.Where(_ => args.Length == 1))
 {
     var game = new GameFolderScanner().Scan(folder);
     var data = ScummDataSources.For(game);
-    var blocks = new List<(string Place, LoomScriptDisassembly Script)>();
+    var blocks = new List<(string Place, ScummScriptDisassembly Script)>();
     var readErrors = new List<string>();
-    void Read(string place, Func<LoomScriptDisassembly?> read)
+    void Read(string place, Func<ScummScriptDisassembly?> read)
     {
         try { if (read() is { } script) blocks.Add((place, script)); }
         catch (Exception ex) { readErrors.Add(place + ": " + ex.Message); }
@@ -126,7 +125,7 @@ foreach (var (name, folder) in editions.Where(_ => args.Length == 1))
     });
     var room34 = data.ReadRoom(34);
     object source34;
-    if (game.Vga is { } vga)
+    if (game.V4Archive is { } vga)
     {
         var room = vga.Rooms.Single(r => r.Number == 34);
         var decoded = ((byte[])Field(vga, "_lec")!).AsSpan(room.Offset, room.Length).ToArray();
@@ -222,9 +221,9 @@ for (var frame = 0; frame <= 6000; frame++)
     if (frame is 0 or 1000 or 3000 or 6000)
     {
         var pending = ((IEnumerable)Field(session, "_pending")!).Cast<object>().Select(p => new {
-            script = ((LoomScriptDisassembly)Prop(p, "Script")!).Context ?? $"global {((LoomScriptDisassembly)Prop(p, "Script")!).ScriptId}",
+            script = ((ScummScriptDisassembly)Prop(p, "Script")!).Context ?? $"global {((ScummScriptDisassembly)Prop(p, "Script")!).ScriptId}",
             offset = Prop(p, "Offset"), locals = Prop(p, "Locals"), room = Prop(p, "RoomId"), number = Prop(p, "ScriptNumber"),
-            next = ((LoomScriptDisassembly)Prop(p, "Script")!).Instructions.FirstOrDefault(i => i.Offset == (int)Prop(p, "Offset")!)
+            next = ((ScummScriptDisassembly)Prop(p, "Script")!).Instructions.FirstOrDefault(i => i.Offset == (int)Prop(p, "Offset")!)
         }).ToArray();
         states.Add(new { frame, room = session.CurrentRoomId, session.InCutscene, session.CameraX,
             session.Actors, session.Messages.HaveMsg, pending, globals = session.Snapshot.KnownGlobalVariables,

@@ -8,7 +8,7 @@ if (args.Length > 1 && args[1] == "instruction")
 {
     // Mt32Probe <game> instruction <text>: every script, room script and object verb with an instruction whose operation or operands contain the text.
     var needle = args.Length > 2 ? args[2] : "roomPalette";
-    new SCUMMexplorer.Core.Formats.LoomSceneStateScanner(game).VisitCodeUnits((code, room, obj, verb, where) =>
+    new SCUMMexplorer.Core.Loom.LoomSceneStateScanner(game).VisitCodeUnits((code, room, obj, verb, where) =>
     {
         if (code is null) return;
         var hits = code.Instructions.Where(i => (i.Operation + " " + i.Operands).Contains(needle, StringComparison.Ordinal)).ToList();
@@ -21,8 +21,8 @@ if (args.Length > 2 && args[1] == "activity")
 {
     // Mt32Probe <game> activity <sound>: notes started and channels used per 5 s window, and the markers in it.
     var res = game.Resources.First(r => r.Kind == ResourceKind.Sound && r.ResourceId == int.Parse(args[2]));
-    var song = SCUMMexplorer.Core.Formats.LoomRolandSong.Read(res);
-    var spt = SCUMMexplorer.Core.Formats.LoomRolandSong.SecondsPerTick;
+    var song = SCUMMexplorer.Core.Scumm.ScummRolandSong.Read(res);
+    var spt = SCUMMexplorer.Core.Scumm.ScummRolandSong.SecondsPerTick;
     for (int w = 0; w * 5 < song.Duration.TotalSeconds + 5; w++)
     {
         var ev = song.Events.Where(e => e.Tick * spt >= w * 5 && e.Tick * spt < w * 5 + 5).ToList();
@@ -37,26 +37,26 @@ if (args.Length > 2 && args[1] == "markers")
 {
     // Mt32Probe <game> markers <sound>: where the song's markers fall (the game's music timer counts them).
     var res = game.Resources.First(r => r.Kind == ResourceKind.Sound && r.ResourceId == int.Parse(args[2]));
-    var song = SCUMMexplorer.Core.Formats.LoomRolandSong.Read(res);
+    var song = SCUMMexplorer.Core.Scumm.ScummRolandSong.Read(res);
     Console.WriteLine($"{song.MarkerTicks.Count} markers, song {song.Duration.TotalSeconds:F1}s ({song.Ticks} ticks)");
     foreach (var n in new[] { 1, 4, 5, 50, 100, 150, 198, 199, 204, 205, 250, song.MarkerTicks.Count })
-        if (n >= 1 && n <= song.MarkerTicks.Count) Console.WriteLine($"marker {n}: tick {song.MarkerTicks[n - 1]} = {song.MarkerTicks[n - 1] * SCUMMexplorer.Core.Formats.LoomRolandSong.SecondsPerTick:F1}s");
+        if (n >= 1 && n <= song.MarkerTicks.Count) Console.WriteLine($"marker {n}: tick {song.MarkerTicks[n - 1]} = {song.MarkerTicks[n - 1] * SCUMMexplorer.Core.Scumm.ScummRolandSong.SecondsPerTick:F1}s");
     return;
 }
 if (args.Length > 1 && args[1] == "timing")
 {
     // Mt32Probe <game> timing: how long a fresh session and the first visit of Room 1 take.
-    var snap = new SCUMMexplorer.Core.Formats.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var snap = new SCUMMexplorer.Core.Scumm.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
     var sw = System.Diagnostics.Stopwatch.StartNew();
     var card = args.Length > 2 ? int.Parse(args[2]) : 0;
-    var session = new SCUMMexplorer.Core.Formats.LoomExplorationSession(game, snap, soundCard: card);
+    var session = new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, snap, soundCard: card);
     Console.WriteLine($"new session (boot completed): {sw.ElapsedMilliseconds} ms, room {session.Snapshot.RoomId}");
     sw.Restart();
     var room = game.Rooms.First(r => r.ResourceId == 1);
     session.VisitRoom(room);
     Console.WriteLine($"VisitRoom(1): {sw.ElapsedMilliseconds} ms");
     sw.Restart();
-    var s2 = new SCUMMexplorer.Core.Formats.LoomExplorationSession(game, snap, stopAtOpening: true);
+    var s2 = new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, snap, stopAtOpening: true);
     Console.WriteLine($"new session stopAtOpening: {sw.ElapsedMilliseconds} ms");
     return;
 }
@@ -64,8 +64,8 @@ if (args.Length > 2 && args[1] == "opening")
 {
     // Mt32Probe <game> opening <card> [frames]: the opening under a sound card, state every 100 frames, until it has run its course.
     var card = int.Parse(args[2]); int limit = args.Length > 3 ? int.Parse(args[3]) : 6000;
-    var snap = new SCUMMexplorer.Core.Formats.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
-    var session = new SCUMMexplorer.Core.Formats.LoomExplorationSession(game, snap, stopAtOpening: true, soundCard: card);
+    var snap = new SCUMMexplorer.Core.Scumm.LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var session = new SCUMMexplorer.Core.Loom.LoomExplorationSession(game, snap, stopAtOpening: true, soundCard: card);
     int lastRoom = -1, shown = 0;
     for (int frame = 1; frame <= limit; frame++)
     {
@@ -88,10 +88,10 @@ if (args.Length > 2 && args[1] == "opening")
 if (args.Length > 1 && args[1] == "compare")
 {
     // Roland length against the AdLib sound 32 lower (script 039/040 add 0x20 to the id on a Roland card).
-    var ad = new SCUMMexplorer.Core.Formats.LoomAdlibAudio();
+    var ad = new SCUMMexplorer.Core.Scumm.ScummAdlibAudio();
     foreach (var r in game.Resources.Where(r => r.Kind == ResourceKind.Sound && r.ResourceId is >= 33).OrderBy(r => r.ResourceId))
     {
-        var song = SCUMMexplorer.Core.Formats.LoomRolandSong.Read(r);
+        var song = SCUMMexplorer.Core.Scumm.ScummRolandSong.Read(r);
         var a = game.Resources.FirstOrDefault(x => x.Kind == ResourceKind.Sound && x.ResourceId == r.ResourceId - 32);
         string adl = "-";
         if (a is not null) { try { adl = ad.HasMusic(a) ? ad.EstimateDuration(a).TotalSeconds.ToString("F1") + "s music" : "effect/other"; } catch (Exception ex) { adl = ex.GetType().Name; } }
@@ -102,10 +102,10 @@ if (args.Length > 1 && args[1] == "compare")
 if (args.Length > 3 && args[1] == "render")
 {
     // Mt32Probe <game> render <romfolder> <outfolder> <ids...>: WAV per Roland sound through the MT-32 emulator.
-    var roms = SCUMMexplorer.Core.Formats.Mt32RomSet.Find(args[2]) ?? throw new FileNotFoundException("no ROM set in " + args[2]);
+    var roms = SCUMMexplorer.Core.Scumm.Mt32RomSet.Find(args[2]) ?? throw new FileNotFoundException("no ROM set in " + args[2]);
     Console.WriteLine($"ROMs: {roms.Model} {roms.ControlPath} + {roms.PcmPath}");
     Directory.CreateDirectory(args[3]);
-    var audio = new SCUMMexplorer.Core.Formats.LoomMt32Audio(roms);
+    var audio = new SCUMMexplorer.Core.Scumm.ScummMt32Audio(roms);
     foreach (var id in args.Skip(4).Select(int.Parse))
     {
         var res = game.Resources.First(r => r.Kind == ResourceKind.Sound && r.ResourceId == id);

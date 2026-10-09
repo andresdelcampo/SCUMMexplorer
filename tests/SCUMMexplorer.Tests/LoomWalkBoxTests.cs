@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -23,7 +22,7 @@ public sealed class LoomWalkBoxTests
         Assert.Equal(76, rooms.Length);
         foreach (var room in rooms)
         {
-            var boxes = LoomWalkBoxReader.Read(File.ReadAllBytes(room.FilePath));
+            var boxes = ScummWalkBoxReader.Read(File.ReadAllBytes(room.FilePath));
             Assert.True(boxes.Count > 0, $"Room {room.ResourceId} has no boxes");
             // The layout is only right if every box's matrix row ends exactly at the image.
             Assert.False(boxes.MatrixTruncated, $"Room {room.ResourceId} matrix does not fit");
@@ -34,14 +33,14 @@ public sealed class LoomWalkBoxTests
     public void Room02IsAPathOfLineSegmentBoxes()
     {
         if (!File.Exists(Path.Combine(Folder, "02.LFL"))) return;
-        var boxes = LoomWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "02.LFL")));
+        var boxes = ScummWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "02.LFL")));
 
         Assert.Equal(15, boxes.Count);
         Assert.All(boxes.Boxes, box => Assert.True(box.IsLine));
-        Assert.Equal(new LoomBoxPoint(830, 60), boxes.Boxes[0].UpperLeft);
-        Assert.Equal(new LoomBoxPoint(811, 60), boxes.Boxes[0].LowerLeft);
-        Assert.Equal(new LoomBoxPoint(912, 80), boxes.Boxes[3].UpperLeft);
-        Assert.Equal(new LoomBoxPoint(890, 118), boxes.Boxes[3].LowerRight);
+        Assert.Equal(new ScummBoxPoint(830, 60), boxes.Boxes[0].UpperLeft);
+        Assert.Equal(new ScummBoxPoint(811, 60), boxes.Boxes[0].LowerLeft);
+        Assert.Equal(new ScummBoxPoint(912, 80), boxes.Boxes[3].UpperLeft);
+        Assert.Equal(new ScummBoxPoint(890, 118), boxes.Boxes[3].LowerRight);
         Assert.Equal(1, boxes.Boxes[3].Mask);
         Assert.Equal(0x12, boxes.Boxes[3].Flags);
         // A point on a segment is inside; one pixel off it is not (no v5 tolerance in v3).
@@ -56,7 +55,7 @@ public sealed class LoomWalkBoxTests
     public void Room17MatrixRoutesAroundItsFloorBox()
     {
         if (!File.Exists(Path.Combine(Folder, "17.LFL"))) return;
-        var boxes = LoomWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "17.LFL")));
+        var boxes = ScummWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(Folder, "17.LFL")));
 
         Assert.Equal(12, boxes.Count);
         Assert.False(boxes.Boxes[8].IsLine);
@@ -64,7 +63,7 @@ public sealed class LoomWalkBoxTests
         Assert.Equal(9, boxes.GetNextBox(8, 10));
         Assert.Equal(11, boxes.GetNextBox(8, 11));
         Assert.Equal(8, boxes.GetNextBox(11, 0));
-        Assert.Equal(-1, boxes.GetNextBox(0, LoomWalkBoxSet.InvalidBox));
+        Assert.Equal(-1, boxes.GetNextBox(0, ScummWalkBoxSet.InvalidBox));
     }
 
     [Fact]
@@ -72,7 +71,7 @@ public sealed class LoomWalkBoxTests
     {
         var boxes = Synthetic(
             Box(10, 10, 50, 10, 50, 40, 10, 40),
-            Box(100, 10, 140, 10, 140, 40, 100, 40, flags: LoomWalkBox.InvisibleFlag));
+            Box(100, 10, 140, 10, 140, 40, 100, 40, flags: ScummWalkBox.InvisibleFlag));
 
         Assert.Equal(new BoxAdjustment(20, 20, 0, 20, 20), boxes.Adjust(20, 20, isPlayer: false, 0, 0));
         // 60,20 is 10 pixels right of box 0's right edge.
@@ -87,10 +86,10 @@ public sealed class LoomWalkBoxTests
     public void PlayerOnlyInvisibleBoxesStayUsableByOtherActors()
     {
         var boxes = Synthetic(Box(10, 10, 50, 10, 50, 40, 10, 40,
-            flags: LoomWalkBox.InvisibleFlag | LoomWalkBox.PlayerOnlyFlag));
+            flags: ScummWalkBox.InvisibleFlag | ScummWalkBox.PlayerOnlyFlag));
 
         Assert.Equal(0, boxes.Adjust(20, 20, isPlayer: false, 0, 0).Box);
-        Assert.Equal(LoomWalkBoxSet.InvalidBox, boxes.Adjust(20, 20, isPlayer: true, 7, 9).Box);
+        Assert.Equal(ScummWalkBoxSet.InvalidBox, boxes.Adjust(20, 20, isPlayer: true, 7, 9).Box);
     }
 
     [Fact]
@@ -101,7 +100,7 @@ public sealed class LoomWalkBoxTests
 
         // 0,0 is more than 0xFFFF (squared) away, so nothing beats the search bound.
         var far = boxes.Adjust(0, 0, isPlayer: false, 12, 34);
-        Assert.Equal(new BoxAdjustment(12, 34, LoomWalkBoxSet.InvalidBox, 12, 34), far);
+        Assert.Equal(new BoxAdjustment(12, 34, ScummWalkBoxSet.InvalidBox, 12, 34), far);
         var near = boxes.Adjust(300, 103, isPlayer: false, 12, 34);
         Assert.Equal((349, 103, 0), (near.X, near.Y, near.Box));
     }
@@ -113,7 +112,7 @@ public sealed class LoomWalkBoxTests
 
         Assert.True(boxes.SetFlags(2, 0x80));
         Assert.Equal(0x80, boxes.GetFlags(1));
-        Assert.False(boxes.SetFlags(LoomWalkBoxSet.InvalidBox, 0x80));
+        Assert.False(boxes.SetFlags(ScummWalkBoxSet.InvalidBox, 0x80));
         Assert.Equal(0, boxes.Clone().GetFlags(1));
     }
 
@@ -122,7 +121,7 @@ public sealed class LoomWalkBoxTests
     {
         var root = Environment.GetEnvironmentVariable("SCUMM_INDY3_EGA_TEST_ROOT");
         if (string.IsNullOrEmpty(root) || !File.Exists(Path.Combine(root, "46.LFL"))) return;
-        var boxes = LoomWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(root, "46.LFL")));
+        var boxes = ScummWalkBoxReader.Read(File.ReadAllBytes(Path.Combine(root, "46.LFL")));
 
         Assert.Equal(2, boxes.Count);
         Assert.True(boxes.MatrixTruncated);
@@ -140,7 +139,7 @@ public sealed class LoomWalkBoxTests
     }
 
     /// <summary>A plain room header with the boxes at 0x20 and a matrix that links every box to itself.</summary>
-    private static LoomWalkBoxSet Synthetic(params byte[][] boxes)
+    private static ScummWalkBoxSet Synthetic(params byte[][] boxes)
     {
         const int tableOffset = 0x20;
         var body = new List<byte> { (byte)boxes.Length };
@@ -153,7 +152,7 @@ public sealed class LoomWalkBoxTests
         BitConverter.GetBytes((ushort)imageOffset).CopyTo(room, 0x0A);
         BitConverter.GetBytes((ushort)tableOffset).CopyTo(room, 0x15);
         body.CopyTo(room, tableOffset);
-        var set = LoomWalkBoxReader.ReadPlain(room);
+        var set = ScummWalkBoxReader.ReadPlain(room);
         Assert.False(set.MatrixTruncated);
         return set;
     }

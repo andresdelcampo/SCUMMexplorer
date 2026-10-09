@@ -1,6 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -18,7 +16,7 @@ public sealed class LoomInputLoopTests
     {
         if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(Folder);
-        var directory = new LoomRoomObjectDirectory();
+        var directory = new ScummRoomObjectDirectory();
         foreach (var room in game.Rooms)
         {
             var bytes = File.ReadAllBytes(room.FilePath);

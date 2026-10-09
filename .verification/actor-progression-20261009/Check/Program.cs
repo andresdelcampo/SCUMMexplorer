@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 var output = Path.GetFullPath(args[1]); Directory.CreateDirectory(output);
 var report = new List<string>(); var states = new List<object>();
@@ -10,7 +9,7 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
 {
     var game = new GameFolderScanner().Scan(Path.Combine(Path.GetFullPath(args[0]), folder));
     var data = ScummDataSources.For(game);
-    var index = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var index = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
     var session = new LoomExplorationSession(game, index);
     void Frames(int count) { for (int f = 0; f < count; f++) session.AdvanceFrame(); }
     bool Settle(int bound = 5000)
@@ -31,7 +30,7 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
         var ego = session.Actors.Single(a => a.Number == 1);
         Check(session.GameStatus.StaffHeld == held, $"{edition} Room {room}: chosen staff branch retained");
         Check(ego.Room == room && ego.Visible == true, $"{edition} Room {room}: Bobbin visible after staff refresh");
-        if (game.Vga is null) Check(ego.Look.StandFrame == (held ? 3 : 10), $"{edition} Room {room}: own Script 17 staff stand frame");
+        if (game.V4Archive is null) Check(ego.Look.StandFrame == (held ? 3 : 10), $"{edition} Room {room}: own Script 17 staff stand frame");
         else
         {
             // CD uses separate large costumes and shared small costumes; Script 17 keeps frames 1..5 for a large held staff.

@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Media;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 // Sound in cutscenes, in the real MainWindow. For the opening (script 044) and script 046 (the Elders' trial), compares
 // the sounds the app's scene player starts and stops, frame by frame, with the sound events a separate session reaches
@@ -51,10 +50,10 @@ internal static class Program
                         for (; seen < session.SoundEvents.Count; seen++)
                         {
                             var item = session.SoundEvents[seen].Event;
-                            if (item.Certainty != LoomScriptEventCertainty.Reached) continue;
-                            if (item.Kind is LoomScriptEventKind.SoundStarted or LoomScriptEventKind.MusicStarted)
+                            if (item.Certainty != ScummScriptEventCertainty.Reached) continue;
+                            if (item.Kind is ScummScriptEventKind.SoundStarted or ScummScriptEventKind.MusicStarted)
                                 lines.Add($"f{frame} start {item.TargetId}");
-                            else if (item.Kind == LoomScriptEventKind.SoundStopped) lines.Add($"f{frame} stop {item.TargetId}");
+                            else if (item.Kind == ScummScriptEventKind.SoundStopped) lines.Add($"f{frame} stop {item.TargetId}");
                         }
                     }
                     return lines;

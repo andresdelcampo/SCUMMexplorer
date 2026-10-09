@@ -3,8 +3,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.App;
 
@@ -24,10 +22,10 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
         try
         {
             // Script 018 draws the staff and the notes from room 1's object images in both games; only where the pieces come from differs.
-            LoomScriptDisassembly script;
+            ScummScriptDisassembly script;
             IReadOnlyList<RoomObjectImage> objects;
             IReadOnlyList<uint> palette;
-            Func<IReadOnlyList<LoomMessage>, LoomMessageLayer> render;
+            Func<IReadOnlyList<ScummMessage>, ScummMessageLayer> render;
             // The CD game draws the quarter notes as image verbs (verbOps <verb>, [at, x, y; on]) whose images Room 1's local script 211 assigned
             // (verbOps <verb>, [new; ...; image, n; off]); the EGA game prints a musical glyph instead.
             var noteImages = new Dictionary<int, int>();
@@ -43,21 +41,21 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                 var data = ScummDataSources.For(game);
                 script = data.GlobalScript(18) ?? throw new InvalidDataException("The game has no script 18.");
                 objects = data.ReadObjectImages(1);
-                palette = game.Vga!.ReadPalette(1);
+                palette = game.V4Archive!.ReadPalette(1);
                 // The strip's text uses the game's first charset for messages, as the room view does.
-                var cdCharset = game.Vga.ReadCharset(2);
+                var cdCharset = game.V4Archive.ReadCharset(2);
                 if (cdCharset is null) { error = "Native charset unavailable."; return null; }
-                render = messages => LoomVgaMessageRenderer.Render(messages, cdCharset);
+                render = messages => ScummV4MessageRenderer.Render(messages, cdCharset);
             }
             else
             {
-                script = new LoomScriptReader(ScummScriptDialects.For(game.Id)).Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == 18));
+                script = new ScummScriptReader(ScummScriptDialects.For(game.Id)).Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == 18));
                 var bytes = File.ReadAllBytes(game.Rooms.Single(r => r.ResourceId == 1).FilePath);
-                objects = new LoomRoomObjects().Decode(bytes);
-                palette = new OldV3EgaRoomDecoder().Decode(bytes).Palette;
-                var egaCharset = LoomCharset.TryLoad(game.FolderPath, 0, out _);
+                objects = new ScummRoomObjects().Decode(bytes);
+                palette = new ScummV3EgaRoomDecoder().Decode(bytes).Palette;
+                var egaCharset = ScummV3Charset.TryLoad(game.FolderPath, 0, out _);
                 if (egaCharset is null) { error = "Native charset unavailable."; return null; }
-                render = messages => LoomMessageRenderer.Render(messages, egaCharset);
+                render = messages => ScummV3MessageRenderer.Render(messages, egaCharset);
             }
             var staffPixels = new byte[224 * 24];
             int note = 0, color = 8;
@@ -66,7 +64,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
             var scorePixels = new byte[224 * 32];
             var notePixels = new byte[224 * 32];
             int scoreX = 0, letterColor = 7;
-            var scoreMessages = new List<LoomMessage>();
+            var scoreMessages = new List<ScummMessage>();
             foreach (var instruction in script.Instructions)
             {
                 if (instruction.Operation == "verbOps" && note < 8)
@@ -120,7 +118,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                 var glyphText = print.Groups[4].Value;
                 byte glyph = glyphText.StartsWith("\\x", StringComparison.Ordinal) ? (byte)Hex(glyphText[2..]) : (byte)glyphText[0];
                 bool musical = print.Groups[3].Value == "2";
-                var message = new LoomMessage(LoomMessageKind.Drawn, 254, 1, [new[] { glyph }],
+                var message = new ScummMessage(ScummMessageKind.Drawn, 254, 1, [new[] { glyph }],
                     print.Groups[1].Value.StartsWith("0x", StringComparison.Ordinal) ? Hex(print.Groups[1].Value[2..]) : scoreX,
                     Hex(print.Groups[2].Value), false, 0, 319, musical ? color : letterColor, 1, "script018", instruction.Offset, 0, null);
                 scoreMessages.Add(message);
@@ -130,7 +128,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
                     for (int y = 0; y < 32; y++) for (int x = 0; x < 224; x++)
                     {
                         byte p = layer.Pixels[(168 + y) * 320 + 16 + x];
-                        if (p != LoomMessageRenderer.Transparent) notePixels[y * 224 + x] = p;
+                        if (p != ScummV3MessageRenderer.Transparent) notePixels[y * 224 + x] = p;
                     }
                 }
             }
@@ -139,7 +137,7 @@ internal sealed record LoomStatusArtwork(BitmapSource Staff, BitmapSource EmptyS
             {
                 if (scoreLayer is null) break;
                 byte p = scoreLayer.Pixels[(168 + y) * 320 + 16 + x];
-                if (p != LoomMessageRenderer.Transparent) scorePixels[y * 224 + x] = p;
+                if (p != ScummV3MessageRenderer.Transparent) scorePixels[y * 224 + x] = p;
             }
             // Native score starts at x24, eight contiguous24-pixel choices; no relocated glyphs.
             // Crop only the shared empty rows below every glyph; preserve native note positions and 2x scale.

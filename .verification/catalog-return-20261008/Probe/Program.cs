@@ -3,8 +3,6 @@ using System.Text.Json;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // Deliberately preserves the reported fresh catalog start. Never loads App settings,
 // writes story bits/costumes/placements, or claims original-game route coverage.
@@ -21,7 +19,7 @@ bool? SourceBit(string key)
 {
     var vars = session.Snapshot.KnownGlobalVariables;
     if (vars.TryGetValue(key, out var direct)) return direct != 0;
-    if (vars.ContainsKey(LoomBoundedScriptExecutor.SeparateBitStorage)) return false;
+    if (vars.ContainsKey(ScummBoundedScriptExecutor.SeparateBitStorage)) return false;
     var bit = Convert.ToInt32(key[6..^1], 16);
     return vars.TryGetValue($"var[0x{bit >> 4:X3}]", out var word) ? ((word >> (bit & 15)) & 1) != 0 : null;
 }
@@ -31,12 +29,12 @@ void Capture(string name)
 {
     var number = session.Snapshot.RoomId!.Value;
     var resource = game.Rooms.Single(r => r.ResourceId == number);
-    var room = new OldV3EgaRoomDecoder().Decode(File.ReadAllBytes(resource.FilePath));
+    var room = new ScummV3EgaRoomDecoder().Decode(File.ReadAllBytes(resource.FilePath));
     var snapshot = session.Snapshot;
     var selection = new RoomObjectSelection(data.ReadObjectImages(number), snapshot.ObjectStates,
         snapshot.ObjectPositions, data.ReadRoom(number).Objects, room, indexed.States, snapshot.DrawQueue);
     var composed = selection.Compose(room);
-    var layer = LoomActorRenderer.Render(session.Actors, number, room.Width, room.Height, session.ReadCostume,
+    var layer = ScummActorRenderer.Render(session.Actors, number, room.Width, room.Height, session.ReadCostume,
         selection.ComposeDepthMask(room), session.CurrentWalkBoxes, snapshot.ObjectClasses,
         room.ExtraDepthMasks.Select(p => p.Pixels.ToArray()).ToArray());
     var pixels = new byte[room.Width * room.Height * 4];

@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -15,7 +14,7 @@ public sealed class CdWalkProbe
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;
         var p = spec.Split(',').Select(int.Parse).ToArray();
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         session.VisitRoom(game.Rooms.First(r => r.ResourceId == p[0]));
         for (var i = 0; i < 30; i++) session.AdvanceFrame();
         var lines = new List<string>();
@@ -47,7 +46,7 @@ public sealed class CdBoxSequenceProbe
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;
         var p = spec.Split(',').Select(int.Parse).ToArray();
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         session.VisitRoom(game.Rooms.First(r => r.ResourceId == p[0]));
         LoomCdSceneSetupPlanner.Settle(session);
         var lines = new List<string>();

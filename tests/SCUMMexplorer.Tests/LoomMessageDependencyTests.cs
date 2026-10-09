@@ -1,5 +1,4 @@
 using System.Text.Json;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -9,8 +8,8 @@ public sealed class LoomMessageDependencyTests
     public void StoredMessageWaitFieldsRemainIndependentOfTheGlobalAndUnknownProvenance()
     {
         var runtime = Talking();
-        runtime.SetGlobalVariable(LoomMessageTable.HaveMsgVariable, 255); // Independent native/global storage.
-        runtime.EstimatedVariables.Add(LoomMessageTable.HaveMsgVariable);
+        runtime.SetGlobalVariable(ScummMessageTable.HaveMsgVariable, 255); // Independent native/global storage.
+        runtime.EstimatedVariables.Add(ScummMessageTable.HaveMsgVariable);
         var observation = Capture(runtime);
         var access = observation.SourceAccess!;
         Assert.NotNull(access.Barrier);
@@ -31,7 +30,7 @@ public sealed class LoomMessageDependencyTests
     [Fact]
     public void FilteredImplicitMessageOperandDoesNotDiscloseNativeFields()
     {
-        var observation = Capture(Talking(), k => k != LoomMessageTable.HaveMsgVariable);
+        var observation = Capture(Talking(), k => k != ScummMessageTable.HaveMsgVariable);
         var dependency = Assert.Single(observation.SourceAccess!.NativeDependencies!);
         Assert.Equal("message-wait", dependency.Domain);
         Assert.Null(dependency.Value);
@@ -42,10 +41,10 @@ public sealed class LoomMessageDependencyTests
     public void MissingNativeFieldProvenanceCannotBecomeALiveLifetimeOrNumericOrigin()
     {
         var runtime = Talking();
-        var native = new LoomNativeDependencyTracker(_ => { });
-        var numeric = new LoomRuntimeRelationTracker(_ => { });
-        var records = new List<LoomScriptObservation>();
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "message")), runtime.ObjectStates, [],
+        var native = new ScummNativeDependencyTracker(_ => { });
+        var numeric = new ScummRuntimeRelationTracker(_ => { });
+        var records = new List<ScummScriptObservation>();
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "message")), runtime.ObjectStates, [],
             runtime: runtime, observation: new(new(records.Add, nativeDependencies: native, runtimeRelations: numeric), 1));
         Assert.Empty(native.ActiveRelations);
         Assert.DoesNotContain(numeric.ActiveRelations, r => r.ObservedOrigin is not null);
@@ -62,19 +61,19 @@ public sealed class LoomMessageDependencyTests
     [InlineData("verb")]
     public void ExecutedMessageMutationsNotifyEvenForNoOpsAndPreserveOtherNativeFamilies(string operation)
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var updates = new List<LoomNativeDependencyUpdate>();
-        var tracker = new LoomNativeDependencyTracker(updates.Add);
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var updates = new List<ScummNativeDependencyUpdate>();
+        var tracker = new ScummNativeDependencyTracker(updates.Add);
         // Synthetic complete native reads isolate the notification API; production message
         // fields retain unknown provenance and establish no loaded lifetime claim.
-        var site = new LoomScriptObservationSite(0, null, 0, 0, "instruction", 0, "debug", "0x0000");
-        var selector = new LoomScriptOperandBinding("native-message", "_message", null, 0, false);
+        var site = new ScummScriptObservationSite(0, null, 0, 0, "instruction", 0, "debug", "0x0000");
+        var selector = new ScummScriptOperandBinding("native-message", "_message", null, 0, false);
         tracker.Observe(new(1, 1, null, 1, site, new Dictionary<string, ushort>(), [], true,
             SourceAccess: new([], null, [], [new("message-talk-delay", selector, 0, true, "historical native estimate"),
                 new("object-position-x", selector with { Value = 204 }, 16, false)])));
         Assert.Equal(2, tracker.ActiveRelations.Count);
         var history = tracker.ActiveRelations[0];
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: tracker);
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: tracker);
         using (runtime.ObserveGlobalMutations(observer)) {
             switch (operation) {
                 case "frame": runtime.Messages.StartFrame(0, runtime); break;
@@ -96,8 +95,8 @@ public sealed class LoomMessageDependencyTests
     public void UnscopedAndRawExternalMessageNotificationsRequireAnAttachedSink()
     {
         var runtime = Talking();
-        var tracker = new LoomNativeDependencyTracker(_ => { });
-        var selector = new LoomScriptOperandBinding("native-message", "_message", null, 0, false);
+        var tracker = new ScummNativeDependencyTracker(_ => { });
+        var selector = new ScummScriptOperandBinding("native-message", "_message", null, 0, false);
         tracker.Observe(new(1, 1, null, 1, new(0, null, 0, 0, "instruction", 0, "debug"), new Dictionary<string, ushort>(), [], false,
             SourceAccess: new([], null, [], [new("message-have-msg", selector, 1, true)])));
         runtime.Messages.SkipTalkDelay();
@@ -111,12 +110,12 @@ public sealed class LoomMessageDependencyTests
     {
         string Run(bool observed) {
             var runtime = Talking();
-            var outer = new List<LoomScriptObservation>();
+            var outer = new List<ScummScriptObservation>();
             var frames = new List<string>();
-            var observer = new LoomScriptObserver(outer.Add, captureSourceAccess: true, nativeDependencies: observed ? new(_ => { }) : null);
+            var observer = new ScummScriptObserver(outer.Add, captureSourceAccess: true, nativeDependencies: observed ? new(_ => { }) : null);
             using (runtime.ObserveGlobalMutations(observer)) {
                 for (var i = 0; i < 8; i++) {
-                    new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "message"), ("stopObjectCode", "")),
+                    new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "message"), ("stopObjectCode", "")),
                         runtime.ObjectStates, [], runtime: runtime, observation: new(observer, 1));
                     runtime.Messages.StartFrame(15, runtime);
                     frames.Add(JsonSerializer.Serialize(new { runtime.Messages.HaveMsg, runtime.Messages.TalkDelay, runtime.Messages.Talk,
@@ -129,16 +128,16 @@ public sealed class LoomMessageDependencyTests
         Assert.Equal(Run(false), Run(true));
     }
 
-    private static LoomScriptRuntimeState Talking()
+    private static ScummScriptRuntimeState Talking()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.Messages.Print(new(255, [], [65, 0], "synthetic talk", 0, null, "message source estimate"), runtime);
         return runtime;
     }
-    private static LoomScriptObservation Capture(LoomScriptRuntimeState runtime, Func<string, bool>? key = null)
+    private static ScummScriptObservation Capture(ScummScriptRuntimeState runtime, Func<string, bool>? key = null)
     {
-        var records = new List<LoomScriptObservation>();
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "message")), runtime.ObjectStates, [],
+        var records = new List<ScummScriptObservation>();
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "message")), runtime.ObjectStates, [],
             runtime: runtime, observation: new(new(records.Add, includeKey: key, captureSourceAccess: true), 1));
         return records.First(r => r.Site?.Stage == "instruction");
     }

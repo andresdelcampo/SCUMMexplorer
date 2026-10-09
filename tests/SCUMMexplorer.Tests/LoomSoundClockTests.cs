@@ -1,7 +1,6 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -12,15 +11,15 @@ public sealed class LoomSoundClockTests
     {
         // Startup is 40 ticks: ceil(40 * 473 / (192 * 2)) = 50 callbacks.
         var finite = Lifetime([0xFF, 0x2F]);
-        Assert.Equal(new(LoomSoundLifetimeKind.Finite, 50, true), finite);
-        Assert.Equal(LoomSoundLifetimeKind.Looping, Lifetime([0x90, 60, 64, 4, 0xFF, 0x2F], loop: true).Kind);
-        Assert.Equal(LoomSoundLifetimeKind.Unknown, Lifetime([0xFF, 0x2F], loop: true).Kind);
-        Assert.Equal(LoomSoundLifetimeKind.Unknown, Lifetime([0x90]).Kind);
-        Assert.Equal(LoomSoundLifetimeKind.Unknown, Lifetime([0xFF, 0x2F], loop: true, loopOffset: 50).Kind);
+        Assert.Equal(new(ScummSoundLifetimeKind.Finite, 50, true), finite);
+        Assert.Equal(ScummSoundLifetimeKind.Looping, Lifetime([0x90, 60, 64, 4, 0xFF, 0x2F], loop: true).Kind);
+        Assert.Equal(ScummSoundLifetimeKind.Unknown, Lifetime([0xFF, 0x2F], loop: true).Kind);
+        Assert.Equal(ScummSoundLifetimeKind.Unknown, Lifetime([0x90]).Kind);
+        Assert.Equal(ScummSoundLifetimeKind.Unknown, Lifetime([0xFF, 0x2F], loop: true, loopOffset: 50).Kind);
         // A loop target can be inside the resource but point at an invalid command.
-        Assert.Equal(LoomSoundLifetimeKind.Unknown, Lifetime([0xFF, 0x2F, 0x01, 0, 0], loop: true, loopOffset: 2).Kind);
+        Assert.Equal(ScummSoundLifetimeKind.Unknown, Lifetime([0xFF, 0x2F, 0x01, 0, 0], loop: true, loopOffset: 2).Kind);
 
-        var clock = new LoomSoundClock(id => id == 1 ? finite : new(LoomSoundLifetimeKind.Looping, null, true));
+        var clock = new ScummSoundClock(id => id == 1 ? finite : new(ScummSoundLifetimeKind.Looping, null, true));
         clock.Start(1, false); clock.Start(2, false);
         Assert.Empty(clock.Advance(6)); // 47.2 callbacks at 0.1 s: still active.
         Assert.True(clock.Status(1).Running);
@@ -32,8 +31,8 @@ public sealed class LoomSoundClockTests
     [Fact]
     public void RestartStopOverlapAndUnknownCertaintyAreIndependent()
     {
-        var clock = new LoomSoundClock(id => id == 3 ? new(LoomSoundLifetimeKind.Unknown, null, false, "malformed") :
-            new(LoomSoundLifetimeKind.Finite, 472, false));
+        var clock = new ScummSoundClock(id => id == 3 ? new(ScummSoundLifetimeKind.Unknown, null, false, "malformed") :
+            new(ScummSoundLifetimeKind.Finite, 472, false));
         clock.Start(1, false); clock.Advance(30); clock.Start(2, true); clock.Start(1, false);
         Assert.Empty(clock.Advance(30));
         Assert.Equal(new[] { 1, 2 }, clock.Advance(30));
@@ -52,16 +51,16 @@ public sealed class LoomSoundClockTests
         if (string.IsNullOrWhiteSpace(folder)) return;
         var resources = new GameFolderScanner().Scan(folder).Resources
             .Where(r => r.Kind == ResourceKind.Sound && r.ResourceId.HasValue).ToDictionary(r => r.ResourceId!.Value);
-        var decoder = new LoomAdlibAudio();
+        var decoder = new ScummAdlibAudio();
         foreach (var id in Enumerable.Range(1, 32).Where(id => id != 24))
         {
             var lifetime = decoder.ReadLifetime(resources[id]);
-            Assert.NotEqual(LoomSoundLifetimeKind.Unknown, lifetime.Kind);
-            if (lifetime.Kind == LoomSoundLifetimeKind.Finite) Assert.True(lifetime.Callbacks > 0);
+            Assert.NotEqual(ScummSoundLifetimeKind.Unknown, lifetime.Kind);
+            if (lifetime.Kind == ScummSoundLifetimeKind.Finite) Assert.True(lifetime.Callbacks > 0);
         }
-        Assert.Equal(LoomSoundLifetimeKind.Unknown, decoder.ReadLifetime(resources[24]).Kind);
-        Assert.Equal(LoomSoundLifetimeKind.Unknown, decoder.ReadLifetime(resources[33]).Kind);
-        Assert.Equal(LoomSoundLifetimeKind.Looping, decoder.ReadLifetime(resources[11]).Kind);
+        Assert.Equal(ScummSoundLifetimeKind.Unknown, decoder.ReadLifetime(resources[24]).Kind);
+        Assert.Equal(ScummSoundLifetimeKind.Unknown, decoder.ReadLifetime(resources[33]).Kind);
+        Assert.Equal(ScummSoundLifetimeKind.Looping, decoder.ReadLifetime(resources[11]).Kind);
         Assert.True(decoder.ReadLifetime(resources[31]).Callbacks > 472 * 180);
     }
 
@@ -84,7 +83,7 @@ public sealed class LoomSoundClockTests
         Assert.DoesNotContain(session.Snapshot.Uncertainties, line => line.Contains("sound 23", StringComparison.OrdinalIgnoreCase));
     }
 
-    private static LoomSoundLifetime Lifetime(byte[] events, bool loop = false, ushort loopOffset = 0)
+    private static ScummSoundLifetime Lifetime(byte[] events, bool loop = false, ushort loopOffset = 0)
     {
         var bytes = new byte[26 + 0x93 + events.Length];
         BinaryPrimitives.WriteUInt16LittleEndian(bytes, 22);
@@ -98,7 +97,7 @@ public sealed class LoomSoundClockTests
         try
         {
             File.WriteAllBytes(path, bytes);
-            return new LoomAdlibAudio().ReadLifetime(new("fixture", ResourceKind.Sound, path, ContainerFileNumber: 1, Offset: 0));
+            return new ScummAdlibAudio().ReadLifetime(new("fixture", ResourceKind.Sound, path, ContainerFileNumber: 1, Offset: 0));
         }
         finally { File.Delete(path); }
     }

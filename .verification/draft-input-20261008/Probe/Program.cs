@@ -1,7 +1,6 @@
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // Independent catalog-prepared sessions; actual click/key dispatch, with explicit staff/note setup.
 // No native ScummVM interaction, story edits, placements, draft-table edits or coverage promotion.
@@ -17,7 +16,7 @@ foreach (var (edition, relative) in new[] { ("ega-en", "loom ega mt32 en"), ("eg
     var data = ScummDataSources.For(game);
     var source = new List<string>();
     var lifetime = new List<string>();
-    void Inspect(string label, LoomScriptDisassembly? script)
+    void Inspect(string label, ScummScriptDisassembly? script)
     {
         if (script is null) return;
         foreach (var i in script.Instructions.Where(i => i.Operation is "stopObjectScript" or "pickupObject"))
@@ -57,7 +56,7 @@ foreach (var (edition, relative) in new[] { ("ega-en", "loom ega mt32 en"), ("eg
     File.WriteAllLines(Path.Combine(output, edition + "-source.txt"), source);
     File.WriteAllLines(Path.Combine(output, edition + "-lifetimes.txt"), lifetime);
     if (args.Length > 2 && args[2] == "source") continue;
-    var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
     foreach (var reverse in new[] { false, true })
     {
         var s = new LoomExplorationSession(game, indexed, completeBoot: game.Id == GameId.Loom);
@@ -93,7 +92,7 @@ foreach (var (edition, relative) in new[] { ("ega-en", "loom ega mt32 en"), ("eg
         {
             var record = rd.Objects.Single(o => o.Id == id);
             var snapshot = s.Snapshot;
-            return LoomObjectHitTest.Find(rd.Objects, snapshot.ObjectStates, snapshot.ObjectPositions, snapshot.ObjectClasses,
+            return ScummObjectHitTest.Find(rd.Objects, snapshot.ObjectStates, snapshot.ObjectPositions, snapshot.ObjectClasses,
                 record.X + record.Width / 2, record.Y + record.Height / 2).Found == id;
         }
         var obj = rd.Objects.Single(o => o.Id == target.Key);

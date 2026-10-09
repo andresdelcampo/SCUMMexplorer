@@ -7,8 +7,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Relationships;
 
 internal static class Program
 {

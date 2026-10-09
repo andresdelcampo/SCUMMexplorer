@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // M3c playback controls in the real MainWindow, on the real playback clock (10 frames a second).
 // 1. "Play a cutscene" → script 052: a fresh session after the boot, Room 10 from the catalog, object 295's

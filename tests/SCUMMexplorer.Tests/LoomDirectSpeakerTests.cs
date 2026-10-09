@@ -1,7 +1,5 @@
 using System.Text;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -27,7 +25,7 @@ public sealed class LoomDirectSpeakerTests
         var source = Assert.Single(LoomSceneStateScanner.For(game).FindActorPlacers(actor, 9), p => p.Where == step.EndBoundary);
         Assert.NotNull(source.Dress?.Costume);
         Assert.Contains(setup.Notes, n => n.Contains(source.Where, StringComparison.Ordinal) && n.Contains("estimate", StringComparison.Ordinal));
-        var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+        var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
         var session = new LoomExplorationSession(game, indexed);
         session.VisitRoomById(9);
         LoomCdSceneSetupPlanner.Settle(session);
@@ -38,7 +36,7 @@ public sealed class LoomDirectSpeakerTests
         Assert.True(shown.Visible);
         Assert.Equal(9, shown.Room);
         Assert.Equal(source.Dress!.Costume, shown.Look.Costume);
-        var layer = LoomActorRenderer.Render([shown], 9, room.Width, room.Height, data.ReadCostume);
+        var layer = ScummActorRenderer.Render([shown], 9, room.Width, room.Height, data.ReadCostume);
         Assert.True(Assert.Single(layer.Actors).Pixels > 0);
         Assert.Equal(status.AvailableNoteCount, session.GameStatus.AvailableNoteCount);
         Assert.Equal(status.StaffHeld, session.GameStatus.StaffHeld);

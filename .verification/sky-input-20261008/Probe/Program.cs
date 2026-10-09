@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 // One bounded route prefix: play the own-source opening, then aim at the sky.
 // Staff/eight-note controls are explicit exploration preparation, not earned gameplay.
@@ -38,12 +37,12 @@ void Check(bool condition, string label)
 }
 foreach (bool reverse in new[] { false, true })
 {
-    var observed = new List<LoomScriptObservation>();
-    var observer = new LoomScriptObserver(observed.Add,
+    var observed = new List<ScummScriptObservation>();
+    var observer = new ScummScriptObserver(observed.Add,
         includeSite: site => site.Script is 6 or 7 or 10 or 45,
         includeKey: key => key is "var[0x099]" or "var[0x098]" || key.StartsWith("local["),
         captureOperandBindings: true, captureSourceAccess: true);
-    var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(),
+    var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(),
         completeBoot: false, playCdIntro: true, observer: observer);
     int frames = 0;
     int playing = 0;

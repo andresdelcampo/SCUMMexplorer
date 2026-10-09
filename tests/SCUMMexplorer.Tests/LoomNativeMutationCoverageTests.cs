@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -13,11 +12,11 @@ public sealed class LoomNativeMutationCoverageTests
     [InlineData("remove-owner")]
     public void NativeSettersAndRemovalsRetireHistoricalReadsWithoutChangingEstimates(string operation)
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 },
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 },
             new Dictionary<int, byte> { [204] = 15 }, new Dictionary<int, uint> { [204] = 0 });
         runtime.EstimatedStates.Add(204);
-        var native = new LoomNativeDependencyTracker(_ => { });
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: native);
+        var native = new ScummNativeDependencyTracker(_ => { });
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: native);
         using (runtime.ObserveGlobalMutations(observer)) {
             Query(runtime, observer, "ifState", "0x00CC, 0x01, branch +0 -> 0x0001");
             var history = Assert.Single(native.ActiveRelations);
@@ -45,11 +44,11 @@ public sealed class LoomNativeMutationCoverageTests
     [InlineData("hide")]
     public void ActualActorMutatorsRetireSameValueAndChangedFieldCorrespondence(string operation)
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var place = new LoomActorTable.Placement(2, null, null, runtime.ObjectClasses);
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var place = new ScummActorTable.Placement(2, null, null, runtime.ObjectClasses);
         runtime.Actors.Put(1, 24, 32, 2, place, null);
-        var native = new LoomNativeDependencyTracker(_ => { });
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: native);
+        var native = new ScummNativeDependencyTracker(_ => { });
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: native);
         using (runtime.ObserveGlobalMutations(observer)) {
             Query(runtime, observer, "getActorRoom", "local[0x000], 0x01");
             var history = Assert.Single(native.ActiveRelations);
@@ -70,10 +69,10 @@ public sealed class LoomNativeMutationCoverageTests
     [Fact]
     public void ActualPaletteWritesAndPaletteEstimatesKeepPlacementIndependent()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.Actors.Put(1, 24, 32, 2, new(2, null, null, runtime.ObjectClasses), null);
-        var native = new LoomNativeDependencyTracker(_ => { });
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: native);
+        var native = new ScummNativeDependencyTracker(_ => { });
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: native);
         using (runtime.ObserveGlobalMutations(observer)) {
             Query(runtime, observer, "getActorRoom", "local[0x000], 0x01");
             runtime.Actors.SetPalette(1, 0, 0);
@@ -87,9 +86,9 @@ public sealed class LoomNativeMutationCoverageTests
     [Fact]
     public void NotificationScopeDisposalAndRawSameValueLimitsRemainExplicit()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 });
-        var native = new LoomNativeDependencyTracker(_ => { });
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: native);
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 });
+        var native = new ScummNativeDependencyTracker(_ => { });
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: native);
         Query(runtime, observer, "ifState", "0x00CC, 0x01, branch +0 -> 0x0001");
         runtime.SetObjectState(204, 1); // Executor notification scope is already disposed.
         Assert.Single(native.ActiveRelations);
@@ -104,14 +103,14 @@ public sealed class LoomNativeMutationCoverageTests
     [Fact]
     public void SameValueSourceStateWriteIsNotifiedEvenAfterConservativeAccessBarrier()
     {
-        var updates = new List<LoomNativeDependencyUpdate>();
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 });
+        var updates = new List<ScummNativeDependencyUpdate>();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 });
         Query(runtime, new(_ => { }, nativeDependencies: new(updates.Add)), "setState", "0x00CC, 0x01");
         Assert.Contains(updates, u => u.Observation is null && u.Barrier == "notified native mutation (including same value)");
         Assert.Equal(1, runtime.ObjectStates[204]);
     }
 
-    private static void Query(LoomScriptRuntimeState runtime, LoomScriptObserver observer, string op, string args) =>
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code((op, args), ("stopObjectCode", "")),
+    private static void Query(ScummScriptRuntimeState runtime, ScummScriptObserver observer, string op, string args) =>
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code((op, args), ("stopObjectCode", "")),
             runtime.ObjectStates, [], runtime: runtime, observation: new(observer, 1));
 }

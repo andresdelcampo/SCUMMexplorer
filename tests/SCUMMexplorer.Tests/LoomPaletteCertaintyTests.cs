@@ -1,13 +1,12 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
 public sealed class LoomPaletteCertaintyTests
 {
-    private static LoomScriptRuntimeState Runtime()
+    private static ScummScriptRuntimeState Runtime()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>()) { CurrentRoom = 2 };
-        var place = new LoomActorTable.Placement(2, null, null, null);
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>()) { CurrentRoom = 2 };
+        var place = new ScummActorTable.Placement(2, null, null, null);
         foreach (var number in new[] { 1, 2 })
         {
             runtime.Actors.SetIgnoreBoxes(number, true);
@@ -16,14 +15,14 @@ public sealed class LoomPaletteCertaintyTests
         return runtime;
     }
 
-    private static LoomBoundedScriptResult Run(LoomScriptRuntimeState runtime, bool pathEstimated,
+    private static ScummBoundedScriptResult Run(ScummScriptRuntimeState runtime, bool pathEstimated,
         params (string Operation, string Operands)[] operations)
     {
         var instructions = operations.Append(("stopObjectCode", ""))
-            .Select((op, offset) => new LoomScriptInstruction(offset, 0, op.Item1, op.Item2, "00")).ToArray();
-        var script = new LoomScriptDisassembly(1, 1, 0, instructions.Length, instructions.Length,
+            .Select((op, offset) => new ScummScriptInstruction(offset, 0, op.Item1, op.Item2, "00")).ToArray();
+        var script = new ScummScriptDisassembly(1, 1, 0, instructions.Length, instructions.Length,
             instructions, null, null, [], []);
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime,
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime,
             pathEstimated: pathEstimated);
         Assert.True(run.ReachedStop);
         return run;

@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -15,15 +14,15 @@ public sealed class LoomCallBoundaryOrderTests
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, []"), ("stopObjectCode", "")));
             session.AdvanceFrame();
         }, chronology: chronology);
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
         foreach (var item in chronology)
         {
-            bool Alter(LoomScriptObservationSite? site, bool? stop) => site is { Script: 2, Stage: "end" } &&
+            bool Alter(ScummScriptObservationSite? site, bool? stop) => site is { Script: 2, Stage: "end" } &&
                 (defect == "terminal-begin" && stop == true || defect == "yield-begin" && stop == false);
-            if (item is LoomScriptObservation script)
+            if (item is ScummScriptObservation script)
                 tracker.ObserveScript(Alter(script.Site, script.ReachedStop) ? script with { Site = script.Site! with { Stage = "begin" } } : script);
-            else if (item is LoomCallObservation call)
+            else if (item is ScummCallObservation call)
                 tracker.ObserveCall(Alter(call.Site, call.ReachedStop) ? call with { Site = call.Site with { Stage = "begin" } } : call);
         }
         if (defect == "none") Assert.Contains(updates, u => u.ChildTerminated);
@@ -44,19 +43,19 @@ public sealed class LoomCallBoundaryOrderTests
     public void ImmediateCorrespondenceRequiresActualInitializationAndDispatchPhases(string defect)
     {
         var chronology = Capture(chain: false);
-        var dispatch = chronology.OfType<LoomCallObservation>().Single(c => c.Stage == "dispatch").Call!;
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        var dispatch = chronology.OfType<ScummCallObservation>().Single(c => c.Stage == "dispatch").Call!;
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
         long sequence = 0;
         foreach (var item in chronology)
         {
-            if (item is LoomScriptObservation script)
+            if (item is ScummScriptObservation script)
             {
                 if (script.Site is { Script: 2, Stage: "begin" })
                 {
                     if (defect == "late-initialization")
                     {
-                        var host = chronology.OfType<LoomCallObservation>().Single(c => c.Stage == "dispatch-ended");
+                        var host = chronology.OfType<ScummCallObservation>().Single(c => c.Stage == "dispatch-ended");
                         tracker.ObserveCall(host with { Sequence = ++sequence });
                     }
                     if (defect == "native") tracker.NotifyExternal("omitted native scheduler boundary", dispatch.Slot);
@@ -64,7 +63,7 @@ public sealed class LoomCallBoundaryOrderTests
                 }
                 tracker.ObserveScript(ChangeSite(script, defect));
             }
-            else if (item is LoomCallObservation call)
+            else if (item is ScummCallObservation call)
             {
                 if (call.Stage == "dispatch-ended")
                 {
@@ -99,13 +98,13 @@ public sealed class LoomCallBoundaryOrderTests
     public void DeferredChainNeedsItsObservedHostAndTerminatedChainingCaller(string defect)
     {
         var chronology = Capture(chain: true);
-        var dispatch = chronology.OfType<LoomCallObservation>().Single(c => c.Stage == "dispatch" && c.Site.Operation == "chainScript").Call!;
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        var dispatch = chronology.OfType<ScummCallObservation>().Single(c => c.Stage == "dispatch" && c.Site.Operation == "chainScript").Call!;
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
         long sequence = 0;
         foreach (var item in chronology)
         {
-            if (item is LoomScriptObservation script)
+            if (item is ScummScriptObservation script)
             {
                 if (script.Site is { Script: 2, Stage: "end" })
                     script = defect switch {
@@ -116,7 +115,7 @@ public sealed class LoomCallBoundaryOrderTests
                     };
                 tracker.ObserveScript(script);
             }
-            else if (item is LoomCallObservation call)
+            else if (item is ScummCallObservation call)
             {
                 if (call.Stage == "caller-ended" && call.Call?.Id == dispatch.Id && defect == "missing-caller-end") continue;
                 if (call.Site is { Script: 2, Stage: "end" })
@@ -138,13 +137,13 @@ public sealed class LoomCallBoundaryOrderTests
         Assert.All(chain, u => Assert.Null(u.ImmediateStopCorrespondence));
     }
 
-    private static LoomScriptObservationSite InitialSite(LoomScriptObservationSite site, string defect) => defect switch {
+    private static ScummScriptObservationSite InitialSite(ScummScriptObservationSite site, string defect) => defect switch {
         "initial-offset" => site with { Offset = 1 },
         "initial-instruction" => site with { Stage = "instruction" },
         _ => site
     };
 
-    private static LoomScriptObservation ChangeSite(LoomScriptObservation script, string defect)
+    private static ScummScriptObservation ChangeSite(ScummScriptObservation script, string defect)
     {
         if (script.Site is { Script: 2, Stage: "begin" } site) return script with { Site = InitialSite(site, defect) };
         if (script.Site is { Script: 0, Stage: "instruction", Operation: "stopObjectCode" } continuation && defect == "continuation-begin")

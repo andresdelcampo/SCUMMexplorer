@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -14,7 +13,7 @@ public sealed class LoomCdReadableTests
         var glossary = LoomGlossary.Load(game);
         var counts = new Dictionary<string, int>();
         var raw = new Dictionary<string, int>();
-        void Check(string kind, LoomScriptDisassembly? script)
+        void Check(string kind, ScummScriptDisassembly? script)
         {
             if (script is null) return;
             var output = new LoomScriptPresenter(glossary).Present(script);

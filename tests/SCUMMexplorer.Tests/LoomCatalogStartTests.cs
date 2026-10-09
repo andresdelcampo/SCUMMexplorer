@@ -1,7 +1,5 @@
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -46,7 +44,7 @@ public sealed class LoomCatalogStartTests
             var actor = session.Actors.Single(a => a.Number == 3);
             if (session.Snapshot.RoomId != 34 || actor.Visible != true || actor.Room != 34) continue;
             Assert.Equal(120, actor.Look.Costume);
-            var layer = LoomActorRenderer.Render([actor], 34, 640, 144, session.ReadCostume);
+            var layer = ScummActorRenderer.Render([actor], 34, 640, 144, session.ReadCostume);
             drawnGhost |= layer.Actors.Any(a => a.Number == 3 && a.Costume == 120 && a.Pixels > 0);
         }
         Assert.True(conversation.Complete, conversation.Failure);

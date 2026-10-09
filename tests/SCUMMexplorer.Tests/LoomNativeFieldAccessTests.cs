@@ -1,5 +1,3 @@
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -12,8 +10,8 @@ public sealed class LoomNativeFieldAccessTests
     [InlineData("userInputSoftOff", -3)]
     public void ImplicitNativeInputCopiesSignedBeforeValueAndRetiresOnExecutedWrite(string command, int after)
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>()) { UserPut = -2, UserPutEstimate = "prior input estimate" };
-        var updates = new List<LoomNativeDependencyUpdate>();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>()) { UserPut = -2, UserPutEstimate = "prior input estimate" };
+        var updates = new List<ScummNativeDependencyUpdate>();
         var capture = Capture(runtime, "cursorCommand", command, native: new(updates.Add));
         var dependency = Assert.Single(capture.SourceAccess!.NativeDependencies!);
         Assert.Equal("user-input", dependency.Domain);
@@ -56,8 +54,8 @@ public sealed class LoomNativeFieldAccessTests
     {
         var runtime = Positioned();
         runtime.EstimatedStates.Add(204);
-        var tracker = new LoomNativeDependencyTracker(_ => { });
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: tracker);
+        var tracker = new ScummNativeDependencyTracker(_ => { });
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: tracker);
         using (runtime.ObserveGlobalMutations(observer)) {
             Query(runtime, observer, "getActorX", "local[0x000], 0x00CC");
             var historical = tracker.ActiveRelations.ToArray();
@@ -78,8 +76,8 @@ public sealed class LoomNativeFieldAccessTests
     public void RawPositionSameValueStillRequiresNotificationAndDoesNotClearHistory()
     {
         var runtime = Positioned();
-        var tracker = new LoomNativeDependencyTracker(_ => { });
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: tracker);
+        var tracker = new ScummNativeDependencyTracker(_ => { });
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: tracker);
         using (runtime.ObserveGlobalMutations(observer)) {
             Query(runtime, observer, "getActorY", "local[0x000], 0x00CC");
             var copied = tracker.ActiveRelations.ToArray();
@@ -105,11 +103,11 @@ public sealed class LoomNativeFieldAccessTests
     public void DrawCoordinatesRemainRawOperandsAndSentinelStillNotifiesStoredPosition()
     {
         var runtime = Positioned();
-        var records = new[] { new LoomRoomObjectRecord(204, 0, 16, 24, 8, 8, 0, 0, 16, 24, 0, 0, null) };
-        var updates = new List<LoomNativeDependencyUpdate>();
-        var outer = new List<LoomScriptObservation>();
-        var observer = new LoomScriptObserver(outer.Add, captureSourceAccess: true, nativeDependencies: new(updates.Add));
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("drawObject", "0x00CC, at, 0x00FF, 0x00FF"), ("stopObjectCode", "")),
+        var records = new[] { new ScummRoomObjectRecord(204, 0, 16, 24, 8, 8, 0, 0, 16, 24, 0, 0, null) };
+        var updates = new List<ScummNativeDependencyUpdate>();
+        var outer = new List<ScummScriptObservation>();
+        var observer = new ScummScriptObserver(outer.Add, captureSourceAccess: true, nativeDependencies: new(updates.Add));
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("drawObject", "0x00CC, at, 0x00FF, 0x00FF"), ("stopObjectCode", "")),
             runtime.ObjectStates, records, runtime: runtime, observation: new(observer, 1));
         var access = outer.First(o => o.Site?.Stage == "instruction").SourceAccess!;
         Assert.Equal(new[] { "target", "draw-x", "draw-y" }, access.Bindings.Select(b => b.Role));
@@ -124,8 +122,8 @@ public sealed class LoomNativeFieldAccessTests
     public void NativeInputEstimateWriteAndSameValueAssignmentNotifyWithoutChangingOtherFamilies()
     {
         var runtime = Positioned();
-        var tracker = new LoomNativeDependencyTracker(_ => { });
-        var observer = new LoomScriptObserver(_ => { }, nativeDependencies: tracker);
+        var tracker = new ScummNativeDependencyTracker(_ => { });
+        var observer = new ScummScriptObserver(_ => { }, nativeDependencies: tracker);
         using (runtime.ObserveGlobalMutations(observer)) {
             Query(runtime, observer, "getActorX", "local[0x000], 0x00CC");
             runtime.UserPut = runtime.UserPut;
@@ -135,21 +133,21 @@ public sealed class LoomNativeFieldAccessTests
         }
     }
 
-    private static LoomScriptRuntimeState Positioned()
+    private static ScummScriptRuntimeState Positioned()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 });
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte> { [204] = 1 });
         runtime.SetObjectPosition(204, new(16, 24));
         return runtime;
     }
-    private static LoomScriptObservation Capture(LoomScriptRuntimeState runtime, string op, string args,
-        LoomNativeDependencyTracker? native = null, Func<string, bool>? filter = null)
+    private static ScummScriptObservation Capture(ScummScriptRuntimeState runtime, string op, string args,
+        ScummNativeDependencyTracker? native = null, Func<string, bool>? filter = null)
     {
-        var records = new List<LoomScriptObservation>();
+        var records = new List<ScummScriptObservation>();
         Query(runtime, new(records.Add, includeKey: filter, captureSourceAccess: true, nativeDependencies: native), op, args);
         return records.First(r => r.Site?.Stage == "instruction");
     }
-    private static void Query(LoomScriptRuntimeState runtime, LoomScriptObserver observer, string op, string args) =>
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code((op, args), ("stopObjectCode", "")),
-            runtime.ObjectStates, [new LoomRoomObjectRecord(204, 0, 16, 24, 8, 8, 0, 0, 80, 96, 0, 0, null)],
+    private static void Query(ScummScriptRuntimeState runtime, ScummScriptObserver observer, string op, string args) =>
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code((op, args), ("stopObjectCode", "")),
+            runtime.ObjectStates, [new ScummRoomObjectRecord(204, 0, 16, 24, 8, 8, 0, 0, 80, 96, 0, 0, null)],
             runtime: runtime, observation: new(observer, 1));
 }

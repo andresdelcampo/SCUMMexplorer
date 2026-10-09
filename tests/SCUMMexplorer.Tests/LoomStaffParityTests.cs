@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -13,7 +12,7 @@ public sealed class LoomStaffParityTests
     {
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", edition));
         var game = new GameFolderScanner().Scan(folder);
-        var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
+        var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
         var session = new LoomExplorationSession(game, indexed);
         void Visit(int room)
         {
@@ -59,7 +58,7 @@ public sealed class LoomStaffParityTests
     {
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", edition));
         var game = new GameFolderScanner().Scan(folder);
-        var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
+        var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
         var session = new LoomExplorationSession(game, indexed);
         session.VisitRoom(game.Rooms.Single(r => r.ResourceId == 26), preserveStaffLevel: true);
         for (int f = 0; f < 600 && (!session.GameStatus.CanEdit || f < 40); f++) session.AdvanceFrame();

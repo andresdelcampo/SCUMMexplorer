@@ -33,7 +33,7 @@ internal static class Program
             var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
             using var stream = File.Create(Path.Combine(output, file)); encoder.Save(stream);
         }
-        int? SessionRoom() => (Field("_session") as SCUMMexplorer.Core.Formats.LoomExplorationSession)?.Snapshot.RoomId;
+        int? SessionRoom() => (Field("_session") as SCUMMexplorer.Core.Loom.LoomExplorationSession)?.Snapshot.RoomId;
         window.ContentRendered += async (_, _) =>
         {
             var report = new List<string>();
@@ -76,7 +76,7 @@ internal static class Program
                 var leftover = Field("_playback");
                 report.Add($"opened Room 09: playback null {leftover is null}, still the preview {leftover?.GetType().GetProperty("Preview")?.GetValue(leftover)}, what \"{leftover?.GetType().GetProperty("What")?.GetValue(leftover)}\"; session room {room9} then {SessionRoom()} (expected 9 both: the director no longer runs)");
                 Save("after-leaving.png");
-                var s = (SCUMMexplorer.Core.Formats.LoomExplorationSession)Field("_session")!;
+                var s = (SCUMMexplorer.Core.Loom.LoomExplorationSession)Field("_session")!;
                 report.Add("session actors after leaving: " + string.Join("; ", s.Actors.Where(a => a.Room == s.Snapshot.RoomId).Select(a => $"actor {a.Number} costume {a.Look.Costume} at {a.X},{a.Y} visible {a.Visible} frame {a.Look.Frame} facing {a.Look.Facing} elev {a.Look.Elevation}")));
                 var overlay = Find<Image>("RoomActorOverlay");
                 report.Add($"actor overlay: visibility {overlay.Visibility}, source {(overlay.Source is null ? "null" : overlay.Source.Width + "x" + overlay.Source.Height)}, playback {Field("_playback") is not null}");

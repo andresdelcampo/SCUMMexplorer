@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -24,7 +23,7 @@ public sealed class LoomVerbClickTests
     private static ushort? Var(LoomExplorationSession session, int number) =>
         session.Snapshot.KnownGlobalVariables.TryGetValue($"var[0x{number:X3}]", out var value) ? value : null;
 
-    private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
+    private static ScummScriptDisassembly Script(params ScummScriptInstruction[] instructions) =>
         new(250, 1, 0, 32, 16, instructions, null, null, [], [], "Synthetic test script");
 
     // Script 018 [2], as script 003 starts it in play: var[0x064] = 2 and the distaff notes on.
@@ -88,7 +87,7 @@ public sealed class LoomVerbClickTests
         Assert.Contains(outside.Uncertainties, line => line.Contains("not sent, because the point is outside the verb area", StringComparison.Ordinal));
 
         // Script 002 (the cutscene start hook) turns user input off.
-        session.RunTopLevelScript(new LoomScriptReader().Decode(game.Resources.Single(item => item.Kind == ResourceKind.Script && item.ResourceId == 2)));
+        session.RunTopLevelScript(new ScummScriptReader().Decode(game.Resources.Single(item => item.Kind == ResourceKind.Script && item.ResourceId == 2)));
         var ignored = session.ClickVerbArea(20, 150);
         Assert.Contains(ignored.Uncertainties, line => line.Contains("user input is off", StringComparison.Ordinal));
     }

@@ -1,8 +1,5 @@
 using System.Globalization;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
-using SCUMMexplorer.Core.Storage;
 
 namespace SCUMMexplorer.Core.Discovery;
 
@@ -146,7 +143,7 @@ public sealed class GameFolderScanner
         else if (Directory.Exists(path))
         {
             var folder = new FolderFileSource(path);
-            if (LoomVgaArchive.IsVga(folder)) source = folder;
+            if (ScummV4Archive.IsVga(folder)) source = folder;
             else if (folder.FileNames.Any(n => n.Equals("00.LFL", StringComparison.OrdinalIgnoreCase)) || DiscImage.FindImageIn(path) is null) return null;
             else
             {
@@ -155,9 +152,9 @@ public sealed class GameFolderScanner
             }
         }
         else return null;
-        if (!LoomVgaArchive.IsVga(source)) return null;
+        if (!ScummV4Archive.IsVga(source)) return null;
 
-        var archive = LoomVgaArchive.Load(source);
+        var archive = ScummV4Archive.Load(source);
         var resources = archive.Rooms.Select(room => new GameResource($"Room {room.Number:00}", ResourceKind.Room, source.Location,
             room.Number, string.IsNullOrEmpty(room.Name) ? "LOOM CD room (DISK01.LEC)." : $"LOOM CD room \"{room.Name}\" (DISK01.LEC).",
             1, room.Offset)).ToList();
@@ -172,7 +169,7 @@ public sealed class GameFolderScanner
                 $"Room {room.Number:00} local script {s.Number}", ResourceKind.Script, source.Location, s.Number,
                 "LOOM CD room-local script (DISK01.LEC).", 1, s.BlockOffset, ScriptRoom: room.Number)));
         const string note = "LOOM CD (SCUMM v4, VGA) read from its disc image or files: 000.LFL and DISK01.LEC. Rooms, scripts, objects, actors, texts, the sounds in DISK01.LEC (AdLib and PC speaker) and the voices on the disc's audio track are read.";
-        return new GameLibrary("LOOM (CD)", source.Location, ScummVersion.V4, "CD (VGA)", resources, note, GameId.LoomVga) { Vga = archive };
+        return new GameLibrary("LOOM (CD)", source.Location, ScummVersion.V4, "CD (VGA)", resources, note, GameId.LoomVga) { V4Archive = archive };
     }
 
     /// <summary>
@@ -184,7 +181,7 @@ public sealed class GameFolderScanner
     private static int DropUnreadableDemoResources(string folder, List<GameResource> resources)
     {
         var provisional = new GameLibrary("LOOM (demo)", folder, ScummVersion.V3, "DOS (inferred)", resources, "", GameId.Loom, true);
-        var scripts = new LoomScriptReader(ScummScriptDialects.For(GameId.Loom));
+        var scripts = new ScummScriptReader(ScummScriptDialects.For(GameId.Loom));
         bool Reads(GameResource resource)
         {
             try
@@ -192,7 +189,7 @@ public sealed class GameFolderScanner
                 return resource.Kind switch
                 {
                     ResourceKind.Script => scripts.Decode(resource) is { Issues: not { Count: > 0 }, DecodeNote: null },
-                    ResourceKind.Costume => resource.ResourceId is int id && LoomCostume.Load(provisional, id) is not null,
+                    ResourceKind.Costume => resource.ResourceId is int id && ScummCostume.Load(provisional, id) is not null,
                     // Sounds are only checked for where they start: half of the full game's sounds have no AdLib or PC speaker bundle either.
                     _ => true
                 };

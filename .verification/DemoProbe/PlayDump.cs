@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 // DemoProbe <folder> play <frames>: a fresh session, then frames; logs every room change, the pending-script count and the uncertainties.
 static class PlayDump

@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // Audit <game folder> <out folder> <loom-replays.json> [scripts|scenes|interactions|all]
 // Missing data is a hard error. A started scene is not a completed scene. All starts are isolated seed-0 previews.
@@ -16,7 +15,7 @@ var mode = args.Length > 3 ? args[3] : "all";
 var json = new JsonSerializerOptions { WriteIndented = true, PropertyNameCaseInsensitive = true };
 void Save(string name, object value) => File.WriteAllText(Path.Combine(output, name + ".json"), JsonSerializer.Serialize(value, json));
 var clock = Stopwatch.StartNew();
-var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
 LoomExplorationSession Fresh() => new(game, indexed, completeBoot: game.Id == GameId.Loom);
 var rooms = game.Rooms.Select(r => r.ResourceId!.Value).ToArray();
 var selectedRooms = mode is not ("dump" or "anomalies") && args.Length > 4 ? args.Skip(4).Select(int.Parse).ToHashSet() : rooms.ToHashSet();
@@ -38,7 +37,7 @@ if (mode == "dump")
 if (mode is "scripts" or "all")
 {
     var blocks = new List<object>(); int complete = 0, decoded = 0;
-    void Read(string place, Func<LoomScriptDisassembly?> read)
+    void Read(string place, Func<ScummScriptDisassembly?> read)
     {
         try
         {

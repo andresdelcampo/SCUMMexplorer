@@ -1,6 +1,5 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -12,7 +11,7 @@ public sealed class LoomRoomLocalScriptTests
         var room = WriteRoom(BuildRoom());
         try
         {
-            var script = new LoomScriptReader().DecodeRoomLocalScript(room, 200, 200);
+            var script = new ScummScriptReader().DecodeRoomLocalScript(room, 200, 200);
 
             Assert.NotNull(script);
             Assert.Equal(36, script.ResourceOffset);
@@ -34,7 +33,7 @@ public sealed class LoomRoomLocalScriptTests
         try
         {
             Assert.Throws<InvalidDataException>(() =>
-                new LoomScriptReader().DecodeRoomLocalScript(room, 200, 200));
+                new ScummScriptReader().DecodeRoomLocalScript(room, 200, 200));
         }
         finally { Directory.Delete(Path.GetDirectoryName(room.FilePath)!, recursive: true); }
     }
@@ -45,7 +44,7 @@ public sealed class LoomRoomLocalScriptTests
         var room = WriteRoom(BuildRoom());
         try
         {
-            Assert.Null(new LoomScriptReader().DecodeRoomLocalScript(room, 199, 200));
+            Assert.Null(new ScummScriptReader().DecodeRoomLocalScript(room, 199, 200));
         }
         finally { Directory.Delete(Path.GetDirectoryName(room.FilePath)!, recursive: true); }
     }
@@ -131,7 +130,7 @@ public sealed class LoomRoomLocalScriptTests
             var game = new GameLibrary("LOOM", directory, ScummVersion.V3, "DOS",
                 [room03, room04, script199], "test");
             var session = new LoomExplorationSession(game,
-                new LoomIndexedObjectSnapshot(new Dictionary<int, byte> { [162] = 0 },
+                new ScummIndexedObjectSnapshot(new Dictionary<int, byte> { [162] = 0 },
                     new Dictionary<int, byte> { [162] = 15 }));
             check(session, room03);
         }

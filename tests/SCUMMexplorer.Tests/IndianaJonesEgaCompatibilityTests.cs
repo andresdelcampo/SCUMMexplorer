@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -18,7 +17,7 @@ public sealed class IndianaJonesEgaCompatibilityTests
         var rooms = game.Rooms.ToArray();
         Assert.NotEmpty(rooms);
 
-        var decoder = new OldV3EgaRoomDecoder();
+        var decoder = new ScummV3EgaRoomDecoder();
         foreach (var room in rooms)
         {
             var image = decoder.Decode(File.ReadAllBytes(room.FilePath));

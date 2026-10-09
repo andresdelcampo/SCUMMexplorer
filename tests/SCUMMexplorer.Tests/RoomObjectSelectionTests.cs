@@ -1,5 +1,3 @@
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -15,7 +13,7 @@ public sealed class RoomObjectSelectionTests
             background: background);
 
         Assert.Empty(selection.ShowUnresolvedArtwork(
-            [new([new(2)], LoomSceneDrawBatches.OtherScriptPriority, "later larger overlay")], statesSetByCode: [1]));
+            [new([new(2)], ScummSceneDrawBatches.OtherScriptPriority, "later larger overlay")], statesSetByCode: [1]));
         Assert.Equal(background.Pixels.ToArray(), selection.Compose(background));
     }
 
@@ -32,7 +30,7 @@ public sealed class RoomObjectSelectionTests
         RoomDrawStep[] steps = secondaryStep ? [new(2), new(1)] : [new(1)];
 
         var estimates = selection.ShowUnresolvedArtwork(
-            [new(steps, LoomSceneDrawBatches.OtherScriptPriority, "static future draw")], statesSetByCode: [1]);
+            [new(steps, ScummSceneDrawBatches.OtherScriptPriority, "static future draw")], statesSetByCode: [1]);
 
         Assert.DoesNotContain(estimates, e => e.ObjectId == 1);
         Assert.False(selection.IsActive(closed));
@@ -51,7 +49,7 @@ public sealed class RoomObjectSelectionTests
         var overlay = Filled(10, 4, 4, 8, 8, 2);
         var hidden = new Dictionary<int, byte> { [10] = 0 };
         var selection = new RoomObjectSelection([overlay], hidden, background: background, indexedStates: hidden);
-        RoomDrawBatch[] later = [new([new(10)], LoomSceneDrawBatches.OtherScriptPriority, "later reaction")];
+        RoomDrawBatch[] later = [new([new(10)], ScummSceneDrawBatches.OtherScriptPriority, "later reaction")];
 
         Assert.Empty(selection.ShowUnresolvedArtwork(later));
         Assert.Equal(original, selection.Compose(background));
@@ -68,7 +66,7 @@ public sealed class RoomObjectSelectionTests
         var overlay = Filled(10, 4, 4, 8, 8, 2);
         var hidden = new Dictionary<int, byte> { [10] = 0 };
         var selection = new RoomObjectSelection([overlay], hidden, background: background, indexedStates: hidden);
-        RoomDrawBatch[] entry = [new([new(10)], LoomSceneDrawBatches.EntryScriptPriority, "entry")];
+        RoomDrawBatch[] entry = [new([new(10)], ScummSceneDrawBatches.EntryScriptPriority, "entry")];
 
         Assert.Single(selection.ShowUnresolvedArtwork(entry));
         Assert.True(selection.IsActive(overlay));
@@ -350,9 +348,9 @@ public sealed class RoomObjectSelectionTests
         var child = Image(2, 8, 0, 8, 8);
         var records = new[]
         {
-            new LoomRoomObjectRecord(1, 1, 0, 0, 8, 8,
+            new ScummRoomObjectRecord(1, 1, 0, 0, 8, 8,
                 0, 0, 0, 0, 0, 0, null),
-            new LoomRoomObjectRecord(3, 2, 0, 0, 8, 8,
+            new ScummRoomObjectRecord(3, 2, 0, 0, 8, 8,
                 1, 1, 0, 0, 0, 0, null),
             Record(child with { Id = 4 }, 3, 2, 2)
         };
@@ -373,7 +371,7 @@ public sealed class RoomObjectSelectionTests
         var child = Image(2, 8, 0, 8, 8);
         var records = new[]
         {
-            new LoomRoomObjectRecord(1, 1, 0, 0, 8, 8,
+            new ScummRoomObjectRecord(1, 1, 0, 0, 8, 8,
                 0, 0, 0, 0, 0, 0, null),
             Record(child, 2, 1, 0)
         };
@@ -432,9 +430,9 @@ public sealed class RoomObjectSelectionTests
 
         var estimates = selection.ShowUnresolvedArtwork(
         [
-            new RoomDrawBatch([new RoomDrawStep(1)], LoomSceneDrawBatches.OtherScriptPriority, "script 01"),
-            new RoomDrawBatch([new RoomDrawStep(2), new RoomDrawStep(5)], LoomSceneDrawBatches.EntryScriptPriority, "entry script"),
-            new RoomDrawBatch([new RoomDrawStep(3)], LoomSceneDrawBatches.OpeningFramePriority, "opening frame"),
+            new RoomDrawBatch([new RoomDrawStep(1)], ScummSceneDrawBatches.OtherScriptPriority, "script 01"),
+            new RoomDrawBatch([new RoomDrawStep(2), new RoomDrawStep(5)], ScummSceneDrawBatches.EntryScriptPriority, "entry script"),
+            new RoomDrawBatch([new RoomDrawStep(3)], ScummSceneDrawBatches.OpeningFramePriority, "opening frame"),
         ], seed: 4);
 
         Assert.Equal([(3, "opening frame"), (5, "entry script"), (6, RoomObjectSelection.FirstStoredImageReason)],
@@ -451,8 +449,8 @@ public sealed class RoomObjectSelectionTests
         var second = Filled(2, 0, 0, 8, 8, 2);
         RoomDrawBatch[] batches =
         [
-            new([new RoomDrawStep(2)], LoomSceneDrawBatches.OtherScriptPriority, "script 02"),
-            new([new RoomDrawStep(1)], LoomSceneDrawBatches.OtherScriptPriority, "script 01"),
+            new([new RoomDrawStep(2)], ScummSceneDrawBatches.OtherScriptPriority, "script 02"),
+            new([new RoomDrawStep(1)], ScummSceneDrawBatches.OtherScriptPriority, "script 01"),
         ];
         (int, string) Pick(int seed) =>
             Assert.Single(new RoomObjectSelection([first, second]).ShowUnresolvedArtwork(batches, seed)) is var estimate
@@ -479,7 +477,7 @@ public sealed class RoomObjectSelectionTests
             new Dictionary<int, byte> { [10] = 0, [11] = 0, [12] = 0 }, background: background);
 
         var estimates = selection.ShowUnresolvedArtwork(
-            [new RoomDrawBatch([new RoomDrawStep(10)], LoomSceneDrawBatches.EntryScriptPriority, "entry script")]);
+            [new RoomDrawBatch([new RoomDrawStep(10)], ScummSceneDrawBatches.EntryScriptPriority, "entry script")]);
 
         Assert.Equal([(10, "entry script"), (12, "random choice among the images stored for this position")],
             estimates.Select(item => (item.ObjectId, item.Reason)));
@@ -513,7 +511,7 @@ public sealed class RoomObjectSelectionTests
 
         // Both were set to 0 by reached code; a later batch still draws 1.
         var estimates = selection.ShowUnresolvedArtwork(
-            [new RoomDrawBatch([new RoomDrawStep(1)], LoomSceneDrawBatches.OpeningFramePriority, "opening frame")],
+            [new RoomDrawBatch([new RoomDrawStep(1)], ScummSceneDrawBatches.OpeningFramePriority, "opening frame")],
             statesSetByCode: [1, 2]);
 
         Assert.Equal([(1, "opening frame")], estimates.Select(item => (item.ObjectId, item.Reason)));
@@ -559,7 +557,7 @@ public sealed class RoomObjectSelectionTests
         return new RoomObjectImage(id, x, y, width, height, pixels);
     }
 
-    private static LoomRoomObjectRecord Record(RoomObjectImage image, int localIndex,
+    private static ScummRoomObjectRecord Record(RoomObjectImage image, int localIndex,
         int parentIndex, byte parentState) =>
         new(image.Id, localIndex, image.X, image.Y, image.Width, image.Height,
             parentIndex, parentState, 0, 0, 0, 0, null);

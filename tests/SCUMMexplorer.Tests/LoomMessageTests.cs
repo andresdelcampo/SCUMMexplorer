@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -41,8 +40,8 @@ public sealed class LoomMessageTests
     [Fact]
     public void LaterDrawnStringsDoNotEvictTheScoreAndRepeatedGlyphsReplaceTheirColour()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        LoomPrintRequest Glyph(int x, int color) => new(0xFE,
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        ScummPrintRequest Glyph(int x, int color) => new(0xFE,
             [new("position", x, 169), new("color", color)], [0x12], "Score", 0, 2, null);
         // More than the old 32-entry cap, at distinct screen locations.
         for (var i = 0; i < 40; i++) runtime.Messages.Print(Glyph(i * 8, 7), runtime);
@@ -63,9 +62,9 @@ public sealed class LoomMessageTests
     {
         // Script 008 +0x000E erases the close-up and name area (232,152)–(312,192) before
         // script 007 +0x001E prints the next object's name centred at (272, 181).
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         var table = runtime.Messages;
-        LoomPrintRequest Name(string text) => new(0xFE,
+        ScummPrintRequest Name(string text) => new(0xFE,
             [new("center"), new("position", 0x110, 0xB5), new("color", 0x8F)],
             System.Text.Encoding.ASCII.GetBytes(text), "Script 07", 0x1E, 2, null);
         table.Print(Name("cielo"), runtime);
@@ -80,7 +79,7 @@ public sealed class LoomMessageTests
         table.Print(Name("cielo"), runtime);
         table.DrawBox(0xE8, 0x98, 0x110, 0xC0, 0);
         var partly = Assert.Single(table.Drawn);
-        Assert.Equal(new LoomScreenBox(0xE8, 0x98, 0x110, 0xC0, 0), Assert.Single(partly.ErasedBy));
+        Assert.Equal(new ScummScreenBox(0xE8, 0x98, 0x110, 0xC0, 0), Assert.Single(partly.ErasedBy));
     }
 
     [Fact]
@@ -102,7 +101,7 @@ public sealed class LoomMessageTests
         var message = session.Messages.Talk;
         Assert.NotNull(message);
         Assert.Equal("Dawn.", message.Text);
-        Assert.Equal(LoomMessageKind.Talk, message.Kind);
+        Assert.Equal(ScummMessageKind.Talk, message.Kind);
         Assert.Equal(1, message.Actor);
         Assert.True(message.Center);
         Assert.Equal("Room 02 Object 156 Verb 0x36 +0x0000", message.Source);
@@ -169,7 +168,7 @@ public sealed class LoomMessageTests
         if (Start() is not { } started) return;
         var session = started.Session;
         // print 0xFF, [text, "Hi"]; waitFor message; var[0x0F0] = 1.
-        session.RunTopLevelScript(new LoomScriptDisassembly(250, 1, 0, 32, 16,
+        session.RunTopLevelScript(new ScummScriptDisassembly(250, 1, 0, 32, 16,
             [
                 new(0, 0x14, "print", "0xFF, [text, \"Hi\"]", "14 FF 0F 48 69 00"),
                 new(6, 0xAE, "waitFor", "message", "AE 02"),

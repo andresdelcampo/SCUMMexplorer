@@ -1,5 +1,4 @@
 using System.Text.Json;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -8,11 +7,11 @@ public sealed class LoomCameraDependencyTests
     [Fact]
     public void CameraWaitCopiesSignedNativeStorageWithUnknownIndependentProvenance()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.SetGlobalVariable("var[0x002]", 240);
         runtime.EstimatedVariables.Add("var[0x002]");
         runtime.Camera.DestX = -8;
-        runtime.Camera.Mode = LoomCamera.FollowActor;
+        runtime.Camera.Mode = ScummCamera.FollowActor;
         runtime.Camera.Follows = 3;
         runtime.Camera.MovingToActor = true;
         var records = Capture(runtime);
@@ -45,8 +44,8 @@ public sealed class LoomCameraDependencyTests
     [Fact]
     public void CopiedNativeCameraFieldsSupplyNeitherLiveLifetimeNorNumericOrigin()
     {
-        var native = new LoomNativeDependencyTracker(_ => { });
-        var numeric = new LoomRuntimeRelationTracker(_ => { });
+        var native = new ScummNativeDependencyTracker(_ => { });
+        var numeric = new ScummRuntimeRelationTracker(_ => { });
         var access = Capture(new(new Dictionary<int, byte>()), native, numeric)
             .Single(r => r.Site?.Operation == "waitFor").SourceAccess!;
         Assert.Equal(5, access.NativeDependencies!.Count);
@@ -64,8 +63,8 @@ public sealed class LoomCameraDependencyTests
     [InlineData("early-clamp")]
     public void ExecutedIdenticalAndNoOpCameraMutationsRetireOnlyTheCameraFamily(string operation)
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var updates = new List<LoomNativeDependencyUpdate>();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var updates = new List<ScummNativeDependencyUpdate>();
         var tracker = SyntheticReads(updates.Add);
         var history = tracker.ActiveRelations.First(r => r.Storage!.Family == "camera");
         using (runtime.ObserveGlobalMutations(new(_ => { }, nativeDependencies: tracker))) {
@@ -89,7 +88,7 @@ public sealed class LoomCameraDependencyTests
     [Fact]
     public void UnattachedAndDisposedCameraNotificationsDetectNothing()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         var previous = SyntheticReads();
         var temporary = SyntheticReads();
         runtime.Camera.DestX = 160;
@@ -107,15 +106,15 @@ public sealed class LoomCameraDependencyTests
     public void CameraObservationLeavesEveryFrameAndLegacyInstructionExact()
     {
         string Run(bool tracked) {
-            var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+            var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
             runtime.Camera.Reset(192);
-            var outer = new List<LoomScriptObservation>();
+            var outer = new List<ScummScriptObservation>();
             var frames = new List<string>();
-            var observer = new LoomScriptObserver(outer.Add, captureSourceAccess: true,
+            var observer = new ScummScriptObserver(outer.Add, captureSourceAccess: true,
                 nativeDependencies: tracked ? new(_ => { }) : null);
             using (runtime.ObserveGlobalMutations(observer)) {
                 for (var i = 0; i < 6; i++) {
-                    new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "camera"), ("stopObjectCode", "")),
+                    new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "camera"), ("stopObjectCode", "")),
                         runtime.ObjectStates, [], runtime: runtime, observation: new(observer, 1));
                     runtime.SetGlobalVariable("var[0x002]", (ushort)runtime.Camera.Move(runtime.GlobalVariables["var[0x002]"],
                         160, 320, (160, 320), null));
@@ -128,20 +127,20 @@ public sealed class LoomCameraDependencyTests
         Assert.Equal(Run(false), Run(true));
     }
 
-    private static List<LoomScriptObservation> Capture(LoomScriptRuntimeState runtime,
-        LoomNativeDependencyTracker? native = null, LoomRuntimeRelationTracker? numeric = null, Func<string, bool>? key = null)
+    private static List<ScummScriptObservation> Capture(ScummScriptRuntimeState runtime,
+        ScummNativeDependencyTracker? native = null, ScummRuntimeRelationTracker? numeric = null, Func<string, bool>? key = null)
     {
-        var records = new List<LoomScriptObservation>();
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "camera"), ("stopObjectCode", "")),
+        var records = new List<ScummScriptObservation>();
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code(("waitFor", "camera"), ("stopObjectCode", "")),
             runtime.ObjectStates, [], runtime: runtime,
             observation: new(new(records.Add, includeKey: key, captureSourceAccess: true, nativeDependencies: native, runtimeRelations: numeric), 1));
         return records;
     }
 
-    private static LoomNativeDependencyTracker SyntheticReads(Action<LoomNativeDependencyUpdate>? receive = null)
+    private static ScummNativeDependencyTracker SyntheticReads(Action<ScummNativeDependencyUpdate>? receive = null)
     {
-        var tracker = new LoomNativeDependencyTracker(receive ?? (_ => { }));
-        var selector = new LoomScriptOperandBinding("implicit-camera", "var[0x002]", "var[0x002]", 240, false);
+        var tracker = new ScummNativeDependencyTracker(receive ?? (_ => { }));
+        var selector = new ScummScriptOperandBinding("implicit-camera", "var[0x002]", "var[0x002]", 240, false);
         // Complete synthetic reads isolate notification; loaded camera provenance stays unknown.
         tracker.Observe(new(1, 1, null, 1, new(0, null, 0, 0, "instruction", 0, "debug"),
             new Dictionary<string, ushort> { ["var[0x002]"] = 240 }, [], true,

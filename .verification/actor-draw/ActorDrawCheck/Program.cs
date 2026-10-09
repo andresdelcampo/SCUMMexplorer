@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // M2c in the real MainWindow: after the boot, Room 02 shows the session's actors on the
 // actor layer (RoomActorOverlay) over the room image, sorted by y and drawn at

@@ -1,6 +1,5 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 

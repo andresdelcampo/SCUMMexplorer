@@ -1,6 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -32,7 +30,7 @@ public sealed class LoomRoomObjectsTests
         var path = Path.Combine(GameFolder(), "17.LFL");
         if (!File.Exists(path)) return;
         var bytes = File.ReadAllBytes(path);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
 
         var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
 
@@ -48,7 +46,7 @@ public sealed class LoomRoomObjectsTests
     {
         var folder = GameFolder();
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
-        var images = new LoomRoomObjects().Decode(File.ReadAllBytes(Path.Combine(folder, $"{roomNumber:00}.LFL")));
+        var images = new ScummRoomObjects().Decode(File.ReadAllBytes(Path.Combine(folder, $"{roomNumber:00}.LFL")));
         var states = new LflObjectStateReader().Read(Path.Combine(folder, "00.LFL"));
         var selection = new RoomObjectSelection(images, states);
 
@@ -62,7 +60,7 @@ public sealed class LoomRoomObjectsTests
     {
         var path = Path.Combine(GameFolder(), "28.LFL");
         if (!File.Exists(path)) return;
-        var images = new LoomRoomObjects().Decode(File.ReadAllBytes(path));
+        var images = new ScummRoomObjects().Decode(File.ReadAllBytes(path));
         var first = Assert.Single(images, image => image.Id == 479);
         var second = Assert.Single(images, image => image.Id == 486);
         var taller = Assert.Single(images, image => image.Id == 493);
@@ -81,8 +79,8 @@ public sealed class LoomRoomObjectsTests
         var path = Path.Combine(GameFolder(), "06.LFL");
         if (!File.Exists(path)) return;
         var bytes = File.ReadAllBytes(path);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
-        var images = new LoomRoomObjects().Decode(bytes);
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
+        var images = new ScummRoomObjects().Decode(bytes);
 
         Assert.Contains(records, record => record.Id == 211 && record.ImageOffset is null);
         Assert.Contains(records, record => record.Id == 212 && record.ImageOffset is not null);
@@ -104,8 +102,8 @@ public sealed class LoomRoomObjectsTests
         var folder = GameFolder();
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
 
-        var decoder = new LoomRoomObjects();
-        var background = new LoomEgaRoomDecoder();
+        var decoder = new ScummRoomObjects();
+        var background = new ScummV3EgaRoomDecoder();
         var indexStates = new LflObjectStateReader().Read(Path.Combine(folder, "00.LFL"));
         var total = 0;
         var room06Ids = Array.Empty<int>();

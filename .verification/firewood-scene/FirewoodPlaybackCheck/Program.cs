@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // M3: script 086 (the firewood scene) played in the real MainWindow, on the real playback clock.
 // 1. "Play a cutscene" → "Script 086": a fresh session after the boot, a catalog visit to Room 36, object 599's
@@ -57,7 +56,7 @@ internal static class Program
                 bool HasPlayback() => Field("_playback") is not null;
                 int? Shown() => (int?)Field("_currentRoomResource")?.GetType().GetProperty("ResourceId")?.GetValue(Field("_currentRoomResource"));
                 string Status() => Find<TextBlock>("StatusText").Text;
-                LoomActorSnapshot Ego(LoomExplorationSession session) => session.Actors.Single(actor => actor.Number == 1);
+                ScummActorSnapshot Ego(LoomExplorationSession session) => session.Actors.Single(actor => actor.Number == 1);
                 string Describe(LoomExplorationSession session)
                 {
                     var ego = Ego(session);

@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 var output = Path.GetFullPath(args[0]);
 Directory.CreateDirectory(output);
@@ -25,9 +24,9 @@ foreach (var (name, folder) in editions)
 {
     var game = new GameFolderScanner().Scan(folder);
     var data = ScummDataSources.For(game);
-    var blocks = new List<(string Place, LoomScriptDisassembly Script)>();
+    var blocks = new List<(string Place, ScummScriptDisassembly Script)>();
     var errors = new List<string>();
-    void Read(string place, Func<LoomScriptDisassembly?> read)
+    void Read(string place, Func<ScummScriptDisassembly?> read)
     {
         try { if (read() is { } script) blocks.Add((place, script)); }
         catch (Exception ex) { errors.Add(place + ": " + ex.Message); }
@@ -69,7 +68,7 @@ foreach (var (name, folder) in editions)
         b.Script.Context, b.Script.ContainerFileNumber, b.Script.ResourceOffset, b.Script.CodeLength, b.Script.Issues }).ToArray(),
         files = game.Id == GameId.LoomVga
             ? new[] { new { path = "DISK01.LEC (decoded from the local disc)", sha256 = Convert.ToHexString(SHA256.HashData(
-                (byte[])typeof(LoomVgaArchive).GetField("_lec", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(game.Vga!)!)) } }
+                (byte[])typeof(ScummV4Archive).GetField("_lec", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(game.V4Archive!)!)) } }
             : new[] { Path.Combine(folder, "00.LFL"), Path.Combine(folder, "34.LFL"), Path.Combine(folder, "46.LFL") }
                 .Select(p => new { path = p, sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(p))) }).ToArray() });
     Console.WriteLine($"{name}: {blocks.Count} decoded blocks; {errors.Count} read errors; state references exported.");

@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -18,7 +17,7 @@ public sealed class LoomCdRunningSetupTests
         var step = Assert.Single(setup.Before);
         Assert.Equal("bit[0x077]", step.ResultVariable);
         Assert.Equal(1, step.ResultValue);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects());
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects());
         session.VisitRoomById(4);
         LoomCdSceneSetupPlanner.Settle(session);
         session.UpdateStaffPossession(true);
@@ -41,7 +40,7 @@ public sealed class LoomCdRunningSetupTests
     {
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom vga en"));
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects());
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects());
         var repeated = new LoomCdSetupStep("scene", 41, 557, 0x36, 0, "Room 41 local 207 +0x0000", ResultVariable: "bit[0x077]", ResultValue: 1);
         var unknown = repeated with { ResultVariable = null, ResultValue = null };
         var setup = new LoomCdStartSetup([repeated, repeated, unknown], [], [], true);

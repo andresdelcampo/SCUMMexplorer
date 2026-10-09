@@ -1,6 +1,5 @@
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 Directory.CreateDirectory(args[1]);
 foreach (var edition in new[] { "loom ega mt32 en", "loom ega mt32 es", "loom vga en" })
@@ -15,7 +14,7 @@ foreach (var edition in new[] { "loom ega mt32 en", "loom ega mt32 es", "loom vg
     {
         try { return data.GlobalScript(id); }
         catch (InvalidDataException ex) { skipped.Add($"Script {id:000}: {ex.Message}"); return null; }
-    }).OfType<LoomScriptDisassembly>().ToArray();
+    }).OfType<ScummScriptDisassembly>().ToArray();
     var prefix = edition.Contains("vga") ? "vga" : edition.EndsWith("es") ? "ega-es" : "ega";
     File.WriteAllText(Path.Combine(args[1], prefix + ".json"), JsonSerializer.Serialize(scripts));
     File.WriteAllLines(Path.Combine(args[1], prefix + "-skipped.txt"), skipped);

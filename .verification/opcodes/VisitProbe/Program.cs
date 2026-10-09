@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 // Usage: VisitProbe <game folder> <step>...
 // A step is "R" (visit Room R from the catalog) or "R/O/V" (visit Room R, then
@@ -103,7 +102,7 @@ foreach (var step in args.Skip(1))
         var arguments = fields.Length > 1 && fields[1].Length > 0 ? fields[1].Split(',').Select(int.Parse).ToArray() : [];
         var operands = $"0x{number:X2}, [{string.Join(", ", arguments.Select(value => $"0x{value:X4}"))}]";
         var bytes = string.Join(" ", new[] { "0A", $"{number:X2}" }.Concat(arguments.Select(value => $"{value & 0xFF:X2} {value >> 8:X2}")).Append("FF"));
-        var script = new LoomScriptDisassembly(250, 1, 0, 32, 16,
+        var script = new ScummScriptDisassembly(250, 1, 0, 32, 16,
             [new(0, 0x0A, "startScript", operands, bytes), new(5, 0, "stopObjectCode", "", "00")],
             null, null, [], [], "Synthetic probe script");
         typeof(LoomExplorationSession).GetMethod("RunTopLevelScript", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
@@ -115,7 +114,7 @@ foreach (var step in args.Skip(1))
     {
         // "objects" lists the current room's objects: box, walk point and classes.
         var room = game.Rooms.Single(item => item.ResourceId == session.Snapshot.RoomId);
-        foreach (var record in new SCUMMexplorer.Core.Rendering.LoomRoomObjectDirectory().Decode(File.ReadAllBytes(room.FilePath)))
+        foreach (var record in new SCUMMexplorer.Core.Scumm.ScummRoomObjectDirectory().Decode(File.ReadAllBytes(room.FilePath)))
             Console.WriteLine($"   object {record.Id}: ({record.X}, {record.Y}, {record.Width}, {record.Height}), walk ({record.WalkX}, {record.WalkY}), classes 0x{session.Snapshot.ObjectClasses.GetValueOrDefault(record.Id):X8}");
         continue;
     }

@@ -8,8 +8,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 internal static class Program
 {
@@ -30,7 +28,7 @@ internal static class Program
         {
             var vars = session.Snapshot.KnownGlobalVariables;
             if (vars.TryGetValue(key, out var direct)) return direct != 0;
-            if (vars.ContainsKey(LoomBoundedScriptExecutor.SeparateBitStorage)) return false;
+            if (vars.ContainsKey(ScummBoundedScriptExecutor.SeparateBitStorage)) return false;
             var bit = Convert.ToInt32(key[6..^1], 16);
             return vars.TryGetValue($"var[0x{bit >> 4:X3}]", out var backing)
                 ? ((backing >> (bit & 15)) & 1) != 0 : null;
@@ -66,12 +64,12 @@ internal static class Program
                     Capture(prefix + "-closed-before");
                     var records = ((IEnumerable)Field("_roomNavigationCandidates")!).Cast<object>()
                         .Where(c => (int)c.GetType().GetProperty("TargetRoomId")!.GetValue(c)! == 46)
-                        .Select(c => (LoomRoomObjectRecord)c.GetType().GetProperty("Object")!.GetValue(c)!)
+                        .Select(c => (ScummRoomObjectRecord)c.GetType().GetProperty("Object")!.GetValue(c)!)
                         .DistinctBy(r => r.Id).ToArray();
                     report.Add($"NOTE {prefix} candidates to 46: {string.Join("; ", records.Select(r => $"{r.Id} rect {r.X},{r.Y},{r.Width},{r.Height} parent {r.ParentLocalIndex}/{r.ParentRequiredState} untouchable {session.Snapshot.IsUntouchable(r.Id)}"))}");
                     var portal = records.OrderBy(r => r.Width).First();
                     Check(session.Snapshot.IsUntouchable(portal.Id), prefix + " source entry marks the closed portal untouchable");
-                    Check(!((IEnumerable)Call("VisibleDoorways", session.Snapshot)!).Cast<LoomRoomObjectRecord>().Any(r => r.Id == portal.Id),
+                    Check(!((IEnumerable)Call("VisibleDoorways", session.Snapshot)!).Cast<ScummRoomObjectRecord>().Any(r => r.Id == portal.Id),
                         prefix + " closed portal has no active doorway overlay");
                     var marker = session.SessionTrace.Count;
                     var actorBefore = session.Actors.Single(a => a.Number == 3).Look.Costume;

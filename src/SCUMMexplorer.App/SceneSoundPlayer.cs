@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Media;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.App;
 
@@ -30,7 +29,7 @@ public sealed class SceneSoundPlayer
 
     /// <summary>True for a game folder with the Roland upgrade installed (its sounds 33 to 64 are Roland streams).</summary>
     public static bool HasRolandSounds(GameLibrary game) =>
-        game.Id == GameId.Loom && game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == 33) is { } sound && LoomRolandSong.IsRoland(sound);
+        game.Id == GameId.Loom && game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == 33) is { } sound && ScummRolandSong.IsRoland(sound);
 
     /// <summary>The sound card number the scripts see for a device: 4 for the Roland upgrade, which makes them choose its sounds; the other devices keep 0.</summary>
     public static int SoundCardFor(SoundMode mode) => mode == SoundMode.Roland ? LoomExplorationSession.RolandSoundCard : 0;
@@ -58,8 +57,8 @@ public sealed class SceneSoundPlayer
         public bool Stopped { get; set; }
     }
 
-    private readonly LoomAdlibAudio _adlib = new();
-    private readonly LoomPcSpeakerAudio _speaker = new();
+    private readonly ScummAdlibAudio _adlib = new();
+    private readonly ScummPcSpeakerAudio _speaker = new();
     private readonly Dictionary<(SoundMode Mode, int Id), Task<(string? Path, bool Music)>> _renders = [];
     private readonly List<Voice> _voices = [];
     private readonly Stopwatch _clock = Stopwatch.StartNew();
@@ -113,21 +112,21 @@ public sealed class SceneSoundPlayer
             var item = events[_seen].Event;
             // Follow commands actually executed in the state preview, including its labelled estimated route.
             // Commands merely collected from an unresolved branch (Executed false) must stay silent.
-            if (item.Certainty != LoomScriptEventCertainty.Reached && !item.Executed) continue;
+            if (item.Certainty != ScummScriptEventCertainty.Reached && !item.Executed) continue;
             var source = $"{item.SourceLabel} +0x{item.Offset:X4} {item.Operation} {item.Operands}".TrimEnd();
-            var estimated = item.Certainty != LoomScriptEventCertainty.Reached;
+            var estimated = item.Certainty != ScummScriptEventCertainty.Reached;
             if (estimated) source = "Estimated preview route: " + source;
             switch (item.Kind)
             {
-                case LoomScriptEventKind.SoundStarted or LoomScriptEventKind.MusicStarted when item.TargetId is int id:
+                case ScummScriptEventKind.SoundStarted or ScummScriptEventKind.MusicStarted when item.TargetId is int id:
                     Stop(id);
                     Start(id, source, estimated);
                     break;
-                case LoomScriptEventKind.SoundStopped when item.TargetId is int id:
+                case ScummScriptEventKind.SoundStopped when item.TargetId is int id:
                     Stop(id);
                     Log.Add(new(_frames, _clock.ElapsedMilliseconds, "stop", id, "", source));
                     break;
-                case LoomScriptEventKind.MusicStopped:
+                case ScummScriptEventKind.MusicStopped:
                     StopAll(source);
                     break;
                 default:
@@ -240,28 +239,28 @@ public sealed class SceneSoundPlayer
                 {
                     bool music;
                     byte[] wave;
-                    if (_game?.Vga is { } vga)
+                    if (_game?.V4Archive is { } vga)
                     {
                         // The CD game's sounds hold an AdLib and a PC speaker part; it has no Roland data.
                         if (mode == SoundMode.Roland || vga.ReadSounds().FirstOrDefault(item => item.Id == id) is not { } cdSound) return (null, false);
                         music = cdSound.IsMusic;
                         wave = mode == SoundMode.Adlib
-                            ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("No AdLib part.")), AdlibGainDb)
+                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("No AdLib part.")), AdlibGainDb)
                             : _speaker.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("No PC speaker part."), 6);
                     }
                     else if (mode == SoundMode.Roland)
                     {
                         // Only the upgrade's own sounds have a Roland rendition; the scripts choose them when the sound card is 4.
-                        if (Roms is not { } roms || !LoomRolandSong.IsRoland(resource)) return (null, false);
-                        var song = LoomRolandSong.Read(resource);
+                        if (Roms is not { } roms || !ScummRolandSong.IsRoland(resource)) return (null, false);
+                        var song = ScummRolandSong.Read(resource);
                         music = song.Duration.TotalSeconds > 3;
-                        wave = new LoomMt32Audio(roms).RenderWave(song);
+                        wave = new ScummMt32Audio(roms).RenderWave(song);
                     }
                     else
                     {
                         music = _adlib.HasMusic(resource);
                         wave = mode == SoundMode.Adlib
-                            ? LoomAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), AdlibGainDb)
+                            ? ScummAdlibAudio.ApplyOutputGain(_adlib.RenderWave(resource), AdlibGainDb)
                             : _speaker.RenderWave(resource);
                     }
                     var path = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");

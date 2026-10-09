@@ -1,7 +1,6 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -20,7 +19,7 @@ public sealed class LoomEgaRoomDecoderTests
         new byte[] { 0x40, 0xC4, 0x12, 0x84, 0x44, 0x44, 0x44, 0x44, 0x44 }.CopyTo(room, 36);
         for (var i = 0; i < room.Length; i++) room[i] ^= 0xFF;
 
-        var image = new LoomEgaRoomDecoder().Decode(room);
+        var image = new ScummV3EgaRoomDecoder().Decode(room);
 
         Assert.True(image.IsValid);
         Assert.Equal(8, image.Width);
@@ -48,7 +47,7 @@ public sealed class LoomEgaRoomDecoderTests
         new byte[] { 4, 0x81, 0x42, 0x18, 0xFF }.CopyTo(room, 47);
         for (var i = 0; i < room.Length; i++) room[i] ^= 0xFF;
 
-        var image = new LoomEgaRoomDecoder().Decode(room);
+        var image = new ScummV3EgaRoomDecoder().Decode(room);
 
         Assert.NotNull(image.DepthMask);
         Assert.True(image.DepthMask.IsValid);
@@ -71,7 +70,7 @@ public sealed class LoomEgaRoomDecoderTests
         Assert.Equal(ScummVersion.V3, game.Version);
         var rooms = game.Rooms.ToArray();
         Assert.True(rooms.Length > 50);
-        var decoder = new LoomEgaRoomDecoder();
+        var decoder = new ScummV3EgaRoomDecoder();
         var variedBackgrounds = 0;
         var decodedByName = new Dictionary<string, RoomImage>(StringComparer.OrdinalIgnoreCase);
         foreach (var resource in rooms.Where(room => File.Exists(room.FilePath)))
@@ -101,7 +100,7 @@ public sealed class LoomEgaRoomDecoderTests
         var game = new GameFolderScanner().Scan(folder);
         var counts = new Dictionary<(int Room, int Object), int>();
         foreach (var resource in game.Rooms.Where(room => File.Exists(room.FilePath)))
-        foreach (var image in new LoomRoomObjects().Decode(File.ReadAllBytes(resource.FilePath)))
+        foreach (var image in new ScummRoomObjects().Decode(File.ReadAllBytes(resource.FilePath)))
         {
             Assert.NotNull(image.Mask);
             Assert.Equal(image.Width * image.Height, image.Mask.Length);

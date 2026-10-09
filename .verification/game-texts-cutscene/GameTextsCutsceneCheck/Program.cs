@@ -8,7 +8,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // M3c: "Play this cutscene" from Game Texts, in the real MainWindow and the real TextGalleryWindow.
 // The gallery is built as GameTexts_Click builds it (the extraction, and the main window's GalleryCutscenes()),

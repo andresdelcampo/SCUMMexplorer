@@ -1,7 +1,6 @@
 using System.Buffers.Binary;
 using System.Text.Json;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -10,10 +9,10 @@ public sealed class LoomCallObservationTests
     [Fact]
     public void ActualInitializationRetainsSuppliedDefaultAndEstimatedLocalsWithoutOrigins()
     {
-        var records = new List<LoomCallObservation>();
-        var relations = new LoomRuntimeRelationTracker(_ => { });
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        new LoomBoundedScriptExecutor().Execute(Code(("stopObjectCode", "")), runtime.ObjectStates, [], runtime: runtime,
+        var records = new List<ScummCallObservation>();
+        var relations = new ScummRuntimeRelationTracker(_ => { });
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        new ScummBoundedScriptExecutor().Execute(Code(("stopObjectCode", "")), runtime.ObjectStates, [], runtime: runtime,
             initialLocals: new Dictionary<string, ushort> { ["local[0x000]"] = 7 }, estimatedLocals: ["local[0x000]"],
             observation: new(new(_ => { }, runtimeRelations: relations, receiveCall: records.Add), 1), pathEstimated: true);
         var init = records[0];
@@ -27,7 +26,7 @@ public sealed class LoomCallObservationTests
         Assert.Empty(relations.ActiveRelations);
         Assert.Null(init.Call);
         Assert.NotNull(init.Barrier);
-        Assert.Throws<NotSupportedException>(() => ((IList<LoomScriptOperandBinding>)init.Locals).Clear());
+        Assert.Throws<NotSupportedException>(() => ((IList<ScummScriptOperandBinding>)init.Locals).Clear());
     }
 
     [Theory]
@@ -174,10 +173,10 @@ public sealed class LoomCallObservationTests
     public void SeparateCallBoundaryBoundStopsRecordingAndLeavesExecutionAndOuterSequenceExact()
     {
         var code = Code(Enumerable.Repeat(("startScript", "0x02, []"), 1400).Append(("stopObjectCode", "")).ToArray());
-        var records = new List<LoomCallObservation>();
-        var outer = new List<LoomScriptObservation>();
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var result = new LoomBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
+        var records = new List<ScummCallObservation>();
+        var outer = new List<ScummScriptObservation>();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var result = new ScummBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime,
             onEvent: (_, _) => "", observation: new(new(outer.Add, receiveCall: records.Add), 1));
         Assert.True(result.ReachedStop);
         Assert.Equal(1401, result.InstructionsVisited);
@@ -201,13 +200,13 @@ public sealed class LoomCallObservationTests
         Assert.Equal(Run(false), Run(true));
     }
 
-    internal static LoomScriptDisassembly Code(params (string Op, string Args)[] operations) => new(0, 0, 0, operations.Length, operations.Length,
-        operations.Select((p, i) => new LoomScriptInstruction(i, 0, p.Op, p.Args, "00")).ToArray(), null, null, [], []);
+    internal static ScummScriptDisassembly Code(params (string Op, string Args)[] operations) => new(0, 0, 0, operations.Length, operations.Length,
+        operations.Select((p, i) => new ScummScriptInstruction(i, 0, p.Op, p.Args, "00")).ToArray(), null, null, [], []);
 
     internal static void WithSession(Dictionary<int, byte[]> programs,
-        Action<LoomExplorationSession, List<LoomCallObservation>, List<LoomScriptObservation>> check,
-        Func<LoomScriptObservationSite, bool>? site = null, Func<string, bool>? key = null, bool capture = true,
-        LoomCallCorrespondenceTracker? correspondence = null, List<object>? chronology = null)
+        Action<LoomExplorationSession, List<ScummCallObservation>, List<ScummScriptObservation>> check,
+        Func<ScummScriptObservationSite, bool>? site = null, Func<string, bool>? key = null, bool capture = true,
+        ScummCallCorrespondenceTracker? correspondence = null, List<object>? chronology = null)
     {
         var directory = Path.Combine(Path.GetTempPath(), "loom-calls-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
@@ -223,8 +222,8 @@ public sealed class LoomCallObservationTests
                 resources.Add(new($"Script {id}", ResourceKind.Script, path, id, ContainerFileNumber: id, Offset: 0));
             }
             var game = new GameLibrary("LOOM", directory, ScummVersion.V3, "DOS", resources, "synthetic call fixtures", GameId.Loom);
-            var records = new List<LoomCallObservation>();
-            var outer = new List<LoomScriptObservation>();
+            var records = new List<ScummCallObservation>();
+            var outer = new List<ScummScriptObservation>();
             check(new(game, new(new Dictionary<int, byte>(), new Dictionary<int, byte>()), completeBoot: false,
                 observer: new(s => { outer.Add(s); chronology?.Add(s); }, site, key,
                     receiveCall: capture ? c => { records.Add(c); chronology?.Add(c); } : null,

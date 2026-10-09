@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 using SCUMMexplorer.App;
 
 var output = Path.GetFullPath(args[1]);
@@ -12,9 +11,9 @@ var route = args[2]; var edition = args[3];
 var folder = edition switch { "ega-en" => "loom ega mt32 en", "ega-es" => "ALTERNATIVE LOOMS/loom ega mt32 es", "vga" => "loom vga en", _ => throw new ArgumentException("Unreviewed edition") };
 var game = new GameFolderScanner().Scan(Path.Combine(Path.GetFullPath(args[0]), folder));
 var data = ScummDataSources.For(game);
-var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
 var sourceHashes = new Dictionary<string, string>();
-void SaveSource(string name, LoomScriptDisassembly? script)
+void SaveSource(string name, ScummScriptDisassembly? script)
 {
     if (script is null) return;
     var text = script.Format(); File.WriteAllText(Path.Combine(output, name + ".txt"), text);
@@ -34,8 +33,8 @@ if (route == "dump")
     File.WriteAllText(Path.Combine(output, "hashes.json"), JsonSerializer.Serialize(sourceHashes));
     return 0;
 }
-var observations = new List<LoomScriptObservation>();
-var session = new LoomExplorationSession(game, indexed, observer: new LoomScriptObserver(observations.Add,
+var observations = new List<ScummScriptObservation>();
+var session = new LoomExplorationSession(game, indexed, observer: new ScummScriptObserver(observations.Add,
     site => site.Script is 25 or 29 or 106 or 110 || site.Script >= 200,
     key => key.StartsWith("local[") || key is "var[0x002]" or "var[0x064]" or "var[0x0C3]"));
 var records = new List<object>(); var checks = new List<string>(); var frames = 0;
@@ -128,7 +127,7 @@ bool? Bit(string key)
 {
     var vars = session.Snapshot.KnownGlobalVariables;
     if (vars.TryGetValue(key, out var value)) return value != 0;
-    if (vars.ContainsKey(LoomBoundedScriptExecutor.SeparateBitStorage)) return false;
+    if (vars.ContainsKey(ScummBoundedScriptExecutor.SeparateBitStorage)) return false;
     int bit = Convert.ToInt32(key[6..^1], 16);
     return vars.TryGetValue($"var[0x{bit >> 4:X3}]", out var word) ? (word & (1 << (bit & 15))) != 0 : null;
 }

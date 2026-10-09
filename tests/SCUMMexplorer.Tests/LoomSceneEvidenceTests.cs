@@ -1,9 +1,8 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
 /// <summary>
-/// Static evidence that <see cref="LoomSceneDrawBatches"/> collects besides draw
+/// Static evidence that <see cref="ScummSceneDrawBatches"/> collects besides draw
 /// batches: interface (verb-area) images and unavoidable entry-script states.
 /// </summary>
 public sealed class LoomSceneEvidenceTests
@@ -20,7 +19,7 @@ public sealed class LoomSceneEvidenceTests
             I(0x05, "move", "var[0x068] = 0x0000"),
             I(0x0A, "move", "var[0x069] = 0x00A0"));
 
-        var found = LoomSceneDrawBatches.FindInterfaceImages([(shows, "script 008"), (selects, "Room 02 object 154 Verb 0x39")]);
+        var found = ScummSceneDrawBatches.FindInterfaceImages([(shows, "script 008"), (selects, "Room 02 object 154 Verb 0x39")]);
 
         Assert.Equal([0x64, 0x9E], found.Keys.Order());
         Assert.Equal("verbOps image in script 008 +0x0000", found[0x64]);
@@ -40,7 +39,7 @@ public sealed class LoomSceneEvidenceTests
             I(0x10, "setState", "0x0011, 0x00"),
             I(0x14, "stopObjectCode", ""));
 
-        var states = LoomSceneDrawBatches.FindUnavoidableStates(script, "Room 99 entry script");
+        var states = ScummSceneDrawBatches.FindUnavoidableStates(script, "Room 99 entry script");
 
         var only = Assert.Single(states);
         Assert.Equal(0x11, only.Key);
@@ -57,7 +56,7 @@ public sealed class LoomSceneEvidenceTests
             I(0x07, "setState", "0x0011, 0x01"),
             I(0x0B, "stopObjectCode", ""));
 
-        Assert.Empty(LoomSceneDrawBatches.FindUnavoidableStates(script, "entry"));
+        Assert.Empty(ScummSceneDrawBatches.FindUnavoidableStates(script, "entry"));
     }
 
     [Fact]
@@ -68,13 +67,13 @@ public sealed class LoomSceneEvidenceTests
             I(0x04, "setState", "0x0011, 0x00"),
             I(0x08, "setState", "0x0012, 0x01"),
             I(0x0C, "stopObjectCode", ""));
-        Assert.Equal([0x12], LoomSceneDrawBatches.FindUnavoidableStates(twice, "entry").Keys);
+        Assert.Equal([0x12], ScummSceneDrawBatches.FindUnavoidableStates(twice, "entry").Keys);
 
         var variable = Script(
             I(0x00, "setState", "0x0012, 0x01"),
             I(0x04, "setState", "local[0x000], 0x00"),
             I(0x08, "stopObjectCode", ""));
-        Assert.Empty(LoomSceneDrawBatches.FindUnavoidableStates(variable, "entry"));
+        Assert.Empty(ScummSceneDrawBatches.FindUnavoidableStates(variable, "entry"));
     }
 
     [Fact]
@@ -98,10 +97,10 @@ public sealed class LoomSceneEvidenceTests
             [0xB2] = (8, 8, 16, 16), [0xB3] = (8, 8, 16, 16), [0xB4] = (8, 8, 16, 16)
         };
 
-        var batch = Assert.Single(LoomSceneDrawBatches.FindLocalTableRestFrames(script, "Room 04 local script 201", rects));
+        var batch = Assert.Single(ScummSceneDrawBatches.FindLocalTableRestFrames(script, "Room 04 local script 201", rects));
 
         Assert.Equal([0xB2], batch.Steps.Select(step => step.ObjectId));
-        Assert.Equal(LoomSceneDrawBatches.OtherScriptPriority, batch.Priority);
+        Assert.Equal(ScummSceneDrawBatches.OtherScriptPriority, batch.Priority);
         Assert.Equal("Room 04 local script 201 +0x001F, last frame from the table set at +0x0007", batch.Source);
     }
 
@@ -115,7 +114,7 @@ public sealed class LoomSceneEvidenceTests
             I(0x08, "drawObject", "local[0x000], at, 0x00FF, 0x00FF"),
             I(0x0F, "setVarRange", "local[0x006], count=2, [0x10, 0x11]"),
             I(0x18, "stopObjectCode", ""));
-        Assert.Empty(LoomSceneDrawBatches.FindLocalTableRestFrames(arguments, "s", new Dictionary<int, (int, int, int, int)>()));
+        Assert.Empty(ScummSceneDrawBatches.FindLocalTableRestFrames(arguments, "s", new Dictionary<int, (int, int, int, int)>()));
 
         // A table entry overwritten by a result is no longer known.
         var overwritten = Script(
@@ -123,14 +122,14 @@ public sealed class LoomSceneEvidenceTests
             I(0x09, "getRandomNr", "local[0x006], 0x0005"),
             I(0x0E, "drawObject", "local[0x006], at, 0x00FF, 0x00FF"),
             I(0x15, "stopObjectCode", ""));
-        Assert.Empty(LoomSceneDrawBatches.FindLocalTableRestFrames(overwritten, "s",
+        Assert.Empty(ScummSceneDrawBatches.FindLocalTableRestFrames(overwritten, "s",
             new Dictionary<int, (int, int, int, int)> { [0x10] = (0, 0, 8, 8) }));
     }
 
-    private static LoomScriptInstruction I(int offset, string operation, string operands) =>
+    private static ScummScriptInstruction I(int offset, string operation, string operands) =>
         new(offset, 0, operation, operands, "");
 
-    private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
+    private static ScummScriptDisassembly Script(params ScummScriptInstruction[] instructions) =>
         new(1, 1, 0, 32, 16, instructions, null, null, [], []);
 
     [Fact]
@@ -139,7 +138,7 @@ public sealed class LoomSceneEvidenceTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
-        var drawn = LoomSceneDrawBatches.Build(game).ForRoom(69).SelectMany(batch => batch.Steps).Select(step => step.ObjectId);
+        var drawn = ScummSceneDrawBatches.Build(game).ForRoom(69).SelectMany(batch => batch.Steps).Select(step => step.ObjectId);
         // Local 201 stops 202 and boxes (120,64)-(200,128) over objects 876-878.
         Assert.DoesNotContain(drawn, id => id is 876 or 877 or 878);
         Assert.Contains(885, drawn);
@@ -168,7 +167,7 @@ public sealed class LoomSceneEvidenceTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new SCUMMexplorer.Core.Discovery.GameFolderScanner().Scan(folder);
-        var banks = game.Rooms.Where(SCUMMexplorer.Core.Rendering.LoomRoomKinds.IsResourceBank).Select(r => r.ResourceId!.Value).ToArray();
+        var banks = game.Rooms.Where(SCUMMexplorer.Core.Loom.LoomRoomKinds.IsResourceBank).Select(r => r.ResourceId!.Value).ToArray();
         Assert.Equal([82, 83, 84, 85], banks);
         Assert.DoesNotContain(game.Scenes, r => banks.Contains(r.ResourceId!.Value));
         Assert.Contains(game.Scenes, r => r.ResourceId == 61);

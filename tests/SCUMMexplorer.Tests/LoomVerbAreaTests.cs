@@ -1,7 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -15,10 +13,10 @@ public sealed class LoomVerbAreaTests
         Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
 
     private static RoomObjectImage? Image(GameLibrary game, int room, int objectId) =>
-        new LoomRoomObjects().Decode(File.ReadAllBytes(game.Rooms.Single(item => item.ResourceId == room).FilePath))
+        new ScummRoomObjects().Decode(File.ReadAllBytes(game.Rooms.Single(item => item.ResourceId == room).FilePath))
             .FirstOrDefault(item => item.Id == objectId);
 
-    private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
+    private static ScummScriptDisassembly Script(params ScummScriptInstruction[] instructions) =>
         new(250, 1, 0, 32, 16, instructions, null, null, [], [], "Synthetic test script");
 
     [Fact]
@@ -30,7 +28,7 @@ public sealed class LoomVerbAreaTests
             new LflObjectStateReader().ReadSnapshot(Path.Combine(Folder, "00.LFL")));
 
         // After the boot every verb Room 01 local 211 created is off: nothing is drawn.
-        var empty = LoomVerbArea.Compose(session.Verbs, (room, obj) => Image(game, room, obj));
+        var empty = ScummVerbArea.Compose(session.Verbs, (room, obj) => Image(game, room, obj));
         Assert.Empty(empty.Items);
         Assert.All(empty.Pixels, pixel => Assert.Equal(0, pixel));
 
@@ -41,7 +39,7 @@ public sealed class LoomVerbAreaTests
             new(0, 0x0A, "startScript", "0x12, [0x0002]", "0A 12 02 00 FF"),
             new(5, 0, "stopObjectCode", "", "00")));
         Assert.Equal((ushort)2, session.Snapshot.KnownGlobalVariables["var[0x064]"]);
-        var area = LoomVerbArea.Compose(session.Verbs, (room, obj) => Image(game, room, obj));
+        var area = ScummVerbArea.Compose(session.Verbs, (room, obj) => Image(game, room, obj));
         Assert.Equal([.. Enumerable.Range(1, 8), 0x31, 0x32], area.Items.Select(item => item.VerbId));
         var first = area.Items[0];
         Assert.Equal((16, 144, 100, 1), (first.X, first.Y, first.ImageObject, first.ImageRoom));
@@ -50,18 +48,18 @@ public sealed class LoomVerbAreaTests
 
         // findVerbAtPos: a point inside note 0x03's rectangle finds it; the room above does not.
         var third = area.Items[2];
-        Assert.Equal(0x03, LoomVerbArea.FindVerbAt(area.Items, third.X + 1, third.Y + 1)?.VerbId);
-        Assert.Null(LoomVerbArea.FindVerbAt(area.Items, third.X + 1, 100));
+        Assert.Equal(0x03, ScummVerbArea.FindVerbAt(area.Items, third.X + 1, third.Y + 1)?.VerbId);
+        Assert.Null(ScummVerbArea.FindVerbAt(area.Items, third.X + 1, 100));
     }
 
     [Fact]
     public void FindVerbAtTakesTheHighestSlotThatIsOn()
     {
-        LoomVerbAreaItem Item(int slot, int verb, int mode) => new(slot, verb, mode, 16, 144, 24, 16, 100, 1, null);
-        Assert.Equal(0x09, LoomVerbArea.FindVerbAt([Item(1, 0x01, 1), Item(9, 0x09, 1)], 20, 150)?.VerbId);
+        ScummVerbAreaItem Item(int slot, int verb, int mode) => new(slot, verb, mode, 16, 144, 24, 16, 100, 1, null);
+        Assert.Equal(0x09, ScummVerbArea.FindVerbAt([Item(1, 0x01, 1), Item(9, 0x09, 1)], 20, 150)?.VerbId);
         // Dim verbs are drawn but not found.
-        Assert.Equal(0x01, LoomVerbArea.FindVerbAt([Item(1, 0x01, 1), Item(9, 0x09, 2)], 20, 150)?.VerbId);
-        Assert.Null(LoomVerbArea.FindVerbAt([Item(1, 0x01, 1)], 40, 150));
+        Assert.Equal(0x01, ScummVerbArea.FindVerbAt([Item(1, 0x01, 1), Item(9, 0x09, 2)], 20, 150)?.VerbId);
+        Assert.Null(ScummVerbArea.FindVerbAt([Item(1, 0x01, 1)], 40, 150));
     }
 
     [Fact]
@@ -88,29 +86,29 @@ public sealed class LoomVerbAreaTests
         var area = session.VerbArea();
         var plain = Image(game, 1, 112)!;
         var glow = Image(game, 1, 117)!;
-        byte At(byte[] pixels, int x, int y) => pixels[y * LoomVerbArea.Width + x];
+        byte At(byte[] pixels, int x, int y) => pixels[y * ScummVerbArea.Width + x];
         var matchesPlain = Enumerable.Range(0, plain.Height / 8 * 8).All(row =>
             Enumerable.Range(0, plain.Width / 8 * 8).All(column => At(area.Pixels, 72 + column, row) == plain.Pixels[row * plain.Width + column]));
         Assert.True(matchesPlain);
         Assert.NotEqual(plain.Pixels, glow.Pixels);
-        var slotOrder = LoomVerbArea.Compose(session.Verbs.Select(verb => verb with { DrawOrder = 0 }), (room, obj) => Image(game, room, obj));
+        var slotOrder = ScummVerbArea.Compose(session.Verbs.Select(verb => verb with { DrawOrder = 0 }), (room, obj) => Image(game, room, obj));
         Assert.NotEqual(area.Pixels, slotOrder.Pixels);
     }
 
     [Fact]
     public void AVerbTurnedOffClearsWhereItWasDrawn()
     {
-        var table = new LoomVerbTable { ImageSize = (_, _) => (32, 24) };
+        var table = new ScummVerbTable { ImageSize = (_, _) => (32, 24) };
         (string, int?[], string?) Op(string name, params int?[] values) => (name, values, null);
         table.Apply(0x01, [Op("new"), Op("at", 16, 144), Op("image", 100), Op("on")], _ => true, 1, null);
-        Assert.Equal(new LoomScreenBox(16, 144, 47, 167, 0), table.LastCover);
+        Assert.Equal(new ScummScreenBox(16, 144, 47, 167, 0), table.LastCover);
         table.Apply(0x35, [Op("new"), Op("at", 96, 184), Op("image", 151), Op("on")], _ => true, 1, null);
         table.Apply(0x35, [Op("off")], _ => true, 1, null);
         // restoreVerbBG clears verb 0x35's rectangle; verb 0x01, drawn before, is under it only where they overlap.
-        Assert.Equal([new LoomVerbErase(3, new LoomScreenBox(96, 184, 127, 207, 0))], table.Erases());
-        Assert.Equal(new LoomScreenBox(96, 184, 127, 207, 0), table.LastCover);
-        var area = LoomVerbArea.Compose(table.Snapshot(), (_, _) => new RoomObjectImage(0, 0, 0, 32, 24, Enumerable.Repeat((byte)5, 32 * 24).ToArray()), table.Erases());
-        Assert.Equal(5, area.Pixels[0 * LoomVerbArea.Width + 16]);
-        Assert.Equal(0, area.Pixels[40 * LoomVerbArea.Width + 96]);
+        Assert.Equal([new ScummVerbErase(3, new ScummScreenBox(96, 184, 127, 207, 0))], table.Erases());
+        Assert.Equal(new ScummScreenBox(96, 184, 127, 207, 0), table.LastCover);
+        var area = ScummVerbArea.Compose(table.Snapshot(), (_, _) => new RoomObjectImage(0, 0, 0, 32, 24, Enumerable.Repeat((byte)5, 32 * 24).ToArray()), table.Erases());
+        Assert.Equal(5, area.Pixels[0 * ScummVerbArea.Width + 16]);
+        Assert.Equal(0, area.Pixels[40 * ScummVerbArea.Width + 96]);
     }
 }

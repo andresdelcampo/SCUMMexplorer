@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // Plays catalog scenes through the real MainWindow (PlayKnownCutscene, the picker's own entry) and saves the room view
 // every <interval> ms with the on-screen texts and the picker note. No physical input.
@@ -79,13 +78,13 @@ internal static class Program
                         if (text != lastText) { report.Add($"   {clock.ElapsedMilliseconds,6} ms room {room:00}: {text}"); lastText = text; report.Add("      actors: " + string.Join("; ", session.Actors.Where(a => a.Room == room).Select(a => $"#{a.Number} ({a.X},{a.Y}) vis={a.Visible} costume={a.Look.Costume} frame={a.Look.Frame} elev={a.Look.Elevation}"))); }
                         var actorSig = string.Join("; ", session.Actors.Where(a => a.Room == room).Select(a => $"#{a.Number} vis={a.Visible} costume={a.Look.Costume}"));
                         if (actorSig != lastActors && actorSig.Contains("#8")) {
-                            var rimg = (SCUMMexplorer.Core.Rendering.RoomImage)Field("_currentRoom")!; var gm = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
+                            var rimg = (SCUMMexplorer.Core.Scumm.RoomImage)Field("_currentRoom")!; var gm = (SCUMMexplorer.Core.Domain.GameLibrary)Field("_game")!;
                             var sel = Field("_objectSelection")!; var mask = (byte[]?)sel.GetType().GetMethod("ComposeDepthMask")!.Invoke(sel, [rimg]);
                             foreach (var useMask in new[] { false, true }) {
-                                var lay = SCUMMexplorer.Core.Rendering.LoomActorRenderer.Render(session.Actors, room!.Value, rimg.Width, rimg.Height, id => SCUMMexplorer.Core.Rendering.LoomCostume.Load(gm, id), useMask ? mask : null, session.CurrentWalkBoxes, session.ObjectClasses);
+                                var lay = SCUMMexplorer.Core.Scumm.ScummActorRenderer.Render(session.Actors, room!.Value, rimg.Width, rimg.Height, id => SCUMMexplorer.Core.Scumm.ScummCostume.Load(gm, id), useMask ? mask : null, session.CurrentWalkBoxes, session.ObjectClasses);
                                 report.Add($"      render mask={useMask}: " + string.Join("; ", lay.Actors.Select(a => $"#{a.Number} px={a.Pixels} z={a.ZPlane} bounds={a.Bounds} dir={a.Direction} frame={a.Frame}")) + " skipped: " + string.Join("|", lay.Skipped));
                             }
-                                                        { var only = SCUMMexplorer.Core.Rendering.LoomActorRenderer.Render(session.Actors.Where(a => a.Number == 8).ToArray(), room!.Value, rimg.Width, rimg.Height, id => SCUMMexplorer.Core.Rendering.LoomCostume.Load(gm, id));
+                                                        { var only = SCUMMexplorer.Core.Scumm.ScummActorRenderer.Render(session.Actors.Where(a => a.Number == 8).ToArray(), room!.Value, rimg.Width, rimg.Height, id => SCUMMexplorer.Core.Scumm.ScummCostume.Load(gm, id));
                               var hist = only.Pixels.Where(b => b != 0xFF).GroupBy(b => b).OrderByDescending(g => g.Count()).Select(g => $"{g.Key}:{g.Count()}=#{rimg.Palette[g.Key]:X6}"); report.Add("      actor8 colours: " + string.Join(" ", hist)); }
                             var a4 = session.Actors.First(a => a.Number == 8); report.Add($"      actor4 box={a4.WalkBox} look.anim={a4.Look.Animation} facing={a4.Look.Facing} classes={(session.ObjectClasses.TryGetValue(4, out var cb) ? cb : 0u):X}");
                         }

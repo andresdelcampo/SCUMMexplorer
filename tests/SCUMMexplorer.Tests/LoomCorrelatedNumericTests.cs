@@ -1,16 +1,15 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
 public sealed class LoomCorrelatedNumericTests
 {
-    private static LoomScriptDisassembly Code(params (string Op, string Args)[] operations) =>
+    private static ScummScriptDisassembly Code(params (string Op, string Args)[] operations) =>
         new(2, 3, 0x100, operations.Length, operations.Length,
-            operations.Select((o, i) => new LoomScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
+            operations.Select((o, i) => new ScummScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
 
-    private static LoomNumericWorld World(string id, params (string Key, ushort Number)[] values) =>
+    private static ScummNumericWorld World(string id, params (string Key, ushort Number)[] values) =>
         new(id, "Hypothetical complete tuple; no selected runtime values.",
-            values.ToDictionary(p => p.Key, p => LoomNumericValue.Hypothesis(p.Number, "source tuple " + id)));
+            values.ToDictionary(p => p.Key, p => ScummNumericValue.Hypothesis(p.Number, "source tuple " + id)));
 
     [Fact]
     public void MaskedComponentsRemainInTheSameWorldAcrossIndexedReadsAndArguments()
@@ -23,7 +22,7 @@ public sealed class LoomCorrelatedNumericTests
             ("chainScript", "0x04, [var[0x052], var[0x053]]"));
         var worlds = new[] { World("first", ("var[0x060]", 2), ("var[0x034]", 17)),
             World("second", ("var[0x060]", 4), ("var[0x036]", 10)) };
-        var results = new LoomCorrelatedNumericAnalyzer().Analyze(caller, worlds, _ => decoder);
+        var results = new ScummCorrelatedNumericAnalyzer().Analyze(caller, worlds, _ => decoder);
         Assert.Equal(new ushort?[] { 1, 2 }, results.Select(r => r.Boundary!.Arguments[0].Number));
         Assert.Equal(new ushort?[] { 2, 1 }, results.Select(r => r.Boundary!.Arguments[1].Number));
         Assert.All(results, r =>
@@ -39,13 +38,13 @@ public sealed class LoomCorrelatedNumericTests
     [Fact]
     public void UnknownIndexAndOpaqueResponseCannotBecomeSelectedNumbers()
     {
-        var unknown = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("move", "var[0x065] = var[0x032+var[0x060]]")),
+        var unknown = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("move", "var[0x065] = var[0x032+var[0x060]]")),
             [World("missing", ("var[0x032]", 9))]).Single();
         Assert.Contains("unknown external", unknown.UnresolvedReason);
         Assert.Empty(unknown.Writes);
-        var world = new LoomNumericWorld("opaque", "Response deliberately opaque.",
-            new Dictionary<string, LoomNumericValue> { ["var[0x033]"] = LoomNumericValue.Opaque("response0", "slot0 source") });
-        var result = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("move", "var[0x065] = var[0x033]"),
+        var world = new ScummNumericWorld("opaque", "Response deliberately opaque.",
+            new Dictionary<string, ScummNumericValue> { ["var[0x033]"] = ScummNumericValue.Opaque("response0", "slot0 source") });
+        var result = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("move", "var[0x065] = var[0x033]"),
             ("isEqual", "var[0x065], 0x4241, branch +0 -> 0x0002"), ("stopObjectCode", "")), [world]).Single();
         Assert.Null(result.Globals["var[0x065]"].Number);
         Assert.Equal("response0", result.Globals["var[0x065]"].Symbol);
@@ -55,7 +54,7 @@ public sealed class LoomCorrelatedNumericTests
     [Fact]
     public void WordWritesReplaceBitsAndBitWritesPreserveKnownSiblingBits()
     {
-        var result = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("move", "bit[0xD67] = 0x0000"),
+        var result = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("move", "bit[0xD67] = 0x0000"),
             ("move", "var[0x0D6] = 0x0080"), ("move", "var[0x052] = bit[0xD67]"),
             ("move", "bit[0xD6C] = 0x0001"), ("move", "var[0x053] = bit[0xD67]"), ("stopObjectCode", "")),
             [World("alias", ("var[0x0D6]", 0xFFFF))]).Single();
@@ -72,7 +71,7 @@ public sealed class LoomCorrelatedNumericTests
     public void EffectAndSchedulerBoundariesDoNotAssumeACalleeReturned(string operation)
     {
         var child = Code((operation, ""), ("move", "var[0x052] = 0x0000"), ("stopObjectCode", ""));
-        var result = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("startScript", "0x03, []"),
+        var result = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("startScript", "0x03, []"),
             ("move", "var[0x053] = 0x0000"), ("stopObjectCode", "")), [World("bounded")], _ => child).Single();
         Assert.False(result.ReachedStop);
         Assert.Equal(operation, result.Boundary!.Operation);
@@ -84,7 +83,7 @@ public sealed class LoomCorrelatedNumericTests
     [InlineData(0, 0xFFFF, true)]
     public void RelationalOperandsUseOldV3SignedReversedOrdering(ushort first, ushort second, bool expected)
     {
-        var result = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("isLess", "var[0x052], var[0x053], branch +0 -> 0x0001"),
+        var result = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("isLess", "var[0x052], var[0x053], branch +0 -> 0x0001"),
             ("stopObjectCode", "")), [World("signed", ("var[0x052]", first), ("var[0x053]", second))]).Single();
         Assert.Equal(expected, result.Branches.Single().Condition);
     }
@@ -92,20 +91,20 @@ public sealed class LoomCorrelatedNumericTests
     [Fact]
     public void LimitsAndMissingCalleesLeaveExplicitUnresolvedResults()
     {
-        var cycle = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("jumpRelative", "0 -> 0x0000")),
+        var cycle = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("jumpRelative", "0 -> 0x0000")),
             [World("cycle")], instructionLimit: 3).Single();
         Assert.Contains("instruction limit", cycle.UnresolvedReason);
-        var missing = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("startScript", "0x03, []")), [World("missing")]).Single();
+        var missing = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("startScript", "0x03, []")), [World("missing")]).Single();
         Assert.Contains("unresolved numeric callee", missing.UnresolvedReason);
         var recursive = Code(("startScript", "0x03, []"));
-        var bounded = new LoomCorrelatedNumericAnalyzer().Analyze(recursive, [World("recursive")], _ => recursive, callLimit: 2).Single();
+        var bounded = new ScummCorrelatedNumericAnalyzer().Analyze(recursive, [World("recursive")], _ => recursive, callLimit: 2).Single();
         Assert.Contains("call limit", bounded.UnresolvedReason);
     }
 
     [Fact]
     public void SelfStopRetainsThePendingFlagAndDoesNotClaimACompletionSummary()
     {
-        var result = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("move", "bit[0xD67] = 0x0001"),
+        var result = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("move", "bit[0xD67] = 0x0001"),
             ("stopScript", "0x00"), ("move", "bit[0xD67] = 0x0000")), [World("early-stop")]).Single();
         Assert.True(result.ReachedStop);
         Assert.Equal("stopScript", result.Boundary!.Operation);
@@ -116,7 +115,7 @@ public sealed class LoomCorrelatedNumericTests
     [Fact]
     public void RangeAndWrappingArithmeticHaveSourceDependencies()
     {
-        var result = new LoomCorrelatedNumericAnalyzer().Analyze(Code(("setVarRange", "var[0x052], count=2, [0xFFFF, 0x0003]"),
+        var result = new ScummCorrelatedNumericAnalyzer().Analyze(Code(("setVarRange", "var[0x052], count=2, [0xFFFF, 0x0003]"),
             ("increment", "var[0x052]"), ("multiply", "var[0x053] *= 0xFFFF"), ("stopObjectCode", "")), [World("range")]).Single();
         Assert.Null(result.UnresolvedReason);
         Assert.Equal((ushort)0, result.Globals["var[0x052]"].Number);

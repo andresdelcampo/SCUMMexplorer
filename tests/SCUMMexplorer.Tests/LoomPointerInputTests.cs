@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -93,7 +92,7 @@ public sealed class LoomPointerInputTests
     [Fact]
     public void VerbOpsOnAVerbWithoutASlotLeavesTheVerbsAlone()
     {
-        var table = new LoomVerbTable();
+        var table = new ScummVerbTable();
         // getVerbSlot returns 0 for an unknown verb: image is ignored and nothing is listed.
         var trace = table.Apply(0x40, [("image", [7], null), ("on", [], null)], _ => true, 2, null);
         Assert.Contains("scratch slot 0", trace);

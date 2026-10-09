@@ -1,6 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -44,8 +42,8 @@ public sealed class LoomActorLookTests
     {
         if (!HasGame) return;
         var game = new GameFolderScanner().Scan(Folder);
-        var table = new LoomActorTable { CostumeSource = id => LoomCostume.Load(game, id) };
-        var place = new LoomActorTable.Placement(2, null, null, null);
+        var table = new ScummActorTable { CostumeSource = id => ScummCostume.Load(game, id) };
+        var place = new ScummActorTable.Placement(2, null, null, null);
         table.SetIgnoreBoxes(3, true);
         table.Put(3, 100, 80, 2, place, ego: 1);
         table.CostumeChanged(3, 1, place);
@@ -70,9 +68,9 @@ public sealed class LoomActorLookTests
         // 0xF6: chore 4, turn to direction 2 (180): turnToDirection sets MF_TURN, and walkActor turns
         // one step a frame (actorTurnInterpolateTable: right to down is one step), then clears _moving.
         Assert.Equal("turn to 180", table.Animate(3, 0xF6, place));
-        Assert.Equal((90, LoomActorTable.MoveTurn), (table[3].Look.Facing, table[3].Moving));
+        Assert.Equal((90, ScummActorTable.MoveTurn), (table[3].Look.Facing, table[3].Moving));
         table.StepWalks(place);
-        Assert.Equal((180, LoomActorTable.MoveTurn), (table[3].Look.Facing, table[3].Moving));
+        Assert.Equal((180, ScummActorTable.MoveTurn), (table[3].Look.Facing, table[3].Moving));
         table.StepWalks(place);
         Assert.Equal((180, 0), (table[3].Look.Facing, table[3].Moving));
         // A turn to the opposite side goes through a side step: up (0) from down turns right first.
@@ -102,8 +100,8 @@ public sealed class LoomActorLookTests
     {
         if (!HasGame) return;
         var game = new GameFolderScanner().Scan(Folder);
-        var table = new LoomActorTable { CostumeSource = id => LoomCostume.Load(game, id) };
-        var place = new LoomActorTable.Placement(2, null, null, null);
+        var table = new ScummActorTable { CostumeSource = id => ScummCostume.Load(game, id) };
+        var place = new ScummActorTable.Placement(2, null, null, null);
         table.PutInRoom(4, 5, place, ego: 1);
         table.CostumeChanged(4, 1, place);
         table.Animate(4, 0x0A, place);
@@ -117,7 +115,7 @@ public sealed class LoomActorLookTests
     [Fact]
     public void ActorOpsPaletteElevationAndInit()
     {
-        var table = new LoomActorTable();
+        var table = new ScummActorTable();
         table.SetPalette(1, 7, 15);
         table.SetElevation(1, 25);
         table.SetFrame(1, "stand", 10);

@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -25,22 +24,22 @@ public sealed class LoomCallPhasePayloadTests
                 session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, [0x0007]"), ("stopObjectCode", "")));
                 session.AdvanceFrame(); session.AdvanceFrame();
             }, chronology: chronology);
-        var outgoing = chronology.OfType<LoomCallObservation>().Single(b => b.Stage == "dispatch" && b.Site.Script == 2).Call!;
-        var selected = chronology.OfType<LoomCallObservation>().First(b => b.Stage == "resumed-locals" && b.Site.Script == (phase == "child" ? 3 : 2));
-        var first = chronology.OfType<LoomScriptObservation>().First(s => s.Invocation == selected.Invocation && s.Site?.Stage == "instruction");
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        var outgoing = chronology.OfType<ScummCallObservation>().Single(b => b.Stage == "dispatch" && b.Site.Script == 2).Call!;
+        var selected = chronology.OfType<ScummCallObservation>().First(b => b.Stage == "resumed-locals" && b.Site.Script == (phase == "child" ? 3 : 2));
+        var first = chronology.OfType<ScummScriptObservation>().First(s => s.Invocation == selected.Invocation && s.Site?.Stage == "instruction");
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
         bool? stop = defect == "stop" ? true : defect == "yield" ? false : null;
         int? resume = defect == "resume" ? selected.Site.Offset : null;
         foreach (var item in chronology)
         {
-            if (item is LoomScriptObservation script)
+            if (item is ScummScriptObservation script)
             {
                 if (defect != "none" && script.Sequence == (phase == "first" ? first.Sequence : selected.InstructionSequence))
                     script = script with { ReachedStop = stop, ResumeOffset = resume };
                 tracker.ObserveScript(script);
             }
-            else if (item is LoomCallObservation boundary)
+            else if (item is ScummCallObservation boundary)
             {
                 if (defect != "none" && phase != "first" && boundary.Sequence == selected.Sequence)
                     boundary = boundary with { ReachedStop = stop, ResumeOffset = resume };
@@ -73,17 +72,17 @@ public sealed class LoomCallPhasePayloadTests
         LoomCallObservationTests.WithSession(new() { [2] = [0] }, (session, _, _) =>
             session.RunTopLevelScript(LoomCallObservationTests.Code(("startScript", "0x02, []"), ("stopObjectCode", ""))),
             chronology: chronology);
-        var selected = chronology.OfType<LoomCallObservation>().Single(b => b.Stage == (phase == "dispatch" ? "dispatch" : "caller-continued"));
-        var updates = new List<LoomCallCorrespondence>();
-        var tracker = new LoomCallCorrespondenceTracker(updates.Add);
+        var selected = chronology.OfType<ScummCallObservation>().Single(b => b.Stage == (phase == "dispatch" ? "dispatch" : "caller-continued"));
+        var updates = new List<ScummCallCorrespondence>();
+        var tracker = new ScummCallCorrespondenceTracker(updates.Add);
         bool? stop = defect == "stop" ? true : defect == "yield" ? false : null;
         int? resume = defect == "resume" ? selected.Site.Offset : null;
         foreach (var item in chronology)
         {
-            if (item is LoomScriptObservation script)
+            if (item is ScummScriptObservation script)
                 tracker.ObserveScript(defect != "none" && script.Sequence == selected.InstructionSequence
                     ? script with { ReachedStop = stop, ResumeOffset = resume } : script);
-            else if (item is LoomCallObservation boundary)
+            else if (item is ScummCallObservation boundary)
                 tracker.ObserveCall(defect != "none" && boundary.Sequence == selected.Sequence
                     ? boundary with { ReachedStop = stop, ResumeOffset = resume } : boundary);
         }

@@ -1,7 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // DemoProbe <folder> shot <room> <x0> <x1> <scale> <out.bmp> [marks x,y;x,y]: the room's first-visit background over x0..x1 at a scale, the depth mask tinted red, marks as green dots.
 static class RoomShot
@@ -11,9 +9,9 @@ static class RoomShot
         var game = new GameFolderScanner().Scan(folder);
         var resource = game.Rooms.Single(r => r.ResourceId == roomId);
         var bytes = File.ReadAllBytes(resource.FilePath);
-        var room = new OldV3EgaRoomDecoder().Decode(bytes);
-        var records = new LoomRoomObjectDirectory().Decode(bytes);
-        var images = new LoomRoomObjects().Decode(bytes);
+        var room = new ScummV3EgaRoomDecoder().Decode(bytes);
+        var records = new ScummRoomObjectDirectory().Decode(bytes);
+        var images = new ScummRoomObjects().Decode(bytes);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")));
         session.VisitRoomById(roomId);
         var snapshot = session.Snapshot;

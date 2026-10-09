@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 var output = Path.GetFullPath(args[1]); Directory.CreateDirectory(output);
 var packets = new List<object>(); var checks = new List<string>();
@@ -14,7 +13,7 @@ void Check(bool ok, string label) { checks.Add((ok ? "PASS " : "FAIL ") + label)
 foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"), ("vga", "loom vga en") })
 {
     var game = new GameFolderScanner().Scan(Path.Combine(Path.GetFullPath(args[0]), folder)); var data = ScummDataSources.For(game);
-    var indexed = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
     if (dumpOnly)
     {
         foreach (var (room, local) in new[] { (4, 200), (4, 201), (46, 202), (46, 203), (46, 204), (9, 209), (9, 223), (9, 224), (23, 200), (23, 201), (23, 202), (25, 204), (25, 208) })
@@ -43,8 +42,8 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
     var baseline = new LoomExplorationSession(game, indexed);
     File.WriteAllText(Path.Combine(output, edition + "-initial-status.json"), JsonSerializer.Serialize(baseline.GameStatus, new JsonSerializerOptions { WriteIndented = true }));
     var candidates = new List<Lesson>(); var levels = new List<Lesson>();
-    var scripts = new Dictionary<(int, int), LoomScriptDisassembly?>();
-    LoomScriptDisassembly? Script(int room, int id)
+    var scripts = new Dictionary<(int, int), ScummScriptDisassembly?>();
+    ScummScriptDisassembly? Script(int room, int id)
     {
         var key = (id < data.GlobalScriptCount ? 0 : room, id);
         if (!scripts.TryGetValue(key, out var script))
@@ -52,7 +51,7 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
             catch (InvalidDataException) { scripts[key] = null; }
         return script;
     }
-    void Find(int rootRoom, int objectId, int verb, LoomScriptDisassembly? script, int depth, HashSet<(int, int)> seen)
+    void Find(int rootRoom, int objectId, int verb, ScummScriptDisassembly? script, int depth, HashSet<(int, int)> seen)
     {
         if (script is null || depth > 4) return;
         foreach (var i in script.Instructions.Where(i => i.Operation is "startScript" or "chainScript"))
@@ -89,8 +88,8 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
         var earned = false;
         foreach (var root in roots)
         {
-            var observations = new List<LoomScriptObservation>();
-            var observer = new LoomScriptObserver(observations.Add, site => site.Script is 25 or 29, key => key == "local[0x000]");
+            var observations = new List<ScummScriptObservation>();
+            var observer = new ScummScriptObserver(observations.Add, site => site.Script is 25 or 29, key => key == "local[0x000]");
             var session = new LoomExplorationSession(game, indexed, observer: observer);
             void Frames(int count) { for (int f = 0; f < count; f++) session.AdvanceFrame(); }
             void Settle(int bound = 3500) { int quiet = 0; for (int f = 0; f < bound && quiet < 32; f++) { quiet = session.GameStatus.CanEdit ? quiet + 1 : 0; session.AdvanceFrame(); } }
@@ -115,8 +114,8 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
     {
         if (args[3] == "chains")
         {
-        var observations = new List<LoomScriptObservation>();
-        var session = new LoomExplorationSession(game, indexed, observer: new LoomScriptObserver(observations.Add,
+        var observations = new List<ScummScriptObservation>();
+        var session = new LoomExplorationSession(game, indexed, observer: new ScummScriptObserver(observations.Add,
             site => site.Script is 25 or 29, key => key == "local[0x000]"));
         void Settle() { int quiet = 0; for (int f = 0; f < 5000 && quiet < 32; f++) { quiet = session.GameStatus.CanEdit ? quiet + 1 : 0; session.AdvanceFrame(); } }
         session.VisitRoomById(pickup.Room); session.ActivateObjectVerb(pickup.ObjectId!.Value, pickup.VerbId!.Value); Settle();
@@ -132,8 +131,8 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
         Console.WriteLine($"{edition} cumulative hole looks: learned slot 3 = {after.Drafts[3].Learned}; retained source guard");
         }
         // The reviewed 3 October late-story prefix; derive the other editions' source objects.
-        var lateObservations = new List<LoomScriptObservation>();
-        var late = new LoomExplorationSession(game, indexed, observer: new LoomScriptObserver(lateObservations.Add,
+        var lateObservations = new List<ScummScriptObservation>();
+        var late = new LoomExplorationSession(game, indexed, observer: new ScummScriptObserver(lateObservations.Add,
             site => site.Script is 25 or 29, key => key == "local[0x000]"));
         void LateSettle() { int quiet = 0; for (int f = 0; f < 5000 && quiet < 32; f++) { quiet = late.GameStatus.CanEdit ? quiet + 1 : 0; late.AdvanceFrame(); } }
         late.VisitRoomById(pickup.Room); late.ActivateObjectVerb(pickup.ObjectId!.Value, pickup.VerbId!.Value); LateSettle();
@@ -183,8 +182,8 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
             var roots = levels.Where(c => c.Slot == level && c.Object != 0).DistinctBy(c => (c.Room, c.Object, c.Verb))
                 .OrderBy(c => c.Depth).ThenBy(c => c.Verb == 0x38 ? 0 : 1).ThenBy(c => c.Room).ToArray();
             if (roots.Length == 0) { Console.WriteLine($"{edition} level {level}: no direct caller root; source prerequisites remain"); continue; }
-            var observations = new List<LoomScriptObservation>();
-            var observer = new LoomScriptObserver(observations.Add, site => site.Script == 29, key => key == "local[0x000]");
+            var observations = new List<ScummScriptObservation>();
+            var observer = new ScummScriptObserver(observations.Add, site => site.Script == 29, key => key == "local[0x000]");
             var session = new LoomExplorationSession(game, indexed, observer: observer);
             void Settle() { int quiet = 0; for (int f = 0; f < 5000 && quiet < 32; f++) { quiet = session.GameStatus.CanEdit ? quiet + 1 : 0; session.AdvanceFrame(); } }
             session.VisitRoomById(pickup.Room); session.ActivateObjectVerb(pickup.ObjectId!.Value, pickup.VerbId!.Value); Settle();

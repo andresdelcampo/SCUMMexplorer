@@ -1,8 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // For every room: a catalog visit plus up to 8 frames, then every object verb
 // activated directly (fresh session each) plus up to 8 frames. Lists each
@@ -16,7 +14,7 @@ var trace = args.Length > 2 ? args[2] : null;
 var traced = new List<string>();
 var game = new GameFolderScanner().Scan(folder);
 var index = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
-var verbReader = new LoomObjectVerbReader(ScummScriptDialects.For(game.Id));
+var verbReader = new ScummObjectVerbReader(ScummScriptDialects.For(game.Id));
 var source = new Regex(@"^(?<ctx>.+?) \+0x[0-9A-F]{4}: ", RegexOptions.Compiled);
 var offset = new Regex(@"(?:at|getRandomNr at) \+0x(?<off>[0-9A-F]{4})", RegexOptions.Compiled);
 
@@ -63,7 +61,7 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
     Collect(id, "visit", visit.Snapshot.Uncertainties);
 
     var bytes = File.ReadAllBytes(room.FilePath);
-    var records = new LoomRoomObjectDirectory().Decode(bytes);
+    var records = new ScummRoomObjectDirectory().Decode(bytes);
     var tables = verbReader.ReadAll(bytes, records);
     foreach (var record in records)
     {

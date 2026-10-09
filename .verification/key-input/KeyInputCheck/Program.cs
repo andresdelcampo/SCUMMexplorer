@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // Keys as game input: in the real MainWindow, raises the window's own
 // PreviewKeyDown and PreviewTextInput events (synthetic events, no physical
@@ -121,7 +120,7 @@ internal static class Program
                 viewport.Focus();
 
                 // Script 018 [2] turns the distaff on; a room click aims at Room 02 object 156 (class 1).
-                var script = new LoomScriptDisassembly(250, 1, 0, 32, 16,
+                var script = new ScummScriptDisassembly(250, 1, 0, 32, 16,
                     [new(0, 0x0A, "startScript", "0x12, [0x0002]", "0A 12 02 00 FF"), new(5, 0, "stopObjectCode", "", "00")],
                     null, null, [], [], "Synthetic test script");
                 typeof(LoomExplorationSession).GetMethod("RunTopLevelScript", Private)!.Invoke(Session(), [script]);

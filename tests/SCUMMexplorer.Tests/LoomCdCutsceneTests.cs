@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -10,7 +9,7 @@ public sealed class LoomCdCutsceneTests
     private static GameLibrary? Game()
     {
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
-        return Directory.Exists(folder) && SCUMMexplorer.Core.Storage.DiscImage.FindImageIn(folder) is not null ? new GameFolderScanner().Scan(folder) : null;
+        return Directory.Exists(folder) && SCUMMexplorer.Core.Scumm.DiscImage.FindImageIn(folder) is not null ? new GameFolderScanner().Scan(folder) : null;
     }
 
     private static IReadOnlyList<LoomCdCutsceneGroup> Groups(GameLibrary game) =>
@@ -39,7 +38,7 @@ public sealed class LoomCdCutsceneTests
     public void AnEscapeAtTheFirstSkipPointOnlySkipsTheOpeningNarrationAndTheIntroPlaysOn()
     {
         if (Game() is not { } game) return;
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
         var frames = 0;
         // Script 001's own beginOverride (+0x0337) covers only the narration over the skill screen's answer, so Escape there
         // jumps to +0x0354 and script 044's opening still plays: the first skip point is not the whole intro.
@@ -60,7 +59,7 @@ public sealed class LoomCdCutsceneTests
     public void AnEscapeDuringTheCdIntroSkipsToTheGame(int framesBeforeEscape)
     {
         if (Game() is not { } game) return;
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
         var frames = 0;
         var presses = 0;
         // -1: Escape at every frame that has a skip point (each cutscene's own override), as a player holding the key would.
@@ -77,7 +76,7 @@ public sealed class LoomCdCutsceneTests
         Assert.True(frames < 600, $"{presses} Escape presses, {frames} frames; the whole intro takes 978");
     }
 
-    private static LoomExplorationSession Fresh(GameLibrary game) => new(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+    private static LoomExplorationSession Fresh(GameLibrary game) => new(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
 
     private static ushort Known(LoomExplorationSession session, string key) =>
         session.Snapshot.KnownGlobalVariables.TryGetValue(key, out var value) ? value : (ushort)0;

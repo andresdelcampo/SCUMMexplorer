@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // Source-only extension: causal draft teaching, literal terminology and dynamic operands.
 // Detached sessions read the own-edition draft table; no game/profile writes or native input.
@@ -26,9 +25,9 @@ foreach (var (edition, relative) in new[] {
 {
     var game = new GameFolderScanner().Scan(Path.Combine(root, relative));
     var data = ScummDataSources.For(game);
-    var blocks = new List<(string Place, LoomScriptDisassembly Script)>();
+    var blocks = new List<(string Place, ScummScriptDisassembly Script)>();
     var errors = new List<string>();
-    void Read(string place, Func<LoomScriptDisassembly?> read)
+    void Read(string place, Func<ScummScriptDisassembly?> read)
     {
         try { if (read() is { } script) blocks.Add((place, script)); }
         catch (InvalidDataException ex) { errors.Add($"{place}: {ex.Message}"); }
@@ -45,13 +44,13 @@ foreach (var (edition, relative) in new[] {
             Read($"room {room} object {id} verb {verb.VerbId:X2}",
                 () => data.ReadObjectVerb(room, rd.Objects.Single(o => o.Id == id), verb.VerbId, out _));
     }
-    LoomScriptDisassembly Global(int id) => blocks.Single(b => b.Place == $"global {id}").Script;
-    LoomScriptDisassembly Local(int id) => blocks.Single(b => b.Place == $"room 9 local {id}").Script;
-    bool Calls(LoomScriptDisassembly script, int target, string argument) => script.Instructions.Any(i =>
+    ScummScriptDisassembly Global(int id) => blocks.Single(b => b.Place == $"global {id}").Script;
+    ScummScriptDisassembly Local(int id) => blocks.Single(b => b.Place == $"room 9 local {id}").Script;
+    bool Calls(ScummScriptDisassembly script, int target, string argument) => script.Instructions.Any(i =>
         i.Operation == "startScript" && i.Operands == $"0x{target:X2}, [{argument}]");
-    string Fingerprint(LoomScriptDisassembly script) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
+    string Fingerprint(ScummScriptDisassembly script) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
         string.Join("\n", script.Instructions.Select(i => $"{i.Offset:X4}:{i.Bytes}")))));
-    var session = new LoomExplorationSession(game, game.Vga?.ReadIndexedObjects() ??
+    var session = new LoomExplorationSession(game, game.V4Archive?.ReadIndexedObjects() ??
         new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")), completeBoot: game.Id == GameId.Loom);
     var drafts = session.GameStatus.Drafts.Where(d => d.Slot is 12 or 13).ToArray();
     Check(drafts.Length == 2 && drafts.Single(d => d.Slot == 12).ForwardVerb == 0x4E &&

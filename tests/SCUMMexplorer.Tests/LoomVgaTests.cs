@@ -1,8 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Storage;
-using SCUMMexplorer.Core.Rendering;
 
 namespace SCUMMexplorer.Tests;
 
@@ -27,7 +24,7 @@ public sealed class LoomVgaTests
         var source = new DiscFileSource(folder);
         Assert.Contains("DISK01.LEC", source.FileNames);
         Assert.Contains("000.LFL", source.FileNames);
-        Assert.True(LoomVgaArchive.IsVga(source));
+        Assert.True(ScummV4Archive.IsVga(source));
         Assert.True(source.Image.AudioStartSector > 20000);
     }
 
@@ -49,8 +46,8 @@ public sealed class LoomVgaTests
     public void TheTwoDumpsCarryTheSameRooms()
     {
         if (Folder("loom vga en") is not { } a || Folder("loom vga en kixx") is not { } b) return;
-        var first = new GameFolderScanner().Scan(a).Vga!;
-        var second = new GameFolderScanner().Scan(b).Vga!;
+        var first = new GameFolderScanner().Scan(a).V4Archive!;
+        var second = new GameFolderScanner().Scan(b).V4Archive!;
         Assert.Equal(first.Rooms, second.Rooms);
     }
 
@@ -58,7 +55,7 @@ public sealed class LoomVgaTests
     public void EveryRoomBackgroundDecodesWithItsPaletteAndSize()
     {
         if (Folder("loom vga en") is not { } folder) return;
-        var archive = new GameFolderScanner().Scan(folder).Vga!;
+        var archive = new GameFolderScanner().Scan(folder).V4Archive!;
         foreach (var room in archive.Rooms)
         {
             var image = archive.DecodeRoom(room.Number);
@@ -77,10 +74,10 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+        var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
         var count = 0;
-        foreach (var room in game.Vga!.Rooms)
-            foreach (var script in game.Vga.ReadScripts(room.Number))
+        foreach (var room in game.V4Archive!.Rooms)
+            foreach (var script in game.V4Archive.ReadScripts(room.Number))
             {
                 var decoded = reader.DecodeCode(script.Code, script.Number);
                 Assert.True(decoded.Issues is not { Count: > 0 } && decoded.DecodeNote is null,
@@ -98,7 +95,7 @@ public sealed class LoomVgaTests
     public void TheV4DialectReadsItsOwnOperandForms(string hex, string operation, string startsWith)
     {
         var code = Convert.FromHexString(hex.Replace(" ", ""));
-        var decoded = new LoomScriptReader(ScummScriptDialect.LoomCd).DecodeCode(code);
+        var decoded = new ScummScriptReader(ScummScriptDialect.LoomCd).DecodeCode(code);
         var first = decoded.Instructions.First();
         Assert.Equal(operation, first.Operation);
         Assert.StartsWith(startsWith, first.Operands, StringComparison.Ordinal);
@@ -108,7 +105,7 @@ public sealed class LoomVgaTests
     public void TheCdGamesObjectsHaveNamesAndVerbsThatLandOnCode()
     {
         if (Folder("loom vga en") is not { } folder) return;
-        var archive = new GameFolderScanner().Scan(folder).Vga!;
+        var archive = new GameFolderScanner().Scan(folder).V4Archive!;
         var owl = archive.ReadObjects(4).Single(o => o.Name == "owl");
         Assert.Equal(100, owl.Id);
         Assert.Equal([0x36, 0x39, 0x56], owl.Verbs.Select(v => v.VerbId).Order());
@@ -134,7 +131,7 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var archive = game.Vga!;
+        var archive = game.V4Archive!;
         var costumes = archive.ReadCostumes();
         Assert.Equal(165, costumes.Count);
         Assert.Equal(165, game.Resources.Count(r => r.Kind == ResourceKind.Costume));
@@ -152,8 +149,8 @@ public sealed class LoomVgaTests
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
-        Assert.IsType<LoomCdDataSource>(data);
-        Assert.Equal(LoomVgaArchive.LocalScriptBase, data.GlobalScriptCount);
+        Assert.IsType<ScummV4DataSource>(data);
+        Assert.Equal(ScummV4Archive.LocalScriptBase, data.GlobalScriptCount);
         var globals = Enumerable.Range(0, data.GlobalScriptCount).Count(n => data.GlobalScript(n) is not null);
         Assert.Equal(122, globals);
         Assert.Null(data.GlobalScript(data.GlobalScriptCount + 50));
@@ -189,7 +186,7 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         var withStates = 0;
         foreach (var room in game.Rooms)
         {
@@ -239,8 +236,8 @@ public sealed class LoomVgaTests
         // Room 4: five boxes, the first a strip at y 132 to 134 from x 208 to 664.
         var boxes = data.ReadRoom(4).WalkBoxes!;
         Assert.Equal(5, boxes.Count);
-        Assert.Equal(new LoomBoxPoint(208, 132), boxes.Boxes[0].UpperLeft);
-        Assert.Equal(new LoomBoxPoint(664, 134), boxes.Boxes[0].LowerRight);
+        Assert.Equal(new ScummBoxPoint(208, 132), boxes.Boxes[0].UpperLeft);
+        Assert.Equal(new ScummBoxPoint(664, 134), boxes.Boxes[0].LowerRight);
     }
 
     [Fact]
@@ -248,7 +245,7 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var vga = game.Vga!;
+        var vga = game.V4Archive!;
         var withMask = new List<int>();
         var objectMasks = 0;
         foreach (var room in game.Rooms)
@@ -282,8 +279,8 @@ public sealed class LoomVgaTests
             catch (Exception ex) when (ex is InvalidDataException or InvalidOperationException) { continue; }
             var mask = scene.Selection.ComposeDepthMask(scene.Room);
             if (mask is null) continue;
-            var open = LoomActorRenderer.Render(scene.Actors, id, scene.Room.Width, scene.Room.Height, scene.Costumes, null, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
-            var masked = LoomActorRenderer.Render(scene.Actors, id, scene.Room.Width, scene.Room.Height, scene.Costumes, mask, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
+            var open = ScummActorRenderer.Render(scene.Actors, id, scene.Room.Width, scene.Room.Height, scene.Costumes, null, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
+            var masked = ScummActorRenderer.Render(scene.Actors, id, scene.Room.Width, scene.Room.Height, scene.Costumes, mask, scene.WalkBoxes, scene.Snapshot.ObjectClasses);
             var hidden = open.Actors.Sum(a => a.Pixels) - masked.Actors.Sum(a => a.Pixels);
             Assert.True(hidden >= 0);
             if (hidden > 0) clipped.Add($"{id}:{hidden}");
@@ -296,13 +293,13 @@ public sealed class LoomVgaTests
     public void EveryCdCostumeReadsAsAnAnimatedCostume()
     {
         if (Folder("loom vga en") is not { } folder) return;
-        var archive = new GameFolderScanner().Scan(folder).Vga!;
+        var archive = new GameFolderScanner().Scan(folder).V4Archive!;
         var drawn = 0;
         foreach (var costume in archive.ReadCostumes())
         {
-            var read = LoomCostume.ReadVga(costume.Body, costume.Id);
+            var read = ScummCostume.ReadVga(costume.Body, costume.Id);
             Assert.True(read.IsVga);
-            var state = new LoomCostumeAnimationState();
+            var state = new ScummCostumeAnimationState();
             for (var direction = 0; direction < 4; direction++)
                 if (read.DecodeAnimation(state, 1, direction) && read.Draw(state, direction).Count > 0) { drawn++; break; }
         }
@@ -321,7 +318,7 @@ public sealed class LoomVgaTests
         Assert.True(bobbin.Visible);
         Assert.True(bobbin.Look.Costume > 0);
         Assert.Contains(scene.Snapshot.Uncertainties, note => note.Contains("Assumed arrival", StringComparison.Ordinal));
-        var layer = LoomActorRenderer.Render(scene.Actors, 35, scene.Room.Width, scene.Room.Height, scene.Costumes, null, scene.WalkBoxes);
+        var layer = ScummActorRenderer.Render(scene.Actors, 35, scene.Room.Width, scene.Room.Height, scene.Costumes, null, scene.WalkBoxes);
         var drawn = layer.Actors.Single(item => item.Number == 1);
         Assert.True(drawn.Pixels > 100);
         // His feet are at his place, inside the room.
@@ -346,7 +343,7 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true) { WaitForSkillClick = true };
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true) { WaitForSkillClick = true };
         for (var frame = 0; frame < 150; frame++) session.AdvanceFrame();
         // Room 69's three buttons are drawn and stay while nobody presses (without the wait the assumed answer comes at frame 30).
         Assert.Equal(69, session.Snapshot.RoomId);
@@ -364,7 +361,7 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var data = new LoomCdDataSource(game);
+        var data = new ScummV4DataSource(game);
         var matrixScripts = 0;
         foreach (var room in game.Rooms.Select(item => item.ResourceId!.Value))
         {
@@ -374,7 +371,7 @@ public sealed class LoomVgaTests
             {
                 if (data.RoomLocalScript(room, id) is not { } script || !script.Instructions.Any(item => item.Operation == "matrixOps")) continue;
                 matrixScripts++;
-                var run = new LoomBoundedScriptExecutor().Execute(script, states, records);
+                var run = new ScummBoundedScriptExecutor().Execute(script, states, records);
                 Assert.DoesNotContain("matrixOps", run.UnresolvedReason ?? "");
             }
         }
@@ -385,7 +382,7 @@ public sealed class LoomVgaTests
     public void TheFourCharsetsReadAndDrawLegibleGlyphs()
     {
         if (Folder("loom vga en") is not { } folder) return;
-        var archive = new GameFolderScanner().Scan(folder).Vga!;
+        var archive = new GameFolderScanner().Scan(folder).V4Archive!;
         foreach (var number in new[] { 1, 2, 3, 4 })
         {
             var charset = archive.ReadCharset(number)!;
@@ -406,7 +403,7 @@ public sealed class LoomVgaTests
     {
         if (Folder("loom vga en") is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         session.VisitRoom(game.Rooms.First(item => item.ResourceId == 1));
         session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
         Assert.Empty(session.VerbArea().Items);
@@ -425,10 +422,10 @@ public sealed class LoomVgaTests
     public void ATalkLineDrawsInTheCdCharset()
     {
         if (Folder("loom vga en") is not { } folder) return;
-        var charset = new GameFolderScanner().Scan(folder).Vga!.ReadCharset(2)!;
+        var charset = new GameFolderScanner().Scan(folder).V4Archive!.ReadCharset(2)!;
         var text = System.Text.Encoding.Latin1.GetBytes("It's locked.");
-        var message = new LoomMessage(LoomMessageKind.Talk, 1, 0, [text], 160, 100, true, 0, 319, 15, 35, "test", 0, 120, null);
-        var layer = LoomVgaMessageRenderer.Render(message, charset);
+        var message = new ScummMessage(ScummMessageKind.Talk, 1, 0, [text], 160, 100, true, 0, 319, 15, 35, "test", 0, 120, null);
+        var layer = ScummV4MessageRenderer.Render(message, charset);
         Assert.NotNull(layer.Bounds);
         Assert.Contains((byte)15, layer.Pixels);
         Assert.Contains((byte)0, layer.Pixels);
@@ -444,7 +441,7 @@ public sealed class LoomVgaCharsetPerMessageTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
         // Script 044 (the intro) +0x0210 sets charset 4, prints the company line, then sets charset 2 for the copyright line.
         var run = typeof(LoomExplorationSession).GetMethod("RunStartedScript", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
@@ -454,8 +451,8 @@ public sealed class LoomVgaCharsetPerMessageTests
         // The talk slot holds one line, so the company line is already replaced on screen; the log keeps it.
         Assert.Contains(session.Messages.Log, message => message.Text == "LucasArts Entertainment Company" && message.Charset == 4);
         Assert.Contains(drawn, message => message.Text.Contains("All rights reserved", StringComparison.Ordinal) && message.Charset == 2);
-        var archive = game.Vga!;
-        var layer = LoomVgaMessageRenderer.Render(drawn, number => archive.ReadCharset(number ?? 2)!);
+        var archive = game.V4Archive!;
+        var layer = ScummV4MessageRenderer.Render(drawn, number => archive.ReadCharset(number ?? 2)!);
         Assert.NotNull(layer.Bounds);
     }
 
@@ -465,27 +462,27 @@ public sealed class LoomVgaCharsetPerMessageTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
         // Script 022 +0x001F: "It's too noisy to spin any drafts in here!", sayVoice 0x1DAA, 0x001B.
         var run = typeof(LoomExplorationSession).GetMethod("RunStartedScript", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
         run.Invoke(session, System.Reflection.BindingFlags.Default, Type.DefaultBinder,
             [22, 0x1F, new Dictionary<string, ushort>(), 0, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing], null);
         var line = session.Messages.Log.Last(message => message.Text.StartsWith("It's too noisy", StringComparison.Ordinal));
-        Assert.Equal(new LoomVoiceCue(0x1DAA, 0x1B), line.Voice);
+        Assert.Equal(new ScummVoiceCue(0x1DAA, 0x1B), line.Voice);
         Assert.Equal(759.4, line.Voice!.Value.DiscSeconds, 1);
         Assert.DoesNotContain("sayVoice", line.Estimate ?? "");
-        Assert.Contains(new LoomVoiceCue(0x1DAA, 0x1B), session.Messages.VoiceEvents);
+        Assert.Contains(new ScummVoiceCue(0x1DAA, 0x1B), session.Messages.VoiceEvents);
     }
 
     [Fact]
     public void AVoiceCueMapsToFramesOfTheAudioTrackAndTheDiscHoldsThem()
     {
-        var cue = new LoomVoiceCue(0x1DAA, 0x1B);
+        var cue = new ScummVoiceCue(0x1DAA, 0x1B);
         // ScummVM: offset * 7.5 frames from the disc start, less the first track (22,500) and the two-second lead-in (150).
         Assert.Equal(34305, cue.TrackStartFrame);
         Assert.Equal(207, cue.TrackFrameCount);
-        Assert.True(new LoomVoiceCue(0, 0).IsStop);
+        Assert.True(new ScummVoiceCue(0, 0).IsStop);
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var disc = DiscImage.Open(folder);
@@ -507,15 +504,15 @@ public sealed class LoomVgaCharsetPerMessageTests
     {
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
-        var archive = LoomVgaArchive.Load(new DiscFileSource(folder));
+        var archive = ScummV4Archive.Load(new DiscFileSource(folder));
         var sounds = archive.ReadSounds();
         Assert.Equal(30, sounds.Count);
         Assert.Equal(8, sounds.Count(s => s.Room == 1));
         Assert.DoesNotContain(sounds, s => s.Id is 24 or 32);
         Assert.All(sounds, s => { Assert.NotNull(s.Speaker); Assert.NotNull(s.Adlib); });
         Assert.Equal(18, sounds.Count(s => s.IsMusic));
-        var adlib = new LoomAdlibAudio();
-        var speaker = new LoomPcSpeakerAudio();
+        var adlib = new ScummAdlibAudio();
+        var speaker = new ScummPcSpeakerAudio();
         // Sound 9 (room 11) is a music track; sound 1 an effect. Both parts of each render real audio.
         foreach (var id in new[] { 1, 9, 19 })
         {
@@ -537,7 +534,7 @@ public sealed class LoomVgaCharsetPerMessageTests
         Assert.Contains(cues, c => c.Cue.Offset == 0x7654 && c.Cue.Length == 0x347 && c.IsMusicOrNarration);
         Assert.Contains(cues, c => c.Text.StartsWith("Not so fast") && !c.IsMusicOrNarration);
         var overture = cues.First(c => c.Cue.Offset == 0x7654 && c.Cue.Length == 0x347).Cue;
-        var wave = game.Vga!.Disc!.ReadAudioWave(overture.TrackStartFrame, overture.TrackFrameCount);
+        var wave = game.V4Archive!.Disc!.ReadAudioWave(overture.TrackStartFrame, overture.TrackFrameCount);
         Assert.True(wave.Length > 44 + 44100 * 4 * 80, $"{wave.Length} bytes");
     }
 
@@ -555,7 +552,7 @@ public sealed class LoomVgaCharsetPerMessageTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         session.VisitRoom(game.Rooms.First(item => item.ResourceId == 1));
         session.VisitRoom(game.Rooms.First(item => item.ResourceId == 35));
         var status = session.GameStatus;
@@ -589,19 +586,19 @@ public sealed class LoomVgaIntroTests
     [Fact]
     public void TheCdMusicTimerRestartsWithEachCueAndCountsOneAJiffyUntilTheNext()
     {
-        var table = new LoomMessageTable();
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var table = new ScummMessageTable();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         Assert.False(table.CdTimerRunning);
         table.AdvanceCdTimer(6);
         Assert.Equal(0, table.CdMusicTimer);
-        var print = new LoomPrintRequest(0xFF, [new("sayVoice", 3023, 24)], null, "test", 0, null, null);
+        var print = new ScummPrintRequest(0xFF, [new("sayVoice", 3023, 24)], null, "test", 0, null, null);
         table.Print(print, runtime);
         Assert.True(table.CdTimerRunning);
         table.AdvanceCdTimer(6);
         table.AdvanceCdTimer(6);
         Assert.Equal(12, table.CdMusicTimer);
         // A stop zeroes the variable for the script but not the CD timer, which the next frame copies back (ScummVM keeps counting).
-        table.Print(new LoomPrintRequest(0xFF, [new("sayVoice", 0, 0)], null, "test", 0, null, null), runtime);
+        table.Print(new ScummPrintRequest(0xFF, [new("sayVoice", 0, 0)], null, "test", 0, null, null), runtime);
         Assert.Equal(0, runtime.GlobalVariables["var[0x00E]"]);
         Assert.Equal(12, table.CdMusicTimer);
         table.Print(print, runtime);
@@ -614,7 +611,7 @@ public sealed class LoomVgaIntroTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
         Assert.True(session.BootRunning);
         Assert.Equal(69, session.Snapshot.RoomId);
         var frames = 0;
@@ -643,10 +640,10 @@ public sealed class LoomVgaVoiceTimingTests
     [Fact]
     public void ALineStartsWhenTheLineBeforeEndsOrWhenItsPrintRanWhicheverIsLater()
     {
-        var a = new LoomVoiceCue(9715, 22);
-        var b = new LoomVoiceCue(9745, 15);
+        var a = new ScummVoiceCue(9715, 22);
+        var b = new ScummVoiceCue(9745, 15);
         // Printed 30 jiffies after the first, which lasts 22 * 7.5 + 5 frames = 2.3 s: it waits for it (no gap).
-        var plan = LoomVoiceSchedule.Plan([a, new LoomVoiceCue(0, 0), b], [100, 110, 130]);
+        var plan = LoomVoiceSchedule.Plan([a, new ScummVoiceCue(0, 0), b], [100, 110, 130]);
         Assert.Equal(2, plan.Count);
         Assert.Equal(0, plan[0].StartSeconds);
         Assert.Equal(170 / 75.0, plan[1].StartSeconds, 3);
@@ -655,7 +652,7 @@ public sealed class LoomVgaVoiceTimingTests
         plan = LoomVoiceSchedule.Plan([a, b], [100, 340]);
         Assert.Equal(4.0, plan[1].StartSeconds, 3);
         Assert.Equal(4.0 - 170 / 75.0, plan[1].GapSeconds, 3);
-        Assert.Empty(LoomVoiceSchedule.Plan([new LoomVoiceCue(0, 0)], [5]));
+        Assert.Empty(LoomVoiceSchedule.Plan([new ScummVoiceCue(0, 0)], [5]));
     }
 
     [Fact]
@@ -665,7 +662,7 @@ public sealed class LoomVgaVoiceTimingTests
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
         var cd = ScummDataSources.For(game);
-        var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+        var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         // Room 18's description (double click): two lines, 9715/22 and 9745/15, then the game's own stop.
         var room = game.Rooms.First(item => item.ResourceId == 18);
         session.VisitRoom(room);

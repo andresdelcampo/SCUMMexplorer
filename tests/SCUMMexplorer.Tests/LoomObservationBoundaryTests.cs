@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -13,8 +12,8 @@ public sealed class LoomObservationBoundaryTests
     [InlineData("stage")]
     public void AMatchingNumberCannotConfirmAForeignSourceOrCausalSnapshot(string mismatch)
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         var writer = Write(1, 12, 8);
         tracker.Observe(writer);
         var confirmation = Confirm(2, 12, 8);
@@ -35,9 +34,9 @@ public sealed class LoomObservationBoundaryTests
     [InlineData("parent")]
     public void AForeignTerminalBoundaryCannotEstablishWriterTermination(string mismatch)
     {
-        var matches = new List<LoomCompletionRead>();
-        var completion = new LoomCompletionObserver(matches.Add);
-        var tracker = new LoomRuntimeRelationTracker(completion.Observe);
+        var matches = new List<ScummCompletionRead>();
+        var completion = new ScummCompletionObserver(matches.Add);
+        var tracker = new ScummRuntimeRelationTracker(completion.Observe);
         tracker.Observe(Write(1, 12, 8));
         tracker.Observe(Confirm(2, 12, 8));
         var end = Confirm(3, 12, 8) with { Site = Site("end"), ReachedStop = true };
@@ -55,8 +54,8 @@ public sealed class LoomObservationBoundaryTests
     [Fact]
     public void SameInvocationTerminalBoundaryPreservesIndependentKnownAndEstimatedPaths()
     {
-        var matches = new List<LoomCompletionRead>();
-        var tracker = new LoomRuntimeRelationTracker(new LoomCompletionObserver(matches.Add).Observe);
+        var matches = new List<ScummCompletionRead>();
+        var tracker = new ScummRuntimeRelationTracker(new ScummCompletionObserver(matches.Add).Observe);
         tracker.Observe(Write(1, 12, 8));
         tracker.Observe(Confirm(2, 12, 8));
         tracker.Observe(Confirm(3, 12, 8) with { Site = Site("end"), ReachedStop = true });
@@ -71,8 +70,8 @@ public sealed class LoomObservationBoundaryTests
     [Fact]
     public void ObservedArgumentNumbersDoNotEstablishCalleeLocalOriginsOrReturns()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         tracker.Observe(Write(1, 12, 8));
         tracker.Observe(Confirm(2, 12, 8) with {
             Site = Site("instruction") with { Operation = "startScript" },
@@ -91,15 +90,15 @@ public sealed class LoomObservationBoundaryTests
         Assert.Empty(updates[^1].Writes);
     }
 
-    private static LoomScriptObservationSite Site(string stage) => new(31, null, 1, 0, stage, 0, "stopObjectCode", "");
-    private static LoomScriptObservation Write(long sequence, long slot, long parent) =>
+    private static ScummScriptObservationSite Site(string stage) => new(31, null, 1, 0, stage, 0, "stopObjectCode", "");
+    private static ScummScriptObservation Write(long sequence, long slot, long parent) =>
         new(sequence, slot, parent, slot, Site("instruction") with { Operation = "move" },
             new Dictionary<string, ushort> { ["var[0x060]"] = 0 }, ["var[0x060]"], true,
             OperandBindings: [new("destination-before", "var[0x060]", "var[0x060]", 0, true),
                 new("source", "0x0000", null, 0, false)]);
-    private static LoomScriptObservation Confirm(long sequence, long slot, long parent) =>
+    private static ScummScriptObservation Confirm(long sequence, long slot, long parent) =>
         Write(sequence, slot, parent) with { Site = Site("instruction"), OperandBindings = [] };
-    private static LoomScriptObservation Read(long sequence, long slot) =>
+    private static ScummScriptObservation Read(long sequence, long slot) =>
         Write(sequence, slot, 0) with { ParentSlot = null, PathEstimated = false,
             Site = Site("instruction") with { Script = 20, Operation = "equalZero" },
             OperandBindings = [new("condition", "var[0x060]", "var[0x060]", 0, true)] };

@@ -1,10 +1,9 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
 public sealed class LoomExpressionTests
 {
-    private static LoomScriptDisassembly Script(string operands) => new(1, 1, 0, 32, 16,
+    private static ScummScriptDisassembly Script(string operands) => new(1, 1, 0, 32, 16,
         [new(0, 0, "expression", operands, "AC 00 40 FF"), new(4, 0, "stopObjectCode", "", "00")], null, null, [], []);
 
     [Theory]
@@ -14,7 +13,7 @@ public sealed class LoomExpressionTests
     [InlineData("[0xFFFF 0x0002 +]", 1)]
     public void ExpressionUsesOrderedIntegerStackAndSignedWordInputs(string body, int expected)
     {
-        var run = new LoomBoundedScriptExecutor().Execute(Script("local[0x000], " + body), new Dictionary<int, byte>(), []);
+        var run = new ScummBoundedScriptExecutor().Execute(Script("local[0x000], " + body), new Dictionary<int, byte>(), []);
         Assert.True(run.ReachedStop);
         Assert.Null(run.UnresolvedReason);
         Assert.Equal(unchecked((ushort)expected), run.KnownVariables["local[0x000]"]);
@@ -23,12 +22,12 @@ public sealed class LoomExpressionTests
     [Fact]
     public void TimerAndPointerExpressionPreservesOperandEstimates()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x00B]"] = 24;
         runtime.GlobalVariables["var[0x014]"] = 120;
         runtime.GlobalVariables["var[0x015]"] = 40;
         runtime.EstimatedVariables.Add("var[0x014]");
-        var run = new LoomBoundedScriptExecutor().Execute(
+        var run = new ScummBoundedScriptExecutor().Execute(
             Script("local[0x001], [var[0x00B] var[0x014] + var[0x015] +]"), new Dictionary<int, byte>(), [], runtime: runtime);
         Assert.Equal(184, run.KnownVariables["local[0x001]"]);
         Assert.Contains("local[0x001]", run.EstimatedLocals);
@@ -38,8 +37,8 @@ public sealed class LoomExpressionTests
     [Fact]
     public void NestedRandomOpcodeWritesScratchAndKeepsSeededResultEstimated()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
-        var run = new LoomBoundedScriptExecutor().Execute(Script("local[0x007], [getRandomNr(var[0x000], 0x05) 0x0001 +]"),
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
+        var run = new ScummBoundedScriptExecutor().Execute(Script("local[0x007], [getRandomNr(var[0x000], 0x05) 0x0001 +]"),
             new Dictionary<int, byte>(), [], runtime: runtime);
         Assert.True(run.ReachedStop);
         var pick = Assert.Single(run.RandomPicks);
@@ -58,7 +57,7 @@ public sealed class LoomExpressionTests
     [InlineData("[var[0x123]]")]
     public void UnsupportedOrInvalidExpressionDoesNotWriteDestination(string body)
     {
-        var run = new LoomBoundedScriptExecutor().Execute(Script("local[0x000], " + body),
+        var run = new ScummBoundedScriptExecutor().Execute(Script("local[0x000], " + body),
             new Dictionary<int, byte>(), [], initialLocals: new Dictionary<string, ushort> { ["local[0x000]"] = 77 });
         Assert.False(run.ReachedStop);
         Assert.NotNull(run.UnresolvedReason);

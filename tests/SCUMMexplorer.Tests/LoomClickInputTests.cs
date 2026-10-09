@@ -1,6 +1,5 @@
 ﻿using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -131,7 +130,7 @@ public sealed class LoomClickInputTests
         Assert.Contains(outside.Uncertainties, line => line.Contains("not sent, because the point is outside the room picture", StringComparison.Ordinal));
 
         // Script 002 (the cutscene start hook) turns user input off.
-        var script = new LoomScriptReader().Decode(started.Game.Resources.Single(item => item.Kind == ResourceKind.Script && item.ResourceId == 2));
+        var script = new ScummScriptReader().Decode(started.Game.Resources.Single(item => item.Kind == ResourceKind.Script && item.ResourceId == 2));
         session.RunTopLevelScript(script);
         var ignored = session.Click(450, 60);
         Assert.Contains(ignored.Uncertainties, line => line.Contains("user input is off", StringComparison.Ordinal));

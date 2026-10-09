@@ -1,5 +1,4 @@
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -24,7 +23,7 @@ public sealed class LoomFrameTimingTests
         session.Snapshot.KnownGlobalVariables.TryGetValue(name, out var value) ? value : null;
 
     // A synthetic script: the delay, then var[0x0F0] = 1 (no game code uses var[0x0F0]).
-    private static LoomScriptDisassembly Delayed(LoomScriptInstruction delay) =>
+    private static ScummScriptDisassembly Delayed(ScummScriptInstruction delay) =>
         new(250, 1, 0, 32, 16,
             [delay, new(delay.Offset + 4, 0x1A, "move", "var[0x0F0] = 0x0001", "1A F0 00 01 00"), new(delay.Offset + 9, 0, "stopObjectCode", "", "00")],
             null, null, [], [], "Synthetic test script");
@@ -54,7 +53,7 @@ public sealed class LoomFrameTimingTests
     public void ADelayVariableReadsItsVariable()
     {
         if (Start() is not { } session) return;
-        session.RunTopLevelScript(new LoomScriptDisassembly(250, 1, 0, 32, 16,
+        session.RunTopLevelScript(new ScummScriptDisassembly(250, 1, 0, 32, 16,
             [new(0, 0x1A, "move", "var[0x0F1] = 0x000D", "1A F1 00 0D 00"), new(5, 0, "stopObjectCode", "", "00")],
             null, null, [], [], "Synthetic test script"));
         session.RunTopLevelScript(Delayed(new(0, 0x2B, "delayVariable", "var[0x0F1]", "2B F1 00 00")));

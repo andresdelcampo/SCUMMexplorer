@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -15,7 +14,7 @@ public sealed class CdCutsceneSweep
         var frames = 0; var skippable = false; var rooms = 0; var began = false;
         try
         {
-            var session = new LoomExplorationSession(game, game.Vga!.ReadIndexedObjects(), completeBoot: false);
+            var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
             var room = game.Rooms.First(r => r.ResourceId == t.Room);
             var setup = planner.Derive(t);
             var useSetup = setup is { Plays: true, HasSteps: true };

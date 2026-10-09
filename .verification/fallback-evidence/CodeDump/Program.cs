@@ -1,7 +1,5 @@
-using SCUMMexplorer.Core.Rendering;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // Dumps every decoded instruction of every source (global scripts, room
 // entry/exit/local scripts, object verbs) as TSV, plus the object directory of
@@ -10,15 +8,15 @@ var folder = args[0];
 var output = args[1];
 var game = new GameFolderScanner().Scan(folder);
 var dialect = ScummScriptDialects.For(game.Id);
-var reader = new LoomScriptReader(dialect);
-var verbs = new LoomObjectVerbReader(dialect);
+var reader = new ScummScriptReader(dialect);
+var verbs = new ScummObjectVerbReader(dialect);
 var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(folder, "00.LFL"));
 using var code = new StreamWriter(Path.Combine(output, "code.tsv"));
 using var objects = new StreamWriter(Path.Combine(output, "objects.tsv"));
 objects.WriteLine("room\tid\tlocalIndex\tparentLocal\tparentState\thasImage\tx\ty\tw\th");
-void Scan(string source, Func<LoomScriptDisassembly?> decode)
+void Scan(string source, Func<ScummScriptDisassembly?> decode)
 {
-    LoomScriptDisassembly? script;
+    ScummScriptDisassembly? script;
     try { script = decode(); }
     catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { code.WriteLine($"{source}\t-\tDECODE-FAILURE\t{ex.Message}"); return; }
     if (script is null) return;
@@ -32,8 +30,8 @@ foreach (var room in game.Rooms.Where(r => r.ResourceId.HasValue).OrderBy(r => r
     Scan($"Room {id:00} entry", () => reader.DecodeRoomEntry(room));
     Scan($"Room {id:00} exit", () => reader.DecodeRoomExit(room));
     foreach (var l in LoomSceneDrawBatchesProbe.Locals(bytes, globalCount)) Scan($"Room {id:00} local {l}", () => reader.DecodeRoomLocalScript(room, l, globalCount));
-    var records = new LoomRoomObjectDirectory().Decode(bytes);
-    var images = new LoomRoomObjects().Decode(bytes).ToDictionary(i => i.Id);
+    var records = new ScummRoomObjectDirectory().Decode(bytes);
+    var images = new ScummRoomObjects().Decode(bytes).ToDictionary(i => i.Id);
     foreach (var rec in records)
     {
         images.TryGetValue(rec.Id, out var img);

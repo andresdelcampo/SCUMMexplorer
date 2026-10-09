@@ -3,8 +3,6 @@ using System.Net;
 using System.Text;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 if (args.Length is < 1 or > 2)
 {
@@ -39,7 +37,7 @@ var outputPath = Path.GetFullPath(args.Length == 2 ? args[1] : Path.Combine(game
 Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 var roomImages = new Dictionary<int, string>();
 var roomById = game.Rooms.Where(room => room.ResourceId.HasValue).ToDictionary(room => room.ResourceId!.Value);
-var decoder = new OldV3EgaRoomDecoder();
+var decoder = new ScummV3EgaRoomDecoder();
 foreach (var roomId in groups.SelectMany(item => item.RoomIds).Distinct())
 {
     // Room 32's supplied EGA bitmap is an all-black placeholder, not usable scene art.
@@ -127,7 +125,7 @@ static string? DialogueMenuExclusionReason(IReadOnlyList<Option> options, IReadO
     return null;
 }
 
-static bool IsIndirectTravelPicker(LoomScriptDisassembly? disassembly)
+static bool IsIndirectTravelPicker(ScummScriptDisassembly? disassembly)
 {
     if (disassembly is null) return false;
     var setsDestination = disassembly.Instructions.Any(item => item.Operation == "move" &&
@@ -137,9 +135,9 @@ static bool IsIndirectTravelPicker(LoomScriptDisassembly? disassembly)
     return setsDestination && startsTravelUi;
 }
 
-static LoomScriptDisassembly? ReadSourceDisassembly(IReadOnlyList<LoomTextEntry> rows, int? scriptId, GameLibrary game)
+static ScummScriptDisassembly? ReadSourceDisassembly(IReadOnlyList<LoomTextEntry> rows, int? scriptId, GameLibrary game)
 {
-    var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
     try
     {
         if (scriptId is int indexed)
@@ -176,10 +174,10 @@ static bool IsGenericActionLabel(string label)
 
 static Conversation[] LinkConversationMenus(Conversation[] groups, GameLibrary game)
 {
-    var scripts = new Dictionary<int, LoomScriptDisassembly>();
+    var scripts = new Dictionary<int, ScummScriptDisassembly>();
     var resources = game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
         .ToDictionary(item => item.ResourceId!.Value);
-    var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
     foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
     {
         try { scripts[resource.ResourceId!.Value] = reader.Decode(resource); }
@@ -305,7 +303,7 @@ static Conversation[] LinkConversationMenus(Conversation[] groups, GameLibrary g
         }).ToArray()
     }).ToArray();
 
-    static int IndexOf(IReadOnlyList<LoomScriptInstruction> instructions, int offset)
+    static int IndexOf(IReadOnlyList<ScummScriptInstruction> instructions, int offset)
     {
         for (var index = 0; index < instructions.Count; index++)
             if (instructions[index].Offset == offset) return index;
@@ -366,13 +364,13 @@ static Conversation[] LinkConversationMenus(Conversation[] groups, GameLibrary g
 
     static bool IsConditional(string operation) => operation is "isGreaterEqual" or "isNotEqual" or "isLessEqual" or
         "isLess" or "isEqual" or "isGreater" or "equalZero" or "notEqualZero" or "ifClassOfIs" or "isActorInBox" or "ifState" or "ifNotState";
-    static bool TryBranchTarget(LoomScriptInstruction instruction, out int target)
+    static bool TryBranchTarget(ScummScriptInstruction instruction, out int target)
     {
         var match = System.Text.RegularExpressions.Regex.Match(instruction.Operands, @"->\s*0x(?<target>[0-9A-Fa-f]+)");
         return match.Success && int.TryParse(match.Groups["target"].Value, System.Globalization.NumberStyles.HexNumber,
             System.Globalization.CultureInfo.InvariantCulture, out target) || (target = 0) != 0;
     }
-    static bool TryEquality(LoomScriptInstruction instruction, out string variable, out int value, out int target)
+    static bool TryEquality(ScummScriptInstruction instruction, out string variable, out int value, out int target)
     {
         var match = System.Text.RegularExpressions.Regex.Match(instruction.Operands,
             @"^(?<var>[a-z]+\[[^\]]+\]),\s*0x(?<value>[0-9A-Fa-f]+),.*->\s*0x(?<target>[0-9A-Fa-f]+)");
@@ -382,21 +380,21 @@ static Conversation[] LinkConversationMenus(Conversation[] groups, GameLibrary g
                int.TryParse(match.Groups["target"].Value, System.Globalization.NumberStyles.HexNumber,
                    System.Globalization.CultureInfo.InvariantCulture, out target);
     }
-    static bool WritesVariable(LoomScriptInstruction instruction, string variable) =>
+    static bool WritesVariable(ScummScriptInstruction instruction, string variable) =>
         System.Text.RegularExpressions.Regex.IsMatch(instruction.Operands,
             "^" + System.Text.RegularExpressions.Regex.Escape(variable) + @"\s*(?:=|\+=|-=|\+\+|--)" );
 }
 
 static Conversation[] TraceBranchReplies(Conversation[] groups, LoomTextExtraction extraction, GameLibrary game)
 {
-    var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
     var resources = game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
         .ToDictionary(item => item.ResourceId!.Value);
     var updated = new List<Conversation>(groups.Length);
     foreach (var group in groups)
     {
         if (group.ScriptId is not int scriptId || !resources.TryGetValue(scriptId, out var resource)) { updated.Add(group); continue; }
-        LoomScriptDisassembly script;
+        ScummScriptDisassembly script;
         try { script = reader.Decode(resource); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException)
         { updated.Add(group); continue; }
@@ -499,11 +497,11 @@ static Conversation[] TraceBranchReplies(Conversation[] groups, LoomTextExtracti
             ? path
             : (path.Length == 0 ? "" : path + "; ") + $"selection slot was overwritten before +0x{offset:X4}; later handler conditions not evaluated";
 
-    static bool WritesVariable(LoomScriptInstruction instruction, string variable) =>
+    static bool WritesVariable(ScummScriptInstruction instruction, string variable) =>
         System.Text.RegularExpressions.Regex.IsMatch(instruction.Operands,
             "^" + System.Text.RegularExpressions.Regex.Escape(variable) + @"\s*(?:=|\+=|-=|\+\+|--)" );
 
-    static bool TryEquality(LoomScriptInstruction instruction, out string variable, out int verb, out int target)
+    static bool TryEquality(ScummScriptInstruction instruction, out string variable, out int verb, out int target)
     {
         var match = System.Text.RegularExpressions.Regex.Match(instruction.Operands,
             @"^(?<var>[a-z]+\[[^\]]+\]),\s*0x(?<value>[0-9A-Fa-f]+),.*->\s*0x(?<target>[0-9A-Fa-f]+)");
@@ -513,7 +511,7 @@ static Conversation[] TraceBranchReplies(Conversation[] groups, LoomTextExtracti
                int.TryParse(match.Groups["target"].Value, System.Globalization.NumberStyles.HexNumber,
                    System.Globalization.CultureInfo.InvariantCulture, out target);
     }
-    static bool TryTarget(LoomScriptInstruction instruction, out int target)
+    static bool TryTarget(ScummScriptInstruction instruction, out int target)
     {
         var match = System.Text.RegularExpressions.Regex.Match(instruction.Operands, @"->\s*0x(?<target>[0-9A-Fa-f]+)");
         target = 0;
@@ -536,7 +534,7 @@ static Conversation[] TraceBranchReplies(Conversation[] groups, LoomTextExtracti
 
 static Conversation[] TraceOpeningLines(Conversation[] groups, LoomTextExtraction extraction, GameLibrary game)
 {
-    var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
     var resources = game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue)
         .ToDictionary(item => item.ResourceId!.Value);
     var updated = new List<Conversation>(groups.Length);
@@ -544,7 +542,7 @@ static Conversation[] TraceOpeningLines(Conversation[] groups, LoomTextExtractio
     {
         if (group.ScriptId is not int scriptId || !resources.TryGetValue(scriptId, out var resource))
         { updated.Add(group); continue; }
-        LoomScriptDisassembly script;
+        ScummScriptDisassembly script;
         try { script = reader.Decode(resource); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException)
         { updated.Add(group); continue; }
@@ -595,7 +593,7 @@ static Conversation[] TraceOpeningLines(Conversation[] groups, LoomTextExtractio
     }
     return updated.ToArray();
 
-    static bool TryTarget(LoomScriptInstruction instruction, out int target)
+    static bool TryTarget(ScummScriptInstruction instruction, out int target)
     {
         var match = System.Text.RegularExpressions.Regex.Match(instruction.Operands, @"->\s*0x(?<target>[0-9A-Fa-f]+)");
         return match.Success && int.TryParse(match.Groups["target"].Value, System.Globalization.NumberStyles.HexNumber,
@@ -617,8 +615,8 @@ static Conversation[] TraceOpeningLines(Conversation[] groups, LoomTextExtractio
 
 static Conversation[] ExpandConditionalOptions(Conversation[] groups, LoomTextExtraction extraction, GameLibrary game)
 {
-    var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
-    var scripts = new Dictionary<int, LoomScriptDisassembly>();
+    var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+    var scripts = new Dictionary<int, ScummScriptDisassembly>();
     foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
     {
         try { scripts[resource.ResourceId!.Value] = reader.Decode(resource); }
@@ -674,12 +672,12 @@ static Conversation[] ExpandConditionalOptions(Conversation[] groups, LoomTextEx
     }
     return updated.ToArray();
 
-    static bool TryVerbLabel(LoomScriptInstruction instruction, out int verb, out string text)
+    static bool TryVerbLabel(ScummScriptInstruction instruction, out int verb, out string text)
     {
         verb = 0; text = "";
         if (!int.TryParse(instruction.Operands.Split(',', 2)[0].Trim().Replace("0x", "", StringComparison.Ordinal),
                 System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out verb)) return false;
-        var literals = LoomScummTextDecoder.DecodeLiterals(instruction.Operands);
+        var literals = ScummTextDecoder.DecodeLiterals(instruction.Operands);
         if (literals.Count == 0) return false;
         text = literals[0];
         return true;

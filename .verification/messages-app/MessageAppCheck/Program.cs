@@ -6,8 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
-using SCUMMexplorer.Core.Rendering;
 
 // M1c/M1d in the real MainWindow: a double click on Room 02 object 156 (the sky)
 // through HandleRoomPoint (the game's click, assumed input) plays on the app's
@@ -70,7 +68,7 @@ internal static class Program
                 }
                 var overlay = Find<Image>("RoomMessageOverlay");
                 var verbOverlay = Find<Image>("VerbMessageOverlay");
-                var charset = (LoomCharset?)Field("_charset");
+                var charset = (ScummV3Charset?)Field("_charset");
                 Check(charset is not null, $"charset 0 was read ({charset?.FilePath ?? (string?)Field("_charsetError")})");
 
                 await Open(2);
@@ -162,7 +160,7 @@ internal static class Program
                 // Clicking one object after another: script 008 erases the name area with drawBox
                 // (232,152)–(312,192) before script 007 prints the next name, so one name shows at a time,
                 // under the close-up (verb 0x36) at (248, 152).
-                var records = ((IEnumerable<LoomRoomObjectRecord>)Field("_currentRoomObjectRecords")!).ToArray();
+                var records = ((IEnumerable<ScummRoomObjectRecord>)Field("_currentRoomObjectRecords")!).ToArray();
                 var verbImage = Find<Image>("VerbStripImage");
                 foreach (var id in new[] { 155, 157, 156 })
                 {

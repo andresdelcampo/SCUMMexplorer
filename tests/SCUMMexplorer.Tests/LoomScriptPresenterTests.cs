@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -17,9 +16,9 @@ public sealed class LoomScriptPresenterTests
 
     private static string Present(byte[] code)
     {
-        var decoded = LoomScriptDisassembler.Disassemble(code);
+        var decoded = ScummScriptDisassembler.Disassemble(code);
         Assert.Empty(decoded.Issues);
-        var script = new LoomScriptDisassembly(1, 1, 0, code.Length, code.Length, decoded.Instructions, null, null, [], []);
+        var script = new ScummScriptDisassembly(1, 1, 0, code.Length, code.Length, decoded.Instructions, null, null, [], []);
         return new LoomScriptPresenter(LoomGlossary.Default).Present(script);
     }
 
@@ -65,11 +64,11 @@ public sealed class LoomScriptPresenterTests
     {
         var instructions = new[]
         {
-            new LoomScriptInstruction(0, 0, "move", "var[0x032+local[0x000]] = 0x0001", ""),
-            new LoomScriptInstruction(1, 0, "move", "var[0x033+local[0x000]] = 0x0001", ""),
-            new LoomScriptInstruction(2, 0, "move", "var[0x0D1+var[0x002]] = 0x0001", "")
+            new ScummScriptInstruction(0, 0, "move", "var[0x032+local[0x000]] = 0x0001", ""),
+            new ScummScriptInstruction(1, 0, "move", "var[0x033+local[0x000]] = 0x0001", ""),
+            new ScummScriptInstruction(2, 0, "move", "var[0x0D1+var[0x002]] = 0x0001", "")
         };
-        var script = new LoomScriptDisassembly(1, 1, 0, 3, 3, instructions, null, null, [], []);
+        var script = new ScummScriptDisassembly(1, 1, 0, 3, 3, instructions, null, null, [], []);
         var text = new LoomScriptPresenter(LoomGlossary.Default).Present(script);
         Assert.Contains("draft table (pattern words)[local 0] = 1", text);
         Assert.Contains("var[0x033+local[0x000]] = 1", text);
@@ -96,7 +95,7 @@ public sealed class LoomScriptPresenterTests
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
         var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative)));
         var glossary = LoomGlossary.Load(game);
-        var script = new LoomScriptReader().Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == scriptId));
+        var script = new ScummScriptReader().Decode(game.Resources.Single(r => r.Kind == ResourceKind.Script && r.ResourceId == scriptId));
         var text = new LoomScriptPresenter(glossary).Present(script);
         // One golden per edition: the text, the offsets and the bit numbers differ between the releases.
         var edition = Path.GetFileName(game.FolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
@@ -125,8 +124,8 @@ public sealed class LoomScriptPresenterTests
     [InlineData("print", "0x0B, [sayVoice, 0x1BD4, 0x0014]", "play CD audio from disc second 712.4 for 2 s")]
     public void RoomStringAndSentenceOperationsGetPlainPhrases(string operation, string operands, string expected)
     {
-        var instructions = new[] { new LoomScriptInstruction(0, 0, operation, operands, "") };
-        var script = new LoomScriptDisassembly(1, 1, 0, 1, 1, instructions, null, null, [], []);
+        var instructions = new[] { new ScummScriptInstruction(0, 0, operation, operands, "") };
+        var script = new ScummScriptDisassembly(1, 1, 0, 1, 1, instructions, null, null, [], []);
         var text = new LoomScriptPresenter(LoomGlossary.Default).Present(script);
         Assert.Contains(expected, text);
         Assert.DoesNotContain("[raw]", text);

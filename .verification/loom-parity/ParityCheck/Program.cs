@@ -7,7 +7,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 internal static class Program
 {
@@ -139,7 +138,7 @@ internal static class Program
                     else
                     {
                         await Visit(68);
-                        var batches = LoomSceneDrawBatches.Build(game);
+                        var batches = ScummSceneDrawBatches.Build(game);
                         var resource = game.Rooms.Single(r => r.ResourceId == 68);
                         var thumb = (BitmapSource)typeof(MainWindow).GetMethod("RenderRoomCardThumbnail", BindingFlags.Static | BindingFlags.NonPublic)!
                             .Invoke(null, [game, resource, Field("_indexedObjectSnapshot"), Field("_indexedStates"), batches, CancellationToken.None])!;

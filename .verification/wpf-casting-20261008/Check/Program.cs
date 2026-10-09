@@ -9,7 +9,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 // Real offscreen MainWindow, private profile/cache, no activation or OS input.
 // Text is a routed WPF event; note clicks use the handler's Point-based seam.
@@ -117,7 +116,7 @@ internal static class Program
                             int noteVerb = game.Id == GameId.LoomVga ? 0x59 + note : note;
                             var slot = session.VerbArea().Items.Single(i => i.VerbId == noteVerb && i.Mode == 1);
                             var position = new Point((slot.X + slot.Width / 2.0) * strip.ActualWidth / 320,
-                                (slot.Y + slot.Height / 2.0 - LoomVerbArea.Top) * strip.ActualHeight / LoomVerbArea.Height);
+                                (slot.Y + slot.Height / 2.0 - ScummVerbArea.Top) * strip.ActualHeight / ScummVerbArea.Height);
                             var hit = window.InputHitTest(strip.TranslatePoint(position, window));
                             Check(ReferenceEquals(hit, strip), label + $" note {note} layout hit reaches strip");
                             Check((bool)Call("ClickVerbStrip", position)!, label + $" note {note} strip click accepted");

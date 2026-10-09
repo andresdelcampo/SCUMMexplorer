@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -12,7 +11,7 @@ public sealed class LoomScriptDisassemblerTests
         // Room 70's locals 203/204 use this grammar. The string range ends at
         // 0x14 (20), which used to be misread as a truncated print opcode.
         byte[] code = [0xA7, (byte)mode, 0x03, .. "savegame.___"u8.ToArray(), 0x00, 0x02, 0x09, 0x14, 0xFF, 0xA0];
-        var result = LoomScriptDisassembler.Disassemble(code);
+        var result = ScummScriptDisassembler.Disassemble(code);
 
         Assert.Empty(result.Issues);
         Assert.Equal([0, 20], result.Instructions.Select(i => i.Offset));
@@ -28,7 +27,7 @@ public sealed class LoomScriptDisassemblerTests
     public void SaveLoadVarsReadsVariableRangesAndStopsAtEachNativeTerminator(byte terminator)
     {
         byte[] code = [0xA7, 0x01, 0x01, 0x01, 0x00, 0x02, 0x40, 0xC2, 0x03, 0x00, 0x04, 0x40, terminator, 0xA0];
-        var result = LoomScriptDisassembler.Disassemble(code);
+        var result = ScummScriptDisassembler.Disassemble(code);
 
         Assert.Empty(result.Issues);
         Assert.Equal([0, 13], result.Instructions.Select(i => i.Offset));
@@ -42,7 +41,7 @@ public sealed class LoomScriptDisassemblerTests
     [InlineData(new byte[] { 0xA7, 0x01, 0x01, 0x00 })]
     public void SaveLoadVarsRetainsGenuineTruncatedOperandDiagnostics(byte[] code)
     {
-        var result = LoomScriptDisassembler.Disassemble(code);
+        var result = ScummScriptDisassembler.Disassemble(code);
 
         Assert.NotEmpty(result.Issues);
         Assert.Contains(result.Issues, issue => issue.Offset == 0 && issue.Reason.Contains("truncated", StringComparison.Ordinal));
@@ -53,8 +52,8 @@ public sealed class LoomScriptDisassemblerTests
     {
         // 0xAE is followed directly by breakHere and stopObjectCode in Indy3.
         byte[] code = [0xAE, 0x80, 0x00];
-        var indy = LoomScriptDisassembler.Disassemble(code, ScummScriptDialect.Indy3);
-        var loom = LoomScriptDisassembler.Disassemble(code);
+        var indy = ScummScriptDisassembler.Disassemble(code, ScummScriptDialect.Indy3);
+        var loom = ScummScriptDisassembler.Disassemble(code);
 
         Assert.Empty(indy.Issues);
         Assert.Equal(["waitFor", "breakHere", "stopObjectCode"], indy.Instructions.Select(item => item.Operation));
@@ -66,7 +65,7 @@ public sealed class LoomScriptDisassemblerTests
     public void Indy3WaitForActorAndActorPositionReadByteOperands()
     {
         byte[] code = [0x3B, 0x05, 0x43, 0x01, 0x00, 0x05, 0x23, 0x02, 0x00, 0x06, 0x00];
-        var result = LoomScriptDisassembler.Disassemble(code, ScummScriptDialect.Indy3);
+        var result = ScummScriptDisassembler.Disassemble(code, ScummScriptDialect.Indy3);
 
         Assert.Empty(result.Issues);
         Assert.Equal(["waitForActor", "getActorX", "getActorY", "stopObjectCode"],
@@ -79,7 +78,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void LoomWaitForActorHasNoOperands()
     {
-        var result = LoomScriptDisassembler.Disassemble([0x3B, 0x80, 0x00]);
+        var result = ScummScriptDisassembler.Disassemble([0x3B, 0x80, 0x00]);
 
         Assert.Empty(result.Issues);
         Assert.Equal(["waitForActor", "breakHere", "stopObjectCode"], result.Instructions.Select(item => item.Operation));
@@ -88,7 +87,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void JumpTraversesTargetAndSkipsUnreachableStop()
     {
-        var result = LoomScriptDisassembler.Disassemble([0x18, 0x01, 0x00, 0x00, 0x20, 0x00]);
+        var result = ScummScriptDisassembler.Disassemble([0x18, 0x01, 0x00, 0x00, 0x20, 0x00]);
 
         Assert.Empty(result.Issues);
         Assert.Equal([0, 4, 5], result.Instructions.Select(item => item.Offset));
@@ -98,7 +97,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void ConditionalTraversesBothEncodedPaths()
     {
-        var result = LoomScriptDisassembler.Disassemble([0x28, 0x00, 0x00, 0x02, 0x00, 0x20, 0x00, 0x80, 0x00]);
+        var result = ScummScriptDisassembler.Disassemble([0x28, 0x00, 0x00, 0x02, 0x00, 0x20, 0x00, 0x80, 0x00]);
 
         Assert.Empty(result.Issues);
         Assert.Equal([0, 5, 6, 7, 8], result.Instructions.Select(item => item.Offset));
@@ -108,7 +107,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void BackwardJumpVisitsInstructionOnce()
     {
-        var result = LoomScriptDisassembler.Disassemble([0x18, 0xFD, 0xFF]);
+        var result = ScummScriptDisassembler.Disassemble([0x18, 0xFD, 0xFF]);
 
         Assert.Empty(result.Issues);
         Assert.Single(result.Instructions);
@@ -117,7 +116,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void OutOfResourceTargetIsReported()
     {
-        var result = LoomScriptDisassembler.Disassemble([0x18, 0x04, 0x00]);
+        var result = ScummScriptDisassembler.Disassemble([0x18, 0x04, 0x00]);
 
         Assert.Single(result.Issues);
         Assert.Equal(7, result.Issues[0].Offset);
@@ -131,7 +130,7 @@ public sealed class LoomScriptDisassemblerTests
     [InlineData(new byte[] { 0x33, 0x0F, 0x00, 0x0F, 0x00, 0x04, 0x00 }, "roomOps", 6)]
     public void OldV3OperandsEndAtFollowingOpcode(byte[] code, string operation, int nextOffset)
     {
-        var result = LoomScriptDisassembler.Disassemble(code);
+        var result = ScummScriptDisassembler.Disassemble(code);
 
         Assert.Empty(result.Issues);
         Assert.Equal([0, nextOffset], result.Instructions.Select(item => item.Offset));
@@ -141,7 +140,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void StateConditionalTracksTargetAndFallthrough()
     {
-        var result = LoomScriptDisassembler.Disassemble([0x2F, 0x0A, 0x00, 0x01, 0x01, 0x00, 0x20, 0x00]);
+        var result = ScummScriptDisassembler.Disassemble([0x2F, 0x0A, 0x00, 0x01, 0x01, 0x00, 0x20, 0x00]);
 
         Assert.Empty(result.Issues);
         Assert.Equal([0, 6, 7], result.Instructions.Select(item => item.Offset));
@@ -154,7 +153,7 @@ public sealed class LoomScriptDisassemblerTests
     [InlineData(new byte[] { 0x45, 0x0A, 0x00, 0x04, 0x00, 0x03, 0x00, 0x00 }, "0x000A, at, var[0x004], 0x0003")]
     public void SmallHeaderDrawObjectUsesOpcodeWordOperands(byte[] code, string operands)
     {
-        var result = LoomScriptDisassembler.Disassemble(code);
+        var result = ScummScriptDisassembler.Disassemble(code);
 
         Assert.Empty(result.Issues);
         Assert.Equal("drawObject", result.Instructions[0].Operation);
@@ -171,7 +170,7 @@ public sealed class LoomScriptDisassemblerTests
         // Compact actor op 15 maps to SO_ACTOR_NAME; 14 sets talk colour.
         byte[] code = [0x13, 0x01, 0x0F, (byte)'I', (byte)'n', (byte)'d', (byte)'y', 0,
             0x0E, 0x0F, 0xFF, 0x00];
-        var result = LoomScriptDisassembler.Disassemble(code, dialect);
+        var result = ScummScriptDisassembler.Disassemble(code, dialect);
 
         Assert.Empty(result.Issues);
         Assert.Contains("actorName, \"Indy\"", result.Instructions[0].Operands);
@@ -183,7 +182,7 @@ public sealed class LoomScriptDisassemblerTests
     [Fact]
     public void EmptyActorNameStillConsumesItsTerminator()
     {
-        var result = LoomScriptDisassembler.Disassemble([0x13, 0x01, 0x0F, 0x00, 0xFF, 0x00], ScummScriptDialect.Indy3);
+        var result = ScummScriptDisassembler.Disassemble([0x13, 0x01, 0x0F, 0x00, 0xFF, 0x00], ScummScriptDialect.Indy3);
         Assert.Empty(result.Issues);
         Assert.Contains("actorName, \"\"", result.Instructions[0].Operands);
         Assert.Equal(5, result.Instructions[1].Offset);

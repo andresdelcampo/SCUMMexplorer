@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -63,9 +62,9 @@ public sealed class LoomObservedLineageTests
     [Fact]
     public void DestinationIndexIsHistoricalLineageAndSameValueIndexMutationRejectsAPendingCopy()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
-        var destination = new LoomScriptOperandBinding("destination-before", "var[0x032+var[0x060]]", "var[0x034]", 0, false,
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
+        var destination = new ScummScriptOperandBinding("destination-before", "var[0x032+var[0x060]]", "var[0x034]", 0, false,
             new("index", "var[0x060]", "var[0x060]", 2, true));
         tracker.Observe(LoomRuntimeRelationTests.Record(1, 1, 1, "move",
             [destination, new("source", "0x0009", null, 9, false)], ("var[0x034]", 0), ("var[0x060]", 2)));
@@ -81,7 +80,7 @@ public sealed class LoomObservedLineageTests
         var updates = Run(Runtime(), ("divide", "var[0x060] /= 0x0000"), ("stopObjectCode", ""));
         Assert.Empty(updates.SelectMany(u => u.Writes));
         Assert.Contains(updates, u => u.Barrier == "unresolved execution or omitted effects");
-        var tracker = new LoomRuntimeRelationTracker(updates.Add);
+        var tracker = new ScummRuntimeRelationTracker(updates.Add);
         tracker.Observe(LoomRuntimeRelationTests.Record(1, 1, 1, "add",
             [new("destination-before", "var[0x060]", "var[0x060]", 1, false), new("source", "0x0001", null, 1, false)],
             ("var[0x060]", 1)));
@@ -92,10 +91,10 @@ public sealed class LoomObservedLineageTests
     [Fact]
     public void OversizedArgumentBatchAndWriterStorageStayBounded()
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var tracker = new LoomRuntimeRelationTracker(updates.Add, relationLimit: 2);
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var tracker = new ScummRuntimeRelationTracker(updates.Add, relationLimit: 2);
         tracker.Observe(LoomRuntimeRelationTests.Record(1, 1, 1, "startScript",
-            Enumerable.Range(0, 3).Select(i => new LoomScriptOperandBinding("argument", "var[0x060]", "var[0x060]", 1, false,
+            Enumerable.Range(0, 3).Select(i => new ScummScriptOperandBinding("argument", "var[0x060]", "var[0x060]", 1, false,
                 ArgumentIndex: i)).ToArray()));
         Assert.Empty(tracker.ActiveRelations);
         Assert.Empty(updates[^1].Reads);
@@ -112,19 +111,19 @@ public sealed class LoomObservedLineageTests
         Assert.Contains(updates.Skip(1), u => u.Barrier == "relation bound reached");
     }
 
-    private static LoomScriptRuntimeState Runtime()
+    private static ScummScriptRuntimeState Runtime()
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
         runtime.GlobalVariables["var[0x060]"] = 1;
         return runtime;
     }
-    private static List<LoomRuntimeRelationUpdate> Run(LoomScriptRuntimeState runtime,
+    private static List<ScummRuntimeRelationUpdate> Run(ScummScriptRuntimeState runtime,
         params (string Op, string Args)[] operations)
     {
-        var updates = new List<LoomRuntimeRelationUpdate>();
-        var code = new LoomScriptDisassembly(2, 1, 0, operations.Length, operations.Length,
-            operations.Select((o, i) => new LoomScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
-        new LoomBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime, pathEstimated: true,
+        var updates = new List<ScummRuntimeRelationUpdate>();
+        var code = new ScummScriptDisassembly(2, 1, 0, operations.Length, operations.Length,
+            operations.Select((o, i) => new ScummScriptInstruction(i, 0, o.Op, o.Args, "00")).ToArray(), null, null, [], []);
+        new ScummBoundedScriptExecutor().Execute(code, runtime.ObjectStates, [], runtime: runtime, pathEstimated: true,
             onEvent: (_, _) => "", observation: new(new(_ => { }, runtimeRelations: new(updates.Add)), 1));
         return updates;
     }

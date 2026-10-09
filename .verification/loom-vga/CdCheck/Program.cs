@@ -62,7 +62,7 @@ internal static class Program
                         for (var n = 0; n < 100 && Field("_currentRoomResource") != room; n++) await Task.Delay(100);
                         await Task.Delay(2500);
                         // CD_LOOK_STAFF=1 gives Bobbin the staff through Game Status's own call (as the window's edit does), then shoots again.
-                        if (Environment.GetEnvironmentVariable("CD_LOOK_STAFF") == "1" && Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession status)
+                        if (Environment.GetEnvironmentVariable("CD_LOOK_STAFF") == "1" && Field("_session") is SCUMMexplorer.Core.Loom.LoomExplorationSession status)
                         {
                             Shot($"look-{number:00}-before.png");
                             var gs = status.GameStatus;
@@ -80,9 +80,9 @@ internal static class Program
                         }
                         Shot($"look-{number:00}.png");
                         if (Environment.GetEnvironmentVariable("CD_VERBS") == "1" && number == 5)
-                            foreach (var g in (System.Collections.Generic.IEnumerable<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>)Call("CdCutsceneGroups")!)
+                            foreach (var g in (System.Collections.Generic.IEnumerable<SCUMMexplorer.Core.Loom.LoomCdCutsceneGroup>)Call("CdCutsceneGroups")!)
                                 if (g.First.VerbId is not (0x36 or 0x37 or 0x38) && !g.First.IsRoomEntry) Console.WriteLine($"VERBID room {g.First.Room} obj {g.First.ObjectId} {g.First.ObjectName} verb 0x{g.First.VerbId:X2}");
-                        if (Environment.GetEnvironmentVariable("CD_CYCLE") == "1" && Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession cy)
+                        if (Environment.GetEnvironmentVariable("CD_CYCLE") == "1" && Field("_session") is SCUMMexplorer.Core.Loom.LoomExplorationSession cy)
                         {
                             void Ego(string what) { var e = cy.Actors.First(x => x.Number == 1); Console.WriteLine($"CYCLE room {number} {what}: held {cy.GameStatus.StaffHeld} costume {e.Look.Costume} frame {e.Look.Frame} notes-on {cy.Verbs.Count(v => v.VerbId is >= 1 and <= 8 && v.Mode is 1 or 2)}"); }
                             int Overlay() { Call("UpdateActorLayer"); var src = ((System.Windows.Controls.Image)window.FindName("RoomActorOverlay")).Source as System.Windows.Media.Imaging.BitmapSource; if (src is null) return -1; var px = new byte[src.PixelWidth * src.PixelHeight * 4]; src.CopyPixels(px, src.PixelWidth * 4, 0); var n = 0; for (var i = 3; i < px.Length; i += 4) if (px[i] != 0) n++; return n; }
@@ -91,10 +91,10 @@ internal static class Program
                             cy.UpdateStaffPossession(true); Refresh(); Ego("give"); await Task.Delay(500); Console.WriteLine($"CYCLE overlay give {Overlay()}");
                             cy.UpdateStaffPossession(false); Refresh(); Ego("remove"); await Task.Delay(500); Console.WriteLine($"CYCLE overlay remove {Overlay()}");
                         }
-                        if (Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession sm) Console.WriteLine($"STAFFSYNC room {number}: held {sm.GameStatus.StaffHeld}, ego costume {sm.Actors.FirstOrDefault(x => x.Number == 1)?.Look.Costume}, verbs on {sm.Verbs.Count(v => v.Mode is 1 or 2)} (notes 1-8 on {sm.Verbs.Count(v => v.VerbId is >= 1 and <= 8 && v.Mode is 1 or 2)}); verb 0x31 mode {sm.Verbs.FirstOrDefault(v => v.VerbId == 0x31)?.Mode}");
-                        if (Field("_session") is SCUMMexplorer.Core.Formats.LoomExplorationSession sm2) Console.WriteLine($"VERBTEXT room {number}: {sm2.Messages.OnScreen.Count(m => m.Y >= 144)} string(s) on the verb screen");
+                        if (Field("_session") is SCUMMexplorer.Core.Loom.LoomExplorationSession sm) Console.WriteLine($"STAFFSYNC room {number}: held {sm.GameStatus.StaffHeld}, ego costume {sm.Actors.FirstOrDefault(x => x.Number == 1)?.Look.Costume}, verbs on {sm.Verbs.Count(v => v.Mode is 1 or 2)} (notes 1-8 on {sm.Verbs.Count(v => v.VerbId is >= 1 and <= 8 && v.Mode is 1 or 2)}); verb 0x31 mode {sm.Verbs.FirstOrDefault(v => v.VerbId == 0x31)?.Mode}");
+                        if (Field("_session") is SCUMMexplorer.Core.Loom.LoomExplorationSession sm2) Console.WriteLine($"VERBTEXT room {number}: {sm2.Messages.OnScreen.Count(m => m.Y >= 144)} string(s) on the verb screen");
                         if (Environment.GetEnvironmentVariable("CD_IMG") == "1")
-                            foreach (var im in ((SCUMMexplorer.Core.Formats.IScummDataSource)Field("_cdData")!).ReadObjectImages(1).Where(i => new[]{17,23,29,35,41,47,53,59,65,66,70,71,72,73,74,75,76,77}.Contains(i.Id)))
+                            foreach (var im in ((SCUMMexplorer.Core.Scumm.IScummDataSource)Field("_cdData")!).ReadObjectImages(1).Where(i => new[]{17,23,29,35,41,47,53,59,65,66,70,71,72,73,74,75,76,77}.Contains(i.Id)))
                                 { if (im.Id is 65 or 70 or 71 or 72 or 73 or 74 or 75 or 76 or 77) for (var r = 0; r < im.Height; r++) Console.WriteLine($"ROW {im.Id} {r,2} " + string.Concat(Enumerable.Range(0, Math.Min(im.Width, 40)).Select(c => im.Pixels[r*im.Width+c] == 0 ? '.' : '#')));
                                 Console.WriteLine($"IMG {im.Id} xy=({im.X},{im.Y}) {im.Width}x{im.Height} rows-with-pixels: " + string.Join(",", Enumerable.Range(0, im.Height).Where(r => Enumerable.Range(0, im.Width).Any(c => im.Pixels[r*im.Width+c] != 0)))); }
                         if (Environment.GetEnvironmentVariable("CD_STATUS") == "1")
@@ -127,8 +127,8 @@ internal static class Program
                     }
                     // The rooms each scene plays out in are derived in the background; wait for the last one (up to 8 minutes).
                     {
-                        var groups = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>().ToList();
-                        var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Formats.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!;
+                        var groups = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Loom.LoomCdCutsceneGroup>().ToList();
+                        var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Loom.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!;
                         var wait = System.Diagnostics.Stopwatch.StartNew();
                         while (wait.Elapsed < TimeSpan.FromMinutes(8) && !(planner.IntroRoomsIfKnown is not null && groups.All(g => planner.TryGetVisitedRooms(g.First, out _)))) await Task.Delay(1000);
                         report.Add($"visited rooms ready after {wait.Elapsed.TotalSeconds:0} s");
@@ -160,10 +160,10 @@ internal static class Program
                     else
                     {
                         var want = cut.Split(',').Select(int.Parse).ToArray();
-                        var group = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Formats.LoomCdCutsceneGroup>()
+                        var group = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Loom.LoomCdCutsceneGroup>()
                             .First(g => g.First.Room == want[0] && g.First.ObjectId == want[1] && (g.First.VerbId == want[2] || g.First.IsRoomEntry && want[2] == 0));
                         report.Add($"cutscene room {group.First.Room} object {group.First.ObjectId} {group.First.ObjectName} {group.First.VerbLabel}, scene {group.IsScene}");
-                        { var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Formats.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!; var setup = planner.Derive(group.First);
+                        { var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Loom.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!; var setup = planner.Derive(group.First);
                           report.Add($"setup: plays {setup.Plays}, before {setup.Before.Count}, after [{string.Join(",", setup.After.Select(s => s.Kind + s.Box))}]"); }
                         Call("PlayCdCutscene", group);
                     }
@@ -198,7 +198,7 @@ internal static class Program
                         var snap = session.GetType().GetProperty("Snapshot")!.GetValue(session)!;
                         var msgs = session.GetType().GetProperty("Messages")!.GetValue(session)!;
                         var on = string.Join(" / ", ((System.Collections.IEnumerable)msgs.GetType().GetProperty("OnScreen")!.GetValue(msgs)!).Cast<object>().Select(m => m.GetType().GetProperty("Text")!.GetValue(m)!.ToString()!.Replace("\n", "|")));
-                        report.Add($"+{clock.ElapsedMilliseconds} ms: room {snap.GetType().GetProperty("RoomId")!.GetValue(snap)} boot {session.GetType().GetProperty("BootRunning")!.GetValue(session)} timer {msgs.GetType().GetProperty("CdMusicTimer")!.GetValue(msgs)} | {on} | {((TextBlock)window.FindName("StatusText")).Text} | view objects {((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Rendering.RoomObjectImage>().Count()} (808 present {((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Rendering.RoomObjectImage>().Any(o => o.Id == 808)}), current room {((GameResource?)Field("_currentRoomResource"))?.ResourceId} | selection active 808: {(Field("_objectSelection") is SCUMMexplorer.Core.Rendering.RoomObjectSelection sel ? ((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Rendering.RoomObjectImage>().Where(o => o.Id == 808).Select(o => sel.IsActive(o).ToString()).FirstOrDefault() : "no selection")}");
+                        report.Add($"+{clock.ElapsedMilliseconds} ms: room {snap.GetType().GetProperty("RoomId")!.GetValue(snap)} boot {session.GetType().GetProperty("BootRunning")!.GetValue(session)} timer {msgs.GetType().GetProperty("CdMusicTimer")!.GetValue(msgs)} | {on} | {((TextBlock)window.FindName("StatusText")).Text} | view objects {((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Scumm.RoomObjectImage>().Count()} (808 present {((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Scumm.RoomObjectImage>().Any(o => o.Id == 808)}), current room {((GameResource?)Field("_currentRoomResource"))?.ResourceId} | selection active 808: {(Field("_objectSelection") is SCUMMexplorer.Core.Scumm.RoomObjectSelection sel ? ((System.Collections.IEnumerable)Field("_objects")!).Cast<SCUMMexplorer.Core.Scumm.RoomObjectImage>().Where(o => o.Id == 808).Select(o => sel.IsActive(o).ToString()).FirstOrDefault() : "no selection")}");
                     }
                     { var voice = Field("_cdVoice"); foreach (var line in (IEnumerable<string>)voice!.GetType().GetProperty("Log")!.GetValue(voice)!) report.Add("voice " + line); }
                     File.WriteAllLines(Path.Combine(output, "report.txt"), report);
@@ -216,7 +216,7 @@ internal static class Program
                     report.Add($"room {number}: {((IReadOnlyCollection<object>)((System.Collections.IEnumerable)Field("_objects")!).Cast<object>().ToList()).Count} object images, view offset {((ScrollViewer)window.FindName("RoomViewport")).HorizontalOffset:0} of {((ScrollViewer)window.FindName("RoomViewport")).ScrollableWidth:0}, pending camera {Field("_pendingCameraX")}");
                 }
                 // The game's click in the live CD session, several rooms: the first object that has a use verb (0x38) or a walk-to verb (0x37).
-                var cd = (SCUMMexplorer.Core.Formats.IScummDataSource)Field("_cdData")!;
+                var cd = (SCUMMexplorer.Core.Scumm.IScummDataSource)Field("_cdData")!;
                 if (Environment.GetEnvironmentVariable("CD_DUMP2") == "1")
                     foreach (var id in cd.GlobalScriptIds()) { var sc = cd.GlobalScript(id); if (sc is not null) foreach (var ins in sc.Instructions) if (ins.Operation is "drawObject" or "setState" or "startObject") report.Add($"   global {id} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
                 // CD_STATUS=1 opens the Game Status window on room 35 and saves a picture of it.
@@ -265,7 +265,7 @@ internal static class Program
                     foreach (var id in printIds.Split(',').Select(int.Parse)) { report.Add($"== script {id}"); if (cd.GlobalScript(id) is { } sc) foreach (var ins in sc.Instructions) report.Add($"   {id:000} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
                 if (Environment.GetEnvironmentVariable("CD_DUMP3") == "1")
                 {
-                    var all = new List<(string, SCUMMexplorer.Core.Formats.LoomScriptDisassembly?)>();
+                    var all = new List<(string, SCUMMexplorer.Core.Scumm.ScummScriptDisassembly?)>();
                     foreach (var id in cd.GlobalScriptIds()) all.Add(($"global {id}", cd.GlobalScript(id)));
                     foreach (var r in game.Rooms.Select(r => r.ResourceId!.Value)) { all.Add(($"room {r} entry", cd.RoomEntryScript(r))); all.Add(($"room {r} exit", cd.RoomExitScript(r)));
                         { var rd = cd.ReadRoom(r); foreach (var (oid, list) in cd.ReadObjectVerbs(r, rd.Objects)) { var rec = rd.Objects.First(o => o.Id == oid); foreach (var v in list) { try { all.Add(($"room {r} object {oid} verb 0x{v.VerbId:X2}", cd.ReadObjectVerb(r, rec, v.VerbId, out _))); } catch (Exception) { } } } } foreach (var id in cd.RoomLocalScriptIds(r)) all.Add(($"room {r} local {id}", cd.RoomLocalScript(r, id))); }
@@ -286,7 +286,7 @@ internal static class Program
                     var data = cd.ReadRoom(number);
                     if (Environment.GetEnvironmentVariable("CD_DUMP") == "1")
                     {
-                        var scripts = new List<(string, SCUMMexplorer.Core.Formats.LoomScriptDisassembly?)> { ("entry", cd.RoomEntryScript(number)) };
+                        var scripts = new List<(string, SCUMMexplorer.Core.Scumm.ScummScriptDisassembly?)> { ("entry", cd.RoomEntryScript(number)) };
                         foreach (var id in cd.RoomLocalScriptIds(number)) scripts.Add(($"local {id}", cd.RoomLocalScript(number, id)));
                         foreach (var (name, sc) in scripts) if (sc is not null) foreach (var ins in sc.Instructions) if (ins.Operation == "drawObject") report.Add($"   {name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}");
                     }

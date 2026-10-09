@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Reflection;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 var output = Path.GetFullPath(args[0]);
 Directory.CreateDirectory(output);
@@ -18,14 +17,14 @@ if(args.Contains("arrival") || args.Contains("monitor"))
     var samples=new List<object>();
     var monitorContext=data.RoomLocalScript(34,200)!.Context;
     var entryContext=data.RoomEntryScript(34)!.Context;
-    var observer=new LoomScriptObserver(o=> {
+    var observer=new ScummScriptObserver(o=> {
         if(o.Site?.Stage!="instruction" || session is null) return;
         var ego=session.Actors.Single(a=>a.Number==1);
         samples.Add(new { frame,o.Sequence,o.Site,o.Values,o.SourceAccess,
             ego.X,ego.Y,ego.WalkBox,ego.Moving,session.CameraX,session.InCutscene });
     },includeSite:s=>s.Script==97 || s.Context==monitorContext || s.Context==entryContext,
         captureSourceAccess:true);
-    session=new LoomExplorationSession(game,game.Vga!.ReadIndexedObjects(),completeBoot:false,observer:observer);
+    session=new LoomExplorationSession(game,game.V4Archive!.ReadIndexedObjects(),completeBoot:false,observer:observer);
     var monitorRun=args.Contains("monitor");
     session.VisitRoomById(monitorRun ? 34 : 46);
     for(;frame<3000 && !session.GameStatus.CanEdit;frame++) session.AdvanceFrame();
@@ -65,8 +64,8 @@ foreach (var (room, startX, startY, destX, destY) in new[] {
     // Decoded resource defaults, with box 6 enabled as Room 34's entry does.
     // This is an isolated geometry comparison; no story state is manufactured.
     if (room == 34) boxes.SetFlags(6,0);
-    var actors = new LoomActorTable(useV4Walking: args.Contains("v4"));
-    var place = new LoomActorTable.Placement(room, boxes, null, null);
+    var actors = new ScummActorTable(useV4Walking: args.Contains("v4"));
+    var place = new ScummActorTable.Placement(room, boxes, null, null);
     actors.Put(1,startX,startY,room,place,1);
     actors.Walk(1,destX,destY,place,"diagnostic geometry walk");
     var before = actors[1];

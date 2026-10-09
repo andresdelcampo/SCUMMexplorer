@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -23,7 +22,7 @@ public sealed class LoomScriptIndexTests
         if (!File.Exists(indexPath)) return;
         var index = new LflIndexReader().Read(indexPath);
         var game = new GameFolderScanner().Scan(Folder);
-        var reader = new LoomScriptReader(ScummScriptDialects.For(game.Id));
+        var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
 
         var failing = new List<int>();
         foreach (var script in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))

@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -25,7 +24,7 @@ public sealed class LoomRoom03ExitTests
         session.VisitRoom(game.Rooms.Single(room => room.ResourceId == 3));
         // The English release has no "full animation" bit (the Spanish script 1 sets 0xD62 at +0x015B, so its entry skips startScript 0x2A): the entry starts it.
         Assert.Contains(session.LastVisitEvents, item =>
-            item.Kind == LoomScriptEventKind.ScriptStarted && item.TargetId == 0x2A);
+            item.Kind == ScummScriptEventKind.ScriptStarted && item.TargetId == 0x2A);
 
         var action = session.ActivateObjectVerb(162, 0x36);
         Assert.Null(action.ReachedRoomLoad);

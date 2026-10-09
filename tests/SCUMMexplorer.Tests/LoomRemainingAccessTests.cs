@@ -1,4 +1,3 @@
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -76,13 +75,13 @@ public sealed class LoomRemainingAccessTests
         Assert.NotNull(access.Barrier);
     }
 
-    private static LoomScriptObservation Capture(string op, string operands, Func<string, bool>? filter = null)
+    private static ScummScriptObservation Capture(string op, string operands, Func<string, bool>? filter = null)
     {
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>(), new Dictionary<int, byte> { [204] = 15 });
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>(), new Dictionary<int, byte> { [204] = 15 });
         runtime.SetGlobalVariable("var[0x060]", 204);
         runtime.EstimatedVariables.Add("var[0x060]");
-        var records = new List<LoomScriptObservation>();
-        new LoomBoundedScriptExecutor().Execute(LoomCallObservationTests.Code((op, operands), ("stopObjectCode", "")),
+        var records = new List<ScummScriptObservation>();
+        new ScummBoundedScriptExecutor().Execute(LoomCallObservationTests.Code((op, operands), ("stopObjectCode", "")),
             runtime.ObjectStates, [], runtime: runtime, observation: new(new(records.Add, includeKey: filter, captureSourceAccess: true), 1));
         return records.First(r => r.Site?.Stage == "instruction");
     }

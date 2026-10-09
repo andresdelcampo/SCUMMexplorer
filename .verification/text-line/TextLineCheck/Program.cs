@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
-using SCUMMexplorer.Core.Formats;
 
 // The game's text line (screen rows 0–15, above the room), in the real MainWindow. Room 41's entry sets text slot 0's
 // y to 12 (script 016, `startScript 0x10, [0x000C]`), so Bobbin's look lines there (object 632 verb 0x36) print on the

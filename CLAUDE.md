@@ -4,7 +4,10 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 
 ## Layout
 
-- `src/SCUMMexplorer.Core`: parsing, rendering and bounded script execution (net10.0). It covers LFL/index readers, the old-v3 disassembler (`Formats/LoomScriptReader.cs`), the bounded executor and session, object selection and painting (`Rendering/RoomObjectSelection.cs`), the text extractor, and audio (PC speaker, AdLib via NukedOPL3Sharp, Roland via Munt and CD voice/music cue timing).
+- `src/SCUMMexplorer.Core` (net10.0) has three layers; put new code in the lowest layer that is true for it:
+  - `Scumm/` (namespace `SCUMMexplorer.Core.Scumm`): the SCUMM engine, any game. It cannot see `Loom` (the compiler enforces it). `Scripts/` (disassembler `ScummScriptReader` with its dialects, `ScummBoundedScriptExecutor`, runtime state), `Runtime/` (actors, walk boxes, camera, verbs, messages), `Rendering/` (rooms, objects, costumes, `RoomObjectSelection`, verb area), `Analysis/` (script observers, relation trackers, draw batches), `Audio/` (PC speaker, AdLib via NukedOPL3Sharp, Roland via Munt, sound clock) and `Storage/` (folders, disc images). `V3/` and `V4/` hold what exists in only one engine version: the LFL/index readers and `ScummV3DataSource`, the DISK01.LEC `ScummV4Archive` and `ScummV4DataSource`, charsets, EGA/VGA costume and message renderers, the v4 walker. Both data sources implement `IScummDataSource`; code that needs scripts, objects or costumes should take that interface, not branch on the game.
+  - `Loom/` (namespace `SCUMMexplorer.Core.Loom`): what is true of LOOM in every edition. `Session/` (`LoomExplorationSession`, game status, story events), `Text/` (glossary, script presenter, text extractor, speaker names), `Scenes/` (scene setup, doorways, arrivals, replays, usage index, room kinds), `Relationships/`. Edition code is marked by folder and name: `Cd/` (`LoomCd*`: LOOM CD voice cues, cutscene index, scene setup) and `Ega/` (reviewed names, demo looks).
+  - `Domain/` (`GameLibrary`, `GameId`) and `Discovery/` (`GameFolderScanner`) are shared by both. `Domain` may use `Scumm` types.
 - `src/SCUMMexplorer.App`: the WPF desktop UI (net10.0-windows). `MainWindow.xaml.cs` holds most of the UI logic; `TextGalleryWindow` is the Game Texts browser.
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
 - `docs/`: `docs/README.md` is the index. `docs/CURRENT_WORK.md` is the single current plan, rules and session handoff; `docs/CHANGELOG.md` holds finished work with validation links. `docs/loom/` and `docs/indy3/` hold game references, `docs/engine/` holds generic SCUMM notes, and `docs/archive/` preserves dated plans/audits. `docs/loom/LOOM_SCRIPT_MAP.md` records decoded scripts, variables, verbs and rooms.
@@ -45,7 +48,7 @@ All shell and child commands must use RTK, including PowerShell; `C:\Users\adelc
   - `0xAE` wait has no subopcode.
   - `0x3B`/`0xBB` is waitForActor with a byte parameter. In LOOM it is a no-op with no operands.
   - `getActorX`/`getActorY` take a byte parameter.
-  - Use `ScummScriptDialects.For(game.Id)` whenever you construct `LoomScriptReader` or `LoomObjectVerbReader`.
+  - Use `ScummScriptDialects.For(game.Id)` whenever you construct `ScummScriptReader` or `ScummObjectVerbReader`.
 - **Indy3 dialogue choices** use verbs 120–125, set with `verbOps(n, [on, name "…"])`. The script clears `Var[114]`, waits, then branches on `isEqual var[0x072], n`.
 
 ## Evidence rules

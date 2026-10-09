@@ -1,6 +1,5 @@
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -16,8 +15,8 @@ public sealed class LoomRandomPickTests
     [Fact]
     public void SeededPickStaysInRangeAndRepeatsForTheSameSeed()
     {
-        var first = new LoomSeededRandom(7);
-        var again = new LoomSeededRandom(7);
+        var first = new ScummSeededRandom(7);
+        var again = new ScummSeededRandom(7);
         var values = Enumerable.Range(0, 200).Select(_ => first.Pick("Script 42", 0x26, 4)).ToArray();
 
         Assert.All(values, pick => Assert.InRange(pick.Value, 0, 4));
@@ -26,7 +25,7 @@ public sealed class LoomRandomPickTests
             Enumerable.Range(0, 200).Select(_ => again.Pick("Script 42", 0x26, 4).Value));
         Assert.Equal((7, 199), (values[^1].Seed, values[^1].Draw));
         // A pick does not depend on draws taken at other instructions.
-        var interleaved = new LoomSeededRandom(7);
+        var interleaved = new ScummSeededRandom(7);
         interleaved.Pick("Room 04 local script 203", 0, 0x20);
         Assert.Equal(values[0].Value, interleaved.Pick("Script 42", 0x26, 4).Value);
     }
@@ -37,12 +36,12 @@ public sealed class LoomRandomPickTests
         var script = Script(
             new(0, 0, "getRandomNr", "local[0x001], 0x03", "16 01 03"),
             new(3, 0, "stopObjectCode", "", "00"));
-        var executor = new LoomBoundedScriptExecutor();
+        var executor = new ScummBoundedScriptExecutor();
 
         var alone = executor.Execute(script, new Dictionary<int, byte>(), []);
         Assert.Contains("seeded random source", alone.UnresolvedReason, StringComparison.Ordinal);
 
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>()) { Random = new LoomSeededRandom(3) };
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>()) { Random = new ScummSeededRandom(3) };
         var run = executor.Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         var pick = Assert.Single(run.RandomPicks);
@@ -65,10 +64,10 @@ public sealed class LoomRandomPickTests
             new(21, 0, "loadRoom", "0x05", "72 05"),
             new(23, 0, "stopObjectCode", "", "00"),
             new(26, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte> { [10] = 0, [11] = 0 });
-        var events = new List<LoomScriptEvent>();
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte> { [10] = 0, [11] = 0 });
+        var events = new List<ScummScriptEvent>();
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime,
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime,
             onEvent: (item, _) => { events.Add(item); return ""; });
 
         // Max 0 always picks 0, so the branch falls through to the second setState.
@@ -78,8 +77,8 @@ public sealed class LoomRandomPickTests
         Assert.DoesNotContain(10, runtime.StatesSetInRoom);
         Assert.Contains(10, runtime.EstimatedStates);
         Assert.Contains("var[0x010]", runtime.EstimatedVariables);
-        var load = Assert.Single(events, item => item.Kind == LoomScriptEventKind.RoomLoaded);
-        Assert.Equal(LoomScriptEventCertainty.Conditional, load.Certainty);
+        var load = Assert.Single(events, item => item.Kind == ScummScriptEventKind.RoomLoaded);
+        Assert.Equal(ScummScriptEventCertainty.Conditional, load.Certainty);
     }
 
     [Fact]
@@ -91,9 +90,9 @@ public sealed class LoomRandomPickTests
             new(10, 0, "move", "local[0x003] = var[0x0B3+local[0x002]]", "00 00 00 00 00 00 00"),
             new(17, 0, "move", "local[0x004+0x001] = 0x0009", "00 00 00 00 00 00 00"),
             new(24, 0, "stopObjectCode", "", "00"));
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>());
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>());
 
-        var run = new LoomBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates, [], runtime: runtime);
 
         Assert.Null(run.UnresolvedReason);
         Assert.Equal((ushort)0x77, run.KnownVariables["local[0x003]"]);
@@ -127,9 +126,9 @@ public sealed class LoomRandomPickTests
         if (!File.Exists(Path.Combine(Folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(Folder);
         var resource = game.Resources.Single(item => item.Kind == ResourceKind.Script && item.ResourceId == 42);
-        var script = new LoomScriptReader(ScummScriptDialects.For(game.Id)).Decode(resource);
-        var runtime = new LoomScriptRuntimeState(new Dictionary<int, byte>()) { Random = new LoomSeededRandom(1) };
-        var executor = new LoomBoundedScriptExecutor();
+        var script = new ScummScriptReader(ScummScriptDialects.For(game.Id)).Decode(resource);
+        var runtime = new ScummScriptRuntimeState(new Dictionary<int, byte>()) { Random = new ScummSeededRandom(1) };
+        var executor = new ScummBoundedScriptExecutor();
         // Room 03 entry +0x0114 starts it as startScript 0x2A, [0x0005].
         var locals = new Dictionary<string, ushort> { ["local[0x000]"] = 5 };
 
@@ -169,13 +168,13 @@ public sealed class LoomRandomPickTests
         Assert.Contains("Script 30 chains to script 31", session.SessionTrace);
         // Script 040 starts the note's sound from the estimated argument: a possible outcome.
         var notes = session.SoundEvents.Where(item => item.Event is
-            { SourceLabel: "Script 40", Kind: LoomScriptEventKind.SoundStarted }).ToArray();
+            { SourceLabel: "Script 40", Kind: ScummScriptEventKind.SoundStarted }).ToArray();
         Assert.NotEmpty(notes);
-        Assert.All(notes, item => Assert.Equal(LoomScriptEventCertainty.Conditional, item.Event.Certainty));
+        Assert.All(notes, item => Assert.Equal(ScummScriptEventCertainty.Conditional, item.Event.Certainty));
         Assert.DoesNotContain(session.ReachedSoundEvents,
-            item => item is { SourceLabel: "Script 40", Kind: LoomScriptEventKind.SoundStarted });
+            item => item is { SourceLabel: "Script 40", Kind: ScummScriptEventKind.SoundStarted });
     }
 
-    private static LoomScriptDisassembly Script(params LoomScriptInstruction[] instructions) =>
+    private static ScummScriptDisassembly Script(params ScummScriptInstruction[] instructions) =>
         new(1, 1, 0, 32, 32, instructions, null, null, [], []);
 }

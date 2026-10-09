@@ -1,6 +1,5 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -121,10 +120,10 @@ public sealed class LoomScriptCancellationTests
         session.RunTopLevelScript(decoded);
     }
 
-    private static LoomScriptDisassembly DecodeFixture(byte[] code)
+    private static ScummScriptDisassembly DecodeFixture(byte[] code)
     {
         // Top-level test driver; child programs use the normal resource reader.
-        var instructions = new List<LoomScriptInstruction>();
+        var instructions = new List<ScummScriptInstruction>();
         for (var at = 0; at < code.Length - 1; at += 3)
             instructions.Add(new(at, 0x0A, "startScript", $"0x{code[at + 1]:X2}, []", $"0A {code[at + 1]:X2} FF"));
         instructions.Add(new(code.Length - 1, 0, "stopObjectCode", "", "00"));
@@ -149,7 +148,7 @@ public sealed class LoomScriptCancellationTests
                 resources.Add(new($"Script {id}", ResourceKind.Script, path, id, ContainerFileNumber: id, Offset: 0));
             }
             var game = new GameLibrary("LOOM", directory, ScummVersion.V3, "DOS", resources, "synthetic cancellation fixtures", GameId.Loom);
-            check(new LoomExplorationSession(game, new LoomIndexedObjectSnapshot(new Dictionary<int, byte>(),
+            check(new LoomExplorationSession(game, new ScummIndexedObjectSnapshot(new Dictionary<int, byte>(),
                 new Dictionary<int, byte>()), completeBoot: false));
         }
         finally { Directory.Delete(directory, recursive: true); }

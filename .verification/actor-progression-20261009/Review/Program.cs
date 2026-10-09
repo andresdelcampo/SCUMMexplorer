@@ -1,6 +1,5 @@
 using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
-using SCUMMexplorer.Core.Formats;
 
 var root = Path.GetFullPath(args[0]);
 var output = Path.GetFullPath(args[1]); Directory.CreateDirectory(output);
@@ -8,7 +7,7 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
 {
     var game = new GameFolderScanner().Scan(Path.Combine(root, folder)); var data = ScummDataSources.For(game);
     var lines = new List<string>();
-    void Inspect(string where, LoomScriptDisassembly? script)
+    void Inspect(string where, ScummScriptDisassembly? script)
     {
         if (script is null) return;
         var code = script.Instructions.ToArray();
@@ -39,7 +38,7 @@ foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-
     }
     foreach (int id in new[] { 56, 58, 59, 85, 86, 87, 104, 105 })
         File.WriteAllText(Path.Combine(output, $"{edition}-global-{id}.txt"), data.GlobalScript(id)?.Format());
-    var index = game.Vga?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var index = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
     var samples = new List<object>();
     foreach (int room in new[] { 9, 10, 17, 18, 34, 38, 51 })
     {

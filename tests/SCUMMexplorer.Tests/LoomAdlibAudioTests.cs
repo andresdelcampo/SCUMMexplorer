@@ -1,7 +1,6 @@
 using System.Buffers.Binary;
 using SCUMMexplorer.Core.Discovery;
 using SCUMMexplorer.Core.Domain;
-using SCUMMexplorer.Core.Formats;
 
 namespace SCUMMexplorer.Tests;
 
@@ -74,7 +73,7 @@ public sealed class LoomAdlibAudioTests
             File.WriteAllBytes(path, encodedFile);
             var resource = new GameResource("Tempo fixture", ResourceKind.Sound, path,
                 ContainerFileNumber: 1, Offset: 0);
-            return new LoomAdlibAudio().RenderWave(resource);
+            return new ScummAdlibAudio().RenderWave(resource);
         }
         finally
         {
@@ -106,7 +105,7 @@ public sealed class LoomAdlibAudioTests
         var sounds = new GameFolderScanner().Scan(folder).Resources
             .Where(resource => resource.Kind == ResourceKind.Sound && resource.ResourceId.HasValue)
             .ToDictionary(resource => resource.ResourceId!.Value);
-        var renderer = new LoomAdlibAudio();
+        var renderer = new ScummAdlibAudio();
         foreach (var sound in Enumerable.Range(1, 12).Select(id => sounds[id]))
         {
             byte[] wave;
@@ -114,7 +113,7 @@ public sealed class LoomAdlibAudioTests
             catch (Exception ex) { throw new Xunit.Sdk.XunitException($"Sound {sound.ResourceId}: {ex}"); }
             Assert.Contains(wave.AsSpan(44).ToArray(), value => value != 0);
             Assert.Equal(2, BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(22, 2)));
-            Assert.False(wave.SequenceEqual(new LoomPcSpeakerAudio().RenderWave(sound)), $"Sound {sound.ResourceId} used speaker PCM.");
+            Assert.False(wave.SequenceEqual(new ScummPcSpeakerAudio().RenderWave(sound)), $"Sound {sound.ResourceId} used speaker PCM.");
         }
         Assert.Throws<NotSupportedException>(() => renderer.RenderWave(sounds[24]));
         Assert.Throws<NotSupportedException>(() => renderer.RenderWave(sounds[33]));
@@ -128,7 +127,7 @@ public sealed class LoomAdlibAudioTests
         var sounds = new GameFolderScanner().Scan(folder).Resources
             .Where(resource => resource.Kind == ResourceKind.Sound && resource.ResourceId.HasValue)
             .ToDictionary(resource => resource.ResourceId!.Value);
-        var renderer = new LoomAdlibAudio();
+        var renderer = new ScummAdlibAudio();
         Assert.False(renderer.HasMusic(sounds[1]));
         foreach (var id in Enumerable.Range(13, 20).Where(id => id != 24))
         {
