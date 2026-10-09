@@ -7,7 +7,7 @@ using SCUMMexplorer.Core.Domain;
 var folder = args[0];
 var output = args[1];
 var game = new GameFolderScanner().Scan(folder);
-var dialect = ScummScriptDialects.For(game.Id);
+var dialect = ScummProfile.For(game).Dialect;
 var reader = new ScummScriptReader(dialect);
 var verbs = new ScummObjectVerbReader(dialect);
 var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(folder, "00.LFL"));

@@ -5,7 +5,7 @@ using SCUMMexplorer.Core.Domain;
 // undecodable index entries (0, 51, 55, 116) are ever started.
 var folder = args[0];
 var game = new GameFolderScanner().Scan(folder);
-var dialect = ScummScriptDialects.For(game.Id);
+var dialect = ScummProfile.For(game).Dialect;
 var reader = new ScummScriptReader(dialect);
 var verbs = new ScummObjectVerbReader(dialect);
 var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(folder, "00.LFL"));

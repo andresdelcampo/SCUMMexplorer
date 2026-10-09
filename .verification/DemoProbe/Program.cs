@@ -47,7 +47,7 @@ if (args.Length > 3 && args[1] == "verbs")
     var vbRoom = vbGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
     var vbBytes = File.ReadAllBytes(vbRoom.FilePath);
     var vbRecord = new ScummRoomObjectDirectory().Decode(vbBytes).Single(r => r.Id == int.Parse(args[3]));
-    var vbReader = new ScummObjectVerbReader(ScummScriptDialects.For(vbGame.Id));
+    var vbReader = new ScummObjectVerbReader(ScummProfile.For(vbGame).Dialect);
     foreach (var entry in vbReader.ReadAll(vbBytes, [vbRecord])[vbRecord.Id])
     {
         Console.WriteLine($"== {entry.Label} (code +0x{entry.ScriptOffset:X4})");
@@ -70,7 +70,7 @@ if (args.Length > 2 && args[1] == "findload")
 {
     // DemoProbe <folder> findload <room>: every loadRoom/loadRoomWithEgo in the room's local scripts and entry, with the lines before it.
     var flGame = new GameFolderScanner().Scan(args[0]);
-    var flReader = new ScummScriptReader(ScummScriptDialects.For(flGame.Id));
+    var flReader = new ScummScriptReader(ScummProfile.For(flGame).Dialect);
     var flRoom = flGame.Rooms.Single(r => r.ResourceId == int.Parse(args[2]));
     var globalCount = new LflIndexReader().ReadDeclaredScriptCount(Path.Combine(flGame.FolderPath, "00.LFL"));
     foreach (var id in ScummScriptReader.ReadRoomLocalScriptIds(File.ReadAllBytes(flRoom.FilePath), globalCount))
@@ -121,7 +121,7 @@ if (args.Length > 1 && args[1] is "play" or "idle") { PlayDump.Run(args[0], args
 var game = new GameFolderScanner().Scan(args[0]);
 Console.WriteLine($"{game.Title}: id {game.Id}, version {game.Version}, rooms {game.Rooms.Count()}, resources {game.Resources.Count} ({string.Join(", ", game.Resources.GroupBy(r => r.Kind).Select(g => $"{g.Count()} {g.Key}"))})");
 var scripts = 0; var scriptFail = new List<string>();
-var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
 foreach (var r in game.Resources.Where(r => r.Kind == ResourceKind.Script))
 {
     try { reader.Decode(r); scripts++; } catch (Exception ex) { scriptFail.Add($"script {r.ResourceId}: {ex.GetType().Name}: {ex.Message}"); }

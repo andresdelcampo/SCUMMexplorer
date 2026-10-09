@@ -6,7 +6,7 @@ using SCUMMexplorer.Core.Domain;
 //        ScriptDump <game folder> entry <room>
 //        ScriptDump <game folder> objmap <other game folder>   (room objects of both editions side by side, matched by directory position)
 var game = new GameFolderScanner().Scan(args[0]);
-var reader = new ScummScriptReader(ScummScriptDialects.For(game.Id));
+var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
 void Dump(string title, ScummScriptDisassembly? d)
 {
     Console.WriteLine($"== {title}");
