@@ -1,0 +1,9 @@
+# Room 43 accepted by the user — 9 October 2026
+
+The user reports no issue in Room 43: after the scene starts, the other two arrive a couple of seconds later; the swordsman and Bobbin are in the right places. The user said to move on. **The Room 43 actor-arrival/placement concern is closed for the scene they checked.** No behavior correction or repeat investigation is requested.
+
+This is a direct user observation, not a new automated/native measurement. The report does not specify edition, callback, staff pose or measured pixel bounds. It does not establish unrelated Room 09/17 actors, physical casting input or audio synchronization. These scope limits do not keep Room 43 on the active checklist; reopen it only for a concrete newly reported mismatch.
+
+For preservation, the earlier comparison recipe used English Roland EGA cage Opening (644 / 3A → Script 91), orb use (651 / 38 → Script 93), and CD's own cage 569 / orb 576. It proposed matched Bobbin/Mandible/Cob poses, staff and note rectangles. These are historical source anchors, not claims that the user checked all callbacks or editions. Existing note-coordinate/source evidence remains in [the staff checkpoint](../staff-layout-20261008/README.md).
+
+The user's next clarification prioritizes state-correct cutscene actors (costume, staff and visibility, as in the Rusty issue), then source-triggered learning/level progression. Audio comparison is lower priority: do it only if small, with ScummVM as the fidelity reference. The live [plan](../../docs/LOOM_EGA_PLAN.md) and [dossier](../../docs/loom/FINAL_GAPS_HANDOFF.md) reflect that scope. Room 09/17 actor comparisons remain separate residual items. Native Computer Use remains stopped; Room 34's standalone reveal remains parked. This record changes documentation only; no game, ROM, save, user-profile or running-application operations occur.

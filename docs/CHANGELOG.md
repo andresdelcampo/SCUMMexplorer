@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current capability and remaining work are in [CURRENT_WORK](CURRENT_WORK.md) and [the live plan](LOOM_EGA_PLAN.md).
 
+## 9 October: accept Room 43 arrival and placement
+
+The user sees no Room 43 issue: the other two arrive a couple of seconds after the scene starts, and the swordsman and Bobbin are correctly placed. The checked scene's arrival/placement concern is closed and removed from active comparisons; move to physical casting/input, then listening/timing. Other actor comparisons and unmeasured scopes remain separate. No behavior change or repeated scene investigation. [User observation and retained source anchors](../.verification/room43-accepted-20261009/README.md).
+
 ## 8 October: close whole-draft WPF input integration
 
 Twelve independent prepared Room 04 casts use four routed text-input events or scaled staff-strip clicks through the real MainWindow, across English EGA, Spanish EGA and CD/VGA. All 168 assertions pass: source target/direction, response text, balanced scopes and settled state. The offscreen window never activates; audio is off and profile/cache/build outputs are private. The failed first harness attempt is retained with its timing/edition-ID mistakes; no App/Core behavior changed. This closes the previously untested whole-draft WPF integration item. Original-game actor/staff, physical input/earned routes and listening comparisons remain open. [Evidence and reproduction](../.verification/wpf-casting-20261008/README.md).

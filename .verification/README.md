@@ -1,9 +1,10 @@
 # Verification: current checkpoints and historical records
 
-Updated 8 October 2026. Rebuild a harness before running it so it includes the current failure policy. Run focused checks for the change; dated counts do not prove every original-game route or audiovisual detail.
+Updated 9 October 2026. Rebuild a harness before running it so it includes the current failure policy. Run focused checks for the change; dated counts do not prove every original-game route or audiovisual detail.
 
 ## Current checkpoint entry points
 
+- [room43-accepted-20261009](room43-accepted-20261009/README.md): user accepts the checked scene's delayed actor arrivals and placement; Room 43 removed from active comparisons, no behavior change.
 - [wpf-casting-20261008](wpf-casting-20261008/README.md): 12 whole-draft casts through routed WPF text and scaled staff-strip clicks across three editions; 168 assertions, private profile, no OS/native input or timing claim.
 - [source-gaps-20261008](source-gaps-20261008/README.md): own-source Silence chain, Shaping terminology limit and 11/11/8 dynamic call sites; 33 source assertions, no behavior change.
 - [sky-input-20261008](sky-input-20261008/README.md): prepared VGA sky forward/reverse casts from the source opening's arrival; 24 input assertions, no physical/native/audio claim.

@@ -44,3 +44,5 @@ From `D:\Documents\Personal\Code Projects\SCUMMexplorer`, every shell/child comm
 The reproduction script parses without errors; whitespace checks pass. All **347 relative links in seven changed Markdown files** resolve. No broad Core or scene sweep was repeated for this verification-only change.
 
 The three original-game comparison areas remain open in [the live dossier](../../docs/loom/FINAL_GAPS_HANDOFF.md). The smallest next picture comparison is Room 43's matched actor/staff frame. Native Computer Use and the standalone Room 34 reveal remain stopped/parked under the user's earlier instruction.
+
+**9 October update:** the user accepts the checked Room 43 scene's actor arrivals and placement and says to move on. [That concern is closed](../room43-accepted-20261009/README.md); the paragraph above records the 8 October handoff, not a current instruction to repeat Room 43. Physical casting/input is now the next priority, followed by listening/timing.
