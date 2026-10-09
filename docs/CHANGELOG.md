@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: qualify source learning and later-level controls
+
+Reviewed the original actor inventory and earlier source-earned level-four/input routes before new checks. Actual lesson helpers earn eleven previously unlearned slots per edition across English Roland EGA, Spanish Roland EGA and English CD/VGA: 33 unique checks, with unchanged note/reverse/used bits. The reviewed late-story prefix now earns slots 12/13/14 without supplied learned flags. Nine source controls reach five/six/eight-note helpers; draft-response callbacks remain distinct from earned four-note input. Slots 3/7/11 and seven-note progression retain their source gates and required routes, with failed controls preserved. No progression engine change was justified. Audio remains manual comparison. [Evidence, packet hashes and remaining guards](../.verification/earned-progression-20261009/README.md).
+
 ## 9 October: preserve the running state for CD single scenes
 
 Starting a CD scene that needed derived preparation created a fresh session and lost chosen note/story state. It now keeps the session and omits source preludes whose exact assignment is already present. Unknown results and required repeated stages stay in the setup. The actual sword/Blunting trigger reproduced the reset; six isolated WPF assertions now preserve session identity, notes, draft choice and ghost state. The focused Core suite passes 64 tests with three existing diagnostic skips; 168 source actor assertions also pass. These prepared checks do not establish earned history or native audiovisual fidelity. [Evidence and reproduction](../.verification/actor-progression-20261009/STATE_CHECKS.md).

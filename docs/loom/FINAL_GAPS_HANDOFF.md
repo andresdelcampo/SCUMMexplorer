@@ -10,6 +10,8 @@ Priorities are in [CURRENT_WORK](../CURRENT_WORK.md). Source checks can continue
 
 **Bounded actor-state checkpoint, 9 October:** [168 own-source assertions and six real WPF state checks](../../.verification/actor-progression-20261009/STATE_CHECKS.md) qualify staff branches, sleeping/ghost/restored Rusty, close-up returns and retention of running CD scene state. VGA story ranges and CD session resets were corrected. These prepared checks leave the native bounds, physical input/earned native routes and listening rows below open.
 
+**Source learning checkpoint, 9 October:** [33 actual lesson checks](../../.verification/earned-progression-20261009/README.md) earn eleven slots per checked edition, including slots 12/13/14 from the actual late-story prefix. Five/six/eight-note helper effects are source-executed; direct response callbacks do not prove earned casting. Slots 3/7/11 and seven-note progression still need their guarded routes. The original-game physical-input and listening rows remain open.
+
 | Area | Established evidence | Still needed |
 | --- | --- | --- |
 | Residual actor/staff picture | Room 43's checked arrivals/placement accepted above. [Source comparison](../../.verification/staff-layout-20261008/README.md) confirms existing VGA note alignment through complete `o5_verbOps`; experimental edit withdrawn, 18 final assertions and restored hashes. EGA Room 17 scale stays 255 with own costume/pose choices. | Separate El Muerto/Room 17 actor sizes, actor 4 placement and visible bounds. No current regression is established by the old checklist alone; do not reopen accepted Room 43 without a new concrete mismatch. |

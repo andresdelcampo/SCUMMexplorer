@@ -5,7 +5,7 @@ Updated 9 October 2026. Rebuild a harness before running it so it includes the c
 ## Current checkpoint entry points
 
 - [actor-progression-20261009](actor-progression-20261009/STATE_CHECKS.md): original partial inventory preserved; own-edition story range and 168 bounded staff/Rusty/close-up assertions. Native size comparisons remain separate.
-
+- [earned-progression-20261009](earned-progression-20261009/README.md): 33 actual lesson checks and nine later-level source controls; three lesson slots/seven-note route and earned physical casting remain open. Prior level-four routes reviewed without replay.
 - [room43-accepted-20261009](room43-accepted-20261009/README.md): user accepts the checked scene's delayed actor arrivals and placement; Room 43 removed from active comparisons, no behavior change.
 - [wpf-casting-20261008](wpf-casting-20261008/README.md): 12 whole-draft casts through routed WPF text and scaled staff-strip clicks across three editions; 168 assertions, private profile, no OS/native input or timing claim.
 - [source-gaps-20261008](source-gaps-20261008/README.md): own-source Silence chain, Shaping terminology limit and 11/11/8 dynamic call sites; 33 source assertions, no behavior change.

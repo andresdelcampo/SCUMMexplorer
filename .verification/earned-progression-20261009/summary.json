@@ -1,0 +1,749 @@
+﻿{
+    "date":  "2026-10-09",
+    "scope":  "Source callbacks and catalog starts; no Game Status edits or direct runtime writes. Not four-note input or a full original-game route.",
+    "lessons":  [
+                    {
+                        "edition":  "ega-en",
+                        "slot":  1,
+                        "before":  5120,
+                        "after":  13312,
+                        "root":  {
+                                     "Room":  62,
+                                     "Object":  811,
+                                     "Verb":  54,
+                                     "Slot":  1,
+                                     "Depth":  1,
+                                     "Source":  "Room 62 local script 200 +0x0076: startScript 0x19, [0x0001]"
+                                 },
+                        "room":  62,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  2,
+                        "before":  4608,
+                        "after":  12800,
+                        "root":  {
+                                     "Room":  6,
+                                     "Object":  205,
+                                     "Verb":  54,
+                                     "Slot":  2,
+                                     "Depth":  1,
+                                     "Source":  "Room 06 local script 201 +0x004A: startScript 0x19, [0x0002]"
+                                 },
+                        "room":  6,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  4,
+                        "before":  4120,
+                        "after":  12312,
+                        "root":  {
+                                     "Room":  13,
+                                     "Object":  325,
+                                     "Verb":  54,
+                                     "Slot":  4,
+                                     "Depth":  0,
+                                     "Source":  "Room 13 Object 325 Verb 0x36 +0x0031: startScript 0x19, [0x0004]"
+                                 },
+                        "room":  13,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  5,
+                        "before":  4181,
+                        "after":  12373,
+                        "root":  {
+                                     "Room":  24,
+                                     "Object":  432,
+                                     "Verb":  54,
+                                     "Slot":  5,
+                                     "Depth":  1,
+                                     "Source":  "Room 24 local script 204 +0x007A: startScript 0x19, [0x0005]"
+                                 },
+                        "room":  24,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  6,
+                        "before":  5340,
+                        "after":  13532,
+                        "root":  {
+                                     "Room":  6,
+                                     "Object":  214,
+                                     "Verb":  54,
+                                     "Slot":  6,
+                                     "Depth":  1,
+                                     "Source":  "Room 06 local script 215 +0x009C: startScript 0x19, [0x0006]"
+                                 },
+                        "room":  6,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  8,
+                        "before":  1242,
+                        "after":  9434,
+                        "root":  {
+                                     "Room":  18,
+                                     "Object":  370,
+                                     "Verb":  54,
+                                     "Slot":  8,
+                                     "Depth":  1,
+                                     "Source":  "Script 65 +0x0217: startScript 0x19, [0x0008]"
+                                 },
+                        "room":  18,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  9,
+                        "before":  6509,
+                        "after":  14701,
+                        "root":  {
+                                     "Room":  20,
+                                     "Object":  386,
+                                     "Verb":  54,
+                                     "Slot":  9,
+                                     "Depth":  1,
+                                     "Source":  "Room 20 local script 202 +0x008E: startScript 0x19, [0x0009]"
+                                 },
+                        "room":  20,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  10,
+                        "before":  2781,
+                        "after":  10973,
+                        "root":  {
+                                     "Room":  31,
+                                     "Object":  523,
+                                     "Verb":  54,
+                                     "Slot":  10,
+                                     "Depth":  1,
+                                     "Source":  "Room 31 local script 200 +0x0155: startScript 0x19, [0x000A]"
+                                 },
+                        "room":  31,
+                        "helper25Observed":  true,
+                        "estimatedPath":  false
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  12,
+                        "before":  4102,
+                        "after":  12294,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  272,
+                                     "Verb":  54,
+                                     "Slot":  12,
+                                     "Depth":  2,
+                                     "Source":  "Script 101 +0x0854: startScript 0x19, [0x000C]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  false
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  13,
+                        "before":  4486,
+                        "after":  12678,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  273,
+                                     "Verb":  79,
+                                     "Slot":  13,
+                                     "Depth":  1,
+                                     "Source":  "Room 09 local script 223 +0x02A7: startScript 0x19, [0x000D]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-en",
+                        "slot":  14,
+                        "before":  7093,
+                        "after":  15285,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  273,
+                                     "Verb":  81,
+                                     "Slot":  14,
+                                     "Depth":  1,
+                                     "Source":  "Room 09 local script 224 +0x03C6: startScript 0x19, [0x000E]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  1,
+                        "before":  5120,
+                        "after":  13312,
+                        "root":  {
+                                     "Room":  62,
+                                     "Object":  810,
+                                     "Verb":  54,
+                                     "Slot":  1,
+                                     "Depth":  1,
+                                     "Source":  "Room 62 local script 200 +0x0075: startScript 0x19, [0x0001]"
+                                 },
+                        "room":  62,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  2,
+                        "before":  4608,
+                        "after":  12800,
+                        "root":  {
+                                     "Room":  6,
+                                     "Object":  205,
+                                     "Verb":  54,
+                                     "Slot":  2,
+                                     "Depth":  1,
+                                     "Source":  "Room 06 local script 201 +0x0045: startScript 0x19, [0x0002]"
+                                 },
+                        "room":  6,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  4,
+                        "before":  4120,
+                        "after":  12312,
+                        "root":  {
+                                     "Room":  13,
+                                     "Object":  325,
+                                     "Verb":  54,
+                                     "Slot":  4,
+                                     "Depth":  0,
+                                     "Source":  "Room 13 Object 325 Verb 0x36 +0x0031: startScript 0x19, [0x0004]"
+                                 },
+                        "room":  13,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  5,
+                        "before":  4181,
+                        "after":  12373,
+                        "root":  {
+                                     "Room":  24,
+                                     "Object":  432,
+                                     "Verb":  54,
+                                     "Slot":  5,
+                                     "Depth":  1,
+                                     "Source":  "Room 24 local script 204 +0x007A: startScript 0x19, [0x0005]"
+                                 },
+                        "room":  24,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  6,
+                        "before":  5340,
+                        "after":  13532,
+                        "root":  {
+                                     "Room":  6,
+                                     "Object":  214,
+                                     "Verb":  54,
+                                     "Slot":  6,
+                                     "Depth":  1,
+                                     "Source":  "Room 06 local script 215 +0x009E: startScript 0x19, [0x0006]"
+                                 },
+                        "room":  6,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  8,
+                        "before":  1242,
+                        "after":  9434,
+                        "root":  {
+                                     "Room":  18,
+                                     "Object":  370,
+                                     "Verb":  54,
+                                     "Slot":  8,
+                                     "Depth":  1,
+                                     "Source":  "Script 65 +0x0217: startScript 0x19, [0x0008]"
+                                 },
+                        "room":  18,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  9,
+                        "before":  6509,
+                        "after":  14701,
+                        "root":  {
+                                     "Room":  20,
+                                     "Object":  386,
+                                     "Verb":  54,
+                                     "Slot":  9,
+                                     "Depth":  1,
+                                     "Source":  "Room 20 local script 202 +0x008E: startScript 0x19, [0x0009]"
+                                 },
+                        "room":  20,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  10,
+                        "before":  2781,
+                        "after":  10973,
+                        "root":  {
+                                     "Room":  31,
+                                     "Object":  523,
+                                     "Verb":  54,
+                                     "Slot":  10,
+                                     "Depth":  1,
+                                     "Source":  "Room 31 local script 200 +0x0157: startScript 0x19, [0x000A]"
+                                 },
+                        "room":  31,
+                        "helper25Observed":  true,
+                        "estimatedPath":  false
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  12,
+                        "before":  4102,
+                        "after":  12294,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  272,
+                                     "Verb":  54,
+                                     "Slot":  12,
+                                     "Depth":  2,
+                                     "Source":  "Script 101 +0x0895: startScript 0x19, [0x000C]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  false
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  13,
+                        "before":  4486,
+                        "after":  12678,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  273,
+                                     "Verb":  79,
+                                     "Slot":  13,
+                                     "Depth":  1,
+                                     "Source":  "Room 09 local script 223 +0x02AC: startScript 0x19, [0x000D]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "ega-es",
+                        "slot":  14,
+                        "before":  7093,
+                        "after":  15285,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  273,
+                                     "Verb":  81,
+                                     "Slot":  14,
+                                     "Depth":  1,
+                                     "Source":  "Room 09 local script 224 +0x03DA: startScript 0x19, [0x000E]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  1,
+                        "before":  5193,
+                        "after":  13385,
+                        "root":  {
+                                     "Room":  62,
+                                     "Object":  742,
+                                     "Verb":  54,
+                                     "Slot":  1,
+                                     "Depth":  1,
+                                     "Source":  "Room 62 local script 200 +0x0058: startScript 0x19, [0x0001]"
+                                 },
+                        "room":  62,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  2,
+                        "before":  4616,
+                        "after":  12808,
+                        "root":  {
+                                     "Room":  6,
+                                     "Object":  130,
+                                     "Verb":  54,
+                                     "Slot":  2,
+                                     "Depth":  1,
+                                     "Source":  "Room 06 local script 201 +0x003F: startScript 0x19, [0x0002]"
+                                 },
+                        "room":  6,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  4,
+                        "before":  4120,
+                        "after":  12312,
+                        "root":  {
+                                     "Room":  13,
+                                     "Object":  250,
+                                     "Verb":  54,
+                                     "Slot":  4,
+                                     "Depth":  0,
+                                     "Source":  "Room 13 Object 250 Verb 0x36 +0x0039: startScript 0x19, [0x0004]"
+                                 },
+                        "room":  13,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  5,
+                        "before":  5349,
+                        "after":  13541,
+                        "root":  {
+                                     "Room":  24,
+                                     "Object":  358,
+                                     "Verb":  54,
+                                     "Slot":  5,
+                                     "Depth":  1,
+                                     "Source":  "Room 24 local script 204 +0x007A: startScript 0x19, [0x0005]"
+                                 },
+                        "room":  24,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  6,
+                        "before":  5340,
+                        "after":  13532,
+                        "root":  {
+                                     "Room":  6,
+                                     "Object":  139,
+                                     "Verb":  54,
+                                     "Slot":  6,
+                                     "Depth":  1,
+                                     "Source":  "Room 06 local script 215 +0x00AB: startScript 0x19, [0x0006]"
+                                 },
+                        "room":  6,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  8,
+                        "before":  1242,
+                        "after":  9434,
+                        "root":  {
+                                     "Room":  18,
+                                     "Object":  295,
+                                     "Verb":  54,
+                                     "Slot":  8,
+                                     "Depth":  1,
+                                     "Source":  "Script 65 +0x0224: startScript 0x19, [0x0008]"
+                                 },
+                        "room":  18,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  9,
+                        "before":  6509,
+                        "after":  14701,
+                        "root":  {
+                                     "Room":  20,
+                                     "Object":  311,
+                                     "Verb":  54,
+                                     "Slot":  9,
+                                     "Depth":  1,
+                                     "Source":  "Room 20 local script 202 +0x008E: startScript 0x19, [0x0009]"
+                                 },
+                        "room":  20,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  10,
+                        "before":  2637,
+                        "after":  10829,
+                        "root":  {
+                                     "Room":  31,
+                                     "Object":  449,
+                                     "Verb":  54,
+                                     "Slot":  10,
+                                     "Depth":  1,
+                                     "Source":  "Room 31 local script 200 +0x0178: startScript 0x19, [0x000A]"
+                                 },
+                        "room":  31,
+                        "helper25Observed":  true,
+                        "estimatedPath":  false
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  12,
+                        "before":  5934,
+                        "after":  14126,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  197,
+                                     "Verb":  54,
+                                     "Slot":  12,
+                                     "Depth":  2,
+                                     "Source":  "Script 101 +0x0A06: startScript 0x19, [0x000C]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  false
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  13,
+                        "before":  6046,
+                        "after":  14238,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  198,
+                                     "Verb":  79,
+                                     "Slot":  13,
+                                     "Depth":  1,
+                                     "Source":  "Room 09 local script 223 +0x02CB: startScript 0x19, [0x000D]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    },
+                    {
+                        "edition":  "vga",
+                        "slot":  14,
+                        "before":  7174,
+                        "after":  15366,
+                        "root":  {
+                                     "Room":  9,
+                                     "Object":  198,
+                                     "Verb":  81,
+                                     "Slot":  14,
+                                     "Depth":  1,
+                                     "Source":  "Room 09 local script 224 +0x0688: startScript 0x19, [0x000E]"
+                                 },
+                        "room":  9,
+                        "helper25Observed":  true,
+                        "estimatedPath":  true
+                    }
+                ],
+    "sourceExecutedLevels":  [
+                                 {
+                                     "edition":  "ega-en",
+                                     "level":  5,
+                                     "notes":  5,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  13,
+                                                          "Object":  323,
+                                                          "Verb":  56,
+                                                          "Slot":  5,
+                                                          "Depth":  1,
+                                                          "Source":  "Script 54 +0x00C5: startScript 0x1D, [0x0005, 0x000C]"
+                                                      }
+                                                  ],
+                                     "room":  15
+                                 },
+                                 {
+                                     "edition":  "ega-en",
+                                     "level":  6,
+                                     "notes":  6,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  28,
+                                                          "Object":  470,
+                                                          "Verb":  61,
+                                                          "Slot":  6,
+                                                          "Depth":  1,
+                                                          "Source":  "Room 28 local script 200 +0x0264: chainScript 0x1D, [0x0006, 0x000C]"
+                                                      }
+                                                  ],
+                                     "room":  28
+                                 },
+                                 {
+                                     "edition":  "ega-en",
+                                     "level":  8,
+                                     "notes":  8,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  9,
+                                                          "Object":  272,
+                                                          "Verb":  82,
+                                                          "Slot":  8,
+                                                          "Depth":  1,
+                                                          "Source":  "Script 104 +0x06D8: chainScript 0x1D, [0x0008, 0x0009]"
+                                                      }
+                                                  ],
+                                     "room":  51
+                                 },
+                                 {
+                                     "edition":  "ega-es",
+                                     "level":  5,
+                                     "notes":  5,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  13,
+                                                          "Object":  323,
+                                                          "Verb":  56,
+                                                          "Slot":  5,
+                                                          "Depth":  1,
+                                                          "Source":  "Script 54 +0x00C5: startScript 0x1D, [0x0005, 0x000C]"
+                                                      }
+                                                  ],
+                                     "room":  15
+                                 },
+                                 {
+                                     "edition":  "ega-es",
+                                     "level":  6,
+                                     "notes":  6,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  28,
+                                                          "Object":  470,
+                                                          "Verb":  61,
+                                                          "Slot":  6,
+                                                          "Depth":  1,
+                                                          "Source":  "Room 28 local script 200 +0x026D: chainScript 0x1D, [0x0006, 0x000C]"
+                                                      }
+                                                  ],
+                                     "room":  28
+                                 },
+                                 {
+                                     "edition":  "ega-es",
+                                     "level":  8,
+                                     "notes":  8,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  9,
+                                                          "Object":  272,
+                                                          "Verb":  82,
+                                                          "Slot":  8,
+                                                          "Depth":  1,
+                                                          "Source":  "Script 104 +0x06FD: chainScript 0x1D, [0x0008, 0x0009]"
+                                                      }
+                                                  ],
+                                     "room":  51
+                                 },
+                                 {
+                                     "edition":  "vga",
+                                     "level":  5,
+                                     "notes":  5,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  13,
+                                                          "Object":  248,
+                                                          "Verb":  56,
+                                                          "Slot":  5,
+                                                          "Depth":  1,
+                                                          "Source":  "Script 54 +0x00C5: startScript 0x1D, [0x0005, 0x000C]"
+                                                      }
+                                                  ],
+                                     "room":  15
+                                 },
+                                 {
+                                     "edition":  "vga",
+                                     "level":  6,
+                                     "notes":  6,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  28,
+                                                          "Object":  396,
+                                                          "Verb":  61,
+                                                          "Slot":  6,
+                                                          "Depth":  1,
+                                                          "Source":  "Room 28 local script 200 +0x0260: chainScript 0x1D, [0x0006, 0x000C]"
+                                                      }
+                                                  ],
+                                     "room":  28
+                                 },
+                                 {
+                                     "edition":  "vga",
+                                     "level":  8,
+                                     "notes":  8,
+                                     "sequence":  [
+                                                      {
+                                                          "Room":  9,
+                                                          "Object":  197,
+                                                          "Verb":  82,
+                                                          "Slot":  8,
+                                                          "Depth":  1,
+                                                          "Source":  "Script 104 +0x0571: chainScript 0x1D, [0x0008, 0x0009]"
+                                                      }
+                                                  ],
+                                     "room":  51
+                                 }
+                             ],
+    "remainingLessons":  [
+                             3,
+                             7,
+                             11
+                         ],
+    "remainingLevel":  7,
+    "packets":  [
+                    {
+                        "path":  "out-lessons/lessons.json",
+                        "sha256":  "188e0f460a1a5454c419d582d741f6d6010300ffeab81c2b8c8b8131bf542d3b"
+                    },
+                    {
+                        "path":  "out-lessons-final/lessons.json",
+                        "sha256":  "01b698affc8e8687503b5700fbcccab63604e2f630eb327612f5215a55c94a36"
+                    },
+                    {
+                        "path":  "out-lessons-cd/lessons.json",
+                        "sha256":  "c57469f703501b4c0e626984a2b7e5160d98572498f67e3ee08be4be4ee905e6"
+                    },
+                    {
+                        "path":  "out-chains/chains.json",
+                        "sha256":  "7c3233b3ded617c6f406de523198c446d06b1a6d030d3597541117e2997fc232"
+                    },
+                    {
+                        "path":  "out-late/chains.json",
+                        "sha256":  "07841678a891db05ac5910abf13c174815a6f5db0314bfe6beb441c2bd564aa1"
+                    },
+                    {
+                        "path":  "out-levels/levels.json",
+                        "sha256":  "453f535a166205ebddf42a4674481ec9be62586dd265af12674552a136b33e6d"
+                    },
+                    {
+                        "path":  "out-levels-reviewed/levels.json",
+                        "sha256":  "592c64a277d9c569bf0ae7d6bbe28b7c9da1d3089067a2689d15e57f4b887894"
+                    }
+                ]
+}
