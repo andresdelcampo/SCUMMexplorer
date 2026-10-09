@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 9 October: show VGA Room 09 speakers in direct responses
+
+The user reproduced missing Hetchel/Dead One actors when selecting VGA Room 09 spell responses. CD picker and Interact starts now share EGA's source-derived actor-only setup, using each edition's data and preserving actors already present. A placement later in a response no longer suppresses the named target's initial preparation. Five failing picker cases were retained; ten corrected picker/Interact cases pass target visibility/pixel and state-retention checks. Validation: 55 VGA and four EGA WPF assertions, 24 focused Core tests/three existing diagnostic skips, and clean Release solution build. Both exact Room 13 Use picker routes also raise a fresh three-pitch session to five without Game Status edits. Physical EGA/VGA keyboard/mouse casting has the user's confirmation; CD audiovisual matching moves out of active work to their full manual run. Original actor inventory preserved, no native control or push. [Evidence, source anchors, short recipe and failed attempts](../.verification/room09-speakers-20261009/README.md).
+
 ## 9 October: reconcile the remaining comparison checkpoint
 
 The comparison reference still listed slots 3/7/11 and seven-note progression as pending after their routes were completed. It now records the 40 unique lessons, 37 additional lesson/control assertions and the English seven-note chain's 25 assertions/26 balanced scopes, preserving the source-preparation and edition limits. The current handoff confirms that remaining picture/input/audio evidence is manual. Validation: all 318 relative links across three changed guides resolve; whitespace check passes. Documentation only; no runtime route rerun, native control or push. [Comparison reference](loom/FINAL_GAPS_HANDOFF.md).

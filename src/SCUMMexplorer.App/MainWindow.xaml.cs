@@ -1508,9 +1508,9 @@ public partial class MainWindow : Window
     private List<string> PlaceSpeakersForDirectVerb(GameResource room, int objectId, int verbId)
     {
         var notes = new List<string>();
-        if (_game is null || _session is null || _game.Id != GameId.Loom || room.ResourceId is not int roomId || !_session.GameStatus.CanEdit) return notes;
+        if (_game is null || _session is null || _game.Id is not (GameId.Loom or GameId.LoomVga) || room.ResourceId is not int roomId || !_session.GameStatus.CanEdit) return notes;
         _setupPlanner ??= new LoomSceneSetupPlanner(_game);
-        var setup = _setupPlanner.Derive(roomId, [], objectId, verbId);
+        var setup = _setupPlanner.DeriveActors(roomId, objectId, verbId);
         foreach (var step in setup.Steps.Where(item => item.Kind == "actor"))
         {
             try { _session.PlaceActorInRoom(step.ObjectId, step.X, step.Y, step.Verb, step.EndBoundary ?? "the game's code"); }
@@ -4139,7 +4139,7 @@ public partial class MainWindow : Window
                $"reaches {string.Join(", ", first.Scripts)} (a cutscene ... endCutscene span of {first.SpanInstructions} instructions, {first.Texts} printed line(s), {first.RoomLoads} room load(s)). " +
                "A branch can keep part of it from running, so the lines and loads are possible, not certain." + others + " " +
                CdSetupNote(first) +
-               "Stated start: the running exploration session (state kept, a fresh post-boot session if none; always a fresh one when a setup is derived above), the room opened from the catalog (Bobbin's arrival is assumed), " +
+               "Stated start: the running exploration session (state kept, a fresh post-boot session if none), the room opened from the catalog (Bobbin's arrival is assumed), " +
                (first.IsRoomEntry ? "then the room's entry script plays on the clock. " :
                 $"then the object's verb 0x{first.VerbId:X2} run directly: an exploration action, not the game's click (Bobbin does not walk there, the object may be untouchable in this state, and a draft response does not simulate casting the draft). ") +
                "The frames play on the playback clock at the game's frame rate; voices play from the disc as a click's would.";
@@ -4180,6 +4180,7 @@ public partial class MainWindow : Window
         var before = (session.CutscenesBegun, session.EgoPuts);
         session.VisitRoom(room);
         if (useSetup) LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
+        var speakerNotes = trigger.IsRoomEntry ? [] : PlaceSpeakersForDirectVerb(room, trigger.ObjectId, trigger.VerbId);
         var action = trigger.IsRoomEntry ? null : session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
         var uncertainties = (action?.Uncertainties ?? session.Snapshot.Uncertainties).ToList();
         if (_currentRoomResource?.ResourceId == room.ResourceId && _currentRoom is not null)
@@ -4192,7 +4193,7 @@ public partial class MainWindow : Window
         StartPlayback(trigger.IsRoomEntry ? $"Room {trigger.Room:00}'s entry scripts" : $"Object {trigger.ObjectId}'s verb 0x{trigger.VerbId:X2} (run directly)", action, room, doorways: null, leftRoom: false,
             sceneBefore: before, expectedCutscene: title);
         StatusText.Text = $"Playing {title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
-        StatusText.ToolTip = CdCutsceneNote(group) + Environment.NewLine + string.Join(Environment.NewLine, uncertainties);
+        StatusText.ToolTip = CdCutsceneNote(group) + Environment.NewLine + string.Join(Environment.NewLine, speakerNotes.Concat(uncertainties));
     }
 
     private string PickerVerbTitle(string title, int verb) =>

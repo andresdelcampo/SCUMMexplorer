@@ -35,11 +35,13 @@ public sealed class LoomSceneSetupPlanner
 
     private readonly LoomSceneStateScanner _scanner;
     private readonly GameLibrary _game;
+    private readonly IScummDataSource _data;
     private IReadOnlyList<LoomStateSource>? _staffHeldWriters;
 
     public LoomSceneSetupPlanner(GameLibrary game)
     {
         _game = game;
+        _data = ScummDataSources.For(game);
         _scanner = LoomSceneStateScanner.For(game);
         _firstStoryBit = LoomStoryEvents.FirstBitFor(game);
     }
@@ -98,6 +100,31 @@ public sealed class LoomSceneSetupPlanner
 
         if (steps.Count > 0 && steps[0].ObjectId != startRoom) steps.Add(new("visit", startRoom));
 
+        var actors = ActorSetup(startRoom, scan, objectId);
+        steps.AddRange(actors.Steps);
+        notes.AddRange(actors.Notes);
+
+        // The ego's costume variable: a scene that tests it is reached with the fresh value, the first-visit branch.
+        var costumeReads = own.Where(t => !t.Write && t.Variable == "var[0x07D]").Select(t => t.Where).Distinct().ToList();
+        if (costumeReads.Count > 0)
+            notes.Add($"The scene's own code tests the ego's costume variable var[0x07D] ({string.Join(", ", costumeReads.Take(2))}); the fresh value (Bobbin's own look) is kept.");
+
+        // Story bits: every read is first-visit (0) unless a setup step above changed it.
+        var storyReads = own.Where(t => !t.Write && IsStoryBit(t.Variable)).Select(t => t.Variable).Distinct().Order().ToList();
+        if (storyReads.Count > 0)
+            notes.Add($"Story bits read by the scene's own code ({string.Join(" ", storyReads)}) keep their first-visit value 0; no flag is set by the explorer.");
+
+        return notes.Count == 0 ? LoomStartSetup.None : new LoomStartSetup(steps, notes);
+    }
+
+    /// <summary>The own-source actor placements for a direct object verb, without staff or story preparation; works with EGA and CD data.</summary>
+    public LoomStartSetup DeriveActors(int startRoom, int objectId, int verbId) =>
+        ActorSetup(startRoom, _scanner.Scan(startRoom, [], objectId, verbId), objectId);
+
+    private LoomStartSetup ActorSetup(int startRoom, LoomSceneScan scan, int objectId)
+    {
+        var steps = new List<LoomReplayStep>();
+        var notes = new List<string>();
         // Actors. A line printed for an actor who is not in the room shows nothing (ScummVM's actorTalk), and one that is told to walk or
         // animate is not seen either, so a scene whose own code uses actor N without putting him in a room first needs him there. The game's own placement of him into
         // this room (putActorInRoom then putActor / putActorAtObject) is taken as the labelled estimate; the first in the
@@ -105,7 +132,9 @@ public sealed class LoomSceneSetupPlanner
         // An actor shown as an object: the named object of an interaction is an actor when the game itself puts an actor at that
         // object (putActorAtObject) or at a point inside its rectangle; he comes into the room with the interaction.
         var tied = objectId == 0 ? [] : ActorsAtObject(startRoom, objectId);
-        foreach (var actor in scan.UsedActors.Concat(tied.Keys).Distinct().Except(scan.PlacedActors).Order())
+        // A target may be placed only later in its response (for example after changing form).
+        // Its source-backed object association still needs the actor present at the start.
+        foreach (var actor in scan.UsedActors.Except(scan.PlacedActors).Concat(tied.Keys).Distinct().Order())
         {
             var placers = ActorPlacers(actor, startRoom);
             if (placers.Count == 0)
@@ -123,16 +152,6 @@ public sealed class LoomSceneSetupPlanner
                       $"{(chosen.AtObject is int o ? $" (at object {o}'s walk point)" : $" ({chosen.X}, {chosen.Y})")}, dressed as it dresses him; that placement is applied if he is not there already (estimate: which earlier scene left him there was not executed)." +
                       (placers.Count > 1 ? $" Other placements: {string.Join(", ", placers.Where(p => p != chosen).Select(p => p.Where).Take(4))}." : ""));
         }
-
-        // The ego's costume variable: a scene that tests it is reached with the fresh value, the first-visit branch.
-        var costumeReads = own.Where(t => !t.Write && t.Variable == "var[0x07D]").Select(t => t.Where).Distinct().ToList();
-        if (costumeReads.Count > 0)
-            notes.Add($"The scene's own code tests the ego's costume variable var[0x07D] ({string.Join(", ", costumeReads.Take(2))}); the fresh value (Bobbin's own look) is kept.");
-
-        // Story bits: every read is first-visit (0) unless a setup step above changed it.
-        var storyReads = own.Where(t => !t.Write && IsStoryBit(t.Variable)).Select(t => t.Variable).Distinct().Order().ToList();
-        if (storyReads.Count > 0)
-            notes.Add($"Story bits read by the scene's own code ({string.Join(" ", storyReads)}) keep their first-visit value 0; no flag is set by the explorer.");
 
         return notes.Count == 0 ? LoomStartSetup.None : new LoomStartSetup(steps, notes);
     }
@@ -158,12 +177,11 @@ public sealed class LoomSceneSetupPlanner
         var found = new Dictionary<int, LoomActorPlacer>();
         try
         {
-            var resource = _game.Rooms.FirstOrDefault(r => r.ResourceId == room);
-            if (resource is null) return found;
-            var bytes = File.ReadAllBytes(resource.FilePath);
-            var records = new LoomRoomObjectDirectory().Decode(bytes);
-            if (records.FirstOrDefault(r => r.Id == objectId) is not { } record) return found;
-            if (!LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records).TryGetValue(objectId, out var name) || string.IsNullOrWhiteSpace(name)) return found;
+            if (_game.Rooms.All(r => r.ResourceId != room)) return found;
+            var data = _data.ReadRoom(room);
+            if (data.Objects.FirstOrDefault(r => r.Id == objectId) is not { } record) return found;
+            if (!data.ObjectNames.TryGetValue(objectId, out var name) ||
+                string.IsNullOrWhiteSpace(System.Text.Encoding.Latin1.GetString(name))) return found;
             for (var actor = 2; actor < 13; actor++)
             {
                 var hit = ActorPlacers(actor, room)
