@@ -1,6 +1,6 @@
 # Final-gap investigation — 8 October 2026
 
-**Subsequent status:** native v4 VGA walking was corrected in [the walking checkpoint](../native-walk-20261008/README.md); the standalone Room 34 fortress reveal is parked. The separate fresh English Room 46 → 34 ghost-return defect was corrected with user-approved source prerequisites in [the catalog checkpoint](../catalog-return-20261008/README.md). Current remaining work is in [the live plan](../../docs/LOOM_EGA_PLAN.md). The findings/counts below describe this earlier investigation.
+**Subsequent status:** native v4 VGA walking was corrected in [the walking checkpoint](../native-walk-20261008/README.md); the standalone Room 34 fortress reveal is parked. The separate fresh English Room 46 → 34 ghost-return defect was corrected with user-approved source prerequisites in [the catalog checkpoint](../catalog-return-20261008/README.md). Current remaining work is in [the live plan](../../docs/CURRENT_WORK.md). The findings/counts below describe this earlier investigation.
 
 This is a focused follow-up to the [correctness audit](../correctness-20261008/README.md). Its baseline remains historical evidence, not a rerun of every replay. All commands run from `D:\Documents\Personal\Code Projects\SCUMMexplorer` through the required RTK wrapper. Game bytes, user saves and ROMs are unchanged.
 

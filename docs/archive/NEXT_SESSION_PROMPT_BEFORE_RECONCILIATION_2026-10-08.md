@@ -21,7 +21,7 @@ Native route update: two ordinary eastward clicks (the first selected a grave) r
 - [FINAL_GAPS_HANDOFF.md](../loom/FINAL_GAPS_HANDOFF.md): detailed gap dossier, facts versus hypotheses, investigation order, completion criteria and conditional user needs.
 - [8 October correctness audit](../../.verification/correctness-20261008/README.md): exact results, product fixes, reproduction and ignored local evidence.
 - [CURRENT_WORK.md](../CURRENT_WORK.md): standing product/workflow rules.
-- [LOOM_EGA_PLAN.md](../LOOM_EGA_PLAN.md): open items and parked work.
+- [LOOM_EGA_PLAN.md](../CURRENT_WORK.md): open items and parked work.
 - [CHANGELOG.md](../CHANGELOG.md): completed milestones and validation.
 
 The superseded handoff is preserved as [HANDOFF_2026-10-08_BEFORE_FINAL_GAPS.md](HANDOFF_2026-10-08_BEFORE_FINAL_GAPS.md). Older handoffs and research remain records; statements such as "VGA step 3", "no full suite" and the old step-24 missing-feature list do not describe the current implementation.

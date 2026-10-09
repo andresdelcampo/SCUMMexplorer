@@ -1,50 +1,46 @@
 # Current work
 
-Reconciled 9 October 2026. Current priorities are in [the plan](LOOM_EGA_PLAN.md); continuation details are in [the handoff](NEXT_SESSION_PROMPT.md). Superseded narratives are preserved in [the historical snapshot](archive/CURRENT_WORK_BEFORE_RECONCILIATION_2026-10-08.md).
+Updated 9 October 2026. This is the single plan and session handoff. Completed work and validation belong in [CHANGELOG](CHANGELOG.md); source knowledge belongs in the game references.
 
-## Current state
+## Status
 
-Local master includes `ebdf3b2` (closed/conditional portals), `0243a5a` (Sharpening / Blunting and real-note input evidence), `9de8193` (source preparation for Rusty's catalog return), `e9cdb24` (documentation reconciliation), `2a51c06` (remaining source checks), `5486af1` (prepared sky input) and `8da4945` (whole-draft WPF input). No push is authorized.
+Current priority: finish bounded actor-state checks, then source-earned learning/progression. Nothing has been pushed.
 
-**Accepted by the user, 9 October:** Room 43's other two arrive a couple of seconds after the scene starts; the swordsman and Bobbin are correctly placed. The user sees no issue and says to move on. The checked scene's actor-arrival/placement concern is closed; do not repeat it or propose a patch absent a new concrete mismatch. [Observation and scope](../.verification/room43-accepted-20261009/README.md). The user next prioritizes cutscene-start actor costume/staff/visibility under changing story status, then source-triggered learning/level progression. Audio is lower priority and bounded; ScummVM is the fidelity reference. Room 09/17 actor comparisons remain separate.
+LOOM EGA and CD/VGA have live interaction, actors, scripts, scene playback, Game Status and audio. English Roland EGA (`Games/loom ega mt32 en`) is the replay reference; derive comparison editions from their own data. Indy EGA supports backgrounds/text and conversation export; further gameplay is deferred.
 
-**Fixed in `9de8193`:** previously, a fresh English EGA Room 46 catalog selection → Room 34 return left Rusty in sleeping-boy costume 112 during Script 98's movement. Actual Core click dispatch and inspected renderer output reproduce it. Room 46 sets late D7A; the skipped dream route never establishes ghost D9C. A source-prepared ghost path retains costume 120. The user approved real source-prerequisite preparation for direct late-room selection. The fingerprinted English Room 46 recipe now runs missing Awakening/Reflection/Firewood/dream stages in the running session; it preserves existing ghost/restored state, skips completed stages and cancels the target visit on failure. The real WPF route now shows ghost costume 120; the early closed portal remains unchanged. [Reproduction, correction and validation](../.verification/catalog-return-20261008/README.md). No story bit/costume patch or native takeover.
+Room 43's checked arrivals and placement are accepted: the other two arrive after a couple of seconds, and the swordsman and Bobbin are correctly placed. Do not repeat this investigation. The English Rusty catalog-return correction and whole-draft WPF input checks are finished; their results are in the changelog, not new tasks.
 
-**Parked:** the standalone Room 34 local-200 fortress reveal. The user separated it from the ghost conversation's local-206 pan and parked further investigation. Save, console and close assists are fulfilled. The ordinary native eastward route left DCF clear; intermediate boxes were not sampled. The user later reported returning to Room 34, then stopped Computer Use with physical Escape before a refreshed picture returned. Current native screen/state is unverified. Do not resume native control without a direct human request. [Native history and identity](../.verification/room34-state-20261008/NATIVE_SESSION.md).
+## Next work
 
-Original-game physical casting-route and listening comparisons remain open, plus the separate Room 09/17 actor comparisons. Room 43's checked arrival/placement concern is accepted above. Six prepared Room 04 forward/reverse casts pass real Explorer note input across English EGA, Spanish EGA and VGA. Two prepared VGA Room 02 sky casts now pass after the source opening's arrival; the earlier failed catalog-arrival packets retain their limit. Silence now has an own-source causative chain in each edition; Shaping's canonical label and exact reverse names remain uncertain. The 11/11/8 nonliteral call sites are source-classified, with input-dependent and incomplete-data limits retained. [Sky checkpoint](../.verification/sky-input-20261008/README.md), [remaining-source checkpoint](../.verification/source-gaps-20261008/README.md), [draft checkpoint](../.verification/draft-input-20261008/README.md), [exact comparison dossier](loom/FINAL_GAPS_HANDOFF.md).
+Take the easiest bounded checks first. Do not change behavior without a demonstrated mismatch and source evidence.
 
-## Established validation
+1. **Cutscene actor state — unfinished.** Check scene starts under changed story status for wrong actor versions/costumes, Bobbin with or without the staff, and visibility after close-ups. Use the Rusty failure as the concrete pattern. First review the existing source inventory in `.verification/actor-progression-20261009/`: its helper finished, but the outputs are unreviewed and prove no correctness. The partial helper remains uncommitted; preserve its ignored outputs.
+2. **Source-earned learning/progression.** Check whether ordinary scripts earn drafts and notes while playing in Explorer. Review established routes first; prepared Game Status input is not proof of earned progression. Fix only demonstrated omissions.
+3. **Audio/timing, only if straightforward.** Use ScummVM as the fidelity reference; otherwise leave this for manual comparison. No broad audiovisual audit is requested.
 
-Whole-draft WPF text/staff-strip integration is closed: 168 assertions in 12 prepared cases. Room 43 arrival/placement is accepted by the user's observation. Physical focus/mouse delivery, player-acquired prerequisites, audio timing and separate Room 09/17 bounds still require observation; these are not demonstrated regressions.
+[Exact original-game comparison recipes](loom/FINAL_GAPS_HANDOFF.md) retain the editions, source phases and measurements still missing: Room 09/17 actor bounds, earned casting with physical keyboard/mouse input and focus, and representative CD picture/voice/music timing. Roland A/B is conditional on a specific audible discrepancy. Native control needs its own explicit resume.
 
-| Checkpoint | Result and scope |
-| --- | --- |
-| Documentation reconciliation | All live guides and recent status packets reconciled; seven complete historical snapshots retained. 31 files / 688 relative links checked, no missing targets; whitespace check passes. |
-| [Correctness audit](../.verification/correctness-20261008/README.md) | 328 English EGA recipes and 222/223 VGA groups complete normally/with Escape; 833 Core tests pass, five diagnostic skips; 201 WPF assertions. Historical full-audit baseline, not every native route or actor-picture proof. |
-| [Native walking](../.verification/native-walk-20261008/README.md) | VGA v4 walking; EGA v3 retained. Eleven bounded native C++ comparisons, 51 focused Core checks, 30 WPF assertions; VGA replay rerun preserves 222/223 completions. |
-| [Final gaps](../.verification/final-gaps-20261008/README.md) | Room 70 operands corrected, interior script titles excluded, residual raw callbacks classified; focused checks/build. |
-| [Portal correction](../.verification/portal-state-20261008/README.md) | 41 source/WPF plus 30 existing navigation assertions; clean build. Covers closed/conditional traversal and prepared ghost/restoration, not fresh Room 46 catalog history. |
-| [Staff/source comparison](../.verification/staff-layout-20261008/README.md) | Existing VGA alignment confirmed; experimental edits withdrawn; 18 assertions and original buffer hashes. Native visual bounds unmeasured. |
-| [Catalog return correction](../.verification/catalog-return-20261008/README.md) | 32 focused Core checks, 18 isolated-profile WPF assertions, inspected ghost image and clean build. Fresh Room 46 return, later-state preservation, fingerprint exclusion and failure cancellation. |
-| [Draft/source checkpoint](../.verification/draft-input-20261008/README.md) | Six real-note casts, three profile-free Game Status renders, clean build. No whole-game/native audiovisual claim. |
-| [Remaining-source checkpoint](../.verification/source-gaps-20261008/README.md) | 33 source assertions: Silence causality, Shaping effect/name limit and 11/11/8 dynamic call-site classification. No behavior change or native comparison. |
-| [Sky input checkpoint](../.verification/sky-input-20261008/README.md) | 24 input assertions, two prepared VGA source-opening sky casts; isolated solution build with zero warnings/errors. All 377 relative links in nine changed Markdown files resolve. Earlier catalog failures preserved; no earned/native/physical/audio claim. |
-| [Whole-draft WPF input](../.verification/wpf-casting-20261008/README.md) | 168 assertions, 12 independent Room 04 casts via routed text and scaled staff-strip clicks across three editions; isolated build with zero warnings/errors. Explorer integration closed; original-game physical input, acquired prerequisites and timing remain open. |
+Shaping's canonical label, exact reverse draft names and unidentified story roles remain uncertain. Silence and the dynamic-call classification are established. Extend names or engine behavior only when new own-source evidence justifies a visible correction.
 
-## Standing product rules
+## Product rules
 
-- Rooms start in the earliest game state. A room moves late after the user triggers its causing scene; the session carries that state on. Earlier scenes are not chained merely to show a later branch. **User-approved exception, 8 October:** direct late-room catalog starts may run reviewed actual source prerequisites, with disclosed estimates, only when the running state lacks them. The current fingerprinted recipe covers English EGA Room 46; this is not automatic all-edition or all-room story reconstruction. The explicit off-island staff exception runs the real pickup when a scene needs it. Assumptions belong in the picker note.
-- Game Status gives the user control of staff, notes, drafts and story events. Add only the minimum a selected scene needs, keeping a later running state. Single scene picks preserve the running session; stated sequences start fresh; Restart returns to the boot. Real pickups/scenes establish story bits.
-- Costumes persist until source code changes them. A catalog start uses the room entry's look. Derive starts from own code; no invented flags, one-off teleports, forced boxes, actor/costume patches or room-number hacks.
-- Single click walks/uses through scripts 005–007; double click also looks. Inspection cycles stored art. Source responses and touchability govern navigation; static possible destinations cannot override them.
-- Normal mode shows artwork, game text and concise controls; traces, assumptions, IDs and source details belong to Advanced. Preserve edition differences, palettes and verified source glitches.
-- Use focused tests for changed behavior; broaden when new failures justify it. A completed scope is not proof of prerequisites, correct actors, physical input or audio fidelity.
+- Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state. Single picks keep the session; explicit sequences start fresh; Restart returns to boot.
+- The approved late-room exception runs reviewed actual source prerequisites when absent. The fingerprinted English Room 46 recipe implements it; do not generalize it by guessing story bits. The disclosed off-island staff setup runs the real pickup.
+- Costumes persist until source changes them. Derive actor look, placement and scene starts from own-edition scripts; no forced costumes/flags/boxes, one-off teleports or room-specific engine hacks. Label estimates and picker assumptions.
+- Single click walks/uses through source scripts; double click also looks. Stored-art cycling is inspection only. Source responses and touchability govern navigation, not static possible destinations.
+- Normal mode shows artwork, game text and concise controls. Technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches; keep window subtitles short.
+- Source execution, prepared Explorer/Core/WPF checks and original-game observation are distinct evidence. A scene completing does not prove correct actors, earned prerequisites, physical event delivery or timing.
 
-## Working rules
+## Preservation and workflow
 
-- All shell and child commands use `C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe`, per `C:\Users\adelc\.codex\RTK.md`. Escalate normally if execution is blocked; do not bypass RTK.
-- Preserve game data, ROMs, saves, the native session and `%LOCALAPPDATA%\SCUMMexplorer`. Prefer isolated probes; native Computer Use remains stopped.
-- Commit finished tasks separately, stage explicit paths, preserve concurrent work, and do not push. Ask before editing CLAUDE.md unless the human already authorized its inclusion; the current request covers all stale documentation.
-- At session end, update live state/details and create the next chat with a self-contained prompt using `create_thread`. Do not store the actual prompt in these docs. Reuse an already prepared waiting chat where suitable; no recursive idle chains. Messaging another chat requires direct human authorization.
-- M5/secrets, cleanup deletion, Indy expansion and later games remain parked.
+Read [CLAUDE.md](../CLAUDE.md) for layout, engine facts and build instructions, and `C:\Users\adelc\.codex\RTK.md` for the mandatory shell wrapper. All shell/child commands use RTK.
+
+Preserve game data, ROMs, saves, running applications, the native session and `%LOCALAPPDATA%\SCUMMexplorer`. Use focused checks and isolated output/profile directories; do not repeat broad audits without a relevant failure. Keep failed evidence and uncertainty. [Verification index](../.verification/README.md).
+
+Commit finished tasks separately with explicit paths; preserve unrelated/unfinished work and do not push. Update this file for current state and CHANGELOG for completed results. Create or message another task only with direct human authorization; do not generate idle continuation chains. An existing waiting chat is `01a11cdb-3f40-78a2-a3a7-4ab351cefc34`; it must read the current handoff before continuing.
+
+## Separately parked
+
+- **Room 34 standalone fortress reveal**, local 200 +0035: unresolved, separate from local 206's ghost pan. Save/console/close assists are fulfilled; current native screen/state is unverified. [Preserved native evidence](../.verification/room34-state-20261008/NATIVE_SESSION.md).
+- M5/secrets, Indy expansion/later games, demo carrier rooms, broad performance and optional General MIDI/card archaeology.
+- Other cleanup/deletion/worktree proposals remain outside current work; see the [historical review](archive/CLEANUP_REVIEW.md).

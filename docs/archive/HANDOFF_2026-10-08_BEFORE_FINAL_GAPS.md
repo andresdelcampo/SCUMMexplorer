@@ -1,10 +1,10 @@
 # Archived handoff — 8 October 2026
 
-This is the previous handoff, preserved before the final-gap preparation. It contains dated and superseded status; current guidance is [NEXT_SESSION_PROMPT.md](../NEXT_SESSION_PROMPT.md) and [FINAL_GAPS_HANDOFF.md](../loom/FINAL_GAPS_HANDOFF.md). Only this archive notice and link paths were adjusted when preserving it.
+This is the previous handoff, preserved before the final-gap preparation. It contains dated and superseded status; current guidance is [NEXT_SESSION_PROMPT.md](../CURRENT_WORK.md) and [FINAL_GAPS_HANDOFF.md](../loom/FINAL_GAPS_HANDOFF.md). Only this archive notice and link paths were adjusted when preserving it.
 
 # Next session
 
-Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT_WORK.md](../CURRENT_WORK.md) (rules), [LOOM_EGA_PLAN.md](../LOOM_EGA_PLAN.md) (state, open items, next phase) and [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md) (what was kept, removed and why). Finished work is in [CHANGELOG.md](../CHANGELOG.md); older hand-offs are in [HANDOFF_HISTORY_2026-10.md](HANDOFF_HISTORY_2026-10.md) and [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md).
+Continue SCUMMexplorer in this chat or a fresh session. Read CLAUDE.md, [CURRENT_WORK.md](../CURRENT_WORK.md) (rules), [LOOM_EGA_PLAN.md](../CURRENT_WORK.md) (state, open items, next phase) and [HARNESS_REVIEW_2026-10-04.md](HARNESS_REVIEW_2026-10-04.md) (what was kept, removed and why). Finished work is in [CHANGELOG.md](../CHANGELOG.md); older hand-offs are in [HANDOFF_HISTORY_2026-10.md](HANDOFF_HISTORY_2026-10.md) and [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md).
 
 > The prompt itself is not kept here: the session that ends starts the next one as a task (`spawn_task`). This file holds the details of the project state the prompt points to.
 

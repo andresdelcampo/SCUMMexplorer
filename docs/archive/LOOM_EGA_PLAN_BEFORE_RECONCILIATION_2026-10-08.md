@@ -51,7 +51,7 @@ The user's three priorities of 28 September (object interactions, cutscenes and 
 - Engine gaps, only if a route needs them: `stopObjectScript`, inventory object code, `killScriptsAndResources` ending other room-owned scripts at a room load; the Room 69 difficulty and draft answer are assumed, not simulated; the Room 03 town and cemetery labels are unidentified.
 
 **4. Housekeeping**
-- 17 historical git worktrees under `.claude/worktrees/` and the open proposals in [CLEANUP_REVIEW.md](../CLEANUP_REVIEW.md).
+- 17 historical git worktrees under `.claude/worktrees/` and the open proposals in [CLEANUP_REVIEW.md](../archive/CLEANUP_REVIEW.md).
 
 ## M5. Secrets and guide (shelved 5 October; old specification)
 

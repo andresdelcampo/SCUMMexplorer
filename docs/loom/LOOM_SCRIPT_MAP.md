@@ -2,7 +2,7 @@
 
 Reconciled 8 October 2026. The numeric tables below originated from the Spanish EGA source audits of 27–30 September; retain their dates and edition-specific identities. They are reference evidence, not a current list of missing implementation. English Roland EGA (`Games/loom ega mt32 en`) is now the replay reference; Spanish comparison files are under `Games/ALTERNATIVE LOOMS/loom ega mt32 es`. VGA uses its own decoded scripts and identifiers.
 
-Old route logs, percentages and implementation priorities are preserved in [the historical script map](../archive/LOOM_SCRIPT_MAP_BEFORE_RECONCILIATION_2026-10-08.md). Current capability, remaining comparisons and validation are in [CURRENT_WORK](../CURRENT_WORK.md), [the plan](../LOOM_EGA_PLAN.md) and [the gap dossier](FINAL_GAPS_HANDOFF.md).
+Old route logs, percentages and implementation priorities are preserved in [the historical script map](../archive/LOOM_SCRIPT_MAP_BEFORE_RECONCILIATION_2026-10-08.md). Current capability, remaining comparisons and validation are in [CURRENT_WORK](../CURRENT_WORK.md), [the plan](../CURRENT_WORK.md) and [the gap dossier](FINAL_GAPS_HANDOFF.md).
 
 The latest source correction is the approved English Room 46 catalog preparation: actual missing Awakening/Reflection/Firewood/dream scripts establish Rusty's ghost before the return. Existing ghost/restored state is preserved; failure cancels the target visit. [Source boundaries and validation](../../.verification/catalog-return-20261008/README.md). This is separate from the parked standalone Room 34 fortress reveal.
 

@@ -4,7 +4,7 @@ Preserved research and handoff history. Task instructions and current-status cla
 
 # Current work
 
-Rewritten 4 October 2026 (the old route-priority and observer-hardening text, and an RTK command block that duplicated the global instructions, are gone; the route/observer history is in [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md)). CLAUDE.md points here. The hand-off for the next session is [NEXT_SESSION_PROMPT.md](../NEXT_SESSION_PROMPT.md); priorities, state and open items are in [LOOM_EGA_PLAN.md](../LOOM_EGA_PLAN.md).
+Rewritten 4 October 2026 (the old route-priority and observer-hardening text, and an RTK command block that duplicated the global instructions, are gone; the route/observer history is in [PLAN_HISTORY_2026-10.md](PLAN_HISTORY_2026-10.md)). CLAUDE.md points here. The hand-off for the next session is [NEXT_SESSION_PROMPT.md](../CURRENT_WORK.md); priorities, state and open items are in [LOOM_EGA_PLAN.md](../CURRENT_WORK.md).
 
 ## Where the work stands
 

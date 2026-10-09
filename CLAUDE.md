@@ -7,13 +7,13 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 - `src/SCUMMexplorer.Core`: parsing, rendering and bounded script execution (net10.0). It covers LFL/index readers, the old-v3 disassembler (`Formats/LoomScriptReader.cs`), the bounded executor and session, object selection and painting (`Rendering/RoomObjectSelection.cs`), the text extractor, and audio (PC speaker, AdLib via NukedOPL3Sharp, Roland via Munt and CD voice/music cue timing).
 - `src/SCUMMexplorer.App`: the WPF desktop UI (net10.0-windows). `MainWindow.xaml.cs` holds most of the UI logic; `TextGalleryWindow` is the Game Texts browser.
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
-- `docs/`: `docs/README.md` is the index. Top level holds the live files: `docs/LOOM_EGA_PLAN.md` (current EGA/VGA work and parked tasks), `docs/CURRENT_WORK.md` (rules), `docs/NEXT_SESSION_PROMPT.md` (hand-off for the next session) and `docs/CHANGELOG.md` (finished work with links to its validation). `docs/loom/` and `docs/indy3/` hold per-game reference and plans (`docs/loom/LOOM_SCRIPT_MAP.md` records what the decoded scripts, variables, object verbs and rooms do), `docs/engine/` holds generic SCUMM notes, and `docs/archive/` holds finished plans, audits and history.
+- `docs/`: `docs/README.md` is the index. `docs/CURRENT_WORK.md` is the single current plan, rules and session handoff; `docs/CHANGELOG.md` holds finished work with validation links. `docs/loom/` and `docs/indy3/` hold game references, `docs/engine/` holds generic SCUMM notes, and `docs/archive/` preserves dated plans/audits. `docs/loom/LOOM_SCRIPT_MAP.md` records decoded scripts, variables, verbs and rooms.
 - `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. Evidence from the Spanish-edition work (27 September to 4 October 2026) is in `.verification/archive/`; `.verification/README.md` says what is live and what is a record. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
 - `Games/`: the local game data. Never commit it.
   - `Games/loom ega mt32 en`: DOS LOOM EGA, **English**, with the Roland (MT-32) upgrade installed. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
   - `Games/ALTERNATIVE LOOMS/loom ega mt32 es`: DOS LOOM EGA, Spanish, Roland upgrade installed. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
   - Plain English/Italian EGA folders are under Games; other comparison editions and the short/long demos are under `Games/ALTERNATIVE LOOMS/`. English/Spanish/French/German and v1.2 comparison records are dated; current available folders may differ from that inventory. Hebrew support is dropped. Do not move/delete game data during documentation cleanup.
-  - `Games/loom vga en`: LOOM CD (VGA, SCUMM v4) as `Loom.cue` + `Loom.bin` (ISO 9660 data track plus one CD audio track). Read directly by the app, including live v4 session, object/actor rendering, Readable scripts, source-derived scenes and CD voice/music. See the live plan for comparison limitations.
+  - `Games/loom vga en`: LOOM CD (VGA, SCUMM v4) as `Loom.cue` + `Loom.bin` (ISO 9660 data track plus one CD audio track). Read directly by the app, including live v4 session, object/actor rendering, Readable scripts, source-derived scenes and CD voice/music. See CURRENT_WORK for comparison limitations.
   - `Games/mt32`: the user's MT-32/CM-32L ROM images for the Roland sound device. Never commit.
   - `Games/FUTURE/indy3 ega en`: Indy3 EGA, **English**. Set `SCUMM_INDY3_EGA_TEST_ROOT` to this absolute folder for Indy checks.
   - Other Indy editions/demo, Monkey Island and enhanced Maniac Mansion folders are under `Games/FUTURE/`; they are deferred comparison data.
@@ -47,7 +47,7 @@ All shell and child commands must use RTK, including PowerShell; `C:\Users\adelc
   - Use `ScummScriptDialects.For(game.Id)` whenever you construct `LoomScriptReader` or `LoomObjectVerbReader`.
 - **Indy3 dialogue choices** use verbs 120–125, set with `verbOps(n, [on, name "…"])`. The script clears `Var[114]`, waits, then branches on `isEqual var[0x072], n`.
 
-## Evidence rules (from the plan)
+## Evidence rules
 
 - Tie every exit, action, state change, cue, scene or secret to the resource, script and instruction that support it.
 - A decoded branch or room load is a **possible** outcome. Calling a verb directly is an **exploration action**. A partial session is a **state preview**. Label estimates as estimates.
@@ -58,12 +58,12 @@ All shell and child commands must use RTK, including PowerShell; `C:\Users\adelc
 
 ## Workflow notes
 
-- **End every session by starting the next one as a task**: update the plan and `docs/NEXT_SESSION_PROMPT.md` (state and details only, never the prompt text itself), then launch the next session with the `create_thread` tool and a self-contained prompt (state, next task, standing rules), and tell the user what it says. Never keep a prompt in the prompt file. Reuse an already prepared waiting chat when suitable; do not create recursive idle continuations. Messaging another chat requires human authorization.
+- At session end, update `docs/CURRENT_WORK.md` and record finished results in `docs/CHANGELOG.md`. Create a new task or message another chat only with direct human authorization. Do not create idle continuation chains.
 - Verification executables include `.verification/HarnessFailurePolicy.cs` through `Directory.Build.targets`: rebuild old harnesses before running them. Fatal exceptions log under `Exe/HarnessFailures/` (or `SCUMM_HARNESS_FAILURE_LOG`) and exit 1 without Windows crash/debug UI. The shipped app is unaffected. WPF harnesses can set `SCUMM_EXPLORER_PROFILE_ROOT` to a private output/profile directory before constructing MainWindow; otherwise the normal user profile is used and must be preserved.
 
 - The repository is on git (`master`). Commit each finished task separately; `Games/` stays out of git.
-- Record verification for each milestone under `.verification/<topic>/`, and update `docs/LOOM_EGA_PLAN.md` with its status and next task, and add a row to `docs/CHANGELOG.md`.
+- Record verification under `.verification/<topic>/`, update `docs/CURRENT_WORK.md` with current status/next work, and add finished results to `docs/CHANGELOG.md`.
 
 ## Current work
 
-See `docs/CURRENT_WORK.md` (rules, route priority, scene start setups and open decisions) and the top of `docs/NEXT_SESSION_PROMPT.md`. Keep that file current instead of growing this one.
+See `docs/CURRENT_WORK.md` for status, ordered work, product rules and the session handoff. Keep current state there instead of growing this file.

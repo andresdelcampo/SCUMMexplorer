@@ -1,6 +1,6 @@
 # Cutscene discovery
 
-Reconciled 8 October 2026. Session execution and replay discovery are separate: a reached source scene can work without a reviewed catalog recipe. Play Cutscene uses shared, fingerprinted descriptors and validated setup metadata. Current capability and remaining comparisons are in [CURRENT_WORK](../CURRENT_WORK.md), [the plan](../LOOM_EGA_PLAN.md) and [the gap dossier](FINAL_GAPS_HANDOFF.md). Earlier route-by-route logs are preserved in [the historical discovery record](../archive/LOOM_CUTSCENE_DISCOVERY_BEFORE_RECONCILIATION_2026-10-08.md).
+Reconciled 8 October 2026. Session execution and replay discovery are separate: a reached source scene can work without a reviewed catalog recipe. Play Cutscene uses shared, fingerprinted descriptors and validated setup metadata. Current capability and remaining comparisons are in [CURRENT_WORK](../CURRENT_WORK.md), [the plan](../CURRENT_WORK.md) and [the gap dossier](FINAL_GAPS_HANDOFF.md). Earlier route-by-route logs are preserved in [the historical discovery record](../archive/LOOM_CUTSCENE_DISCOVERY_BEFORE_RECONCILIATION_2026-10-08.md).
 
 ## Established coverage and limits
 

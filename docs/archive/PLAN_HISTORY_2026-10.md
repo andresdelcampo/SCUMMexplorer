@@ -1,10 +1,10 @@
 # Plan history, September to October 2026
 
-Moved out of `LOOM_EGA_PLAN.md` on 4 October 2026 so the plan stays short. These are the dated "Current follow-up" checkpoints, route-coverage logs and completed UI specifications, kept unchanged and newest first. Finished work is summarised in [CHANGELOG.md](../CHANGELOG.md); the live plan is [LOOM_EGA_PLAN.md](../LOOM_EGA_PLAN.md).
+Moved out of `LOOM_EGA_PLAN.md` on 4 October 2026 so the plan stays short. These are the dated "Current follow-up" checkpoints, route-coverage logs and completed UI specifications, kept unchanged and newest first. Finished work is summarised in [CHANGELOG.md](../CHANGELOG.md); the live plan is [LOOM_EGA_PLAN.md](../CURRENT_WORK.md).
 
 ## Current follow-up (3 October, end of day)
 
-Done 3 October (later): readable scripts steps 1-3 (glossary, names in the views, Readable/Raw script view) and the draft verb check (Sleep and Invisibility were swapped). Readable scripts steps 4-6 (Last action timeline, grouped assumptions, "Used by") are done too; the plan is complete. Next: glossary growth and the open items in [NEXT_SESSION_PROMPT.md](../NEXT_SESSION_PROMPT.md). The user's state rules (earliest room state, user-controlled Game Status, Advanced-only technical views) are in [CURRENT_WORK.md](../CURRENT_WORK.md). The route and audit items below are parked unless a milestone needs them.
+Done 3 October (later): readable scripts steps 1-3 (glossary, names in the views, Readable/Raw script view) and the draft verb check (Sleep and Invisibility were swapped). Readable scripts steps 4-6 (Last action timeline, grouped assumptions, "Used by") are done too; the plan is complete. Next: glossary growth and the open items in [NEXT_SESSION_PROMPT.md](../CURRENT_WORK.md). The user's state rules (earliest room state, user-controlled Game Status, Advanced-only technical views) are in [CURRENT_WORK.md](../CURRENT_WORK.md). The route and audit items below are parked unless a milestone needs them.
 
 ## Current follow-up (2 October)
 
@@ -227,7 +227,7 @@ User follow-up: all rebuilt verification executables log fatal exceptions and ex
 
 Room departure/control state fixed: selecting a catalog room stops playing or paused cutscenes and their voices; leaving the suspended opening uses ordinary post-boot exploration state. Idle arrival polling leaves Pause disabled and allows manual cutscene starts. Sound mode and AdLib gain are locked during scenes, including pause. This is explorer cancellation policy, not a game skip. [Verification](../../.verification/archive/scene-room-controls-20260930/validation.md): 19 focused WPF checks, 249 tests, required doorways 16/16; main Release rebuilt with zero warnings/errors.
 
-Checkout/build and construction review completed: [cleanup review](../CLEANUP_REVIEW.md), [verification](../../.verification/archive/cleanup-review-20260930/validation.md). No files deleted; all 16 historical worktrees are clean ancestors of master. Main Release builds without warnings/errors; committed suite 246/246.
+Checkout/build and construction review completed: [cleanup review](../archive/CLEANUP_REVIEW.md), [verification](../../.verification/archive/cleanup-review-20260930/validation.md). No files deleted; all 16 historical worktrees are clean ancestors of master. Main Release builds without warnings/errors; committed suite 246/246.
 
 Score loss reproduced and fixed: persistent score/staff strings no longer disappear when subsequent notes exceed the old 32-string queue. Note glow and source-driven erases preserved. [Verification](../../.verification/archive/score-preservation-20260930/validation.md): 247 tests pass, focused score/verb checks pass, RoomAudit has zero gaps and unchanged room PNGs.
 

@@ -1,6 +1,6 @@
 # SCUMM room object states
 
-Reconciled 8 October 2026. This reference separates the current interaction/rendering contract from the original old-v3 format evidence. LOOM EGA and CD/VGA use edition-specific data providers; the v3 byte offsets below do not apply to VGA archives. Current capability and remaining comparisons are in [the plan](../LOOM_EGA_PLAN.md) and [CURRENT_WORK](../CURRENT_WORK.md). The complete early implementation record is preserved in [the historical snapshot](../archive/SCUMM_OBJECT_STATES_BEFORE_RECONCILIATION_2026-10-08.md).
+Reconciled 8 October 2026. This reference separates the current interaction/rendering contract from the original old-v3 format evidence. LOOM EGA and CD/VGA use edition-specific data providers; the v3 byte offsets below do not apply to VGA archives. Current capability and remaining comparisons are in [the plan](../CURRENT_WORK.md) and [CURRENT_WORK](../CURRENT_WORK.md). The complete early implementation record is preserved in [the historical snapshot](../archive/SCUMM_OBJECT_STATES_BEFORE_RECONCILIATION_2026-10-08.md).
 
 The image directory is an asset directory. Geometry or image order cannot establish which images belong to a story transition. Reached script state, positions, parent requirements and draw order feed the renderer; unresolved behavior and display-only estimates remain explicit.
 

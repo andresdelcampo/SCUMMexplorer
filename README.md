@@ -43,9 +43,7 @@ For Indiana Jones and the Last Crusade EGA, the app previews the indexed room ba
 
 | Document | Purpose |
 |---|---|
-| [LOOM EGA plan](docs/LOOM_EGA_PLAN.md) | Product direction, state, open items and milestones |
-| [Current work](docs/CURRENT_WORK.md) | The rules set for the project |
-| [Next session](docs/NEXT_SESSION_PROMPT.md) | Hand-off: state, ordered tasks, tooling notes |
+| [Current work](docs/CURRENT_WORK.md) | Current state, priorities, rules and session handoff |
 | [Changelog](docs/CHANGELOG.md) | Finished work with links to its validation |
 | [Script map](docs/loom/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, object verbs and rooms |
 | [English edition compatibility](docs/loom/ENGLISH_COMPAT_2026-10-04.md) | What differs between the English and Spanish data |

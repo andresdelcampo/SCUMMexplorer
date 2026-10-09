@@ -1,18 +1,12 @@
 # Remaining LOOM evidence gaps
 
-Reconciled 9 October 2026. This is the current dossier. The [prior detailed investigation](../archive/FINAL_GAPS_HANDOFF_BEFORE_RECONCILIATION_2026-10-08.md) preserves historical probes and source offsets; its old next-session instructions are superseded. Follow [CURRENT_WORK](../CURRENT_WORK.md) and [the plan](../LOOM_EGA_PLAN.md).
+Updated 9 October 2026. This is a comparison reference, not the task plan. The [prior detailed investigation](../archive/FINAL_GAPS_HANDOFF_BEFORE_RECONCILIATION_2026-10-08.md) preserves historical probes and source offsets; its old next-session instructions are superseded. Follow [CURRENT_WORK](../CURRENT_WORK.md) for status, priorities and authorization. Completed corrections are in [CHANGELOG](../CHANGELOG.md).
 
-## Latest correction
-
-The rebuilt/reopened English EGA Room 46 catalog return was a real second path to sleeping Rusty in the ghost conversation. The isolated raw reproduction shows late D7A=1, ghost D9C=0, costume 112. Room 46 selection skipped the earlier dream route; Script 98 moves actor 3 without first supplying its ghost costume. This was not an old-session-only issue or a demonstrated renderer defect.
-
-The user approved source prerequisites for direct late-room selection. The fingerprinted English Room 46 recipe now runs missing Awakening/Reflection/Firewood/dream stages in the running session. Actual source scenes establish D9C; existing ghost/restored state is preserved, completed stages skipped, and a failed stage cancels the target visit. Real WPF input/rendering shows ghost costume 120, while early Room 34 remains sleeping/closed. [Reproduction and validation](../../.verification/catalog-return-20261008/README.md): 32 focused Core checks, 18 isolated-profile WPF assertions and clean build. The original `ebdf3b2` closed/conditional portal fix remains valid. This catalog recipe is English EGA only; no all-room/all-edition story reconstruction or native-route claim.
-
-## Active comparisons
+## Comparison scope
 
 **Room 43 accepted, 9 October:** the user sees no issue: the other two arrive a couple of seconds after the scene starts, and the swordsman and Bobbin are correctly placed. The checked scene's arrival/placement concern is closed. No further Room 43 measurement is an active blocker. [Direct observation, scope and preserved source anchors](../../.verification/room43-accepted-20261009/README.md). Room 09/17 actor comparisons below are separate.
 
-**User's next priorities:** check state-conditioned cutscene starts for wrong actor costume/version, Bobbin's held/unheld staff and visibility, then verify that normal source scripts earn drafts/notes and level progression in Explorer. Use isolated source execution first; do not substitute forced flags, actors or Game Status edits for earned progression. Audio is lower priority, only if a small comparison is straightforward; ScummVM is the fidelity reference. Room 43 acceptance does not close this broader scene-start/history concern.
+Priorities are in [CURRENT_WORK](../CURRENT_WORK.md). Source checks can continue; these native comparison recipes do not authorize operating the original game.
 
 | Area | Established evidence | Still needed |
 | --- | --- | --- |
@@ -59,4 +53,4 @@ The supplied English Roland EGA ScummVM 2.2.0 save/console/close assists are ful
 
 Historical engine-gap lists (inventory-object code, script/resource cleanup, expression forms, `stopObjectScript`) are candidates to recheck only if a demonstrated route needs them. The new literal scan found no decoded literal `stopObjectScript`/`pickupObject` use in the reference editions; dynamic/incomplete data remains outside that claim. Room 69's difficulty/draft answers, seeded draft words, catalog arrivals and pointer/timing assumptions stay disclosed. The non-cutscene ending is an existing Interact action; do not equate absence from a cutscene inventory with missing story playback.
 
-M5, Indy expansion, later games, worktree deletion and broad performance work stay parked. Current local paths and commands are in [the handoff](../NEXT_SESSION_PROMPT.md). Use focused checks; the historical EGA sweep takes about 20 minutes and is not a routine next action.
+M5, Indy expansion, later games, worktree deletion and broad performance work stay parked. Current workflow and build instructions are linked from [CURRENT_WORK](../CURRENT_WORK.md). Use focused checks; the historical EGA sweep takes about 20 minutes and is not a routine next action.

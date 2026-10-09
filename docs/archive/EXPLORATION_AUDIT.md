@@ -1,6 +1,6 @@
 # Interactive LOOM exploration: implementation audit
 
-This records the implementation audit and its verification results. For current product priorities and the next bounded work session, use the [LOOM EGA plan and progress tracker](../LOOM_EGA_PLAN.md). The checks below are historical results, not a new validation run during the product assessment.
+This records the implementation audit and its verification results. For current product priorities and the next bounded work session, use the [LOOM EGA plan and progress tracker](../CURRENT_WORK.md). The checks below are historical results, not a new validation run during the product assessment.
 
 Audited 25 September 2026 against the supplied DOS LOOM files in `Games/loom`.
 The game data remains local. Counts describe this release and the current parser;

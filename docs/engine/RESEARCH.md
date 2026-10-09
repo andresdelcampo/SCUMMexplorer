@@ -1,6 +1,6 @@
 # SCUMM format and tool research
 
-Third-party research checked 23 September 2026; those external projects were not re-reviewed during the 8 October documentation reconciliation. Current implementation supports live LOOM EGA and CD/VGA resources, actors, scripts, interaction and audio through edition-specific providers. Current capability and priorities are in [the plan](../LOOM_EGA_PLAN.md). The goal is to reuse validated format knowledge while keeping SCUMMexplorer's domain model and UI independent from binary details.
+Third-party research checked 23 September 2026; those external projects were not re-reviewed during the 8 October documentation reconciliation. Current implementation supports live LOOM EGA and CD/VGA resources, actors, scripts, interaction and audio through edition-specific providers. Current capability and priorities are in [the plan](../CURRENT_WORK.md). The goal is to reuse validated format knowledge while keeping SCUMMexplorer's domain model and UI independent from binary details.
 
 ## Existing explorers and parsers
 
@@ -27,7 +27,7 @@ Third-party research checked 23 September 2026; those external projects were not
 
 ## First parser findings
 
-These findings preserve the early parser research. References below to an index-only preview, missing entry execution, or background cycling describe that earlier stage. The current bounded session and rendering contract are documented in [object states](SCUMM_OBJECT_STATES.md); current priorities are in the [LOOM EGA plan](../LOOM_EGA_PLAN.md).
+These findings preserve the early parser research. References below to an index-only preview, missing entry execution, or background cycling describe that earlier stage. The current bounded session and rendering contract are documented in [object states](SCUMM_OBJECT_STATES.md); current priorities are in the [LOOM EGA plan](../CURRENT_WORK.md).
 
 - The supplied DOS LOOM `00.LFL` and numbered rooms are XOR-FF encoded. Decoding the index yields the `0x0100` old-v3 magic; the old-v3 directory supplies room ordinals and offsets. The room header supplies image width and height at bytes 4-7 and the background offset at byte 10. The background begins with a length and a 16-bit offset for each eight-pixel strip.
 - `LoomEgaRoomDecoder` reads the background strips into indexed pixels. The WPF preview uses the standard DOS EGA palette. The decoder was run against all indexed room files in the supplied LOOM folder; a flat-colour room is valid.

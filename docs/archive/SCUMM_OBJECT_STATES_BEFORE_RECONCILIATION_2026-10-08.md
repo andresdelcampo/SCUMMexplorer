@@ -4,7 +4,7 @@ Snapshot before 8 October reconciliation. Implementation status and interactions
 
 # Old v3 SCUMM room object states
 
-Technical reference. See the [LOOM EGA product plan](../LOOM_EGA_PLAN.md) for current priorities and progress; this document records the rendering and state contract.
+Technical reference. See the [LOOM EGA product plan](../CURRENT_WORK.md) for current priorities and progress; this document records the rendering and state contract.
 
 The object image directory is an asset directory, not an animation or variant table. A correct first-visit room view must use object state produced by the SCUMM interpreter. Geometry or image order cannot establish which images belong to a transition. The explorer now runs a bounded subset of startup, room, and object-verb scripts in a persistent session, with unresolved behavior shown explicitly.
 
