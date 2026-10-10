@@ -155,6 +155,18 @@ if (args.Length > 2 && args[2] == "parcheck") // CutsceneScanCompare <folder> - 
     Console.WriteLine($"{first.Count} groups, {diff.Count} differences");
     return;
 }
+if (args.Length > 2 && args[2] == "setup") // CutsceneScanCompare <folder> - setup <room> <object> <verb>: the planner's derived start and the rooms its headless run entered (any edition)
+{
+    var planner2 = new LoomCdSceneSetupPlanner(game, scan, data);
+    var want = scan.First(t => t.Room == int.Parse(args[3]) && t.ObjectId == int.Parse(args[4]) && t.VerbId == int.Parse(args[5]));
+    var st = planner2.Derive(want);
+    Console.WriteLine($"{LoomCutsceneTitles.Title(want)} | plays={st.Plays} before={st.Before.Count} after={st.After.Count}");
+    foreach (var b in st.Before) Console.WriteLine($"  before: {b.Kind} room {b.Room} object {b.ObjectId} verb {b.VerbId} {b.Reason}");
+    foreach (var b in st.After) Console.WriteLine($"  after: {b.Kind} room {b.Room} object {b.ObjectId} verb {b.VerbId} box {b.Box} {b.Reason}");
+    Console.WriteLine("  " + st.Describe());
+    Console.WriteLine("  rooms: " + string.Join(",", planner2.VisitedRooms(want)));
+    return;
+}
 if (args.Length > 2 && args[2] == "trigger") // CutsceneScanCompare <folder> - trigger <room> <object> <verb hex>: the verb's code and the scripts it starts (literal numbers, depth 3), instructions listed
 {
     int room = int.Parse(args[3]), obj = int.Parse(args[4]), verb = Convert.ToInt32(args[5], 16);
