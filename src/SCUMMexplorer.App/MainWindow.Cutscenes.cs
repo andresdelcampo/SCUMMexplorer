@@ -188,15 +188,17 @@ public partial class MainWindow
     private void StartCdSetupDerivation(GameLibrary game)
     {
         if (!ScannedCutscenes) { _cdSetupPlanner = null; _cdSavedRoomLists = null; return; }
-        // As with the thumbnails, only reopening the last game reuses the saved lists; the Open button derives them again.
-        _cdSavedRoomLists = _roomCardsMayUseCache ? CdRoomScenesCache.Load(game.FolderPath) : null;
+        // The shipped lists of the known disc come first (fingerprint-checked); otherwise, as with the thumbnails, only reopening the last game reuses
+        // the saved lists, and the Open button derives them again.
+        var seed = LoomCdSeed.Load(game);
+        _cdSavedRoomLists = seed?.Rooms ?? (_roomCardsMayUseCache ? CdRoomScenesCache.Load(game.FolderPath) : null);
         var planner = new Lazy<LoomCdSceneSetupPlanner>(() =>
         {
             var data = ScummDataSources.For(game);
             return new LoomCdSceneSetupPlanner(game, LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game), data);
         });
         _cdSetupPlanner = planner;
-        _cdRoomListsDone = false;
+        _cdRoomListsDone = seed is not null;
         _ = Task.Run(() =>
         {
             try
@@ -219,6 +221,8 @@ public partial class MainWindow
                     return;
                 }
                 foreach (var group in groups) planner.Value.Derive(group.First);
+                // The shipped lists already hold the rooms each scene plays out in; only the start setups (for the notes and for playing) are derived.
+                if (seed is not null) return;
                 // Then the rooms each scene plays out in, so the room's own "Play Cutscene" list has them (the EGA list does, through the catalog's membership).
                 if (game.V4Archive is not null) planner.Value.IntroRooms();
                 foreach (var group in groups) planner.Value.VisitedRooms(group.First);

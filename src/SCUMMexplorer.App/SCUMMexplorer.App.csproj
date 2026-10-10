@@ -13,6 +13,7 @@
     <Resource Include="Assets\*.ico" />
     <Resource Include="Assets\scummexplorer-title-v1.png" />
     <EmbeddedResource Include="loom-replays.json" />
+    <EmbeddedResource Include="loom-cd-scenes.json" />
     <ProjectReference Include="..\SCUMMexplorer.Core\SCUMMexplorer.Core.csproj" />
     <Content Include="..\..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\licenses\*" Link="licenses\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />

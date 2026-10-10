@@ -66,6 +66,15 @@ public sealed class ScummV4Archive
 
     public IReadOnlyList<ScummV4Room> Rooms { get; }
 
+    private string? _fingerprint;
+
+    /// <summary>
+    /// SHA-256 of the game data the scene lists depend on (the decoded <c>DISK01.LEC</c> and <c>000.LFL</c>), as one hex string; a shipped list is used only when this
+    /// matches the one it was made from. The disc image's own bytes (a .bin) are not hashed: the files inside are what the scripts come from.
+    /// </summary>
+    public string Fingerprint => _fingerprint ??=
+        Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(_lec)) + "-" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(_index));
+
     /// <summary>The disc image the game was read from (its CD audio track carries the voices), or null for a folder of files.</summary>
     public DiscImage? Disc { get; private init; }
 

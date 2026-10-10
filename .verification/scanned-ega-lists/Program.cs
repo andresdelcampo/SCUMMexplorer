@@ -26,6 +26,18 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 Check((bool)Prop("ScannedCutscenes")! == expectScanned, $"ScannedCutscenes == {expectScanned}");
+                if (args.Length > 2 && args[2] == "cd") // the CD game: the shipped seed is used at once (no waiting), a different disc would not match
+                {
+                    Check((bool)Field("_cdRoomListsDone")!, "room lists are known straight away (shipped seed matched)");
+                    Check(Field("_cdSavedRoomLists") is System.Collections.IDictionary { Count: > 100 }, "the seed's lists are in use");
+                    var cdItems = (System.Collections.IList)Call("RoomCutsceneItems", 1)!;
+                    Check(cdItems.Count > 0 && cdItems[0]!.GetType().GetProperty("Title")!.GetValue(cdItems[0]) as string == "The Intro", $"Room 01 lists The Intro first ({cdItems.Count} entries)");
+                    var cdRoom4 = (System.Collections.IList)Call("RoomCutsceneItems", 4)!;
+                    Check(cdRoom4.Count >= 5, $"Room 04 lists {cdRoom4.Count} entries");
+                    Console.WriteLine(failures == 0 ? "PASS" : $"FAIL ({failures})");
+                    app.Shutdown(failures == 0 ? 0 : 1);
+                    return;
+                }
                 if (expectScanned)
                 {
                     for (var n = 0; n < 600 && !(bool)Field("_cdRoomListsDone")!; n++) await Task.Delay(1000);
