@@ -4,7 +4,7 @@ Updated 10 October 2026. This is the single plan and session handoff. Completed 
 
 ## Status
 
-The approved graphical SCUMMexplorer title is embedded in the app header, cropped and scaled at runtime. [Header preview](../.verification/title-wordmark-20261010/validation.md) confirms the default and minimum window widths.
+The approved graphical SCUMMexplorer title is embedded in the app header, cropped and scaled at runtime, with a 2-pixel downward alignment adjustment. [Header preview](../.verification/title-wordmark-20261010/validation.md) confirms the default and minimum window widths.
 
 The earned lesson routes and English seven-note excursion/Closing chain are complete within their bounded source scope. The user's missing VGA Room 09 actors exposed a gap beyond the earlier actor matrix: direct CD scene starts now share EGA's own-source speaker preparation. See [Room 09 verification](../.verification/room09-speakers-20261009/README.md). Nothing has been pushed.
 

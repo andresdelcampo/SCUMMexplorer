@@ -4,6 +4,8 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 
 ## 10 October: graphical app title
 
+Follow-up: moved the lettering 2 WPF pixels downward for better vertical centering in the header; re-rendered the header and rebuilt the app successfully.
+
 The approved gold/green SCUMMexplorer wordmark replaces the top-left text title. Its original transparent PNG is stored in App/Assets and embedded as a WPF resource; runtime cropping removes empty margins and scales the artwork into a 200 × 42 pixel area with high-quality filtering and an accessible name. Release build passes with no warnings/errors. Actual WPF header captures at 1180 and 900 window widths show readable lettering and working control wrapping. [Preview and validation](../.verification/title-wordmark-20261010/validation.md).
 
 ## 10 October (evening): first-room speed and the K/M findings

@@ -192,7 +192,7 @@
         <Border x:Name="AppHeader" Grid.Row="0" MinHeight="58" Background="#192632" BorderBrush="#334452" BorderThickness="0,0,0,1">
             <Grid Margin="18,0">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Image x:Name="AppTitleImage" Width="200" Height="42" Stretch="Uniform"
+                <Image x:Name="AppTitleImage" Width="200" Height="42" Stretch="Uniform" Margin="0,4,0,0"
                        VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
                        AutomationProperties.Name="SCUMMexplorer">
                     <Image.Source>

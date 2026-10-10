@@ -1,5 +1,7 @@
 # Graphical title, 10 October 2026
 
+Vertical-centering follow-up: a 4-pixel top margin moves the centered lettering down by 2 WPF pixels. The real header was rendered again at both widths and inspected; its size and the wordmark size are unchanged. Release preview rebuild passes with no warnings/errors.
+
 The original 2172 × 724 transparent PNG is embedded as `Assets/scummexplorer-title-v1.png`. The top-left Image uses a CroppedBitmap rectangle `10,150,2152,435` to remove transparent margins at runtime, then fits inside 200 × 42 WPF pixels with HighQuality scaling. Its accessible name is SCUMMexplorer.
 
 The Debug and Release app builds passed with zero warnings/errors. TitlePreview constructs the real App/MainWindow with a private profile, renders the header offscreen at window widths 1180 and 900, and captures welcome/full-control layouts without opening game data. The image resource loads and its rendered size is 200 × 40.43. At normal width the header remains 58 pixels high; at minimum width with every optional control shown, the controls wrap and the header grows to 100.92 pixels. Both captures were inspected and the lettering remains clear, with no clipping or overlap.
