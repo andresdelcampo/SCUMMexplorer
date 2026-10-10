@@ -122,6 +122,39 @@ if (args.Length > 2 && args[2] == "walk") // CutsceneScanCompare <folder> - walk
     }
     return;
 }
+if (args.Length > 2 && args[2] == "bench") // CutsceneScanCompare <folder> - bench: where the time of one headless trial goes (new session, room visit, frames)
+{
+    var bsnap = args.Length > 3 && args[3] == "cd" ? game.V4Archive!.ReadIndexedObjects() : new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var sw = System.Diagnostics.Stopwatch.StartNew();
+    for (var i = 0; i < 5; i++)
+    {
+        sw.Restart();
+        if (args.Length > 3 && args[3] == "noboot") { sw.Restart(); var nb = new LoomExplorationSession(game, bsnap, completeBoot: false); Console.WriteLine($"completeBoot:false session {sw.ElapsedMilliseconds} ms, room {nb.Snapshot.RoomId}"); continue; }
+        var fast = args.Length > 3 && args[3] == "skip";
+        var bs = game.V4Archive is not null ? new LoomExplorationSession(game, bsnap, completeBoot: false)
+            : fast ? new LoomExplorationSession(game, bsnap, stopAtOpening: true) : new LoomExplorationSession(game, bsnap);
+        if (fast) { bs.PressKey(0x1B); for (var k = 0; k < 6000 && bs.BootRunning; k++) bs.AdvanceFrame(); Console.WriteLine($"  booting={bs.BootRunning} room={bs.Snapshot.RoomId}"); }
+        var tNew = sw.ElapsedMilliseconds; sw.Restart();
+        bs.VisitRoom(game.Rooms.First(r => r.ResourceId == (game.V4Archive is not null ? 4 : 2)));
+        var tVisit = sw.ElapsedMilliseconds; sw.Restart();
+        for (var f = 0; f < 300; f++) bs.AdvanceFrame();
+        Console.WriteLine($"new session {tNew} ms, visit room {tVisit} ms, 300 frames {sw.ElapsedMilliseconds} ms");
+    }
+    return;
+}
+if (args.Length > 2 && args[2] == "parcheck") // CutsceneScanCompare <folder> - parcheck [n]: LoomCutsceneRun over the first n groups serially and in parallel; the results must be identical
+{
+    var psnap = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var first = groups.Take(args.Length > 3 ? int.Parse(args[3]) : 40).Select(g => g.First).ToList();
+    string Show(IReadOnlyList<int>? r) => r is null ? "none" : string.Join(",", r);
+    var serial = first.Select(t => Show(LoomCutsceneRun.VisitedRooms(game, psnap, t))).ToList();
+    var parallel = new string[first.Count];
+    System.Threading.Tasks.Parallel.For(0, first.Count, new ParallelOptions { MaxDegreeOfParallelism = 4 }, i => parallel[i] = Show(LoomCutsceneRun.VisitedRooms(game, psnap, first[i])));
+    var diff = Enumerable.Range(0, first.Count).Where(i => serial[i] != parallel[i]).ToList();
+    foreach (var i in diff) Console.WriteLine($"DIFFERS {LoomCutsceneTitles.Title(first[i])}: serial [{serial[i]}] parallel [{parallel[i]}]");
+    Console.WriteLine($"{first.Count} groups, {diff.Count} differences");
+    return;
+}
 if (args.Length > 2 && args[2] == "trigger") // CutsceneScanCompare <folder> - trigger <room> <object> <verb hex>: the verb's code and the scripts it starts (literal numbers, depth 3), instructions listed
 {
     int room = int.Parse(args[3]), obj = int.Parse(args[4]), verb = Convert.ToInt32(args[5], 16);

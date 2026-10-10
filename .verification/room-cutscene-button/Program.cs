@@ -48,6 +48,8 @@ internal static class Program
             Console.WriteLine(failures == 0 ? "PASS" : $"FAIL ({failures})");
             app.Shutdown(failures == 0 ? 0 : 1);
         };
+        // Off-screen and unfocused, so nobody mistakes the harness window for a stray app and closes it mid-run.
+        window.WindowStartupLocation = WindowStartupLocation.Manual; window.Left = -32000; window.Top = -32000; window.ShowInTaskbar = false; window.ShowActivated = false;
         window.Show();
         return app.Run();
     }

@@ -235,6 +235,16 @@ public sealed partial class LoomCdSceneSetupPlanner
 
     private static (int, int, int) Key(LoomCutscene t) => (t.Room, t.ObjectId, t.VerbId);
 
+    /// <summary>
+    /// Records the result of a fresh headless run (<see cref="LoomCutsceneRun"/>) that began the cutscene: no setup is needed, and the rooms it entered are the scene's.
+    /// Saves the planner its own trials (each boots a whole EGA game) for the scenes a fresh start does not begin.
+    /// </summary>
+    public void RecordFreshRun(LoomCutscene t, IReadOnlyList<int> roomsEntered)
+    {
+        _cache[Key(t)] = LoomCdStartSetup.None;
+        _visited[Key(t)] = [t.Room, .. roomsEntered.Where(r => r != t.Room)];
+    }
+
     /// <summary>The derived setup when it has been derived already (so a caller on the UI thread can ask without waiting).</summary>
     public bool TryGet(LoomCutscene t, out LoomCdStartSetup setup) => _cache.TryGetValue(Key(t), out setup!);
 

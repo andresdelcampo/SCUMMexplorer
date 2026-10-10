@@ -168,6 +168,13 @@ public partial class MainWindow
         StatusText.ToolTip = CdIntroNote + Environment.NewLine + string.Join(Environment.NewLine, _session.Snapshot.Uncertainties);
     }
 
+    /// <summary>
+    /// The games whose cutscene lists come from their scripts (<see cref="LoomCutsceneIndex"/>, start setups by <see cref="LoomCdSceneSetupPlanner"/>, rooms by headless
+    /// runs): LOOM CD, and an EGA edition without a validated replay catalog, which would otherwise offer only the four established starts. The reference
+    /// edition keeps its hand-validated catalog.
+    /// </summary>
+    private bool ScannedCutscenes => _game is { Id: GameId.LoomVga } or { Id: GameId.Loom, IsDemo: false, Version: ScummVersion.V3 } && (_game.Id == GameId.LoomVga || _replayCatalog is { Replays.Length: 0 });
+
     private IReadOnlyList<LoomCutsceneGroup>? _cdCutsceneGroups;
     private Lazy<LoomCdSceneSetupPlanner>? _cdSetupPlanner;
     /// <summary>Room lists saved by an earlier run (same build and game data), used until the background runs finish.</summary>
@@ -180,7 +187,7 @@ public partial class MainWindow
     /// </summary>
     private void StartCdSetupDerivation(GameLibrary game)
     {
-        if (game is not { Id: GameId.LoomVga }) { _cdSetupPlanner = null; _cdSavedRoomLists = null; return; }
+        if (!ScannedCutscenes) { _cdSetupPlanner = null; _cdSavedRoomLists = null; return; }
         // As with the thumbnails, only reopening the last game reuses the saved lists; the Open button derives them again.
         _cdSavedRoomLists = _roomCardsMayUseCache ? CdRoomScenesCache.Load(game.FolderPath) : null;
         var planner = new Lazy<LoomCdSceneSetupPlanner>(() =>
@@ -195,9 +202,25 @@ public partial class MainWindow
             try
             {
                 var groups = LoomCutsceneIndex.Group(planner.Value.Triggers);
+                // The EGA game boots in about a second per trial (the CD's session starts past its intro in milliseconds), so one fresh run per scene
+                // settles every scene a fresh start begins, and the room lists are usable as soon as those are done. The planner's long trials for the
+                // scenes a fresh start does not begin follow; until a scene's setup is derived its note says it is still being checked.
+                if (game.V4Archive is null)
+                {
+                    var snapshot = new LflObjectStateReader().ReadSnapshot(System.IO.Path.Combine(game.FolderPath, "00.LFL"));
+                    Parallel.ForEach(groups, new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2) }, group =>
+                    {
+                        if (LoomCutsceneRun.VisitedRooms(game, snapshot, group.First) is { } entered) planner.Value.RecordFreshRun(group.First, entered);
+                    });
+                    CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
+                    Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) { _cdRoomListsDone = true; UpdatePlaybackControls(); } });
+                    foreach (var group in groups) { planner.Value.Derive(group.First); planner.Value.VisitedRooms(group.First); }
+                    CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
+                    return;
+                }
                 foreach (var group in groups) planner.Value.Derive(group.First);
                 // Then the rooms each scene plays out in, so the room's own "Play Cutscene" list has them (the EGA list does, through the catalog's membership).
-                planner.Value.IntroRooms();
+                if (game.V4Archive is not null) planner.Value.IntroRooms();
                 foreach (var group in groups) planner.Value.VisitedRooms(group.First);
                 CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                 Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) { _cdRoomListsDone = true; UpdatePlaybackControls(); } });
@@ -213,8 +236,8 @@ public partial class MainWindow
 
     /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="LoomCutsceneIndex"/>).</summary>
     private IReadOnlyList<LoomCutsceneGroup> CdCutsceneGroups() =>
-        _cdCutsceneGroups ??= _game is { Id: GameId.LoomVga } && _cdData is not null
-            ? LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(_cdData, _game.Rooms.Select(r => r.ResourceId!.Value), LoomCutsceneTitles.Doorways(_game), _game))
+        _cdCutsceneGroups ??= ScannedCutscenes && _game is not null
+            ? LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(_cdData ?? ScummDataSources.For(_game), _game.Rooms.Select(r => r.ResourceId!.Value), LoomCutsceneTitles.Doorways(_game), _game))
             : [];
 
     private string CdCutsceneTitle(LoomCutscene trigger)
@@ -227,14 +250,14 @@ public partial class MainWindow
         var first = group.First;
         var others = group.Others.Count == 0 ? "" : " The same scripts are reached from " + string.Join(", ",
             group.Others.Select(o => $"object {o.ObjectId}{(o.ObjectName.Length > 0 ? $" ({o.ObjectName})" : "")} {o.VerbLabel}")) + ".";
-        return $"Found in the CD scripts: {first.Room.ToString("00")} · {(first.IsRoomEntry ? "the room's entry script" : $"object {first.ObjectId}'s {first.VerbLabel}")} " +
+        return $"Found in the {(_game?.Id == GameId.LoomVga ? "CD" : "game's")} scripts: {first.Room.ToString("00")} · {(first.IsRoomEntry ? "the room's entry script" : $"object {first.ObjectId}'s {first.VerbLabel}")} " +
                $"reaches {string.Join(", ", first.Scripts)} (a cutscene ... endCutscene span of {first.SpanInstructions} instructions, {first.Texts} printed line(s), {first.RoomLoads} room load(s)). " +
                "A branch can keep part of it from running, so the lines and loads are possible, not certain." + others + " " +
                CdSetupNote(first) +
                "Stated start: the running exploration session (state kept, a fresh post-boot session if none), the room opened from the catalog (Bobbin's arrival is assumed), " +
                (first.IsRoomEntry ? "then the room's entry script plays on the clock. " :
                 $"then the object's verb 0x{first.VerbId:X2} run directly: an exploration action, not the game's click (Bobbin does not walk there, the object may be untouchable in this state, and a draft response does not simulate casting the draft). ") +
-               "The frames play on the playback clock at the game's frame rate; voices play from the disc as a click's would.";
+               "The frames play on the playback clock at the game's frame rate" + (_game?.Id == GameId.LoomVga ? "; voices play from the disc as a click's would." : ".");
     }
 
     private List<(string Id, CutscenePickerItem Item)> CdCutsceneItems(int? room = null) =>
@@ -257,18 +280,21 @@ public partial class MainWindow
     private void PlayCdCutscene(LoomCutsceneGroup group)
     {
         var trigger = group.First;
-        if (_game is not { Id: GameId.LoomVga, V4Archive: { } vga } || !CanStartCutscene ||
+        if (!ScannedCutscenes || _game is null || !CanStartCutscene ||
             _game.Rooms.FirstOrDefault(item => item.ResourceId == trigger.Room) is not { } room) return;
+        var vga = _game.V4Archive;
         StopScenePlayback();
         _cdVoice.Stop();
         // Single scenes keep the running story/status, including later actor and staff state.
         // Only missing source prerequisites run unseen; explicit sequences/restart own their fresh starts.
         var setup = _cdSetupPlanner?.Value.Derive(trigger) ?? LoomCdStartSetup.None;
-        var session = _session is { BootRunning: false } ? _session : _session = new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false);
+        var session = _session is { BootRunning: false } ? _session
+            : _session = vga is not null ? new LoomExplorationSession(_game, vga.ReadIndexedObjects(), completeBoot: false)
+            : new LoomExplorationSession(_game, _indexedObjectSnapshot!, soundCard: SoundCard);
         setup = LoomCdSceneSetupPlanner.Adapt(setup, session);
         var useSetup = setup is { Plays: true, HasSteps: true };
         if (useSetup) LoomCdSceneSetupPlanner.ApplyBefore(session, _game, setup.Before);
-        _cdVoice.Attach(vga.Disc, session);
+        if (vga is not null) _cdVoice.Attach(vga.Disc, session);
         var before = (session.CutscenesBegun, session.EgoPuts);
         session.VisitRoom(room);
         if (useSetup) LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
@@ -298,6 +324,7 @@ public partial class MainWindow
     private List<(string Id, CutscenePickerItem Item)> PlayableCutsceneItems(ISet<string>? onlyIds = null)
     {
         if (_game is { Id: GameId.LoomVga }) return [("cd-intro", CdIntroItem()), .. CdCutsceneItems()];
+        var scanned = ScannedCutscenes && onlyIds is null ? CdCutsceneItems() : [];
         // A demo has no catalog of scenes: the full game's replays name its rooms, objects and scripts.
         if (_game is { IsDemo: true }) return [("demo-preview", DemoPreviewItem())];
         var items = new List<(string, CutscenePickerItem)>();
@@ -305,16 +332,17 @@ public partial class MainWindow
             items.Add(("opening", new(OpeningTitle, "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening)));
         foreach (var scene in AllCutscenes().Where(scene => onlyIds is null || onlyIds.Contains(scene.Id)))
             items.Add((scene.Id, new(PickerVerbTitle(scene.Title, scene.ObjectId == 0 ? 0 : scene.VerbId), scene.Category, scene.Source + " " + CutsceneStartNote(scene), () => PlayKnownCutscene(scene))));
+        items.AddRange(scanned.Select(choice => (choice.Id, choice.Item)));
         return items;
     }
 
     private List<CutscenePickerItem> RoomCutsceneItems(int roomId)
     {
         if (_game is { IsDemo: true }) return roomId == 1 ? [DemoPreviewItem()] : [];
-        if (_game is { Id: GameId.LoomVga })
+        if (ScannedCutscenes)
         {
             var items = CdCutsceneItems(roomId).Select(choice => choice.Item).ToList();
-            if (CdIntroPlaysIn(roomId)) items.Insert(0, CdIntroItem());
+            if (_game?.Id == GameId.LoomVga && CdIntroPlaysIn(roomId)) items.Insert(0, CdIntroItem());
             return items;
         }
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();

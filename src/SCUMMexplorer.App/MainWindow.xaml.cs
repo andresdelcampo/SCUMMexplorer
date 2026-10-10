@@ -3955,10 +3955,10 @@ public partial class MainWindow : Window
         CutsceneMenuButton.IsEnabled = active && CanStartCutscene;
         var roomChoices = _currentRoomResource?.ResourceId is int shownRoom ? RoomCutsceneItems(shownRoom) : [];
         // Until the background runs have listed the scenes that play out in rooms, a first launch shows the button disabled (nothing is known yet).
-        var listing = _game is { Id: GameId.LoomVga } && !_cdRoomListsDone && _cdSavedRoomLists is null && roomChoices.Count == 0;
+        var listing = ScannedCutscenes && !_cdRoomListsDone && _cdSavedRoomLists is null && roomChoices.Count == 0;
         RoomCutsceneButton.Visibility = active && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.IsEnabled = active && CanStartCutscene && !listing;
-        var computing = _game is { Id: GameId.LoomVga } && !_cdRoomListsDone && _cdSavedRoomLists is null;
+        var computing = ScannedCutscenes && !_cdRoomListsDone && _cdSavedRoomLists is null;
         CutsceneScanNote.Visibility = active && computing ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.Content = ButtonWithSpinner(roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴", computing);
         RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)." : !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
