@@ -14,9 +14,8 @@ SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Pick any
   - Italian
   - the short and the long self-running demo
 - **LOOM** (CD, VGA, English), from a folder, a `.cue`/`.bin` or an `.iso`, with the voices and music from the disc
-- **Indiana Jones and the Last Crusade** (EGA, DOS): room art and texts, including the dialogue choices
 
-Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing.
+Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. Other classic SCUMM games of the same generation open in a limited way: you get their room pictures and their texts.
 
 ## Getting started
 
@@ -48,7 +47,6 @@ Switch **Advanced** on, and the explorer opens up. Everything here reads from th
 - **Restart the story** from the very beginning in one click.
 - **A sound player for every sound.** Play any music or effect on demand, with an AdLib level slider and the room's music cues. On the CD edition, browse every voice and music track on the disc.
 - **Game Status in depth.** The raw story bits, where each value comes from, and every draft with its notes, flags and reversing.
-- **Indiana Jones conversation maps.** A tool turns the decoded dialogue menus into a branching map with the room backgrounds.
 
 ## Roland MT-32 music (optional)
 

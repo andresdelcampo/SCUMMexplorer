@@ -984,7 +984,7 @@ public partial class MainWindow : Window
         StatusText.ToolTip = resource.FilePath;
 
         var isCd = _game is { Id: GameId.LoomVga, V4Archive: not null };
-        if (!isCd && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 } ||
+        if (!isCd && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 or GameId.Unknown } ||
             !_roomDecoder.CanDecode(resource.FilePath, 3)))
         {
             PreviewDescription.Text = "This room format is not supported yet.";
@@ -1007,7 +1007,7 @@ public partial class MainWindow : Window
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
             _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
-            if (_game?.Id is GameId.IndianaJones3 || isCd && cdRoom is null)
+            if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
             {
                 if (token.IsCancellationRequested) return;
                 _currentRoom = room;

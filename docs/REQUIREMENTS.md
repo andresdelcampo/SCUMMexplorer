@@ -37,7 +37,7 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 |---|---|---|---|
 | R-1.1 | APP | The app is an audio-visual, interactive **explorer**, not a technical SCUMM viewer: users walk through rooms, trigger cutscenes, change objects and discover secrets. Technical evidence exists, but only behind **Advanced**. | Rule |
 | R-1.2 | APP | Game data is never shipped or committed. The user opens a folder (or disc image) they own. `Games/` and `Games/mt32` stay out of git. | Rule |
-| R-1.3 | LOOM | Reference quality is **LOOM EGA (DOS)**. LOOM CD/VGA has live interaction, actors, scripts, scene playback, Game Status and CD audio. Indy3 EGA is limited to backgrounds and texts, including dialogue choices. | Rule |
+| R-1.3 | LOOM | Reference quality is **LOOM EGA (DOS)**. LOOM CD/VGA has live interaction, actors, scripts, scene playback, Game Status and CD audio. Indy3 EGA (not part of the first LOOM release's claims, README omits it) is limited to backgrounds and texts, including dialogue choices. | Rule |
 | R-1.4 | APP | **Rooms show no gaps and show their first-visit state.** Where the data does not decide, pick at random and label the pick. Implementation: LOOM today (first-visit state from the room entry scripts and the session). | Rule |
 | R-1.5 | APP | **Objects respond as in the game, with the game's hero on screen** (28 Sep). Single click walks the hero to the object and uses it (exits lead on). Double click also looks at it (the description). Implementation: LOOM, Bobbin, input scripts 005–007, use verb 0x38, look verb 0x36; another game supplies its own verbs and input script. Cycling an object's stored images belongs only to the inspection mode, and the mode's text says so. There is no hidden modifier gesture (no Alt+click). Hiding an object is allowed only if the background behind it has no gap. | Rule |
 | R-1.6 | APP | **Room hotspots navigate between rooms.** Implementation: LOOM doorways from source responses (R-7.2). | Rule |
@@ -70,6 +70,7 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 | LOOM demos (short, long) | LOOM demo | ✔ | first-visit, objects, actors | ✔ | ✔ (full-game names not applied) | only **The preview** | ✔ | ✔ | as EGA |
 | LOOM CD/VGA en (`.cue`/`.bin`/`.iso`, folder, or copied files) | LOOM CD | ✔ | first-visit, objects, actors | ✔ | ✔ | derived from scripts | ✔ (Advanced) | ✔ | CD Audio / No Sound |
 | Indy3 EGA en | INDY3 EGA | ✔ | backgrounds only (R-6.12) | – | not shown in tree | – | ✔ incl. dialogue choices | – | – |
+| Any other old-v3 game whose `00.LFL` parses (not recognised; folder name as title) | SCUMM v3 | ✔ limited | backgrounds only (as Indy3) | – | not shown in tree | – | ✔ (LOOM script dialect; a game with other opcodes may read wrongly) | – | – |
 
 Every ✔ in *Rooms* means the same thing: no gaps, first-visit state, objects and actors drawn by the shared engine code. The reference edition differs only in having a **replay catalog** (cutscene picker column), which is data, not room rendering.
 

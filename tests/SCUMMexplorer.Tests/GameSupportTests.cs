@@ -21,6 +21,11 @@ public class GameSupportTests
         Assert.True(indy.Rooms && indy.Texts);
         Assert.False(indy.LiveSession || indy.Cutscenes || indy.Status || indy.Audio);
 
+        // Any other old-v3 game whose index parsed gets the same limited look: room pictures and texts.
+        var otherV3 = GameSupport.For(Game(GameId.Unknown, ScummVersion.V3));
+        Assert.True(otherV3.Rooms && otherV3.Texts);
+        Assert.False(otherV3.LiveSession || otherV3.Cutscenes || otherV3.Status || otherV3.Audio || otherV3.Scripts);
+
         var unknown = GameSupport.For(Game(GameId.Unknown, ScummVersion.Unknown));
         Assert.False(unknown.Rooms);
         Assert.Contains("not supported", unknown.Subtitle);

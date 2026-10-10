@@ -19,6 +19,9 @@ public sealed record GameSupport(bool Rooms, bool LiveSession, bool Scripts, boo
             "Explore rooms, objects, and sounds.", "Pick a room to explore the game from there."),
         (GameId.IndianaJones3, ScummVersion.V3) => new(true, false, false, false, true, false, false,
             "Room backgrounds and texts from the game.", "Select a room to see its background."),
+        // Any other game with an old-v3 index that parsed (Zak McKracken EGA and the like): the room pictures and the texts need nothing game-specific. Limited on purpose.
+        (GameId.Unknown, ScummVersion.V3) => new(true, false, false, false, true, false, false,
+            "Room backgrounds and texts from the game.", "Select a room to see its background."),
         _ => new(false, false, false, false, false, false, false, Unsupported, UnsupportedPreview)
     };
 }
