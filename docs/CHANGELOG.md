@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 10 October (night): script-derived cutscene lists for every edition, CD seed, small fixes
+
+- **Scan aligned with the EGA catalog** (`.verification/cutscene-scan-ega`, R-8.10/8.23): loads after a span, scripts started from inside a span, literal load targets in titles ("Reached Room N" for unnamed plain verbs) and silent Use scenes; title+category identical for 217 of 328 replays (187 before). `LoomCutsceneRun` (a fresh headless run per trigger, 271 s for all 328) agrees with the catalog's category for 320 of 328; the 8 left are hand-labelled scenes that stay in their room. The 42 scan-only groups were all run: 23 play fresh, 19 need story state; `LoomCdSceneSetupPlanner` derives a start for 17 of those on EGA data (Room 34's entry is the known untriggable scene).
+- **Editions without a validated catalog use the scan** (R-8.24, `ScannedCutscenes`): picker, room lists and Play via the CD's path; one fresh run per scene in parallel settles the room lists (about 8 minutes on a first launch, Spanish edition PASS in `.verification/scanned-ega-lists`), the planner's trials follow. The reference edition keeps its catalog, which stays until the scan agrees with it.
+- **CD seed** (R-8.25, `.verification/cd-seed`, `loom-cd-scenes.json`): the rooms each scene plays out in, fingerprint-checked (`ScummV4Archive.Fingerprint`); a first launch has the lists at once. Categories stay on the static rule (the run disagrees for 19 scenes).
+- **Smaller:** Left/Right pan the room from anywhere (R-6.1); Game Texts for LOOM CD (R-11.1, 1,196 entries); CD `Play Cutscene` shows a turning arc and an explanatory line while the scan runs; E-1 harness (`room-cutscene-button`) and E-5 test (`ReplayCatalogReachabilityTests`). The difficulty click in Room 69 starts no sound in the data (nothing to fix).
+
 ## 10 October: graphical app title
 
 Follow-up: moved the lettering 2 WPF pixels downward for better vertical centering in the header; re-rendered the header and rebuilt the app successfully.

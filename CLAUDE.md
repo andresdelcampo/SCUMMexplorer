@@ -26,19 +26,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 
 ## Requirements and scope tags
 
-`docs/REQUIREMENTS.md` is the list of what the app must do; `docs/REQUIREMENTS_FINDINGS.md` holds the problems and ideas found while writing it. Every requirement carries a scope tag, and the tag says where its code belongs. Choose the folder by the tag, from the lowest layer that is true:
-
-| Tag | Reach | Code home |
-|---|---|---|
-| `SCUMM` | any SCUMM game and version | `Core/Scumm/` |
-| `SCUMM v3` / `SCUMM v4` | old-v3 (LFL files) / v4 (`DISK01.LEC`) only | `Core/Scumm/V3/` / `V4/` |
-| `LOOM` | both LOOM editions | `Core/Loom/` (`Session`, `Text`, `Scenes`, `Relationships`) |
-| `LOOM EGA` / `LOOM CD` | one edition | `Core/Loom/Ega/` or v3 data / `Core/Loom/Cd/` |
-| `LOOM EGA ref` | the English Roland reference edition only | catalog data + App |
-| `LOOM demo`, `INDY3 EGA` | demos / Indy3 | `Core/Loom/Ega/` + App / `Core/Scumm/` dialect `V3Indy3` |
-| `APP` | the WPF shell, whichever game is open | `src/SCUMMexplorer.App` |
-
-**Normal vs Advanced (R-1.13):** Normal mode is strictly exploratory and playful and never shows status, validation or evidence information (no "needs validation", no "not yet playable"). All of that belongs in Advanced only.
+`docs/REQUIREMENTS.md` is the list of what the app must do (scope tags, code homes, the Normal vs Advanced rule and the requirement-vs-implementation rule are defined there, in section 0); `docs/REQUIREMENTS_FINDINGS.md` holds the problems and ideas found while writing it. Keep requirement rules in that document, not here. A requirement's tag states how wide the requirement is; put the code in the lowest layer that is true for the code.
 
 ## Build and test
 

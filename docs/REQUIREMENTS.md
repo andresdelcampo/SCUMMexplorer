@@ -1,10 +1,10 @@
 # SCUMMexplorer requirements
 
-Drafted 10 October 2026 from `CLAUDE.md`, `README.md`, `docs/` and the source under `src/` (read, not run: no build, test or app run was done for this draft). Problems found on the way are **not** mixed in here; they are in [REQUIREMENTS_FINDINGS.md](REQUIREMENTS_FINDINGS.md).
+Drafted 10 October 2026 from the project notes, `README.md`, `docs/` and the source under `src/` (read, not run: no build, test or app run was done for this draft). Problems found on the way are **not** mixed in here; they are in [REQUIREMENTS_FINDINGS.md](REQUIREMENTS_FINDINGS.md).
 
 ## 0. How to read this document
 
-**Scope tags.** Every requirement carries one tag that says how widely it holds and therefore where its code belongs (the layering rule in `CLAUDE.md`: put code in the lowest layer that is true for it).
+**Scope tags.** Every requirement carries one tag that says how widely it holds and therefore where its code belongs (layering rule: put code in the lowest layer that is true for it; `Scumm` cannot see `Loom`, and `Domain`/`Discovery` are shared by both).
 
 | Tag | Meaning | Code home |
 |---|---|---|
@@ -21,6 +21,10 @@ Drafted 10 October 2026 from `CLAUDE.md`, `README.md`, `docs/` and the source un
 
 A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`: the tag states the *intended* reach.
 
+**Requirement vs implementation.** The tag belongs to the *requirement*, not to the code that happens to meet it today. A requirement that should hold for every game (or for the whole app) keeps the wide tag even when today's implementation is LOOM-specific or needs per-game or per-version data; such a row names the implementation after `Implementation:` and may say what another game would have to supply. Only a requirement that is true of one game or edition by nature carries a narrow tag.
+
+**Normal vs Advanced** is the product's central display rule (R-1.13): Normal mode is strictly exploratory and playful and never shows status, validation or evidence information; all of that belongs in Advanced only.
+
 **Basis column.** `Rule` = a product rule the user decided (with date where the docs give one); `Code` = behaviour implemented today and worth keeping, taken from the source (file named); `Doc` = taken from a reference document; `Target` = stated by docs or code comments as intent but not fully met today (see the findings).
 
 **Words that are normative.** *Must* = required. *Should* = wanted, may be partial. Exact on-screen strings are in `code font`.
@@ -31,14 +35,14 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-1.1 | APP | The app is an audio-visual, interactive **explorer**, not a technical SCUMM viewer: users walk through rooms, trigger cutscenes, change objects and discover secrets. Technical evidence exists, but only behind **Advanced**. | Rule (CLAUDE.md) |
+| R-1.1 | APP | The app is an audio-visual, interactive **explorer**, not a technical SCUMM viewer: users walk through rooms, trigger cutscenes, change objects and discover secrets. Technical evidence exists, but only behind **Advanced**. | Rule |
 | R-1.2 | APP | Game data is never shipped or committed. The user opens a folder (or disc image) they own. `Games/` and `Games/mt32` stay out of git. | Rule |
 | R-1.3 | LOOM | Reference quality is **LOOM EGA (DOS)**. LOOM CD/VGA has live interaction, actors, scripts, scene playback, Game Status and CD audio. Indy3 EGA is limited to backgrounds and texts, including dialogue choices. | Rule |
-| R-1.4 | LOOM | **Rooms show no gaps and show their first-visit state.** Where the data does not decide, pick at random and label the pick. | Rule |
-| R-1.5 | LOOM | **Objects respond as in the game, with Bobbin on screen** (28 Sep). Single click walks Bobbin to the object and uses it (scripts 005–007, verb 0x38; exits lead on). Double click also looks at it (verb 0x36, the description). Cycling an object's stored images belongs only to the inspection mode, and the mode's text says so. There is no hidden modifier gesture (no Alt+click). Hiding an object is allowed only if the background behind it has no gap. | Rule |
-| R-1.6 | LOOM | **Room hotspots navigate between rooms.** | Rule |
-| R-1.7 | LOOM | Rooms begin in their earliest state; the running session carries changes caused by real scenes. A scene adds only its minimum prerequisites and preserves later state. Single picks keep the session; explicit sequences start fresh; Restart returns to boot. | Rule (CURRENT_WORK) |
-| R-1.8 | LOOM | **Game Status is under the user's control**; the app never silently edits it as a shortcut. The approved exception (8 Oct) is reviewed *actual source* prerequisites run for a late-room catalog start (English Room 46 recipe); it is not generalised by guessing story bits. | Rule |
+| R-1.4 | APP | **Rooms show no gaps and show their first-visit state.** Where the data does not decide, pick at random and label the pick. Implementation: LOOM today (first-visit state from the room entry scripts and the session). | Rule |
+| R-1.5 | APP | **Objects respond as in the game, with the game's hero on screen** (28 Sep). Single click walks the hero to the object and uses it (exits lead on). Double click also looks at it (the description). Implementation: LOOM, Bobbin, input scripts 005–007, use verb 0x38, look verb 0x36; another game supplies its own verbs and input script. Cycling an object's stored images belongs only to the inspection mode, and the mode's text says so. There is no hidden modifier gesture (no Alt+click). Hiding an object is allowed only if the background behind it has no gap. | Rule |
+| R-1.6 | APP | **Room hotspots navigate between rooms.** Implementation: LOOM doorways from source responses (R-7.2). | Rule |
+| R-1.7 | APP | Rooms begin in their earliest state; the running session carries changes caused by real scenes. A scene adds only its minimum prerequisites and preserves later state. Single picks keep the session; explicit sequences start fresh; Restart returns to boot. Implementation: `LoomExplorationSession`. | Rule |
+| R-1.8 | APP | **Game state shown to the user (for LOOM, Game Status) is under the user's control**; the app never silently edits it as a shortcut. The approved exception (8 Oct) is reviewed *actual source* prerequisites run for a late-room catalog start (English Room 46 recipe); it is not generalised by guessing story bits. | Rule |
 | R-1.9 | SCUMM | **No room-specific engine or renderer hacks, no invented states, no forced costumes/flags/boxes, no one-off teleports.** Actor look, placement and scene starts come from the edition's own scripts. | Rule |
 | R-1.10 | APP | **Normal mode** shows artwork, game text and concise controls. Technical details belong in Advanced. Preserve edition differences, palettes and verified source glitches. Window subtitles stay short. See R-1.13 for the intent behind the two modes. | Rule |
 | R-1.11 | APP | **Estimates never change gameplay.** Where the app must assume (a click point, a random pick, a skill answer), the assumption is labelled and does not alter game state. | Rule |
@@ -51,33 +55,35 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 |---|---|---|---|
 | R-2.1 | SCUMM | Every exit, action, state change, cue, scene or secret is tied to a resource, script and instruction (`Script 85 +0x05A8`-style offsets, `Room 34 local script 202`, `Room 36 object 600 verb 0x38`). | Rule |
 | R-2.2 | SCUMM | A decoded branch or room load is a **possible** outcome; calling a verb directly is an **exploration action**; a partial session is a **state preview**; estimates are labelled **estimate**. These exact words are used in notes and tooltips. | Rule |
-| R-2.3 | LOOM | Glossary names always carry one evidence level: `decoded` (read from instructions or game data), `engine` (ScummVM behaviour), `reading` (interpretation, not verified in a run), `play` (seen in play). A name never exists without one. Unnamed things keep their raw form (`var[0x0D1]`), never a guess. | Code (LoomGlossary) |
+| R-2.3 | SCUMM | Glossary names always carry one evidence level: `decoded` (read from instructions or game data), `engine` (ScummVM behaviour), `reading` (interpretation, not verified in a run), `play` (seen in play). A name never exists without one. Unnamed things keep their raw form (`var[0x0D1]`), never a guess. | Code (LoomGlossary) |
 | R-2.4 | APP | Source execution, prepared Explorer/Core/WPF checks and original-game observation are distinct evidence; a scene completing does not prove correct actors, prerequisites, event delivery or timing. | Rule |
-| R-2.5 | LOOM | Names already judged unreliable stay out: **sounds are plain `Sound NN`** in the tree (4 Oct). Uncertain names stay uncertain (Shaping's canonical label, the reverse of Silence, unidentified story roles). | Rule |
+| R-2.5 | SCUMM | Names already judged unreliable stay out: **sounds are plain `Sound NN`** in the tree (4 Oct). Uncertain names stay uncertain (Shaping's canonical label, the reverse of Silence, unidentified story roles). | Rule |
 
 ## 3. Games and editions
 
 ### 3.1 Support matrix
 
-| Game / edition | Tag | Opens | Rooms | Live session | Scripts (Raw/Readable) | Cutscene picker | Game Texts | Game Status | Audio |
+| Game / edition | Tag | Opens | Rooms (R-1.4) | Live session | Scripts (Raw/Readable) | Cutscene picker | Game Texts | Game Status | Audio |
 |---|---|---|---|---|---|---|---|---|---|
 | LOOM EGA en, Roland (reference) | LOOM EGA ref | ✔ | first-visit, objects, actors | ✔ | ✔ | full catalog (328 replays) | ✔ | ✔ | AdLib, PC Speaker, Roland MT-32 |
-| LOOM EGA other editions (Spanish, plain English, French, German, v1.2; Italian unreviewed) | LOOM EGA | ✔ | no gaps | ✔ | ✔ | four established starts only | ✔ | ✔ | AdLib, PC Speaker; Roland only with files 82–85 |
-| LOOM demos (short, long) | LOOM demo | ✔ | ✔ | ✔ | ✔ (full-game names not applied) | only **The preview** | ✔ | ✔ | as EGA |
-| LOOM CD/VGA en (`.cue`/`.bin`/`.iso`, folder, or copied files) | LOOM CD | ✔ | ✔ | ✔ | ✔ | derived from scripts | ✔ (Advanced) | ✔ | CD Audio / No Sound |
-| Indy3 EGA en | INDY3 EGA | ✔ | backgrounds | – | not shown in tree | – | ✔ incl. dialogue choices | – | – |
+| LOOM EGA other editions (Spanish, plain English, French, German, v1.2; Italian unreviewed) | LOOM EGA | ✔ | first-visit, objects, actors (same code; no gaps checked, first-visit per edition not recorded: I-07) | ✔ | ✔ | four established starts only | ✔ | ✔ | AdLib, PC Speaker; Roland only with files 82–85 |
+| LOOM demos (short, long) | LOOM demo | ✔ | first-visit, objects, actors | ✔ | ✔ (full-game names not applied) | only **The preview** | ✔ | ✔ | as EGA |
+| LOOM CD/VGA en (`.cue`/`.bin`/`.iso`, folder, or copied files) | LOOM CD | ✔ | first-visit, objects, actors | ✔ | ✔ | derived from scripts | ✔ (Advanced) | ✔ | CD Audio / No Sound |
+| Indy3 EGA en | INDY3 EGA | ✔ | backgrounds only (R-6.12) | – | not shown in tree | – | ✔ incl. dialogue choices | – | – |
+
+Every ✔ in *Rooms* means the same thing: no gaps, first-visit state, objects and actors drawn by the shared engine code. The reference edition differs only in having a **replay catalog** (cutscene picker column), which is data, not room rendering.
 
 ### 3.2 Detection and opening
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
 | R-3.1 | SCUMM v3 | A folder is identified from files: `LOOM.EXE` or `LOOMDEMO.EXE` → LOOM (demo flagged by the latter); `INDY3.EXE` → Indy3; otherwise untitled by folder name. SCUMM v3 is confirmed only when `00.LFL` parses. If it does not parse, the version is `Unknown`, rooms are not claimed, and the note says so. | Code (GameFolderScanner) |
-| R-3.2 | SCUMM v4 | The CD game opens from a `.cue`, `.iso`, `.bin`, a folder holding one, or a folder with `000.LFL` + `DISK01.LEC`. Title is `LOOM (CD)`, platform `CD (VGA)`. | Code |
+| R-3.2 | SCUMM v4 | The CD game opens from a `.cue`, `.iso`, `.bin`, a folder holding one, or a folder with `000.LFL` + `DISK01.LEC`. The title is the game's name with the edition mark (for LOOM CD: `LOOM (CD)`), platform `CD (VGA)`. | Code |
 | R-3.3 | LOOM demo | A demo's `00.LFL` is not a subset of the game's: entries pointing at missing containers, at non-resource offsets or at unreadable resources are dropped, and the dropped count is stated in the detection note. Title `LOOM (demo)`. Full-game script/bit/actor/sound names are **not** applied to a demo; variables and rooms are. | Code |
 | R-3.4 | APP | The app reopens the last game folder at start (`last-folder` file under `%LOCALAPPDATA%\SCUMMexplorer`). A missing folder yields `Last game folder is unavailable. Choose a folder to open.` and no crash. Only reopening the last game may reuse saved room thumbnails; the **Open Game Folder** button rebuilds them. | Code |
 | R-3.5 | APP | Opening another game stops playback, sound and CD voice, replaces the session and rebuilds the catalog; nothing from the previous game leaks. | Code |
 | R-3.6 | SCUMM | One engine entry maps game → variant: `ScummProfile.For(game)` gives script dialect (`V3`, `V3Indy3`, `V4`), walking style and archive kind. Code that needs scripts, objects or costumes takes `IScummDataSource` (`ScummDataSources.For(game)`), and never branches on the game. | Rule/Code |
-| R-3.7 | SCUMM v3 | Indy3 EGA (non-Mac) uses dialect `V3Indy3`: `0xAE` wait has no subopcode; `0x3B/0xBB` waitForActor takes a byte parameter (LOOM: no-op, no operands); `getActorX/Y` take a byte parameter. | Doc (CLAUDE.md) |
+| R-3.7 | SCUMM v3 | Indy3 EGA (non-Mac) uses dialect `V3Indy3`: `0xAE` wait has no subopcode; `0x3B/0xBB` waitForActor takes a byte parameter (LOOM: no-op, no operands); `getActorX/Y` take a byte parameter. | Doc |
 | R-3.8 | SCUMM v4 | Dialect `V4` uses the v5 operand forms: roomOps sub-opcode first, line-height print operand, charset cursor command, opcodes 0x30, 0x3B, 0x4C differ. | Code |
 
 ### 3.3 What is shared and what is not
@@ -110,7 +116,7 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 |---|---|---|---|
 | R-5.1 | SCUMM | One card per room, 96×42.7 px, wrapped in the order of the index. A card shows the room's **first-visit** thumbnail; until it loads, the placeholder is the room number as `NN` (two digits, grey). Tooltip `Room NN · loading preview`. Automation name `Open room NN`. | Code |
 | R-5.2 | SCUMM | The selected/last-viewed room's card has the accent border (`#B78442`). Thumbnails are produced off the UI thread, one at a time, cancellable, and cached per game folder. A failed room shows a failure card with the reason, not a blank. | Code |
-| R-5.3 | LOOM CD | A room thumbnail is the room's entry script run in a fresh session; if that cannot run, the plain background. | Code |
+| R-5.3 | SCUMM | A room thumbnail is the room's entry script run in a fresh session; if that cannot run, the plain background. | Code |
 | R-5.4 | SCUMM | Costume cards: 96×94, thumbnail 80×62 of the best pose, caption `NNN` (three digits), tooltip is the costume name and detail. | Code |
 
 ### 5.2 Resource tree (Advanced)
@@ -142,25 +148,25 @@ Top level order and header format are exact: **label, two spaces, count in paren
 | R-6.2 | SCUMM | Layers, bottom to top: room picture, actors, navigation overlay (doorways), walk-box overlay, hotspot highlight, message text. Overlays never take clicks except the picture. | Code |
 | R-6.3 | SCUMM v3 | Old-v3 rooms are XOR 0xFF encoded; the object directory starts at byte 29; room-local script ids are ≥ the global script count declared in `00.LFL`. | Doc |
 | R-6.4 | SCUMM | **Paint order**: a room redraw paints active objects in reverse directory order (first entry ends on top); `drawObject` queues; queued objects paint on top in call order; `setState` marks the area dirty and clears the queue. Close-up faces (LOOM rooms 56, 58, 86 …) have colour-0 cut-outs that eye/mouth images fill. | Doc (ScummVM-checked) |
-| R-6.5 | LOOM | The Options expander (collapsed by default) holds: `Original framing`; `Doorways` `Never / On hover / Always`; `Object hotspots` `Never / On hover / Always`; and, Advanced only, `Show depth areas` and `Show walk boxes`. | Code |
-| R-6.6 | LOOM | Under the room: the **verb strip** (the game's own bottom verb screen, rendered from the game's verbs; hover tooltip is Advanced only) and a full-screen button. Below that, a one-row control bar: group 1 `⏸ Pause` (`▶` when paused), `Step ▸` (Advanced), `⏭ Skip (Esc)`, `Skip line`; group 2 `Play Cutscene` (shown when the room has any), `Interact ▴`, `Sounds ▴` (CD, when the room has cues and voices are on). | Code |
-| R-6.7 | LOOM | Mode switch **Interactive** (default on, right panel): on, clicks and keys go to the game; off (inspection), a click cycles an object's stored images and no script runs. The tooltip lists the keys: `q w e r t y u i` and `c d e f g a b C` play the distaff's notes, `.` skips the text, Esc skips a cutscene, Space pauses. | Code |
-| R-6.8 | LOOM | The hint line under the scene (`ObjectsNote`) is shown only in inspection mode (and Advanced); the game's own screen needs none. | Code |
-| R-6.9 | LOOM | Right-click or **Interact ▴** on an object opens a menu of the object's actual verbs, labelled by `LoomVerbNames`; choosing one is an *exploration action* and says so. | Code |
-| R-6.10 | LOOM | Session bar text, Advanced only in inspection mode; busy badge (`BusyBadge`) with wait cursor while the app does blocking work such as opening a scene or preparing music. | Code |
-| R-6.11 | LOOM | The right panel (Advanced) sections, in order: `DOORWAYS`, `HOTSPOTS`, `ACTIONS`, object preview + description, `Room entry` (summary, event buttons, `Raw disassembly`), `Last action` (summary, timeline, issues, `Raw trace`), `Assumptions` (`No assumptions` or `Assumptions · N`). | Code |
+| R-6.5 | APP | The Options expander (collapsed by default) holds: `Original framing`; `Doorways` `Never / On hover / Always`; `Object hotspots` `Never / On hover / Always`; and, Advanced only, `Show depth areas` and `Show walk boxes`. | Code |
+| R-6.6 | SCUMM | Under the room: the **verb strip** (the game's own bottom verb screen, rendered from the game's verbs; hover tooltip is Advanced only) and a full-screen button. Below that, a one-row control bar: group 1 `⏸ Pause` (`▶` when paused), `Step ▸` (Advanced), `⏭ Skip (Esc)`, `Skip line`; group 2 `Play Cutscene` (shown when the room has any), `Interact ▴`, `Sounds ▴` (CD, when the room has cues and voices are on). | Code |
+| R-6.7 | SCUMM | Mode switch **Interactive** (default on, right panel): on, clicks and keys go to the game; off (inspection), a click cycles an object's stored images and no script runs. The tooltip lists the keys: LOOM's `q w e r t y u i` and `c d e f g a b C` play the distaff's notes (the staff labels them c d e f g a b c′, R-12.2), `.` skips the text, Esc skips a cutscene, Space pauses. Implementation: LOOM keys and its distaff. | Code |
+| R-6.8 | SCUMM | The hint line under the scene (`ObjectsNote`) is shown only in inspection mode (and Advanced); the game's own screen needs none. | Code |
+| R-6.9 | SCUMM | Right-click or **Interact ▴** on an object opens a menu of the object's actual verbs, labelled by `LoomVerbNames`; choosing one is an *exploration action* and says so. | Code |
+| R-6.10 | APP | Session bar text, Advanced only in inspection mode; busy badge (`BusyBadge`) with wait cursor while the app does blocking work such as opening a scene or preparing music. | Code |
+| R-6.11 | APP | The right panel (Advanced) sections, in order: `DOORWAYS`, `HOTSPOTS`, `ACTIONS`, object preview + description, `Room entry` (summary, event buttons, `Raw disassembly`), `Last action` (summary, timeline, issues, `Raw trace`), `Assumptions` (`No assumptions` or `Assumptions · N`). | Code |
 | R-6.12 | INDY3 EGA | Background preview only, with the note `Background preview only. Object art, scripts, and room routes are not decoded for this game yet.` | Code |
 
 ## 7. Interaction model (LOOM)
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-7.1 | LOOM | Click input is delivered to the game's input script chain (`VAR_VERB_SCRIPT` = script 005 → 006 → 007): script 006 timers (`var[0x0C]`, double-click window ≤ 0x28 jiffies, ±6 px across/3 down), class 1 objects show close-ups on hover, class 2 are exits. The session has no pointer; the virtual mouse position is stated, and labelled assumed input. | Doc (script map) |
-| R-7.2 | LOOM | Walk, use and look go through source scripts; **source responses and touchability decide navigation**, not static possible destinations. A static doorway guess is never presented as a certain exit. | Rule |
-| R-7.3 | LOOM | Keyboard: notes via the key rows above; `.` skips a line, Esc skips the cutscene only after the cutscene has set its skip point (`beginOverride`); until then the Skip button is disabled and its tooltip explains. Space toggles pause during playback. | Code |
+| R-7.1 | SCUMM | Click input is delivered to the game's input script chain (`VAR_VERB_SCRIPT` = script 005 → 006 → 007): script 006 timers (`var[0x0C]`, double-click window ≤ 0x28 jiffies, ±6 px across/3 down), class 1 objects show close-ups on hover, class 2 are exits. The session has no pointer; the virtual mouse position is stated, and labelled assumed input. | Doc (script map) |
+| R-7.2 | SCUMM | Walk, use and look go through source scripts; **source responses and touchability decide navigation**, not static possible destinations. A static doorway guess is never presented as a certain exit. | Rule |
+| R-7.3 | SCUMM | Keyboard: notes via the key rows above; `.` skips a line, Esc skips the cutscene only after the cutscene has set its skip point (`beginOverride`); until then the Skip button is disabled and its tooltip explains. Space toggles pause during playback. | Code |
 | R-7.4 | LOOM | Physical spellcasting works with keyboard **and** mouse in EGA and VGA (user-confirmed). | Rule |
-| R-7.5 | LOOM | The playback clock runs at the game's frame rate; animations, camera, sound and voice follow it. Pause, step (Advanced) and skip are available during a scene. | Code |
-| R-7.6 | LOOM | Voices/music/effects start with the scene and stop when the scene is left, another game is opened, or the device changes. Changing device stops current audio; the next sound command uses the new device. | Code |
+| R-7.5 | SCUMM | The playback clock runs at the game's frame rate; animations, camera, sound and voice follow it. Pause, step (Advanced) and skip are available during a scene. | Code |
+| R-7.6 | SCUMM | Voices/music/effects start with the scene and stop when the scene is left, another game is opened, or the device changes. Changing device stops current audio; the next sound command uses the new device. | Code |
 
 ## 8. Cutscenes
 
@@ -168,11 +174,11 @@ Top level order and header format are exact: **label, two spaces, count in paren
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-8.1 | LOOM | **Global picker** (header `Play Cutscene`, Advanced only): a dialog with search, a category filter (`Scenes`, `Dialogue and reactions`, `All playable`, and in Advanced `Needs validation`), the list, a selection note and `Play`. Double-click on an entry plays it. Entries without a play action show their status in the note and disable `Play`. | Code |
-| R-8.2 | LOOM | **Room list** (the room's `Play Cutscene` button, Normal mode too): one entry → plays directly; several → popup headed `CUTSCENES IN THIS ROOM`. In the dialog form there is no category filter, and no search when ≤ 15 entries. Advanced adds each entry's note as tooltip. On LOOM CD, while the background derivation of the rooms' scenes still runs, the caption carries a small turning arc (the button is disabled until the first entries are known) and a gold italic line under the controls says what is happening (`Looking for the scenes that happen in each room… The first launch takes a while; the result is kept for the next one.`). Both go when the scan is done. | Code |
-| R-8.3 | LOOM | A scene belongs to the rooms it plays out in: the room list of a room includes scenes that *start* there and scenes that *visit* it, the latter with the suffix ` (played from Room NN)` (NN = the start room, two digits). | Code |
-| R-8.4 | LOOM | Playing a cutscene from the picker, the Game Texts window or a script's `▶ Play as cutscene` button switches the Interactive mode on first. | Code |
-| R-8.5 | LOOM | Single scenes keep the running story/status; only missing source prerequisites run unseen and are disclosed in the notes. Explicit sequences and the intro start from a fresh session and replace the exploration state (the note says so). | Rule |
+| R-8.1 | APP | **Global picker** (header `Play Cutscene`, Advanced only): a dialog with search, a category filter (`Scenes`, `Dialogue and reactions`, `All playable`, and in Advanced `Needs validation`), the list, a selection note and `Play`. Double-click on an entry plays it. Entries without a play action show their status in the note and disable `Play`. | Code |
+| R-8.2 | APP | **Room list** (the room's `Play Cutscene` button, Normal mode too): one entry → plays directly; several → popup headed `CUTSCENES IN THIS ROOM`. In the dialog form there is no category filter, and no search when ≤ 15 entries. Advanced adds each entry's note as tooltip. On LOOM CD, while the background derivation of the rooms' scenes still runs, the caption carries a small turning arc (the button is disabled until the first entries are known) and a gold italic line under the controls says what is happening (`Looking for the scenes that happen in each room… The first launch takes a while; the result is kept for the next one.`). Both go when the scan is done. | Code |
+| R-8.3 | APP | A scene belongs to the rooms it plays out in: the room list of a room includes scenes that *start* there and scenes that *visit* it, the latter with the suffix ` (played from Room NN)` (NN = the start room, two digits). | Code |
+| R-8.4 | APP | Playing a cutscene from the picker, the Game Texts window or a script's `▶ Play as cutscene` button switches the Interactive mode on first. | Code |
+| R-8.5 | APP | Single scenes keep the running story/status; only missing source prerequisites run unseen and are disclosed in the notes. Explicit sequences and the intro start from a fresh session and replace the exploration state (the note says so). | Rule |
 
 ### 8.2 Title formats (exact)
 
@@ -195,7 +201,7 @@ All titles are **`Room NN · <description>`** (two-digit room, ` · ` = space, m
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-8.6 | LOOM | In **Advanced**, a title for a verb-triggered entry gets the suffix ` (verb 0xHH)` (two-digit uppercase hex, e.g. `(verb 0x38)`); entries for room entry scripts get none. Normal mode never shows the verb byte. | Code |
+| R-8.6 | SCUMM | In **Advanced**, a title for a verb-triggered entry gets the suffix ` (verb 0xHH)` (two-digit uppercase hex, e.g. `(verb 0x38)`); entries for room entry scripts get none. Normal mode never shows the verb byte. | Code |
 | R-8.7 | LOOM | Draft naming (`LoomDraftNames`) is the one source for both editions. Slot order is the game's draft table: 0 `Opening / Closing` (0x3A/0x3B), 1 `Straw into Gold` (0x3C/0x3D), 2 `Dyeing / Bleaching` (0x3E/0x3F), 3 `Night Vision` (0x40), 4 `Twisting` (0x41/0x42), 5 `Sleep` (0x43/0x44), 6 `Emptying` (0x45/0x46), 7 `Invisibility` (0x47/0x48), 8 `Terror` (0x49), 9 `Sharpening / Blunting` (0x4A/0x4B), 10 `Reflection` (0x4C), 11 `Healing` (0x4D), 12 `Silence` (0x4E/0x4F), 13 `Shaping` (0x50/0x51), 14 `Unmaking` (0x52/0x53), 15 `Transcend` (0x54). A draft not matching its slot's verbs is `Draft N` (1-based). Each name's evidence is recorded beside it in code. | Code/Doc |
 | R-8.8 | LOOM | Slash names split into forward/reverse; single names get `(reverse)` for the reverse verb. One spelling must be used everywhere (see F-12). | Target |
 | R-8.9 | LOOM EGA | Categories (catalog): **Scenes** = the replay visits another room (all 51 multi-room replays) or is a long silent animation; **Dialogue and reactions** = the rest. The scan's rule (R-8.10) agrees with this catalog for 301 of 328 replays. The EGA catalog holds 79 scenes and 249 dialogue/reaction previews. | Code |
@@ -207,11 +213,11 @@ All titles are **`Room NN · <description>`** (two-digit room, ` · ` = space, m
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-8.13 | LOOM | Each entry has a note stating: source (room/object/verb → script → span size and offsets), the **stated start** (which state the scene begins in), what is assumed, and that branches make lines/loads *possible, not certain*. | Code |
+| R-8.13 | APP | Each entry has a note stating: source (room/object/verb → script → span size and offsets), the **stated start** (which state the scene begins in), what is assumed, and that branches make lines/loads *possible, not certain*. | Code |
 | R-8.14 | LOOM CD | The CD note begins `Found in the CD scripts: NN · <the room's entry script | object N's verb label> reaches <scripts> (a cutscene ... endCutscene span of N instructions, N printed line(s), N room load(s)).` followed by `A branch can keep part of it from running, so the lines and loads are possible, not certain.`, other triggers reaching the same scripts, the start-setup sentence (`A fresh start begins its cutscene (checked by a headless run).` or the derived setup, or `Whether a fresh start begins it is still being checked (open the list again in a few seconds).`), and the stated start. Verb labels are `entry script`, `verb 0x36 (look)`, `verb 0x37 (walk to)`, `verb 0x38 (use)`, `verb 0xHH`. | Code |
-| R-8.15 | LOOM | Playing sets status `Playing <title> from a stated start (see the tooltip). Escape skips once the cutscene allows it.` and the tooltip carries note + assumptions. | Code |
-| R-8.16 | LOOM | Directly-run verbs say: an *exploration action*, not the game's click; Bobbin does not walk there; the object may be untouchable in this state; a draft response does not simulate casting. | Code |
-| R-8.17 | LOOM | **Needs validation** (Advanced only): coverage entries (51 on the reference: 42 `Start needs validation`, 7 `Shared input/draft helper; not a standalone story scene`, 2 `Some branches need validation`) and the catalog summary line are visible only in Advanced, by design (R-1.13): Normal mode does not mention hidden scenes. | Code |
+| R-8.15 | APP | Playing sets status `Playing <title> from a stated start (see the tooltip). Escape skips once the cutscene allows it.` and the tooltip carries note + assumptions. | Code |
+| R-8.16 | APP | Directly-run verbs say: an *exploration action*, not the game's click; Bobbin does not walk there; the object may be untouchable in this state; a draft response does not simulate casting. | Code |
+| R-8.17 | APP | **Needs validation** (Advanced only): coverage entries (51 on the reference: 42 `Start needs validation`, 7 `Shared input/draft helper; not a standalone story scene`, 2 `Some branches need validation`) and the catalog summary line are visible only in Advanced, by design (R-1.13): Normal mode does not mention hidden scenes. | Code |
 
 ### 8.4 Catalog scope
 
@@ -220,9 +226,11 @@ All titles are **`Room NN · <description>`** (two-digit room, ` · ` = space, m
 | R-8.18 | LOOM EGA ref | The replay catalog (`loom-replays.json`) is enabled only when **every** listed source file's SHA-256 matches (78 files). Otherwise the catalog is empty with an explanatory summary and the four established starts remain: The Intro, `Walk to Room 13`, `The Elders' trial`, `The firewood scene`. | Code |
 | R-8.19 | LOOM EGA | No rerun of the discovery pipeline for other editions (user decision, 5 Oct); other editions open, show rooms and texts, and keep the four starts. | Rule |
 | R-8.20 | LOOM EGA ref | Catalog starts for a late room (Room 46) run the reviewed actual prerequisites (Awakening, Reflection, Firewood, dream) only when ghost/restored state is absent; existing state is preserved; failure cancels the visit with `Could not prepare this scene` / `The earlier story scene did not finish. Choose another room or restart the session.` | Rule/Code |
-| R-8.21 | LOOM CD | The CD list is derived from the scripts when the game opens (`LoomCutsceneIndex`, depth 3 through literal `startScript`/`chainScript`), start setups are derived in the background, and per-room lists are saved per build+data for reuse. | Code |
+| R-8.21 | LOOM CD | The CD list is derived from the scripts when the game opens (`LoomCutsceneIndex`, depth 3 through literal `startScript`/`chainScript`), start setups are derived in the background, and per-room lists are saved per build+data for reuse. For the known disc a shipped seed (R-8.25) replaces the per-room derivation. | Code |
 | R-8.22 | LOOM CD | The intro starts script 001 from the beginning over the 84 s overture cue; the skill screen waits for a click (assumed answer after 3 s for unattended runs only); the draft question is not simulated; `SCUMM_CD_INTRO_AUTOANSWER=1` lets harnesses run unattended. | Code |
 | R-8.23 | LOOM | **Scan vs catalog (checked 10 October, reference English EGA, `.verification/cutscene-scan-ega titles`)**: the script scan finds all 328 catalogued replays as triggers, plus 72 more (42 groups with no catalogued member). With the title and category rules above, 217 of 328 titles+categories are identical (187 before the 10 October scan changes: loads after the span, silent Use, literal load targets in titles of unnamed plain verbs) and only 9 titles differ (a doorway the finder follows but the run did not take, and conditional loads); 15 categories differ besides the 90 helpers (loads in branches the replay did not take, and silent look scenes). **Headless run (10 October, `LoomCutsceneRun`, `.verification/cutscene-scan-ega visit`)**: running each of the 328 triggers in a fresh session without a start setup (every one began a cutscene; 271 s in all, so a background job) and calling it a scene when the run left the room, or it is an entry or a silent Use, agrees with the catalog's category for 320 of 328 (the static rule alone: 225 of the 238 grouped ones). The run never made a catalogued dialogue a scene; the 8 left are catalog scenes that stay in their room and speak (Room 09 distaff and feather, Room 18 Use, Room 35 gate, Room 43 Opening, Room 51 Dead One and feather). 90 catalogued reactions (generic draft/look responses reached from > 20 triggers) are dropped by the scan as shared helpers. The scan is therefore a sound source for editions without a catalog (not yet wired for EGA: see M-01), with those two known differences. | Doc |
+| R-8.24 | LOOM EGA | **Editions without a validated catalog** (the replay catalog is empty because a fingerprint does not match: Spanish, plain English, French, German, v1.2, Italian) get the CD's script-derived cutscene machinery (`ScannedCutscenes`): the picker and the room's `Play Cutscene` list come from `LoomCutsceneIndex` plus the four established starts; start setups come from `LoomCdSceneSetupPlanner` (it runs on EGA data; `NewSession` boots the EGA game) and playing uses the same path as the CD (`PlayCdCutscene`). Room lists settle after one fresh headless run per scene (`LoomCutsceneRun`, in parallel on half the cores, about 8 minutes on the first launch; the CD-style turning arc and note show meanwhile); the planner's long trials for the state-gated scenes (18 on the Spanish edition, 17 find a start) follow in the background and the scene notes say they are still being checked. Cached per game folder like the CD's lists. The reference edition keeps its catalog; the catalog is not to be removed until the scan agrees with it (R-8.23: 217 of 328 title and category, 320 of 328 category with the run). | Code |
+| R-8.25 | LOOM CD | **Shipped seed** (`loom-cd-scenes.json`, `.verification/cd-seed`): the rooms each of the 223 scanned groups plays out in, and the intro's rooms, made offline from the scan, the derived setups and a headless run, and tied to `ScummV4Archive.Fingerprint` (SHA-256 of the decoded `DISK01.LEC` and `000.LFL`; the Kixx release matches too). With a matching fingerprint the room lists are known at once (no arc or note) and only the start setups are derived in the background; otherwise the live scan of R-8.21 runs. Categories are not in the seed: the run calls 19 of the static rule's 98 scenes dialogue, some of which leave the room in the validated EGA game, so the CD keeps the static rule (R-8.10) until the run is checked against the real game. Regenerate the seed after any change to the scan, the planner or the headless run. | Code |
 
 ## 9. Scripts
 
@@ -230,9 +238,9 @@ All titles are **`Room NN · <description>`** (two-digit room, ` · ` = space, m
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-9.1 | LOOM | Selecting a script hides the right panel and shows: title = tree label (`Script 91 · cage scene`), subtitle `Indexed script resource · DOS LOOM old-v3` (+ ` · name: <evidence>` when named) or `LOOM CD script · SCUMM v4`; tooltip = glossary evidence or description. Controls: **Readable** (default on), **Show bytecode** (only meaningful in Raw, disabled in Readable), **▶ Play as cutscene** (when the script is a known cutscene), event buttons (static candidates only), **Used by** expander, output box (Consolas 13). | Code |
-| R-9.2 | LOOM | The note reads `Control-flow decode: N/M resource bytes, K unresolved paths. Event links are static candidates; branch choices and script order are not executed in this view.` (script body is never executed here). | Code |
-| R-9.3 | LOOM | The status line reads `<name> · N instructions · K decode issues`; an unreadable script says `bytecode unavailable` and shows the reason. | Code |
+| R-9.1 | APP | Selecting a script hides the right panel and shows: title = tree label (`Script 91 · cage scene`), subtitle `Indexed script resource · DOS LOOM old-v3` (+ ` · name: <evidence>` when named) or `LOOM CD script · SCUMM v4`; tooltip = glossary evidence or description. Controls: **Readable** (default on), **Show bytecode** (only meaningful in Raw, disabled in Readable), **▶ Play as cutscene** (when the script is a known cutscene), event buttons (static candidates only), **Used by** expander, output box (Consolas 13). | Code |
+| R-9.2 | APP | The note reads `Control-flow decode: N/M resource bytes, K unresolved paths. Event links are static candidates; branch choices and script order are not executed in this view.` (script body is never executed here). | Code |
+| R-9.3 | APP | The status line reads `<name> · N instructions · K decode issues`; an unreadable script says `bytecode unavailable` and shows the reason. | Code |
 | R-9.4 | LOOM EGA | If an index entry points inside another resource ("leftover"), the page states that the entry does not establish a standalone script. | Code |
 
 ### 9.2 Raw view (the decoded instructions)
@@ -250,14 +258,14 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-9.9 | LOOM | Header: `Script NN · <name>  ·  <container>` (global) or `<Context>  ·  <container>` (local), then the fixed paragraph `Readable view: the decoded instructions in plain language. Static paths, not proof of execution. Names carry their evidence (listed at the end); anything unnamed keeps its raw form. Switch to Raw for the instructions as decoded.` | Code |
-| R-9.10 | LOOM | Each line is `XXXX` (4-hex offset of the first instruction of the construct, blank for closing keywords) + two spaces + 4-space indent per nesting level + phrase. | Code |
-| R-9.11 | LOOM | **Structure** is recovered from forward jumps: `if <cond>` … `else` … `end if`; `while <cond>` … `end while`; `repeat` … `until <cond>`; a one-instruction wait loop becomes `wait until <cond>`; `if <cond>, go to XXXX` where a jump cannot be nested. SCUMM conditionals jump when false, so a block is the code that runs when true; conditions are negated accordingly. The jump after `beginOverride` is printed as `begin the skippable part (if the player skips, the game jumps to XXXX)`. | Code |
-| R-9.12 | LOOM | Condition phrases: bit tests as the bare name or `not (<name>)` (bit `== 0/1` collapses to truth); numeric relations `==, !=, <, <=, >, >=` with the operand order that reflects ScummVM's jump; `X is in state N`, `X is in walk box N`, class tests `X is in class N`/`not in class N`. | Code |
-| R-9.13 | LOOM | Action phrases (examples, exact): `end of script`; `pause until the next frame`; `begin cutscene` / `end cutscene`; `begin the skippable part…` / `end of the skippable part`; `start <script>` / `continue in <script> (this script ends)` / `stop this script`; `go to <room>`; `go to <room> through <object>; Bobbin walks to <x,y>`; `place <actor> at (x, y)`; `<actor> walks to (x, y)` / `… to <object>`; `<actor> turns to face <object>`; `the camera pans to x=N`; `wait N jiffies (60 jiffies = 1 second)`; `start <sound> (music)`; `set <object> to state N`; `draw <object> at (x, y)`; `pick up <object>`; `verb N: …`; `<var> += 1`; `<var> = a random number from 0 to N`; `<var> = x of <actor>`; `(no operation in LOOM)` for the LOOM no-op waitForActor. | Code |
-| R-9.14 | LOOM | Names: `<kind> N` becomes `Role N · <glossary name>` where the glossary names it (rooms `Room 05 · name`, scripts, sounds, actors, objects by their stored name). Actor names are scoped by script: actor numbers are reused between scenes, so a scoped name wins over a general one. | Code |
-| R-9.15 | LOOM | The readable view ends with `Names used (evidence: decoded = …, engine = ScummVM, reading = interpretation, play = seen in play):` and one line per used name: reference, name, `[evidence]`, source. Unresolved paths print as `Not decoded: path at +0xXXXX: <reason>`. | Code |
-| R-9.16 | LOOM | Print phrases show text with `\xNN` escape runs cleaned and speaker named through `LoomSpeakerNames` (`Bobbin` for the ego; actor-number names scoped by script/room; `Unknown speaker`). | Code |
+| R-9.9 | SCUMM | Header: `Script NN · <name>  ·  <container>` (global) or `<Context>  ·  <container>` (local), then the fixed paragraph `Readable view: the decoded instructions in plain language. Static paths, not proof of execution. Names carry their evidence (listed at the end); anything unnamed keeps its raw form. Switch to Raw for the instructions as decoded.` | Code |
+| R-9.10 | SCUMM | Each line is `XXXX` (4-hex offset of the first instruction of the construct, blank for closing keywords) + two spaces + 4-space indent per nesting level + phrase. | Code |
+| R-9.11 | SCUMM | **Structure** is recovered from forward jumps: `if <cond>` … `else` … `end if`; `while <cond>` … `end while`; `repeat` … `until <cond>`; a one-instruction wait loop becomes `wait until <cond>`; `if <cond>, go to XXXX` where a jump cannot be nested. SCUMM conditionals jump when false, so a block is the code that runs when true; conditions are negated accordingly. The jump after `beginOverride` is printed as `begin the skippable part (if the player skips, the game jumps to XXXX)`. | Code |
+| R-9.12 | SCUMM | Condition phrases: bit tests as the bare name or `not (<name>)` (bit `== 0/1` collapses to truth); numeric relations `==, !=, <, <=, >, >=` with the operand order that reflects ScummVM's jump; `X is in state N`, `X is in walk box N`, class tests `X is in class N`/`not in class N`. | Code |
+| R-9.13 | SCUMM | Action phrases (examples, exact): `end of script`; `pause until the next frame`; `begin cutscene` / `end cutscene`; `begin the skippable part…` / `end of the skippable part`; `start <script>` / `continue in <script> (this script ends)` / `stop this script`; `go to <room>`; `go to <room> through <object>; Bobbin walks to <x,y>`; `place <actor> at (x, y)`; `<actor> walks to (x, y)` / `… to <object>`; `<actor> turns to face <object>`; `the camera pans to x=N`; `wait N jiffies (60 jiffies = 1 second)`; `start <sound> (music)`; `set <object> to state N`; `draw <object> at (x, y)`; `pick up <object>`; `verb N: …`; `<var> += 1`; `<var> = a random number from 0 to N`; `<var> = x of <actor>`; `(no operation in LOOM)` for the LOOM no-op waitForActor. | Code |
+| R-9.14 | SCUMM | Names: `<kind> N` becomes `Role N · <glossary name>` where the glossary names it (rooms `Room 05 · name`, scripts, sounds, actors, objects by their stored name). Actor names are scoped by script: actor numbers are reused between scenes, so a scoped name wins over a general one. | Code |
+| R-9.15 | SCUMM | The readable view ends with `Names used (evidence: decoded = …, engine = ScummVM, reading = interpretation, play = seen in play):` and one line per used name: reference, name, `[evidence]`, source. Unresolved paths print as `Not decoded: path at +0xXXXX: <reason>`. | Code |
+| R-9.16 | SCUMM | Print phrases show text with `\xNN` escape runs cleaned and speaker named through `LoomSpeakerNames` (`Bobbin` for the ego; actor-number names scoped by script/room; `Unknown speaker`). | Code |
 | R-9.17 | LOOM CD | Readable views exist for global scripts, room-local scripts, object verb scripts and entry/exit scripts, with source-scoped links. | Doc |
 
 ### 9.4 Disassembler requirements
@@ -266,7 +274,7 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 |---|---|---|---|
 | R-9.18 | SCUMM | Decoding is conservative: it follows reachable control flow only, reports unresolved paths rather than guessing, and decodes under the right dialect. Coverage is counted (`DecodedBytes/CodeLength`); it measures decoder coverage, not gameplay coverage. | Doc |
 | R-9.19 | SCUMM | The bounded executor runs scripts in sessions with a step/frame cap, reports unsupported behaviour explicitly (never silently), and is cancellable. | Doc/Code |
-| R-9.20 | LOOM | Findings from decoding go in `docs/loom/LOOM_SCRIPT_MAP.md` (variables, bits, verbs, rooms, with source and date) for future features. | Rule (memory) |
+| R-9.20 | APP | Findings from decoding go in `docs/loom/LOOM_SCRIPT_MAP.md` (variables, bits, verbs, rooms, with source and date) for future features. | Rule (memory) |
 
 ## 10. Names, glossary and speakers
 
@@ -281,7 +289,7 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-11.1 | LOOM EGA, LOOM CD, INDY3 EGA | Window `Game Texts` (since 10 October also for LOOM CD: the extractor reads the CD's script blocks and object verbs; 1,196 entries on the English CD; the replay buttons and first-visit room renders of the EGA window are not offered there; `GameSupport.Texts`). Heading `WORDS FROM THE GAME`, title `Game texts`, coverage line `<N> texts found. Browse spoken lines, object names and other stored words.` Left: search, room filter (`Every room`, `Room NN`), kind filter (`Every kind`, `Spoken lines`, `Conversations and cutscenes`, `Object names`, `Other labels and stored text`), result count (`N matching texts` / `N matching groups`), **Export visible text**, list. | Code |
+| R-11.1 | SCUMM | Window `Game Texts` for every game whose texts are read (today LOOM EGA, LOOM CD and Indy3 EGA; `GameSupport.Texts`; since 10 October also for LOOM CD: the extractor reads the CD's script blocks and object verbs; 1,196 entries on the English CD; the replay buttons and first-visit room renders of the EGA window are not offered there). Implementation: per-game extraction (script blocks and object verbs by dialect); the window itself is shared. Heading `WORDS FROM THE GAME`, title `Game texts`, coverage line `<N> texts found. Browse spoken lines, object names and other stored words.` Left: search, room filter (`Every room`, `Room NN`), kind filter (`Every kind`, `Spoken lines`, `Conversations and cutscenes`, `Object names`, `Other labels and stored text`), result count (`N matching texts` / `N matching groups`), **Export visible text**, list. | Code |
 | R-11.2 | SCUMM | List item heading, all caps: `ROOM NN  /  OBJECT N · <name>  /  <KIND>` or `ELSEWHERE IN GAME  /  <KIND>`; conversations: `ROOM NN  /  <KIND> GROUP  /  N LINES  /  OBJECT N · <name>` or `… /  LINE NN`. Text below, trimmed to 2 lines. | Code |
 | R-11.3 | SCUMM | Entry kinds: `Spoken line` (print/printEgo), `Object name`, `Stored line` (stringOps), `Verb label` (verbOps), `Object label`. A **conversation group** is a run of lines in one decoded script; `Dialogue choices` groups are menus offered to the player, each followed by the replies in its branch. Conditions can hide options or change replies, and the detail text says so. | Code |
 | R-11.4 | SCUMM | Detail pane: kind, heading, room artwork (first-visit state for LOOM; stored background otherwise), conversation lines with speakers, **Visit room** and, when a known cutscene prints the text, **Play this cutscene**; an expander `Source and extraction details` lists script ranges visited, unresolved paths, skipped ranges, leftover entries and diagnostics (max 8 shown). | Code |
@@ -293,7 +301,7 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
 | R-12.1 | LOOM | `Game Status` (header button once a session exists) opens a modal window, 900×780: **Staff / distaff** (resolved from the session or `Unresolved`), **Available notes** (1–8), **Spell / draft sequences** grid, **Story** list, `Apply and close` / `Cancel`. | Code |
-| R-12.2 | LOOM | Draft grid columns: `Spell / draft` (title from R-8.7), notes `1`–`4` (dropdowns from the eight-note set), `Learned`, `Can reverse`; Advanced adds `State source`. A `Mark all as learned` button exists. | Code |
+| R-12.2 | LOOM | Draft grid columns: `Spell / draft` (title from R-8.7), notes `1`–`4` (dropdowns from the eight-note set, labelled as ScummVM names them: c d e f g a b c′; the eighth is the upper-octave c, ScummVM's Mac GUI notes "the note names c through c'"), `Learned`, `Can reverse`; Advanced adds `State source`. A `Mark all as learned` button exists. | Code |
 | R-12.3 | LOOM EGA | Story section header `Story: conversations, scenes and objects the game remembers`. Each row is a checkbox with the **catalog scene title** that sets the bit (`A / B ...`), else `<place> ran`; named rows first, then by label; the bit key (`bit[0xD9C]`) at the right. Intro text: the game remembers what happened in story bits; checking marks the scene as done as the game would after it ran; clearing undoes it; changes show when the room is entered again; **these are your choices, not played scenes**. | Code |
 | R-12.4 | LOOM CD | Reads CD staff, notes and drafts; the story list uses the CD bit bank (no EGA flag source). | Code |
 | R-12.5 | LOOM | Editing is allowed only when the session can be edited (not while a cutscene plays); the staff held/not held and notes edits go through supported session edits (the disclosed off-island staff setup runs the real pickup). The window refreshes every 250 ms while open. | Code |
@@ -303,11 +311,11 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-13.1 | LOOM EGA | Music/effects device box: `No Sound`, `PC Speaker`, `AdLib` (default), `Roland MT-32`, each with an icon. The choice is remembered. | Code |
+| R-13.1 | SCUMM | Music/effects device box: `No Sound`, `PC Speaker`, `AdLib` (default), `Roland MT-32`, each with an icon. The choice is remembered. | Code |
 | R-13.2 | LOOM EGA | Roland needs `82.LFL`–`85.LFL` **and** the user's MT-32 or CM-32L ROM images. ROM folder search order: `SCUMM_MT32_ROM_ROOT`, the remembered folder (`mt32-rom-folder.txt`), a `mt32` folder beside the game folder; otherwise the user is asked once. If unusable for a folder the session plays on AdLib, the choice is kept (not saved over), and the box says so. Roland sets `VAR_SOUNDCARD` to 4 so the game picks Roland sounds itself. | Code/Doc |
 | R-13.3 | LOOM CD | Sound box: `No Sound` / `CD Audio` (default `CD Audio`), only when the disc has an audio track. Voices follow `sayVoice` cues scheduled from the disc; the overture timer counts jiffies from the cue start. | Code |
 | R-13.4 | SCUMM | Sound resources are playable on demand in a SOUND PLAYER (title, description, ▶ Ⅱ ■, `0:00 / 0:00`); AdLib has a level slider (`+6.0 dB` default, 0–24, peaks kept below clipping). A sound with no data says `No playable audio`. | Code |
-| R-13.5 | LOOM | Room music/cues: the MUSIC strip (▶ Ⅱ ■, title, time in Advanced, evidence) plays a room's candidate cue; a candidate is "may start", not necessarily played. | Code |
+| R-13.5 | SCUMM | Room music/cues: the MUSIC strip (▶ Ⅱ ■, title, time in Advanced, evidence) plays a room's candidate cue; a candidate is "may start", not necessarily played. | Code |
 | R-13.6 | SCUMM | AdLib via NukedOPL3Sharp (LGPL), PC speaker per the SCUMM driver's envelopes and pitch modulation, Roland via Munt; third-party notices stay current (`THIRD_PARTY_NOTICES.md`). | Doc |
 | R-13.7 | LOOM | The Roland upgrade's overture is rendered on first need (≈10 s); the scene waits, then the music starts with it. | Doc |
 
@@ -316,17 +324,17 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
 | R-14.1 | LOOM EGA | The English Roland copy is the reference for tests, harness drivers and `loom-replays.json`. Spanish Roland is comparison only (`SCUMM_LOOM_TEST_ROOT`). | Rule |
-| R-14.2 | LOOM EGA | **Editions differ in data, not only text.** Never key shared code on a byte offset or assume a language identifies numbering. The English Roland upgrade lacks Spanish `bit[0xD62]` and shifts later bits by one; plain en/fr/de/v1.2 use Spanish numbering; object ids differ between English and Spanish from Room 34. Derive bits, ids, resource availability and offsets from each edition's scripts (`LoomStatusSchema`). | Rule |
+| R-14.2 | SCUMM | **Editions differ in data, not only text.** Never key shared code on a byte offset or assume a language identifies numbering. The English Roland upgrade lacks Spanish `bit[0xD62]` and shifts later bits by one; plain en/fr/de/v1.2 use Spanish numbering; object ids differ between English and Spanish from Room 34. Derive bits, ids, resource availability and offsets from each edition's scripts (`LoomStatusSchema`). | Rule |
 | R-14.3 | LOOM EGA | Every edition opens, shows rooms without gaps, and extracts texts. v1.2 differs from plain only in data the app reads (e.g. Room 15 depth mask) so needs no special handling. Hebrew is dropped. | Doc |
-| R-14.4 | LOOM EGA | For each feature, check the plausible edition-dependent differences (opening/detection, format/scripts, text/fonts, graphics, audio), reuse `.verification/editions-20261005`, and choose only relevant checks. Italian (`Games/loom ega it`) needs its first review when relevant. Isolate genuine differences only where evidence requires. | Rule |
+| R-14.4 | APP | For each feature, check the plausible edition-dependent differences (opening/detection, format/scripts, text/fonts, graphics, audio), reuse `.verification/editions-20261005`, and choose only relevant checks. Italian (`Games/loom ega it`) needs its first review when relevant. Isolate genuine differences only where evidence requires. | Rule |
 | R-14.5 | LOOM CD | Compared with EGA, CD verb numbers and slot pairs match; object verb tables put each verb on the same rooms' objects; shortened dialogue is expected. | Doc |
 
 ## 15. State, session and persistence
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-15.1 | LOOM | `LoomExplorationSession` is the single live state: boot to Room 02 (ego at 828,60 on the English reference), then room visits; the CD session starts past the intro (`completeBoot: false`) and plays the intro on request. | Code |
-| R-15.2 | LOOM | **Restart game state** (`↺ Restart game state`, Advanced) forgets everything explored and starts from the beginning; its tooltip lists story, objects, inventory. | Code |
+| R-15.1 | SCUMM | One live session object holds the game's state (implementation: `LoomExplorationSession`): boot to Room 02 (ego at 828,60 on the English reference), then room visits; the CD session starts past the intro (`completeBoot: false`) and plays the intro on request. | Code |
+| R-15.2 | APP | **Restart game state** (`↺ Restart game state`, Advanced) forgets everything explored and starts from the beginning; its tooltip lists story, objects, inventory. | Code |
 | R-15.3 | APP | Persisted under `%LOCALAPPDATA%\SCUMMexplorer`: last folder, view options, MT32 ROM folder, room thumbnails per game folder, CD room scene lists. The folder is **never deleted** by harnesses or by the app unless the user asks. Harnesses set `SCUMM_EXPLORER_PROFILE_ROOT` to isolate. | Rule |
 | R-15.4 | APP | All file I/O failures on settings/caches are swallowed with a status note, never a crash (`Game opened; last folder could not be saved.`). | Code |
 
