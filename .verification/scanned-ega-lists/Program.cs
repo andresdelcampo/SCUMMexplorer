@@ -42,6 +42,12 @@ internal static class Program
                 {
                     for (var n = 0; n < 600 && !(bool)Field("_cdRoomListsDone")!; n++) await Task.Delay(1000);
                     Check((bool)Field("_cdRoomListsDone")!, "background derivation finished");
+                    var total = (int)Field("_scanTotal")!;
+                    Check(total > 0, $"the scan counts its steps ({total})");
+                    for (var n = 0; n < 600 && (bool)Prop("ScanRunning")!; n++) await Task.Delay(1000);
+                    Check(!(bool)Prop("ScanRunning")!, $"the scan finished all its steps ({Field("_scanDone")} of {total})");
+                    window.UpdateLayout();
+                    Check(!((ProgressBar)window.FindName("CutsceneScanProgress")).IsVisible, "the progress bar is gone when the scan is over");
                     var groups = (System.Collections.ICollection)Call("CdCutsceneGroups")!;
                     Check(groups.Count > 150, $"{groups.Count} scanned groups");
                     var items = (System.Collections.IList)Call("RoomCutsceneItems", 2)!;

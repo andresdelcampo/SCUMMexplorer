@@ -76,6 +76,10 @@ The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplor
 | [Script map](docs/loom/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, verbs and rooms |
 | [Research](docs/engine/RESEARCH.md) | Technical references |
 
+## License
+
+SCUMMexplorer is licensed under the GNU General Public License, version 3 or later (see [LICENSE](LICENSE)). It adapts parts of ScummVM, which is GPL; game files and ROM images are never included.
+
 ## Audio and third-party notices
 
 AdLib uses [NukedOPL3Sharp](https://www.nuget.org/packages/NukedOPL3Sharp/) (LGPL 2.1). The Roland MT-32 uses [Munt](https://github.com/munt/munt) (`mt32emu`, LGPL-2.1-or-later) through [Mt32emu.net](https://github.com/gregdivis/mt32emu.net). See [third-party audio notices](THIRD_PARTY_NOTICES.md).

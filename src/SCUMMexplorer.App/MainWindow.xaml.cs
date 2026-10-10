@@ -3959,7 +3959,8 @@ public partial class MainWindow : Window
         RoomCutsceneButton.Visibility = active && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.IsEnabled = active && CanStartCutscene && !listing;
         var computing = ScannedCutscenes && !_cdRoomListsDone && _cdSavedRoomLists is null;
-        CutsceneScanNote.Visibility = active && computing ? Visibility.Visible : Visibility.Collapsed;
+        CutsceneScanNote.Visibility = active && (computing || ScanRunning) ? Visibility.Visible : Visibility.Collapsed;
+        CutsceneScanProgress.Visibility = active && ScanRunning ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.Content = ButtonWithSpinner(roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴", computing);
         RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)." : !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
             roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";

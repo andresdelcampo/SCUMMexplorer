@@ -397,6 +397,7 @@
                                     <TextBlock x:Name="ObjectsNote" Text="Choose a scene." Foreground="#AAB4BA" FontSize="11.5" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="520"/>
                                     <TextBlock x:Name="CutsceneScanNote" Visibility="Collapsed" Foreground="#B78442" FontSize="11.5" FontStyle="Italic" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="520" Margin="0,2,0,0"
                                                Text="Looking for the scenes that happen in each room…&#10;The first launch takes a while; the result is kept for the next one."/>
+                                    <ProgressBar x:Name="CutsceneScanProgress" Visibility="Collapsed" Height="4" Width="260" Minimum="0" Maximum="1" Value="0" Margin="0,3,0,0" Foreground="#B78442" Background="#27384A" BorderThickness="0"/>
                                     <StackPanel x:Name="ObjectActionPanel" Visibility="Collapsed" Margin="0,3,0,0">
                                         <TextBlock x:Name="ObjectActionNote" Foreground="#D2C7B5" TextWrapping="Wrap" MaxWidth="520" TextAlignment="Center"/>
                                         <StackPanel x:Name="ObjectVerbButtons" Margin="0,5,0,0" HorizontalAlignment="Center"/>

@@ -28,6 +28,19 @@ Take the easiest bounded checks first. Do not change behavior without a demonstr
 
 Shaping's canonical label, exact reverse draft names and unidentified story roles remain uncertain. Silence and the dynamic-call classification are established. Extend names or engine behavior only when new own-source evidence justifies a visible correction.
 
+## Release readiness (LOOM and all its variants), 10 October
+
+Done: editions are recognised from the bytes of specific LFL files (R-3.1, R-3.9; demos and the Roland upgrade included, Italian too), a v4 archive is claimed as LOOM CD only for LOOM CD data, any other old-v3 game opens in a limited room/text mode, the plain English Game Status schema reads its own initial note limit (this also unblocked the cutscene starts for that edition), the first-launch scan shows a percentage and bar (all editions measure about 3 minutes on 16 workers, longer with fewer cores), Italian passed the room, glossary, text and sound checks (`.verification/editions-20261005/italian`), a LICENSE (GPL-3.0-or-later, as ScummVM-derived code requires) and a player-facing README.
+
+Open before shipping:
+1. **Look at each edition in the real window** (Italian, plain English, the two demos, the Roland copies). Everything so far is harness and scan evidence. Italian accents on screen are unseen.
+2. **Release build and packaging**: no publish settings, version number or installer yet; decide the distribution (zip, framework-dependent or self-contained).
+3. **First run on a clean profile** (user will try): no last folder, no MT-32 ROM folder, the welcome text; Roland must fail gracefully without ROMs.
+4. **Room 15 notes (reported 10 October, user)**: on entering Room 15 the staff notes were missing until a new note was gained, then all showed. Not investigated; check which edition and what the note display reads on room entry.
+5. Update the unit tests' per-edition expectations if more editions are added (`known-editions.json`, `.verification/known-editions/make.py`).
+
+Decided: Room 34's entry scene without a start is ignored; Indy3 is not claimed (README is LOOM only; the generic old-v3 mode and the Indy3 data still open as rooms and texts); CD picture/voice/music timing has no automatable check (every recipe in `loom/FINAL_GAPS_HANDOFF.md` compares against the original game by observation), so it stays in the user's manual run and is not a release blocker; shipped seeds for the EGA editions are not worth it (they would save only the first minute).
+
 ## Product rules
 
 - Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state. Single picks keep the session; explicit sequences start fresh; Restart returns to boot.
