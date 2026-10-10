@@ -84,6 +84,44 @@ if (args.Length > 2 && args[2] == "gated") // CutsceneScanCompare <folder> - gat
     }
     return;
 }
+if (args.Length > 2 && args[2] == "local") // CutsceneScanCompare <folder> - local <room> entry|<id>...: a room's entry script or local scripts listed
+{
+    var lroom = int.Parse(args[3]);
+    foreach (var which in args.Skip(4))
+    {
+        Console.WriteLine($"== room {lroom} {which}");
+        var d = which == "entry" ? data.RoomEntryScript(lroom) : data.RoomLocalScript(lroom, int.Parse(which));
+        foreach (var ins in d?.Instructions ?? []) Console.WriteLine($"{ins.Offset:X4} {ins.Operation} {ins.Operands}");
+    }
+    return;
+}
+if (args.Length > 2 && args[2] == "walk") // CutsceneScanCompare <folder> - walk <room> <x,y>...: fresh session, visit the room, then click the points one after another (Bobbin walks there), reporting cutscenes begun and the ego's box
+{
+    var snap2 = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    var wroom = int.Parse(args[3]);
+    var ws = new LoomExplorationSession(game, snap2);
+    foreach (var pre in (Environment.GetEnvironmentVariable("PREV") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)) { ws.VisitRoom(game.Rooms.First(r => r.ResourceId == int.Parse(pre))); for (var k = 0; k < 200; k++) ws.AdvanceFrame(); }
+    ws.VisitRoom(game.Rooms.First(r => r.ResourceId == wroom));
+    for (var i = 0; i < 200; i++) ws.AdvanceFrame();
+    Console.WriteLine($"in room {ws.Snapshot.RoomId}; cutscenes begun {ws.CutscenesBegun}");
+    foreach (var point in args.Skip(4))
+    {
+        var place = point.StartsWith('p');
+        var xy = point.TrimStart('p').Split(',').Select(int.Parse).ToArray();
+        if (place) { ws.PlaceEgo(xy[0], xy[1]); for (var k = 0; k < 40; k++) ws.AdvanceFrame(); Console.WriteLine($"placed at {point}: ego box {ws.Actors.First(x => x.Number == 1).WalkBox}"); continue; }
+        ws.WalkEgoTo(xy[0], xy[1]);
+        var before = ws.CutscenesBegun;
+        for (var i = 0; i < 1500; i++)
+        {
+            ws.AdvanceFrame();
+            if (i % 10 == 0 && ws.Actors.FirstOrDefault(x => x.Number == 1) is { } ego) Console.WriteLine($"    f{i}: ego ({ego.X},{ego.Y}) box {ego.WalkBox}");
+            if (ws.CutscenesBegun > before) { Console.WriteLine($"  cutscene began at frame {i} after clicking {point}"); break; }
+            if (!ws.EgoMoving && i > 60) break;
+        }
+        Console.WriteLine($"clicked {point}: cutscenes begun {ws.CutscenesBegun}, room {ws.Snapshot.RoomId}, moving={ws.EgoMoving}");
+    }
+    return;
+}
 if (args.Length > 2 && args[2] == "trigger") // CutsceneScanCompare <folder> - trigger <room> <object> <verb hex>: the verb's code and the scripts it starts (literal numbers, depth 3), instructions listed
 {
     int room = int.Parse(args[3]), obj = int.Parse(args[4]), verb = Convert.ToInt32(args[5], 16);
