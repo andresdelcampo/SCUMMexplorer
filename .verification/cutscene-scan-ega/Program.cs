@@ -167,6 +167,16 @@ if (args.Length > 2 && args[2] == "setup") // CutsceneScanCompare <folder> - set
     Console.WriteLine("  rooms: " + string.Join(",", planner2.VisitedRooms(want)));
     return;
 }
+if (args.Length > 2 && args[2] == "cdtrace") // CutsceneScanCompare <CD folder> - cdtrace <room> <object> <verb>: a fresh CD session runs the verb for 8000 frames; rooms entered and the trace lines that mention a room load or the cutscene
+{
+    var cs = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
+    cs.VisitRoom(game.Rooms.First(r => r.ResourceId == int.Parse(args[3])));
+    cs.ActivateObjectVerb(int.Parse(args[4]), int.Parse(args[5]));
+    var frames = 0; var quiet = 0;
+    for (; frames < 8000; frames++) { cs.AdvanceFrame(); if (frames % 500 == 0) Console.WriteLine($"f{frames}: room {cs.Snapshot.RoomId} inCutscene={cs.InCutscene} cutscenesBegun={cs.CutscenesBegun} msg={cs.Messages.HaveMsg} entered=[{string.Join(",", cs.RoomsEntered)}]"); }
+    foreach (var line in cs.SessionTrace.Where(l => l.Contains("oom", StringComparison.Ordinal) || l.Contains("utscene", StringComparison.Ordinal)).Take(40)) Console.WriteLine("  " + line);
+    return;
+}
 if (args.Length > 2 && args[2] == "trigger") // CutsceneScanCompare <folder> - trigger <room> <object> <verb hex>: the verb's code and the scripts it starts (literal numbers, depth 3), instructions listed
 {
     int room = int.Parse(args[3]), obj = int.Parse(args[4]), verb = Convert.ToInt32(args[5], 16);
