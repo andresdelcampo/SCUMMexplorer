@@ -1,85 +1,83 @@
 # SCUMMexplorer
 
-An audio-visual, interactive explorer for classic SCUMM adventures. Walk through the rooms in any order, click objects and exits, replay the cutscenes, hear the original music and read the games' texts, all rebuilt from your own game files. It is not meant as a technical SCUMM viewer: the script evidence is there when you want it (Advanced mode), not in your way.
+*Remember walking into the Guild of Glassmakers for the first time, or hunting for the one note that opens the sky?*
 
-**Current scope.** DOS **LOOM EGA** is the main focus. The English release is the reference edition (the Spanish release also opens). **LOOM CD/VGA, English**, also supports live interaction, actors, scripts, scene playback, Game Status and CD audio. The two LOOM self-running previews (`LOOMDEMO.EXE`, short and long) open too. **Indiana Jones and the Last Crusade EGA** is supported only for room backgrounds and texts, including its dialogue choices. Indy object art, scripts, sounds, the VGA edition and the other SCUMM games are not supported yet.
+SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Pick any room from its artwork, click objects and exits, watch cutscenes again, hear the music, read what everyone says, and see how the game is put together when you want to know. Everything is rebuilt live from **your own game files**. Nothing is included, nothing is copied.
 
-Game files are not included and never committed: you open a folder you own.
+## Games
 
-## Verified editions
+- **LOOM** (EGA, DOS), the main focus, in these editions:
+  - English, with or without the Roland (MT-32) upgrade
+  - Spanish, with or without the Roland upgrade, and version 1.2
+  - French
+  - German
+  - Italian
+  - the short and the long self-running demo
+- **LOOM** (CD, VGA, English), from a folder, a `.cue`/`.bin` or an `.iso`, with the voices and music from the disc
+- **Indiana Jones and the Last Crusade** (EGA, DOS): room art and texts, including the dialogue choices
 
-Checked by opening the folder in the app and running the room, text and glossary checks (record: [.verification/editions-20261005](.verification/editions-20261005/README.md)). "Full" means the cutscene catalog and replay tests too.
+Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing.
 
-- **LOOM EGA, English, with the Roland (MT-32) upgrade**: full (the reference edition, and the only one with the cutscene catalog).
-- **LOOM EGA, Spanish, with the Roland upgrade**: opens; used for comparison.
-- **LOOM EGA, English (plain DOS release)**: opens, rooms without gaps, texts extract, sounds fall back to AdLib and PC speaker.
-- **LOOM EGA, Spanish (plain DOS release)**: opens, rooms without gaps.
-- **LOOM EGA, French**: opens, rooms without gaps, texts extract.
-- **LOOM EGA, German**: opens, rooms without gaps.
-- **LOOM EGA v1.2, Spanish and German**: open, rooms without gaps (v1.2 German is byte-identical to the plain German release).
-- **LOOM EGA, Italian**: present under `Games/loom ega it`, not yet reviewed.
-- **LOOM self-running previews (short and long, English)**: open.
-- **LOOM CD (VGA), English, both dumps**: opens from folder, `.cue` or `.bin`; room backgrounds, first-visit objects, costumes, walk boxes/depth masks and a live v4 session. Clicks walk Bobbin and dispatch source verbs; text uses the CD fonts and voice cues play from the disc. The intro waits for the skill-screen click (its later draft answer is assumed). Game Status reads CD staff/note/draft data; all script kinds have Readable views and source-scoped links. Source-derived cutscene starts and per-room scene lists are implemented. The sound menu offers CD Audio / No Sound, with advanced disc-cue and stored-sound inspection. Source/bounded validation is distinct from independent picture/listening comparison; current counts and limits are in [Current work](docs/CURRENT_WORK.md).
-- **Indiana Jones and the Last Crusade EGA, English**: room backgrounds and texts only.
+## Getting started
 
-Not supported: the Hebrew release (dropped).
+1. Build and run the app (Windows, .NET 10; see *Development* below).
+2. Press **Open Game Folder** and choose a folder you own. The app reopens it next time.
+3. Pick a room and explore.
 
-## What you can do today (LOOM EGA and CD/VGA)
+## For everyone: just play with it
 
-- **Pick a scene by its artwork** in the visual room picker, and see each room without black gaps. Room numbers and exit outlines are available on request.
-- **Click the world.** A click walks Bobbin to an object and uses it through the game's own scripts; a double click also looks at it; exits lead on to the next room. Bobbin, the other actors and their costumes are drawn and animated, with the camera following, and room animations keep running as in the game.
-- **Cutscenes and drafts play.** Source-derived cutscene starts and a few reviewed sequences can be launched from **Play Cutscene**, each with a start setup derived from the scene's code; drafts and the staff go through the game's scripts. **Game Status** lets you set the staff, notes, learned drafts and story events yourself. Every assumption a start makes is shown in the picker's note.
-- **Hear it.** EGA music/effects through AdLib, PC speaker, Roland MT-32 (see below) or No Sound; VGA voices/music from CD Audio. Sounds and room cues can be played on demand. The chosen device is remembered.
-- **Read the games' texts** in the searchable **Game Texts** gallery (Advanced): extracted dialogue, object names and stored text with the original room artwork, and links that play the cutscene a text belongs to.
-- **Open a LOOM demo.** The rooms are explorable like the full game's, and **The preview** (in Play Cutscene) plays the demo's own self-running tour until you open another room. A demo is another build of the game, not a subset: its scripts, rooms and index differ, so full-game names and scene catalogs are not applied to it.
-- **Advanced mode** shows the raw resource tree, readable and raw script views with a glossary, the last action's timeline, hotspot lists, depth and walk-box overlays, and resource links.
+- **Choose a room by its picture.** Every room is shown as the game first showed it, with no gaps. Wide rooms scroll with the arrow keys.
+- **Click the world.** Bobbin walks to what you click and uses it, exactly as the game's own scripts decide. Double-click to look at something. Exits lead on to the next room. The other characters are there too, walking and talking, and the room's own animations keep running.
+- **Cast drafts.** Play the distaff with the keyboard or the mouse, as in the game.
+- **Play a cutscene.** Any room with a scene offers **Play Cutscene**; pause it, skip it, or watch it through to the end.
+- **Change the story.** **Game Status** lets you pick up the staff, set how many notes you know, learn any draft, and mark scenes as done or undone, then walk on from there.
+- **Listen.** Music and effects through AdLib, PC Speaker or the Roland MT-32 (see below); the CD edition plays its voices and its disc music. The choice is remembered.
+- **Look closer.** Show doorways and hotspots on hover, switch to the original framing or fill the window, or go full screen (F11).
 
-A direct late-room pick can prepare missing story prerequisites by running reviewed earlier game scenes, with the preparation disclosed in session notes. The English EGA Room 46 return now uses this source preparation so Rusty's ghost conversation has its ghost actor; existing ghost/restored state is preserved. Catalog preparation remains a preview, not a whole-game route.
+## For the curious: Advanced mode
 
-Everything is labelled by how well the game's data supports it: a decoded branch is a *possible* outcome, calling a verb directly is an *exploration action*, a partial session is a *state preview*, and artwork the scripts leave undecided is filled with a labelled estimate that never changes the game state.
+Switch **Advanced** on, and the explorer opens up. Everything here reads from the game's own data, and every guess is labelled as a guess.
 
-For Indiana Jones and the Last Crusade EGA, the app previews the indexed room backgrounds and extracts stored text. Its scripts use a slightly different opcode dialect (`wait`, `waitForActor` and `getActorX/Y` operands), and its multiple-choice dialogue labels are grouped as **Dialogue choices**, each followed by the replies spoken in its branch. This is a bounded text preview, not Indy gameplay. The standalone conversation map is generated from an EGA folder with `rtk proxy dotnet run --project tools/Indy3ConversationExport/Indy3ConversationExport.csproj -- "Games/FUTURE/indy3 ega en"`; it expands the decoded menus into collapsible, source-linked branches with the room backgrounds, and writes a `.graph.json` audit beside the HTML. Conditional state is left unevaluated and the map does not assign outcomes.
+- **The whole game as a tree.** Rooms, costumes, scripts, sounds and music, and the game files, each with the names the community knows them by and where the name comes from.
+- **Every script, two ways.** The decoded instructions, or a plain-language reading with names, conditions and branches written out. A "used by" index shows who calls what.
+- **A cutscene picker for everything.** Search by title and filter by scenes, dialogue and reactions, or all playable. Each entry says how its start was set up, and anything the app had to assume is spelled out.
+- **Game Texts.** Every spoken line, object name, verb label and dialogue menu, searchable, shown with the room's artwork. Read a conversation, visit its room, or play the cutscene it belongs to.
+- **What just happened?** After each click: the game's reaction, a timeline of the scripts it ran, the raw trace, and the assumptions behind it.
+- **Room inspection.** Doorway and hotspot lists, walk boxes, depth areas, the room's entry script, and an inspection mode where a click cycles an object's stored pictures without running any script.
+- **Step and pause.** Advance a scene frame by frame.
+- **Restart the story** from the very beginning in one click.
+- **A sound player for every sound.** Play any music or effect on demand, with an AdLib level slider and the room's music cues. On the CD edition, browse every voice and music track on the disc.
+- **Game Status in depth.** The raw story bits, where each value comes from, and every draft with its notes, flags and reversing.
+- **Indiana Jones conversation maps.** A tool turns the decoded dialogue menus into a branching map with the room backgrounds.
 
-## Documentation
+## Roland MT-32 music (optional)
 
-| Document | Purpose |
-|---|---|
-| [Current work](docs/CURRENT_WORK.md) | Current state, priorities, rules and session handoff |
-| [Changelog](docs/CHANGELOG.md) | Finished work with links to its validation |
-| [Script map](docs/loom/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, object verbs and rooms |
-| [English edition compatibility](docs/loom/ENGLISH_COMPAT_2026-10-04.md) | What differs between the English and Spanish data |
-| [Cutscene discovery](docs/loom/LOOM_CUTSCENE_DISCOVERY.md) | How the cutscene catalog is generated and audited |
-| [Object-state reference](docs/engine/SCUMM_OBJECT_STATES.md) | Format evidence, rendering rules and preview semantics |
-| [Script coverage](docs/archive/LOOM_SCRIPT_COVERAGE.md) | Measured decoder coverage; not gameplay coverage |
-| [Harness review](docs/archive/HARNESS_REVIEW_2026-10-04.md) | Which verification tools are kept and why |
-| [Research](docs/engine/RESEARCH.md) | Technical references and prior research |
+Choose **Roland MT-32** in the sound menu to hear the LOOM Roland upgrade's music, including the overture that only plays on this card. It needs two things that are not part of this program:
+
+1. **A game folder with the Roland upgrade installed** (it has `82.LFL` to `85.LFL`).
+2. **Your own MT-32 ROM images**, in one folder: `MT32_CONTROL.ROM` and `MT32_PCM.ROM`, or `CM32L_CONTROL.ROM` and `CM32L_PCM.ROM`. They are copyrighted and never shipped.
+
+The app looks for that folder in this order: the `SCUMM_MT32_ROM_ROOT` environment variable, the folder you chose last time, then a folder named `mt32` beside the game folder. If it finds none it asks once and remembers.
 
 ## Development
 
-Windows WPF application targeting .NET 10. `SCUMMexplorer.Core` owns parsing, rendering and bounded script execution; `SCUMMexplorer.App` owns the desktop UI; `SCUMMexplorer.Tests` holds the Core tests; `.verification/` holds UI harnesses and evidence (see its README). Game data stays local in the folder you open.
-
-From the repository root, with the .NET 10 SDK:
+Windows WPF application targeting .NET 10. From the repository root:
 
 ```powershell
 & 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet build SCUMMexplorer.slnx
 & 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build
 ```
 
-The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. All development shell commands use RTK per the repository instructions. LOOM tests prefer `Games/loom ega mt32 en`; their legacy Spanish fallback has not moved with the data, so use an absolute `SCUMM_LOOM_TEST_ROOT` for `Games/ALTERNATIVE LOOMS/loom ega mt32 es`. Set `SCUMM_SOUND_TEST_ROOT` for sound checks; without `SCUMM_INDY3_EGA_TEST_ROOT` the Indy tests skip. Tests that need the demo folders skip when they are absent.
+The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. All development shell commands use RTK per the repository instructions.
 
-## Roland MT-32 music (optional)
-
-Choose **Roland MT-32** in the sound menu to hear the LOOM Roland upgrade's music, including the overture that the opening plays only with this card. It needs two things that are not part of this program:
-
-1. **A game folder with the LOOM Roland upgrade installed.** It has `82.LFL` to `85.LFL` (the upgrade disk's `READ.ME` describes it). Without them the Roland entry says so and the previous device stays.
-2. **Your own MT-32 ROM images.** The emulator ([Munt](https://github.com/munt/munt)) plays the real instrument samples, which live in the ROM. The ROMs are copyrighted, so they are neither shipped nor committed. Put these files together in one folder:
-   - `MT32_CONTROL.ROM` and `MT32_PCM.ROM` (a Roland MT-32), or
-   - `CM32L_CONTROL.ROM` and `CM32L_PCM.ROM` (a CM-32L, the LAPC-1's sound; the MT-32 pair is preferred when both are present).
-
-   The app looks for that folder in this order: the `SCUMM_MT32_ROM_ROOT` environment variable; the folder you chose the last time; a folder named `mt32` beside the game folder (for example `Games/mt32` next to `Games/loom ega mt32 en`). If it finds none it asks for the folder once and remembers it (`%LOCALAPPDATA%\SCUMMexplorer\mt32-rom-folder.txt`).
-
-Choosing Roland also tells the game it runs on a Roland card, so its own scripts pick the Roland sounds; the other devices keep the game as it was. The first time a long piece is needed it is rendered (the overture takes about 10 seconds); the scene waits for it, then the music starts with the scene. If the saved choice cannot be used for a folder (no upgrade, no ROMs), that session plays on AdLib and the choice is kept.
+| Document | Purpose |
+|---|---|
+| [Requirements](docs/REQUIREMENTS.md) | What the app must do |
+| [Current work](docs/CURRENT_WORK.md) | State, priorities and session handoff |
+| [Changelog](docs/CHANGELOG.md) | Finished work with its validation |
+| [Script map](docs/loom/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, verbs and rooms |
+| [Research](docs/engine/RESEARCH.md) | Technical references |
 
 ## Audio and third-party notices
 
-AdLib rendering uses the separate [NukedOPL3Sharp](https://www.nuget.org/packages/NukedOPL3Sharp/) library, licensed under LGPL 2.1; [source and license](https://github.com/codengine/NukedOPL3Sharp) are available from its author. PC speaker rendering follows the SCUMM driver's envelopes and pitch modulation, with a filtered square wave integrated over each audio sample. Roland MT-32 rendering uses [Munt](https://github.com/munt/munt)'s `mt32emu` (LGPL-2.1-or-later) through the [Mt32emu.net](https://github.com/gregdivis/mt32emu.net) wrapper, loaded as a separate library. See [third-party audio notices](THIRD_PARTY_NOTICES.md) for ScummVM references and licenses.
+AdLib uses [NukedOPL3Sharp](https://www.nuget.org/packages/NukedOPL3Sharp/) (LGPL 2.1). The Roland MT-32 uses [Munt](https://github.com/munt/munt) (`mt32emu`, LGPL-2.1-or-later) through [Mt32emu.net](https://github.com/gregdivis/mt32emu.net). See [third-party audio notices](THIRD_PARTY_NOTICES.md).

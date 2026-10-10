@@ -41,7 +41,7 @@ Not yet checked: sounds degrading cleanly without files 82–85 in the real wind
 
 **Decision (user, 5 October): no replay-pipeline rerun for the other editions.** `loom ega mt32 en` is the only edition that gets the cutscene catalog and the replay tests; the other editions open, show rooms and texts, and keep the four established starts.
 
-**Keeping track (user, 5 October):** the list of verified editions lives in the main `README.md`, section "Verified editions"; add a bullet there whenever an edition is checked.
+**Keeping track (user, 5 October; reworded 10 October):** the editions the app knows are the bullets under "Games" in the main `README.md` (kept short, no test detail) and the hash table `src/SCUMMexplorer.Core/Discovery/known-editions.json`; add both when an edition is added.
 
 ## What the two room-15 bytes do (5 October)
 
