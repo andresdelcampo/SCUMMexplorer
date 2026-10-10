@@ -166,6 +166,16 @@ public sealed class GameFolderScanner
     /// The LOOM CD game: a .cue, .iso or .bin file, a folder holding one, or a folder with the files copied off the disc
     /// (000.LFL and DISK01.LEC). Null when the path is none of these, so the folder scan goes on.
     /// </summary>
+    /// <summary>The SHA-256 fingerprint of the LOOM CD data (both local dumps, the Kixx release included; see <c>ScummV4Archive.Fingerprint</c>).</summary>
+    private const string LoomCdFingerprint = "8A23DBBAFC432CE3F428DF15AFA47B6ED4F38117BF9490ED7DDB0F6F23E6318B-A13D9B5D5EBDA838014293E5A9BF131D4BF7DC792DC3A0AE193838B8B3395A05";
+
+    /// <summary>
+    /// Whether a v4 archive is LOOM CD: its known fingerprint, or (another release of the disc) 78 rooms, 165 costumes, 637 scripts and 30 sounds, the counts of both
+    /// local dumps.
+    /// </summary>
+    public static bool IsLoomCd(string fingerprint, int rooms, int costumes, int scripts, int sounds) =>
+        string.Equals(fingerprint, LoomCdFingerprint, StringComparison.OrdinalIgnoreCase) || (rooms, costumes, scripts, sounds) == (78, 165, 637, 30);
+
     private static GameLibrary? TryScanCd(string path)
     {
         IGameFileSource source;
@@ -202,6 +212,11 @@ public sealed class GameFolderScanner
             resources.AddRange(archive.ReadScripts(room.Number).Where(s => s.Kind == "LS").Select(s => new GameResource(
                 $"Room {room.Number:00} local script {s.Number}", ResourceKind.Script, source.Location, s.Number,
                 "LOOM CD room-local script (DISK01.LEC).", 1, s.BlockOffset, ScriptRoom: room.Number)));
+        // 000.LFL + DISK01.LEC is the container of every game of this SCUMM generation, not only LOOM CD: claim LOOM only for the known data (the fingerprint of the
+        // two dumps), or, for another release of the disc, by the size of its resource directories; anything else is reported as an unsupported v4 game.
+        if (!IsLoomCd(archive.Fingerprint, archive.Rooms.Count, resources.Count(r => r.Kind == ResourceKind.Costume), resources.Count(r => r.Kind == ResourceKind.Script), resources.Count(r => r.Kind == ResourceKind.Sound)))
+            return new GameLibrary(Path.GetFileName(Path.TrimEndingDirectorySeparator(source.Location)), source.Location, ScummVersion.V4, "CD (VGA)", [],
+                "The folder holds a SCUMM v4 game (000.LFL and DISK01.LEC) that is not LOOM CD. It is not supported yet.");
         const string note = "LOOM CD (SCUMM v4, VGA) read from its disc image or files: 000.LFL and DISK01.LEC. Rooms, scripts, objects, actors, texts, the sounds in DISK01.LEC (AdLib and PC speaker) and the voices on the disc's audio track are read.";
         return new GameLibrary("LOOM (CD)", source.Location, ScummVersion.V4, "CD (VGA)", resources, note, GameId.LoomVga) { V4Archive = archive };
     }

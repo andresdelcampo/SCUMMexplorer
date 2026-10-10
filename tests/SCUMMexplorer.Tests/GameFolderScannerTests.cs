@@ -20,6 +20,14 @@ public sealed class GameFolderScannerTests
     }
 
     [Fact]
+    public void OnlyLoomCdDataIsClaimedAsLoomCd()
+    {
+        Assert.True(GameFolderScanner.IsLoomCd("8A23DBBAFC432CE3F428DF15AFA47B6ED4F38117BF9490ED7DDB0F6F23E6318B-A13D9B5D5EBDA838014293E5A9BF131D4BF7DC792DC3A0AE193838B8B3395A05", 1, 1, 1, 1));
+        Assert.True(GameFolderScanner.IsLoomCd("other", 78, 165, 637, 30)); // another release of the disc: the directory sizes
+        Assert.False(GameFolderScanner.IsLoomCd("other", 85, 120, 400, 60)); // another game on the same archive format
+    }
+
+    [Fact]
     public void RecognizesTheLoomDemosWithoutTheirExecutable()
     {
         var source = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/ALTERNATIVE LOOMS/loom demo short ega en"));
