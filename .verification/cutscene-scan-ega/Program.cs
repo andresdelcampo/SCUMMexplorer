@@ -70,6 +70,20 @@ if (args.Length > 2 && args[2] == "uncovered") // CutsceneScanCompare <folder> <
     }
     return;
 }
+if (args.Length > 2 && args[2] == "gated") // CutsceneScanCompare <folder> - gated: the scan's triggers whose fresh run begins no cutscene, with the setup the CD planner derives for them on EGA data
+{
+    var planner = new LoomCdSceneSetupPlanner(game, scan, data);
+    foreach (var g in groups)
+    {
+        var t = g.First;
+        var fresh = LoomCutsceneRun.VisitedRooms(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")), t);
+        if (fresh is not null) continue;
+        var setup = planner.Derive(t);
+        Console.WriteLine($"{LoomCutsceneTitles.Title(t)} | {t.VerbLabel} | plays={setup.Plays} steps={setup.Before.Count}+{setup.After.Count} | {setup.Describe()}");
+        if (setup.Plays) Console.WriteLine($"    rooms: {string.Join(",", planner.VisitedRooms(t))}");
+    }
+    return;
+}
 if (args.Length > 2 && args[2] == "trigger") // CutsceneScanCompare <folder> - trigger <room> <object> <verb hex>: the verb's code and the scripts it starts (literal numbers, depth 3), instructions listed
 {
     int room = int.Parse(args[3]), obj = int.Parse(args[4]), verb = Convert.ToInt32(args[5], 16);

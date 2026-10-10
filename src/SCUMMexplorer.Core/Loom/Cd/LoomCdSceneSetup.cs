@@ -66,7 +66,10 @@ public sealed partial class LoomCdSceneSetupPlanner
     [GeneratedRegex(@"^(?:Room (\d+) (?:local|entry|exit)(?: (\d+))?|Script (\d+))")]
     private static partial Regex WriterPlace();
 
-    private LoomExplorationSession NewSession() => new(_game, _game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
+    // The CD game boots lazily (completeBoot false, the intro is not wanted); the EGA game boots fully, as LoomCutsceneRun does.
+    private LoomExplorationSession NewSession() => _game.V4Archive is { } vga
+        ? new(_game, vga.ReadIndexedObjects(), completeBoot: false)
+        : new(_game, new LflObjectStateReader().ReadSnapshot(System.IO.Path.Combine(_game.FolderPath, "00.LFL")));
 
     private static GameResource RoomOf(GameLibrary game, int room) => game.Rooms.First(r => r.ResourceId == room);
 

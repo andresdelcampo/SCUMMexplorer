@@ -71,6 +71,19 @@ public class LoomCutsceneRunTests
     }
 
     [Fact]
+    public void TheCdSetupPlannerDerivesAStartForAStateGatedEgaScene()
+    {
+        if (Load() is not var (game, snapshot, scan)) return;
+        // Room 25's look at the lamb tests bit D91, which the room's local script 200 sets; a fresh run begins no cutscene.
+        var lamb = scan.First(t => t is { Room: 25, ObjectId: 447, VerbId: 0x36 });
+        Assert.Null(LoomCutsceneRun.VisitedRooms(game, snapshot, lamb));
+        var planner = new LoomCdSceneSetupPlanner(game, scan, ScummDataSources.For(game));
+        var setup = planner.Derive(lamb);
+        Assert.True(setup is { Plays: true, HasSteps: true });
+        Assert.Contains(24, planner.VisitedRooms(lamb));
+    }
+
+    [Fact]
     public void ARunSeesTheRoomsAScenePlaysInAndNotTheLoadsOfBranchesItDoesNotTake()
     {
         if (Load() is not var (game, snapshot, scan)) return;
