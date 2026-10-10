@@ -21,6 +21,16 @@ public sealed class GameFolderScannerTests
             Assert.Equal("LOOM", game.Title);
             Assert.False(game.IsDemo);
             Assert.True(game.Rooms.Count() > 60);
+            Assert.Contains("known data", game.DetectionNote);
+            // A few of the listed files modified or gone: still the same game by the rest.
+            foreach (var name in new[] { "27.LFL", "29.LFL" }) File.WriteAllBytes(Path.Combine(folder, name), [1, 2, 3]);
+            File.Delete(Path.Combine(folder, "39.LFL"));
+            Assert.Contains("known data", new GameFolderScanner().Scan(folder).DetectionNote);
+            // Too many gone: the known hashes no longer vouch for it, and the shape of the index is the labelled last resort.
+            File.Delete(Path.Combine(folder, "52.LFL"));
+            var inferred = new GameFolderScanner().Scan(folder);
+            Assert.Equal(GameId.Loom, inferred.Id);
+            Assert.Contains("index shape only", inferred.DetectionNote);
         }
         finally { Directory.Delete(folder, recursive: true); }
         var tiny = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");

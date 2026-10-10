@@ -46,12 +46,23 @@ public sealed class GameFolderScanner
         var executableNames = files.Select(path => Path.GetFileName(path)).ToHashSet(StringComparer.OrdinalIgnoreCase);
         // The self-running LOOM previews ship as LOOMDEMO.EXE with a subset of the game's rooms, same resource layout.
         var isDemo = executableNames.Contains("LOOMDEMO.EXE");
-        var gameId = executableNames.Contains("LOOM.EXE") || isDemo ? GameId.Loom
-            : executableNames.Contains("INDY3.EXE") ? GameId.IndianaJones3
-            : GameId.Unknown;
+        // The data decides first (known hashes of specific LFL files, so a copy without its executable, as a SCUMMVM-style install keeps it, or with a renamed one is
+        // still told); then the executable's name (the demos), then the shape of the index as a last resort.
+        var gameId = KnownGameFiles.Identify(lflFiles.GroupBy(item => Path.GetFileName(item.Path), StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.First().Path, StringComparer.OrdinalIgnoreCase)) ?? GameId.Unknown;
+        var recognizedBy = gameId == GameId.Unknown ? "" : "known data";
+        if (gameId == GameId.Unknown)
+        {
+            gameId = executableNames.Contains("LOOM.EXE") || isDemo ? GameId.Loom
+                : executableNames.Contains("INDY3.EXE") ? GameId.IndianaJones3
+                : GameId.Unknown;
+            recognizedBy = gameId == GameId.Unknown ? "" : "executable name";
+        }
         var hasIndex = lflFiles.Any(item => item.Id == 0);
-        // A copy without its executable (a SCUMMVM-style install keeps only the data) is told by its index.
-        if (gameId == GameId.Unknown && hasIndex) gameId = IdentifyByIndex(lflFiles.First(item => item.Id == 0).Path);
+        if (gameId == GameId.Unknown && hasIndex && IdentifyByIndex(lflFiles.First(item => item.Id == 0).Path) is var byShape && byShape != GameId.Unknown)
+        {
+            gameId = byShape;
+            recognizedBy = "index shape only (inferred)";
+        }
         var hasRoomFiles = lflFiles.Length > 1;
 
         var resources = new List<GameResource>();
@@ -144,6 +155,7 @@ public sealed class GameFolderScanner
             _ => "Folder contents found. Game and SCUMM version are not confirmed yet."
         };
 
+        if (recognizedBy.Length > 0 && gameId != GameId.Unknown) note += $" Recognised by: {recognizedBy}.";
         return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo);
     }
 
