@@ -6,6 +6,9 @@ namespace SCUMMexplorer.Core.Loom;
 /// What to call a speaker in the text views. The scripts print lines for an actor number; the names below come from the
 /// lines themselves (what the others call them, who they are in the story), not from any table in the game data.
 /// An actor whose identity the lines do not settle keeps its number, with the role when the lines show it.
+/// SCUMM v3/v4 data hold no actor names, so there is nothing to read them from. Checked against the English Roland edition on 10 October
+/// (<c>.verification/cutscene-scan-ega speakers</c>): the scoped names (Mandible, Cob, Rusty, The Dead One, Mr. Stoke, Hetchel in Room 9) are
+/// confirmed by the English lines; actors 2 to 5 and 255 elsewhere are reused for many characters, so their generic labels are a role at best.
 /// </summary>
 public static class LoomSpeakerNames
 {

@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 10 October (later): requirements findings applied
+
+- **Fixed (F-01..F-07):** LOOM CD shows the normal subtitle and preview text; the platform line reads `DOS edition` for `DOS (inferred)`; the doc comment on `LoomResourceNames`; the picker removes its "Needs validation" filter by name; one spelling `(reverse)` for reversed drafts; Game Texts message wording; the stale `src/SCUMMexplorer.Core/Exe/` build folders deleted. Game Texts is hidden for LOOM CD.
+- **Titles and categories in Core (I-01):** `LoomDraftNames` moved to `Core/Loom/Text`, and `LoomCutsceneTitles` (Core, `Loom/Scenes`) now builds every title (`Format`, `Title`). `LoomCdCutsceneIndex.Scan` takes an optional doorway finder and records each look/walk/use verb's destination rooms (`LoomCdCutscene.Destinations`). Scenes are now: entry, a room load, or a verb that leads to another room (no longer "three or more lines"). Unnamed objects read `Use response`; object names lose a trailing `@`. Compared with the 328-replay English catalog (`.verification/cutscene-scan-ega titles`): the scan finds all 328; 187 identical, 24 titles differ (static doorway vs run), 90 shared-helper reactions are dropped by design. See R-8.23.
+- **Room names (I-02):** the tree and room-card tooltips show `Room NN · <glossary name>` for the 8 named LOOM rooms (the game data has no room names).
+- **Speaker names (I-05):** `.verification/cutscene-scan-ega speakers` confirms the scoped names on the English edition; the game holds no actor names to read.
+
 ## 10 October: learn all spells, readable Assumptions panel, nearest door entrance
 
 - **Game Status:** a "Mark all as learned" button ticks Learned on every resolved spell/draft (pending until Apply); shared by EGA and CD/VGA.

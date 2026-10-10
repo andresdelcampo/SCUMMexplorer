@@ -188,7 +188,7 @@ public partial class MainWindow : Window
     {
         if (_game is null)
         {
-            MessageBox.Show(this, "Open a LOOM game folder first.", "Game texts", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, "Open a game folder first.", "Game texts", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -370,7 +370,7 @@ public partial class MainWindow : Window
         WalkBoxOverlay.Visibility = Visibility.Collapsed;
         PreviewMessage.Visibility = Visibility.Visible;
         GameTitle.Text = game.Title;
-        GameInfo.Text = game.Platform == "DOS" ? "DOS edition" : game.Platform;
+        GameInfo.Text = game.Platform.StartsWith("DOS", StringComparison.Ordinal) ? "DOS edition" : game.Platform;
         GameInfo.ToolTip = $"{game.Version switch { ScummVersion.Unknown => "SCUMM version unconfirmed", _ => $"SCUMM {game.Version}" }} · {game.Platform}";
         ResourceTree.Items.Clear();
         RoomCardList.Children.Clear();
@@ -378,7 +378,7 @@ public partial class MainWindow : Window
 
         var rooms = new TreeViewItem { Header = $"Rooms  ({game.Scenes.Count()})", IsExpanded = false };
         foreach (var room in game.Scenes)
-            rooms.Items.Add(new TreeViewItem { Header = room.Name, Tag = room });
+            rooms.Items.Add(new TreeViewItem { Header = LoomResourceNames.Label(_glossary, room), ToolTip = LoomResourceNames.Evidence(_glossary, room), Tag = room });
         ResourceTree.Items.Add(rooms);
 
         foreach (var (kind, label) in new[]
@@ -429,13 +429,14 @@ public partial class MainWindow : Window
             GameId.IndianaJones3 when game.Version == ScummVersion.V3 =>
                 "Room backgrounds and texts from the game.",
             GameId.Loom when game.Version == ScummVersion.V3 => "Explore rooms, objects, and sounds.",
+            GameId.LoomVga => "Explore rooms, objects, and sounds.",
             _ => "The folder index was read, but room and resource inspection is not supported for this game yet."
         };
         PageSubtitle.ToolTip = game.DetectionNote;
         PreviewTitle.Text = "Choose a room";
         PreviewDescription.Text = game.Id == GameId.IndianaJones3 && game.Version == ScummVersion.V3
             ? "Select a room to see its background."
-            : game.Id == GameId.Loom && game.Version == ScummVersion.V3
+            : game.Id == GameId.LoomVga || game.Id == GameId.Loom && game.Version == ScummVersion.V3
                 ? "Pick a room to explore the game from there."
                 : "This game layout does not yet have a supported room background decoder.";
         StatusText.Text = "Ready";
@@ -690,7 +691,7 @@ public partial class MainWindow : Window
         ObjectsNote.Visibility = SessionModeToggle.IsChecked != true ? Visibility.Visible : Visibility.Collapsed;
         VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
         CutsceneMenuButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
-        GameTextsButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        GameTextsButton.Visibility = advanced && _game?.Id != GameId.LoomVga ? Visibility.Visible : Visibility.Collapsed;
         var rootGrid = ContentPanel.Parent as Grid;
         var showRoomDetails = advanced && _selectedResource?.Kind == ResourceKind.Room;
         if (rootGrid is not null && rootGrid.ColumnDefinitions.Count > 2)
@@ -1305,8 +1306,8 @@ public partial class MainWindow : Window
         var card = RoomCardList.Children.OfType<Button>().FirstOrDefault(item => Equals(item.Tag, resource));
         if (card is null) return;
         if (card.Content is Image preview) preview.Source = bitmap;
-        else card.Content = CreateRoomCardImage(bitmap, resource.Name);
-        card.ToolTip = $"Open {resource.Name}";
+        else card.Content = CreateRoomCardImage(bitmap, LoomResourceNames.Label(_glossary, resource));
+        card.ToolTip = $"Open {LoomResourceNames.Label(_glossary, resource)}";
     }
 
     private string EstimateSummary()
@@ -3949,7 +3950,7 @@ public partial class MainWindow : Window
         (int X, int Y)? Click = null, string Category = "Scenes", int[]? TextScripts = null,
         LoomReplayStep[]? Steps = null, string? SequenceId = null, int SilentSteps = 0)
     {
-        public string Title => LoomReplayTitle.Format(RoomId, Description);
+        public string Title => LoomCutsceneTitles.Format(RoomId, Description);
         public string Id => SequenceId ?? (ObjectId == 0 ? $"Room {RoomId:00} entry" : $"Room {RoomId:00} object {ObjectId} Verb 0x{VerbId:X2}");
     }
 
@@ -4114,7 +4115,7 @@ public partial class MainWindow : Window
         var planner = new Lazy<LoomCdSceneSetupPlanner>(() =>
         {
             var data = ScummDataSources.For(game);
-            return new LoomCdSceneSetupPlanner(game, LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList()), data);
+            return new LoomCdSceneSetupPlanner(game, LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game), data);
         });
         _cdSetupPlanner = planner;
         _cdRoomListsDone = false;
@@ -4142,35 +4143,12 @@ public partial class MainWindow : Window
     /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="LoomCdCutsceneIndex"/>).</summary>
     private IReadOnlyList<LoomCdCutsceneGroup> CdCutsceneGroups() =>
         _cdCutsceneGroups ??= _game is { Id: GameId.LoomVga } && _cdData is not null
-            ? LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(_cdData, _game.Rooms.Select(r => r.ResourceId!.Value)))
+            ? LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(_cdData, _game.Rooms.Select(r => r.ResourceId!.Value), LoomCutsceneTitles.Doorways(_game), _game))
             : [];
 
     private string CdCutsceneTitle(LoomCdCutscene trigger)
     {
-        // Use the same source-backed doorway finder as the room hotspots, including loads in local scripts.
-        if (!trigger.IsRoomEntry && trigger.VerbId is 0x36 or 0x37 or 0x38 && _cdData is not null && _game is not null)
-        {
-            var record = _cdData.ReadRoom(trigger.Room).Objects.FirstOrDefault(o => o.Id == trigger.ObjectId);
-            var code = record is null ? null : _cdData.ReadObjectVerb(trigger.Room, record, trigger.VerbId, out _);
-            _doorwayFinder ??= new LoomDoorwayFinder(_game);
-            var destinations = code is null ? [] : _doorwayFinder.Find(_game.Rooms.Single(r => r.ResourceId == trigger.Room), code)
-                .Select(t => t.RoomId).Distinct().ToArray();
-            if (destinations.Length > 0)
-                return PickerVerbTitle(LoomReplayTitle.Format(trigger.Room, "Reached " +
-                    (destinations.Length == 1 ? "Room " : "Rooms ") + string.Join(", ", destinations.Select(r => r.ToString("00")))), trigger.VerbId);
-        }
-        // As the EGA titles read ("Look at leaf", "Opening at sky"): the verb as a word. The verb byte is a technical detail: only Advanced adds it.
-        var verb = trigger.VerbId switch
-        {
-            0x36 => "Look at",
-            0x37 => "Walk to",
-            0x38 => "Use",
-            // A draft verb the table does not name (0x56 is the generic "that spell does nothing here") reads as the EGA titles do.
-            var v => LoomDraftNames.ForVerb(v)?.Name.Replace("(reversed)", "(reverse)") ?? "Other draft response"
-        };
-        var target = trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}";
-        var what = trigger.IsRoomEntry ? "Entry" : $"{verb} {(trigger.VerbId is 0x36 or 0x37 or 0x38 ? "" : "at ")}{target}";
-        return PickerVerbTitle(LoomReplayTitle.Format(trigger.Room, what), trigger.IsRoomEntry ? 0 : trigger.VerbId);
+        return PickerVerbTitle(LoomCutsceneTitles.Title(trigger), trigger.IsRoomEntry ? 0 : trigger.VerbId);
     }
 
     private string CdCutsceneNote(LoomCdCutsceneGroup group)

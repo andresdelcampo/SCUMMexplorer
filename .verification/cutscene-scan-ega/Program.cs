@@ -6,7 +6,7 @@ using SCUMMexplorer.Core.Discovery;
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
 var rooms = game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).ToList();
-var scan = LoomCdCutsceneIndex.Scan(data, rooms);
+var scan = LoomCdCutsceneIndex.Scan(data, rooms, LoomCutsceneTitles.Doorways(game), game);
 var groups = LoomCdCutsceneIndex.Group(scan);
 var scanned = scan.Select(t => (t.Room, t.ObjectId, t.VerbId)).ToHashSet();
 if (args.Length > 2 && args[2] == "verbs") // CutsceneScanCompare <folder> - verbs <room>...: every object verb of those rooms, with whether the scan found a cutscene in it
@@ -60,6 +60,36 @@ if (args.Length > 2 && args[2] == "grep") // CutsceneScanCompare <folder> - grep
     void Scan(string name, ScummScriptDisassembly? d) { foreach (var ins in d?.Instructions ?? []) if ($"{ins.Operation} {ins.Operands}".Contains(args[3])) Console.WriteLine($"{name} +{ins.Offset:X4} {ins.Operation} {ins.Operands}"); }
     foreach (var id in data.GlobalScriptIds()) Scan($"global {id}", data.GlobalScript(id));
     foreach (var room in rooms) { Scan($"room {room} entry", data.RoomEntryScript(room)); foreach (var id in data.RoomLocalScriptIds(room)) Scan($"room {room} local {id}", data.RoomLocalScript(room, id)); }
+    return;
+}
+if (args.Length > 2 && args[2] == "speakers") // CutsceneScanCompare <folder> - speakers: per actor number and script/room, the speaker table's name and a sample line (checks LoomSpeakerNames against this edition)
+{
+    foreach (var g in new LoomTextExtractor().Extract(game).Entries.Where(en => en.Speaker is { } sp && sp.StartsWith("Actor "))
+        .GroupBy(en => (en.Speaker, en.ScriptId, en.RoomId)).OrderBy(g => g.Key.Speaker).ThenBy(g => g.Key.ScriptId))
+        Console.WriteLine($"{g.Key.Speaker} script {g.Key.ScriptId} room {g.Key.RoomId} => {LoomSpeakerNames.Display(g.First())}: {string.Join(" / ", g.Take(2).Select(en => en.Text.Length > 60 ? en.Text[..60] : en.Text))}");
+    return;
+}
+if (args.Length > 2 && args[2] == "titles") // CutsceneScanCompare <folder> <loom-replays.json> titles: scan-derived title and category against the catalog's, per replay
+{
+    using var tdoc = JsonDocument.Parse(File.ReadAllText(args[1]));
+    var groupOf = groups.SelectMany(g => g.Others.Append(g.First).Select(t => (t, g))).ToDictionary(x => (x.t.Room, x.t.ObjectId, x.t.VerbId), x => x.g);
+    int same = 0, titleDiff = 0, catDiff = 0, helper = 0;
+    foreach (var e in tdoc.RootElement.GetProperty("replays").EnumerateArray())
+    {
+        var key = (e.GetProperty("room").GetInt32(), e.GetProperty("objectId").GetInt32(), e.GetProperty("verb").GetInt32());
+        var trigger = scan.First(t => (t.Room, t.ObjectId, t.VerbId) == key);
+        var catTitle = LoomCutsceneTitles.Format(key.Item1, LoomDraftNames.ReplayTitle(e.GetProperty("title").GetString()!, key.Item3));
+        var scanTitle = LoomCutsceneTitles.Title(trigger);
+        var catCat = e.GetProperty("category").GetString();
+        var scanCat = groupOf.TryGetValue(key, out var g) ? (g.IsScene ? "Scenes" : "Dialogue and reactions") : "(shared helper: no group)";
+        if (!groupOf.ContainsKey(key)) helper++;
+        var t = catTitle == scanTitle; var c = catCat == scanCat;
+        if (t && c) same++; if (!t) titleDiff++; if (!c) catDiff++;
+        if (args.Length > 3 && args[3] == "csv")
+            Console.WriteLine($"CSV,{catCat},{trigger.Texts},{trigger.RoomLoads},{trigger.SpanInstructions},{trigger.IsRoomEntry},{e.GetProperty("rooms").GetArrayLength()},{(scanTitle.Contains("Reached") ? 1 : 0)},{(groupOf.ContainsKey(key) ? 1 : 0)}");
+        if (!t || !c) Console.WriteLine($"{e.GetProperty("id").GetString()}{Environment.NewLine}    catalog: {catTitle} [{catCat}]{Environment.NewLine}    scan:    {scanTitle} [{scanCat}]{Environment.NewLine}    stats:   texts {trigger.Texts}, room loads {trigger.RoomLoads}, span {trigger.SpanInstructions}, catalog rooms {e.GetProperty("rooms").GetArrayLength()}, frames {e.GetProperty("frames").GetInt32()}");
+    }
+    Console.WriteLine($"identical title and category: {same}; title differs: {titleDiff}; category differs: {catDiff}; replays whose scripts the scan drops as shared helpers: {helper}");
     return;
 }
 using var doc = JsonDocument.Parse(File.ReadAllText(args[1]));

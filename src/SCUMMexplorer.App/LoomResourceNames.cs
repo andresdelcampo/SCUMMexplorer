@@ -22,13 +22,13 @@ internal static class LoomResourceNames
             ? $"{entry.Name} ({entry.EvidenceLabel})" + (entry.Source.Length > 0 ? $": {entry.Source}" : "")
             : null;
 
-    /// <summary>Adds the glossary name after each "script 028" in a line of the explorer's own text (the line itself stays the evidence in the tooltip).</summary>
     /// <summary>Adds the name after each "bit[0xD9D]" the glossary (or the catalog scene that sets it) names.</summary>
     public static string NameBits(LoomGlossary glossary, string text) =>
         System.Text.RegularExpressions.Regex.Replace(text, @"bit\[0x([0-9A-Fa-f]{1,4})\](?! \()", match =>
             glossary.Bit(int.Parse(match.Groups[1].Value, System.Globalization.NumberStyles.HexNumber)) is { } entry
                 ? $"{match.Value} ({entry.Name})" : match.Value);
 
+    /// <summary>Adds the glossary name after each "script 028" in a line of the explorer's own text (the line itself stays the evidence in the tooltip).</summary>
     public static string NameScripts(LoomGlossary glossary, string text) =>
         System.Text.RegularExpressions.Regex.Replace(text, @"\b([Ss]cript )(\d{1,3})\b(?! \()", match =>
             glossary.Script(int.Parse(match.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture)) is { } entry

@@ -115,12 +115,12 @@ internal static class Program
                     if (popupRoot is not null) Save(popupRoot, prefix + "-sounds");
                     // Close the popup by moving focus back to the main window before the next view.
                     window.Activate();
-                    var formatted = typeof(MainWindow).Assembly.GetType("SCUMMexplorer.App.LoomReplayTitle")!.GetMethod("Format")!.Invoke(null, [2, "Room 02 · Use response · Reached Room 03"]);
+                    var formatted = SCUMMexplorer.Core.Loom.LoomCutsceneTitles.Format(2, "Room 02 · Use response · Reached Room 03");
                     Check((string)formatted! == "Room 02 · Reached Room 03", prefix + " concise doorway title");
                     Check((string)Call("PickerVerbTitle", formatted, 0x38)! == "Room 02 · Reached Room 03 (verb 0x38)", prefix + " advanced verb title");
                     if (cd)
                     {
-                        var trigger = new LoomCdCutscene(2, 78, "", 0x38, [], 0, 1, 0, "");
+                        var trigger = LoomCdCutsceneIndex.Scan(ScummDataSources.For(game), [2], LoomCutsceneTitles.Doorways(game), game).Single(t => t.ObjectId == 78 && t.VerbId == 0x38);
                         var title = (string)Call("CdCutsceneTitle", trigger)!;
                         Check(title == "Room 02 · Reached Room 03 (verb 0x38)", "VGA doorway destination from object 78's own code: " + title);
                         var entry = session.LastVisitEvents.First(ev => ev.TargetKind == ResourceKind.Script && ev.TargetId == 17);

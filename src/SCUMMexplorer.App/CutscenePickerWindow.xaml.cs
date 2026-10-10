@@ -15,7 +15,7 @@ public partial class CutscenePickerWindow : Window
     {
         InitializeComponent(); _items = items;
         CoverageSummary.Text = summary; CoverageSummary.Visibility = advanced && summary.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-        if (!advanced) { CategoryFilter.Items.RemoveAt(3); DetailsExpander.Visibility = Visibility.Collapsed; }
+        if (!advanced) { CategoryFilter.Items.Remove(NeedsValidationFilter); DetailsExpander.Visibility = Visibility.Collapsed; }
         if (roomScope)
         {
             CategoryFilter.SelectedIndex = 2; // all playable; a room may have only dialogue previews

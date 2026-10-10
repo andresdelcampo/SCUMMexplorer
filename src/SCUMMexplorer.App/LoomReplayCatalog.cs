@@ -42,13 +42,4 @@ internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayR
 
 internal sealed record CutscenePickerItem(string Title, string Category, string Note, Action? Play, string Status = "");
 
-internal static class LoomReplayTitle
-{
-    public static string Format(int room, string description)
-    {
-        description = System.Text.RegularExpressions.Regex.Replace(description,
-            @"(?:Use|Look|Walk) response · (?=Reached Rooms? )", "");
-        var prefix = $"Room {room:00} · ";
-        return description.StartsWith(prefix, StringComparison.Ordinal) ? description : prefix + description;
-    }
-}
+

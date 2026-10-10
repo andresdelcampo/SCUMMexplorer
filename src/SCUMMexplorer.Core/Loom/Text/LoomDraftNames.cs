@@ -1,7 +1,7 @@
 
-namespace SCUMMexplorer.App;
+namespace SCUMMexplorer.Core.Loom;
 
-internal static class LoomDraftNames
+public static class LoomDraftNames
 {
     // Shared display associations already used by Game Status. They do not supply spell prerequisites or change the
     // source verb selected by a replay. The slot order is the game's draft table; the names were checked on 3 October
@@ -63,7 +63,7 @@ internal static class LoomDraftNames
             if (verb != name.Forward && verb != name.Reverse) continue;
             var reverse = verb == name.Reverse;
             var parts = name.Title.Split(" / ", StringSplitOptions.None);
-            return (parts.Length == 2 ? parts[reverse ? 1 : 0] : name.Title + (reverse ? " (reversed)" : ""), reverse);
+            return (parts.Length == 2 ? parts[reverse ? 1 : 0] : name.Title + (reverse ? " (reverse)" : ""), reverse);
         }
         return null;
     }

@@ -33,7 +33,7 @@ From the repository root (Windows, .NET 10 SDK):
 & 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build
 ```
 
-All shell and child commands must use RTK, including PowerShell; `C:\Users\adelc\.codex\RTK.md` is mandatory. `.verification/run-verify.cmd` is a full-audit driver, not a routine check. LOOM tests prefer `Games/loom ega mt32 en`; legacy Spanish/`loom` fallback names remain in TestGames. For the moved Spanish comparison use `SCUMM_LOOM_TEST_ROOT` with its absolute path. Set `SCUMM_SOUND_TEST_ROOT` and `SCUMM_INDY3_EGA_TEST_ROOT` when those checks are needed; Indy checks skip without their data setting.
+All shell and child commands must use RTK, including PowerShell; the global RTK.md is mandatory (`C:\Users\adelc\.claude\RTK.md` for Claude Code, `C:\Users\adelc\.codex\RTK.md` for Codex; keep both in step). `.verification/run-verify.cmd` is a full-audit driver, not a routine check. LOOM tests prefer `Games/loom ega mt32 en`; legacy Spanish/`loom` fallback names remain in TestGames. For the moved Spanish comparison use `SCUMM_LOOM_TEST_ROOT` with its absolute path. Set `SCUMM_SOUND_TEST_ROOT` and `SCUMM_INDY3_EGA_TEST_ROOT` when those checks are needed; Indy checks skip without their data setting.
 
 ## Engine facts that matter here (checked against ScummVM `engines/scumm`)
 

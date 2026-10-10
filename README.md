@@ -17,6 +17,7 @@ Checked by opening the folder in the app and running the room, text and glossary
 - **LOOM EGA, French**: opens, rooms without gaps, texts extract.
 - **LOOM EGA, German**: opens, rooms without gaps.
 - **LOOM EGA v1.2, Spanish and German**: open, rooms without gaps (v1.2 German is byte-identical to the plain German release).
+- **LOOM EGA, Italian**: present under `Games/loom ega it`, not yet reviewed.
 - **LOOM self-running previews (short and long, English)**: open.
 - **LOOM CD (VGA), English, both dumps**: opens from folder, `.cue` or `.bin`; room backgrounds, first-visit objects, costumes, walk boxes/depth masks and a live v4 session. Clicks walk Bobbin and dispatch source verbs; text uses the CD fonts and voice cues play from the disc. The intro waits for the skill-screen click (its later draft answer is assumed). Game Status reads CD staff/note/draft data; all script kinds have Readable views and source-scoped links. Source-derived cutscene starts and per-room scene lists are implemented. The sound menu offers CD Audio / No Sound, with advanced disc-cue and stored-sound inspection. Source/bounded validation is distinct from independent picture/listening comparison; current counts and limits are in [Current work](docs/CURRENT_WORK.md).
 - **Indiana Jones and the Last Crusade EGA, English**: room backgrounds and texts only.
