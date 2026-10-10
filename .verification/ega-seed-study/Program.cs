@@ -57,7 +57,7 @@ if (args.Length > 0 && args[0] == "index") // EgaSeedStudy index <folder>...: id
     {
         var g6 = new GameFolderScanner().Scan(dir);
         var byKind = g6.Resources.Where(r => r.ContainerFileNumber is not null || r.Kind is ResourceKind.Room or ResourceKind.Costume or ResourceKind.Script or ResourceKind.Sound).GroupBy(r => r.Kind).ToDictionary(x => x.Key, x => x.Count());
-        Console.WriteLine($"{Path.GetFileName(Path.TrimEndingDirectorySeparator(dir))}: {g6.Id} {g6.Version} demo={g6.IsDemo} rooms={byKind.GetValueOrDefault(ResourceKind.Room)} costumes={byKind.GetValueOrDefault(ResourceKind.Costume)} scripts={byKind.GetValueOrDefault(ResourceKind.Script)} sounds={byKind.GetValueOrDefault(ResourceKind.Sound)}");
+        Console.WriteLine($"{Path.GetFileName(Path.TrimEndingDirectorySeparator(dir))}: {g6.Id} {g6.Version} demo={g6.IsDemo} edition=[{g6.Edition}] rooms={byKind.GetValueOrDefault(ResourceKind.Room)} costumes={byKind.GetValueOrDefault(ResourceKind.Costume)} scripts={byKind.GetValueOrDefault(ResourceKind.Script)} sounds={byKind.GetValueOrDefault(ResourceKind.Sound)}");
     }
     return;
 }

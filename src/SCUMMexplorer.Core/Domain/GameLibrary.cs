@@ -55,7 +55,8 @@ public sealed record GameLibrary(
     IReadOnlyList<GameResource> Resources,
     string DetectionNote,
     GameId Id = GameId.Unknown,
-    bool IsDemo = false)
+    bool IsDemo = false,
+    string Edition = "")
 {
     /// <summary>The SCUMM v4 archive (DISK01.LEC; LOOM CD); null for every other game.</summary>
     public ScummV4Archive? V4Archive { get; init; }

@@ -5,6 +5,38 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class GameFolderScannerTests
 {
+    [Theory]
+    [InlineData("loom ega mt32 en", "English, Roland upgrade", false)]
+    [InlineData("loom ega en", "English", false)]
+    [InlineData("loom ega it", "Italian", false)]
+    public void NamesTheEditionFromTheFilesAlone(string folderName, string edition, bool demo)
+    {
+        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/" + folderName));
+        if (!File.Exists(Path.Combine(folder, "00.LFL")) && !File.Exists(Path.Combine(folder, "00.lfl"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal(GameId.Loom, game.Id);
+        Assert.Equal(edition, game.Edition);
+        Assert.Equal(demo, game.IsDemo);
+    }
+
+    [Fact]
+    public void RecognizesTheLoomDemosWithoutTheirExecutable()
+    {
+        var source = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/ALTERNATIVE LOOMS/loom demo short ega en"));
+        if (!File.Exists(Path.Combine(source, "00.LFL"))) return;
+        var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(folder);
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(source, "*.LFL")) File.Copy(file, Path.Combine(folder, Path.GetFileName(file)));
+            var game = new GameFolderScanner().Scan(folder);
+            Assert.Equal(GameId.Loom, game.Id);
+            Assert.True(game.IsDemo);
+            Assert.Equal("English, short demo", game.Edition);
+        }
+        finally { Directory.Delete(folder, recursive: true); }
+    }
+
     [Fact]
     public void RecognizesLoomWithoutItsExecutableFromTheIndexAndStillSaysNothingAboutAnUnknownIndex()
     {
@@ -22,12 +54,13 @@ public sealed class GameFolderScannerTests
             Assert.False(game.IsDemo);
             Assert.True(game.Rooms.Count() > 60);
             Assert.Contains("known data", game.DetectionNote);
+            Assert.False(string.IsNullOrEmpty(game.Edition));
             // A few of the listed files modified or gone: still the same game by the rest.
             foreach (var name in new[] { "27.LFL", "29.LFL" }) File.WriteAllBytes(Path.Combine(folder, name), [1, 2, 3]);
             File.Delete(Path.Combine(folder, "39.LFL"));
             Assert.Contains("known data", new GameFolderScanner().Scan(folder).DetectionNote);
-            // Too many gone: the known hashes no longer vouch for it, and the shape of the index is the labelled last resort.
-            File.Delete(Path.Combine(folder, "52.LFL"));
+            // Almost all gone: the known hashes no longer vouch for it, and the shape of the index is the labelled last resort.
+            foreach (var file in Directory.EnumerateFiles(folder, "*.LFL").Where(f => !new[] { "00.LFL", "01.LFL", "02.LFL" }.Contains(Path.GetFileName(f)))) File.Delete(file);
             var inferred = new GameFolderScanner().Scan(folder);
             Assert.Equal(GameId.Loom, inferred.Id);
             Assert.Contains("index shape only", inferred.DetectionNote);

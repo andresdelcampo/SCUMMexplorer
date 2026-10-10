@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Discovery\known-editions.json" LogicalName="SCUMMexplorer.Core.known-editions.json" />
     <EmbeddedResource Include="Loom\Text\loom-glossary.json" LogicalName="SCUMMexplorer.Core.loom-glossary.json" />
     <EmbeddedResource Include="Loom\Cd\loom-cd-glossary.json" LogicalName="SCUMMexplorer.Core.loom-cd-glossary.json" />
     <EmbeddedResource Include="Loom\Ega\loom-ega-reviewed-glossary.json" LogicalName="SCUMMexplorer.Core.loom-ega-reviewed-glossary.json" />

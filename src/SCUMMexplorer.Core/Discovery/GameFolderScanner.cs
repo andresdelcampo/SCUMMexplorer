@@ -44,12 +44,14 @@ public sealed class GameFolderScanner
             .OrderBy(item => item.Id)
             .ToArray();
         var executableNames = files.Select(path => Path.GetFileName(path)).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        // The self-running LOOM previews ship as LOOMDEMO.EXE with a subset of the game's rooms, same resource layout.
-        var isDemo = executableNames.Contains("LOOMDEMO.EXE");
-        // The data decides first (known hashes of specific LFL files, so a copy without its executable, as a SCUMMVM-style install keeps it, or with a renamed one is
-        // still told); then the executable's name (the demos), then the shape of the index as a last resort.
-        var gameId = KnownGameFiles.Identify(lflFiles.GroupBy(item => Path.GetFileName(item.Path), StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.First().Path, StringComparer.OrdinalIgnoreCase)) ?? GameId.Unknown;
+        // The data decides first: the edition whose known hashes the LFL files match, then the game by its language-free files; only then the executable's name (the demos)
+        // and, last, the shape of the index. So a copy without its executable (as a SCUMMVM-style install keeps it) or with a renamed one is still told.
+        var lflByName = lflFiles.GroupBy(item => Path.GetFileName(item.Path), StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.First().Path, StringComparer.OrdinalIgnoreCase);
+        var edition = KnownGameFiles.IdentifyEdition(lflByName);
+        var gameId = edition?.Game ?? KnownGameFiles.IdentifyGame(lflByName) ?? GameId.Unknown;
         var recognizedBy = gameId == GameId.Unknown ? "" : "known data";
+        // The self-running LOOM previews ship as LOOMDEMO.EXE with a subset of the game's rooms, same resource layout.
+        var isDemo = executableNames.Contains("LOOMDEMO.EXE") || edition?.Demo == true;
         if (gameId == GameId.Unknown)
         {
             gameId = executableNames.Contains("LOOM.EXE") || isDemo ? GameId.Loom
@@ -155,8 +157,9 @@ public sealed class GameFolderScanner
             _ => "Folder contents found. Game and SCUMM version are not confirmed yet."
         };
 
-        if (recognizedBy.Length > 0 && gameId != GameId.Unknown) note += $" Recognised by: {recognizedBy}.";
-        return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo);
+        if (recognizedBy.Length > 0 && gameId != GameId.Unknown)
+            note += edition is not null ? $" Recognised by known data: {edition.Label}." : $" Recognised by: {recognizedBy}.";
+        return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo, edition?.Label ?? "");
     }
 
     /// <summary>
