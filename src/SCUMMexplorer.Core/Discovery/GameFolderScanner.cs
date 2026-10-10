@@ -9,6 +9,23 @@ namespace SCUMMexplorer.Core.Discovery;
 /// </summary>
 public sealed class GameFolderScanner
 {
+    /// <summary>
+    /// The game an old-v3 index belongs to when the folder has no executable (a SCUMMVM-style install may keep only the data): how many costumes and scripts the
+    /// index lists. Checked on 10 October on every local copy: all LOOM EGA editions list 176 costumes and 117 scripts, Indiana Jones and the Last Crusade EGA
+    /// 100 and 130. The demos and other games differ and stay unknown without their executable.
+    /// </summary>
+    private static GameId IdentifyByIndex(string indexPath)
+    {
+        try
+        {
+            var entries = new LflIndexReader().Read(indexPath);
+            var costumes = entries.Count(e => e.Kind == ResourceKind.Costume);
+            var scripts = entries.Count(e => e.Kind == ResourceKind.Script);
+            return (costumes, scripts) switch { (176, 117) => GameId.Loom, (100, 130) => GameId.IndianaJones3, _ => GameId.Unknown };
+        }
+        catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or IOException) { return GameId.Unknown; }
+    }
+
     private static readonly HashSet<string> SoundExtensions = new(StringComparer.OrdinalIgnoreCase)
         { ".SOU", ".MIDI", ".MID", ".IMS" };
 
@@ -33,6 +50,8 @@ public sealed class GameFolderScanner
             : executableNames.Contains("INDY3.EXE") ? GameId.IndianaJones3
             : GameId.Unknown;
         var hasIndex = lflFiles.Any(item => item.Id == 0);
+        // A copy without its executable (a SCUMMVM-style install keeps only the data) is told by its index.
+        if (gameId == GameId.Unknown && hasIndex) gameId = IdentifyByIndex(lflFiles.First(item => item.Id == 0).Path);
         var hasRoomFiles = lflFiles.Length > 1;
 
         var resources = new List<GameResource>();

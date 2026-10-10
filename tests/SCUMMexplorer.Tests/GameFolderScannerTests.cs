@@ -6,6 +6,35 @@ namespace SCUMMexplorer.Tests;
 public sealed class GameFolderScannerTests
 {
     [Fact]
+    public void RecognizesLoomWithoutItsExecutableFromTheIndexAndStillSaysNothingAboutAnUnknownIndex()
+    {
+        // An install without LOOM.EXE (a SCUMMVM-style copy, or the Italian release as found) is told by the index's costume and script counts.
+        var source = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative));
+        if (!File.Exists(Path.Combine(source, "00.LFL"))) return;
+        var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(folder);
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(source, "*.LFL")) File.Copy(file, Path.Combine(folder, Path.GetFileName(file)));
+            var game = new GameFolderScanner().Scan(folder);
+            Assert.Equal(GameId.Loom, game.Id);
+            Assert.Equal("LOOM", game.Title);
+            Assert.False(game.IsDemo);
+            Assert.True(game.Rooms.Count() > 60);
+        }
+        finally { Directory.Delete(folder, recursive: true); }
+        var tiny = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tiny);
+        try
+        {
+            WriteOldV3Index(Path.Combine(tiny, "00.LFL"));
+            File.WriteAllBytes(Path.Combine(tiny, "01.LFL"), []);
+            Assert.Equal(GameId.Unknown, new GameFolderScanner().Scan(tiny).Id);
+        }
+        finally { Directory.Delete(tiny, recursive: true); }
+    }
+
+    [Fact]
     public void RecognizesLikelyDosLoomAndKeepsIndexOutOfRoomList()
     {
         var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");

@@ -51,6 +51,16 @@ if (args.Length > 2 && args[2] == "grep") // EgaSeedStudy <folder> - grep <text>
     for (var id = 0; id < 60; id++) foreach (var i in d5.GlobalScript(id)?.Instructions ?? []) if (i.Operands.Contains(args[3], StringComparison.Ordinal)) Console.WriteLine($"  global {id} +0x{i.Offset:X4} {i.Operation} {i.Operands}");
     return;
 }
+if (args.Length > 0 && args[0] == "index") // EgaSeedStudy index <folder>...: id/version and the 00.LFL directory counts of each folder, to find a data signature for a game
+{
+    foreach (var dir in args.Skip(1))
+    {
+        var g6 = new GameFolderScanner().Scan(dir);
+        var byKind = g6.Resources.Where(r => r.ContainerFileNumber is not null || r.Kind is ResourceKind.Room or ResourceKind.Costume or ResourceKind.Script or ResourceKind.Sound).GroupBy(r => r.Kind).ToDictionary(x => x.Key, x => x.Count());
+        Console.WriteLine($"{Path.GetFileName(Path.TrimEndingDirectorySeparator(dir))}: {g6.Id} {g6.Version} demo={g6.IsDemo} rooms={byKind.GetValueOrDefault(ResourceKind.Room)} costumes={byKind.GetValueOrDefault(ResourceKind.Costume)} scripts={byKind.GetValueOrDefault(ResourceKind.Script)} sounds={byKind.GetValueOrDefault(ResourceKind.Sound)}");
+    }
+    return;
+}
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
 var total = Stopwatch.StartNew();
