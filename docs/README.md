@@ -5,7 +5,7 @@ Updated 9 October 2026. CURRENT_WORK is the current plan and handoff; CHANGELOG 
 - [CURRENT_WORK.md](CURRENT_WORK.md): current state, ordered tasks, rules and session handoff.
 - [FINAL_GAPS_HANDOFF.md](loom/FINAL_GAPS_HANDOFF.md): exact original-game comparison recipes and evidence limits.
 - [REQUIREMENTS.md](REQUIREMENTS.md): what the app must do, tagged by scope (SCUMM, SCUMM v3/v4, LOOM, LOOM EGA/CD), with exact title and script-view formats.
-- [REQUIREMENTS_FINDINGS.md](REQUIREMENTS_FINDINGS.md): faults, inconsistencies, risks and improvement ideas found while drafting the requirements (static reading, nothing run).
+- [REQUIREMENTS_FINDINGS.md](archive/REQUIREMENTS_FINDINGS.md): faults, inconsistencies, risks and improvement ideas found while drafting the requirements (static reading, nothing run).
 - [CHANGELOG.md](CHANGELOG.md): finished work, with links to its validation.
 - [CLEANUP_REVIEW.md](archive/CLEANUP_REVIEW.md): historical cleanup review; other deletion proposals remain parked.
 

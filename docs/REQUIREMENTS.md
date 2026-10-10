@@ -1,6 +1,6 @@
 # SCUMMexplorer requirements
 
-Drafted 10 October 2026 from the project notes, `README.md`, `docs/` and the source under `src/` (read, not run: no build, test or app run was done for this draft). Problems found on the way are **not** mixed in here; they are in [REQUIREMENTS_FINDINGS.md](REQUIREMENTS_FINDINGS.md).
+Drafted 10 October 2026 from the project notes, `README.md`, `docs/` and the source under `src/` (read, not run: no build, test or app run was done for this draft). Problems found on the way are **not** mixed in here; they are in [REQUIREMENTS_FINDINGS.md](archive/REQUIREMENTS_FINDINGS.md).
 
 ## 0. How to read this document
 

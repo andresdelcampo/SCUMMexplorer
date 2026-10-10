@@ -26,7 +26,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 
 ## Requirements and scope tags
 
-`docs/REQUIREMENTS.md` is the list of what the app must do (scope tags, code homes, the Normal vs Advanced rule and the requirement-vs-implementation rule are defined there, in section 0); `docs/REQUIREMENTS_FINDINGS.md` holds the problems and ideas found while writing it. Keep requirement rules in that document, not here. A requirement's tag states how wide the requirement is; put the code in the lowest layer that is true for the code.
+`docs/REQUIREMENTS.md` is the list of what the app must do (scope tags, code homes, the Normal vs Advanced rule and the requirement-vs-implementation rule are defined there, in section 0); `docs/archive/REQUIREMENTS_FINDINGS.md` holds the problems and ideas found while writing it. Keep requirement rules in that document, not here. A requirement's tag states how wide the requirement is; put the code in the lowest layer that is true for the code.
 
 ## Build and test
 
