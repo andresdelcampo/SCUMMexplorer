@@ -5,7 +5,7 @@ Updated 9 October 2026. Rebuild a harness before running it so it includes the c
 ## Current checkpoint entry points
 
 - [room09-speakers-20261009](room09-speakers-20261009/README.md): user-reported missing VGA Hetchel/Dead One reproduced; own-source speaker setup shared by EGA/CD direct starts. User confirms physical EGA/VGA keyboard/mouse casting; CD synchronization moves to the full manual run.
-- [actor-progression-20261009](actor-progression-20261009/STATE_CHECKS.md): original partial inventory preserved; own-edition story range and 168 bounded staff/Rusty/close-up assertions. Native size comparisons remain separate.
+- [actor-progression-20261009](actor-progression-20261009/STATE_CHECKS.md): own-edition story range and 168 bounded staff/Rusty/close-up assertions. Native size comparisons remain separate.
 - [earned-progression-20261009](earned-progression-20261009/README.md): 40 unique lessons and corrected completion guards; complete English seven-note source/input excursion chain (25 assertions/26 balanced scopes). Prior level-four and later helper evidence reused; physical/native/audio comparisons remain manual.
 - [room43-accepted-20261009](room43-accepted-20261009/README.md): user accepts the checked scene's delayed actor arrivals and placement; Room 43 removed from active comparisons, no behavior change.
 - [wpf-casting-20261008](wpf-casting-20261008/README.md): 12 whole-draft casts through routed WPF text and scaled staff-strip clicks across three editions; 168 assertions, private profile, no OS/native input or timing claim.

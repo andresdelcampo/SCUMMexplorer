@@ -1,6 +1,6 @@
 # Actor state checks, 9 October 2026
 
-The original `Probe/`, `README.md`, ignored `out-build/` and `out-source/` are preserved as the user's uncommitted partial checkpoint. Their 217/219/216 ego sites and ten level sites per edition were reviewed as an inventory, not converted into correctness assertions. `Review/` adds own-edition entry scripts, relevant close-up scripts and lesson call sites in separate ignored output.
+The early source-inventory `Probe/` (217/219/216 ego sites and ten level sites per edition, reviewed as an inventory, never correctness assertions) was deleted on 10 October once the work below superseded it. `Review/` adds own-edition entry scripts, relevant close-up scripts and lesson call sites in separate ignored output.
 
 ## Edition story controls
 
