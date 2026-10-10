@@ -57,8 +57,8 @@ Severity: **High** = wrong visible behaviour, **Med** = user-visible inconsisten
 
 Listed so nobody mistakes them for verified requirements:
 
-1. That the room's **Play Cutscene** button is visible in Normal mode (the XAML has it outside the Advanced-only group and `UpdateAdvancedMode` does not hide it, but its visibility is also set elsewhere).
-2. Keyboard pan of the room viewport (`RoomViewport_PreviewKeyDown`) — documented in requirements only as "or keys".
-3. The exact wording of CD draft/skill-screen messages after the intro.
-4. Whether Game Texts for LOOM CD opens, and what it shows (I-06).
-5. That every `Dialogue and reactions` EGA entry is reachable from the room popup (`Membership` is generated data).
+1. **Checked 10 Oct (`.verification/room-cutscene-button`, PASS in Normal and Advanced).** That the room's **Play Cutscene** button is visible in Normal mode (the XAML has it outside the Advanced-only group and `UpdateAdvancedMode` does not hide it, but its visibility is also set elsewhere).
+2. Keyboard pan of the room viewport — **10 Oct: it worked only after clicking an arrow (focus). Left/Right now pan from anywhere except text boxes, combo boxes, sliders and expandable tree nodes (`RoomPanKeysAvailable`); not yet retested by the user.**
+3. CD skill screen and draft question — **10 Oct, user: the difficulty screen (Room 69) works; clicking a difficulty makes no sound: checked, the click starts no sound or voice in the data (the next cue, 3049/44, belongs to the intro's narration after the boot answer); the CD has no copy-protection/draft question, the intro goes on to the opening.**
+4. Game Texts for LOOM CD — **10 Oct: enabled (`GameSupport.Texts` for the CD; the extractor already read the CD scripts: 1,196 entries, 0 skipped). Not yet opened in the window by the user.**
+5. **Pinned 10 Oct by `ReplayCatalogReachabilityTests`.** That every catalog entry (also `Dialogue and reactions`) is reachable from the room popup (`Membership` is generated data).

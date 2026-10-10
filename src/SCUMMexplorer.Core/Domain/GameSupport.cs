@@ -15,7 +15,7 @@ public sealed record GameSupport(bool Rooms, bool LiveSession, bool Scripts, boo
     {
         (GameId.Loom, ScummVersion.V3) => new(true, true, true, true, true, true, true,
             "Explore rooms, objects, and sounds.", "Pick a room to explore the game from there."),
-        (GameId.LoomVga, _) => new(true, true, true, true, false, true, true,
+        (GameId.LoomVga, _) => new(true, true, true, true, true, true, true,
             "Explore rooms, objects, and sounds.", "Pick a room to explore the game from there."),
         (GameId.IndianaJones3, ScummVersion.V3) => new(true, false, false, false, true, false, false,
             "Room backgrounds and texts from the game.", "Select a room to see its background."),

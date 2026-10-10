@@ -15,7 +15,7 @@ public class GameSupportTests
 
         var cd = GameSupport.For(Game(GameId.LoomVga, ScummVersion.V4));
         Assert.True(cd.LiveSession && cd.Cutscenes && cd.Status && cd.Audio);
-        Assert.False(cd.Texts); // Game Texts is not offered for the CD game
+        Assert.True(cd.Texts); // the extractor reads the CD scripts and objects too
 
         var indy = GameSupport.For(Game(GameId.IndianaJones3, ScummVersion.V3));
         Assert.True(indy.Rooms && indy.Texts);

@@ -2535,6 +2535,7 @@ public partial class MainWindow : Window
                 return;
             }
         }
+        if (e.Key is Key.Left or Key.Right && RoomPanKeysAvailable) { RoomViewport_PreviewKeyDown(sender, e); if (e.Handled) return; }
         if (!GameKeysActive) return;
         // F10 arrives as a system key.
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
@@ -2568,14 +2569,40 @@ public partial class MainWindow : Window
     private void SendKeyToGame(int key) =>
         SendInputToGame(() => _session!.PressKey(key), $"Key {LoomExplorationSession.DescribeKey(key)}");
 
+    /// <summary>A button caption with a small turning arc in front of it while the scenes of the rooms are still being worked out; the caption alone otherwise.</summary>
+    private static object ButtonWithSpinner(string text, bool spinning)
+    {
+        if (!spinning) return text;
+        var arc = new System.Windows.Shapes.Path
+        {
+            Data = Geometry.Parse("M 6,1 A 5,5 0 1 1 1,6"),
+            Stroke = Brushes.Goldenrod, StrokeThickness = 1.8, StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round,
+            Width = 12, Height = 12, Margin = new Thickness(0, 0, 6, 0), VerticalAlignment = VerticalAlignment.Center,
+            RenderTransformOrigin = new Point(0.5, 0.5), RenderTransform = new RotateTransform()
+        };
+        arc.RenderTransform.BeginAnimation(RotateTransform.AngleProperty,
+            new System.Windows.Media.Animation.DoubleAnimation(0, 360, TimeSpan.FromSeconds(0.9)) { RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever });
+        var panel = new StackPanel { Orientation = Orientation.Horizontal };
+        panel.Children.Add(arc);
+        panel.Children.Add(new TextBlock { Text = text, VerticalAlignment = VerticalAlignment.Center });
+        return panel;
+    }
+
     private void RoomViewport_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
     {
         if (_roomPanKey is not null) StopRoomPan();
     }
 
+    // Left/Right pan the room wherever the focus is, so a room picked in the tree pans without first clicking the
+    // arrows. Controls that use those keys themselves (text entry, drop-downs, sliders, tree nodes that
+    // expand or collapse) keep them.
+    private bool RoomPanKeysAvailable =>
+        _game is not null && RoomDisplayLayout.Visibility == Visibility.Visible && Keyboard.Modifiers == ModifierKeys.None &&
+        Keyboard.FocusedElement is not (TextBox or ComboBox or Slider or PasswordBox) and not TreeViewItem { HasItems: true };
+
     private void RoomViewport_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (!RoomViewport.IsKeyboardFocusWithin || NormalRoomWidthToggle.IsChecked != true) return;
+        if (NormalRoomWidthToggle.IsChecked != true) return;
         var direction = e.Key == Key.Left ? -1 : e.Key == Key.Right ? 1 : 0;
         if (direction == 0) return;
         if (!_roomPanActive || _roomPanKey != e.Key)
@@ -3931,7 +3958,9 @@ public partial class MainWindow : Window
         var listing = _game is { Id: GameId.LoomVga } && !_cdRoomListsDone && _cdSavedRoomLists is null && roomChoices.Count == 0;
         RoomCutsceneButton.Visibility = active && (roomChoices.Count > 0 || listing) ? Visibility.Visible : Visibility.Collapsed;
         RoomCutsceneButton.IsEnabled = active && CanStartCutscene && !listing;
-        RoomCutsceneButton.Content = roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴";
+        var computing = _game is { Id: GameId.LoomVga } && !_cdRoomListsDone && _cdSavedRoomLists is null;
+        CutsceneScanNote.Visibility = active && computing ? Visibility.Visible : Visibility.Collapsed;
+        RoomCutsceneButton.Content = ButtonWithSpinner(roomChoices.Count == 1 || listing ? "Play Cutscene" : "Play Cutscene ▴", computing);
         RoomCutsceneButton.ToolTip = listing ? "Looking for the scenes that happen in this room… (the first launch takes a while; the result is kept for the next one)." : !CanStartCutscene ? "Playback is active. Finish or skip it before starting another scene." :
             roomChoices.Count == 1 ? $"Play {roomChoices[0].Title}" : "Choose a cutscene that happens in this room.";
         if (!active) return;
