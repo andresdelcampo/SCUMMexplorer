@@ -81,7 +81,11 @@
         </Grid>
         <Grid Grid.Row="2" MinHeight="150">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-            <TextBlock Text="Spell / draft sequences" FontSize="17" Margin="0,0,0,8"/>
+            <DockPanel Margin="0,0,0,8">
+                <Button x:Name="LearnAllButton" DockPanel.Dock="Right" Content="Mark all as learned" Click="LearnAll_Click" Padding="10,3"
+                        ToolTip="Tick Learned on every spell; press Apply to keep the change"/>
+                <TextBlock Text="Spell / draft sequences" FontSize="17"/>
+            </DockPanel>
             <DataGrid x:Name="DraftGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
                       CanUserSortColumns="False" Background="#151F29" Foreground="#E7E0D2" RowBackground="#151F29"
                       AlternatingRowBackground="#192632" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#334452"

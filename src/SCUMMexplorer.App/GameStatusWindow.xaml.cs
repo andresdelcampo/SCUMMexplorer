@@ -177,6 +177,7 @@ public partial class GameStatusWindow : Window
         StaffButton.IsEnabled = editable && _staffHeld.HasValue;
         NoteButtons.IsEnabled = editable && _noteCount.HasValue && _staffHeld.HasValue;
         DraftGrid.IsReadOnly = !editable;
+        LearnAllButton.IsEnabled = editable && _rows.Any(r => r.Learned == false);
         FlagList.IsEnabled = editable;
         ApplyButton.IsEnabled = !PendingChanges || editable && !stale;
         if (PendingChanges) EditMessage.Text = stale ? "Game status changed. Close and reopen to inspect the new values before applying." :
@@ -208,6 +209,14 @@ public partial class GameStatusWindow : Window
         _staffHeld = !_staffHeld.Value;
         _noteCount = _staffHeld == true ? Math.Max(3, _noteCount ?? 0) : 0;
         UpdateSelectors(); UpdateControls();
+    }
+
+    private void LearnAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_canEdit()) return;
+        DraftGrid.CommitEdit(DataGridEditingUnit.Cell, true); DraftGrid.CommitEdit(DataGridEditingUnit.Row, true);
+        foreach (var row in _rows.Where(r => r.Learned == false)) row.Learned = true;
+        UpdateControls();
     }
 
     private void Apply_Click(object sender, RoutedEventArgs e)

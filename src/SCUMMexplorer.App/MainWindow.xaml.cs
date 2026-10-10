@@ -1642,30 +1642,46 @@ public partial class MainWindow : Window
                 Text = "What the explorer had to assume or estimate to show this room (clicks sent as assumed input, camera or artwork estimates). Nothing is waiting on you.",
                 Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6)
             });
+        // Flat sections instead of nested expanders: a title with its count, one sentence of meaning, then the first few lines
+        // (two lines each, full text in the tooltip) with a link to reveal the rest.
+        const int visibleItems = 4;
+        var dim = new SolidColorBrush(Color.FromRgb(159, 171, 174));
         foreach (var group in LoomAssumptionGroups.Group(issues))
         {
-            var items = new StackPanel { Margin = new Thickness(8, 2, 0, 4) };
-            items.Children.Add(new TextBlock
+            var section = new StackPanel { Margin = new Thickness(0, 0, 0, 10) };
+            section.Children.Add(new TextBlock
             {
-                Text = group.Meaning, Foreground = new SolidColorBrush(Color.FromRgb(159, 171, 174)), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 4)
+                Text = $"{group.Title} ({group.Items.Count})", FontWeight = FontWeights.SemiBold, Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)), Margin = new Thickness(0, 0, 0, 2)
             });
+            section.Children.Add(new TextBlock { Text = group.Meaning, Foreground = dim, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 4) });
+            var lines = new List<TextBlock>();
             foreach (var issue in group.Items)
-                items.Children.Add(new TextBlock
-                {
-                    Text = LoomResourceNames.NameBits(_glossary, LoomResourceNames.NameScripts(_glossary, issue)) is { Length: > 150 } named ? named[..147] + "…" : LoomResourceNames.NameBits(_glossary, LoomResourceNames.NameScripts(_glossary, issue)),
-                    ToolTip = issue,
-                    Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)),
-                    FontSize = 11,
-                    TextWrapping = TextWrapping.Wrap,
-                    Margin = new Thickness(0, 0, 0, 4)
-                });
-            StateIssueList.Children.Add(new Expander
             {
-                Header = $"{group.Title} · {group.Items.Count}",
-                Foreground = new SolidColorBrush(Color.FromRgb(231, 224, 210)),
-                Content = items,
-                Margin = new Thickness(0, 0, 0, 2)
-            });
+                var named = LoomResourceNames.NameBits(_glossary, LoomResourceNames.NameScripts(_glossary, issue));
+                var line = new TextBlock
+                {
+                    Text = "• " + named, ToolTip = issue, Foreground = new SolidColorBrush(Color.FromRgb(184, 170, 140)), FontSize = 11,
+                    TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis, MaxHeight = 30,
+                    Margin = new Thickness(8, 0, 0, 3), Visibility = lines.Count < visibleItems ? Visibility.Visible : Visibility.Collapsed
+                };
+                lines.Add(line); section.Children.Add(line);
+            }
+            if (lines.Count > visibleItems)
+            {
+                var more = new TextBlock
+                {
+                    Text = $"Show {lines.Count - visibleItems} more", Foreground = new SolidColorBrush(Color.FromRgb(183, 132, 66)), FontSize = 11,
+                    Cursor = System.Windows.Input.Cursors.Hand, Margin = new Thickness(8, 0, 0, 0), TextDecorations = TextDecorations.Underline
+                };
+                more.MouseLeftButtonUp += (_, _) =>
+                {
+                    bool expand = lines[visibleItems].Visibility != Visibility.Visible;
+                    for (int i = visibleItems; i < lines.Count; i++) lines[i].Visibility = expand ? Visibility.Visible : Visibility.Collapsed;
+                    more.Text = expand ? "Show fewer" : $"Show {lines.Count - visibleItems} more";
+                };
+                section.Children.Add(more);
+            }
+            StateIssueList.Children.Add(section);
         }
         StateIssuesSection.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -3626,10 +3642,40 @@ public partial class MainWindow : Window
         }
         if (SessionModeToggle.IsChecked == true && _session is not null)
         {
+            if (NearestEntranceAt(x, y) is { } entrance)
+            {
+                // Overlapping doors of one doorway (Room 16's two doors to Room 17): the game keeps one of them clickable
+                // depending on where Bobbin stands, so the click would always use that one. The explorer lets the entrance
+                // nearest to the click win and says so.
+                StatusText.Text = $"Door object {entrance.Id} nearest the click taken (the game would not select it from where Bobbin stands: an exploration action)";
+                FollowDoorway(entrance);
+                return;
+            }
             SendInputToGame(() => _session.Click(x, y, doubleClick), doubleClick ? "Double click" : "Click", DoorwaysAt(x, y));
             return;
         }
         CycleArtworkAt(x, y);
+    }
+
+    /// <summary>
+    /// When several doorway objects overlap at a room point (every entrance of one door), the one whose walk point is nearest
+    /// to the point, if the game would not select it now (untouchable, class 24). Null when the game's own click already picks
+    /// the nearest entrance, or the point holds a single door.
+    /// </summary>
+    private ScummRoomObjectRecord? NearestEntranceAt(int x, int y)
+    {
+        if (_session?.Snapshot is not { } snapshot) return null;
+        var doors = _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
+            .Where(record => record.Width > 0 && record.Height > 0 && snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
+                             ParentStateMatches(record, snapshot))
+            .Where(record =>
+            {
+                var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current) ? current : new RoomObjectPosition(record.X, record.Y);
+                return at.X <= x && x < at.X + record.Width && at.Y <= y && y < at.Y + record.Height;
+            }).ToArray();
+        if (doors.Length < 2) return null;
+        var nearest = doors.OrderBy(record => (record.WalkX - x) * (record.WalkX - x) + (record.WalkY - y) * (record.WalkY - y)).First();
+        return snapshot.IsUntouchable(nearest.Id) ? nearest : null;
     }
 
     /// <summary>

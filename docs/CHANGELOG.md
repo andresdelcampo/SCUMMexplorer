@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 10 October: learn all spells, readable Assumptions panel, nearest door entrance
+
+- **Game Status:** a "Mark all as learned" button ticks Learned on every resolved spell/draft (pending until Apply); shared by EGA and CD/VGA.
+- **Advanced > Assumptions:** the nested expanders and long truncated lines are replaced by flat sections (title with count, one sentence of meaning, the first four lines with a "Show N more" link; full text in the tooltip).
+- **Room 17 entrances (user report, VGA):** Room 16's two overlapping doors to Room 17 (objects 270/274 in CD, 345/349 in EGA) are made clickable one at a time by Room 16's walk-box watcher (local 205), so after leaving Room 17 by its west door only the west entrance could be clicked. A click on overlapping doors now takes the entrance whose walk point is nearest the click; if the game would not select it, it runs as a labelled exploration action. Room 17 costume sizes in VGA are confirmed fine by the user; that open point is closed.
+
 ## 9 October: separate the SCUMM engine from LOOM in Core
 
 Core is now `Scumm/` (engine, any game; `V3/` and `V4/` for version-only readers), `Loom/` (all LOOM editions; `Cd/` and `Ega/` for edition code) plus shared `Domain/` and `Discovery/`; the engine cannot reference `Loom`. Generic types lost the `Loom` prefix (`ScummScriptReader`, `ScummActorTable`, `ScummWalkBoxSet`, ...), version-specific ones became `ScummV3*`/`ScummV4*`, and `GameLibrary.Vga` is `V4Archive`. The doorway finder and status schema read through `IScummDataSource` only; `ScummProfile` is the single game-to-engine-variant mapping and `ScummVars` names the engine script variables. No behaviour change (873 tests pass). Still separate by design: the EGA and CD scene-setup planners (different algorithms and outputs) and the `MainWindow` EGA/CD audio and edition branches (need UI verification).
