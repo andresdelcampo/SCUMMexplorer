@@ -192,7 +192,18 @@
         <Border x:Name="AppHeader" Grid.Row="0" MinHeight="58" Background="#192632" BorderBrush="#334452" BorderThickness="0,0,0,1">
             <Grid Margin="18,0">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="SCUMMexplorer" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <Image x:Name="AppTitleImage" Width="200" Height="42" Stretch="Uniform"
+                       VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
+                       AutomationProperties.Name="SCUMMexplorer">
+                    <Image.Source>
+                        <!-- Trim the transparent margins at runtime; keep the full-resolution asset. -->
+                        <CroppedBitmap SourceRect="10,150,2152,435">
+                            <CroppedBitmap.Source>
+                                <BitmapImage UriSource="/SCUMMexplorer.App;component/Assets/scummexplorer-title-v1.png"/>
+                            </CroppedBitmap.Source>
+                        </CroppedBitmap>
+                    </Image.Source>
+                </Image>
                 <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="16,0,0,0">
                     <Button x:Name="CutsceneMenuButton" Content="Play Cutscene" Visibility="Collapsed" Click="CutsceneMenu_Click" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962" IsEnabled="False"/>
                     <Button x:Name="GameTextsButton" Content="Game Texts" Click="GameTexts_Click" Visibility="Collapsed" Padding="13,8" Margin="0,9,8,9" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>

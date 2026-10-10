@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\*.ico" />
+    <Resource Include="Assets\scummexplorer-title-v1.png" />
     <EmbeddedResource Include="loom-replays.json" />
     <ProjectReference Include="..\SCUMMexplorer.Core\SCUMMexplorer.Core.csproj" />
     <Content Include="..\..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" />

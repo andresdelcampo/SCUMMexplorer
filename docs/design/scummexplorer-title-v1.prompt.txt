@@ -1,0 +1,12 @@
+Generated with the built-in image_gen tool; transparent_background=true.
+Asset: src/SCUMMexplorer.App/Assets/scummexplorer-title-v1.png
+
+Use case: logo-brand.
+Asset type: graphical title wordmark for a Windows desktop app that explores classic SCUMM adventure games.
+Primary request: Design an original, beautifully crafted retro adventure-game title reading exactly "SCUMMexplorer", drawing loose inspiration from the playful chunky lettering of ScummVM and late-1980s / early-1990s adventure game title screens.
+Text (verbatim): "SCUMMexplorer". Spell it S C U M M e x p l o r e r. SCUMM must be uppercase; explorer must be lowercase. All letters must be clear and correct.
+Composition: a single horizontal wordmark, SCUMM and explorer joined as one name on a shared baseline. Wide landscape canvas; the wordmark fills most of the width with modest transparent margins. SCUMM slightly taller; explorer about 75 percent its height. No text underneath.
+Style: confident hand-drawn display lettering, slightly irregular chunky shapes with a friendly adventurous character. Thoughtful custom typography, restrained shallow beveled edges and a clean dark ink outline. Very subtle stepped-pixel detailing in a few corners, without sacrificing readability. Polished lettering suitable for an actual app header, readable when reduced.
+Palette: SCUMM in warm parchment gold and amber, explorer in muted luminous sage / moss green, outlined in deep midnight blue. The app background is #101821 so ensure strong contrast there.
+Backdrop: genuinely transparent alpha background.
+Constraints: only the wordmark; no scenery, characters, mascots, magnifying glasses, compasses, slogans, badges, extra lettering, watermark, or copied ScummVM logo. No oversized extruded 3D, neon glow, chrome, heavy grunge or elaborate flourishes. Original design, elegant and playful, with crisp edges.

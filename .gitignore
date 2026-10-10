@@ -17,6 +17,7 @@ Exe/
 *.suo
 
 # Generated verification output
+.verification/title-wordmark-20261010/out/
 .verification/actor-progression-20261009/out*/
 .verification/**/*.png
 .verification/**/*.bmp

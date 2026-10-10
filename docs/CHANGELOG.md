@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 10 October: graphical app title
+
+The approved gold/green SCUMMexplorer wordmark replaces the top-left text title. Its original transparent PNG is stored in App/Assets and embedded as a WPF resource; runtime cropping removes empty margins and scales the artwork into a 200 × 42 pixel area with high-quality filtering and an accessible name. Release build passes with no warnings/errors. Actual WPF header captures at 1180 and 900 window widths show readable lettering and working control wrapping. [Preview and validation](../.verification/title-wordmark-20261010/validation.md).
+
 ## 10 October (evening): first-room speed and the K/M findings
 
 - **First room opened in ~10 s (English reference):** `UpdatePlaybackControls` asked `RoomCutsceneItems` for the room's button, which built the notes of all ~328 catalog entries, each deriving a start setup. Only the room's entries are built now: first room ~1.3 s, next rooms ~0.3 s (Debug, `.verification/first-room-timing-20261010/`). Script draw batches are built once on a worker (`DrawBatchesAsync`), shared by room cards, the first room and Game Texts.
