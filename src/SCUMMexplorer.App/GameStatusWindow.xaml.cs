@@ -93,7 +93,7 @@ public partial class GameStatusWindow : Window
         {
             int count = i;
             var button = new Button { Style = (Style)FindResource("ArtworkChoice"), Tag = count,
-                Width = 48, Height = noteHeight, ToolTip = $"Available through {LoomNoteNames.Label(Math.Max(3, count))}" + (count < 3 ? " (minimum C, D, E)" : "") };
+                Width = 48, Height = noteHeight, ToolTip = $"Available through {LoomNoteNames.Label(Math.Max(3, count))}" + (count < 3 ? " (minimum c, d, e)" : "") };
             System.Windows.Automation.AutomationProperties.SetName(button, button.ToolTip.ToString());
             var content = new StackPanel();
             content.Children.Add(new Image { Width = 48, Height = noteHeight, Stretch = Stretch.Fill, SnapsToDevicePixels = true });

@@ -9,7 +9,7 @@ namespace SCUMMexplorer.App;
 internal sealed record LoomNoteChoice(int Id, string Label);
 internal static class LoomNoteNames
 {
-    public static readonly LoomNoteChoice[] Choices = [new(1, "C"), new(2, "D"), new(3, "E"), new(4, "F"), new(5, "G"), new(6, "A"), new(7, "B"), new(8, "C′")];
+    public static readonly LoomNoteChoice[] Choices = [new(1, "c"), new(2, "d"), new(3, "e"), new(4, "f"), new(5, "g"), new(6, "a"), new(7, "b"), new(8, "c′")];
     public static string Label(int id) => id is >= 1 and <= 8 ? Choices[id - 1].Label : "Unresolved";
 }
 
