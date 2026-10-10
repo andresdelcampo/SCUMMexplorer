@@ -114,13 +114,16 @@ internal sealed record LoomStatusSchema(string StaffKey, string NoteLimitKey, in
         }
         var init = data.RoomLocalScript(1, 211);
         var checkpoint = data.RoomLocalScript(46, 204);
-        if (init is null || !init.Instructions.Any(i => i.Operation == "move" && i.Operands == "var[0x07A] = 0x0003") || checkpoint is null)
+        // The opening sets the note limit (the Spanish and Roland copies start with 3; the plain English release's script assigns 8 at the same place).
+        var initialNotes = init?.Instructions.Select(i => i.Operation == "move" ? Regex.Match(i.Operands, @"^var\[0x07A\] = 0x([0-9A-F]+)$") : Match.Empty)
+            .FirstOrDefault(m => m.Success) is { } initialMatch ? int.Parse(initialMatch.Groups[1].Value, NumberStyles.HexNumber) : (int?)null;
+        if (initialNotes is null || checkpoint is null)
             throw new InvalidDataException("Loaded staff progression checkpoints are unresolved.");
         var cp = checkpoint.Instructions.ToList();
         int cpIndex = cp.FindIndex(i => i.Operation == "startScript" && i.Operands == "0x1D, [0x0007, 0x000C]");
         if (cpIndex < 1 || cp[cpIndex - 1].Operation != "move" || Regex.Match(cp[cpIndex - 1].Operands, @"^(bit\[0x[0-9A-F]+\]) = 0x0001$") is not { Success: true } cpBit)
             throw new InvalidDataException("Loaded staff progression checkpoints are unresolved.");
-        return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, 3, cpBit.Groups[1].Value, 7, startKey, playKey, Number(learned) - SpanishLearnedBit,
+        return new(staff, noteLimit, int.Parse(table.Groups[1].Value, NumberStyles.HexNumber), 16, initialNotes.Value, cpBit.Groups[1].Value, 7, startKey, playKey, Number(learned) - SpanishLearnedBit,
             $"Loaded scripts 017 +0x{staffTest.Offset:X4}/+0x{staffMove.Offset:X4}: {staff}=1 means held; 010 +0x{limitTest.Offset:X4}/+0x{limitChain.Offset:X4}: note IDs 1..8 up to and including {noteLimit} are available. " +
             $"023: two words per draft, four 3-bit notes +1; flags 0x2000 learned ({learned})/0x1000 reverse ({reverse})/0x4000 last-note knowledge ({lastNote}). " +
             "022 searches slots 0..15 inclusively, including Transcend. 026 refuses matched unlearned drafts before target dispatch; 022 skips reverse matching without 0x1000. " +
