@@ -20,6 +20,80 @@ if (args.Length > 2 && args[2] == "verbs") // CutsceneScanCompare <folder> - ver
     }
     return;
 }
+if (args.Length > 2 && args[2] == "visit") // CutsceneScanCompare <folder> <loom-replays.json> visit: a fresh headless run of every catalogued trigger (no start setup); rooms it entered vs the catalog's, and whether a cutscene began
+{
+    using var vdoc = JsonDocument.Parse(File.ReadAllText(args[1]));
+    var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    int agree = 0, total = 0, notBegun = 0;
+    var started = System.Diagnostics.Stopwatch.StartNew();
+    foreach (var e in vdoc.RootElement.GetProperty("replays").EnumerateArray())
+    {
+        var room = e.GetProperty("room").GetInt32(); var obj = e.GetProperty("objectId").GetInt32(); var verb = e.GetProperty("verb").GetInt32();
+        var catScene = e.GetProperty("category").GetString() == "Scenes";
+        var catRooms = e.GetProperty("rooms").EnumerateArray().Select(x => x.GetInt32()).ToList();
+        var visited = new List<int>(); var begun = false; string note = "";
+        try
+        {
+            var session = new LoomExplorationSession(game, snapshot);
+            session.VisitRoom(game.Rooms.First(r => r.ResourceId == room));
+            var earlier = session.CutscenesBegun; var mark = session.RoomsEntered.Count;
+            if (obj != 0) session.ActivateObjectVerb(obj, verb);
+            for (var i = 0; i < 6000; i++)
+            {
+                if (session.InCutscene || session.CutscenesBegun > earlier) begun = true;
+                if (begun && !session.InCutscene && session.Messages.HaveMsg == 0) break;
+                if (!begun && i >= 600) break;
+                session.AdvanceFrame();
+            }
+            visited = session.RoomsEntered.Skip(mark).Distinct().ToList();
+        }
+        catch (Exception ex) { note = ex.GetType().Name + ": " + ex.Message; }
+        var left = visited.Any(r => r != room);
+        total++; if (!begun) notBegun++;
+        var runScene = left;
+        if (begun && runScene == catScene || !begun && !catScene) agree++;
+        Console.WriteLine($"{e.GetProperty("id").GetString()} | catalog {(catScene ? "Scene" : "Dialogue")} rooms [{string.Join(",", catRooms)}] | run began={begun} entered [{string.Join(",", visited)}] {note}");
+    }
+    Console.WriteLine($"agree on scene-ness (left the room vs catalog category; not-begun counts as dialogue): {agree} of {total}; no cutscene began: {notBegun}; {started.Elapsed.TotalSeconds:F0} s");
+    return;
+}
+if (args.Length > 2 && args[2] == "uncovered") // CutsceneScanCompare <folder> <loom-replays.json> uncovered: the scan's groups with no catalogued member, each run headless (LoomCutsceneRun)
+{
+    using var udoc = JsonDocument.Parse(File.ReadAllText(args[1]));
+    var inCat = udoc.RootElement.GetProperty("replays").EnumerateArray().Select(e => (e.GetProperty("room").GetInt32(), e.GetProperty("objectId").GetInt32(), e.GetProperty("verb").GetInt32())).ToHashSet();
+    var snap = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+    foreach (var g in groups.Where(g => !g.Others.Append(g.First).Any(t => inCat.Contains((t.Room, t.ObjectId, t.VerbId)))))
+    {
+        var ran = LoomCutsceneRun.VisitedRooms(game, snap, g.First);
+        var t = g.First;
+        Console.WriteLine($"{LoomCutsceneTitles.Title(t)} | {t.VerbLabel} obj {t.ObjectId} | static {(g.IsScene ? "Scene" : "Dialogue")} run {(ran is null ? "NO CUTSCENE BEGAN" : ran.Count > 0 ? "left to " + string.Join(",", ran) : "stayed")} -> {(LoomCutsceneRun.IsScene(g, ran) ? "Scene" : "Dialogue")} | texts {t.Texts} loads {t.RoomLoads} span {t.SpanInstructions} others {g.Others.Count} | \"{(t.FirstText.Length > 70 ? t.FirstText[..70] : t.FirstText)}\"");
+    }
+    return;
+}
+if (args.Length > 2 && args[2] == "trigger") // CutsceneScanCompare <folder> - trigger <room> <object> <verb hex>: the verb's code and the scripts it starts (literal numbers, depth 3), instructions listed
+{
+    int room = int.Parse(args[3]), obj = int.Parse(args[4]), verb = Convert.ToInt32(args[5], 16);
+    var rd = data.ReadRoom(room);
+    var seen = new HashSet<(bool, int)>();
+    void Dump(string label, ScummScriptDisassembly? d, int depth)
+    {
+        Console.WriteLine($"== {label}");
+        foreach (var ins in d?.Instructions ?? []) Console.WriteLine($"{new string(' ', depth * 2)}{ins.Offset:X4} {ins.Operation} {ins.Operands}");
+        if (depth >= 3) return;
+        foreach (var ins in (d?.Instructions ?? []).Where(i => i.Operation is "startScript" or "chainScript"))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(ins.Operands, @"^(?:0x)?([0-9A-Fa-f]+),");
+            if (!m.Success) continue;
+            var id = int.Parse(m.Groups[1].Value, System.Globalization.NumberStyles.HexNumber);
+            var local = id >= data.GlobalScriptCount;
+            if (!seen.Add((local, id))) continue;
+            Dump(local ? $"room {room} local {id}" : $"global {id}", local ? data.RoomLocalScript(room, id) : data.GlobalScript(id), depth + 1);
+        }
+    }
+    var record = rd.Objects.First(o => o.Id == obj);
+    Dump($"room {room} object {obj} verb 0x{verb:X2}", data.ReadObjectVerb(room, record, verb, out _), 0);
+    return;
+}
 if (args.Length > 2 && args[2] == "script") // CutsceneScanCompare <folder> - script <id>...: global scripts listed
 {
     foreach (var id in args.Skip(3).Select(int.Parse))
@@ -86,7 +160,7 @@ if (args.Length > 2 && args[2] == "titles") // CutsceneScanCompare <folder> <loo
         var t = catTitle == scanTitle; var c = catCat == scanCat;
         if (t && c) same++; if (!t) titleDiff++; if (!c) catDiff++;
         if (args.Length > 3 && args[3] == "csv")
-            Console.WriteLine($"CSV,{catCat},{trigger.Texts},{trigger.RoomLoads},{trigger.SpanInstructions},{trigger.IsRoomEntry},{e.GetProperty("rooms").GetArrayLength()},{(scanTitle.Contains("Reached") ? 1 : 0)},{(groupOf.ContainsKey(key) ? 1 : 0)}");
+            Console.WriteLine($"CSV,{catCat},{trigger.Texts},{trigger.RoomLoads},{trigger.SpanInstructions},{trigger.IsRoomEntry},{e.GetProperty("rooms").GetArrayLength()},{(scanTitle.Contains("Reached") ? 1 : 0)},{(groupOf.ContainsKey(key) ? 1 : 0)},{e.GetProperty("frames").GetInt32()},{trigger.LeadsTo.Count},{trigger.VerbId:X2},{trigger.LoadsAfter},0,{trigger.LoadTargets?.Count ?? 0},{string.Join("/", trigger.LoadTargets ?? [])}");
         if (!t || !c) Console.WriteLine($"{e.GetProperty("id").GetString()}{Environment.NewLine}    catalog: {catTitle} [{catCat}]{Environment.NewLine}    scan:    {scanTitle} [{scanCat}]{Environment.NewLine}    stats:   texts {trigger.Texts}, room loads {trigger.RoomLoads}, span {trigger.SpanInstructions}, catalog rooms {e.GetProperty("rooms").GetArrayLength()}, frames {e.GetProperty("frames").GetInt32()}");
     }
     Console.WriteLine($"identical title and category: {same}; title differs: {titleDiff}; category differs: {catDiff}; replays whose scripts the scan drops as shared helpers: {helper}");

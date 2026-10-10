@@ -11,9 +11,12 @@ namespace SCUMMexplorer.Core.Loom;
 /// <param name="Texts">Distinct printed texts inside those spans (a text is a possible line, since branches decide which one runs).</param>
 /// <param name="RoomLoads">Room loads inside those spans.</param>
 /// <param name="FirstText">The first printed text of the spans, for a title; empty when there is none.</param>
+/// <param name="LoadTargets">The literal rooms the span's room loads name (a load with a computed room is counted in <paramref name="RoomLoads"/> only).</param>
+/// <param name="LoadsAfter">Room loads in the reached scripts outside any span (a cutscene that ends and then changes room).</param>
 /// <param name="Destinations">For a look, walk-to or use verb, the rooms its code leads to (the same doorway finder as the room hotspots, so loads in local scripts count); empty when none was asked for or found.</param>
 public sealed record LoomCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
-    int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null)
+    int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null,
+    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0)
 {
     public IReadOnlyList<int> LeadsTo => Destinations ?? [];
 
@@ -33,11 +36,14 @@ public sealed record LoomCutscene(int Room, int ObjectId, string ObjectName, int
 public sealed record LoomCutsceneGroup(LoomCutscene First, IReadOnlyList<LoomCutscene> Others)
 {
     /// <summary>
-    /// A scene: the room's entry, a span that loads a room, or a verb that leads to another room. Everything else, however many lines it
-    /// prints, is "dialogue and reactions". Checked on 10 October against the reference EGA catalog (328 replays): this rule agrees with
-    /// its categories for 301 of them; the old rule (three or more printed lines also made a scene) agreed far less.
+    /// A scene: the room's entry, a span that loads a room (or whose scripts load one right after it ends), a verb that leads to another
+    /// room, or a silent Use (Bobbin goes into a tent, the camera pans to something). Everything else, however many
+    /// lines it prints, is "dialogue and reactions". Checked on 10 October against the reference EGA catalog (328 replays, 238 of them in
+    /// a group): the first three conditions agreed with its categories for 211 of the 238, the silent-use one brings it to 225. The rest
+    /// depend on which branch runs (a load that only happens in some answers), which a scan of the code cannot tell.
     /// </summary>
-    public bool IsScene => First.IsRoomEntry || First.RoomLoads > 0 || First.LeadsTo.Count > 0;
+    public bool IsScene => First.IsRoomEntry || First.RoomLoads > 0 || First.LeadsTo.Count > 0 || First.LoadsAfter > 0 ||
+                           (First.Texts == 0 && First.VerbId == 0x38);
 }
 
 /// <summary>
@@ -71,13 +77,14 @@ public static partial class LoomCutsceneIndex
                 var visited = new HashSet<(bool Local, int Id)>();
                 var texts = new List<string>();
                 var summary = new Span();
-                Walk(data, room, script, label, 0, visited, scripts, texts, summary);
+                Walk(data, room, script, label, 0, false, visited, scripts, texts, summary);
                 if (scripts.Count == 0) return;
                 IReadOnlyList<int>? destinations = null;
                 if (objectId != 0 && verbId is 0x36 or 0x37 or 0x38 && doorways is not null &&
                     game?.Rooms.FirstOrDefault(r => r.ResourceId == room) is { } resource)
                     destinations = doorways(resource, script);
-                found.Add(new(room, objectId, objectName, verbId, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", destinations));
+                found.Add(new(room, objectId, objectName, verbId, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", destinations,
+                    summary.Targets.Distinct().ToArray(), summary.LoadsAfter));
             }
             Trigger(0, "", 0, Try(() => data.RoomEntryScript(room)), $"Room {room} entry script");
             var verbs = Try(() => data.ReadObjectVerbs(room, roomData.Objects)) ?? new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
@@ -120,20 +127,34 @@ public static partial class LoomCutsceneIndex
             .ToArray();
     }
 
-    private sealed class Span { public int RoomLoads; public int Instructions; }
+    private sealed class Span { public int RoomLoads; public int Instructions; public int LoadsAfter; public List<int> Targets = []; }
 
-    private static void Walk(IScummDataSource data, int room, ScummScriptDisassembly script, string label, int depth,
+    /// <param name="spanOpen">True when the script was started from inside a cutscene span: everything it does runs inside that span, even though the
+    /// script holds no <c>cutscene</c> opcode itself (a span of two instructions that starts the script that does the walking and talking).</param>
+    private static void Walk(IScummDataSource data, int room, ScummScriptDisassembly script, string label, int depth, bool spanOpen,
         HashSet<(bool, int)> visited, List<string> scripts, List<string> texts, Span summary)
     {
         var ins = script.Instructions;
-        var open = false; var counted = false;
+        var open = spanOpen; var counted = false;
+        var calls = new List<(ScummScriptInstruction Call, bool InSpan)>();
         foreach (var i in ins)
         {
             if (i.Operation == "cutscene") { open = true; if (!counted) { scripts.Add(label); counted = true; } continue; }
             if (i.Operation == "endCutscene") { open = false; continue; }
-            if (!open) continue;
+            if (i.Operation is "startScript" or "chainScript") calls.Add((i, open));
+            if (!open)
+            {
+                if (i.Operation is "loadRoom" or "loadRoomWithEgo") summary.LoadsAfter++;
+                continue;
+            }
             summary.Instructions++;
-            if (i.Operation is "loadRoom" or "loadRoomWithEgo") summary.RoomLoads++;
+            if (i.Operation is "loadRoom" or "loadRoomWithEgo")
+            {
+                summary.RoomLoads++;
+                var parts = i.Operands.Split(',', StringSplitOptions.TrimEntries);
+                var operand = i.Operation == "loadRoom" ? parts[0] : parts.ElementAtOrDefault(1) ?? "";
+                if (operand.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(operand[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var target)) summary.Targets.Add(target);
+            }
             if (i.Operation == "print" && TextOperand().Match(i.Operands) is { Success: true } m)
             {
                 var text = Regex.Replace(m.Groups[1].Value, @"\\x[0-9A-F]{2}", " ").Trim();
@@ -141,14 +162,14 @@ public static partial class LoomCutsceneIndex
             }
         }
         if (depth >= Depth) return;
-        foreach (var i in ins.Where(i => i.Operation is "startScript" or "chainScript"))
+        foreach (var (i, inSpan) in calls)
         {
             if (LiteralScriptNumber().Match(i.Operands) is not { Success: true } m) continue;
             var id = int.Parse(m.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             var local = id >= data.GlobalScriptCount;
             if (!visited.Add((local, id))) continue;
             var next = Try(() => local ? data.RoomLocalScript(room, id) : data.GlobalScript(id));
-            if (next is not null) Walk(data, room, next, local ? $"Room {room} local script {id}" : $"global script {id}", depth + 1, visited, scripts, texts, summary);
+            if (next is not null) Walk(data, room, next, local ? $"Room {room} local script {id}" : $"global script {id}", depth + 1, inSpan, visited, scripts, texts, summary);
         }
     }
 

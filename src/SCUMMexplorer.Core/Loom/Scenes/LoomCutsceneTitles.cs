@@ -37,11 +37,17 @@ public static class LoomCutsceneTitles
     /// </summary>
     public static string Title(LoomCutscene trigger)
     {
-        if (trigger.LeadsTo.Count > 0)
-            return Format(trigger.Room, "Reached " + (trigger.LeadsTo.Count == 1 ? "Room " : "Rooms ") +
-                string.Join(", ", trigger.LeadsTo.Select(r => r.ToString("00"))));
-        if (trigger.IsRoomEntry) return Format(trigger.Room, "Entry");
+        // Rooms the verb leads to by the doorway finder. An unnamed object's plain verb, which the EGA catalog titles by the rooms a run reached,
+        // falls back to the rooms its span names in literal loads (20 of the catalog's 24 title differences with the scan were such a load the
+        // doorway finder does not follow). Named objects and draft verbs keep their names, as the catalog does.
         var plain = trigger.VerbId is 0x36 or 0x37 or 0x38;
+        var reached = trigger.LeadsTo.Count > 0 ? trigger.LeadsTo
+            : !trigger.IsRoomEntry && plain && trigger.ObjectName.Length == 0 ? (trigger.LoadTargets ?? []).Where(r => r != trigger.Room).ToArray()
+            : [];
+        if (reached.Count > 0)
+            return Format(trigger.Room, "Reached " + (reached.Count == 1 ? "Room " : "Rooms ") +
+                string.Join(", ", reached.Select(r => r.ToString("00"))));
+        if (trigger.IsRoomEntry) return Format(trigger.Room, "Entry");
         if (trigger.ObjectName.Length == 0 && plain) return Format(trigger.Room, VerbWord(trigger.VerbId).Split(' ')[0] + " response");
         var target = trigger.ObjectName.Length > 0 ? trigger.ObjectName : $"object {trigger.ObjectId}";
         return Format(trigger.Room, $"{VerbWord(trigger.VerbId)} {(plain ? "" : "at ")}{target}");

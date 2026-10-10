@@ -1,3 +1,5 @@
+using SCUMMexplorer.Core.Discovery;
+using SCUMMexplorer.Core.Domain;
 using SCUMMexplorer.Core.Loom;
 
 namespace SCUMMexplorer.Tests;
@@ -31,6 +33,56 @@ public class LoomCutsceneTitlesTests
         var talk = new LoomCutscene(5, 2, "elder", 0x36, ["s"], 14, 0, 78, "");
         Assert.True(new LoomCutsceneGroup(withDoor, []).IsScene);
         Assert.False(new LoomCutsceneGroup(talk, []).IsScene);
+    }
+
+    [Fact]
+    public void ALiteralRoomLoadNamesAnUnnamedPlainVerbButNotANamedObjectOrADraft()
+    {
+        static LoomCutscene Loads(string name, int verb) => new(13, 323, name, verb, ["s"], 0, 2, 88, "", null, [15, 13]);
+        Assert.Equal("Room 13 · Reached Room 15", LoomCutsceneTitles.Title(Loads("", 0x38)));
+        Assert.Equal("Room 13 · Use gate", LoomCutsceneTitles.Title(Loads("gate", 0x38)));
+        Assert.Equal("Room 13 · Opening at gate", LoomCutsceneTitles.Title(Loads("gate", 0x3A)));
+    }
+
+    [Fact]
+    public void ALoadAfterTheSpanOrASilentUseMakesASceneButASilentLookDoesNot()
+    {
+        var after = new LoomCutscene(18, 369, "bell", 0x36, ["s"], 0, 0, 9, "", null, null, 1);
+        var silentUse = new LoomCutscene(24, 433, "sheep", 0x38, ["s"], 0, 0, 2, "");
+        var talkingUse = new LoomCutscene(30, 504, "", 0x38, ["s"], 3, 0, 7, "");
+        var silentLook = new LoomCutscene(30, 505, "", 0x36, ["s"], 0, 0, 7, "");
+        Assert.True(new LoomCutsceneGroup(after, []).IsScene);
+        Assert.True(new LoomCutsceneGroup(silentUse, []).IsScene);
+        Assert.False(new LoomCutsceneGroup(talkingUse, []).IsScene);
+        Assert.False(new LoomCutsceneGroup(silentLook, []).IsScene);
+    }
+}
+
+public class LoomCutsceneRunTests
+{
+    private static (GameLibrary Game, ScummIndexedObjectSnapshot Snapshot, IReadOnlyList<LoomCutscene> Scan)? Load()
+    {
+        var folder = Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative);
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return null;
+        var game = new GameFolderScanner().Scan(folder);
+        var data = ScummDataSources.For(game);
+        var scan = LoomCutsceneIndex.Scan(data, game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game);
+        return (game, new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")), scan);
+    }
+
+    [Fact]
+    public void ARunSeesTheRoomsAScenePlaysInAndNotTheLoadsOfBranchesItDoesNotTake()
+    {
+        if (Load() is not var (game, snapshot, scan)) return;
+        // Room 02's use of object 153 goes on to Room 03 (the catalog: rooms 2 and 3); the dragon's sleep reaction (Room 28 object 466, verb 0x43) has loads in its code but stays.
+        var goes = scan.First(t => t is { Room: 2, ObjectId: 153, VerbId: 0x38 });
+        var stays = scan.First(t => t is { Room: 28, ObjectId: 466, VerbId: 0x43 });
+        Assert.Contains(3, LoomCutsceneRun.VisitedRooms(game, snapshot, goes)!);
+        Assert.Empty(LoomCutsceneRun.VisitedRooms(game, snapshot, stays)!);
+        Assert.True(stays.RoomLoads > 0);
+        Assert.True(LoomCutsceneRun.IsScene(new LoomCutsceneGroup(goes, []), [3]));
+        Assert.False(LoomCutsceneRun.IsScene(new LoomCutsceneGroup(stays, []), []));
+        Assert.True(new LoomCutsceneGroup(stays, []).IsScene); // the static rule over-reports it
     }
 }
 
