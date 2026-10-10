@@ -47,12 +47,12 @@ public sealed partial class LoomCdSceneSetupPlanner
     private readonly GameLibrary _game;
     private readonly IScummDataSource _data;
     private readonly LoomSceneStateScanner _scanner;
-    private readonly IReadOnlyList<LoomCdCutscene> _triggers;
+    private readonly IReadOnlyList<LoomCutscene> _triggers;
     private readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int, int), LoomCdStartSetup> _cache = [];
     private readonly object _gate = new();
 
-    /// <param name="triggers">Every cutscene trigger of the game (<see cref="LoomCdCutsceneIndex.Scan"/>): a story state written by a scene's script is set by running that scene.</param>
-    public LoomCdSceneSetupPlanner(GameLibrary game, IReadOnlyList<LoomCdCutscene> triggers, IScummDataSource? data = null)
+    /// <param name="triggers">Every cutscene trigger of the game (<see cref="LoomCutsceneIndex.Scan"/>): a story state written by a scene's script is set by running that scene.</param>
+    public LoomCdSceneSetupPlanner(GameLibrary game, IReadOnlyList<LoomCutscene> triggers, IScummDataSource? data = null)
     {
         _game = game;
         _data = data ?? ScummDataSources.For(game);
@@ -61,7 +61,7 @@ public sealed partial class LoomCdSceneSetupPlanner
     }
 
     /// <summary>Every cutscene trigger of the game the planner works from.</summary>
-    public IReadOnlyList<LoomCdCutscene> Triggers => _triggers;
+    public IReadOnlyList<LoomCutscene> Triggers => _triggers;
 
     [GeneratedRegex(@"^(?:Room (\d+) (?:local|entry|exit)(?: (\d+))?|Script (\d+))")]
     private static partial Regex WriterPlace();
@@ -165,7 +165,7 @@ public sealed partial class LoomCdSceneSetupPlanner
     /// Runs the scene headless from the given start. Without <paramref name="mustEnd"/> it is enough that a cutscene begins; with it the cutscene must also
     /// end by itself (no Escape) within <see cref="EndFrames"/> frames, which tells a scene that plays from one that stalls on the state around it.
     /// </summary>
-    private bool Trial(LoomCdCutscene t, IReadOnlyList<LoomCdSetupStep> before, IReadOnlyList<LoomCdSetupStep> after, bool mustEnd = false)
+    private bool Trial(LoomCutscene t, IReadOnlyList<LoomCdSetupStep> before, IReadOnlyList<LoomCdSetupStep> after, bool mustEnd = false)
     {
         try
         {
@@ -198,7 +198,7 @@ public sealed partial class LoomCdSceneSetupPlanner
         catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException) { return false; }
     }
 
-    private IReadOnlyList<LoomCdScenePath> Paths(LoomCdCutscene t)
+    private IReadOnlyList<LoomCdScenePath> Paths(LoomCutscene t)
     {
         var room = _data.ReadRoom(t.Room);
         var root = t.IsRoomEntry ? _data.RoomEntryScript(t.Room)
@@ -217,7 +217,7 @@ public sealed partial class LoomCdSceneSetupPlanner
         _ => null
     };
 
-    /// <summary>The script label (as <see cref="LoomCdCutscene.Scripts"/> names it) of the code a writer's place names, or null for an entry script or verb.</summary>
+    /// <summary>The script label (as <see cref="LoomCutscene.Scripts"/> names it) of the code a writer's place names, or null for an entry script or verb.</summary>
     private static string? ScriptLabel(LoomStateSource w)
     {
         if (WriterPlace().Match(w.Where) is not { Success: true } m) return null;
@@ -228,24 +228,24 @@ public sealed partial class LoomCdSceneSetupPlanner
     /// <summary>The simplest way to set a state first: an object verb, a room entry, a scene's local script, then a global script (which many scenes share).</summary>
     private static int WriterRank(LoomStateSource w) => w.ObjectId is not null ? 0 : w.Where.Contains(" entry ", StringComparison.Ordinal) ? 1 : w.Where.StartsWith("Room ", StringComparison.Ordinal) ? 2 : 3;
 
-    private static int Rank(LoomCdCutscene c) => c.IsRoomEntry ? 0 : c.VerbId switch { 0x38 => 1, 0x37 => 2, 0x36 => 3, _ => 4 };
+    private static int Rank(LoomCutscene c) => c.IsRoomEntry ? 0 : c.VerbId switch { 0x38 => 1, 0x37 => 2, 0x36 => 3, _ => 4 };
 
-    private static (int, int, int) Key(LoomCdCutscene t) => (t.Room, t.ObjectId, t.VerbId);
+    private static (int, int, int) Key(LoomCutscene t) => (t.Room, t.ObjectId, t.VerbId);
 
     /// <summary>The derived setup when it has been derived already (so a caller on the UI thread can ask without waiting).</summary>
-    public bool TryGet(LoomCdCutscene t, out LoomCdStartSetup setup) => _cache.TryGetValue(Key(t), out setup!);
+    public bool TryGet(LoomCutscene t, out LoomCdStartSetup setup) => _cache.TryGetValue(Key(t), out setup!);
 
     private readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int, int), IReadOnlyList<int>> _visited = [];
 
     /// <summary>The rooms a trigger's scene has been seen to play in, when they have been derived already (so a caller on the UI thread can ask without waiting).</summary>
-    public bool TryGetVisitedRooms(LoomCdCutscene t, out IReadOnlyList<int> rooms) => _visited.TryGetValue(Key(t), out rooms!);
+    public bool TryGetVisitedRooms(LoomCutscene t, out IReadOnlyList<int> rooms) => _visited.TryGetValue(Key(t), out rooms!);
 
     /// <summary>
     /// The rooms the scene is in while it runs, from a headless run of its derived start setup (the way the app plays it): the trigger's own room first, then every
     /// other room the session loads until the cutscene and its lines are over (no Escape, so a scene is not cut short). A branch the run did not take is not seen,
     /// so the list is what this run did, not every room the code could load. Cached; one run at a time.
     /// </summary>
-    public IReadOnlyList<int> VisitedRooms(LoomCdCutscene t)
+    public IReadOnlyList<int> VisitedRooms(LoomCutscene t)
     {
         if (_visited.TryGetValue(Key(t), out var cached)) return cached;
         lock (_gate)
@@ -312,13 +312,13 @@ public sealed partial class LoomCdSceneSetupPlanner
     }
 
     /// <summary>Derives (once, then cached) the setup of one trigger; one derivation runs at a time, since they share the scanner's data source.</summary>
-    public LoomCdStartSetup Derive(LoomCdCutscene t)
+    public LoomCdStartSetup Derive(LoomCutscene t)
     {
         if (_cache.TryGetValue(Key(t), out var cached)) return cached;
         lock (_gate) return Derive(t, 0, []);
     }
 
-    private LoomCdStartSetup Derive(LoomCdCutscene t, int depth, HashSet<(int, int, int)> stack)
+    private LoomCdStartSetup Derive(LoomCutscene t, int depth, HashSet<(int, int, int)> stack)
     {
         stack = [.. stack, Key(t)];
         var result = DeriveOnce(t, depth, stack);
@@ -359,7 +359,7 @@ public sealed partial class LoomCdSceneSetupPlanner
     /// of the game sets (<c>bit[k] = 1</c>) is written for the state in which that bit is set; so the code that sets it is the candidate, run first (an
     /// object verb, an entry, or the scene that runs it) and kept if the scene then ends by itself. Null when no candidate makes it end.
     /// </summary>
-    private LoomCdStartSetup? DeriveStall(LoomCdCutscene t, int depth, HashSet<(int, int, int)> stack)
+    private LoomCdStartSetup? DeriveStall(LoomCutscene t, int depth, HashSet<(int, int, int)> stack)
     {
         var paths = Paths(t);
         var chain = paths.SelectMany(p => p.Chain).ToHashSet();
@@ -408,7 +408,7 @@ public sealed partial class LoomCdSceneSetupPlanner
     [GeneratedRegex(@"^0x([0-9A-Fa-f]+)")]
     private static partial Regex FirstLiteral();
 
-    /// <summary>The script a label names (as <see cref="LoomCdCutscene.Scripts"/> and the guard paths write it), or null.</summary>
+    /// <summary>The script a label names (as <see cref="LoomCutscene.Scripts"/> and the guard paths write it), or null.</summary>
     private ScummScriptDisassembly? LoadLabel(int room, string label)
     {
         try
@@ -454,7 +454,7 @@ public sealed partial class LoomCdSceneSetupPlanner
     private readonly System.Collections.Concurrent.ConcurrentDictionary<(int, int, int), HashSet<string>> _started = [];
 
     /// <summary>The scripts a scene's cutscene scripts run (one step: what they start or chain to), with the cutscene scripts themselves.</summary>
-    private HashSet<string> Started(LoomCdCutscene c) => _started.GetOrAdd(Key(c), _ =>
+    private HashSet<string> Started(LoomCutscene c) => _started.GetOrAdd(Key(c), _ =>
     {
         var set = new HashSet<string>(c.Scripts);
         foreach (var label in c.Scripts)
@@ -467,7 +467,7 @@ public sealed partial class LoomCdSceneSetupPlanner
                     }
         return set;
     });
-    private LoomCdStartSetup DeriveOnce(LoomCdCutscene t, int depth, HashSet<(int, int, int)> stack)
+    private LoomCdStartSetup DeriveOnce(LoomCutscene t, int depth, HashSet<(int, int, int)> stack)
     {
         var trials = 0;
         bool Try(IReadOnlyList<LoomCdSetupStep> b, IReadOnlyList<LoomCdSetupStep> a) { trials++; return Trial(t, b, a); }

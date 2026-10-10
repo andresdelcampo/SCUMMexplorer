@@ -129,7 +129,7 @@ public sealed class CdLocalDisasm
 /// <summary>Discovery only (env CD_NEEDS_OUT): for every derived CD scene that opens no cutscene from a fresh state, which single story bits (read by its own code) flip it when forced to 1.</summary>
 public sealed class CdNeedsProbe
 {
-    private static bool Run(GameLibrary game, LoomCdCutscene t, IReadOnlyList<string> force, int frames = 400)
+    private static bool Run(GameLibrary game, LoomCutscene t, IReadOnlyList<string> force, int frames = 400)
     {
         var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
         var runtime = typeof(LoomExplorationSession).GetField("_runtime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(session)!;
@@ -150,7 +150,7 @@ public sealed class CdNeedsProbe
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
         var scanner = LoomSceneStateScanner.For(game);
-        var groups = LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
+        var groups = LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
         var lines = new List<string>();
         foreach (var g in groups)
         {
@@ -185,7 +185,7 @@ public sealed class CdGuardProbe
         var rooms = only?.Split(',').Select(int.Parse).ToHashSet();
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
-        var groups = LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
+        var groups = LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
         var lines = new List<string>();
         foreach (var g in groups.Where(g => rooms is null || rooms.Contains(g.First.Room)))
         {
@@ -214,7 +214,7 @@ public sealed class CdGuardStateProbe
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
-        var groups = LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
+        var groups = LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
         var lines = new List<string>();
         foreach (var g in groups)
         {
@@ -323,8 +323,8 @@ public sealed class CdSetupProbe
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
-        var groups = LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
-        var planner = new LoomCdSceneSetupPlanner(game, LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
+        var groups = LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
+        var planner = new LoomCdSceneSetupPlanner(game, LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value)));
         var lines = new List<string>();
         var results = groups.Select(g => planner.Derive(g.First)).ToList();
         var fresh = results.Count(s => s == LoomCdStartSetup.None);

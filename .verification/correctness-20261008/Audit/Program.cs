@@ -118,8 +118,8 @@ if (mode is "scenes" or "all")
     }
     if (game.Id == GameId.LoomVga)
     {
-        var triggers = LoomCdCutsceneIndex.Scan(data, rooms);
-        var groups = LoomCdCutsceneIndex.Group(triggers);
+        var triggers = LoomCutsceneIndex.Scan(data, rooms);
+        var groups = LoomCutsceneIndex.Group(triggers);
         var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
         var setups = new List<object>();
         foreach (var group in groups.Where(g => selectedRooms.Contains(g.First.Room)))

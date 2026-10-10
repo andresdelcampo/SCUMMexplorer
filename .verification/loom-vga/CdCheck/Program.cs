@@ -80,7 +80,7 @@ internal static class Program
                         }
                         Shot($"look-{number:00}.png");
                         if (Environment.GetEnvironmentVariable("CD_VERBS") == "1" && number == 5)
-                            foreach (var g in (System.Collections.Generic.IEnumerable<SCUMMexplorer.Core.Loom.LoomCdCutsceneGroup>)Call("CdCutsceneGroups")!)
+                            foreach (var g in (System.Collections.Generic.IEnumerable<SCUMMexplorer.Core.Loom.LoomCutsceneGroup>)Call("CdCutsceneGroups")!)
                                 if (g.First.VerbId is not (0x36 or 0x37 or 0x38) && !g.First.IsRoomEntry) Console.WriteLine($"VERBID room {g.First.Room} obj {g.First.ObjectId} {g.First.ObjectName} verb 0x{g.First.VerbId:X2}");
                         if (Environment.GetEnvironmentVariable("CD_CYCLE") == "1" && Field("_session") is SCUMMexplorer.Core.Loom.LoomExplorationSession cy)
                         {
@@ -127,7 +127,7 @@ internal static class Program
                     }
                     // The rooms each scene plays out in are derived in the background; wait for the last one (up to 8 minutes).
                     {
-                        var groups = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Loom.LoomCdCutsceneGroup>().ToList();
+                        var groups = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Loom.LoomCutsceneGroup>().ToList();
                         var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Loom.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!;
                         var wait = System.Diagnostics.Stopwatch.StartNew();
                         while (wait.Elapsed < TimeSpan.FromMinutes(8) && !(planner.IntroRoomsIfKnown is not null && groups.All(g => planner.TryGetVisitedRooms(g.First, out _)))) await Task.Delay(1000);
@@ -160,7 +160,7 @@ internal static class Program
                     else
                     {
                         var want = cut.Split(',').Select(int.Parse).ToArray();
-                        var group = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Loom.LoomCdCutsceneGroup>()
+                        var group = ((System.Collections.IEnumerable)Call("CdCutsceneGroups")!).Cast<SCUMMexplorer.Core.Loom.LoomCutsceneGroup>()
                             .First(g => g.First.Room == want[0] && g.First.ObjectId == want[1] && (g.First.VerbId == want[2] || g.First.IsRoomEntry && want[2] == 0));
                         report.Add($"cutscene room {group.First.Room} object {group.First.ObjectId} {group.First.ObjectName} {group.First.VerbLabel}, scene {group.IsScene}");
                         { var lazy = Field("_cdSetupPlanner")!; var planner = (SCUMMexplorer.Core.Loom.LoomCdSceneSetupPlanner)lazy.GetType().GetProperty("Value")!.GetValue(lazy)!; var setup = planner.Derive(group.First);

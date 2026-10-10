@@ -15,7 +15,7 @@ public class LoomCutsceneTitlesTests
     [Fact]
     public void TitlesNameTheVerbAndObjectLikeTheEgaCatalog()
     {
-        static LoomCdCutscene T(int obj, string name, int verb, params int[] to) => new(5, obj, name, verb, ["s"], 0, 0, 1, "", to);
+        static LoomCutscene T(int obj, string name, int verb, params int[] to) => new(5, obj, name, verb, ["s"], 0, 0, 1, "", to);
         Assert.Equal("Room 05 · Look at leaf", LoomCutsceneTitles.Title(T(1, "leaf", 0x36)));
         Assert.Equal("Room 05 · Use response", LoomCutsceneTitles.Title(T(1, "", 0x38)));
         Assert.Equal("Room 05 · Opening at sky", LoomCutsceneTitles.Title(T(1, "sky", 0x3A)));
@@ -27,9 +27,40 @@ public class LoomCutsceneTitlesTests
     [Fact]
     public void ARoomChangeMakesAScene()
     {
-        var withDoor = new LoomCdCutscene(5, 1, "door", 0x38, ["s"], 1, 0, 9, "", [3]);
-        var talk = new LoomCdCutscene(5, 2, "elder", 0x36, ["s"], 14, 0, 78, "");
-        Assert.True(new LoomCdCutsceneGroup(withDoor, []).IsScene);
-        Assert.False(new LoomCdCutsceneGroup(talk, []).IsScene);
+        var withDoor = new LoomCutscene(5, 1, "door", 0x38, ["s"], 1, 0, 9, "", [3]);
+        var talk = new LoomCutscene(5, 2, "elder", 0x36, ["s"], 14, 0, 78, "");
+        Assert.True(new LoomCutsceneGroup(withDoor, []).IsScene);
+        Assert.False(new LoomCutsceneGroup(talk, []).IsScene);
+    }
+}
+
+public class LoomReferenceCatalogTitleTests
+{
+    private static string CatalogPath()
+    {
+        for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
+            if (File.Exists(Path.Combine(dir.FullName, "SCUMMexplorer.slnx")))
+                return Path.Combine(dir.FullName, "src", "SCUMMexplorer.App", "loom-replays.json");
+        throw new FileNotFoundException("Repository root not found.");
+    }
+
+    [Fact]
+    public void EveryCatalogTitleHasExactlyOneMatchingRoomPrefix()
+    {
+        using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(CatalogPath()));
+        var replays = document.RootElement.GetProperty("replays").EnumerateArray().ToArray();
+        Assert.NotEmpty(replays);
+        foreach (var replay in replays)
+        {
+            var room = replay.GetProperty("room").GetInt32();
+            var verb = replay.GetProperty("verb").GetInt32();
+            var shown = LoomCutsceneTitles.Format(room, LoomDraftNames.ReplayTitle(replay.GetProperty("title").GetString()!, verb));
+            var prefix = $"Room {room:00} · ";
+            Assert.StartsWith(prefix, shown);
+            Assert.DoesNotContain(" · Room ", shown[prefix.Length..]); // no second "Room NN ·" prefix inside
+            Assert.Single(System.Text.RegularExpressions.Regex.Matches(shown, @"^Room \d\d · "));
+            Assert.Equal(shown, LoomCutsceneTitles.Format(room, shown)); // formatting twice must not double the prefix
+            Assert.DoesNotContain("Draft response", shown);
+        }
     }
 }

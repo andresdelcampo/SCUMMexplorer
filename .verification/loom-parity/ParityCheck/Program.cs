@@ -120,7 +120,7 @@ internal static class Program
                     Check((string)Call("PickerVerbTitle", formatted, 0x38)! == "Room 02 · Reached Room 03 (verb 0x38)", prefix + " advanced verb title");
                     if (cd)
                     {
-                        var trigger = LoomCdCutsceneIndex.Scan(ScummDataSources.For(game), [2], LoomCutsceneTitles.Doorways(game), game).Single(t => t.ObjectId == 78 && t.VerbId == 0x38);
+                        var trigger = LoomCutsceneIndex.Scan(ScummDataSources.For(game), [2], LoomCutsceneTitles.Doorways(game), game).Single(t => t.ObjectId == 78 && t.VerbId == 0x38);
                         var title = (string)Call("CdCutsceneTitle", trigger)!;
                         Check(title == "Room 02 · Reached Room 03 (verb 0x38)", "VGA doorway destination from object 78's own code: " + title);
                         var entry = session.LastVisitEvents.First(ev => ev.TargetKind == ResourceKind.Script && ev.TargetId == 17);

@@ -8,7 +8,7 @@ public sealed class CdCutsceneSweep
 {
     private sealed record Run(int Frames, bool Skippable, int Lines, int Rooms, int Voices, bool Began, string? Error);
 
-    private static Run Play(GameLibrary game, LoomCdCutsceneGroup group, bool escape, LoomCdSceneSetupPlanner planner)
+    private static Run Play(GameLibrary game, LoomCutsceneGroup group, bool escape, LoomCdSceneSetupPlanner planner)
     {
         var t = group.First;
         var frames = 0; var skippable = false; var rooms = 0; var began = false;
@@ -48,8 +48,8 @@ public sealed class CdCutsceneSweep
         var outPath = Environment.GetEnvironmentVariable("CD_SWEEP_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
-        var triggers = LoomCdCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value).ToList());
-        var groups = LoomCdCutsceneIndex.Group(triggers);
+        var triggers = LoomCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var groups = LoomCutsceneIndex.Group(triggers);
         var planner = new LoomCdSceneSetupPlanner(game, triggers);
         var lines = new List<string>();
         foreach (var g in groups)

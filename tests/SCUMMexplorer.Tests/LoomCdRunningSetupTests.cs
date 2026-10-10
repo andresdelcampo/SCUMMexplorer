@@ -10,7 +10,7 @@ public sealed class LoomCdRunningSetupTests
         var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom vga en"));
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
-        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
+        var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
         var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
         var trigger = triggers.Single(t => t.Room == 41 && t.ObjectId == 559 && t.VerbId == 0x4B);
         var setup = planner.Derive(trigger);

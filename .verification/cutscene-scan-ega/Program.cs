@@ -2,12 +2,12 @@ using System.Text.Json;
 using SCUMMexplorer.Core.Discovery;
 
 // Usage: CutsceneScanCompare <loom ega folder> <loom-replays.json>
-// Runs the CD's script scan (LoomCdCutsceneIndex) on the EGA data and compares its triggers with the hand-made catalog.
+// Runs the CD's script scan (LoomCutsceneIndex) on the EGA data and compares its triggers with the hand-made catalog.
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
 var rooms = game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).ToList();
-var scan = LoomCdCutsceneIndex.Scan(data, rooms, LoomCutsceneTitles.Doorways(game), game);
-var groups = LoomCdCutsceneIndex.Group(scan);
+var scan = LoomCutsceneIndex.Scan(data, rooms, LoomCutsceneTitles.Doorways(game), game);
+var groups = LoomCutsceneIndex.Group(scan);
 var scanned = scan.Select(t => (t.Room, t.ObjectId, t.VerbId)).ToHashSet();
 if (args.Length > 2 && args[2] == "verbs") // CutsceneScanCompare <folder> - verbs <room>...: every object verb of those rooms, with whether the scan found a cutscene in it
 {

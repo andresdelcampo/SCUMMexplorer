@@ -1,9 +1,9 @@
 using SCUMMexplorer.Core.Domain;
 
-namespace SCUMMexplorer.App;
+namespace SCUMMexplorer.Core.Loom;
 
 /// <summary>A resource's own label with the glossary's name after it ("Script 91 · cage scene (Room 43)"), where the glossary has evidence for one.</summary>
-internal static class LoomResourceNames
+public static class LoomResourceNames
 {
     public static GlossaryEntry? Entry(LoomGlossary glossary, GameResource resource) => resource.ResourceId is not int id ? null : resource.Kind switch
     {

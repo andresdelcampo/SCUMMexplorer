@@ -91,8 +91,8 @@ internal static class Program
                     string play;
                     if (cd)
                     {
-                        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
-                        scene = LoomCdCutsceneIndex.Group(triggers).Single(g => g.First.Room == 9 && g.First.ObjectId == 199 && g.First.VerbId == 0x38);
+                        var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
+                        scene = LoomCutsceneIndex.Group(triggers).Single(g => g.First.Room == 9 && g.First.ObjectId == 199 && g.First.VerbId == 0x38);
                         play = "PlayCdCutscene";
                     }
                     else

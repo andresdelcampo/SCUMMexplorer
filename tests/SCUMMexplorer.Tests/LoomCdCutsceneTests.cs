@@ -12,15 +12,15 @@ public sealed class LoomCdCutsceneTests
         return Directory.Exists(folder) && SCUMMexplorer.Core.Scumm.DiscImage.FindImageIn(folder) is not null ? new GameFolderScanner().Scan(folder) : null;
     }
 
-    private static IReadOnlyList<LoomCdCutsceneGroup> Groups(GameLibrary game) =>
-        LoomCdCutsceneIndex.Group(LoomCdCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value)));
+    private static IReadOnlyList<LoomCutsceneGroup> Groups(GameLibrary game) =>
+        LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value)));
 
     [Fact]
     public void TheCutscenesAreDerivedFromTheScriptsAndSharedHelpersAreLeftOut()
     {
         if (Game() is not { } game) return;
-        var triggers = LoomCdCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
-        var groups = LoomCdCutsceneIndex.Group(triggers);
+        var triggers = LoomCutsceneIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
+        var groups = LoomCutsceneIndex.Group(triggers);
         Assert.True(triggers.Count > 300, $"{triggers.Count} triggers");
         Assert.InRange(groups.Count, 100, 260);
         // The generic reaction (global 41) is reached from about a hundred objects: a helper, not a scene.
@@ -141,7 +141,7 @@ public sealed class LoomCdCutsceneTests
     {
         if (Game() is not { } game) return;
         var data = ScummDataSources.For(game);
-        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
         var sword = triggers.First(t => t is { Room: 41, ObjectId: 559, VerbId: 0x41 });
 
         int Frames(LoomExplorationSession session)
@@ -180,7 +180,7 @@ public sealed class LoomCdCutsceneTests
     {
         if (Game() is not { } game) return;
         var data = ScummDataSources.For(game);
-        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
         var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
         var sword = triggers.First(t => t is { Room: 41, ObjectId: 559, VerbId: 0x41 });
         var rooms = planner.VisitedRooms(sword);
@@ -198,7 +198,7 @@ public sealed class LoomCdCutsceneTests
     {
         if (Game() is not { } game) return;
         var data = ScummDataSources.For(game);
-        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
         var scene = triggers.First(t => t is { Room: 25, ObjectId: 372, VerbId: 0x37 });
         var setup = new LoomCdSceneSetupPlanner(game, triggers, data).Derive(scene);
         Assert.True(setup.Plays, string.Join(" ", setup.Notes));
@@ -222,9 +222,9 @@ public sealed class LoomCdCutsceneTests
     {
         if (Game() is not { } game) return;
         var data = ScummDataSources.For(game);
-        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
+        var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList());
         var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
-        var groups = LoomCdCutsceneIndex.Group(triggers);
+        var groups = LoomCutsceneIndex.Group(triggers);
         var setups = groups.Select(g => (g, s: planner.Derive(g.First))).Where(x => x.s != LoomCdStartSetup.None).ToList();
         Assert.InRange(setups.Count, 12, 30);
         Assert.All(setups, x => Assert.NotEmpty(x.s.Notes));
@@ -251,7 +251,7 @@ public sealed class LoomCdCutsceneTests
     {
         if (Game() is not { } game) return;
         var data = ScummDataSources.For(game);
-        var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
+        var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
         var t = triggers.Single(t => t.Room == 20 && t.ObjectId == 315 && t.VerbId == 0x48);
         var setup = new LoomCdSceneSetupPlanner(game, triggers, data).Derive(t);
         var placement = Assert.Single(setup.After);

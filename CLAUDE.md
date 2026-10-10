@@ -6,7 +6,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 
 - `src/SCUMMexplorer.Core` (net10.0) has three layers; put new code in the lowest layer that is true for it:
   - `Scumm/` (namespace `SCUMMexplorer.Core.Scumm`): the SCUMM engine, any game. It cannot see `Loom` (the compiler enforces it). `Scripts/` (disassembler `ScummScriptReader` with its dialects, `ScummBoundedScriptExecutor`, runtime state), `Runtime/` (actors, walk boxes, camera, verbs, messages), `Rendering/` (rooms, objects, costumes, `RoomObjectSelection`, verb area), `Analysis/` (script observers, relation trackers, draw batches), `Audio/` (PC speaker, AdLib via NukedOPL3Sharp, Roland via Munt, sound clock) and `Storage/` (folders, disc images). `V3/` and `V4/` hold what exists in only one engine version: the LFL/index readers and `ScummV3DataSource`, the DISK01.LEC `ScummV4Archive` and `ScummV4DataSource`, charsets, EGA/VGA costume and message renderers, the v4 walker. Both data sources implement `IScummDataSource`; code that needs scripts, objects or costumes should take that interface (`ScummDataSources.For(game)`), not branch on the game. `ScummProfile.For(game)` is the only place the engine maps a game to variants (script dialect `V3`/`V3Indy3`/`V4`, walking, archive); `ScummVars` names the engine-defined script variables.
-  - `Loom/` (namespace `SCUMMexplorer.Core.Loom`): what is true of LOOM in every edition. `Session/` (`LoomExplorationSession`, game status, story events), `Text/` (glossary, script presenter, text extractor, speaker names), `Scenes/` (scene setup, doorways, arrivals, replays, usage index, room kinds), `Relationships/`. Edition code is marked by folder and name: `Cd/` (`LoomCd*`: LOOM CD voice cues, cutscene index, scene setup) and `Ega/` (reviewed names, demo looks).
+  - `Loom/` (namespace `SCUMMexplorer.Core.Loom`): what is true of LOOM in every edition. `Session/` (`LoomExplorationSession`, game status, story events), `Text/` (glossary, script presenter, text extractor, speaker names), `Scenes/` (scene setup, doorways, arrivals, replays, cutscene scan and titles, usage index, room kinds), `Relationships/`. Edition code is marked by folder and name: `Cd/` (`LoomCd*`: LOOM CD voice cues, scene setup) and `Ega/` (reviewed names, demo looks).
   - `Domain/` (`GameLibrary`, `GameId`) and `Discovery/` (`GameFolderScanner`) are shared by both. `Domain` may use `Scumm` types.
 - `src/SCUMMexplorer.App`: the WPF desktop UI (net10.0-windows). `MainWindow.xaml.cs` holds most of the UI logic; `TextGalleryWindow` is the Game Texts browser.
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
@@ -23,6 +23,22 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
   - Other Indy editions/demo, Monkey Island and enhanced Maniac Mansion folders are under `Games/FUTURE/`; they are deferred comparison data.
 - `scummvm/`: a ScummVM Windows build for comparing behaviour at runtime. It contains no source code.
 - Build output goes to `Exe/<Project>/…` (see `Directory.Build.props`).
+
+## Requirements and scope tags
+
+`docs/REQUIREMENTS.md` is the list of what the app must do; `docs/REQUIREMENTS_FINDINGS.md` holds the problems and ideas found while writing it. Every requirement carries a scope tag, and the tag says where its code belongs. Choose the folder by the tag, from the lowest layer that is true:
+
+| Tag | Reach | Code home |
+|---|---|---|
+| `SCUMM` | any SCUMM game and version | `Core/Scumm/` |
+| `SCUMM v3` / `SCUMM v4` | old-v3 (LFL files) / v4 (`DISK01.LEC`) only | `Core/Scumm/V3/` / `V4/` |
+| `LOOM` | both LOOM editions | `Core/Loom/` (`Session`, `Text`, `Scenes`, `Relationships`) |
+| `LOOM EGA` / `LOOM CD` | one edition | `Core/Loom/Ega/` or v3 data / `Core/Loom/Cd/` |
+| `LOOM EGA ref` | the English Roland reference edition only | catalog data + App |
+| `LOOM demo`, `INDY3 EGA` | demos / Indy3 | `Core/Loom/Ega/` + App / `Core/Scumm/` dialect `V3Indy3` |
+| `APP` | the WPF shell, whichever game is open | `src/SCUMMexplorer.App` |
+
+**Normal vs Advanced (R-1.13):** Normal mode is strictly exploratory and playful and never shows status, validation or evidence information (no "needs validation", no "not yet playable"). All of that belongs in Advanced only.
 
 ## Build and test
 

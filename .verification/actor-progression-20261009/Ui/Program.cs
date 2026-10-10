@@ -42,14 +42,14 @@ internal static class Program
                 original.UpdateStaffPossession(true); original.UpdateAvailableNotes(8); original.UpdateDraftLearned(15, false);
                 original.UpdateStoryBit("bit[0x03D]", true); // Own Room 34 entry's ghost selector; prepared state, not earned.
                 var data = ScummDataSources.For(game);
-                var triggers = LoomCdCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
+                var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
                 var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
                 var trigger = triggers.Single(t => t.Room == 41 && t.ObjectId == 559 && t.VerbId == 0x4B);
                 var setup = planner.Derive(trigger);
                 Check(setup.Plays && setup.HasSteps, "own-source sword trigger requires a derived start");
                 File.WriteAllText(Path.Combine(output, "setup.json"), JsonSerializer.Serialize(setup, new JsonSerializerOptions { WriteIndented = true }));
                 typeof(MainWindow).GetField("_cdSetupPlanner", flags)!.SetValue(window, new Lazy<LoomCdSceneSetupPlanner>(() => planner));
-                Call("PlayCdCutscene", new LoomCdCutsceneGroup(trigger, []));
+                Call("PlayCdCutscene", new LoomCutsceneGroup(trigger, []));
                 (Field("_playbackTimer") as System.Windows.Threading.DispatcherTimer)?.Stop();
                 Check(ReferenceEquals(original, Session()), "single CD scene retains the running session");
                 Check(Session().GameStatus.AvailableNoteCount == 8, "single CD scene retains eight chosen notes");

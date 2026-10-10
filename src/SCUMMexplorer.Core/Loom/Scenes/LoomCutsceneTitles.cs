@@ -24,7 +24,7 @@ public static class LoomCutsceneTitles
         var v => LoomDraftNames.ForVerb(v)?.Name ?? "Other draft response"
     };
 
-    /// <summary>The rooms a verb's code leads to, in the form <see cref="LoomCdCutsceneIndex.Scan"/> takes (the doorway finder of the room hotspots).</summary>
+    /// <summary>The rooms a verb's code leads to, in the form <see cref="LoomCutsceneIndex.Scan"/> takes (the doorway finder of the room hotspots).</summary>
     public static Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>> Doorways(GameLibrary game)
     {
         var finder = new LoomDoorwayFinder(game);
@@ -35,7 +35,7 @@ public static class LoomCutsceneTitles
     /// The title of a trigger found by the script scan: "Reached Room 03" when the verb leads to other rooms, otherwise the verb and the
     /// object ("Use sheep", "Opening at sky"). An object without a name reads as the EGA titles do: "Use response".
     /// </summary>
-    public static string Title(LoomCdCutscene trigger)
+    public static string Title(LoomCutscene trigger)
     {
         if (trigger.LeadsTo.Count > 0)
             return Format(trigger.Room, "Reached " + (trigger.LeadsTo.Count == 1 ? "Room " : "Rooms ") +

@@ -50,6 +50,10 @@ public partial class GameStatusWindow : Window
     {
         public required int Slot { get; init; }
         public string Title { get; private set; } = "";
+        private string? _evidence;
+        /// <summary>Set by the window: the name's evidence is a technical detail, shown (as the tooltip) in Advanced only.</summary>
+        public bool ShowEvidence { get; set; }
+        public string? TitleTip => ShowEvidence ? _evidence : null;
         private int _note1, _note2, _note3, _note4;
         private bool? _learned, _reversible;
         private string _origin = "";
@@ -67,7 +71,8 @@ public partial class GameStatusWindow : Window
         { if (EqualityComparer<T>.Default.Equals(field, value)) return; field = value; PropertyChanged?.Invoke(this, new(name)); }
         public void Load(LoomDraftStatus draft)
         {
-            Title = LoomDraftNames.Title(draft); PropertyChanged?.Invoke(this, new(nameof(Title)));
+            Title = LoomDraftNames.Title(draft); _evidence = LoomDraftNames.Evidence(draft);
+            PropertyChanged?.Invoke(this, new(nameof(Title))); PropertyChanged?.Invoke(this, new(nameof(TitleTip)));
             Note1 = draft.Notes.ElementAtOrDefault(0); Note2 = draft.Notes.ElementAtOrDefault(1);
             Note3 = draft.Notes.ElementAtOrDefault(2); Note4 = draft.Notes.ElementAtOrDefault(3);
             Learned = draft.Learned; Reversible = draft.Reversible; Origin = draft.Origin;
@@ -134,7 +139,7 @@ public partial class GameStatusWindow : Window
                 DraftGrid.ItemsSource = _rows;
             }
             _loadingRows = true;
-            foreach (var row in _rows) row.Load(status.Drafts.Single(d => d.Slot == row.Slot));
+            foreach (var row in _rows) { row.ShowEvidence = _advanced(); row.Load(status.Drafts.Single(d => d.Slot == row.Slot)); }
             _loadingRows = false;
         }
         RefreshFlags(session, status);

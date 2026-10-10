@@ -96,7 +96,9 @@
                     <Style TargetType="DataGridRow"><Setter Property="IsEnabled" Value="{Binding Resolved}"/></Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Spell / draft" Binding="{Binding Title}" IsReadOnly="True" Width="*" MinWidth="145" ElementStyle="{StaticResource SpellText}"/>
+                    <DataGridTextColumn Header="Spell / draft" Binding="{Binding Title}" IsReadOnly="True" Width="*" MinWidth="145">
+                        <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock" BasedOn="{StaticResource SpellText}"><Setter Property="ToolTip" Value="{Binding TitleTip}"/></Style></DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                     <DataGridComboBoxColumn x:Name="Note1Column" Header="1" SelectedValueBinding="{Binding Note1, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48" ElementStyle="{StaticResource SpellNote}" EditingElementStyle="{StaticResource SpellNoteEditor}"/>
                     <DataGridComboBoxColumn x:Name="Note2Column" Header="2" SelectedValueBinding="{Binding Note2, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48" ElementStyle="{StaticResource SpellNote}" EditingElementStyle="{StaticResource SpellNoteEditor}"/>
                     <DataGridComboBoxColumn x:Name="Note3Column" Header="3" SelectedValueBinding="{Binding Note3, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="Label" Width="48" ElementStyle="{StaticResource SpellNote}" EditingElementStyle="{StaticResource SpellNoteEditor}"/>

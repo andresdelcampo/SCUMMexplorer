@@ -44,7 +44,7 @@ public static partial class LoomCdSceneGuards
     [GeneratedRegex(@"^(bit|var|local)\[0x([0-9A-Fa-f]+)\]")]
     private static partial Regex FirstVariable();
 
-    public static IReadOnlyList<LoomCdScenePath> Find(IScummDataSource data, int room, ScummScriptDisassembly root, string rootLabel, int depth = LoomCdCutsceneIndex.Depth)
+    public static IReadOnlyList<LoomCdScenePath> Find(IScummDataSource data, int room, ScummScriptDisassembly root, string rootLabel, int depth = LoomCutsceneIndex.Depth)
     {
         var paths = new List<LoomCdScenePath>();
         Walk(data, room, root, rootLabel, [rootLabel], [], depth, [], paths);

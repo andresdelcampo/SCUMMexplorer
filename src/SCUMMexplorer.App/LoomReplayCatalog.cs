@@ -25,12 +25,19 @@ internal sealed record LoomReplayCatalog(ReplaySourceFile[] SourceFiles, ReplayR
         if (stream is null) return Empty("Replay discovery data is unavailable.");
         var catalog = JsonSerializer.Deserialize<LoomReplayCatalog>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         if (catalog is null) return Empty("Replay discovery data could not be read.");
-        foreach (var file in catalog.SourceFiles)
+        // Hashing every .LFL is the cost of opening the folder, so the files are read in parallel and the first mismatch stops the rest.
+        var matches = true;
+        Parallel.ForEach(catalog.SourceFiles, (file, state) =>
         {
             var path = Path.Combine(game.FolderPath, file.Name);
             if (!File.Exists(path) || !Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).Equals(file.Sha256, StringComparison.OrdinalIgnoreCase))
-                return Empty("This edition has not been validated against the expanded replay catalog. The four established starts remain available; discovery and validation must be rerun for these files.");
-        }
+            {
+                matches = false;
+                state.Stop();
+            }
+        });
+        if (!matches)
+            return Empty("This edition has not been validated against the expanded replay catalog. The four established starts remain available; discovery and validation must be rerun for these files.");
         return catalog with
         {
             Replays = catalog.Replays.Select(recipe => recipe with

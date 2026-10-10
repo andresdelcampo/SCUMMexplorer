@@ -55,6 +55,21 @@ public static class LoomDraftNames
         Names[draft.Slot].Forward == draft.ForwardVerb && Names[draft.Slot].Reverse == draft.ReverseVerb
             ? Names[draft.Slot].Title : $"Draft {draft.Slot + 1}";
 
+    /// <summary>
+    /// Where a draft's name comes from (R-2.3: a reading is never shown as a fact): <c>decoded</c> names were checked against what the verb does
+    /// to the objects that answer it; Shaping and the reverse of Silence are <c>reading</c>s. Null for a draft that has no name (<c>Draft N</c>).
+    /// </summary>
+    public static string? Evidence(LoomDraftStatus draft)
+    {
+        if (Title(draft).StartsWith("Draft ", StringComparison.Ordinal)) return null;
+        return draft.ForwardVerb switch
+        {
+            0x50 => "reading: the effect (Hetchel's form change, costume 34) supports the name Shaping; the exact name is a reading.",
+            0x4E => "decoded: each edition's Script 101 says Silence; the name of its reverse (verb 0x4F) is a reading.",
+            _ => "decoded: the name was checked against what the verb does to the objects that answer it (LOOM_SCRIPT_MAP, Draft verb names)."
+        };
+    }
+
     /// <summary>The draft a verb number casts and whether it is the reverse (0x3A "Opening", 0x3B "Closing"...), or null for a verb that is not a draft.</summary>
     public static (string Name, bool Reverse)? ForVerb(int verb)
     {

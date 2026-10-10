@@ -2,6 +2,14 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 10 October (evening): first-room speed and the K/M findings
+
+- **First room opened in ~10 s (English reference):** `UpdatePlaybackControls` asked `RoomCutsceneItems` for the room's button, which built the notes of all ~328 catalog entries, each deriving a start setup. Only the room's entries are built now: first room ~1.3 s, next rooms ~0.3 s (Debug, `.verification/first-room-timing-20261010/`). Script draw batches are built once on a worker (`DrawBatchesAsync`), shared by room cards, the first room and Game Texts.
+- **K-01:** the catalog fingerprint hashes the 78 files in parallel (~25 ms). `OpenGameFolder` still takes ~1.1 s, mostly the live session boot.
+- **K-04/K-05/K-06:** cutscene code moved to `MainWindow.Cutscenes.cs`; `LoomResourceNames`/`LoomVerbNames` to `Core/Loom/Text`; `LoomCdCutscene*` became `LoomCutscene*` in `Core/Loom/Scenes`.
+- **M-03/M-04/M-06/M-07:** `GameSupport` (Core/Domain); Advanced-only evidence tooltip on draft names; golden test of the 328 catalog titles; scope-tag map in CLAUDE.md. R-1.13 (Normal vs Advanced) added; M-05 rejected.
+- Not done: K-02, K-07, M-01 (see REQUIREMENTS_FINDINGS).
+
 ## 10 October (later): requirements findings applied
 
 - **Fixed (F-01..F-07):** LOOM CD shows the normal subtitle and preview text; the platform line reads `DOS edition` for `DOS (inferred)`; the doc comment on `LoomResourceNames`; the picker removes its "Needs validation" filter by name; one spelling `(reverse)` for reversed drafts; Game Texts message wording; the stale `src/SCUMMexplorer.Core/Exe/` build folders deleted. Game Texts is hidden for LOOM CD.

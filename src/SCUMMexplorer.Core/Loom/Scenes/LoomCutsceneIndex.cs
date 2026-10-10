@@ -12,7 +12,7 @@ namespace SCUMMexplorer.Core.Loom;
 /// <param name="RoomLoads">Room loads inside those spans.</param>
 /// <param name="FirstText">The first printed text of the spans, for a title; empty when there is none.</param>
 /// <param name="Destinations">For a look, walk-to or use verb, the rooms its code leads to (the same doorway finder as the room hotspots, so loads in local scripts count); empty when none was asked for or found.</param>
-public sealed record LoomCdCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
+public sealed record LoomCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
     int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null)
 {
     public IReadOnlyList<int> LeadsTo => Destinations ?? [];
@@ -30,7 +30,7 @@ public sealed record LoomCdCutscene(int Room, int ObjectId, string ObjectName, i
 }
 
 /// <summary>Triggers that run the same cutscene scripts: the one to play and the others that reach it.</summary>
-public sealed record LoomCdCutsceneGroup(LoomCdCutscene First, IReadOnlyList<LoomCdCutscene> Others)
+public sealed record LoomCutsceneGroup(LoomCutscene First, IReadOnlyList<LoomCutscene> Others)
 {
     /// <summary>
     /// A scene: the room's entry, a span that loads a room, or a verb that leads to another room. Everything else, however many lines it
@@ -45,7 +45,7 @@ public sealed record LoomCdCutsceneGroup(LoomCdCutscene First, IReadOnlyList<Loo
 /// chains by a literal number, up to <see cref="Depth"/> levels) holds a <c>cutscene</c> ... <c>endCutscene</c> span.
 /// A branch can keep a span from running; what a trigger "possibly" shows is not a measured outcome.
 /// </summary>
-public static partial class LoomCdCutsceneIndex
+public static partial class LoomCutsceneIndex
 {
     public const int Depth = 3;
 
@@ -55,10 +55,10 @@ public static partial class LoomCdCutsceneIndex
     [GeneratedRegex(@"text, ""(.*?)""")]
     private static partial Regex TextOperand();
 
-    public static IReadOnlyList<LoomCdCutscene> Scan(IScummDataSource data, IEnumerable<int> rooms,
+    public static IReadOnlyList<LoomCutscene> Scan(IScummDataSource data, IEnumerable<int> rooms,
         Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null)
     {
-        var found = new List<LoomCdCutscene>();
+        var found = new List<LoomCutscene>();
         foreach (var room in rooms)
         {
             ScummRoomData? roomData;
@@ -100,13 +100,13 @@ public static partial class LoomCdCutsceneIndex
     /// Groups the triggers by the cutscene scripts they reach and leaves out shared helpers. The representative is the trigger the player
     /// meets first: an entry script, then the use, walk-to and look verbs (0x38, 0x37, 0x36), then the lowest verb and object number.
     /// </summary>
-    public static IReadOnlyList<LoomCdCutsceneGroup> Group(IReadOnlyList<LoomCdCutscene> triggers)
+    public static IReadOnlyList<LoomCutsceneGroup> Group(IReadOnlyList<LoomCutscene> triggers)
     {
         // A draft verb (0x39 and up) is its own scene even when another verb of the object reaches the same scripts: the EGA catalog lists
         // each spell (Twisting, Sharpening, its reverse) separately, and the player casts them one by one.
-        static string ScriptsKey(LoomCdCutscene c) => string.Join("|", c.Scripts);
-        static string Key(LoomCdCutscene c) => ScriptsKey(c) + (c.IsRoomEntry || c.VerbId < 0x39 ? "" : $"#{c.VerbId}");
-        static int Rank(LoomCdCutscene c) => c.IsRoomEntry ? 0 : c.VerbId switch { 0x38 => 1, 0x37 => 2, 0x36 => 3, _ => 4 };
+        static string ScriptsKey(LoomCutscene c) => string.Join("|", c.Scripts);
+        static string Key(LoomCutscene c) => ScriptsKey(c) + (c.IsRoomEntry || c.VerbId < 0x39 ? "" : $"#{c.VerbId}");
+        static int Rank(LoomCutscene c) => c.IsRoomEntry ? 0 : c.VerbId switch { 0x38 => 1, 0x37 => 2, 0x36 => 3, _ => 4 };
         // Count uses before separating draft verbs: a generic response reached by many spells is still a shared helper.
         var helpers = triggers.GroupBy(ScriptsKey).Where(g => g.Count() > SharedHelperTriggers)
             .Select(g => g.Key).ToHashSet(StringComparer.Ordinal);
@@ -114,7 +114,7 @@ public static partial class LoomCdCutsceneIndex
             .Select(g =>
             {
                 var ordered = g.OrderBy(Rank).ThenBy(c => c.VerbId).ThenBy(c => c.ObjectId).ToArray();
-                return new LoomCdCutsceneGroup(ordered[0], ordered.Skip(1).ToArray());
+                return new LoomCutsceneGroup(ordered[0], ordered.Skip(1).ToArray());
             })
             .OrderBy(g => g.First.Room).ThenBy(g => Rank(g.First)).ThenBy(g => g.First.ObjectId).ThenBy(g => g.First.VerbId)
             .ToArray();
