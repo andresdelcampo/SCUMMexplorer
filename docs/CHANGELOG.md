@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (last, sounds): sounds play for the browsed v4 games; room cards load by themselves
+
+- **Room cards:** the thumbnail loader read `FilePath` as a file for these games, so every card failed until its room was clicked (only the clicked room's card filled in). It now decodes through the disk's archive (`RenderRoomCardThumbnail`), so the picker fills in on open.
+- **Sounds:** the tree lists "Sounds & music" and Play uses the existing PC speaker and AdLib renderers on the disk's `WA` and `AD` parts (`V4ArchiveFor(resource)`). `ScummV4Archive.ReadSounds` follows the second `SO` block the 256-colour Indy wraps its sounds in (`SoundParts`). Monkey: 90 sounds on both versions, each with both parts; Indy 256: 73 with AdLib. Every AdLib sound renders audible samples (253 of 253); PC speaker renders 235, and 18 have no speaker notes (the app says so). I cannot judge by ear whether the music is musically right.
+- Roland MT-32 mode says these games have no MT-32 music here.
+
 ## 11 October (last): Monkey Island EGA opens for browsing
 
 - **16-colour v4 rooms:** a room without a `PA` block is read with the fixed EGA palette and the old-v3 EGA strip code (`ScummV3EgaRoomDecoder.DecodeStrip`, now shared; the BM body is a length word, a word offset per strip, the strips). Depth masks are not read. `ReadPalette` falls back to the EGA palette, so the EGA costumes decode too.

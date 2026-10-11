@@ -32,6 +32,10 @@ public class OtherV4GameTests
             Assert.True(archive.DecodeRoom(room.ResourceId!.Value).IsValid);
         });
         Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Costume);
+        // Every sound is an SO block with both an AdLib and a PC speaker part, across all four disks.
+        var sounds = game.V4Disks.Disks.SelectMany(d => d.ReadSounds()).ToArray();
+        Assert.Equal(90, sounds.Length);
+        Assert.All(sounds, sound => { Assert.NotNull(sound.Adlib); Assert.NotNull(sound.Speaker); });
     }
 
     [Fact]
@@ -51,6 +55,10 @@ public class OtherV4GameTests
         Assert.All(rooms, room => Assert.True(disk.DecodeRoom(room.ResourceId!.Value).IsValid));
         Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Costume);
         Assert.DoesNotContain(rooms, room => room.ResourceId is 98 or 99);
+        // The sounds sit in a second SO block inside the first; the parts are found through it.
+        var sounds = disk.ReadSounds();
+        Assert.Equal(73, sounds.Count);
+        Assert.All(sounds, sound => Assert.NotNull(sound.Adlib));
     }
 
     [Fact]

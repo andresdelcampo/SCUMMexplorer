@@ -54,6 +54,12 @@ internal static class Program
                 await Task.Delay(1500);
                 report.Add($"costume {costume.Name}: {((TextBlock)window.FindName("StatusText")).Text} | {((TextBlock)window.FindName("CostumeMessage")).Text}");
                 Shot("costume.png");
+                foreach (var sound in game.Resources.Where(r => r.Kind == ResourceKind.Sound).Take(1).Concat(game.Resources.Where(r => r.Kind == ResourceKind.Sound).Skip(7).Take(1)))
+                {
+                    Call("SelectResourceInTree", sound);
+                    for (var n = 0; n < 150 && ((TextBlock)window.FindName("AudioTime")).Text.StartsWith("Preparing"); n++) await Task.Delay(100);
+                    report.Add($"sound {sound.Name}: {((TextBlock)window.FindName("AudioDescription")).Text} | {((TextBlock)window.FindName("AudioTime")).Text} | {((TextBlock)window.FindName("StatusText")).Text}");
+                }
             }
             catch (Exception ex) { report.Add("ERROR " + ex); Environment.ExitCode = 1; }
             finally { File.WriteAllLines(Path.Combine(output, "report.txt"), report); window.Close(); app.Shutdown(); }

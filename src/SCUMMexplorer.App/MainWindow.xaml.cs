@@ -408,7 +408,7 @@ public partial class MainWindow : Window
         })
         {
             if (game.Id != GameId.Loom && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
-                !(game.V4Disks is not null && kind == ResourceKind.Costume) && kind != ResourceKind.Executable) continue;
+                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -642,6 +642,12 @@ public partial class MainWindow : Window
                 var cdRoom = vga.DecodeRoom(roomResource.ResourceId!.Value);
                 return CreateRoomCardBitmap(cdRoom, cdRoom.Pixels.ToArray(), 0);
             }
+        }
+        if (game.V4Disks is not null && game.V4ArchiveFor(roomResource) is { } browsed)
+        {
+            // A browsed v4 game (not LOOM CD): the plain background out of the disk that holds the room.
+            var browsedRoom = browsed.DecodeRoom(roomResource.ResourceId!.Value);
+            return CreateRoomCardBitmap(browsedRoom, browsedRoom.Pixels.ToArray(), 0, browsedRoom.Palette);
         }
         var bytes = File.ReadAllBytes(roomResource.FilePath);
         var decoder = new ScummV3EgaRoomDecoder();
@@ -2737,10 +2743,10 @@ public partial class MainWindow : Window
     private Task<byte[]> RenderAudioWaveAsync(GameResource resource, bool adlib,
         CancellationToken token) => Task.Run(() =>
         {
-            if (_game?.V4Archive is { } vga)
+            if (_game?.V4ArchiveFor(resource) is { } vga)
             {
-                if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("The CD game has no MT-32 music. Choose AdLib or the PC speaker.");
-                var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in DISK01.LEC.");
+                if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
+                var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in the game's archive.");
                 return adlib
                     ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token)
                     : _audioDecoder.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("This sound has no PC speaker part."), 6, token);

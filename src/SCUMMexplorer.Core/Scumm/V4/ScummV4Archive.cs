@@ -386,7 +386,7 @@ public sealed class ScummV4Archive
             var size = (int)BinaryPrimitives.ReadUInt32LittleEndian(_lec.AsSpan(block));
             if (size < 6 || block + size > _lec.Length) continue;
             byte[]? speaker = null, adlib = null;
-            foreach (var part in Blocks(_lec, block + 6, block + size))
+            foreach (var part in SoundParts(block + 6, block + size))
             {
                 if (part.Tag == "WA") speaker ??= _lec.AsSpan(part.Start, part.Size).ToArray();
                 else if (part.Tag == "AD") adlib ??= _lec.AsSpan(part.Start + 6, part.Size - 6).ToArray();
@@ -394,6 +394,17 @@ public sealed class ScummV4Archive
             sounds.Add(new ScummV4Sound(id, room, speaker, adlib));
         }
         return sounds.OrderBy(s => s.Id).ToArray();
+    }
+
+    /// <summary>The parts of an SO block; the older 256-colour Indiana Jones wraps them in a second SO block, whose parts count the same.</summary>
+    private IEnumerable<Block> SoundParts(int start, int end)
+    {
+        foreach (var part in Blocks(_lec, start, end))
+        {
+            if (part.Tag == "SO")
+                foreach (var inner in SoundParts(part.Start + 6, part.Start + part.Size)) yield return inner;
+            else yield return part;
+        }
     }
 
     /// <summary>The costume with this number, or null.</summary>
