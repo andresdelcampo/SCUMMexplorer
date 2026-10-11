@@ -338,8 +338,8 @@ public sealed class GameFolderScanner
     }
 
     /// <summary>
-    /// Whether the entry is a PC speaker sound of the v2 player's format (the one LOOM's old bundle uses): a length word, the priority and restart bytes, then the channel
-    /// pointers, the first at 22 and the other three empty. Zak McKracken classic and the enhanced games have it; Maniac Mansion classic uses another format, not read.
+    /// Whether the entry is a PC speaker sound: of the v2 player's format (the one LOOM's old bundle uses; a length word, the priority and restart bytes, then the channel
+    /// pointers, the first at 22 and the other three empty), which Zak McKracken classic and the enhanced games have, or of classic Maniac Mansion's chunk format.
     /// </summary>
     private static bool ReadsAsOlderSound(string path, int offset)
     {
@@ -349,8 +349,11 @@ public sealed class GameFolderScanner
             var data = LflEncoding.DecodeXorFF(File.ReadAllBytes(path));
             if (offset < 0 || offset + 12 > data.Length) return false;
             var size = data[offset] | data[offset + 1] << 8;
-            return size >= 22 && offset + size <= data.Length && (data[offset + 6] | data[offset + 7] << 8) == 22 &&
-                data[offset + 8] == 0 && data[offset + 9] == 0 && data[offset + 10] == 0 && data[offset + 11] == 0;
+            if (size < 12 || offset + size > data.Length) return false;
+            var sound = data.AsSpan(offset, size).ToArray();
+            if (ScummPcSpeakerV1Audio.IsV2Format(sound)) return size >= 22;
+            // Classic Maniac Mansion's own chunk format: it ends with the 0xFFFF chunk and plays at least one note.
+            return sound[size - 2] == 0xFF && sound[size - 1] == 0xFF && ScummPcSpeakerV1Audio.HasNotes(sound);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return false; }
     }

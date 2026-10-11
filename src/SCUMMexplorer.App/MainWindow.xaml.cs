@@ -2785,7 +2785,11 @@ public partial class MainWindow : Window
                 return new ScummMt32Audio(roms).RenderWave(resource, token);
             }
             if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
-            if (_game is { Version: ScummVersion.V1 or ScummVersion.V2 } && adlib) throw new NotSupportedException("This game's sounds are for the PC speaker. Choose that device.");
+            if (_game is { Version: ScummVersion.V1 or ScummVersion.V2 })
+            {
+                if (adlib) throw new NotSupportedException("This game's sounds are for the PC speaker. Choose that device.");
+                return ScummPcSpeakerV1Audio.RenderOlder(resource, _audioDecoder, token);
+            }
             return adlib ? _adlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
         }, token);
 
