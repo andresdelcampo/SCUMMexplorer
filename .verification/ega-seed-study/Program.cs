@@ -61,6 +61,28 @@ if (args.Length > 0 && args[0] == "index") // EgaSeedStudy index <folder>...: id
     }
     return;
 }
+if (args.Length > 2 && args[2] == "ops") // EgaSeedStudy <folder> - ops <operation substring> <operand regex>: every instruction of the game's code whose operation and operands match
+{
+    var g7 = new GameFolderScanner().Scan(args[0]);
+    var op = args[3]; var rx = new System.Text.RegularExpressions.Regex(args[4]);
+    LoomSceneStateScanner.For(g7).VisitCodeUnits((script, room, obj, verb, label) =>
+    {
+        foreach (var i in script?.Instructions ?? []) if (i.Operation.Contains(op, StringComparison.OrdinalIgnoreCase) && rx.IsMatch(i.Operands)) Console.WriteLine($"{label} +0x{i.Offset:X4} {i.Operation} {i.Operands}");
+    });
+    return;
+}
+if (args.Length > 2 && args[2] == "objs") // EgaSeedStudy <folder> - objs <room>: the room's objects with their walk points
+{
+    var g8 = new GameFolderScanner().Scan(args[0]); var d8 = ScummDataSources.For(g8);
+    foreach (var o in d8.ReadRoom(int.Parse(args[3])).Objects) Console.WriteLine($"  object {o.Id} x={o.X} y={o.Y} w={o.Width} h={o.Height} walk=({o.WalkX},{o.WalkY})");
+    return;
+}
+if (args.Length > 2 && args[2] == "global") // EgaSeedStudy <folder> - global <n>...: the global scripts' instructions
+{
+    var g9 = new GameFolderScanner().Scan(args[0]); var d9 = ScummDataSources.For(g9);
+    foreach (var n in args.Skip(3).Select(int.Parse)) { Console.WriteLine($"== global {n}"); foreach (var i in d9.GlobalScript(n)?.Instructions ?? []) Console.WriteLine($"{i.Offset:X4} {i.Operation} {i.Operands}"); }
+    return;
+}
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
 var total = Stopwatch.StartNew();
