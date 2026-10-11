@@ -223,14 +223,30 @@ public partial class MainWindow : Window
     }, _game, () => IsAdvancedMode, _game?.Id == GameId.LoomVga ? null : LoomEgaStateFlags.Create(() => _replayCatalog?.Replays ?? [])) { Owner = this, Resources = Resources };
 
 
+    /// <summary>Game Status exists only for a loaded LOOM game with a live session; every other state hides it.</summary>
+    private bool GameStatusAvailable => _game is { Id: GameId.Loom or GameId.LoomVga } && _session is not null;
+
+    private void UpdateGameStatusButton()
+    {
+        GameStatusButton.Visibility = GameStatusAvailable ? Visibility.Visible : Visibility.Collapsed;
+        GameStatusButton.IsEnabled = GameStatusAvailable;
+    }
+
     private void GameStatus_Click(object sender, RoutedEventArgs e)
     {
-        if (_game?.Id is GameId.Loom or GameId.LoomVga && _session is not null) BuildGameStatusWindow().ShowDialog();
+        if (!GameStatusAvailable) { UpdateGameStatusButton(); return; }
+        try { BuildGameStatusWindow().ShowDialog(); }
+        catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException or IOException or NullReferenceException)
+        {
+            MessageBox.Show(this, ex.Message, "Game Status could not open", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void OpenGameFolder(string folder)
     {
         var game = _scanner.Scan(folder);
+        // The session and game change step by step below; until ShowGame finishes (or if it fails) no Game Status.
+        GameStatusButton.Visibility = Visibility.Collapsed;
         var indexedSnapshot = game.Id == GameId.Loom && game.Version == ScummVersion.V3
             ? _stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
             : null;
@@ -436,11 +452,10 @@ public partial class MainWindow : Window
         StatusText.Text = "Ready";
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         // Game Status needs the session, not a room: show it as soon as the game is loaded (the header then stays still).
-        GameStatusButton.Visibility = game.Id is GameId.Loom or GameId.LoomVga && _session is not null ? Visibility.Visible : Visibility.Collapsed;
         // The CD game has no music device to choose (its music has not been read); its voices come from the disc's audio track (the CD Audio choice of its own sound box).
         SoundModeCombo.Visibility = game.Id == GameId.LoomVga ? Visibility.Collapsed : Visibility.Visible;
         CdSoundCombo.Visibility = game is { Id: GameId.LoomVga, V4Archive.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
-        GameStatusButton.IsEnabled = _session is not null;
+        UpdateGameStatusButton();
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
     }
@@ -3938,8 +3953,7 @@ public partial class MainWindow : Window
     /// <summary>Shows the playback bar in the explore mode, and enables pause/play and skip as the playback allows.</summary>
     private void UpdatePlaybackControls()
     {
-        GameStatusButton.Visibility = _game?.Id is GameId.Loom or GameId.LoomVga && _session is not null ? Visibility.Visible : Visibility.Collapsed;
-        GameStatusButton.IsEnabled = _session is not null; // Inspection is available during playback too; editing stays guarded.
+        UpdateGameStatusButton(); // Inspection is available during playback too; editing stays guarded.
         CutsceneMenuButton.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
         var active = GameClickActive && IsLoomGame;
         UpdateInteractButton();
