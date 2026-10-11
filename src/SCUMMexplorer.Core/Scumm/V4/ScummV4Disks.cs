@@ -18,6 +18,9 @@ public sealed class ScummV4Disks
     public static ScummV4Disks Load(IGameFileSource source)
     {
         var disks = new List<ScummV4Archive>();
+        // One archive built from the plain per-room files (Indiana Jones 256 colours) counts as the single disk.
+        if (!source.Exists(ScummV4Archive.DiskFileName(1)) && ScummV4Archive.IsRoomFileLayout(source))
+            return new ScummV4Disks([ScummV4Archive.LoadRoomFiles(source)]);
         while (source.Exists(ScummV4Archive.DiskFileName(disks.Count + 1)))
             disks.Add(ScummV4Archive.Load(source, ScummV4Archive.DiskFileName(disks.Count + 1)));
         if (disks.Count == 0) throw new InvalidDataException("000.LFL and DISK01.LEC are both needed.");

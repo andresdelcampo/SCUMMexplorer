@@ -34,6 +34,7 @@ public sealed class GameFolderScanner
         ArgumentException.ThrowIfNullOrWhiteSpace(folderPath);
         var fullPath = Path.GetFullPath(folderPath);
         if (TryScanCd(fullPath) is { } cd) return cd;
+        if (Directory.Exists(fullPath) && TryScanV4RoomFiles(fullPath) is { } roomFiles) return roomFiles;
         if (!Directory.Exists(fullPath))
             throw new DirectoryNotFoundException($"Game folder not found: {fullPath}");
 
@@ -220,6 +221,13 @@ public sealed class GameFolderScanner
         return new GameLibrary("LOOM (CD)", source.Location, ScummVersion.V4, "CD (VGA)", resources, note, GameId.LoomVga) { V4Archive = archive };
     }
 
+    /// <summary>A v4 game stored as one plain <c>NN.LFL</c> per room (Indiana Jones and the Last Crusade, 256 colours), or null when the folder is not one.</summary>
+    private static GameLibrary? TryScanV4RoomFiles(string path)
+    {
+        var folder = new FolderFileSource(path);
+        return ScummV4Archive.IsRoomFileLayout(folder) ? ScanOtherV4(folder) : null;
+    }
+
     /// <summary>
     /// A v4 game that is not LOOM CD (Monkey Island, for one), browsed from every disk it has: its rooms, costumes and sounds, with no session. The game is not named
     /// (<see cref="GameId.Unknown"/>), so no game-specific feature switches on. If no room of any disk decodes (the 16-colour EGA rooms are stored in another image format),
@@ -233,35 +241,38 @@ public sealed class GameFolderScanner
         var title = folderName.Equals("EGA", StringComparison.OrdinalIgnoreCase) || folderName.Equals("VGA", StringComparison.OrdinalIgnoreCase)
             ? $"{parentName} {folderName}".Trim() : folderName;
         var disks = ScummV4Disks.Load(source);
+        var perRoomFiles = !source.Exists(ScummV4Archive.DiskFileName(1));
         var resources = new List<GameResource>();
-        var decodable = false;
+        var withoutPicture = 0;
         for (var i = 0; i < disks.Disks.Count; i++)
         {
             var disk = i + 1;
             var archive = disks.Disks[i];
-            var diskName = ScummV4Archive.DiskFileName(disk);
+            var diskName = perRoomFiles ? "its room files" : ScummV4Archive.DiskFileName(disk);
+            // A room is offered only if its picture decodes: a resource bank (rooms 98 and 99 of the 256-colour Indiana Jones) has none, and so does an EGA room.
             foreach (var room in archive.Rooms)
+            {
+                try { if (!archive.DecodeRoom(room.Number).IsValid) throw new InvalidDataException(); }
+                catch (Exception ex) when (ex is InvalidDataException or IndexOutOfRangeException or ArgumentException) { withoutPicture++; continue; }
                 resources.Add(new GameResource($"Room {room.Number:00}", ResourceKind.Room, source.Location, room.Number,
                     string.IsNullOrEmpty(room.Name) ? $"Room on {diskName}." : $"Room \"{room.Name}\" on {diskName}.", disk, room.Offset));
+            }
             foreach (var costume in archive.ReadCostumes())
                 resources.Add(new GameResource($"Costume {costume.Id:00}", ResourceKind.Costume, source.Location, costume.Id,
                     $"Costume stored in room {costume.Room:00} on {diskName}.", disk, null));
             foreach (var sound in archive.ReadSounds())
                 resources.Add(new GameResource($"Sound {sound.Id:00}", ResourceKind.Sound, source.Location, sound.Id,
                     $"{(sound.IsMusic ? "Music" : "Sound effect")} stored in room {sound.Room:00} on {diskName}.", disk, null));
-            if (!decodable && archive.Rooms.Count > 0)
-            {
-                try { decodable = archive.DecodeRoom(archive.Rooms[0].Number).IsValid; }
-                catch (Exception ex) when (ex is InvalidDataException or IndexOutOfRangeException or ArgumentException) { }
-            }
         }
-        if (!decodable)
+        var layout = perRoomFiles ? "one file per room (00.LFL and NN.LFL)" : $"{disks.Disks.Count} disks (000.LFL and DISK01.LEC to DISK{disks.Disks.Count:00}.LEC)";
+        if (!resources.Any(r => r.Kind == ResourceKind.Room))
             return new GameLibrary(title, source.Location, ScummVersion.V4, "DOS (SCUMM v4)", [],
-                $"The folder holds a SCUMM v4 game ({disks.Disks.Count} disks) that is not LOOM CD. Its rooms are not in a format this explorer reads yet (the 16-colour EGA version), so it is not supported yet.");
+                $"The folder holds a SCUMM v4 game ({layout}) that is not LOOM CD. Its rooms are not in a format this explorer reads yet (the 16-colour EGA version), so it is not supported yet.");
         var ordered = resources.OrderBy(r => r.Kind).ThenBy(r => r.ResourceId).ToList();
         return new GameLibrary(title, source.Location, ScummVersion.V4, "DOS (SCUMM v4)", ordered,
-            $"A SCUMM v4 game that is not LOOM CD, read from its {disks.Disks.Count} disks (000.LFL and DISK01.LEC to DISK{disks.Disks.Count:00}.LEC). Room backgrounds and costumes are shown; " +
-            "objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks };
+            $"A SCUMM v4 game that is not LOOM CD, read from {layout}. Room backgrounds and costumes are shown" +
+            (withoutPicture > 0 ? $" ({withoutPicture} room entries without a picture are left out)" : "") +
+            "; objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks };
     }
 
     /// <summary>

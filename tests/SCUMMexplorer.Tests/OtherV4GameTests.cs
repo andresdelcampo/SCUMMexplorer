@@ -6,7 +6,7 @@ namespace SCUMMexplorer.Tests;
 
 /// <summary>
 /// A v4 game that is not LOOM CD is browsed from all its disks. Set <c>SCUMM_MONKEY1_VGA_TEST_ROOT</c> (and, for the 16-colour copy,
-/// <c>SCUMM_MONKEY1_EGA_TEST_ROOT</c>) to the absolute folders (<c>Games/FUTURE/monkey1/VGA</c>, <c>…/EGA</c>); the checks are skipped without them.
+/// <c>SCUMM_MONKEY1_EGA_TEST_ROOT</c>; for the 256-colour Indiana Jones, <c>SCUMM_INDY3_VGA_TEST_ROOT</c>) to the absolute folders (<c>Games/FUTURE/monkey1/VGA</c>, <c>…/EGA</c>); the checks are skipped without them.
 /// </summary>
 public class OtherV4GameTests
 {
@@ -31,7 +31,26 @@ public class OtherV4GameTests
             Assert.NotNull(archive);
             Assert.True(archive.DecodeRoom(room.ResourceId!.Value).IsValid);
         });
-        Assert.NotEmpty(game.Resources.Where(r => r.Kind == ResourceKind.Costume));
+        Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Costume);
+    }
+
+    [Fact]
+    public void BrowsesTheRoomFilesOfTheSuppliedIndianaJones256ColourGameWhenConfigured()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_INDY3_VGA_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal(GameId.Unknown, game.Id);
+        Assert.Equal(ScummVersion.V4, game.Version);
+        Assert.NotNull(game.V4Disks);
+        var disk = Assert.Single(game.V4Disks.Disks);
+        // The 87 room files whose picture decodes, through the four older 256-colour strip codes (2, 3, 4 and 7) as well as raw and bit-coded strips.
+        var rooms = game.Rooms.ToArray();
+        Assert.Equal(87, rooms.Length);
+        Assert.All(rooms, room => Assert.True(disk.DecodeRoom(room.ResourceId!.Value).IsValid));
+        Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Costume);
+        Assert.DoesNotContain(rooms, room => room.ResourceId is 98 or 99);
     }
 
     [Fact]

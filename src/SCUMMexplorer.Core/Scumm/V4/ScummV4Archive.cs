@@ -107,6 +107,50 @@ public sealed class ScummV4Archive
         return archive;
     }
 
+    /// <summary>
+    /// The index of the per-room layout (Indiana Jones and the Last Crusade, 256 colours): <c>00.LFL</c> holds the same tagged blocks as <c>000.LFL</c>
+    /// ("0R", "0S", "0C", "0N", "0O"), unencrypted, and each <c>NN.LFL</c> is the content of one room's LF block.
+    /// </summary>
+    public const string RoomFileIndex = "00.LFL";
+
+    /// <summary>Whether the source is a v4 game stored as one plain <c>NN.LFL</c> per room: its <c>00.LFL</c> starts with a "0R" block (the old-v3 index is XOR 0xFF and does not).</summary>
+    public static bool IsRoomFileLayout(IGameFileSource source)
+    {
+        if (!source.Exists(RoomFileIndex)) return false;
+        var index = source.ReadAllBytes(RoomFileIndex);
+        return index.Length >= 8 && index[4] == (byte)'0' && index[5] == (byte)'R' && BinaryPrimitives.ReadUInt32LittleEndian(index) >= 8;
+    }
+
+    /// <summary>
+    /// Loads the per-room layout by wrapping every room file (one that starts with an RO block) in an LF block header, which makes it the same bytes as a
+    /// disk's archive: the index offsets count from the first block inside the LF block, which is the start of the room file.
+    /// </summary>
+    public static ScummV4Archive LoadRoomFiles(IGameFileSource source)
+    {
+        if (!IsRoomFileLayout(source)) throw new InvalidDataException($"{RoomFileIndex} is not a v4 index.");
+        var index = source.ReadAllBytes(RoomFileIndex);
+        var all = new MemoryStream();
+        var rooms = new List<ScummV4Room>();
+        var header = new byte[8];
+        for (var number = 1; number <= 99; number++)
+        {
+            var name = $"{number:00}.LFL";
+            if (!source.Exists(name)) continue;
+            var file = source.ReadAllBytes(name);
+            if (file.Length < 6 || file[4] != (byte)'R' || file[5] != (byte)'O') continue;
+            var start = (int)all.Length;
+            BinaryPrimitives.WriteUInt32LittleEndian(header, (uint)(8 + file.Length));
+            header[4] = (byte)'L';
+            header[5] = (byte)'F';
+            BinaryPrimitives.WriteUInt16LittleEndian(header.AsSpan(6), (ushort)number);
+            all.Write(header);
+            all.Write(file);
+            rooms.Add(new ScummV4Room(number, "", start, 8 + file.Length));
+        }
+        if (rooms.Count == 0) throw new InvalidDataException("No room file starts with an RO block.");
+        return new ScummV4Archive(all.ToArray(), index, rooms);
+    }
+
     /// <summary>Charset 1 to 4 (<c>901.LFL</c> to <c>904.LFL</c>), or null when the disc has no such file.</summary>
     public ScummV4Charset? ReadCharset(int number) =>
         _charsets.TryGetValue(number, out var file) ? ScummV4Charset.Parse(file, number) : null;
@@ -485,6 +529,11 @@ public sealed class ScummV4Archive
                 for (var y = 0; y < height; y++) pixels[y * width + x0 + x] = data[pos++];
             return;
         }
+        if (code is 0x02 or 0x03 or 0x04 or 0x07)
+        {
+            DecodeOld256Strip(code, data, pos, end, pixels, width, height, x0);
+            return;
+        }
         var vertical = code is >= 0x0E and <= 0x12;
         if (!vertical && code is not (>= 0x18 and <= 0x1C))
             throw new InvalidDataException($"Unsupported strip code 0x{code:X2}.");
@@ -511,6 +560,94 @@ public sealed class ScummV4Archive
                 else if (Bit() == 0) color = (color + step) & 0xFF;
                 else { step = -step; color = (color + step) & 0xFF; }
             }
+        }
+    }
+
+    /// <summary>
+    /// One strip of the older 256-colour games (Indiana Jones 256 colours; ScummVM's unkDecode8 to 11), column by column: 0x02 runs (a count byte plus one,
+    /// then the colour), 0x03 four-bit codes (repeat a nibble, a list of nibbles, or the high nibble of the following colours), 0x04 a local palette
+    /// with runs for the codes past it, 0x07 one bit-coded colour that steps up or down or is set anew.
+    /// </summary>
+    private static void DecodeOld256Strip(byte code, byte[] data, int pos, int end, byte[] pixels, int width, int height, int x0)
+    {
+        int column = 0, row = 0;
+        // Writes one pixel and moves down the column; false once the strip's eighth column is full.
+        bool Put(int color)
+        {
+            pixels[row * width + x0 + column] = (byte)color;
+            if (++row < height) return true;
+            row = 0;
+            return ++column < 8;
+        }
+        byte Next() => pos < end ? data[pos++] : throw new InvalidDataException("A strip ends before its picture does.");
+        int buffer = 0, mask = 128;
+        int Bit()
+        {
+            if ((mask <<= 1) == 256) { buffer = Next(); mask = 1; }
+            return (buffer & mask) != 0 ? 1 : 0;
+        }
+        int Bits(int count)
+        {
+            var value = 0;
+            for (var i = 0; i < count; i++) value += Bit() << i;
+            return value;
+        }
+        switch (code)
+        {
+            case 0x02:
+                while (true)
+                {
+                    var run = Next() + 1;
+                    var color = Next();
+                    for (; run > 0; run--) if (!Put(color)) return;
+                }
+            case 0x03:
+                var high = 0;
+                while (true)
+                {
+                    var c = Bits(4);
+                    switch (c >> 2)
+                    {
+                        case 0:
+                            var repeated = Bits(4);
+                            for (var i = 0; i < (c & 3) + 2; i++) if (!Put(high * 16 + repeated)) return;
+                            break;
+                        case 1:
+                            for (var i = 0; i < (c & 3) + 1; i++) if (!Put(high * 16 + Bits(4))) return;
+                            break;
+                        case 2:
+                            high = Bits(4);
+                            break;
+                    }
+                }
+            case 0x04:
+                int colors = Next();
+                var local = new byte[colors];
+                for (var i = 0; i < colors; i++) local[i] = Next();
+                while (true)
+                {
+                    int entry = Next();
+                    if (entry < colors) { if (!Put(local[entry])) return; continue; }
+                    var run = entry - colors + 1;
+                    var color = Next();
+                    for (; run > 0; run--) if (!Put(color)) return;
+                }
+            default:
+                byte shade = Next();
+                var increment = 1;
+                for (var pixel = 0; pixel < 8 * height; pixel++)
+                {
+                    Put(shade);
+                    var ones = 0;
+                    while (ones < 3 && Bit() == 1) ones++;
+                    switch (ones)
+                    {
+                        case 1: increment = -increment; shade = (byte)(shade - increment); break;
+                        case 2: shade = (byte)(shade - increment); break;
+                        case 3: increment = 1; shade = (byte)Bits(8); break;
+                    }
+                }
+                break;
         }
     }
 

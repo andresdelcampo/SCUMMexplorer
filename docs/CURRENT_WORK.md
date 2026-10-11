@@ -66,6 +66,6 @@ Commit finished tasks separately with explicit paths; preserve unrelated/unfinis
 ## Separately parked
 
 - **Room 34 standalone fortress reveal**, local 200 +0035: unresolved, separate from local 206's ghost pan. Save/console/close assists are fulfilled; current native screen/state is unverified. [Preserved native evidence](../.verification/room34-state-20261008/NATIVE_SESSION.md).
-- **Other games, browse only** (11 October): Monkey Island VGA opens (rooms, costumes; see CHANGELOG). Next candidates in order: Indy3 VGA (unencrypted tagged `.lfl`, probe whether the v4 room decoder reads it), Monkey EGA rooms (16-colour decoder), costume palette check, v4 sound listing/playback. Maniac Mansion Enhanced is v2 and last. Existing games must keep identical scan results.
+- **Other games, browse only** (11 October): Monkey Island VGA opens (rooms, costumes; see CHANGELOG). Indy3 VGA opens too (87 rooms, 101 costumes). Next candidates in order: Monkey EGA rooms (16-colour decoder), Monkey costume colours (Guybrush's shirt is dark; Indy's costume looks right), v4 sound listing/playback. Maniac Mansion Enhanced is v2 and last. Existing games must keep identical scan results.
 - M5/secrets, Indy expansion/later games, demo carrier rooms, broad performance and optional General MIDI/card archaeology.
 - Other cleanup/deletion/worktree proposals remain outside current work; see the [historical review](archive/CLEANUP_REVIEW.md).

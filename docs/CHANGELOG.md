@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (later still): Indiana Jones 256 colours opens for browsing
+
+- **Not v3 as first guessed:** the unencrypted `00.lfl` of `Games/FUTURE/indy3 vga en|es` holds the v4 index blocks (`0R 0S 0C 0N 0O`) and every `NN.lfl` is the content of one room's LF block (RO, SC, SO, CO blocks). `ScummV4Archive.LoadRoomFiles` wraps each room file in an LF header, so the existing readers work unchanged (index offsets count from the start of the room file); `ScummV4Disks.Load` treats that as the single disk.
+- **Four older strip codes** (`DecodeOld256Strip`: 0x02 runs, 0x03 four-bit, 0x04 local palette, 0x07 stepped colour; ScummVM's `unkDecode8` to `11`) decode the 256-colour backgrounds. 87 rooms and 101 costumes open in the real window (Berlin cafe, Room 15; Indy's brown suit); [record](../.verification/generic-v4/README.md).
+- A room is now offered only if its picture decodes: Room 98 and 99 (resource banks) and, for Monkey VGA, two empty entries (293 → 291 resources) are left out.
+- Scan hashes of all other local folders are unchanged. `OtherV4GameTests` gained an Indy3 VGA check (`SCUMM_INDY3_VGA_TEST_ROOT`).
+
 ## 11 October (later): other v4 games open for browsing (Monkey Island VGA)
 
 - **`ScummV4Disks`** (Core, `Scumm/V4`): a v4 game that is not LOOM CD is read from every `DISK01..NN.LEC` (`ScummV4Archive.Load(source, archiveFile)`); `GameFolderScanner.ScanOtherV4` lists its rooms, costumes and sounds with the disk in `ContainerFileNumber`, `GameLibrary.V4Disks` / `V4ArchiveFor(resource)` find the archive. The game stays `GameId.Unknown`, so no LOOM/Indy feature switches on; the app shows room backgrounds and costume poses (tree: Rooms, Costumes).
