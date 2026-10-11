@@ -228,6 +228,33 @@ public sealed class ScummV5Archive : IBrowsableArchive
         catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { return null; }
     }
 
+    /// <summary>
+    /// The room's <c>OBCD</c> blocks: <c>CDHD</c> (object number word, x, y, width and height in 8-pixel units, flags, parent, walk point, facing) and <c>OBNA</c> (the name).
+    /// </summary>
+    public IReadOnlyList<BrowsedObjectLabel> ReadObjectLabels(int number)
+    {
+        var labels = new List<BrowsedObjectLabel>();
+        try
+        {
+            var room = Room(number);
+            foreach (var obcd in Blocks(_resources, room.Start + 8, room.Start + room.Size).Where(b => b.Tag == "OBCD"))
+            {
+                var parts = Blocks(_resources, obcd.Start + 8, obcd.Start + obcd.Size);
+                if (parts.FirstOrDefault(b => b.Tag == "CDHD") is not { Size: >= 18 } header || parts.FirstOrDefault(b => b.Tag == "OBNA") is not { } nameBlock) continue;
+                var at = header.Start + 8;
+                var width = _resources[at + 4] * 8;
+                var height = _resources[at + 5] * 8;
+                var nameEnd = Array.IndexOf(_resources, (byte)0, nameBlock.Start + 8, nameBlock.Size - 8);
+                var name = nameEnd > nameBlock.Start + 8
+                    ? new string(Encoding.Latin1.GetString(_resources, nameBlock.Start + 8, nameEnd - nameBlock.Start - 8).Where(c => c >= ' ').ToArray()) : "";
+                if (name.Length > 0 && width > 0 && height > 0)
+                    labels.Add(new BrowsedObjectLabel(BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(at)), name, _resources[at + 2] * 8, (_resources[at + 3] & 0x7F) * 8, width, height));
+            }
+        }
+        catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { }
+        return labels;
+    }
+
     private sealed record Block(string Tag, int Start, int Size);
 
     private static List<Block> Blocks(byte[] data, int start, int end)

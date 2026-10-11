@@ -4,6 +4,9 @@ namespace SCUMMexplorer.Core.Scumm;
 /// What the browse-only games need from one archive of resources: its rooms with their pictures, its costumes with their poses and its sounds. The v4 archives
 /// (<see cref="ScummV4Archive"/>) and the v5 one (<see cref="ScummV5Archive"/>) both give it, so the scanner and the window read either the same way.
 /// </summary>
+/// <summary>An object of a room as the pointer reveals it: its number, the name stored with it (empty when it has none) and its rectangle in room pixels.</summary>
+public sealed record BrowsedObjectLabel(int Id, string Name, int X, int Y, int Width, int Height);
+
 public interface IBrowsableArchive
 {
     IReadOnlyList<ScummV4Room> Rooms { get; }
@@ -13,6 +16,9 @@ public interface IBrowsableArchive
 
     /// <summary>The room's walk boxes (the box matrix is not kept where the archive stores it apart); null when the room has none or they do not read.</summary>
     ScummWalkBoxSet? ReadWalkBoxes(int number);
+
+    /// <summary>The room's objects with a name and a rectangle, in directory order; empty when they cannot be read.</summary>
+    IReadOnlyList<BrowsedObjectLabel> ReadObjectLabels(int number);
 
     IReadOnlyList<ScummV4Costume> ReadCostumes();
 

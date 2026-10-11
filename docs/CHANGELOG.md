@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: object names of v4 and v5 rooms (item 4 of the browse plan, in the form that pays off)
+
+- **Why not object pictures:** the index gives an object its starting state, and in the v4 and v5 games almost all start at 0 (Monkey Island EGA: 2 of 1000 objects non-zero; Indy3 256 colours: 12); the rooms' entry scripts show the rest. Painting the index states would add almost nothing, and the real start needs the entry scripts run (the `IScummDataSource` and bounded executor exist for the LOOM CD only).
+- **Done instead:** hovering an object of a browsed v4 or v5 room shows its name (`IBrowsableArchive.ReadObjectLabels`: `OC` blocks for v4, `OBCD` > `CDHD` + `OBNA` for v5), for every named object, whatever its state. Monkey Island EGA 426 names in 60 rooms, Monkey Island 2 650 in 76 rooms, Indy3 256 colours 343 in 54. v1/v2 keep the drawn objects only. Not checked in the real window.
+
 ## 12 October: walk boxes of every browsed game
 
 - The **Walk boxes** overlay (Advanced) now works for all browsed games, from ScummVM's `boxes.cpp` (fetched 12 October with the user's approval): **v1/v2** (`ScummWalkBoxReader.ReadV2`: table at the byte in room header 0x15, 8-byte boxes of upper and lower y, four x and mask and flags, in units of 8 pixels across and 2 down); **v4** (`BX` block, 20-byte boxes; the 256-colour Indy is a version 3 game and has 18-byte boxes); **v5** (`BOXD`, count word and 20-byte boxes). `IBrowsableArchive.ReadWalkBoxes`. The box matrix is not read for v1/v2 and v5; box 0 of the v5 games is a placeholder (corners -32000) and is not drawn.

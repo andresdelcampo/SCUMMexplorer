@@ -352,6 +352,12 @@ public sealed class ScummV4Archive : IBrowsableArchive
         return bx is null ? null : _lec.AsSpan(bx.Start + 6, bx.Size - 6).ToArray();
     }
 
+    public IReadOnlyList<BrowsedObjectLabel> ReadObjectLabels(int number)
+    {
+        try { return ReadObjects(number).Where(o => o.Name.Length > 0 && o.Width > 0 && o.Height > 0).Select(o => new BrowsedObjectLabel(o.Id, o.Name, o.X, o.Y, o.Width, o.Height)).ToList(); }
+        catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { return []; }
+    }
+
     public ScummWalkBoxSet? ReadWalkBoxes(int number)
     {
         // The 256-colour Indy (per-room files) is a version 3 game in ScummVM: 18-byte boxes without the scale word.
