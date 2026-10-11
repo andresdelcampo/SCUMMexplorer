@@ -3132,8 +3132,7 @@ public partial class MainWindow : Window
             var hotspots = _currentRoomObjectRecords.OrderBy(item => item.LocalIndex)
                 .Where(record => IsVerbHotspotAvailable(record, _session!.Snapshot) &&
                                  _roomVerbs.TryGetValue(record.Id, out var verbs) && verbs.Count > 0 &&
-                                 // Doorways have their own overlay and room clicks; they are not object hotspots.
-                                 DoorwayTargets(record).Length == 0)
+                                 IsObjectHotspot(record))
                 .Select(record =>
                 {
                     // The stored name, else its index.
@@ -4896,7 +4895,8 @@ public partial class MainWindow : Window
         var snapshot = _session.Snapshot;
         var hits = _currentRoomObjectRecords.OrderBy(item => item.LocalIndex).Where(record =>
         {
-            if (!listed.Contains(record.Id)) return false;
+            // Doorways are not listed but still are what the game's pointer is over.
+            if (!listed.Contains(record.Id) && (IsObjectHotspot(record) || !IsVerbHotspotAvailable(record, snapshot))) return false;
             var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
                 ? current : new RoomObjectPosition(record.X, record.Y);
             return at.X <= x && x < at.X + record.Width && at.Y <= y && y < at.Y + record.Height;
@@ -4926,7 +4926,7 @@ public partial class MainWindow : Window
         }
         // The row's own hover and focus outline take the box when the pointer leaves the room.
         if (record is not null || ObjectList.Children.OfType<Button>().All(button => !button.IsMouseOver && !button.IsKeyboardFocused))
-            ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never ? null : record);
+            ShowHotspotHighlight(ObjectAreaMode == DisplayMode.Never || record is not null && !IsObjectHotspot(record) ? null : record);
     }
 
     private IReadOnlyList<RoomVerbChoice> FindVerbChoicesAt(int x, int y)
@@ -4946,6 +4946,9 @@ public partial class MainWindow : Window
         }
         return choices;
     }
+
+    /// <summary>An object hotspot: a doorway is not one (it has its own overlay and room clicks, R-6.13).</summary>
+    private bool IsObjectHotspot(ScummRoomObjectRecord record) => DoorwayTargets(record).Length == 0;
 
     private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, LoomSessionSnapshot snapshot) =>
         record.Width > 0 && record.Height > 0 &&
@@ -5220,7 +5223,7 @@ public partial class MainWindow : Window
         if (all)
             foreach (var other in _currentRoomObjectRecords)
             {
-                if (other.Id == record?.Id || !IsVerbHotspotAvailable(other, _session!.Snapshot)) continue;
+                if (other.Id == record?.Id || !IsVerbHotspotAvailable(other, _session!.Snapshot) || !IsObjectHotspot(other)) continue;
                 var otherAt = _session.Snapshot.ObjectPositions.TryGetValue(other.Id, out var pos) ? pos : new RoomObjectPosition(other.X, other.Y);
                 var faint = new Border
                 {

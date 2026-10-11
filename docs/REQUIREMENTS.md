@@ -156,8 +156,9 @@ Top level order and header format are exact: **label, two spaces, count in paren
 | R-6.8 | SCUMM | The hint line under the scene (`ObjectsNote`) is shown only in inspection mode (and Advanced); the game's own screen needs none. | Code |
 | R-6.9 | SCUMM | Right-click or **Interact ▴** on an object opens a menu of the object's actual verbs, labelled by `LoomVerbNames`; choosing one is an *exploration action* and says so. | Code |
 | R-6.10 | APP | Session bar text, Advanced only in inspection mode; busy badge (`BusyBadge`) with wait cursor while the app does blocking work such as opening a scene or preparing music. | Code |
-| R-6.11 | APP | The right panel (Advanced) sections, in order: `DOORWAYS`, `HOTSPOTS`, `ACTIONS`, object preview + description, `Room entry` (summary, event buttons, `Raw disassembly`), `Last action` (summary, timeline, issues, `Raw trace`), `Assumptions` (`No assumptions` or `Assumptions · N`). | Code |
+| R-6.11 | APP | The right panel (Advanced) sections, in order: `DOORWAYS`, `HOTSPOTS` (objects that are not doorways, R-6.13), `ACTIONS`, object preview + description, `Room entry` (summary, event buttons, `Raw disassembly`), `Last action` (summary, timeline, issues, `Raw trace`), `Assumptions` (`No assumptions` or `Assumptions · N`). | Code |
 | R-6.12 | INDY3 EGA | Background preview only, with the note `Background preview only. Object art, scripts, and room routes are not decoded for this game yet.` | Code |
+| R-6.13 | APP | **A doorway is not an object hotspot** (decided 11 October). An object whose verbs can load a room (`DoorwayTargets`) appears only as a doorway: in the `DOORWAYS` section and the Doorways overlay, and through room clicks (R-1.6). It has no row in `HOTSPOTS`, no label suffix, no `Object hotspots` box (Always or hover outline) and no entry in the object list. The game's own pointer still sees it, so the cursor, the hover object sent to the game and a click on it work as for any object. Implementation: `IsObjectHotspot`. | Code |
 
 ## 7. Interaction model (LOOM)
 
