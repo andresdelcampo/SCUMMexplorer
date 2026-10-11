@@ -160,14 +160,19 @@ public sealed class LoomTextExtractor
                 $"{script.ContainerFileNumber:00}:{script.ResourceOffset:X4}:choices");
         }
 
-        if (game.V4Archive is { } vga)
+        // The CD game keeps its scripts in tagged blocks of DISK01.LEC, a browsed v4 game (Monkey Island) in the blocks of each of its disks: every block is one
+        // script (conversation ids use the block's offset, and the disk number as the container).
+        var archives = game.V4Archive is { } cd ? [cd] : game.V4Disks?.Disks.OfType<ScummV4Archive>().ToList() ?? [];
+        for (var disk = 0; disk < archives.Count; disk++)
         {
-            // The CD game keeps its scripts in tagged blocks of DISK01.LEC: every block is one script (conversation ids use the block's offset).
+            var vga = archives[disk];
+            var container = disk + 1;
+            var diskLabel = archives.Count > 1 ? $"Disk {container} / " : "";
             foreach (var room in vga.Rooms)
                 foreach (var script in vga.ReadScripts(room.Number))
                 {
-                    var source = $"Room {room.Number:00} / {script.Label}";
-                    try { Add(scripts.DecodeCode(script.Code, script.Number, 1, script.BlockOffset) with { Context = source }, room.Number, sourceOverride: source); }
+                    var source = $"{diskLabel}Room {room.Number:00} / {script.Label}";
+                    try { Add(scripts.DecodeCode(script.Code, script.Number, container, script.BlockOffset) with { Context = source }, room.Number, sourceOverride: source); }
                     catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source, ex); }
                 }
             foreach (var room in vga.Rooms)
@@ -177,23 +182,23 @@ public sealed class LoomTextExtractor
                 foreach (var obj in objects)
                 {
                     if (HasUsefulText(obj.Name))
-                        entries.Add(new LoomTextEntry(obj.Name, "Object name", $"Room {room.Number:00} / Object {obj.Id}", room.Number, obj.Id, null, null,
+                        entries.Add(new LoomTextEntry(obj.Name, "Object name", $"{diskLabel}Room {room.Number:00} / Object {obj.Id}", room.Number, obj.Id, null, null,
                             obj.BlockOffset, obj.Name));
                     foreach (var verb in obj.Verbs)
                     {
                         var label = verb.VerbId == 0xFF ? "Fallback verb" : $"Verb 0x{verb.VerbId:X2}";
-                        var source = $"Room {room.Number:00} / Object {obj.Id} / {label}";
+                        var source = $"{diskLabel}Room {room.Number:00} / Object {obj.Id} / {label}";
                         try
                         {
-                            Add(scripts.DecodeCode(obj.Block[verb.Offset..], obj.Id, 1, obj.BlockOffset + verb.Offset) with { Context = source }, room.Number, obj.Id,
+                            Add(scripts.DecodeCode(obj.Block[verb.Offset..], obj.Id, container, obj.BlockOffset + verb.Offset) with { Context = source }, room.Number, obj.Id,
                                 verb.VerbId, source, obj.Name.Length > 0 ? obj.Name : null, names);
                         }
                         catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source, ex); }
                     }
                 }
             }
-            return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics, leftovers);
         }
+        if (archives.Count > 0) return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics, leftovers);
 
         foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
         {

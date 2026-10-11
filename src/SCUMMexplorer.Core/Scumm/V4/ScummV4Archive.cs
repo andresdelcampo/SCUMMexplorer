@@ -59,6 +59,9 @@ public sealed class ScummV4Archive : IBrowsableArchive
     /// <summary>The per-room-file layout (Indiana Jones 256 colours) stores a costume pose's limb commands as bytes, not words (see <see cref="ScummV4CostumeRenderer.DecodePose"/>).</summary>
     private bool _byteCostumeCommands;
 
+    /// <summary>True for the per-room-file layout (the 256-colour Indy3, a version 3 game): its scripts are not read with the v4 dialect.</summary>
+    public bool IsRoomFileGame => _byteCostumeCommands;
+
     private ScummV4Archive(byte[] lec, byte[] index, IReadOnlyList<ScummV4Room> rooms)
     {
         _lec = lec;

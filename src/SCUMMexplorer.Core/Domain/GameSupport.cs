@@ -22,6 +22,9 @@ public sealed record GameSupport(bool Rooms, bool LiveSession, bool Scripts, boo
         // Any other game with an old-v3 index that parsed (Zak McKracken EGA and the like): the room pictures and the texts need nothing game-specific. Limited on purpose.
         (GameId.Unknown, ScummVersion.V3) => new(true, false, false, false, true, false, false,
             "Room backgrounds and texts from the game.", "Select a room to see its background."),
+        // A browsed v4 game read with the v4 script dialect (Monkey Island): its texts too. The 256-colour Indy3 has v4-style blocks but version 3 scripts, which are not read here.
+        (GameId.Unknown, ScummVersion.V4) when game.V4Disks?.Disks.OfType<ScummV4Archive>().Any(disk => !disk.IsRoomFileGame) == true => new(true, false, false, false, true, false, false,
+            "Room backgrounds, costumes, sounds and texts from the game.", "Select a room to see its background."),
         // Browsed games that are not LOOM or Indy3: the v4 ones (Monkey Island, Indy3 256 colours) and the enhanced v2 one (Maniac Mansion Enhanced).
         (GameId.Unknown, ScummVersion.V5 or ScummVersion.V4 or ScummVersion.V2 or ScummVersion.V1) => new(true, false, false, false, false, false, false,
             "Room backgrounds, costumes and sounds from the game.", "Select a room to see its background."),

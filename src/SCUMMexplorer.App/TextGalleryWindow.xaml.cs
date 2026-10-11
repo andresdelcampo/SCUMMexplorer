@@ -206,7 +206,7 @@ public partial class TextGalleryWindow : Window
         {
             BitmapSource? picture = _roomImage is null ? null : await _roomImage(roomId);
             if (picture is not null) return picture;
-            var decoded = _game.V4Archive is { } vga ? vga.DecodeRoom(roomId) : await _roomDecoder.DecodeAsync(room.FilePath);
+            var decoded = _game.V4ArchiveFor(room) is { } archive ? archive.DecodeRoom(roomId) : await _roomDecoder.DecodeAsync(room.FilePath);
             return CreateBitmap(decoded.Width, decoded.Height, decoded.Pixels.ToArray(), decoded.Palette);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { return null; }
@@ -317,7 +317,7 @@ public partial class TextGalleryWindow : Window
             if (entry.IsPlayerChoice) { who = "▸"; colour = Color.FromRgb(183, 132, 66); }
             else
             {
-                who = LoomSpeakerNames.Display(entry);
+                who = SpeakerName(entry);
                 if (!colours.TryGetValue(who, out colour)) colours[who] = colour = SpeakerColors[colours.Count % SpeakerColors.Length];
             }
             var name = new TextBlock
@@ -333,10 +333,14 @@ public partial class TextGalleryWindow : Window
         }
     }
 
-    private static string FormatConversationLine(LoomTextEntry entry) =>
+    /// <summary>The names LOOM's lines settle are LOOM's; another game's speakers keep the label the extractor gives them ("Actor 5", "Ego").</summary>
+    private string SpeakerName(LoomTextEntry entry) =>
+        _game.Id is GameId.Loom or GameId.LoomVga ? LoomSpeakerNames.Display(entry) : entry.Speaker ?? "Unknown speaker";
+
+    private string FormatConversationLine(LoomTextEntry entry) =>
         entry.IsPlayerChoice ? $"▸ {entry.Text}"
-        : entry.ChoiceVerbId.HasValue ? $"      {LoomSpeakerNames.Display(entry)}: {entry.Text}"
-        : $"{LoomSpeakerNames.Display(entry)}: {entry.Text}";
+        : entry.ChoiceVerbId.HasValue ? $"      {SpeakerName(entry)}: {entry.Text}"
+        : $"{SpeakerName(entry)}: {entry.Text}";
 
     private static BitmapSource CreateBitmap(int width, int height, byte[] pixels, IReadOnlyList<uint> palette)
     {

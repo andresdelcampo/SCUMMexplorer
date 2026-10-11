@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: Game Texts for Monkey Island (browsed v4 games)
+
+- The Game Texts window (Advanced) now opens for browsed v4 games that use the v4 script dialect (Monkey Island EGA and VGA). `LoomTextExtractor` reads every disk's script and object blocks as it does the CD's, with the disk number as the container. Monkey Island EGA: 4,194 texts (2,960 spoken lines, 605 verb labels, 535 object names, 94 stored lines) from 2,041 decode ranges, 61 with an undecoded path (3%); real lines such as "You beat the Sword Master." Speakers keep the extractor's label ("Actor 5", "Ego"); LOOM's speaker names apply only to LOOM. The room picture in the window comes from the game's own archive.
+- **Not offered:** the 256-colour Indy3 (v4-style blocks, version 3 scripts: 15% of its ranges fail with the v4 dialect), the v5 games (no v5 script reader), and v1/v2 (no reader). Not checked in the real window; the lines are not compared with ScummVM.
+
 ## 12 October: object names of v4 and v5 rooms (item 4 of the browse plan, in the form that pays off)
 
 - **Why not object pictures:** the index gives an object its starting state, and in the v4 and v5 games almost all start at 0 (Monkey Island EGA: 2 of 1000 objects non-zero; Indy3 256 colours: 12); the rooms' entry scripts show the rest. Painting the index states would add almost nothing, and the real start needs the entry scripts run (the `IScummDataSource` and bounded executor exist for the LOOM CD only).
