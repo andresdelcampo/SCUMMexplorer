@@ -9,15 +9,18 @@ namespace SCUMMexplorer.Core.Scumm;
 /// </summary>
 public sealed class ScummV4Disks
 {
-    private ScummV4Disks(IReadOnlyList<ScummV4Archive> disks) => Disks = disks;
+    private ScummV4Disks(IReadOnlyList<IBrowsableArchive> disks) => Disks = disks;
+
+    /// <summary>A game made of the given archives (the single archive of a v5 game).</summary>
+    public static ScummV4Disks FromArchives(params IBrowsableArchive[] archives) => new(archives);
 
     /// <summary>The disks in order: element 0 is <c>DISK01.LEC</c>.</summary>
-    public IReadOnlyList<ScummV4Archive> Disks { get; }
+    public IReadOnlyList<IBrowsableArchive> Disks { get; }
 
     /// <summary>Loads every consecutive <c>DISKnn.LEC</c> that the source has, starting at 1; throws when there is no first disk.</summary>
     public static ScummV4Disks Load(IGameFileSource source)
     {
-        var disks = new List<ScummV4Archive>();
+        var disks = new List<IBrowsableArchive>();
         // One archive built from the plain per-room files (Indiana Jones 256 colours) counts as the single disk.
         if (!source.Exists(ScummV4Archive.DiskFileName(1)) && ScummV4Archive.IsRoomFileLayout(source))
             return new ScummV4Disks([ScummV4Archive.LoadRoomFiles(source)]);
@@ -28,6 +31,6 @@ public sealed class ScummV4Disks
     }
 
     /// <summary>The archive holding the resource (its disk number is the container file number), or null when the resource names no disk of this game.</summary>
-    public ScummV4Archive? ArchiveFor(GameResource resource) =>
+    public IBrowsableArchive? ArchiveFor(GameResource resource) =>
         resource.ContainerFileNumber is int disk && disk >= 1 && disk <= Disks.Count ? Disks[disk - 1] : null;
 }

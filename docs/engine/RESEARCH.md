@@ -39,7 +39,7 @@ These findings preserve the early parser research. References below to an index-
 
 ## Browsed games (11 October 2026)
 
-- Maniac Mansion, Zak McKracken (classic v1 and enhanced v2), Monkey Island (v4, VGA and EGA) and Indiana Jones 256 colours are read for rooms, costumes and (v4) sounds only. The index layouts, room pictures, strip codes and what is not read are in [SCUMM resource formats](SCUMM_RESOURCE_FORMATS.md); sources are ScummVM's `resource_v2.cpp`, `room.cpp`, `gfx.cpp` (`GdiV1`, `GdiV2`, `unkDecode8-11`, `drawStripEGA`), `costume.cpp` and `palette.cpp` (`v1ColorMaps`).
+- Maniac Mansion, Zak McKracken (classic v1 and enhanced v2), Monkey Island (v4, VGA and EGA), Indiana Jones 256 colours and the v5 games (Indy 4, Monkey Island 1 CD, Monkey Island 2) are read for rooms, costumes and (v4) sounds only. The index layouts, room pictures, strip codes and what is not read are in [SCUMM resource formats](SCUMM_RESOURCE_FORMATS.md); sources are ScummVM's `resource_v2.cpp`, `room.cpp`, `gfx.cpp` (`GdiV1`, `GdiV2`, `unkDecode8-11`, `drawStripEGA`), `costume.cpp` and `palette.cpp` (`v1ColorMaps`).
 
 ## Historical parser priorities
 

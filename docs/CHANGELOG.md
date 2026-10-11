@@ -2,6 +2,14 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (late night): SCUMM v5 games open for browsing (Indy 4, Monkey Island 1 CD, Monkey Island 2)
+
+- **Why `monkey1 vga en` showed nothing:** it is the Monkey Island **CD**, SCUMM **v5**: `MONKEY.000`/`.001` inside `ENGLISH/`, `FRENCH/` and so on, with CD audio tracks. The Indy 4 floppy, talkie and CD (`ATLANTIS.000/.001`, also inside `ATLANTIS/` beside two demos) are v5 as well. The scanner knew only v1 to v4 layouts and looked for files at the top level.
+- **`ScummV5Archive`** reads the index (`RNAM DROO DCOS`…, XOR 0x69) and the `LECF` resource file (`LOFF`, `LFLF`, `ROOM`, `COST`); `FindGame` picks, among all `X.000` + `X.001` pairs of a folder or disc, the one whose index lists the most rooms (a full game over its demos; `ENGLISH` on a tie). New **`IBrowsableArchive`** (rooms, costumes, sounds) is implemented by both archives, so the scanner and window treat v4 and v5 alike.
+- **Pictures:** `CLUT` palette, `RMIM` > `IM00` > `SMAP` strips; the strip decoder gained the transparent twins of the zigzag codes and the major-minor codec (`DecodeMajorMinorStrip`, ScummVM `MajMinCodec`). **Costumes** reuse the v4 renderer with the 32-colour format 0x59 added.
+- **Result in the real window** ([record](../.verification/generic-v4/README.md)): Indy 4 (floppy, talkie, CD): 96 rooms, 240 costumes; Monkey Island 1 CD (English): 83 rooms, 119 costumes; Monkey Island 2 (five editions): 272 resources each. Sounds, scripts and objects are not read. No ScummVM comparison.
+- No change to any other folder's scan hash (only the new games and the two classic ones moved). `OtherV4GameTests` gained a v5 check (`SCUMM_V5_TEST_ROOT`).
+
 ## 11 October (night): classic v1 costumes
 
 - **Format 0x57** read by the existing `ScummV3CostumeReader` and `ScummCostumeRenderer` (`DecodeClassicV1Pose`, ScummVM `ClassicCostumeLoader` + `byleRLEDecode_C64`): 2-bit pixels in 8-pixel columns, skin / suit / black through the game's C64-to-EGA table. The Costumes tab now shows for Maniac Mansion Classic (23 costumes) and Zak McKracken Classic (35). Colours are an **estimate**: the real actor colours come from scripts (Maniac's actor tables with the costume number as actor, a fixed blue for Zak).

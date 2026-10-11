@@ -45,7 +45,7 @@ public sealed record ScummV4Room(int Number, string Name, int Offset, int Length
 /// size u32 (header included), a two-letter tag, the body. 000.LFL is the index (plain blocks). Probe record:
 /// .verification/loom-vga/README.md.
 /// </summary>
-public sealed class ScummV4Archive
+public sealed class ScummV4Archive : IBrowsableArchive
 {
     public const string IndexFile = "000.LFL";
     public const string ArchiveFile = "DISK01.LEC";
@@ -559,9 +559,18 @@ public sealed class ScummV4Archive
     /// 0x0E-0x12 or horizontal 0x18-0x1C (code mod 10 = colour bits). Bits: 0 same colour; 10 a new colour; 110 colour += step;
     /// 111 step = -step, then colour += step (ScummVM's drawStripBasicV/H).
     /// </summary>
-    private static void DecodeStrip(byte[] data, int pos, int end, byte[] pixels, int width, int height, int x0)
+    internal static void DecodeStrip(byte[] data, int pos, int end, byte[] pixels, int width, int height, int x0)
     {
         var code = data[pos++];
+        // Version 5 adds the transparent twins of the bit codes (0x22-0x26 vertical, 0x2C-0x30 horizontal: drawn like the plain ones, the transparent colour kept) and the
+        // major-minor codes (0x40-0x44, 0x54-0x58 transparent, 0x68-0x6C run, 0x7C-0x80 run transparent); a still picture draws them all.
+        if (code is >= 0x22 and <= 0x26) code = (byte)(code - 0x22 + 0x0E);
+        else if (code is >= 0x2C and <= 0x30) code = (byte)(code - 0x2C + 0x18);
+        else if (code is >= 0x40 and <= 0x44 or >= 0x54 and <= 0x58 or >= 0x68 and <= 0x6C or >= 0x7C and <= 0x80)
+        {
+            DecodeMajorMinorStrip(code % 10, data, pos, end, pixels, width, height, x0);
+            return;
+        }
         if (code == 0x01)
         {
             for (var x = 0; x < 8; x++)
@@ -598,6 +607,53 @@ public sealed class ScummV4Archive
                 if (Bit() == 0) { Fill(); color = bits & mask; bits >>= shift; count -= shift; step = -1; }
                 else if (Bit() == 0) color = (color + step) & 0xFF;
                 else { step = -step; color = (color + step) & 0xFF; }
+            }
+        }
+    }
+
+    /// <summary>
+    /// A major-minor strip (ScummVM <c>MajMinCodec</c>): row by row, eight pixels per row. The first byte is the colour, then bits: 0 keeps the colour; 10 a new colour of
+    /// <paramref name="shift"/> bits; 11 and three bits, minus four, a colour step, where a step of zero means "repeat the colour for the next byte's count of pixels".
+    /// </summary>
+    private static void DecodeMajorMinorStrip(int shift, byte[] data, int pos, int end, byte[] pixels, int width, int height, int x0)
+    {
+        if (pos + 3 > data.Length) throw new InvalidDataException("A strip ends before its picture does.");
+        var color = data[pos];
+        var bits = data[pos + 1] | data[pos + 2] << 8;
+        var numBits = 16;
+        pos += 3;
+        var repeat = false;
+        var repeatCount = 0;
+        int Read(int count)
+        {
+            if (numBits <= 8)
+            {
+                if (pos >= data.Length) throw new InvalidDataException("A strip ends before its picture does.");
+                bits |= data[pos++] << numBits;
+                numBits += 8;
+            }
+            var value = bits & ((1 << count) - 1);
+            numBits -= count;
+            bits = (bits >> count) & 0xFFFF;
+            return value;
+        }
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < 8; x++)
+            {
+                pixels[y * width + x0 + x] = color;
+                if (!repeat)
+                {
+                    if (Read(1) == 0) continue;
+                    if (Read(1) == 1)
+                    {
+                        var difference = Read(3) - 4;
+                        if (difference != 0) color = (byte)(color + difference);
+                        else { repeat = true; repeatCount = Read(8) - 1; }
+                    }
+                    else color = (byte)Read(shift);
+                }
+                else if (--repeatCount == 0) repeat = false;
             }
         }
     }

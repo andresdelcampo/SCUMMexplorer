@@ -142,4 +142,25 @@ public class OtherV4GameTests
         });
         Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Script or ResourceKind.Sound);
     }
+
+    [Fact]
+    public void BrowsesAV5GameFromFilesOrADiscWhenConfigured()
+    {
+        // Indy 4, Monkey Island 1 CD or 2: NAME.000 and NAME.001 (on a disc, in a language or game folder; the game with the most rooms is taken).
+        var folder = Environment.GetEnvironmentVariable("SCUMM_V5_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal(GameId.Unknown, game.Id);
+        Assert.Equal(ScummVersion.V5, game.Version);
+        var archive = Assert.Single(game.V4Disks!.Disks);
+        var rooms = game.Rooms.ToArray();
+        Assert.True(rooms.Length >= 50);
+        // The pictures use zigzag, major-minor and raw strip codes; costumes of 16 or 32 colours.
+        Assert.All(rooms, room => Assert.True(archive.DecodeRoom(room.ResourceId!.Value).IsValid));
+        var costumes = game.Resources.Where(r => r.Kind == ResourceKind.Costume).ToArray();
+        Assert.True(costumes.Length >= 100);
+        Assert.NotEmpty(archive.DecodeCostumePoses(archive.FindCostume(costumes[0].ResourceId!.Value)!));
+        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Sound or ResourceKind.Script);
+    }
 }

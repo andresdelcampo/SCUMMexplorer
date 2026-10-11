@@ -70,7 +70,7 @@ public sealed record GameLibrary(
     public ScummV1Game? V1Game { get; init; }
 
     /// <summary>The v4 archive that holds the resource: the CD game's single archive, or the disk of a browsed v4 game; null for the old-v3 games.</summary>
-    public ScummV4Archive? V4ArchiveFor(GameResource resource) => V4Archive ?? V4Disks?.ArchiveFor(resource);
+    public IBrowsableArchive? V4ArchiveFor(GameResource resource) => V4Archive ?? V4Disks?.ArchiveFor(resource);
 
     public IEnumerable<GameResource> Rooms =>Resources.Where(r => r.Kind == ResourceKind.Room);
 }

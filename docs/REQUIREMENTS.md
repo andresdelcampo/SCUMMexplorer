@@ -13,6 +13,7 @@ Drafted 10 October 2026 from the project notes, `README.md`, `docs/` and the sou
 | `SCUMM v2` | Only the enhanced v2 games (one-byte object index, one-stream rooms): Maniac Mansion Enhanced, Zak McKracken Enhanced | `Core/Scumm/V2/` |
 | `SCUMM v3` | Only old-v3 (LFL files, XOR 0xFF rooms): LOOM EGA, Indy3 EGA | `Core/Scumm/V3/` |
 | `SCUMM v4` | Only v4 (`DISK01.LEC` archives, or per-room files for Indy3 256 colours): LOOM CD, Monkey Island, Indy3 256 colours | `Core/Scumm/V4/` |
+| `SCUMM v5` | Only v5 (`NAME.000` index and `NAME.001` resources, XOR 0x69): Indy 4, Monkey Island 1 CD, Monkey Island 2 | `Core/Scumm/V5/` |
 | `BROWSED` | A game that is only browsed (rooms, costumes where readable, sounds where readable): Monkey Island, Indy3 256 colours, Maniac Mansion and Zak McKracken (classic and enhanced). Always `GameId.Unknown`: no LOOM or Indy3 feature switches on | `Core/Scumm/` + `Discovery` |
 | `LOOM` | Both LOOM editions (EGA and CD) | `Core/Loom/` (Session, Text, Scenes, Relationships) |
 | `LOOM EGA` | DOS LOOM EGA, any language edition | `Core/Loom/Ega/` or v3 data |
@@ -74,6 +75,7 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 | LOOM CD/VGA en (`.cue`/`.bin`/`.iso`, folder, or copied files) | LOOM CD | ✔ | first-visit, objects, actors | ✔ | ✔ | derived from scripts | ✔ (Advanced) | ✔ | CD Audio / No Sound |
 | Indy3 EGA en | INDY3 EGA | ✔ | backgrounds only (R-6.12) | – | not shown in tree | – | ✔ incl. dialogue choices | – | – |
 | Monkey Island VGA (4 disks) and EGA (8 disks), any language | BROWSED | ✔ | backgrounds only (R-3.10, R-6.13) | – | – | – | – | – | AdLib, PC Speaker (R-13.8); costumes tab (R-5.5) |
+| Indiana Jones and the Fate of Atlantis (floppy, talkie, CD), Monkey Island 1 CD, Monkey Island 2 (v5; any language) | BROWSED | ✔ | backgrounds only (R-3.14) | – | – | – | – | – | – (sounds not read); costumes tab |
 | Indiana Jones and the Last Crusade, 256 colours (per-room `.lfl`) | BROWSED | ✔ | backgrounds only | – | – | – | – | – | AdLib, PC Speaker; costumes tab |
 | Maniac Mansion Enhanced, Zak McKracken Enhanced (v2) | BROWSED | ✔ | backgrounds only | – | – | – | – | – | – (sounds not read); costumes tab |
 | Maniac Mansion, Zak McKracken classic (v1) | BROWSED | ✔ | backgrounds only | – | – | – | – | – | – (sounds not read); costumes tab (actor colours estimated) |
@@ -92,6 +94,7 @@ Every ✔ in *Rooms* means the same thing: no gaps, first-visit state, objects a
 | R-3.11 | BROWSED, SCUMM v2 | An index whose directories end exactly at the end of the file with **one** byte per global object (the old-v3 index has four) is an enhanced v2 game (`GameLibrary.Version` = `V2`); only rooms (those whose picture decodes: room 0 is the index file itself) and costumes are offered; scripts and sounds are not. | Code |
 | R-3.12 | BROWSED, SCUMM v1 | An index with magic `0x0A31` whose fixed per-game directory sizes add up to the length of the file is a classic v1 game (`Version` = `V1`; `GameLibrary.V1Game` says Maniac Mansion or Zak McKracken and picks the colour table); rooms and costumes are offered (costume colours are the explorer's estimate: Maniac's actor table with the costume number as actor number, a fixed colour for Zak; the scripts choose the real ones). | Code |
 | R-3.13 | BROWSED | Evidence for these games is the format reading only: a picture that decodes is shown as stored (the palette of the room that holds a costume is used for v4 costumes), and nothing is claimed about scripts, objects or interaction. Format references: [resource formats](engine/SCUMM_RESOURCE_FORMATS.md). | Rule/Doc |
+| R-3.14 | BROWSED, SCUMM v5 | A folder or disc image holding `NAME.000` and `NAME.001` is a v5 game (`GameLibrary.Version` = `V5`): `ScummV5Archive` reads the index (room names, the directories of costumes) and the `LECF` resource file; on a disc the candidates may be in language or game folders (`ENGLISH/MONKEY.000`, `ATLANTIS/ATLANTIS.000`, demos beside the game): the one whose index lists the most rooms is opened, an `ENGLISH` folder winning a tie. Rooms (picture and `CLUT` palette) and costumes (16 and 32 colours) are offered; scripts, sounds and objects are not. | Code |
 | R-3.3 | LOOM demo | A demo's `00.LFL` is not a subset of the game's: entries pointing at missing containers, at non-resource offsets or at unreadable resources are dropped, and the dropped count is stated in the detection note. Title `LOOM (demo)`. Full-game script/bit/actor/sound names are **not** applied to a demo; variables and rooms are. | Code |
 | R-3.4 | APP | The app reopens the last game folder at start (`last-folder` file under `%LOCALAPPDATA%\SCUMMexplorer`). A missing folder yields `Last game folder is unavailable. Choose a folder to open.` and no crash. Only reopening the last game may reuse saved room thumbnails; the **Open Game Folder** button rebuilds them. | Code |
 | R-3.5 | APP | Opening another game stops playback, sound and CD voice, replaces the session and rebuilds the catalog; nothing from the previous game leaks. | Code |
@@ -131,7 +134,7 @@ Every ✔ in *Rooms* means the same thing: no gaps, first-visit state, objects a
 | R-5.2 | SCUMM | The selected/last-viewed room's card has the accent border (`#B78442`). Thumbnails are produced off the UI thread, one at a time, cancellable, and cached per game folder. A failed room shows a failure card with the reason, not a blank. | Code |
 | R-5.3 | SCUMM | A room thumbnail is the room's entry script run in a fresh session; if that cannot run, the plain background. | Code |
 | R-5.4 | SCUMM | Costume cards: 96×94, thumbnail 80×62 of the best pose, caption `NNN` (three digits), tooltip is the costume name and detail. | Code |
-| R-5.5 | BROWSED | The Rooms and Costumes tabs of the normal catalog (as for LOOM) appear for every browsed game whose costumes can be read (v4, enhanced v2 and classic v1). Room cards and costume thumbnails load by themselves when the game opens, through the disk's archive (v4) or the room and costume files. | Code |
+| R-5.5 | BROWSED | The Rooms and Costumes tabs of the normal catalog (as for LOOM) appear for every browsed game whose costumes can be read (v4, v5, enhanced v2 and classic v1). Room cards and costume thumbnails load by themselves when the game opens, through the disk's archive (v4) or the room and costume files. | Code |
 
 ### 5.2 Resource tree (Advanced)
 
@@ -388,4 +391,4 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 ## 17. Out of scope (today)
 
-Indy3 object art, scripts, sounds and gameplay; objects, scripts, depth masks and interaction of every browsed game; v1/v2 sounds and the real actor colours of v1 costumes; games in other layouts (v5 `.000`/`.001`: Indy 4, Monkey Island 1 from CD); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`.
+Indy3 object art, scripts, sounds and gameplay; objects, scripts, depth masks and interaction of every browsed game; v1/v2 sounds and the real actor colours of v1 costumes; v5 sounds, scripts and objects, Monkey Island 1's CD audio tracks, and games after v5 (v6 and later: Day of the Tentacle and on); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`.

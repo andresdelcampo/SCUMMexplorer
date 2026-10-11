@@ -23,7 +23,7 @@ public sealed record GameSupport(bool Rooms, bool LiveSession, bool Scripts, boo
         (GameId.Unknown, ScummVersion.V3) => new(true, false, false, false, true, false, false,
             "Room backgrounds and texts from the game.", "Select a room to see its background."),
         // Browsed games that are not LOOM or Indy3: the v4 ones (Monkey Island, Indy3 256 colours) and the enhanced v2 one (Maniac Mansion Enhanced).
-        (GameId.Unknown, ScummVersion.V4 or ScummVersion.V2 or ScummVersion.V1) => new(true, false, false, false, false, false, false,
+        (GameId.Unknown, ScummVersion.V5 or ScummVersion.V4 or ScummVersion.V2 or ScummVersion.V1) => new(true, false, false, false, false, false, false,
             "Room backgrounds, costumes and sounds from the game.", "Select a room to see its background."),
         _ => new(false, false, false, false, false, false, false, Unsupported, UnsupportedPreview)
     };

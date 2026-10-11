@@ -19,3 +19,7 @@ Monkey Island EGA (first version of this record): every room failed with "no PA 
 ## Maniac Mansion and Zak McKracken (enhanced v2 and classic v1)
 
 `mm-enhanced/` and `zak-enhanced/` (rooms 1, 4, 12, 30, the Costumes tab, `costume-cards.png`), `mm-classic/` and `zak-classic/` (rooms 4, 10, 30). Enhanced: Secret Lab door with its dithered wall, the Pepsi lab, Zak's mountain and van; the costume cards show the limb costumes (Maniac's heads are separate costumes). Classic: Maniac's foyer with the grandfather clock in the original pinks and browns, Zak's rooms. Rooms were not compared with ScummVM. Zak Enhanced Costume 00 is an empty entry ("points past the end of its file").
+
+## SCUMM v5 (Indy 4, Monkey Island 1 CD, Monkey Island 2)
+
+`indy4-classic/` (rooms 1, 4, 20; Costumes tab: Indy in several poses), `monkey-cd/` (the English folder of the CD, rooms 1, 4, 20), `mi2/` (Monkey Island 2 talkie). `monkey1 vga en` showed nothing before because it is the CD (v5, `ENGLISH/MONKEY.000`). Indy 4 room 20 is a plain tan screen (a flat room). No ScummVM comparison.

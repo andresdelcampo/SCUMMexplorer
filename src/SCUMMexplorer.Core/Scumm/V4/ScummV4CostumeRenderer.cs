@@ -12,9 +12,12 @@ namespace SCUMMexplorer.Core.Scumm;
 public static class ScummV4CostumeRenderer
 {
     private const int PaletteStart = 2;
-    private const int CommandsOffset = 18;
-    private const int LimbTable = 20;
-    private const int AnimationTable = 52;
+
+    /// <summary>The colours a costume has: 16 (format 0x58) or 32 (0x59, version 5). The tables after the palette move up by the difference.</summary>
+    private static int ColorCount(ReadOnlySpan<byte> body) => (body[1] & 0x7F) == 0x59 ? 32 : 16;
+    private static int CommandsOffsetOf(ReadOnlySpan<byte> body) => PaletteStart + ColorCount(body);
+    private static int LimbTableOf(ReadOnlySpan<byte> body) => CommandsOffsetOf(body) + 2;
+    private static int AnimationTableOf(ReadOnlySpan<byte> body) => LimbTableOf(body) + 32;
     private const int BaseShift = 6;
     private const int MaximumCelDimension = 1024;
     private const int MaximumImagePixels = 1_048_576;
@@ -26,7 +29,7 @@ public static class ScummV4CostumeRenderer
     {
         var poses = new List<int>();
         for (var i = 0; i <= LastAnimation(body); i++)
-            if (AnimationTable + i * 2 + 2 <= body.Length && ReadWord(body, AnimationTable + i * 2) != 0) poses.Add(i);
+            if (body.Length > 1 && AnimationTableOf(body) + i * 2 + 2 <= body.Length && ReadWord(body, AnimationTableOf(body) + i * 2) != 0) poses.Add(i);
         return poses;
     }
 
@@ -36,14 +39,15 @@ public static class ScummV4CostumeRenderer
     /// </summary>
     public static RoomImage? DecodePose(ReadOnlySpan<byte> body, int animationIndex, IReadOnlyList<uint> roomPalette, bool byteCommands = false)
     {
-        if (body.Length < AnimationTable) throw new InvalidDataException("The costume is too short.");
+        if (body.Length < 2 || body.Length < AnimationTableOf(body)) throw new InvalidDataException("The costume is too short.");
         var format = body[1] & 0x7F;
-        if (format != 0x58) throw new NotSupportedException($"Costume format 0x{format:X2} is not supported.");
+        if (format is not (0x58 or 0x59)) throw new NotSupportedException($"Costume format 0x{format:X2} is not supported.");
+        var colors = ColorCount(body);
         if (animationIndex < 0 || animationIndex > body[0]) throw new InvalidDataException("The pose is outside this costume.");
-        var poseOffset = ReadWord(body, AnimationTable + animationIndex * 2);
+        var poseOffset = ReadWord(body, AnimationTableOf(body) + animationIndex * 2);
         if (poseOffset == 0) return null;
         poseOffset -= BaseShift;
-        var commands = ReadWord(body, CommandsOffset) - BaseShift;
+        var commands = ReadWord(body, CommandsOffsetOf(body)) - BaseShift;
         var mask = ReadWord(body, poseOffset);
         var cursor = poseOffset + 2;
         var drawToRight = animationIndex % 4 != 0 || (body[1] & 0x80) != 0;
@@ -70,7 +74,7 @@ public static class ScummV4CostumeRenderer
             if (command is 0x79 or 0x7A) continue;
             var celCode = command & 0x7F;
             if (celCode == 0x7B || byteCommands && celCode >= 0x79) continue;
-            var frameTable = ReadWord(body, LimbTable + limb * 2) - BaseShift;
+            var frameTable = ReadWord(body, LimbTableOf(body) + limb * 2) - BaseShift;
             var celOffset = ReadWord(body, frameTable + celCode * 2) - BaseShift;
             var width = ReadWord(body, celOffset);
             var height = ReadWord(body, celOffset + 2);
@@ -85,7 +89,7 @@ public static class ScummV4CostumeRenderer
             var relativeX = xMove + ReadSigned(body, celOffset + 4);
             var left = drawToRight ? relativeX : -relativeX - width;
             var top = yMove + ReadSigned(body, celOffset + 6);
-            cels.Add((left, top, width, height, DecodeCel(body, celOffset + 12, width, height)));
+            cels.Add((left, top, width, height, DecodeCel(body, celOffset + 12, width, height, colors)));
             xMove += ReadSigned(body, celOffset + 8);
             yMove -= ReadSigned(body, celOffset + 10);
         }
@@ -117,7 +121,7 @@ public static class ScummV4CostumeRenderer
         return new RoomImage(canvasWidth, canvasHeight, canvas, palette);
     }
 
-    private static byte[] DecodeCel(ReadOnlySpan<byte> body, int offset, int width, int height)
+    private static byte[] DecodeCel(ReadOnlySpan<byte> body, int offset, int width, int height, int colors)
     {
         var count = width * height;
         var pixels = new byte[count];
@@ -126,8 +130,9 @@ public static class ScummV4CostumeRenderer
         while (written < count)
         {
             var run = Byte(body, source++);
-            var color = (byte)(run >> 4);
-            var length = run & 0x0F;
+            // 16 colours: a nibble each for colour and count; 32 colours: five bits of colour, three of count (ScummVM's shr 3 and mask 7).
+            var color = (byte)(colors == 16 ? run >> 4 : run >> 3);
+            var length = colors == 16 ? run & 0x0F : run & 0x07;
             if (length == 0) length = Byte(body, source++);
             if (length == 0 || length > count - written) throw new InvalidDataException("The costume's compressed image has an invalid run.");
             for (var i = 0; i < length; i++, written++)
