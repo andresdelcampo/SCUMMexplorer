@@ -4955,6 +4955,9 @@ public partial class MainWindow : Window
         // LOOM keeps its draft previews (48 × 40) at 0, 0: they are not in the scene, so they are no hotspots (R-6.14).
         (snapshot.ObjectPositions.TryGetValue(record.Id, out var at) ? at : new RoomObjectPosition(record.X, record.Y)) != new RoomObjectPosition(0, 0) &&
         snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
+        // The game's findObject skips untouchable objects (class 24): Room 28 keeps one dragon object per state and
+        // makes the other states untouchable, so offering their verbs runs scenes the game never reaches (R-6.15).
+        !snapshot.IsUntouchable(record.Id) &&
         ParentStateMatches(record, snapshot);
 
     /// <summary>
