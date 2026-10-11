@@ -407,7 +407,8 @@ public partial class MainWindow : Window
             (ResourceKind.Sound, "Sounds & music"), (ResourceKind.Executable, "Game files")
         })
         {
-            if (game.Id != GameId.Loom && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && kind != ResourceKind.Executable) continue;
+            if (game.Id != GameId.Loom && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
+                !(game.V4Disks is not null && kind == ResourceKind.Costume) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -1002,7 +1003,9 @@ public partial class MainWindow : Window
         StatusText.ToolTip = resource.FilePath;
 
         var isCd = _game is { Id: GameId.LoomVga, V4Archive: not null };
-        if (!isCd && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 or GameId.Unknown } ||
+        // A browsed v4 game (not LOOM CD) reads its room out of the disk that holds it.
+        var browseArchive = _game?.V4Disks is null ? null : _game.V4ArchiveFor(resource);
+        if (!isCd && browseArchive is null && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 or GameId.Unknown } ||
             !_roomDecoder.CanDecode(resource.FilePath, 3)))
         {
             PreviewDescription.Text = "This room format is not supported yet.";
@@ -1012,7 +1015,7 @@ public partial class MainWindow : Window
         try
         {
             // The CD game's rooms come out of DISK01.LEC (no per-room file); the others read their LFL file.
-            var bytes = isCd ? [] : await File.ReadAllBytesAsync(resource.FilePath, token);
+            var bytes = isCd || browseArchive is not null ? [] : await File.ReadAllBytesAsync(resource.FilePath, token);
             LoomCdScene? cdScene = null;
             if (isCd && _session is null)
             {
@@ -1020,10 +1023,11 @@ public partial class MainWindow : Window
                 try { cdScene = await Task.Run(() => LoomCdRoomScene.FirstVisit(cdGame, resource.ResourceId!.Value), token); }
                 catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
             }
-            var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
+            var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
+                : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
-            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : TryReadWalkBoxes(bytes);
+            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null ? null : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
             {
@@ -2135,7 +2139,7 @@ public partial class MainWindow : Window
 
         try
         {
-            if (_game is { Id: GameId.LoomVga, V4Archive: { } vga })
+            if (_game?.V4ArchiveFor(resource) is { } vga)
             {
                 var costume = vga.FindCostume(resource.ResourceId ?? -1) ?? throw new InvalidDataException("This costume has no data.");
                 var poses = vga.DecodeCostumePoses(costume);

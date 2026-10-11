@@ -61,5 +61,11 @@ public sealed record GameLibrary(
     /// <summary>The SCUMM v4 archive (DISK01.LEC; LOOM CD); null for every other game.</summary>
     public ScummV4Archive? V4Archive { get; init; }
 
-    public IEnumerable<GameResource> Rooms => Resources.Where(r => r.Kind == ResourceKind.Room);
+    /// <summary>The disks of a v4 game that is only browsed (rooms, costumes, sounds; not LOOM CD); null for every other game.</summary>
+    public ScummV4Disks? V4Disks { get; init; }
+
+    /// <summary>The v4 archive that holds the resource: the CD game's single archive, or the disk of a browsed v4 game; null for the old-v3 games.</summary>
+    public ScummV4Archive? V4ArchiveFor(GameResource resource) => V4Archive ?? V4Disks?.ArchiveFor(resource);
+
+    public IEnumerable<GameResource> Rooms =>Resources.Where(r => r.Kind == ResourceKind.Room);
 }

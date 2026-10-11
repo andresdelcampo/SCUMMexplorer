@@ -215,10 +215,53 @@ public sealed class GameFolderScanner
         // 000.LFL + DISK01.LEC is the container of every game of this SCUMM generation, not only LOOM CD: claim LOOM only for the known data (the fingerprint of the
         // two dumps), or, for another release of the disc, by the size of its resource directories; anything else is reported as an unsupported v4 game.
         if (!IsLoomCd(archive.Fingerprint, archive.Rooms.Count, resources.Count(r => r.Kind == ResourceKind.Costume), resources.Count(r => r.Kind == ResourceKind.Script), resources.Count(r => r.Kind == ResourceKind.Sound)))
-            return new GameLibrary(Path.GetFileName(Path.TrimEndingDirectorySeparator(source.Location)), source.Location, ScummVersion.V4, "CD (VGA)", [],
-                "The folder holds a SCUMM v4 game (000.LFL and DISK01.LEC) that is not LOOM CD. It is not supported yet.");
+            return ScanOtherV4(source);
         const string note = "LOOM CD (SCUMM v4, VGA) read from its disc image or files: 000.LFL and DISK01.LEC. Rooms, scripts, objects, actors, texts, the sounds in DISK01.LEC (AdLib and PC speaker) and the voices on the disc's audio track are read.";
         return new GameLibrary("LOOM (CD)", source.Location, ScummVersion.V4, "CD (VGA)", resources, note, GameId.LoomVga) { V4Archive = archive };
+    }
+
+    /// <summary>
+    /// A v4 game that is not LOOM CD (Monkey Island, for one), browsed from every disk it has: its rooms, costumes and sounds, with no session. The game is not named
+    /// (<see cref="GameId.Unknown"/>), so no game-specific feature switches on. If no room of any disk decodes (the 16-colour EGA rooms are stored in another image format),
+    /// nothing is offered rather than rooms that cannot be shown.
+    /// </summary>
+    private static GameLibrary ScanOtherV4(IGameFileSource source)
+    {
+        var folderName = Path.GetFileName(Path.TrimEndingDirectorySeparator(source.Location));
+        var parentName = Path.GetFileName(Path.TrimEndingDirectorySeparator(Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(source.Location)) ?? ""));
+        // A folder named after its graphics ("EGA", "VGA") is told by the game folder around it.
+        var title = folderName.Equals("EGA", StringComparison.OrdinalIgnoreCase) || folderName.Equals("VGA", StringComparison.OrdinalIgnoreCase)
+            ? $"{parentName} {folderName}".Trim() : folderName;
+        var disks = ScummV4Disks.Load(source);
+        var resources = new List<GameResource>();
+        var decodable = false;
+        for (var i = 0; i < disks.Disks.Count; i++)
+        {
+            var disk = i + 1;
+            var archive = disks.Disks[i];
+            var diskName = ScummV4Archive.DiskFileName(disk);
+            foreach (var room in archive.Rooms)
+                resources.Add(new GameResource($"Room {room.Number:00}", ResourceKind.Room, source.Location, room.Number,
+                    string.IsNullOrEmpty(room.Name) ? $"Room on {diskName}." : $"Room \"{room.Name}\" on {diskName}.", disk, room.Offset));
+            foreach (var costume in archive.ReadCostumes())
+                resources.Add(new GameResource($"Costume {costume.Id:00}", ResourceKind.Costume, source.Location, costume.Id,
+                    $"Costume stored in room {costume.Room:00} on {diskName}.", disk, null));
+            foreach (var sound in archive.ReadSounds())
+                resources.Add(new GameResource($"Sound {sound.Id:00}", ResourceKind.Sound, source.Location, sound.Id,
+                    $"{(sound.IsMusic ? "Music" : "Sound effect")} stored in room {sound.Room:00} on {diskName}.", disk, null));
+            if (!decodable && archive.Rooms.Count > 0)
+            {
+                try { decodable = archive.DecodeRoom(archive.Rooms[0].Number).IsValid; }
+                catch (Exception ex) when (ex is InvalidDataException or IndexOutOfRangeException or ArgumentException) { }
+            }
+        }
+        if (!decodable)
+            return new GameLibrary(title, source.Location, ScummVersion.V4, "DOS (SCUMM v4)", [],
+                $"The folder holds a SCUMM v4 game ({disks.Disks.Count} disks) that is not LOOM CD. Its rooms are not in a format this explorer reads yet (the 16-colour EGA version), so it is not supported yet.");
+        var ordered = resources.OrderBy(r => r.Kind).ThenBy(r => r.ResourceId).ToList();
+        return new GameLibrary(title, source.Location, ScummVersion.V4, "DOS (SCUMM v4)", ordered,
+            $"A SCUMM v4 game that is not LOOM CD, read from its {disks.Disks.Count} disks (000.LFL and DISK01.LEC to DISK{disks.Disks.Count:00}.LEC). Room backgrounds and costumes are shown; " +
+            "objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks };
     }
 
     /// <summary>

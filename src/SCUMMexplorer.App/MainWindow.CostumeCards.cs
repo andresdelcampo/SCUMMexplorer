@@ -72,9 +72,9 @@ public partial class MainWindow
                 (bitmap, detail) = await Task.Run(() =>
                 {
                     token.ThrowIfCancellationRequested();
-                    if (game.V4Archive is { } vga)
+                    if (game.V4ArchiveFor(resource) is { } vga)
                     {
-                        // The CD game: the stored pose with the most visible pixels, in the palette of the room that holds the costume.
+                        // The CD game (or a browsed v4 game's disk): the stored pose with the most visible pixels, in the palette of the room that holds the costume.
                         var costume = vga.FindCostume(resource.ResourceId!.Value) ?? throw new InvalidDataException("No costume block.");
                         var poses = vga.DecodeCostumePoses(costume);
                         if (poses.Count == 0) throw new InvalidDataException("No decoded pose.");

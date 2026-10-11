@@ -80,15 +80,21 @@ public sealed class ScummV4Archive
 
     public static bool IsVga(IGameFileSource source) => source.Exists(IndexFile) && source.Exists(ArchiveFile);
 
-    public static ScummV4Archive Load(IGameFileSource source)
+    public static ScummV4Archive Load(IGameFileSource source) => Load(source, ArchiveFile);
+
+    /// <summary>The name of disk <paramref name="number"/>'s archive (<c>DISK02.LEC</c>); multi-disk games keep their rooms on several.</summary>
+    public static string DiskFileName(int number) => $"DISK{number:00}.LEC";
+
+    /// <summary>Loads one disk of a game: the room blocks of <paramref name="archiveFile"/>, with the index and charsets of the folder.</summary>
+    public static ScummV4Archive Load(IGameFileSource source, string archiveFile)
     {
-        if (!IsVga(source)) throw new InvalidDataException("000.LFL and DISK01.LEC are both needed.");
-        var lec = source.ReadAllBytes(ArchiveFile);
+        if (!source.Exists(IndexFile) || !source.Exists(archiveFile)) throw new InvalidDataException($"{IndexFile} and {archiveFile} are both needed.");
+        var lec = source.ReadAllBytes(archiveFile);
         for (var i = 0; i < lec.Length; i++) lec[i] ^= Xor;
         var index = source.ReadAllBytes(IndexFile);
         var names = ReadRoomNames(index);
         var top = Blocks(lec, 0, lec.Length).FirstOrDefault(b => b.Tag == "LE")
-            ?? throw new InvalidDataException("DISK01.LEC has no LE block.");
+            ?? throw new InvalidDataException($"{archiveFile} has no LE block.");
         var rooms = new List<ScummV4Room>();
         foreach (var block in Blocks(lec, top.Start + 6, top.Start + top.Size).Where(b => b.Tag == "LF"))
         {

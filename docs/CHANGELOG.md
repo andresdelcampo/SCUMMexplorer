@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (later): other v4 games open for browsing (Monkey Island VGA)
+
+- **`ScummV4Disks`** (Core, `Scumm/V4`): a v4 game that is not LOOM CD is read from every `DISK01..NN.LEC` (`ScummV4Archive.Load(source, archiveFile)`); `GameFolderScanner.ScanOtherV4` lists its rooms, costumes and sounds with the disk in `ContainerFileNumber`, `GameLibrary.V4Disks` / `V4ArchiveFor(resource)` find the archive. The game stays `GameId.Unknown`, so no LOOM/Indy feature switches on; the app shows room backgrounds and costume poses (tree: Rooms, Costumes).
+- **Monkey Island VGA** (`Games/FUTURE/monkey1/VGA`, 4 disks, 83 rooms, 293 resources) opens in the real window; backgrounds and Guybrush's poses render ([record](../.verification/generic-v4/README.md)). **Monkey Island EGA** still offers nothing: its 16-colour rooms have no `PA` block, so a new decoder is needed (the scanner says so instead of listing rooms that cannot be shown).
+- **No change to existing games:** scan results (title, version, id, every resource) of all 19 local folders hash identical before and after, apart from the two new Monkey folders. Tests: `OtherV4GameTests` (skipped without `SCUMM_MONKEY1_VGA_TEST_ROOT` / `SCUMM_MONKEY1_EGA_TEST_ROOT`).
+- Open: objects, scripts, sound playback and the costume palette for these games (some costume colours look off); Indy3 VGA (unencrypted tagged v3 `.lfl`), Monkey EGA rooms, Maniac Mansion (v2).
+
 ## 11 October: cutscenes bring their story state (R-8.26)
 
 - **`LoomCutsceneReadiness`** (Core): headless search for the staff, notes and story bits that make a launched scene fuller, applied raise-only to the running session with a re-entry of the room; wired into the catalog and scanned play paths (`PrepareStoryState`), disclosed in the status tooltip. Reference EGA: 36 of 218 groups gain state, 2 begin only with it. Tests `LoomCutsceneReadinessTests`; audit and results in `.verification/cutscene-state-audit` (`readiness` mode).
