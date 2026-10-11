@@ -59,21 +59,18 @@ The app looks for that folder in this order: the `SCUMM_MT32_ROM_ROOT` environme
 
 ## Development
 
-Windows WPF application targeting .NET 10. From the repository root:
+Windows WPF application targeting .NET 10. Build from the repository root; the app is compiled into **`Exe/Debug/`** (or **`Exe/Release/`** with `-c Release`).
 
 ```powershell
-& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet build SCUMMexplorer.slnx
-& 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build
+dotnet build SCUMMexplorer.slnx
+dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build
 ```
-
-The Debug executable is `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`. All development shell commands use RTK per the repository instructions.
 
 | Document | Purpose |
 |---|---|
 | [Requirements](docs/REQUIREMENTS.md) | What the app must do |
-| [Current work](docs/CURRENT_WORK.md) | State, priorities and session handoff |
-| [Changelog](docs/CHANGELOG.md) | Finished work with its validation |
-| [Script map](docs/loom/LOOM_SCRIPT_MAP.md) | Decoded scripts, variables, verbs and rooms |
+| [SCUMM script reference](docs/engine/SCUMM_SCRIPT_MAP.md) | Version-specific engine variables and script behavior |
+| [LOOM script map](docs/loom/LOOM_SCRIPT_MAP.md) | Game-specific scripts, variables, verbs and rooms, with edition scope |
 | [Research](docs/engine/RESEARCH.md) | Technical references |
 
 ## License
