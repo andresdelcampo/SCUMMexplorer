@@ -283,31 +283,53 @@ public sealed class ScummV4Archive : IBrowsableArchive
         var ro = Blocks(_lec, room.Offset + 8, room.Offset + room.Length).FirstOrDefault(b => b.Tag == "RO");
         if (ro is null) return [];
         var objects = ReadObjects(number).GroupBy(o => o.Id).ToDictionary(g => g.Key, g => g.First());
+        var roomChildren = Blocks(_lec, ro.Start + 6, ro.Start + ro.Size);
+        var ega = roomChildren.All(b => b.Tag != "PA");
         var images = new List<ScummV4ObjectImage>();
-        foreach (var oi in Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).Where(b => b.Tag == "OI"))
+        foreach (var oi in roomChildren.Where(b => b.Tag == "OI"))
         {
             if (oi.Size < 14) continue;
             var id = BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(oi.Start + 6));
             if (!objects.TryGetValue(id, out var owner) || owner.Width < 8 || owner.Height < 1) continue;
             var body = oi.Start + 8;
             var end = oi.Start + oi.Size;
-            var pixels = new byte[owner.Width * owner.Height];
+            byte[] pixels;
+            byte[]? mask;
             try
             {
-                for (var strip = 0; strip < owner.Width / 8; strip++)
+                if (ega)
                 {
-                    var offset = BinaryPrimitives.ReadUInt32LittleEndian(_lec.AsSpan(body + 4 + strip * 4));
-                    if (body + offset >= end) throw new InvalidDataException("strip outside the image");
-                    DecodeStrip(_lec, (int)(body + offset), end, pixels, owner.Width, owner.Height, strip * 8);
+                    // A 16-colour room's object image is a background bitmap: a length word, a word offset per strip, the EGA strips, then the masks.
+                    pixels = DecodeEgaBitmap(body, end, owner.Width, owner.Height, out var imageEnd, $"Object {id}");
+                    mask = imageEnd < end ? ReadMaskPlane(_lec, body, end, owner.Width, owner.Height, out _, imageEnd) : null;
+                }
+                else
+                {
+                    pixels = new byte[owner.Width * owner.Height];
+                    for (var strip = 0; strip < owner.Width / 8; strip++)
+                    {
+                        var offset = BinaryPrimitives.ReadUInt32LittleEndian(_lec.AsSpan(body + 4 + strip * 4));
+                        if (body + offset >= end) throw new InvalidDataException("strip outside the image");
+                        DecodeStrip(_lec, (int)(body + offset), end, pixels, owner.Width, owner.Height, strip * 8);
+                    }
+                    mask = ReadMaskPlane(_lec, body, end, owner.Width, owner.Height, _byteCostumeCommands ? 4 : 2);
                 }
             }
             catch (Exception ex) when (ex is InvalidDataException or ArgumentOutOfRangeException or IndexOutOfRangeException) { continue; }
-            images.Add(new ScummV4ObjectImage(id, owner.X, owner.Y, owner.Width, owner.Height, pixels)
-            {
-                Mask = ReadMaskPlane(_lec, body, end, owner.Width, owner.Height)
-            });
+            images.Add(new ScummV4ObjectImage(id, owner.X, owner.Y, owner.Width, owner.Height, pixels) { Mask = mask });
         }
         return images;
+    }
+
+    public BrowsedObjects ReadBrowsedObjects(int number)
+    {
+        var objects = ReadObjects(number);
+        var withImage = ReadObjectImages(number);
+        var imaged = withImage.Select(image => image.Id).ToHashSet();
+        var records = objects.Select((o, i) => new ScummRoomObjectRecord(o.Id, i + 1, o.X, o.Y, o.Width, o.Height, o.Parent, (byte)o.ParentState, o.WalkX, o.WalkY,
+            (byte)o.Direction, o.BlockOffset, imaged.Contains(o.Id) ? o.BlockOffset : null)).ToArray();
+        var names = objects.Where(o => o.Name.Length > 0).GroupBy(o => o.Id).ToDictionary(g => g.Key, g => g.First().Name);
+        return new BrowsedObjects(records, BrowsedObjects.NumberStates(withImage.Select(i => new RoomObjectImage(i.Id, i.X, i.Y, i.Width, i.Height, i.Pixels) { Mask = i.Mask })), names);
     }
 
     /// <summary>
@@ -473,32 +495,48 @@ public sealed class ScummV4Archive : IBrowsableArchive
             if (body + offset >= end) throw new InvalidDataException($"Room {number} strip {strip} starts outside its bitmap.");
             DecodeStrip(_lec, (int)(body + offset), end, pixels, width, height, strip * 8);
         }
-        var mask = ReadMaskPlane(_lec, body, end, width, height, out var next);
+        var tableAt = _byteCostumeCommands ? 4 : 2;
+        var mask = ReadMaskPlane(_lec, body, end, width, height, out var next, 0, tableAt);
         // More z-planes follow the first, each the same block (length word, strip offsets, rows): Room 25's house is plane 2.
         var extra = new List<RoomDepthMask>();
-        while (mask is not null && next > 0 && ReadMaskPlane(_lec, body, end, width, height, out next, next) is { } more) extra.Add(new RoomDepthMask(width, height, more));
+        while (mask is not null && next > 0 && ReadMaskPlane(_lec, body, end, width, height, out next, next, tableAt) is { } more) extra.Add(new RoomDepthMask(width, height, more));
         return new RoomImage(width, height, pixels, palette) { DepthMask = mask is null ? null : new RoomDepthMask(width, height, mask), ExtraDepthMasks = extra };
     }
 
     /// <summary>
+    /// A 16-colour bitmap (a room's BM body or an object's OI body): a length word (where the masks start, returned in <paramref name="imageEnd"/>), a word offset per 8-pixel
+    /// strip (counted from the body's start) and the strips, which use the old-v3 EGA strip code.
+    /// </summary>
+    private byte[] DecodeEgaBitmap(int body, int end, int width, int height, out int imageEnd, string what)
+    {
+        var strips = width / 8;
+        if (end - body < 2 + strips * 2) throw new InvalidDataException($"{what} has a bitmap too short for its {strips} strips.");
+        imageEnd = Math.Min(end, body + BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(body)));
+        var pixels = new byte[width * height];
+        for (var strip = 0; strip < strips; strip++)
+        {
+            var relative = BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(body + 2 + strip * 2));
+            if (relative < 2 + strips * 2 || body + relative >= imageEnd) throw new InvalidDataException($"{what} strip {strip} starts outside its bitmap.");
+            ScummV3EgaRoomDecoder.DecodeStrip(_lec, body + relative, imageEnd, pixels, width, height, strip);
+        }
+        return pixels;
+    }
+
+    /// <summary>
     /// The background of a 16-colour room: the BM body is a length word (where the depth masks start), a word offset per 8-pixel strip (counted from the
-    /// body's start) and the strips, which use the old-v3 EGA strip code. The depth masks are not read.
+    /// body's start) and the strips, which use the old-v3 EGA strip code. The depth masks follow the image.
     /// </summary>
     private RoomImage DecodeEgaRoom(int number, int width, int height, Block bm)
     {
         var body = bm.Start + 6;
         var end = bm.Start + bm.Size;
-        var strips = width / 8;
-        if (bm.Size < 6 + 2 + strips * 2) throw new InvalidDataException($"Room {number} has a bitmap too short for its {strips} strips.");
-        var imageEnd = Math.Min(end, body + BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(body)));
-        var pixels = new byte[width * height];
-        for (var strip = 0; strip < strips; strip++)
-        {
-            var relative = BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(body + 2 + strip * 2));
-            if (relative < 2 + strips * 2 || body + relative >= imageEnd) throw new InvalidDataException($"Room {number} strip {strip} starts outside its bitmap.");
-            ScummV3EgaRoomDecoder.DecodeStrip(_lec, body + relative, imageEnd, pixels, width, height, strip);
-        }
-        return new RoomImage(width, height, pixels, ScummV3EgaRoomDecoder.EgaPalette);
+        var pixels = DecodeEgaBitmap(body, end, width, height, out var imageEnd, $"Room {number}");
+        // The masks start where the image ends (same block layout as the VGA ones: a length word, then a word per strip); a bitmap that ends there has none.
+        var next = 0;
+        var mask = imageEnd < end ? ReadMaskPlane(_lec, body, end, width, height, out next, imageEnd) : null;
+        var extra = new List<RoomDepthMask>();
+        while (mask is not null && next > 0 && ReadMaskPlane(_lec, body, end, width, height, out next, next) is { } more) extra.Add(new RoomDepthMask(width, height, more));
+        return new RoomImage(width, height, pixels, ScummV3EgaRoomDecoder.EgaPalette) { DepthMask = mask is null ? null : new RoomDepthMask(width, height, mask), ExtraDepthMasks = extra };
     }
 
     /// <summary>
@@ -508,24 +546,40 @@ public sealed class ScummV4Archive : IBrowsableArchive
     /// bytes; 0 means 256). Null when the bitmap has no mask block (the size field reaches the end) or the block does not read.
     /// One byte per pixel, 0 or 1.
     /// </summary>
-    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height) => ReadMaskPlane(data, body, end, width, height, out _);
+    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height, int tableAt = 2) => ReadMaskPlane(data, body, end, width, height, out _, 0, tableAt);
 
-    /// <summary>The plane at <paramref name="at"/> (the first plane when 0); <paramref name="next"/> is where a further plane would start (0 when the block ends the body).</summary>
-    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height, out int next, int at = 0)
+    /// <summary>
+    /// The plane at <paramref name="at"/> (the first plane when 0); <paramref name="next"/> is where a further plane would start (0 when the block ends the body).
+    /// <paramref name="tableAt"/> is where the strip offsets start inside the block: 2 (after the length word), 4 in the older 256-colour games (ScummVM <c>GF_OLD256</c>).
+    /// A first plane whose first dword is zero is "no mask" in those games.
+    /// </summary>
+    private static byte[]? ReadMaskPlane(byte[] data, int body, int end, int width, int height, out int next, int at = 0, int tableAt = 2)
     {
         next = 0;
         var strips = width / 8;
         var start = at > 0 ? at : body + (int)BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(body));
-        if (start + 2 + strips * 2 > end) return null;
+        if (start + tableAt + strips * 2 > end) return null;
+        if (tableAt > 2 && BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(start)) == 0) return null;
         var blockEnd = Math.Min(end, start + BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(start)));
-        if (blockEnd - start >= 2 + strips * 2 && end - blockEnd >= 2 + strips * 2) next = blockEnd;
+        if (blockEnd - start >= tableAt + strips * 2 && end - blockEnd >= tableAt + strips * 2) next = blockEnd;
+        return DecodeMaskStrips(data, start, tableAt, blockEnd, width, height);
+    }
+
+    /// <summary>
+    /// The strips of one mask plane (ScummVM <c>decompressMaskImg</c>): a word per 8-pixel strip at <paramref name="start"/> + <paramref name="tableAt"/> (offset from
+    /// <paramref name="start"/>; 0 = nothing masked), and per strip run-length rows of 8 mask bits (bit 7 of a code: repeat the next byte; otherwise copy that many
+    /// bytes; 0 means 256). Null when a strip does not read. One byte per pixel, 0 or 1.
+    /// </summary>
+    internal static byte[]? DecodeMaskStrips(byte[] data, int start, int tableAt, int blockEnd, int width, int height)
+    {
+        var strips = width / 8;
         var pixels = new byte[width * height];
         for (var strip = 0; strip < strips; strip++)
         {
-            var offset = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(start + 2 + strip * 2));
+            var offset = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(start + tableAt + strip * 2));
             if (offset == 0) continue;
             var pos = start + offset;
-            if (offset < 2 + strips * 2 || pos >= blockEnd) return null;
+            if (offset < tableAt + strips * 2 || pos >= blockEnd) return null;
             for (var row = 0; row < height;)
             {
                 if (pos >= blockEnd) return null;

@@ -1045,6 +1045,13 @@ public partial class MainWindow : Window
                 : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : _roomDecoder.Decode(bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
+            // A browsed game shows its stored objects (names and images), nothing run.
+            BrowsedObjects? browsedObjects = null;
+            if (browseArchive is not null)
+            {
+                try { browsedObjects = await Task.Run(() => browseArchive.ReadBrowsedObjects(resource.ResourceId!.Value), token); }
+                catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException or ArgumentOutOfRangeException or IndexOutOfRangeException) { }
+            }
             _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null || enhancedV2 ? null : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
@@ -1056,12 +1063,15 @@ public partial class MainWindow : Window
                 _currentRoomObjectRecords = cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
-                _objects = cdScene?.Images ?? [];
-                _objectSelection = cdScene?.Selection ?? new RoomObjectSelection([], background: room);
+                _objects = cdScene?.Images ?? browsedObjects?.Images ?? [];
+                _objectSelection = cdScene?.Selection ?? new RoomObjectSelection(_objects, background: room);
+                if (browsedObjects is not null) _roomObjectNames = browsedObjects.Names;
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
                 ClearObjectList();
-                ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
+                ObjectsNote.Text = isCd ? CdSceneNote(cdScene)
+                    : browsedObjects is not null ? "Stored object images and names, as the game's data holds them. Choose one to show it; scripts, states and routes are not read for this game."
+                    : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
                 ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
@@ -3196,12 +3206,14 @@ public partial class MainWindow : Window
         {
             var obj = _objects[index];
             var visible = _objectSelection.IsActive(obj);
+            // A browsed game has stored names; a later stored image of one object is numbered by BrowsedObjects.NumberStates.
+            var storedName = _game?.Id == GameId.Unknown && _roomObjectNames.TryGetValue(BrowsedObjects.BaseId(obj.Id), out var browsedName) ? browsedName : null;
             var button = new Button
             {
                 Content = interactive
                     ? $"Hotspot {index + 1} · interact{(_estimatedObjectIds.Contains(obj.Id) ? " · estimated image" : "")}" 
-                    : $"Scene detail {index + 1} · {(visible ? _objectSelection.HasAlternatives(obj) ? "next" : "selected" : "show")}{(_objectSelection.CanShowBackground(obj) ? " / background" : "")}",
-                ToolTip = $"Object {obj.Id} · {_objectSelection.GetPosition(obj).X}, {_objectSelection.GetPosition(obj).Y} · {obj.Width} × {obj.Height}" +
+                    : $"{(storedName is null ? "Scene detail" : storedName)} {index + 1} · {(visible ? _objectSelection.HasAlternatives(obj) ? "next" : "selected" : "show")}{(_objectSelection.CanShowBackground(obj) ? " / background" : "")}",
+                ToolTip = $"Object {BrowsedObjects.BaseId(obj.Id)}{(obj.Id >> 16 is var stateNumber and > 0 ? $" · stored image {stateNumber + 1}" : "")} · {_objectSelection.GetPosition(obj).X}, {_objectSelection.GetPosition(obj).Y} · {obj.Width} × {obj.Height}" +
                           (_estimatedObjectIds.Contains(obj.Id) ? " · artwork estimate; not a script-proven state" : ""),
                 Tag = obj.Id,
                 HorizontalContentAlignment = HorizontalAlignment.Left,

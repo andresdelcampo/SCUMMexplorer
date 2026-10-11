@@ -11,7 +11,7 @@ public sealed record ScummV5Game(string Stem, int RoomCount);
 /// <c>NAME.001</c> the resources, every byte XOR 0x69; blocks are a four-letter tag and a big-endian size that counts its 8-byte header. The index has
 /// <c>RNAM</c> (room names), <c>MAXS</c> and the directories <c>DROO DSCR DSOU DCOS DCHR DOBJ</c>: a word count, a room byte per resource, then a little-endian dword offset
 /// per resource. <c>NAME.001</c> is <c>LECF</c> holding <c>LOFF</c> (each room's offset: the first block inside its <c>LFLF</c>) and the <c>LFLF</c> blocks, which hold
-/// <c>ROOM SCRP SOUN COST CHAR</c>; a resource of the directories sits at its room's offset plus its own. Read for browsing: rooms (picture and palette) and costumes.
+/// <c>ROOM SCRP SOUN COST CHAR</c>; a resource of the directories sits at its room's offset plus its own. Read for browsing: rooms (picture, palette, depth masks) and costumes.
 /// </summary>
 public sealed class ScummV5Archive : IBrowsableArchive
 {
@@ -205,7 +205,75 @@ public sealed class ScummV5Archive : IBrowsableArchive
             if (start >= end) throw new InvalidDataException($"Room {number} strip {strip} starts outside its bitmap.");
             ScummV4Archive.DecodeStrip(_resources, start, end, pixels, width, height, strip * 8);
         }
-        return new RoomImage(width, height, pixels, palette);
+        // The depth masks are the ZP01.. blocks after SMAP in the same IM00: a word per strip at offset 8 (counted from the block), the rows coded as in v4.
+        var planes = Blocks(_resources, im00.Start + 8, im00.Start + im00.Size).Where(b => b.Tag.StartsWith("ZP", StringComparison.Ordinal) && b.Tag != "ZP00")
+            .OrderBy(b => b.Tag, StringComparer.Ordinal)
+            .Select(b => ScummV4Archive.DecodeMaskStrips(_resources, b.Start, 8, b.Start + b.Size, width, height))
+            .TakeWhile(plane => plane is not null).ToArray();
+        return new RoomImage(width, height, pixels, palette)
+        {
+            DepthMask = planes.Length > 0 ? new RoomDepthMask(width, height, planes[0]!) : null,
+            ExtraDepthMasks = planes.Skip(1).Select(plane => new RoomDepthMask(width, height, plane!)).ToArray()
+        };
+    }
+
+    /// <summary>
+    /// The room's objects (ScummVM <c>resetRoomObject</c>, version 5): per object an <c>OBCD</c> block (<c>CDHD</c>: id word, x, y, width and height in 8-pixel units, flags, parent,
+    /// walk-to point as words, facing; then <c>VERB</c> and <c>OBNA</c>, the zero-ended name) and an <c>OBIM</c> block (<c>IMHD</c> with the id and image count, then <c>IM01</c>,
+    /// <c>IM02</c>… one per state, each an <c>SMAP</c> like the room's, sized by the CDHD). An image that does not decode is left out.
+    /// </summary>
+    public BrowsedObjects ReadBrowsedObjects(int number)
+    {
+        var room = Room(number);
+        var children = Blocks(_resources, room.Start + 8, room.Start + room.Size);
+        var records = new List<ScummRoomObjectRecord>();
+        var sizes = new Dictionary<int, (int X, int Y, int W, int H)>();
+        var names = new Dictionary<int, string>();
+        foreach (var obcd in children.Where(b => b.Tag == "OBCD"))
+        {
+            var parts = Blocks(_resources, obcd.Start + 8, obcd.Start + obcd.Size);
+            if (parts.FirstOrDefault(b => b.Tag == "CDHD") is not { } cdhd || cdhd.Size < 8 + 13) continue;
+            var h = cdhd.Start + 8;
+            var id = BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(h));
+            var (x, y, w, ht) = (_resources[h + 2] * 8, _resources[h + 3] * 8, _resources[h + 4] * 8, _resources[h + 5] * 8);
+            var flags = _resources[h + 6];
+            sizes[id] = (x, y, w, ht);
+            records.Add(new ScummRoomObjectRecord(id, records.Count + 1, x, y, w, ht, _resources[h + 7], (byte)(flags == 0x80 ? 1 : flags & 0xF),
+                BinaryPrimitives.ReadInt16LittleEndian(_resources.AsSpan(h + 8)), BinaryPrimitives.ReadInt16LittleEndian(_resources.AsSpan(h + 10)), (byte)(_resources[h + 12] & 7),
+                obcd.Start - room.Start, null));
+            if (parts.FirstOrDefault(b => b.Tag == "OBNA") is { } obna)
+            {
+                var end = Array.IndexOf(_resources, (byte)0, obna.Start + 8, obna.Size - 8);
+                var name = Encoding.Latin1.GetString(_resources, obna.Start + 8, (end < 0 ? obna.Start + obna.Size : end) - obna.Start - 8);
+                if (name.Length > 0) names[id] = name;
+            }
+        }
+        var images = new List<RoomObjectImage>();
+        foreach (var obim in children.Where(b => b.Tag == "OBIM"))
+        {
+            var parts = Blocks(_resources, obim.Start + 8, obim.Start + obim.Size);
+            if (parts.FirstOrDefault(b => b.Tag == "IMHD") is not { } imhd || imhd.Size < 10) continue;
+            var id = BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(imhd.Start + 8));
+            if (!sizes.TryGetValue(id, out var box) || box.W < 8 || box.H < 1) continue;
+            foreach (var state in parts.Where(b => b.Tag.Length == 4 && b.Tag.StartsWith("IM", StringComparison.Ordinal) && b.Tag != "IMHD"))
+            {
+                if (Blocks(_resources, state.Start + 8, state.Start + state.Size).FirstOrDefault(b => b.Tag == "SMAP") is not { } smap) continue;
+                var pixels = new byte[box.W * box.H];
+                try
+                {
+                    for (var strip = 0; strip < box.W / 8; strip++)
+                    {
+                        var start = smap.Start + (int)BinaryPrimitives.ReadUInt32LittleEndian(_resources.AsSpan(smap.Start + 8 + strip * 4));
+                        if (start >= smap.Start + smap.Size) throw new InvalidDataException("strip outside the image");
+                        ScummV4Archive.DecodeStrip(_resources, start, smap.Start + smap.Size, pixels, box.W, box.H, strip * 8);
+                    }
+                }
+                catch (Exception ex) when (ex is InvalidDataException or ArgumentOutOfRangeException or IndexOutOfRangeException) { continue; }
+                images.Add(new RoomObjectImage(id, box.X, box.Y, box.W, box.H, pixels));
+            }
+        }
+        var imaged = images.Select(i => i.Id).ToHashSet();
+        return new BrowsedObjects(records.Select(r => imaged.Contains(r.Id) ? r with { ImageOffset = r.CodeOffset } : r).ToArray(), BrowsedObjects.NumberStates(images), names);
     }
 
     private sealed record Block(string Tag, int Start, int Size);

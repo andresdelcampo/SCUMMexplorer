@@ -49,6 +49,21 @@ internal static class Program
                     await Task.Delay(300);
                     report.Add($"room {room}: {((TextBlock)window.FindName("StatusText")).ToolTip} | {((TextBlock)window.FindName("ObjectsNote")).Text}");
                     Shot($"room-{room:00}.png");
+                    if (Environment.GetEnvironmentVariable("GV4_ADVANCED") == "1")
+                    {
+                        // Advanced mode: the depth-mask toggle, the object list (names), the first object shown, the mask highlighted.
+                        var adv = (CheckBox)window.FindName("AdvancedModeToggle");
+                        if (adv.IsChecked != true) { adv.IsChecked = true; Call("AdvancedModeToggle_Click", adv, new RoutedEventArgs()); }
+                        await Task.Delay(300);
+                        var mask = (CheckBox)window.FindName("RoomMaskToggle");
+                        var list = (Panel)window.FindName("ObjectList");
+                        var labels = list.Children.OfType<Button>().Select(b => b.Content?.ToString()).Take(6);
+                        report.Add($"  advanced: mask toggle {mask.Visibility}/{(mask.IsEnabled ? "enabled" : "disabled")} ({mask.ToolTip}); objects {list.Children.Count}: {string.Join(" | ", labels)}");
+                        if (list.Children.OfType<Button>().FirstOrDefault() is { } first) { first.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Task.Delay(300); }
+                        if (mask.IsEnabled) { mask.IsChecked = true; await Task.Delay(300); }
+                        Shot($"room-{room:00}-advanced.png");
+                        mask.IsChecked = false;
+                    }
                 }
                 // Normal mode: the Costumes tab of the catalog, as for LOOM.
                 var tabs = (Panel)window.FindName("NormalCatalogTabs");

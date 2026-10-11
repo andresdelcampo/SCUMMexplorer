@@ -5,7 +5,7 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <summary>
 /// Decodes the room backgrounds of the "enhanced" SCUMM v2 DOS games (Maniac Mansion Enhanced): the room file is XOR 0xFF and the picture is one stream for the
 /// whole room, not strips (ScummVM's <c>GdiV2</c>): column by column, top to bottom, each code a run of one colour (high nibble count, low nibble colour) or, with
-/// bit 7, a run that repeats what the column to the left shows in those rows (a dither); a zero count takes the next byte. The depth masks that follow are not read.
+/// bit 7, a run that repeats what the column to the left shows in those rows (a dither); a zero count takes the next byte. The depth masks follow the picture (read by <c>ReadMask</c>).
 /// </summary>
 public sealed class ScummV2RoomDecoder : IRoomBackgroundDecoder
 {
@@ -59,7 +59,44 @@ public sealed class ScummV2RoomDecoder : IRoomBackgroundDecoder
                 pixels[y * width + x] = left[y];
             }
         }
-        return new RoomImage(width, height, pixels, ScummV3EgaRoomDecoder.EgaPalette);
+        return new RoomImage(width, height, pixels, ScummV3EgaRoomDecoder.EgaPalette) { DepthMask = ReadMask(data, pos, roomLength, width, height) };
+    }
+
+    /// <summary>
+    /// The mask stream that follows the picture (ScummVM <c>generateStripTable</c>): one byte of 8 mask bits (bit 7 = the leftmost pixel) per row of each 8-pixel strip, strip after strip;
+    /// a code is a run (bit 7: the next byte repeated, otherwise that many bytes follow), and a run may cross from one strip to the next. Null when the stream is missing or truncated.
+    /// </summary>
+    private static RoomDepthMask? ReadMask(byte[] data, int pos, int end, int width, int height)
+    {
+        var pixels = new byte[width * height];
+        var strips = width / 8;
+        var strip = 0;
+        var row = 0;
+        while (strip < strips)
+        {
+            if (pos >= end) return null;
+            var code = data[pos++];
+            var repeat = (code & 0x80) != 0;
+            var count = code & 0x7F;
+            if (count == 0) return null;
+            byte value = 0;
+            if (repeat)
+            {
+                if (pos >= end) return null;
+                value = data[pos++];
+            }
+            for (var i = 0; i < count && strip < strips; i++)
+            {
+                if (!repeat)
+                {
+                    if (pos >= end) return null;
+                    value = data[pos++];
+                }
+                for (var x = 0; x < 8; x++) pixels[row * width + strip * 8 + x] = (byte)((value & (0x80 >> x)) != 0 ? 1 : 0);
+                if (++row == height) { row = 0; strip++; }
+            }
+        }
+        return new RoomDepthMask(width, height, pixels);
     }
 
     private static ushort Word(byte[] bytes, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(offset, 2));
