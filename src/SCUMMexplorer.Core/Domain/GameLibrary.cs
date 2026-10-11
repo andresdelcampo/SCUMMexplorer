@@ -3,6 +3,8 @@ namespace SCUMMexplorer.Core.Domain;
 public enum ScummVersion
 {
     Unknown,
+    V1,
+    V2,
     V3,
     V4,
     V5,
@@ -63,6 +65,9 @@ public sealed record GameLibrary(
 
     /// <summary>The disks of a v4 game that is only browsed (rooms, costumes, sounds; not LOOM CD); null for every other game.</summary>
     public ScummV4Disks? V4Disks { get; init; }
+
+    /// <summary>Which classic (v1) game this is (it picks the colour table of its rooms); null for every other game.</summary>
+    public ScummV1Game? V1Game { get; init; }
 
     /// <summary>The v4 archive that holds the resource: the CD game's single archive, or the disk of a browsed v4 game; null for the old-v3 games.</summary>
     public ScummV4Archive? V4ArchiveFor(GameResource resource) => V4Archive ?? V4Disks?.ArchiveFor(resource);

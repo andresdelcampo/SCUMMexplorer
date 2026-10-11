@@ -15,3 +15,7 @@ Monkey Island EGA (first version of this record): every room failed with "no PA 
 ## Indiana Jones and the Last Crusade, 256 colours (`Games/FUTURE/indy3 vga en`)
 
 `indy-vga/` holds rooms 01, 08 and 15 and Costume 01 in the real window (`GenericV4Check`). The folder is the v4 format with one plain file per room (see CHANGELOG); the four older strip codes 0x02/0x03/0x04/0x07 were added from ScummVM's `unkDecode8` to `11`. All 87 room files with a picture decode; Rooms 98 and 99 are resource banks without one. Costume colours look right (Indy in a brown suit), which suggests the dark shirt of Monkey's Guybrush is a Monkey-specific costume colour mapping rather than the palette lookup.
+
+## Maniac Mansion and Zak McKracken (enhanced v2 and classic v1)
+
+`mm-enhanced/` and `zak-enhanced/` (rooms 1, 4, 12, 30, the Costumes tab, `costume-cards.png`), `mm-classic/` and `zak-classic/` (rooms 4, 10, 30). Enhanced: Secret Lab door with its dithered wall, the Pepsi lab, Zak's mountain and van; the costume cards show the limb costumes (Maniac's heads are separate costumes). Classic: Maniac's foyer with the grandfather clock in the original pinks and browns, Zak's rooms. Rooms were not compared with ScummVM. Zak Enhanced Costume 00 is an empty entry ("points past the end of its file").

@@ -81,4 +81,51 @@ public class OtherV4GameTests
             Assert.All(image.Pixels.ToArray(), pixel => Assert.True(pixel < 16));
         });
     }
+
+    [Fact]
+    public void BrowsesAnEnhancedV2GameWhenConfigured()
+    {
+        // Maniac Mansion Enhanced or Zak McKracken Enhanced: the index gives one byte per object, the room picture is one run-length stream.
+        var folder = Environment.GetEnvironmentVariable("SCUMM_V2_ENHANCED_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal(GameId.Unknown, game.Id);
+        Assert.Equal(ScummVersion.V2, game.Version);
+        var rooms = game.Rooms.ToArray();
+        Assert.NotEmpty(rooms);
+        Assert.DoesNotContain(rooms, room => room.ResourceId == 0);
+        var decoder = new ScummV2RoomDecoder();
+        Assert.All(rooms, room =>
+        {
+            var image = decoder.Decode(File.ReadAllBytes(room.FilePath));
+            Assert.True(image.IsValid);
+            Assert.All(image.Pixels.ToArray(), pixel => Assert.True(pixel < 16));
+        });
+        Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Costume);
+        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Script or ResourceKind.Sound);
+    }
+
+    [Fact]
+    public void BrowsesAClassicV1GameWhenConfigured()
+    {
+        // Maniac Mansion or Zak McKracken: the fixed-size index and the tile rooms; costumes (format 0x57) are not offered yet.
+        var folder = Environment.GetEnvironmentVariable("SCUMM_V1_CLASSIC_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal(GameId.Unknown, game.Id);
+        Assert.Equal(ScummVersion.V1, game.Version);
+        Assert.NotNull(game.V1Game);
+        var rooms = game.Rooms.ToArray();
+        Assert.NotEmpty(rooms);
+        var decoder = new ScummV1RoomDecoder(game.V1Game.Value);
+        Assert.All(rooms, room =>
+        {
+            var image = decoder.Decode(File.ReadAllBytes(room.FilePath));
+            Assert.True(image.IsValid);
+            Assert.All(image.Pixels.ToArray(), pixel => Assert.True(pixel < 16));
+        });
+        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Costume or ResourceKind.Script or ResourceKind.Sound);
+    }
 }

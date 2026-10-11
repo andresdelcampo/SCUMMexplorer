@@ -13,7 +13,7 @@ public partial class MainWindow
     private bool _showCostumeCards;
 
     /// <summary>The Costumes tab of the normal view: both LOOM games, and the v4 games that are only browsed.</summary>
-    private static bool HasCostumeCards(GameLibrary? game) => game is { Id: GameId.Loom or GameId.LoomVga } || game?.V4Disks is not null;
+    private static bool HasCostumeCards(GameLibrary? game) => game is { Id: GameId.Loom or GameId.LoomVga } || game?.V4Disks is not null || game?.Version == ScummVersion.V2;
 
     private void NormalCatalogTab_Click(object sender, RoutedEventArgs e)
     {

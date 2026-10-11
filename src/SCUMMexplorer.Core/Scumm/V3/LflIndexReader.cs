@@ -28,7 +28,33 @@ public sealed class LflIndexReader
         return reader.ReadByte();
     }
 
-    public IReadOnlyList<IndexedResource> Read(string indexFilePath)
+    /// <summary>
+    /// How many bytes the index gives each global object: 4 in the old-v3 games (class bits, owner and state), 1 in the "enhanced" v2 games (Maniac Mansion
+    /// Enhanced: owner and state only). Both then continue with the same four directories, so the one whose directories end exactly at the end of the file is
+    /// the layout. Returns 0 when neither fits.
+    /// </summary>
+    public int DetectObjectEntryBytes(string indexFilePath)
+    {
+        var data = LflEncoding.Read(indexFilePath);
+        foreach (var entryBytes in new[] { 4, 1 })
+        {
+            try
+            {
+                using var reader = new BinaryReader(new MemoryStream(data));
+                if (ReadUInt16(reader) != 0x0100) return 0;
+                Skip(reader, checked(ReadUInt16(reader) * entryBytes));
+                for (var directory = 0; directory < 4; directory++) SkipDirectory(reader);
+                if (reader.BaseStream.Position == data.Length) return entryBytes;
+            }
+            catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException) { }
+        }
+        return 0;
+    }
+
+    public IReadOnlyList<IndexedResource> Read(string indexFilePath) => Read(indexFilePath, 4);
+
+    /// <summary>The directories of the index; <paramref name="objectEntryBytes"/> is 4 for the old-v3 games and 1 for the enhanced v2 ones (see <see cref="DetectObjectEntryBytes"/>).</summary>
+    public IReadOnlyList<IndexedResource> Read(string indexFilePath, int objectEntryBytes)
     {
         using var stream = new MemoryStream(LflEncoding.Read(indexFilePath));
         using var reader = new BinaryReader(stream);
@@ -38,7 +64,7 @@ public sealed class LflIndexReader
             throw new InvalidDataException($"Unexpected 00.LFL signature 0x{magic:X4}; expected the SCUMM v3 signature 0x0100.");
 
         var globalObjectCount = ReadUInt16(reader);
-        Skip(reader, checked(globalObjectCount * 4));
+        Skip(reader, checked(globalObjectCount * objectEntryBytes));
 
         var resources = new List<IndexedResource>();
         ReadDirectory(reader, ResourceKind.Room, resources, roomDirectory: true);

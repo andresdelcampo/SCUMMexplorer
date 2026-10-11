@@ -408,7 +408,7 @@ public partial class MainWindow : Window
         })
         {
             if (game.Id != GameId.Loom && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
-                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && kind != ResourceKind.Executable) continue;
+                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && !(game.Version == ScummVersion.V2 && kind == ResourceKind.Costume) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -623,6 +623,10 @@ public partial class MainWindow : Window
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or InvalidOperationException) { return null; }
     }
 
+    /// <summary>A room of a classic v1 or an enhanced v2 game (XOR-encoded room file), as its background picture.</summary>
+    private static RoomImage DecodeOlderRoom(GameLibrary game, byte[] bytes) =>
+        game is { Version: ScummVersion.V1, V1Game: { } v1 } ? new ScummV1RoomDecoder(v1).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes);
+
     private static BitmapSource RenderRoomCardThumbnail(GameLibrary game, GameResource roomResource,
         ScummIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
         ScummSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
@@ -648,6 +652,11 @@ public partial class MainWindow : Window
             // A browsed v4 game (not LOOM CD): the plain background out of the disk that holds the room.
             var browsedRoom = browsed.DecodeRoom(roomResource.ResourceId!.Value);
             return CreateRoomCardBitmap(browsedRoom, browsedRoom.Pixels.ToArray(), 0, browsedRoom.Palette);
+        }
+        if (game.Version is ScummVersion.V1 or ScummVersion.V2)
+        {
+            var olderRoom = DecodeOlderRoom(game, File.ReadAllBytes(roomResource.FilePath));
+            return CreateRoomCardBitmap(olderRoom, olderRoom.Pixels.ToArray(), 0, olderRoom.Palette);
         }
         var bytes = File.ReadAllBytes(roomResource.FilePath);
         var decoder = new ScummV3EgaRoomDecoder();
@@ -1011,7 +1020,9 @@ public partial class MainWindow : Window
         var isCd = _game is { Id: GameId.LoomVga, V4Archive: not null };
         // A browsed v4 game (not LOOM CD) reads its room out of the disk that holds it.
         var browseArchive = _game?.V4Disks is null ? null : _game.V4ArchiveFor(resource);
-        if (!isCd && browseArchive is null && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 or GameId.Unknown } ||
+        // An enhanced v2 game (Maniac Mansion Enhanced) reads its XOR-encoded room file with the v2 decoder.
+        var enhancedV2 = _game is { Version: ScummVersion.V1 or ScummVersion.V2 };
+        if (!isCd && browseArchive is null && !enhancedV2 && (_game is not { Version: ScummVersion.V3, Id: GameId.Loom or GameId.IndianaJones3 or GameId.Unknown } ||
             !_roomDecoder.CanDecode(resource.FilePath, 3)))
         {
             PreviewDescription.Text = "This room format is not supported yet.";
@@ -1030,10 +1041,11 @@ public partial class MainWindow : Window
                 catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
             }
             var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
-                : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token) : _roomDecoder.Decode(bytes));
+                : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token)
+                : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : _roomDecoder.Decode(bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
-            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null ? null : TryReadWalkBoxes(bytes);
+            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null || enhancedV2 ? null : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
             {
@@ -2163,7 +2175,7 @@ public partial class MainWindow : Window
                 }
                 return;
             }
-            if (_game is not { Id: GameId.Loom, Version: ScummVersion.V3 } || resource.Offset is not int resourceOffset)
+            if (_game is not ({ Id: GameId.Loom, Version: ScummVersion.V3 } or { Version: ScummVersion.V2 }) || resource.Offset is not int resourceOffset)
                 throw new NotSupportedException("This costume has no supported DOS LOOM resource offset.");
 
             var container = LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath));

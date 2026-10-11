@@ -41,7 +41,8 @@ internal static class Program
                 var tree = (TreeView)window.FindName("ResourceTree");
                 foreach (var room in args.Skip(2).Select(int.Parse))
                 {
-                    var resource = game.Rooms.First(r => r.ResourceId == room);
+                    var resource = game.Rooms.FirstOrDefault(r => r.ResourceId == room);
+                    if (resource is null) { report.Add($"room {room}: not in this game"); continue; }
                     Call("SelectResourceInTree", resource);
                     for (var n = 0; n < 100 && Field("_currentRoomResource") != resource; n++) await Task.Delay(100);
                     if (Field("_currentRoomResource") != resource) throw new Exception($"Room {room} did not load: {((TextBlock)window.FindName("PreviewDescription")).Text}");
@@ -57,11 +58,14 @@ internal static class Program
                 var cards = (Panel)window.FindName("CostumeCardList");
                 report.Add($"costume cards: {cards.Children.Count}");
                 Shot("costume-cards.png");
-                var costume = game.Resources.First(r => r.Kind == ResourceKind.Costume);
+                var costume = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Costume);
+                if (costume is null) { report.Add("no costumes offered"); }
+                else {
                 Call("SelectResourceInTree", costume);
                 await Task.Delay(1500);
                 report.Add($"costume {costume.Name}: {((TextBlock)window.FindName("StatusText")).Text} | {((TextBlock)window.FindName("CostumeMessage")).Text}");
                 Shot("costume.png");
+                }
                 foreach (var sound in game.Resources.Where(r => r.Kind == ResourceKind.Sound).Take(1).Concat(game.Resources.Where(r => r.Kind == ResourceKind.Sound).Skip(7).Take(1)))
                 {
                     Call("SelectResourceInTree", sound);

@@ -61,6 +61,13 @@ public sealed class GameFolderScanner
             recognizedBy = gameId == GameId.Unknown ? "" : "executable name";
         }
         var hasIndex = lflFiles.Any(item => item.Id == 0);
+        // The old-v3 index gives every global object four bytes; the enhanced v2 games (Maniac Mansion Enhanced) one. The directories that follow are the same.
+        var objectEntryBytes = hasIndex ? new LflIndexReader().DetectObjectEntryBytes(lflFiles.First(item => item.Id == 0).Path) : 0;
+        var isV2 = objectEntryBytes == 1 && gameId == GameId.Unknown;
+        // The classic v1 games (Maniac Mansion, Zak McKracken) have another index, with the sizes of its directories fixed per game.
+        var classic = hasIndex && objectEntryBytes == 0 && gameId == GameId.Unknown ? ScummV1Index.TryRead(lflFiles.First(item => item.Id == 0).Path) : null;
+        var isV1 = classic is not null;
+        var isOlder = isV1 || isV2;
         if (gameId == GameId.Unknown && hasIndex && IdentifyByIndex(lflFiles.First(item => item.Id == 0).Path) is var byShape && byShape != GameId.Unknown)
         {
             gameId = byShape;
@@ -82,11 +89,17 @@ public sealed class GameFolderScanner
                 {
                     try
                     {
-                        foreach (var indexed in new LflIndexReader().Read(item.Path))
+                        foreach (var indexed in isV1 ? classic!.Resources : new LflIndexReader().Read(item.Path, objectEntryBytes == 1 ? 1 : 4))
                         {
+                            // Of a v1 or enhanced v2 game only the rooms and costumes (v2 only) are offered: its scripts and sounds are other formats, not read yet.
+                            if (isOlder && indexed.Kind is ResourceKind.Script or ResourceKind.Sound) continue;
+                            // The classic costumes (format 0x57) are drawn per actor in 8-pixel limbs: another renderer, not written yet.
+                            if (isV1 && indexed.Kind == ResourceKind.Costume) continue;
                             var fileName = $"{indexed.ContainerFileNumber:00}.LFL";
                             var resourcePath = Path.Combine(fullPath, fileName);
                             if (indexed.Kind == ResourceKind.Room && !File.Exists(resourcePath)) continue;
+                            // An enhanced v2 game's room directory also points at room 0, which is the index file itself: only a room whose picture decodes is offered.
+                            if (isOlder && indexed.Kind == ResourceKind.Room && !DecodesAsOlderRoom(resourcePath, classic?.Game)) continue;
                             // A demo's index is not a subset of the full game's: it keeps entries for resources its
                             // folder lacks (no container file) or whose offset is not where a resource starts.
                             if (isDemo && indexed.Kind != ResourceKind.Room && !StartsResource(chains, resourcePath, indexed.Offset))
@@ -140,7 +153,7 @@ public sealed class GameFolderScanner
             GameId.IndianaJones3 => "Indiana Jones and the Last Crusade",
             _ => Path.GetFileName(fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
         };
-        var version = indexWasParsed ? ScummVersion.V3 : ScummVersion.Unknown;
+        var version = isV1 ? ScummVersion.V1 : indexWasParsed ? isV2 ? ScummVersion.V2 : ScummVersion.V3 : ScummVersion.Unknown;
         var note = gameId switch
         {
             GameId.Loom when indexWasParsed && isDemo =>
@@ -153,6 +166,10 @@ public sealed class GameFolderScanner
                 "DOS EGA profile inferred from INDY3.EXE and the old-v3 00.LFL resource directory. Room backgrounds are supported; object and script behavior is not yet verified.",
             GameId.IndianaJones3 =>
                 "Indiana Jones and the Last Crusade files found. The SCUMM version is not confirmed because no supported old-v3 index was parsed.",
+            _ when isV1 =>
+                "A classic SCUMM v1 game (fixed-size index in 00.LFL): room backgrounds are shown; costumes, objects, scripts and sounds are not read for this game yet.",
+            _ when indexWasParsed && isV2 =>
+                "An enhanced SCUMM v2 game (the 00.LFL index lists one byte per object): room backgrounds and costumes are shown; objects, scripts and sounds are not read for this game yet.",
             _ when indexWasParsed =>
                 "The old-v3 SCUMM index in 00.LFL was parsed; game identity and resource-specific support are not confirmed.",
             _ => "Folder contents found. Game and SCUMM version are not confirmed yet."
@@ -160,7 +177,8 @@ public sealed class GameFolderScanner
 
         if (recognizedBy.Length > 0 && gameId != GameId.Unknown)
             note += edition is not null ? $" Recognised by known data: {edition.Label}." : $" Recognised by: {recognizedBy}.";
-        return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo, edition?.Label ?? "");
+        // The classic index is never "parsed" by the old-v3 reader, so its rooms and costumes come from the loop above only when the classic index was read.
+        return new GameLibrary(title, fullPath, version, "DOS (inferred)", resources, note, gameId, isDemo, edition?.Label ?? "") { V1Game = classic?.Game };
     }
 
     /// <summary>
@@ -307,6 +325,16 @@ public sealed class GameFolderScanner
                 foreach (var script in shared.Where(r => r.Kind == ResourceKind.Script)) drop.Add(script);
         resources.RemoveAll(drop.Contains);
         return drop.Count;
+    }
+
+    private static bool DecodesAsOlderRoom(string path, ScummV1Game? v1Game)
+    {
+        try
+        {
+            var bytes = File.ReadAllBytes(path);
+            return (v1Game is { } game ? new ScummV1RoomDecoder(game).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes)).IsValid;
+        }
+        catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException or ArgumentException) { return false; }
     }
 
     private static bool StartsResource(Dictionary<string, IReadOnlyList<LflChainResource>?> chains, string path, int offset)

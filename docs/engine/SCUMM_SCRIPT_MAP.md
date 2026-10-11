@@ -77,6 +77,10 @@ Sources: ScummVM [print operations](https://github.com/scummvm/scummvm/blob/mast
 
 Sources: ScummVM [actors](https://github.com/scummvm/scummvm/blob/master/engines/scumm/actor.cpp), [costumes](https://github.com/scummvm/scummvm/blob/master/engines/scumm/costume.cpp), [camera](https://github.com/scummvm/scummvm/blob/master/engines/scumm/camera.cpp), [rooms](https://github.com/scummvm/scummvm/blob/master/engines/scumm/room.cpp) and [boxes](https://github.com/scummvm/scummvm/blob/master/engines/scumm/boxes.cpp). These v3 algorithms do not establish the v4 walker.
 
+## Scope: games whose scripts are not read
+
+The browsed games (Monkey Island, Indy3 256 colours, Maniac Mansion and Zak McKracken, classic and enhanced) are read for rooms, costumes and sounds only: this reference says nothing about their scripts, variables or verbs, and the explorer shows no script page for them. Their `SC`/`LS` blocks (v4) and script directories exist in the data, but no dialect (`ScummProfile`) is defined for them; the v4 dialect of LOOM CD should not be assumed for Monkey Island without its own check, and the v1 and v2 script formats differ again. See [the resource formats](SCUMM_RESOURCE_FORMATS.md).
+
 ## Explorer evidence
 
 Decoded instructions, engine interpretations, source readings, observed execution and explorer preview assumptions are different evidence categories. Catalog arrivals, seeded randomness, synthetic input timing and direct story edits retain their labels. Dated LOOM session mappings and validation remain in the [game map](../loom/LOOM_SCRIPT_MAP.md#historical-session-mapping-september-baseline).

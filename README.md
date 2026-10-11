@@ -15,7 +15,13 @@ SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Pick any
   - the short and the long self-running demo
 - **LOOM** (CD, VGA, English), from a folder, a `.cue`/`.bin` or an `.iso`, with the voices and music from the disc
 
-Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. Other classic SCUMM games of the same generation open in a limited way: you get their room pictures and their texts.
+Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. Other classic SCUMM games open in a limited, browse-only way (no scripts, objects or interaction yet):
+
+- **Indiana Jones and the Last Crusade** (EGA): room pictures and texts. The **256-colour** version: room pictures, costumes and sounds.
+- **Monkey Island** (VGA and EGA, all disks): room pictures, costumes and sounds.
+- **Maniac Mansion** and **Zak McKracken**, **Enhanced** versions: room pictures and costumes. **Classic** versions: room pictures.
+
+In these games the room picker fills in on its own, the Costumes tab sits beside the Rooms tab (where costumes can be read), and sounds are in the Advanced tree.
 
 ## Getting started
 

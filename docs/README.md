@@ -5,6 +5,7 @@
 - [SCUMM script reference](engine/SCUMM_SCRIPT_MAP.md): engine variables and script behavior, with explicit SCUMM version scope.
 - [Object states](engine/SCUMM_OBJECT_STATES.md): object state, visibility and rendering behavior.
 - [Research](engine/RESEARCH.md): format references, tools and parser findings.
+- [Resource formats of the browsed games](engine/SCUMM_RESOURCE_FORMATS.md): v1, enhanced v2 and v4 (Monkey Island, Indy3 256 colours) indexes, room pictures, costumes and sounds, with what is not read.
 
 ## Game references
 

@@ -2,6 +2,15 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (end of day): Maniac Mansion and Zak McKracken, enhanced (v2) and classic (v1), open for browsing
+
+- **Enhanced v2** (`Games/FUTURE/mmansionE ega es`, `zakE ega en`): the old-v3 index with **one byte per object** (`LflIndexReader.DetectObjectEntryBytes`: the layout whose four directories end exactly at the end of the file), `GameLibrary.Version` = `V2`. Rooms are one run-length stream per picture (`ScummV2RoomDecoder`, ScummVM `GdiV2`; dither runs repeat the column to the left). Costumes use the old-v3 reader unchanged. Rooms whose picture does not decode (room 0 is the index file) are left out. Maniac: 54 rooms, 24 costumes; Zak: 58 rooms, 39 costumes (Costume 00 of Zak is an empty entry that says so).
+- **Classic v1** (`mmansion ega en`, `zak ega en`): fixed-size index (`ScummV1Index`; the game is the one whose directory sizes add up to the file length), 8x8 tile rooms with 2-bit characters (`ScummV1RoomDecoder`, ScummVM `GdiV1`, C64 colours through the per-game table into EGA). Rooms only (Maniac 51, Zak 58); the v1 costume format (0x57, per actor) is not read, so no costume tab. `GameLibrary.V1Game` picks the colour table.
+- Pictures checked in the real window ([record](../.verification/generic-v4/README.md)): Maniac Enhanced Secret Lab and Pepsi lab, Zak Enhanced mountain and van, Maniac Classic foyer, Zak Classic. Costumes of both enhanced games show in the normal Costumes tab. No comparison with ScummVM's rendering was run.
+- **Docs:** new [resource formats](../docs/engine/SCUMM_RESOURCE_FORMATS.md); REQUIREMENTS (tags `SCUMM v1`, `SCUMM v2`, `BROWSED`; R-3.10 to R-3.13, R-5.5, R-6.13, R-13.8; support matrix; out of scope), README, docs README, research and script-map scope notes, CLAUDE.md.
+- **No regression:** scan hashes of every other local folder unchanged. `OtherV4GameTests` gained v2 and v1 checks (`SCUMM_V2_ENHANCED_TEST_ROOT`, `SCUMM_V1_CLASSIC_TEST_ROOT`).
+- Seen but not opened: `monkey1 vga en` (a `.cue`/`.bin` CD), `indy4 vga en`, `indy4classic vga es`, `indy4talkie vga es` (`ATLANTIS.000/.001`: SCUMM v5, another container); `monkey1 ega en` holds four disks of VGA data and opens as Monkey VGA.
+
 ## 11 October (last, costume tab): costumes in the normal view of the browsed v4 games
 
 - The Rooms | Costumes tabs of the normal catalog (as for LOOM) now also appear for the browsed v4 games (`HasCostumeCards`): Monkey VGA 115 cards with pictures, via the disk archive. The Games folder was reorganised meanwhile (`Games/FUTURE/monkey1 vga es`, `monkey1 ega es`; the same data).
