@@ -3116,14 +3116,14 @@ public partial class MainWindow : Window
         {
             var hotspots = _currentRoomObjectRecords.OrderBy(item => item.LocalIndex)
                 .Where(record => IsVerbHotspotAvailable(record, _session!.Snapshot) &&
-                                 _roomVerbs.TryGetValue(record.Id, out var verbs) && verbs.Count > 0)
+                                 _roomVerbs.TryGetValue(record.Id, out var verbs) && verbs.Count > 0 &&
+                                 // Doorways have their own overlay and room clicks; they are not object hotspots.
+                                 DoorwayTargets(record).Length == 0)
                 .Select(record =>
                 {
-                    // The stored name, else the rooms a doorway can load, else its index.
+                    // The stored name, else its index.
                     var name = _roomObjectNames.TryGetValue(record.Id, out var stored) ? stored : null;
-                    var doorway = DoorwayTargets(record).Length > 0 ? "→ " + DoorwayLabel(record) : null;
-                    var label = name is null ? doorway ?? $"Hotspot {record.LocalIndex}"
-                        : doorway is null ? name : $"{name} {doorway}";
+                    var label = name ?? $"Hotspot {record.LocalIndex}";
                     return (Record: record, Name: name, Label: label);
                 }).ToArray();
             var repeated = hotspots.GroupBy(item => item.Label).Where(group => group.Count() > 1)
