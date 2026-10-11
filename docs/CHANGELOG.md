@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: PC speaker sounds of Zak McKracken and the enhanced Maniac Mansion
+
+- The v1/v2 sound entries that have the v2 player's format (the same as LOOM's old bundle) are now listed and play through the existing PC speaker renderer: Zak McKracken classic (110), Zak McKracken Enhanced (112), Maniac Mansion Enhanced (59). AdLib and Roland are refused with a message (these games have PC speaker only). Maniac Mansion classic uses the `Player_V1` chunk format and still lists no sounds. All listed sounds render; not listened to in the window.
+
 ## 12 October: browsed rooms show every row; v1/v2 objects painted
 
 - **Cut bottoms (reported by the user):** the room viewer capped every game except LOOM at 128 rows. Indy3 EGA has rooms of 136 to 200 rows (about 56 of them) and classic Maniac Mansion 136, so their bottoms were cut and their geometry differed. Browsed games now show every row of the picture (`RoomScreenRows`); LOOM keeps 144. Not compared with the bundled ScummVM (the original may crop 136-row Maniac Mansion rooms to 128).

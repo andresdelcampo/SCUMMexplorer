@@ -91,8 +91,8 @@ public sealed class GameFolderScanner
                     {
                         foreach (var indexed in isV1 ? classic!.Resources : new LflIndexReader().Read(item.Path, objectEntryBytes == 1 ? 1 : 4))
                         {
-                            // Of a v1 or enhanced v2 game only the rooms and costumes are offered: its scripts and sounds are other formats, not read yet.
-                            if (isOlder && indexed.Kind is ResourceKind.Script or ResourceKind.Sound) continue;
+                            // Of a v1 or enhanced v2 game the rooms, costumes and PC speaker sounds are offered: its scripts are not read, nor are the sounds of the other formats.
+                            if (isOlder && indexed.Kind == ResourceKind.Script) continue;
                             var fileName = $"{indexed.ContainerFileNumber:00}.LFL";
                             var resourcePath = Path.Combine(fullPath, fileName);
                             if (indexed.Kind == ResourceKind.Room && !File.Exists(resourcePath)) continue;
@@ -100,6 +100,7 @@ public sealed class GameFolderScanner
                             if (isOlder && indexed.Kind == ResourceKind.Room && !DecodesAsOlderRoom(resourcePath, classic?.Game)) continue;
                             // Likewise a costume entry that is empty or points at nothing (Costume 00) is left out.
                             if (isOlder && indexed.Kind == ResourceKind.Costume && !ReadsAsOlderCostume(resourcePath, indexed.Offset)) continue;
+                            if (isOlder && indexed.Kind == ResourceKind.Sound && !ReadsAsOlderSound(resourcePath, indexed.Offset)) continue;
                             // A demo's index is not a subset of the full game's: it keeps entries for resources its
                             // folder lacks (no container file) or whose offset is not where a resource starts.
                             if (isDemo && indexed.Kind != ResourceKind.Room && !StartsResource(chains, resourcePath, indexed.Offset))
@@ -334,6 +335,24 @@ public sealed class GameFolderScanner
     {
         try { return new ScummV3CostumeReader().Decode(LflEncoding.DecodeXorFF(File.ReadAllBytes(path)), offset).AnimationSlots.Any(slot => slot.HasData); }
         catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException or UnauthorizedAccessException or ArgumentException) { return false; }
+    }
+
+    /// <summary>
+    /// Whether the entry is a PC speaker sound of the v2 player's format (the one LOOM's old bundle uses): a length word, the priority and restart bytes, then the channel
+    /// pointers, the first at 22 and the other three empty. Zak McKracken classic and the enhanced games have it; Maniac Mansion classic uses another format, not read.
+    /// </summary>
+    private static bool ReadsAsOlderSound(string path, int offset)
+    {
+        try
+        {
+            if (!File.Exists(path)) return false;
+            var data = LflEncoding.DecodeXorFF(File.ReadAllBytes(path));
+            if (offset < 0 || offset + 12 > data.Length) return false;
+            var size = data[offset] | data[offset + 1] << 8;
+            return size >= 22 && offset + size <= data.Length && (data[offset + 6] | data[offset + 7] << 8) == 22 &&
+                data[offset + 8] == 0 && data[offset + 9] == 0 && data[offset + 10] == 0 && data[offset + 11] == 0;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return false; }
     }
 
     private static bool DecodesAsOlderRoom(string path, ScummV1Game? v1Game)

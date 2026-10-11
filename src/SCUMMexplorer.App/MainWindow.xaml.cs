@@ -408,7 +408,7 @@ public partial class MainWindow : Window
         })
         {
             if (game.Id != GameId.Loom && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
-                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind == ResourceKind.Costume) && kind != ResourceKind.Executable) continue;
+                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -2785,6 +2785,7 @@ public partial class MainWindow : Window
                 return new ScummMt32Audio(roms).RenderWave(resource, token);
             }
             if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
+            if (_game is { Version: ScummVersion.V1 or ScummVersion.V2 } && adlib) throw new NotSupportedException("This game's sounds are for the PC speaker. Choose that device.");
             return adlib ? _adlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
         }, token);
 
