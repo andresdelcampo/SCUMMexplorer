@@ -154,10 +154,13 @@ public sealed partial class LoomExplorationSession
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
             _runtime.SetGlobalVariable(timer, 0);
+        // Script 017 starts the notes script 018 only while the distaff is not yet on (var[0x064] != 2) and 018 alone prints the note
+        // letters, so a room change must leave the verb screen's strings alone in the EGA game too: erasing them left bare staves after
+        // cutscenes and walks (user reports, 11 October).
+        _runtime.Messages.KeepVerbScreenOnRoomEntry = true;
         if (game.Id == GameId.LoomVga)
         {
             _runtime.GlobalVariables[ScummBoundedScriptExecutor.SeparateBitStorage] = 1;
-            _runtime.Messages.KeepVerbScreenOnRoomEntry = true;
             _runtime.EstimatedVariables.Add(ScummBoundedScriptExecutor.SeparateBitStorage);
         }
         if (soundCard != 0) _runtime.SetGlobalVariable(SoundCardVariable, (ushort)soundCard);
