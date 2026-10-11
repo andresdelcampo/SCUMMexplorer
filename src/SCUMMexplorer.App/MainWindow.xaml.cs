@@ -787,6 +787,7 @@ public partial class MainWindow : Window
     /// <summary>A track the game started is still being rendered and the game waits for it (see <see cref="SceneSoundPlayer.IsPreparing"/>).</summary>
     private void SceneSound_PreparingChanged()
     {
+        if (_sceneSound.IsPreparing) _scanGate.Reset(); else _scanGate.Set();
         if (_sceneSound.IsPreparing)
         {
             _musicBusy ??= BeginBusy(_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland

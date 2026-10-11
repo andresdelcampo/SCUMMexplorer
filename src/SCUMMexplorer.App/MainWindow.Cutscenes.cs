@@ -183,6 +183,9 @@ public partial class MainWindow
     /// <summary>Steps of the background scan (a run and a start setup per scene on EGA; the CD counts its setups and its runs): <c>_scanDone</c> of <c>_scanTotal</c>.</summary>
     private int _scanTotal, _scanDone;
 
+    /// <summary>Open while the scan may work. A track the game waits for is rendered on a loaded CPU about eight times slower (13 s became 100 s), so the scan holds its next step until the sound is ready.</summary>
+    private readonly ManualResetEventSlim _scanGate = new(true);
+
     private bool ScanRunning => _scanTotal > 0 && _scanDone < _scanTotal;
 
     /// <summary>Counts one finished step; the note and bar under the room are refreshed on the UI thread (throttled by the dispatcher's background priority).</summary>
@@ -227,6 +230,7 @@ public partial class MainWindow
         _cdSetupPlanner = planner;
         _cdRoomListsDone = seed is not null;
         _scanDone = 0; _scanTotal = 0;
+        if (!_sceneSound.IsPreparing) _scanGate.Set();
         _ = Task.Run(() =>
         {
             try
@@ -241,22 +245,23 @@ public partial class MainWindow
                     _scanTotal = groups.Count * 2; // a fresh run per scene, then a derived start per scene
                     Parallel.ForEach(groups, new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2) }, group =>
                     {
+                        _scanGate.Wait();
                         if (LoomCutsceneRun.VisitedRooms(game, snapshot, group.First) is { } entered) planner.Value.RecordFreshRun(group.First, entered);
                         CountScanStep(planner);
                     });
                     CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                     Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) { _cdRoomListsDone = true; UpdatePlaybackControls(); } });
-                    foreach (var group in groups) { planner.Value.Derive(group.First); planner.Value.VisitedRooms(group.First); CountScanStep(planner); }
+                    foreach (var group in groups) { _scanGate.Wait(); planner.Value.Derive(group.First); planner.Value.VisitedRooms(group.First); CountScanStep(planner); }
                     CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                     return;
                 }
                 _scanTotal = seed is not null ? groups.Count : groups.Count * 2; // the setups, then (without the shipped lists) the runs
-                foreach (var group in groups) { planner.Value.Derive(group.First); CountScanStep(planner); }
+                foreach (var group in groups) { _scanGate.Wait(); planner.Value.Derive(group.First); CountScanStep(planner); }
                 // The shipped lists already hold the rooms each scene plays out in; only the start setups (for the notes and for playing) are derived.
                 if (seed is not null) return;
                 // Then the rooms each scene plays out in, so the room's own "Play Cutscene" list has them (the EGA list does, through the catalog's membership).
                 if (game.V4Archive is not null) planner.Value.IntroRooms();
-                foreach (var group in groups) { planner.Value.VisitedRooms(group.First); CountScanStep(planner); }
+                foreach (var group in groups) { _scanGate.Wait(); planner.Value.VisitedRooms(group.First); CountScanStep(planner); }
                 CdRoomScenesCache.Save(game.FolderPath, planner.Value.ExportRoomLists());
                 Dispatcher.BeginInvoke(() => { if (_cdSetupPlanner == planner) { _cdRoomListsDone = true; UpdatePlaybackControls(); } });
             }

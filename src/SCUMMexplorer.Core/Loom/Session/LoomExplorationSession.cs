@@ -161,6 +161,9 @@ public sealed partial class LoomExplorationSession
             _runtime.EstimatedVariables.Add(ScummBoundedScriptExecutor.SeparateBitStorage);
         }
         if (soundCard != 0) _runtime.SetGlobalVariable(SoundCardVariable, (ushort)soundCard);
+        // The plain EGA editions' script 001 turns the music off (bit 0xD76) unless var[0x28] is above 250, a host-reported speed/memory figure;
+        // ScummVM plays their music, so a modern host reports a fast machine. The Roland upgrade and the CD game do not test it.
+        if (game.Id == GameId.Loom) _runtime.SetGlobalVariable(MachinePerformanceVariable, 1000);
         // ScummVM runs indexed script 1 at boot for this release family.
         if (!completeBoot)
         {
@@ -306,6 +309,7 @@ public sealed partial class LoomExplorationSession
 
     /// <summary><c>VAR_SOUNDCARD</c>: 0 in a session by default, 3 for AdLib in ScummVM and 4 for the Roland upgrade, whose sounds (33 to 64) the scripts then choose.</summary>
     public const string SoundCardVariable = "var[0x030]";
+    private const string MachinePerformanceVariable = "var[0x028]";
     public const int RolandSoundCard = 4;
 
     /// <summary>The sound card the game's scripts see. Changing it takes effect at the scripts' next read, as it would in the game.</summary>

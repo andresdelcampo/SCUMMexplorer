@@ -38,11 +38,16 @@ internal static class Program
             {
                 Call("OpenGameFolder", args[0]);
                 Console.WriteLine("scanned=" + Prop("ScannedCutscenes"));
-                await Select(2);
                 await Select(1);
-                var max = 0;
-                for (var i = 0; i < 600; i++) { await Task.Delay(1000); max = Math.Max(max, (int)Field("_scanDone")!); if (!(bool)Prop("ScanRunning")! && (bool)Field("_cdRoomListsDone")! && (int)Field("_scanTotal")! > 0) break; }
-                Console.WriteLine($"final done={Field("_scanDone")} total={Field("_scanTotal")} maxDone={max} listsDone={Field("_cdRoomListsDone")}");
+                await Task.Delay(3000);
+                Call("RoomCutscene_Click", window, new RoutedEventArgs());
+                var gate = (System.Threading.ManualResetEventSlim)Field("_scanGate")!; var sn = Field("_sceneSound")!;
+                for (var i = 0; i < 100; i++) { await Task.Delay(1000); if (i % 5 == 0) Console.WriteLine($"t={i}s gateOpen={gate.IsSet} preparing={sn.GetType().GetProperty("IsPreparing")!.GetValue(sn)} scan={Field("_scanDone")}"); }
+                var ss = Field("_session")!;
+                var evs = (System.Collections.IEnumerable)ss.GetType().GetProperty("SoundEvents")!.GetValue(ss)!;
+                foreach (var e in evs) { var ev = e.GetType().GetProperty("Event")!.GetValue(e)!; Console.WriteLine("EVENT " + string.Join(" | ", ev.GetType().GetProperties().Select(pr => pr.Name + "=" + pr.GetValue(ev)))); }
+                var snd = Field("_sceneSound")!;
+                foreach (var e in (System.Collections.IEnumerable)snd.GetType().GetProperty("Log")!.GetValue(snd)!) Console.WriteLine("LOG " + string.Join(" | ", e.GetType().GetProperties().Select(pr => pr.Name + "=" + pr.GetValue(e))));
             }
             catch (Exception ex) { Console.WriteLine("FAILED: " + ex); }
             app.Shutdown();
