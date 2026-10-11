@@ -2318,9 +2318,11 @@ public partial class MainWindow : Window
     /// The room screen's height in the game. <c>redrawBGStrip</c> draws the main virtual screen's rows of the room
     /// image. ScummVM's default <c>initScreens(16, 144)</c> gives it 128 rows (versions 1–6 outside the C64/NES
     /// ports); LOOM's boot (script 001 +0x0000, <c>roomOps setScreen 0, 144</c>) calls <c>initScreens(0, 144)</c>,
-    /// so LOOM shows all 144 rows of its rooms from screen row 0. Indy3 keeps the default (not checked).
+    /// so LOOM shows all 144 rows of its rooms from screen row 0. Other games are browsed (R-6.13: the room is
+    /// shown as stored): Indy3 EGA has rooms 136 to 200 rows tall and classic Maniac Mansion 136 (a cap of 128 cut
+    /// their bottoms), so they show every row of the picture.
     /// </summary>
-    private int RoomScreenRows => _game?.Id is GameId.Loom or GameId.LoomVga ? ScummVerbArea.Top - ScummV3MessageRenderer.RoomScreenTop : 128;
+    private int RoomScreenRows => _game?.Id is GameId.Loom or GameId.LoomVga ? ScummVerbArea.Top - ScummV3MessageRenderer.RoomScreenTop : int.MaxValue;
 
     private int ShownRoomRows(RoomImage room) => Math.Min(room.Height, RoomScreenRows);
 
