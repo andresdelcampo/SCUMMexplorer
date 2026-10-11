@@ -40,6 +40,24 @@ string Run(LoomCutscene t, Action<LoomExplorationSession>? edit)
     catch (Exception ex) { return "ERR " + ex.GetType().Name + ": " + ex.Message; }
 }
 
+if (args.Length > 2 && args[2] == "readiness") // CutsceneStateAudit <folder> <limit> readiness: what LoomCutsceneReadiness adds per group and what it changes
+{
+    var readiness = new LoomCutsceneReadiness(game, () => new LoomExplorationSession(game, snapshot));
+    var lines = new ConcurrentBag<string>(); int withEdits = 0, newlyBegun = 0, n = 0;
+    var clock = System.Diagnostics.Stopwatch.StartNew();
+    Parallel.ForEach(groups.Take(limit), new ParallelOptions { MaxDegreeOfParallelism = 8 }, g =>
+    {
+        var t = g.First;
+        var plan = readiness.Plan(t.Room, t.ObjectId, t.VerbId, LoomCutsceneReadiness.ScriptIds(t.Scripts));
+        Interlocked.Increment(ref n);
+        if (plan.HasEdits) Interlocked.Increment(ref withEdits);
+        if (plan.HasEdits && !plan.Base.Begun && plan.Result.Begun) Interlocked.Increment(ref newlyBegun);
+        lines.Add($"room {t.Room:00} obj {t.ObjectId} verb 0x{t.VerbId:X2} | base {(plan.Base.Begun ? "began" : "NOT begun")} {plan.Base.Lines}l/{plan.Base.Rooms}r -> {plan.Result.Lines}l/{plan.Result.Rooms}r | staff={plan.Staff} notes={plan.Notes} bits=[{string.Join(" ", plan.Bits)}]");
+    });
+    foreach (var l in lines.OrderBy(l => l)) Console.WriteLine(l);
+    Console.WriteLine($"groups {n}; with state added: {withEdits}; began only with it: {newlyBegun}; {clock.Elapsed.TotalSeconds:F0} s");
+    return;
+}
 var results = new ConcurrentBag<string>();
 int sensitive = 0, total = 0, notBegun = 0;
 var counts = new ConcurrentDictionary<string, int>();

@@ -339,6 +339,7 @@ public partial class MainWindow
         session.VisitRoom(room);
         if (useSetup) LoomCdSceneSetupPlanner.ApplyAfter(session, setup.After);
         var speakerNotes = trigger.IsRoomEntry ? [] : PlaceSpeakersForDirectVerb(room, trigger.ObjectId, trigger.VerbId);
+        var storyNotes = PrepareStoryState(session, trigger.Room, trigger.ObjectId, trigger.VerbId, LoomCutsceneReadiness.ScriptIds(trigger.Scripts));
         var action = trigger.IsRoomEntry ? null : session.ActivateObjectVerb(trigger.ObjectId, trigger.VerbId);
         var uncertainties = (action?.Uncertainties ?? session.Snapshot.Uncertainties).ToList();
         if (_currentRoomResource?.ResourceId == room.ResourceId && _currentRoom is not null)
@@ -351,7 +352,30 @@ public partial class MainWindow
         StartPlayback(trigger.IsRoomEntry ? $"Room {trigger.Room:00}'s entry scripts" : $"Object {trigger.ObjectId}'s verb 0x{trigger.VerbId:X2} (run directly)", action, room, doorways: null, leftRoom: false,
             sceneBefore: before, expectedCutscene: title);
         StatusText.Text = $"Playing {title} from a stated start (see the tooltip). Escape skips once the cutscene allows it.";
-        StatusText.ToolTip = CdCutsceneNote(group) + Environment.NewLine + string.Join(Environment.NewLine, speakerNotes.Concat(uncertainties));
+        StatusText.ToolTip = CdCutsceneNote(group) + Environment.NewLine + string.Join(Environment.NewLine, storyNotes.Concat(speakerNotes).Concat(uncertainties));
+    }
+
+
+    /// <summary>
+    /// Brings a launched single cutscene to the story state it needs (R-8.26): the headless search of <see cref="LoomCutsceneReadiness"/> (cached;
+    /// the first time for a scene takes a few seconds) and then only a raise of what the running session lacks. Returns the notes for the status tooltip.
+    /// </summary>
+    private IReadOnlyList<string> PrepareStoryState(LoomExplorationSession session, int room, int objectId, int verbId, IReadOnlyCollection<int> scriptIds)
+    {
+        if (_game is not { Id: GameId.Loom or GameId.LoomVga } game || game.IsDemo) return [];
+        var vga = game.V4Archive;
+        _readiness ??= new LoomCutsceneReadiness(game, vga is not null
+            ? () => new LoomExplorationSession(game, vga.ReadIndexedObjects(), completeBoot: false)
+            : () => new LoomExplorationSession(game, _indexedObjectSnapshot!));
+        var previous = System.Windows.Input.Mouse.OverrideCursor;
+        System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+        try
+        {
+            var plan = _readiness.Plan(room, objectId, verbId, scriptIds);
+            var added = LoomCutsceneReadiness.Apply(session, plan, _game.Rooms.FirstOrDefault(r => r.ResourceId == room));
+            return [plan.Note + (added.Count > 0 ? $" Added now: {string.Join(", ", added)}." : plan.HasEdits ? " The running session already had it." : "")];
+        }
+        finally { System.Windows.Input.Mouse.OverrideCursor = previous; }
     }
 
     private string PickerVerbTitle(string title, int verb) =>
@@ -524,6 +548,7 @@ public partial class MainWindow
             _sceneSound.Attach(_game, session);
         }
         LoomObjectActionResult? action;
+        IReadOnlyList<string> storyNotes = [];
         if (cutscene.Steps is { } steps)
         {
             _replaySequence = new LoomReplaySequence(session, steps);
@@ -538,8 +563,13 @@ public partial class MainWindow
             if (_replaySequence.Failure is null) _replaySequence.Continue();
             action = _replaySequence.LastAction;
         }
-        else action = cutscene.ObjectId == 0 ? null : session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
+        else
+        {
+            storyNotes = PrepareStoryState(session, cutscene.RoomId, cutscene.ObjectId, cutscene.VerbId, cutscene.TextScripts ?? [cutscene.Script]);
+            action = cutscene.ObjectId == 0 ? null : session.ActivateObjectVerb(cutscene.ObjectId, cutscene.VerbId);
+        }
         var uncertainties = (action?.Uncertainties ?? session.Snapshot.Uncertainties).ToList();
+        uncertainties.InsertRange(0, storyNotes);
         if (setupFailure is not null) uncertainties.Insert(0, setupFailure);
         if (cutscene.Click is { } click)
         {

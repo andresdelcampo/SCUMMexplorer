@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October: cutscenes bring their story state (R-8.26)
+
+- **`LoomCutsceneReadiness`** (Core): headless search for the staff, notes and story bits that make a launched scene fuller, applied raise-only to the running session with a re-entry of the room; wired into the catalog and scanned play paths (`PrepareStoryState`), disclosed in the status tooltip. Reference EGA: 36 of 218 groups gain state, 2 begin only with it. Tests `LoomCutsceneReadinessTests`; audit and results in `.verification/cutscene-state-audit` (`readiness` mode).
+- Open: costumes and room object state (R-8.28/8.29) and the story-path comparison (R-8.31); see REQUIREMENTS 8.5.
+
 ## 10 October (night): script-derived cutscene lists for every edition, CD seed, small fixes
 
 - **Scan aligned with the EGA catalog** (`.verification/cutscene-scan-ega`, R-8.10/8.23): loads after a span, scripts started from inside a span, literal load targets in titles ("Reached Room N" for unnamed plain verbs) and silent Use scenes; title+category identical for 217 of 328 replays (187 before). `LoomCutsceneRun` (a fresh headless run per trigger, 271 s for all 328) agrees with the catalog's category for 320 of 328; the 8 left are hand-labelled scenes that stay in their room. The 42 scan-only groups were all run: 23 play fresh, 19 need story state; `LoomCdSceneSetupPlanner` derives a start for 17 of those on EGA data (Room 34's entry is the known untriggable scene).
