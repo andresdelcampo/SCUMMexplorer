@@ -376,6 +376,9 @@ public partial class MainWindow
         {
             var items = CdCutsceneItems(roomId).Select(choice => choice.Item).ToList();
             if (_game?.Id == GameId.LoomVga && CdIntroPlaysIn(roomId)) items.Insert(0, CdIntroItem());
+            // The EGA opening (script 044) is not a scanned trigger; it plays in the rooms OpeningSource names, so Room 01 (the title) is never an empty list.
+            else if (_game?.Id == GameId.Loom && roomId is 1 or 2 or 53)
+                items.Insert(0, new(OpeningTitle, "Scenes", OpeningSource + " " + OpeningStartNote, PlayOpening));
             return items;
         }
         var ids = (_replayCatalog?.Membership ?? []).Where(m => m.StartRoom == roomId || m.Rooms.Contains(roomId)).Select(m => m.Id).ToHashSet();
