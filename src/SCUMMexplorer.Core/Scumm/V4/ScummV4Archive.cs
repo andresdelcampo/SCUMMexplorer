@@ -420,7 +420,9 @@ public sealed class ScummV4Archive
     {
         if (!_rooms.TryGetValue(number, out var room)) throw new KeyNotFoundException($"Room {number} is not in DISK01.LEC.");
         var ro = Blocks(_lec, room.Offset + 8, room.Offset + room.Length).First(b => b.Tag == "RO");
-        var pa = Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).First(b => b.Tag == "PA").Start + 6;
+        var paBlock = Blocks(_lec, ro.Start + 6, ro.Start + ro.Size).FirstOrDefault(b => b.Tag == "PA");
+        if (paBlock is null) return ScummV3EgaRoomDecoder.EgaPalette;
+        var pa = paBlock.Start + 6;
         var palette = new uint[256];
         for (var i = 0; i < 256; i++)
             palette[i] = 0xFF000000u | (uint)(_lec[pa + 2 + i * 3] << 16) | (uint)(_lec[pa + 3 + i * 3] << 8) | _lec[pa + 4 + i * 3];
@@ -440,6 +442,8 @@ public sealed class ScummV4Archive
         if (width is < 8 or > 2048 || height is < 8 or > 400 || width % 8 != 0)
             throw new InvalidDataException($"Room {number} has an unsupported size {width} x {height}.");
 
+        // A room without a PA block is a 16-colour (EGA) room: the fixed EGA palette and the EGA strip codes.
+        if (children.All(b => b.Tag != "PA")) return DecodeEgaRoom(number, width, height, Child("BM"));
         var pa = Child("PA").Start + 6;
         var palette = new uint[256];
         for (var i = 0; i < 256; i++)
@@ -460,6 +464,27 @@ public sealed class ScummV4Archive
         var extra = new List<RoomDepthMask>();
         while (mask is not null && next > 0 && ReadMaskPlane(_lec, body, end, width, height, out next, next) is { } more) extra.Add(new RoomDepthMask(width, height, more));
         return new RoomImage(width, height, pixels, palette) { DepthMask = mask is null ? null : new RoomDepthMask(width, height, mask), ExtraDepthMasks = extra };
+    }
+
+    /// <summary>
+    /// The background of a 16-colour room: the BM body is a length word (where the depth masks start), a word offset per 8-pixel strip (counted from the
+    /// body's start) and the strips, which use the old-v3 EGA strip code. The depth masks are not read.
+    /// </summary>
+    private RoomImage DecodeEgaRoom(int number, int width, int height, Block bm)
+    {
+        var body = bm.Start + 6;
+        var end = bm.Start + bm.Size;
+        var strips = width / 8;
+        if (bm.Size < 6 + 2 + strips * 2) throw new InvalidDataException($"Room {number} has a bitmap too short for its {strips} strips.");
+        var imageEnd = Math.Min(end, body + BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(body)));
+        var pixels = new byte[width * height];
+        for (var strip = 0; strip < strips; strip++)
+        {
+            var relative = BinaryPrimitives.ReadUInt16LittleEndian(_lec.AsSpan(body + 2 + strip * 2));
+            if (relative < 2 + strips * 2 || body + relative >= imageEnd) throw new InvalidDataException($"Room {number} strip {strip} starts outside its bitmap.");
+            ScummV3EgaRoomDecoder.DecodeStrip(_lec, body + relative, imageEnd, pixels, width, height, strip);
+        }
+        return new RoomImage(width, height, pixels, ScummV3EgaRoomDecoder.EgaPalette);
     }
 
     /// <summary>

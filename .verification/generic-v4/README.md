@@ -8,9 +8,9 @@ $env:SCUMM_EXPLORER_PROFILE_ROOT = '<private profile folder>'
 & 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe' proxy dotnet 'Exe/GenericV4Check/Debug/net10.0-windows/GenericV4Check.dll' '<Games/FUTURE/monkey1/VGA>' '<output>' 33 34 10
 ```
 
-Result for Monkey Island VGA: 83 rooms, 293 resources; rooms 33 (Scumm Bar front) and 34 (town) show complete backgrounds, Costume 01 shows 45 stored poses. Known imperfection: Guybrush's shirt is dark in the poses, so the costume palette (taken from the room holding the costume) is probably not what the game uses.
+Result for Monkey Island VGA: 83 rooms, 293 resources; rooms 33 (Scumm Bar front) and 34 (town) show complete backgrounds, Costume 01 shows 45 stored poses. Guybrush's shirt is dark in the poses because a costume is drawn in the palette of the room that stores it (room 10, dusk); the EGA costume is white.
 
-Monkey Island EGA: every room fails with "no PA block" (16-colour image format), so the scanner offers no resources. Existing games: scan hashes (title, version, id, every resource) of all 19 local folders matched before and after the change.
+Monkey Island EGA (first version of this record): every room failed with "no PA block" (16-colour image format), so the scanner offered no resources. Later the same day the EGA strip code was shared with the v3 decoder: `monkey-ega/` shows rooms 10, 33, 34 and Costume 01 (white shirt, 81 rooms, 286 resources). Existing games: scan hashes (title, version, id, every resource) of all 19 local folders matched before and after the change.
 
 ## Indiana Jones and the Last Crusade, 256 colours (`Games/FUTURE/indy3 vga en`)
 

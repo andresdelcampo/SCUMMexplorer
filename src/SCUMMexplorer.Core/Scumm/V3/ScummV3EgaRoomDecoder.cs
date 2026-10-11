@@ -6,7 +6,7 @@ namespace SCUMMexplorer.Core.Scumm;
 public class ScummV3EgaRoomDecoder : IRoomBackgroundDecoder
 {
     // Standard 16-colour DOS EGA palette, stored as 0xAARRGGBB.
-    private static readonly uint[] EgaPalette =
+    internal static readonly uint[] EgaPalette =
     [
         0xFF000000, 0xFF0000AA, 0xFF00AA00, 0xFF00AAAA,
         0xFFAA0000, 0xFFAA00AA, 0xFFAA5500, 0xFFAAAAAA,
@@ -54,41 +54,50 @@ public class ScummV3EgaRoomDecoder : IRoomBackgroundDecoder
             if (relativeOffset < 2 + stripCount * 2 || pos >= imageEnd)
                 throw new InvalidDataException($"Invalid background strip {strip} offset.");
 
-            var x = 0;
-            var y = 0;
-            while (x < 8)
-            {
-                if (pos >= imageEnd) throw new InvalidDataException($"Background strip {strip} is truncated.");
-                var command = data[pos++];
-                var copyPrevious = (command & 0xC0) == 0x80;
-                var alternating = (command & 0xC0) == 0xC0;
-                var run = (command & 0x80) != 0 ? command & 0x3F : command >> 4;
-                if (copyPrevious || alternating) run = command & 0x3F;
-                if (alternating && pos >= imageEnd)
-                    throw new InvalidDataException($"Background strip {strip} is truncated.");
-                var pair = alternating ? data[pos++] : (byte)0;
-                if (run == 0)
-                {
-                    if (pos >= imageEnd) throw new InvalidDataException($"Background strip {strip} is truncated.");
-                    run = data[pos++];
-                }
-                if (run == 0 || run > 8 * height - (x * height + y))
-                    throw new InvalidDataException($"Invalid run in background strip {strip}.");
-
-                for (var z = 0; z < run; z++)
-                {
-                    var absoluteX = strip * 8 + x;
-                    pixels[y * width + absoluteX] = copyPrevious
-                        ? absoluteX > 0 ? pixels[y * width + absoluteX - 1] : (byte)0
-                        : alternating ? (byte)((z & 1) == 0 ? pair >> 4 : pair & 0x0F)
-                        : (byte)(command & 0x0F);
-                    if (++y == height) { y = 0; x++; }
-                }
-            }
+            DecodeStrip(data, pos, imageEnd, pixels, width, height, strip);
         }
 
         var depthMask = DecodeDepthMask(data, imageEnd, roomLength, width, height);
         return new RoomImage(width, height, pixels, EgaPalette) { DepthMask = depthMask };
+    }
+
+    /// <summary>
+    /// One 8-pixel-wide EGA strip, column by column: a command byte is a run of one colour (high nibble count, low nibble colour), a copy of the
+    /// pixel to the left (0x80 and a count) or an alternation of two colours (0xC0, a count and the pair). Also the strip code of the v4 EGA rooms.
+    /// </summary>
+    internal static void DecodeStrip(byte[] data, int pos, int end, byte[] pixels, int width, int height, int strip)
+    {
+        var x = 0;
+        var y = 0;
+        while (x < 8)
+        {
+            if (pos >= end) throw new InvalidDataException($"Background strip {strip} is truncated.");
+            var command = data[pos++];
+            var copyPrevious = (command & 0xC0) == 0x80;
+            var alternating = (command & 0xC0) == 0xC0;
+            var run = (command & 0x80) != 0 ? command & 0x3F : command >> 4;
+            if (copyPrevious || alternating) run = command & 0x3F;
+            if (alternating && pos >= end)
+                throw new InvalidDataException($"Background strip {strip} is truncated.");
+            var pair = alternating ? data[pos++] : (byte)0;
+            if (run == 0)
+            {
+                if (pos >= end) throw new InvalidDataException($"Background strip {strip} is truncated.");
+                run = data[pos++];
+            }
+            if (run == 0 || run > 8 * height - (x * height + y))
+                throw new InvalidDataException($"Invalid run in background strip {strip}.");
+
+            for (var z = 0; z < run; z++)
+            {
+                var absoluteX = strip * 8 + x;
+                pixels[y * width + absoluteX] = copyPrevious
+                    ? absoluteX > 0 ? pixels[y * width + absoluteX - 1] : (byte)0
+                    : alternating ? (byte)((z & 1) == 0 ? pair >> 4 : pair & 0x0F)
+                    : (byte)(command & 0x0F);
+                if (++y == height) { y = 0; x++; }
+            }
+        }
     }
 
     private static RoomDepthMask? DecodeDepthMask(byte[] data, int maskStart, int roomLength, int width, int height)

@@ -54,14 +54,23 @@ public class OtherV4GameTests
     }
 
     [Fact]
-    public void OffersNothingForTheSixteenColourVersionWhenConfigured()
+    public void BrowsesTheSixteenColourVersionWhenConfigured()
     {
         var folder = Environment.GetEnvironmentVariable("SCUMM_MONKEY1_EGA_TEST_ROOT");
         if (string.IsNullOrWhiteSpace(folder)) return;
 
         var game = new GameFolderScanner().Scan(folder);
         Assert.Equal(ScummVersion.V4, game.Version);
-        Assert.Empty(game.Resources);
-        Assert.Null(game.V4Disks);
+        Assert.NotNull(game.V4Disks);
+        Assert.Equal(8, game.V4Disks.Disks.Count);
+        // The rooms have no PA block: the fixed EGA palette (16 colours) and the old-v3 strip code.
+        var rooms = game.Rooms.ToArray();
+        Assert.NotEmpty(rooms);
+        Assert.All(rooms.Where(r => r.ResourceId is 10 or 33 or 34), room =>
+        {
+            var image = game.V4ArchiveFor(room)!.DecodeRoom(room.ResourceId!.Value);
+            Assert.True(image.IsValid);
+            Assert.All(image.Pixels.ToArray(), pixel => Assert.True(pixel < 16));
+        });
     }
 }

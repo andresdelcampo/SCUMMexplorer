@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (last): Monkey Island EGA opens for browsing
+
+- **16-colour v4 rooms:** a room without a `PA` block is read with the fixed EGA palette and the old-v3 EGA strip code (`ScummV3EgaRoomDecoder.DecodeStrip`, now shared; the BM body is a length word, a word offset per strip, the strips). Depth masks are not read. `ReadPalette` falls back to the EGA palette, so the EGA costumes decode too.
+- **Monkey Island EGA** (8 disks, 81 rooms, 286 resources) opens in the real window: Scumm Bar front (room 33) and Guybrush with his white shirt ([record](../.verification/generic-v4/README.md)). Rooms are not compared with ScummVM's rendering yet.
+- **No regression:** the old-v3 EGA decoder was refactored to share the strip routine; the pixels and depth masks of every room of LOOM EGA en/es, the long demo, Indy3 EGA and the Indy3 demo hash identical before and after, and the scan hashes of all other local folders are unchanged. `OtherV4GameTests` now checks the EGA game (8 disks, only colours below 16).
+- Open: depth masks and objects for these games, sound playback, comparison with ScummVM. Guybrush's dark shirt in the VGA costume is the palette of the room that stores the costume (room 10, dusk), not a decoder fault: the EGA costume is white and the Indy VGA costume is right.
+
 ## 11 October (later still): Indiana Jones 256 colours opens for browsing
 
 - **Not v3 as first guessed:** the unencrypted `00.lfl` of `Games/FUTURE/indy3 vga en|es` holds the v4 index blocks (`0R 0S 0C 0N 0O`) and every `NN.lfl` is the content of one room's LF block (RO, SC, SO, CO blocks). `ScummV4Archive.LoadRoomFiles` wraps each room file in an LF header, so the existing readers work unchanged (index offsets count from the start of the room file); `ScummV4Disks.Load` treats that as the single disk.
