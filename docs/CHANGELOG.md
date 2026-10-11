@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: browsed rooms show every row; v1/v2 objects painted
+
+- **Cut bottoms (reported by the user):** the room viewer capped every game except LOOM at 128 rows. Indy3 EGA has rooms of 136 to 200 rows (about 56 of them) and classic Maniac Mansion 136, so their bottoms were cut and their geometry differed. Browsed games now show every row of the picture (`RoomScreenRows`); LOOM keeps 144. Not compared with the bundled ScummVM (the original may crop 136-row Maniac Mansion rooms to 128).
+- **v1/v2 objects** (`ScummOldRoomObjects`, format in SCUMM_RESOURCE_FORMATS): objects visible at the start of the game (state bit 3 from `00.LFL`) are painted over the room in Maniac Mansion and Zak McKracken, classic and enhanced. Checked by rendering Maniac Mansion rooms 1 and 20 in both versions (doors, mailbox, posters, stereo, speakers look right); all rooms of the four games compose without error (13/20/12/23 rooms gain objects). Not yet checked in the real window or against ScummVM. Objects can not be clicked or listed; names, masks and other states are not read.
+
 ## 11 October (late night): SCUMM v5 games open for browsing (Indy 4, Monkey Island 1 CD, Monkey Island 2)
 
 - **Why `monkey1 vga en` showed nothing:** it is the Monkey Island **CD**, SCUMM **v5**: `MONKEY.000`/`.001` inside `ENGLISH/`, `FRENCH/` and so on, with CD audio tracks. The Indy 4 floppy, talkie and CD (`ATLANTIS.000/.001`, also inside `ATLANTIS/` beside two demos) are v5 as well. The scanner knew only v1 to v4 layouts and looked for files at the top level.

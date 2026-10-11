@@ -64,11 +64,16 @@ public sealed class ScummV1RoomDecoder(ScummV1Game game)
     private static byte[] DecodeStream(byte[] data, int start, int size)
     {
         if (start < 0 || start + 4 > data.Length) throw new InvalidDataException("A v1 room stream starts outside the room.");
+        var pos = start + 4;
+        return DecodeCodes(data, ref pos, data.AsSpan(start, 4).ToArray(), size);
+    }
+
+    /// <summary>The codes of a stream whose four common bytes are already known; <paramref name="pos"/> ends after the last code (an object's streams share the first one's common bytes).</summary>
+    internal static byte[] DecodeCodes(byte[] data, ref int pos, byte[] common, int size)
+    {
         var output = new byte[size];
-        var pos = start;
-        var common = data.AsSpan(pos, 4).ToArray();
-        pos += 4;
-        byte Next() => pos < data.Length ? data[pos++] : throw new InvalidDataException("A v1 room stream is truncated.");
+        var at = pos;
+        byte Next() => at < data.Length ? data[at++] : throw new InvalidDataException("A v1 room stream is truncated.");
         var x = 0;
         while (x < size)
         {
@@ -89,8 +94,12 @@ public sealed class ScummV1RoomDecoder(ScummV1Game game)
                 for (var z = 0; z <= run && x < size; z++) output[x++] = Next();
             }
         }
+        pos = at;
         return output;
     }
+
+    /// <summary>The room's 256 character patterns (eight rows of four 2-bit pixels each).</summary>
+    internal static byte[] Characters(byte[] data) => DecodeStream(data, Word(data, 10), 2048);
 
     private static int Word(byte[] data, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(offset, 2));
 }

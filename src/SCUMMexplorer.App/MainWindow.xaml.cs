@@ -624,8 +624,15 @@ public partial class MainWindow : Window
     }
 
     /// <summary>A room of a classic v1 or an enhanced v2 game (XOR-encoded room file), as its background picture.</summary>
-    private static RoomImage DecodeOlderRoom(GameLibrary game, byte[] bytes) =>
-        game is { Version: ScummVersion.V1, V1Game: { } v1 } ? new ScummV1RoomDecoder(v1).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes);
+    private static RoomImage DecodeOlderRoom(GameLibrary game, byte[] bytes)
+    {
+        var background = game is { Version: ScummVersion.V1, V1Game: { } v1 } ? new ScummV1RoomDecoder(v1).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes);
+        // The objects that are visible at the start of the game are painted over the background.
+        var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
+        return ScummOldRoomObjects.ComposeVisible(background, bytes, game.V1Game, states);
+    }
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte[]?> OlderObjectStates = new();
 
     private static BitmapSource RenderRoomCardThumbnail(GameLibrary game, GameResource roomResource,
         ScummIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,

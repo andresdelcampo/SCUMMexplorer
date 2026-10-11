@@ -1,6 +1,6 @@
 # SCUMM resource formats the explorer reads (beyond LOOM and Indy3 EGA)
 
-Version scope is stated on every item. Everything here was checked against ScummVM's `engines/scumm` (resource, room, gfx, costume and palette sources) and against the local game data on 11 October 2026; pictures were checked in the real window (`.verification/generic-v4/README.md`). Only **rooms, costumes and sounds are read** for these games: their scripts, objects and actors are not, so nothing here says what a script does (see [the script reference](SCUMM_SCRIPT_MAP.md) for the scope).
+Version scope is stated on every item. Everything here was checked against ScummVM's `engines/scumm` (resource, room, gfx, costume and palette sources) and against the local game data on 11 October 2026; pictures were checked in the real window (`.verification/generic-v4/README.md`). Only **rooms, costumes and sounds are read** for these games (plus, for v1/v2, the object pictures, below): their scripts and actors are not, so nothing here says what a script does (see [the script reference](SCUMM_SCRIPT_MAP.md) for the scope).
 
 ## Index and container layouts
 
@@ -37,6 +37,10 @@ A v5 sound is not the older SCUMM sound format. `SOUN` > `SOU ` > one card part:
 
 What it would take: a standard-MIDI reader, an iMUSE part model (on/off, volume, pan, transpose, program, pitch-bend range, loops and hooks), the Roland custom instruments as MT-32 system exclusives, and for AdLib an iMUSE AdLib MIDI driver (instrument definitions from the 0x7D 16 messages, voice allocation) on the existing OPL3 chip. The MT-32 half could reuse `ScummMt32Audio` (Munt takes short messages and system exclusives; the ROMs are in `Games/mt32`). Not started.
 
+## Objects of v1 and v2 rooms (`ScummOldRoomObjects`)
+
+Room header byte 20 counts the objects; from byte 28 a word per object to its image (0, or at or past the first object code: none), then a word per object to its code (the same in v1 and v2). Code: word at +4 the global object number, +7 x and +8 (low seven bits) y in units of 8 pixels, +9 width in units of 8, +13 height (multiple of 8), +14 the name offset. The image is the room picture's format at the object's size: **v2** the column-by-column run stream (a dither run copies the pixel to the left on screen); **v1** a tile-character grid read **row by row**, then a colour byte per tile, both streams using the *first* stream's four common bytes, then a mask stream (not read); drawn with the room's characters and colours. ScummVM paints objects from the last down to the second (the first is never drawn), and in these versions only those whose state has bit 3 set; the initial state is the high nibble of the object's byte in `00.LFL` (low nibble: owner, `0xF` = in the room). The explorer paints those objects over the room (checked: Maniac Mansion room 20 posters, stereo, speakers; room 1 doors and mailbox, v1 and v2). Not read: object names/verbs, masks, other states.  
+
 ## Open
 
-Depth masks, objects, scripts, the real actor colours of v1 costumes, v2 and v1 sounds, and a pixel comparison of every picture against ScummVM. v5 sounds (`SOUN` with `ADL`, `ROL`, `SPK` parts), scripts and objects; Monkey Island 1's CD audio tracks; v6 and later.
+Depth masks, object names and states, scripts, the real actor colours of v1 costumes, v2 and v1 sounds, and a pixel comparison of every picture against ScummVM. v5 sounds (`SOUN` with `ADL`, `ROL`, `SPK` parts), scripts and objects; Monkey Island 1's CD audio tracks; v6 and later.
