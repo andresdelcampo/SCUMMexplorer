@@ -58,6 +58,38 @@ if (args.Length > 2 && args[2] == "readiness") // CutsceneStateAudit <folder> <l
     Console.WriteLine($"groups {n}; with state added: {withEdits}; began only with it: {newlyBegun}; {clock.Elapsed.TotalSeconds:F0} s");
     return;
 }
+if (args.Length > 2 && args[2] == "writers") // CutsceneStateAudit <folder> <limit> writers: can the game's own scene that sets each story bit be run from a fresh game (staff held)?
+{
+    var probe = new LoomExplorationSession(game, snapshot);
+    var events = probe.StoryEvents; int sets = 0, objectWriters = 0;
+    foreach (var ev in events)
+    {
+        var w = ev.Scenes.Where(x => x.ObjectId is not null && x.VerbId is not null).ToList();
+        string result = "no object-verb setter";
+        if (w.Count > 0)
+        {
+            objectWriters++;
+            var ok = new List<string>();
+            foreach (var writer in w.Take(3))
+            {
+                try
+                {
+                    var s = new LoomExplorationSession(game, snapshot);
+                    s.VisitRoom(game.Rooms.First(r => r.ResourceId == writer.Room));
+                    LoomCutsceneReadiness.Settle(s); s.UpdateStaffPossession(true);
+                    LoomCutsceneReadiness.Play(s, writer.ObjectId!.Value, writer.VerbId!.Value);
+                    if (s.StoryBit(ev.Key) == true) ok.Add($"R{writer.Room} o{writer.ObjectId} v{writer.VerbId:X2}");
+                }
+                catch (Exception ex) { ok.Add("ERR " + ex.GetType().Name); }
+            }
+            result = ok.Count > 0 ? "sets it from fresh: " + string.Join("; ", ok) : $"{w.Count} object-verb setter(s), none set it from fresh";
+            if (ok.Any(x => !x.StartsWith("ERR"))) sets++;
+        }
+        Console.WriteLine($"{ev.Key}: {result} (all setters: {string.Join(", ", ev.Setters.Select(x => x.Where.Split(" +")[0]).Distinct().Take(4))})");
+    }
+    Console.WriteLine($"story bits {events.Count}; with an object-verb setter {objectWriters}; set by running one from a fresh game {sets}");
+    return;
+}
 var results = new ConcurrentBag<string>();
 int sensitive = 0, total = 0, notBegun = 0;
 var counts = new ConcurrentDictionary<string, int>();
