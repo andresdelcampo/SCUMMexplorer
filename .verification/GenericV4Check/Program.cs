@@ -49,6 +49,14 @@ internal static class Program
                     report.Add($"room {room}: {((TextBlock)window.FindName("StatusText")).ToolTip} | {((TextBlock)window.FindName("ObjectsNote")).Text}");
                     Shot($"room-{room:00}.png");
                 }
+                // Normal mode: the Costumes tab of the catalog, as for LOOM.
+                var tabs = (Panel)window.FindName("NormalCatalogTabs");
+                report.Add($"costume tabs visible: {tabs.Visibility}");
+                Call("NormalCatalogTab_Click", window.FindName("CostumesTab")!, new RoutedEventArgs());
+                await Task.Delay(5000);
+                var cards = (Panel)window.FindName("CostumeCardList");
+                report.Add($"costume cards: {cards.Children.Count}");
+                Shot("costume-cards.png");
                 var costume = game.Resources.First(r => r.Kind == ResourceKind.Costume);
                 Call("SelectResourceInTree", costume);
                 await Task.Delay(1500);

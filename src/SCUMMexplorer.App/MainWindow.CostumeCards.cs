@@ -12,6 +12,9 @@ public partial class MainWindow
     private CancellationTokenSource? _costumeCardCancellation;
     private bool _showCostumeCards;
 
+    /// <summary>The Costumes tab of the normal view: both LOOM games, and the v4 games that are only browsed.</summary>
+    private static bool HasCostumeCards(GameLibrary? game) => game is { Id: GameId.Loom or GameId.LoomVga } || game?.V4Disks is not null;
+
     private void NormalCatalogTab_Click(object sender, RoutedEventArgs e)
     {
         _showCostumeCards = ReferenceEquals(sender, CostumesTab);
@@ -21,7 +24,7 @@ public partial class MainWindow
     private void UpdateNormalCatalog(bool advanced)
     {
         bool visible = _game is not null && !advanced;
-        bool costumes = _game?.Id is GameId.Loom or GameId.LoomVga;
+        bool costumes = HasCostumeCards(_game);
         NormalCatalogTabs.Visibility = visible && costumes ? Visibility.Visible : Visibility.Collapsed;
         if (!costumes) _showCostumeCards = false;
         RoomsTab.IsChecked = !_showCostumeCards;
@@ -36,7 +39,7 @@ public partial class MainWindow
         var cancellation = _costumeCardCancellation = new CancellationTokenSource();
         _showCostumeCards = false;
         CostumeCardList.Children.Clear();
-        if (game.Id is not (GameId.Loom or GameId.LoomVga)) return;
+        if (!HasCostumeCards(game)) return;
         var resources = game.Resources.Where(r => r.Kind == ResourceKind.Costume).ToArray();
         foreach (var resource in resources)
         {

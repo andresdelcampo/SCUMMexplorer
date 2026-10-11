@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (last, costume tab): costumes in the normal view of the browsed v4 games
+
+- The Rooms | Costumes tabs of the normal catalog (as for LOOM) now also appear for the browsed v4 games (`HasCostumeCards`): Monkey VGA 115 cards with pictures, via the disk archive. The Games folder was reorganised meanwhile (`Games/FUTURE/monkey1 vga es`, `monkey1 ega es`; the same data).
+
 ## 11 October (last, sounds): sounds play for the browsed v4 games; room cards load by themselves
 
 - **Room cards:** the thumbnail loader read `FilePath` as a file for these games, so every card failed until its room was clicked (only the clicked room's card filled in). It now decodes through the disk's archive (`RenderRoomCardThumbnail`), so the picker fills in on open.
