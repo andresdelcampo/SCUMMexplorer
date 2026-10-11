@@ -58,7 +58,8 @@ internal static class Program
                 var cards = (Panel)window.FindName("CostumeCardList");
                 report.Add($"costume cards: {cards.Children.Count}");
                 Shot("costume-cards.png");
-                var costume = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Costume);
+                var wanted = int.TryParse(Environment.GetEnvironmentVariable("GV4_COSTUME"), out var wantedId) ? wantedId : (int?)null;
+                var costume = game.Resources.FirstOrDefault(r => r.Kind == ResourceKind.Costume && (wanted is null || r.ResourceId == wanted));
                 if (costume is null) { report.Add("no costumes offered"); }
                 else {
                 Call("SelectResourceInTree", costume);

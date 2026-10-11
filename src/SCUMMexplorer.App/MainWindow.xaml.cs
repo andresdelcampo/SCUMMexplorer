@@ -408,7 +408,7 @@ public partial class MainWindow : Window
         })
         {
             if (game.Id != GameId.Loom && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
-                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && !(game.Version == ScummVersion.V2 && kind == ResourceKind.Costume) && kind != ResourceKind.Executable) continue;
+                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind == ResourceKind.Costume) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -2175,7 +2175,7 @@ public partial class MainWindow : Window
                 }
                 return;
             }
-            if (_game is not ({ Id: GameId.Loom, Version: ScummVersion.V3 } or { Version: ScummVersion.V2 }) || resource.Offset is not int resourceOffset)
+            if (_game is not ({ Id: GameId.Loom, Version: ScummVersion.V3 } or { Version: ScummVersion.V1 or ScummVersion.V2 }) || resource.Offset is not int resourceOffset)
                 throw new NotSupportedException("This costume has no supported DOS LOOM resource offset.");
 
             var container = LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath));
@@ -2186,7 +2186,7 @@ public partial class MainWindow : Window
             {
                 try
                 {
-                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index);
+                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index, _game!.V1Game, resource.ResourceId ?? 0);
                     if (pose is null) continue;
                     CostumePoseGallery.Children.Add(CreateCostumePoseCard(slot.Index, pose));
                     availableCount++;

@@ -56,6 +56,9 @@ public sealed class ScummV4Archive
     private readonly Dictionary<int, ScummV4Room> _rooms;
     private readonly Dictionary<int, byte[]> _charsets = [];
 
+    /// <summary>The per-room-file layout (Indiana Jones 256 colours) stores a costume pose's limb commands as bytes, not words (see <see cref="ScummV4CostumeRenderer.DecodePose"/>).</summary>
+    private bool _byteCostumeCommands;
+
     private ScummV4Archive(byte[] lec, byte[] index, IReadOnlyList<ScummV4Room> rooms)
     {
         _lec = lec;
@@ -148,7 +151,7 @@ public sealed class ScummV4Archive
             rooms.Add(new ScummV4Room(number, "", start, 8 + file.Length));
         }
         if (rooms.Count == 0) throw new InvalidDataException("No room file starts with an RO block.");
-        return new ScummV4Archive(all.ToArray(), index, rooms);
+        return new ScummV4Archive(all.ToArray(), index, rooms) { _byteCostumeCommands = true };
     }
 
     /// <summary>Charset 1 to 4 (<c>901.LFL</c> to <c>904.LFL</c>), or null when the disc has no such file.</summary>
@@ -419,7 +422,7 @@ public sealed class ScummV4Archive
         {
             try
             {
-                if (ScummV4CostumeRenderer.DecodePose(costume.Body, pose, palette) is { } image) poses.Add((pose, image));
+                if (ScummV4CostumeRenderer.DecodePose(costume.Body, pose, palette, _byteCostumeCommands) is { } image) poses.Add((pose, image));
             }
             catch (InvalidDataException) { }
         }

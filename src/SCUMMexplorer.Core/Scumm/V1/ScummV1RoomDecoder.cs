@@ -14,6 +14,9 @@ public sealed class ScummV1RoomDecoder(ScummV1Game game)
     private static readonly byte[] ManiacMansionColors = [0x00, 0x0F, 0x04, 0x03, 0x05, 0x02, 0x01, 0x0E, 0x0C, 0x06, 0x0C, 0x08, 0x07, 0x0A, 0x09, 0x08];
     private static readonly byte[] ZakColors = [0x00, 0x0F, 0x04, 0x03, 0x05, 0x02, 0x01, 0x0E, 0x0C, 0x06, 0x0D, 0x08, 0x07, 0x0A, 0x09, 0x07];
 
+    /// <summary>The game's table from C64 colour numbers to EGA colours (ScummVM <c>v1ColorMaps</c>, EGA rows).</summary>
+    internal static byte[] EgaColors(ScummV1Game game) => game == ScummV1Game.ZakMcKracken ? ZakColors : ManiacMansionColors;
+
     public RoomImage Decode(ReadOnlySpan<byte> encoded)
     {
         if (encoded.Length < 22) throw new InvalidDataException("The v1 room is too short.");

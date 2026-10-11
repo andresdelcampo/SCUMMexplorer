@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (night): classic v1 costumes
+
+- **Format 0x57** read by the existing `ScummV3CostumeReader` and `ScummCostumeRenderer` (`DecodeClassicV1Pose`, ScummVM `ClassicCostumeLoader` + `byleRLEDecode_C64`): 2-bit pixels in 8-pixel columns, skin / suit / black through the game's C64-to-EGA table. The Costumes tab now shows for Maniac Mansion Classic (23 costumes) and Zak McKracken Classic (35). Colours are an **estimate**: the real actor colours come from scripts (Maniac's actor tables with the costume number as actor, a fixed blue for Zak).
+- Empty or unreadable costume entries (Costume 00) are no longer listed for v1 and v2 games.
+- Pictures checked in the real window (`mm-classic`, `zak-classic`); no ScummVM comparison.
+- **Fix, reported by the user: two heads in Indy3 256-colour costumes** (Costume 11, poses 08 and 09, and others). The v4 costume renderer had been written for LOOM CD, where a pose stores each limb's command index as a **word**; the 256-colour Indy (version 3 in ScummVM) stores a **byte**, and codes from 0x79 up draw nothing. Reading words misaligned the pose and picked wrong cels. `ScummV4CostumeRenderer.DecodePose(..., byteCommands)` is set for the per-room-file layout only; LOOM CD is untouched. Guarded by a check that costume 11 decodes 30 or more poses.
+
 ## 11 October (end of day): Maniac Mansion and Zak McKracken, enhanced (v2) and classic (v1), open for browsing
 
 - **Enhanced v2** (`Games/FUTURE/mmansionE ega es`, `zakE ega en`): the old-v3 index with **one byte per object** (`LflIndexReader.DetectObjectEntryBytes`: the layout whose four directories end exactly at the end of the file), `GameLibrary.Version` = `V2`. Rooms are one run-length stream per picture (`ScummV2RoomDecoder`, ScummVM `GdiV2`; dither runs repeat the column to the left). Costumes use the old-v3 reader unchanged. Rooms whose picture does not decode (room 0 is the index file) are left out. Maniac: 54 rooms, 24 costumes; Zak: 58 rooms, 39 costumes (Costume 00 of Zak is an empty entry that says so).

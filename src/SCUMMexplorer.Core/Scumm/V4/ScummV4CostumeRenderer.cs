@@ -30,7 +30,11 @@ public static class ScummV4CostumeRenderer
         return poses;
     }
 
-    public static RoomImage? DecodePose(ReadOnlySpan<byte> body, int animationIndex, IReadOnlyList<uint> roomPalette)
+    /// <summary>
+    /// A stored pose. <paramref name="byteCommands"/> is for the older 256-colour games (Indiana Jones, which ScummVM treats as version 3): a limb's command index is one
+    /// byte (0xFF: none) instead of a word, and a command code from 0x79 up draws nothing. LOOM CD (version 4) stores words.
+    /// </summary>
+    public static RoomImage? DecodePose(ReadOnlySpan<byte> body, int animationIndex, IReadOnlyList<uint> roomPalette, bool byteCommands = false)
     {
         if (body.Length < AnimationTable) throw new InvalidDataException("The costume is too short.");
         var format = body[1] & 0x7F;
@@ -49,14 +53,23 @@ public static class ScummV4CostumeRenderer
         for (var limb = 0; limb < 16; limb++)
         {
             if ((mask & (0x8000 >> limb)) == 0) continue;
-            var commandIndex = ReadWord(body, cursor);
-            cursor += 2;
-            if (commandIndex == 0xFFFF) continue;
+            int commandIndex;
+            if (byteCommands)
+            {
+                commandIndex = Byte(body, cursor++);
+                if (commandIndex == 0xFF) continue;
+            }
+            else
+            {
+                commandIndex = ReadWord(body, cursor);
+                cursor += 2;
+                if (commandIndex == 0xFFFF) continue;
+            }
             cursor++; // the length and loop flag belong to playback
             var command = Byte(body, commands + commandIndex);
             if (command is 0x79 or 0x7A) continue;
             var celCode = command & 0x7F;
-            if (celCode == 0x7B) continue;
+            if (celCode == 0x7B || byteCommands && celCode >= 0x79) continue;
             var frameTable = ReadWord(body, LimbTable + limb * 2) - BaseShift;
             var celOffset = ReadWord(body, frameTable + celCode * 2) - BaseShift;
             var width = ReadWord(body, celOffset);

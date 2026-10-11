@@ -58,6 +58,9 @@ public class OtherV4GameTests
         // The sounds sit in a second SO block inside the first; the parts are found through it.
         var sounds = disk.ReadSounds();
         Assert.Equal(73, sounds.Count);
+        // The limb commands of these costumes are bytes (LOOM CD stores words): read as words the side-walking poses of the guard (costume 11) drew a second head.
+        var guard = disk.FindCostume(11);
+        if (guard is not null) Assert.True(disk.DecodeCostumePoses(guard).Count >= 30);
         Assert.All(sounds, sound => Assert.NotNull(sound.Adlib));
     }
 
@@ -109,7 +112,7 @@ public class OtherV4GameTests
     [Fact]
     public void BrowsesAClassicV1GameWhenConfigured()
     {
-        // Maniac Mansion or Zak McKracken: the fixed-size index and the tile rooms; costumes (format 0x57) are not offered yet.
+        // Maniac Mansion or Zak McKracken: the fixed-size index, the tile rooms and the 0x57 costumes.
         var folder = Environment.GetEnvironmentVariable("SCUMM_V1_CLASSIC_TEST_ROOT");
         if (string.IsNullOrWhiteSpace(folder)) return;
 
@@ -126,6 +129,17 @@ public class OtherV4GameTests
             Assert.True(image.IsValid);
             Assert.All(image.Pixels.ToArray(), pixel => Assert.True(pixel < 16));
         });
-        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Costume or ResourceKind.Script or ResourceKind.Sound);
+        // The classic costumes (format 0x57) are drawn in the colours of the actor the explorer assumes; every offered costume has a picture.
+        var costumes = game.Resources.Where(r => r.Kind == ResourceKind.Costume).ToArray();
+        Assert.NotEmpty(costumes);
+        var reader = new ScummV3CostumeReader();
+        var renderer = new ScummCostumeRenderer();
+        Assert.All(costumes, costume =>
+        {
+            var container = LflEncoding.DecodeXorFF(File.ReadAllBytes(costume.FilePath));
+            var slots = reader.Decode(container, costume.Offset!.Value).AnimationSlots.Where(s => s.HasData);
+            Assert.Contains(slots, slot => renderer.DecodePose(container, costume.Offset.Value, slot.Index, game.V1Game, costume.ResourceId ?? 0) is not null);
+        });
+        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Script or ResourceKind.Sound);
     }
 }

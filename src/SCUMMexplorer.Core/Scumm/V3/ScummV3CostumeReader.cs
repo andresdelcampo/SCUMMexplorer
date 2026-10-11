@@ -28,7 +28,11 @@ public sealed class ScummV3CostumeReader
             throw new InvalidDataException("The costume offset is outside its LFL container.");
 
         var resourceLength = ReadWord(decodedContainer, resourceOffset);
-        if (resourceLength < AnimationDataOffsetsStart || resourceLength > decodedContainer.Length - resourceOffset)
+        if (resourceLength > decodedContainer.Length - resourceOffset)
+            throw new InvalidDataException("The costume resource length is invalid.");
+        if (resourceLength >= 6 && (decodedContainer[resourceOffset + 5] & 0x7F) == 0x57)
+            return DecodeClassicV1(decodedContainer.Slice(resourceOffset, resourceLength), resourceLength);
+        if (resourceLength < AnimationDataOffsetsStart)
             throw new InvalidDataException("The costume resource length is invalid.");
 
         var resource = decodedContainer.Slice(resourceOffset, resourceLength);
@@ -75,6 +79,37 @@ public sealed class ScummV3CostumeReader
 
         return new ScummCostumeSummary(resourceLength, animationIndexLimit, format,
             (formatAndFlags & 0x80) != 0, paletteMappingIndex, animationCommandOffset, slots);
+    }
+
+    /// <summary>
+    /// The classic v1 costume (format 0x57, ScummVM's <c>ClassicCostumeLoader</c> with <c>_baseptr</c> four bytes into the resource): the animation count at byte 4,
+    /// the animation commands at byte 4 + the word at 6, one word per limb from byte 8 (frame tables), one word per animation from byte 24; an animation is a
+    /// limb mask byte (limb 0 is the high bit) then, per limb, a command index and a duration byte (command index 0xFF: no limb).
+    /// </summary>
+    private static ScummCostumeSummary DecodeClassicV1(ReadOnlySpan<byte> resource, int resourceLength)
+    {
+        const int animationStart = 24;
+        var animationIndexLimit = resource[4];
+        var animationCommandOffset = 4 + ReadWord(resource, 6);
+        if (animationCommandOffset >= resourceLength || animationStart + (animationIndexLimit + 1) * 2 > resourceLength)
+            throw new InvalidDataException("The classic costume's tables are outside the resource.");
+        var slots = new List<ScummCostumeAnimationSlot>(animationIndexLimit + 1);
+        for (var index = 0; index <= animationIndexLimit; index++)
+        {
+            var relative = ReadWord(resource, animationStart + index * 2);
+            var offset = 4 + relative;
+            if (relative == 0 || offset >= resourceLength)
+            {
+                slots.Add(new ScummCostumeAnimationSlot(index, 0, [], false));
+                continue;
+            }
+            var limbMask = (ushort)(resource[offset] << 8);
+            var limbs = new List<int>();
+            for (var limb = 0; limb < 8; limb++)
+                if ((limbMask & (0x8000 >> limb)) != 0) limbs.Add(limb);
+            slots.Add(new ScummCostumeAnimationSlot(index, limbMask, limbs, true));
+        }
+        return new ScummCostumeSummary(resourceLength, animationIndexLimit, 0x57, (resource[5] & 0x80) != 0, 0, animationCommandOffset, slots);
     }
 
     private static ushort ReadWord(ReadOnlySpan<byte> data, int offset) =>

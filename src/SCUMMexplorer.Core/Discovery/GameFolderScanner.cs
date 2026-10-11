@@ -91,15 +91,15 @@ public sealed class GameFolderScanner
                     {
                         foreach (var indexed in isV1 ? classic!.Resources : new LflIndexReader().Read(item.Path, objectEntryBytes == 1 ? 1 : 4))
                         {
-                            // Of a v1 or enhanced v2 game only the rooms and costumes (v2 only) are offered: its scripts and sounds are other formats, not read yet.
+                            // Of a v1 or enhanced v2 game only the rooms and costumes are offered: its scripts and sounds are other formats, not read yet.
                             if (isOlder && indexed.Kind is ResourceKind.Script or ResourceKind.Sound) continue;
-                            // The classic costumes (format 0x57) are drawn per actor in 8-pixel limbs: another renderer, not written yet.
-                            if (isV1 && indexed.Kind == ResourceKind.Costume) continue;
                             var fileName = $"{indexed.ContainerFileNumber:00}.LFL";
                             var resourcePath = Path.Combine(fullPath, fileName);
                             if (indexed.Kind == ResourceKind.Room && !File.Exists(resourcePath)) continue;
                             // An enhanced v2 game's room directory also points at room 0, which is the index file itself: only a room whose picture decodes is offered.
                             if (isOlder && indexed.Kind == ResourceKind.Room && !DecodesAsOlderRoom(resourcePath, classic?.Game)) continue;
+                            // Likewise a costume entry that is empty or points at nothing (Costume 00) is left out.
+                            if (isOlder && indexed.Kind == ResourceKind.Costume && !ReadsAsOlderCostume(resourcePath, indexed.Offset)) continue;
                             // A demo's index is not a subset of the full game's: it keeps entries for resources its
                             // folder lacks (no container file) or whose offset is not where a resource starts.
                             if (isDemo && indexed.Kind != ResourceKind.Room && !StartsResource(chains, resourcePath, indexed.Offset))
@@ -167,7 +167,7 @@ public sealed class GameFolderScanner
             GameId.IndianaJones3 =>
                 "Indiana Jones and the Last Crusade files found. The SCUMM version is not confirmed because no supported old-v3 index was parsed.",
             _ when isV1 =>
-                "A classic SCUMM v1 game (fixed-size index in 00.LFL): room backgrounds are shown; costumes, objects, scripts and sounds are not read for this game yet.",
+                "A classic SCUMM v1 game (fixed-size index in 00.LFL): room backgrounds and costumes are shown; objects, scripts and sounds are not read for this game yet.",
             _ when indexWasParsed && isV2 =>
                 "An enhanced SCUMM v2 game (the 00.LFL index lists one byte per object): room backgrounds and costumes are shown; objects, scripts and sounds are not read for this game yet.",
             _ when indexWasParsed =>
@@ -325,6 +325,12 @@ public sealed class GameFolderScanner
                 foreach (var script in shared.Where(r => r.Kind == ResourceKind.Script)) drop.Add(script);
         resources.RemoveAll(drop.Contains);
         return drop.Count;
+    }
+
+    private static bool ReadsAsOlderCostume(string path, int offset)
+    {
+        try { return new ScummV3CostumeReader().Decode(LflEncoding.DecodeXorFF(File.ReadAllBytes(path)), offset).AnimationSlots.Any(slot => slot.HasData); }
+        catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException or UnauthorizedAccessException or ArgumentException) { return false; }
     }
 
     private static bool DecodesAsOlderRoom(string path, ScummV1Game? v1Game)
