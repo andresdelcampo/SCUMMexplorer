@@ -10,6 +10,7 @@ Exe/
 [Oo]bj/
 
 # IDE and user files
+.rtk/
 .idea/
 .vs/
 .vscode/
