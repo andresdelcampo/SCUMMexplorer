@@ -63,7 +63,9 @@ public sealed partial class LoomGlossary
         // (its script 045 directs the preview), so those numbers are not named there; variables and rooms are kept.
         var demo = game is { IsDemo: true };
         var cd = game?.Id == GameId.LoomVga;
-        foreach (var row in file.Entries.Where(row => cd ? row.Kind == "var" && row.Evidence == "engine"
+        // Only LOOM EGA's own names are shared by the EGA editions; any other game (LOOM CD, Indy3, the browsed games) keeps just the engine variables.
+        var engineOnly = game is not null && game.Id != GameId.Loom;
+        foreach (var row in file.Entries.Where(row => engineOnly ? row.Kind == "var" && row.Evidence == "engine"
             : !demo || row.Kind is not ("script" or "bit" or "actor" or "sound")))
         {
             var from = ParseNumber(row.Key);

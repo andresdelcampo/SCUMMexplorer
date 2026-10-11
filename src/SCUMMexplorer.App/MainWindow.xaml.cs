@@ -251,7 +251,7 @@ public partial class MainWindow : Window
             ? _stateReader.ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"))
             : null;
         _game = game;
-        _glossary = game.Id is GameId.Loom or GameId.LoomVga ? LoomGlossary.Load(game) : LoomGlossary.Default;
+        _glossary = LoomGlossary.Load(game);
         _usageIndex = LoomUsageIndex.Empty;
         if (game.Id is GameId.Loom or GameId.LoomVga) _ = BuildUsageIndexAsync(game);
         _replayCatalog = LoomReplayCatalog.Load(game);
