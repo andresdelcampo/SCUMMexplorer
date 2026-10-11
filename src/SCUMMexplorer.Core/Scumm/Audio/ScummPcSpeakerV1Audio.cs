@@ -33,6 +33,14 @@ public sealed class ScummPcSpeakerV1Audio
     public static bool IsV2Format(byte[] data) =>
         data.Length >= 12 && BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(6, 2)) == 22 && data[8] == 0 && data[9] == 0 && data[10] == 0 && data[11] == 0;
 
+    /// <summary>The header of this format: three zero bytes after the priority byte and a known type for the first chunk.</summary>
+    public static bool LooksLikeV1(byte[] data)
+    {
+        if (data.Length < 12 || data[7] != 0 || data[8] != 0 || data[9] != 0) return false;
+        var type = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(10, 2));
+        return type <= 3 || type >= 0xFFFC;
+    }
+
     /// <summary>Renders a sound of either format (Zak McKracken and the enhanced games use the v2 player's, classic Maniac Mansion this one's).</summary>
     public static byte[] RenderOlder(GameResource resource, ScummPcSpeakerAudio v2Player, CancellationToken cancellationToken = default)
     {

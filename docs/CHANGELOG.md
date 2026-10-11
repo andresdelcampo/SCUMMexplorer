@@ -4,7 +4,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 
 ## 12 October: PC speaker sounds of Zak McKracken and the enhanced Maniac Mansion
 
-- The v1/v2 sound entries that have the v2 player's format (the same as LOOM's old bundle) are now listed and play through the existing PC speaker renderer: Zak McKracken classic (110), Zak McKracken Enhanced (112), Maniac Mansion Enhanced (59). AdLib and Roland are refused with a message (these games have PC speaker only). Classic Maniac Mansion uses ScummVM's `Player_V1` chunk format, now ported (`ScummPcSpeakerV1Audio`, from `player_v1.cpp` and the square generator of `player_v2.cpp`, fetched 12 October with the user's approval): 49 sounds list and render (effects of a few ms up to an 84 s tune; looping ones stop at three minutes). All listed sounds render; none listened to in the window yet.
+- The v1/v2 sound entries that have the v2 player's format (the same as LOOM's old bundle) are now listed and play through the existing PC speaker renderer: Zak McKracken classic (110), Zak McKracken Enhanced (112), Maniac Mansion Enhanced (59). AdLib and Roland are refused with a message (these games have PC speaker only). Classic Maniac Mansion uses ScummVM's `Player_V1` chunk format, now ported (`ScummPcSpeakerV1Audio`, from `player_v1.cpp` and the square generator of `player_v2.cpp`, fetched 12 October with the user's approval): 61 sounds list and render (effects of a few ms up to an 84 s tune; looping ones stop at three minutes). All listed sounds render; none listened to in the window yet.
 
 ## 12 October: browsed rooms show every row; v1/v2 objects painted
 

@@ -352,8 +352,8 @@ public sealed class GameFolderScanner
             if (size < 12 || offset + size > data.Length) return false;
             var sound = data.AsSpan(offset, size).ToArray();
             if (ScummPcSpeakerV1Audio.IsV2Format(sound)) return size >= 22;
-            // Classic Maniac Mansion's own chunk format: it ends with the 0xFFFF chunk and plays at least one note.
-            return sound[size - 2] == 0xFF && sound[size - 1] == 0xFF && ScummPcSpeakerV1Audio.HasNotes(sound);
+            // Classic Maniac Mansion's own chunk format: zero bytes after the priority, a known first chunk, and at least one note.
+            return ScummPcSpeakerV1Audio.LooksLikeV1(sound) && ScummPcSpeakerV1Audio.HasNotes(sound);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return false; }
     }
