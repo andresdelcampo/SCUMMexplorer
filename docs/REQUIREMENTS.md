@@ -391,4 +391,4 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 ## 17. Out of scope (today)
 
-Indy3 object art, scripts, sounds and gameplay; objects, scripts, depth masks and interaction of every browsed game; v1/v2 sounds and the real actor colours of v1 costumes; v5 sounds, scripts and objects, Monkey Island 1's CD audio tracks, and games after v5 (v6 and later: Day of the Tentacle and on); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`.
+Indy3 object art, scripts, sounds and gameplay; objects, scripts, depth masks and interaction of every browsed game; v1/v2 sounds and the real actor colours of v1 costumes; v5 sounds (a large feature, surveyed in the resource-format reference), scripts and objects, Monkey Island 1's CD audio tracks, and games after v5 (v6 and later: Day of the Tentacle and on); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`.
