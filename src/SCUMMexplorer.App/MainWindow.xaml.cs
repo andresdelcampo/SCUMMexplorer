@@ -2691,6 +2691,9 @@ public partial class MainWindow : Window
     private const int CdCueIdBase = 1000;
     private bool IsCdCue(GameResource resource) => _game?.V4Archive is not null && resource.ResourceId >= CdCueIdBase;
 
+    /// <summary>A whole red-book track of a game disc (Monkey Island), which the player reads straight from the image.</summary>
+    private bool IsCdTrack(GameResource resource) => _game?.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId >= GameLibrary.CdTrackIdBase;
+
     private async Task ShowAudio(GameResource resource, bool preserveFormat = false, bool autoPlay = false)
     {
         StopAudio();
@@ -2701,7 +2704,7 @@ public partial class MainWindow : Window
         RoomObjectPanel.Visibility = Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, 2);
         _selectedSound = resource;
-        var cdCue = IsCdCue(resource);
+        var cdCue = IsCdCue(resource) || IsCdTrack(resource);
         var adlib = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
         var roland = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
         var format = cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : "PC speaker";
@@ -2743,7 +2746,7 @@ public partial class MainWindow : Window
         var token = _audioCancellation.Token;
         try
         {
-            var wave = cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
+            var wave = IsCdTrack(resource) ? await Task.Run(() => ReadCdTrackWave(resource), token) : cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
             if (token.IsCancellationRequested) return;
             _adlibBaseWave = adlib ? wave : null;
             if (adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, AdlibGainSlider.Value);
@@ -2778,6 +2781,13 @@ public partial class MainWindow : Window
             _audioTimeNote = AudioTime.Text = "No playable audio";
             StatusText.Text = $"{resource.Name} · playback unavailable";
         }
+    }
+
+    private byte[] ReadCdTrackWave(GameResource resource)
+    {
+        var wave = _game!.AudioDisc!.ReadTrackWave(resource.ResourceId!.Value - GameLibrary.CdTrackIdBase);
+        if (wave.Length <= 44) throw new InvalidDataException("The disc holds no audio for this track.");
+        return wave;
     }
 
     /// <summary>The cue's stretch of the disc's audio track, as the voice player would play it (the real recording, not a rendition).</summary>

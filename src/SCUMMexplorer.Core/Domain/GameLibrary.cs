@@ -66,6 +66,12 @@ public sealed record GameLibrary(
     /// <summary>The disks of a v4 game that is only browsed (rooms, costumes, sounds; not LOOM CD); null for every other game.</summary>
     public ScummV4Disks? V4Disks { get; init; }
 
+    /// <summary>The disc image of a game read from a .cue/.bin, when it carries CD audio tracks that are listed as sounds (see <see cref="CdTrackIdBase"/>); null for every other game.</summary>
+    public DiscImage? AudioDisc { get; init; }
+
+    /// <summary>The resource number of CD audio track <c>n</c> is <c>CdTrackIdBase + n</c>.</summary>
+    public const int CdTrackIdBase = 2000;
+
     /// <summary>Which classic (v1) game this is (it picks the colour table of its rooms); null for every other game.</summary>
     public ScummV1Game? V1Game { get; init; }
 

@@ -286,6 +286,12 @@ public sealed class GameFolderScanner
                 resources.Add(new GameResource($"Sound {sound.Id:00}", ResourceKind.Sound, source.Location, sound.Id,
                     $"{(sound.IsMusic ? "Music" : "Sound effect")} stored in room {sound.Room:00} on {diskName}.", disk, null));
         }
+        // A game on a disc image: the red-book audio tracks the cue sheet names (Monkey Island's music), played by the scripts through the CD drive.
+        var disc = source is DiscFileSource discSource && discSource.Image.AudioTracks.Count > 0 ? discSource.Image : null;
+        if (disc is not null)
+            foreach (var track in disc.AudioTracks)
+                resources.Add(new GameResource($"CD audio track {track.Number:00}", ResourceKind.Sound, source.Location, GameLibrary.CdTrackIdBase + track.Number,
+                    $"Track {track.Number} of the disc, {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}.", null, null));
         var layout = v5 is not null ? $"a SCUMM v5 index and resource file ({v5.Stem}.000 and .001)" : perRoomFiles ? "one file per room (00.LFL and NN.LFL)" : $"{disks.Disks.Count} disks (000.LFL and DISK01.LEC to DISK{disks.Disks.Count:00}.LEC)";
         if (!resources.Any(r => r.Kind == ResourceKind.Room))
             return new GameLibrary(title, source.Location, v5 is null ? ScummVersion.V4 : ScummVersion.V5, v5 is null ? "DOS (SCUMM v4)" : "DOS (SCUMM v5)", [],
@@ -294,7 +300,7 @@ public sealed class GameFolderScanner
         return new GameLibrary(title, source.Location, v5 is null ? ScummVersion.V4 : ScummVersion.V5, v5 is null ? "DOS (SCUMM v4)" : "DOS (SCUMM v5)", ordered,
             $"A SCUMM {(v5 is null ? "v4" : "v5")} game that is not LOOM CD, read from {layout}. Room backgrounds and costumes are shown" +
             (withoutPicture > 0 ? $" ({withoutPicture} room entries without a picture are left out)" : "") +
-            "; objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks };
+            "; objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks, AudioDisc = disc };
     }
 
     /// <summary>

@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: Monkey Island CD audio tracks
+
+- A game read from a `.cue`/`.bin` now lists the disc's red-book tracks as sounds (`CD audio track NN`, with the length) and plays them straight from the image, as LOOM CD's cues are played. `DiscImage.AudioTracks` reads every `TRACK`/`INDEX` of the cue (a track runs from its INDEX 01 to the next track's INDEX 00, else INDEX 01; the last to the end of the file; `PREGAP` is not in the file). Monkey Island 1 CD: tracks 2 to 25, 24 tracks of 1:55 to 2:35, 46.6 minutes; the second track's wave reads and is not silent. LOOM CD is unchanged (its single track is still read by cue, 30 sounds, the 57 disc, cue and scan tests pass). Which track a script starts (the original's `startMusic` maps sounds to tracks) is not read, so the tracks carry no names. Not listened to in the window.
+
 ## 12 October: Game Texts for Monkey Island (browsed v4 games)
 
 - The Game Texts window (Advanced) now opens for browsed v4 games that use the v4 script dialect (Monkey Island EGA and VGA). `LoomTextExtractor` reads every disk's script and object blocks as it does the CD's, with the disk number as the container. Monkey Island EGA: 4,194 texts (2,960 spoken lines, 605 verb labels, 535 object names, 94 stored lines) from 2,041 decode ranges, 61 with an undecoded path (3%); real lines such as "You beat the Sword Master." Speakers keep the extractor's label ("Actor 5", "Ego"); LOOM's speaker names apply only to LOOM. The room picture in the window comes from the game's own archive.
