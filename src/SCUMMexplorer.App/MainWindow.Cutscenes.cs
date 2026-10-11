@@ -188,7 +188,9 @@ public partial class MainWindow
     /// <summary>Counts one finished step; the note and bar under the room are refreshed on the UI thread (throttled by the dispatcher's background priority).</summary>
     private void CountScanStep(object owner)
     {
-        Interlocked.Increment(ref _scanDone);
+        // A run for a game that was replaced (or reopened) keeps going in the background; its steps must not count into the new run's bar.
+        if (!ReferenceEquals(_cdSetupPlanner, owner)) return;
+        if (Interlocked.Increment(ref _scanDone) > _scanTotal && _scanTotal > 0) Interlocked.Exchange(ref _scanDone, _scanTotal);
         Dispatcher.BeginInvoke(DispatcherPriority.Background, () => { if (ReferenceEquals(_cdSetupPlanner, owner)) UpdateScanProgress(); });
     }
 

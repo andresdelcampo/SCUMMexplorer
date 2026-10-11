@@ -40,9 +40,9 @@ internal static class Program
                 Console.WriteLine("scanned=" + Prop("ScannedCutscenes"));
                 await Select(2);
                 await Select(1);
-                Console.WriteLine(State("room 1 mid-scan"));
-                Call("RoomCutscene_Click", window, new RoutedEventArgs());
-                for (var i = 0; i < 4; i++) { await Task.Delay(2000); window.UpdateLayout(); Console.WriteLine(State($"after click +{(i + 1) * 2}s")); }
+                var max = 0;
+                for (var i = 0; i < 600; i++) { await Task.Delay(1000); max = Math.Max(max, (int)Field("_scanDone")!); if (!(bool)Prop("ScanRunning")! && (bool)Field("_cdRoomListsDone")! && (int)Field("_scanTotal")! > 0) break; }
+                Console.WriteLine($"final done={Field("_scanDone")} total={Field("_scanTotal")} maxDone={max} listsDone={Field("_cdRoomListsDone")}");
             }
             catch (Exception ex) { Console.WriteLine("FAILED: " + ex); }
             app.Shutdown();
