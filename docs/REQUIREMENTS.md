@@ -159,6 +159,7 @@ Top level order and header format are exact: **label, two spaces, count in paren
 | R-6.11 | APP | The right panel (Advanced) sections, in order: `DOORWAYS`, `HOTSPOTS` (objects that are not doorways, R-6.13), `ACTIONS`, object preview + description, `Room entry` (summary, event buttons, `Raw disassembly`), `Last action` (summary, timeline, issues, `Raw trace`), `Assumptions` (`No assumptions` or `Assumptions · N`). | Code |
 | R-6.12 | INDY3 EGA | Background preview only, with the note `Background preview only. Object art, scripts, and room routes are not decoded for this game yet.` | Code |
 | R-6.13 | APP | **A doorway is not an object hotspot** (decided 11 October). An object whose verbs can load a room (`DoorwayTargets`) appears only as a doorway: in the `DOORWAYS` section and the Doorways overlay, and through room clicks (R-1.6). It has no row in `HOTSPOTS`, no label suffix, no `Object hotspots` box (Always or hover outline) and no entry in the object list. The game's own pointer still sees it, so the cursor, the hover object sent to the game and a click on it work as for any object. Implementation: `IsObjectHotspot`. | Code |
+| R-6.14 | LOOM | **Objects at 0, 0 are preview objects, not hotspots** (decided 11 October): LOOM keeps its 48 × 40 draft previews (and a few other off-scene images) at position 0, 0 of a room. Whatever the session position says is 0, 0 gets no row, no box, no hover outline and no interaction menu entry. Implementation: `IsVerbHotspotAvailable`. | Code |
 
 ## 7. Interaction model (LOOM)
 

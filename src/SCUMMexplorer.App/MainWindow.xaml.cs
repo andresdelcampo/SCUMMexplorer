@@ -4952,6 +4952,8 @@ public partial class MainWindow : Window
 
     private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, LoomSessionSnapshot snapshot) =>
         record.Width > 0 && record.Height > 0 &&
+        // LOOM keeps its draft previews (48 × 40) at 0, 0: they are not in the scene, so they are no hotspots (R-6.14).
+        (snapshot.ObjectPositions.TryGetValue(record.Id, out var at) ? at : new RoomObjectPosition(record.X, record.Y)) != new RoomObjectPosition(0, 0) &&
         snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
         ParentStateMatches(record, snapshot);
 
