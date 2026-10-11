@@ -43,6 +43,8 @@ Decided: Room 34's entry scene without a start is ignored; Indy3 is not claimed 
 
 ## Product rules
 
+- **Under review (11 October):** the user wants cutscene launches to set missing story state, actors, room state and costume (REQUIREMENTS 8.5, R-8.26 to R-8.31). Until implemented, the rules below that say no flag is forced still describe the code. Feasibility audit: [cutscene-state-audit](../.verification/cutscene-state-audit/README.md) (76 of 218 scenes state-sensitive, 19 do not start fresh).
+
 - Rooms begin in their earliest state; the running session carries changes caused by real scenes. Game Status is under user control. A scene adds only its minimum prerequisites and preserves later state. Single picks keep the session; explicit sequences start fresh; Restart returns to boot.
 - The approved late-room exception runs reviewed actual source prerequisites when absent. The fingerprinted English Room 46 recipe implements it; do not generalize it by guessing story bits. The disclosed off-island staff setup runs the real pickup.
 - Costumes persist until source changes them. Derive actor look, placement and scene starts from own-edition scripts; no forced costumes/flags/boxes, one-off teleports or room-specific engine hacks. Label estimates and picker assumptions.
