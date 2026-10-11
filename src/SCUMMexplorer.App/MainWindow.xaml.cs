@@ -2760,7 +2760,7 @@ public partial class MainWindow : Window
                 if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in the game's archive.");
                 return adlib
-                    ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token)
+                    ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token, halfTempo: _game!.V4Archive is null)
                     : _audioDecoder.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("This sound has no PC speaker part."), 6, token);
             }
             if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland)

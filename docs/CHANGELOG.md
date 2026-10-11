@@ -26,6 +26,10 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - **No regression:** scan hashes of every other local folder unchanged. `OtherV4GameTests` gained v2 and v1 checks (`SCUMM_V2_ENHANCED_TEST_ROOT`, `SCUMM_V1_CLASSIC_TEST_ROOT`).
 - Seen but not opened: `monkey1 vga en` (a `.cue`/`.bin` CD), `indy4 vga en`, `indy4classic vga es`, `indy4talkie vga es` (`ATLANTIS.000/.001`: SCUMM v5, another container); `monkey1 ega en` holds four disks of VGA data and opens as Monkey VGA.
 
+## 11 October (last, AdLib speed): browsed Monkey Island and Indy3 256-colour music at half tempo
+
+- The user heard the AdLib music of the browsed v4 games (Monkey Island VGA es/en, Indy3 VGA) at about twice the right speed. `ScummAdlibAudio.RenderWave(data, token, halfTempo: true)` now halves the tick rate (`data[3]` instead of `data[3] * 2`, and the `0x51` tempo word) for archives other than LOOM CD (`GameLibrary.V4Archive is null`). The factor is from the user's ear (about 2x), not a ScummVM source check; if a piece still sounds off, compare with `scummvm/`. Indy3 EGA lists no sounds in its tree: not looked at yet. Build: 0 warnings, 0 errors; not listened to.
+
 ## 11 October (last, costume tab): costumes in the normal view of the browsed v4 games
 
 - The Rooms | Costumes tabs of the normal catalog (as for LOOM) now also appear for the browsed v4 games (`HasCostumeCards`): Monkey VGA 115 cards with pictures, via the disk archive. The Games folder was reorganised meanwhile (`Games/FUTURE/monkey1 vga es`, `monkey1 ega es`; the same data).

@@ -53,14 +53,14 @@ public sealed partial class ScummAdlibAudio
     }
 
     /// <summary>The same for AdLib data given directly (the part after the resource header; the CD game's <c>AD</c> block body).</summary>
-    public ScummSoundLifetime ReadDataLifetime(byte[] data)
+    public ScummSoundLifetime ReadDataLifetime(byte[] data, bool halfTempo = false)
     {
         try
         {
             if (data.Length < 3) throw new InvalidDataException("The AdLib resource is too short.");
             if (data[2] == 0x80)
             {
-                var player = new MusicPlayer(data);
+                var player = new MusicPlayer(data, halfTempo);
                 for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds; callbacks++)
                 {
                     player.Tick();
@@ -93,14 +93,14 @@ public sealed partial class ScummAdlibAudio
     public byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default) =>
         RenderWave(ReadTrack(resource), cancellationToken);
 
-    /// <summary>Renders AdLib data given directly: the bytes after the resource header (old bundle: after 4 bytes; the CD game's <c>AD</c> block body).</summary>
-    public byte[] RenderWave(byte[] data, CancellationToken cancellationToken = default)
+    /// <summary>Renders AdLib data given directly (<paramref name="halfTempo"/>: the browsed Monkey Island and Indy3 256-colour disks, whose music plays at half the LOOM CD rate, by ear 11 October): the bytes after the resource header (old bundle: after 4 bytes; the CD game's <c>AD</c> block body).</summary>
+    public byte[] RenderWave(byte[] data, CancellationToken cancellationToken = default, bool halfTempo = false)
     {
         if (data.Length < 3) throw new InvalidDataException("The AdLib resource is too short.");
         if (data[2] != 0x80) return RenderEffectWave(data, cancellationToken);
         if (data.Length < 0x94) throw new InvalidDataException("AdLib music header is incomplete.");
-        var player = new MusicPlayer(data);
-        var lifetime = ReadDataLifetime(data);
+        var player = new MusicPlayer(data, halfTempo);
+        var lifetime = ReadDataLifetime(data, halfTempo);
         var maxCallbacks = lifetime.Kind == ScummSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxSeconds;
         var samples = new List<short>();
         var frameRemainder = 0;
@@ -242,6 +242,7 @@ public sealed partial class ScummAdlibAudio
         private int _nextEvent = 40;
         private int _timer;
         private int _ticks;
+        private readonly bool _halfTempo;
         private int _rhythm;
 
         public NukedOplChip Chip { get; }
@@ -250,7 +251,7 @@ public sealed partial class ScummAdlibAudio
         public int LoopBoundaries { get; private set; }
         public bool LoopBoundaryReached => LoopBoundaries != 0;
 
-        public MusicPlayer(byte[] data)
+        public MusicPlayer(byte[] data, bool halfTempo = false)
         {
             Chip = new NukedOplChip(SampleRate);
             _data = data;
@@ -268,7 +269,8 @@ public sealed partial class ScummAdlibAudio
             }
             _voiceCount = _rhythm == 0 ? 9 : 6;
             Write(0xbd, _rhythm);
-            _ticks = data[3] * 2;
+            _halfTempo = halfTempo;
+            _ticks = halfTempo ? data[3] : data[3] * 2;
             if (_ticks == 0) throw new InvalidDataException("AdLib music has zero tempo.");
             _loop = data[4] == 0;
             _loopStart = _position + BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(5, 2));
@@ -303,7 +305,7 @@ public sealed partial class ScummAdlibAudio
                         // The LOOM driver reads the first two payload bytes as its tempo word.
                         // _position already points past the length byte, at that first byte.
                         var timing = (Read(_position) << 8) | Read(_position + 1);
-                        if (timing > 0) _ticks = 0x73000 / timing;
+                        if (timing > 0) _ticks = 0x73000 / timing / (_halfTempo ? 2 : 1);
                     }
                     _position += length;
                 }
