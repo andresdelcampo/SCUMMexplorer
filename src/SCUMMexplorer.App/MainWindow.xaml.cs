@@ -634,6 +634,15 @@ public partial class MainWindow : Window
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte[]?> OlderObjectStates = new();
 
+    /// <summary>The objects drawn in the shown room of a v1 or v2 game, for the names the pointer reveals (empty for other games).</summary>
+    private IReadOnlyList<ScummOldRoomObjects.Entry> _olderObjects = [];
+
+    private static IReadOnlyList<ScummOldRoomObjects.Entry> ReadOlderObjects(GameLibrary game, byte[] bytes)
+    {
+        var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
+        return ScummOldRoomObjects.Read(LflEncoding.DecodeXorFF(bytes), states).Where(entry => entry.Visible).ToList();
+    }
+
     /// <summary>A browsed old-v3 game's room (Indy3 and other games that are not LOOM) with the objects of its starting state painted over the background; LOOM has its own session.</summary>
     private static RoomImage DecodeBrowsedOldV3Room(GameLibrary game, RoomImage background, byte[] bytes)
     {
@@ -1036,6 +1045,7 @@ public partial class MainWindow : Window
         ObjectAssetPreview.Source = null;
         ObjectAssetPreview.Visibility = Visibility.Collapsed;
         ObjectAssetDescription.Text = "";
+        _olderObjects = [];
         StatusText.Text = $"Opening {resource.Name}…";
         StatusText.ToolTip = resource.FilePath;
 
@@ -1075,6 +1085,7 @@ public partial class MainWindow : Window
                 _currentRoom = room;
                 _currentRoomResource = resource;
                 _lastViewedRoomResource = resource;
+                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : [];
                 _currentRoomObjectRecords = cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
@@ -4698,6 +4709,14 @@ public partial class MainWindow : Window
             ShowHoveredHotspotRow(null);
             UpdateDoorwayHover(null, null);
             SendPointerToGame(null, null);
+            return;
+        }
+        if (_olderObjects.Count > 0)
+        {
+            // A browsed v1 or v2 game: the name of the drawn object under the pointer (the first of the directory is on top).
+            var under = _olderObjects.FirstOrDefault(entry => x >= entry.X && x < entry.X + entry.Width && y >= entry.Y && y < entry.Y + entry.Height);
+            RoomPreview.Cursor = Cursors.Arrow;
+            RoomPreview.ToolTip = under is { Name.Length: > 0 } ? under.Name : null;
             return;
         }
         var hoveredRow = SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null;

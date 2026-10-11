@@ -13,6 +13,12 @@ namespace SCUMMexplorer.Core.Scumm;
 /// </summary>
 public static class ScummOldRoomObjects
 {
+    /// <summary>
+    /// An object of a room: the global number, the name stored in its code (plain characters; a Spanish accent is stored as a code of its own), its rectangle, where its image
+    /// is (0: none) and whether it is drawn at the start of the game.
+    /// </summary>
+    public sealed record Entry(int Id, string Name, int X, int Y, int Width, int Height, int ImageOffset, bool Visible);
+
     private const int StateVisible = 8;
 
     /// <summary>
@@ -46,6 +52,36 @@ public static class ScummOldRoomObjects
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return null; }
     }
 
+    /// <summary>The room's objects in directory order (the first is never drawn); empty when the room has none. <paramref name="decoded"/> is the room file after XOR 0xFF.</summary>
+    public static IReadOnlyList<Entry> Read(byte[] decoded, byte[]? states)
+    {
+        if (decoded.Length < 30) return [];
+        var count = decoded[20];
+        if (count < 2 || 28 + 4 * count > decoded.Length) return [];
+        var codes = new int[count];
+        for (var i = 0; i < count; i++) codes[i] = Word(decoded, 28 + 2 * count + 2 * i);
+        var firstCode = codes.Where(c => c > 0).DefaultIfEmpty(decoded.Length).Min();
+        var entries = new List<Entry>();
+        for (var i = 0; i < count; i++)
+        {
+            var code = codes[i];
+            if (code == 0 || code + 15 > decoded.Length) continue;
+            var image = Word(decoded, 28 + 2 * i);
+            var id = Word(decoded, code + 4);
+            var nameStart = code + decoded[code + 14];
+            var name = "";
+            if (nameStart < decoded.Length)
+            {
+                var nameEnd = Array.IndexOf(decoded, (byte)0, nameStart);
+                if (nameEnd > nameStart) name = System.Text.Encoding.Latin1.GetString(decoded, nameStart, Math.Min(nameEnd - nameStart, 40));
+            }
+            var hasImage = image != 0 && image < firstCode;
+            entries.Add(new Entry(id, name, decoded[code + 7] * 8, (decoded[code + 8] & 0x7F) * 8, decoded[code + 9] * 8, decoded[code + 13] & 0xF8,
+                hasImage ? image : 0, i >= 1 && hasImage && states is not null && id < states.Length && (states[id] & StateVisible) != 0));
+        }
+        return entries;
+    }
+
     /// <summary>
     /// The room picture with the objects that are visible at the start of the game painted over it. <paramref name="states"/> are the initial object states
     /// (<see cref="ReadInitialStates"/>); without them the room is returned as it is.
@@ -55,30 +91,17 @@ public static class ScummOldRoomObjects
         if (states is null || encoded.Length < 30) return room;
         var data = encoded.ToArray();
         for (var i = 0; i < data.Length; i++) data[i] ^= 0xFF;
-        var count = data[20];
-        if (count < 2 || 28 + 4 * count > data.Length) return room;
-        var codes = new int[count];
-        for (var i = 0; i < count; i++) codes[i] = Word(data, 28 + 2 * count + 2 * i);
-        var firstCode = codes.Where(c => c > 0).DefaultIfEmpty(data.Length).Min();
-
         var pixels = room.Pixels.ToArray();
         byte[]? characters = null;
-        for (var i = count - 1; i >= 1; i--)
+        var entries = Read(data, states);
+        for (var i = entries.Count - 1; i >= 0; i--)
         {
-            var code = codes[i];
-            var image = Word(data, 28 + 2 * i);
-            if (image == 0 || image >= firstCode || code == 0 || code + 14 > data.Length) continue;
-            var id = Word(data, code + 4);
-            if (id >= states.Length || (states[id] & StateVisible) == 0) continue;
-            var x = data[code + 7] * 8;
-            var y = (data[code + 8] & 0x7F) * 8;
-            var width = data[code + 9] * 8;
-            var height = data[code + 13] & 0xF8;
-            if (width == 0 || height == 0 || x + width > room.Width || y + height > room.Height) continue;
+            var entry = entries[i];
+            if (!entry.Visible || entry.Width == 0 || entry.Height == 0 || entry.X + entry.Width > room.Width || entry.Y + entry.Height > room.Height) continue;
             try
             {
-                if (v1Game is { } v1) PaintV1(data, image, x, y, width, height, v1, pixels, room.Width, ref characters);
-                else PaintV2(data, image, x, y, width, height, pixels, room.Width);
+                if (v1Game is { } v1) PaintV1(data, entry.ImageOffset, entry.X, entry.Y, entry.Width, entry.Height, v1, pixels, room.Width, ref characters);
+                else PaintV2(data, entry.ImageOffset, entry.X, entry.Y, entry.Width, entry.Height, pixels, room.Width);
             }
             catch (InvalidDataException)
             {
