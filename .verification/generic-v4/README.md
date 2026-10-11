@@ -23,3 +23,7 @@ Monkey Island EGA (first version of this record): every room failed with "no PA 
 ## SCUMM v5 (Indy 4, Monkey Island 1 CD, Monkey Island 2)
 
 `indy4-classic/` (rooms 1, 4, 20; Costumes tab: Indy in several poses), `monkey-cd/` (the English folder of the CD, rooms 1, 4, 20), `mi2/` (Monkey Island 2 talkie). `monkey1 vga en` showed nothing before because it is the CD (v5, `ENGLISH/MONKEY.000`). Indy 4 room 20 is a plain tan screen (a flat room). No ScummVM comparison.
+
+## Depth masks and stored objects (11 October 2026, later)
+
+`GV4_ADVANCED=1` makes `GenericV4Check` switch Advanced on per room, list the objects, show the first one, switch the depth-area highlight on and save `room-NN-advanced.png` (`objects-masks/`: `mi-ega` rooms 33 and 34, `mi2` room 20, `indy3` room 15). Reports: Monkey Island EGA room 34, mask toggle enabled (20,625 marked pixels), objects listed by stored Spanish names (`puerta`); MI2 room 20: 9 objects, mask 26,912 px; Indy3 room 15: 27 objects (`door`, `manhole cover`, `slob`..), mask 7,244 px, the highlight covering the foreground tables and people. `.verification/MaskSurvey` (throwaway console tool, `--png`, `--objects`) hashed every folder before and after: the LOOM, Indy3 EGA and demo editions and LOOM CD are identical. No ScummVM comparison.

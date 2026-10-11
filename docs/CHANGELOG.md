@@ -2,6 +2,14 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 11 October (night, later): depth masks and stored objects for the browsed games
+
+- **Depth masks** now come with every browsed layout (R-6.16, [formats](engine/SCUMM_RESOURCE_FORMATS.md)): v4 EGA (Monkey Island EGA), v5 (`ZP01`..), enhanced v2 (stream after the picture) and classic v1 (tile mask characters); v4 VGA already had them. The Advanced `Show depth areas` toggle works for all of these. **Fix:** the 256-colour Indy's masks were read two bytes off (scrambled); the table now starts four bytes in (`GF_OLD256`).
+- **Objects** (Advanced `SCENE DETAILS`, by stored name): v4 EGA and VGA (EGA object bitmaps decode now: 606 images, the same as VGA), the 256-colour Indy (624 images), v5 (new `OBCD`/`OBIM` reader). New `IBrowsableArchive.ReadBrowsedObjects`. Nothing is run: no states, scripts or interaction. **v1/v2 objects were not built** (two more image decoders; survey in the formats reference).
+- **Existing games unchanged:** a throwaway survey (`.verification/MaskSurvey`) hashed every folder's scan and every decoded room (pixels and masks) before and after: every LOOM edition, both demos, LOOM CD, Indy3 EGA and its demo are identical; only the browsed games changed (as intended).
+- **Checked in the real window** (`.verification/generic-v4/objects-masks/`, `GV4_ADVANCED=1`): Monkey Island EGA rooms 33/34, MI2 room 20, Indy3 room 15 (mask highlight on foreground scenery; object list with names). Not compared with ScummVM.
+- Tests: `BrowsedMasksAndObjectsTests` (env-guarded like `OtherV4GameTests`).
+
 ## 11 October (late night): SCUMM v5 games open for browsing (Indy 4, Monkey Island 1 CD, Monkey Island 2)
 
 - **Why `monkey1 vga en` showed nothing:** it is the Monkey Island **CD**, SCUMM **v5**: `MONKEY.000`/`.001` inside `ENGLISH/`, `FRENCH/` and so on, with CD audio tracks. The Indy 4 floppy, talkie and CD (`ATLANTIS.000/.001`, also inside `ATLANTIS/` beside two demos) are v5 as well. The scanner knew only v1 to v4 layouts and looked for files at the top level.
