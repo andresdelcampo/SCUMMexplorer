@@ -401,21 +401,45 @@ public static class ScummWalkBoxReader
     /// Reads the body of a v4/v5 BX block (ScummVM <c>BOXD</c>): a count byte, then 20-byte boxes (four signed corner pairs, mask, flags,
     /// scale word), then the box matrix to the end of the block, in the same triplet rows as the old-v3 game.
     /// </summary>
-    public static ScummWalkBoxSet ReadBlockBody(byte[] body)
+    public static ScummWalkBoxSet ReadBlockBody(byte[] body, int boxSize = BoxSizeV5)
     {
         if (body.Length < 1) throw new InvalidDataException("The BX block is empty.");
         var count = body[0];
-        var matrixStart = 1 + count * BoxSizeV5;
+        var matrixStart = 1 + count * boxSize;
         if (matrixStart > body.Length) throw new InvalidDataException($"{count} walk boxes run past the end of the BX block.");
         var boxes = new List<ScummWalkBox>(count);
         for (var index = 0; index < count; index++)
         {
-            var at = 1 + index * BoxSizeV5;
+            var at = 1 + index * boxSize;
             ScummBoxPoint Point(int offset) => new(SignedWord(body, at + offset), SignedWord(body, at + offset + 2));
-            boxes.Add(new ScummWalkBox(index, Point(0), Point(4), Point(8), Point(12), body[at + 16], body[at + 17], Word(body, at + 18)));
+            boxes.Add(new ScummWalkBox(index, Point(0), Point(4), Point(8), Point(12), body[at + 16], body[at + 17], boxSize >= BoxSizeV5 ? Word(body, at + 18) : 0));
         }
         var matrix = body.AsSpan(matrixStart).ToArray();
         return new ScummWalkBoxSet(boxes, matrix, 0, !MatrixFits(matrix, count));
+    }
+
+    /// <summary>
+    /// The boxes of a room of the v1 and v2 games (ScummVM <c>Box::v2</c>, <c>SIZEOF_BOX_V2</c> = 8): the room header's byte 0x15 is the offset of a count byte, then per box
+    /// the upper and lower y, the upper-left, upper-right, lower-left and lower-right x, the mask and the flags, all single bytes. The scripts' units are 8 pixels across and
+    /// 2 down (<c>V12_X_MULTIPLIER</c>, <c>V12_Y_MULTIPLIER</c>), so the corners are returned in room pixels. The box matrix of these games is not read.
+    /// </summary>
+    public static ScummWalkBoxSet ReadV2(byte[] decodedRoom)
+    {
+        if (decodedRoom.Length < 30) throw new InvalidDataException("The room is too short for a walk-box offset.");
+        var table = decodedRoom[0x15];
+        if (table < 24 || table >= decodedRoom.Length) throw new InvalidDataException($"The walk-box offset 0x{table:X2} is outside the room.");
+        var count = decodedRoom[table];
+        if (table + 1 + count * 8 > decodedRoom.Length) throw new InvalidDataException($"{count} walk boxes at 0x{table:X2} run past the room.");
+        var boxes = new List<ScummWalkBox>(count);
+        for (var index = 0; index < count; index++)
+        {
+            var at = table + 1 + index * 8;
+            var upper = decodedRoom[at] * 2;
+            var lower = decodedRoom[at + 1] * 2;
+            boxes.Add(new ScummWalkBox(index, new ScummBoxPoint(decodedRoom[at + 2] * 8, upper), new ScummBoxPoint(decodedRoom[at + 3] * 8, upper),
+                new ScummBoxPoint(decodedRoom[at + 5] * 8, lower), new ScummBoxPoint(decodedRoom[at + 4] * 8, lower), decodedRoom[at + 6], decodedRoom[at + 7]));
+        }
+        return new ScummWalkBoxSet(boxes, [], table, false);
     }
 
     public static ScummWalkBoxSet Read(ReadOnlySpan<byte> encodedRoom) => ReadPlain(LflEncoding.DecodeXorFF(encodedRoom));

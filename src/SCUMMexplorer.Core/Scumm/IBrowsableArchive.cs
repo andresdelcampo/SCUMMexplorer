@@ -11,6 +11,9 @@ public interface IBrowsableArchive
     /// <summary>The room's background as palette indices with its palette; throws <see cref="InvalidDataException"/> when the room has no picture or one that does not decode.</summary>
     RoomImage DecodeRoom(int number);
 
+    /// <summary>The room's walk boxes (the box matrix is not kept where the archive stores it apart); null when the room has none or they do not read.</summary>
+    ScummWalkBoxSet? ReadWalkBoxes(int number);
+
     IReadOnlyList<ScummV4Costume> ReadCostumes();
 
     ScummV4Costume? FindCostume(int id);

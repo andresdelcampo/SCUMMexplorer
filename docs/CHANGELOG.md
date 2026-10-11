@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: walk boxes of every browsed game
+
+- The **Walk boxes** overlay (Advanced) now works for all browsed games, from ScummVM's `boxes.cpp` (fetched 12 October with the user's approval): **v1/v2** (`ScummWalkBoxReader.ReadV2`: table at the byte in room header 0x15, 8-byte boxes of upper and lower y, four x and mask and flags, in units of 8 pixels across and 2 down); **v4** (`BX` block, 20-byte boxes; the 256-colour Indy is a version 3 game and has 18-byte boxes); **v5** (`BOXD`, count word and 20-byte boxes). `IBrowsableArchive.ReadWalkBoxes`. The box matrix is not read for v1/v2 and v5; box 0 of the v5 games is a placeholder (corners -32000) and is not drawn.
+- Checked as pictures for Maniac Mansion rooms 5 and 20 (boxes lie on the floor) and by corner ranges for Monkey Island EGA, Indy3 256 colours and Monkey Island 2. Not checked in the real window. Indy3 EGA already had boxes.
+
 ## 12 October: Indy3 EGA objects in the starting state
 
 - Browsed old-v3 games other than LOOM (Indy3 EGA) paint the objects the index gives a non-zero state (`ScummRoomObjects.ComposeInitial`, the same `RoomObjectSelection` rules as LOOM: state, parents, draw order). **Only 12 of Indy3's 1000 objects start in a non-zero state** (rooms 2, 25, 41, 48, 53, 73, 92 gain objects); the others are shown by the rooms' entry scripts (room 1 has 38 objects, none active), so most rooms still show only the background. Showing them needs the entry scripts run, as LOOM's session does. Room 2 (college office) checked as a rendered picture.

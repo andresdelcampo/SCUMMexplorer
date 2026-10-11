@@ -1077,7 +1077,7 @@ public partial class MainWindow : Window
                 : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : DecodeBrowsedOldV3Room(_game!, _roomDecoder.Decode(bytes), bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
-            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null || enhancedV2 ? null : TryReadWalkBoxes(bytes);
+            _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null ? browseArchive.ReadWalkBoxes(resource.ResourceId!.Value) : enhancedV2 ? TryReadOlderWalkBoxes(bytes) : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
             {
@@ -3293,6 +3293,12 @@ public partial class MainWindow : Window
 
     private void WalkBoxOverlay_SizeChanged(object sender, SizeChangedEventArgs e) => RefreshWalkBoxOverlay();
 
+    private static ScummWalkBoxSet? TryReadOlderWalkBoxes(byte[] roomBytes)
+    {
+        try { return ScummWalkBoxReader.ReadV2(LflEncoding.DecodeXorFF(roomBytes)); }
+        catch (InvalidDataException) { return null; }
+    }
+
     private static ScummWalkBoxSet? TryReadWalkBoxes(byte[] roomBytes)
     {
         try { return ScummWalkBoxReader.Read(roomBytes); }
@@ -3341,6 +3347,8 @@ public partial class MainWindow : Window
 
         foreach (var box in boxes!.Boxes)
         {
+            // Box 0 of the v5 games is a placeholder whose corners are all -32000.
+            if (box.Corners.Any(point => point.X < -1000 || point.Y < -1000)) continue;
             var invisible = (boxes.GetFlags(box.Index) & ScummWalkBox.InvisibleFlag) != 0;
             var accent = invisible ? Color.FromRgb(170, 170, 170) : Color.FromRgb(110, 235, 140);
             var shape = new System.Windows.Shapes.Polygon

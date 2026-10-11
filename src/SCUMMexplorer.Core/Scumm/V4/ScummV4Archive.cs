@@ -352,6 +352,13 @@ public sealed class ScummV4Archive : IBrowsableArchive
         return bx is null ? null : _lec.AsSpan(bx.Start + 6, bx.Size - 6).ToArray();
     }
 
+    public ScummWalkBoxSet? ReadWalkBoxes(int number)
+    {
+        // The 256-colour Indy (per-room files) is a version 3 game in ScummVM: 18-byte boxes without the scale word.
+        try { return ReadWalkBoxBlock(number) is { } body ? ScummWalkBoxReader.ReadBlockBody(body, _byteCostumeCommands ? ScummWalkBoxReader.BoxSize : ScummWalkBoxReader.BoxSizeV5) : null; }
+        catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { return null; }
+    }
+
     /// <summary>The room's SA block body (the scale slots: scale, y, scale, y per slot), or null when the room has none.</summary>
     public byte[]? ReadScaleSlotBlock(int number)
     {

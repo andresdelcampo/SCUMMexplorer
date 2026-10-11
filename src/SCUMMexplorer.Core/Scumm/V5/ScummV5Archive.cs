@@ -208,6 +208,26 @@ public sealed class ScummV5Archive : IBrowsableArchive
         return new RoomImage(width, height, pixels, palette);
     }
 
+    /// <summary>
+    /// The room's <c>BOXD</c> block: a count word, then 20-byte boxes (four signed corner pairs, mask, flags, scale word) as in the v4 games; the box matrix is the
+    /// separate <c>BOXM</c> block and is not read.
+    /// </summary>
+    public ScummWalkBoxSet? ReadWalkBoxes(int number)
+    {
+        try
+        {
+            var room = Room(number);
+            if (Blocks(_resources, room.Start + 8, room.Start + room.Size).FirstOrDefault(b => b.Tag == "BOXD") is not { } boxd || boxd.Size < 10) return null;
+            var count = BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(boxd.Start + 8));
+            if (count > 255 || 10 + count * ScummWalkBoxReader.BoxSizeV5 > boxd.Size) return null;
+            var body = new byte[1 + count * ScummWalkBoxReader.BoxSizeV5];
+            body[0] = (byte)count;
+            _resources.AsSpan(boxd.Start + 10, count * ScummWalkBoxReader.BoxSizeV5).CopyTo(body.AsSpan(1));
+            return ScummWalkBoxReader.ReadBlockBody(body);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { return null; }
+    }
+
     private sealed record Block(string Tag, int Start, int Size);
 
     private static List<Block> Blocks(byte[] data, int start, int end)
