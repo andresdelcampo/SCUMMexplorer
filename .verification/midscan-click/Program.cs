@@ -42,7 +42,7 @@ internal static class Program
                 await Task.Delay(3000);
                 Call("RoomCutscene_Click", window, new RoutedEventArgs());
                 var gate = (System.Threading.ManualResetEventSlim)Field("_scanGate")!; var sn = Field("_sceneSound")!;
-                for (var i = 0; i < 100; i++) { await Task.Delay(1000); if (i % 5 == 0) Console.WriteLine($"t={i}s gateOpen={gate.IsSet} preparing={sn.GetType().GetProperty("IsPreparing")!.GetValue(sn)} scan={Field("_scanDone")}"); }
+                for (var i = 0; i < 12; i++) { await Task.Delay(1000); if (i % 5 == 0) Console.WriteLine($"t={i}s gateOpen={gate.IsSet} preparing={sn.GetType().GetProperty("IsPreparing")!.GetValue(sn)} scan={Field("_scanDone")}"); }
                 var ss = Field("_session")!;
                 var evs = (System.Collections.IEnumerable)ss.GetType().GetProperty("SoundEvents")!.GetValue(ss)!;
                 foreach (var e in evs) { var ev = e.GetType().GetProperty("Event")!.GetValue(e)!; Console.WriteLine("EVENT " + string.Join(" | ", ev.GetType().GetProperties().Select(pr => pr.Name + "=" + pr.GetValue(ev)))); }
