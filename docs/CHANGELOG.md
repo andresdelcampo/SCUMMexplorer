@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: Indy3 EGA objects in the starting state
+
+- Browsed old-v3 games other than LOOM (Indy3 EGA) paint the objects the index gives a non-zero state (`ScummRoomObjects.ComposeInitial`, the same `RoomObjectSelection` rules as LOOM: state, parents, draw order). **Only 12 of Indy3's 1000 objects start in a non-zero state** (rooms 2, 25, 41, 48, 53, 73, 92 gain objects); the others are shown by the rooms' entry scripts (room 1 has 38 objects, none active), so most rooms still show only the background. Showing them needs the entry scripts run, as LOOM's session does. Room 2 (college office) checked as a rendered picture.
+
 ## 12 October: PC speaker sounds of Zak McKracken and the enhanced Maniac Mansion
 
 - The v1/v2 sound entries that have the v2 player's format (the same as LOOM's old bundle) are now listed and play through the existing PC speaker renderer: Zak McKracken classic (110), Zak McKracken Enhanced (112), Maniac Mansion Enhanced (59). AdLib and Roland are refused with a message (these games have PC speaker only). Classic Maniac Mansion uses ScummVM's `Player_V1` chunk format, now ported (`ScummPcSpeakerV1Audio`, from `player_v1.cpp` and the square generator of `player_v2.cpp`, fetched 12 October with the user's approval): 61 sounds list and render (effects of a few ms up to an 84 s tune; looping ones stop at three minutes). All listed sounds render; none listened to in the window yet.

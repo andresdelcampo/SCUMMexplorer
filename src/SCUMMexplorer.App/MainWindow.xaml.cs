@@ -634,6 +634,20 @@ public partial class MainWindow : Window
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte[]?> OlderObjectStates = new();
 
+    /// <summary>A browsed old-v3 game's room (Indy3 and other games that are not LOOM) with the objects of its starting state painted over the background; LOOM has its own session.</summary>
+    private static RoomImage DecodeBrowsedOldV3Room(GameLibrary game, RoomImage background, byte[] bytes)
+    {
+        if (game.Id == GameId.Loom) return background;
+        var states = BrowsedObjectStates.GetOrAdd(game.FolderPath, folder =>
+        {
+            try { return Directory.EnumerateFiles(folder, "00.LFL").FirstOrDefault() is { } index ? new LflObjectStateReader().Read(index) : null; }
+            catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException) { return null; }
+        });
+        return ScummRoomObjects.ComposeInitial(background, bytes, states);
+    }
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, IReadOnlyDictionary<int, byte>?> BrowsedObjectStates = new();
+
     private static BitmapSource RenderRoomCardThumbnail(GameLibrary game, GameResource roomResource,
         ScummIndexedObjectSnapshot? indexedSnapshot, IReadOnlyDictionary<int, byte> indexedStates,
         ScummSceneDrawBatches sceneBatches, CancellationToken cancellationToken)
@@ -668,6 +682,7 @@ public partial class MainWindow : Window
         var bytes = File.ReadAllBytes(roomResource.FilePath);
         var decoder = new ScummV3EgaRoomDecoder();
         var room = decoder.Decode(bytes);
+        if (game.Id != GameId.Loom) return CreateRoomCardBitmap(room, DecodeBrowsedOldV3Room(game, room, bytes).Pixels.ToArray(), 0, room.Palette);
         var pixels = room.Pixels.ToArray();
         var cameraX = 0;
         IReadOnlyList<uint> palette = room.Palette;
@@ -1049,7 +1064,7 @@ public partial class MainWindow : Window
             }
             var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
                 : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token)
-                : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : _roomDecoder.Decode(bytes));
+                : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : DecodeBrowsedOldV3Room(_game!, _roomDecoder.Decode(bytes), bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
             _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null || enhancedV2 ? null : TryReadWalkBoxes(bytes);

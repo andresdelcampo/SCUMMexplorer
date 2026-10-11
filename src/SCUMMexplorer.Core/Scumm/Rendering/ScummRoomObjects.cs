@@ -56,6 +56,24 @@ public sealed class ScummRoomObjects
         return objects;
     }
 
+    /// <summary>
+    /// The room picture with the objects its game starts with painted over it, for a game that is only browsed: each object in the state the index gives it
+    /// (<paramref name="states"/>, see <see cref="LflObjectStateReader"/>), parents and draw order as the game's own redraw. The room as it is when the
+    /// states cannot place every object.
+    /// </summary>
+    public static RoomImage ComposeInitial(RoomImage room, ReadOnlySpan<byte> encoded, IReadOnlyDictionary<int, byte>? states)
+    {
+        if (states is null) return room;
+        try
+        {
+            var records = new ScummRoomObjectDirectory().Decode(encoded);
+            var objects = new ScummRoomObjects().Decode(encoded);
+            var selection = new RoomObjectSelection(objects, states, null, records, room, states);
+            return room with { Pixels = selection.Compose(room) };
+        }
+        catch (Exception ex) when (ex is InvalidDataException or ArgumentException or KeyNotFoundException) { return room; }
+    }
+
     private static byte[] DecodeImage(byte[] data, int start, int end, int width, int height)
     {
         var pixels = new byte[width * height];
