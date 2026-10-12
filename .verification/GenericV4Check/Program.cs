@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SCUMMexplorer.App;
 using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Loom;
 
 // Opens a browsed v4 game (Monkey Island VGA) in the real MainWindow, selects the given rooms and one costume, and saves what the window shows.
 // args: game folder, output folder, room numbers…
@@ -80,6 +81,20 @@ internal static class Program
                     Call("SelectResourceInTree", sound);
                     for (var n = 0; n < 150 && ((TextBlock)window.FindName("AudioTime")).Text.StartsWith("Preparing"); n++) await Task.Delay(100);
                     report.Add($"sound {sound.Name}: {((TextBlock)window.FindName("AudioDescription")).Text} | {((TextBlock)window.FindName("AudioTime")).Text} | {((TextBlock)window.FindName("StatusText")).Text}");
+                }
+                if (Environment.GetEnvironmentVariable("GV4_TEXTS") == "1")
+                {
+                    var extraction = new LoomTextExtractor().Extract(game);
+                    report.Add($"texts: {extraction.Entries.Count} entries; Game Texts offered: {GameSupport.For(game).Texts}");
+                    var gallery = new TextGalleryWindow(game, extraction, room => Call("SelectResourceInTree", game.Rooms.First(r => r.ResourceId == room))) { Owner = window };
+                    gallery.Show();
+                    await Task.Delay(4000);
+                    gallery.UpdateLayout();
+                    var bmp = new RenderTargetBitmap((int)gallery.ActualWidth, (int)gallery.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                    bmp.Render(gallery);
+                    var enc = new PngBitmapEncoder(); enc.Frames.Add(BitmapFrame.Create(bmp));
+                    using var fs = File.Create(Path.Combine(output, "texts.png")); enc.Save(fs);
+                    gallery.Close();
                 }
             }
             catch (Exception ex) { report.Add("ERROR " + ex); Environment.ExitCode = 1; }

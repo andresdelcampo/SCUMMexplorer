@@ -14,7 +14,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 
 ## 12 October: Game Texts for Indiana Jones 3, 256 colours
 
-- The 256-colour Indy3 (one file per room, v4-style blocks, **version 3 scripts**) was left out of Game Texts because the v4 dialect failed on 15% of its ranges. `ScummProfile` now gives the room-file layout the Indy3 script dialect (the one Indy3 EGA already uses), and `GameSupport` offers Texts for every browsed v4 game. Result: 2,292 texts from 1,552 decode ranges, real dialogue ("Hello again, Marcus!"). Test `ExtractsTextsOfTheIndy256ColourGameWhenConfigured` (`SCUMM_INDY3_VGA_TEST_ROOT`). Not yet opened in the real window; the speakers are the extractor's generic labels.
+- The 256-colour Indy3 (one file per room, v4-style blocks, **version 3 scripts**) was left out of Game Texts because the v4 dialect failed on 15% of its ranges. `ScummProfile` now gives the room-file layout the Indy3 script dialect (the one Indy3 EGA already uses), and `GameSupport` offers Texts for every browsed v4 game. Result: 2,292 texts from 1,552 decode ranges, real dialogue ("Hello again, Marcus!"). Test `ExtractsTextsOfTheIndy256ColourGameWhenConfigured` (`SCUMM_INDY3_VGA_TEST_ROOT`). Opened in the real window (`.verification/generic-v4/indy3-256/texts.png`); the speakers are the extractor's generic labels ("Ego" for everyone).
 
 ## 12 October: costumes and sounds of Indiana Jones 3 EGA
 
