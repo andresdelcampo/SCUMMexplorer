@@ -270,6 +270,7 @@ public partial class MainWindow : Window
         _sceneSound.StopAll("another game was opened");
         _cdVoice.Stop();
         // The Roland device needs the upgrade's sounds in this folder; another folder falls back to AdLib.
+        ApplySoundDeviceChoices(game);
         // v1/v2 games (Maniac Mansion, Zak McKracken) only ever had PC speaker sound: AdLib and Roland are not offered.
         if (game.Version is ScummVersion.V1 or ScummVersion.V2 && _sceneSound.Mode is SceneSoundPlayer.SoundMode.Adlib or SceneSoundPlayer.SoundMode.Roland)
         {
@@ -2982,22 +2983,19 @@ public partial class MainWindow : Window
 
     private const string SoundModeToolTip = "Music and effects. Changing device stops current audio; the next sound command uses the selected device.";
 
-    /// <summary>Offers only the devices the open game can use: v1/v2 games are PC speaker only; Roland needs the LOOM upgrade's sounds.</summary>
-    private void SoundModeCombo_DropDownOpened(object? sender, EventArgs e)
+    /// <summary>Offers only the devices the open game can use, as soon as it is opened: v1/v2 games are PC speaker only; Roland needs the LOOM upgrade's sounds.</summary>
+    private void ApplySoundDeviceChoices(GameLibrary game)
     {
-        var game = _game;
-        for (var i = 0; i < SoundModeCombo.Items.Count; i++)
+        var style = new Style(typeof(ComboBoxItem), TryFindResource(typeof(ComboBoxItem)) as Style);
+        void Hide(string device)
         {
-            if (SoundModeCombo.ItemContainerGenerator.ContainerFromIndex(i) is not ComboBoxItem item) continue;
-            var mode = (SceneSoundPlayer.SoundMode)i;
-            var offered = game is null || mode switch
-            {
-                SceneSoundPlayer.SoundMode.Adlib => game.Version is not (ScummVersion.V1 or ScummVersion.V2),
-                SceneSoundPlayer.SoundMode.Roland => SceneSoundPlayer.HasRolandSounds(game),
-                _ => true,
-            };
-            item.Visibility = offered ? Visibility.Visible : Visibility.Collapsed;
+            var trigger = new DataTrigger { Binding = new System.Windows.Data.Binding(), Value = device };
+            trigger.Setters.Add(new Setter(UIElement.VisibilityProperty, Visibility.Collapsed));
+            style.Triggers.Add(trigger);
         }
+        if (game.Version is ScummVersion.V1 or ScummVersion.V2) Hide("AdLib");
+        if (!SceneSoundPlayer.HasRolandSounds(game)) Hide("Roland MT-32");
+        SoundModeCombo.ItemContainerStyle = style;
     }
 
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

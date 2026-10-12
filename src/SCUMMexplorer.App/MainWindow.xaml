@@ -352,7 +352,7 @@
                     </ComboBox>
                     <ComboBox x:Name="SoundModeCombo" Width="166" MinHeight="32" VerticalAlignment="Center" Margin="0,0,14,0"
                               ItemTemplate="{StaticResource SoundDeviceItem}" SelectedIndex="2" ToolTipService.ShowOnDisabled="True"
-                              SelectionChanged="SoundModeCombo_SelectionChanged" DropDownOpened="SoundModeCombo_DropDownOpened"
+                              SelectionChanged="SoundModeCombo_SelectionChanged"
                               ToolTip="Music and effects. Changing device stops current audio; the next sound command uses the selected device.">
                         <sys:String>No Sound</sys:String>
                         <sys:String>PC Speaker</sys:String>
