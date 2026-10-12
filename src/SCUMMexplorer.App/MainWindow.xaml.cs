@@ -411,6 +411,7 @@ public partial class MainWindow : Window
         GameInfo.Text = game.Platform.StartsWith("DOS", StringComparison.Ordinal) ? "DOS edition" : game.Platform;
         GameInfo.ToolTip = $"{game.Version switch { ScummVersion.Unknown => "SCUMM version unconfirmed", _ => $"SCUMM {game.Version}" }} · {game.Platform}";
         ResourceTree.Items.Clear();
+        _durationKey = default; // the new tree has no durations yet
         RoomCardList.Children.Clear();
         RoomCardScroll.Visibility = Visibility.Visible;
 
@@ -789,6 +790,7 @@ public partial class MainWindow : Window
         RoomObjectPanel.Visibility = showRoomDetails ? Visibility.Visible : Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, showRoomDetails ? 1 : 2);
         ResourceTree.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
+        StartSoundDurations();
         UpdateNormalCatalog(advanced);
         RoomMaskToggle.Visibility = advanced && _currentRoom is not null ? Visibility.Visible : Visibility.Collapsed;
         WalkBoxToggle.Visibility = advanced && _currentRoom is not null && _currentWalkBoxes is not null
@@ -2726,7 +2728,7 @@ public partial class MainWindow : Window
         var adlib = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
         var roland = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
         var format = cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Pcjr ? "PCjr/Tandy" : "PC speaker";
-        AdlibGainPanel.Visibility = adlib ? Visibility.Visible : Visibility.Collapsed;
+        AdlibGainPanel.Visibility = Visibility.Collapsed; // the level bar is hidden; the slider keeps its +6 dB default, which is still applied
         _previewCancellation?.Cancel();
         RoomPreview.Visibility = Visibility.Collapsed;
         RoomMaskToggle.Visibility = Visibility.Collapsed;
@@ -2993,6 +2995,64 @@ public partial class MainWindow : Window
 
     private const string SoundModeToolTip = "Music and effects. Changing device stops current audio; the next sound command uses the selected device.";
 
+    // "Sound NN - mm:ss" in the Advanced tree: the length of the sound on the selected device, rendered in the background (the devices differ:
+    // the PC speaker and PCjr parts of one sound can be seconds apart), so it follows the device and is filled in as each sound is done.
+    private CancellationTokenSource? _durationCancellation;
+    private (GameLibrary? Game, SceneSoundPlayer.SoundMode Mode) _durationKey;
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<(SceneSoundPlayer.SoundMode Mode, GameResource Resource), string?> _durationLabels = new();
+
+    private static string DurationText(TimeSpan duration) => $"{(int)duration.TotalMinutes:00}:{duration.Seconds:00}{(duration.TotalSeconds >= 179 ? "+" : "")}";
+
+    private static TimeSpan RenderedDuration(byte[] wave)
+    {
+        var byteRate = wave.Length >= 44 ? BitConverter.ToInt32(wave, 28) : 0;
+        return byteRate > 0 ? TimeSpan.FromSeconds(Math.Max(0, wave.Length - 44) / (double)byteRate) : TimeSpan.Zero;
+    }
+
+    private void StartSoundDurations()
+    {
+        if (_game is not { } game || !IsAdvancedMode) return;
+        var mode = _sceneSound.Mode;
+        if ((game, mode) == _durationKey) return;
+        _durationCancellation?.Cancel();
+        if (_durationKey.Game != game) _durationLabels.Clear();
+        _durationKey = (game, mode);
+        var items = ResourceTree.Items.OfType<TreeViewItem>().SelectMany(group => group.Items.OfType<TreeViewItem>())
+            .Where(item => item.Tag is GameResource { Kind: ResourceKind.Sound } sound && !IsCdCue(sound) && !IsCdTrack(sound)).ToArray();
+        string Header(TreeViewItem item, string? duration) =>
+            LoomResourceNames.Label(_glossary, (GameResource)item.Tag) + (duration is null ? "" : " - " + duration);
+        foreach (var item in items)
+            item.Header = Header(item, _durationLabels.GetValueOrDefault((mode, (GameResource)item.Tag)));
+        if (mode == SceneSoundPlayer.SoundMode.None) return;
+        var cancellation = _durationCancellation = new CancellationTokenSource();
+        var token = cancellation.Token;
+        // The tree items belong to the UI thread: the work list is made here, the worker only touches the resources.
+        var work = items.Select(item => (Item: item, Resource: (GameResource)item.Tag)).ToArray();
+        _ = Task.Run(async () =>
+        {
+            foreach (var (item, resource) in work)
+            {
+                if (token.IsCancellationRequested) return;
+                if (_durationLabels.ContainsKey((mode, resource))) continue;
+                string? label = null;
+                try
+                {
+                    var wave = await RenderAudioWaveAsync(resource, mode == SceneSoundPlayer.SoundMode.Adlib, token);
+                    label = DurationText(RenderedDuration(wave));
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException) { }
+                catch (OperationCanceledException) { return; }
+                if (token.IsCancellationRequested) return;
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (token.IsCancellationRequested) return;
+                    _durationLabels[(mode, resource)] = label;
+                    item.Header = Header(item, label);
+                });
+            }
+        }, token);
+    }
+
     /// <summary>Offers only the devices the open game can use, as soon as it is opened: v1/v2 games are PC speaker only; Roland needs the LOOM upgrade's sounds.</summary>
     private void ApplySoundDeviceChoices(GameLibrary game)
     {
@@ -3027,6 +3087,7 @@ public partial class MainWindow : Window
         var selected = _selectedSound;
         StopAudio();
         _sceneSound.SetMode(requested);
+        StartSoundDurations();
         // The game's scripts read the sound card when they choose a sound, so the new device applies from the next one on.
         if (_session is not null) _session.SoundCard = SoundCard;
         if (!_soundModeFallback) SaveViewOptions();

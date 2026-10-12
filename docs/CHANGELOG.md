@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: sound lengths in the Advanced tree, no AdLib level bar
+
+- The Advanced tree shows **"Sound NN - mm:ss"** for every sound, in every game, for the selected sound device. The devices differ a lot (Maniac Mansion: Sound 7 is 4 s on the PC speaker and 11 s on PCjr; many effects are 0 s on the speaker and about 1 s on PCjr), so the length follows the device and is redone when it changes. Each sound is rendered in the background with the same renderer that plays it (`StartSoundDurations`, cancelled on a new game or device, cached per device and sound); a sound the device cannot play (for example LOOM's Roland-only sounds on AdLib) keeps its plain name. Sounds that loop or hold long notes stop at the three-minute preview limit and show `03:00+`. Checked in the real window on Maniac Mansion (61 of 61 labelled within 8 s; the labels change with the device). The first version touched the tree items from the worker thread and silently did nothing.
+- The AdLib level bar is no longer shown under the sound player; the +6 dB default still applies.
+
 ## 12 October: PCjr/Tandy device for the classic Maniac Mansion
 
 - New sound device **PCjr / Tandy** (`SoundMode.Pcjr`, `ScummPcjrV1Audio`), a port of ScummVM's `Player_V1` PCjr half (`parsePCjrChunk`, `nextPCjrCmd`, `generatePCjrSamples`) with `Player_V2`'s three square voices and noise voice (16 volume steps of 2 dB, 111860 Hz base, 44100 Hz output). The PCjr part of a v1-format sound starts at the word at byte 4. Offered only for v1 games (the classic Maniac Mansion); other games hide it, and a saved PCjr choice falls back when a game without it opens. All 61 sounds of `mmansion ega en` render (Sound 58 98 s, Sound 69 17.5 s); six whose envelope data starts at the very end of the resource read zeros past it (ScummVM reads the following memory). Sounds 21 and 38 run to the three-minute preview limit (long notes). Not listened to, not compared with ScummVM on PCjr.
