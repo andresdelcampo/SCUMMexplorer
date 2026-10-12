@@ -331,7 +331,7 @@
                         <!-- Trim the transparent margins at runtime; keep the full-resolution asset. -->
                         <CroppedBitmap SourceRect="10,150,2152,435">
                             <CroppedBitmap.Source>
-                                <BitmapImage UriSource="/SCUMMexplorer.App;component/Assets/scummexplorer-title-v1.png"/>
+                                <BitmapImage UriSource="/SCUMMexplorer;component/Assets/scummexplorer-title-v1.png"/>
                             </CroppedBitmap.Source>
                         </CroppedBitmap>
                     </Image.Source>
