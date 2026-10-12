@@ -125,6 +125,10 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        var release = System.Reflection.CustomAttributeExtensions
+            .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(MainWindow).Assembly)?.InformationalVersion?.Split('+')[0];
+        if (!string.IsNullOrWhiteSpace(release))
+            Title = $"SCUMMexplorer · {release}";
         Loaded += (_, _) => ReopenLastFolder();
         Closed += (_, _) => { _roomCardCancellation?.Cancel(); _costumeCardCancellation?.Cancel(); StopRoomPan(); StopAudio(); };
         Deactivated += (_, _) => StopRoomPan();

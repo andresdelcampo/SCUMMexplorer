@@ -9,6 +9,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets\costume-133-pose-04.ico</ApplicationIcon>
+    <!-- The release label shown in the main window title. Change it here only. -->
+    <InformationalVersion>Preview1</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
