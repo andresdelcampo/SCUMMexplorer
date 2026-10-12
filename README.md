@@ -187,6 +187,8 @@ Collaborations are welcome, whether you write code, research the original engine
 
 Open an issue to discuss an idea, report what you find, or send a pull request.
 
+Knowing which games and features people want to explore helps guide future work. Sharing the project with another adventure fan, or leaving a GitHub star, is also a small way to show you'd like to see it keep growing.
+
 ## License
 
 SCUMMexplorer is licensed under the GNU General Public License, version 3 or later (see [LICENSE](LICENSE)). It adapts parts of ScummVM, which is GPL; game files and ROM images are never included.
