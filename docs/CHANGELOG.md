@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: PC speaker sounds of the classic Maniac Mansion
+
+- **Playback was refused:** the sound panel called every v1/v2 sound "Roland only", because `ScummRolandSong.IsRoland` looks for the v3 speaker+AdLib header and the old format has none. The v1/v2 branch now runs before that check (`RenderAudioWaveAsync`); Maniac Mansion's sounds play on the PC speaker.
+- **Devices:** v1/v2 games offer only No Sound and PC Speaker (opening one switches an AdLib or Roland choice to PC Speaker, not saved); Roland is offered only for a folder with the LOOM Roland upgrade sounds. The list is trimmed when the dropdown opens.
+- **v1 player:** renders at 44100 Hz like ScummVM's mixer (the panel's duration reads the rate from the wave header). Compared line by line with ScummVM's `player_v1.cpp` and `player_v2.cpp` (fetched 12 October): chunks, tick lengths, noise, square generator, low-pass and the full-scale forced level all match. An attempt to halve the forced level was wrong and is reverted.
+- **Comparison pitfall:** the user's ScummVM (`music_driver=auto`) was playing the **PCjr** version of the sounds, not the PC speaker, which looked like a pitch and drum difference. Set the music device to PC Speaker before comparing. The PCjr part of the sounds (offset in the word at byte 4) is not played by this app. Not compared again against a PC speaker ScummVM.
+
 ## 12 October: Monkey Island CD audio tracks
 
 - A game read from a `.cue`/`.bin` now lists the disc's red-book tracks as sounds (`CD audio track NN`, with the length) and plays them straight from the image, as LOOM CD's cues are played. `DiscImage.AudioTracks` reads every `TRACK`/`INDEX` of the cue (a track runs from its INDEX 01 to the next track's INDEX 00, else INDEX 01; the last to the end of the file; `PREGAP` is not in the file). Monkey Island 1 CD: tracks 2 to 25, 24 tracks of 1:55 to 2:35, 46.6 minutes; the second track's wave reads and is not silent. LOOM CD is unchanged (its single track is still read by cue, 30 sounds, the 57 disc, cue and scan tests pass). Which track a script starts (the original's `startMusic` maps sounds to tracks) is not read, so the tracks carry no names. Not listened to in the window.

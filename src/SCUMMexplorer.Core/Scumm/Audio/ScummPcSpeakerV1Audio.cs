@@ -14,7 +14,7 @@ namespace SCUMMexplorer.Core.Scumm;
 /// </summary>
 public sealed class ScummPcSpeakerV1Audio
 {
-    private const int SampleRate = 22050;
+    private const int SampleRate = 44100; // ScummVM's mixer rate: at 22050 the noise and fast sweeps alias into harsh distortion
     private const int FixShift = 16;
     private const int MaxSamples = SampleRate * 180;
     private const int MaxTicks = 4_000_000;
@@ -288,6 +288,7 @@ public sealed class ScummPcSpeakerV1Audio
             {
                 if (_forcedLevel != 0)
                 {
+                    // As Player_V1::generateSpkSamples: the forced level is a full-scale step (the notes' square wave is +-VolumeLevel0/2).
                     var sample = _forcedLevel * VolumeLevel0;
                     Array.Fill(buffer, sample);
                 }

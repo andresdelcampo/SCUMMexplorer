@@ -270,7 +270,15 @@ public partial class MainWindow : Window
         _sceneSound.StopAll("another game was opened");
         _cdVoice.Stop();
         // The Roland device needs the upgrade's sounds in this folder; another folder falls back to AdLib.
-        if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && !(SceneSoundPlayer.HasRolandSounds(game) && (_sceneSound.Roms ??= FindMt32Roms(game)) is not null))
+        // v1/v2 games (Maniac Mansion, Zak McKracken) only ever had PC speaker sound: AdLib and Roland are not offered.
+        if (game.Version is ScummVersion.V1 or ScummVersion.V2 && _sceneSound.Mode is SceneSoundPlayer.SoundMode.Adlib or SceneSoundPlayer.SoundMode.Roland)
+        {
+            _sceneSound.SetMode(SceneSoundPlayer.SoundMode.PcSpeaker);
+            _soundModeFallback = true;
+            SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.PcSpeaker;
+            _soundModeFallback = false;
+        }
+        else if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && !(SceneSoundPlayer.HasRolandSounds(game) && (_sceneSound.Roms ??= FindMt32Roms(game)) is not null))
         {
             // Not saved: the choice stays for a folder with the upgrade and the ROMs.
             _sceneSound.SetMode(SceneSoundPlayer.SoundMode.Adlib);
@@ -2766,7 +2774,7 @@ public partial class MainWindow : Window
             PauseButton.IsEnabled = true;
             StopButton.IsEnabled = true;
             AdlibGainSlider.IsEnabled = adlib;
-            AudioDescription.Text = !roland && wave.Length >= 44 + (adlib ? 49716 * 4 : 22050 * 2) * 179
+            AudioDescription.Text = !roland && wave.Length >= 44 + (adlib ? 49716 * 4 : SpeakerWaveRate(wave) * 2) * 179
                 ? $"DOS {format} rendition · preview limited to three minutes"
                 : cdCue ? $"{resource.Description} Straight from the disc's audio track · select Play to listen"
                 : $"DOS {format} rendition · select Play to listen";
@@ -2822,12 +2830,13 @@ public partial class MainWindow : Window
                 }
                 return new ScummMt32Audio(roms).RenderWave(resource, token);
             }
-            if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
             if (_game is { Version: ScummVersion.V1 or ScummVersion.V2 })
             {
+                // The v1/v2 sound format has no speaker+AdLib bundle header, so IsRoland would misread every sound as Roland.
                 if (adlib) throw new NotSupportedException("This game's sounds are for the PC speaker. Choose that device.");
                 return ScummPcSpeakerV1Audio.RenderOlder(resource, _audioDecoder, token);
             }
+            if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
             return adlib ? _adlibDecoder.RenderWave(resource, token) : _audioDecoder.RenderWave(resource, token);
         }, token);
 
@@ -2972,6 +2981,24 @@ public partial class MainWindow : Window
     }
 
     private const string SoundModeToolTip = "Music and effects. Changing device stops current audio; the next sound command uses the selected device.";
+
+    /// <summary>Offers only the devices the open game can use: v1/v2 games are PC speaker only; Roland needs the LOOM upgrade's sounds.</summary>
+    private void SoundModeCombo_DropDownOpened(object? sender, EventArgs e)
+    {
+        var game = _game;
+        for (var i = 0; i < SoundModeCombo.Items.Count; i++)
+        {
+            if (SoundModeCombo.ItemContainerGenerator.ContainerFromIndex(i) is not ComboBoxItem item) continue;
+            var mode = (SceneSoundPlayer.SoundMode)i;
+            var offered = game is null || mode switch
+            {
+                SceneSoundPlayer.SoundMode.Adlib => game.Version is not (ScummVersion.V1 or ScummVersion.V2),
+                SceneSoundPlayer.SoundMode.Roland => SceneSoundPlayer.HasRolandSounds(game),
+                _ => true,
+            };
+            item.Visibility = offered ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
 
     private async void SoundModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -3139,7 +3166,10 @@ public partial class MainWindow : Window
 
     private TimeSpan WaveDuration(byte[] wave, bool adlib) => _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && wave.Length >= 44
         ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4))
-        : TimeSpan.FromSeconds(Math.Max(0, wave.Length - 44) / (double)(adlib ? 49716 * 4 : 22050 * 2));
+        : TimeSpan.FromSeconds(Math.Max(0, wave.Length - 44) / (double)(adlib ? 49716 * 4 : SpeakerWaveRate(wave) * 2));
+
+    /// <summary>The sample rate in a PC speaker wave's header (the v1 player renders at 44100, the others at 22050).</summary>
+    private static int SpeakerWaveRate(byte[] wave) => wave.Length >= 44 ? BitConverter.ToInt32(wave, 24) : 22050;
 
     private void StopAudio()
     {
