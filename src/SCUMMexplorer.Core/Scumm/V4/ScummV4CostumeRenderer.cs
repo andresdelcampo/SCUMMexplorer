@@ -105,6 +105,11 @@ public static class ScummV4CostumeRenderer
         palette[0] = 0;
         var canvas = new byte[canvasWidth * canvasHeight];
         var any = false;
+        // The stand-in for opaque black must be a palette slot the costume does not use (costumes do name 255, e.g. a white shirt).
+        var used = new bool[256];
+        for (var i = 1; i < colors; i++) used[body[PaletteStart + i]] = true;
+        var blackSlot = (byte)255;
+        while (blackSlot > 1 && used[blackSlot]) blackSlot--;
         foreach (var cel in cels)
             for (var x = 0; x < cel.Width; x++)
                 for (var y = 0; y < cel.Height; y++)
@@ -113,11 +118,11 @@ public static class ScummV4CostumeRenderer
                     if (color == 0) continue;
                     var index = body[PaletteStart + color];
                     // A palette entry that names room colour 0 (black) would read as transparent: show it as its own opaque black.
-                    canvas[(cel.Top - minY + y) * canvasWidth + cel.Left - minX + x] = index == 0 ? (byte)255 : index;
+                    canvas[(cel.Top - minY + y) * canvasWidth + cel.Left - minX + x] = index == 0 ? blackSlot : index;
                     any = true;
                 }
         if (!any) return null;
-        palette[255] = 0xFF000000;
+        palette[blackSlot] = 0xFF000000;
         return new RoomImage(canvasWidth, canvasHeight, canvas, palette);
     }
 
