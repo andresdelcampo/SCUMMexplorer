@@ -736,10 +736,12 @@ public partial class MainWindow : Window
     /// <summary>The doorway boxes of a browse-only room (those stored objects whose scripts can load a room), per the Never / On hover / Always doorway option.</summary>
     private IEnumerable<(int X, int Y, int Width, int Height, int[] Targets, bool Live, string ToolTip, string Prefix)> BrowsedDoorwayBoxes()
     {
-        foreach (var label in _olderObjects)
+        // Doorways in one rectangle share one box.
+        foreach (var same in _olderObjects.Where(label => _roomNavigationCandidates.Any(item => item.Object.Id == label.Id)).GroupBy(label => (label.X, label.Y, label.Width, label.Height)))
         {
-            var targets = _roomNavigationCandidates.Where(item => item.Object.Id == label.Id).Select(item => item.TargetRoomId).Distinct().Order().ToArray();
-            if (targets.Length == 0 || DoorwayMode == DisplayMode.Never || DoorwayMode == DisplayMode.Hover && !_hoveredDoorwayIds.Contains(label.Id)) continue;
+            var label = same.FirstOrDefault(item => item.Name.Length > 0) ?? same.First();
+            var targets = _roomNavigationCandidates.Where(item => same.Any(other => other.Id == item.Object.Id)).Select(item => item.TargetRoomId).Distinct().Order().ToArray();
+            if (targets.Length == 0 || DoorwayMode == DisplayMode.Never || DoorwayMode == DisplayMode.Hover && !same.Any(item => _hoveredDoorwayIds.Contains(item.Id))) continue;
             yield return (label.X, label.Y, label.Width, label.Height, targets, true,
                 $"{BrowsedName(label)}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))} (a static candidate; no script condition is evaluated). " +
                 "The Advanced doorway buttons open the rooms directly.",
@@ -800,7 +802,9 @@ public partial class MainWindow : Window
                 Width = Math.Max(1, item.Width * scale), Height = Math.Max(1, item.Height * scale),
                 BorderThickness = new Thickness(strong ? Math.Clamp(scale, 2, 3) : 1),
                 BorderBrush = new SolidColorBrush(strong ? Color.FromRgb(120, 220, 255) : Color.FromArgb(150, 120, 220, 255)),
-                Background = new SolidColorBrush(Color.FromArgb((byte)(strong ? 56 : 22), 120, 220, 255)),
+                // Outlines only (a hovered box gets a light tint): stored objects often stack several states in one rectangle, and filled boxes hid the picture.
+                Background = strong ? new SolidColorBrush(Color.FromArgb(32, 120, 220, 255)) : Brushes.Transparent,
+                IsHitTestVisible = false,
                 CornerRadius = new CornerRadius(2)
             };
             Canvas.SetLeft(box, offsetX + item.X * scale);
@@ -820,8 +824,9 @@ public partial class MainWindow : Window
             HotspotHighlightOverlay.Children.Add(name);
         }
         if (all)
-            foreach (var item in BrowsedObjects)
-                if (item.Id != label?.Id) Box(item, false);
+            // One box per rectangle, named when any object there has a name.
+            foreach (var group in BrowsedObjects.GroupBy(item => (item.X, item.Y, item.Width, item.Height)))
+                if (!group.Any(item => item.Id == label?.Id)) Box(group.FirstOrDefault(item => item.Name.Length > 0) ?? group.First(), false);
         if (label is not null) Box(label, true);
     }
 
