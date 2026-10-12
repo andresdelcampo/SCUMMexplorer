@@ -81,7 +81,7 @@ public sealed class ScummMt32Audio
         return ToWave(pcm, rate);
     }
 
-    private static byte[] ToWave(short[] pcm, int rate)
+    internal static byte[] ToWave(short[] pcm, int rate)
     {
         var bytes = pcm.Length * 2;
         var wave = new byte[44 + bytes];

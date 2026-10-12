@@ -29,6 +29,11 @@ public sealed record ScummV4Sound(int Id, int Room, byte[]? Speaker, byte[]? Adl
 {
     /// <summary>AdLib music starts with 0x80 at byte 2; the rest are effects.</summary>
     public bool IsMusic => Adlib is { Length: >= 3 } ad && ad[2] == 0x80;
+
+    /// <summary>The v5 (iMUSE) parts: the body of the <c>ROL </c>, <c>ADL </c> and <c>SPK </c> block, each starting at its <c>MDhd</c> block. Null when the sound has no such part (and always null outside v5).</summary>
+    public byte[]? ImuseRoland { get; init; }
+    public byte[]? ImuseAdlib { get; init; }
+    public byte[]? ImuseSpeaker { get; init; }
 }
 
 /// <summary>One decoded OI image of a room object: the object's id, its size from the OC block and the picture as palette indices (the room's PA palette).</summary>

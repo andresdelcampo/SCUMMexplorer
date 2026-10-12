@@ -29,7 +29,12 @@ public sealed class SceneSoundPlayer
 
     /// <summary>True for a LOOM folder that carries Roland streams: the Roland upgrade (sounds 33 to 64) or a demo with its own Roland sounds (9 to 16, 29, 41).</summary>
     public static bool HasRolandSounds(GameLibrary game) =>
-        game.Id == GameId.Loom && game.Resources.Where(item => item.Kind == ResourceKind.Sound).OrderBy(item => item.ResourceId != 33).Any(ScummRolandSong.IsRoland);
+        game.Id == GameId.Loom && game.Resources.Where(item => item.Kind == ResourceKind.Sound).OrderBy(item => item.ResourceId != 33).Any(ScummRolandSong.IsRoland) ||
+        HasV5RolandSounds(game);
+
+    /// <summary>True for a v5 game (Monkey Island 2, Indiana Jones and the Fate of Atlantis) whose archive holds <c>ROL </c> sounds, the MT-32 version of its music.</summary>
+    public static bool HasV5RolandSounds(GameLibrary game) =>
+        game.Version == ScummVersion.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any(archive => archive.ReadSounds().Any(sound => sound.ImuseRoland is not null)) == true;
 
     /// <summary>The sound card number the scripts see for a device: 4 for the Roland upgrade, which makes them choose its sounds; the other devices keep 0.</summary>
     public static int SoundCardFor(SoundMode mode) => mode == SoundMode.Roland ? LoomExplorationSession.RolandSoundCard : 0;

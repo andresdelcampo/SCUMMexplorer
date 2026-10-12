@@ -2845,8 +2845,19 @@ public partial class MainWindow : Window
         {
             if (_game?.V4ArchiveFor(resource) is { } vga)
             {
-                if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in the game's archive.");
+                if (vga is ScummV5Archive)
+                {
+                    // A v5 sound number holds the music of one sound card only.
+                    if (cdSound.ImuseRoland is { } roland)
+                    {
+                        if (_sceneSound.Mode != SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
+                        if (_sceneSound.Roms is not { } v5Roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
+                        return new ScummImuseMt32(v5Roms).RenderWave(roland, token);
+                    }
+                    throw new NotSupportedException(cdSound.ImuseAdlib is not null ? "This is an AdLib sound; AdLib playback of this game is not available yet." : "This sound is for the PC speaker; playback of this game's PC speaker sounds is not available yet.");
+                }
+                if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 return adlib
                     ? _adlibDecoder.RenderWave(cdSound.Adlib ?? throw new InvalidDataException("This sound has no AdLib part."), token, halfTempo: _game!.V4Archive is null)
                     : _audioDecoder.RenderWave(cdSound.Speaker ?? throw new InvalidDataException("This sound has no PC speaker part."), 6, token);
@@ -2982,7 +2993,7 @@ public partial class MainWindow : Window
     {
         if (_game is null || !SceneSoundPlayer.HasRolandSounds(_game))
         {
-            MessageBox.Show(this, "This game folder does not have the LOOM Roland upgrade installed (its sounds 33 to 64 are missing), so there is no Roland music to play.",
+            MessageBox.Show(this, "This game folder has no Roland music to play (for LOOM, the Roland upgrade with its sounds 33 to 64 is not installed).",
                 "Roland MT-32", MessageBoxButton.OK, MessageBoxImage.Information);
             return false;
         }

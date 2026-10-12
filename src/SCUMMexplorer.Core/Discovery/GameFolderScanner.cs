@@ -284,7 +284,7 @@ public sealed class GameFolderScanner
                     $"Costume stored in room {costume.Room:00} on {diskName}.", disk, null));
             foreach (var sound in archive.ReadSounds())
                 resources.Add(new GameResource($"Sound {sound.Id:00}", ResourceKind.Sound, source.Location, sound.Id,
-                    $"{(sound.IsMusic ? "Music" : "Sound effect")} stored in room {sound.Room:00} on {diskName}.", disk, null));
+                    $"{(sound.ImuseRoland is not null ? "Roland MT-32 sound" : sound.ImuseAdlib is not null ? "AdLib sound" : sound.ImuseSpeaker is not null ? "PC speaker sound" : sound.IsMusic ? "Music" : "Sound effect")} stored in room {sound.Room:00} on {diskName}.", disk, null));
             // Scripts of the v5 archive: the global SCRP blocks and each room's local LSCR blocks.
             if (archive is ScummV5Archive v5Scripts)
             {
