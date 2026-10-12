@@ -12,8 +12,8 @@ public partial class MainWindow
     private CancellationTokenSource? _costumeCardCancellation;
     private bool _showCostumeCards;
 
-    /// <summary>The Costumes tab of the normal view: both LOOM games, and the v4 games that are only browsed.</summary>
-    private static bool HasCostumeCards(GameLibrary? game) => game is { Id: GameId.Loom or GameId.LoomVga } || game?.V4Disks is not null || game?.Version is ScummVersion.V1 or ScummVersion.V2;
+    /// <summary>The Costumes tab of the normal view: both LOOM games, Indy3 EGA, and the v4 games that are only browsed.</summary>
+    private static bool HasCostumeCards(GameLibrary? game) => game is { Id: GameId.Loom or GameId.LoomVga or GameId.IndianaJones3 } || game?.V4Disks is not null || game?.Version is ScummVersion.V1 or ScummVersion.V2;
 
     private void NormalCatalogTab_Click(object sender, RoutedEventArgs e)
     {

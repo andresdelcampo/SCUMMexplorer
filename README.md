@@ -15,13 +15,47 @@ SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Pick any
   - the short and the long self-running demo
 - **LOOM** (CD, VGA, English), from a folder, a `.cue`/`.bin` or an `.iso`, with the voices and music from the disc
 
-Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. Other classic SCUMM games open in a limited, browse-only way (no scripts, objects or interaction yet):
+Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. Other classic SCUMM games open in a limited, browse-only way (no interaction, actors or cutscenes yet):
 
-- **Indiana Jones and the Last Crusade** (EGA): room pictures and texts. The **256-colour** version: room pictures, costumes and sounds.
-- **Monkey Island** (VGA and EGA, all disks): room pictures, costumes and sounds. The **CD** version and **Monkey Island 2**, and **Indiana Jones and the Fate of Atlantis** (floppy, talkie, CD): room pictures and costumes.
-- **Maniac Mansion** and **Zak McKracken**, **Enhanced** versions: room pictures and costumes. **Classic** versions: room pictures.
+- **Indiana Jones and the Last Crusade** (EGA and 256 colours)
+- **Monkey Island** (VGA, EGA and CD) and **Monkey Island 2**
+- **Indiana Jones and the Fate of Atlantis** (floppy, talkie, CD)
+- **Maniac Mansion** and **Zak McKracken**, classic and enhanced
 
 In these games the room picker fills in on its own, the Costumes tab sits beside the Rooms tab (where costumes can be read), and sounds are in the Advanced tree.
+
+### What each game supports
+
+✔ works, ◐ partly (see the notes under the table), – not supported yet. This is what has been checked so far; most browse-only features have been verified against the game data and as pictures, not yet compared line by line with ScummVM.
+
+| Game | Rooms | Objects | Walk boxes | Costumes | Sound | Texts | Scripts | Play | Cutscenes | Status |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| **LOOM** EGA English (reference) | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| **LOOM** EGA other editions | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **LOOM** demos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **LOOM** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Indiana Jones 3** EGA | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | – | – | – | – |
+| **Indiana Jones 3** 256 colours | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – | – | – |
+| **Monkey Island 1** floppy | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | – | – | – | – |
+| **Monkey Island 1** CD | ✔ | ◐ | ✔ | ✔ | ◐ | – | – | – | – | – |
+| **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | – | – | – | – | – | – |
+| **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | – | – | – | – | – | – |
+| **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – | – | – |
+| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | – | – | – | – | – |
+| **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – | – | – |
+| **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | – | – | – | – | – |
+
+Notes:
+
+- **Columns.** *Rooms* shows the room pictures (LOOM in its first-visit state), *Texts* is the Game Texts browser, *Scripts* the raw and readable script views, *Play* clicking in a live room with actors and scripts, *Status* the Game Status editor.
+- **LOOM editions.** "Other editions" are Spanish, plain English, French, German, v1.2 and Italian. "Demos" are the short and the long self-running demo.
+- **Audio devices.** LOOM EGA: AdLib and PC speaker, plus Roland MT-32 when the Roland upgrade is installed. LOOM CD: voices and disc music. Browse-only games: AdLib and PC speaker (Indiana Jones 3, Monkey Island 1 floppy) or PC speaker and PCjr/Tandy (Maniac Mansion, Zak McKracken).
+- **Objects.** In the browse-only games, objects are painted only where the game data gives them a starting state (Maniac Mansion and Zak McKracken, Indiana Jones 3 EGA). The v4 and v5 games show an object's name when you hover over it; the objects themselves would need the room scripts to run first.
+- **Walk boxes** (Advanced) are read for every game.
+- **Costumes** are drawn in the palette of the room that stores them, so some look off (Guybrush's shirt). The classic Maniac Mansion and Zak McKracken use the explorer's estimate of the actor colours, because the scripts choose them.
+- **Sounds.** AdLib music in the Monkey Island and Indiana Jones 3 (256 colours) disks plays at half tempo, set by ear, not from ScummVM's source. Indiana Jones 3 EGA plays its AdLib music at the LOOM tempo, which has not been checked by ear. Monkey Island 1 CD lists the disc's 24 audio tracks without names. The Monkey Island 2 and Indiana Jones 4 MIDI music (iMUSE) is not read. The PCjr/Tandy sounds of Maniac Mansion and Zak McKracken are ported from ScummVM but not yet listened to.
+- **Cutscenes.** The demos play only their preview. LOOM English EGA has a hand-checked list of 328 scenes. Other LOOM editions and the CD derive theirs from the game's own scripts.
+- The Maniac Mansion, Zak McKracken, Monkey Island, Indiana Jones and Atlantis columns marked "–" describe what the app does not read yet, not what the original game lacks. The detailed list is in [Requirements](docs/REQUIREMENTS.md) (section 3.1).
 
 ## Getting started
 

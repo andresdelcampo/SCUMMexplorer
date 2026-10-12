@@ -73,7 +73,7 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 | LOOM EGA other editions (Spanish, plain English, French, German, v1.2, Italian) | LOOM EGA | ✔ | first-visit, objects, actors (same code; no gaps checked, first-visit per edition not recorded: I-07) | ✔ | ✔ | four established starts only | ✔ | ✔ | AdLib, PC Speaker; Roland only with files 82–85 |
 | LOOM demos (short, long) | LOOM demo | ✔ | first-visit, objects, actors | ✔ | ✔ (full-game names not applied) | only **The preview** | ✔ | ✔ | as EGA |
 | LOOM CD/VGA en (`.cue`/`.bin`/`.iso`, folder, or copied files) | LOOM CD | ✔ | first-visit, objects, actors | ✔ | ✔ | derived from scripts | ✔ (Advanced) | ✔ | CD Audio / No Sound |
-| Indy3 EGA en | INDY3 EGA | ✔ | backgrounds only (R-6.12) | – | not shown in tree | – | ✔ incl. dialogue choices | – | – |
+| Indy3 EGA en | INDY3 EGA | ✔ | backgrounds only (R-6.12) | – | not shown in tree | – | ✔ incl. dialogue choices | – | AdLib, PC Speaker; costumes tab |
 | Monkey Island VGA (4 disks) and EGA (8 disks), any language | BROWSED | ✔ | backgrounds only (R-3.10, R-6.13) | – | – | – | – | – | AdLib, PC Speaker (R-13.8); costumes tab (R-5.5) |
 | Indiana Jones and the Fate of Atlantis (floppy, talkie, CD), Monkey Island 1 CD, Monkey Island 2 (v5; any language) | BROWSED | ✔ | backgrounds only (R-3.14) | – | – | – | – | – | – (sounds not read); costumes tab |
 | Indiana Jones and the Last Crusade, 256 colours (per-room `.lfl`) | BROWSED | ✔ | backgrounds only | – | – | – | – | – | AdLib, PC Speaker; costumes tab |

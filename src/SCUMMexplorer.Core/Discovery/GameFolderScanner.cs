@@ -99,7 +99,7 @@ public sealed class GameFolderScanner
                             // An enhanced v2 game's room directory also points at room 0, which is the index file itself: only a room whose picture decodes is offered.
                             if (isOlder && indexed.Kind == ResourceKind.Room && !DecodesAsOlderRoom(resourcePath, classic?.Game)) continue;
                             // Likewise a costume entry that is empty or points at nothing (Costume 00) is left out.
-                            if (isOlder && indexed.Kind == ResourceKind.Costume && !ReadsAsOlderCostume(resourcePath, indexed.Offset)) continue;
+                            if ((isOlder || gameId == GameId.IndianaJones3) && indexed.Kind == ResourceKind.Costume && !ReadsAsOlderCostume(resourcePath, indexed.Offset)) continue;
                             if (isOlder && indexed.Kind == ResourceKind.Sound && !ReadsAsOlderSound(resourcePath, indexed.Offset)) continue;
                             // A demo's index is not a subset of the full game's: it keeps entries for resources its
                             // folder lacks (no container file) or whose offset is not where a resource starts.
