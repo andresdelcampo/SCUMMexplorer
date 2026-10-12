@@ -203,7 +203,7 @@
                         <Path.Style><Style TargetType="{x:Type Path}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding}" Value="No Sound"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Path.Style>
                     </Path>
                     <Canvas Width="20" Height="20">
-                        <Canvas.Style><Style TargetType="{x:Type Canvas}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding}" Value="PC Speaker"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Canvas.Style>
+                        <Canvas.Style><Style TargetType="{x:Type Canvas}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding}" Value="PC Speaker"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding}" Value="PCjr / Tandy"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Canvas.Style>
                         <Path Data="M1,7.5 H5 L10,3 V17 L5,12.5 H1 Z" Fill="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"/>
                         <Path Data="M13,7 Q15,10 13,13 M15.5,4.5 Q19.5,10 15.5,15.5" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stroke="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"/>
                     </Canvas>
@@ -358,6 +358,7 @@
                         <sys:String>PC Speaker</sys:String>
                         <sys:String>AdLib</sys:String>
                         <sys:String>Roland MT-32</sys:String>
+                        <sys:String>PCjr / Tandy</sys:String>
                     </ComboBox>
                     <CheckBox x:Name="AdvancedModeToggle" Content="Advanced" IsChecked="False" Click="AdvancedModeToggle_Click" Style="{StaticResource SwitchCheck}"
                               VerticalAlignment="Center" Margin="0,0,14,0"

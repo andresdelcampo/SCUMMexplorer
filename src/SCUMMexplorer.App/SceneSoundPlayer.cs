@@ -18,7 +18,7 @@ namespace SCUMMexplorer.App;
 /// </summary>
 public sealed class SceneSoundPlayer
 {
-    public enum SoundMode { None, PcSpeaker, Adlib, Roland }
+    public enum SoundMode { None, PcSpeaker, Adlib, Roland, Pcjr }
     public SoundMode Mode { get; private set; } = SoundMode.Adlib;
 
     /// <summary>The AdLib rendition's default level; the room panel's slider can change it.</summary>
@@ -34,7 +34,7 @@ public sealed class SceneSoundPlayer
     /// <summary>The sound card number the scripts see for a device: 4 for the Roland upgrade, which makes them choose its sounds; the other devices keep 0.</summary>
     public static int SoundCardFor(SoundMode mode) => mode == SoundMode.Roland ? LoomExplorationSession.RolandSoundCard : 0;
 
-    public static string DeviceName(SoundMode mode) => mode switch { SoundMode.Adlib => "AdLib", SoundMode.Roland => "Roland MT-32", _ => "PC speaker" };
+    public static string DeviceName(SoundMode mode) => mode switch { SoundMode.Adlib => "AdLib", SoundMode.Roland => "Roland MT-32", SoundMode.Pcjr => "PCjr/Tandy", _ => "PC speaker" };
 
     /// <summary>Changing device stops current voices; subsequent script commands use the new device.</summary>
     public void SetMode(SoundMode mode)

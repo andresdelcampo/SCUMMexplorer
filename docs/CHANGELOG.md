@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: PCjr/Tandy device for the classic Maniac Mansion
+
+- New sound device **PCjr / Tandy** (`SoundMode.Pcjr`, `ScummPcjrV1Audio`), a port of ScummVM's `Player_V1` PCjr half (`parsePCjrChunk`, `nextPCjrCmd`, `generatePCjrSamples`) with `Player_V2`'s three square voices and noise voice (16 volume steps of 2 dB, 111860 Hz base, 44100 Hz output). The PCjr part of a v1-format sound starts at the word at byte 4. Offered only for v1 games (the classic Maniac Mansion); other games hide it, and a saved PCjr choice falls back when a game without it opens. All 61 sounds of `mmansion ega en` render (Sound 58 98 s, Sound 69 17.5 s); six whose envelope data starts at the very end of the resource read zeros past it (ScummVM reads the following memory). Sounds 21 and 38 run to the three-minute preview limit (long notes). Not listened to, not compared with ScummVM on PCjr.
+- **Not done:** the v2 format (Zak McKracken, enhanced Maniac Mansion) has its own PCjr routine in `Player_V2` (envelope tables); those games do not offer the device.
+
 ## 12 October: PC speaker sounds of the classic Maniac Mansion
 
 - **Playback was refused:** the sound panel called every v1/v2 sound "Roland only", because `ScummRolandSong.IsRoland` looks for the v3 speaker+AdLib header and the old format has none. The v1/v2 branch now runs before that check (`RenderAudioWaveAsync`); Maniac Mansion's sounds play on the PC speaker.

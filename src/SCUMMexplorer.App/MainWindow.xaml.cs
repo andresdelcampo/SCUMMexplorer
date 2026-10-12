@@ -279,6 +279,15 @@ public partial class MainWindow : Window
             SoundModeCombo.SelectedIndex = (int)SceneSoundPlayer.SoundMode.PcSpeaker;
             _soundModeFallback = false;
         }
+        else if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Pcjr && game.Version != ScummVersion.V1)
+        {
+            // The PCjr/Tandy part is played for the classic v1 Maniac Mansion only; not saved, so the choice returns with such a game.
+            var fallback = game.Version == ScummVersion.V2 ? SceneSoundPlayer.SoundMode.PcSpeaker : SceneSoundPlayer.SoundMode.Adlib;
+            _sceneSound.SetMode(fallback);
+            _soundModeFallback = true;
+            SoundModeCombo.SelectedIndex = (int)fallback;
+            _soundModeFallback = false;
+        }
         else if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && !(SceneSoundPlayer.HasRolandSounds(game) && (_sceneSound.Roms ??= FindMt32Roms(game)) is not null))
         {
             // Not saved: the choice stays for a folder with the upgrade and the ROMs.
@@ -2716,7 +2725,7 @@ public partial class MainWindow : Window
         var cdCue = IsCdCue(resource) || IsCdTrack(resource);
         var adlib = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
         var roland = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
-        var format = cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : "PC speaker";
+        var format = cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Pcjr ? "PCjr/Tandy" : "PC speaker";
         AdlibGainPanel.Visibility = adlib ? Visibility.Visible : Visibility.Collapsed;
         _previewCancellation?.Cancel();
         RoomPreview.Visibility = Visibility.Collapsed;
@@ -2835,6 +2844,7 @@ public partial class MainWindow : Window
             {
                 // The v1/v2 sound format has no speaker+AdLib bundle header, so IsRoland would misread every sound as Roland.
                 if (adlib) throw new NotSupportedException("This game's sounds are for the PC speaker. Choose that device.");
+                if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Pcjr) return ScummPcjrV1Audio.RenderWave(resource, token);
                 return ScummPcSpeakerV1Audio.RenderOlder(resource, _audioDecoder, token);
             }
             if (ScummRolandSong.IsRoland(resource)) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
@@ -2995,6 +3005,7 @@ public partial class MainWindow : Window
         }
         if (game.Version is ScummVersion.V1 or ScummVersion.V2) Hide("AdLib");
         if (!SceneSoundPlayer.HasRolandSounds(game)) Hide("Roland MT-32");
+        if (game.Version != ScummVersion.V1) Hide("PCjr / Tandy");
         SoundModeCombo.ItemContainerStyle = style;
     }
 
