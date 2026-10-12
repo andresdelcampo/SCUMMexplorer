@@ -32,6 +32,13 @@ public sealed class LoomDoorwayFinder
         _data = ScummDataSources.For(game);
     }
 
+    /// <summary>The finder over a given data source: one disk of a browsed v4 game, which <see cref="ScummDataSources.For"/> does not cover.</summary>
+    public LoomDoorwayFinder(GameLibrary game, IScummDataSource data)
+    {
+        _game = game ?? throw new ArgumentNullException(nameof(game));
+        _data = data ?? throw new ArgumentNullException(nameof(data));
+    }
+
     public IReadOnlyList<LoomDoorwayTarget> Find(GameResource room, ScummScriptDisassembly verbScript)
     {
         ArgumentNullException.ThrowIfNull(room);

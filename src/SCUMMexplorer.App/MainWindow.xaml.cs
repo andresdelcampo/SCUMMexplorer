@@ -692,12 +692,70 @@ public partial class MainWindow : Window
 
     private BrowsedObjectLabel? _browsedHover;
 
-    /// <summary>Browse-only games: the room's stored objects as an Advanced-mode list; hovering a row outlines its box. Raw stored data only.</summary>
-    private void ShowStoredObjectHotspots()
+    /// <summary>The stored objects that are not doorways (a doorway has its own overlay, list and option, as in LOOM).</summary>
+    private IEnumerable<BrowsedObjectLabel> BrowsedObjects => _olderObjects.Where(label => !_roomNavigationCandidates.Any(item => item.Object.Id == label.Id));
+
+    private static string BrowsedName(BrowsedObjectLabel label) => label.Name.Length > 0 ? label.Name : $"Object {label.Id}";
+
+    /// <summary>
+    /// The rooms an object's verb scripts can load (static candidates, as for LOOM; no script is run). Only games with a script reader
+    /// (v3 and v4) have any; the other browse-only games have none.
+    /// </summary>
+    private IReadOnlyList<RoomVerbDestination> FindBrowsedDoorways(GameResource room)
+    {
+        if (_game is not { Version: ScummVersion.V3 or ScummVersion.V4 } game || room.ResourceId is not int roomId) return [];
+        try
+        {
+            // A browsed v4 game reads its room out of the disk (or the room files) that holds it.
+            IScummDataSource data = game.Version == ScummVersion.V4 && game.V4Archive is null
+                ? game.V4ArchiveFor(room) is ScummV4Archive archive && room.ContainerFileNumber is int disk
+                    ? new ScummV4DataSource(archive, ScummProfile.For(game).Dialect, disk, archive.IsRoomFileGame ? "its room files" : ScummV4Archive.DiskFileName(disk))
+                    : throw new InvalidDataException("This room is not stored in the game's archive.")
+                : ScummDataSources.For(game);
+            var records = data.ReadRoom(roomId).Objects;
+            var verbs = data.ReadObjectVerbs(roomId, records);
+            var finder = new LoomDoorwayFinder(game, data);
+            var found = new List<RoomVerbDestination>();
+            foreach (var record in records)
+            {
+                if (!verbs.TryGetValue(record.Id, out var entries)) continue;
+                foreach (var verb in entries)
+                {
+                    ScummScriptDisassembly script;
+                    try { script = data.ReadObjectVerb(roomId, record, verb.VerbId, out _); }
+                    catch (Exception ex) when (ex is IOException or InvalidDataException or KeyNotFoundException or ArgumentException) { continue; }
+                    foreach (var target in finder.Find(room, script))
+                        found.Add(new RoomVerbDestination(record, verb, target.RoomId, target.InstructionOffset, target.Path));
+                }
+            }
+            return found;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or KeyNotFoundException or ArgumentException or NotSupportedException or InvalidOperationException) { return []; }
+    }
+
+    /// <summary>The doorway boxes of a browse-only room (those stored objects whose scripts can load a room), per the Never / On hover / Always doorway option.</summary>
+    private IEnumerable<(int X, int Y, int Width, int Height, int[] Targets, bool Live, string ToolTip, string Prefix)> BrowsedDoorwayBoxes()
+    {
+        foreach (var label in _olderObjects)
+        {
+            var targets = _roomNavigationCandidates.Where(item => item.Object.Id == label.Id).Select(item => item.TargetRoomId).Distinct().Order().ToArray();
+            if (targets.Length == 0 || DoorwayMode == DisplayMode.Never || DoorwayMode == DisplayMode.Hover && !_hoveredDoorwayIds.Contains(label.Id)) continue;
+            yield return (label.X, label.Y, label.Width, label.Height, targets, true,
+                $"{BrowsedName(label)}: its script can load {string.Join(" or ", targets.Select(id => $"Room {id:00}"))} (a static candidate; no script condition is evaluated). " +
+                "The Advanced doorway buttons open the rooms directly.",
+                label.Name.Length > 0 ? label.Name + " → " : "");
+        }
+    }
+
+    /// <summary>Browse-only games: the room's stored objects as an Advanced-mode list; hovering a row outlines its box. Doorways get their own buttons and overlay. Raw stored data only.</summary>
+    private void ShowStoredObjectHotspots(GameResource room, IReadOnlyList<RoomVerbDestination> doorways)
     {
         _browsedHover = null;
+        // Only doorways that are among the room's stored objects with a box.
         if (_olderObjects.Count == 0) { ShowBrowsedHighlight(null, true); return; }
-        foreach (var label in _olderObjects)
+        var present = _olderObjects.Select(label => label.Id).ToHashSet();
+        ShowRoomNavigationCandidates(room, doorways.Where(item => present.Contains(item.Object.Id)).ToArray());
+        foreach (var label in BrowsedObjects)
         {
             var text = label.Name.Length > 0 ? label.Name : $"Object {label.Id}";
             var button = new Button
@@ -748,9 +806,21 @@ public partial class MainWindow : Window
             Canvas.SetLeft(box, offsetX + item.X * scale);
             Canvas.SetTop(box, offsetY + item.Y * scale);
             HotspotHighlightOverlay.Children.Add(box);
+            // The object's name (the highlighted one always has a label: its name, else its number).
+            if (item.Name.Length == 0 && !strong) return;
+            var name = new Border
+            {
+                Child = new TextBlock { Text = BrowsedName(item), Foreground = Brushes.White, FontSize = Math.Clamp(scale * 5, 8, 12), Margin = new Thickness(3, 1, 3, 1), TextTrimming = TextTrimming.CharacterEllipsis },
+                Background = new SolidColorBrush(Color.FromArgb(200, 17, 24, 32)),
+                MaxWidth = Math.Max(24, item.Width * scale),
+                IsHitTestVisible = false
+            };
+            Canvas.SetLeft(name, offsetX + item.X * scale);
+            Canvas.SetTop(name, offsetY + item.Y * scale);
+            HotspotHighlightOverlay.Children.Add(name);
         }
         if (all)
-            foreach (var item in _olderObjects)
+            foreach (var item in BrowsedObjects)
                 if (item.Id != label?.Id) Box(item, false);
         if (label is not null) Box(label, true);
     }
@@ -1202,6 +1272,7 @@ public partial class MainWindow : Window
             _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
             {
+                IReadOnlyList<RoomVerbDestination> browsedDoorways = isCd ? [] : await Task.Run(() => FindBrowsedDoorways(resource), token);
                 if (token.IsCancellationRequested) return;
                 _currentRoom = room;
                 _currentRoomResource = resource;
@@ -1236,7 +1307,7 @@ public partial class MainWindow : Window
                 ShowWalkBoxToggle();
                 PreviewMessage.Visibility = Visibility.Collapsed;
                 // After the preview refresh and the navigation update, which rebuild the list and hide the hotspot options.
-                ShowStoredObjectHotspots();
+                ShowStoredObjectHotspots(resource, browsedDoorways);
                 UpdateAdvancedMode();
                 PageSubtitle.Text = "Original artwork from the game";
                 StatusText.Text = "Ready";
@@ -4975,10 +5046,16 @@ public partial class MainWindow : Window
         if (_olderObjects.Count > 0)
         {
             // A browsed v1 or v2 game: the name of the drawn object under the pointer (the first of the directory is on top).
-            var under = _olderObjects.FirstOrDefault(entry => x >= entry.X && x < entry.X + entry.Width && y >= entry.Y && y < entry.Y + entry.Height);
+            bool Over(BrowsedObjectLabel entry) => x >= entry.X && x < entry.X + entry.Width && y >= entry.Y && y < entry.Y + entry.Height;
+            var under = _olderObjects.FirstOrDefault(Over);
+            var doorwayIds = _olderObjects.Where(entry => Over(entry) && _roomNavigationCandidates.Any(item => item.Object.Id == entry.Id)).Select(entry => entry.Id).ToHashSet();
+            if (DoorwayMode == DisplayMode.Hover && !doorwayIds.SetEquals(_hoveredDoorwayIds)) { _hoveredDoorwayIds = doorwayIds; RefreshRoomNavigationOverlay(); }
+            var overObject = BrowsedObjects.FirstOrDefault(Over);
             RoomPreview.Cursor = Cursors.Arrow;
-            RoomPreview.ToolTip = under is null ? null : under.Name.Length > 0 ? under.Name : $"Object {under.Id}";
-            if (under?.Id != _browsedHover?.Id) ShowBrowsedHighlight(under, false);
+            RoomPreview.ToolTip = under is null ? null : doorwayIds.Contains(under.Id)
+                ? $"{BrowsedName(under)} → {string.Join(" or ", _roomNavigationCandidates.Where(item => item.Object.Id == under.Id).Select(item => $"Room {item.TargetRoomId:00}").Distinct())}"
+                : BrowsedName(under);
+            if (overObject?.Id != _browsedHover?.Id) ShowBrowsedHighlight(overObject, false);
             return;
         }
         var hoveredRow = SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null;
@@ -5425,6 +5502,12 @@ public partial class MainWindow : Window
                     candidates.Add(new RoomVerbDestination(record, verb, target.RoomId, target.InstructionOffset, target.Path));
             }
         }
+        ShowRoomNavigationCandidates(room, candidates);
+    }
+
+    /// <summary>The doorway buttons, options and overlay for a list of candidates; the session's rooms and the browse-only games share it.</summary>
+    private void ShowRoomNavigationCandidates(GameResource room, IReadOnlyList<RoomVerbDestination> candidates)
+    {
         _roomNavigationCandidates = candidates.DistinctBy(item =>
             (item.Object.Id, item.Verb.VerbId, item.TargetRoomId)).ToArray();
         // One button per target room; every hotspot that leads there stays in its tooltip.
@@ -5480,19 +5563,21 @@ public partial class MainWindow : Window
         var offsetX = (RoomNavigationOverlay.ActualWidth - room.Width * scale) / 2;
         var offsetY = (RoomNavigationOverlay.ActualHeight - room.Height * scale) / 2;
 
-        if (_session?.Snapshot is not { } snapshot) return;
-        // Doorways that share one rectangle get one box and one label.
-        foreach (var group in VisibleDoorways(snapshot).Where(record => DoorwayMode == DisplayMode.Always || DoorwayMode == DisplayMode.Hover && _hoveredDoorwayIds.Contains(record.Id)).GroupBy(record =>
-                 {
-                     var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
-                         ? current : new RoomObjectPosition(record.X, record.Y);
-                     return (at.X, at.Y, record.Width, record.Height);
-                 }))
+        IEnumerable<(int X, int Y, int Width, int Height, int[] Targets, bool Live, string ToolTip, string Prefix)> boxes;
+        if (_olderObjects.Count > 0) boxes = BrowsedDoorwayBoxes();
+        else if (_session?.Snapshot is { } snapshot)
+            // Doorways that share one rectangle get one box and one label.
+            boxes = VisibleDoorways(snapshot).Where(record => DoorwayMode == DisplayMode.Always || DoorwayMode == DisplayMode.Hover && _hoveredDoorwayIds.Contains(record.Id)).GroupBy(record =>
+                {
+                    var at = snapshot.ObjectPositions.TryGetValue(record.Id, out var current)
+                        ? current : new RoomObjectPosition(record.X, record.Y);
+                    return (at.X, at.Y, record.Width, record.Height);
+                }).Select(group => (group.Key.X, group.Key.Y, group.Key.Width, group.Key.Height,
+                    group.SelectMany(DoorwayTargets).Distinct().Order().ToArray(), group.Any(record => !snapshot.IsUntouchable(record.Id)),
+                    string.Join("\n", group.Select(DoorwayToolTip)), ""));
+        else return;
+        foreach (var (x, y, width, height, targetIds, live, toolTip, prefix) in boxes)
         {
-            var (x, y, width, height) = group.Key;
-            var targetIds = group.SelectMany(DoorwayTargets).Distinct().Order().ToArray();
-            var live = group.Any(record => !snapshot.IsUntouchable(record.Id));
-            var toolTip = string.Join("\n", group.Select(DoorwayToolTip));
             var accent = live ? Color.FromRgb(255, 207, 105) : Color.FromRgb(190, 176, 150);
 
             var bounds = new Border
@@ -5513,7 +5598,7 @@ public partial class MainWindow : Window
             {
                 Child = new TextBlock
                 {
-                    Text = "Room " + string.Join(" / ", targetIds.Select(id => id.ToString("00"))),
+                    Text = prefix + "Room " + string.Join(" / ", targetIds.Select(id => id.ToString("00"))),
                     FontStyle = live ? FontStyles.Normal : FontStyles.Italic,
                     Foreground = Brushes.White,
                     FontWeight = FontWeights.SemiBold,

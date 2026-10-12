@@ -31,6 +31,7 @@ internal static class Program
                 advanced.IsChecked = true;
                 Call("UpdateAdvancedMode");
                 ((RadioButton)window.FindName("ObjectsAlways")).IsChecked = true;
+                ((RadioButton)window.FindName("DoorwaysAlways")).IsChecked = true;
                 var report = new List<string>();
                 foreach (var room in args.Skip(2).Select(int.Parse))
                 {
@@ -46,6 +47,7 @@ internal static class Program
                     var overlay = (Panel)window.FindName("HotspotHighlightOverlay");
                     report.Add($"Room {room:00}: header=\"{((TextBlock)window.FindName("ObjectListHeader")).Text}\" rows={list.Children.Count} boxesDrawn={overlay.Children.Count} " +
                         $"overlay={overlay.Visibility} section={((UIElement)window.FindName("ObjectListSection")).Visibility} options={((UIElement)window.FindName("ObjectAreaOptions")).Visibility}");
+                    report.Add($"  doorway buttons: {string.Join(" | ", ((Panel)window.FindName("RoomNavigationButtons")).Children.OfType<Button>().Select(b => b.Content))}; doorway boxes drawn={((Panel)window.FindName("RoomNavigationOverlay")).Children.Count}; doorway options={((UIElement)window.FindName("DoorwayOptions")).Visibility}");
                     report.Add("  first rows: " + string.Join(" | ", list.Children.OfType<Button>().Take(6).Select(b => b.Content)));
                     var bitmap = new RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32);
                     bitmap.Render(window);
