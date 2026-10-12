@@ -6,6 +6,20 @@
 
 SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Revisit their room artwork, read the dialogue, and explore the scripts behind those memories. In LOOM, you can also click objects and exits, replay cutscenes, and hear the music; the other games currently offer browsing, with sound where supported. Everything is rebuilt live from **your own game files**. Nothing is included, nothing is copied.
 
+<p align="center">
+  <a href="screenshots/Rooms.jpg"><img src="screenshots/Rooms.jpg" alt="The Secret of Monkey Island room browser, with thumbnail navigation and the island's volcanic landscape" width="1000"></a>
+  <br>
+  <strong>Return to the places you remember.</strong><br>
+  Browse The Secret of Monkey Island's rooms by their artwork.
+</p>
+
+<p align="center">
+  <a href="screenshots/Costumes.jpg"><img src="screenshots/Costumes.jpg" alt="Indiana Jones and the Last Crusade costume browser, showing Indy's stored poses" width="1000"></a>
+  <br>
+  <strong>Look closer at familiar faces.</strong><br>
+  Explore the stored costume poses from Indiana Jones and the Last Crusade.
+</p>
+
 ## Games
 
 - **LOOM** (EGA, DOS), the main focus, in these editions:
@@ -80,9 +94,31 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 - **Listen.** Music and effects through AdLib, PC Speaker or the Roland MT-32 (see below); the CD edition plays its voices and its disc music. The choice is remembered.
 - **Look closer.** Show doorways and hotspots on hover, switch to the original framing or fill the window, or go full screen (F11).
 
+<table>
+  <tr>
+    <td width="50%" valign="top" align="center">
+      <a href="screenshots/LoomGameStatus.jpg"><img src="screenshots/LoomGameStatus.jpg" alt="LOOM Game Status editor with available notes, learned drafts and their note sequences" width="500"></a><br>
+      <strong>Change what Bobbin knows.</strong><br>
+      Choose available notes and learned drafts in Game Status.
+    </td>
+    <td width="50%" valign="top" align="center">
+      <a href="screenshots/LoomGameTexts.jpg"><img src="screenshots/LoomGameTexts.jpg" alt="LOOM Game Texts browser with searchable dialogue and the matching room artwork" width="500"></a><br>
+      <strong>Rediscover the words.</strong><br>
+      Browse LOOM's dialogue alongside the rooms it belongs to.
+    </td>
+  </tr>
+</table>
+
 ## For the curious: Advanced mode
 
 Switch **Advanced** on, and the explorer opens up. Everything here reads from the game's own data, and every guess is labelled as a guess.
+
+<p align="center">
+  <a href="screenshots/LoomAdvanced.jpg"><img src="screenshots/LoomAdvanced.jpg" alt="LOOM CD in Advanced mode with walk boxes, depth areas, doorways, hotspots and room entry script details" width="1000"></a>
+  <br>
+  <strong>See how a room works.</strong><br>
+  LOOM CD with walk boxes, depth areas and the scripts behind the scene.
+</p>
 
 - **The whole game as a tree.** Rooms, costumes, scripts, sounds and music, and the game files, each with the names the community knows them by and where the name comes from.
 - **Every script, two ways.** The decoded instructions, or a plain-language reading with names, conditions and branches written out. A "used by" index shows who calls what.
@@ -94,6 +130,13 @@ Switch **Advanced** on, and the explorer opens up. Everything here reads from th
 - **Restart the story** from the very beginning in one click.
 - **A sound player for every sound.** Play any music or effect on demand, with an AdLib level slider and the room's music cues. On the CD edition, browse every voice and music track on the disc.
 - **Game Status in depth.** The raw story bits, where each value comes from, and every draft with its notes, flags and reversing.
+
+<p align="center">
+  <a href="screenshots/LoomReadableScripts.jpg"><img src="screenshots/LoomReadableScripts.jpg" alt="LOOM CD readable script view translating Script 12 into plain language, with script links and a used-by index" width="1000"></a>
+  <br>
+  <strong>Read the logic behind a familiar line.</strong><br>
+  The game's own script, decoded into plain language with links to related scripts.
+</p>
 
 ## Roland MT-32 music (optional)
 
