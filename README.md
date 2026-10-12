@@ -20,6 +20,13 @@ SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Revisit 
   Explore the stored costume poses from Indiana Jones and the Last Crusade.
 </p>
 
+<p align="center">
+  <a href="screenshots/PlayWide.png"><img src="screenshots/PlayWide.png" alt="LOOM in normal mode with Bobbin in a wide coastal room, the distaff and controls for interaction and cutscenes" width="1000"></a>
+  <br>
+  <strong>Step back into LOOM.</strong><br>
+  Explore wide rooms, cast drafts and revisit cutscenes in the interactive view.
+</p>
+
 ## Games
 
 - **LOOM** (EGA, DOS), the main focus, in these editions:
@@ -138,7 +145,18 @@ Switch **Advanced** on, and the explorer opens up. Everything here reads from th
   The game's own script, decoded into plain language with links to related scripts.
 </p>
 
-## Roland MT-32 music (optional)
+## Music and sound
+
+Browse the available music and effects in Advanced mode and play them on demand. Depending on the game and edition, the explorer supports PC Speaker, AdLib, Roland MT-32, sampled effects and CD audio.
+
+<p align="center">
+  <a href="screenshots/Audio.jpg"><img src="screenshots/Audio.jpg" alt="The Secret of Monkey Island CD audio player with the sound-device menu open, listing PC Speaker, AdLib and Roland MT-32" width="1000"></a>
+  <br>
+  <strong>Hear the soundtrack again.</strong><br>
+  The Secret of Monkey Island's CD audio player, with the sound-device menu open.
+</p>
+
+### Roland MT-32 music (optional)
 
 Choose **Roland MT-32** in the sound menu to hear the LOOM Roland upgrade's music, including the overture that only plays on this card. It needs two things that are not part of this program:
 
