@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: stored-object hotspots for browse-only games
+
+Browse-only games (Indy3 EGA, v1/v2, v4, v5) show the room's stored objects as boxes (existing Never / On hover / Always option) and as a "STORED OBJECTS" list in Advanced mode; hovering a row or the room outlines the box. Raw stored data only: no script analysis, so the list does not say which objects the game has in the room. Indy3 now reads its object directory and names like LOOM. Built; not yet checked in the running window.
+
 ## 12 October: v5 audio (Monkey Island 2, Indiana Jones 4): Roland MT-32 and AdLib music
 
 - **`ScummV5Archive.ReadSounds`** reads the `SOUN` blocks (`DSOU` directory): the `ROL `, `ADL ` and `SPK ` parts, kept as `ScummV4Sound.ImuseRoland/ImuseAdlib/ImuseSpeaker`. Each sound holds the music of every card (ROL, ADL, SPK, a few effects SBL), so the device chosen in the sound list decides which version plays (a first version of the reader stopped at the first part and showed only 51 AdLib sounds; the part sizes are 8 bytes short); the Roland device is offered for a v5 game with `ROL ` sounds (the ROMs are found as for LOOM).

@@ -656,6 +656,85 @@ public partial class MainWindow : Window
     /// <summary>The objects drawn in the shown room of a v1 or v2 game, for the names the pointer reveals (empty for other games).</summary>
     private IReadOnlyList<BrowsedObjectLabel> _olderObjects = [];
 
+    /// <summary>The objects a browsed v3 room (Indy3) stores: every record with a box, named when the room stores a name. No script decides which are present.</summary>
+    private IReadOnlyList<BrowsedObjectLabel> ReadStoredV3Objects(byte[] bytes)
+    {
+        try
+        {
+            var records = _objectDirectory.Decode(bytes);
+            var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
+            return records.Where(record => record.Width > 0 && record.Height > 0)
+                .Select(record => new BrowsedObjectLabel(record.Id, names.TryGetValue(record.Id, out var name) ? name : "", record.X, record.Y, record.Width, record.Height))
+                .ToList();
+        }
+        catch (Exception ex) when (ex is InvalidDataException or IndexOutOfRangeException or ArgumentException) { return []; }
+    }
+
+    private BrowsedObjectLabel? _browsedHover;
+
+    /// <summary>Browse-only games: the room's stored objects as an Advanced-mode list; hovering a row outlines its box. Raw stored data only.</summary>
+    private void ShowStoredObjectHotspots()
+    {
+        _browsedHover = null;
+        if (_olderObjects.Count == 0) { ShowBrowsedHighlight(null, true); return; }
+        foreach (var label in _olderObjects)
+        {
+            var text = label.Name.Length > 0 ? label.Name : $"Object {label.Id}";
+            var button = new Button
+            {
+                Content = text,
+                ToolTip = $"Object {label.Id} · {label.X}, {label.Y} · {label.Width} × {label.Height}. A stored object; the game's scripts decide whether it is present.",
+                HorizontalContentAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(0, 0, 0, 3),
+                Padding = new Thickness(8, 3, 8, 3),
+                Background = HotspotRowBrush,
+                Foreground = Brushes.Beige,
+                BorderThickness = new Thickness(0)
+            };
+            button.MouseEnter += (_, _) => ShowBrowsedHighlight(label, true);
+            button.GotKeyboardFocus += (_, _) => ShowBrowsedHighlight(label, true);
+            button.MouseLeave += (_, _) => { if (!button.IsKeyboardFocused) ShowBrowsedHighlight(null, true); };
+            button.LostKeyboardFocus += (_, _) => { if (!button.IsMouseOver) ShowBrowsedHighlight(null, true); };
+            ObjectList.Children.Add(button);
+        }
+        ObjectAreaOptions.Visibility = Visibility.Visible;
+        ShowObjectListSection("STORED OBJECTS");
+        ShowBrowsedHighlight(null, true);
+    }
+
+    /// <summary>Outlines browsed objects on the room: all of them under "Always", the hovered one under "On hover"; a list row always outlines its own.</summary>
+    private void ShowBrowsedHighlight(BrowsedObjectLabel? label, bool fromList)
+    {
+        if (!fromList && ObjectAreaMode == DisplayMode.Never) label = null;
+        _browsedHover = label;
+        HotspotHighlightOverlay.Children.Clear();
+        var all = ObjectAreaMode == DisplayMode.Always && _olderObjects.Count > 0;
+        HotspotHighlightOverlay.Visibility = label is null && !all ? Visibility.Collapsed : Visibility.Visible;
+        if (_currentRoom is null || HotspotHighlightOverlay.ActualWidth <= 0 || HotspotHighlightOverlay.ActualHeight <= 0 || label is null && !all) return;
+        var scale = Math.Min(HotspotHighlightOverlay.ActualWidth / _currentRoom.Width, HotspotHighlightOverlay.ActualHeight / _currentRoom.Height);
+        if (scale <= 0) return;
+        var offsetX = (HotspotHighlightOverlay.ActualWidth - _currentRoom.Width * scale) / 2;
+        var offsetY = (HotspotHighlightOverlay.ActualHeight - _currentRoom.Height * scale) / 2;
+        void Box(BrowsedObjectLabel item, bool strong)
+        {
+            var box = new Border
+            {
+                Width = Math.Max(1, item.Width * scale), Height = Math.Max(1, item.Height * scale),
+                BorderThickness = new Thickness(strong ? Math.Clamp(scale, 2, 3) : 1),
+                BorderBrush = new SolidColorBrush(strong ? Color.FromRgb(120, 220, 255) : Color.FromArgb(150, 120, 220, 255)),
+                Background = new SolidColorBrush(Color.FromArgb((byte)(strong ? 56 : 22), 120, 220, 255)),
+                CornerRadius = new CornerRadius(2)
+            };
+            Canvas.SetLeft(box, offsetX + item.X * scale);
+            Canvas.SetTop(box, offsetY + item.Y * scale);
+            HotspotHighlightOverlay.Children.Add(box);
+        }
+        if (all)
+            foreach (var item in _olderObjects)
+                if (item.Id != label?.Id) Box(item, false);
+        if (label is not null) Box(label, true);
+    }
+
     private static IReadOnlyList<BrowsedObjectLabel> ReadOlderObjects(GameLibrary game, byte[] bytes)
     {
         var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
@@ -1108,7 +1187,8 @@ public partial class MainWindow : Window
                 _currentRoomResource = resource;
                 _lastViewedRoomResource = resource;
                 // Names the pointer reveals: the drawn objects of a v1 or v2 game; every named object of a v4 or v5 game (their starting states come from scripts).
-                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : browseArchive?.ReadObjectLabels(resource.ResourceId!.Value) ?? [];
+                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : browseArchive?.ReadObjectLabels(resource.ResourceId!.Value)
+                    ?? (_game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes) : []);
                 _currentRoomObjectRecords = cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
@@ -1117,7 +1197,9 @@ public partial class MainWindow : Window
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
                 ClearObjectList();
-                ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet.";
+                ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet." +
+                    (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");
+                ShowStoredObjectHotspots();
                 ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
@@ -4875,7 +4957,8 @@ public partial class MainWindow : Window
             // A browsed v1 or v2 game: the name of the drawn object under the pointer (the first of the directory is on top).
             var under = _olderObjects.FirstOrDefault(entry => x >= entry.X && x < entry.X + entry.Width && y >= entry.Y && y < entry.Y + entry.Height);
             RoomPreview.Cursor = Cursors.Arrow;
-            RoomPreview.ToolTip = under?.Name;
+            RoomPreview.ToolTip = under is null ? null : under.Name.Length > 0 ? under.Name : $"Object {under.Id}";
+            if (under?.Id != _browsedHover?.Id) ShowBrowsedHighlight(under, false);
             return;
         }
         var hoveredRow = SessionModeToggle.IsChecked == true ? HotspotRowRecordAt(x, y) : null;
@@ -4936,6 +5019,8 @@ public partial class MainWindow : Window
         RoomPreview.Cursor = Cursors.Arrow;
         RoomPreview.ToolTip = null;
         ShowHoveredHotspotRow(null);
+        if (_olderObjects.Count > 0 && _browsedHover is not null && !ObjectList.Children.OfType<Button>().Any(button => button.IsMouseOver || button.IsKeyboardFocused))
+            ShowBrowsedHighlight(null, true);
         SendPointerToGame(null, null);
     }
 
@@ -5441,6 +5526,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowHotspotHighlight(ScummRoomObjectRecord? record)
     {
+        // Browse-only games have stored objects, no session records.
+        if (_olderObjects.Count > 0) { ShowBrowsedHighlight(_browsedHover, true); return; }
         _highlightedHotspot = record;
         HotspotHighlightOverlay.Children.Clear();
         var all = ObjectAreaMode == DisplayMode.Always && SessionModeToggle.IsChecked == true && _session is not null;
