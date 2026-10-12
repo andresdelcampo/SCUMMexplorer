@@ -427,7 +427,7 @@ public partial class MainWindow : Window
         })
         {
             if (game.Id != GameId.Loom && !(game.Id == GameId.IndianaJones3 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
-                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound) && kind != ResourceKind.Executable) continue;
+                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -643,7 +643,7 @@ public partial class MainWindow : Window
     }
 
     /// <summary>A room of a classic v1 or an enhanced v2 game (XOR-encoded room file), as its background picture.</summary>
-    private static RoomImage DecodeOlderRoom(GameLibrary game, byte[] bytes)
+    internal static RoomImage DecodeOlderRoom(GameLibrary game, byte[] bytes)
     {
         var background = game is { Version: ScummVersion.V1, V1Game: { } v1 } ? new ScummV1RoomDecoder(v1).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes);
         // The objects that are visible at the start of the game are painted over the background.
@@ -978,11 +978,11 @@ public partial class MainWindow : Window
             ShowPageHeader(true);
             PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
             PageSubtitle.Text = _game?.Id == GameId.LoomVga ? "LOOM CD script · SCUMM v4" + (LoomResourceNames.Entry(_glossary, resource) is { } cdNamed ? $" · name: {cdNamed.EvidenceLabel}" : "") : LoomResourceNames.Entry(_glossary, resource) is { } named
-                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : _game?.Id == GameId.IndianaJones3 ? "Indexed script resource · Indiana Jones 3 EGA · SCUMM v3" : _game?.V4Disks is not null ? $"{_game.Title} script · SCUMM {(_game.V4Disks.Disks.OfType<ScummV4Archive>().Any(d => d.IsRoomFileGame) ? "v3 (one file per room)" : "v4")}" : "Indexed script resource · DOS LOOM old-v3";
+                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : _game?.Id == GameId.IndianaJones3 ? "Indexed script resource · Indiana Jones 3 EGA · SCUMM v3" : _game?.Version is ScummVersion.V1 or ScummVersion.V2 ? $"{_game.Title} script · SCUMM v{(_game.Version == ScummVersion.V1 ? 1 : 2)}" : _game?.V4Disks is not null ? $"{_game.Title} script · SCUMM {(_game.V4Disks.Disks.OfType<ScummV4Archive>().Any(d => d.IsRoomFileGame) ? "v3 (one file per room)" : "v4")}" : "Indexed script resource · DOS LOOM old-v3";
             PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
-            ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : _game?.Id == GameId.IndianaJones3 ? "Reading Indiana Jones 3 EGA bytecode…" : _game?.V4Disks is not null ? "Reading the game's bytecode…" : "Reading DOS LOOM old-v3 bytecode…";
+            ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : _game?.Id == GameId.IndianaJones3 ? "Reading Indiana Jones 3 EGA bytecode…" : _game?.Version is ScummVersion.V1 or ScummVersion.V2 || _game?.V4Disks is not null ? "Reading the game's bytecode…" : "Reading DOS LOOM old-v3 bytecode…";
             var interior = _game is { Id: GameId.Loom } egaGame
                 ? new LflResourceChain().FindLeftover(egaGame, resource) : null;
             var boundaryNote = interior is null ? "" : interior.Describe() +

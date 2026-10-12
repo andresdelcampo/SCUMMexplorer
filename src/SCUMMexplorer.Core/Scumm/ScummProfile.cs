@@ -20,7 +20,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
         ArgumentNullException.ThrowIfNull(game);
         // The 256-colour Indy3 has v4-style blocks (one file per room) but version 3 scripts, with Indy3's opcode differences.
         var roomFileGame = game.V4Disks?.Disks.OfType<ScummV4Archive>().Any(disk => disk.IsRoomFileGame) == true;
-        var dialect = roomFileGame ? ScummScriptDialect.V3Indy3
+        var dialect = game.Version is ScummVersion.V1 or ScummVersion.V2 ? ScummScriptDialect.V2
+            : roomFileGame ? ScummScriptDialect.V3Indy3
             : game.Version >= ScummVersion.V4 ? ScummScriptDialect.V4
             : game.Id == GameId.IndianaJones3 ? ScummScriptDialect.V3Indy3
             : ScummScriptDialect.V3;

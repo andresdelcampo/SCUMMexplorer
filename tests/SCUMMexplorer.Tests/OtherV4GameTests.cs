@@ -106,7 +106,7 @@ public class OtherV4GameTests
             Assert.All(image.Pixels.ToArray(), pixel => Assert.True(pixel < 16));
         });
         Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Costume);
-        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Script or ResourceKind.Sound);
+        Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Script);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class OtherV4GameTests
             var slots = reader.Decode(container, costume.Offset!.Value).AnimationSlots.Where(s => s.HasData);
             Assert.Contains(slots, slot => renderer.DecodePose(container, costume.Offset.Value, slot.Index, game.V1Game, costume.ResourceId ?? 0) is not null);
         });
-        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Script or ResourceKind.Sound);
+        Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Script);
     }
 
     [Fact]
@@ -174,5 +174,25 @@ public class OtherV4GameTests
         Console.WriteLine($"Indy3 256: {result.Entries.Count} texts; {result.Coverage}");
         foreach (var e in result.Entries.Where(e => e.Kind == "Spoken line").Take(8)) Console.WriteLine($"  [{e.Kind}] {e.Text}");
         Assert.True(result.Entries.Count > 500);
+    }
+
+    [Theory]
+    [InlineData("SCUMM_V2_ENHANCED_TEST_ROOT", 1000)]
+    [InlineData("SCUMM_V1_CLASSIC_TEST_ROOT", 1000)]
+    public void ReadsTheScriptsOfTheOlderGamesWhenConfigured(string variable, int minimumTexts)
+    {
+        var folder = Environment.GetEnvironmentVariable(variable);
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
+        var scripts = game.Resources.Where(r => r.Kind == ResourceKind.Script).ToArray();
+        Assert.True(scripts.Length > 100);
+        // A script header of the wrong size decodes one instruction per script; the real thing decodes thousands, almost all with full coverage.
+        var decoded = scripts.Select(reader.Decode).ToArray();
+        Assert.True(decoded.Sum(d => d.Instructions.Count) > 3000);
+        Assert.True(decoded.Count(d => d.Issues is { Count: 0 } && d.DecodedBytes >= d.CodeLength - 1) * 10 >= scripts.Length * 8);
+        var texts = new SCUMMexplorer.Core.Loom.LoomTextExtractor().Extract(game);
+        Assert.True(texts.Entries.Count >= minimumTexts, $"Only {texts.Entries.Count} texts.");
+        Assert.Contains(texts.Entries, e => e.Kind == "Spoken line");
     }
 }

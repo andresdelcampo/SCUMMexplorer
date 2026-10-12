@@ -92,7 +92,6 @@ public sealed class GameFolderScanner
                         foreach (var indexed in isV1 ? classic!.Resources : new LflIndexReader().Read(item.Path, objectEntryBytes == 1 ? 1 : 4))
                         {
                             // Of a v1 or enhanced v2 game the rooms, costumes and PC speaker sounds are offered: its scripts are not read, nor are the sounds of the other formats.
-                            if (isOlder && indexed.Kind == ResourceKind.Script) continue;
                             var fileName = $"{indexed.ContainerFileNumber:00}.LFL";
                             var resourcePath = Path.Combine(fullPath, fileName);
                             if (indexed.Kind == ResourceKind.Room && !File.Exists(resourcePath)) continue;
@@ -101,6 +100,7 @@ public sealed class GameFolderScanner
                             // Likewise a costume entry that is empty or points at nothing (Costume 00) is left out.
                             if ((isOlder || gameId == GameId.IndianaJones3) && indexed.Kind == ResourceKind.Costume && !ReadsAsOlderCostume(resourcePath, indexed.Offset)) continue;
                             if (isOlder && indexed.Kind == ResourceKind.Sound && !ReadsAsOlderSound(resourcePath, indexed.Offset)) continue;
+                            if (isOlder && indexed.Kind == ResourceKind.Script && !ReadsAsOlderScript(resourcePath, indexed.Offset)) continue;
                             // A demo's index is not a subset of the full game's: it keeps entries for resources its
                             // folder lacks (no container file) or whose offset is not where a resource starts.
                             if (isDemo && indexed.Kind != ResourceKind.Room && !StartsResource(chains, resourcePath, indexed.Offset))
@@ -346,6 +346,13 @@ public sealed class GameFolderScanner
                 foreach (var script in shared.Where(r => r.Kind == ResourceKind.Script)) drop.Add(script);
         resources.RemoveAll(drop.Contains);
         return drop.Count;
+    }
+
+    /// <summary>A v1/v2 script entry whose size word fits inside its room file (the directory also lists unused entries).</summary>
+    private static bool ReadsAsOlderScript(string path, int offset)
+    {
+        try { return File.Exists(path) && ScummOldScripts.ReadGlobalScript(LflEncoding.DecodeXorFF(File.ReadAllBytes(path)), offset) is not null; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return false; }
     }
 
     private static bool ReadsAsOlderCostume(string path, int offset)

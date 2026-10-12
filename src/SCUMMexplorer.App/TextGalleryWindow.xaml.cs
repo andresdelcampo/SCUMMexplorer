@@ -206,7 +206,9 @@ public partial class TextGalleryWindow : Window
         {
             BitmapSource? picture = _roomImage is null ? null : await _roomImage(roomId);
             if (picture is not null) return picture;
-            var decoded = _game.V4ArchiveFor(room) is { } archive ? archive.DecodeRoom(roomId) : await _roomDecoder.DecodeAsync(room.FilePath);
+            var decoded = _game.V4ArchiveFor(room) is { } archive ? archive.DecodeRoom(roomId)
+                : _game.Version is ScummVersion.V1 or ScummVersion.V2 ? MainWindow.DecodeOlderRoom(_game, await File.ReadAllBytesAsync(room.FilePath))
+                : await _roomDecoder.DecodeAsync(room.FilePath);
             return CreateBitmap(decoded.Width, decoded.Height, decoded.Pixels.ToArray(), decoded.Palette);
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException) { return null; }

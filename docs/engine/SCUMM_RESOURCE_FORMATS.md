@@ -46,6 +46,10 @@ Room header byte 20 counts the objects; from byte 28 a word per object to its im
 - **v1/v2:** byte 0x15 of the room header is the offset of a count byte; each box is 8 bytes: upper y, lower y, upper-left x, upper-right x, lower-left x, lower-right x, mask, flags. Units: x in 8 pixels, y in 2 pixels (`V12_X_MULTIPLIER`, `V12_Y_MULTIPLIER`). Matrix not read.
 - **Old v3 (LOOM, Indy3 EGA) and the 256-colour Indy:** 18-byte boxes (four signed word corner pairs ul, ur, lr, ll; mask; flags), then the matrix. **v4 (Monkey Island, LOOM CD):** the `BX` block, count byte then 20-byte boxes (the 18 bytes plus a scale word). **v5:** `BOXD`, count word then the same 20-byte boxes; the matrix is the separate `BOXM`. Box 0 of the v5 games has all corners -32000.
 
+## Scripts of v1 and v2 (`ScummScriptDisassembler.V2.cs`, `ScummOldScripts`)
+
+ScummVM `script_v2.cpp` (`setupOpcodes`, the `o2_*` functions, `decodeParseString`) and `room.cpp` (`setupRoomSubBlocks`, version 2 and below), 12 October 2026. The opcode byte keeps the parameter bits of v3 (0x80, 0x40, 0x20 make parameter 1, 2, 3 a variable), but a variable and a result variable are **one byte**; 32 rows of eight handlers give the opcode (the table is in the source file). A print is the actor byte (unless `printEgo`) and then the text up to a zero: a byte with bit 7 set is followed by a space, 1 to 3 are text controls, 4 to 7 take another byte. `verbOps` reads a verb byte (0 delete: slot; 0xFF on/off: verb, state; else x, y, slot, preposition, then the **verb name as a string**, padded with `@`). A global script is a size word, two header bytes and the code; a room's exit script starts at the word at byte 0x18 and its entry script at 0x1A (to the room's end); an object's code has a 15-byte header (name offset at byte 14) and (verb, offset) byte pairs up to 0, with offsets counted from the code start.
+
 ## Open
 
 Depth masks, object names and states, scripts, the real actor colours of v1 costumes, v2 and v1 sounds, and a pixel comparison of every picture against ScummVM. v5 sounds (`SOUN` with `ADL`, `ROL`, `SPK` parts), scripts and objects; Monkey Island 1's CD audio tracks; v6 and later.

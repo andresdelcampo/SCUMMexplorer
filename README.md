@@ -40,10 +40,10 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 | **Monkey Island 1** CD | ✔ | ◐ | ✔ | ✔ | ◐ | – | – | – | – | – |
 | **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | – | – | – | – | – | – |
 | **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | – | – | – | – | – | – |
-| **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – | – | – |
-| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | – | – | – | – | – |
-| **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – | – | – |
-| **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | – | – | – | – | – |
+| **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
+| **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
 
 Notes:
 

@@ -19,7 +19,9 @@ public enum ScummScriptDialect
     V3,
     V3Indy3,
     /// <summary>SCUMM v4 (LOOM CD): the v5 operand forms, which differ from the old-v3 ones in roomOps (sub-opcode first), the line-height print operand, charset cursor command and three opcodes (0x30, 0x3B, 0x4C).</summary>
-    V4
+    V4,
+    /// <summary>SCUMM v1 and v2 (Maniac Mansion, Zak McKracken): byte variables, texts inline, its own opcode table (<c>ScummScriptDisassembler.V2.cs</c>).</summary>
+    V2
 }
 
 public sealed record ScummScriptDisassembly(
@@ -113,13 +115,14 @@ public sealed class ScummScriptReader(ScummScriptDialect dialect = ScummScriptDi
         if (resourceOffset < 0 || resourceOffset > data.Length - 2)
             throw new InvalidDataException($"Script {scriptId:00} points outside {container:00}.LFL at 0x{resourceOffset:X4}.");
 
+        var headerLength = Dialect == ScummScriptDialect.V2 ? ScummOldScripts.ResourceHeaderLength : ResourceHeaderLength;
         var resourceLength = ReadWord(data, resourceOffset);
-        if (resourceLength < ResourceHeaderLength)
+        if (resourceLength < headerLength)
             throw new InvalidDataException($"Script {scriptId:00} has an invalid old-v3 resource length ({resourceLength}).");
         if (resourceLength > data.Length - resourceOffset)
             throw new InvalidDataException($"Script {scriptId:00} declares {resourceLength} bytes at 0x{resourceOffset:X4}, past the end of {container:00}.LFL.");
 
-        var code = data.AsSpan(resourceOffset + ResourceHeaderLength, resourceLength - ResourceHeaderLength).ToArray();
+        var code = data.AsSpan(resourceOffset + headerLength, resourceLength - headerLength).ToArray();
         var decoded = ScummScriptDisassembler.Disassemble(code, Dialect);
         return new ScummScriptDisassembly(scriptId, container, resourceOffset, resourceLength, code.Length,
             decoded.Instructions, decoded.Note, decoded.UndecodedOffset, decoded.UndecodedBytes, decoded.TrailingBytes,
@@ -127,9 +130,9 @@ public sealed class ScummScriptReader(ScummScriptDialect dialect = ScummScriptDi
     }
 
     /// <summary>Disassembles script code that is already out of its container (the CD game keeps scripts in tagged blocks).</summary>
-    public ScummScriptDisassembly DecodeCode(byte[] code, int scriptId = 0, int container = 0, int offset = 0)
+    public ScummScriptDisassembly DecodeCode(byte[] code, int scriptId = 0, int container = 0, int offset = 0, int startOffset = 0)
     {
-        var decoded = ScummScriptDisassembler.Disassemble(code, Dialect);
+        var decoded = ScummScriptDisassembler.Disassemble(code, Dialect, startOffset);
         return new ScummScriptDisassembly(scriptId, container, offset, code.Length, code.Length,
             decoded.Instructions, decoded.Note, decoded.UndecodedOffset, decoded.UndecodedBytes, decoded.TrailingBytes,
             Issues: decoded.Issues);
@@ -240,7 +243,7 @@ public sealed class ScummScriptReader(ScummScriptDialect dialect = ScummScriptDi
     private static ushort ReadWord(byte[] data, int offset) => BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(offset, 2));
 }
 
-internal static class ScummScriptDisassembler
+internal static partial class ScummScriptDisassembler
 {
     // SCUMM v3 inherits the v4 small-header actorOps encoding. The low five
     // bits are indices into this translation table; the upper parameter-mode
@@ -256,7 +259,7 @@ internal static class ScummScriptDisassembler
         byte[] TrailingBytes,
         IReadOnlyList<ScummScriptDecodeIssue> Issues);
 
-    public static Result Disassemble(byte[] code, ScummScriptDialect dialect = ScummScriptDialect.V3)
+    public static Result Disassemble(byte[] code, ScummScriptDialect dialect = ScummScriptDialect.V3, int startOffset = 0)
     {
         var instructions = new SortedDictionary<int, ScummScriptInstruction>();
         var issues = new List<ScummScriptDecodeIssue>();
@@ -264,7 +267,7 @@ internal static class ScummScriptDisassembler
         var visited = new HashSet<int>();
         var byteOwners = new int[code.Length];
         Array.Fill(byteOwners, -1);
-        if (code.Length > 0) queued.Enqueue(0);
+        if (code.Length > 0) queued.Enqueue(startOffset);
 
         while (queued.Count > 0)
         {
@@ -286,7 +289,7 @@ internal static class ScummScriptDisassembler
             try
             {
                 var opcode = cursor.ReadByte();
-                var (operation, operands) = DecodeInstruction(cursor, opcode);
+                var (operation, operands) = dialect == ScummScriptDialect.V2 ? DecodeV2Instruction(cursor, opcode) : DecodeInstruction(cursor, opcode);
                 var end = cursor.Position;
                 var overlap = Enumerable.Range(start, end - start).FirstOrDefault(offset => byteOwners[offset] >= 0, -1);
                 if (overlap >= 0)
@@ -303,7 +306,7 @@ internal static class ScummScriptDisassembler
                 // ScummEngine::beginOverride records the jump that follows it (taken
                 // only when the player skips the cutscene) and steps over it, so
                 // the code after that jump is the cutscene's normal path.
-                if (operation == "beginOverride" && end + 3 <= code.Length && code[end] == 0x18)
+                if (dialect != ScummScriptDialect.V2 && operation == "beginOverride" && end + 3 <= code.Length && code[end] == 0x18)
                     queued.Enqueue(end + 3);
                 if (IsBranchOperation(operation))
                 {

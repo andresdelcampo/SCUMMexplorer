@@ -200,6 +200,36 @@ public sealed class LoomTextExtractor
         }
         if (archives.Count > 0) return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics, leftovers);
 
+        if (game.Version is ScummVersion.V1 or ScummVersion.V2)
+        {
+            // Maniac Mansion and Zak McKracken: the global scripts, then each room's entry and exit scripts and the verb scripts of its objects.
+            foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue && item.Offset.HasValue))
+            {
+                try
+                {
+                    var code = ScummOldScripts.ReadGlobalScript(LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath)), resource.Offset!.Value) ?? throw new InvalidDataException("size");
+                    Add(scripts.DecodeCode(code, resource.ResourceId!.Value, resource.ContainerFileNumber ?? 0, resource.Offset.Value) with { Context = resource.Name }, null, sourceOverride: resource.Name);
+                }
+                catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { Skip(resource.Name, ex); }
+            }
+            foreach (var room in game.Rooms.Where(item => item.ResourceId.HasValue))
+            {
+                var roomId = room.ResourceId!.Value;
+                var plain = LflEncoding.DecodeXorFF(File.ReadAllBytes(room.FilePath));
+                var roomObjects = ScummOldRoomObjects.Read(plain, null);
+                var names = roomObjects.Where(o => o.Name.Length > 0).GroupBy(o => o.Id).ToDictionary(g => g.Key, g => g.First().Name);
+                foreach (var o in roomObjects)
+                    if (HasUsefulText(o.Name))
+                        entries.Add(new LoomTextEntry(o.Name, "Object name", $"Room {roomId:00} / Object {o.Id}", roomId, o.Id, null, null, 0, o.Name));
+                foreach (var source in ScummOldScripts.ReadRoomScripts(plain, roomId))
+                {
+                    try { Add(scripts.DecodeCode(source.Code, source.ObjectId ?? roomId, source.Container, source.Offset, source.StartOffset) with { Context = source.Label }, roomId, source.ObjectId, source.VerbId, source.Label, source.ObjectName, names); }
+                    catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source.Label, ex); }
+                }
+            }
+            return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics, leftovers);
+        }
+
         foreach (var resource in game.Resources.Where(item => item.Kind == ResourceKind.Script && item.ResourceId.HasValue))
         {
             if (chains.FindLeftover(game, resource) is { } leftover)
