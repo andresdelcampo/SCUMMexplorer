@@ -147,7 +147,7 @@ Switch **Advanced** on, and the explorer opens up. Everything here reads from th
 
 ## Music and sound
 
-Browse the available music and effects in Advanced mode and play them on demand. Depending on the game and edition, the explorer supports PC Speaker, AdLib, Roland MT-32, sampled effects and CD audio.
+Browse the available music and effects in Advanced mode and play them on demand. Depending on the game and edition, the explorer supports PC Speaker, **PCjr / Tandy**, AdLib, Roland MT-32, sampled effects and CD audio. Choose **PCjr / Tandy** in the sound menu for Maniac Mansion and Zak McKracken.
 
 <p align="center">
   <a href="screenshots/Audio.jpg"><img src="screenshots/Audio.jpg" alt="The Secret of Monkey Island CD audio player with the sound-device menu open, listing PC Speaker, AdLib and Roland MT-32" width="1000"></a>
