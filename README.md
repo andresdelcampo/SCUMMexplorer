@@ -2,9 +2,9 @@
   <img src="src/SCUMMexplorer.App/Assets/scummexplorer-title-v1.png" alt="SCUMMexplorer" width="620">
 </p>
 
-*Remember walking into the Guild of Glassmakers for the first time, or hunting for the one note that opens the sky?*
+*Remember the view from the lookout on Mêlée Island, the eerie halls of Maniac Mansion, or your first steps into LOOM's Guild of Glassmakers?*
 
-SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Pick any room from its artwork, click objects and exits, watch cutscenes again, hear the music, read what everyone says, and see how the game is put together when you want to know. Everything is rebuilt live from **your own game files**. Nothing is included, nothing is copied.
+SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Revisit their room artwork, read the dialogue, and explore the scripts behind those memories. In LOOM, you can also click objects and exits, replay cutscenes, and hear the music; the other games currently offer browsing, with sound where supported. Everything is rebuilt live from **your own game files**. Nothing is included, nothing is copied.
 
 ## Games
 
