@@ -97,7 +97,7 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 <table>
   <tr>
     <td width="50%" valign="top" align="center">
-      <a href="screenshots/LoomGameStatus.jpg"><img src="screenshots/LoomGameStatus.jpg" alt="LOOM Game Status editor with available notes, learned drafts and their note sequences" width="500"></a><br>
+      <a href="screenshots/LoomGameStatus.jpg"><img src="screenshots/LoomGameStatus-cropped.png" alt="LOOM Game Status editor with available notes, learned drafts and their note sequences" width="500"></a><br>
       <strong>Change what Bobbin knows.</strong><br>
       Choose available notes and learned drafts in Game Status.
     </td>
