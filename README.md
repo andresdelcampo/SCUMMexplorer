@@ -21,7 +21,7 @@ Point the app at a game folder and it recognises the game and the edition from t
 
 - **Indiana Jones and the Last Crusade** (EGA and 256 colours)
 - **The Secret of Monkey Island** (VGA, EGA and CD)
-- **Monkey Island 2: LeChuck's Revenge**
+- **Monkey Island 2: LeChuck's Revenge** (floppy, with the MT-32 and Sound Blaster releases, and talkie; English and Spanish)
 - **Indiana Jones and the Fate of Atlantis** (floppy, talkie, CD)
 - **Maniac Mansion** (classic and enhanced)
 - **Zak McKracken and the Alien Mindbenders** (classic and enhanced)
