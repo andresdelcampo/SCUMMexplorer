@@ -152,7 +152,9 @@ public sealed class GameFolderScanner
         {
             GameId.Loom => isDemo ? "LOOM (demo)" : "LOOM",
             GameId.IndianaJones3 => "Indiana Jones and the Last Crusade",
-            _ => Path.GetFileName(fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+            _ when classic is not null => classic.Game == ScummV1Game.ManiacMansion ? KnownGameTitles.ManiacMansion : KnownGameTitles.ZakMcKracken,
+            _ => KnownGameTitles.ForExecutables(executableNames) is { } known ? (isV2 ? known + " (Enhanced)" : known)
+                : Path.GetFileName(fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
         };
         var version = isV1 ? ScummVersion.V1 : indexWasParsed ? isV2 ? ScummVersion.V2 : ScummVersion.V3 : ScummVersion.Unknown;
         var note = gameId switch
@@ -260,8 +262,9 @@ public sealed class GameFolderScanner
         var folderName = Path.GetFileName(Path.TrimEndingDirectorySeparator(source.Location));
         var parentName = Path.GetFileName(Path.TrimEndingDirectorySeparator(Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(source.Location)) ?? ""));
         // A folder named after its graphics ("EGA", "VGA") is told by the game folder around it.
-        var title = v5 is not null ? Path.GetFileNameWithoutExtension(v5.Stem) : folderName.Equals("EGA", StringComparison.OrdinalIgnoreCase) || folderName.Equals("VGA", StringComparison.OrdinalIgnoreCase)
-            ? $"{parentName} {folderName}".Trim() : folderName;
+        var title = (v5 is not null ? KnownGameTitles.ForV5Stem(v5.Stem) : null) ?? KnownGameTitles.ForExecutables(source.FileNames)
+            ?? (v5 is not null ? Path.GetFileNameWithoutExtension(v5.Stem) : folderName.Equals("EGA", StringComparison.OrdinalIgnoreCase) || folderName.Equals("VGA", StringComparison.OrdinalIgnoreCase)
+                ? $"{parentName} {folderName}".Trim() : folderName);
         var disks = loaded ?? ScummV4Disks.Load(source);
         var perRoomFiles = v5 is null && !source.Exists(ScummV4Archive.DiskFileName(1));
         var resources = new List<GameResource>();
