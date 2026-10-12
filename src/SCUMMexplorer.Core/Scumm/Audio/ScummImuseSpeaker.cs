@@ -345,6 +345,7 @@ public sealed class ScummImuseSpeaker
             switch (control)
             {
                 case 1:
+                    ModWheel = (byte)value;
                     if (Out.EnvA.State != 0 && Out.DefA.UseModWheel != 0) Out.EnvA.ModWheelState = (byte)(value >> 2);
                     if (Out.EnvB.State != 0 && Out.DefB.UseModWheel != 0) Out.EnvB.ModWheelState = (byte)(value >> 2);
                     break;
