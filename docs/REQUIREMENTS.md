@@ -148,6 +148,7 @@ Top level order and header format are exact: **label, two spaces, count in paren
 | `Sounds & music  (N)` | LOOM EGA, LOOM CD | `Sound NN` — always plain | description |
 | `Game files  (N)` | all games | file name (`LOOM.EXE`) | – |
 | `CD audio  (N)` | LOOM CD with a disc audio track | `CD audio NNN · <s> s` + ` · <first 40 chars…>` ; music/narration prefixed `♪ ` | `<voice | music / narration>, <s> s at disc second <t>; first asked for by <source>.` |
+| `CD audio  (N)` | Disc-image games with red-book tracks (Monkey Island) | `CD track NN · m:ss · room NN "<name>"` (up to two rooms, then `, ...`); `CD track NN · m:ss · not started by a sound` when no sound of the game starts it | `<label>` plus the description: track length and the sounds that start it (sound id, repeats, disc time range). |
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
@@ -155,6 +156,8 @@ Top level order and header format are exact: **label, two spaces, count in paren
 | R-5.6 | LOOM EGA | Script names apply only to *global* scripts of a full game (`ScriptRoom is null`); room-local scripts and a demo's scripts are unnamed. | Code |
 | R-5.7 | LOOM CD | CD audio cue numbers are the order found by scanning every room for `sayVoice`; those with no line or long duration are music/narration (♪). | Code |
 | R-5.8 | SCUMM v3 | Resource labels come from `00.LFL`: `Room NN`, `Costume NN`, `Script NN`, `Sound NN` (two digits; larger ids stay as numbers). When the index is not parsed, physical files appear as `Room file NN` with the note `Physical LFL file; no supported index was parsed.` | Code |
+| R-5.10 | APP | CD audio is always its own tree group, never mixed into `Sounds & music`, in every game that has disc audio (LOOM CD cues, Monkey Island tracks). A CD label shows, in order: the track or cue number, the duration, the room (when known) and, for speech, the first words played. Labels that do not fit the sidebar must end in an ellipsis with the full text in the tooltip, never be cut mid-word. | Decided 12 October |
+| R-5.11 | APP | Selection colour of tree items is the app theme's, not the system blue, in every game's tree (see R-5.5). | Code |
 | R-5.9 | SCUMM v4 | Names: `Room NN`, `Costume NN`, `Sound NN`, `Script NN` (global), `Room NN local script N` (room-local). Descriptions say what the item is and where it is stored (`LOOM CD costume, stored in room 04 (DISK01.LEC).`). | Code |
 
 ## 6. Room scene (the central view)

@@ -322,7 +322,8 @@ public sealed class GameFolderScanner
             {
                 var played = users.TryGetValue(track.Number, out var list) ? list : [];
                 var rooms = played.Select(item => string.IsNullOrEmpty(item.Room?.Name) ? $"room {item.Sound.Room:00}" : $"room {item.Sound.Room:00} \"{item.Room!.Name}\"").Distinct().ToList();
-                var name = $"CD audio track {track.Number:00}" + (rooms.Count > 0 ? " - " + string.Join(", ", rooms.Take(2)) + (rooms.Count > 2 ? ", ..." : "") : "");
+                // "CD track 03 · 2:41 · room 34 "Name"": the track, its length, and the rooms whose music it is (nothing when no sound of the game starts it).
+                var name = $"CD track {track.Number:00} · {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}" + (rooms.Count > 0 ? " · " + string.Join(", ", rooms.Take(2)) + (rooms.Count > 2 ? ", ..." : "") : " · not started by a sound");
                 var plays = played.Count == 0 ? "" : " Started by " + string.Join(", ", played.Select(item =>
                     $"sound {item.Sound.SoundId}{(item.Sound.Loops == 0xFF ? " (repeats)" : "")}{(item.Sound.EndFrame > item.Sound.StartFrame ? $" ({item.Sound.StartFrame / 4500}:{item.Sound.StartFrame / 75 % 60:00} to {item.Sound.EndFrame / 4500}:{item.Sound.EndFrame / 75 % 60:00})" : "")}")) + ".";
                 resources.Add(new GameResource(name, ResourceKind.Sound, source.Location, GameLibrary.CdTrackIdBase + track.Number,

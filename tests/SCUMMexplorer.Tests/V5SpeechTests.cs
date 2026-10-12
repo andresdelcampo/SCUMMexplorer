@@ -43,7 +43,7 @@ public sealed class V5SpeechTests
         var cue = Environment.GetEnvironmentVariable("SCUMM_MI1CD");
         if (cue is null || !File.Exists(cue)) return;
         var game = new GameFolderScanner().Scan(cue);
-        var tracks = game.Resources.Where(r => r.Name.StartsWith("CD audio track")).ToList();
+        var tracks = game.Resources.Where(r => r.Name.StartsWith("CD track")).ToList();
         Assert.True(tracks.Count >= 20);
         File.WriteAllLines(Path.Combine(Path.GetTempPath(), "mi1-tracks.txt"), tracks.Select(t => t.Name + " | " + t.Description));
         Assert.True(tracks.Count(t => t.Name.Contains(" - ")) >= 10);

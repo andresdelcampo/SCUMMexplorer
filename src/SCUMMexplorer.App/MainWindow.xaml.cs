@@ -470,13 +470,23 @@ public partial class MainWindow : Window
         {
             if (game.Id != GameId.Loom && !(game.Id == GameId.IndianaJones3 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
                 !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && kind != ResourceKind.Executable) continue;
-            var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
+            var group = game.Resources.Where(resource => resource.Kind == kind && !IsDiscTrack(game, resource)).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
             foreach (var item in group)
                 node.Items.Add(new TreeViewItem { Header = LoomResourceNames.Label(_glossary, item),
                     ToolTip = LoomResourceNames.Evidence(_glossary, item) ?? item.Description, Tag = item });
             ResourceTree.Items.Add(node);
+        }
+
+        // The disc's red-book tracks (Monkey Island's music) are a group of their own, as LOOM CD's cues are, not mixed in with the sounds.
+        var discTracks = game.Resources.Where(resource => IsDiscTrack(game, resource)).ToArray();
+        if (discTracks.Length > 0)
+        {
+            var trackNode = new TreeViewItem { Header = $"CD audio  ({discTracks.Length})", IsExpanded = false };
+            foreach (var track in discTracks)
+                trackNode.Items.Add(new TreeViewItem { Header = track.Name, ToolTip = $"{track.Name}\n{track.Description}", Tag = track });
+            ResourceTree.Items.Add(trackNode);
         }
 
         if (game.Id == GameId.LoomVga && game.V4Archive is { Disc: not null } cdArchive)
@@ -517,8 +527,7 @@ public partial class MainWindow : Window
         StatusText.ToolTip = $"{game.Scenes.Count()} indexed rooms found.";
         // Game Status needs the session, not a room: show it as soon as the game is loaded (the header then stays still).
         // The CD game has no music device to choose (its music has not been read); its voices come from the disc's audio track (the CD Audio choice of its own sound box).
-        SoundModeCombo.Visibility = game.Id == GameId.LoomVga ? Visibility.Collapsed : Visibility.Visible;
-        CdSoundCombo.Visibility = game is { Id: GameId.LoomVga, V4Archive.Disc.AudioStartSector: not null } ? Visibility.Visible : Visibility.Collapsed;
+        UpdateSoundDeviceVisibility();
         UpdateGameStatusButton();
         FooterText.Text = $"{game.Title} · {game.Platform}";
         FooterText.ToolTip = game.FolderPath;
@@ -971,6 +980,18 @@ public partial class MainWindow : Window
             card.ToolTip = $"Room {resource.ResourceId:00} · preview unavailable: {message}";
     }
 
+    /// <summary>
+    /// The sound device only matters where something plays by itself: in a game with a live session (the playable games) always, and in any other game only
+    /// in Advanced mode, where the Sounds list is. The CD game picks between its disc audio and silence instead of a device.
+    /// </summary>
+    private void UpdateSoundDeviceVisibility()
+    {
+        var show = _game is not null && (_session is not null || IsAdvancedMode);
+        var disc = _game is { V4Archive.Disc.AudioStartSector: not null };
+        SoundModeCombo.Visibility = show && !disc ? Visibility.Visible : Visibility.Collapsed;
+        CdSoundCombo.Visibility = show && disc ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     private bool IsAdvancedMode => AdvancedModeToggle.IsChecked == true;
 
     private bool _restoringInteractiveView;
@@ -996,6 +1017,7 @@ public partial class MainWindow : Window
     private void UpdateAdvancedMode()
     {
         var advanced = IsAdvancedMode;
+        UpdateSoundDeviceVisibility();
         // The hint line under the scene is for Advanced mode and the inspection view; the game's own screen needs none.
         ObjectsNote.Visibility = SessionModeToggle.IsChecked != true ? Visibility.Visible : Visibility.Collapsed;
         VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
@@ -2955,6 +2977,8 @@ public partial class MainWindow : Window
     private bool IsCdCue(GameResource resource) => _game?.V4Archive is not null && resource.ResourceId >= CdCueIdBase;
 
     /// <summary>A whole red-book track of a game disc (Monkey Island), which the player reads straight from the image.</summary>
+    private static bool IsDiscTrack(GameLibrary game, GameResource resource) => game.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId is >= GameLibrary.CdTrackIdBase and < GameLibrary.SpeechIdBase;
+
     private bool IsCdTrack(GameResource resource) => _game?.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId is >= GameLibrary.CdTrackIdBase and < GameLibrary.SpeechIdBase;
 
     /// <summary>A spoken line of a talkie game's MONSTER.SOU: digital audio that plays as recorded, whatever the sound device.</summary>
