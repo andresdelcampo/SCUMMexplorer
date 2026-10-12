@@ -20,8 +20,13 @@ public sealed class ScummPcSpeakerAudio
         [0, 0, 0, 2, 0, 3, 4, 5, 6, 8, 9, 12, 16, 18, 24, 32, 36, 48, 64, 72, 96];
     private static readonly int[] Divisors =
         [36484, 34436, 32503, 30679, 28957, 27332, 25798, 24350, 22983, 21693, 20476, 19326];
+    // The PCjr's divisors are for its 111860 Hz base (Player_V2Base pcjr_freq_table).
+    private static readonly int[] PcjrDivisors =
+        [65472, 61760, 58304, 55040, 52032, 49024, 46272, 43648, 41216, 38912, 36736, 34624];
     private const int TickRate = 236;
     private const int SampleRate = 22050;
+    private const int PcjrSampleRate = 44100;
+    private const uint WhiteNoise = 0x12000, PeriodicNoise = 0x08000;
     private const int MaxTicks = TickRate * 180;
     private const int FixShift = 16;
     private const int MaxScriptSteps = 1 << 16;
@@ -87,15 +92,28 @@ public sealed class ScummPcSpeakerAudio
         return RenderWave(data, 4, cancellationToken);
     }
 
+    /// <summary>Renders the PCjr/Tandy part of a v2-format sound (Zak McKracken, enhanced Maniac Mansion): the channel pointers sit 10 bytes later in the header.</summary>
+    public byte[] RenderPcjrWave(GameResource resource, CancellationToken cancellationToken = default)
+    {
+        if (resource.Kind != ResourceKind.Sound || resource.Offset is null)
+            throw new NotSupportedException("This is not an indexed sound resource.");
+        var file = File.ReadAllBytes(resource.FilePath);
+        for (var i = 0; i < file.Length; i++) file[i] ^= 0xFF;
+        var data = ScummPcSpeakerV1Audio.Slice(file, resource.Offset.Value);
+        if (!ScummPcSpeakerV1Audio.IsV2Format(data) || data.Length < 4 + 10 + 8)
+            throw new NotSupportedException("This sound has no PCjr/Tandy version this app can play. Choose the PC speaker.");
+        return RenderWave(data, 4, cancellationToken, pcjr: true);
+    }
+
     /// <summary>
     /// Renders PC speaker data given directly. <paramref name="headerLength"/> is the resource header the data starts with:
     /// 4 in the old bundle (a word length), 6 in the CD game's <c>WA</c> block (a dword length and the tag). The channel
     /// pointers follow the header and a word; they count from the start of the data.
     /// </summary>
-    public byte[] RenderWave(byte[] data, int headerLength, CancellationToken cancellationToken = default)
+    public byte[] RenderWave(byte[] data, int headerLength, CancellationToken cancellationToken = default, bool pcjr = false)
     {
-        if (data.Length < headerLength + 10) throw new InvalidDataException("The PC speaker resource is too short.");
-        var player = new Player(data, headerLength);
+        if (data.Length < headerLength + (pcjr ? 18 : 10)) throw new InvalidDataException("The sound resource is too short.");
+        var player = new Player(data, headerLength, pcjr);
         var samples = new List<short>();
         var hadSound = false;
         for (var tick = 0; tick < MaxTicks && player.Playing; tick++)
@@ -109,10 +127,10 @@ public sealed class ScummPcSpeakerAudio
             throw new NotSupportedException("This resource has no playable PC speaker notes.");
         // ScummVM keeps running the low-pass filter on silence until it has settled.
         player.Settle(samples);
-        return ToWave(samples);
+        return ToWave(samples, pcjr ? PcjrSampleRate : SampleRate);
     }
 
-    private static byte[] ToWave(List<short> samples)
+    private static byte[] ToWave(List<short> samples, int sampleRate)
     {
         using var stream = new MemoryStream(44 + samples.Count * 2);
         using var writer = new BinaryWriter(stream);
@@ -122,8 +140,8 @@ public sealed class ScummPcSpeakerAudio
         writer.Write(16);
         writer.Write((short)1);
         writer.Write((short)1);
-        writer.Write(SampleRate);
-        writer.Write(SampleRate * 2);
+        writer.Write(sampleRate);
+        writer.Write(sampleRate * 2);
         writer.Write((short)2);
         writer.Write((short)16);
         writer.Write("data"u8);
@@ -141,8 +159,14 @@ public sealed class ScummPcSpeakerAudio
         private int _returnAddress = -1;
 
         // Player_V2 output state.
-        private readonly uint _tickLength = (uint)(((long)SampleRate << FixShift) / TickRate);
-        private readonly uint _updateStep = (uint)(((long)SampleRate << FixShift) / (1193000 * 2));
+        private readonly bool _pcjr;
+        private readonly int _rate;
+        private readonly uint _tickLength;
+        private readonly uint _updateStep;
+        private uint _rng = 0x0f35;
+        private readonly int[] _volumeTable = new int[16];
+        private readonly int[] _pcjrTimerCount = new int[4];
+        private int _pcjrTimerOutput;
         private readonly uint _decay;
         private readonly int _volumeLevel0 = (int)(255 * 128.0 / 3.0);
         private uint _nextTick;
@@ -150,23 +174,33 @@ public sealed class ScummPcSpeakerAudio
         private int _timerCount;
         private bool _timerOutput;
 
-        public Player(byte[] data, int headerLength)
+        public Player(byte[] data, int headerLength, bool pcjr = false)
         {
             _data = data;
+            _pcjr = pcjr;
+            _rate = pcjr ? PcjrSampleRate : SampleRate;
+            _tickLength = (uint)(((long)_rate << FixShift) / TickRate);
+            _updateStep = (uint)(((long)_rate << FixShift) / ((pcjr ? 111860 : 1193000) * 2));
+            var volume = 255 * 128.0 / 3.0;
+            for (var i = 0; i < 15; i++)
+            {
+                _volumeTable[i] = (int)Math.Min(volume, 0xffff);
+                volume /= 1.258925412;
+            }
             for (var i = 0; i < 4; i++)
             {
-                _channels[i][NextCmd] = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(headerLength + 2 + 2 * i, 2));
+                _channels[i][NextCmd] = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(headerLength + (pcjr ? 10 : 2) + 2 * i, 2));
                 if (_channels[i][NextCmd] != 0) _channels[i][TimeLeft] = 1;
             }
             // Adapt _decay to the sample rate; it is squared when the rate halves.
             var decay = 0xa000u;
-            for (var i = 0; (SampleRate << i) < 30000; i++) decay = decay * decay / 65536;
+            for (var i = 0; (_rate << i) < 30000; i++) decay = decay * decay / 65536;
             _decay = decay;
         }
 
         public bool Playing => _channels.Take(4).Any(channel => channel[TimeLeft] != 0);
 
-        public bool HasWinner => WinningChannel() >= 0;
+        public bool HasWinner => WinningChannel() >= 0 || (_pcjr && _channels.Take(4).Any(channel => channel[Volume] != 0 && channel[TimeLeft] != 0));
 
         public void NextTick()
         {
@@ -195,6 +229,11 @@ public sealed class ScummPcSpeakerAudio
 
         public void Generate(List<short> output, int length)
         {
+            if (_pcjr)
+            {
+                GeneratePcjr(output, length);
+                return;
+            }
             var winner = WinningChannel();
             var buffer = new int[length];
             if (winner >= 0) SquareGenerator(_channels[winner][Freq], buffer);
@@ -210,8 +249,88 @@ public sealed class ScummPcSpeakerAudio
 
         public void Settle(List<short> output)
         {
-            for (var guard = 0; guard < SampleRate && _level is not (0 or -1); guard++)
+            for (var guard = 0; guard < _rate && _level is not (0 or -1); guard++)
                 Generate(output, 1);
+        }
+
+        /// <summary>Player_V2::generatePCjrSamples: three square voices and a noise voice with their own 2 dB volume steps.</summary>
+        private void GeneratePcjr(List<short> output, int length)
+        {
+            var buffer = new int[length];
+            var hasData = false;
+            bool Active(int i) => _channels[i][Volume] != 0 && _channels[i][TimeLeft] != 0;
+            for (var i = 1; i < 3; i++)
+            {
+                var freq = _channels[i][Freq] >> 6;
+                if (!Active(i)) continue;
+                for (var j = 0; j < i; j++)
+                {
+                    if (!Active(j) || freq != _channels[j][Freq] >> 6) continue;
+                    // Same pitch as another voice: ScummVM synchronises the phase to prevent interference.
+                    _pcjrTimerCount[i] = _pcjrTimerCount[j];
+                    _pcjrTimerOutput ^= (1 << i) & (_pcjrTimerOutput ^ _pcjrTimerOutput << (i - j));
+                }
+            }
+            for (var i = 0; i < 4; i++)
+            {
+                int freq = _channels[i][Freq] >> 6;
+                var volume = (65535 - _channels[i][Volume]) >> 12;
+                if (!Active(i))
+                {
+                    _pcjrTimerCount[i] -= length << FixShift;
+                    if (_pcjrTimerCount[i] < 0) _pcjrTimerCount[i] = 0;
+                }
+                else if (i < 3)
+                {
+                    hasData = true;
+                    PcjrSquare(i, freq, volume, 0, buffer);
+                }
+                else
+                {
+                    var feedback = (freq & 4) != 0 ? WhiteNoise : PeriodicNoise;
+                    var n = freq & 3;
+                    var noiseFreq = n == 3 ? 2 * (_channels[2][Freq] >> 6) : 1 << (5 + n);
+                    hasData = true;
+                    PcjrSquare(i, noiseFreq, volume, feedback, buffer);
+                }
+            }
+            if (_level == 0 && !hasData)
+            {
+                for (var i = 0; i < length; i++) output.Add(0);
+                return;
+            }
+            LowPass(buffer);
+            foreach (var value in buffer) output.Add((short)value);
+        }
+
+        private void PcjrSquare(int channel, int freq, int volume, uint noiseFeedback, int[] samples)
+        {
+            var period = unchecked((int)(_updateStep * (uint)freq));
+            if (period == 0) period = (int)_updateStep;
+            for (var i = 0; i < samples.Length; i++)
+            {
+                uint duration = 0;
+                if ((_pcjrTimerOutput & (1 << channel)) != 0) duration += unchecked((uint)_pcjrTimerCount[channel]);
+                _pcjrTimerCount[channel] -= 1 << FixShift;
+                while (_pcjrTimerCount[channel] <= 0)
+                {
+                    if (noiseFeedback != 0)
+                    {
+                        if ((_rng & 1) != 0)
+                        {
+                            _rng ^= noiseFeedback;
+                            _pcjrTimerOutput ^= 1 << channel;
+                        }
+                        _rng >>= 1;
+                    }
+                    else _pcjrTimerOutput ^= 1 << channel;
+                    if ((_pcjrTimerOutput & (1 << channel)) != 0) duration += (uint)period;
+                    _pcjrTimerCount[channel] += period;
+                }
+                if ((_pcjrTimerOutput & (1 << channel)) != 0) duration -= unchecked((uint)_pcjrTimerCount[channel]);
+                var value = samples[i] + (int)((long)unchecked((int)(duration - (1 << (FixShift - 1)))) * _volumeTable[volume] >> FixShift);
+                samples[i] = Math.Clamp(value, -0x8000, 0x7fff);
+            }
         }
 
         private void SquareGenerator(int freq, int[] samples)
@@ -434,7 +553,12 @@ public sealed class ScummPcSpeakerAudio
                         note %= 12;
                         destination[HullOffset] = 0;
                         destination[HullCounter] = 1;
-                        destination[Freq] = destination[BaseFreq] = (ushort)(Divisors[note] >> octave);
+                        if (_pcjr && destination == _channels[3])
+                        {
+                            destination[HullCurve] = (ushort)(196 + note * 12);
+                            destination[Freq] = destination[BaseFreq] = unchecked((ushort)(384 - 64 * octave));
+                        }
+                        else destination[Freq] = destination[BaseFreq] = (ushort)((_pcjr ? PcjrDivisors : Divisors)[note] >> octave);
                         if (isLastNote) goto end;
                         opcode = Byte(ref position);
                     }

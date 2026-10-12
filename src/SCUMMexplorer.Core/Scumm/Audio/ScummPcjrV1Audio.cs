@@ -25,6 +25,17 @@ public sealed class ScummPcjrV1Audio
     public static bool HasPcjrPart(byte[] data) =>
         data.Length >= 12 && BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(4, 2)) is var offset && offset >= 8 && offset + 4 <= data.Length;
 
+    /// <summary>The PCjr/Tandy part of a sound of either format (v1: this player; v2: <see cref="ScummPcSpeakerAudio.RenderPcjrWave"/>).</summary>
+    public static byte[] RenderEither(GameResource resource, ScummPcSpeakerAudio v2Player, CancellationToken cancellationToken = default)
+    {
+        if (resource.Kind != ResourceKind.Sound || resource.Offset is null)
+            throw new NotSupportedException("This is not an indexed sound resource.");
+        var file = File.ReadAllBytes(resource.FilePath);
+        for (var i = 0; i < file.Length; i++) file[i] ^= 0xFF;
+        var data = ScummPcSpeakerV1Audio.Slice(file, resource.Offset.Value);
+        return ScummPcSpeakerV1Audio.IsV2Format(data) ? v2Player.RenderPcjrWave(resource, cancellationToken) : RenderWave(resource, cancellationToken);
+    }
+
     public static byte[] RenderWave(GameResource resource, CancellationToken cancellationToken = default)
     {
         if (resource.Kind != ResourceKind.Sound || resource.Offset is null)
