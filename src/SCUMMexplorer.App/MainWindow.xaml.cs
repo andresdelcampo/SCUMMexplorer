@@ -426,8 +426,8 @@ public partial class MainWindow : Window
             (ResourceKind.Sound, "Sounds & music"), (ResourceKind.Executable, "Game files")
         })
         {
-            if (game.Id != GameId.Loom && !(game.Id == GameId.IndianaJones3 && kind is ResourceKind.Costume or ResourceKind.Sound) && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
-                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound) && kind != ResourceKind.Executable) continue;
+            if (game.Id != GameId.Loom && !(game.Id == GameId.IndianaJones3 && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Id == GameId.LoomVga && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) &&
+                !(game.V4Disks is not null && kind is ResourceKind.Costume or ResourceKind.Sound or ResourceKind.Script) && !(game.Version is ScummVersion.V1 or ScummVersion.V2 && kind is ResourceKind.Costume or ResourceKind.Sound) && kind != ResourceKind.Executable) continue;
             var group = game.Resources.Where(resource => resource.Kind == kind).ToArray();
             if (group.Length == 0) continue;
             var node = new TreeViewItem { Header = $"{label}  ({group.Length})", IsExpanded = false };
@@ -978,11 +978,11 @@ public partial class MainWindow : Window
             ShowPageHeader(true);
             PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
             PageSubtitle.Text = _game?.Id == GameId.LoomVga ? "LOOM CD script · SCUMM v4" + (LoomResourceNames.Entry(_glossary, resource) is { } cdNamed ? $" · name: {cdNamed.EvidenceLabel}" : "") : LoomResourceNames.Entry(_glossary, resource) is { } named
-                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : "Indexed script resource · DOS LOOM old-v3";
+                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : _game?.Id == GameId.IndianaJones3 ? "Indexed script resource · Indiana Jones 3 EGA · SCUMM v3" : _game?.V4Disks is not null ? $"{_game.Title} script · SCUMM {(_game.V4Disks.Disks.OfType<ScummV4Archive>().Any(d => d.IsRoomFileGame) ? "v3 (one file per room)" : "v4")}" : "Indexed script resource · DOS LOOM old-v3";
             PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
-            ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : "Reading DOS LOOM old-v3 bytecode…";
+            ScriptNote.Text = _game?.Id == GameId.LoomVga ? "Reading LOOM CD bytecode…" : _game?.Id == GameId.IndianaJones3 ? "Reading Indiana Jones 3 EGA bytecode…" : _game?.V4Disks is not null ? "Reading the game's bytecode…" : "Reading DOS LOOM old-v3 bytecode…";
             var interior = _game is { Id: GameId.Loom } egaGame
                 ? new LflResourceChain().FindLeftover(egaGame, resource) : null;
             var boundaryNote = interior is null ? "" : interior.Describe() +
@@ -992,6 +992,7 @@ public partial class MainWindow : Window
                 var disassembly = _game?.Id == GameId.LoomVga && _cdData is not null
                     ? (resource.ScriptRoom is int scriptRoom ? _cdData.RoomLocalScript(scriptRoom, resource.ResourceId!.Value)
                         : _cdData.GlobalScript(resource.ResourceId!.Value)) ?? throw new InvalidDataException("This script is not stored in the CD data.")
+                    : _game?.V4Disks is not null ? DecodeBrowsedV4Script(resource)
                     : _scriptReader.Decode(resource);
                 _scriptShown = disassembly;
                 ScriptOutput.Text = FormatScript(disassembly);
@@ -2179,6 +2180,16 @@ public partial class MainWindow : Window
                 : new SolidColorBrush(Color.FromRgb(64, 82, 96));
             card.BorderThickness = new Thickness(2);
         }
+    }
+
+    /// <summary>A global or room-local script of a browsed v4 game, read from the disk that holds it in the game's own script dialect.</summary>
+    private ScummScriptDisassembly DecodeBrowsedV4Script(GameResource resource)
+    {
+        if (_game?.V4ArchiveFor(resource) is not ScummV4Archive archive || resource.ContainerFileNumber is not int disk)
+            throw new InvalidDataException("This script is not stored in the game's archive.");
+        var source = new ScummV4DataSource(archive, ScummProfile.For(_game).Dialect, disk, archive.IsRoomFileGame ? "its room files" : ScummV4Archive.DiskFileName(disk));
+        return (resource.ScriptRoom is int room ? source.RoomLocalScript(room, resource.ResourceId!.Value) : source.GlobalScript(resource.ResourceId!.Value))
+            ?? throw new InvalidDataException("This script is not stored in the game's archive.");
     }
 
     private void ShowCostume(GameResource resource)

@@ -285,6 +285,17 @@ public sealed class GameFolderScanner
             foreach (var sound in archive.ReadSounds())
                 resources.Add(new GameResource($"Sound {sound.Id:00}", ResourceKind.Sound, source.Location, sound.Id,
                     $"{(sound.IsMusic ? "Music" : "Sound effect")} stored in room {sound.Room:00} on {diskName}.", disk, null));
+            // Scripts of the v4 archives (v5 has no script reader yet): global ones and each room's local ones, for the raw and readable views.
+            if (archive is ScummV4Archive scriptArchive)
+            {
+                foreach (var id in scriptArchive.GlobalScriptNumbers())
+                    resources.Add(new GameResource($"Script {id:00}", ResourceKind.Script, source.Location, id,
+                        $"Global script stored on {diskName}.", disk, scriptArchive.ReadGlobalScript(id)?.BlockOffset));
+                foreach (var room in scriptArchive.Rooms)
+                    foreach (var local in scriptArchive.ReadScripts(room.Number).Where(s => s.Kind == "LS"))
+                        resources.Add(new GameResource($"Room {room.Number:00} local script {local.Number}", ResourceKind.Script, source.Location, local.Number,
+                            $"Room-local script of room {room.Number:00} on {diskName}.", disk, local.BlockOffset, ScriptRoom: room.Number));
+            }
         }
         // A game on a disc image: the red-book audio tracks the cue sheet names (Monkey Island's music), played by the scripts through the CD drive.
         var disc = source is DiscFileSource discSource && discSource.Image.AudioTracks.Count > 0 ? discSource.Image : null;

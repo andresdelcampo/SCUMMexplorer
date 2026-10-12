@@ -67,6 +67,14 @@ internal static class Program
                 report.Add($"costume {costume.Name}: {((TextBlock)window.FindName("StatusText")).Text} | {((TextBlock)window.FindName("CostumeMessage")).Text}");
                 Shot("costume.png");
                 }
+                foreach (var script in game.Resources.Where(r => r.Kind == ResourceKind.Script).Skip(5).Take(2))
+                {
+                    Call("SelectResourceInTree", script);
+                    await Task.Delay(1500);
+                    var shown = ((TextBox)window.FindName("ScriptOutput")).Text;
+                    var firstLines = string.Join(" / ", shown.Split((char)10).Take(4).Select(l => l.Trim()));
+                    report.Add($"script {script.Name}: {((TextBlock)window.FindName("PageSubtitle")).Text} | {((TextBlock)window.FindName("ScriptNote")).Text} | {shown.Length} chars | {firstLines}");
+                }
                 foreach (var sound in game.Resources.Where(r => r.Kind == ResourceKind.Sound).Take(1).Concat(game.Resources.Where(r => r.Kind == ResourceKind.Sound).Skip(7).Take(1)))
                 {
                     Call("SelectResourceInTree", sound);

@@ -11,15 +11,28 @@ namespace SCUMMexplorer.Core.Scumm;
 /// </summary>
 public sealed class ScummV4DataSource : IScummDataSource
 {
-    private const int Container = 1;
+    private readonly int _container;
+    private readonly string _containerName;
     private readonly ScummV4Archive _archive;
-    private readonly ScummScriptReader _reader = new(ScummScriptDialect.V4);
+    private readonly ScummScriptReader _reader;
     private readonly Dictionary<int, IReadOnlyList<ScummV4Script>> _scripts = [];
     private readonly Dictionary<int, IReadOnlyList<ScummV4Object>> _objects = [];
 
     public ScummV4DataSource(GameLibrary game)
     {
         _archive = game.V4Archive ?? throw new InvalidDataException("The CD game has no archive.");
+        _reader = new(ScummScriptDialect.V4);
+        _container = 1;
+        _containerName = "DISK01.LEC";
+    }
+
+    /// <summary>One disk (or the room files) of a browsed v4 game: its scripts read in the game's own dialect, the disk number as the container file number.</summary>
+    public ScummV4DataSource(ScummV4Archive archive, ScummScriptDialect dialect, int disk, string containerName)
+    {
+        _archive = archive;
+        _reader = new(dialect);
+        _container = disk;
+        _containerName = containerName;
     }
 
     public int GlobalScriptCount => ScummV4Archive.LocalScriptBase;
@@ -103,8 +116,8 @@ public sealed class ScummV4DataSource : IScummDataSource
             throw new InvalidDataException($"Object {record.Id} verb 0x{entry.VerbId:X2} points outside its block.");
         selectedEntry = entry;
         var code = o.Block.AsSpan(entry.ScriptOffset).ToArray();
-        return _reader.DecodeCode(code, room, Container, o.BlockOffset + entry.ScriptOffset)
-            with { Context = $"Room {room:00} Object {record.Id} {entry.Label}", ContainerName = "DISK01.LEC",
+        return _reader.DecodeCode(code, room, _container, o.BlockOffset + entry.ScriptOffset)
+            with { Context = $"Room {room:00} Object {record.Id} {entry.Label}", ContainerName = _containerName,
                 CodeFileOffset = o.BlockOffset + entry.ScriptOffset };
     }
 
@@ -117,9 +130,9 @@ public sealed class ScummV4DataSource : IScummDataSource
             : null;
 
     private ScummScriptDisassembly Decode(ScummV4Script script, int id) =>
-        _reader.DecodeCode(script.Code, id, Container, script.BlockOffset) with
+        _reader.DecodeCode(script.Code, id, _container, script.BlockOffset) with
         {
-            ContainerName = "DISK01.LEC",
+            ContainerName = _containerName,
             CodeFileOffset = script.BlockOffset + (script.Kind == "LS" ? 7 : 6),
             ResourceLength = script.Code.Length + (script.Kind == "LS" ? 7 : 6)
         };
