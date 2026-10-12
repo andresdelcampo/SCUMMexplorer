@@ -49,7 +49,8 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 | **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
 
-Notes:
+<details>
+<summary>Notes on the matrix</summary>
 
 - **Columns.** *Rooms* shows the room pictures (LOOM in its first-visit state), *Texts* is the Game Texts browser, *Scripts* the raw and readable script views, *Play* clicking in a live room with actors and scripts, *Status* the Game Status editor.
 - **LOOM editions.** "Other editions" are Spanish, plain English, French, German, v1.2 and Italian. "Demos" are the short and the long self-running demo.
@@ -60,6 +61,8 @@ Notes:
 - **Sounds.** AdLib music in the Monkey Island and Indiana Jones 3 (256 colours) disks plays at half tempo, set by ear, not from ScummVM's source. Indiana Jones 3 EGA plays its AdLib music at the LOOM tempo, which has not been checked by ear. Monkey Island 1 CD lists the disc's 24 audio tracks, each named after the room whose music it is and the sound that starts it (read from the game's own sounds; two tracks no sound starts stay unnamed). The Monkey Island 2 and Indiana Jones 4 music (iMUSE) plays on Roland MT-32, AdLib and PC speaker, and their sampled effects (Sound Blaster) play too; these were listened to and confirmed by the author, and songs wait at the first loop point instead of looping. The spoken lines of the talkie versions (`MONSTER.SOU`, also on the Indiana Jones 4 CD) play from Game Texts with "Play speech" on any line that has one. The PCjr/Tandy sounds of Maniac Mansion and Zak McKracken are ported from ScummVM but not yet listened to.
 - **Cutscenes.** The demos play only their preview. LOOM English EGA has a hand-checked list of 328 scenes. Other LOOM editions and the CD derive theirs from the game's own scripts.
 - The Maniac Mansion, Zak McKracken, Monkey Island, Indiana Jones and Atlantis columns marked "–" describe what the app does not read yet, not what the original game lacks. The detailed list is in [Requirements](docs/REQUIREMENTS.md) (section 3.1).
+
+</details>
 
 ## Getting started
 
