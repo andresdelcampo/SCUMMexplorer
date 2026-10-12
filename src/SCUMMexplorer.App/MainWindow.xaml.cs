@@ -2855,7 +2855,12 @@ public partial class MainWindow : Window
                         if (_sceneSound.Roms is not { } v5Roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
                         return new ScummImuseMt32(v5Roms).RenderWave(roland, token);
                     }
-                    throw new NotSupportedException(cdSound.ImuseAdlib is not null ? "This is an AdLib sound; AdLib playback of this game is not available yet." : "This sound is for the PC speaker; playback of this game's PC speaker sounds is not available yet.");
+                    if (cdSound.ImuseAdlib is { } adlibPart)
+                    {
+                        if (_sceneSound.Mode != SceneSoundPlayer.SoundMode.Adlib) throw new NotSupportedException("This sound exists only for the AdLib card. Choose that device to hear it.");
+                        return new ScummImuseAdlib().RenderWave(adlibPart, token);
+                    }
+                    throw new NotSupportedException("This sound is for the PC speaker; playback of this game's PC speaker sounds is not available yet.");
                 }
                 if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 return adlib

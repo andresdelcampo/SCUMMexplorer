@@ -55,4 +55,57 @@ public sealed class V5ImuseAudioTests
         for (var i = 44; i + 1 < result.Wave.Length; i += 2) peak = Math.Max(peak, Math.Abs((int)BitConverter.ToInt16(result.Wave, i)));
         Assert.True(peak > 1000);
     }
+
+    [Fact]
+    public void RendersTheMonkeyIsland2AdlibMusicWhenTheDataIsGiven()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_V5_MT32_TEST_ROOT");
+        if (folder is null || !Directory.Exists(folder)) return;
+        var source = new FolderFileSource(folder);
+        var archive = ScummV5Archive.Load(source, ScummV5Archive.FindGame(source)!);
+        var report = new System.Text.StringBuilder();
+        foreach (var sound in archive.ReadSounds().Where(s => s.ImuseAdlib is not null))
+        {
+            var result = new ScummImuseAdlib().Render(ScummImuseSong.Parse(sound.ImuseAdlib!));
+            var peak = 0;
+            for (var i = 44; i + 1 < result.Wave.Length; i += 2) peak = Math.Max(peak, Math.Abs((int)BitConverter.ToInt16(result.Wave, i)));
+            report.AppendLine($"{sound.Id}: {result.Seconds:0.0}s loops {result.Loops} peak {peak}");
+            if (sound.Id is 4 or 16 or 34) File.WriteAllBytes(Path.Combine(Path.GetTempPath(), $"v5-adl-{sound.Id}.wav"), result.Wave);
+        }
+        File.WriteAllText(Path.Combine(Path.GetTempPath(), "v5-adl-report.txt"), report.ToString());
+    }
+
+    private static byte[] Nibbles(params byte[] bytes) => bytes.SelectMany(b => new[] { (byte)(b >> 4), (byte)(b & 15) }).ToArray();
+
+    [Fact]
+    public void AdlibNote69SoundsWhereTheDriversTablePutsIt()
+    {
+        // Part 0: on, full volume, bend range 2, one carrier-only (additive, modulator silenced) instrument, then note 69 for a second.
+        byte[] instrument = new byte[30];
+        // The driver writes the attack/decay and sustain/release bytes inverted and treats the output level as 63 = loudest.
+        instrument[0] = 0x21; instrument[1] = 0x00; instrument[2] = 0x0F; instrument[3] = 0xFF;          // modulator, silent
+        instrument[5] = 0x21; instrument[6] = 0x3F; instrument[7] = 0x0F; instrument[8] = 0xFF;          // carrier, loudest, fastest attack, full sustain
+        instrument[10] = 0x00;
+        byte[] setup = [0x7D, 0x00, 0x00, .. Nibbles(0x01, 0x00, 0x7F, 0x40, 0x00, 0x00, 0x02, 0x00)];
+        byte[] define = [0x7D, 0x10, 0x00, 0x01, .. Nibbles(instrument)];
+        var track = new List<byte> { 0x00, 0xF0, (byte)(setup.Length + 1) };
+        track.AddRange(setup); track.Add(0xF7);
+        track.AddRange([0x00, 0xF0, (byte)(define.Length + 1)]); track.AddRange(define); track.Add(0xF7);
+        track.AddRange([0x00, 0x90, 69, 100, 0x87, 0x40, 0x80, 69, 0, 0x00, 0xFF, 0x2F, 0x00]); // 960 ticks = 1 s at 120 bpm... (tempo default 500000: 480 ticks a half second)
+        var song = ScummImuseSong.Parse(Part([.. track]));
+        var wave = new ScummImuseAdlib().Render(song).Wave;
+        // Count rising zero crossings of the left channel in the second after the attack.
+        const int rate = 49716;
+        var crossings = 0;
+        short previous = 0;
+        for (var i = 44 + rate / 4 * 4; i < 44 + rate / 4 * 4 + rate / 4 * 4 * 2 && i + 3 < wave.Length; i += 4)
+        {
+            var sample = BitConverter.ToInt16(wave, i);
+            if (previous < 0 && sample >= 0) crossings++;
+            previous = sample;
+        }
+        var hz = crossings / 0.5;
+        // MIDI note 69 -> note 65 -> block 5, F-number 143 (driver table): 143 * 49716 / 2^15 = 216.97 Hz, as in ScummVM's driver.
+        Assert.InRange(hz, 214, 220);
+    }
 }

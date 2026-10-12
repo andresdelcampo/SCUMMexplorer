@@ -111,6 +111,15 @@ public sealed class ScummImuseSong
         return new ScummImuseSong(division, events, tempos, tick);
     }
 
+    /// <summary>iMUSE writes a byte as two nibble bytes (high first); <paramref name="count"/> bytes are read.</summary>
+    internal static byte[] Decode(ReadOnlySpan<byte> source, int count)
+    {
+        var length = Math.Min(count, source.Length / 2);
+        var bytes = new byte[length];
+        for (var i = 0; i < length; i++) bytes[i] = (byte)(source[i * 2] << 4 & 0xFF | source[i * 2 + 1] & 0x0F);
+        return bytes;
+    }
+
     private static int ReadVlq(ReadOnlySpan<byte> data, ref int p, int end)
     {
         var value = 0;

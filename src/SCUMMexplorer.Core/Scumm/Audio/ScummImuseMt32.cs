@@ -6,7 +6,8 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <summary>
 /// Plays the <c>ROL </c> part of a v5 sound (<see cref="ScummImuseSong"/>) on Munt's MT-32 and renders it to a stereo wave. It follows ScummVM's iMUSE player
 /// for the messages that decide how a song sounds: the part set-up exclusive (0x7D 0: channel, on/off, reverb, volume, pan, transpose, pitch-bend range, program),
-/// the Roland custom timbre (0x41), the controllers and program changes of the track, and the unconditional hooks (hook id 0). A song is rendered up to the first
+/// the Roland custom timbre (0x41), the controllers and program changes of the track, and the unconditional hooks (hook id 0). As in ScummVM the MT-32 driver
+/// ignores a part's transpose. A song is rendered up to the first
 /// jump back or loop end (<see cref="Result.Loops"/> tells the game plays it again from there); hooks that wait for a script's id are never taken here.
 /// </summary>
 public sealed class ScummImuseMt32
@@ -71,10 +72,12 @@ public sealed class ScummImuseMt32
         public bool On;
         public bool Rhythm;
         public int Channel = -1; // the MT-32 channel this part plays on
-        public int Transpose;
     }
 
     /// <summary>Walks the song and turns it into timed messages for the MT-32.</summary>
+    /// <summary>iMUSE's part volume as the driver gets it: (volume + 1) times the player's effective volume (127 at full), shifted down 7.</summary>
+    private static int EffectiveVolume(int volume) => (volume + 1) * 127 >> 7;
+
     private static Planned Plan(ScummImuseSong song)
     {
         var parts = new Part?[16];
@@ -110,20 +113,19 @@ public sealed class ScummImuseMt32
                         if (d.Length < 3) break;
                         var chan = d[2] & 0x0F;
                         // ScummVM's buf[1..8]: on/reverb, priority, volume, pan, transpose (bit 7: percussion), detune, bend range, program.
-                        var buf = Decode(d.AsSpan(3), 8).Prepend((byte)chan).ToArray();
+                        var buf = ScummImuseSong.Decode(d.AsSpan(3), 8).Prepend((byte)chan).ToArray();
                         if (buf.Length < 9) break;
                         var part = parts[chan] ??= new Part();
                         part.On = (buf[1] & 1) != 0;
                         part.Rhythm = (buf[5] & 0x80) != 0;
-                        part.Transpose = buf[5] == 0x80 ? 0 : Math.Clamp((sbyte)buf[5], (sbyte)-12, (sbyte)12);
                         if (part.Channel < 0) part.Channel = part.Rhythm ? RhythmChannel : nextChannel < 9 ? nextChannel++ : -1;
                         if (part.Channel < 0) break;
-                        if (part.Rhythm) { Short(e.Tick, 0xB0 | part.Channel, 7, Math.Min(127, (int)buf[3])); break; }
+                        if (part.Rhythm) { Short(e.Tick, 0xB0 | part.Channel, 7, EffectiveVolume(buf[3])); break; }
                         var ch = part.Channel;
                         var range = buf[7] <= 12 ? buf[7] : 12;
                         Roland(e.Tick, ch, [0x00, 0x00, 0x04, (byte)range]);
-                        Short(e.Tick, 0xB0 | ch, 7, Math.Min(127, (int)buf[3]));
-                        Short(e.Tick, 0xB0 | ch, 10, Math.Clamp((sbyte)buf[4] + 0x40, 0, 127));
+                        Short(e.Tick, 0xB0 | ch, 7, EffectiveVolume(buf[3]));
+                        Short(e.Tick, 0xB0 | ch, 10, 127 - Math.Clamp((sbyte)buf[4] + 0x40, 0, 127)); // the original MT-32 driver reverses the pan
                         Short(e.Tick, 0xC0 | ch, buf[8] & 0x7F);
                         break;
                     }
@@ -132,7 +134,7 @@ public sealed class ScummImuseMt32
                         break;
                     case 48 when d.Length > 3: // hook: jump (id 0: always taken)
                     {
-                        var buf = Decode(d.AsSpan(3), 9);
+                        var buf = ScummImuseSong.Decode(d.AsSpan(3), 9);
                         // buf: hook id, track, beat, tick (480 ticks to a beat, counted from beat 1); a jump back ends the pass.
                         if (buf.Length < 7 || buf[0] != 0) break;
                         var target = (long)(BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(3)) - 1) * 480 + BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(5));
@@ -158,12 +160,11 @@ public sealed class ScummImuseMt32
                     if (!pp.On && e.Command == 0x9) break;
                     var note = e.Data[0];
                     var velocity = e.Command == 0x8 || e.Data[1] == 0 ? 0 : e.Data[1];
-                    if (!pp.Rhythm) note = (byte)Math.Clamp(note + pp.Transpose, 0, 127);
                     if (velocity == 0) Short(e.Tick, 0x80 | ch2, note, 0); else Short(e.Tick, 0x90 | ch2, note, velocity);
                     break;
                 }
-                case 0xB: // controller: volume, pan, sustain, modulation and the effect levels go straight on
-                    Short(e.Tick, 0xB0 | ch2, e.Data[0], e.Data[1]);
+                case 0xB: // controller: volume, pan, sustain, modulation and the effect levels go on (the part's volume is scaled as in iMUSE)
+                    Short(e.Tick, 0xB0 | ch2, e.Data[0], e.Data[0] == 7 ? EffectiveVolume(e.Data[1]) : e.Data[0] == 10 ? 127 - e.Data[1] : e.Data[1]);
                     break;
                 case 0xC:
                     Short(e.Tick, 0xC0 | ch2, e.Data[0]);
@@ -174,15 +175,6 @@ public sealed class ScummImuseMt32
             }
         }
         return new Planned(messages, loops ? endTick : song.Ticks - shift, loops);
-    }
-
-    /// <summary>iMUSE writes a byte as two nibble bytes (high first); <paramref name="count"/> bytes are read.</summary>
-    private static byte[] Decode(ReadOnlySpan<byte> source, int count)
-    {
-        var length = Math.Min(count, source.Length / 2);
-        var bytes = new byte[length];
-        for (var i = 0; i < length; i++) bytes[i] = (byte)(source[i * 2] << 4 & 0xFF | source[i * 2 + 1] & 0x0F);
-        return bytes;
     }
 
     /// <summary>A Roland data-set message for the device number (here a channel) with the address and data in <paramref name="body"/> and the checksum added.</summary>
