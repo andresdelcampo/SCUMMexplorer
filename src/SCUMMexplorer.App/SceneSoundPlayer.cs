@@ -27,9 +27,9 @@ public sealed class SceneSoundPlayer
     /// <summary>The MT-32 ROM images the Roland device needs (the user's own files); null until a folder with them is known.</summary>
     public Mt32RomSet? Roms { get; set; }
 
-    /// <summary>True for a game folder with the Roland upgrade installed (its sounds 33 to 64 are Roland streams).</summary>
+    /// <summary>True for a LOOM folder that carries Roland streams: the Roland upgrade (sounds 33 to 64) or a demo with its own Roland sounds (9 to 16, 29, 41).</summary>
     public static bool HasRolandSounds(GameLibrary game) =>
-        game.Id == GameId.Loom && game.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == 33) is { } sound && ScummRolandSong.IsRoland(sound);
+        game.Id == GameId.Loom && game.Resources.Where(item => item.Kind == ResourceKind.Sound).OrderBy(item => item.ResourceId != 33).Any(ScummRolandSong.IsRoland);
 
     /// <summary>The sound card number the scripts see for a device: 4 for the Roland upgrade, which makes them choose its sounds; the other devices keep 0.</summary>
     public static int SoundCardFor(SoundMode mode) => mode == SoundMode.Roland ? LoomExplorationSession.RolandSoundCard : 0;

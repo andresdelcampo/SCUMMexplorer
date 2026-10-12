@@ -115,6 +115,7 @@ if (args.Length > 4 && args[1] == "walk")
     Console.WriteLine($"final room {walkSession.Snapshot.RoomId}");
     return;
 }
+if (args.Length > 1 && args[1] == "sndhdr") { SoundHeaders.Run(args[0]); return; }
 if (args.Length > 1 && args[1] == "index") { IndexDump.Run(args[0]); return; }
 if (args.Length > 1 && args[1] is "play" or "idle") { PlayDump.Run(args[0], args.Length > 2 ? int.Parse(args[2]) : 3000, args[1] == "idle"); return; }
 // What the existing code makes of a LOOM folder: identity, resources, every script decoded, every room opened in a session, the boot.
