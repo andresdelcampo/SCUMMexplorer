@@ -142,6 +142,14 @@
         </Style>
         <Style TargetType="TreeViewItem">
             <Setter Property="Foreground" Value="#E7E0D2"/>
+            <!-- Long labels (CD audio tracks with room names) wrap in the sidebar instead of being cut off. -->
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Foreground" Value="#15212B"/>
@@ -391,7 +399,7 @@
                     <ScrollViewer x:Name="CostumeCardScroll" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="-5,0,-3,8">
                         <WrapPanel x:Name="CostumeCardList"/>
                     </ScrollViewer>
-                    <TreeView x:Name="ResourceTree" Grid.Row="1" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="#E7E0D2" SelectedItemChanged="ResourceTree_SelectedItemChanged" TreeViewItem.Expanded="ResourceTree_Expanded"/>
+                    <TreeView x:Name="ResourceTree" Grid.Row="1" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="#E7E0D2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItemChanged="ResourceTree_SelectedItemChanged" TreeViewItem.Expanded="ResourceTree_Expanded"/>
                 </Grid>
             </Border>
             <Grid x:Name="ContentPanel" Grid.Column="1" Margin="20,14,20,8">
