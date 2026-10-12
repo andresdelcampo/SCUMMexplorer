@@ -15,7 +15,7 @@ public sealed class ScummImuseSpeaker
     private const int CallbackRate = 250;
     private const double ReleaseSeconds = 1;
     private const double MaxSeconds = 420;
-    private const short Amplitude = 9000;
+    private const double Amplitude = 6000;
 
     public sealed record Result(byte[] Wave, bool Loops, double Seconds);
 
@@ -53,14 +53,19 @@ public sealed class ScummImuseSpeaker
             frameRemainder += SampleRate;
             var frames = frameRemainder / CallbackRate;
             frameRemainder %= CallbackRate;
-            // A square wave at the speaker's current frequency (the PIT counts 1193180 Hz / divisor).
-            var hz = driver.Divisor == 0 ? 0 : 1193180.0 / driver.Divisor;
+            // A square wave at the speaker's current frequency; each sample is the mean of the wave over its interval (no aliasing).
+            var hz = (double)driver.Frequency;
             for (var i = 0; i < frames; i++)
             {
-                if (hz == 0) { samples.Add(0); phase = 0; continue; }
-                samples.Add(phase < 0.5 ? Amplitude : (short)-Amplitude);
-                phase += hz / SampleRate;
-                if (phase >= 1) phase -= Math.Floor(phase);
+                if (hz <= 0) { samples.Add(0); phase = 0; continue; }
+                var advance = hz / SampleRate;
+                var next = phase + advance;
+                // High part of the cycle is [0, 0.5), low part [0.5, 1).
+                double Area(double x) => Math.Floor(x) * 0.5 + Math.Min(x - Math.Floor(x), 0.5);
+                var high = Area(next) - Area(phase);
+                var mean = (2 * high / advance) - 1;
+                samples.Add((short)Math.Round(mean * Amplitude));
+                phase = next - Math.Floor(next);
             }
         }
         var last = samples.Count - 1;
@@ -351,7 +356,7 @@ public sealed class ScummImuseSpeaker
                         {
                             owner.LastActiveChannel = null;
                             owner.LastActiveOut = 0;
-                            owner.Divisor = 0;
+                            owner.Frequency = 0;
                         }
                         else owner.OutputNote((ushort)((Out.Note << 7) + PitchBendValue + Out.Unk60 + Out.UnkE));
                     }
@@ -393,7 +398,7 @@ public sealed class ScummImuseSpeaker
         private readonly Channel[] _channels = new Channel[6];
         public Channel? ActiveChannel, LastActiveChannel;
         public ushort LastActiveOut;
-        public int Divisor; // 0: the speaker is off
+        public int Frequency; // Hz; 0: the speaker is off
         private int _effectTimer;
         private byte _randBase = 1;
 
@@ -443,7 +448,7 @@ public sealed class ScummImuseSpeaker
                 OutputNote((ushort)((active.Out.Note << 7) + active.PitchBendValue + active.Out.Unk60 + active.Out.UnkE));
             else
             {
-                Divisor = 0;
+                Frequency = 0;
                 LastActiveChannel = null;
                 LastActiveOut = 0;
             }
@@ -463,7 +468,7 @@ public sealed class ScummImuseSpeaker
             }
             if (ActiveChannel is null || ActiveChannel.Tl == 0)
             {
-                Divisor = 0;
+                Frequency = 0;
                 LastActiveChannel = null;
                 LastActiveOut = 0;
             }
@@ -480,7 +485,7 @@ public sealed class ScummImuseSpeaker
             var frequency = ScummImuseSpeakerTables.FrequencyTable[Math.Min((indexBase + v2) / 2, ScummImuseSpeakerTables.FrequencyTable.Length - 1)] >> shift;
             if (LastActiveChannel != ActiveChannel || LastActiveOut != value)
             {
-                Divisor = frequency == 0 ? 0 : 1193180 / frequency;
+                Frequency = frequency == 0 ? 0 : 1193180 / frequency; // the table holds PIT divisors
                 LastActiveChannel = ActiveChannel;
                 LastActiveOut = value;
             }

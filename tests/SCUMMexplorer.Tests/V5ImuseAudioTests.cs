@@ -156,4 +156,27 @@ public sealed class V5ImuseAudioTests
         File.WriteAllText(Path.Combine(Path.GetTempPath(), "v5-spk-report.txt"), report.ToString());
         Assert.True(silent < 12, $"{silent} silent PC speaker sounds");
     }
+
+    [Fact]
+    public void SpeakerNote69SoundsAtTheFrequencyOfTheDriversTable()
+    {
+        // One part, a speaker instrument of zeros (steady tone), full volume, MIDI note 69 for 0.5 s.
+        byte[] setup = [0x7D, 0x00, 0x00, .. Nibbles(0x01, 0x00, 0x7F, 0x40, 0x00, 0x00, 0x02, 0x00)];
+        var track = new List<byte> { 0x00, 0xF0, (byte)(setup.Length + 1) };
+        track.AddRange(setup); track.Add(0xF7);
+        track.AddRange([0x00, 0x90, 69, 100, 0x83, 0x60, 0x80, 69, 0, 0x00, 0xFF, 0x2F, 0x00]);
+        var wave = new ScummImuseSpeaker().Render(ScummImuseSong.Parse(Part([.. track]))).Wave;
+        const int rate = 44100;
+        var crossings = 0;
+        short previous = 0;
+        for (var i = 44 + rate / 10 * 2; i < 44 + rate * 2 / 2 && i + 1 < wave.Length; i += 2)
+        {
+            var sample = BitConverter.ToInt16(wave, i);
+            if (previous < 0 && sample >= 0) crossings++;
+            previous = sample;
+        }
+        var hz = crossings / (((rate - rate / 10) / (double)rate));
+        // Note 69 -> table: out = 69 * 128; shift 4? The result must be an audible musical pitch (around 100 to 1000 Hz), not a divisor read as a frequency.
+        Assert.InRange(hz, 100, 1000);
+    }
 }
