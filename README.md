@@ -1,4 +1,6 @@
-# SCUMMexplorer
+<p align="center">
+  <img src="src/SCUMMexplorer.App/Assets/scummexplorer-title-v1.png" alt="SCUMMexplorer" width="620">
+</p>
 
 *Remember walking into the Guild of Glassmakers for the first time, or hunting for the one note that opens the sky?*
 
