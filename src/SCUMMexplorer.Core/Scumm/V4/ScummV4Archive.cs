@@ -34,6 +34,8 @@ public sealed record ScummV4Sound(int Id, int Room, byte[]? Speaker, byte[]? Adl
     public byte[]? ImuseRoland { get; init; }
     public byte[]? ImuseAdlib { get; init; }
     public byte[]? ImuseSpeaker { get; init; }
+    /// <summary>The sampled (<c>SBL </c>) version of an effect, see <see cref="ScummV5Digital"/>.</summary>
+    public byte[]? ImuseDigital { get; init; }
 }
 
 /// <summary>One decoded OI image of a room object: the object's id, its size from the OC block and the picture as palette indices (the room's PA palette).</summary>

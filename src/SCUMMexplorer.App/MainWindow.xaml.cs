@@ -2848,7 +2848,10 @@ public partial class MainWindow : Window
                 var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in the game's archive.");
                 if (vga is ScummV5Archive)
                 {
-                    // A v5 sound holds one version per sound card; the device chosen decides which one is played.
+                    // A v5 sound holds one version per sound card; the device chosen decides which one is played. Sampled effects (Sound Blaster) have no
+                    // music version and play whatever the device.
+                    if (cdSound.ImuseDigital is { } digital && cdSound.ImuseRoland is null && cdSound.ImuseAdlib is null && cdSound.ImuseSpeaker is null)
+                        return ScummV5Digital.RenderWave(digital);
                     if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland)
                     {
                         if (cdSound.ImuseRoland is not { } roland) throw new NotSupportedException("This sound has no Roland MT-32 version.");
@@ -3268,7 +3271,9 @@ public partial class MainWindow : Window
     private TimeSpan? _audioKnownDuration;
     private string? _audioTimeNote;
 
-    private TimeSpan WaveDuration(byte[] wave, bool adlib) => _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && wave.Length >= 44
+    private TimeSpan WaveDuration(byte[] wave, bool adlib) => wave.Length >= 44 && BitConverter.ToInt32(wave, 28) is > 0 and var byteRate && _game?.Version == ScummVersion.V5
+        ? TimeSpan.FromSeconds((wave.Length - 44) / (double)byteRate)
+        : _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland && wave.Length >= 44
         ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4))
         : TimeSpan.FromSeconds(Math.Max(0, wave.Length - 44) / (double)(adlib ? 49716 * 4 : SpeakerWaveRate(wave) * 2));
 

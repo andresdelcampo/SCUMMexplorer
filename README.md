@@ -40,8 +40,8 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 | **Indiana Jones 3** 256 colours | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Monkey Island 1** floppy | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Monkey Island 1** CD | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
-| **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | – | ✔ | ✔ | – | – | – |
-| **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | – | ✔ | ✔ | – | – | – |
+| **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
+| **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
 | **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
@@ -51,11 +51,11 @@ Notes:
 
 - **Columns.** *Rooms* shows the room pictures (LOOM in its first-visit state), *Texts* is the Game Texts browser, *Scripts* the raw and readable script views, *Play* clicking in a live room with actors and scripts, *Status* the Game Status editor.
 - **LOOM editions.** "Other editions" are Spanish, plain English, French, German, v1.2 and Italian. "Demos" are the short and the long self-running demo.
-- **Audio devices.** LOOM EGA: AdLib and PC speaker, plus Roland MT-32 when the Roland upgrade is installed. LOOM CD: voices and disc music. Browse-only games: AdLib and PC speaker (Indiana Jones 3, Monkey Island 1 floppy) or PC speaker and PCjr/Tandy (Maniac Mansion, Zak McKracken).
+- **Audio devices.** LOOM EGA: AdLib and PC speaker, plus Roland MT-32 when the Roland upgrade is installed. LOOM CD: voices and disc music. Monkey Island 2 and Indiana Jones 4: Roland MT-32 (needs your own MT-32 ROM images) and AdLib. Other browse-only games: AdLib and PC speaker (Indiana Jones 3, Monkey Island 1 floppy) or PC speaker and PCjr/Tandy (Maniac Mansion, Zak McKracken).
 - **Objects.** In the browse-only games, objects are painted only where the game data gives them a starting state (Maniac Mansion and Zak McKracken, Indiana Jones 3 EGA). The v4 and v5 games show an object's name when you hover over it; the objects themselves would need the room scripts to run first.
 - **Walk boxes** (Advanced) are read for every game.
 - **Costumes** are drawn in the palette of the room that stores them, so some look off (Guybrush's shirt). The classic Maniac Mansion and Zak McKracken use the explorer's estimate of the actor colours, because the scripts choose them.
-- **Sounds.** AdLib music in the Monkey Island and Indiana Jones 3 (256 colours) disks plays at half tempo, set by ear, not from ScummVM's source. Indiana Jones 3 EGA plays its AdLib music at the LOOM tempo, which has not been checked by ear. Monkey Island 1 CD lists the disc's 24 audio tracks without names. The Monkey Island 2 and Indiana Jones 4 MIDI music (iMUSE) is not read. The PCjr/Tandy sounds of Maniac Mansion and Zak McKracken are ported from ScummVM but not yet listened to.
+- **Sounds.** AdLib music in the Monkey Island and Indiana Jones 3 (256 colours) disks plays at half tempo, set by ear, not from ScummVM's source. Indiana Jones 3 EGA plays its AdLib music at the LOOM tempo, which has not been checked by ear. Monkey Island 1 CD lists the disc's 24 audio tracks without names. The Monkey Island 2 and Indiana Jones 4 music (iMUSE) plays on Roland MT-32 and AdLib, and their sampled effects (Sound Blaster) play too; these are checked against the data and ScummVM's source but have not been listened to yet, and songs wait at the first loop point instead of looping. Their PC speaker versions and speech are not read yet. The PCjr/Tandy sounds of Maniac Mansion and Zak McKracken are ported from ScummVM but not yet listened to.
 - **Cutscenes.** The demos play only their preview. LOOM English EGA has a hand-checked list of 328 scenes. Other LOOM editions and the CD derive theirs from the game's own scripts.
 - The Maniac Mansion, Zak McKracken, Monkey Island, Indiana Jones and Atlantis columns marked "–" describe what the app does not read yet, not what the original game lacks. The detailed list is in [Requirements](docs/REQUIREMENTS.md) (section 3.1).
 

@@ -113,4 +113,21 @@ public sealed class V5ImuseAudioTests
         // MIDI note 69 -> note 65 -> block 5, F-number 143 (driver table): 143 * 49716 / 2^15 = 216.97 Hz, as in ScummVM's driver.
         Assert.InRange(hz, 214, 220);
     }
+
+    [Fact]
+    public void ReadsTheSampledEffectsWhenTheDataIsGiven()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_V5_MT32_TEST_ROOT");
+        if (folder is null || !Directory.Exists(folder)) return;
+        var source = new FolderFileSource(folder);
+        var archive = ScummV5Archive.Load(source, ScummV5Archive.FindGame(source)!);
+        var digital = archive.ReadSounds().Where(s => s.ImuseDigital is not null).ToList();
+        Assert.NotEmpty(digital);
+        foreach (var sound in digital)
+        {
+            var wave = ScummV5Digital.RenderWave(sound.ImuseDigital!);
+            Assert.True(wave.Length > 1000);
+            Assert.InRange(BitConverter.ToInt32(wave, 24), 5000, 48000);
+        }
+    }
 }

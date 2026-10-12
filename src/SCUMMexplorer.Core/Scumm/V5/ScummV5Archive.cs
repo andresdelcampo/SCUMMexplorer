@@ -152,7 +152,7 @@ public sealed class ScummV5Archive : IBrowsableArchive
             if (position + 8 > _resources.Length || Encoding.Latin1.GetString(_resources, position, 4) != "SOUN") continue;
             var size = (int)BinaryPrimitives.ReadUInt32BigEndian(_resources.AsSpan(position + 4));
             if (size < 8 || position + size > _resources.Length) continue;
-            byte[]? rol = null, adl = null, spk = null;
+            byte[]? rol = null, adl = null, spk = null, sbl = null;
             // SOUN > SOU > the parts of every card (ROL, ADL, SPK, or SBL). A part that starts with an MDhd block states its size 8 bytes short (the
             // MDhd size counts its body only), so the next part starts 8 bytes after where the size says; SOU and SOUN carry the same slip.
             var end = position + size;
@@ -163,7 +163,8 @@ public sealed class ScummV5Archive : IBrowsableArchive
                 var tag = Encoding.Latin1.GetString(_resources, p, 4);
                 var partSize = (int)BinaryPrimitives.ReadUInt32BigEndian(_resources.AsSpan(p + 4));
                 if (partSize < 8) break;
-                var mdhd = Encoding.Latin1.GetString(_resources, p + 8, 4) == "MDhd";
+                var inner = Encoding.Latin1.GetString(_resources, p + 8, 4);
+                var mdhd = inner is "MDhd" or "AUhd" or "WVhd";
                 var length = partSize + (mdhd ? 8 : 0);
                 if (p + length > _resources.Length) break;
                 var body = _resources.AsSpan(p + 8, length - 8).ToArray();
@@ -172,11 +173,12 @@ public sealed class ScummV5Archive : IBrowsableArchive
                     case "ROL ": rol ??= body; break;
                     case "ADL ": adl ??= body; break;
                     case "SPK ": spk ??= body; break;
+                    case "SBL ": sbl ??= body; break;
                 }
                 p += length;
             }
-            if (rol is null && adl is null && spk is null) continue;
-            sounds.Add(new ScummV4Sound(id, room, null, null) { ImuseRoland = rol, ImuseAdlib = adl, ImuseSpeaker = spk });
+            if (rol is null && adl is null && spk is null && sbl is null) continue;
+            sounds.Add(new ScummV4Sound(id, room, null, null) { ImuseRoland = rol, ImuseAdlib = adl, ImuseSpeaker = spk, ImuseDigital = sbl });
         }
         return sounds.OrderBy(s => s.Id).ToArray();
     }
