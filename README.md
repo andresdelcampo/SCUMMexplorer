@@ -181,6 +181,12 @@ dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-build
 | [LOOM script map](docs/loom/LOOM_SCRIPT_MAP.md) | Game-specific scripts, variables, verbs and rooms, with edition scope |
 | [Research](docs/engine/RESEARCH.md) | Technical references |
 
+## Collaborations welcome
+
+Collaborations are welcome, whether you write code, research the original engines, test game editions or improve the documentation. There is plenty to explore: adding support for **SCUMM v6 and later**, making **all currently supported games fully playable**, and improving audio, script decoding and edition coverage.
+
+Open an issue to discuss an idea, report what you find, or send a pull request.
+
 ## License
 
 SCUMMexplorer is licensed under the GNU General Public License, version 3 or later (see [LICENSE](LICENSE)). It adapts parts of ScummVM, which is GPL; game files and ROM images are never included.
