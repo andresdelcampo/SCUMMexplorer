@@ -163,4 +163,16 @@ public class OtherV4GameTests
         Assert.NotEmpty(archive.DecodeCostumePoses(archive.FindCostume(costumes[0].ResourceId!.Value)!));
         Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Sound or ResourceKind.Script);
     }
+
+    [Fact]
+    public void ExtractsTextsOfTheIndy256ColourGameWhenConfigured()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_INDY3_VGA_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var result = new LoomTextExtractor().Extract(game);
+        Console.WriteLine($"Indy3 256: {result.Entries.Count} texts; {result.Coverage}");
+        foreach (var e in result.Entries.Where(e => e.Kind == "Spoken line").Take(8)) Console.WriteLine($"  [{e.Kind}] {e.Text}");
+        Assert.True(result.Entries.Count > 500);
+    }
 }
