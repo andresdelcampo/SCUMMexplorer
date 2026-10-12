@@ -75,6 +75,9 @@ public sealed record GameLibrary(
     /// <summary>The resource number of CD audio track <c>n</c> is <c>CdTrackIdBase + n</c>.</summary>
     public const int CdTrackIdBase = 2000;
 
+    /// <summary>The resource number of speech sample <c>n</c> (counted from 1 in file order) of a talkie game's <c>MONSTER.SOU</c> is <c>SpeechIdBase + n</c>; its <c>Offset</c> is the sample's place in the file.</summary>
+    public const int SpeechIdBase = 10000;
+
     /// <summary>Which classic (v1) game this is (it picks the colour table of its rooms); null for every other game.</summary>
     public ScummV1Game? V1Game { get; init; }
 

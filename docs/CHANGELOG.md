@@ -2,6 +2,18 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 12 October: waiting cursor for large sound-tree expansion
+
+Expanding a sound branch with at least 1,000 entries now shows the waiting cursor before WPF realizes the rows, and releases it after pending layout/render work reaches dispatcher idle. The shared busy scope preserves any other ongoing busy operation and also cleans up on dispatcher shutdown. Tree appearance, labels and selection are unchanged.
+
+App and WPF preview rebuilt successfully. Real-window checks passed for the Indiana Jones 4 English branch with 7,236 sound rows (cursor set immediately and restored after layout) and the small LOOM branch (no new busy scope). The existing player transport/layout checks also passed. [Large-branch report](../.verification/sound-layout-20261012/cursor-speech/validation.txt), [small-branch report](../.verification/sound-layout-20261012/cursor-music/validation.txt).
+
+## 12 October: Advanced sound-player presentation
+
+The sound player now uses a compact dark card with a device/recording badge, full available speech or CD-cue text, labelled Play/Pause/Stop controls, real playback progress, and a clear ready/playing/paused/unavailable state. Timing annotations are removed from the card's displayed text; the underlying text and existing tree labels remain intact. The page title no longer repeats the selected sound's name. The user requested that the treeview stay unchanged, so the presentation changes are confined to the listening screen.
+
+Rebuilt the missing Core outputs, then built the App and an isolated-profile WPF preview. Checked real Indiana Jones 4 English speech and LOOM English EGA AdLib music at 1180×760 and 900×600, including progress, pause, stop, minimum-size control visibility, unavailable resources and No Sound. [Validation and screenshots](../.verification/sound-layout-20261012/validation.md). The preview restore reported NU1900 because NuGet vulnerability data was unreachable; app compilation succeeded without compiler warnings. These checks establish presentation and transport behavior, not perceived audio quality.
+
 ## 12 October: stored-object hotspots for browse-only games
 
 Browse-only games (Indy3 EGA, v1/v2, v4, v5) show the room's stored objects as boxes (existing Never / On hover / Always option) and as a "STORED OBJECTS" list in Advanced mode; hovering a row or the room outlines the box. Raw stored data only: no script analysis, so the list does not say which objects the game has in the room. Indy3 now reads its object directory and names like LOOM. Unnamed objects with a box are listed too, and children whose parent chain is not in the required start state (index state; v4/v5 take 0) are hidden; Indy3 EGA also requires owner 15. Checked in the real window (`.verification/StoredHotspots`, Indy3 EGA en and VGA es, rooms 20, 28, 32, 76, 21): both editions list 16, 20, 19, 1 and 6 objects. Rooms 20, 28 and 32 have a black background in the browse view (their picture is made of objects), so only the boxes show there.

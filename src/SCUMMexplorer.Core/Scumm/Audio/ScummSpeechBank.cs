@@ -29,6 +29,39 @@ public sealed class ScummSpeechBank
         return name is null ? null : new ScummSpeechBank(source, name);
     }
 
+    /// <summary>
+    /// Every sample in the file, in file order. The file is the 8-byte "SOU " header followed by back-to-back samples, each a <c>VCTL</c> block (its size field is the
+    /// distance to the voice file) and a Creative Voice File that runs to its end block; the scripts' offsets point at those <c>VCTL</c> blocks.
+    /// <c>Length</c> is what <see cref="ReadWave"/> takes.
+    /// </summary>
+    public IReadOnlyList<(int Offset, int Length)> ListSamples()
+    {
+        var samples = new List<(int, int)>();
+        var total = _source.Length(_name);
+        long position = 8;
+        while (position + 8 <= total && position < int.MaxValue)
+        {
+            var header = _source.ReadRange(_name, position, 8);
+            if (header.Length < 8 || !header.AsSpan(0, 4).SequenceEqual("VCTL"u8)) break;
+            var size = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(4));
+            if (size < 8) break;
+            var voc = _source.ReadRange(_name, position + size, 26);
+            if (voc.Length < 26 || !voc.AsSpan(0, 19).SequenceEqual("Creative Voice File"u8)) break;
+            var block = position + size + BinaryPrimitives.ReadUInt16LittleEndian(voc.AsSpan(20));
+            for (var guard = 0; guard < 4096 && block < total; guard++)
+            {
+                var head = _source.ReadRange(_name, block, 4);
+                if (head.Length < 1) break;
+                if (head[0] == 0) { block++; break; }
+                if (head.Length < 4) break;
+                block += 4 + (head[1] | head[2] << 8 | head[3] << 16);
+            }
+            samples.Add(((int)position, size));
+            position = block;
+        }
+        return samples;
+    }
+
     /// <summary>The line as a 16-bit mono wave. Throws <see cref="InvalidDataException"/> for an offset that holds no sample.</summary>
     public byte[] ReadWave(int offset, int length)
     {

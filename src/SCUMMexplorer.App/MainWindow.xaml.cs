@@ -166,6 +166,8 @@ public partial class MainWindow : Window
             else
             {
                 AudioDescription.Text = message;
+                AudioPlaybackState.Text = "Playback unavailable";
+                AudioProgress.Value = 0;
                 PlayButton.IsEnabled = false;
                 PauseButton.IsEnabled = false;
                 StopButton.IsEnabled = false;
@@ -187,6 +189,41 @@ public partial class MainWindow : Window
         {
             MessageBox.Show(this, ex.Message, "Could not open game folder", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    /// <summary>
+    /// The text each spoken line of a talkie game says, from the scripts' own text (the same scan as Game Texts), added after the sample's name in the Sounds list
+    /// the way the disc's voice cues carry theirs. The list shows the numbers at once; the words follow when the scan is done.
+    /// </summary>
+    private async Task NameSpeechSoundsAsync(GameLibrary game)
+    {
+        Dictionary<int, string> lines;
+        try
+        {
+            lines = await Task.Run(() =>
+            {
+                var found = new Dictionary<int, string>();
+                foreach (var entry in new LoomTextExtractor().Extract(game).Entries)
+                    if (entry.SpeechOffset is { } offset) found.TryAdd(offset, entry.Text);
+                return found;
+            });
+        }
+        catch (Exception ex) when (ex is InvalidDataException or IOException or NotSupportedException or InvalidOperationException) { return; }
+        if (_game != game) return;
+        foreach (var group in ResourceTree.Items.OfType<TreeViewItem>())
+            foreach (var item in group.Items.OfType<TreeViewItem>())
+            {
+                if (item.Tag is not GameResource { Kind: ResourceKind.Sound, ResourceId: >= GameLibrary.SpeechIdBase, Offset: { } offset } resource || !lines.TryGetValue(offset, out var text)) continue;
+                var line = string.Join(' ', text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+                _soundLines[resource] = line;
+                item.Header = $"{resource.Name} · {(line.Length > 40 ? line[..40] + "…" : line)}";
+                item.ToolTip = resource.Description + Environment.NewLine + "\"" + line + "\"";
+                if (_selectedSound == resource && AudioPanel.Visibility == Visibility.Visible)
+                {
+                    AudioLine.Text = SoundDisplayLine(line);
+                    AudioLine.Visibility = Visibility.Visible;
+                }
+            }
     }
 
     private void GameTexts_Click(object sender, RoutedEventArgs e)
@@ -419,6 +456,7 @@ public partial class MainWindow : Window
         RoomCardList.Children.Clear();
         RoomCardScroll.Visibility = Visibility.Visible;
 
+        _soundLines.Clear();
         var rooms = new TreeViewItem { Header = $"Rooms  ({game.Scenes.Count()})", IsExpanded = false };
         foreach (var room in game.Scenes)
             rooms.Items.Add(new TreeViewItem { Header = LoomResourceNames.Label(_glossary, room), ToolTip = LoomResourceNames.Evidence(_glossary, room), Tag = room });
@@ -452,6 +490,7 @@ public partial class MainWindow : Window
                 var kind = cue.IsMusicOrNarration ? "music / narration" : "voice";
                 var resource = new GameResource($"CD audio {i + 1:000}", ResourceKind.Sound, game.FolderPath, CdCueIdBase + i,
                     $"{kind}, {cue.Cue.Seconds:0.#} s at disc second {cue.Cue.DiscSeconds:0.#}; first asked for by {cue.Source}.", 1, null);
+                _soundLines[resource] = cue.Text;
                 var snippet = cue.Text.Length > 40 ? cue.Text[..40] + "…" : cue.Text;
                 cueNode.Items.Add(new TreeViewItem
                 {
@@ -465,6 +504,7 @@ public partial class MainWindow : Window
         PopulateRoomCards(game);
         PopulateCostumeCards(game);
         UpdateAdvancedMode();
+        if (game.Speech is not null) _ = NameSpeechSoundsAsync(game);
 
         ShowPageHeader(true);
         PageTitle.Text = game.Title;
@@ -2915,7 +2955,10 @@ public partial class MainWindow : Window
     private bool IsCdCue(GameResource resource) => _game?.V4Archive is not null && resource.ResourceId >= CdCueIdBase;
 
     /// <summary>A whole red-book track of a game disc (Monkey Island), which the player reads straight from the image.</summary>
-    private bool IsCdTrack(GameResource resource) => _game?.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId >= GameLibrary.CdTrackIdBase;
+    private bool IsCdTrack(GameResource resource) => _game?.AudioDisc is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId is >= GameLibrary.CdTrackIdBase and < GameLibrary.SpeechIdBase;
+
+    /// <summary>A spoken line of a talkie game's MONSTER.SOU: digital audio that plays as recorded, whatever the sound device.</summary>
+    private bool IsSpeech(GameResource resource) => _game?.Speech is not null && resource.Kind == ResourceKind.Sound && resource.ResourceId >= GameLibrary.SpeechIdBase;
 
     private async Task ShowAudio(GameResource resource, bool preserveFormat = false, bool autoPlay = false)
     {
@@ -2927,10 +2970,10 @@ public partial class MainWindow : Window
         RoomObjectPanel.Visibility = Visibility.Collapsed;
         Grid.SetColumnSpan(ContentPanel, 2);
         _selectedSound = resource;
-        var cdCue = IsCdCue(resource) || IsCdTrack(resource);
+        var cdCue = IsCdCue(resource) || IsCdTrack(resource) || IsSpeech(resource);
         var adlib = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib;
         var roland = !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland;
-        var format = cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Pcjr ? "PCjr/Tandy" : "PC speaker";
+        var format = IsSpeech(resource) ? "speech" : cdCue ? "CD audio" : adlib ? "AdLib FM" : roland ? "Roland MT-32" : !cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.Pcjr ? "PCjr/Tandy" : "PC speaker";
         AdlibGainPanel.Visibility = Visibility.Collapsed; // the level bar is hidden; the slider keeps its +6 dB default, which is still applied
         _previewCancellation?.Cancel();
         RoomPreview.Visibility = Visibility.Collapsed;
@@ -2945,11 +2988,12 @@ public partial class MainWindow : Window
         ObjectAssetPreview.Visibility = Visibility.Collapsed;
         ObjectAssetDescription.Text = "";
         ShowPageHeader(true);
-        PageTitle.Text = resource.Name;
+        PageTitle.Text = "Sounds & music";
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
-        PageSubtitle.Text = "Play this sound on demand.";
+        PageSubtitle.Text = "Listen to the game's music, effects and speech.";
         PageSubtitle.ToolTip = resource.FilePath;
         AudioTitle.Text = resource.Name;
+        ShowSoundPresentation(resource, format);
         AudioDescription.Text = $"Preparing {format} audio…";
         // No length until there is one: 0:00 / 0:00 would read as a sound of no length.
         AudioTime.Text = "Preparing…";
@@ -2960,6 +3004,7 @@ public partial class MainWindow : Window
         if (!cdCue && _sceneSound.Mode == SceneSoundPlayer.SoundMode.None)
         {
             _audioTimeNote = AudioTime.Text = "Muted";
+            AudioPlaybackState.Text = "Muted";
             AudioDescription.Text = "No Sound selected";
             StatusText.Text = $"{resource.Name} · muted";
             return;
@@ -2969,7 +3014,7 @@ public partial class MainWindow : Window
         var token = _audioCancellation.Token;
         try
         {
-            var wave = IsCdTrack(resource) ? await Task.Run(() => ReadCdTrackWave(resource), token) : cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
+            var wave = IsSpeech(resource) ? await Task.Run(() => _game!.Speech!.ReadWave(resource.Offset!.Value, resource.ContainerNumberOffset!.Value), token) : IsCdTrack(resource) ? await Task.Run(() => ReadCdTrackWave(resource), token) : cdCue ? ReadCdCueWave(resource) : await RenderAudioWaveAsync(resource, adlib, token);
             if (token.IsCancellationRequested) return;
             _adlibBaseWave = adlib ? wave : null;
             if (adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, AdlibGainSlider.Value);
@@ -2982,17 +3027,19 @@ public partial class MainWindow : Window
             }
             _audioFile = path;
             _playWhenReady = autoPlay;
-            _audioKnownDuration = cdCue ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4)) : WaveDuration(wave, adlib);
+            _audioKnownDuration = IsSpeech(resource) ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 2)) : cdCue ? TimeSpan.FromSeconds((wave.Length - 44) / (double)(BitConverter.ToInt32(wave, 24) * 4)) : WaveDuration(wave, adlib);
             _audioPlayer.Open(new Uri(path));
             _audioReady = true;
             PlayButton.IsEnabled = true;
             PauseButton.IsEnabled = true;
             StopButton.IsEnabled = true;
             AdlibGainSlider.IsEnabled = adlib;
-            AudioDescription.Text = !roland && wave.Length >= 44 + (adlib ? 49716 * 4 : SpeakerWaveRate(wave) * 2) * 179
+            AudioDescription.Text = !cdCue && !roland && wave.Length >= 44 + (adlib ? 49716 * 4 : SpeakerWaveRate(wave) * 2) * 179
                 ? $"DOS {format} rendition · preview limited to three minutes"
-                : cdCue ? $"{resource.Description} Straight from the disc's audio track · select Play to listen"
+                : IsSpeech(resource) ? "Original recorded speech"
+                : cdCue ? "Original disc audio"
                 : $"DOS {format} rendition · select Play to listen";
+            AudioPlaybackState.Text = "Ready to play";
             StatusText.Text = $"{resource.Name} · {format} track ready";
             UpdateAudioTime();
         }
@@ -3002,6 +3049,7 @@ public partial class MainWindow : Window
             if (token.IsCancellationRequested) return;
             AudioDescription.Text = ex.Message;
             _audioTimeNote = AudioTime.Text = "No playable audio";
+            AudioPlaybackState.Text = "Playback unavailable";
             StatusText.Text = $"{resource.Name} · playback unavailable";
         }
     }
@@ -3237,7 +3285,7 @@ public partial class MainWindow : Window
         if (_durationKey.Game != game) _durationLabels.Clear();
         _durationKey = (game, mode);
         var items = ResourceTree.Items.OfType<TreeViewItem>().SelectMany(group => group.Items.OfType<TreeViewItem>())
-            .Where(item => item.Tag is GameResource { Kind: ResourceKind.Sound } sound && !IsCdCue(sound) && !IsCdTrack(sound)).ToArray();
+            .Where(item => item.Tag is GameResource { Kind: ResourceKind.Sound } sound && !IsCdCue(sound) && !IsCdTrack(sound) && !IsSpeech(sound)).ToArray();
         string Header(TreeViewItem item, string? duration) =>
             LoomResourceNames.Label(_glossary, (GameResource)item.Tag) + (duration is null ? "" : " - " + duration);
         foreach (var item in items)
@@ -3446,6 +3494,9 @@ public partial class MainWindow : Window
         // The player reports the length only once the file is open; the rendered wave's own length is known at once.
         TimeSpan? total = _audioPlayer.NaturalDuration.HasTimeSpan ? _audioPlayer.NaturalDuration.TimeSpan : _audioKnownDuration;
         AudioTime.Text = total is TimeSpan length ? $"{current:m\\:ss} / {length:m\\:ss}" : _audioTimeNote ?? "Preparing…";
+        AudioProgress.Value = total is { TotalSeconds: > 0 } ? Math.Clamp(current.TotalSeconds / total.Value.TotalSeconds, 0, 1) : 0;
+        if (_audioSurface == AudioSurface.Resource && _audioReady)
+            AudioPlaybackState.Text = _audioTimer.IsEnabled ? "Playing" : current > TimeSpan.Zero ? "Paused" : "Ready to play";
         RoomCueTime.Text = AudioTime.Text;
     }
 

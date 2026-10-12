@@ -4,6 +4,8 @@ Updated 10 October 2026. This is the single plan and session handoff. Completed 
 
 ## Status
 
+The Advanced sound-player presentation is refreshed (12 October): compact card, labelled transport controls, real progress and available speech text. Tree appearance is unchanged at the user's request; the later requested waiting cursor is shown while branches with 1,000+ sounds expand. [WPF validation](../.verification/sound-layout-20261012/validation.md) covers speech/music, minimum window size and cursor cleanup; no remaining player-layout blocker was found.
+
 The approved graphical SCUMMexplorer title is embedded in the app header, cropped and scaled at runtime, with a 2-pixel downward alignment adjustment. [Header preview](../.verification/title-wordmark-20261010/validation.md) confirms the default and minimum window widths.
 
 Cutscene lists are now script-derived for every edition without a validated catalog (R-8.24) and the CD has a shipped, fingerprint-checked seed of its room lists (R-8.25); the English reference keeps its hand-validated catalog, which is not to be removed until the scan agrees with it (title+category 217 of 328; with the headless run 320 of 328 categories; see [the harness README](../.verification/cutscene-scan-ega/README.md)). Open: check the run-based category on the CD against the bundled ScummVM (it calls 19 of 98 scenes dialogue; some leave the room in EGA), review the 8 hand-labelled EGA scenes only if wanted, and write a seed for other editions only with the user's OK (it reverses the 5 October no-rerun decision).

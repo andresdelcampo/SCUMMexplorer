@@ -391,7 +391,7 @@
                     <ScrollViewer x:Name="CostumeCardScroll" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="-5,0,-3,8">
                         <WrapPanel x:Name="CostumeCardList"/>
                     </ScrollViewer>
-                    <TreeView x:Name="ResourceTree" Grid.Row="1" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="#E7E0D2" SelectedItemChanged="ResourceTree_SelectedItemChanged"/>
+                    <TreeView x:Name="ResourceTree" Grid.Row="1" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="#E7E0D2" SelectedItemChanged="ResourceTree_SelectedItemChanged" TreeViewItem.Expanded="ResourceTree_Expanded"/>
                 </Grid>
             </Border>
             <Grid x:Name="ContentPanel" Grid.Column="1" Margin="20,14,20,8">
@@ -581,10 +581,19 @@
                                            TextAlignment="Center" Foreground="#AAB4BA"/>
                             </Grid>
                         </Grid>
-                        <StackPanel x:Name="AudioPanel" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Width="380">
-                            <TextBlock Text="SOUND PLAYER" Foreground="#B78442" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
-                            <TextBlock x:Name="AudioTitle" FontSize="24" FontWeight="SemiBold" TextAlignment="Center" Margin="0,12,0,3"/>
-                            <TextBlock x:Name="AudioDescription" Foreground="#AAB4BA" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                        <ScrollViewer x:Name="AudioPanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                          <Border x:Name="AudioCard" MaxWidth="560" Margin="20,8" Padding="24" Background="#151F29" BorderBrush="#334452" BorderThickness="1" CornerRadius="8" VerticalAlignment="Center">
+                           <StackPanel>
+                            <DockPanel Margin="0,0,0,16">
+                                <Border DockPanel.Dock="Right" Background="#25343F" CornerRadius="3" Padding="8,4">
+                                    <TextBlock x:Name="AudioFormat" Foreground="#C9B894" FontSize="11"/>
+                                </Border>
+                                <TextBlock Text="SOUND PLAYER" Foreground="#B78442" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock x:Name="AudioTitle" FontSize="24" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="AudioLine" Visibility="Collapsed" Foreground="#E7E0D2" FontSize="16" TextWrapping="Wrap" Margin="0,12,0,0"/>
+                            <TextBlock x:Name="AudioSource" Foreground="#8E9FA9" FontSize="11" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                            <TextBlock x:Name="AudioDescription" Foreground="#AAB4BA" TextWrapping="Wrap" Margin="0,12,0,16"/>
                             <StackPanel x:Name="AdlibGainPanel" Visibility="Collapsed" Margin="12,0,12,12">
                                 <DockPanel LastChildFill="True">
                                     <TextBlock Text="AdLib level" Foreground="#E7E0D2" VerticalAlignment="Center"/>
@@ -594,13 +603,19 @@
                                         IsSnapToTickEnabled="False" ValueChanged="AdlibGainSlider_ValueChanged"
                                         ToolTip="AdLib playback gain. Peaks are kept below clipping; some tracks may reach their safe maximum before 24 dB."/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button x:Name="PlayButton" Content="▶" ToolTip="Play" AutomationProperties.Name="Play" Click="PlayButton_Click" Width="44" Height="36" Margin="4" FontSize="15" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                <Button x:Name="PauseButton" Content="Ⅱ" ToolTip="Pause" AutomationProperties.Name="Pause" Click="PauseButton_Click" Width="44" Height="36" Margin="4" FontSize="15" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
-                                <Button x:Name="StopButton" Content="■" ToolTip="Stop" AutomationProperties.Name="Stop" Click="StopButton_Click" Width="44" Height="36" Margin="4" FontSize="15" Background="#273642" Foreground="#E7E0D2" BorderBrush="#4A5962"/>
+                            <ProgressBar x:Name="AudioProgress" Height="4" Minimum="0" Maximum="1" Value="0" Foreground="#B78442" Background="#25343F" BorderThickness="0" Focusable="False" AutomationProperties.Name="Playback progress"/>
+                            <DockPanel Margin="0,8,0,16">
+                                <TextBlock x:Name="AudioTime" Text="0:00 / 0:00" DockPanel.Dock="Right" Foreground="#B8AA8C" FontSize="12"/>
+                                <TextBlock x:Name="AudioPlaybackState" Text="Ready to play" Foreground="#AAB4BA" FontSize="12"/>
+                            </DockPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="PlayButton" Content="▶  Play" ToolTip="Play" AutomationProperties.Name="Play" Click="PlayButton_Click" Width="100" Height="38" Margin="0,0,8,0" Background="#685132" Foreground="#F0E6D2" BorderBrush="#8E7046"/>
+                                <Button x:Name="PauseButton" Content="Ⅱ  Pause" ToolTip="Pause" AutomationProperties.Name="Pause" Click="PauseButton_Click" Width="84" Height="38" Margin="0,0,8,0"/>
+                                <Button x:Name="StopButton" Content="■  Stop" ToolTip="Stop" AutomationProperties.Name="Stop" Click="StopButton_Click" Width="80" Height="38"/>
                             </StackPanel>
-                            <TextBlock x:Name="AudioTime" Text="0:00 / 0:00" Foreground="#B8AA8C" HorizontalAlignment="Center" Margin="0,14,0,0"/>
-                        </StackPanel>
+                           </StackPanel>
+                          </Border>
+                        </ScrollViewer>
                         <Grid x:Name="ScriptPanel" Visibility="Collapsed" Margin="12">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>

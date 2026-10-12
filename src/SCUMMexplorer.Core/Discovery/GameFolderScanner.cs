@@ -329,6 +329,18 @@ public sealed class GameFolderScanner
                     $"Track {track.Number} of the disc, {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}.{plays}", null, null));
             }
         }
+        // A talkie game: every spoken line of MONSTER.SOU is a sound of its own (device-independent digital audio, like the disc's tracks).
+        var speech = v5 is null ? null : ScummSpeechBank.Find(source);
+        if (speech is not null)
+        {
+            var number = 0;
+            foreach (var (offset, length) in speech.ListSamples())
+            {
+                number++;
+                resources.Add(new GameResource($"Speech {number:0000}", ResourceKind.Sound, source.Location, GameLibrary.SpeechIdBase + number,
+                    $"Spoken line {number} of {speech.FileName}. Its text is in Game Texts.", null, offset, ContainerNumberOffset: length));
+            }
+        }
         var layout = v5 is not null ? $"a SCUMM v5 index and resource file ({v5.Stem}.000 and .001)" : perRoomFiles ? "one file per room (00.LFL and NN.LFL)" : $"{disks.Disks.Count} disks (000.LFL and DISK01.LEC to DISK{disks.Disks.Count:00}.LEC)";
         if (!resources.Any(r => r.Kind == ResourceKind.Room))
             return new GameLibrary(title, source.Location, v5 is null ? ScummVersion.V4 : ScummVersion.V5, v5 is null ? "DOS (SCUMM v4)" : "DOS (SCUMM v5)", [],
@@ -337,7 +349,7 @@ public sealed class GameFolderScanner
         return new GameLibrary(title, source.Location, v5 is null ? ScummVersion.V4 : ScummVersion.V5, v5 is null ? "DOS (SCUMM v4)" : "DOS (SCUMM v5)", ordered,
             $"A SCUMM {(v5 is null ? "v4" : "v5")} game that is not LOOM CD, read from {layout}. Room backgrounds and costumes are shown" +
             (withoutPicture > 0 ? $" ({withoutPicture} room entries without a picture are left out)" : "") +
-            "; objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks, AudioDisc = disc, Speech = v5 is null ? null : ScummSpeechBank.Find(source) };
+            "; objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks, AudioDisc = disc, Speech = speech };
     }
 
     /// <summary>
