@@ -75,6 +75,17 @@ public sealed class ScummImuseAdlib
     private sealed class Player(Driver driver)
     {
         private readonly PartState?[] _parts = new PartState?[16];
+        private readonly byte[]?[] _globalInstruments = new byte[]?[32];
+
+        /// <summary>Part::load_global_instrument / copyGlobalInstrument: the global instrument of a slot, or the all-zero default the original uses.</summary>
+        private void LoadGlobalInstrument(PartState state, int slot)
+        {
+            if (slot >= 32) return;
+            var instrument = new byte[30];
+            _globalInstruments[slot]?.CopyTo(instrument, 0);
+            state.Mc.Instrument = instrument;
+            state.InstrumentValid = true;
+        }
 
         /// <summary>Handles an event; returns the target tick of a hook that jumps (id 0), or null.</summary>
         public long? Handle(ScummImuseEvent e)
@@ -91,6 +102,7 @@ public sealed class ScummImuseAdlib
                     else if (state.On && state.InstrumentValid) driver.PartKeyOn(part, part.Instrument, e.Data[0], e.Data[1]);
                     break;
                 case 0xB: Controller(state, e.Data[0], e.Data[1]); break;
+                case 0xC: LoadGlobalInstrument(state, e.Data[0]); break;
                 case 0xE: part.PitchBend(((e.Data[0] | e.Data[1] << 7) - 0x2000)); break;
             }
             return null;
@@ -136,6 +148,7 @@ public sealed class ScummImuseAdlib
                     state.Vol = buf[3];
                     state.Transpose = buf[5] == 0x80 ? 0 : Math.Clamp((sbyte)buf[5], (sbyte)-12, (sbyte)12);
                     state.Detune = (sbyte)buf[6];
+                    LoadGlobalInstrument(state, buf[8]);
                     // Part::sendAll
                     if (buf[7] <= 12) { part.PitchBend(0); part.PitchBendFactor(buf[7]); }
                     part.Transpose((sbyte)state.Transpose);
@@ -162,6 +175,14 @@ public sealed class ScummImuseAdlib
                     }
                     break;
                 }
+                case 17: // AdLib instrument definition (global)
+                    if (d.Length == 65 && d[4] < 32)
+                    {
+                        var instrument = new byte[30];
+                        ScummImuseSong.Decode(d.AsSpan(5), 30).CopyTo(instrument, 0);
+                        _globalInstruments[d[4] & 31] = instrument;
+                    }
+                    break;
                 case 48 when d.Length > 3: // hook: jump (id 0 is always taken)
                 {
                     var buf = ScummImuseSong.Decode(d.AsSpan(3), 9);

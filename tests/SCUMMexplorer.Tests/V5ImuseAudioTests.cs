@@ -130,4 +130,30 @@ public sealed class V5ImuseAudioTests
             Assert.InRange(BitConverter.ToInt32(wave, 24), 5000, 48000);
         }
     }
+
+    [Fact]
+    public void RendersTheMonkeyIsland2PcSpeakerMusicWhenTheDataIsGiven()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_V5_MT32_TEST_ROOT");
+        if (folder is null || !Directory.Exists(folder)) return;
+        var source = new FolderFileSource(folder);
+        var archive = ScummV5Archive.Load(source, ScummV5Archive.FindGame(source)!);
+        var sounds = archive.ReadSounds().Where(s => s.ImuseSpeaker is not null).ToList();
+        Assert.True(sounds.Count > 40);
+        var silent = 0;
+        var report = new System.Text.StringBuilder();
+        foreach (var sound in sounds)
+        {
+            try
+            {
+                var result = new ScummImuseSpeaker().Render(ScummImuseSong.Parse(sound.ImuseSpeaker!));
+                report.AppendLine($"{sound.Id}: {result.Seconds:0.00}s loops {result.Loops}");
+                if (result.Wave.Length <= 100) silent++;
+            }
+            catch (InvalidDataException) { silent++; }
+        }
+        File.WriteAllText(Path.Combine(Path.GetTempPath(), "v5-spk-report.txt"), report.ToString());
+        File.WriteAllText(Path.Combine(Path.GetTempPath(), "v5-spk-report.txt"), report.ToString());
+        Assert.True(silent < 12, $"{silent} silent PC speaker sounds");
+    }
 }

@@ -2860,7 +2860,7 @@ public partial class MainWindow : Window
                     }
                     if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib)
                         return new ScummImuseAdlib().RenderWave(cdSound.ImuseAdlib ?? throw new NotSupportedException("This sound has no AdLib version."), token);
-                    throw new NotSupportedException("The PC speaker version of this game's sounds is not available yet. Choose AdLib or Roland.");
+                    return new ScummImuseSpeaker().RenderWave(cdSound.ImuseSpeaker ?? throw new NotSupportedException("This sound has no PC speaker version."), token);
                 }
                 if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 return adlib
