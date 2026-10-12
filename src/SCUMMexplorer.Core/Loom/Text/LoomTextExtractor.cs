@@ -34,11 +34,13 @@ public sealed record LoomTextExtraction(IReadOnlyList<LoomTextEntry> Entries,
 public sealed class LoomTextExtractor
 {
     public const string ChoiceConversationKind = "Dialogue choices";
+    private static readonly Regex SpeechCodePattern = new(@"\[text control 0A: [0-9A-F]{2} [0-9A-F]{2}\]", RegexOptions.Compiled);
     private readonly ScummRoomObjectDirectory _objects = new();
     public LoomTextExtraction Extract(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
         var dialect = ScummProfile.For(game).Dialect;
+        var isV5 = game.Version == ScummVersion.V5;
         var scripts = new ScummScriptReader(dialect);
         var verbs = new ScummObjectVerbReader(dialect);
         var entries = new List<LoomTextEntry>();
@@ -119,8 +121,10 @@ public sealed class LoomTextExtractor
                         entryObjectName = null;
                     }
                 }
-                foreach (var text in ScummTextDecoder.DecodeLiterals(instruction.Operands))
+                foreach (var rawText in ScummTextDecoder.DecodeLiterals(instruction.Operands))
                 {
+                    // The talkie games (Monkey Island 2, Indiana Jones 4) put four "play this speech sample" codes (0xFF 0x0A and two bytes each) before a spoken line.
+                    var text = isV5 ? SpeechCodePattern.Replace(rawText, "") : rawText;
                     if (!HasUsefulText(text)) continue;
                     var kind = instruction.Operation switch
                     {
@@ -198,7 +202,43 @@ public sealed class LoomTextExtractor
                 }
             }
         }
-        if (archives.Count > 0) return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics, leftovers);
+        // The v5 games (Monkey Island 1 CD, Monkey Island 2, Indiana Jones 4): the SCRP, ENCD, EXCD and LSCR blocks and the VERB tables of the objects.
+        var v5Archives = game.V4Disks?.Disks.OfType<ScummV5Archive>().ToList() ?? [];
+        foreach (var v5 in v5Archives)
+        {
+            foreach (var script in v5.ReadGlobalScripts())
+            {
+                var source = $"Script {script.Number:00}";
+                try { Add(scripts.DecodeCode(script.Code, script.Number, 1, script.Position) with { Context = source }, null, sourceOverride: source); }
+                catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source, ex); }
+            }
+            foreach (var room in v5.Rooms)
+            {
+                foreach (var script in v5.ReadRoomScripts(room.Number))
+                {
+                    var source = script.Kind switch { "ENCD" => $"Room {room.Number:00} / Entry script", "EXCD" => $"Room {room.Number:00} / Exit script", _ => $"Room {room.Number:00} / Local script {script.Number}" };
+                    try { Add(scripts.DecodeCode(script.Code, script.Number, 1, script.Position) with { Context = source }, room.Number, sourceOverride: source); }
+                    catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source, ex); }
+                }
+                var labels = v5.ReadObjectLabels(room.Number);
+                var names = labels.GroupBy(o => o.Id).ToDictionary(g => g.Key, g => g.First().Name);
+                foreach (var label in labels)
+                    if (HasUsefulText(label.Name))
+                        entries.Add(new LoomTextEntry(label.Name, "Object name", $"Room {room.Number:00} / Object {label.Id}", room.Number, label.Id, null, null, 0, label.Name));
+                foreach (var verb in v5.ReadObjectVerbs(room.Number))
+                {
+                    var verbLabel = verb.VerbId == 0xFF ? "Fallback verb" : $"Verb 0x{verb.VerbId:X2}";
+                    var source = $"Room {room.Number:00} / Object {verb.ObjectId} / {verbLabel}";
+                    try
+                    {
+                        Add(scripts.DecodeCode(verb.Block, verb.ObjectId, 1, verb.Position, verb.StartOffset) with { Context = source }, room.Number, verb.ObjectId, verb.VerbId, source,
+                            verb.ObjectName is { Length: > 0 } ? verb.ObjectName : null, names);
+                    }
+                    catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or ArgumentException) { Skip(source, ex); }
+                }
+            }
+        }
+        if (archives.Count > 0 || v5Archives.Count > 0) return new LoomTextExtraction(entries, decodedBytes, candidateBytes, unresolved, visited, skipped, diagnostics, leftovers);
 
         if (game.Version is ScummVersion.V1 or ScummVersion.V2)
         {

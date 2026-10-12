@@ -161,7 +161,9 @@ public class OtherV4GameTests
         var costumes = game.Resources.Where(r => r.Kind == ResourceKind.Costume).ToArray();
         Assert.True(costumes.Length >= 100);
         Assert.NotEmpty(archive.DecodeCostumePoses(archive.FindCostume(costumes[0].ResourceId!.Value)!));
-        Assert.DoesNotContain(game.Resources, r => r.Kind is ResourceKind.Sound or ResourceKind.Script);
+        // v5 sounds (iMUSE MIDI) are not read; its scripts are.
+        Assert.DoesNotContain(game.Resources, r => r.Kind == ResourceKind.Sound && r.ResourceId < GameLibrary.CdTrackIdBase);
+        Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Script);
     }
 
     [Fact]
@@ -194,5 +196,24 @@ public class OtherV4GameTests
         var texts = new SCUMMexplorer.Core.Loom.LoomTextExtractor().Extract(game);
         Assert.True(texts.Entries.Count >= minimumTexts, $"Only {texts.Entries.Count} texts.");
         Assert.Contains(texts.Entries, e => e.Kind == "Spoken line");
+    }
+
+    [Fact]
+    public void ReadsTheScriptsAndTextsOfAV5GameWhenConfigured()
+    {
+        var folder = Environment.GetEnvironmentVariable("SCUMM_V5_TEST_ROOT");
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        Assert.Equal(ScummVersion.V5, game.Version);
+        Assert.Equal(ScummScriptDialect.V5, ScummProfile.For(game).Dialect);
+        var archive = game.V4Disks!.Disks.OfType<ScummV5Archive>().Single();
+        var reader = new ScummScriptReader(ScummScriptDialect.V5);
+        // The v4 operand forms with v5's own actor sub-opcodes and getObjectState: nearly every script block decodes without an unresolved path.
+        var blocks = archive.ReadGlobalScripts().Select(s => s.Code).Concat(archive.Rooms.SelectMany(r => archive.ReadRoomScripts(r.Number)).Select(s => s.Code)).ToArray();
+        Assert.True(blocks.Length > 200);
+        Assert.True(blocks.Count(code => reader.DecodeCode(code).Issues is { Count: 0 }) * 100 >= blocks.Length * 85);
+        var texts = new SCUMMexplorer.Core.Loom.LoomTextExtractor().Extract(game);
+        Assert.True(texts.Entries.Count > 2000, $"Only {texts.Entries.Count} texts.");
+        Assert.DoesNotContain(texts.Entries, e => e.Text.Contains("[text control 0A"));
     }
 }

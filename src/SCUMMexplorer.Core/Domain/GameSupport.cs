@@ -29,6 +29,8 @@ public sealed record GameSupport(bool Rooms, bool LiveSession, bool Scripts, boo
         // Maniac Mansion and Zak McKracken (v1/v2): their scripts are read for the texts and the script view.
         (GameId.Unknown, ScummVersion.V2 or ScummVersion.V1) => new(true, false, true, false, true, false, false,
             "Room backgrounds, costumes, sounds, scripts and texts from the game.", "Select a room to see its background."),
+        (GameId.Unknown, ScummVersion.V5) => new(true, false, true, false, true, false, false,
+            "Room backgrounds, costumes, scripts and texts from the game.", "Select a room to see its background."),
         (GameId.Unknown, ScummVersion.V5 or ScummVersion.V4 or ScummVersion.V2 or ScummVersion.V1) => new(true, false, false, false, false, false, false,
             "Room backgrounds, costumes and sounds from the game.", "Select a room to see its background."),
         _ => new(false, false, false, false, false, false, false, Unsupported, UnsupportedPreview)

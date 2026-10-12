@@ -285,7 +285,18 @@ public sealed class GameFolderScanner
             foreach (var sound in archive.ReadSounds())
                 resources.Add(new GameResource($"Sound {sound.Id:00}", ResourceKind.Sound, source.Location, sound.Id,
                     $"{(sound.IsMusic ? "Music" : "Sound effect")} stored in room {sound.Room:00} on {diskName}.", disk, null));
-            // Scripts of the v4 archives (v5 has no script reader yet): global ones and each room's local ones, for the raw and readable views.
+            // Scripts of the v5 archive: the global SCRP blocks and each room's local LSCR blocks.
+            if (archive is ScummV5Archive v5Scripts)
+            {
+                foreach (var script in v5Scripts.ReadGlobalScripts())
+                    resources.Add(new GameResource($"Script {script.Number:00}", ResourceKind.Script, source.Location, script.Number,
+                        $"Global script stored in room {script.Room:00}.", disk, script.Position));
+                foreach (var room in v5Scripts.Rooms)
+                    foreach (var local in v5Scripts.ReadRoomScripts(room.Number).Where(s => s.Kind == "LSCR"))
+                        resources.Add(new GameResource($"Room {room.Number:00} local script {local.Number}", ResourceKind.Script, source.Location, local.Number,
+                            $"Room-local script of room {room.Number:00}.", disk, local.Position, ScriptRoom: room.Number));
+            }
+            // Scripts of the v4 archives: global ones and each room's local ones, for the raw and readable views.
             if (archive is ScummV4Archive scriptArchive)
             {
                 foreach (var id in scriptArchive.GlobalScriptNumbers())

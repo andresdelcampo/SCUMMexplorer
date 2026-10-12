@@ -21,7 +21,9 @@ public enum ScummScriptDialect
     /// <summary>SCUMM v4 (LOOM CD): the v5 operand forms, which differ from the old-v3 ones in roomOps (sub-opcode first), the line-height print operand, charset cursor command and three opcodes (0x30, 0x3B, 0x4C).</summary>
     V4,
     /// <summary>SCUMM v1 and v2 (Maniac Mansion, Zak McKracken): byte variables, texts inline, its own opcode table (<c>ScummScriptDisassembler.V2.cs</c>).</summary>
-    V2
+    V2,
+    /// <summary>SCUMM v5 (Monkey Island 1 CD, Monkey Island 2, Indiana Jones 4): the v4 forms, with the actor sub-opcodes as ScummVM numbers them (no small-header translation).</summary>
+    V5
 }
 
 public sealed record ScummScriptDisassembly(
@@ -358,6 +360,12 @@ internal static partial class ScummScriptDisassembler
 
         if (Is(opcode, 0x05, 0x25, 0x45, 0x65, 0x85, 0xA5, 0xC5, 0xE5))
             return DecodeDrawObject(cursor, opcode);
+        // v5 dropped ifState/ifNotState: 0x0F and 0x8F read an object's state into a variable (ScummVM o5_getObjectState); the other forms are not registered.
+        if (cursor.Dialect == ScummScriptDialect.V5 && (opcode & 0x1F) == 0x0F)
+        {
+            if (opcode is 0x0F or 0x8F) return ("getObjectState", Join(ReadResult(cursor), ReadParam(cursor, 2, opcode, 0x80)));
+            throw new UnsupportedBytecodeException($"opcode 0x{opcode:X2} is not defined in SCUMM v5");
+        }
         if (Is(opcode, 0x0F, 0x4F, 0x8F, 0xCF, 0x2F, 0x6F, 0xAF, 0xEF))
             return DecodeStateConditional(cursor, opcode);
         if (Is(opcode, 0x07, 0x47, 0x87, 0xC7))
@@ -488,13 +496,13 @@ internal static partial class ScummScriptDisassembler
         if (opcode == 0x2B) return ("delayVariable", ReadVar(cursor));
         // v3 maps 0x3B to o3_waitForActor: a LOOM no-op without operands, and
         // an Indy3 wait on a byte (or variable) actor operand.
-        if (cursor.Dialect == ScummScriptDialect.V4 && opcode is 0x3B or 0xBB)
+        if (cursor.V4Like && opcode is 0x3B or 0xBB)
             return ("getActorScale", Join(ReadResult(cursor), ReadParam(cursor, 1, opcode, 0x80)));
         if (opcode is 0x3B or 0xBB)
             return cursor.Dialect == ScummScriptDialect.V3Indy3
                 ? ("waitForActor", ReadParam(cursor, 1, opcode, 0x80))
                 : ("waitForActor", "LOOM no-op");
-        if (opcode == 0x4C) return cursor.Dialect == ScummScriptDialect.V4 ? ("soundKludge", ReadVarargList(cursor)) : ("waitForSentence", "");
+        if (opcode == 0x4C) return cursor.V4Like ? ("soundKludge", ReadVarargList(cursor)) : ("waitForSentence", "");
         if (opcode == 0x58) return (cursor.ReadByte() == 0 ? "endOverride" : "beginOverride", "");
         if (opcode == 0x32 || opcode == 0xB2) return ("setCameraAt", ReadParam(cursor, 2, opcode, 0x80));
         if (opcode is 0x12 or 0x92) return ("panCameraTo", ReadParam(cursor, 2, opcode, 0x80));
@@ -514,7 +522,7 @@ internal static partial class ScummScriptDisassembler
 
         if (opcode == 0x27) return DecodeStringOps(cursor);
         if (opcode == 0x2C) return DecodeCursorCommand(cursor);
-        if (cursor.Dialect == ScummScriptDialect.V4 && opcode is 0x30 or 0xB0) return DecodeMatrixOps(cursor);
+        if (cursor.V4Like && opcode is 0x30 or 0xB0) return DecodeMatrixOps(cursor);
         if (opcode == 0x30 || opcode == 0xB0)
             return ("setBoxFlags", Join(ReadParam(cursor, 1, opcode, 0x80), $"0x{cursor.ReadByte():X2}"));
         if (Is(opcode, 0x3F, 0x7F, 0xBF, 0xFF)) return DecodeDrawBox(cursor, opcode);
@@ -633,7 +641,7 @@ internal static partial class ScummScriptDisassembler
             0x0B => Join("cursorHotspot", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40), ReadParam(cursor, 1, sub, 0x20)),
             0x0C => Join("cursorSet", ReadParam(cursor, 1, sub, 0x80)),
             0x0D => Join("charsetSet", ReadParam(cursor, 1, sub, 0x80)),
-            0x0E => cursor.Dialect == ScummScriptDialect.V4 ? Join("charsetColors", ReadVarargList(cursor))
+            0x0E => cursor.V4Like ? Join("charsetColors", ReadVarargList(cursor))
                 : Join("v3CharsetInit", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
             _ => throw new UnsupportedBytecodeException($"cursorCommand subopcode 0x{sub:X2} is not defined for DOS LOOM old-v3")
         };
@@ -819,9 +827,10 @@ internal static partial class ScummScriptDisassembler
             var sub = cursor.ReadByte();
             if (sub == 0xFF) return ("actorOps", Join(actor, $"[{string.Join("; ", operations)}]"));
             var compactKind = sub & 0x1F;
-            if (compactKind is < 1 or > 20)
+            if (cursor.Dialect != ScummScriptDialect.V5 && compactKind is < 1 or > 20)
                 throw new UnsupportedBytecodeException($"small-header actorOps subopcode 0x{sub:X2} is not defined");
-            var kind = SmallHeaderActorOperations[compactKind - 1];
+            // v5 numbers the sub-opcodes as the table below does; the older games store a compact form that the translation table maps onto them.
+            var kind = cursor.Dialect == ScummScriptDialect.V5 ? compactKind : SmallHeaderActorOperations[compactKind - 1];
             var item = kind switch
             {
                 0x00 => Join("unknown", ReadParam(cursor, 1, sub, 0x80)),
@@ -920,7 +929,7 @@ internal static partial class ScummScriptDisassembler
 
     private static (string, string) DecodeRoomOps(Cursor cursor, byte opcode)
     {
-        if (cursor.Dialect == ScummScriptDialect.V4) return DecodeRoomOpsCd(cursor);
+        if (cursor.V4Like) return DecodeRoomOpsCd(cursor);
         var first = ReadParam(cursor, 2, opcode, 0x80);
         var second = ReadParam(cursor, 2, opcode, 0x40);
         var sub = cursor.ReadByte();
@@ -1006,7 +1015,7 @@ internal static partial class ScummScriptDisassembler
                 0x03 => Join("erase", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x04 => "center",
                 // v3 reads the line height here (ScummVM decodeParseString, SO_LEFT for later versions).
-                0x06 => cursor.Dialect == ScummScriptDialect.V4 ? "left" : Join("height", ReadParam(cursor, 2, sub, 0x80)),
+                0x06 => cursor.V4Like ? "left" : Join("height", ReadParam(cursor, 2, sub, 0x80)),
                 0x07 => "overhead",
                 0x08 => Join("sayVoice", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40)),
                 0x0F => Join("text", ReadScummString(cursor)),
@@ -1117,6 +1126,9 @@ internal static partial class ScummScriptDisassembler
     private sealed class Cursor(byte[] data, int start = 0, ScummScriptDialect dialect = ScummScriptDialect.V3)
     {
         public ScummScriptDialect Dialect { get; } = dialect;
+
+        /// <summary>The v4 and v5 forms of the opcodes that differ from old-v3 (roomOps, matrixOps, print line height, ...).</summary>
+        public bool V4Like => Dialect is ScummScriptDialect.V4 or ScummScriptDialect.V5;
 
         public int Position { get; private set; } = start;
 

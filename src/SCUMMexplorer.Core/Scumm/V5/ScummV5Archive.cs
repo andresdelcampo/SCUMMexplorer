@@ -6,6 +6,12 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <summary>Which files hold a v5 game: the stem shared by <c>NAME.000</c> (the index) and <c>NAME.001</c> (the resources), with the folder in front on a disc, and how many rooms the index lists.</summary>
 public sealed record ScummV5Game(string Stem, int RoomCount);
 
+/// <summary>A v5 script block: kind (<c>SCRP</c>, <c>LSCR</c>, <c>ENCD</c>, <c>EXCD</c>), number (the room number for entry and exit), room, position in the resource file and bytecode.</summary>
+public sealed record ScummV5Script(string Kind, int Number, int Room, int Position, byte[] Code);
+
+/// <summary>One verb of a v5 object: its <c>VERB</c> block (offsets are from its start), the verb number and where its code starts in the block.</summary>
+public sealed record ScummV5ObjectVerb(int ObjectId, string? ObjectName, int VerbId, int StartOffset, int Position, byte[] Block);
+
 /// <summary>
 /// A SCUMM v5 game (Indiana Jones and the Fate of Atlantis, Monkey Island 1 CD; ScummVM <c>readIndexFile</c> for version 5): <c>NAME.000</c> is the index and
 /// <c>NAME.001</c> the resources, every byte XOR 0x69; blocks are a four-letter tag and a big-endian size that counts its 8-byte header. The index has
@@ -253,6 +259,67 @@ public sealed class ScummV5Archive : IBrowsableArchive
         }
         catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { }
         return labels;
+    }
+
+    /// <summary>The global scripts (<c>DSCR</c> directory, <c>SCRP</c> blocks): number, room that stores it, position in the resource file and bytecode.</summary>
+    public IReadOnlyList<ScummV5Script> ReadGlobalScripts()
+    {
+        var scripts = new List<ScummV5Script>();
+        foreach (var (id, room, position) in ReadDirectory("DSCR"))
+        {
+            if (position + 8 > _resources.Length || Encoding.Latin1.GetString(_resources, position, 4) != "SCRP") continue;
+            var size = (int)BinaryPrimitives.ReadUInt32BigEndian(_resources.AsSpan(position + 4));
+            if (size < 8 || position + size > _resources.Length) continue;
+            scripts.Add(new ScummV5Script("SCRP", id, room, position, _resources.AsSpan(position + 8, size - 8).ToArray()));
+        }
+        return scripts;
+    }
+
+    /// <summary>A room's own code: its entry (<c>ENCD</c>) and exit (<c>EXCD</c>) scripts and its local scripts (<c>LSCR</c>, a script number byte and the code).</summary>
+    public IReadOnlyList<ScummV5Script> ReadRoomScripts(int number)
+    {
+        var scripts = new List<ScummV5Script>();
+        try
+        {
+            var room = Room(number);
+            foreach (var block in Blocks(_resources, room.Start + 8, room.Start + room.Size))
+            {
+                if (block.Tag is "ENCD" or "EXCD")
+                    scripts.Add(new ScummV5Script(block.Tag, number, number, block.Start, _resources.AsSpan(block.Start + 8, block.Size - 8).ToArray()));
+                else if (block.Tag == "LSCR" && block.Size > 9)
+                    scripts.Add(new ScummV5Script("LSCR", _resources[block.Start + 8], number, block.Start, _resources.AsSpan(block.Start + 9, block.Size - 9).ToArray()));
+            }
+        }
+        catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { }
+        return scripts;
+    }
+
+    /// <summary>
+    /// The verb scripts of a room's objects (<c>OBCD</c> > <c>VERB</c>: (verb, word offset) entries ending in 0, offsets from the start of the <c>VERB</c> block, then the code);
+    /// each carries the whole VERB block as its code and the entry point in <see cref="ScummV5ObjectVerb.StartOffset"/>, because a verb may jump back into earlier code.
+    /// </summary>
+    public IReadOnlyList<ScummV5ObjectVerb> ReadObjectVerbs(int number)
+    {
+        var verbs = new List<ScummV5ObjectVerb>();
+        try
+        {
+            var room = Room(number);
+            foreach (var obcd in Blocks(_resources, room.Start + 8, room.Start + room.Size).Where(b => b.Tag == "OBCD"))
+            {
+                var parts = Blocks(_resources, obcd.Start + 8, obcd.Start + obcd.Size);
+                var objectId = parts.FirstOrDefault(b => b.Tag == "CDHD") is { Size: >= 10 } header ? BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(header.Start + 8)) : 0;
+                var nameBlock = parts.FirstOrDefault(b => b.Tag == "OBNA");
+                string? name = null;
+                if (nameBlock is not null && Array.IndexOf(_resources, (byte)0, nameBlock.Start + 8, nameBlock.Size - 8) is var end && end > nameBlock.Start + 8)
+                    name = new string(Encoding.Latin1.GetString(_resources, nameBlock.Start + 8, end - nameBlock.Start - 8).Where(c => c >= ' ').ToArray());
+                if (parts.FirstOrDefault(b => b.Tag == "VERB") is not { } verb) continue;
+                var code = _resources.AsSpan(verb.Start, verb.Size).ToArray();
+                for (var p = 8; p + 2 < code.Length && code[p] != 0; p += 3)
+                    verbs.Add(new ScummV5ObjectVerb(objectId, name, code[p], BinaryPrimitives.ReadUInt16LittleEndian(code.AsSpan(p + 1)), verb.Start, code));
+            }
+        }
+        catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { }
+        return verbs;
     }
 
     private sealed record Block(string Tag, int Start, int Size);

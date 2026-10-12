@@ -978,7 +978,7 @@ public partial class MainWindow : Window
             ShowPageHeader(true);
             PageTitle.Text = LoomResourceNames.Label(_glossary, resource);
             PageSubtitle.Text = _game?.Id == GameId.LoomVga ? "LOOM CD script · SCUMM v4" + (LoomResourceNames.Entry(_glossary, resource) is { } cdNamed ? $" · name: {cdNamed.EvidenceLabel}" : "") : LoomResourceNames.Entry(_glossary, resource) is { } named
-                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : _game?.Id == GameId.IndianaJones3 ? "Indexed script resource · Indiana Jones 3 EGA · SCUMM v3" : _game?.Version is ScummVersion.V1 or ScummVersion.V2 ? $"{_game.Title} script · SCUMM v{(_game.Version == ScummVersion.V1 ? 1 : 2)}" : _game?.V4Disks is not null ? $"{_game.Title} script · SCUMM {(_game.V4Disks.Disks.OfType<ScummV4Archive>().Any(d => d.IsRoomFileGame) ? "v3 (one file per room)" : "v4")}" : "Indexed script resource · DOS LOOM old-v3";
+                ? $"Indexed script resource · DOS LOOM old-v3 · name: {named.EvidenceLabel}" : _game?.Id == GameId.IndianaJones3 ? "Indexed script resource · Indiana Jones 3 EGA · SCUMM v3" : _game?.Version is ScummVersion.V1 or ScummVersion.V2 ? $"{_game.Title} script · SCUMM v{(_game.Version == ScummVersion.V1 ? 1 : 2)}" : _game?.V4Disks is not null ? $"{_game.Title} script · SCUMM {(_game.V4Disks.Disks.OfType<ScummV4Archive>().Any(d => d.IsRoomFileGame) ? "v3 (one file per room)" : _game.Version == ScummVersion.V5 ? "v5" : "v4")}" : "Indexed script resource · DOS LOOM old-v3";
             PageTitle.ToolTip = LoomResourceNames.Evidence(_glossary, resource) ?? resource.Description;
             UpdateScriptUsedBy(resource);
             ScriptOutput.Text = "";
@@ -2185,6 +2185,16 @@ public partial class MainWindow : Window
     /// <summary>A global or room-local script of a browsed v4 game, read from the disk that holds it in the game's own script dialect.</summary>
     private ScummScriptDisassembly DecodeBrowsedV4Script(GameResource resource)
     {
+        if (_game?.V4ArchiveFor(resource) is ScummV5Archive v5 && resource.ResourceId is int v5Id)
+        {
+            var found = resource.ScriptRoom is int v5Room
+                ? v5.ReadRoomScripts(v5Room).FirstOrDefault(s => s.Kind == "LSCR" && s.Number == v5Id)
+                : v5.ReadGlobalScripts().FirstOrDefault(s => s.Number == v5Id);
+            if (found is null) throw new InvalidDataException("This script is not stored in the game's archive.");
+            return new ScummScriptReader(ScummScriptDialect.V5).DecodeCode(found.Code, v5Id, 1, found.Position)
+                with { ContainerName = "its resource file", CodeFileOffset = found.Position + (found.Kind == "LSCR" ? 9 : 8), ResourceLength = found.Code.Length + (found.Kind == "LSCR" ? 9 : 8),
+                       Context = resource.ScriptRoom is int roomNumber ? $"Room {roomNumber:00} local script {v5Id}" : null };
+        }
         if (_game?.V4ArchiveFor(resource) is not ScummV4Archive archive || resource.ContainerFileNumber is not int disk)
             throw new InvalidDataException("This script is not stored in the game's archive.");
         var source = new ScummV4DataSource(archive, ScummProfile.For(_game).Dialect, disk, archive.IsRoomFileGame ? "its room files" : ScummV4Archive.DiskFileName(disk));
