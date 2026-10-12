@@ -69,6 +69,9 @@ public sealed record GameLibrary(
     /// <summary>The disc image of a game read from a .cue/.bin, when it carries CD audio tracks that are listed as sounds (see <see cref="CdTrackIdBase"/>); null for every other game.</summary>
     public DiscImage? AudioDisc { get; init; }
 
+    /// <summary>The spoken lines of a talkie game (<c>MONSTER.SOU</c>), when the game has them; null for every other game.</summary>
+    public ScummSpeechBank? Speech { get; init; }
+
     /// <summary>The resource number of CD audio track <c>n</c> is <c>CdTrackIdBase + n</c>.</summary>
     public const int CdTrackIdBase = 2000;
 

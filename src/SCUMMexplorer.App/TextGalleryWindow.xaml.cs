@@ -116,6 +116,7 @@ public partial class TextGalleryWindow : Window
             SourceDetails.Text = "";
             VisitRoomButton.Visibility = Visibility.Collapsed;
             PlayCutsceneButton.Visibility = Visibility.Collapsed;
+            PlaySpeechButton.Visibility = Visibility.Collapsed;
             RoomArtworkPreview.Source = null;
             RoomArtworkPreview.Visibility = Visibility.Collapsed;
         }
@@ -166,6 +167,8 @@ public partial class TextGalleryWindow : Window
         VisitRoomButton.Visibility = item.Entry.RoomId.HasValue ? Visibility.Visible : Visibility.Collapsed;
         var cutscene = CutsceneFor(item.Entry);
         PlayCutsceneButton.Visibility = cutscene is null ? Visibility.Collapsed : Visibility.Visible;
+        StopSpeech();
+        PlaySpeechButton.Visibility = _game.Speech is not null && item.Entry.SpeechOffset is not null ? Visibility.Visible : Visibility.Collapsed;
         PlayCutsceneButton.ToolTip = cutscene is null ? null : $"Plays {cutscene.Title}, which prints this text. {cutscene.Note}";
 
         if (item.Entry.RoomId is not int roomId)
@@ -224,6 +227,47 @@ public partial class TextGalleryWindow : Window
     /// <summary>The known cutscene whose script prints this text, if any.</summary>
     private GalleryCutscene? CutsceneFor(LoomTextEntry entry) =>
         entry.ScriptId is int scriptId && _cutscenes.TryGetValue(scriptId, out var cutscene) ? cutscene : null;
+
+    private readonly System.Windows.Media.MediaPlayer _speechPlayer = new();
+    private string? _speechFile;
+
+    private void StopSpeech()
+    {
+        _speechPlayer.Stop();
+        _speechPlayer.Close();
+        if (_speechFile is not null)
+        {
+            try { File.Delete(_speechFile); } catch (IOException) { }
+            _speechFile = null;
+        }
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        StopSpeech();
+        base.OnClosed(e);
+    }
+
+    /// <summary>Plays the spoken line the selected text belongs to, from the game's speech file (MONSTER.SOU).</summary>
+    private async void PlaySpeech_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedEntry is not { SpeechOffset: { } offset, SpeechLength: { } length } || _game.Speech is not { } speech) return;
+        PlaySpeechButton.IsEnabled = false;
+        try
+        {
+            var wave = await Task.Run(() => speech.ReadWave(offset, length));
+            StopSpeech();
+            _speechFile = Path.Combine(Path.GetTempPath(), $"scummexplorer-speech-{Guid.NewGuid():N}.wav");
+            await File.WriteAllBytesAsync(_speechFile, wave);
+            _speechPlayer.Open(new Uri(_speechFile));
+            _speechPlayer.Play();
+        }
+        catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException)
+        {
+            MessageBox.Show(this, ex.Message, "Speech", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        finally { PlaySpeechButton.IsEnabled = true; }
+    }
 
     private void PlayCutscene_Click(object sender, RoutedEventArgs e)
     {

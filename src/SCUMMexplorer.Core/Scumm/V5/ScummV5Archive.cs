@@ -6,6 +6,9 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <summary>Which files hold a v5 game: the stem shared by <c>NAME.000</c> (the index) and <c>NAME.001</c> (the resources), with the folder in front on a disc, and how many rooms the index lists.</summary>
 public sealed record ScummV5Game(string Stem, int RoomCount);
 
+/// <summary>A sound of the CD game that plays a track of the disc: the sound's number, the room that stores it, the track, its loop count (0xFF: for ever) and the stretch (in 1/75 s) played.</summary>
+public sealed record ScummCdTrackSound(int SoundId, int Room, int Track, int Loops, int StartFrame, int EndFrame);
+
 /// <summary>A v5 script block: kind (<c>SCRP</c>, <c>LSCR</c>, <c>ENCD</c>, <c>EXCD</c>), number (the room number for entry and exit), room, position in the resource file and bytecode.</summary>
 public sealed record ScummV5Script(string Kind, int Number, int Room, int Position, byte[] Code);
 
@@ -139,6 +142,24 @@ public sealed class ScummV5Archive : IBrowsableArchive
     }
 
     public ScummV4Costume? FindCostume(int id) => ReadCostumes().FirstOrDefault(c => c.Id == id);
+
+    /// <summary>
+    /// The sounds that start a track of the game's CD (Monkey Island 1 CD): a <c>SOUN</c> block without a <c>SOU </c> part whose bytes 24 to 31 are the track number, the loop
+    /// count (0xFF: for ever) and the start and end as minutes, seconds and frames (ScummVM <c>soundcd.cpp</c>, <c>getCDTrackIdFromSoundId</c>).
+    /// </summary>
+    public IReadOnlyList<ScummCdTrackSound> ReadCdTrackSounds()
+    {
+        var sounds = new List<ScummCdTrackSound>();
+        foreach (var (id, room, position) in ReadDirectory("DSOU"))
+        {
+            if (position + 32 > _resources.Length || Encoding.Latin1.GetString(_resources, position, 4) != "SOUN") continue;
+            var size = (int)BinaryPrimitives.ReadUInt32BigEndian(_resources.AsSpan(position + 4));
+            if (size < 32 || size > 40 || Encoding.Latin1.GetString(_resources, position + 8, 4) == "SOU ") continue;
+            int Frames(int at) => (_resources[position + at] * 60 + _resources[position + at + 1]) * 75 + _resources[position + at + 2];
+            sounds.Add(new ScummCdTrackSound(id, room, _resources[position + 24], _resources[position + 25], Frames(26), Frames(29)));
+        }
+        return sounds;
+    }
 
     /// <summary>
     /// The sounds: <c>SOUN</c> &gt; <c>SOU </c> &gt; the parts of the sound cards (<c>ROL </c> MT-32, <c>ADL </c> AdLib, <c>SPK </c> PC speaker; <c>SBL </c> digital is left out), each an

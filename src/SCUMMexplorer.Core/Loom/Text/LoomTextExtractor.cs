@@ -8,7 +8,7 @@ namespace SCUMMexplorer.Core.Loom;
 public sealed record LoomTextEntry(string Text, string Kind, string Source, int? RoomId,
     int? ObjectId, int? VerbId, int? ScriptId, int CodeOffset,
     string? ObjectName = null, string? ConversationId = null, int? ConversationLine = null, string? ConversationKind = null, string? Speaker = null,
-    int? SourceObjectId = null, string? SourceObjectName = null, int? ChoiceVerbId = null)
+    int? SourceObjectId = null, string? SourceObjectName = null, int? ChoiceVerbId = null, int? SpeechOffset = null, int? SpeechLength = null)
 {
     /// <summary>True for a player-selectable dialogue label in a choice set.</summary>
     public bool IsPlayerChoice => ChoiceVerbId.HasValue && Kind == "Verb label";
@@ -34,8 +34,20 @@ public sealed record LoomTextExtraction(IReadOnlyList<LoomTextEntry> Entries,
 public sealed class LoomTextExtractor
 {
     public const string ChoiceConversationKind = "Dialogue choices";
-    private static readonly Regex SpeechCodePattern = new(@"\[text control 0A: [0-9A-F]{2} [0-9A-F]{2}\]", RegexOptions.Compiled);
+    private static readonly Regex SpeechCodePattern = new(@"\[text control 0A: ([0-9A-F]{2}) ([0-9A-F]{2})\]", RegexOptions.Compiled);
     private readonly ScummRoomObjectDirectory _objects = new();
+    /// <summary>The offset and length of the speech sample from a line's four 0xFF 0x0A codes (two bytes each: offset low, offset high, length low, length high), or null.</summary>
+    internal static (int? Offset, int? Length) ReadSpeechCodes(string text)
+    {
+        var matches = SpeechCodePattern.Matches(text);
+        if (matches.Count < 4) return (null, null);
+        int Pair(int i) => int.Parse(matches[i].Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) |
+                           int.Parse(matches[i].Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture) << 8;
+        var offset = Pair(0) | Pair(1) << 16;
+        var length = Pair(2) | Pair(3) << 16;
+        return (offset, length);
+    }
+
     public LoomTextExtraction Extract(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -125,6 +137,7 @@ public sealed class LoomTextExtractor
                 {
                     // The talkie games (Monkey Island 2, Indiana Jones 4) put four "play this speech sample" codes (0xFF 0x0A and two bytes each) before a spoken line.
                     var text = isV5 ? SpeechCodePattern.Replace(rawText, "") : rawText;
+                    var (speechOffset, speechLength) = isV5 ? ReadSpeechCodes(rawText) : (null, null);
                     if (!HasUsefulText(text)) continue;
                     var kind = instruction.Operation switch
                     {
@@ -146,7 +159,7 @@ public sealed class LoomTextExtractor
                         entryObjectName, groupId, line, groupKind,
                         kind == "Spoken line" ? GetSpeaker(instruction) : null,
                         instruction.Operation == "setObjectName" ? objectId : null,
-                        instruction.Operation == "setObjectName" ? objectName : null));
+                        instruction.Operation == "setObjectName" ? objectName : null, null, speechOffset, speechLength));
                     if (kind == "Spoken line" && !inMarkedCutscene)
                     {
                         if (!unmarkedLineIndexes.TryGetValue(scriptDialogueSegment, out var segmentLines))

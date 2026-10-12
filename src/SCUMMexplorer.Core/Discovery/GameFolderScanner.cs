@@ -311,9 +311,21 @@ public sealed class GameFolderScanner
         // A game on a disc image: the red-book audio tracks the cue sheet names (Monkey Island's music), played by the scripts through the CD drive.
         var disc = source is DiscFileSource discSource && discSource.Image.AudioTracks.Count > 0 ? discSource.Image : null;
         if (disc is not null)
+        {
+            // The game's own sounds say which track plays where: the sound is stored in the room whose music it is.
+            var users = disks.Disks.OfType<ScummV5Archive>().SelectMany(a => a.ReadCdTrackSounds().Select(s => (Sound: s, Room: a.Rooms.FirstOrDefault(r => r.Number == s.Room))))
+                .GroupBy(item => item.Sound.Track).ToDictionary(g => g.Key, g => g.ToList());
             foreach (var track in disc.AudioTracks)
-                resources.Add(new GameResource($"CD audio track {track.Number:00}", ResourceKind.Sound, source.Location, GameLibrary.CdTrackIdBase + track.Number,
-                    $"Track {track.Number} of the disc, {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}.", null, null));
+            {
+                var played = users.TryGetValue(track.Number, out var list) ? list : [];
+                var rooms = played.Select(item => string.IsNullOrEmpty(item.Room?.Name) ? $"room {item.Sound.Room:00}" : $"room {item.Sound.Room:00} \"{item.Room!.Name}\"").Distinct().ToList();
+                var name = $"CD audio track {track.Number:00}" + (rooms.Count > 0 ? " - " + string.Join(", ", rooms.Take(2)) + (rooms.Count > 2 ? ", ..." : "") : "");
+                var plays = played.Count == 0 ? "" : " Started by " + string.Join(", ", played.Select(item =>
+                    $"sound {item.Sound.SoundId}{(item.Sound.Loops == 0xFF ? " (repeats)" : "")}{(item.Sound.EndFrame > item.Sound.StartFrame ? $" ({item.Sound.StartFrame / 4500}:{item.Sound.StartFrame / 75 % 60:00} to {item.Sound.EndFrame / 4500}:{item.Sound.EndFrame / 75 % 60:00})" : "")}")) + ".";
+                resources.Add(new GameResource(name, ResourceKind.Sound, source.Location, GameLibrary.CdTrackIdBase + track.Number,
+                    $"Track {track.Number} of the disc, {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}.{plays}", null, null));
+            }
+        }
         var layout = v5 is not null ? $"a SCUMM v5 index and resource file ({v5.Stem}.000 and .001)" : perRoomFiles ? "one file per room (00.LFL and NN.LFL)" : $"{disks.Disks.Count} disks (000.LFL and DISK01.LEC to DISK{disks.Disks.Count:00}.LEC)";
         if (!resources.Any(r => r.Kind == ResourceKind.Room))
             return new GameLibrary(title, source.Location, v5 is null ? ScummVersion.V4 : ScummVersion.V5, v5 is null ? "DOS (SCUMM v4)" : "DOS (SCUMM v5)", [],
@@ -322,7 +334,7 @@ public sealed class GameFolderScanner
         return new GameLibrary(title, source.Location, v5 is null ? ScummVersion.V4 : ScummVersion.V5, v5 is null ? "DOS (SCUMM v4)" : "DOS (SCUMM v5)", ordered,
             $"A SCUMM {(v5 is null ? "v4" : "v5")} game that is not LOOM CD, read from {layout}. Room backgrounds and costumes are shown" +
             (withoutPicture > 0 ? $" ({withoutPicture} room entries without a picture are left out)" : "") +
-            "; objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks, AudioDisc = disc };
+            "; objects, scripts, sounds and interaction are not read for this game yet.") { V4Disks = disks, AudioDisc = disc, Speech = v5 is null ? null : ScummSpeechBank.Find(source) };
     }
 
     /// <summary>

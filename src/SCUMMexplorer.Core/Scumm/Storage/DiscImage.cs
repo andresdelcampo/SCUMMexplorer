@@ -187,6 +187,17 @@ public sealed class DiscImage
         return result;
     }
 
+    /// <summary>A stretch of a file of the data track (shorter at its end), read without the rest of the file.</summary>
+    public byte[] ReadRange(DiscFile file, long offset, int count)
+    {
+        if (offset >= file.Length) return [];
+        var length = (int)Math.Min(count, file.Length - offset);
+        var firstSector = (int)(offset / UserBytes);
+        var skip = (int)(offset % UserBytes);
+        var sectors = (skip + length + UserBytes - 1) / UserBytes;
+        return ReadSectors(file.FirstSector + firstSector, sectors).AsSpan(skip, length).ToArray();
+    }
+
     public byte[] Read(DiscFile file) => ReadSectors(file.FirstSector, (file.Length + UserBytes - 1) / UserBytes)[..file.Length];
 
     /// <summary>The files in the root directory and below (names without the ;1 version suffix, sub-directories as a/b).</summary>
