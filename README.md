@@ -20,9 +20,11 @@ SCUMMexplorer lets you wander the old SCUMM adventures from the inside. Revisit 
 Point the app at a game folder and it recognises the game and the edition from the files themselves, even if the executable is missing. Other classic SCUMM games open in a limited, browse-only way (no interaction, actors or cutscenes yet):
 
 - **Indiana Jones and the Last Crusade** (EGA and 256 colours)
-- **Monkey Island** (VGA, EGA and CD) and **Monkey Island 2**
+- **The Secret of Monkey Island** (VGA, EGA and CD)
+- **Monkey Island 2: LeChuck's Revenge**
 - **Indiana Jones and the Fate of Atlantis** (floppy, talkie, CD)
-- **Maniac Mansion** and **Zak McKracken**, classic and enhanced
+- **Maniac Mansion** (classic and enhanced)
+- **Zak McKracken and the Alien Mindbenders** (classic and enhanced)
 
 In these games the room picker fills in on its own, the Costumes tab sits beside the Rooms tab (where costumes can be read), and sounds are in the Advanced tree.
 
