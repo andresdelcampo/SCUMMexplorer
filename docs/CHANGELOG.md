@@ -4,7 +4,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 
 ## 12 October: stored-object hotspots for browse-only games
 
-Browse-only games (Indy3 EGA, v1/v2, v4, v5) show the room's stored objects as boxes (existing Never / On hover / Always option) and as a "STORED OBJECTS" list in Advanced mode; hovering a row or the room outlines the box. Raw stored data only: no script analysis, so the list does not say which objects the game has in the room. Indy3 now reads its object directory and names like LOOM. Built; not yet checked in the running window.
+Browse-only games (Indy3 EGA, v1/v2, v4, v5) show the room's stored objects as boxes (existing Never / On hover / Always option) and as a "STORED OBJECTS" list in Advanced mode; hovering a row or the room outlines the box. Raw stored data only: no script analysis, so the list does not say which objects the game has in the room. Indy3 now reads its object directory and names like LOOM. Unnamed objects with a box are listed too, and children whose parent chain is not in the required start state (index state; v4/v5 take 0) are hidden; Indy3 EGA also requires owner 15. Checked in the real window (`.verification/StoredHotspots`, Indy3 EGA en and VGA es, rooms 20, 28, 32, 76, 21): both editions list 16, 20, 19, 1 and 6 objects. Rooms 20, 28 and 32 have a black background in the browse view (their picture is made of objects), so only the boxes show there.
 
 ## 12 October: v5 audio (Monkey Island 2, Indiana Jones 4): Roland MT-32 and AdLib music
 

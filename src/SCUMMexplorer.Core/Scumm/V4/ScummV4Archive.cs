@@ -364,7 +364,24 @@ public sealed class ScummV4Archive : IBrowsableArchive
 
     public IReadOnlyList<BrowsedObjectLabel> ReadObjectLabels(int number)
     {
-        try { return ReadObjects(number).Where(o => o.Name.Length > 0 && o.Width > 0 && o.Height > 0).Select(o => new BrowsedObjectLabel(o.Id, o.Name, o.X, o.Y, o.Width, o.Height)).ToList(); }
+        try
+        {
+            // Every object with a box, named or not, whose parent chain is in the required state at the start (the index gives every room object state 0).
+            var objects = ReadObjects(number);
+            var states = ReadIndexedObjects().States;
+            bool ParentsMatch(ScummV4Object obj)
+            {
+                for (var steps = 0; obj.Parent != 0; steps++)
+                {
+                    if (steps > objects.Count || obj.Parent > objects.Count) return false;
+                    var parent = objects[obj.Parent - 1];
+                    if ((states.GetValueOrDefault(parent.Id) & 0x0F) != obj.ParentState) return false;
+                    obj = parent;
+                }
+                return true;
+            }
+            return objects.Where(o => o.Width > 0 && o.Height > 0 && ParentsMatch(o)).Select(o => new BrowsedObjectLabel(o.Id, o.Name, o.X, o.Y, o.Width, o.Height)).ToList();
+        }
         catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { return []; }
     }
 

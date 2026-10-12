@@ -663,12 +663,32 @@ public partial class MainWindow : Window
         {
             var records = _objectDirectory.Decode(bytes);
             var names = LoomTextExtractor.ReadObjectNames(LflEncoding.DecodeXorFF(bytes), records);
-            return records.Where(record => record.Width > 0 && record.Height > 0)
+            // The starting state from the index: objects the room owns (owner 15), whose parent chain is in the required state.
+            var snapshot = _game is null ? null : BrowsedObjectSnapshots.GetOrAdd(_game.FolderPath, folder =>
+            {
+                try { return Directory.EnumerateFiles(folder, "00.LFL").FirstOrDefault() is { } index ? new LflObjectStateReader().ReadSnapshot(index) : null; }
+                catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException) { return null; }
+            });
+            bool Present(ScummRoomObjectRecord record)
+            {
+                if (snapshot is null) return true;
+                if (snapshot.Owners.GetValueOrDefault(record.Id) != 15) return false;
+                for (var steps = 0; record.ParentLocalIndex != 0; steps++)
+                {
+                    var parent = records.FirstOrDefault(item => item.LocalIndex == record.ParentLocalIndex);
+                    if (steps > records.Count || parent is null || (snapshot.States.GetValueOrDefault(parent.Id) & 0x0F) != record.ParentRequiredState) return false;
+                    record = parent;
+                }
+                return true;
+            }
+            return records.Where(record => record.Width > 0 && record.Height > 0 && Present(record))
                 .Select(record => new BrowsedObjectLabel(record.Id, names.TryGetValue(record.Id, out var name) ? name : "", record.X, record.Y, record.Width, record.Height))
                 .ToList();
         }
         catch (Exception ex) when (ex is InvalidDataException or IndexOutOfRangeException or ArgumentException) { return []; }
     }
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, ScummIndexedObjectSnapshot?> BrowsedObjectSnapshots = new();
 
     private BrowsedObjectLabel? _browsedHover;
 
@@ -1198,9 +1218,7 @@ public partial class MainWindow : Window
                 _selectedObject = null;
                 ClearObjectList();
                 ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet." +
-                    (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");
-                ShowStoredObjectHotspots();
-                ObjectActionPanel.Visibility = Visibility.Collapsed;
+                    (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");                ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
                 UpdateRoomNavigationActions(resource);
@@ -1217,6 +1235,8 @@ public partial class MainWindow : Window
                 RoomMaskToggle.Visibility = IsAdvancedMode ? Visibility.Visible : Visibility.Collapsed;
                 ShowWalkBoxToggle();
                 PreviewMessage.Visibility = Visibility.Collapsed;
+                // After the preview refresh and the navigation update, which rebuild the list and hide the hotspot options.
+                ShowStoredObjectHotspots();
                 UpdateAdvancedMode();
                 PageSubtitle.Text = "Original artwork from the game";
                 StatusText.Text = "Ready";

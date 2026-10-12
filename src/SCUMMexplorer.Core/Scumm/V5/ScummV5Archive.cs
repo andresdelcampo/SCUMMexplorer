@@ -282,20 +282,37 @@ public sealed class ScummV5Archive : IBrowsableArchive
         var labels = new List<BrowsedObjectLabel>();
         try
         {
+            // Every object with a box, named or not, whose parent chain is in the required state at the start. The parent byte of CDHD counts the room's
+            // objects from 1; the start state of the room's objects is taken as 0 (the DOBJ state nibbles are not read here).
+            var all = new List<(BrowsedObjectLabel Label, int Parent, int ParentState)>();
             var room = Room(number);
             foreach (var obcd in Blocks(_resources, room.Start + 8, room.Start + room.Size).Where(b => b.Tag == "OBCD"))
             {
                 var parts = Blocks(_resources, obcd.Start + 8, obcd.Start + obcd.Size);
-                if (parts.FirstOrDefault(b => b.Tag == "CDHD") is not { Size: >= 18 } header || parts.FirstOrDefault(b => b.Tag == "OBNA") is not { } nameBlock) continue;
+                if (parts.FirstOrDefault(b => b.Tag == "CDHD") is not { Size: >= 18 } header) continue;
                 var at = header.Start + 8;
-                var width = _resources[at + 4] * 8;
-                var height = _resources[at + 5] * 8;
-                var nameEnd = Array.IndexOf(_resources, (byte)0, nameBlock.Start + 8, nameBlock.Size - 8);
-                var name = nameEnd > nameBlock.Start + 8
-                    ? new string(Encoding.Latin1.GetString(_resources, nameBlock.Start + 8, nameEnd - nameBlock.Start - 8).Where(c => c >= ' ').ToArray()) : "";
-                if (name.Length > 0 && width > 0 && height > 0)
-                    labels.Add(new BrowsedObjectLabel(BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(at)), name, _resources[at + 2] * 8, (_resources[at + 3] & 0x7F) * 8, width, height));
+                var name = "";
+                if (parts.FirstOrDefault(b => b.Tag == "OBNA") is { } nameBlock)
+                {
+                    var nameEnd = Array.IndexOf(_resources, (byte)0, nameBlock.Start + 8, nameBlock.Size - 8);
+                    if (nameEnd > nameBlock.Start + 8)
+                        name = new string(Encoding.Latin1.GetString(_resources, nameBlock.Start + 8, nameEnd - nameBlock.Start - 8).Where(c => c >= ' ').ToArray());
+                }
+                all.Add((new BrowsedObjectLabel(BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(at)), name, _resources[at + 2] * 8,
+                    (_resources[at + 3] & 0x7F) * 8, _resources[at + 4] * 8, _resources[at + 5] * 8), _resources[at + 7], _resources[at + 3] >> 7));
             }
+            bool ParentsMatch(int index)
+            {
+                for (var steps = 0; all[index].Parent != 0; steps++)
+                {
+                    if (steps > all.Count || all[index].Parent > all.Count) return false;
+                    if (all[index].ParentState != 0) return false;
+                    index = all[index].Parent - 1;
+                }
+                return true;
+            }
+            for (var index = 0; index < all.Count; index++)
+                if (all[index].Label.Width > 0 && all[index].Label.Height > 0 && ParentsMatch(index)) labels.Add(all[index].Label);
         }
         catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { }
         return labels;
