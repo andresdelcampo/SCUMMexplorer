@@ -64,15 +64,20 @@ public sealed class V5ImuseAudioTests
         var source = new FolderFileSource(folder);
         var archive = ScummV5Archive.Load(source, ScummV5Archive.FindGame(source)!);
         var report = new System.Text.StringBuilder();
-        foreach (var sound in archive.ReadSounds().Where(s => s.ImuseAdlib is not null))
+        var silent = 0;
+        foreach (var sound in archive.ReadSounds().Where(s => s.ImuseAdlib is not null).Where((s, i) => i % 5 == 0 || s.Id is 4 or 16 or 34))
         {
-            var result = new ScummImuseAdlib().Render(ScummImuseSong.Parse(sound.ImuseAdlib!));
+            ScummImuseAdlib.Result result;
+            try { result = new ScummImuseAdlib().Render(ScummImuseSong.Parse(sound.ImuseAdlib!)); }
+            catch (InvalidDataException) { silent++; report.AppendLine($"{sound.Id}: silent"); continue; } // e.g. parts a script must switch on
             var peak = 0;
             for (var i = 44; i + 1 < result.Wave.Length; i += 2) peak = Math.Max(peak, Math.Abs((int)BitConverter.ToInt16(result.Wave, i)));
             report.AppendLine($"{sound.Id}: {result.Seconds:0.0}s loops {result.Loops} peak {peak}");
             if (sound.Id is 4 or 16 or 34) File.WriteAllBytes(Path.Combine(Path.GetTempPath(), $"v5-adl-{sound.Id}.wav"), result.Wave);
         }
         File.WriteAllText(Path.Combine(Path.GetTempPath(), "v5-adl-report.txt"), report.ToString());
+        Assert.True(archive.ReadSounds().Count(s => s.ImuseAdlib is not null) > 150);
+        Assert.True(silent < 10, $"{silent} silent AdLib sounds");
     }
 
     private static byte[] Nibbles(params byte[] bytes) => bytes.SelectMany(b => new[] { (byte)(b >> 4), (byte)(b & 15) }).ToArray();

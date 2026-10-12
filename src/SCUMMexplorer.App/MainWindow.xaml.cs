@@ -2848,19 +2848,16 @@ public partial class MainWindow : Window
                 var cdSound = vga.ReadSounds().FirstOrDefault(item => item.Id == resource.ResourceId) ?? throw new InvalidDataException("This sound is not in the game's archive.");
                 if (vga is ScummV5Archive)
                 {
-                    // A v5 sound number holds the music of one sound card only.
-                    if (cdSound.ImuseRoland is { } roland)
+                    // A v5 sound holds one version per sound card; the device chosen decides which one is played.
+                    if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland)
                     {
-                        if (_sceneSound.Mode != SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This sound exists only for the Roland MT-32. Choose that device to hear it.");
+                        if (cdSound.ImuseRoland is not { } roland) throw new NotSupportedException("This sound has no Roland MT-32 version.");
                         if (_sceneSound.Roms is not { } v5Roms) throw new NotSupportedException("The MT-32 ROM images are not set.");
                         return new ScummImuseMt32(v5Roms).RenderWave(roland, token);
                     }
-                    if (cdSound.ImuseAdlib is { } adlibPart)
-                    {
-                        if (_sceneSound.Mode != SceneSoundPlayer.SoundMode.Adlib) throw new NotSupportedException("This sound exists only for the AdLib card. Choose that device to hear it.");
-                        return new ScummImuseAdlib().RenderWave(adlibPart, token);
-                    }
-                    throw new NotSupportedException("This sound is for the PC speaker; playback of this game's PC speaker sounds is not available yet.");
+                    if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Adlib)
+                        return new ScummImuseAdlib().RenderWave(cdSound.ImuseAdlib ?? throw new NotSupportedException("This sound has no AdLib version."), token);
+                    throw new NotSupportedException("The PC speaker version of this game's sounds is not available yet. Choose AdLib or Roland.");
                 }
                 if (_sceneSound.Mode == SceneSoundPlayer.SoundMode.Roland) throw new NotSupportedException("This game has no MT-32 music here. Choose AdLib or the PC speaker.");
                 return adlib

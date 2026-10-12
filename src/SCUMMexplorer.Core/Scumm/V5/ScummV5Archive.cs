@@ -141,8 +141,8 @@ public sealed class ScummV5Archive : IBrowsableArchive
     public ScummV4Costume? FindCostume(int id) => ReadCostumes().FirstOrDefault(c => c.Id == id);
 
     /// <summary>
-    /// The sounds: <c>SOUN</c> &gt; <c>SOU </c> &gt; one card part (<c>ROL </c> MT-32, <c>ADL </c> AdLib, <c>SPK </c> PC speaker; <c>SBL </c> digital is left out), each an
-    /// <c>MDhd</c> block and a standard MIDI file with iMUSE system exclusives (see <see cref="ScummImuseSong"/>). A sound number holds one card's part.
+    /// The sounds: <c>SOUN</c> &gt; <c>SOU </c> &gt; the parts of the sound cards (<c>ROL </c> MT-32, <c>ADL </c> AdLib, <c>SPK </c> PC speaker; <c>SBL </c> digital is left out), each an
+    /// <c>MDhd</c> block and a standard MIDI file with iMUSE system exclusives (see <see cref="ScummImuseSong"/>). Each sound holds the music for every card.
     /// </summary>
     public IReadOnlyList<ScummV4Sound> ReadSounds()
     {
@@ -153,19 +153,27 @@ public sealed class ScummV5Archive : IBrowsableArchive
             var size = (int)BinaryPrimitives.ReadUInt32BigEndian(_resources.AsSpan(position + 4));
             if (size < 8 || position + size > _resources.Length) continue;
             byte[]? rol = null, adl = null, spk = null;
-            foreach (var wrap in Blocks(_resources, position + 8, position + size))
+            // SOUN > SOU > the parts of every card (ROL, ADL, SPK, or SBL). A part that starts with an MDhd block states its size 8 bytes short (the
+            // MDhd size counts its body only), so the next part starts 8 bytes after where the size says; SOU and SOUN carry the same slip.
+            var end = position + size;
+            var p = position + 8;
+            if (p + 8 <= end && Encoding.Latin1.GetString(_resources, p, 4) == "SOU ") p += 8;
+            while (p + 12 <= end)
             {
-                var parts = wrap.Tag == "SOU " ? Blocks(_resources, wrap.Start + 8, wrap.Start + wrap.Size) : [wrap];
-                foreach (var part in parts)
+                var tag = Encoding.Latin1.GetString(_resources, p, 4);
+                var partSize = (int)BinaryPrimitives.ReadUInt32BigEndian(_resources.AsSpan(p + 4));
+                if (partSize < 8) break;
+                var mdhd = Encoding.Latin1.GetString(_resources, p + 8, 4) == "MDhd";
+                var length = partSize + (mdhd ? 8 : 0);
+                if (p + length > _resources.Length) break;
+                var body = _resources.AsSpan(p + 8, length - 8).ToArray();
+                switch (tag)
                 {
-                    var body = _resources.AsSpan(part.Start + 8, part.Size - 8).ToArray();
-                    switch (part.Tag)
-                    {
-                        case "ROL ": rol ??= body; break;
-                        case "ADL ": adl ??= body; break;
-                        case "SPK ": spk ??= body; break;
-                    }
+                    case "ROL ": rol ??= body; break;
+                    case "ADL ": adl ??= body; break;
+                    case "SPK ": spk ??= body; break;
                 }
+                p += length;
             }
             if (rol is null && adl is null && spk is null) continue;
             sounds.Add(new ScummV4Sound(id, room, null, null) { ImuseRoland = rol, ImuseAdlib = adl, ImuseSpeaker = spk });
