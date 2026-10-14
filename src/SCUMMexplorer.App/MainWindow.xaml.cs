@@ -60,6 +60,8 @@ public partial class MainWindow : Window
     private ScummWalkBoxSet? _currentWalkBoxes;
     /// <summary>The CD game's first-visit scene of the room shown (its actors are drawn from it); null for other games.</summary>
     private LoomCdScene? _cdScene;
+    // A browsed old-bundle game's room as the generic session leaves it on the first visit (Indiana Jones and the Last Crusade EGA), or null (plain background).
+    private ScummRoomScene? _browsedScene;
     // The CD game's data source for the room view (null for the other games).
     private IScummDataSource? _cdData;
     private IReadOnlyList<ScummRoomObjectRecord> _currentRoomObjectRecords = [];
@@ -710,7 +712,7 @@ public partial class MainWindow : Window
     private IReadOnlyList<BrowsedObjectLabel> _olderObjects = [];
 
     /// <summary>The objects a browsed v3 room (Indy3) stores: every record with a box, named when the room stores a name. No script decides which are present.</summary>
-    private IReadOnlyList<BrowsedObjectLabel> ReadStoredV3Objects(byte[] bytes)
+    private IReadOnlyList<BrowsedObjectLabel> ReadStoredV3Objects(byte[] bytes, ScummRoomScene? scene = null)
     {
         try
         {
@@ -724,6 +726,8 @@ public partial class MainWindow : Window
             });
             bool Present(ScummRoomObjectRecord record)
             {
+                // With a first visit the game's own object search decides (owner, class 24, parent states, off-scene position); else the index states.
+                if (scene is not null) return scene.IsHotspot(record);
                 if (snapshot is null) return true;
                 if (snapshot.Owners.GetValueOrDefault(record.Id) != 15) return false;
                 for (var steps = 0; record.ParentLocalIndex != 0; steps++)
@@ -935,6 +939,10 @@ public partial class MainWindow : Window
             var olderRoom = DecodeOlderRoom(game, File.ReadAllBytes(roomResource.FilePath));
             return CreateRoomCardBitmap(olderRoom, olderRoom.Pixels.ToArray(), 0, olderRoom.Palette);
         }
+        // First visit of a browsed old-bundle game (R-5.3): the room as the generic session leaves it, with its actors; the plain background where that cannot run.
+        if (ScummProfile.For(game).HasFirstVisitScenes && roomResource.ResourceId is int firstVisitRoom &&
+            ScummRoomFirstVisit.Cached(game, firstVisitRoom) is { } firstVisit)
+            return CreateRoomCardBitmap(firstVisit.Room, firstVisit.ComposeWithActors(), firstVisit.State.CameraX ?? 0, firstVisit.DisplayPalette());
         var bytes = File.ReadAllBytes(roomResource.FilePath);
         var decoder = new ScummV3EgaRoomDecoder();
         var room = decoder.Decode(bytes);
@@ -1020,6 +1028,8 @@ public partial class MainWindow : Window
         UpdateSoundDeviceVisibility();
         // The hint line under the scene is for Advanced mode and the inspection view; the game's own screen needs none.
         ObjectsNote.Visibility = SessionModeToggle.IsChecked != true ? Visibility.Visible : Visibility.Collapsed;
+        // A browsed first visit explains itself in Advanced mode only (R-1.13).
+        if (_browsedScene is { } shownScene && _currentRoom is not null && ReferenceEquals(shownScene.Room, _currentRoom)) ObjectsNote.Text = BrowsedSceneNote(shownScene);
         VerbStripBorder.ToolTip = advanced ? _verbScreenNote : null;
         CutsceneMenuButton.Visibility = advanced ? Visibility.Visible : Visibility.Collapsed;
         GameTextsButton.Visibility = advanced && _game is { } textGame && GameSupport.For(textGame).Texts ? Visibility.Visible : Visibility.Collapsed;
@@ -1295,6 +1305,7 @@ public partial class MainWindow : Window
         _currentRoomResource = null;
         _currentWalkBoxes = null;
         _cdScene = null;
+        _browsedScene = null;
         _currentRoomObjectRecords = [];
         _roomObjectNames = new Dictionary<int, string>();
         _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
@@ -1334,7 +1345,12 @@ public partial class MainWindow : Window
                 try { cdScene = await Task.Run(() => LoomCdRoomScene.FirstVisit(cdGame, resource.ResourceId!.Value), token); }
                 catch (Exception ex) when (ex is InvalidDataException or IOException or InvalidOperationException) { }
             }
-            var room = cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
+            // First visit of a browsed old-bundle game (R-5.3): the entry hooks and scripts run in a fresh generic session; the plain background where that cannot run.
+            ScummRoomScene? browsedScene = null;
+            if (_game is { } sceneGame && ScummProfile.For(sceneGame).HasFirstVisitScenes && resource.ResourceId is int sceneRoomId)
+                browsedScene = await Task.Run(() => ScummRoomFirstVisit.Cached(sceneGame, sceneRoomId), token);
+            _browsedScene = browsedScene;
+            var room = browsedScene?.Room ?? cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
                 : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token)
                 : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : DecodeBrowsedOldV3Room(_game!, _roomDecoder.Decode(bytes), bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
@@ -1350,17 +1366,23 @@ public partial class MainWindow : Window
                 _lastViewedRoomResource = resource;
                 // Names the pointer reveals: the drawn objects of a v1 or v2 game; every named object of a v4 or v5 game (their starting states come from scripts).
                 _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : browseArchive?.ReadObjectLabels(resource.ResourceId!.Value)
-                    ?? (_game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes) : []);
-                _currentRoomObjectRecords = cdScene?.Records ?? [];
+                    ?? (_game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes, browsedScene) : []);
+                _currentRoomObjectRecords = browsedScene?.Records ?? cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
-                _objects = cdScene?.Images ?? [];
-                _objectSelection = cdScene?.Selection ?? new RoomObjectSelection([], background: room);
+                _objects = browsedScene?.Images ?? cdScene?.Images ?? [];
+                _objectSelection = browsedScene?.NewSelection() ?? cdScene?.Selection ?? new RoomObjectSelection([], background: room);
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
                 ClearObjectList();
-                ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet." +
-                    (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");                ObjectActionPanel.Visibility = Visibility.Collapsed;
+                if (browsedScene is not null) _pendingCameraX = browsedScene.State.CameraX;
+                ObjectsNote.Text = isCd ? CdSceneNote(cdScene) : browsedScene is not null ? BrowsedSceneNote(browsedScene)
+                    : _game is { } fallbackGame && ScummProfile.For(fallbackGame).HasFirstVisitScenes
+                        // The plain background shows where the first visit could not run: a note for Advanced only (R-1.13).
+                        ? (IsAdvancedMode ? "Plain background: the room's first visit could not run in the generic session." : "")
+                        : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet." +
+                          (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");
+                ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
                 UpdateRoomNavigationActions(resource);
@@ -1437,6 +1459,17 @@ public partial class MainWindow : Window
                 StatusText.Text = $"{resource.Name} · background unavailable";
             }
         }
+    }
+
+    /// <summary>Advanced only (R-1.13): how the first visit of a browsed room was made and what the run could not follow.</summary>
+    private string BrowsedSceneNote(ScummRoomScene scene)
+    {
+        if (!IsAdvancedMode) return "";
+        var notFollowed = scene.Snapshot.Uncertainties.Count(item => item.Contains("not modeled", StringComparison.Ordinal) || item.Contains("depends on", StringComparison.Ordinal) ||
+                                                                      item.Contains("could not", StringComparison.Ordinal) || item.Contains("unknown", StringComparison.Ordinal));
+        return string.Join(" ", scene.Notes) + (scene.Snapshot.Picks is { Count: > 0 } ? $" Random values the scripts asked for were picked by the explorer ({scene.Snapshot.Picks.Count} seeded picks)." : "") +
+               (scene.RoomLit ? "" : " The game starts this room dark (VAR_CURRENT_LIGHTS without room lights); it is shown lit.") +
+               (notFollowed > 0 ? $" {notFollowed} things the run could not follow are in the session notes." : "");
     }
 
     private static string CdSceneNote(LoomCdScene? scene) =>
@@ -4696,6 +4729,8 @@ public partial class MainWindow : Window
     /// <summary>The room's palette as the game shows it now: the colour slots a script faded (the opening's title) show other colours.</summary>
     private IReadOnlyList<uint> DisplayPalette(RoomImage room)
     {
+        // A browsed first visit: the colour table and the shadow palette the game's scripts left (the room picture and its objects; actors use the shadow palette only).
+        if (_browsedScene is { } scene && ReferenceEquals(scene.Room, room)) return scene.BackgroundPalette();
         if (_session is not { } session || room.Palette.Count > 256) return room.Palette;
         return DisplayPalette(room, session.ShadowPalette);
     }
@@ -4826,6 +4861,27 @@ public partial class MainWindow : Window
     private void UpdateActorLayer()
     {
         var room = _currentRoom;
+        if (_browsedScene is { } browsed && room is not null && ReferenceEquals(browsed.Room, room))
+        {
+            var sceneLayer = browsed.ActorLayer();
+            if (sceneLayer.Actors.Count == 0)
+            {
+                RoomActorOverlay.Source = null;
+                RoomActorOverlay.Visibility = Visibility.Collapsed;
+                return;
+            }
+            var shownActors = browsed.DisplayPalette();
+            var actorPixels = new byte[room.Width * room.Height * 4];
+            for (var i = 0; i < sceneLayer.Pixels.Length; i++)
+            {
+                if (!sceneLayer.IsDrawn(i)) continue;
+                var index = sceneLayer.Pixels[i];
+                SetBgra(actorPixels, i * 4, index < shownActors.Count ? shownActors[index] : 0xFF000000u);
+            }
+            RoomActorOverlay.Source = FrozenBgra(room.Width, room.Height, actorPixels);
+            RoomActorOverlay.Visibility = Visibility.Visible;
+            return;
+        }
         if (_cdScene is { } cdScene && room is not null && cdScene.Snapshot.RoomId == _currentRoomResource?.ResourceId)
         {
             UpdateCdActorLayer(cdScene, room);

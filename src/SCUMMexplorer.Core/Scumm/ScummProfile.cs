@@ -25,6 +25,12 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     public IReadOnlyList<string> ExtraTimerVariables { get; init; } = [];
 
     /// <summary>
+    /// The room view and room cards of this game come from the first visit the generic session runs (<see cref="ScummRoomFirstVisit"/>, S5): a browsed game
+    /// of the old bundle whose boot the session follows (Indiana Jones and the Last Crusade EGA). LOOM has its own session and scenes.
+    /// </summary>
+    public bool HasFirstVisitScenes { get; init; }
+
+    /// <summary>
     /// The value the engine gives <c>VAR_VIDEOMODE</c> (variable 49) at start (<c>setVideoModeVarToCurrentConfig</c>, vars.cpp): 13 for an EGA game, 19 for VGA.
     /// Null before version 3, which has no such variable. A game's scripts test it to choose their palettes (Indiana Jones tests for 4, CGA).
     /// </summary>
@@ -47,6 +53,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
         return new ScummProfile(game.Version, dialect)
         {
             AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard,
+            HasFirstVisitScenes = game.Id == GameId.IndianaJones3 && game.Version == ScummVersion.V3,
             ExtraTimerVariables = game.Id == GameId.IndianaJones3 ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : []
         };
     }

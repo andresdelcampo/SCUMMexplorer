@@ -13,6 +13,13 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
 {
     public ScummSessionSnapshot Snapshot => State.Snapshot;
 
+    /// <summary>The object states the game's index gives (the picture selection needs them for objects the scripts did not touch).</summary>
+    public IReadOnlyDictionary<int, byte> IndexedStates { get; init; } = new Dictionary<int, byte>();
+
+    /// <summary>A selection of its own for a view: inspecting stored alternatives changes it, and the cached scene's must stay as the scripts left it.</summary>
+    public RoomObjectSelection NewSelection() =>
+        new(Images, Snapshot.ObjectStates, Snapshot.ObjectPositions, Records, Room, IndexedStates, Snapshot.DrawOrder);
+
     /// <summary>The room's pixels with the objects the scripts made visible, drawn through the room colour table (<c>roomColorLegacy</c>).</summary>
     public byte[] Compose()
     {
@@ -45,6 +52,43 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
         return shown;
     }
 
+    /// <summary>
+    /// The palette for the room picture and its objects: the colour table of <c>roomColorLegacy</c> (applied when they were drawn) and then the shadow
+    /// palette (applied when the screen is shown). Actors are drawn through <see cref="DisplayPalette"/> only.
+    /// </summary>
+    public IReadOnlyList<uint> BackgroundPalette()
+    {
+        var map = State.RoomColors;
+        var shadow = State.ShadowPalette;
+        var shown = new uint[Room.Palette.Count];
+        for (var i = 0; i < shown.Length; i++)
+        {
+            var drawn = map[i] < Room.Palette.Count ? map[i] : i;
+            shown[i] = shadow[drawn] < Room.Palette.Count ? Room.Palette[shadow[drawn]] : Room.Palette[drawn];
+        }
+        return shown;
+    }
+
+    /// <summary>
+    /// Whether the game's own object search (<c>findObject</c>) can select this object here: it has a box, it is not at 0, 0 (off the scene), the room owns it,
+    /// it is not untouchable (class 24, R-6.15) and its parent chain is in the required states. Doorways and stored boxes outside these rules are not hotspots.
+    /// </summary>
+    public bool IsHotspot(ScummRoomObjectRecord record)
+    {
+        if (record.Width <= 0 || record.Height <= 0) return false;
+        var at = Snapshot.ObjectPositions.TryGetValue(record.Id, out var moved) ? moved : new RoomObjectPosition(record.X, record.Y);
+        if (at == new RoomObjectPosition(0, 0)) return false;
+        if (Snapshot.ObjectOwners.GetValueOrDefault(record.Id, (byte)0x0F) != 0x0F || Snapshot.IsUntouchable(record.Id)) return false;
+        var current = record;
+        for (var steps = 0; current.ParentLocalIndex != 0; steps++)
+        {
+            var parent = Records.FirstOrDefault(item => item.LocalIndex == current.ParentLocalIndex);
+            if (steps > Records.Count || parent is null || (Snapshot.ObjectStates.GetValueOrDefault(parent.Id) & 0x0F) != current.ParentRequiredState) return false;
+            current = parent;
+        }
+        return true;
+    }
+
     /// <summary><c>VAR_CURRENT_LIGHTS</c> bit 1 (ScummVM <c>LIGHTMODE_room_lights_on</c>): when clear, the game shows the room dark except under a flashlight.</summary>
     public bool RoomLit => (State.Lights & 2) != 0;
 
@@ -59,6 +103,19 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
 /// </summary>
 public static class ScummRoomFirstVisit
 {
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, Lazy<ScummRoomScene?>> Scenes = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The first visit of a room, run once per game folder and room: the room view and the room card of the same room share it. Null when the run cannot be made
+    /// (the plain background is shown instead; the app says so in Advanced only).
+    /// </summary>
+    public static ScummRoomScene? Cached(GameLibrary game, int roomId) =>
+        Scenes.GetOrAdd($"{game.FolderPath}|{roomId}", _ => new Lazy<ScummRoomScene?>(() =>
+        {
+            try { return Run(game, roomId); }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException or NotSupportedException) { return null; }
+        })).Value;
+
     public static ScummRoomScene Run(GameLibrary game, int roomId, int randomSeed = 0)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -90,6 +147,6 @@ public static class ScummRoomFirstVisit
         };
         return new ScummRoomScene(roomId, room, records, images, settled.State, selection, settled.Outcome, settled.Frames, settled.LeftTo,
             id => { try { return session.ReadCostume(id); } catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException) { return null; } },
-            bootRoom, notes);
+            bootRoom, notes) { IndexedStates = indexed.States };
     }
 }
