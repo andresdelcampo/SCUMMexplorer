@@ -6,7 +6,7 @@ public sealed class LoomStoryEditionTests
 {
     [Theory]
     [InlineData("loom ega mt32 en", 0xD71, "bit[0xD9C]", "bit[0xDC7]")]
-    [InlineData("ALTERNATIVE LOOMS/loom ega mt32 es", 0xD72, "bit[0xD9D]", "bit[0xDC8]")]
+    [InlineData("loom ega mt32 es", 0xD72, "bit[0xD9D]", "bit[0xDC8]")]
     [InlineData("loom vga en", 0x12, "bit[0x03D]", "bit[0x068]")]
     public void StoryControlsUseTheirOwnEditionAndChangeRustysSourceBranch(string edition, int first, string ghost, string restored)
     {

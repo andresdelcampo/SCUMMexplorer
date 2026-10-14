@@ -30,7 +30,7 @@ public sealed class GameFolderScannerTests
     [Fact]
     public void RecognizesTheLoomDemosWithoutTheirExecutable()
     {
-        var source = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/ALTERNATIVE LOOMS/loom demo short ega en"));
+        var source = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom demo short ega en"));
         if (!File.Exists(Path.Combine(source, "00.LFL"))) return;
         var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
         Directory.CreateDirectory(folder);

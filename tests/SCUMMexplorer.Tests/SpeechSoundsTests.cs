@@ -5,11 +5,11 @@ namespace SCUMMexplorer.Tests;
 
 public class SpeechSoundsTests
 {
-    /// <summary>Every talkie game found under Games/FUTURE lists each sample of its speech file as a sound, and the first one decodes.</summary>
+    /// <summary>Every talkie game found under Games lists each sample of its speech file as a sound, and the first one decodes.</summary>
     [Fact]
     public void TalkieGamesListTheirSpeechAsSounds()
     {
-        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Games", "FUTURE"));
+        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Games"));
         if (!Directory.Exists(root)) return;
         foreach (var folder in Directory.GetDirectories(root).Where(d => Directory.GetFiles(d, "*.sou").Length > 0))
         {
