@@ -10,7 +10,7 @@ internal static class StateTransitions
     {
         foreach (var (name, folder, boy, gate, seen, input) in new[] {
             ("ega-en", "Games/loom ega mt32 en", 562, "bit[0xD7A]", "bit[0xDCF]", "bit[0xD6D]"),
-            ("ega-es", "Games/ALTERNATIVE LOOMS/loom ega mt32 es", 561, "bit[0xD7B]", "bit[0xDD0]", "bit[0xD6E]"),
+            ("ega-es", "Games/loom ega mt32 es", 561, "bit[0xD7B]", "bit[0xDD0]", "bit[0xD6E]"),
             ("vga-en", "Games/loom vga en", 487, "bit[0x01B]", "bit[0x070]", "bit[0x00E]") })
         {
             var game = new GameFolderScanner().Scan(folder);

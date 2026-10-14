@@ -10,7 +10,7 @@ var json = new JsonSerializerOptions { WriteIndented = true };
 void Save(string name, object value) => File.WriteAllText(Path.Combine(output, name + ".json"), JsonSerializer.Serialize(value, json));
 var editions = new[] {
     ("ega-en", "Games/loom ega mt32 en"),
-    ("ega-es", "Games/ALTERNATIVE LOOMS/loom ega mt32 es"),
+    ("ega-es", "Games/loom ega mt32 es"),
     ("vga-en", "Games/loom vga en")
 };
 

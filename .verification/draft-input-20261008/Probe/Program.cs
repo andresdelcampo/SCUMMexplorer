@@ -10,7 +10,7 @@ Directory.CreateDirectory(output);
 var reports = new List<object>();
 var failures = new List<string>();
 int targetRoom = args.Length > 2 && int.TryParse(args[2], out var requestedRoom) ? requestedRoom : 2;
-foreach (var (edition, relative) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"), ("vga", "loom vga en") })
+foreach (var (edition, relative) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "loom ega mt32 es"), ("vga", "loom vga en") })
 {
     var game = new GameFolderScanner().Scan(Path.Combine(root, relative));
     var data = ScummDataSources.For(game);

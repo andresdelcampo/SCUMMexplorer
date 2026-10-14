@@ -13,9 +13,8 @@ public class ScummV1ActorColorsTests
     private static GameLibrary? Open(string folder)
     {
         var root = SupportMatrixTests.RepositoryRoot();
-        foreach (var candidate in new[] { Path.Combine(root, "Games", folder), Path.Combine(root, "Games", "FUTURE", folder) })
-            if (Directory.Exists(candidate)) return new GameFolderScanner().Scan(candidate);
-        return null;
+        var candidate = Path.Combine(root, "Games", folder);
+        return Directory.Exists(candidate) ? new GameFolderScanner().Scan(candidate) : null;
     }
 
     [Fact]

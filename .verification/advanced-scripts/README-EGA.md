@@ -33,6 +33,6 @@ dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-restore --
 dotnet build .verification/advanced-scripts/ScriptsCheck --no-restore --verbosity quiet
 ```
 
-`ScriptReview` takes the absolute Games folder and a fresh output folder, and finds the Spanish game under `ALTERNATIVE LOOMS` when needed. For reproduction, export to `before-ega/review-input`, then run `review-ega.ps1`. Generated dumps, JSON and UI output remain ignored. `ScriptsCheck` uses the same arguments; run its process with a 45-second deadline.
+`ScriptReview` takes the absolute Games folder and a fresh output folder, For reproduction, export to `before-ega/review-input`, then run `review-ega.ps1`. Generated dumps, JSON and UI output remain ignored. `ScriptsCheck` uses the same arguments; run its process with a 45-second deadline.
 
 App artifact: `Exe/SCUMMexplorer.App/Debug/net10.0-windows/SCUMMexplorer.App.exe`.

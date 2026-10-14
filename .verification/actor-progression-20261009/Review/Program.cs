@@ -3,7 +3,7 @@ using SCUMMexplorer.Core.Discovery;
 
 var root = Path.GetFullPath(args[0]);
 var output = Path.GetFullPath(args[1]); Directory.CreateDirectory(output);
-foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"), ("vga", "loom vga en") })
+foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "loom ega mt32 es"), ("vga", "loom vga en") })
 {
     var game = new GameFolderScanner().Scan(Path.Combine(root, folder)); var data = ScummDataSources.For(game);
     var lines = new List<string>();

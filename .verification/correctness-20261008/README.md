@@ -12,7 +12,7 @@ The audit found and fixed three product issues. The checked replay catalogs are 
 
 ## Verified coverage
 
-Reference data: `Games/loom ega mt32 en` and `Games/loom vga en`. Spanish comparison: `Games/ALTERNATIVE LOOMS/loom ega mt32 es`. The English EGA catalog's source-file hashes match the current game files. The Spanish files do not match that catalog, so its English recipes were not applied to Spanish data.
+Reference data: `Games/loom ega mt32 en` and `Games/loom vga en`. Spanish comparison: `Games/loom ega mt32 es`. The English EGA catalog's source-file hashes match the current game files. The Spanish files do not match that catalog, so its English recipes were not applied to Spanish data.
 
 | Check | Result |
 | --- | --- |

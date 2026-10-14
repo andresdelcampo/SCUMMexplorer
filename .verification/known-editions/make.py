@@ -5,17 +5,17 @@ import glob, hashlib, json, os, itertools
 EDITIONS = [  # (folder, game, label, demo)
  ("Games/loom ega mt32 en", "Loom", "English, Roland upgrade", False),
  ("Games/loom ega en", "Loom", "English", False),
- ("Games/ALTERNATIVE LOOMS/loom ega es", "Loom", "Spanish", False),
- ("Games/ALTERNATIVE LOOMS/loom ega mt32 es", "Loom", "Spanish, Roland upgrade", False),
- ("Games/ALTERNATIVE LOOMS/loom ega fr", "Loom", "French", False),
- ("Games/ALTERNATIVE LOOMS/loom ega de", "Loom", "German", False),
- ("Games/ALTERNATIVE LOOMS/loom ega v1.2 es", "Loom", "Spanish, version 1.2", False),
+ ("Games/loom ega es", "Loom", "Spanish", False),
+ ("Games/loom ega mt32 es", "Loom", "Spanish, Roland upgrade", False),
+ ("Games/loom ega fr", "Loom", "French", False),
+ ("Games/loom ega de", "Loom", "German", False),
+ ("Games/loom ega v1.2 es", "Loom", "Spanish, version 1.2", False),
  ("Games/loom ega it", "Loom", "Italian", False),
- ("Games/ALTERNATIVE LOOMS/loom demo long ega en", "Loom", "English, long demo", True),
- ("Games/ALTERNATIVE LOOMS/loom demo short ega en", "Loom", "English, short demo", True),
- ("Games/FUTURE/indy3 ega en", "IndianaJones3", "English", False),
- ("Games/FUTURE/indy3 ega es", "IndianaJones3", "Spanish", False),
- ("Games/FUTURE/indy3 demo en", "IndianaJones3", "English, demo", True),
+ ("Games/loom demo long ega en", "Loom", "English, long demo", True),
+ ("Games/loom demo short ega en", "Loom", "English, short demo", True),
+ ("Games/indy3 ega en", "IndianaJones3", "English", False),
+ ("Games/indy3 ega es", "IndianaJones3", "Spanish", False),
+ ("Games/indy3 demo en", "IndianaJones3", "English, demo", True),
 ]
 def hashes(folder):
     return {os.path.basename(f).upper(): hashlib.sha256(open(f, "rb").read()).hexdigest()

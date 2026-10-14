@@ -2,7 +2,7 @@
 
 ## Implemented export and current scope
 
-The standalone HTML conversation reference is implemented by `tools/Indy3ConversationExport`. Current English comparison resources are in `Games/FUTURE/indy3 ega en`; the default output is `Games/FUTURE/indy3-conversations.html` with `Games/FUTURE/indy3-conversations.graph.json` beside it. Regenerate it through the exporter after changing extraction. Indy interactive gameplay and further conversation expansion are deferred.
+The standalone HTML conversation reference is implemented by `tools/Indy3ConversationExport`. Current English comparison resources are in `Games/indy3 ega en`; the default output is `Games/indy3-conversations.html` with `Games/indy3-conversations.graph.json` beside it. Regenerate it through the exporter after changing extraction. Indy interactive gameplay and further conversation expansion are deferred.
 
 The historical construction goal was a standalone, locally openable HTML reference for the multiple-choice conversations in the supplied EGA resources. The export shows source room artwork and choices/replies with verified continuations; unresolved scene associations, conditions and terminal actions stay explicit. Reserve outcome and preferred-route annotations for a later pass; do not infer them now.
 
@@ -36,13 +36,13 @@ The call inventory has direct room-side chains for several dialogue scripts: Roo
 
 The independent audit's `--verify` mode checks representative room provenance against the supplied data: 29 in Room 1, 30 in Room 3, 78 in Room 39 rather than storage Room 40, 104 on the normal path through Room 31, and 117 in Rooms 45 and 46. Some scripts have multiple possible contexts because conditions and cutscene overrides are not evaluated.
 
-Run the reproducible audit from the repository root with `rtk proxy dotnet run --project tools/Indy3ConversationAudit/Indy3ConversationAudit.csproj -- "Games/FUTURE/indy3 ega en" --verify`. To refresh the full ignored inventory, omit `--verify` and save the JSON output in a fresh ignored verification directory.
+Run the reproducible audit from the repository root with `rtk proxy dotnet run --project tools/Indy3ConversationAudit/Indy3ConversationAudit.csproj -- "Games/indy3 ega en" --verify`. To refresh the full ignored inventory, omit `--verify` and save the JSON output in a fresh ignored verification directory.
 
 For interpreter semantics, compare the decoded instructions with ScummVM's [v5 script engine](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v5.cpp) and [resource handling](https://github.com/scummvm/scummvm/blob/master/engines/scumm/resource.cpp). These references help decode script control flow and actor text operands; the supplied EGA `.LFL` files remain the evidence for each dialogue edge and scene.
 
 ## Export graph review checklist
 
-The exporter writes `Games/FUTURE/indy3-conversations.graph.json` alongside the offline HTML. The graph records individual option replies, links to later menus, alternative labels for reused verb slots, conditional preludes, scene evidence, and explicit exclusions. Check those fields against source offsets, not just rendered prose. The HTML verifier in `tools/Indy3ConversationExport/verify-html.mjs` checks offline image payloads, internal links, and structure; `tools/Indy3ConversationAudit/inspect_html.py` lists options with neither a spoken reply nor a later menu.
+The exporter writes `Games/indy3-conversations.graph.json` alongside the offline HTML. The graph records individual option replies, links to later menus, alternative labels for reused verb slots, conditional preludes, scene evidence, and explicit exclusions. Check those fields against source offsets, not just rendered prose. The HTML verifier in `tools/Indy3ConversationExport/verify-html.mjs` checks offline image payloads, internal links, and structure; `tools/Indy3ConversationAudit/inspect_html.py` lists options with neither a spoken reply nor a later menu.
 
 The focused control-flow regression is indexed script 29: menu 1 verb 121 leads to menu 2 only; verb 122 leads to menu 3. Menu 3 verb 120 replies appear in the decoded order `+0x04C6`, `+0x0269`, `+0x057A`. Its introductory lines belong to menu 1 only. Do not mistake shared verb IDs across successive menus for shared handlers.
 

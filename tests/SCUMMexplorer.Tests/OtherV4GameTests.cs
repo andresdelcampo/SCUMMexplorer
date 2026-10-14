@@ -6,7 +6,7 @@ namespace SCUMMexplorer.Tests;
 
 /// <summary>
 /// A v4 game that is not LOOM CD is browsed from all its disks. Set <c>SCUMM_MONKEY1_VGA_TEST_ROOT</c> (and, for the 16-colour copy,
-/// <c>SCUMM_MONKEY1_EGA_TEST_ROOT</c>; for the 256-colour Indiana Jones, <c>SCUMM_INDY3_VGA_TEST_ROOT</c>) to the absolute folders (<c>Games/FUTURE/monkey1/VGA</c>, <c>…/EGA</c>); the checks are skipped without them.
+/// <c>SCUMM_MONKEY1_EGA_TEST_ROOT</c>; for the 256-colour Indiana Jones, <c>SCUMM_INDY3_VGA_TEST_ROOT</c>) to the absolute folders (the Monkey Island and Indiana Jones folders under <c>Games</c>); the checks are skipped without them.
 /// </summary>
 public class OtherV4GameTests
 {

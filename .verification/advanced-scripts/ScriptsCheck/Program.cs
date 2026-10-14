@@ -38,7 +38,7 @@ internal static class Program
                 {
                     bool cd = edition.Contains("vga"); string prefix = cd ? "vga" : edition.EndsWith("es") ? "ega-es" : "ega";
                     var folder = Path.Combine(args[0], edition);
-                    if (!Directory.Exists(folder)) folder = Path.Combine(args[0], "ALTERNATIVE LOOMS", edition);
+                    if (!Directory.Exists(folder)) folder = Path.Combine(args[0], edition);
                     Call("OpenGameFolder", folder);
                     Find<ToggleButton>("AdvancedModeToggle").IsChecked = true;
                     Call("AdvancedModeToggle_Click", Find<ToggleButton>("AdvancedModeToggle"), new RoutedEventArgs());

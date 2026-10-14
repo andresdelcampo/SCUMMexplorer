@@ -28,7 +28,6 @@ public sealed class LoomEgaScriptReviewTests
     {
         var games = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games"));
         var folder = Path.Combine(games, "loom ega mt32 " + language);
-        if (!Directory.Exists(folder)) folder = Path.Combine(games, "ALTERNATIVE LOOMS", "loom ega mt32 " + language);
         return new GameFolderScanner().Scan(folder);
     }
 

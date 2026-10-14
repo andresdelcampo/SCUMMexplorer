@@ -20,7 +20,7 @@ void Check(bool condition, string label)
 }
 foreach (var (edition, relative) in new[] {
     ("ega-en", "loom ega mt32 en"),
-    ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"),
+    ("ega-es", "loom ega mt32 es"),
     ("vga", "loom vga en") })
 {
     var game = new GameFolderScanner().Scan(Path.Combine(root, relative));

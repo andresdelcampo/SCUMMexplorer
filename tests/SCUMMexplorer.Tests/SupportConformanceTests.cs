@@ -60,13 +60,8 @@ public class SupportConformanceTests
 
     private static string? Locate(string folder)
     {
-        // The games sit directly under Games/ (they were once split into FUTURE/ and ALTERNATIVE LOOMS/ subfolders; those are still tried).
-        var games = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games");
-        foreach (var parent in new[] { "", "FUTURE", "ALTERNATIVE LOOMS" })
-        {
-            var path = Path.Combine(games, parent, folder);
-            if (Directory.Exists(path)) return path;
-        }
-        return null;
+        // The games sit directly under Games/.
+        var path = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games", folder);
+        return Directory.Exists(path) ? path : null;
     }
 }

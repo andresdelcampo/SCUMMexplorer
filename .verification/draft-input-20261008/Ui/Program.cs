@@ -20,7 +20,7 @@ internal static class Program
         {
             try
             {
-                foreach (var (name, path) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"), ("vga", "loom vga en") })
+                foreach (var (name, path) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "loom ega mt32 es"), ("vga", "loom vga en") })
                 {
                     var game = new GameFolderScanner().Scan(Path.Combine(root, path));
                     var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));

@@ -69,7 +69,7 @@ internal static class Program
                 Field("_cdVoice")!.GetType().GetProperty("Enabled")!.SetValue(Field("_cdVoice"), false);
                 typeof(MainWindow).GetField("_playInstantly", Private)!.SetValue(window, true);
                 foreach (var (edition, relative) in new[] { ("ega-en", "loom ega mt32 en"),
-                    ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"), ("vga", "loom vga en") })
+                    ("ega-es", "loom ega mt32 es"), ("vga", "loom vga en") })
                 foreach (var route in new[] { "text", "notes" })
                 foreach (bool reverse in new[] { false, true })
                 {

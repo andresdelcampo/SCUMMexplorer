@@ -1,6 +1,6 @@
 # Monkey Island 2 support status
 
-Family: Monkey2 | Fixture: `Games/FUTURE/mi2 talkie en` (registry path; the folder now sits at `Games/mi2 talkie en`; `mi2 mt32 en` and `mi2 sb16 en` for the Roland and Sound Blaster data) | Last updated: 14 October 2026 | Owner: S3-leftovers agent
+Family: Monkey2 | Fixture: `Games/mi2 talkie en` ( `mi2 mt32 en` and `mi2 sb16 en` for the Roland and Sound Blaster data) | Last updated: 14 October 2026 | Owner: S3-leftovers agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -25,3 +25,4 @@ Open uncertainties: loops are taken at the from-point to the tick (ScummVM: firs
 | 14 Oct | S3 | Loop sysex 0x7D 80 | keep "end here" / port `setLoop` | port: ScummVM sets a loop (count, to, from) and jumps at the from-point; "end here" rendered some songs (sound 120) as a tenth of a second | `ScummImuseTimeline` case 80 |
 | 14 Oct | S3 | Hooks 49 to 53 with id 0 were ignored | keep / act at once | act at once as `maybe_*` do; changes what is heard (parts switched off by a hook stay off in the default path) | remove the cases 49 to 53 in the three drivers |
 | 14 Oct | S3 | Loop length | one pass / 3 minutes | 3 minutes at the first jump back at or after it, like the preview limit of the other devices | `MinLoopSeconds` |
+| 2026-10-14 | S3 | Raise Sound to Full? | keep partial until S6 hooks / raise now | raised: the user listened and accepted the v5 sounds (loops, hooks with id 0, MI1 CD track list); the script-driven hooks stay a known limit for S6 | revert the one registry line |

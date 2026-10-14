@@ -1,6 +1,6 @@
 # Indiana Jones and the Fate of Atlantis support status
 
-Family: Indy4 | Fixture: `Games/FUTURE/indy4 vga en` (registry path; the folder now sits at `Games/indy4 vga en`, `ATLANTIS.cue`) | Last updated: 14 October 2026 | Owner: S3-leftovers agent
+Family: Indy4 | Fixture: `Games/indy4 vga en` (`ATLANTIS.cue`) | Last updated: 14 October 2026 | Owner: S3-leftovers agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -24,3 +24,4 @@ Open uncertainties: as Monkey Island 2. The CD image has a single data track (`T
 |---|---|---|---|---|---|
 | 14 Oct | S3 | "Indy 4 CD has no tracks" (instructions, section 2) | treat as missing | not a gap: the image holds no audio track; nothing to name | none |
 | 14 Oct | S3 | Loops and hooks 49 to 53 | see the Monkey Island 2 log | same shared drivers | see the Monkey Island 2 log |
+| 2026-10-14 | S3 | Raise Sound to Full? | keep partial until S6 hooks / raise now | raised: the user listened and accepted the v5 sounds (loops, hooks with id 0, MI1 CD track list); the script-driven hooks stay a known limit for S6 | revert the one registry line |

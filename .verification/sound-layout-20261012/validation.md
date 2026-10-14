@@ -29,5 +29,5 @@ Commit verification: exported the staged App/Core sources to the ignored `Exe/.s
 Reproduce a run:
 
 ```powershell
-rtk proxy powershell -NoProfile -ExecutionPolicy Bypass -File .verification/sound-layout-20261012/run-preview.ps1 -GameFolder 'Games/FUTURE/indy4 vga en' -OutputFolder 'D:\Documents\Personal\Code Projects\SCUMMexplorer\.verification\sound-layout-20261012\speech-final'
+rtk proxy powershell -NoProfile -ExecutionPolicy Bypass -File .verification/sound-layout-20261012/run-preview.ps1 -GameFolder 'Games/indy4 vga en' -OutputFolder 'D:\Documents\Personal\Code Projects\SCUMMexplorer\.verification\sound-layout-20261012\speech-final'
 ```

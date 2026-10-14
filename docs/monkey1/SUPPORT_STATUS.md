@@ -1,6 +1,6 @@
 # Monkey Island 1 CD support status
 
-Family: MonkeyCd | Fixture: `Games/FUTURE/monkey1 vga en` (registry path; the folder now sits at `Games/monkey1 vga en`, `The_Secret_of_Monkey_Island.cue`) | Last updated: 14 October 2026 | Owner: S3-leftovers agent
+Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 14 October 2026 | Owner: S3-leftovers agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -25,3 +25,4 @@ Open uncertainties: disc track 21 (16 s) is started by no sound and stays unname
 | 14 Oct | S3 | The sound's CD track byte against the cue's track numbers | (a) byte = cue number, as written on 12 Oct; (b) byte counts the audio tracks from 1 | (b): the disc has 24 audio tracks (cue 2 to 25) and the sounds name 1 to 24; the data track cannot be played; room names and one-shot lengths fit. Cue-number labels in the list are unchanged, the rooms/sounds shown are now right | revert the `gameTrack` change in `GameFolderScanner` |
 | 14 Oct | S3 | Name disc track 21? | name it from a guess / leave unnamed | unnamed: no sound, no direct start (only LOOM CD has one) and no literal script start names it (R-2.1) | none needed |
 | 14 Oct | S3 | How long a looping song is rendered | one pass; 3 minutes (the preview limit already used by the other devices); more | 3 minutes, ending at the first jump back at or after it (hard cap 420 s) | `ScummImuseTimeline.MinLoopSeconds` |
+| 2026-10-14 | S3 | Raise Sound to Full? | keep partial until S6 hooks / raise now | raised: the user listened and accepted the v5 sounds (loops, hooks with id 0, MI1 CD track list); the script-driven hooks stay a known limit for S6 | revert the one registry line |

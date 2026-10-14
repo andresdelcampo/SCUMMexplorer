@@ -24,7 +24,7 @@ Updated 9 October 2026. Rebuild a harness before running it so it includes the c
 
 ## Preservation and archive
 
-`archive/` holds dated Spanish work from September–early October. Its numeric offsets/IDs belong to that edition, now under `Games/ALTERNATIVE LOOMS/loom ega mt32 es`. Old scripts naming `Games/loom` are historical commands; supply the current folder and verify edition identity before repeating them. Do not copy their numbers into an English recipe.
+`archive/` holds dated Spanish work from September–early October. Its numeric offsets/IDs belong to that edition, now under `Games/loom ega mt32 es`. Old scripts naming `Games/loom` are historical commands; supply the current folder and verify edition identity before repeating them. Do not copy their numbers into an English recipe.
 
 Ignored captures/traces are local evidence, not available in a clean clone. Heavy historical captures may be in `Exe/_evidence-archive/`. Preserve failed runs and their limits; a passing process alone is not successful coverage.
 

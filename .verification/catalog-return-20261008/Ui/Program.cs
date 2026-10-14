@@ -81,7 +81,7 @@ internal static class Program
                 Capture("03-early-closed-portal");
                 var catalogType = typeof(MainWindow).Assembly.GetType("SCUMMexplorer.App.LoomReplayCatalog")!;
                 var startsProperty = catalogType.GetProperty("CatalogStarts")!;
-                var spanish = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(args[0], "..", "ALTERNATIVE LOOMS", "loom ega mt32 es")));
+                var spanish = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(args[0], "..", "loom ega mt32 es")));
                 var otherCatalog = catalogType.GetMethod("Load")!.Invoke(null, [spanish])!;
                 Check(((LoomCatalogStartRecipe[])startsProperty.GetValue(otherCatalog)!).Length == 0,
                     "English recipe is withheld from a different source fingerprint");

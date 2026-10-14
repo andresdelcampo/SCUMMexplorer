@@ -16,10 +16,10 @@ object? Field(object item, string name) => item.GetType().GetField(name, Binding
 
 var editions = new[] {
     ("ega-en-roland", "Games/loom ega mt32 en"),
-    ("ega-en-plain", "Games/ALTERNATIVE LOOMS/loom ega en"),
-    ("ega-es-roland", "Games/ALTERNATIVE LOOMS/loom ega mt32 es"),
-    ("ega-es-plain", "Games/ALTERNATIVE LOOMS/loom ega es"),
-    ("ega-es-v12", "Games/ALTERNATIVE LOOMS/loom ega v1.2 es"),
+    ("ega-en-plain", "Games/loom ega en"),
+    ("ega-es-roland", "Games/loom ega mt32 es"),
+    ("ega-es-plain", "Games/loom ega es"),
+    ("ega-es-v12", "Games/loom ega v1.2 es"),
     ("vga-en", "Games/loom vga en")
 };
 

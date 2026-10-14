@@ -5,7 +5,7 @@ Directory.CreateDirectory(args[1]);
 foreach (var edition in new[] { "loom ega mt32 en", "loom ega mt32 es", "loom vga en" })
 {
     var folder = Path.Combine(args[0], edition);
-    if (!Directory.Exists(folder)) folder = Path.Combine(args[0], "ALTERNATIVE LOOMS", edition);
+    if (!Directory.Exists(folder)) folder = Path.Combine(args[0], edition);
     var game = new GameFolderScanner().Scan(folder);
     var data = ScummDataSources.For(game);
     var glossary = LoomGlossary.Load(game);

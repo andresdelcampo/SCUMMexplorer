@@ -47,7 +47,7 @@ internal static class Program
         {
             try
             {
-                foreach (var (edition, prefix) in new[] { ("loom ega mt32 en", "en"), ("ALTERNATIVE LOOMS/loom ega mt32 es", "es"), ("loom vga en", "vga") })
+                foreach (var (edition, prefix) in new[] { ("loom ega mt32 en", "en"), ("loom ega mt32 es", "es"), ("loom vga en", "vga") })
                 {
                     Call("OpenGameFolder", Path.GetFullPath(Path.Combine(args[0], edition)));
                     Find<ToggleButton>("SessionModeToggle").IsChecked = true;

@@ -5,7 +5,7 @@ using SCUMMexplorer.Core.Discovery;
 var output = Path.GetFullPath(args[1]); Directory.CreateDirectory(output);
 var report = new List<string>(); var states = new List<object>();
 void Check(bool ok, string label) { report.Add((ok ? "PASS " : "FAIL ") + label); File.WriteAllLines(Path.Combine(output, "report.txt"), report); }
-foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"), ("vga", "loom vga en") })
+foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "loom ega mt32 es"), ("vga", "loom vga en") })
 {
     var game = new GameFolderScanner().Scan(Path.Combine(Path.GetFullPath(args[0]), folder));
     var data = ScummDataSources.For(game);

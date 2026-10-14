@@ -29,7 +29,7 @@ internal static class Program
             {
                 foreach (var (edition, id, owner) in new[] {
                     ("loom ega mt32 en", 116, "Script 114"),
-                    ("ALTERNATIVE LOOMS/loom ega mt32 es", 51, "Script 49"),
+                    ("loom ega mt32 es", 51, "Script 49"),
                     ("loom vga en", 97, "") })
                 {
                     Call("OpenGameFolder", Path.GetFullPath(Path.Combine(args[0], edition)));

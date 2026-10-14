@@ -10,7 +10,7 @@ var dumpOnly = args.Length > 3 && args[3] == "dump";
 var chainsOnly = args.Length > 3 && args[3] is "chains" or "late";
 packets.AddRange(prior.Cast<object>());
 void Check(bool ok, string label) { checks.Add((ok ? "PASS " : "FAIL ") + label); File.WriteAllLines(Path.Combine(output, "checks.txt"), checks); }
-foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "ALTERNATIVE LOOMS/loom ega mt32 es"), ("vga", "loom vga en") })
+foreach (var (edition, folder) in new[] { ("ega-en", "loom ega mt32 en"), ("ega-es", "loom ega mt32 es"), ("vga", "loom vga en") })
 {
     var game = new GameFolderScanner().Scan(Path.Combine(Path.GetFullPath(args[0]), folder)); var data = ScummDataSources.For(game);
     var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));

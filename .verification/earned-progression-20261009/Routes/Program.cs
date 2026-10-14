@@ -8,7 +8,7 @@ var output = Path.GetFullPath(args[1]);
 if (Directory.Exists(output)) throw new IOException("Use a fresh evidence directory.");
 Directory.CreateDirectory(output);
 var route = args[2]; var edition = args[3];
-var folder = edition switch { "ega-en" => "loom ega mt32 en", "ega-es" => "ALTERNATIVE LOOMS/loom ega mt32 es", "vga" => "loom vga en", _ => throw new ArgumentException("Unreviewed edition") };
+var folder = edition switch { "ega-en" => "loom ega mt32 en", "ega-es" => "loom ega mt32 es", "vga" => "loom vga en", _ => throw new ArgumentException("Unreviewed edition") };
 var game = new GameFolderScanner().Scan(Path.Combine(Path.GetFullPath(args[0]), folder));
 var data = ScummDataSources.For(game);
 var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));

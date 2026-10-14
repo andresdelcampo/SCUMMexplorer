@@ -2,7 +2,7 @@
 
 **Later route checkpoint:** slots 3/7/11 now earn in the reference; seven additional unique learning checks and a Script 106 guard control pass 37 assertions. The complete English Room 46 excursion/Closing chain passes 25 more assertions, with actual source-earned Healing/six-note input and balanced 26/26 scopes. [Actual routes, corrected guard directions, packets and limits](ROUTES.md). Native physical input and audio remain manual.
 
-English Roland EGA is the reference (`Games/loom ega mt32 en`); Spanish Roland EGA (`Games/ALTERNATIVE LOOMS/loom ega mt32 es`) and English CD/VGA (`Games/loom vga en`) use their own scripts, objects and bit banks. The existing actor inventory and its unreviewed outputs were read first and left unmodified/uncommitted. Additional source reads are in the separate actor `Review/` helper and ignored `out-review/`.
+English Roland EGA is the reference (`Games/loom ega mt32 en`); Spanish Roland EGA (`Games/loom ega mt32 es`) and English CD/VGA (`Games/loom vga en`) use their own scripts, objects and bit banks. The existing actor inventory and its unreviewed outputs were read first and left unmodified/uncommitted. Additional source reads are in the separate actor `Review/` helper and ignored `out-review/`.
 
 ## Established evidence reviewed first
 

@@ -4,7 +4,7 @@ This map records **LOOM-specific** script roles, variable meanings, verb IDs and
 
 ## Edition scope
 
-Reconciled 8 October 2026; engine/game separation updated 11 October. Unless an entry explicitly says otherwise, numeric tables and decoded counts below come from the **Spanish DOS EGA release (SCUMM v3)** audited 27–30 September. English Roland EGA (`Games/loom ega mt32 en`) is the replay reference; Spanish comparison files are under `Games/ALTERNATIVE LOOMS/loom ega mt32 es`. Audit dates and evidence limits are retained.
+Reconciled 8 October 2026; engine/game separation updated 11 October. Unless an entry explicitly says otherwise, numeric tables and decoded counts below come from the **Spanish DOS EGA release (SCUMM v3)** audited 27–30 September. English Roland EGA (`Games/loom ega mt32 en`) is the replay reference; Spanish comparison files are under `Games/loom ega mt32 es`. Audit dates and evidence limits are retained.
 
 **CD/VGA (SCUMM v4)** has its own decoded scripts and identifiers. EGA story-variable addresses, bit IDs, counts and offsets must not be transferred to it. `LoomCdGlossary` and `LoomStatusSchema` derive CD roles from that edition's instructions; the cross-edition entries in [Draft verb names](#draft-verb-names) identify the comparisons actually made.
 
