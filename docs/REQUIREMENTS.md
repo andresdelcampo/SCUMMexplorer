@@ -96,7 +96,7 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | Objects | stored object boxes and names from the room data (no script run) | first-visit state from the entry scripts, and click responses through the game's own scripts (R-1.5) | LOOM only today |
 | Walk boxes | – | read for the room and drawn in Advanced | – |
 | Costumes | drawn, but in an estimated palette (Zak McKracken classic: 10 of 35 actor colours depend on what ran and stay labelled estimates; Maniac Mansion classic is derived from the scripts and counts as full) | drawn in the correct palette | costumes offered |
-| Sound | some devices or kinds not heard or not played (v5 loops, MT-32 needs the user's ROMs) | every kind plays on every device the game has | sounds offered |
+| Sound | some devices or kinds not heard or not played (v5 script-driven hooks, loops not yet listened to, MT-32 needs the user's ROMs) | every kind plays on every device the game has | sounds offered |
 | Texts | – | Game Texts extracts spoken lines, names and labels | extractor finds entries |
 | Scripts | – | raw disassembly in the family's dialect, and the Readable view | scripts offered |
 | Play | – | live room: actors, camera, clicks run the game's scripts | LOOM only today |
