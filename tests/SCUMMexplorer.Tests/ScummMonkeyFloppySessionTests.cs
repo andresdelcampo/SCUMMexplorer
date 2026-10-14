@@ -124,6 +124,23 @@ public sealed class ScummMonkeyFloppySessionTests
     }
 
     [Fact]
+    public void TheSpanishEightDiskEgaReleaseBootsTheSameWay()
+    {
+        // S9 note (14 October): the 16-colour release on eight disks takes the same route; its video mode variable is still the VGA 19 (the profile does
+        // not yet tell EGA from VGA for a v4 game), which no script of the boot reads for anything but CGA (4).
+        var path = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games", "monkey1 ega es");
+        if (!File.Exists(Path.Combine(path, "DISK08.LEC"))) return;
+
+        var session = Boot(path, out var game);
+
+        Assert.Equal(8, ((ScummV4DiskSetDataSource)ScummDataSources.For(game)).DiskCount);
+        Assert.False(session.BootReport!.HitFrameLimit);
+        Assert.Equal(33, session.BootReport.FinalRoom);
+        string[] unsupported = ["not modeled", "could not", "disassembly stops", "undecoded", "cannot", "needs a session", "unknown", "depends on"];
+        Assert.DoesNotContain(session.Snapshot.Uncertainties, item => unsupported.Any(item.Contains) && !item.Contains("seeded pick"));
+    }
+
+    [Fact]
     public void VersionFourReadsOneValueForAnActorsScale()
     {
         // o5_actorOps case 17 (script_v5.cpp): version 4 reads one value for both scales, later versions two. Raw sub-opcode 0x13 is case 17 through

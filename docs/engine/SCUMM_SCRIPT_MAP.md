@@ -34,6 +34,8 @@ These slots belong to the engine contract. The game selects values such as the e
 | `0x030` | `VAR_SOUNDCARD` | Sound device |
 | `0x031` | `VAR_VIDEOMODE` | Video mode |
 
+In v4 `resetScummVars` also gives `VAR_HEAPSPACE` (`0x028`) = 1400 and `VAR_FIXEDDISK` (`0x033`) = 1 at start (`vars.cpp`, 14 October 2026). `o5_actorOps` sub-opcode 17 (scale, raw `0x11`; raw `0x13` in small-header games) reads **one** operand in version 4 and two in version 5 (`script_v5.cpp`, 14 October 2026). `actorFollowCamera` on an actor outside the current room runs `startScene` for that room (`camera.cpp` `setCameraFollows`, 14 October 2026).
+
 The v4 contract additionally defines `VAR_SCROLL_SCRIPT` (`0x01B`), `VAR_DEBUGMODE` (`0x027`), `VAR_MAINMENU_KEY` (`0x032`), `VAR_FIXEDDISK` (`0x033`), `VAR_CURSORSTATE` (`0x034`) and `VAR_USERPUT` (`0x035`). Thus a slot holding game data in v3 may be reserved in v4. Source: ScummVM [variable setup](https://github.com/scummvm/scummvm/blob/master/engines/scumm/vars.cpp), checked 11 October 2026. This is a selected reference, not a complete table for every platform or version.
 
 ## Script operands, input and scheduling (v3/v4)

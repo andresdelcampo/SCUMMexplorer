@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 14 October: the generic session boots The Secret of Monkey Island, floppy (S4b, MonkeyFloppy)
+
+- **`ScummV4DiskSetDataSource`** (`Core/Scumm/V4`): one `IScummDataSource` over every disk of a v4 game (a resource is on the one disk that holds its room); all disks are assumed inserted (labelled). `ScummDataSources.For` returns it for the browsed multi-disk games.
+- **The boot** (`ScummGameSession`): the four-disk fixture boots in 2522 frames through rooms 90 (copy protection), 10 (credits), 38 (the opening), 96 (title music) to Room 33, where the player has control; unsupported list empty (display-only operations named). The protection is answered as labelled assumed input through the game's own input script: Enter, then the digits of the year the game's script derived (`var[0x10A]`, read, never written). The eight-disk Spanish release takes the same route (2534 frames).
+- **Engine work from ScummVM, each pinned:** `o5_actorOps` scale reads one value in version 4; `actorFollowCamera` on an actor in another room starts that room's scene (`setCameraFollows`; opt-in per profile so LOOM is identical); `PressKey` works in room 0; AdLib music timer from the disks' `AD` blocks (an estimate: the engine uses iMuse). `ScummProfile` carries the v4 engine variables (`VAR_HEAPSPACE`, `VAR_FIXEDDISK`, `VAR_DEBUGMODE`), 800 zeroed globals, the boot input plan and the "boot ends when the player has control" flag.
+- **Unchanged:** the registry; LOOM results (`Loom*`: 841 tests, 836 passed, 5 skipped, as before; whole project 983, 978 passed, 5 skipped). Proposed requirements R-3.15, R-15.7, R-15.8. Record: [monkey1-session-20261014](../.verification/monkey1-session-20261014/README.md); tracker: [monkey1/SUPPORT_STATUS.md](monkey1/SUPPORT_STATUS.md); facts: [script map](monkey1/MONKEY1_SCRIPT_MAP.md), [boot sequence v4](engine/SCUMM_BOOT_SEQUENCE.md).
+
 ## 14 October: the generic session boots Indiana Jones and the Last Crusade EGA (S4b, Indy3Ega)
 
 - **`ScummGameSession`** (`Core/Scumm/Session`): one data-driven concrete session; `ScummProfile` now also gives the AdLib driver constants, three extra timers (variables 39 to 41) and the video mode. The English EGA fixture boots in 1341 frames through rooms 76, 79, 0, 6, 1, 92, 1 to Room 73 with nothing unsupported; the Room 92 copy-protection screen is answered as a labelled assumed input (a wrong answer, 12 times, the game's own rule then lets play go on).
