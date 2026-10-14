@@ -15,6 +15,9 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <summary>The game's resources live in a v4 archive (<c>DISK01.LEC</c>) instead of old-v3 <c>*.LFL</c> files.</summary>
     public bool UsesV4Archive => Version >= ScummVersion.V4;
 
+    /// <summary>The constants of the AdLib music driver (ScummVM <c>Player_AD</c>): LOOM's differ from every other game's.</summary>
+    public ScummAdlibTiming AdlibTiming { get; init; } = ScummAdlibTiming.Standard;
+
     public static ScummProfile For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -26,6 +29,9 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             : game.Version >= ScummVersion.V4 ? ScummScriptDialect.V4
             : game.Id == GameId.IndianaJones3 ? ScummScriptDialect.V3Indy3
             : ScummScriptDialect.V3;
-        return new ScummProfile(game.Version, dialect);
+        return new ScummProfile(game.Version, dialect)
+        {
+            AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard
+        };
     }
 }

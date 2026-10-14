@@ -4,6 +4,17 @@ using SCUMMexplorer.Core.Domain;
 namespace SCUMMexplorer.Core.Scumm;
 
 /// <summary>Renders old-bundle LOOM AdLib music and effects through an OPL chip emulator.</summary>
+/// <summary>
+/// The constants of ScummVM's <c>Player_AD</c> that differ between games (<c>player_ad.cpp</c>, <c>startMusic</c> and <c>updateMusic</c>):
+/// LOOM's timer limit is 473, its tempo byte counts double and its event delays are shifted right by 2; every other game it plays
+/// (Indiana Jones and the Last Crusade, Monkey Island) uses 256, a plain tempo byte and a shift of 1.
+/// </summary>
+public sealed record ScummAdlibTiming(int TimerLimit, int TempoMultiplier, int DelayShift)
+{
+    public static readonly ScummAdlibTiming Loom = new(473, 2, 2);
+    public static readonly ScummAdlibTiming Standard = new(256, 1, 1);
+}
+
 public sealed partial class ScummAdlibAudio
 {
     private const int SampleRate = 49716;
@@ -52,15 +63,50 @@ public sealed partial class ScummAdlibAudio
         }
     }
 
+    /// <summary>
+    /// The lifetime as <c>Player_AD</c> (ScummVM) runs it with the given driver constants, with the music timer's markers: the game's
+    /// <c>VAR_MUSIC_TIMER</c> is <c>getMusicTimer() * timerFrequency / 240</c> (<c>Sound::updateMusicTimer</c>; 236.7 Hz for these games), the engine timer
+    /// going up once every 121 timer steps. Markers are in 240 Hz ticks, as <see cref="ScummSoundClock.MusicTimer"/> counts.
+    /// Effects have none.
+    /// </summary>
+    public ScummSoundLifetime ReadLifetime(GameResource resource, ScummAdlibTiming timing)
+    {
+        try
+        {
+            var data = ReadTrack(resource);
+            var lifetime = ReadDataLifetime(data, false, timing);
+            if (data.Length < 3 || data[2] != 0x80) return lifetime;
+            var limit = lifetime.Kind == ScummSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxMarkerSeconds;
+            var player = new MusicPlayer(data, false, timing);
+            var markers = new List<long>();
+            for (var callbacks = 1; callbacks <= limit && player.Active; callbacks++)
+            {
+                player.Tick();
+                if ((int)(player.EngineMusicTimer * DosTimerFrequency / 240.0) >= markers.Count + 1) markers.Add(callbacks * 240L / CallbackRate);
+            }
+            // Player_AD does not reset its timer when a song stops (only startMusic does).
+            return lifetime with { MarkerTicks = markers.ToArray(), KeepsMusicTimer = true };
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
+    }
+
+    private const int MaxMarkerSeconds = 600;
+
+    /// <summary>ScummVM's <c>_timerFrequency</c> for a DOS game of version 2 to 4 (<c>setTimerAndShakeFrequency</c>): the PIT's 1193182 Hz over 5041.</summary>
+    private const double DosTimerFrequency = 1193182.0 / 5041.0;
+
     /// <summary>The same for AdLib data given directly (the part after the resource header; the CD game's <c>AD</c> block body).</summary>
-    public ScummSoundLifetime ReadDataLifetime(byte[] data, bool halfTempo = false)
+    public ScummSoundLifetime ReadDataLifetime(byte[] data, bool halfTempo = false, ScummAdlibTiming? timing = null)
     {
         try
         {
             if (data.Length < 3) throw new InvalidDataException("The AdLib resource is too short.");
             if (data[2] == 0x80)
             {
-                var player = new MusicPlayer(data, halfTempo);
+                var player = new MusicPlayer(data, halfTempo, timing);
                 for (var callbacks = 1; callbacks <= CallbackRate * MaxLifetimeSeconds; callbacks++)
                 {
                     player.Tick();
@@ -251,8 +297,15 @@ public sealed partial class ScummAdlibAudio
         public int LoopBoundaries { get; private set; }
         public bool LoopBoundaryReached => LoopBoundaries != 0;
 
-        public MusicPlayer(byte[] data, bool halfTempo = false)
+        private readonly ScummAdlibTiming _timing;
+        private int _internalTimer;
+
+        /// <summary>Player_AD's <c>_engineMusicTimer</c>: what <c>getMusicTimer</c> reports (the game's variable sees a quarter of it).</summary>
+        public int EngineMusicTimer { get; private set; }
+
+        public MusicPlayer(byte[] data, bool halfTempo = false, ScummAdlibTiming? timing = null)
         {
+            _timing = timing ?? ScummAdlibTiming.Loom;
             Chip = new NukedOplChip(SampleRate);
             _data = data;
             Write(0x01, 0x20);
@@ -270,7 +323,7 @@ public sealed partial class ScummAdlibAudio
             _voiceCount = _rhythm == 0 ? 9 : 6;
             Write(0xbd, _rhythm);
             _halfTempo = halfTempo;
-            _ticks = halfTempo ? data[3] : data[3] * 2;
+            _ticks = halfTempo ? data[3] : data[3] * _timing.TempoMultiplier;
             if (_ticks == 0) throw new InvalidDataException("AdLib music has zero tempo.");
             _loop = data[4] == 0;
             _loopStart = _position + BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(5, 2));
@@ -279,8 +332,9 @@ public sealed partial class ScummAdlibAudio
         public void Tick()
         {
             _timer += _ticks;
-            if (_timer < 473) return;
-            _timer -= 473;
+            if (_timer < _timing.TimerLimit) return;
+            _timer -= _timing.TimerLimit;
+            if (++_internalTimer > 120) { _internalTimer = 0; EngineMusicTimer++; }
             if (--_nextEvent > 0) return;
             for (var commands = 0; commands < 256 && Active; commands++)
             {
@@ -340,7 +394,7 @@ public sealed partial class ScummAdlibAudio
                 if (_data[_position] == 0) { _position++; continue; }
                 var delay = Read(_position++);
                 if ((delay & 0x80) != 0) delay = ((delay & 0x7f) << 7) | Read(_position++);
-                _nextEvent = Math.Max(1, delay >> 2);
+                _nextEvent = Math.Max(1, delay >> _timing.DelayShift);
                 return;
             }
             if (Active) throw new InvalidDataException("AdLib music has too many simultaneous commands.");
