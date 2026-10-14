@@ -1,4 +1,4 @@
-# Indiana Jones and the Last Crusade script map
+﻿# Indiana Jones and the Last Crusade script map
 
 This map records **Indy3-specific** script roles, variable meanings, verb ids and room behaviour. Engine-defined variables and opcode rules are in the [SCUMM script reference](../engine/SCUMM_SCRIPT_MAP.md); the engine's boot sequence is in [SCUMM_BOOT_SEQUENCE.md](../engine/SCUMM_BOOT_SEQUENCE.md).
 
@@ -36,7 +36,7 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | Name | Meaning | Evidence | Source | Date |
 |---|---|---|---|---|
 | `var[0x039]` | "scene part finished" flag: set by the opening's room scripts, by the answering script of Room 92 and by Room 73's scene; script 1 waits on it | decoded | Room 76 local script 201 +0x00D2; Room 92 local script 204 +0x009F, +0x00B4; Script 1 +0x01E7 | 2026-10-14 |
-| `bit[0x5E4]` | the copy-protection check failed ("I'm disappointed in you!" instead of "Good work, Indy!") | decoded | Room 92 local script 204 +0x0022; Script 1 +0x04E1 | 2026-10-14 |
+| `bit[0x5E4]` | the copy-protection check failed ("I'm disappointed in you!" instead of "Good work, Indy!"); 0 on the explorer's correct-answer route (S5) | decoded | Room 92 local script 204 +0x0022; Script 1 +0x04E1 | 2026-10-14 |
 | `var[0x063..0x066]` | the four correct code-wheel answers of Room 92, computed from three random numbers | decoded | Room 92 local script 205 | 2026-10-14 |
 | `var[0x067..0x069]` | the three random numbers (section, row, column picks) | decoded | Room 92 local script 201 +0x002C | 2026-10-14 |
 | `var[0x06A]`, `var[0x06B]` | question number 1 to 4 and count of failed rounds (3 lets play go on) | decoded | Room 92 local script 204 +0x007F, +0x008E, +0x0098 | 2026-10-14 |
@@ -54,7 +54,7 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | 12 | inventory script: lists up to six inventory objects as verbs 0x65 to 0x6A, scroll verbs 0x6B and 0x6C | decoded | Script 12 | 2026-10-14 |
 | 17 | background loop of random numbers | decoded | Script 17 | 2026-10-14 |
 | 22, 23 | cutscene start (freezes scripts) and end (restores verbs saved as id 2, empties the sentence stack, unfreezes) | decoded | Script 23 +0x0000 to +0x0025 | 2026-10-14 |
-| 73 | scene with two men (actors 10 and 11) walking to the ego in Room 6 ("Dr. Jones, come with us"); started by Room 6's entry while script 1 runs | decoded | Script 73; Room 06 entry +0x0021 | 2026-10-14 |
+| 73 | the Donovan scene: two men (actors 10 and 11) come for the ego in Room 6 ("Dr. Jones, come with us"), then Room 9 with Donovan. Started by Room 6's entry (`ifState 0x7C 0`) only when script 1 is **not** running, so not during the boot; **not pending after the boot** (S5; S4b started it by a session bug) | decoded | Script 73; Room 06 entry +0x0008 to +0x0021 | 2026-10-14 |
 | 118 | start-up: `pseudoRoom`, resource loading, sets the cutscene hooks | decoded | Script 118 | 2026-10-14 |
 | 119 | the script script 1 chains to at the end of the boot | decoded | Script 1 +0x05BC | 2026-10-14 |
 
@@ -65,9 +65,9 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | 76 | opening: entry starts object 842 verb 0xFA and script 201 (local) if `var[0x039]` is 0; local 201 starts sound 35 and ten timed scripts | decoded | Room 76 entry +0x0013; Room 76 local script 201 | 2026-10-14 |
 | 79 | opening credits scrolling over three screens (text "TM & ... 1989 Lucasfilm Ltd."), timed by the music timer; local 205 moves actor 1 across | decoded | Room 79 local script 200 +0x0047; local script 205 | 2026-10-14 |
 | 0 | "no room" (ScummVM room 0): used to clear the screen between scenes | engine | Script 1 +0x0219 | 2026-10-14 |
-| 6 | verb names "To Henry's House", "To the Plane to Venice", "Cancel" (saved as verb set 6); title card "Barnett College, New York, 1938" | decoded | Room 06 entry +0x0035; Script 1 +0x0257 | 2026-10-14 |
+| 6 | exterior of Barnett College; entry starts Script 73 and changes the ego's costume only while script 1 is not running (`isScriptRunning 1`); verb names "To Henry's House", "To the Plane to Venice", "Cancel" (saved as verb set 6); title card "Barnett College, New York, 1938" | decoded | Room 06 entry +0x0035; Script 1 +0x0257 | 2026-10-14 |
 | 1 | dialogue with Marcus ("Hello Marcus!") before the copy-protection screen | decoded | Script 1 +0x02F0 | 2026-10-14 |
-| 92 | copy-protection screen: local 201 draws random symbols, 203 prints "Check Section ..., Row ..., Column ...", 204 checks answers, 205 computes them; answer objects 932 and up (verb 0xFF) start 204 | decoded | Room 92 local scripts 201 to 205; object verbs | 2026-10-14 |
+| 92 | copy-protection screen: the first click on the full-screen object 929 (fallback verb) starts local 201, which picks the three random numbers and starts 205 (computes `var[0x063..0x066]`) and 203 (prints "Check Section ..., Row ..., Column ..."); local 204 checks each answer with `isEqual var[0x06A], n` then `isNotEqual var[0x062+n], local[0x000]`; the twelve answer objects 932 to 943 (fallback verb) start 204 with their number 0 to 11 in local 0; after four right answers `var[0x039]` = 1 and `bit[0x5E4]` stays 0 | decoded | Room 92 object 929 verb fallback +0x0013; local scripts 201 to 205; objects 932 to 943 | 2026-10-14 |
 | 73 | first playable room (a gym with a ring, two boxers and Indy); local scripts 200 to 204 | decoded | Script 1 +0x0564; Room 73 | 2026-10-14 |
 
 ## Verbs and the input chain
@@ -94,7 +94,7 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 
 | Actor / costume | Meaning (look, palette, talk colour, who wears what) | Evidence | Source | Date |
 |---|---|---|---|---|
-| Actor 1 | the ego; costume 0x2B in Room 6, 0x01 in Room 1, 39 in Room 73 | decoded | Room 06 entry +0x0011; Script 1 +0x0591; boot run | 2026-10-14 |
+| Actor 1 | the ego; costume 0x01 in Room 1 and in Room 73 at the end of the boot. Room 6's entry gives costume 0x2B only when script 1 is not running (so not during the boot). Room 73's local script 203 keeps costume 1 (walks in) and gives other costumes 0x0E, 0x3C, 0x27 on its other branch | decoded | Room 06 entry +0x0011; Room 73 local script 203 +0x0012; boot run (S5 corrected S4b's costume 39) | 2026-10-14 |
 | Actors 10, 11 | the two men of script 73, costume 0x2B | decoded | Script 73 +0x0000, +0x0012 | 2026-10-14 |
 | Actor 4 | Marcus in Room 1 | decoded | Script 1 +0x02DD | 2026-10-14 |
 
@@ -105,9 +105,20 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | 35 (0x23) | opening music (AdLib part); the opening ends only once its music timer has passed 105 (0x69) | decoded | Room 76 local script 201 +0x0023; Script 1 +0x01CD | 2026-10-14 |
 | 30 | effect started by Room 92's answering script, ends before the next answer | decoded | Room 92 local script 204 +0x0005 | 2026-10-14 |
 
+## First-visit facts (S5)
+
+| Item | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| Room 92, the player's route | the explorer's boot clicks object 929 once and answers the four questions with the values the game computed (`var[0x063..0x066]`), derived from the answering script's own checks; labelled "Player input assumed" and "Player answer assumed" | decoded | Room 92 object 929 +0x0013; local script 204 +0x002E, +0x0044, +0x005A, +0x0070 | 2026-10-14 |
+| `var[0x009]` (current lights) | starts 11 (base palette, room lights, actors' own colours); `lights a, b, 0` sets it. Eight `lights` instructions exist; three rooms start dark in the explorer's visit (47, 60, 66) | decoded | Script 5 +0x0000; room audit | 2026-10-14 |
+| `roomColorLegacy` | 64 instructions set the room's colour table slot by slot (EGA palette changes by room entry scripts, e.g. Room 4 entry +0x0007, Room 92 entry +0x0007 for CGA) | decoded | Room 04 entry +0x0007; Room 92 entry +0x0007 | 2026-10-14 |
+| Rooms whose first visit never rests | rooms 1, 6, 15, 20, 28, 32, 39, 44, 47, 60, 66, 79, 80, 83, 84, 94 keep changing within 2400 frames (ambient or long scenes); the state at the limit is shown | decoded | room audit (`.verification/indy3-objects-20261014`) | 2026-10-14 |
+| Rooms a script leaves | rooms 37, 41, 43, 82 load another room during the visit; the state at the last frame in the room is shown | decoded | room audit | 2026-10-14 |
+
 ## Open questions
 
-- Script 73 is started by Room 6's entry while script 1 runs and is still pending at the end of the boot (waiting at +0x00A3 for actor 1 to come near actor 10, which stays in Room 6). Whether the game behaves so, and what the player sees, needs the S5 comparison with the bundled ScummVM.
 - Who sets the hook values at Room 73 (entry 5 and 6, exit 7, input 4).
 - The meaning of the object classes the sentence script tests.
-- Display-only operations the boot reports as not applied: `roomOps`, `oldRoomEffect`, `resourceRoutines`, `stringOps`, `lights` (what they change on screen is S5).
+- Script 23 (cutscene end) follows the ego with `actorFollowCamera` and, with the ego in another room, ScummVM's `setCameraFollows` loads that room; the session does not model that load (Rooms 18, 78, 80 in the explorer's visit).
+- Rooms 20, 28 and 32 show a mostly black picture in the explorer's visit (the picture of ScummVM was not compared at runtime); their ambient scripts never rest.
+- Script 131 (+0x0038) starts script 132 with arguments from unknown variables in Rooms 12, 13 and 77; Room 03 entry +0x006F starts local script 200 the same way; Room 33's entry depends on `bit[0x1517]`: the story state the visit does not have.

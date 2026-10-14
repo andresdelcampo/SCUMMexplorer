@@ -13,6 +13,15 @@ The image directory is an asset directory. Geometry or image order cannot establ
 - Display gap filling and provisional artwork do not assign persistent game state. Costumes persist until source changes them. No room-specific renderer preset, fabricated story flag or geometry-derived story transition is justified.
 - A verified first visit means the settled state reached through the earliest normal game route. Catalog arrivals, direct verbs, explicit staff/note edits and seeded choices remain preview assumptions. Current bounded coverage does not prove every native input route, actor picture or audiovisual detail.
 
+## First visit of a room without LOOM's session (old bundle, S5, 14 October 2026)
+
+For a game with no game-specific session (Indiana Jones and the Last Crusade EGA) the first visit of a room is built by the generic session (`ScummRoomFirstVisit`):
+
+- **Route.** The first playable room is the boot's own state. Any other room is entered **without playing the route to it** (ScummVM's debugger `room N` does the same: `startScene`), from the state the boot left, with the ego brought in as one decoded `loadRoomWithEgo` into the room would bring it (a seeded, labelled pick among the distinct placements, those found in the previous room's own code first). Nothing is written to the story state; the visit is a state preview, never a reached outcome.
+- **Settled.** After the entry hooks, the entry script and the child scripts have started, frames are played until nothing has changed for 90 frames (no cutscene, message or movement, and no change in object states, positions, actors' rooms and positions, costumes, palettes or the camera), or until a script leaves the room (the state at the last frame in the room is kept), or a limit of 2400 frames. An object whose state or position changes four times within 240 frames is an **ambient animator** (a crowd, a flame): it does not keep the room from settling and is shown in the phase of its loop the room was in when the rest began. A room whose own scripts never rest within the limit says so (outcome "frame limit").
+- **No pixels are filled.** A gap that remains after a correct run means missing script behaviour, not a reason for a room-specific fill.
+- **Hotspots** follow `findObject` (`object.cpp`): an object is skipped when it is untouchable (class 24); its parent chain must be in the required states; its own state does not matter. The explorer also leaves out objects the room does not own and objects at 0, 0 (off the scene).
+
 ## Historical old-v3 format evidence
 
 The following byte offsets, object IDs and counts belong to the supplied Spanish EGA audits of 27 September. They remain source evidence for that edition, not a fresh English/VGA inventory.

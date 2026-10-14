@@ -1,0 +1,628 @@
+Before S5 (index states only): rooms with a gap 1, gaps 1
+Rooms: 88; rooms without a gap: 88; rooms with remaining gaps: 0 (0 gaps); rooms that could not run: 0
+
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 01 (38 images, 43 objects) outcome=FrameLimit frames=2400 lit=True 9,1s
+   Room 01 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 11; paint order: 45,49,62,33,37,52,38,57,48,58,30
+   actors drawn: 4(costume 6 at 492,106), 1(costume 1 at 945,124); skipped: 
+   pending scripts: 13; camera 800; lights 11
+   before S5 (index states only): 0 gaps, 2 active images
+== Room 02 (6 images, 23 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 02 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 65,63
+   actors drawn: 1(costume 1 at 160,120); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 03 (28 images, 29 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 03 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 5 at 174,83); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   NOT FOLLOWED: Room 03 entry script +0x006F: started script 200 has arguments depending on unknown variables; the parent continues without its effects.
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 04 (2 images, 2 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 04 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 5 at 173,90), 1(costume 1 at 95,109); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 06 (6 images, 11 objects) outcome=FrameLimit frames=2400 lit=True 2,5s
+   Room 06 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 1; paint order: 127
+   actors drawn: 10(costume 43 at 477,101), 11(costume 43 at 356,114); skipped: 
+   pending scripts: 4; camera ; lights 11
+   NOT FOLLOWED: Script 73 +0x00F4: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 09, which would load that room (not modelled) (+0x011E)
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 07 (8 images, 25 objects) outcome=Settled frames=135 lit=True 1,4s
+   Room 07 was entered from the first room's state without playing the route to it (state preview), then ran 135 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 37,114); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 08 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 08 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 09 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 09 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 12 (1 images, 4 objects) outcome=Settled frames=189 lit=True 1,4s
+   Room 12 was entered from the first room's state without playing the route to it (state preview), then ran 189 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 42 at 150,166); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   NOT FOLLOWED: Script 131 +0x0038: started script 132 has arguments depending on unknown variables; the parent continues without its effects.
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 13 (7 images, 9 objects) outcome=Settled frames=102 lit=True 1,5s
+   Room 13 was entered from the first room's state without playing the route to it (state preview), then ran 102 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 2; camera 160; lights 11
+   NOT FOLLOWED: Script 131 +0x0038: started script 132 has arguments depending on unknown variables; the parent continues without its effects.
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 14 (11 images, 12 objects) outcome=Settled frames=90 lit=True 1,3s
+   Room 14 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 1 gaps, 0 active images
+== Room 15 (27 images, 29 objects) outcome=FrameLimit frames=2400 lit=True 3,8s
+   Room 15 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 8; paint order: 186,195,197,199,189,181,191,204
+   actors drawn: 1(costume 2 at 313,117), 10(costume 82 at 61,121); skipped: 
+   pending scripts: 10; camera 312; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 16 (7 images, 17 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 16 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 160,97), 10(costume 74 at 271,118); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 17 (17 images, 23 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 17 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 18 (17 images, 32 objects) outcome=Settled frames=122 lit=True 1,4s
+   Room 18 was entered from the first room's state without playing the route to it (state preview), then ran 122 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   NOT FOLLOWED: Script 23 +0x0000: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 73, which would load that room (not modelled) (+0x0022)
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 19 (0 images, 2 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 19 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 166,88); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 20 (16 images, 31 objects) outcome=FrameLimit frames=2400 lit=True 11,1s
+   Room 20 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 8; paint order: 295,294,293,292,290,289,288,283
+   actors drawn: 10(costume 28 at 79,20), 1(costume 20 at 144,74), 11(costume 28 at 98,162); skipped: 
+   pending scripts: 4; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 21 (3 images, 6 objects) outcome=Settled frames=90 lit=True 1,1s
+   Room 21 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 316
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 22 (0 images, 4 objects) outcome=Settled frames=187 lit=True 1,2s
+   Room 22 was entered from the first room's state without playing the route to it (state preview), then ran 187 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 30 at 100,112), 10(costume 8 at 68,112); skipped: 
+   pending scripts: 6; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 23 (18 images, 18 objects) outcome=Settled frames=90 lit=True 1,0s
+   Room 23 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 24 (20 images, 22 objects) outcome=Settled frames=90 lit=True 1,0s
+   Room 24 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 1 active images
+== Room 25 (9 images, 12 objects) outcome=Settled frames=90 lit=True 1,0s
+   Room 25 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 368
+   actors drawn: 1(costume 1 at 138,92); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 26 (29 images, 30 objects) outcome=Settled frames=122 lit=True 6,7s
+   Room 26 was entered from the first room's state without playing the route to it (state preview), then ran 122 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 379,384
+   actors drawn: 1(costume 1 at 171,96); skipped: 
+   pending scripts: 3; camera 168; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 27 (4 images, 5 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 27 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 174,116); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 28 (20 images, 39 objects) outcome=FrameLimit frames=2400 lit=True 12,0s
+   Room 28 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 10; paint order: 427,426,425,424,423,422,421,420,419,408
+   actors drawn: 1(costume 20 at 23,53), 11(costume 28 at 309,105), 10(costume 28 at 93,171); skipped: 
+   pending scripts: 4; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 29 (4 images, 15 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 29 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 667,49); skipped: 
+   pending scripts: 1; camera 520; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 30 (1 images, 3 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 30 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 462
+   actors drawn: 1(costume 1 at 200,118); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 31 (3 images, 5 objects) outcome=Settled frames=154 lit=True 1,4s
+   Room 31 was entered from the first room's state without playing the route to it (state preview), then ran 154 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 468
+   actors drawn: 1(costume 1 at 139,111), 8(costume 86 at 171,111); skipped: 
+   pending scripts: 7; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 32 (18 images, 30 objects) outcome=FrameLimit frames=2400 lit=True 11,5s
+   Room 32 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 9; paint order: 487,486,485,484,483,482,480,479,472
+   actors drawn: 1(costume 20 at 241,33), 10(costume 23 at 208,105), 12(costume 28 at 74,165); skipped: 
+   pending scripts: 4; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 33 (16 images, 16 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 33 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   NOT FOLLOWED: Room 33 entry script +0x0000: condition at +0x007A depends on bit[0x1517]; its paths may change object state
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 34 (3 images, 6 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 34 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 9(costume 77 at 92,115), 1(costume 1 at 400,118); skipped: 
+   pending scripts: 2; camera 272; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 35 (12 images, 14 objects) outcome=Settled frames=304 lit=True 1,5s
+   Room 35 was entered from the first room's state without playing the route to it (state preview), then ran 304 frames.
+   The room settled: nothing changed for a while.
+   active images: 5; paint order: 525,533,530,528,527
+   actors drawn: 11(costume 81 at 367,79), 10(costume 73 at 141,107), 1(costume 1 at 36,112), 2(costume 7 at 22,112); skipped: 
+   pending scripts: 8; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 36 (13 images, 15 objects) outcome=Settled frames=102 lit=True 1,4s
+   Room 36 was entered from the first room's state without playing the route to it (state preview), then ran 102 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 548,545,542
+   actors drawn: 1(costume 40 at 233,97), 11(costume 72 at 139,98), 10(costume 72 at 135,101); skipped: 
+   pending scripts: 4; camera 232; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 37 (21 images, 24 objects) outcome=RoomLeft frames=439 left to 36 lit=True 1,5s
+   Room 37 was entered from the first room's state without playing the route to it (state preview), then ran 439 frames.
+   A script left the room for Room 36: the room is shown as it was the last time it was current.
+   active images: 2; paint order: 561,557
+   actors drawn: ; skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 38 (6 images, 8 objects) outcome=Settled frames=118 lit=True 1,3s
+   Room 38 was entered from the first room's state without playing the route to it (state preview), then ran 118 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 576,580,579
+   actors drawn: 10(costume 75 at 92,72), 1(costume 1 at 631,114); skipped: 
+   pending scripts: 5; camera 480; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 39 (5 images, 9 objects) outcome=FrameLimit frames=2400 lit=True 1,9s
+   Room 39 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 12(costume 88 at 176,30), 1(costume 1 at 88,115), 10(costume 4 at 155,118); skipped: 
+   pending scripts: 4; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 40 (5 images, 5 objects) outcome=Settled frames=90 lit=True 1,1s
+   Room 40 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 7(costume 76 at 168,91), 1(costume 1 at 125,107); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 1 active images
+== Room 41 (1 images, 5 objects) outcome=RoomLeft frames=276 left to 42 lit=True 1,6s
+   Room 41 was entered from the first room's state without playing the route to it (state preview), then ran 276 frames.
+   A script left the room for Room 42: the room is shown as it was the last time it was current.
+   active images: 1; paint order: 597
+   actors drawn: 12(costume 29 at 407,18), 10(costume 29 at 42,21), 11(costume 29 at 475,21), 1(costume 21 at 42,21); skipped: 
+   pending scripts: 5; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 42 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 42 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 43 (0 images, 8 objects) outcome=RoomLeft frames=138 left to 42 lit=True 1,4s
+   Room 43 was entered from the first room's state without playing the route to it (state preview), then ran 138 frames.
+   A script left the room for Room 42: the room is shown as it was the last time it was current.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 21 at 661,23), 11(costume 29 at 164,23), 12(costume 29 at 653,23), 10(costume 29 at 785,91); skipped: 
+   pending scripts: 5; camera 632; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 44 (0 images, 5 objects) outcome=FrameLimit frames=2400 lit=True 3,0s
+   Room 44 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 21 at 149,52), 11(costume 29 at 201,57), 12(costume 29 at 369,108), 10(costume 29 at 462,133); skipped: 
+   pending scripts: 5; camera 168; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 45 (9 images, 9 objects) outcome=Settled frames=96 lit=True 1,1s
+   Room 45 was entered from the first room's state without playing the route to it (state preview), then ran 96 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 615,618,621
+   actors drawn: ; skipped: 
+   pending scripts: 7; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 46 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,0s
+   Room 46 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 47 (0 images, 16 objects) outcome=FrameLimit frames=2400 lit=False 1,9s
+   Room 47 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 83 at 666,17), 1(costume 26 at 907,18); skipped: 
+   pending scripts: 3; camera 800; lights 12
+   before S5 (index states only): 0 gaps, 3 active images
+== Room 48 (21 images, 22 objects) outcome=Settled frames=90 lit=True 6,6s
+   Room 48 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 653,649,645
+   actors drawn: 1(costume 1 at 203,106); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 49 (1 images, 3 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 49 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 63,64); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 50 (1 images, 4 objects) outcome=Settled frames=90 lit=True 1,6s
+   Room 50 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 139,90); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 51 (2 images, 4 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 51 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 38,93); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 52 (2 images, 4 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 52 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 280,93); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 2 active images
+== Room 53 (3 images, 5 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 53 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 681,680
+   actors drawn: 1(costume 1 at 113,106); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 54 (18 images, 20 objects) outcome=Settled frames=90 lit=True 1,3s
+   Room 54 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 250,112); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 55 (4 images, 7 objects) outcome=Settled frames=131 lit=True 1,4s
+   Room 55 was entered from the first room's state without playing the route to it (state preview), then ran 131 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 706
+   actors drawn: 1(costume 1 at 17,51); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 56 (0 images, 5 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 56 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 22,51); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 57 (1 images, 3 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 57 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 714
+   actors drawn: 1(costume 1 at 263,100); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 58 (5 images, 7 objects) outcome=Settled frames=90 lit=True 1,3s
+   Room 58 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 72,97); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 59 (0 images, 2 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 59 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 32,107); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 60 (0 images, 11 objects) outcome=FrameLimit frames=2400 lit=False 2,9s
+   Room 60 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 11(costume 83 at 520,55), 1(costume 26 at 664,65), 10(costume 83 at 708,170); skipped: 
+   pending scripts: 4; camera 664; lights 12
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 61 (20 images, 22 objects) outcome=Settled frames=98 lit=True 1,5s
+   Room 61 was entered from the first room's state without playing the route to it (state preview), then ran 98 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 739,747
+   actors drawn: 1(costume 1 at 66,93); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 62 (10 images, 16 objects) outcome=Settled frames=90 lit=True 1,3s
+   Room 62 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 45,88); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 63 (0 images, 2 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 63 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 2 at 238,93); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 64 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,3s
+   Room 64 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 66 (0 images, 2 objects) outcome=FrameLimit frames=2400 lit=False 2,7s
+   Room 66 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 11(costume 83 at 666,51), 10(costume 83 at 682,123), 12(costume 83 at 742,140), 1(costume 26 at 867,151); skipped: 
+   pending scripts: 4; camera 800; lights 12
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 67 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 67 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 68 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 68 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 69 (10 images, 10 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 69 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 5; paint order: 779,780,781,782,783
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 70 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 70 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 90 at 160,1), 8(costume 94 at 1000,1000), 11(costume 91 at 1000,1000); skipped: 
+   pending scripts: 3; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 71 (19 images, 21 objects) outcome=Settled frames=202 lit=True 6,8s
+   Room 71 was entered from the first room's state without playing the route to it (state preview), then ran 202 frames.
+   The room settled: nothing changed for a while.
+   active images: 7; paint order: 805,795,803,801,799,797,791
+   actors drawn: 1(costume 2 at 100,115), 2(costume 53 at 350,125); skipped: 
+   pending scripts: 10; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 72 (15 images, 15 objects) outcome=Settled frames=164 lit=True 1,6s
+   Room 72 was entered from the first room's state without playing the route to it (state preview), then ran 164 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 822,818,819
+   actors drawn: 10(costume 95 at 0,0), 1(costume 1 at 293,108), 11(costume 79 at 325,108), 2(costume 57 at 216,116); skipped: 
+   pending scripts: 5; camera 320; lights 11
+   before S5 (index states only): 0 gaps, 1 active images
+== Room 73 (9 images, 14 objects) outcome=Settled frames=587 lit=True 1,9s
+   Room 73 is the first room of the game: the boot's own state after 587 more frames.
+   The room settled: nothing changed for a while.
+   active images: 4; paint order: 830,832,828,826
+   actors drawn: 1(costume 1 at 119,83), 9(costume 38 at 256,86); skipped: 
+   pending scripts: 5; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 74 (0 images, 0 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 74 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 75 (4 images, 4 objects) outcome=Settled frames=90 lit=True 1,6s
+   Room 75 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 839
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 76 (1 images, 3 objects) outcome=Settled frames=90 lit=True 1,5s
+   Room 76 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 844
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 77 (3 images, 6 objects) outcome=Settled frames=102 lit=True 1,5s
+   Room 77 was entered from the first room's state without playing the route to it (state preview), then ran 102 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 848,850
+   actors drawn: 1(costume 1 at 165,65); skipped: 
+   pending scripts: 2; camera 224; lights 11
+   NOT FOLLOWED: Script 131 +0x0038: started script 132 has arguments depending on unknown variables; the parent continues without its effects.
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 78 (0 images, 0 objects) outcome=Settled frames=265 lit=True 1,5s
+   Room 78 was entered from the first room's state without playing the route to it (state preview), then ran 265 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   NOT FOLLOWED: Script 23 +0x0000: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 73, which would load that room (not modelled) (+0x0022)
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 79 (7 images, 7 objects) outcome=FrameLimit frames=2400 lit=True 3,9s
+   Room 79 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 2; paint order: 851,852
+   actors drawn: 1(costume 59 at 1145,19), 9(costume 99 at 1370,136); skipped: 
+   pending scripts: 4; camera 1120; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 80 (0 images, 0 objects) outcome=FrameLimit frames=2400 lit=True 2,6s
+   Room 80 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 93 at 206,291); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   NOT FOLLOWED: Script 23 +0x0000: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 70, which would load that room (not modelled) (+0x0022)
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 81 (0 images, 3 objects) outcome=Settled frames=405 lit=True 1,6s
+   Room 81 was entered from the first room's state without playing the route to it (state preview), then ran 405 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 2 at 140,108), 4(costume 15 at 30,110); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 82 (12 images, 15 objects) outcome=RoomLeft frames=59 left to 94 lit=True 1,4s
+   Room 82 was entered from the first room's state without playing the route to it (state preview), then ran 59 frames.
+   A script left the room for Room 94: the room is shown as it was the last time it was current.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 2 at 138,111); skipped: 
+   pending scripts: 3; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 83 (0 images, 3 objects) outcome=FrameLimit frames=2400 lit=True 2,5s
+   Room 83 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 40,119); skipped: 
+   pending scripts: 3; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 84 (0 images, 0 objects) outcome=FrameLimit frames=2400 lit=True 2,1s
+   Room 84 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 65 at 132,108); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 85 (0 images, 2 objects) outcome=Settled frames=97 lit=True 1,4s
+   Room 85 was entered from the first room's state without playing the route to it (state preview), then ran 97 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 45,94); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 86 (16 images, 18 objects) outcome=Settled frames=96 lit=True 1,5s
+   Room 86 was entered from the first room's state without playing the route to it (state preview), then ran 96 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 882,885
+   actors drawn: 1(costume 1 at 522,90), 10(costume 84 at 192,110); skipped: 
+   pending scripts: 4; camera 480; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 87 (14 images, 14 objects) outcome=Settled frames=131 lit=True 1,5s
+   Room 87 was entered from the first room's state without playing the route to it (state preview), then ran 131 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 906,909,912
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 90 (12 images, 12 objects) outcome=Settled frames=92 lit=True 1,4s
+   Room 90 was entered from the first room's state without playing the route to it (state preview), then ran 92 frames.
+   The room settled: nothing changed for a while.
+   active images: 6; paint order: 915,917,921,913,920,922
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 91 (0 images, 4 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 91 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 160,100); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 1 active images
+== Room 92 (3 images, 15 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 92 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 930,929
+   actors drawn: ; skipped: 
+   pending scripts: 2; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 93 (0 images, 2 objects) outcome=Settled frames=90 lit=True 1,4s
+   Room 93 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 71 at 136,101); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   before S5 (index states only): 0 gaps, 0 active images
+== Room 94 (0 images, 1 objects) outcome=FrameLimit frames=2400 lit=True 2,1s
+   Room 94 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 4; camera 160; lights 11

@@ -47,6 +47,15 @@ The v4 contract additionally defines `VAR_SCROLL_SCRIPT` (`0x01B`), `VAR_DEBUGMO
 
 Sources: ScummVM [v3](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v3.cpp), [v4](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v4.cpp), shared [v5 handlers](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v5.cpp), [scheduling](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script.cpp) and [input](https://github.com/scummvm/scummvm/blob/master/engines/scumm/input.cpp). An `o5_` handler name alone does not establish v5-only behavior.
 
+## Display operations of the old bundle (v3, S5, ScummVM `script_v5.cpp`, `gfx.cpp`, `room.cpp`, read 14 October 2026)
+
+- **`roomOps` sub-opcode 2 (`roomColorLegacy a, b`, small-header games):** `_roomPalette[b] = a`. Every pixel of the room picture and of its objects is drawn through `_roomPalette`; a full redraw follows, so the change colours the whole room picture. Actors are not drawn through it. The table is the identity at every room load (`startScene`).
+- **`roomOps` sub-opcode 4 (`roomPalette a, b`):** `_shadowPalette[b] = a`, applied when the screen is shown (the opening's title fade). Also reset at room load.
+- **`roomOps` 3 (`setScreen`), 5/6 (`shakeOn`/`shakeOff`), `oldRoomEffect` (`switchEffect`):** screen geometry, shaking and a transition effect; nothing of them stays in the room picture.
+- **`lights a, b, c`:** `c = 0` sets `VAR_CURRENT_LIGHTS` (variable 9 in v3 to v5) to `a`; `c = 1` sets the flashlight's size in strips (`a` by `b`). Bits of `VAR_CURRENT_LIGHTS`: 0 actors use the base palette, 1 room lights on, 2 flashlight on, 3 actors use their own colours. With the room lights off the game draws the room dark except under the flashlight (`scummLoop_handleActors`). The engine starts the variable at 1 | 2 | 8 (`resetScummVars`).
+- **`stringOps` (`loadString`, `copyString`, `setStringChar`, `getStringChar`, `createString`):** the game's string resources; `getStringChar`/`setStringChar` read and write a byte (a write a few bytes past the end is allowed by the safety area, the rest denied).
+- **`resourceRoutines`:** loads, locks and unlocks resources; nothing visible.
+
 ## Verb slots and drawing (v3/v4 small-header path)
 
 `verbOps` updates engine verb slots. Object-verb code is a separate dispatch table. Neither gives a verb ID a universal gameplay meaning.

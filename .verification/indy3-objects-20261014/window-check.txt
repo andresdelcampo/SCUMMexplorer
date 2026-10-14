@@ -1,0 +1,5 @@
+Room 73: first-visit scene present; Normal-mode note: ""
+   Advanced-mode note: "Room 73 is the first room of the game: the boot's own state after 587 more frames. The room settled: nothing changed for a while. Random values the scripts asked for were picked by the explorer (1812 seeded picks)."
+Room 28: first-visit scene present; Normal-mode note: ""
+   Advanced-mode note: "Room 28 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames. The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown. Random values the scripts asked for were picked by the explorer (1642 seeded picks)."
+Room cards with a picture: 11 of 88

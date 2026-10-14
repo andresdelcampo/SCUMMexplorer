@@ -16,6 +16,8 @@ var rooms = game.Rooms.Where(r => r.ResourceId.HasValue && (only.Count == 0 || o
 var lines = new ConcurrentDictionary<int, (string Report, string Row, int Gaps, bool Failed)>();
 string[] unsupported = ["not modeled", "could not", "disassembly stops", "undecoded", "cannot", "needs a session", "unknown", "depends on"];
 
+var totalBefore = 0;
+var roomsBefore = 0;
 Parallel.ForEach(rooms, new ParallelOptions { MaxDegreeOfParallelism = 4 }, id =>
 {
     var watch = Stopwatch.StartNew();
@@ -25,6 +27,12 @@ Parallel.ForEach(rooms, new ParallelOptions { MaxDegreeOfParallelism = 4 }, id =
         var scene = ScummRoomFirstVisit.Run(game, id);
         var snapshot = scene.Snapshot;
         var gaps = scene.Gaps();
+        // Before S5: the view painted the objects of the index states only (no script run).
+        var indexOnly = new RoomObjectSelection(scene.Images, scene.IndexedStates, new Dictionary<int, RoomObjectPosition>(), scene.Records, scene.Room, scene.IndexedStates, []);
+        var gapsBefore = indexOnly.VisibleGaps().Count;
+        Interlocked.Add(ref totalBefore, gapsBefore);
+        if (gapsBefore > 0) Interlocked.Increment(ref roomsBefore);
+        report.AppendLine($"   before S5 (index states only): {indexOnly.VisibleGaps().Count} gaps, {scene.Images.Count(indexOnly.IsActive)} active images");
         var active = scene.Images.Count(scene.Selection.IsActive);
         var layer = scene.ActorLayer();
         var notFollowed = snapshot.Uncertainties.Where(item => unsupported.Any(item.Contains) && !item.Contains("seeded pick")).Distinct().ToArray();
@@ -47,7 +55,7 @@ Parallel.ForEach(rooms, new ParallelOptions { MaxDegreeOfParallelism = 4 }, id =
 var totalGaps = lines.Values.Sum(item => item.Gaps);
 var roomsWithGaps = lines.Values.Count(item => item.Gaps > 0);
 var failed = lines.Values.Count(item => item.Failed);
-var head = $"Rooms: {rooms.Length}; rooms without a gap: {rooms.Length - roomsWithGaps - failed}; rooms with remaining gaps: {roomsWithGaps} ({totalGaps} gaps); rooms that could not run: {failed}\n\n";
+var head = $"Before S5 (index states only): rooms with a gap {roomsBefore}, gaps {totalBefore}\nRooms: {rooms.Length}; rooms without a gap: {rooms.Length - roomsWithGaps - failed}; rooms with remaining gaps: {roomsWithGaps} ({totalGaps} gaps); rooms that could not run: {failed}\n\n";
 File.WriteAllText(Path.Combine(output, "room-audit.txt"), head + string.Concat(rooms.Select(id => lines[id].Report)));
 File.WriteAllText(Path.Combine(output, "room-audit.tsv"), "room\toutcome\tframes\tactive/images\tgaps\tactors\tnotFollowed\tlit\tseconds\n" + string.Join("\n", rooms.Select(id => lines[id].Row)) + "\n");
 Console.WriteLine(head.Trim());
