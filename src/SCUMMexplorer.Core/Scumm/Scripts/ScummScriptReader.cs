@@ -857,7 +857,10 @@ internal static partial class ScummScriptDisassembler
                 0x0D => Join("actorName", ReadScummString(cursor)),
                 0x0E => Join("initAnimation", ReadParam(cursor, 1, sub, 0x80)),
                 0x10 => Join("width", ReadParam(cursor, 1, sub, 0x80)),
-                0x11 => Join("scale", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
+                // o5_actorOps case 17 (script_v5.cpp, read 14 October 2026): version 4 reads one value and uses it for both scales; later versions read two.
+                0x11 => cursor.Dialect == ScummScriptDialect.V4
+                    ? Join("scale", ReadParam(cursor, 1, sub, 0x80))
+                    : Join("scale", ReadParam(cursor, 1, sub, 0x80), ReadParam(cursor, 1, sub, 0x40)),
                 0x12 => "neverZClip",
                 0x13 => Join("alwaysZClip", ReadParam(cursor, 1, sub, 0x80)),
                 0x14 => "ignoreBoxes",
