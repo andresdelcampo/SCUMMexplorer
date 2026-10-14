@@ -14,7 +14,10 @@ public abstract partial class ScummSession
     protected const string TimerNextVariable = ScummVars.TimerNext;
 
     /// <summary>ScummVM v3 <c>VAR_TMR_1</c>..<c>VAR_TMR_3</c> (vars 11–13): jiffies the frame loop adds every frame.</summary>
-    protected static readonly string[] EngineTimerVariables = [ScummVars.Timer1, ScummVars.Timer2, ScummVars.Timer3];
+    protected IEnumerable<string> EngineTimerVariables => [ScummVars.Timer1, ScummVars.Timer2, ScummVars.Timer3, .. _extraTimerVariables];
+
+    // The timers some games have besides these (ScummProfile.ExtraTimerVariables); scummLoop adds the frame's jiffies to them too.
+    private readonly IReadOnlyList<string> _extraTimerVariables = [];
 
     /// <summary>ScummVM v3 <c>VAR_TIMER</c> (var 46): the jiffies of the last frame.</summary>
     protected const string TimerVariable = ScummVars.Timer;
@@ -107,6 +110,8 @@ public abstract partial class ScummSession
                     item.EstimatedLocals, item.PathEstimated, item.Frame);
                 DispatchRequestedLoads("after a frame advance");
             }
+            // checkAndRunSentenceScript follows runAllScripts and the input check in scummLoop.
+            if (RunSentenceScript()) DispatchRequestedLoads("after a frame advance");
         }
         finally
         {
@@ -127,6 +132,29 @@ public abstract partial class ScummSession
         }
         EnterReachedLoad(roomLoad, target, null, "after a frame advance");
         return Snapshot;
+    }
+
+    /// <summary>
+    /// ScummVM <c>checkAndRunSentenceScript</c>: unless a copy of the sentence script (<c>VAR_SENTENCE_SCRIPT</c>) is running and not frozen,
+    /// the last sentence <c>doSentence</c> queued is taken off the stack and the sentence script runs with its verb and two objects as
+    /// locals 0 to 2 (as a script of no room: <c>_currentScript = 0xFF</c>). Returns true when it ran one.
+    /// </summary>
+    protected bool RunSentenceScript()
+    {
+        if (_runtime.Sentences.Count == 0) return false;
+        var number = _runtime.GlobalVariables.GetValueOrDefault(ScummVars.SentenceScript);
+        if (number != 0 && (_executing.Any(frame => frame.Number == number && !frame.Stopped && frame.FreezeCount == 0) ||
+                            _pending.Any(item => item.ScriptNumber == number && !item.Frame.Stopped && item.Frame.FreezeCount == 0)))
+            return false;
+        var (verb, objectA, objectB) = _runtime.Sentences[^1];
+        _runtime.Sentences.RemoveAt(_runtime.Sentences.Count - 1);
+        if (number == 0) return false;
+        _visitTrace.Add($"sentence script {number} runs verb 0x{verb:X2} with objects {objectA} and {objectB}");
+        RunStartedScript(number, 0, new Dictionary<string, ushort>
+        {
+            ["local[0x000]"] = (ushort)verb, ["local[0x001]"] = (ushort)objectA, ["local[0x002]"] = (ushort)objectB
+        }, 0);
+        return true;
     }
 
     /// <summary>
@@ -231,10 +259,11 @@ public abstract partial class ScummSession
             if (item is null) continue;
             _pending.Remove(item);
             _dispatchedLoads.Add(request.Event);
-            var target = _game.Rooms.First(room => room.ResourceId == request.Event.TargetId);
-            EnterReachedLoad(request.Event, target, request.Frame, when);
+            var target = request.Event.TargetId == NullRoom ? null : _game.Rooms.First(room => room.ResourceId == request.Event.TargetId);
+            if (target is null) EnterNullRoom(request.Event, when);
+            else EnterReachedLoad(request.Event, target, request.Frame, when);
             entered = true;
-            _visitTrace.Add($"{request.Event.SourceLabel} continues at +0x{item.Offset:X4} in Room {target.ResourceId:00} after {request.Event.Operation}");
+            _visitTrace.Add($"{request.Event.SourceLabel} continues at +0x{item.Offset:X4} in Room {target?.ResourceId ?? NullRoom:00} after {request.Event.Operation}");
             _dispatchScope++;
             try
             {

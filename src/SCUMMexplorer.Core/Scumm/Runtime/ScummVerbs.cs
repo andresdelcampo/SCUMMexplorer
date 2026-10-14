@@ -49,6 +49,11 @@ public sealed class ScummVerbTable
     /// <summary>What the last <see cref="Apply"/> drew or cleared on the verb screen (screen coordinates), or null.</summary>
     public ScummScreenBox? LastCover { get; private set; }
 
+    private readonly List<ScummScreenBox> _covers = [];
+
+    /// <summary>The rectangles the last <see cref="SaveRestoreVerbs"/> drew or cleared, in order.</summary>
+    public IReadOnlyList<ScummScreenBox> LastCovers => _covers.ToArray();
+
     /// <summary>Clears drawn after the oldest verb that is on now: only those can show.</summary>
     public IReadOnlyList<ScummVerbErase> Erases() => _erases.ToArray();
 
@@ -57,7 +62,7 @@ public sealed class ScummVerbTable
 
     /// <summary>The slots in use (slot 1 upwards), in slot order.</summary>
     public IReadOnlyList<ScummVerbSnapshot> Snapshot() =>
-        _slots.Skip(1).Where(slot => slot.VerbId != 0).Select(slot => slot.ToSnapshot()).ToArray();
+        _slots.Skip(1).Where(slot => slot.VerbId != 0 && slot.SaveId == 0).Select(slot => slot.ToSnapshot()).ToArray();
 
     public ScummVerbSnapshot? Find(int verbId) =>
         FindSlot(verbId) is var slot and > 0 ? _slots[slot].ToSnapshot() : null;
@@ -158,7 +163,7 @@ public sealed class ScummVerbTable
     private string Draw(Slot slot)
     {
         if (slot.Mode is null) return "not drawn (mode unknown)";
-        if (slot.Mode != 0 && slot.VerbId != 0)
+        if (slot.Mode != 0 && slot.VerbId != 0 && slot.SaveId == 0)
         {
             if (slot.Name is not null) EraseDrawn(slot); // a text verb clears its old rectangle before it prints
             slot.DrawOrder = ++_drawOrder;
@@ -192,16 +197,73 @@ public sealed class ScummVerbTable
         _erases.RemoveAll(erase => erase.Order < oldest);
     }
 
-    private int FindSlot(int verbId)
+    private int FindSlot(int verbId, int saveId = 0)
     {
         for (var index = 1; index < Count; index++)
-            if (_slots[index].VerbId == verbId) return index;
+            if (_slots[index].VerbId == verbId && _slots[index].SaveId == saveId) return index;
         return 0;
+    }
+
+    /// <summary>
+    /// <c>o5_saveRestoreVerbs</c> (ScummVM script_v5.cpp). Save (1): every verb from <paramref name="from"/> to <paramref name="to"/> that is in use
+    /// gets the save id and its rectangle is cleared (<c>drawVerb</c> of a saved slot). Restore (2): the verb saved under the id comes back (the
+    /// verb of the same number now in use is killed first) and is drawn. Delete (3): the verb saved under the id is killed.
+    /// </summary>
+    public string SaveRestoreVerbs(int mode, int from, int to, int saveId)
+    {
+        LastCover = null;
+        _covers.Clear();
+        var notes = new List<string>();
+        for (var verb = from; verb <= to; verb++)
+        {
+            if (LastCover is { } drawn) { _covers.Add(drawn); LastCover = null; }
+            switch (mode)
+            {
+                case 1:
+                    if (FindSlot(verb) is var saved and > 0 && _slots[saved].SaveId == 0)
+                    {
+                        _slots[saved].SaveId = saveId;
+                        Draw(_slots[saved]);
+                        notes.Add($"verb 0x{verb:X2} saved as {saveId}");
+                    }
+                    break;
+                case 2:
+                    if (FindSlot(verb, saveId) is var back and > 0)
+                    {
+                        if (FindSlot(verb) is var current and > 0) Kill(current);
+                        _slots[back].SaveId = 0;
+                        Draw(_slots[back]);
+                        notes.Add($"verb 0x{verb:X2} restored from {saveId}");
+                    }
+                    break;
+                case 3:
+                    if (FindSlot(verb, saveId) is var doomed and > 0)
+                    {
+                        Kill(doomed);
+                        notes.Add($"verb 0x{verb:X2} (saved as {saveId}) deleted");
+                    }
+                    break;
+            }
+        }
+        if (LastCover is { } lastDrawn) _covers.Add(lastDrawn);
+        LastCover = null;
+        var name = mode switch { 1 => "saveVerbs", 2 => "restoreVerbs", _ => "deleteVerbs" };
+        return $"{name} 0x{from:X2}..0x{to:X2} id {saveId}: {(notes.Count == 0 ? "no verb affected" : string.Join(", ", notes))}";
+    }
+
+    // killVerb: the slot is freed and its rectangle cleared.
+    private void Kill(int index)
+    {
+        var slot = _slots[index];
+        slot.Reset(0);
+        Draw(slot);
     }
 
     private sealed class Slot(int index)
     {
         public int VerbId { get; set; }
+        /// <summary>ScummVM <c>saveid</c>: 0 for a verb in use; saveVerbs gives a number, and lookups for the verb in use no longer find it.</summary>
+        public int SaveId { get; set; }
         public int? Mode { get; set; } = 0;
         public int? X { get; set; } = 0;
         public int? Y { get; set; } = 0;
@@ -217,6 +279,7 @@ public sealed class ScummVerbTable
         public void Reset(int verbId)
         {
             VerbId = verbId;
+            SaveId = 0;
             Mode = 0;
             ImageObject = ImageRoom = null;
             Name = null;

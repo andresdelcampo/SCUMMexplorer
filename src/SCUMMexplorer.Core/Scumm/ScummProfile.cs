@@ -18,6 +18,21 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <summary>The constants of the AdLib music driver (ScummVM <c>Player_AD</c>): LOOM's differ from every other game's.</summary>
     public ScummAdlibTiming AdlibTiming { get; init; } = ScummAdlibTiming.Standard;
 
+    /// <summary>
+    /// Variables the frame loop adds the frame's jiffies to besides <c>VAR_TMR_1</c> to <c>VAR_TMR_3</c> (ScummVM <c>scummLoop</c>, scumm.cpp: "Amiga/PC versions
+    /// of Indy3 set three extra timers", variables 39 to 41). The 256-colour Indiana Jones and the Last Crusade has them too.
+    /// </summary>
+    public IReadOnlyList<string> ExtraTimerVariables { get; init; } = [];
+
+    /// <summary>
+    /// The value the engine gives <c>VAR_VIDEOMODE</c> (variable 49) at start (<c>setVideoModeVarToCurrentConfig</c>, vars.cpp): 13 for an EGA game, 19 for VGA.
+    /// Null before version 3, which has no such variable. A game's scripts test it to choose their palettes (Indiana Jones tests for 4, CGA).
+    /// </summary>
+    public int? VideoMode => Version < ScummVersion.V3 ? null : UsesV4Archive ? 19 : 13;
+
+    /// <summary><c>VAR_CHARINC</c> (variable 37) at start: <c>resetScummVars</c> gives the delay between the characters of a message 4 in every version.</summary>
+    public const int CharIncAtStart = 4;
+
     public static ScummProfile For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -31,7 +46,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             : ScummScriptDialect.V3;
         return new ScummProfile(game.Version, dialect)
         {
-            AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard
+            AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard,
+            ExtraTimerVariables = game.Id == GameId.IndianaJones3 ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : []
         };
     }
 }

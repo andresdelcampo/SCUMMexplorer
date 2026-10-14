@@ -55,11 +55,13 @@ public abstract partial class ScummSession
         };
         _globalScriptCount = _data.GlobalScriptCount;
         _runtime.ScriptRunning = IsScriptRunning;
+        _runtime.VerbEntrypoint = ObjectVerbEntrypoint;
         _runtime.SoundRunning = _soundClock.Status;
         _runtime.OverrideChanged = RecordOverride;
         _runtime.Actors.CostumeSource = _data.ReadCostume;
         _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
+        _extraTimerVariables = ScummProfile.For(game).ExtraTimerVariables;
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
         foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
             _runtime.SetGlobalVariable(timer, 0);
@@ -161,6 +163,11 @@ public abstract partial class ScummSession
         new Dictionary<int, uint>(_runtime.ObjectClasses),
         _runtime.Messages.OnScreen);
 
+    /// <summary>The scripts waiting for a later frame, as "label +offset" (evidence for what a stopped run is waiting on).</summary>
+    public IReadOnlyList<string> PendingScriptSummary => _pending
+        .Select(item => $"{item.Script.Context ?? $"Script {item.Script.ScriptId:00}"} +0x{item.Offset:X4}" +
+                        (item.Frame.Delay is int delay ? $" (delay {delay})" : "") + (item.Frame.FreezeCount > 0 ? " (frozen)" : "")).ToArray();
+
     /// <summary>The message state: the talk message, its delay and <c>VAR_HAVE_MSG</c>, and drawn strings.</summary>
     public ScummMessageTable Messages => _runtime.Messages;
 
@@ -190,6 +197,39 @@ public abstract partial class ScummSession
         return running || !_endedUnmodelled.Contains(number)
             ? (running, null)
             : (false, $"script {number} ended at a step the preview does not model, so it may still run in the game");
+    }
+
+    private readonly Dictionary<int, IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>>> _verbTables = [];
+
+    /// <summary>
+    /// ScummVM <c>getVerbEntrypoint(obj, verb)</c> for the old bundle: the object must be in the room (owner 0x0F and a local object) or in
+    /// the inventory array (<c>whereIsObject</c>; an inventory object's code is the copy taken from the room it was picked up in). The
+    /// first table entry that is the verb or the fallback 0xFF gives the offset of its code from the object's start; 0 when none or the object is nowhere.
+    /// Null when the table cannot be read.
+    /// </summary>
+    protected int? ObjectVerbEntrypoint(int obj, int verb)
+    {
+        if (obj < 1) return 0;
+        var owner = _runtime.ObjectOwners.TryGetValue(obj, out var ownerByte) ? (int)ownerByte : 0x0F;
+        int? room;
+        if (owner != 0x0F)
+            room = Array.IndexOf(_runtime.InventorySlots, obj) >= 0 && _runtime.InventoryRooms.TryGetValue(obj, out var taken) ? taken : null;
+        else
+            room = _currentObjects.Any(item => item.Id == obj) ? _currentRoom?.ResourceId : null;
+        if (room is null) return 0;
+        try
+        {
+            if (!_verbTables.TryGetValue(room.Value, out var tables))
+                _verbTables[room.Value] = tables = _data.ReadObjectVerbs(room.Value, _data.ReadRoom(room.Value).Objects);
+            if (!tables.TryGetValue(obj, out var entries)) return 0;
+            var entry = entries.FirstOrDefault(item => item.VerbId == verb || item.IsFallback);
+            return entry is null ? 0 : entry.ScriptOffset - entry.CodeOffset;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            _uncertainties.Add($"Object {obj} verb table of Room {room:00} could not be read: {ex.Message}");
+            return null;
+        }
     }
 
     protected readonly List<ScummScriptEvent> _visitEvents = [];
@@ -554,7 +594,7 @@ public abstract partial class ScummSession
             case ScummScriptEventKind.RoomLoaded when _dispatchScope > 0 && _requestedLoad is null &&
                                                       _executing.Count > 0 && _executing[^1].Global &&
                                                       scriptEvent.TargetId is int loadedRoom &&
-                                                      _game.Rooms.Any(room => room.ResourceId == loadedRoom):
+                                                      (loadedRoom == NullRoom || _game.Rooms.Any(room => room.ResourceId == loadedRoom)):
                 // A global script survives startScene: pause it here, enter the
                 // room, then resume it there (DispatchRequestedLoads).
                 _requestedLoad = (scriptEvent, _executing[^1]);

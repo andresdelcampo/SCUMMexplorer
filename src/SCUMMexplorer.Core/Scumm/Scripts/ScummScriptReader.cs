@@ -470,7 +470,13 @@ internal static partial class ScummScriptDisassembler
             return ("lights", Join(ReadParam(cursor, 1, opcode, 0x80), ReadParam(cursor, 1, opcode, 0), ReadParam(cursor, 1, opcode, 0)));
 
         if (Is(opcode, 0x19, 0x39, 0x59, 0x79, 0x99, 0xB9, 0xD9, 0xF9))
-            return ("doSentence", Join(ReadParam(cursor, 1, opcode, 0x80), ReadParam(cursor, 2, opcode, 0x40), ReadParam(cursor, 2, opcode, 0x20)));
+        {
+            // ScummVM o5_doSentence reads the verb first and, for 0xFE (stop the sentence script, empty the stack), returns without reading the
+            // two objects: a literal 0xFE verb is followed by no operands. (A variable verb cannot be known when decoding.)
+            var verb = ReadParam(cursor, 1, opcode, 0x80);
+            if (verb == "0xFE") return ("doSentence", verb);
+            return ("doSentence", Join(verb, ReadParam(cursor, 2, opcode, 0x40), ReadParam(cursor, 2, opcode, 0x20)));
+        }
         if (Is(opcode, 0x1A, 0x9A))
             return DecodeVariableOperation(cursor, opcode, "move", "=");
         if (Is(opcode, 0x1B, 0x9B))

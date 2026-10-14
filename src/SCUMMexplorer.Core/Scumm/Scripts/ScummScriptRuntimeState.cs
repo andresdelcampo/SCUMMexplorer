@@ -116,6 +116,38 @@ public sealed class ScummScriptRuntimeState
         }
     }
     public HashSet<int> Inventory { get; } = [];
+
+    /// <summary>
+    /// ScummVM's <c>_inventory</c> (80 slots for these versions): <c>addObjectToInventory</c> (pickupObject) takes the first free slot and
+    /// <c>clearOwnerOf</c> (<c>setOwnerOf</c> with owner 0) frees it. <c>findInventory</c> and <c>getInventoryCount</c> read this array, not the owner table:
+    /// an object owned by an actor through <c>setOwnerOf</c> alone is not in it.
+    /// </summary>
+    public int[] InventorySlots { get; } = new int[80];
+    /// <summary>The room an inventory object was taken from (<c>addObjectToInventory</c> copies its code from there).</summary>
+    public Dictionary<int, int> InventoryRooms { get; } = [];
+    /// <summary>
+    /// ScummVM <c>getVerbEntrypoint</c>: where the object's code for the verb starts (0 when the object is not in the room or inventory, or has no entry
+    /// for the verb or a fallback). Answered by the session, which can read the room data; null outside a session.
+    /// </summary>
+    public Func<int, int, int?>? VerbEntrypoint { get; set; }
+    public bool AddToInventorySlots(int subject)
+    {
+        var free = Array.IndexOf(InventorySlots, 0);
+        if (free < 0) return false;
+        InventorySlots[free] = subject;
+        return true;
+    }
+    public void RemoveFromInventorySlots(int subject)
+    {
+        var index = Array.IndexOf(InventorySlots, subject);
+        if (index >= 0) InventorySlots[index] = 0;
+    }
+
+    /// <summary>
+    /// ScummVM's <c>_sentence</c> stack: <c>doSentence</c> pushes a verb with two objects, the engine pops the last one into the sentence script
+    /// (<c>VAR_SENTENCE_SCRIPT</c>) when that script is not running.
+    /// </summary>
+    public List<(int Verb, int ObjectA, int ObjectB)> Sentences { get; } = [];
     /// <summary>Executed membership attempts notify even when unchanged; raw set edits still need notification.</summary>
     public bool AddInventoryObject(int subject)
     { var added = Inventory.Add(subject); NotifyNativeMutation("inventory-membership", subject); return added; }
@@ -187,6 +219,11 @@ public sealed class ScummScriptRuntimeState
     public ScummMessageTable Messages { get; } = new();
     /// <summary>Verb slots as reached <c>verbOps</c> left them (the verb bar and the verb-area close-up).</summary>
     public ScummVerbTable Verbs { get; } = new();
+    /// <summary>
+    /// ScummVM <c>_resourceMapper</c>, as <c>o5_pseudoRoom</c> fills it: a room number from 0x80 up (a pseudo room) names the real room whose
+    /// resource it loads; the same real room can serve several numbers (the game's scripts tell them apart by <c>VAR_ROOM</c>).
+    /// </summary>
+    public Dictionary<int, int> PseudoRooms { get; } = [];
     /// <summary>The current room's number, or null outside a room.</summary>
     public int? CurrentRoom { get; set; }
     /// <summary>

@@ -265,8 +265,29 @@ public sealed class ScummBoundedScriptExecutor
                 continue;
             }
 
+            // o4_pickupObject (v3 and v4): the object's own changes happen here; the inventory script it runs goes out as a started script below.
+            ScummScriptEvent? inventoryScriptStart = null;
+            if (instruction.Operation == "pickupObject" && runtime is not null &&
+                !TryApplyPickupObject(script, instruction, knownVariables, roomObjects, runtime, drawQueue, trace,
+                    onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached,
+                    out inventoryScriptStart, out var pickupProblem))
+            {
+                unresolved = $"{pickupProblem} at +0x{instruction.Offset:X4}";
+                break;
+            }
+            // o5_doSentence 0xFE: the sentence stack is emptied and the sentence script (VAR_SENTENCE_SCRIPT) is stopped; any other verb is pushed.
+            if (instruction.Operation == "doSentence" && runtime is not null)
+            {
+                if (!TryApplyDoSentence(script, instruction, knownVariables, runtime, trace,
+                        onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached,
+                        out inventoryScriptStart, out var sentenceProblem))
+                {
+                    unresolved = $"{sentenceProblem} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+            }
             // An event behind a branch on a seeded pick is a possible outcome, not a reached one.
-            var scriptEvent = ScummScriptEvent.FromInstruction(script, instruction,
+            var scriptEvent = inventoryScriptStart ?? ScummScriptEvent.FromInstruction(script, instruction,
                 onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached);
             if (scriptEvent is not null) scriptEvent = scriptEvent with { Executed = true };
             if (scriptEvent is { TargetId: null, Kind: ScummScriptEventKind.MusicStarted or
@@ -581,6 +602,8 @@ public sealed class ScummBoundedScriptExecutor
                     break;
                 }
                 runtime.SetObjectOwner(objectId, (byte)owner);
+                // clearOwnerOf: owner 0 takes the object out of the inventory array.
+                if (owner == 0) runtime.RemoveFromInventorySlots(objectId);
                 if (knownVariables.TryGetValue(ScummVars.Ego, out var ego))
                 {
                     if (owner == ego) runtime.AddInventoryObject(objectId);
@@ -591,10 +614,98 @@ public sealed class ScummBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "doSentence" && runtime is not null)
+            {
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "waitForSentence" && runtime?.ScriptRunning is not null &&
+                knownVariables.TryGetValue(ScummVars.SentenceScript, out var sentenceScriptNumber))
+            {
+                // o5_wait (SO_WAIT_FOR_SENTENCE): the script waits while a sentence is queued (none is frozen here), and, with none queued,
+                // while the sentence script is in use. It breaks and tries again next frame.
+                var inUse = runtime.ScriptRunning(sentenceScriptNumber).Running;
+                if (runtime.Sentences.Count > 0 || inUse)
+                {
+                    trace.Add($"waiting for the sentence script {sentenceScriptNumber} to end at +0x{instruction.Offset:X4}");
+                    resumeOffset = instruction.Offset;
+                    break;
+                }
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "getVerbEntrypoint" && runtime?.VerbEntrypoint is not null)
+            {
+                // o5_getVerbEntrypoint: result = where the object's code for the verb starts, or 0.
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (parts.Length != 3 || !TryGetVariableKey(parts[0], knownVariables, out var entryKey) ||
+                    !TryReadValue(parts[1], knownVariables, out var entryObject, out _) ||
+                    !TryReadValue(parts[2], knownVariables, out var entryVerb, out _) ||
+                    runtime.VerbEntrypoint(entryObject, entryVerb) is not { } entrypoint)
+                {
+                    unresolved = $"getVerbEntrypoint cannot be answered ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                knownVariables[entryKey] = (ushort)entrypoint;
+                RefreshBitAliases(entryKey, knownVariables);
+                MarkEstimated(estimated, entryKey, onEstimatedPath || parts.Skip(1).Any(operand => OperandIsEstimated(operand, estimated, knownVariables)));
+                trace.Add($"{entryKey} = {entrypoint}: getVerbEntrypoint object {entryObject} verb 0x{entryVerb:X2}");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation is "getObjectOwner" or "getInventoryCount" or "findInventory" && runtime is not null)
+            {
+                // o5_getObjectOwner: the owner table's byte. o5_getInventoryCount and o5_findInventory read the inventory array
+                // (ScummEngine::getInventoryCount / findInventory): objects in a slot whose owner is the given actor, in slot order; the
+                // second returns the idx-th (counting from 1), or 0.
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (!TryGetVariableKey(parts[0], knownVariables, out var queryKey) ||
+                    !TryReadValue(parts[1], knownVariables, out var queryOperand, out _) ||
+                    instruction.Operation == "findInventory" && (parts.Length != 3 || !TryReadValue(parts[2], knownVariables, out _, out _)))
+                {
+                    unresolved = $"{instruction.Operation} operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                int answer;
+                if (instruction.Operation == "getObjectOwner")
+                {
+                    if (!runtime.ObjectOwners.TryGetValue(queryOperand, out var ownerByte))
+                    {
+                        unresolved = $"getObjectOwner: object {queryOperand} is not in the owner table at +0x{instruction.Offset:X4}";
+                        break;
+                    }
+                    answer = ownerByte;
+                }
+                else
+                {
+                    var owned = runtime.InventorySlots.Where(item => item != 0 && runtime.ObjectOwners.TryGetValue(item, out var o) && o == queryOperand).ToArray();
+                    if (instruction.Operation == "getInventoryCount") answer = owned.Length;
+                    else
+                    {
+                        TryReadValue(parts[2], knownVariables, out var index, out _);
+                        answer = index >= 1 && index <= owned.Length ? owned[index - 1] : 0;
+                    }
+                }
+                knownVariables[queryKey] = (ushort)answer;
+                RefreshBitAliases(queryKey, knownVariables);
+                MarkEstimated(estimated, queryKey, onEstimatedPath || parts.Skip(1).Any(operand => OperandIsEstimated(operand, estimated, knownVariables)));
+                trace.Add($"{queryKey} = {answer}: {instruction.Operation} {string.Join(", ", parts.Skip(1))}");
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "pickupObject")
             {
-                unresolved = $"pickupObject also changes classes and invokes the inventory script at +0x{instruction.Offset:X4}";
-                break;
+                if (runtime is null)
+                {
+                    unresolved = $"pickupObject also changes classes and invokes the inventory script, which only a session can run, at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                pc = next;
+                continue;
             }
 
             if (instruction.Operation == "drawObject")
@@ -688,8 +799,8 @@ public sealed class ScummBoundedScriptExecutor
                 continue;
             }
 
-            if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands.StartsWith("actor,", StringComparison.Ordinal) &&
-                TryReadValue(instruction.Operands[6..].Trim(), knownVariables, out var walkingActor, out _) &&
+            if (runtime is not null && IsActorWait(instruction) &&
+                TryReadValue(ActorWaitOperand(instruction), knownVariables, out var walkingActor, out _) &&
                 ScummActorTable.IsValid(walkingActor))
             {
                 // o5_wait (SO_WAIT_FOR_ACTOR): while the actor's _moving is set (a walk or a
@@ -737,7 +848,8 @@ public sealed class ScummBoundedScriptExecutor
 
             if (instruction.Operation is "delay" or "delayVariable" ||
                 instruction.Operation == "waitFor" && (instruction.Operands is "message" or "camera" ||
-                                                       instruction.Operands.StartsWith("actor,", StringComparison.Ordinal)))
+                                                       instruction.Operands.StartsWith("actor,", StringComparison.Ordinal)) ||
+                IsActorWait(instruction))
             {
                 // o5_delay and o5_delayVariable pause the script for a time; o5_wait
                 // breaks while the actor walks, the message shows or the camera
@@ -749,7 +861,7 @@ public sealed class ScummBoundedScriptExecutor
                     "delayVariable" => $"a delay of {instruction.Operands} jiffies",
                     _ when instruction.Operands == "message" => "waiting for the message to finish",
                     _ when instruction.Operands == "camera" => "waiting for the camera",
-                    _ => $"waiting for actor {instruction.Operands[6..].Trim()} to stop walking"
+                    _ => $"waiting for actor {ActorWaitOperand(instruction)} to stop walking"
                 };
                 trace.Add($"{waited} at +0x{instruction.Offset:X4} continues on the next frame");
                 limitations.Add($"timing not simulated: {waited} continues on the next frame (+0x{instruction.Offset:X4})");
@@ -1077,6 +1189,46 @@ public sealed class ScummBoundedScriptExecutor
                 continue;
             }
 
+            if (instruction.Operation == "pseudoRoom" && runtime is not null)
+            {
+                // o5_pseudoRoom: the first byte is a real room; every listed byte from 0x80 up becomes a pseudo room number that loads it.
+                // The disassembler lists the numbers without their 0x80 bit, and names an entry below 0x80 "inventory" (ignored, as the engine does).
+                var open = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
+                if (open < 0 || !instruction.Operands.EndsWith(']') ||
+                    !int.TryParse(instruction.Operands[..open], NumberStyles.Integer, CultureInfo.InvariantCulture, out var realRoom))
+                {
+                    unresolved = $"pseudoRoom operands cannot be read ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                foreach (var item in instruction.Operands[(open + 3)..^1].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                    if (int.TryParse(item, NumberStyles.Integer, CultureInfo.InvariantCulture, out var pseudo))
+                        runtime.PseudoRooms[pseudo | 0x80] = realRoom;
+                trace.Add($"pseudoRoom: room {realRoom} also answers to {string.Join(", ", runtime.PseudoRooms.Where(pair => pair.Value == realRoom).Select(pair => pair.Key))}");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation is "saveVerbs" or "restoreVerbs" or "deleteVerbs" && runtime is not null)
+            {
+                // o5_saveRestoreVerbs: the verbs from the first to the last operand are saved under, restored from or deleted by the third.
+                var saveParts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (saveParts.Length != 3 || !TryReadValue(saveParts[0], knownVariables, out var firstVerb, out _) ||
+                    !TryReadValue(saveParts[1], knownVariables, out var lastVerb, out _) ||
+                    !TryReadValue(saveParts[2], knownVariables, out var saveId, out _))
+                {
+                    runtime.Verbs.ForgetAll($"{instruction.Operation} at +0x{instruction.Offset:X4} names verbs the preview cannot read ({instruction.Operands})");
+                    limitations.Add($"{instruction.Operation} names verbs the preview cannot read, so every verb slot is unknown (+0x{instruction.Offset:X4})");
+                    pc = next;
+                    continue;
+                }
+                var savedMode = instruction.Operation == "saveVerbs" ? 1 : instruction.Operation == "restoreVerbs" ? 2 : 3;
+                var verbNote = runtime.Verbs.SaveRestoreVerbs(savedMode, firstVerb, lastVerb, saveId);
+                foreach (var savedCover in runtime.Verbs.LastCovers) verbNote += runtime.Messages.VerbDrawn(savedCover);
+                trace.Add(verbNote);
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "beginOverride")
             {
                 // ScummEngine::beginOverride records the jump that follows and
@@ -1231,6 +1383,117 @@ public sealed class ScummBoundedScriptExecutor
     private static (int Found, string? Unknown) FindObjectAt(IReadOnlyList<ScummRoomObjectRecord> roomObjects,
         IReadOnlyDictionary<int, byte> states, ScummScriptRuntimeState runtime, int x, int y)
         => ScummObjectHitTest.Find(roomObjects, states, runtime.ObjectPositions, runtime.ObjectClasses, x, y);
+
+    /// <summary>
+    /// ScummVM <c>ScummEngine_v4::o4_pickupObject</c> (script_v4.cpp, which v3 shares): an object the room does not have, or one already held
+    /// (<c>whereIsObject</c> gives the inventory for any owner but the room), is left alone. Otherwise it goes to the inventory of
+    /// <c>VAR_EGO</c> (<c>putOwner</c>), becomes untouchable (class 24) in state 1, the draw queue is cleared and <c>runInventoryScript(1)</c> runs
+    /// the script in <c>VAR_INVENTORY_SCRIPT</c> with 1 as its argument; that start is returned for the session to run.
+    /// </summary>
+    private static bool TryApplyPickupObject(ScummScriptDisassembly script, ScummScriptInstruction instruction,
+        IDictionary<string, ushort> variables, IReadOnlyList<ScummRoomObjectRecord> roomObjects, ScummScriptRuntimeState runtime,
+        List<int> drawQueue, List<string> trace, ScummScriptEventCertainty certainty, out ScummScriptEvent? inventoryStart, out string problem)
+    {
+        inventoryStart = null;
+        problem = "";
+        if (!TryReadValue(instruction.Operands.Trim(), variables, out var obj, out var detail))
+        {
+            problem = $"pickupObject names an unknown object ({detail})";
+            return false;
+        }
+        if (obj < 1)
+        {
+            problem = $"pickupObject received invalid index {obj}";
+            return false;
+        }
+        if (!variables.TryGetValue(ScummVars.Ego, out var ego))
+        {
+            problem = "pickupObject needs VAR_EGO, which is not established";
+            return false;
+        }
+        if (roomObjects.All(item => item.Id != obj))
+        {
+            trace.Add($"pickupObject {obj}: the room has no such object, so nothing happens");
+            return true;
+        }
+        if (runtime.ObjectOwners.TryGetValue((int)obj, out var owner) && owner != RoomOwner)
+        {
+            trace.Add($"pickupObject {obj}: already owned by {owner}, so it is not taken twice");
+            return true;
+        }
+        if (!runtime.AddToInventorySlots((int)obj))
+        {
+            problem = "pickupObject: the inventory is full (80 objects)";
+            return false;
+        }
+        if (runtime.CurrentRoom is int takenFrom) runtime.InventoryRooms[(int)obj] = takenFrom;
+        runtime.SetObjectOwner((int)obj, (byte)ego);
+        runtime.AddInventoryObject((int)obj);
+        var classes = runtime.ObjectClasses.GetValueOrDefault((int)obj) | (1u << (ScummObjectClasses.Untouchable - 1));
+        runtime.SetObjectClasses((int)obj, classes);
+        runtime.SetObjectState((int)obj, 1);
+        runtime.StatesSetInRoom.Add((int)obj);
+        drawQueue.Clear();
+        trace.Add($"object {obj} picked up by actor {ego}: untouchable, state 1");
+        if (variables.TryGetValue(ScummVars.InventoryScript, out var inventoryScript) && inventoryScript != 0)
+        {
+            inventoryStart = new ScummScriptEvent(script.ScriptId, script.Context ?? $"Script {script.ScriptId:00}", instruction.Offset,
+                ScummScriptEventKind.ScriptStarted, "startScript", $"0x{inventoryScript:X2}, [0x0001]", ResourceKind.Script, inventoryScript, certainty);
+            inventoryStart = inventoryStart with { Executed = true };
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// A wait for an actor to stop moving: v5's <c>o5_wait</c> subopcode as <c>waitFor actor, N</c>, and the v3 Indiana Jones opcode 0x3B
+    /// (<c>o3_waitForActor</c>, <c>waitForActor N</c>), which does the same: <c>a->isInCurrentRoom() &amp;&amp; a->_moving</c> breaks and tries again.
+    /// LOOM's 0x3B has no operand (<c>waitForActor LOOM no-op</c>) and is not a wait.
+    /// </summary>
+    private static bool IsActorWait(ScummScriptInstruction instruction) =>
+        instruction.Operation == "waitFor" && instruction.Operands.StartsWith("actor,", StringComparison.Ordinal) ||
+        instruction.Operation == "waitForActor" && instruction.Operands != "LOOM no-op";
+
+    private static string ActorWaitOperand(ScummScriptInstruction instruction) =>
+        instruction.Operation == "waitForActor" ? instruction.Operands.Trim() : instruction.Operands[6..].Trim();
+
+    /// <summary>
+    /// ScummVM <c>o5_doSentence</c>: verb 0xFE empties the sentence stack and stops the script in <c>VAR_SENTENCE_SCRIPT</c> (returned as a stop for
+    /// the session to apply); any other verb pushes (verb, object A, object B). The session pops the last sentence into the sentence script
+    /// once that script is not running (<c>checkAndRunSentenceScript</c>).
+    /// </summary>
+    private static bool TryApplyDoSentence(ScummScriptDisassembly script, ScummScriptInstruction instruction,
+        IDictionary<string, ushort> variables, ScummScriptRuntimeState runtime, List<string> trace,
+        ScummScriptEventCertainty certainty, out ScummScriptEvent? stopEvent, out string problem)
+    {
+        stopEvent = null;
+        problem = "";
+        var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+        ushort verb = 0;
+        var detail = "";
+        if (parts.Length is not (1 or 3) || !TryReadValue(parts[0], variables, out verb, out detail) || parts.Length == 1 && verb != 0xFE)
+        {
+            problem = $"doSentence names a verb the preview cannot read ({instruction.Operands}; {detail})";
+            return false;
+        }
+        if (verb == 0xFE)
+        {
+            runtime.Sentences.Clear();
+            trace.Add("doSentence 0xFE: the sentence stack is emptied");
+            if (variables.TryGetValue(ScummVars.SentenceScript, out var sentenceScript) && sentenceScript != 0)
+                stopEvent = new ScummScriptEvent(script.ScriptId, script.Context ?? $"Script {script.ScriptId:00}", instruction.Offset,
+                    ScummScriptEventKind.ScriptStopped, "stopScript", $"0x{sentenceScript:X2}", ResourceKind.Script, sentenceScript, certainty)
+                { Executed = true };
+            return true;
+        }
+        if (parts.Length != 3 || !TryReadValue(parts[1], variables, out var objectA, out _) || !TryReadValue(parts[2], variables, out var objectB, out _))
+        {
+            problem = $"doSentence names an object the preview cannot read ({instruction.Operands})";
+            return false;
+        }
+        runtime.Sentences.Add((verb, objectA, objectB));
+        trace.Add($"doSentence: verb 0x{verb:X2}, objects {objectA} and {objectB} pushed ({runtime.Sentences.Count} waiting)");
+        return true;
+    }
 
     private static bool IsActorQuery(string operation) => operation is
         "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom" or

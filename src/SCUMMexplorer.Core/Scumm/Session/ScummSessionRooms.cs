@@ -103,6 +103,43 @@ public abstract partial class ScummSession
     }
 
     /// <summary>
+    /// ScummVM's room 0 (<c>startScene(0)</c>, room.cpp): a load of room 0 runs the old room's exit code, ends its room-owned scripts, hides the actors and
+    /// leaves no room: <c>VAR_ROOM</c> is 0, there are no objects and no walk boxes, and no entry script runs. Global scripts carry on. Games use
+    /// it between scenes (Indiana Jones and the Last Crusade EGA clears the screen with it before its opening).
+    /// </summary>
+    public const int NullRoom = 0;
+
+    protected void EnterNullRoom(ScummScriptEvent load, string when)
+    {
+        _uncertainties.Add($"{load.SourceLabel} +0x{load.Offset:X4} reached {load.Operation} to room {NullRoom} {when}: no room is current until the next room load.");
+        if (_currentRoom is not null)
+        {
+            var from = _currentRoom;
+            RunGlobalHook(ScummVars.ExitScript, "before room exit");
+            RunEmbeddedRoomScript(from, exit: true);
+            RunGlobalHook(ScummVars.ExitScript2, "after room exit");
+            _pending.RemoveAll(item => item.RoomId == from.ResourceId);
+        }
+        _currentRoom = null;
+        _runtime.CurrentRoom = NullRoom;
+        _roomsEntered.Add(NullRoom);
+        RoomEntrySequence = _visitEvents.Count;
+        _runtime.DrawQueue.Clear();
+        _runtime.StatesSetInRoom.Clear();
+        _runtime.EstimatedStates.Clear();
+        _runtime.Actors.HideAll();
+        _runtime.Messages.RoomEntered(_runtime);
+        _currentObjects = [];
+        _runtime.ObjectName = _ => null;
+        _runtime.WalkBoxFlagsUnknown = null;
+        _runtime.WalkBoxes = null;
+        _runtime.RoomCameraBounds = _runtime.CameraRange = null;
+        _roomSize = null;
+        _runtime.SetGlobalVariable(ScummVars.Room, NullRoom);
+        _visitTrace.Add($"{load.SourceLabel} +0x{load.Offset:X4}: room {NullRoom} (no room) {when}");
+    }
+
+    /// <summary>
     /// o5_loadRoomWithEgo after <c>startScene</c> (v3/v4): unless the entry code
     /// put the ego somewhere, it stands at the object's walk point; the camera is
     /// put on the ego and follows it; then, when the instruction gives a

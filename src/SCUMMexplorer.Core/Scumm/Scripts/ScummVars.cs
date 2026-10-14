@@ -3,6 +3,11 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <summary>
 /// The engine-defined global variables of the SCUMM v3-v5 family, as the keys the script runtime uses (ScummVM <c>VAR_*</c>).
 /// Games set the rest; a later engine version with another numbering would get its own table chosen by <see cref="ScummProfile"/>.
+/// These numbers are ScummVM's <c>setupScummVars</c> (vars.cpp, checked 14 October 2026) for version 3 (the old bundle: LOOM and Indiana Jones and
+/// the Last Crusade EGA) and version 4, where the base table is the same; version 4 only adds 27, 39 and 50 to 53, version 5 adds 56 to 72.
+/// Version 2 and version 1 number them differently (<c>ScummEngine_v2::setupScummVars</c>) and need their own table (S4b of those families).
+/// One engine tick the DOS v3 games add besides the timers of this table: <c>scummLoop</c> also adds the frame's jiffies to variables 39 to 41 of
+/// Indiana Jones and the Last Crusade (every non-Macintosh Indy3 and the FM-Towns Zak), see <see cref="ScummProfile.ExtraTimerVariables"/>.
 /// </summary>
 public static class ScummVars
 {
@@ -16,6 +21,10 @@ public static class ScummVars
     public const string HaveMsg = "var[0x003]";
     /// <summary><c>VAR_MUSIC_TIMER</c>.</summary>
     public const string MusicTimer = "var[0x00E]";
+    /// <summary>Variables 39 to 41, the three extra timers of Indiana Jones and the Last Crusade (<see cref="ScummProfile.ExtraTimerVariables"/>).</summary>
+    public const string ExtraTimer1 = "var[0x027]";
+    public const string ExtraTimer2 = "var[0x028]";
+    public const string ExtraTimer3 = "var[0x029]";
     /// <summary><c>VAR_CAMERA_MIN_X</c>.</summary>
     public const string CameraMinX = "var[0x011]";
     /// <summary><c>VAR_CAMERA_MAX_X</c>.</summary>
@@ -28,6 +37,8 @@ public static class ScummVars
     public const string CharInc = "var[0x025]";
     /// <summary><c>VAR_SOUNDCARD</c>: the sound card the game's scripts see (0 in a session by default).</summary>
     public const string SoundCard = "var[0x030]";
+    /// <summary><c>VAR_VIDEOMODE</c> (variable 49): 13 EGA, 19 VGA, 4 CGA.</summary>
+    public const string VideoMode = "var[0x031]";
     /// <summary><c>VAR_ROOM</c>: the room the game is in.</summary>
     public const string Room = "var[0x004]";
     /// <summary><c>VAR_OVERRIDE</c>: 1 after an aborted cutscene, 0 otherwise.</summary>
@@ -42,6 +53,9 @@ public static class ScummVars
     public const string CutsceneExitKey = "var[0x018]";
     /// <summary><c>VAR_VERB_SCRIPT</c>: the script <c>runInputScript</c> runs for every click or key.</summary>
     public const string VerbScript = "var[0x020]";
+    /// <summary><c>VAR_SENTENCE_SCRIPT</c>, <c>VAR_INVENTORY_SCRIPT</c>: the scripts the engine runs for a sentence and for any inventory change (<c>runInventoryScript</c>).</summary>
+    public const string SentenceScript = "var[0x021]";
+    public const string InventoryScript = "var[0x022]";
     /// <summary><c>VAR_ENTRY_SCRIPT</c>, <c>VAR_ENTRY_SCRIPT2</c>, <c>VAR_EXIT_SCRIPT</c>, <c>VAR_EXIT_SCRIPT2</c>: the global scripts run around every room entry and exit.</summary>
     public const string EntryScript = "var[0x01C]";
     public const string EntryScript2 = "var[0x01D]";

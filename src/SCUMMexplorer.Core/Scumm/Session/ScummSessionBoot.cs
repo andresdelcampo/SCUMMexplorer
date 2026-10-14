@@ -39,7 +39,8 @@ public abstract partial class ScummSession
         _dispatchScope++;
         try
         {
-            RunStartedScript(input.LocalScript, 0, null, 0);
+            // The engine starts a script with every local at 0; a script started as an answer takes the answer from local 0.
+            RunStartedScript(input.LocalScript, 0, new Dictionary<string, ushort> { ["local[0x000]"] = 0 }, 0);
         }
         finally
         {
@@ -61,31 +62,71 @@ public abstract partial class ScummSession
     {
         if (_currentRoom is null || _pending.FirstOrDefault(item => item.ScriptNumber == BootScript) is not { } boot) return null;
         var wait = boot.Script.Instructions.FirstOrDefault(item => item.Offset == boot.Offset);
-        if (wait is not { Operation: "notEqualZero" } || !wait.Operands.StartsWith("bit[", StringComparison.Ordinal)) return null;
+        // The boot waits on a bit or a variable that the room's own code sets once the player has answered.
+        if (wait is not { Operation: "notEqualZero" } ||
+            !(wait.Operands.StartsWith("bit[", StringComparison.Ordinal) || wait.Operands.StartsWith("var[", StringComparison.Ordinal))) return null;
         var bit = wait.Operands[..(wait.Operands.IndexOf(']') + 1)];
+        var isBit = bit.StartsWith("bit[", StringComparison.Ordinal);
+        var room = _currentRoom.ResourceId!.Value;
+        if (!_awaitedInputCache.TryGetValue((room, bit), out var found))
+            _awaitedInputCache[(room, bit)] = found = ScanForAnswer(room, bit, isBit);
+        if (found is null) return null;
+        var (setter, setOffset, startedBy) = found.Value;
+        // A copy of the answering script that is still running has not finished: nothing to answer again.
+        if (_pending.Any(item => item.ScriptNumber == setter && !item.Frame.Stopped)) return null;
+        return (setter, $"Player input assumed: script 001 +0x{wait.Offset:X4} waits for {bit}, which only Room {room:00} " +
+                        $"local script {setter} sets (+0x{setOffset:X4}). The room's own code starts it after the player's input " +
+                        $"({string.Join(", ", startedBy)}), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.");
+    }
+
+    private readonly Dictionary<(int Room, string Variable), (int Setter, int SetOffset, List<string> StartedBy)?> _awaitedInputCache = [];
+
+    // The one local script of the room that sets the awaited bit or variable, and the room code that starts it (null when ambiguous or unstarted).
+    private (int Setter, int SetOffset, List<string> StartedBy)? ScanForAnswer(int room, string bit, bool isBit)
+    {
         var setters = new List<(int Local, int Offset)>();
         var starters = new List<string>();
         for (var local = _globalScriptCount; local < 256; local++)
         {
             ScummScriptDisassembly? script;
-            try { script = _data.RoomLocalScript(_currentRoom.ResourceId!.Value, local); }
+            try { script = _data.RoomLocalScript(room, local); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
             if (script is null) continue;
             foreach (var item in script.Instructions)
             {
-                if (item.Operation == "move" && item.Operands == $"{bit} = 0x0001") setters.Add((local, item.Offset));
+                if (IsSettingNonZero(item, bit, isBit)) setters.Add((local, item.Offset));
                 if (item.Operation == "startScript" && item.Operands.StartsWith("0x", StringComparison.Ordinal))
-                    starters.Add($"{local}:{item.Operands[..4]}:{item.Offset:X4}");
+                    starters.Add($"local {local} +0x{item.Offset:X4}:{Convert.ToInt32(item.Operands[..4], 16)}");
             }
         }
-        if (setters.Count != 1) return null;
+        // Several instructions of one script may set it (a right answer and the last wrong one); more than one script is ambiguous.
+        if (setters.Select(item => item.Local).Distinct().Count() != 1) return null;
         var (setter, setOffset) = setters[0];
-        var startedBy = starters.Where(item => Convert.ToInt32(item.Split(':')[1], 16) == setter)
-            .Select(item => $"local {item.Split(':')[0]} +0x{item.Split(':')[2]}").ToArray();
-        if (startedBy.Length == 0) return null;
-        return (setter, $"Player input assumed: script 001 +0x{wait.Offset:X4} waits for {bit}, which only Room {_currentRoom.ResourceId:00} " +
-                        $"local script {setter} sets (+0x{setOffset:X4}). The room's own code starts it after the player's input " +
-                        $"({string.Join(", ", startedBy)}), so the preview starts it as if the player had answered. Choices made on that screen were not simulated.");
+        var startedBy = starters.Where(item => int.Parse(item[(item.LastIndexOf(':') + 1)..], CultureInfo.InvariantCulture) == setter)
+            .Select(item => item[..item.LastIndexOf(':')]).ToList();
+        // The room's objects start answers too (a click on an answer is an object's verb code).
+        try
+        {
+            var data = _data.ReadRoom(room);
+            var verbTables = _data.ReadObjectVerbs(room, data.Objects);
+            foreach (var record in data.Objects)
+                foreach (var verb in verbTables.GetValueOrDefault(record.Id) ?? [])
+                {
+                    var code = _data.ReadObjectVerb(room, record, verb.VerbId, out _);
+                    if (code.Instructions.Any(item => item.Operation == "startScript" && item.Operands.StartsWith($"0x{setter:X2}", StringComparison.Ordinal)))
+                        startedBy.Add($"object {record.Id} verb 0x{verb.VerbId:X2}");
+                }
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { }
+        return startedBy.Count == 0 ? null : (setter, setOffset, startedBy);
+    }
+
+    // A move that sets the awaited bit or variable to a nonzero literal.
+    private static bool IsSettingNonZero(ScummScriptInstruction item, string target, bool isBit)
+    {
+        if (item.Operation != "move" || !item.Operands.StartsWith($"{target} = 0x", StringComparison.Ordinal)) return false;
+        var literal = int.Parse(item.Operands[(target.Length + 3 + 2)..], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        return isBit ? literal == 1 : literal != 0;
     }
 
     /// <summary><c>VAR_SOUNDCARD</c>: 0 in a session by default, 3 for AdLib in ScummVM and 4 for the Roland upgrade, whose sounds (33 to 64) the scripts then choose.</summary>
