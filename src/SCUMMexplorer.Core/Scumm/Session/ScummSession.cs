@@ -192,6 +192,7 @@ public abstract partial class ScummSession
     protected (bool Running, string? Estimate) IsScriptRunning(int number)
     {
         var running = _executing.Any(frame => frame.Number == number && !frame.Stopped) ||
+                      _loadingFrames.Any(frame => frame.Number == number && !frame.Stopped) ||
                       _pending.Any(item => item.ScriptNumber == number && !item.Frame.Stopped) ||
                       _frameScripts.Any(item => item.ScriptNumber == number && !item.Frame.Stopped);
         return running || !_endedUnmodelled.Contains(number)
@@ -232,6 +233,8 @@ public abstract partial class ScummSession
         }
     }
 
+    // Global scripts that have asked for a room load and wait while the session enters the room (see DispatchRequestedLoads).
+    protected readonly List<ScriptFrame> _loadingFrames = [];
     protected readonly List<ScummScriptEvent> _visitEvents = [];
     protected readonly List<ScummSessionSoundEvent> _soundEvents = [];
     protected readonly List<string> _visitTrace = [];

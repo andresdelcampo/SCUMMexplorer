@@ -260,8 +260,18 @@ public abstract partial class ScummSession
             _pending.Remove(item);
             _dispatchedLoads.Add(request.Event);
             var target = request.Event.TargetId == NullRoom ? null : _game.Rooms.First(room => room.ResourceId == request.Event.TargetId);
-            if (target is null) EnterNullRoom(request.Event, when);
-            else EnterReachedLoad(request.Event, target, request.Frame, when);
+            // The script that loaded the room is still a live slot while the room is entered (ScummVM startScene runs inside the script's
+            // own opcode), so the room's entry code sees it with isScriptRunning.
+            _loadingFrames.Add(request.Frame);
+            try
+            {
+                if (target is null) EnterNullRoom(request.Event, when);
+                else EnterReachedLoad(request.Event, target, request.Frame, when);
+            }
+            finally
+            {
+                _loadingFrames.Remove(request.Frame);
+            }
             entered = true;
             _visitTrace.Add($"{request.Event.SourceLabel} continues at +0x{item.Offset:X4} in Room {target?.ResourceId ?? NullRoom:00} after {request.Event.Operation}");
             _dispatchScope++;

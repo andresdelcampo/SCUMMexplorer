@@ -492,8 +492,7 @@ public sealed class ScummBoundedScriptExecutor
                 var indexEstimated = OperandIsEstimated(destination, estimated, knownVariables, indexOnly: true);
                 for (var index = 0; index < keys.Count; index++)
                 {
-                    knownVariables[keys[index]] = values[index];
-                    RefreshBitAliases(keys[index], knownVariables);
+                    WriteVariableOrBit(keys[index], values[index], knownVariables);
                     MarkEstimated(estimated, keys[index], onEstimatedPath || indexEstimated);
                 }
                 pc = next;
@@ -3169,6 +3168,33 @@ public sealed class ScummBoundedScriptExecutor
         return false;
     }
 
+    // The destination of a setVarRange: a variable or, as o5_setVarRange's getResultPos allows, a bit (0x8000 addressing); each next number is the next bit.
+    private static bool TryGetVariableOrBitKey(string operand, IDictionary<string, ushort> variables, out string variableKey)
+    {
+        variableKey = "";
+        var match = VariablePattern.Match(ResolveIndexed(operand, variables));
+        if (!match.Success) return false;
+        variableKey = $"{match.Groups[1].Value}[0x{int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]";
+        return true;
+    }
+
+    // Writes a global variable or bit the way a move does: a bit also sets its place in the backing word, a word refreshes its bit aliases.
+    private static void WriteVariableOrBit(string key, ushort value, IDictionary<string, ushort> variables)
+    {
+        if (!key.StartsWith("bit[0x", StringComparison.Ordinal))
+        {
+            variables[key] = value;
+            RefreshBitAliases(key, variables);
+            return;
+        }
+        var bitIndex = int.Parse(key.AsSpan(6, key.Length - 7), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        var backingKey = $"var[0x{bitIndex >> 4:X3}]";
+        var bit = (ushort)(value == 0 ? 0 : 1);
+        variables[key] = bit;
+        if (!variables.ContainsKey(SeparateBitStorage) && variables.TryGetValue(backingKey, out var word))
+            variables[backingKey] = bit == 0 ? (ushort)(word & ~(1 << (bitIndex & 15))) : (ushort)(word | (1 << (bitIndex & 15)));
+    }
+
     private static bool TryGetVariableKey(string operand, IDictionary<string, ushort> variables, out string variableKey)
     {
         variableKey = "";
@@ -3195,7 +3221,7 @@ public sealed class ScummBoundedScriptExecutor
         if (countAt < 0 || open < 0 || !operands.EndsWith(']') ||
             !int.TryParse(operands[(countAt + 8)..open].Trim(' ', ','), NumberStyles.Integer,
                 CultureInfo.InvariantCulture, out var count) ||
-            !TryGetVariableKey(destination, variables, out var first)) return false;
+            !TryGetVariableOrBitKey(destination, variables, out var first)) return false;
         var literals = new List<ushort>();
         foreach (var item in operands[(open + 1)..^1].Split(',', StringSplitOptions.TrimEntries))
         {

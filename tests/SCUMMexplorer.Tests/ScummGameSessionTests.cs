@@ -80,7 +80,10 @@ public sealed class ScummGameSessionTests
         // The first room: the ego stands in it, with the game's own look (costume 39) and the inventory script set by the game.
         var ego = session.Actors.Single(actor => actor.Number == 1);
         Assert.Equal(73, ego.Room);
-        Assert.Equal(39, ego.Look.Costume);
+        // S5: Room 6's entry skips its costume change and the Donovan scene (Script 73) while script 1 is running, and the session now sees it running
+        // while the room is entered (isScriptRunning during a room load); S4b started Script 73 and gave the ego costume 39 by mistake.
+        Assert.Equal(1, ego.Look.Costume);
+        Assert.DoesNotContain(session.PendingScriptSummary, item => item.StartsWith("Script 73 ", StringComparison.Ordinal));
         Assert.Equal(12, session.Snapshot.KnownGlobalVariables[ScummVars.InventoryScript]);
         Assert.Equal(2, session.Snapshot.KnownGlobalVariables[ScummVars.SentenceScript]);
         Assert.Equal(game.Rooms.Single(room => room.ResourceId == 73).ResourceId, session.CurrentRoomId);
