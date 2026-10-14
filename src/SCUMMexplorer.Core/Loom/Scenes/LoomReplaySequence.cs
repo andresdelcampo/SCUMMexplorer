@@ -12,7 +12,7 @@ public sealed class LoomReplaySequence
     private int _index, _frames, _quiet, _traceStart, _begun, _checkedFrame = -1;
     public bool Complete => _index == _steps.Count && Failure is null;
     public string? Failure { get; private set; }
-    public LoomObjectActionResult? LastAction { get; private set; }
+    public ScummObjectActionResult? LastAction { get; private set; }
     public int Stage => _index;
     /// <summary>When set, <see cref="Continue"/> sends nothing from this step on (used to run the leading steps unseen).</summary>
     public int? PauseAt { get; set; }

@@ -46,8 +46,8 @@ public sealed class LoomSoundCueTests
     public void RoomCueKeepsOnlyCuesStartedSinceEntryOrByTheRoomItself()
     {
         // Sound 25 started in Room 02 by a global chain (the intro); sound 30 by Room 16's code.
-        var intro = new LoomSessionSoundEvent(Event(ScummScriptEventKind.SoundStarted, 25), 0, 2, null);
-        var room16 = new LoomSessionSoundEvent(Event(ScummScriptEventKind.SoundStarted, 30), 5, 16, 16);
+        var intro = new ScummSessionSoundEvent(Event(ScummScriptEventKind.SoundStarted, 25), 0, 2, null);
+        var room16 = new ScummSessionSoundEvent(Event(ScummScriptEventKind.SoundStarted, 30), 5, 16, 16);
 
         Assert.Null(LoomSoundCueResolver.ResolveForRoom([intro], 2, 3, _ => true).Start);
         Assert.Equal(25, LoomSoundCueResolver.ResolveForRoom([intro], 2, 0, _ => true).Start?.TargetId);
@@ -64,7 +64,7 @@ public sealed class LoomSoundCueTests
         Assert.Null(LoomSoundCueResolver.ResolveForRoom([intro, room16], 17, 9, _ => true).Start);
 
         // An unresolved stop of a cue that is not shown does not make the room's cue uncertain.
-        var unknownStop = new LoomSessionSoundEvent(Event(ScummScriptEventKind.SoundStopped, null), 1, 2, null);
+        var unknownStop = new ScummSessionSoundEvent(Event(ScummScriptEventKind.SoundStopped, null), 1, 2, null);
         Assert.False(LoomSoundCueResolver.ResolveForRoom([intro, unknownStop, room16], 16, 4, _ => true)
             .HasUnknownSoundTarget);
         Assert.True(LoomSoundCueResolver.ResolveForRoom([intro, room16, unknownStop with { Sequence = 6 }], 16, 9,

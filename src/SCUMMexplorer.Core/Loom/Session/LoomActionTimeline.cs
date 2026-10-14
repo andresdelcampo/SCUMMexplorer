@@ -9,7 +9,7 @@ namespace SCUMMexplorer.Core.Loom;
 /// </summary>
 public static class LoomActionTimeline
 {
-    public static IReadOnlyList<string> Build(LoomObjectActionResult action, LoomScriptPresenter presenter, string objectName, string? verbName)
+    public static IReadOnlyList<string> Build(ScummObjectActionResult action, LoomScriptPresenter presenter, string objectName, string? verbName)
     {
         var steps = new List<string>();
         var what = verbName is null ? "" : $" → {verbName}";

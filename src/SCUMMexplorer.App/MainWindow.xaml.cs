@@ -1596,7 +1596,7 @@ public partial class MainWindow : Window
 
     private static (RoomObjectSelection Selection, IReadOnlyList<RoomArtworkEstimate> Estimates) CreateSessionRoomSelection(
         GameResource resource, RoomImage room, IReadOnlyList<ScummRoomObjectRecord> records,
-        IReadOnlyList<RoomObjectImage> images, LoomSessionSnapshot snapshot,
+        IReadOnlyList<RoomObjectImage> images, ScummSessionSnapshot snapshot,
         IReadOnlyDictionary<int, byte> indexedStates, ScummSceneDrawBatches sceneBatches, bool estimateArtwork = true)
     {
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates,
@@ -4101,7 +4101,7 @@ public partial class MainWindow : Window
     /// doorway's direct verb when playback ends. Returns whether the session is
     /// in another room so far (with the clock running, a later frame may still get there).
     /// </summary>
-    private bool SendInputToGame(Func<LoomObjectActionResult> send, string what,
+    private bool SendInputToGame(Func<ScummObjectActionResult> send, string what,
         IReadOnlyList<ScummRoomObjectRecord>? doorways = null)
     {
         if (_session is null || _currentRoomResource is not { } sourceRoom || _game is null) return false;
@@ -4233,7 +4233,7 @@ public partial class MainWindow : Window
     private sealed class Playback
     {
         public required string What { get; init; }
-        public LoomObjectActionResult? Action { get; init; }
+        public ScummObjectActionResult? Action { get; init; }
         public required GameResource SourceRoom { get; init; }
         public IReadOnlyList<ScummRoomObjectRecord>? Doorways { get; init; }
         public bool LeftRoom { get; set; }
@@ -4284,7 +4284,7 @@ public partial class MainWindow : Window
     /// count, up to <see cref="LoomExplorationSession.CutsceneFrameLimit"/>. A room
     /// load reached while playing opens that room, and playback goes on there.
     /// </summary>
-    private void StartPlayback(string what, LoomObjectActionResult? action, GameResource sourceRoom,
+    private void StartPlayback(string what, ScummObjectActionResult? action, GameResource sourceRoom,
         IReadOnlyList<ScummRoomObjectRecord>? doorways, bool leftRoom, bool instant = false, (int Cutscenes, int EgoPuts)? sceneBefore = null, bool preview = false, string? expectedCutscene = null, int? sentencesBefore = null)
     {
         _playback = new Playback
@@ -4710,7 +4710,7 @@ public partial class MainWindow : Window
         return shown;
     }
 
-    private static string FrameSignature(LoomSessionSnapshot snapshot, LoomExplorationSession session) =>
+    private static string FrameSignature(ScummSessionSnapshot snapshot, LoomExplorationSession session) =>
         string.Join("", session.ShadowPalette.Take(16)) + "|" +
         string.Join(",", snapshot.ObjectStates.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value}")) + "|" +
         string.Join(",", snapshot.ObjectPositions.OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value.X},{pair.Value.Y}")) + "|" +
@@ -5445,7 +5445,7 @@ public partial class MainWindow : Window
     /// <summary>An object hotspot: a doorway is not one (it has its own overlay and room clicks, R-6.13).</summary>
     private bool IsObjectHotspot(ScummRoomObjectRecord record) => DoorwayTargets(record).Length == 0;
 
-    private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, LoomSessionSnapshot snapshot) =>
+    private bool IsVerbHotspotAvailable(ScummRoomObjectRecord record, ScummSessionSnapshot snapshot) =>
         record.Width > 0 && record.Height > 0 &&
         // LOOM keeps its draft previews (48 × 40) at 0, 0: they are not in the scene, so they are no hotspots (R-6.14).
         (snapshot.ObjectPositions.TryGetValue(record.Id, out var at) ? at : new RoomObjectPosition(record.X, record.Y)) != new RoomObjectPosition(0, 0) &&
@@ -5470,7 +5470,7 @@ public partial class MainWindow : Window
         return VisibleDoorways(snapshot).Where(record => record.Id == selected).ToArray();
     }
 
-    private IEnumerable<ScummRoomObjectRecord> VisibleDoorways(LoomSessionSnapshot snapshot) =>
+    private IEnumerable<ScummRoomObjectRecord> VisibleDoorways(ScummSessionSnapshot snapshot) =>
         _roomNavigationCandidates.Select(candidate => candidate.Object).DistinctBy(record => record.Id)
             .Where(record => record.Width > 0 && record.Height > 0 &&
                              snapshot.ObjectOwners.GetValueOrDefault(record.Id) == 15 &&
@@ -5530,7 +5530,7 @@ public partial class MainWindow : Window
         SelectResourceInTree(target);
     }
 
-    private bool ParentStateMatches(ScummRoomObjectRecord record, LoomSessionSnapshot snapshot)
+    private bool ParentStateMatches(ScummRoomObjectRecord record, ScummSessionSnapshot snapshot)
     {
         var checkedCount = 0;
         while (record.ParentLocalIndex != 0)

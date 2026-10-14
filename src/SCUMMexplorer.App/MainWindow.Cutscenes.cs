@@ -547,7 +547,7 @@ public partial class MainWindow
             if (!prelude.RunSilently(setup.Steps.Count)) setupFailure = $"The derived start setup stopped ({prelude.Failure ?? "no result"}); the scene starts from the catalog visit.";
             _sceneSound.Attach(_game, session);
         }
-        LoomObjectActionResult? action;
+        ScummObjectActionResult? action;
         IReadOnlyList<string> storyNotes = [];
         if (cutscene.Steps is { } steps)
         {

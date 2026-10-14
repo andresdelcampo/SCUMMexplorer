@@ -3,75 +3,6 @@ using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Loom;
 
-public sealed record LoomSessionSnapshot(
-    int? RoomId,
-    IReadOnlyDictionary<int, byte> ObjectStates,
-    IReadOnlyDictionary<int, RoomObjectPosition> ObjectPositions,
-    IReadOnlyDictionary<int, byte> ObjectOwners,
-    IReadOnlyDictionary<string, ushort> KnownGlobalVariables,
-    IReadOnlyCollection<int> Inventory,
-    bool InventoryKnown,
-    IReadOnlyCollection<int> ActiveSounds,
-    int PendingScripts,
-    IReadOnlyList<string> Uncertainties,
-    IReadOnlyList<int>? DrawQueue = null,
-    IReadOnlyCollection<int>? StatesSetInRoom = null,
-    IReadOnlyList<ScummRandomPick>? Picks = null,
-    IReadOnlyCollection<int>? EstimatedObjectStates = null,
-    IReadOnlyDictionary<int, uint>? Classes = null,
-    IReadOnlyList<ScummMessage>? Messages = null)
-{
-    /// <summary>The messages on the screen: strings drawn since the room was drawn, then the talk message.</summary>
-    public IReadOnlyList<ScummMessage> ScreenMessages => Messages ?? [];
-
-    /// <summary>Class bits per object number; empty when the index gave none.</summary>
-    public IReadOnlyDictionary<int, uint> ObjectClasses => Classes ?? new Dictionary<int, uint>();
-
-    /// <summary>
-    /// ScummVM <c>findObject</c> skips untouchable objects. Unknown classes count as touchable.
-    /// </summary>
-    public bool IsUntouchable(int objectId) =>
-        ObjectClasses.TryGetValue(objectId, out var bits) && ScummObjectClasses.Has(bits, ScummObjectClasses.Untouchable);
-
-    /// <summary>Every seeded <c>getRandomNr</c> stand-in taken on this route, in order.</summary>
-    public IReadOnlyList<ScummRandomPick> RandomPicks => Picks ?? [];
-
-    /// <summary>Objects whose state or draw followed a seeded pick. These are estimates, not reached states.</summary>
-    public IReadOnlyCollection<int> EstimatedStates => EstimatedObjectStates ?? [];
-
-    /// <summary>Objects drawn since the last redraw, in call order (painted over directory order).</summary>
-    public IReadOnlyList<int> DrawOrder => DrawQueue ?? [];
-
-    /// <summary>Objects whose state a reached <c>setState</c> set since this room was entered.</summary>
-    public IReadOnlyCollection<int> StatesSetByCode => StatesSetInRoom ?? [];
-
-    /// <summary>Runtime state slots to preserve when estimating artwork, including
-    /// estimated execution. This does not promote them into StatesSetByCode.</summary>
-    public IReadOnlyCollection<int> ArtworkStateIds() =>
-        StatesSetByCode.Concat(EstimatedStates).Distinct().ToArray();
-
-    public bool IsFaithful => RoomId.HasValue && PendingScripts == 0 && Uncertainties.Count == 0;
-}
-
-public sealed record LoomObjectActionResult(
-    int SourceRoomId, int ObjectId, int VerbId, int ScriptOffset,
-    ScummScriptDisassembly? Script, ScummBoundedScriptResult? Run,
-    ScummScriptEvent? ReachedRoomLoad, int? DestinationRoomId,
-    IReadOnlyList<string> Uncertainties, string? Input = null)
-{
-    /// <summary>True when the action was a click sent through the game's input scripts, not a direct verb call.</summary>
-    public bool IsGameInput => Input is not null;
-
-    private string Source => Input ?? $"Room {SourceRoomId:00} object {ObjectId}, verb 0x{VerbId:X2}, code 0x{ScriptOffset:X4}";
-
-    public string Evidence => ReachedRoomLoad is null
-        ? $"{Source}; no room load was reached."
-        : $"{Source}; " +
-          $"{ReachedRoomLoad.Operation} at {ReachedRoomLoad.SourceLabel} +0x{ReachedRoomLoad.Offset:X4} → " +
-          (DestinationRoomId is int target ? $"Room {target:00}" : "unresolved room") +
-          (ReachedRoomLoad.Certainty == ScummScriptEventCertainty.Reached ? "." : " (estimated execution).");
-}
-
 /// <summary>
 /// Keeps a conservative, route-scoped LOOM state. Only instructions reached by
 /// bounded execution change the snapshot. Unsupported state or timing is
@@ -435,7 +366,7 @@ public sealed partial class LoomExplorationSession
     /// A click on the skill screen: it goes through the game's input script as any click does (the button objects' own code runs). The challenge
     /// that follows a skill choice in the game is not simulated: the answer is assumed a moment after a click that started a script.
     /// </summary>
-    public LoomObjectActionResult ClickSkillScreen(int x, int y)
+    public ScummObjectActionResult ClickSkillScreen(int x, int y)
     {
         var before = _pending.Count;
         var result = Click(x, y);
@@ -599,7 +530,7 @@ public sealed partial class LoomExplorationSession
     /// <summary>The current class bits per object or actor number (a live view; the snapshot holds a copy).</summary>
     public IReadOnlyDictionary<int, uint> ObjectClasses => _runtime.ObjectClasses;
     public ScummBoundedScriptResult? LastEntryRun { get; private set; }
-    public LoomObjectActionResult? LastAction { get; private set; }
+    public ScummObjectActionResult? LastAction { get; private set; }
     public IReadOnlyList<ScummScriptEvent> LastVisitEvents { get; private set; } = [];
     public IReadOnlyList<ScummScriptEvent> ReachedSoundEvents => _visitEvents.Where(item =>
         item.Certainty == ScummScriptEventCertainty.Reached && item.Kind is
@@ -610,11 +541,11 @@ public sealed partial class LoomExplorationSession
     /// Every sound command the session met, in route order, with the room that was
     /// current and the room whose code started the chain of scripts that ran it.
     /// </summary>
-    public IReadOnlyList<LoomSessionSoundEvent> SoundEvents => _soundEvents;
+    public IReadOnlyList<ScummSessionSoundEvent> SoundEvents => _soundEvents;
 
     /// <summary>The route position at which the current room was last entered (after the previous room's exit code).</summary>
     public int RoomEntrySequence { get; private set; }
-    public LoomSessionSnapshot Snapshot => new(
+    public ScummSessionSnapshot Snapshot => new(
         _currentRoom?.ResourceId,
         new Dictionary<int, byte>(_runtime.ObjectStates),
         new Dictionary<int, RoomObjectPosition>(_runtime.ObjectPositions),
@@ -647,7 +578,7 @@ public sealed partial class LoomExplorationSession
         _visitTrace.Add(description);
     }
 
-    public LoomSessionSnapshot VisitRoom(GameResource room, LoomObjectActionResult? reachedAction = null, bool preserveStaffLevel = false)
+    public ScummSessionSnapshot VisitRoom(GameResource room, ScummObjectActionResult? reachedAction = null, bool preserveStaffLevel = false)
     {
         ArgumentNullException.ThrowIfNull(room);
         if (room.Kind != ResourceKind.Room || room.ResourceId is null)
@@ -672,7 +603,7 @@ public sealed partial class LoomExplorationSession
         return Snapshot;
     }
 
-    private LoomSessionSnapshot CatalogEnter(GameResource room)
+    private ScummSessionSnapshot CatalogEnter(GameResource room)
     {
         var arrival = $"Room {room.ResourceId:00} selected from the catalog; the route to it was not executed from game input.";
         _runtime.Messages.RouteSkipped($"Room {room.ResourceId:00} was selected from the catalog, so prints on the route to it did not run");
@@ -688,7 +619,7 @@ public sealed partial class LoomExplorationSession
         return entered;
     }
 
-    private LoomSessionSnapshot CatalogEnterWithEgo(GameResource room, string arrival, ushort ego)
+    private ScummSessionSnapshot CatalogEnterWithEgo(GameResource room, string arrival, ushort ego)
     {
         var (assumed, label, chosen) = PickCatalogArrival(room.ResourceId!.Value, ego);
         // The ego's position before the arrival (where the route would have left it) is not known.
@@ -975,7 +906,7 @@ public sealed partial class LoomExplorationSession
     private ScummActorTable.Placement CurrentPlacement() =>
         new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses);
 
-    private LoomSessionSnapshot EnterRoom(GameResource room, string arrival, ScummScriptEvent? load = null, string? assumedArrival = null,
+    private ScummSessionSnapshot EnterRoom(GameResource room, string arrival, ScummScriptEvent? load = null, string? assumedArrival = null,
         LoomEgoArrival? placeAfterLoadRoom = null)
     {
         var eventsBeforeVisit = _visitEvents.Count;
@@ -1244,7 +1175,7 @@ public sealed partial class LoomExplorationSession
     /// makes the script go on on the next frame, so the sentence and anything it
     /// loads follow in later frames (<see cref="AdvanceFrame"/>).
     /// </summary>
-    public LoomObjectActionResult Click(int x, int y, bool doubleClick = false)
+    public ScummObjectActionResult Click(int x, int y, bool doubleClick = false)
     {
         _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null; // Subsequent input belongs to gameplay, beyond catalog arrival.
@@ -1265,14 +1196,14 @@ public sealed partial class LoomExplorationSession
         if (refused is not null)
         {
             _uncertainties.Add($"{input}: not sent, because {refused}.");
-            LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
+            LastAction = new ScummObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
                 _uncertainties.Skip(beforeUncertainties).ToArray(), input);
             return LastAction;
         }
         _uncertainties.Add($"{input}. ScummVM runInputScript({SceneClickArea}, 0, {InputMode}) runs script {verbScript} (var[0x020], VAR_VERB_SCRIPT, set by script 001 +0x016B); the click's point and timing are the explorer's, not the game's.");
         if (_runtime.UserPutEstimate is not null)
             _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
-        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        LastAction = new ScummObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
         _dispatchScope++;
         _entersRoomLoads++;
         try
@@ -1340,7 +1271,7 @@ public sealed partial class LoomExplorationSession
     /// is off or when no input script is set, as <see cref="Click"/> is. Verbs the
     /// session cannot draw (unknown mode, image or position, text verbs) cannot be found.
     /// </summary>
-    public LoomObjectActionResult ClickVerbArea(int x, int y)
+    public ScummObjectActionResult ClickVerbArea(int x, int y)
     {
         _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
@@ -1365,7 +1296,7 @@ public sealed partial class LoomExplorationSession
         if (refused is not null)
         {
             _uncertainties.Add($"{input}: not sent, because {refused}.");
-            LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
+            LastAction = new ScummObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
                 _uncertainties.Skip(beforeUncertainties).ToArray(), input);
             return LastAction;
         }
@@ -1378,7 +1309,7 @@ public sealed partial class LoomExplorationSession
             _uncertainties.Add($"Verbs the session cannot draw cannot be found by the click: {string.Join("; ", area.Notes)}.");
         if (_runtime.UserPutEstimate is not null)
             _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
-        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        LastAction = new ScummObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
         _dispatchScope++;
         _entersRoomLoads++;
         try
@@ -1445,7 +1376,7 @@ public sealed partial class LoomExplorationSession
     /// <c>verbOps</c> in the release sets a key, so the session does not keep keys.
     /// The key is assumed input.
     /// </summary>
-    public LoomObjectActionResult PressKey(int key)
+    public ScummObjectActionResult PressKey(int key)
     {
         _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
@@ -1486,14 +1417,14 @@ public sealed partial class LoomExplorationSession
             _uncertainties.Add(aborted is null
                 ? $"{input}: not sent, because {refused}."
                 : $"{input}: the key did not reach the input script after abortCutscene, because {refused}.");
-            LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
+            LastAction = new ScummObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null,
                 _uncertainties.Skip(beforeUncertainties).ToArray(), input);
             return LastAction;
         }
         _uncertainties.Add($"{input}. ScummVM checkExecVerbs: runInputScript({KeyClickArea}, 0x{key:X2}, 1) runs script {verbScript} (var[0x020], VAR_VERB_SCRIPT); the key is the explorer's, not the game's.");
         if (_runtime.UserPutEstimate is not null)
             _uncertainties.Add($"User input is taken to be on, an estimate: {_runtime.UserPutEstimate}.");
-        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        LastAction = new ScummObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
         _dispatchScope++;
         _entersRoomLoads++;
         try
@@ -1515,7 +1446,7 @@ public sealed partial class LoomExplorationSession
     }
 
     // After an input script ran: dispatch the loads it requested, or visit the room a reached load names.
-    private LoomObjectActionResult FinishInput(int beforeUncertainties, int beforeEvents)
+    private ScummObjectActionResult FinishInput(int beforeUncertainties, int beforeEvents)
     {
         var action = LastAction! with { Uncertainties = _uncertainties.Skip(beforeUncertainties).ToArray() };
         LastAction = action;
@@ -1622,7 +1553,7 @@ public sealed partial class LoomExplorationSession
             _uncertainties.Add($"Camera x (var[0x002]) = {camera} is an estimate: {reason}; the walk's end stays within the camera's triggers.");
     }
 
-    public LoomObjectActionResult ActivateObjectVerb(int objectId, int verbId)
+    public ScummObjectActionResult ActivateObjectVerb(int objectId, int verbId)
     {
         _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
@@ -1654,7 +1585,7 @@ public sealed partial class LoomExplorationSession
             _dispatchScope--;
             _entersRoomLoads--;
         }
-        LastAction = new LoomObjectActionResult(sourceRoomId, objectId, verbId,
+        LastAction = new ScummObjectActionResult(sourceRoomId, objectId, verbId,
             script?.ResourceOffset ?? record.CodeOffset, script, run, null, null,
             _uncertainties.Skip(beforeUncertainties).ToArray());
         // A global script the verb started may have loaded a room and carried on.
@@ -1671,7 +1602,7 @@ public sealed partial class LoomExplorationSession
             ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
         if (roomLoad is not null && target is null)
             _uncertainties.Add($"Reached room load has no indexed destination ({roomLoad.Operands}).");
-        var action = new LoomObjectActionResult(sourceRoomId, objectId, verbId,
+        var action = new ScummObjectActionResult(sourceRoomId, objectId, verbId,
             script?.ResourceOffset ?? record.CodeOffset, script, run, roomLoad,
             target?.ResourceId, _uncertainties.Skip(beforeUncertainties).ToArray());
         if (target is not null)
@@ -1687,7 +1618,7 @@ public sealed partial class LoomExplorationSession
     /// A catalog visit by room number (<see cref="VisitRoom"/>), for a replay sequence that moves on to a
     /// room without the game's own route, keeping the story state reached so far.
     /// </summary>
-    public LoomSessionSnapshot VisitRoomById(int roomId) =>
+    public ScummSessionSnapshot VisitRoomById(int roomId) =>
         VisitRoom(_game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) ??
                   throw new ArgumentOutOfRangeException(nameof(roomId), $"Room {roomId:00} is not in this game."));
 
@@ -1782,7 +1713,7 @@ public sealed partial class LoomExplorationSession
     /// the watcher's test is skipped, everything after the offset is the game's own code, and
     /// any running copy of the script is ended first, as <c>runScript</c> does.
     /// </summary>
-    public LoomObjectActionResult RunLocalScriptAt(int scriptId, int offset)
+    public ScummObjectActionResult RunLocalScriptAt(int scriptId, int offset)
     {
         _staffVerbSyncFrames = 0;
         _browsingStaffFloor = null;
@@ -1795,7 +1726,7 @@ public sealed partial class LoomExplorationSession
         var beforeEvents = _visitEvents.Count;
         var input = $"Room {sourceRoomId:00} local script {scriptId} was started directly at +0x{offset:X4}";
         _uncertainties.Add($"{input}: an exploration action, not the game's flow. The condition that guards this offset was not met or tested; input dispatch and the ego's walk were not simulated.");
-        LastAction = new LoomObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
+        LastAction = new ScummObjectActionResult(sourceRoomId, 0, 0, 0, null, null, null, null, [], input);
         _dispatchScope++;
         _entersRoomLoads++;
         try { RunStartedScript(scriptId, offset, new Dictionary<string, ushort>(), 0); }
@@ -1813,7 +1744,7 @@ public sealed partial class LoomExplorationSession
     /// <see cref="ActivateObjectVerb"/> does for a load reached directly, and
     /// the last action records the continued load as its outcome.
     /// </summary>
-    public LoomSessionSnapshot AdvanceFrame()
+    public ScummSessionSnapshot AdvanceFrame()
     {
         var snapshot = AdvanceOneFrame();
         if (_staffVerbSyncFrames > 0 && StatusEditable) { SyncStaffVerbs(); _staffVerbSyncFrames--; snapshot = Snapshot; }
@@ -1878,7 +1809,7 @@ public sealed partial class LoomExplorationSession
 
     private const string MusicTimerVariable = ScummVars.MusicTimer;
 
-    private LoomSessionSnapshot AdvanceOneFrame()
+    private ScummSessionSnapshot AdvanceOneFrame()
     {
         // scummLoop (v3): the talk delay goes down by the frame's jiffies and displayDialog
         // runs before the scripts; VAR_HAVE_MSG takes _haveMsg.
@@ -2083,7 +2014,7 @@ public sealed partial class LoomExplorationSession
         }
         var sourceRoomId = _currentRoom.ResourceId ?? 0;
         var beforeUncertainties = _uncertainties.Count;
-        LoomObjectActionResult action;
+        ScummObjectActionResult action;
         if (LastAction is { ReachedRoomLoad: null } pending && pending.SourceRoomId == sourceRoomId)
             action = pending with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId };
         else if (frame is not null && frame == _actionLoadFrame &&
@@ -2093,7 +2024,7 @@ public sealed partial class LoomExplorationSession
             action = last with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId };
         }
         else
-            action = new LoomObjectActionResult(sourceRoomId, 0, 0, roomLoad.Offset, null, null, roomLoad,
+            action = new ScummObjectActionResult(sourceRoomId, 0, 0, roomLoad.Offset, null, null, roomLoad,
                 target.ResourceId, []);
         _actionLoadFrame = frame;
         _uncertainties.Add($"{roomLoad.SourceLabel} +0x{roomLoad.Offset:X4} reached {roomLoad.Operation} {when}.");
@@ -2118,7 +2049,7 @@ public sealed partial class LoomExplorationSession
     }
 
     private readonly List<ScummScriptEvent> _visitEvents = [];
-    private readonly List<LoomSessionSoundEvent> _soundEvents = [];
+    private readonly List<ScummSessionSoundEvent> _soundEvents = [];
     private readonly List<string> _visitTrace = [];
     private readonly List<ScummRandomPick> _picks = [];
     // Scripts running now, outermost first; the last one is the current script.
@@ -2402,7 +2333,7 @@ public sealed partial class LoomExplorationSession
         _visitEvents.Add(scriptEvent);
         if (scriptEvent.Kind is ScummScriptEventKind.MusicStarted or ScummScriptEventKind.SoundStarted or
             ScummScriptEventKind.MusicStopped or ScummScriptEventKind.SoundStopped)
-            _soundEvents.Add(new LoomSessionSoundEvent(scriptEvent, _visitEvents.Count - 1, _runtime.CurrentRoom,
+            _soundEvents.Add(new ScummSessionSoundEvent(scriptEvent, _visitEvents.Count - 1, _runtime.CurrentRoom,
                 _executing.Count > 0 ? _executing[^1].OriginRoom : null));
         switch (scriptEvent.Kind)
         {

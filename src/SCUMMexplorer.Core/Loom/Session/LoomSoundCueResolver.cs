@@ -7,14 +7,6 @@ namespace SCUMMexplorer.Core.Loom;
 public sealed record LoomReachedSoundCue(ScummScriptEvent? Start, bool HasUnknownSoundTarget,
     int OtherActiveMusicCount, bool StartedBeforeEntry = false);
 
-/// <summary>
-/// A sound command on the session's route. <paramref name="Sequence"/> orders it among
-/// the route's events; <paramref name="RoomId"/> is the room that was current, and
-/// <paramref name="OriginRoomId"/> the room whose code started the chain of scripts
-/// that ran the command (null for a chain the engine started: the boot or a room hook).
-/// </summary>
-public sealed record LoomSessionSoundEvent(ScummScriptEvent Event, int Sequence, int? RoomId, int? OriginRoomId);
-
 /// <summary>Folds reached sound commands in route order without treating static paths as executed.</summary>
 public static class LoomSoundCueResolver
 {
@@ -22,7 +14,7 @@ public static class LoomSoundCueResolver
         Func<int, bool> isMusicTrack)
     {
         ArgumentNullException.ThrowIfNull(events);
-        return Fold(events.Select((item, index) => new LoomSessionSoundEvent(item, index, null, null)),
+        return Fold(events.Select((item, index) => new ScummSessionSoundEvent(item, index, null, null)),
             _ => true, isMusicTrack, 0);
     }
 
@@ -32,7 +24,7 @@ public static class LoomSoundCueResolver
     /// only carries over from another room (such as the intro's) is left out, since
     /// the session does not simulate when a track ends.
     /// </summary>
-    public static LoomReachedSoundCue ResolveForRoom(IEnumerable<LoomSessionSoundEvent> events, int roomId,
+    public static LoomReachedSoundCue ResolveForRoom(IEnumerable<ScummSessionSoundEvent> events, int roomId,
         int entrySequence, Func<int, bool> isMusicTrack)
     {
         ArgumentNullException.ThrowIfNull(events);
@@ -40,13 +32,13 @@ public static class LoomSoundCueResolver
             isMusicTrack, entrySequence);
     }
 
-    private static LoomReachedSoundCue Fold(IEnumerable<LoomSessionSoundEvent> events,
-        Func<LoomSessionSoundEvent, bool> isRelevant, Func<int, bool> isMusicTrack, int entrySequence)
+    private static LoomReachedSoundCue Fold(IEnumerable<ScummSessionSoundEvent> events,
+        Func<ScummSessionSoundEvent, bool> isRelevant, Func<int, bool> isMusicTrack, int entrySequence)
     {
         ArgumentNullException.ThrowIfNull(isMusicTrack);
-        var active = new List<LoomSessionSoundEvent>();
+        var active = new List<ScummSessionSoundEvent>();
         // Cues an unresolved stop may have ended.
-        var possiblyStopped = new HashSet<LoomSessionSoundEvent>(ReferenceEqualityComparer.Instance);
+        var possiblyStopped = new HashSet<ScummSessionSoundEvent>(ReferenceEqualityComparer.Instance);
         var unknownStart = false;
         foreach (var item in events.Where(item => item.Event.Certainty == ScummScriptEventCertainty.Reached))
         {

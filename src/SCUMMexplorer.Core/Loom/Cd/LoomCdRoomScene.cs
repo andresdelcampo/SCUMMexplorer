@@ -4,7 +4,7 @@ namespace SCUMMexplorer.Core.Loom;
 
 /// <summary>A CD room as the game's own entry script leaves it: the background, the object records and images, the session snapshot and the picture selection built from it.</summary>
 public sealed record LoomCdScene(RoomImage Room, IReadOnlyList<ScummRoomObjectRecord> Records, IReadOnlyList<RoomObjectImage> Images,
-    LoomSessionSnapshot Snapshot, RoomObjectSelection Selection, int CameraX,
+    ScummSessionSnapshot Snapshot, RoomObjectSelection Selection, int CameraX,
     IReadOnlyList<ScummActorSnapshot> Actors, ScummWalkBoxSet? WalkBoxes, Func<int, ScummCostume?> Costumes)
 {
     public IReadOnlyList<byte>? ShadowPalette { get; init; }
