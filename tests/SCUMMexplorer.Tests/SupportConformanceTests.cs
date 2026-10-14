@@ -16,19 +16,19 @@ public class SupportConformanceTests
     private static readonly (GameFamily Family, string Folder)[] Fixtures =
     [
         (GameFamily.LoomEgaReference, "loom ega mt32 en"),
-        (GameFamily.LoomEga, "ALTERNATIVE LOOMS/loom ega es"),
-        (GameFamily.LoomEgaDemo, "ALTERNATIVE LOOMS/loom demo short ega en"),
+        (GameFamily.LoomEga, "loom ega es"),
+        (GameFamily.LoomEgaDemo, "loom demo short ega en"),
         (GameFamily.LoomCd, "loom vga en"),
-        (GameFamily.Indy3Ega, "FUTURE/indy3 ega en"),
-        (GameFamily.Indy3Vga, "FUTURE/indy3 vga en"),
-        (GameFamily.MonkeyFloppy, "FUTURE/monkey1 ega en"),
-        (GameFamily.MonkeyCd, "FUTURE/monkey1 vga en"),
-        (GameFamily.Monkey2, "FUTURE/mi2 talkie en"),
-        (GameFamily.Indy4, "FUTURE/indy4 vga en"),
-        (GameFamily.ManiacEnhanced, "FUTURE/mmansionE ega es"),
-        (GameFamily.ManiacClassic, "FUTURE/mmansion ega en"),
-        (GameFamily.ZakEnhanced, "FUTURE/zakE ega en"),
-        (GameFamily.ZakClassic, "FUTURE/zak ega en")
+        (GameFamily.Indy3Ega, "indy3 ega en"),
+        (GameFamily.Indy3Vga, "indy3 vga en"),
+        (GameFamily.MonkeyFloppy, "monkey1 ega en"),
+        (GameFamily.MonkeyCd, "monkey1 vga en"),
+        (GameFamily.Monkey2, "mi2 talkie en"),
+        (GameFamily.Indy4, "indy4 vga en"),
+        (GameFamily.ManiacEnhanced, "mmansionE ega es"),
+        (GameFamily.ManiacClassic, "mmansion ega en"),
+        (GameFamily.ZakEnhanced, "zakE ega en"),
+        (GameFamily.ZakClassic, "zak ega en")
     ];
 
     public static IEnumerable<object[]> Families() => Fixtures.Select(f => new object[] { f.Family });
@@ -60,7 +60,13 @@ public class SupportConformanceTests
 
     private static string? Locate(string folder)
     {
-        var path = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games", folder);
-        return Directory.Exists(path) ? path : null;
+        // The games sit directly under Games/ (they were once split into FUTURE/ and ALTERNATIVE LOOMS/ subfolders; those are still tried).
+        var games = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games");
+        foreach (var parent in new[] { "", "FUTURE", "ALTERNATIVE LOOMS" })
+        {
+            var path = Path.Combine(games, parent, folder);
+            if (Directory.Exists(path)) return path;
+        }
+        return null;
     }
 }
