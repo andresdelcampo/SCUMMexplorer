@@ -26,6 +26,8 @@ public static class ScummVars
     public const string MouseY = "var[0x015]";
     /// <summary><c>VAR_CHARINC</c>: the delay between characters of a message.</summary>
     public const string CharInc = "var[0x025]";
+    /// <summary><c>VAR_SOUNDCARD</c>: the sound card the game's scripts see (0 in a session by default).</summary>
+    public const string SoundCard = "var[0x030]";
     /// <summary><c>VAR_ROOM</c>: the room the game is in.</summary>
     public const string Room = "var[0x004]";
     /// <summary><c>VAR_OVERRIDE</c>: 1 after an aborted cutscene, 0 otherwise.</summary>

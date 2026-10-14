@@ -57,6 +57,12 @@ public abstract partial class ScummSession
         _runtime.ScriptRunning = IsScriptRunning;
         _runtime.SoundRunning = _soundClock.Status;
         _runtime.OverrideChanged = RecordOverride;
+        _runtime.Actors.CostumeSource = _data.ReadCostume;
+        _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
+        _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
+        // The engine starts with every variable at 0; the frame loop adds to the timers from there.
+        foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
+            _runtime.SetGlobalVariable(timer, 0);
     }
 
     /// <summary>True for the verb of a look or use sentence an object script starts (counted in <see cref="ObjectSentencesBegun"/>); the game's verb numbers are the derived session's knowledge.</summary>
