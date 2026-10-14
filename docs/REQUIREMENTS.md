@@ -424,7 +424,7 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 | R-16.5 | APP | Reproduce app differences through the real window (`WindowCheck`) and compare with the bundled ScummVM; never `git stash`. | Rule (memory) |
 | R-16.6 | APP | Git: commit each finished task separately on `master` with explicit paths; `Games/` ignored; merge worktree commits to master with fast-forward after fixes; pushing is allowed. | Rule |
 | R-16.7 | APP | Session end: update `docs/CURRENT_WORK.md`, record finished work with validation in `docs/CHANGELOG.md`, evidence under `.verification/<topic>/`; end with a fresh ready-to-copy next prompt (`NEXT_SESSION_PROMPT.md`). | Rule |
-| R-16.8 | APP | Raising what the explorer supports for a game follows [GAME_SUPPORT_INSTRUCTIONS.md](GAME_SUPPORT_INSTRUCTIONS.md): one family and one stage at a time, a registry level changes only with its conformance test and evidence record, and a stage that needs a new requirement proposes it here first and waits for the user. This document wins where the two differ. | Rule (14 Oct) |
+| R-16.8 | APP | Raising what the explorer supports for a game follows [GAME_SUPPORT_INSTRUCTIONS.md](GAME_SUPPORT_INSTRUCTIONS.md): one family and one stage at a time, a registry level changes only with its conformance test and evidence record, and a stage that needs a new requirement proposes it here first and waits for the user. Where the two differ, the requirements win and the instructions are corrected. | Rule (14 Oct) |
 
 ## 17. Out of scope (today)
 
