@@ -67,7 +67,7 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 | **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
 | **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
 | **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
-| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
+| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
 <!-- support-matrix:end -->
@@ -80,7 +80,7 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 - **Audio devices.** LOOM EGA: AdLib and PC speaker, plus Roland MT-32 when the Roland upgrade is installed. LOOM CD: voices and disc music. Monkey Island 2 and Indiana Jones 4: Roland MT-32 (needs your own MT-32 ROM images), AdLib and PC speaker. Other browse-only games: AdLib and PC speaker (Indiana Jones 3, Monkey Island 1 floppy) or PC speaker and PCjr/Tandy (Maniac Mansion, Zak McKracken).
 - **Objects.** In the browse-only games, objects are painted only where the game data gives them a starting state (Maniac Mansion and Zak McKracken, Indiana Jones 3 EGA). The v4 and v5 games show an object's name when you hover over it; the objects themselves would need the room scripts to run first.
 - **Walk boxes** (Advanced) are read for every game.
-- **Costumes** are drawn in the palette of the room that stores them, so some look off (Guybrush's shirt). The classic Maniac Mansion and Zak McKracken take the actor colours from the game's own scripts and tables (all 23 Maniac costumes; 25 of Zak's 35); the other 10 Zak costumes are labelled estimates, because their colours depend on what ran before.
+- **Costumes** are drawn in the palette of the room that stores them, so some look off (Guybrush's shirt). The classic Maniac Mansion and Zak McKracken take the actor colours from the game's own scripts and tables: all 23 Maniac Mansion costumes, and 25 of Zak's 35; the other 10 Zak costumes are labelled estimates, because their colours depend on what ran before.
 - **Sounds.** AdLib music in the Monkey Island and Indiana Jones 3 (256 colours) disks plays at half tempo, set by ear, not from ScummVM's source. Indiana Jones 3 EGA plays its AdLib music at the LOOM tempo, which has not been checked by ear. Monkey Island 1 CD lists the disc's 24 audio tracks, each named after the room whose music it is and the sound that starts it (read from the game's own sounds; two tracks no sound starts stay unnamed). The Monkey Island 2 and Indiana Jones 4 music (iMUSE) plays on Roland MT-32, AdLib and PC speaker, and their sampled effects (Sound Blaster) play too; these were listened to and confirmed by the author, and songs wait at the first loop point instead of looping. The spoken lines of the talkie versions (`MONSTER.SOU`, also on the Indiana Jones 4 CD) play from Game Texts with "Play speech" on any line that has one. The PCjr/Tandy sounds of Maniac Mansion and Zak McKracken are ported from ScummVM but not yet listened to.
 - **Cutscenes.** The demos play only their preview. LOOM English EGA has a hand-checked list of 328 scenes. Other LOOM editions and the CD derive theirs from the game's own scripts.
 - The Maniac Mansion, Zak McKracken, Monkey Island, Indiana Jones and Atlantis columns marked "–" describe what the app does not read yet, not what the original game lacks. The detailed list is in [Requirements](docs/REQUIREMENTS.md) (section 3.1).

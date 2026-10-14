@@ -80,7 +80,7 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, P, F, F, P, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.Indy4, "**Indiana Jones 4**", [F, P, F, F, P, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.ManiacEnhanced, "**Maniac Mansion** enhanced", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
-        Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, P, F, P, F, F, F, N, N, N], Browsed, BrowsedPreview),
+        Row_(GameFamily.ManiacClassic, "**Maniac Mansion** classic", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.ZakEnhanced, "**Zak McKracken** enhanced", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.ZakClassic, "**Zak McKracken** classic", [F, P, F, P, F, F, F, N, N, N], Browsed, BrowsedPreview),
         // Another old-v3 game (Zak McKracken EGA and the like): the room pictures and the texts need nothing game-specific. Limited on purpose.

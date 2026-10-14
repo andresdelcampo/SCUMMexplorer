@@ -83,7 +83,7 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
 | **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
 | **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
-| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
+| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
 <!-- support-matrix:end -->
@@ -95,7 +95,7 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | Rooms | – | every room picture decodes and is offered; LOOM also shows the first-visit state (R-1.4) | rooms offered, picture decodes |
 | Objects | stored object boxes and names from the room data (no script run) | first-visit state from the entry scripts, and click responses through the game's own scripts (R-1.5) | LOOM only today |
 | Walk boxes | – | read for the room and drawn in Advanced | – |
-| Costumes | drawn, but in an estimated palette (v1: actor colours read from the scripts, estimated only where they depend on the run; not yet compared with a running ScummVM) | drawn in the correct palette | costumes offered |
+| Costumes | drawn, but in an estimated palette (Zak McKracken classic: 10 of 35 actor colours depend on what ran and stay labelled estimates; Maniac Mansion classic is derived from the scripts and counts as full) | drawn in the correct palette | costumes offered |
 | Sound | some devices or kinds not heard or not played (v5 loops, MT-32 needs the user's ROMs) | every kind plays on every device the game has | sounds offered |
 | Texts | – | Game Texts extracts spoken lines, names and labels | extractor finds entries |
 | Scripts | – | raw disassembly in the family's dialect, and the Readable view | scripts offered |
