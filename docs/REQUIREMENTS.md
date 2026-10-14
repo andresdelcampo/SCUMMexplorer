@@ -1,6 +1,6 @@
 # SCUMMexplorer requirements
 
-Drafted 10 October 2026 from the project notes, `README.md`, `docs/` and the source under `src/` (read, not run: no build, test or app run was done for this draft). Problems found on the way are **not** mixed in here; they are in [REQUIREMENTS_FINDINGS.md](archive/REQUIREMENTS_FINDINGS.md).
+Drafted 10 October 2026 from the project notes, `README.md`, `docs/` and the source under `src/` (read, not run). Reviewed 14 October 2026 ([review](REQUIREMENTS_REVIEW_2026-10-14.md)): the support matrix (§3.1) is now generated from the code, the rows about browsed games were brought up to date with the 11–12 October work, and duplicate ids carry a suffix (`R-5.5a`, `R-6.13a`). Problems found on the way are **not** mixed in here; they are in [REQUIREMENTS_FINDINGS.md](archive/REQUIREMENTS_FINDINGS.md).
 
 ## 0. How to read this document
 
@@ -41,7 +41,7 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 |---|---|---|---|
 | R-1.1 | APP | The app is an audio-visual, interactive **explorer**, not a technical SCUMM viewer: users walk through rooms, trigger cutscenes, change objects and discover secrets. Technical evidence exists, but only behind **Advanced**. | Rule |
 | R-1.2 | APP | Game data is never shipped or committed. The user opens a folder (or disc image) they own. `Games/` and `Games/mt32` stay out of git. | Rule |
-| R-1.3 | LOOM | Reference quality is **LOOM EGA (DOS)**. LOOM CD/VGA has live interaction, actors, scripts, scene playback, Game Status and CD audio. Indy3 EGA (not part of the first LOOM release's claims, README omits it) is limited to backgrounds and texts, including dialogue choices. | Rule |
+| R-1.3 | LOOM | Reference quality is **LOOM EGA (DOS)**. LOOM CD/VGA has live interaction, actors, scripts, scene playback, Game Status and CD audio. Indy3 EGA is limited to backgrounds, costumes, sounds, scripts and texts, including dialogue choices; the other games are browse-only (§3.1). | Rule |
 | R-1.4 | APP | **Rooms show no gaps and show their first-visit state.** Where the data does not decide, pick at random and label the pick. Implementation: LOOM today (first-visit state from the room entry scripts and the session). | Rule |
 | R-1.5 | APP | **Objects respond as in the game, with the game's hero on screen** (28 Sep). Single click walks the hero to the object and uses it (exits lead on). Double click also looks at it (the description). Implementation: LOOM, Bobbin, input scripts 005–007, use verb 0x38, look verb 0x36; another game supplies its own verbs and input script. Cycling an object's stored images belongs only to the inspection mode, and the mode's text says so. There is no hidden modifier gesture (no Alt+click). Hiding an object is allowed only if the background behind it has no gap. | Rule |
 | R-1.6 | APP | **Room hotspots navigate between rooms.** Implementation: LOOM doorways from source responses (R-7.2). | Rule |
@@ -67,21 +67,50 @@ A requirement tagged `SCUMM` that today only one game exercises is still `SCUMM`
 
 ### 3.1 Support matrix
 
-| Game / edition | Tag | Opens | Rooms (R-1.4) | Live session | Scripts (Raw/Readable) | Cutscene picker | Game Texts | Game Status | Audio |
-|---|---|---|---|---|---|---|---|---|---|
-| LOOM EGA en, Roland (reference) | LOOM EGA ref | ✔ | first-visit, objects, actors | ✔ | ✔ | full catalog (328 replays) | ✔ | ✔ | AdLib, PC Speaker, Roland MT-32 |
-| LOOM EGA other editions (Spanish, plain English, French, German, v1.2, Italian) | LOOM EGA | ✔ | first-visit, objects, actors (same code; no gaps checked, first-visit per edition not recorded: I-07) | ✔ | ✔ | four established starts only | ✔ | ✔ | AdLib, PC Speaker; Roland only with files 82–85 |
-| LOOM demos (short, long) | LOOM demo | ✔ | first-visit, objects, actors | ✔ | ✔ (full-game names not applied) | only **The preview** | ✔ | ✔ | as EGA |
-| LOOM CD/VGA en (`.cue`/`.bin`/`.iso`, folder, or copied files) | LOOM CD | ✔ | first-visit, objects, actors | ✔ | ✔ | derived from scripts | ✔ (Advanced) | ✔ | CD Audio / No Sound |
-| Indy3 EGA en | INDY3 EGA | ✔ | backgrounds only (R-6.12) | – | not shown in tree | – | ✔ incl. dialogue choices | – | AdLib, PC Speaker; costumes tab |
-| Monkey Island VGA (4 disks) and EGA (8 disks), any language | BROWSED | ✔ | backgrounds only (R-3.10, R-6.13) | – | – | – | – | – | AdLib, PC Speaker (R-13.8); costumes tab (R-5.5) |
-| Indiana Jones and the Fate of Atlantis (floppy, talkie, CD), Monkey Island 1 CD, Monkey Island 2 (v5; any language) | BROWSED | ✔ | backgrounds only (R-3.14) | – | – | – | – | – | Roland MT-32, AdLib, PC speaker and sampled (Sound Blaster) sounds play (MT-32 needs the ROMs); costumes tab |
-| Indiana Jones and the Last Crusade, 256 colours (per-room `.lfl`) | BROWSED | ✔ | backgrounds only | – | – | – | – | – | AdLib, PC Speaker; costumes tab |
-| Maniac Mansion Enhanced, Zak McKracken Enhanced (v2) | BROWSED | ✔ | backgrounds only | – | – | – | – | – | – (sounds not read); costumes tab |
-| Maniac Mansion, Zak McKracken classic (v1) | BROWSED | ✔ | backgrounds only | – | – | – | – | – | – (sounds not read); costumes tab (actor colours estimated) |
-| Any other old-v3 game whose `00.LFL` parses (not recognised; folder name as title) | SCUMM v3 | ✔ limited | backgrounds only (as Indy3) | – | not shown in tree | – | ✔ (LOOM script dialect; a game with other opcodes may read wrongly) | – | – |
+The matrix is **generated** from the registry `GameSupport.Families` (`Core/Domain/GameSupport.cs`, one row per `GameFamily`) and is the same table as in the README. Edit the registry, not the table: a test (`SupportMatrixTests`) fails when either copy differs, and running the tests with `SCUMM_UPDATE_SUPPORT_MATRIX=1` rewrites both. A level is raised only when the feature works for that family and its conformance check passes (`SupportConformanceTests`, run for every family whose data folder is present).
 
-Every ✔ in *Rooms* means the same thing: no gaps, first-visit state, objects and actors drawn by the shared engine code. The reference edition differs only in having a **replay catalog** (cutscene picker column), which is data, not room rendering.
+<!-- support-matrix:start -->
+| Game | Rooms | Objects | Walk boxes | Costumes | Sound | Texts | Scripts | Play | Cutscenes | Status |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| **LOOM** EGA English (reference) | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| **LOOM** EGA other editions | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **LOOM** demos | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **LOOM** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | ✔ |
+| **Indiana Jones 3** EGA | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Indiana Jones 3** 256 colours | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Monkey Island 1** floppy | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Monkey Island 1** CD | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
+| **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
+| **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | ◐ | ✔ | ✔ | – | – | – |
+| **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
+| **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
+<!-- support-matrix:end -->
+
+✔ works (Full), ◐ partly, – not supported. What each column asks for, at each level:
+
+| Column | ◐ Partial | ✔ Full | Checked by |
+|---|---|---|---|
+| Rooms | – | every room picture decodes and is offered; LOOM also shows the first-visit state (R-1.4) | rooms offered, picture decodes |
+| Objects | stored object boxes and names from the room data (no script run) | first-visit state from the entry scripts, and click responses through the game's own scripts (R-1.5) | LOOM only today |
+| Walk boxes | – | read for the room and drawn in Advanced | – |
+| Costumes | drawn, but in an estimated palette (v1: actor colours; the scripts choose the real ones) | drawn in the correct palette | costumes offered |
+| Sound | some devices or kinds not heard or not played (v5 loops, MT-32 needs the user's ROMs) | every kind plays on every device the game has | sounds offered |
+| Texts | – | Game Texts extracts spoken lines, names and labels | extractor finds entries |
+| Scripts | – | raw disassembly in the family's dialect, and the Readable view | scripts offered |
+| Play | – | live room: actors, camera, clicks run the game's scripts | LOOM only today |
+| Cutscenes | list derived from the scripts, not hand-validated | hand-validated catalog (English Roland LOOM only) | – |
+| Status | – | Game Status editor | LOOM only today |
+
+Family notes (what is behind a row):
+
+- `LoomEgaReference`: the English Roland edition (`GameSupport.ReferenceEditionLabel`); the replay catalog (328 replays, R-8.18) is enabled only for its fingerprint. `LoomEga`: the other editions (Spanish, plain English, French, German, v1.2, Italian) use the same code with the script-derived cutscene list (R-8.24); their first-visit state per edition is not recorded (I-07).
+- `LoomEgaDemo`: the short and long self-running demos; the picker offers only **The preview** (R-3.3). `LoomCd`: CD/VGA with voices and disc music; cutscenes derived from scripts (R-8.21, R-8.25).
+- `Indy3Ega`: backgrounds, costumes, sounds, scripts and texts including dialogue choices (R-11.6); no objects with state, no play. The browsed families (`Indy3Vga`, `MonkeyFloppy`, `MonkeyCd`, `Monkey2`, `Indy4`, `ManiacEnhanced`, `ManiacClassic`, `ZakEnhanced`, `ZakClassic`) share the same reading: rooms, costumes, walk boxes, sounds, scripts, texts and stored-object boxes (R-3.10 to R-3.14, R-13.8).
+- Not in the matrix: `OtherV3` (any other old-v3 game whose `00.LFL` parses: rooms and texts, LOOM script dialect, may read wrongly) and `OtherBrowsed` (an unrecognised v1/v2/v4/v5 game, read like the browsed families).
+
+Every Rooms ✔ means the same thing: no gaps, objects and actors drawn by the shared engine code. The reference edition differs only in having a **replay catalog**, which is data, not room rendering.
 
 ### 3.2 Detection and opening
 
@@ -91,10 +120,10 @@ Every ✔ in *Rooms* means the same thing: no gaps, first-visit state, objects a
 | R-3.9 | LOOM EGA, Indy3 EGA | The edition is named in `GameLibrary.Edition` and the detection note when known hashes match: LOOM English, English with the Roland upgrade, Spanish, Spanish with the Roland upgrade, Spanish v1.2, French, German, Italian, the long and the short demo; Indy3 English, Spanish and the demo. Demos are flagged from their data, so a demo without its executable still opens as a demo (R-3.3). Another release (or one with most of those files changed) is still opened as the game when the fallbacks of R-3.1 recognise it, with no edition name. Regenerate `known-editions.json` when a copy is added (`python .verification/known-editions/make.py`). | Code |
 | R-3.2 | SCUMM v4 | `000.LFL` + `DISK01.LEC` is claimed as LOOM CD only for its known fingerprint or its directory sizes (78 rooms, 165 costumes, 637 scripts, 30 sounds); any other game on that format is browsed (R-3.10), never claimed as LOOM. The CD game opens from a `.cue`, `.iso`, `.bin`, a folder holding one, or a folder with `000.LFL` + `DISK01.LEC`. The title is the game's name with the edition mark (for LOOM CD: `LOOM (CD)`), platform `CD (VGA)`. | Code |
 | R-3.10 | BROWSED, SCUMM v4 | A v4 game that is not LOOM CD is read from **every** `DISKnn.LEC` (`ScummV4Disks`; each resource says its disk in `ContainerFileNumber`) and offered with its rooms, costumes and sounds; a room is offered only if its picture decodes. The 256-colour Indiana Jones is the same format with one plain `NN.lfl` per room (`00.lfl` starts with a `0R` block). If no room decodes, nothing is offered and the note says so. Implementation: `GameFolderScanner.ScanOtherV4`, `GameLibrary.V4Disks` / `V4ArchiveFor`. | Code |
-| R-3.11 | BROWSED, SCUMM v2 | An index whose directories end exactly at the end of the file with **one** byte per global object (the old-v3 index has four) is an enhanced v2 game (`GameLibrary.Version` = `V2`); only rooms (those whose picture decodes: room 0 is the index file itself) and costumes are offered; scripts and sounds are not. | Code |
-| R-3.12 | BROWSED, SCUMM v1 | An index with magic `0x0A31` whose fixed per-game directory sizes add up to the length of the file is a classic v1 game (`Version` = `V1`; `GameLibrary.V1Game` says Maniac Mansion or Zak McKracken and picks the colour table); rooms and costumes are offered (costume colours are the explorer's estimate: Maniac's actor table with the costume number as actor number, a fixed colour for Zak; the scripts choose the real ones). | Code |
+| R-3.11 | BROWSED, SCUMM v2 | An index whose directories end exactly at the end of the file with **one** byte per global object (the old-v3 index has four) is an enhanced v2 game (`GameLibrary.Version` = `V2`); rooms (those whose picture decodes: room 0 is the index file itself), costumes, sounds, scripts and texts are offered (12 October); objects are shown as stored boxes only. | Code |
+| R-3.12 | BROWSED, SCUMM v1 | An index with magic `0x0A31` whose fixed per-game directory sizes add up to the length of the file is a classic v1 game (`Version` = `V1`; `GameLibrary.V1Game` says Maniac Mansion or Zak McKracken and picks the colour table); rooms, costumes, sounds, scripts and texts are offered (costume colours are the explorer's estimate: Maniac's actor table with the costume number as actor number, a fixed colour for Zak; the scripts choose the real ones). | Code |
 | R-3.13 | BROWSED | Evidence for these games is the format reading only: a picture that decodes is shown as stored (the palette of the room that holds a costume is used for v4 costumes), and nothing is claimed about scripts, objects or interaction. Format references: [resource formats](engine/SCUMM_RESOURCE_FORMATS.md). | Rule/Doc |
-| R-3.14 | BROWSED, SCUMM v5 | A folder or disc image holding `NAME.000` and `NAME.001` is a v5 game (`GameLibrary.Version` = `V5`): `ScummV5Archive` reads the index (room names, the directories of costumes) and the `LECF` resource file; on a disc the candidates may be in language or game folders (`ENGLISH/MONKEY.000`, `ATLANTIS/ATLANTIS.000`, demos beside the game): the one whose index lists the most rooms is opened, an `ENGLISH` folder winning a tie. Rooms (picture and `CLUT` palette) and costumes (16 and 32 colours) are offered; scripts, sounds and objects are not. | Code |
+| R-3.14 | BROWSED, SCUMM v5 | A folder or disc image holding `NAME.000` and `NAME.001` is a v5 game (`GameLibrary.Version` = `V5`): `ScummV5Archive` reads the index (room names, the directories of costumes) and the `LECF` resource file; on a disc the candidates may be in language or game folders (`ENGLISH/MONKEY.000`, `ATLANTIS/ATLANTIS.000`, demos beside the game): the one whose index lists the most rooms is opened, an `ENGLISH` folder winning a tie. Rooms (picture and `CLUT` palette) and costumes (16 and 32 colours) are offered, and since 12 October also sounds (iMUSE: Roland MT-32, AdLib, PC speaker, sampled), the talkie speech, Monkey Island 1 CD tracks, scripts and texts; objects are shown as stored boxes only. | Code |
 | R-3.3 | LOOM demo | A demo's `00.LFL` is not a subset of the game's: entries pointing at missing containers, at non-resource offsets or at unreadable resources are dropped, and the dropped count is stated in the detection note. Title `LOOM (demo)`. Full-game script/bit/actor/sound names are **not** applied to a demo; variables and rooms are. | Code |
 | R-3.4 | APP | The app reopens the last game folder at start (`last-folder` file under `%LOCALAPPDATA%\SCUMMexplorer`). A missing folder yields `Last game folder is unavailable. Choose a folder to open.` and no crash. Only reopening the last game may reuse saved room thumbnails; the **Open Game Folder** button rebuilds them. | Code |
 | R-3.5 | APP | Opening another game stops playback, sound and CD voice, replaces the session and rebuilds the catalog; nothing from the previous game leaks. | Code |
@@ -114,7 +143,7 @@ Every ✔ in *Rooms* means the same thing: no gaps, first-visit state, objects a
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-4.1 | APP | Window title `SCUMMexplorer`; minimum 900×600. Dark theme; accent `#B78442`. Header row: app name, then (right-aligned wrap) `Play Cutscene` (Advanced), `Game Texts` (Advanced), `Game Status` (LOOM, once a session exists), the CD sound box (CD only), the music sound box (not CD), the **Advanced** switch, and the primary **Open Game Folder** button. The right-hand group (sound, Advanced, Open) never moves when others appear. | Code (MainWindow.xaml) |
+| R-4.1 | APP | Window title `SCUMMexplorer` followed by the release label (`Preview1`); minimum 900×600. Dark theme; accent `#B78442`. Header row: app name, then (right-aligned wrap) `Play Cutscene` (Advanced), `Game Texts` (Advanced), `Game Status` (LOOM, once a session exists), the CD sound box (CD only), the music sound box (not CD), the **Advanced** switch, and the primary **Open Game Folder** button. The right-hand group (sound, Advanced, Open) never moves when others appear. | Code (MainWindow.xaml) |
 | R-4.2 | APP | Three columns: left side panel (250), centre content, right inspection panel (290, **Advanced and a room selected only**). Footer bar shows `<Title> · <Platform>` with the folder path as tooltip. | Code |
 | R-4.3 | APP | **Normal mode**: left panel is a visual picker — tabs `Rooms` / `Costumes` with thumbnail cards; no resource tree. **Advanced mode**: the resource tree is shown instead; right panel, hotspots/doorways lists, depth/walk-box toggles, step button, Restart, trace expanders, `Play Cutscene` and `Game Texts` buttons appear. | Code (UpdateAdvancedMode) |
 | R-4.4 | APP | Side panel header: `EXPLORE`, then game title (e.g. `LOOM`), then the platform line: `DOS edition` for any platform string that starts with `DOS` (the scanner writes `DOS (inferred)`), otherwise the platform string. Tooltip `SCUMM v3 · <platform>` (or `SCUMM version unconfirmed`) with the full platform string. | Code |
@@ -143,21 +172,21 @@ Top level order and header format are exact: **label, two spaces, count in paren
 | Node header | Present for | Children (header text) | Tooltip |
 |---|---|---|---|
 | `Rooms  (N)` | all games | `Room NN` (two digits); LOOM adds ` · <name>` where the glossary names the room (`Room 02 · cliff top where the game starts`; 8 rooms, all hand-made glossary entries: SCUMM v3/v4 data hold no room names). The room cards use the same label in their tooltip. | glossary entry `<name> (<evidence>): <source>` as tooltip |
-| `Costumes  (N)` | LOOM EGA, LOOM CD | `Costume NN` | resource description |
-| `Scripts  (N)` | LOOM EGA, LOOM CD | EGA: `Script NN`, or `Script NN · <glossary name>` when the glossary names it; CD: `Script NN` and `Room NN local script N` | `<name> (<evidence>): <source>` if named, else description |
-| `Sounds & music  (N)` | LOOM EGA, LOOM CD | `Sound NN` — always plain | description |
+| `Costumes  (N)` | every game that has costumes | `Costume NN` | resource description |
+| `Scripts  (N)` | every game whose scripts are read (LOOM; the others show `Script NN` as stored) | EGA: `Script NN`, or `Script NN · <glossary name>` when the glossary names it; CD: `Script NN` and `Room NN local script N` | `<name> (<evidence>): <source>` if named, else description |
+| `Sounds & music  (N)` | every game that has sounds | `Sound NN` — always plain | description |
 | `Game files  (N)` | all games | file name (`LOOM.EXE`) | – |
 | `CD audio  (N)` | LOOM CD with a disc audio track | `CD audio NNN · <s> s` + ` · <first 40 chars…>` ; music/narration prefixed `♪ ` | `<voice | music / narration>, <s> s at disc second <t>; first asked for by <source>.` |
 | `CD audio  (N)` | Disc-image games with red-book tracks (Monkey Island) | `CD track NN · m:ss · room NN "<name>"` (up to two rooms, then `, ...`); `CD track NN · m:ss · not started by a sound` when no sound of the game starts it | `<label>` plus the description: track length and the sounds that start it (sound id, repeats, disc time range). |
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-5.5 | APP | A group with zero items is omitted. Indy3 shows only `Rooms` and `Game files`. Selected-item foreground is dark `#15212B` on the selection colour; otherwise `#E7E0D2`. | Code |
+| R-5.5a | APP | A group with zero items is omitted. Selected-item foreground is dark `#15212B` on the selection colour; otherwise `#E7E0D2`. | Code |
 | R-5.6 | LOOM EGA | Script names apply only to *global* scripts of a full game (`ScriptRoom is null`); room-local scripts and a demo's scripts are unnamed. | Code |
 | R-5.7 | LOOM CD | CD audio cue numbers are the order found by scanning every room for `sayVoice`; those with no line or long duration are music/narration (♪). | Code |
 | R-5.8 | SCUMM v3 | Resource labels come from `00.LFL`: `Room NN`, `Costume NN`, `Script NN`, `Sound NN` (two digits; larger ids stay as numbers). When the index is not parsed, physical files appear as `Room file NN` with the note `Physical LFL file; no supported index was parsed.` | Code |
 | R-5.10 | APP | CD audio is always its own tree group, never mixed into `Sounds & music`, in every game that has disc audio (LOOM CD cues, Monkey Island tracks). A CD label shows, in order: the track or cue number, the duration, the room (when known) and, for speech, the first words played. Labels that do not fit the sidebar must end in an ellipsis with the full text in the tooltip, never be cut mid-word. | Decided 12 October |
-| R-5.11 | APP | Selection colour of tree items is the app theme's, not the system blue, in every game's tree (see R-5.5). | Code |
+| R-5.11 | APP | Selection colour of tree items is the app theme's, not the system blue, in every game's tree (see R-5.5a). | Code |
 | R-5.9 | SCUMM v4 | Names: `Room NN`, `Costume NN`, `Sound NN`, `Script NN` (global), `Room NN local script N` (room-local). Descriptions say what the item is and where it is stored (`LOOM CD costume, stored in room 04 (DISK01.LEC).`). | Code |
 
 ## 6. Room scene (the central view)
@@ -174,14 +203,16 @@ Top level order and header format are exact: **label, two spaces, count in paren
 | R-6.8 | SCUMM | The hint line under the scene (`ObjectsNote`) is shown only in inspection mode (and Advanced); the game's own screen needs none. | Code |
 | R-6.9 | SCUMM | Right-click or **Interact ▴** on an object opens a menu of the object's actual verbs, labelled by `LoomVerbNames`; choosing one is an *exploration action* and says so. | Code |
 | R-6.10 | APP | Session bar text, Advanced only in inspection mode; busy badge (`BusyBadge`) with wait cursor while the app does blocking work such as opening a scene or preparing music. | Code |
-| R-6.11 | APP | The right panel (Advanced) sections, in order: `DOORWAYS`, `HOTSPOTS` (objects that are not doorways, R-6.13), `ACTIONS`, object preview + description, `Room entry` (summary, event buttons, `Raw disassembly`), `Last action` (summary, timeline, issues, `Raw trace`), `Assumptions` (`No assumptions` or `Assumptions · N`). | Code |
+| R-6.11 | APP | The right panel (Advanced) sections, in order: `DOORWAYS`, `HOTSPOTS` (objects that are not doorways, R-6.13a), `ACTIONS`, object preview + description, `Room entry` (summary, event buttons, `Raw disassembly`), `Last action` (summary, timeline, issues, `Raw trace`), `Assumptions` (`No assumptions` or `Assumptions · N`). | Code |
 | R-6.12 | INDY3 EGA | Background preview only, with the note `Background preview only. Object art, scripts, and room routes are not decoded for this game yet.` | Code |
-| R-6.13 | BROWSED | The same background-only preview and note as R-6.12 for the browsed games; the room is shown as stored (no first-visit state, objects, actors or depth masks). | Code |
-| R-6.13 | APP | **A doorway is not an object hotspot** (decided 11 October). An object whose verbs can load a room (`DoorwayTargets`) appears only as a doorway: in the `DOORWAYS` section and the Doorways overlay, and through room clicks (R-1.6). It has no row in `HOTSPOTS`, no label suffix, no `Object hotspots` box (Always or hover outline) and no entry in the object list. The game's own pointer still sees it, so the cursor, the hover object sent to the game and a click on it work as for any object. Implementation: `IsObjectHotspot`. | Code |
+| R-6.13 | BROWSED | The same background preview and note as R-6.12 for the browsed games; the room is shown as stored (no first-visit state, actors or depth masks). Since 12 October the room's stored objects are drawn as outline boxes with their names (option `Object hotspots`) and listed in Advanced, with doorways as a separate option: raw stored data, no script run. | Code |
+| R-6.13a | APP | **A doorway is not an object hotspot** (decided 11 October). An object whose verbs can load a room (`DoorwayTargets`) appears only as a doorway: in the `DOORWAYS` section and the Doorways overlay, and through room clicks (R-1.6). It has no row in `HOTSPOTS`, no label suffix, no `Object hotspots` box (Always or hover outline) and no entry in the object list. The game's own pointer still sees it, so the cursor, the hover object sent to the game and a click on it work as for any object. Implementation: `IsObjectHotspot`. | Code |
 | R-6.14 | LOOM | **Objects at 0, 0 are preview objects, not hotspots** (decided 11 October): LOOM keeps its 48 × 40 draft previews (and a few other off-scene images) at position 0, 0 of a room. Whatever the session position says is 0, 0 gets no row, no box, no hover outline and no interaction menu entry. Implementation: `IsVerbHotspotAvailable`. | Code |
 | R-6.15 | SCUMM | **Untouchable objects are not hotspots** (decided 11 October): an object the session marks untouchable (class 24) gets no row, box, hover outline or interaction-menu entry, because the game's own object search skips it. Room 28 keeps one dragon object per state (asleep/awake) and makes the others untouchable; running Awaken on the asleep-state object while the dragon is awake started its scene in a state the game never reaches (the sparkle actor, costume 4, at elevation 38 beside the head). Implementation: `IsVerbHotspotAvailable`. | Code |
 
 ## 7. Interaction model (LOOM)
+
+The rows below describe the **LOOM binding** of the generic mechanism (input scripts 005–007, the single and double click, the distaff keys). Their `SCUMM` tag states the intended reach of the mechanism (the script chain, the playback clock, skipping, device handling); the click gestures and keys are LOOM's. **Open requirement:** what Play means for a verb-based game (sentence line, verb pick, inventory, the game's own input scripts) is not specified yet. It is to be written, with its first game, when the Play column is raised for a non-LOOM family (see the review of 14 October, stage 3).
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
@@ -275,6 +306,8 @@ A cutscene can be launched from a freshly opened game. The user's target is that
 
 ## 9. Scripts
 
+*Implementation note (14 October):* the script page, the Readable view, speaker names and the text extractor are generic in behaviour (they work through the dialect and `IScummDataSource`, and already serve the browsed games) but still live under `Core/Loom/Text` and carry `Loom*` names (`LoomScriptPresenter`, `LoomTextExtractor`, `LoomSpeakerNames`). Move them to `Core/Scumm/` when a second game needs a LOOM-free version of one, as the layering rule asks; the LOOM tables (glossary, speaker names) stay LOOM data.
+
 ### 9.1 Script page
 
 | ID | Tag | Requirement | Basis |
@@ -330,7 +363,7 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 | ID | Tag | Requirement | Basis |
 |---|---|---|---|
-| R-11.1 | SCUMM | Window `Game Texts` for every game whose texts are read (today LOOM EGA, LOOM CD and Indy3 EGA; `GameSupport.Texts`; since 10 October also for LOOM CD: the extractor reads the CD's script blocks and object verbs; 1,196 entries on the English CD; the replay buttons and first-visit room renders of the EGA window are not offered there). Implementation: per-game extraction (script blocks and object verbs by dialect); the window itself is shared. Heading `WORDS FROM THE GAME`, title `Game texts`, coverage line `<N> texts found. Browse spoken lines, object names and other stored words.` Left: search, room filter (`Every room`, `Room NN`), kind filter (`Every kind`, `Spoken lines`, `Conversations and cutscenes`, `Object names`, `Other labels and stored text`), result count (`N matching texts` / `N matching groups`), **Export visible text**, list. | Code |
+| R-11.1 | SCUMM | Window `Game Texts` for every game whose texts are read (every family with Texts ✔ in §3.1; `GameSupport.Texts`; since 10 October also for LOOM CD: the extractor reads the CD's script blocks and object verbs; 1,196 entries on the English CD; the replay buttons and first-visit room renders of the EGA window are not offered there). Implementation: per-game extraction (script blocks and object verbs by dialect); the window itself is shared. Heading `WORDS FROM THE GAME`, title `Game texts`, coverage line `<N> texts found. Browse spoken lines, object names and other stored words.` Left: search, room filter (`Every room`, `Room NN`), kind filter (`Every kind`, `Spoken lines`, `Conversations and cutscenes`, `Object names`, `Other labels and stored text`), result count (`N matching texts` / `N matching groups`), **Export visible text**, list. | Code |
 | R-11.2 | SCUMM | List item heading, all caps: `ROOM NN  /  OBJECT N · <name>  /  <KIND>` or `ELSEWHERE IN GAME  /  <KIND>`; conversations: `ROOM NN  /  <KIND> GROUP  /  N LINES  /  OBJECT N · <name>` or `… /  LINE NN`. Text below, trimmed to 2 lines. | Code |
 | R-11.3 | SCUMM | Entry kinds: `Spoken line` (print/printEgo), `Object name`, `Stored line` (stringOps), `Verb label` (verbOps), `Object label`. A **conversation group** is a run of lines in one decoded script; `Dialogue choices` groups are menus offered to the player, each followed by the replies in its branch. Conditions can hide options or change replies, and the detail text says so. | Code |
 | R-11.4 | SCUMM | Detail pane: kind, heading, room artwork (first-visit state for LOOM; stored background otherwise), conversation lines with speakers, **Visit room** and, when a known cutscene prints the text, **Play this cutscene**; an expander `Source and extraction details` lists script ranges visited, unresolved paths, skipped ranges, leftover entries and diagnostics (max 8 shown). | Code |
@@ -394,4 +427,4 @@ The Readable view only re-reads what the disassembler decoded; the raw view stay
 
 ## 17. Out of scope (today)
 
-Indy3 object art, scripts, sounds and gameplay; objects, scripts, depth masks and interaction of every browsed game; v1/v2 sounds and the real actor colours of v1 costumes; v5 sounds (a large feature, surveyed in the resource-format reference), scripts and objects, Monkey Island 1's CD audio tracks, and games after v5 (v6 and later: Day of the Tentacle and on); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`.
+Objects with first-visit state, click responses and live play for every game except LOOM (Indy3 and the browsed games show stored object boxes only); depth masks; the real actor colours of v1 costumes (the scripts choose them); v5 script-driven sound hooks (a song plays its default path); games after v5 (v6 and later: Day of the Tentacle and on); the Hebrew LOOM; an M5 "secrets" guide; replay catalogs for non-reference EGA editions; native-control resume; optional General MIDI. These are parked in `docs/CURRENT_WORK.md`.

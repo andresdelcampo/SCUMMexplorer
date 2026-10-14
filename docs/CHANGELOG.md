@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 14 October: one support registry; requirements brought up to date
+
+- **`GameSupport` is now the registry of the support matrix** (`Core/Domain/GameSupport.cs`): 14 families (LOOM EGA reference / other editions / demos, LOOM CD, Indy3 EGA and 256 colours, Monkey Island 1 floppy and CD, Monkey Island 2, Indiana Jones 4, Maniac Mansion and Zak McKracken enhanced and classic) plus the hidden `OtherV3` and `OtherBrowsed`, each with a level (none, partial, full) for the ten README columns. The README table and the table in REQUIREMENTS section 3.1 are generated from it (`SCUMM_UPDATE_SUPPORT_MATRIX=1` with `SupportMatrixTests` rewrites both); the matrix values are unchanged from the README. The page subtitle of the browsed games now names sounds and scripts (it was out of date).
+- **`SupportConformanceTests`**: for every family with a local copy under `Games/` the folder must be recognised as that family and the claimed rooms, costumes, sounds, scripts and texts must exist (13 families, all pass; 19 tests in the three support test classes).
+- **REQUIREMENTS.md**: the stale rows about browsed games (R-3.11, R-3.12, R-3.14, R-5.2 tree table, R-11.1, section 17), R-1.3 and R-4.1 corrected; duplicate ids became `R-5.5a` and `R-6.13a`; sections 7 and 9 now say which part is the LOOM binding. Review and plan: [REQUIREMENTS_REVIEW_2026-10-14](REQUIREMENTS_REVIEW_2026-10-14.md).
+
 ## 12 October: waiting cursor for large sound-tree expansion
 
 Expanding a sound branch with at least 1,000 entries now shows the waiting cursor before WPF realizes the rows, and releases it after pending layout/render work reaches dispatcher idle. The shared busy scope preserves any other ongoing busy operation and also cleans up on dispatcher shutdown. Tree appearance, labels and selection are unchanged.

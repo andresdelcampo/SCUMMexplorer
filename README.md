@@ -51,8 +51,9 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 
 ### What each game supports
 
-✔ works, ◐ partly (see the notes under the table), – not supported yet. This is what has been checked so far; most browse-only features have been verified against the game data and as pictures, not yet compared line by line with ScummVM.
+✔ works, ◐ partly (see the notes under the table), – not supported yet. This table is generated from the code (`GameSupport`) and kept in step by a test. It is what has been checked so far; most browse-only features have been verified against the game data and as pictures, not yet compared line by line with ScummVM.
 
+<!-- support-matrix:start -->
 | Game | Rooms | Objects | Walk boxes | Costumes | Sound | Texts | Scripts | Play | Cutscenes | Status |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | **LOOM** EGA English (reference) | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
@@ -69,6 +70,7 @@ In these games the room picker fills in on its own, the Costumes tab sits beside
 | **Maniac Mansion** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Zak McKracken** classic | ✔ | ◐ | ✔ | ◐ | ✔ | ✔ | ✔ | – | – | – |
+<!-- support-matrix:end -->
 
 <details>
 <summary>Notes on the matrix</summary>

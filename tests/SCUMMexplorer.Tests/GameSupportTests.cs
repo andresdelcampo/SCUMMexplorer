@@ -19,7 +19,8 @@ public class GameSupportTests
 
         var indy = GameSupport.For(Game(GameId.IndianaJones3, ScummVersion.V3));
         Assert.True(indy.Rooms && indy.Texts);
-        Assert.False(indy.LiveSession || indy.Cutscenes || indy.Status || indy.Audio);
+        Assert.False(indy.LiveSession || indy.Cutscenes || indy.Status);
+        Assert.True(indy.Audio && indy.Scripts); // its sounds play and its scripts are read (README matrix)
 
         // Any other old-v3 game whose index parsed gets the same limited look: room pictures and texts.
         var otherV3 = GameSupport.For(Game(GameId.Unknown, ScummVersion.V3));

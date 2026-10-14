@@ -4,6 +4,8 @@ Updated 10 October 2026. This is the single plan and session handoff. Completed 
 
 ## Status
 
+**Scale-out plan (14 October).** Stage 0 is done: the support matrix is generated from `GameSupport` and pinned by tests; requirements are up to date ([review and stages](REQUIREMENTS_REVIEW_2026-10-14.md)). Next stage, when the user chooses: Objects level 2 (first-visit state through the entry scripts) for the v4/v5/v2 families, then Costumes/Walk boxes, then Play for one verb-based family. To raise a cell: implement the feature, change its level in `GameSupport.Families`, run the tests with `SCUMM_UPDATE_SUPPORT_MATRIX=1`, and keep the conformance test green.
+
 The Advanced sound-player presentation is refreshed (12 October): compact card, labelled transport controls, real progress and available speech text. Tree appearance is unchanged at the user's request; the later requested waiting cursor is shown while branches with 1,000+ sounds expand. [WPF validation](../.verification/sound-layout-20261012/validation.md) covers speech/music, minimum window size and cursor cleanup; no remaining player-layout blocker was found.
 
 The approved graphical SCUMMexplorer title is embedded in the app header, cropped and scaled at runtime, with a 2-pixel downward alignment adjustment. [Header preview](../.verification/title-wordmark-20261010/validation.md) confirms the default and minimum window widths.
