@@ -2506,7 +2506,7 @@ public partial class MainWindow : Window
             {
                 try
                 {
-                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index, _game!.V1Game, resource.ResourceId ?? 0);
+                    var pose = _costumeRenderer.DecodePose(container, resourceOffset, slot.Index, _game!.V1Game, ScummV1ActorColors.For(_game!)?.ColorOf(resource.ResourceId ?? 0));
                     if (pose is null) continue;
                     CostumePoseGallery.Children.Add(CreateCostumePoseCard(slot.Index, pose));
                     availableCount++;

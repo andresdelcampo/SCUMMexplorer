@@ -96,7 +96,7 @@ public partial class MainWindow
                         token.ThrowIfCancellationRequested();
                         try
                         {
-                            var pose = renderer.DecodePose(container, offset, slot.Index, game.V1Game, resource.ResourceId ?? 0);
+                            var pose = renderer.DecodePose(container, offset, slot.Index, game.V1Game, ScummV1ActorColors.For(game)?.ColorOf(resource.ResourceId ?? 0));
                             if (pose is null) continue;
                             int pixels = 0;
                             foreach (byte p in pose.Pixels.Span)

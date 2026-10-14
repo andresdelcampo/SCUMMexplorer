@@ -138,7 +138,7 @@ public class OtherV4GameTests
         {
             var container = LflEncoding.DecodeXorFF(File.ReadAllBytes(costume.FilePath));
             var slots = reader.Decode(container, costume.Offset!.Value).AnimationSlots.Where(s => s.HasData);
-            Assert.Contains(slots, slot => renderer.DecodePose(container, costume.Offset.Value, slot.Index, game.V1Game, costume.ResourceId ?? 0) is not null);
+            Assert.Contains(slots, slot => renderer.DecodePose(container, costume.Offset.Value, slot.Index, game.V1Game, ScummV1ActorColors.For(game)?.ColorOf(costume.ResourceId ?? 0)) is not null);
         });
         Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Script);
     }

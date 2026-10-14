@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 14 October: classic v1 costume colours read from the scripts (S2, ManiacClassic and ZakClassic)
+
+- **`ScummV1ActorColors`** (`Core/Scumm/V1`) reads every `actorOps` set-costume and set-palette instruction of the game's scripts and derives each costume's two actor colours as ScummVM does (`byleRLEDecode_C64`, `o2_actorOps`, `scumm.cpp`, fetched 14 October 2026): Maniac Mansion 23 of 23 costumes (actor n wears costume n; engine tables by actor), Zak McKracken 25 of 35 (23 from a costume instruction plus the palette left for that actor, 2 start-state); the other 10 Zak costumes keep a labelled estimate. `ScummCostumeRenderer.DecodePose` now takes the derived colours instead of an actor number. Maniac's pictures do not change; most of Zak's do.
+- Registry **unchanged** (Costumes stays ◐ for both): no comparison with a running ScummVM could be made and 10 Zak costumes are estimates. Record: [.verification/v1-costume-colours-20261014](../.verification/v1-costume-colours-20261014/README.md); trackers `docs/maniac/SUPPORT_STATUS.md`, `docs/zak/SUPPORT_STATUS.md`; unit tests `ScummV1ActorColorsTests`; harness `.verification/V1CostumeColors`.
+
 ## 14 October: one support registry; requirements brought up to date
 
 - **`GameSupport` is now the registry of the support matrix** (`Core/Domain/GameSupport.cs`): 14 families (LOOM EGA reference / other editions / demos, LOOM CD, Indy3 EGA and 256 colours, Monkey Island 1 floppy and CD, Monkey Island 2, Indiana Jones 4, Maniac Mansion and Zak McKracken enhanced and classic) plus the hidden `OtherV3` and `OtherBrowsed`, each with a level (none, partial, full) for the ten README columns. The README table and the table in REQUIREMENTS section 3.1 are generated from it (`SCUMM_UPDATE_SUPPORT_MATRIX=1` with `SupportMatrixTests` rewrites both); the matrix values are unchanged from the README. The page subtitle of the browsed games now names sounds and scripts (it was out of date).

@@ -21,11 +21,10 @@ public sealed class ScummCostumeRenderer
     ];
 
     /// <summary>
-    /// A stored pose of the costume. <paramref name="v1Game"/> and <paramref name="actor"/> matter only for a classic v1 costume (format 0x57): its two colours are
-    /// the actor's, which the game's scripts choose; the explorer uses the colour tables ScummVM keeps for Maniac Mansion's 25 actors with the costume number as the
-    /// actor number (an estimate) and a fixed colour for Zak McKracken.
+    /// A stored pose of the costume. <paramref name="v1Game"/> and <paramref name="v1Colors"/> matter only for a classic v1 costume (format 0x57): its two colours
+    /// are the actor's, which the game's scripts choose (<see cref="ScummV1ActorColors.ColorOf"/>); without them the fixed estimate colours are used.
     /// </summary>
-    public RoomImage? DecodePose(ReadOnlySpan<byte> decodedContainer, int resourceOffset, int animationIndex, ScummV1Game? v1Game = null, int actor = 0)
+    public RoomImage? DecodePose(ReadOnlySpan<byte> decodedContainer, int resourceOffset, int animationIndex, ScummV1Game? v1Game = null, ScummV1CostumeColor? v1Colors = null)
     {
         if (resourceOffset < 0 || resourceOffset > decodedContainer.Length - 2)
             throw new InvalidDataException("The costume offset is outside its LFL container.");
@@ -34,7 +33,7 @@ public sealed class ScummCostumeRenderer
         if (resourceLength > decodedContainer.Length - resourceOffset)
             throw new InvalidDataException("The costume resource length is invalid.");
         if (resourceLength >= 6 && (decodedContainer[resourceOffset + 5] & 0x7F) == 0x57)
-            return DecodeClassicV1Pose(decodedContainer.Slice(resourceOffset, resourceLength), animationIndex, v1Game ?? ScummV1Game.ManiacMansion, actor);
+            return DecodeClassicV1Pose(decodedContainer.Slice(resourceOffset, resourceLength), animationIndex, v1Game ?? ScummV1Game.ManiacMansion, v1Colors);
         if (resourceLength < AnimationDataOffsetsStart)
             throw new InvalidDataException("The costume resource length is invalid.");
 
@@ -148,16 +147,12 @@ public sealed class ScummCostumeRenderer
         return hasVisiblePixels ? new RoomImage(canvasWidth, canvasHeight, canvas, EgaPalette) : null;
     }
 
-    // ScummVM: v1MMActorPalatte1 (skin) and v1MMActorPalatte2 (suit), C64 colour numbers by actor.
-    private static readonly byte[] ManiacSkin = [8, 8, 8, 8, 4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
-    private static readonly byte[] ManiacSuit = [0, 7, 2, 6, 9, 1, 3, 7, 7, 1, 1, 9, 1, 4, 5, 5, 4, 1, 0, 5, 4, 2, 2, 7, 7];
-
     /// <summary>
     /// A pose of a classic v1 costume (ScummVM <c>ClassicCostumeLoader</c> and <c>byleRLEDecode_C64</c>): limb frame tables at byte 8 and animations at byte 24, all
     /// offsets counted from byte 4; a cel has a 6-byte header (width in 8-pixel units, height, signed offsets in units of 8 pixels and pixels, then the movement to the
     /// next limb) and run-length bytes of four 2-bit pixels (each drawn twice as wide) column by column; 0 is transparent, 1 the skin colour, 2 the suit colour, 3 black.
     /// </summary>
-    private static RoomImage? DecodeClassicV1Pose(ReadOnlySpan<byte> resource, int animationIndex, ScummV1Game game, int actor)
+    private static RoomImage? DecodeClassicV1Pose(ReadOnlySpan<byte> resource, int animationIndex, ScummV1Game game, ScummV1CostumeColor? colors)
     {
         const int baseOffset = 4;
         const int frameTables = 8;
@@ -173,8 +168,8 @@ public sealed class ScummCostumeRenderer
         int mask = resource[cursor++] << 8;
 
         var map = ScummV1RoomDecoder.EgaColors(game);
-        var skin = game == ScummV1Game.ManiacMansion ? ManiacSkin[Math.Clamp(actor, 0, 24)] : 8;
-        var suit = game == ScummV1Game.ManiacMansion ? ManiacSuit[Math.Clamp(actor, 0, 24)] : 14;
+        var skin = colors?.Skin ?? 8;
+        var suit = colors?.Suit ?? 14;
         var shades = new[] { 0, map[skin & 15], map[suit & 15], map[0] };
 
         var xMove = -72;
