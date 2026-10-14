@@ -17,6 +17,7 @@
 ## Project references
 
 - [Requirements](REQUIREMENTS.md): what the app must do, tagged by engine, version, game and edition scope.
+- [Game support instructions](GAME_SUPPORT_INSTRUCTIONS.md): the stages and the exact procedure for raising what the explorer supports for one game family, the same for every game.
 - `archive/`: historical plans, audits and evidence records.
 
 Put engine definitions in `engine/` and label the versions and formats they apply to. Put script IDs, story meanings, game-selected values and edition-specific findings in the relevant game folder (`loom/`, `indy3/`, or later games). Explorer implementation choices and dated validation must be identified separately from engine rules and decoded game facts.
