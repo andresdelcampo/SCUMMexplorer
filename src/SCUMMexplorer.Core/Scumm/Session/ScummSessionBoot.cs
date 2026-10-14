@@ -67,6 +67,8 @@ public abstract partial class ScummSession
             !(wait.Operands.StartsWith("bit[", StringComparison.Ordinal) || wait.Operands.StartsWith("var[", StringComparison.Ordinal))) return null;
         var bit = wait.Operands[..(wait.Operands.IndexOf(']') + 1)];
         var isBit = bit.StartsWith("bit[", StringComparison.Ordinal);
+        // A variable that is already set has been answered; the boot only has not run again to see it.
+        if (!isBit && _runtime.GlobalVariables.GetValueOrDefault(bit) != 0) return null;
         var room = _currentRoom.ResourceId!.Value;
         if (!_awaitedInputCache.TryGetValue((room, bit), out var found))
             _awaitedInputCache[(room, bit)] = found = ScanForAnswer(room, bit, isBit);

@@ -67,6 +67,10 @@ public sealed class ScummGameSessionTests
         // The copy-protection screen is the only assumed input, and says so.
         var assumed = Assert.Single(session.Snapshot.Uncertainties, item => item.StartsWith("Player input assumed", StringComparison.Ordinal));
         Assert.Contains("Room 92 local script 204", assumed);
+        // The answer is 0 (wrong): the game's own rule lets play go on after three wrong rounds of its four questions (var[0x06B] = 3) and no more answers follow.
+        Assert.Equal(12, session.SessionTrace.Count(item => item.StartsWith("boot: starts Room 92 local script 204", StringComparison.Ordinal)));
+        Assert.Equal(3, session.Snapshot.KnownGlobalVariables["var[0x06B]"]);
+        Assert.Equal(1, session.Snapshot.KnownGlobalVariables["var[0x039]"]);
 
         // The first room: the ego stands in it, with the game's own look (costume 39) and the inventory script set by the game.
         var ego = session.Actors.Single(actor => actor.Number == 1);
