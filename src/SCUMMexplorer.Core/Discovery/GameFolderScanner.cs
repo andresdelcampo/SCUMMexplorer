@@ -318,16 +318,20 @@ public sealed class GameFolderScanner
             // The game's own sounds say which track plays where: the sound is stored in the room whose music it is.
             var users = disks.Disks.OfType<ScummV5Archive>().SelectMany(a => a.ReadCdTrackSounds().Select(s => (Sound: s, Room: a.Rooms.FirstOrDefault(r => r.Number == s.Room))))
                 .GroupBy(item => item.Sound.Track).ToDictionary(g => g.Key, g => g.ToList());
+            // The sound's track byte counts the disc's audio tracks from 1 (the data track is not counted; ScummVM plays it with AudioCDManager::play(track) and the
+            // MI1 CD has 24 audio tracks, disc tracks 2 to 25, and sounds naming tracks 1 to 24). So disc track N is the game's track N - 1.
+            var gameTrack = 0;
             foreach (var track in disc.AudioTracks)
             {
-                var played = users.TryGetValue(track.Number, out var list) ? list : [];
+                gameTrack++;
+                var played = users.TryGetValue(gameTrack, out var list) ? list : [];
                 var rooms = played.Select(item => string.IsNullOrEmpty(item.Room?.Name) ? $"room {item.Sound.Room:00}" : $"room {item.Sound.Room:00} \"{item.Room!.Name}\"").Distinct().ToList();
                 // "CD track 03 · 2:41 · room 34 "Name"": the track, its length, and the rooms whose music it is (nothing when no sound of the game starts it).
                 var name = $"CD track {track.Number:00} · {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}" + (rooms.Count > 0 ? " · " + string.Join(", ", rooms.Take(2)) + (rooms.Count > 2 ? ", ..." : "") : " · not started by a sound");
                 var plays = played.Count == 0 ? "" : " Started by " + string.Join(", ", played.Select(item =>
                     $"sound {item.Sound.SoundId}{(item.Sound.Loops == 0xFF ? " (repeats)" : "")}{(item.Sound.EndFrame > item.Sound.StartFrame ? $" ({item.Sound.StartFrame / 4500}:{item.Sound.StartFrame / 75 % 60:00} to {item.Sound.EndFrame / 4500}:{item.Sound.EndFrame / 75 % 60:00})" : "")}")) + ".";
                 resources.Add(new GameResource(name, ResourceKind.Sound, source.Location, GameLibrary.CdTrackIdBase + track.Number,
-                    $"Track {track.Number} of the disc, {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}.{plays}", null, null));
+                    $"Track {track.Number} of the disc (track {gameTrack} of the game's audio), {(int)track.Seconds / 60}:{(int)track.Seconds % 60:00}.{plays}", null, null));
             }
         }
         // A talkie game: every spoken line of MONSTER.SOU is a sound of its own (device-independent digital audio, like the disc's tracks).

@@ -46,6 +46,11 @@ public sealed class V5SpeechTests
         var tracks = game.Resources.Where(r => r.Name.StartsWith("CD track")).ToList();
         Assert.True(tracks.Count >= 20);
         File.WriteAllLines(Path.Combine(Path.GetTempPath(), "mi1-tracks.txt"), tracks.Select(t => t.Name + " | " + t.Description));
-        Assert.True(tracks.Count(t => t.Name.Contains(" - ")) >= 10);
+        // The sounds name the audio tracks from 1 (disc track 2 is the game's track 1): 23 of the 24 are started by a sound, the 16-second disc track 21 by none.
+        Assert.Equal(24, tracks.Count);
+        Assert.Equal(["CD track 21 · 0:16 · not started by a sound"], tracks.Where(t => t.Name.Contains("not started")).Select(t => t.Name));
+        // Sound 115 (room 29) is the game's track 1 = disc track 2; the one-shot sounds 104 to 107, 119 and 129 play the three short disc tracks 7, 14 and 20 (13 to 19 s).
+        Assert.Contains("sound 115", tracks.Single(t => t.Name.StartsWith("CD track 02")).Description);
+        Assert.Contains("sound 129", tracks.Single(t => t.Name.StartsWith("CD track 20")).Description);
     }
 }
