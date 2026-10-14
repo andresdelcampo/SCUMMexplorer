@@ -17,6 +17,9 @@
 ## Project references
 
 - [Requirements](REQUIREMENTS.md): what the app must do, tagged by engine, version, game and edition scope.
+- [Templates](templates/README.md): the fixed formats for a game's README, tracker, script map and evidence record.
+- [Boot sequence by version](engine/SCUMM_BOOT_SEQUENCE.md): how each SCUMM version starts.
+- Per-game folders (`loom/`, `indy3/`, `monkey1/`, `monkey2/`, `indy4/`, `maniac/`, `zak/`): README, SUPPORT_STATUS and `<GAME>_SCRIPT_MAP.md` in the same format (see the instructions, section 7).
 - [Game support instructions](GAME_SUPPORT_INSTRUCTIONS.md): the stages and the exact procedure for raising what the explorer supports for one game family, the same for every game.
 - `archive/`: historical plans, audits and evidence records.
 
