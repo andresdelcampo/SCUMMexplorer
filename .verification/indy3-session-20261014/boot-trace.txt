@@ -1,0 +1,173 @@
+game: Indiana Jones and the Last Crusade (IndianaJones3), folder indy3 ega en
+boot: 1341 frames (limit 5000), hit limit: False, wall time 2,2 s
+final room: 73; rooms entered in order: 76, 79, 0, 6, 1, 92, 1, 73
+extra frames played after the boot: 900; room now 73
+in cutscene: False; pending scripts: 6
+
+== pending scripts
+  Script 17 +0x0004 (frozen)
+  Script 73 +0x00A3
+  Room 73 local script 200 +0x005A (delay 9)
+  Room 73 local script 201 +0x002B (delay 360)
+  Room 73 local script 202 +0x002B (delay 348)
+  Script 111 +0x0112
+
+== session trace (waits omitted)
+  cutscene at Script 01 +0x01B6 runs script 0
+  Room 76 entry script +0x0013: startObject runs object 842 verb 0xFA
+  Script 01 continues at +0x01E2 in Room 76 after loadRoom
+  Script 01 continues at +0x0200 in Room 79 after loadRoom
+  script 204 started again: runScript ended its running copy first
+  stopScript 204 at Room 79 local script 205 +0x00EB: script 204 was not running
+  Sound 35 completed on its native AdLib resource clock.
+  endCutscene at Script 01 +0x0218 runs script 0
+  Script 01 +0x0219: room 0 (no room) after a frame advance
+  Script 01 continues at +0x021B in Room 00 after loadRoom
+  cutscene at Script 01 +0x0230 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17
+  cutscene at Script 73 +0x0053 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Room 06 entry script, Script 17
+  Room 06 entry script pauses after startScript +0x0021: nested execution froze its caller
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x0240 in Room 06 after loadRoom
+  script 21 started again: runScript ended its running copy first
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x02D6 in Room 01 after loadRoom
+  stopScript 201 at Script 01 +0x0307: ended its pending run
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x04CD in Room 92 after loadRoom
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  Sound 30 completed on its native AdLib resource clock.
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  Sound 30 completed on its native AdLib resource clock.
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  boot: starts Room 92 local script 204 as the player's answer would
+  cutscene at Room 92 local script 204 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17, Script 73, Room 92 local script 202, Script 01
+  Sound 30 completed on its native AdLib resource clock.
+  endCutscene at Room 92 local script 204 +0x00BA runs script 23
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x04D5 in Room 01 after loadRoom
+  stopScript 200 at Script 01 +0x04D8: ended its pending run
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x0566 in Room 73 after loadRoom
+  sentence script 2 runs verb 0x0A with objects 834 and 0
+  Script 02 +0x0335: startObject runs object 834 verb 0x0A
+  cutscene at Room 73 local script 203 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 02, Room 73 Object 834 Verb 0x0A, Script 17, Script 73, Script 01
+  Room 73 Object 834 Verb 0x0A pauses after startScript +0x0000: nested execution froze its caller
+  Script 02 pauses after startObject +0x0335: nested execution froze its caller
+  stopScript 204 at Room 73 local script 203 +0x0062: ended its pending run
+  endCutscene at Room 73 local script 203 +0x008C runs script 23
+  stopScript 2 at Script 23 +0x0017: ended its running run
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  Room 73 local script 203 chains to script 111
+  script 21 started again: runScript ended its running copy first
+  endCutscene at Script 01 +0x05BB runs script 23
+  stopScript 2 at Script 23 +0x0017: script 2 was not running
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  Script 01 chains to script 119
+  boot: 1341 frames after script 001's first room load; now in Room 73
+
+== operations reported as not applied (presentation only, nothing in game state)
+  lights: 1 runs
+  oldRoomEffect: 7 runs
+  resourceRoutines: 5 runs
+  roomOps: 6 runs
+  stringOps: 1 runs
+
+== unsupported (opcode, operand or state the run could not follow): 0
+
+== random picks: 1653 (seeded; each is labelled an estimate)
+== all other uncertainties
+  Script 01 +0x01E0 reached loadRoom during the boot.
+  Room 76 entered by Script 01 +0x01E0 (loadRoom) during the boot.
+  Script 01 +0x01FE reached loadRoom after a frame advance.
+  Room 79 entered by Script 01 +0x01FE (loadRoom) after a frame advance.
+  Script 01 +0x0219 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 01 +0x023E reached loadRoom after a frame advance.
+  Room 06 entered by Script 01 +0x023E (loadRoom) after a frame advance.
+  Script 01 +0x02D4 reached loadRoom after a frame advance.
+  Room 01 entered by Script 01 +0x02D4 (loadRoom) after a frame advance.
+  Script 01 +0x04CB reached loadRoom after a frame advance.
+  Room 92 entered by Script 01 +0x04CB (loadRoom) after a frame advance.
+  Player input assumed: script 001 +0x04CE waits for var[0x039], which only Room 92 local script 204 sets (+0x009F). The room's own code starts it after the player's input (object 932 verb 0xFF, object 933 verb 0xFF, object 934 verb 0xFF, object 935 verb 0xFF, object 936 verb 0xFF, object 937 verb 0xF...
+  Script 01 +0x04D3 reached loadRoom after a frame advance.
+  Room 01 entered by Script 01 +0x04D3 (loadRoom) after a frame advance.
+  Script 01 +0x0564 reached loadRoom after a frame advance.
+  Room 73 entered by Script 01 +0x0564 (loadRoom) after a frame advance.
+
+== actors
+  actor 1: room 73, (224,86), costume 39, visible True
+  actor 4: room 1, (700,106), costume 6, visible False
+  actor 7: room 40, (168,91), costume 76, visible False
+  actor 9: room 73, (256,86), costume 38, visible True
+  actor 10: room 6, (226,119), costume 43, visible False
+  actor 11: room 6, (240,119), costume 43, visible False
+
+== variables of the first screen
+  var[0x001] = 1
+  var[0x004] = 73
+  var[0x002] = 240
+  var[0x01C] = 5
+  var[0x01D] = 6
+  var[0x01E] = 7
+  var[0x01F] = 0
+  var[0x020] = 18
+  var[0x021] = 2
+  var[0x022] = 12
+
+== room 73: 14 objects, 9 stored images, 2 actors drawn, 0 skipped

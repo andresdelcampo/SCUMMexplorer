@@ -56,7 +56,7 @@ S2 and S3 do not need a session. **They are done for every cell of the matrix ex
 | Family | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | Pending in the matrix |
 |---|---|---|---|---|---|---|---|---|---|
 | LoomEgaReference, LoomEga, LoomEgaDemo, LoomCd | done | done | done | done (LOOM-coupled) | done | done | LoomEga/Demo/Cd ◐ by design | done | only the LOOM items in CURRENT_WORK; the *generalisation* of S4a is the work that serves the other games |
-| Indy3Ega | done | done | done (polish: AdLib tempo unchecked by ear) | – | stored boxes ◐ | – | – | – | Objects, Play, Cutscenes, Status |
+| Indy3Ega | done | done | done (polish: AdLib tempo unchecked by ear) | S4b done (14 Oct) | stored boxes ◐ | – | – | – | Objects, Play, Cutscenes, Status |
 | Indy3Vga, MonkeyFloppy | done | done (polish: costumes use the palette of the storing room) | done (polish: AdLib music at half tempo, set by ear) | – | ◐ | – | – | – | Objects, Play, Cutscenes, Status |
 | MonkeyCd, Monkey2, Indy4 | done | done (polish: ~3% of v5 script blocks unresolved) | **◐ iMUSE: script-driven hooks, loops; two MI1 tracks unnamed; Indy 4 CD has no tracks** | – | ◐ | – | – | – | Sound (needs S6), Objects, Play, Cutscenes, Status |
 | ManiacEnhanced, ZakEnhanced | done | done (polish: Maniac scripts 00/01/06 decode little) | done (polish: PCjr/Tandy not listened) | – | ◐ | – | – | – | Objects, Play, Cutscenes, Status |

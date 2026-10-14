@@ -12,7 +12,7 @@
 - [LOOM script map](loom/LOOM_SCRIPT_MAP.md): decoded game variables, bits, scripts, verbs and rooms. EGA findings retain their edition and audit dates; CD/VGA roles require evidence from that edition's own scripts.
 - [LOOM cutscene discovery](loom/LOOM_CUTSCENE_DISCOVERY.md): how the cutscene catalog is generated.
 - [LOOM English/Spanish compatibility audit](loom/ENGLISH_COMPAT_2026-10-04.md): dated edition comparisons.
-- [Indy3 conversations](indy3/INDY3_CONVERSATIONS_PLAN.md): conversation export and its source limits.
+- [Indy3](indy3/README.md): index, [tracker](indy3/SUPPORT_STATUS.md), [script map](indy3/INDY3_SCRIPT_MAP.md); [conversations](indy3/INDY3_CONVERSATIONS_PLAN.md): conversation export and its source limits.
 
 ## Project references
 

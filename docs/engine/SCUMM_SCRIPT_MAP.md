@@ -23,7 +23,10 @@ These slots belong to the engine contract. The game selects values such as the e
 | `0x01C`, `0x01D` | `VAR_ENTRY_SCRIPT`, `VAR_ENTRY_SCRIPT2` | Entry hooks |
 | `0x01E`, `0x01F` | `VAR_EXIT_SCRIPT`, `VAR_EXIT_SCRIPT2` | Exit hooks |
 | `0x020` | `VAR_VERB_SCRIPT` | Input script |
+| `0x021`, `0x022` | `VAR_SENTENCE_SCRIPT`, `VAR_INVENTORY_SCRIPT` | Script `doSentence` queues into; script `pickupObject` and `setOwnerOf` run (`vars.cpp`, read 14 October 2026) |
 | `0x023`, `0x024` | `VAR_CUTSCENE_START_SCRIPT`, `VAR_CUTSCENE_END_SCRIPT` | Cutscene hooks |
+| `0x027..0x029` | (Indiana Jones 3 only) | `scummLoop` adds the frame's jiffies to variables 39 to 41 for non-Macintosh Indiana Jones 3 and FM-Towns Zak (`scumm.cpp`, 14 October 2026); in v4 slot `0x027` is `VAR_DEBUGMODE` |
+| `0x00E` | `VAR_MUSIC_TIMER` | Music engine timer, see the [boot sequence](SCUMM_BOOT_SEQUENCE.md) |
 | `0x025` | `VAR_CHARINC` | Character delay |
 | `0x02A`, `0x02B` | `VAR_RESTART_KEY`, `VAR_PAUSE_KEY` | Control keys |
 | `0x02C`, `0x02D` | `VAR_MOUSE_X`, `VAR_MOUSE_Y` | Screen pointer |
