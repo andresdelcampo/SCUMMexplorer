@@ -207,8 +207,10 @@ public abstract partial class ScummSession
     public ScummObjectActionResult PressKey(int key)
     {
         BeforeInput();
-        if (_currentRoom?.ResourceId is not int sourceRoomId)
+        // Room 0 (the null room, ScummVM startScene(0)) has no room, but the engine still reads keys there: a game's credits or boot waits in it.
+        if (_currentRoom is null && _runtime.CurrentRoom != NullRoom)
             throw new InvalidOperationException("Visit a room before pressing a key.");
+        var sourceRoomId = _currentRoom?.ResourceId ?? NullRoom;
         _uncertainties.StartStep();
         var beforeUncertainties = _uncertainties.Count;
         var beforeEvents = _visitEvents.Count;

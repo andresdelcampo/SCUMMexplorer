@@ -64,6 +64,10 @@ public static class ScummVars
     /// <summary><c>VAR_CUTSCENE_START_SCRIPT</c> and <c>VAR_CUTSCENE_END_SCRIPT</c>.</summary>
     public const string CutsceneStartScript = "var[0x023]";
     public const string CutsceneEndScript = "var[0x024]";
+    /// <summary>Version 4 and later: <c>VAR_DEBUGMODE</c> (39), <c>VAR_HEAPSPACE</c> (40) and <c>VAR_FIXEDDISK</c> (51) (vars.cpp <c>setupScummVars</c>).</summary>
+    public const string DebugMode = "var[0x027]";
+    public const string HeapSpace = "var[0x028]";
+    public const string FixedDisk = "var[0x033]";
     /// <summary><c>VAR_RESTART_KEY</c> and <c>VAR_PAUSE_KEY</c>: keys the engine handles itself.</summary>
     public const string RestartKey = "var[0x02A]";
     public const string PauseKey = "var[0x02B]";

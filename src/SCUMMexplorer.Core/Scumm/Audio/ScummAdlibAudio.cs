@@ -71,13 +71,22 @@ public sealed partial class ScummAdlibAudio
     /// </summary>
     public ScummSoundLifetime ReadLifetime(GameResource resource, ScummAdlibTiming timing)
     {
+        try { return ReadLifetime(ReadTrack(resource), timing, false); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
+    }
+
+    /// <summary>The same for AdLib data given directly (a v4 disk's <c>AD</c> block body); <paramref name="halfTempo"/> as in <see cref="ReadDataLifetime"/>.</summary>
+    public ScummSoundLifetime ReadLifetime(byte[] data, ScummAdlibTiming timing, bool halfTempo)
+    {
         try
         {
-            var data = ReadTrack(resource);
-            var lifetime = ReadDataLifetime(data, false, timing);
+            var lifetime = ReadDataLifetime(data, halfTempo, timing);
             if (data.Length < 3 || data[2] != 0x80) return lifetime;
             var limit = lifetime.Kind == ScummSoundLifetimeKind.Finite ? lifetime.Callbacks!.Value : CallbackRate * MaxMarkerSeconds;
-            var player = new MusicPlayer(data, false, timing);
+            var player = new MusicPlayer(data, halfTempo, timing);
             var markers = new List<long>();
             for (var callbacks = 1; callbacks <= limit && player.Active; callbacks++)
             {
