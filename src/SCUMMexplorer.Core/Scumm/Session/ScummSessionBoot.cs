@@ -34,8 +34,31 @@ public abstract partial class ScummSession
     public string? AssumeBootAnswer()
     {
         if (FindAwaitedInput() is not { } input || _currentRoom is null) return null;
+        var room = _currentRoom.ResourceId!.Value;
+        // A screen whose answer the game computes first (a code wheel): the player's first click starts the questions, and the answer is given
+        // only once the game's own scripts have computed it (S5, 14 October 2026).
+        if (!_preparationCache.TryGetValue((room, input.LocalScript), out var chain))
+            _preparationCache[(room, input.LocalScript)] = chain = FindAnswerPreparation(room, input.LocalScript);
+        if (chain is { } prepared)
+        {
+            if (_answerPrepared.Add(room))
+            {
+                var note = $"Player input assumed: a first click on Room {room:00} object {prepared.Object.Id} (verb {(prepared.Verb.IsFallback ? "fallback" : $"0x{prepared.Verb.VerbId:X2}")}) " +
+                           $"starts the screen's questions: its code starts {string.Join(", ", prepared.Chain.Select(item => $"local script {item}"))}, which compute the answers {string.Join(", ", prepared.Comparands)} that local script {input.LocalScript} checks.";
+                _uncertainties.Add(note);
+                _visitTrace.Add($"boot: runs Room {room:00} object {prepared.Object.Id}'s code as the player's first click would");
+                _dispatchScope++;
+                try { RunScript(_data.ReadObjectVerb(room, prepared.Object, prepared.Verb.VerbId, out _), _currentObjects, 0, null, 0); }
+                finally { _dispatchScope--; }
+                DispatchRequestedLoads("during the boot");
+                return note;
+            }
+            // The questions are asked once the scripts that compute the answers have run.
+            if (_pending.Any(item => item.ScriptNumber is int number && prepared.Chain.Contains(number) && !item.Frame.Stopped)) return null;
+        }
         _uncertainties.Add(input.Note);
-        ushort answer = 0;
+        var (answer, answerNote) = chain is null ? ((ushort)0, null) : DeriveAcceptedAnswer(room, input.LocalScript);
+        if (answerNote is not null) _uncertainties.Add(answerNote);
         _visitTrace.Add($"boot: starts Room {_currentRoom.ResourceId:00} local script {input.LocalScript} as the player's answer would");
         _dispatchScope++;
         try
@@ -49,6 +72,54 @@ public abstract partial class ScummSession
         }
         DispatchRequestedLoads("during the boot");
         return input.Note;
+    }
+
+    private readonly HashSet<int> _answerPrepared = [];
+    private readonly Dictionary<(int Room, int Script), AnswerPreparation?> _preparationCache = [];
+
+    protected sealed record AnswerPreparation(ScummRoomObjectRecord Object, ScummObjectVerbEntry Verb, IReadOnlyList<int> Chain, IReadOnlyList<string> Comparands);
+
+    /// <summary>
+    /// The click that makes the game compute the answers its answering script checks. Read from the room's own scripts: the answering script
+    /// compares local 0 with variables (<c>isNotEqual var[K], local[0x000]</c>); room scripts that write those variables, the scripts that start them
+    /// (to four levels) and the one object whose verb code starts any of those scripts. Null when the answers need no click (no comparison
+    /// of that shape, or nothing in the room computes them) or the object is not unique.
+    /// </summary>
+    protected AnswerPreparation? FindAnswerPreparation(int room, int answering)
+    {
+        try
+        {
+            var code = _data.RoomLocalScript(room, answering);
+            if (code is null) return null;
+            var comparands = code.Instructions.Where(item => item.Operation == "isNotEqual" && item.Operands.Contains(", local[0x000],", StringComparison.Ordinal))
+                .Select(item => item.Operands[..item.Operands.IndexOf(',')].Trim()).Where(item => item.StartsWith("var[", StringComparison.Ordinal)).Distinct().ToArray();
+            if (comparands.Length == 0) return null;
+            var locals = _data.RoomLocalScriptIds(room).Where(item => item != answering).ToDictionary(item => item, item => _data.RoomLocalScript(room, item)?.Instructions ?? []);
+            var chain = locals.Where(pair => pair.Value.Any(item => item.Operation == "move" && comparands.Any(name => item.Operands.StartsWith(name + " =", StringComparison.Ordinal))))
+                .Select(pair => pair.Key).ToHashSet();
+            if (chain.Count == 0) return null;
+            for (var level = 0; level < 4; level++)
+            {
+                var more = locals.Where(pair => !chain.Contains(pair.Key) && pair.Value.Any(item => item.Operation == "startScript" && StartsAny(item, chain))).Select(pair => pair.Key).ToArray();
+                if (more.Length == 0) break;
+                foreach (var item in more) chain.Add(item);
+            }
+            var data = _data.ReadRoom(room);
+            var tables = _data.ReadObjectVerbs(room, data.Objects);
+            var found = new List<(ScummRoomObjectRecord, ScummObjectVerbEntry)>();
+            foreach (var record in data.Objects)
+                foreach (var verb in (tables.GetValueOrDefault(record.Id) ?? []).DistinctBy(item => item.ScriptOffset))
+                    if (_data.ReadObjectVerb(room, record, verb.VerbId, out _).Instructions.Any(item => item.Operation == "startScript" && StartsAny(item, chain)))
+                        found.Add((record, verb));
+            return found.Count == 1 ? new AnswerPreparation(found[0].Item1, found[0].Item2, chain.Order().ToArray(), comparands) : null;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or FormatException) { return null; }
+
+        static bool StartsAny(ScummScriptInstruction item, HashSet<int> scripts)
+        {
+            var head = item.Operands.Split(',', 2, StringSplitOptions.TrimEntries)[0];
+            return head.StartsWith("0x", StringComparison.Ordinal) && int.TryParse(head.AsSpan(2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var number) && scripts.Contains(number);
+        }
     }
 
     /// <summary>

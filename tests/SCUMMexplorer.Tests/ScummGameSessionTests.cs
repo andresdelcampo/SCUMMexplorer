@@ -65,13 +65,17 @@ public sealed class ScummGameSessionTests
         // S5: the display operations are applied (lights, room colours, strings) or have no lasting effect on the room (transitions, resource routines).
         Assert.Empty(presentation);
 
-        // The copy-protection screen is the only assumed input, and says so.
-        var assumed = Assert.Single(session.Snapshot.Uncertainties, item => item.StartsWith("Player input assumed", StringComparison.Ordinal));
-        Assert.Contains("Room 92 local script 204", assumed);
-        // The answer is 0 (wrong): the game's own rule lets play go on after three wrong rounds of its four questions (var[0x06B] = 3) and no more answers follow.
-        Assert.Equal(12, session.SessionTrace.Count(item => item.StartsWith("boot: starts Room 92 local script 204", StringComparison.Ordinal)));
-        Assert.Equal(3, session.Snapshot.KnownGlobalVariables["var[0x06B]"]);
+        // The copy-protection screen is the only assumed input (a first click and four answers), and says so.
+        var assumed = session.Snapshot.Uncertainties.Where(item => item.StartsWith("Player input assumed", StringComparison.Ordinal)).ToArray();
+        Assert.Equal(2, assumed.Length);
+        Assert.Contains(assumed, item => item.Contains("object 929") && item.Contains("local script 201"));
+        Assert.Contains(assumed, item => item.Contains("Room 92 local script 204"));
+        // S5: a player who reads the code wheel answers all four questions with the values the game computed (var[0x063..0x066]), so no round fails.
+        Assert.Equal(4, session.SessionTrace.Count(item => item.StartsWith("boot: starts Room 92 local script 204", StringComparison.Ordinal)));
+        Assert.Equal(4, session.Snapshot.Uncertainties.Count(item => item.StartsWith("Player answer assumed", StringComparison.Ordinal)));
+        Assert.Equal(0, session.Snapshot.KnownGlobalVariables["var[0x06B]"]);
         Assert.Equal(1, session.Snapshot.KnownGlobalVariables["var[0x039]"]);
+        Assert.Equal(0, session.Snapshot.KnownGlobalVariables.GetValueOrDefault("bit[0x5E4]"));
 
         // The first room: the ego stands in it, with the game's own look (costume 39) and the inventory script set by the game.
         var ego = session.Actors.Single(actor => actor.Number == 1);
