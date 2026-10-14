@@ -13,4 +13,10 @@ Independent of each other and of S4a (different files). Each merges to master as
 
 ## Result
 
-(filled in at the checkpoint)
+**S2 (ManiacClassic, ZakClassic), merged `abb5999`:** v1 actor colours derived from the scripts (Maniac 23/23, Zak 25/35; 10 Zak estimates labelled). Costumes cell raised to full for ManiacClassic on the user's decision (`184c332`); ZakClassic stays partial (needs S4/S6 state).
+
+**S3 (MonkeyCd, Monkey2, Indy4), merged `7466e44`..`62dfd20`:** songs loop as ScummVM's iMUSE plays them without a script (`ScummImuseTimeline`), hooks 49-53 with id 0 now act, the Monkey Island 1 CD track list was one track off and is corrected (one track, disc 21, is started by no sound and stays unnamed). Sound stays partial: script-driven hooks need S6; the loops and the changed hooks have not been listened to.
+
+**User checks:** see the two agent reports summarised in the chat of 14 October: Zak costumes 30 and 12-15, Maniac look unchanged; MI2 sounds 28, 120, 125, 151, 181, 212 and 109 on Roland/AdLib/PC speaker; two looping Indy 4 sounds; MI1 CD tracks 02, 07, 15, 18, 21.
+
+(S4a result: pending.)
