@@ -40,8 +40,8 @@ Written 14 October 2026. The roadmap and the exact, repeatable procedure for rai
 | Stage | What it delivers | Matrix column(s) | Needs | Done once or per game |
 |---|---|---|---|---|
 | **S1 Intake** | The family is recognised, has a fixture, a reference folder and a baseline record | (all, Rooms) | – | per game (done for all current families; re-run as an audit) |
-| **S2 Reading** | Costumes and scripts are read right, in the correct palette and dialect | Costumes, Scripts, Texts | S1 | per game |
-| **S3 Sound** | Every sound kind plays on every device the game has | Sound | S1 | per game |
+| **S2 Reading** | Costumes and scripts are read right, in the correct palette and dialect | Costumes, Scripts, Texts | S1 | per game (open: classic v1 costume colours only) |
+| **S3 Sound** | Every sound kind plays on every device the game has | Sound | S1 | per game (open: v5 script hooks, after S6) |
 | **S4 Session** | A live session that boots the game, runs entry scripts and tracks child scripts | (prerequisite of S5–S8) | S1, S2 | **S4a once** (generic session), **S4b per game** (boot, data source, dialect) |
 | **S5 Objects** | First-visit object state from the game's own scripts, rooms without gaps | Objects | S4b | per game |
 | **S6 Play** | Actors, camera, walking, verbs and clicks run the game's scripts | Play (and Objects ✔) | S5 + the Play requirement | per game |
@@ -49,18 +49,18 @@ Written 14 October 2026. The roadmap and the exact, repeatable procedure for rai
 | **S8 State** | A window for the game's state, **only if the run request asks for it** (default: skipped, offered at the checkpoint) | Status | S6 | per game |
 | **S9 Editions** | The other releases/languages/demos of the family behave | (notes) | the stage being widened | per family, after each stage |
 
-S2 and S3 do not need a session, so they can run in parallel with everything else. S4a is the one piece of shared engine work and is a bottleneck for every other family: it must be done by one agent, reviewed, and merged before any S4b starts (§4.3).
+S2 and S3 do not need a session. **They are done for every cell of the matrix except two**: the actor colours of the classic Maniac Mansion and Zak McKracken costumes (S2) and the v5 sound hooks that wait for a script (S3, which can only be finished after S6, because they need running scripts). Everything else listed as "polish" below (AdLib tempo checked by ear, PCjr/Tandy not yet listened to, a few percent of v5 scripts unresolved) does not change a cell; do it only when a run asks for it.
 
 ### Where each current family stands (14 October)
 
 | Family | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | Pending in the matrix |
 |---|---|---|---|---|---|---|---|---|---|
 | LoomEgaReference, LoomEga, LoomEgaDemo, LoomCd | done | done | done | done (LOOM-coupled) | done | done | LoomEga/Demo/Cd ◐ by design | done | only the LOOM items in CURRENT_WORK; the *generalisation* of S4a is the work that serves the other games |
-| Indy3Ega | done | done | AdLib tempo unchecked by ear | – | stored boxes ◐ | – | – | – | Objects, Play, Cutscenes, Status |
-| Indy3Vga, MonkeyFloppy | done | palette of the storing room | AdLib music at half tempo, set by ear | – | ◐ | – | – | – | Objects, Play, Cutscenes, Status |
-| MonkeyCd, Monkey2, Indy4 | done | v5 scripts ~3% unresolved | ◐ (loops, script hooks, two MI1 tracks unnamed, Indy 4 CD has no tracks) | – | ◐ | – | – | – | Sound, Objects, Play, Cutscenes, Status |
-| ManiacEnhanced, ZakEnhanced | done | scripts 00/01/06 of Maniac decode little | PCjr/Tandy not listened | – | ◐ | – | – | – | Objects, Play, Cutscenes, Status |
-| ManiacClassic, ZakClassic | done | **Costumes ◐ (actor colours estimated)**; Zak Script 39 | PCjr/Tandy not listened | – | ◐ | – | – | – | Costumes, Objects, Play, Cutscenes, Status |
+| Indy3Ega | done | done | done (polish: AdLib tempo unchecked by ear) | – | stored boxes ◐ | – | – | – | Objects, Play, Cutscenes, Status |
+| Indy3Vga, MonkeyFloppy | done | done (polish: costumes use the palette of the storing room) | done (polish: AdLib music at half tempo, set by ear) | – | ◐ | – | – | – | Objects, Play, Cutscenes, Status |
+| MonkeyCd, Monkey2, Indy4 | done | done (polish: ~3% of v5 script blocks unresolved) | **◐ iMUSE: script-driven hooks, loops; two MI1 tracks unnamed; Indy 4 CD has no tracks** | – | ◐ | – | – | – | Sound (needs S6), Objects, Play, Cutscenes, Status |
+| ManiacEnhanced, ZakEnhanced | done | done (polish: Maniac scripts 00/01/06 decode little) | done (polish: PCjr/Tandy not listened) | – | ◐ | – | – | – | Objects, Play, Cutscenes, Status |
+| ManiacClassic, ZakClassic | done | **Costumes ◐: actor colours estimated** (polish: Zak Script 39) | done (polish: PCjr/Tandy not listened) | – | ◐ | – | – | – | Costumes, Objects, Play, Cutscenes, Status |
 
 Facts behind S4 and S5 (so nobody rediscovers them): `LoomExplorationSession` only accepts old-v3 LOOM and LOOM CD (`GameId.Loom`/`LoomVga` checks); `ScummDataSources.For` has an `IScummDataSource` for old-v3 (`ScummV3DataSource`) and v4 (`ScummV4DataSource`) only, so v1/v2/v5 games are decoded ad hoc in the App (`DecodeBrowsedV4Script`, `ScummOldScripts`); a probe on 12 October showed the real starting objects of Indy3 and Monkey Island come from child and local scripts (`startScript`, `isScriptRunning`, `getObjectOwner`, `roomOps`) that only a script-tracking session can follow (`.verification` / CHANGELOG 12 October, "finding: real starting objects").
 
