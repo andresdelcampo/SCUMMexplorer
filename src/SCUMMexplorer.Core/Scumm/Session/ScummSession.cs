@@ -168,7 +168,7 @@ public abstract partial class ScummSession
         item.Certainty is ScummScriptEventCertainty.Reached or ScummScriptEventCertainty.Conditional;
 
     /// <summary>ScummVM <c>VAR_CUTSCENEEXIT_KEY</c> (v3: var 24); the boot sets it to 0x1B (script 001 +0x012C).</summary>
-    protected const string CutsceneExitKeyVariable = "var[0x018]";
+    protected const string CutsceneExitKeyVariable = ScummVars.CutsceneExitKey;
 
     /// <summary>
     /// ScummEngine::isScriptRunning: a global or local script slot with this
@@ -219,16 +219,15 @@ public abstract partial class ScummSession
     protected readonly HashSet<int> _endedUnmodelled = [];
 
     /// <summary>ScummVM <c>VAR_CUTSCENE_START_SCRIPT</c>, <c>VAR_CUTSCENE_END_SCRIPT</c> and <c>VAR_OVERRIDE</c>.</summary>
-    protected const string CutsceneStartScriptVariable = "var[0x023]";
-    protected const string CutsceneEndScriptVariable = "var[0x024]";
-    protected const string OverrideVariable = "var[0x005]";
+    protected const string CutsceneStartScriptVariable = ScummVars.CutsceneStartScript;
+    protected const string CutsceneEndScriptVariable = ScummVars.CutsceneEndScript;
+    protected const string OverrideVariable = ScummVars.Override;
 
     /// <summary>Session-level steps (such as stopped scripts) in the order they were applied.</summary>
     public IReadOnlyList<string> SessionTrace => _visitTrace;
 
-    protected void RunGlobalHook(int variableId, string phase, bool pathEstimated = false)
+    protected void RunGlobalHook(string key, string phase, bool pathEstimated = false)
     {
-        var key = $"var[0x{variableId:X3}]";
         if (!_runtime.GlobalVariables.TryGetValue(key, out var scriptId))
         {
             _uncertainties.Add($"Global {phase} hook {key} is unknown because startup has not established it.");

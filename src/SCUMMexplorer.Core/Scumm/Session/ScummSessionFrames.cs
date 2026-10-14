@@ -11,16 +11,16 @@ public abstract partial class ScummSession
     /// </summary>
     public int FrameJiffies => Math.Max(1, _runtime.GlobalVariables.TryGetValue(TimerNextVariable, out var next) ? next : 0);
 
-    protected const string TimerNextVariable = "var[0x013]";
+    protected const string TimerNextVariable = ScummVars.TimerNext;
 
     /// <summary>ScummVM v3 <c>VAR_TMR_1</c>..<c>VAR_TMR_3</c> (vars 11–13): jiffies the frame loop adds every frame.</summary>
-    protected static readonly string[] EngineTimerVariables = ["var[0x00B]", "var[0x00C]", "var[0x00D]"];
+    protected static readonly string[] EngineTimerVariables = [ScummVars.Timer1, ScummVars.Timer2, ScummVars.Timer3];
 
     /// <summary>ScummVM v3 <c>VAR_TIMER</c> (var 46): the jiffies of the last frame.</summary>
-    protected const string TimerVariable = "var[0x02E]";
+    protected const string TimerVariable = ScummVars.Timer;
 
     /// <summary>ScummVM v3 <c>VAR_TIMER_TOTAL</c> (var 47): jiffies since the start.</summary>
-    protected const string TimerTotalVariable = "var[0x02F]";
+    protected const string TimerTotalVariable = ScummVars.TimerTotal;
 
     /// <summary>ScummVM <c>scummLoop</c> clamps the jiffies it counts script delays and talk down by to 15.</summary>
     protected const int MaxFrameDelta = 15;

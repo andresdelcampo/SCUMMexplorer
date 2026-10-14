@@ -39,9 +39,9 @@ public abstract partial class ScummSession
         }
         if (_currentRoom is not null)
         {
-            RunGlobalHook(30, "before room exit", estimatedLoad);
+            RunGlobalHook(ScummVars.ExitScript, "before room exit", estimatedLoad);
             RunEmbeddedRoomScript(_currentRoom, exit: true, pathEstimated: estimatedLoad);
-            RunGlobalHook(31, "after room exit", estimatedLoad);
+            RunGlobalHook(ScummVars.ExitScript2, "after room exit", estimatedLoad);
             // Room-scoped scripts cannot continue into a different room.
             _pending.RemoveAll(item => item.RoomId == _currentRoom.ResourceId);
         }
@@ -86,15 +86,15 @@ public abstract partial class ScummSession
         _runtime.EstimatedVariables.Remove(ScummVars.CameraMaxX);
         foreach (var item in _currentObjects)
             _runtime.TryAddObjectPosition(item.Id, new RoomObjectPosition(item.X, item.Y));
-        _runtime.SetGlobalVariable("var[0x004]", (ushort)room.ResourceId!.Value);
+        _runtime.SetGlobalVariable(ScummVars.Room, (ushort)room.ResourceId!.Value);
         _roomSize = (roomWidth, roomData.Height);
         _pointer = null;
         PlaceVirtualMouse();
         _uncertainties.Add(arrival);
 
-        RunGlobalHook(28, "before room entry", estimatedLoad);
+        RunGlobalHook(ScummVars.EntryScript, "before room entry", estimatedLoad);
         RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);
-        RunGlobalHook(29, "after room entry", estimatedLoad);
+        RunGlobalHook(ScummVars.EntryScript2, "after room entry", estimatedLoad);
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (placeAfterLoadRoom is not null && ego is int putEgo) placeAfterLoadRoom(putEgo);
         else if (withEgo is not null) ForgetCamera($"{withEgo.SourceLabel} +0x{withEgo.Offset:X4} puts the camera on the ego, whose actor number is unknown");

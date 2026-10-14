@@ -6,9 +6,9 @@ namespace SCUMMexplorer.Core.Scumm;
 public abstract partial class ScummSession
 {
     /// <summary>ScummVM <c>VAR_VERB_SCRIPT</c> (v3: var 32): the script <c>runInputScript</c> runs for every click. The boot sets it to 5 (script 001 +0x016B).</summary>
-    protected const string VerbScriptVariable = "var[0x020]";
+    protected const string VerbScriptVariable = ScummVars.VerbScript;
     /// <summary>ScummVM <c>VAR_TMR_2</c> (v3: var 12), jiffies the engine adds every frame; script 006 resets it on a click and reads it to find a double click.</summary>
-    protected const string ClickTimerVariable = "var[0x00C]";
+    protected const string ClickTimerVariable = ScummVars.Timer2;
     /// <summary>ScummVM <c>kSceneClickArea</c>: a click in the room picture.</summary>
     public const int SceneClickArea = 2;
     /// <summary>Assumed time since the previous click for a single click: one second (60 jiffies), past script 006's 40-jiffy double-click window.</summary>
@@ -84,8 +84,8 @@ public abstract partial class ScummSession
     /// <summary>ScummVM <c>kVerbClickArea</c>: a click in the verb screen.</summary>
     public const int VerbClickArea = 1;
     /// <summary>ScummVM <c>VAR_MOUSE_X</c>/<c>VAR_MOUSE_Y</c> (v3: vars 44 and 45), the pointer's screen point; script 005 reads x for verb 0x31.</summary>
-    protected const string MouseXVariable = "var[0x02C]";
-    protected const string MouseYVariable = "var[0x02D]";
+    protected const string MouseXVariable = ScummVars.ScreenMouseX;
+    protected const string MouseYVariable = ScummVars.ScreenMouseY;
 
 
     /// <summary>
@@ -171,9 +171,9 @@ public abstract partial class ScummSession
     /// <summary>ScummVM <c>kKeyClickArea</c>: a key press.</summary>
     public const int KeyClickArea = 4;
     /// <summary>ScummVM <c>VAR_RESTART_KEY</c> (v3: var 42); the boot sets it to 0x142, F8 (script 001 +0x0131).</summary>
-    protected const string RestartKeyVariable = "var[0x02A]";
+    protected const string RestartKeyVariable = ScummVars.RestartKey;
     /// <summary>ScummVM <c>VAR_PAUSE_KEY</c> (v3: var 43); the boot sets it to 0x20, space (script 001 +0x0136).</summary>
-    protected const string PauseKeyVariable = "var[0x02B]";
+    protected const string PauseKeyVariable = ScummVars.PauseKey;
 
     /// <summary>
     /// A key as ScummVM's <c>processKeyboard</c> hands it to scripts: printable
