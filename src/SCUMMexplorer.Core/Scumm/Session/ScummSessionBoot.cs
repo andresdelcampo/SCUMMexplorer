@@ -35,12 +35,13 @@ public abstract partial class ScummSession
     {
         if (FindAwaitedInput() is not { } input || _currentRoom is null) return null;
         _uncertainties.Add(input.Note);
+        ushort answer = 0;
         _visitTrace.Add($"boot: starts Room {_currentRoom.ResourceId:00} local script {input.LocalScript} as the player's answer would");
         _dispatchScope++;
         try
         {
             // The engine starts a script with every local at 0; a script started as an answer takes the answer from local 0.
-            RunStartedScript(input.LocalScript, 0, new Dictionary<string, ushort> { ["local[0x000]"] = 0 }, 0);
+            RunStartedScript(input.LocalScript, 0, new Dictionary<string, ushort> { ["local[0x000]"] = answer }, 0);
         }
         finally
         {
@@ -48,6 +49,38 @@ public abstract partial class ScummSession
         }
         DispatchRequestedLoads("during the boot");
         return input.Note;
+    }
+
+    /// <summary>
+    /// The answer the answering script accepts at this point, read from the script itself (S5, 14 October 2026): the script checks the answer in
+    /// local 0 with <c>isEqual var[S], n</c> (which question is asked) followed at once by <c>isNotEqual var[K], local[0x000]</c> (the right answer
+    /// of that question). The right answer is then the current value of var[K], which the game's own code has computed. A script of another
+    /// shape gives 0, the answer the engine starts a script with (a wrong one). The pick is an assumed player input, labelled, never a state edit.
+    /// </summary>
+    protected (ushort Answer, string? Note) DeriveAcceptedAnswer(int room, int script)
+    {
+        const string? Wrong = null;
+        ScummScriptDisassembly? code;
+        try { code = _data.RoomLocalScript(room, script); }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { return (0, Wrong); }
+        if (code is null) return (0, Wrong);
+        var instructions = code.Instructions;
+        for (var i = 1; i < instructions.Count; i++)
+        {
+            var test = instructions[i];
+            if (test.Operation != "isNotEqual" || !test.Operands.Contains(", local[0x000],", StringComparison.Ordinal)) continue;
+            var comparand = test.Operands[..test.Operands.IndexOf(',')].Trim();
+            var question = instructions[i - 1];
+            if (question.Operation != "isEqual" || !comparand.StartsWith("var[", StringComparison.Ordinal)) continue;
+            var parts = question.Operands.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length < 2 || !parts[0].StartsWith("var[", StringComparison.Ordinal) || !parts[1].StartsWith("0x", StringComparison.Ordinal)) continue;
+            var selector = _runtime.GlobalVariables.GetValueOrDefault(parts[0]);
+            if (selector != Convert.ToInt32(parts[1][2..], 16)) continue;
+            var answer = _runtime.GlobalVariables.GetValueOrDefault(comparand);
+            return (answer, $"Player answer assumed: {answer}, the value of {comparand} that Room {room:00} local script {script} +0x{test.Offset:X4} accepts while {parts[0]} is {selector}: " +
+                            "a player who reads the code correctly gives it (Advanced; the choice is an assumption, not a state edit).");
+        }
+        return (0, Wrong);
     }
 
     /// <summary>Frames the completed boot ran after script 001's first room load.</summary>

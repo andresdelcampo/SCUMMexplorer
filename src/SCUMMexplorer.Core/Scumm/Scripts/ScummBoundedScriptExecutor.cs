@@ -1322,6 +1322,17 @@ public sealed class ScummBoundedScriptExecutor
                 continue;
             }
 
+            if (runtime is not null && ApplyDisplayOperation(instruction, runtime, knownVariables, estimated, onEstimatedPath, trace, out var displayHandled))
+            {
+                if (!displayHandled)
+                {
+                    unresolved = $"{instruction.Operation} operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                pc = next;
+                continue;
+            }
+
             if (IsPresentationOperation(instruction.Operation))
             {
                 if (eventHandling == "")
@@ -2941,6 +2952,137 @@ public sealed class ScummBoundedScriptExecutor
             return instructions;
         return instructions.Select(item => item.Operation == "matrixOps" && item.Operands.StartsWith(prefix, StringComparison.Ordinal)
             ? item with { Operation = "setBoxFlags", Operands = item.Operands[prefix.Length..] } : item).ToArray();
+    }
+
+    /// <summary>
+    /// The display operations of the old bundle that change what a room shows, or that have no effect on it (ScummVM script_v5.cpp
+    /// <c>o5_roomOps</c>, <c>o5_lights</c>, <c>o5_stringOps</c>, <c>o5_oldRoomEffect</c>, <c>o5_resourceRoutines</c>, read 14 October 2026):
+    /// <c>roomOps roomColorLegacy a, b</c> sets <c>_roomPalette[b] = a</c> (the room picture and its objects are drawn through it);
+    /// <c>lights</c> sets <c>VAR_CURRENT_LIGHTS</c> (c = 0) or the flashlight's strips (c = 1); <c>stringOps</c> keeps the game's string resources;
+    /// a transition effect, a shake, the screen split and a resource load, lock or unlock leave nothing in what the room shows.
+    /// Returns false when the instruction is not one of these; <paramref name="handled"/> is false when an operand is unknown.
+    /// </summary>
+    private static bool ApplyDisplayOperation(ScummScriptInstruction instruction, ScummScriptRuntimeState runtime,
+        Dictionary<string, ushort> knownVariables, HashSet<string> estimated, bool onEstimatedPath, List<string> trace, out bool handled)
+    {
+        handled = true;
+        var head = instruction.Operands.Split(',', 2, StringSplitOptions.TrimEntries)[0];
+        switch (instruction.Operation)
+        {
+            case "oldRoomEffect":
+                trace.Add($"transition effect not drawn (no lasting effect on the room): {instruction.Operands}");
+                return true;
+            case "resourceRoutines":
+                trace.Add($"resource routine {instruction.Operands}: every resource is available to the session");
+                return true;
+            case "roomOps" when head is "shakeOn" or "shakeOff" or "setScreen":
+                trace.Add($"{instruction.Operands}: screen shake and screen split are not part of the room picture");
+                return true;
+            case "roomOps" when head == "roomColorLegacy":
+            {
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (parts.Length != 3 || !TryReadValue(parts[1], knownVariables, out var colour, out _) || !TryReadValue(parts[2], knownVariables, out var slot, out _))
+                { handled = false; return true; }
+                if (!onEstimatedPath)
+                {
+                    runtime.RoomColors[slot & 0xFF] = (byte)colour;
+                    trace.Add($"room colour {slot & 0xFF} is drawn as colour {colour & 0xFF} (roomColorLegacy)");
+                }
+                return true;
+            }
+            case "lights":
+            {
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (parts.Length != 3 || !TryReadValue(parts[0], knownVariables, out var a, out _) ||
+                    !TryReadValue(parts[1], knownVariables, out var b, out _) || !TryReadValue(parts[2], knownVariables, out var c, out _))
+                { handled = false; return true; }
+                if (onEstimatedPath) return true;
+                if (c == 0)
+                {
+                    knownVariables[ScummVars.CurrentLights] = (ushort)(a & 0xFF);
+                    RefreshBitAliases(ScummVars.CurrentLights, knownVariables);
+                    trace.Add($"{ScummVars.CurrentLights} = {a & 0xFF} (lights)");
+                }
+                else if (c == 1)
+                {
+                    runtime.Flashlight = (a & 0xFF, b & 0xFF);
+                    trace.Add($"flashlight is {a & 0xFF} x {b & 0xFF} strips (lights)");
+                }
+                return true;
+            }
+            case "stringOps":
+            {
+                var rest = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                switch (head)
+                {
+                    case "loadString":
+                    {
+                        var parts = instruction.Operands.Split(',', 3, StringSplitOptions.TrimEntries);
+                        if (parts.Length != 3 || !TryReadValue(parts[1], knownVariables, out var id, out _)) { handled = false; return true; }
+                        if (!onEstimatedPath) runtime.Strings[id & 0xFF] = UnescapeStringOperand(parts[2]);
+                        return true;
+                    }
+                    case "createString" or "copyString":
+                    {
+                        if (rest.Length != 3 || !TryReadValue(rest[1], knownVariables, out var first, out _) || !TryReadValue(rest[2], knownVariables, out var second, out _))
+                        { handled = false; return true; }
+                        if (onEstimatedPath) return true;
+                        if (head == "createString") runtime.Strings[first & 0xFF] = new byte[Math.Max(0, second & 0xFF) + 1];
+                        else if (runtime.Strings.TryGetValue(second & 0xFF, out var source)) runtime.Strings[first & 0xFF] = (byte[])source.Clone();
+                        return true;
+                    }
+                    case "setStringChar":
+                    {
+                        if (rest.Length != 4 || !TryReadValue(rest[1], knownVariables, out var id2, out _) || !TryReadValue(rest[2], knownVariables, out var index, out _) ||
+                            !TryReadValue(rest[3], knownVariables, out var character, out _))
+                        { handled = false; return true; }
+                        if (onEstimatedPath) return true;
+                        // ScummVM allows a write a few bytes past the end (its safety area) and denies the rest; only writes inside are kept.
+                        if (runtime.Strings.TryGetValue(id2 & 0xFF, out var text) && index < text.Length) text[index] = (byte)character;
+                        else trace.Add($"string {id2 & 0xFF} write at {index} is outside the string (not kept)");
+                        return true;
+                    }
+                    case "getStringChar":
+                    {
+                        if (rest.Length != 4 || !TryGetVariableKey(rest[1], knownVariables, out var key) ||
+                            !TryReadValue(rest[2], knownVariables, out var id3, out _) || !TryReadValue(rest[3], knownVariables, out var index3, out _))
+                        { handled = false; return true; }
+                        var value = runtime.Strings.TryGetValue(id3 & 0xFF, out var stored) && index3 < stored.Length ? stored[index3] : (byte)0;
+                        knownVariables[key] = value;
+                        RefreshBitAliases(key, knownVariables);
+                        MarkEstimated(estimated, key, onEstimatedPath || OperandIsEstimated(rest[3], estimated, knownVariables));
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // The text of a disassembled string operand (quoted, with \xHH, \\ and \" escapes) as the bytes the game stores, with the zero terminator.
+    private static byte[] UnescapeStringOperand(string operand)
+    {
+        var text = operand.Trim();
+        if (text.Length >= 2 && text[0] == '"' && text[^1] == '"') text = text[1..^1];
+        var bytes = new List<byte>();
+        for (var i = 0; i < text.Length; i++)
+        {
+            if (text[i] == '\\' && i + 1 < text.Length)
+            {
+                if (text[i + 1] == 'x' && i + 3 < text.Length && byte.TryParse(text.AsSpan(i + 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var hex))
+                {
+                    bytes.Add(hex);
+                    i += 3;
+                    continue;
+                }
+                bytes.Add((byte)text[++i]);
+                continue;
+            }
+            bytes.Add((byte)text[i]);
+        }
+        bytes.Add(0);
+        return bytes.ToArray();
     }
 
     private static bool IsPresentationOperation(string operation) => operation is

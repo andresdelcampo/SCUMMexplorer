@@ -76,6 +76,7 @@ public abstract partial class ScummSession
         var roomWidth = roomData.Width;
         _runtime.RoomCameraBounds = _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
         _runtime.ResetShadowPalette();
+        _runtime.ResetRoomColors();
         _runtime.SetGlobalVariable(CameraVariable, 160);
         _runtime.EstimatedVariables.Remove(CameraVariable);
         _runtime.Camera.Reset(160);

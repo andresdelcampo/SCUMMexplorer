@@ -19,6 +19,8 @@ public static class ScummVars
     public const string CameraPosX = "var[0x002]";
     /// <summary><c>VAR_HAVE_MSG</c>: nonzero while a message is on screen.</summary>
     public const string HaveMsg = "var[0x003]";
+    /// <summary><c>VAR_CURRENT_LIGHTS</c> (vars.cpp: 9 for v3 to v5): bit 1 room lights on, bit 2 flashlight on, bit 3 actors use their own colours, bit 0 base palette.</summary>
+    public const string CurrentLights = "var[0x009]";
     /// <summary><c>VAR_MUSIC_TIMER</c>.</summary>
     public const string MusicTimer = "var[0x00E]";
     /// <summary>Variables 39 to 41, the three extra timers of Indiana Jones and the Last Crusade (<see cref="ScummProfile.ExtraTimerVariables"/>).</summary>

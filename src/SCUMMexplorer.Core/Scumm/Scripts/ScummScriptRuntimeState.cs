@@ -194,6 +194,23 @@ public sealed class ScummScriptRuntimeState
     /// </summary>
     public byte[] ShadowPalette { get; } = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
 
+    /// <summary>
+    /// ScummVM <c>_roomPalette</c> (<c>roomOps roomColorLegacy a, b</c>: <c>_roomPalette[b] = a</c>): the colour each colour number of the room picture and its objects is
+    /// drawn as. Identity at every room load (room.cpp <c>startScene</c>). Actors are not drawn through it.
+    /// </summary>
+    public byte[] RoomColors { get; } = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
+
+    public void ResetRoomColors()
+    {
+        for (var i = 0; i < RoomColors.Length; i++) RoomColors[i] = (byte)i;
+    }
+
+    /// <summary>The flashlight's size in strips set by <c>lights</c> (ScummVM <c>_flashlight.xStrips/yStrips</c>), (0, 0) when none.</summary>
+    public (int X, int Y) Flashlight { get; set; }
+
+    /// <summary>The game's string resources (<c>stringOps</c>), by string number, with the zero terminator.</summary>
+    public Dictionary<int, byte[]> Strings { get; } = [];
+
     public void ResetShadowPalette()
     {
         for (var i = 0; i < ShadowPalette.Length; i++) ShadowPalette[i] = (byte)i;

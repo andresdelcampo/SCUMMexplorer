@@ -62,7 +62,8 @@ public sealed class ScummGameSessionTests
         var presentation = session.Snapshot.Uncertainties.SelectMany(item => item.Split("; "))
             .Where(item => item.Contains("presentation operation not applied:"))
             .Select(item => item[(item.LastIndexOf(':') + 1)..].Trim()).Distinct().Order().ToArray();
-        Assert.Equal(["lights", "oldRoomEffect", "resourceRoutines", "roomOps", "stringOps"], presentation);
+        // S5: the display operations are applied (lights, room colours, strings) or have no lasting effect on the room (transitions, resource routines).
+        Assert.Empty(presentation);
 
         // The copy-protection screen is the only assumed input, and says so.
         var assumed = Assert.Single(session.Snapshot.Uncertainties, item => item.StartsWith("Player input assumed", StringComparison.Ordinal));

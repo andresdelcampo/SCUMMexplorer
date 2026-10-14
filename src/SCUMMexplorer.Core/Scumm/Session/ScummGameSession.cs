@@ -20,6 +20,8 @@ public sealed class ScummGameSession : ScummSession
         SoundCard = AdlibCard;
         if (profile.VideoMode is int videoMode) _runtime.SetGlobalVariable(ScummVars.VideoMode, (ushort)videoMode);
         _runtime.SetGlobalVariable(ScummVars.CharInc, ScummProfile.CharIncAtStart);
+        // resetScummVars (scumm.cpp): the lights start as base palette, actors' own colours and room lights on (1 | 8 | 2).
+        _runtime.SetGlobalVariable(ScummVars.CurrentLights, 11);
         if (boot) Boot();
     }
 
