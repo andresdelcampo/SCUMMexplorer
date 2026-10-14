@@ -290,6 +290,19 @@ public sealed class ScummBoundedScriptExecutor
             var scriptEvent = inventoryScriptStart ?? ScummScriptEvent.FromInstruction(script, instruction,
                 onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached);
             if (scriptEvent is not null) scriptEvent = scriptEvent with { Executed = true };
+            // o5_actorFollowCamera -> setCameraFollows (actor.cpp): an actor that is not in the current room starts that room's scene (startScene), then the
+            // camera is put on the actor. The first game that relies on it is Monkey Island's boot (script 1 ends with the ego put in room 38 while room 0 is current).
+            if (scriptEvent is { Operation: "actorFollowCamera" } && runtime is { CameraFollowStartsScene: true } &&
+                TryReadValue(instruction.Operands.Trim(), knownVariables, out var followedActor, out _) &&
+                (followedActor == 0
+                    // Actor 0 is a valid slot of the engine's actor array (derefActor) that is never in a room: following it starts room 0.
+                    ? runtime.CurrentRoom is int currentRoom && currentRoom != 0
+                    : ScummActorTable.IsValid(followedActor) && runtime.Actors[followedActor].Room is int otherRoom && otherRoom != 0 && otherRoom != runtime.CurrentRoom))
+                scriptEvent = scriptEvent with
+                {
+                    Kind = ScummScriptEventKind.RoomLoaded, TargetKind = ResourceKind.Room,
+                    TargetId = followedActor == 0 ? 0 : runtime.Actors[followedActor].Room, ResolvedArguments = [followedActor]
+                };
             if (scriptEvent is { TargetId: null, Kind: ScummScriptEventKind.MusicStarted or
                     ScummScriptEventKind.SoundStarted or ScummScriptEventKind.SoundStopped } &&
                 TryReadValue(instruction.Operands.Trim(), knownVariables, out var soundId, out _))

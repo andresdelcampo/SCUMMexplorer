@@ -98,6 +98,7 @@ public abstract partial class ScummSession
         RunGlobalHook(ScummVars.EntryScript2, "after room entry", estimatedLoad);
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (placeAfterLoadRoom is not null && ego is int putEgo) placeAfterLoadRoom(putEgo);
+        else if (load is { Operation: "actorFollowCamera", ResolvedArguments: [int followed] }) FollowActorAfterEntry(load, followed);
         else if (withEgo is not null) ForgetCamera($"{withEgo.SourceLabel} +0x{withEgo.Offset:X4} puts the camera on the ego, whose actor number is unknown");
         LastVisitEvents = _visitEvents.Skip(eventsBeforeVisit).ToArray();
         return Snapshot;
@@ -193,6 +194,22 @@ public abstract partial class ScummSession
         var state = _runtime.Actors[ego];
         _visitTrace.Add($"{source}: the ego (actor {ego}) stands at ({state.X?.ToString() ?? "?"}, {state.Y?.ToString() ?? "?"}), box {state.WalkBox?.ToString() ?? "?"}" +
                         (state.Estimate is null ? "" : $" (estimate: {state.Estimate})"));
+    }
+
+    /// <summary>
+    /// <c>setCameraFollows</c> for an actor outside the current room (actor.cpp): <c>startScene</c> of the actor's room has run, then
+    /// <c>camera._cur.x</c> is the actor's x and the camera follows the actor.
+    /// </summary>
+    protected void FollowActorAfterEntry(ScummScriptEvent load, int actor)
+    {
+        var source = $"{load.SourceLabel} +0x{load.Offset:X4}";
+        var placed = _runtime.Actors[actor];
+        if (placed.X is not int actorX || placed.Room != _currentRoom?.ResourceId)
+            ForgetCamera($"{source} puts the camera on actor {actor}, whose position is unknown");
+        else SetCamera(actorX, placed.Estimate is null ? null : $"the camera is put on actor {actor} at {source}, whose position is an estimate ({placed.Estimate})",
+            $"{source}: camera x = {{0}} (actor {actor}'s x)");
+        _runtime.Camera.Mode = ScummCamera.FollowActor;
+        _runtime.Camera.Follows = actor;
     }
 
     /// <summary>ScummVM <c>VAR_CAMERA_POS_X</c>.</summary>

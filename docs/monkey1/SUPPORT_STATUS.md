@@ -26,3 +26,39 @@ Open uncertainties: disc track 21 (16 s) is started by no sound and stays unname
 | 14 Oct | S3 | Name disc track 21? | name it from a guess / leave unnamed | unnamed: no sound, no direct start (only LOOM CD has one) and no literal script start names it (R-2.1) | none needed |
 | 14 Oct | S3 | How long a looping song is rendered | one pass; 3 minutes (the preview limit already used by the other devices); more | 3 minutes, ending at the first jump back at or after it (hard cap 420 s) | `ScummImuseTimeline.MinLoopSeconds` |
 | 2026-10-14 | S3 | Raise Sound to Full? | keep partial until S6 hooks / raise now | raised: the user listened and accepted the v5 sounds (loops, hooks with id 0, MI1 CD track list); the script-driven hooks stay a known limit for S6 | revert the one registry line |
+
+
+---
+
+# Monkey Island 1 floppy support status
+
+Family: MonkeyFloppy | Fixture: `Games/monkey1 ega en` (the four-disk 256-colour floppy release, SCUMM v4; the folder name says EGA, the data is VGA) | Last updated: 14 October 2026 | Owner: S4b MonkeyFloppy agent
+
+| Stage | State | Registry cell | Record | Notes |
+|---|---|---|---|---|
+| S1 Intake | done (before this file) | Rooms | | |
+| S2 Reading | done (before this file) | Costumes, Scripts, Texts | | |
+| S3 Sound | done (before this file) | Sound | | polish: AdLib music at half tempo, set by ear |
+| S4b Session | **done** (14 Oct) | unchanged (no cell changes in S4b) | [monkey1-session-20261014](../../.verification/monkey1-session-20261014/README.md) | boot to Room 33 in 2522 frames, unsupported list empty |
+| S5 Objects | not started | Objects (partial) | | the session now exists; first-visit state next |
+| S6 Play | not started | Play | | the interface loop (script 23) and the input script (script 4) already run |
+| S7 Cutscenes | not started | Cutscenes | | |
+| S8 State | not started | Status | | requested in a run: no |
+| S9 Editions | not started | – | | the eight-disk Spanish EGA release boots the same way (record); its video-mode variable is the VGA value |
+
+Blocked on: nothing.
+Next: S5 (first-visit objects of the rooms from the settled state; compare with the bundled ScummVM).
+Open uncertainties: the session's AdLib music timer for the credits is an estimate (iMuse in the engine); the profile gives `VAR_VIDEOMODE` 19 to every v4 game, wrong for the EGA release; the wrong-answer path of the protection (a fourth wrong answer quits) was not run.
+
+## Decision log
+
+| Date | Stage | Open question | Options | Choice and why | How to undo |
+|---|---|---|---|---|---|
+| 2026-10-14 | S4b | Which disks does the game ask for? | model "insert disk" as a blocking screen; assume every disk inserted | every disk available (a v4 resource sits on the one disk that holds its room, found through the index); the boot never waits for a disk (R-3.15, Proposed) | `ScummV4DiskSetDataSource` could be made to refuse a room until its disk is "inserted" |
+| 2026-10-14 | S4b | Answer to the Dial-A-Pirate question (R-15.5 says answer with the answering script, wrong answer allowed) | a wrong answer four times (the game quits); start a local answering script as for Indy3; keys through the game's input script with the right year | the right year, as keys through the game's own input script (script 153 for Enter, 155 for the digits), read from `var[0x10A]` where the game's own script put it (read, never written): the game takes its right branch and the answer is the game's data (R-15.7, Proposed); the failing answer would end the game | `ScummProfile.BootInput` null: the boot then stalls at the protection |
+| 2026-10-14 | S4b | When is a boot "waiting for the player"? | detect the awaited variable like the Indy3 answer; any state that does not change for N frames | nothing changes for 400 frames (`ScummGameSession.BootStallFrames`), so no script number or variable is named in shared code | change the constant |
+| 2026-10-14 | S4b | Where does the boot end? | when script 1 ends (Room 96, title music, input off); when the player has control | when the player has control (a room, no cutscene, user input on): Room 33 (R-15.8, Proposed); other games keep the script-1 end | `BootEndsWhenPlayerHasControl` false |
+| 2026-10-14 | S4b | `actorFollowCamera` of an actor in another room | keep reporting "not modelled"; run `startScene` as ScummVM's `setCameraFollows` does | modelled, but only for the generic session of v4 games (`ScummProfile.CameraFollowStartsScene`), because LOOM's sessions are pinned to identical results; script 1 ends this way | set the property false |
+| 2026-10-14 | S4b | Global variables no script has written yet | "unknown" (LOOM's policy); 0 as the engine allocates them (`calloc`) | 0 for the v4 profile (800 variables); the old-v3 games keep their policy | `GlobalVariableCount` 0 |
+| 2026-10-14 | S4b | The music timer the credits wait on | leave it at 0 (the boot stalls); skip the credits with Escape (a labelled assumed key); play the song's `AD` block at the browsed half tempo (S3's decision) | the AD block at half tempo, labelled an estimate: the engine's own timer is iMuse's, the credits run to their end without a skip | `ScummGameSession.AdlibLifetime` |
+| 2026-10-14 | S4b | A key pressed while no room is current (room 0) | refuse (as before); deliver it | deliver: the engine reads keys in room 0 and the credits' script waits there; `PressKey` takes the null room | restore the exception in `PressKey` |

@@ -7,6 +7,13 @@ namespace SCUMMexplorer.Core.Scumm;
 /// the profile ("does this version walk the v4 way?") instead of testing which game it is running. A new SCUMM version or game
 /// adds a case here and, where it really differs, a reader or data source in its <c>V3</c>/<c>V4</c>-style folder.
 /// </summary>
+/// <summary>
+/// The labelled assumed input of a boot that waits for the player (R-15.5). When nothing in the boot changes for a while, the session presses a key:
+/// the digits of the value in <paramref name="AnswerVariable"/> when the game has put an expected answer there (read, never written: the game's
+/// own script derived it), else <paramref name="ContinueKey"/> (Enter). Keys go through the game's own input script like a player's.
+/// </summary>
+public sealed record ScummBootInputPlan(string? AnswerVariable, int ContinueKey = 13);
+
 public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Dialect)
 {
     /// <summary>Actor walking follows the v4 routines (<c>Actor</c>) instead of the old-v3 ones (<c>Actor_v3</c>).</summary>
@@ -39,6 +46,34 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <summary><c>VAR_CHARINC</c> (variable 37) at start: <c>resetScummVars</c> gives the delay between the characters of a message 4 in every version.</summary>
     public const int CharIncAtStart = 4;
 
+    /// <summary>
+    /// Variables the engine sets to a value besides the ones every session sets (<c>resetScummVars</c>, vars.cpp, read 14 October 2026): for version 4 and later
+    /// <c>VAR_HEAPSPACE</c> = 1400 and <c>VAR_FIXEDDISK</c> = 1 (the game is on a hard disk), and <c>VAR_DEBUGMODE</c> = 0 (version 4 and later, no debug mode).
+    /// </summary>
+    public IReadOnlyList<(string Variable, ushort Value)> EngineVariablesAtStart =>
+        UsesV4Archive ? [(ScummVars.HeapSpace, 1400), (ScummVars.FixedDisk, 1), (ScummVars.DebugMode, 0)] : [];
+
+    /// <summary>
+    /// How many global variables the engine allocates, all zero at start (ScummVM <c>_numVariables</c>, 800 for the version 4 and 5 games); 0 where the
+    /// session does not yet start every variable at 0 (the old-v3 games keep reading unwritten variables as unknown).
+    /// </summary>
+    public int GlobalVariableCount => UsesV4Archive ? 800 : 0;
+
+    /// <summary>
+    /// How a stalled boot is answered when the game waits for the player (a "press a key" screen, a copy-protection question); null when the
+    /// boot of the game does not wait. Edition data: the answer variable is a slot of this game's own scripts.
+    /// </summary>
+    public ScummBootInputPlan? BootInput { get; init; }
+
+    /// <summary>
+    /// <c>actorFollowCamera</c> on an actor that is not in the current room starts that room's scene (ScummVM camera.cpp <c>setCameraFollows</c>, read 14 October 2026).
+    /// Modelled for the generic session of the version 4 games (Monkey Island's boot ends script 1 that way); LOOM's sessions keep reporting it as not modelled.
+    /// </summary>
+    public bool CameraFollowStartsScene => UsesV4Archive;
+
+    /// <summary>The boot is over only when the player has control, not when script 1 has ended (a game whose script 1 hands over to an opening scene).</summary>
+    public bool BootEndsWhenPlayerHasControl { get; init; }
+
     public static ScummProfile For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -54,7 +89,10 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
         {
             AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard,
             HasFirstVisitScenes = game.Id == GameId.IndianaJones3 && game.Version == ScummVersion.V3,
-            ExtraTimerVariables = game.Id == GameId.IndianaJones3 ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : []
+            ExtraTimerVariables = game.Id == GameId.IndianaJones3 ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
+            // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
+            BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
+            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy
         };
     }
 }

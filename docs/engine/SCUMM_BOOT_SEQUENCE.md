@@ -39,7 +39,14 @@ Sources: ScummVM `engines/scumm` `scumm.cpp`, `vars.cpp`, `script.cpp`, `script_
 
 ## SCUMM v4 (LOOM CD, Monkey Island floppy, Indiana Jones 256 colours)
 
-Not documented yet.
+Sources: ScummVM `engines/scumm` `vars.cpp` (`setupScummVars`, `resetScummVars`, `setVideoModeVarToCurrentConfig`, `setSoundCardVarToCurrentConfig`), `script_v5.cpp` (`o5_actorOps`), `camera.cpp` (`setCameraFollows`), `sound.cpp` (`updateMusicTimer`), `scumm.cpp` (`setupMusic`), read from the `master` branch on 14 October 2026 (S4b, Monkey Island floppy). What the first game puts into these variables: [MONKEY1_SCRIPT_MAP.md](../monkey1/MONKEY1_SCRIPT_MAP.md). The generic session that follows this sequence is `ScummGameSession` (Core/Scumm/Session); the record is [monkey1-session-20261014](../../.verification/monkey1-session-20261014/README.md).
+
+- **Boot script:** as in v3 (indexed script 1, argument 0, started by `runBootscript`); nothing in the files read differs for v4.
+- **Variables set by the engine before the boot script** (`vars.cpp`): as v3, plus for version 4 and later `VAR_HEAPSPACE` (var 40) = 1400, `VAR_FIXEDDISK` (var 51) = 1 and `VAR_DEBUGMODE` (var 39) = 0 (no debug mode); `VAR_VIDEOMODE` is 19 for VGA, 13 for a 16-colour (EGA) render mode, 4 CGA. Every global variable is allocated zeroed (800 of them for these games), so a variable no script has written reads 0. The slot table is in the [script reference](SCUMM_SCRIPT_MAP.md); `ScummProfile.EngineVariablesAtStart` and `GlobalVariableCount` carry these values.
+- **Order on a room change:** as v3. `setCameraFollows` (camera.cpp, `actorFollowCamera`): when the actor is not in the current room, `startScene` of the actor's room runs first, then `camera._cur.x` is the actor's x and the camera follows it. Actor 0 is a valid slot of the actor array that is never in a room, so following it starts room 0.
+- **Frame loop:** as v3, with the music timer by music engine: `Sound::updateMusicTimer` (sound.cpp) sets `VAR_MUSIC_TIMER` from the music engine's `getMusicTimer()` times the timer frequency over 240, or from the CD timer for games with audio tracks. `setupMusic` (scumm.cpp) uses `Player_AD` for DOS AdLib only for LOOM and Indiana Jones 3; **Monkey Island floppy with AdLib goes through iMuse** (the generic `IMuse` path), so the explorer's AdLib music timer for it (the song's `AD` block played by `ScummAdlibAudio` at the browsed disks' half tempo, S3's decision made by ear) is an **estimate**, not the engine's own timer.
+- **Opcode differences met by the boot** (`script_v5.cpp`): `o5_actorOps` case 17 (scale) reads one value in version 4 (two later). `actorFollowCamera` as above.
+- **Differences from the previous version:** several disks (`DISK01.LEC` to `DISK04.LEC`, each an XOR 0x69 archive; the index `000.LFL` is shared and names for every resource the room that holds it, so a resource's disk is the disk of its room); the game asks the player to change disks (not modelled: all disks are assumed inserted, R-3.15); script 1 may wait for the player (R-15.7).
 
 ## SCUMM v5 (Monkey Island 1 CD, Monkey Island 2, Indiana Jones and the Fate of Atlantis)
 

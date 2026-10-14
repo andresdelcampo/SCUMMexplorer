@@ -63,6 +63,10 @@ public static class ScummDataSources
     public static IScummDataSource For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
-        return ScummProfile.For(game).UsesV4Archive ? new ScummV4DataSource(game) : new ScummV3DataSource(game);
+        var profile = ScummProfile.For(game);
+        // A v4 game on several disks (Monkey Island's floppy release): every disk behind one source (S4b MonkeyFloppy).
+        if (profile.UsesV4Archive && game.V4Archive is null && game.V4Disks is { } disks && disks.Disks.OfType<ScummV4Archive>().Any())
+            return new ScummV4DiskSetDataSource(disks, profile.Dialect);
+        return profile.UsesV4Archive ? new ScummV4DataSource(game) : new ScummV3DataSource(game);
     }
 }

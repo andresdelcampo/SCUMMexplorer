@@ -185,6 +185,12 @@ public sealed class ScummScriptRuntimeState
     /// narrows. Camera commands keep <c>var[0x002]</c> (<c>VAR_CAMERA_POS_X</c>) inside them.
     /// </summary>
     public (int Min, int Max)? CameraRange { get; set; }
+
+    /// <summary>
+    /// <c>actorFollowCamera</c> on an actor outside the current room starts that room's scene, as ScummVM's <c>setCameraFollows</c> does
+    /// (<see cref="ScummProfile.CameraFollowStartsScene"/>); off, the preview only reports that it did not model the room load.
+    /// </summary>
+    public bool CameraFollowStartsScene { get; set; }
     /// <summary>Half a screen from each edge of the current room: the widest camera limits (<c>cameraMoved</c>).</summary>
     public (int Min, int Max)? RoomCameraBounds { get; set; }
 
