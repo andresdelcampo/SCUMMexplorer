@@ -7,8 +7,8 @@ namespace SCUMMexplorer.Core.Scumm;
 /// Plays the <c>ROL </c> part of a v5 sound (<see cref="ScummImuseSong"/>) on Munt's MT-32 and renders it to a stereo wave. It follows ScummVM's iMUSE player
 /// for the messages that decide how a song sounds: the part set-up exclusive (0x7D 0: channel, on/off, reverb, volume, pan, transpose, pitch-bend range, program),
 /// the Roland custom timbre (0x41), the controllers and program changes of the track, and the unconditional hooks (hook id 0). As in ScummVM the MT-32 driver
-/// ignores a part's transpose. A song is rendered up to the first
-/// jump back or loop end (<see cref="Result.Loops"/> tells the game plays it again from there); hooks that wait for a script's id are never taken here.
+/// ignores a part's transpose. The song is played as ScummVM plays it on its own (<see cref="ScummImuseTimeline"/>): jumps and loops are taken and a looping song is
+/// unrolled to three minutes (<see cref="Result.Loops"/>); hooks that wait for a script's id are never taken here, hooks with id 0 act at once.
 /// </summary>
 public sealed class ScummImuseMt32
 {
@@ -33,8 +33,8 @@ public sealed class ScummImuseMt32
         synth.OpenSynth();
         var rate = (int)Math.Round(synth.ActualStereoOutputSampleRate);
 
-        var plan = Plan(song);
-        var endSeconds = Math.Min(MaxSeconds, song.SecondsAt(plan.EndTick) + ReleaseSeconds);
+        var plan = Plan(ScummImuseTimeline.Build(song));
+        var endSeconds = Math.Min(ScummImuseTimeline.MaxSeconds + ReleaseSeconds, plan.EndSeconds + ReleaseSeconds);
         var totalFrames = (long)Math.Ceiling(endSeconds * rate);
         var pcm = new short[totalFrames * 2];
         long frame = 0;
@@ -54,18 +54,18 @@ public sealed class ScummImuseMt32
 
         foreach (var item in plan.Messages)
         {
-            RenderUntil((long)Math.Round(song.SecondsAt(item.Tick) * rate));
+            RenderUntil((long)Math.Round(item.Seconds * rate));
             if (frame >= totalFrames) break;
             if (item.Sysex is { } sysex) synth.PlaySysex(sysex);
             else synth.PlayMessage(item.Short);
         }
         RenderUntil(totalFrames);
-        return new Result(ScummMt32Audio.ToWave(pcm, rate), plan.Loops, song.SecondsAt(plan.EndTick));
+        return new Result(ScummMt32Audio.ToWave(pcm, rate), plan.Loops, plan.EndSeconds);
     }
 
-    private readonly record struct Message(long Tick, uint Short, byte[]? Sysex);
+    private readonly record struct Message(double Seconds, uint Short, byte[]? Sysex);
 
-    private sealed record Planned(List<Message> Messages, long EndTick, bool Loops);
+    private sealed record Planned(List<Message> Messages, double EndSeconds, bool Loops);
 
     private sealed class Part
     {
@@ -78,22 +78,18 @@ public sealed class ScummImuseMt32
     /// <summary>iMUSE's part volume as the driver gets it: (volume + 1) times the player's effective volume (127 at full), shifted down 7.</summary>
     private static int EffectiveVolume(int volume) => (volume + 1) * 127 >> 7;
 
-    private static Planned Plan(ScummImuseSong song)
+    private static Planned Plan(ScummImuseTimeline timeline)
     {
         var parts = new Part?[16];
         var messages = new List<Message>();
         var nextChannel = 1; // MT-32 parts 1 to 8 answer on channels 2 to 9 (index 1 to 8)
-        var loops = false;
-        var endTick = song.Ticks;
-        long shift = 0, skipUntil = 0; // an unconditional jump forward cuts the stretch it skips out of the timeline
 
-        void Short(long tick, int status, int d1, int d2 = 0) => messages.Add(new Message(tick - shift, (uint)(status | d1 << 8 | d2 << 16), null));
-        void Roland(long tick, int device, byte[] body) => messages.Add(new Message(tick - shift, 0, BuildSysex(device, body)));
-
-        foreach (var e in song.Events)
+        foreach (var item in timeline.Items)
         {
-            if (loops && e.Tick - shift > endTick) break;
-            if (e.Tick < skipUntil) continue;
+            var e = item.Event;
+            var seconds = item.Seconds;
+            void Short(long tick, int status, int d1, int d2 = 0) => messages.Add(new Message(seconds, (uint)(status | d1 << 8 | d2 << 16), null));
+            void Roland(long tick, int device, byte[] body) => messages.Add(new Message(seconds, 0, BuildSysex(device, body)));
             if (e.IsSysex)
             {
                 var d = e.Data;
@@ -132,20 +128,18 @@ public sealed class ScummImuseMt32
                     case 1: // shut a part down
                         if (d.Length > 2 && parts[d[2] & 0x0F] is { } off) off.On = false;
                         break;
-                    case 48 when d.Length > 3: // hook: jump (id 0: always taken)
+                    // Hooks that jump (48) and the loop (80) are played out by ScummImuseTimeline.
+                    // Hooks 50 to 52 act at once when their id is 0 (ScummVM maybe_part_onoff, maybe_set_volume, maybe_set_program); another id waits for a script.
+                    // The transpose hooks (49, 53) change nothing here: this driver ignores transposes.
+                    case 50 or 51 or 52 when d.Length > 3 && parts[d[2] & 0x0F] is { Channel: >= 0 } hooked:
                     {
-                        var buf = ScummImuseSong.Decode(d.AsSpan(3), 9);
-                        // buf: hook id, track, beat, tick (480 ticks to a beat, counted from beat 1); a jump back ends the pass.
-                        if (buf.Length < 7 || buf[0] != 0) break;
-                        var target = (long)(BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(3)) - 1) * 480 + BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(5));
-                        if (target <= e.Tick) { loops = true; endTick = Math.Min(endTick, e.Tick - shift); }
-                        else { shift += target - e.Tick; skipUntil = target; }
+                        var b = ScummImuseSong.Decode(d.AsSpan(3), 2);
+                        if (b.Length < 2 || b[0] != 0) break;
+                        if (d[1] == 50) hooked.On = b[1] != 0;
+                        else if (d[1] == 51) Short(e.Tick, 0xB0 | hooked.Channel, 7, EffectiveVolume(b[1]));
+                        else if (!hooked.Rhythm) Short(e.Tick, 0xC0 | hooked.Channel, b[1] & 0x7F);
                         break;
                     }
-                    case 80: // loop: the song would play on from the loop start here
-                        loops = true;
-                        endTick = Math.Min(endTick, e.Tick - shift);
-                        break;
                 }
                 continue;
             }
@@ -174,7 +168,7 @@ public sealed class ScummImuseMt32
                     break;
             }
         }
-        return new Planned(messages, loops ? endTick : song.Ticks - shift, loops);
+        return new Planned(messages, timeline.EndSeconds, timeline.Loops);
     }
 
     /// <summary>A Roland data-set message for the device number (here a channel) with the address and data in <paramref name="body"/> and the checksum added.</summary>

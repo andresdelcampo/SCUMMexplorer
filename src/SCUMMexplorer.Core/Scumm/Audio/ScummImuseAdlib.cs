@@ -15,7 +15,6 @@ public sealed class ScummImuseAdlib
     private const int SampleRate = 49716;
     private const int CallbackRate = 250;
     private const double ReleaseSeconds = 2;
-    private const double MaxSeconds = 420;
 
     public sealed record Result(byte[] Wave, bool Loops, double Seconds);
 
@@ -30,27 +29,20 @@ public sealed class ScummImuseAdlib
         var samples = new List<short>();
         var frameRemainder = 0;
         var index = 0;
-        long shift = 0, skipUntil = 0;
-        var loops = false;
-        double? end = null; // the second at which the song's last pass ends (its end, or the loop point)
-        var events = song.Events;
-        var maxSteps = (int)(MaxSeconds * CallbackRate);
+        // The song as the game plays it on its own: jumps taken, a looping song unrolled (see ScummImuseTimeline).
+        var timeline = ScummImuseTimeline.Build(song);
+        var loops = timeline.Loops;
+        var items = timeline.Items;
+        var end = timeline.EndSeconds; // the second at which the last pass ends (the song's end, or the loop point)
+        var maxSteps = (int)((ScummImuseTimeline.MaxSeconds + ReleaseSeconds + 1) * CallbackRate);
 
         for (var step = 0; step < maxSteps; step++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var now = step / (double)CallbackRate;
             // The iMUSE timer runs first, then the driver's voice timer.
-            while (end is null && index < events.Count && song.SecondsAt(events[index].Tick - shift) <= now + 1e-9)
-            {
-                var e = events[index++];
-                if (e.Tick < skipUntil) continue;
-                if (player.Handle(e) is not { } target) continue;
-                if (target <= e.Tick) { loops = true; end = song.SecondsAt(e.Tick - shift); }
-                else { shift += target - e.Tick; skipUntil = target; }
-            }
-            if (end is null && index >= events.Count) end = song.SecondsAt(song.Ticks - shift);
-            if (end is { } stop && now >= stop + ReleaseSeconds) break;
+            while (index < items.Count && items[index].Seconds <= now + 1e-9) player.Handle(items[index++].Event);
+            if (now >= end + ReleaseSeconds) break;
             driver.OnTimer();
             frameRemainder += SampleRate;
             var frames = frameRemainder / CallbackRate;
@@ -146,12 +138,12 @@ public sealed class ScummImuseAdlib
                     }
                     state.Pri = (sbyte)buf[2];
                     state.Vol = buf[3];
-                    state.Transpose = buf[5] == 0x80 ? 0 : Math.Clamp((sbyte)buf[5], (sbyte)-12, (sbyte)12);
+                    state.Transpose = (sbyte)buf[5]; // the part's own transpose; -128 (0x80) means none
                     state.Detune = (sbyte)buf[6];
                     LoadGlobalInstrument(state, buf[8]);
                     // Part::sendAll
                     if (buf[7] <= 12) { part.PitchBend(0); part.PitchBendFactor(buf[7]); }
-                    part.Transpose((sbyte)state.Transpose);
+                    part.Transpose(EffectiveTranspose(state, 12)); // the original set-up always clips to -12/12
                     part.Detune(state.Detune);
                     part.Volume(EffectiveVolume(state.Vol));
                     part.Priority((byte)Math.Clamp((int)state.Pri, 0, 255));
@@ -183,16 +175,69 @@ public sealed class ScummImuseAdlib
                         _globalInstruments[d[4] & 31] = instrument;
                     }
                     break;
-                case 48 when d.Length > 3: // hook: jump (id 0 is always taken)
+                // Hooks that jump and the loop (48, 80) move the song's position: ScummImuseTimeline has already played them out.
+                // The other hooks (49 to 53) act at once when their id is 0 (ScummVM maybe_set_transpose, maybe_part_onoff, ...); one with another id waits for a script's setHook and is not taken.
+                case 49 when d.Length > 3: // global transpose
                 {
-                    var buf = ScummImuseSong.Decode(d.AsSpan(3), 9);
-                    if (buf.Length < 7 || buf[0] != 0) break;
-                    return (long)(BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(3)) - 1) * 480 + BinaryPrimitives.ReadUInt16BigEndian(buf.AsSpan(5));
+                    var b = ScummImuseSong.Decode(d.AsSpan(3), 3);
+                    if (b.Length < 3 || b[0] != 0) break;
+                    SetTranspose(b[1], (sbyte)b[2]);
+                    break;
                 }
-                case 80: // loop: the song would play on from the loop start here
-                    return 0;
+                case 50 when d.Length > 3: // part on/off
+                {
+                    var b = ScummImuseSong.Decode(d.AsSpan(3), 2);
+                    if (b.Length < 2 || b[0] != 0 || _parts[d[2] & 0x0F] is not { } state) break;
+                    var on = b[1] != 0;
+                    if (state.On != on)
+                    {
+                        state.On = on;
+                        if (!on) { state.Mc.Sustain(false); state.Mc.AllNotesOff(); }
+                    }
+                    break;
+                }
+                case 51 when d.Length > 3: // part volume
+                {
+                    var b = ScummImuseSong.Decode(d.AsSpan(3), 2);
+                    if (b.Length < 2 || b[0] != 0 || _parts[d[2] & 0x0F] is not { } state) break;
+                    state.Vol = b[1];
+                    state.Mc.Volume(EffectiveVolume(state.Vol));
+                    break;
+                }
+                case 52 when d.Length > 3: // part program
+                {
+                    var b = ScummImuseSong.Decode(d.AsSpan(3), 2);
+                    if (b.Length < 2 || b[0] != 0 || _parts[d[2] & 0x0F] is not { } state) break;
+                    LoadGlobalInstrument(state, b[1]);
+                    break;
+                }
+                case 53 when d.Length > 3: // part transpose
+                {
+                    var b = ScummImuseSong.Decode(d.AsSpan(3), 3);
+                    if (b.Length < 3 || b[0] != 0 || _parts[d[2] & 0x0F] is not { } state) break;
+                    var value = (sbyte)b[2];
+                    if (value > 24 || value < -24) break;
+                    if (b[1] != 0) value = (sbyte)Math.Clamp(value + (state.Transpose == -128 ? 0 : state.Transpose), -7, 7);
+                    state.Transpose = value;
+                    state.Mc.Transpose(EffectiveTranspose(state, 24));
+                    break;
+                }
             }
             return null;
+        }
+
+        private int _transpose; // the player's global transpose (Player::_transpose)
+
+        /// <summary>Part::set_transpose: the part's transpose plus the player's, clipped; -128 is "none".</summary>
+        private sbyte EffectiveTranspose(PartState state, int limit) => state.Transpose == -128 ? (sbyte)0 : (sbyte)Math.Clamp(state.Transpose + _transpose, -limit, limit);
+
+        /// <summary>Player::setTranspose: -24..24; relative adds to the current one (clipped to -7..7); every part is re-clipped to -24..24 (AdLib and PC speaker).</summary>
+        private void SetTranspose(int relative, int value)
+        {
+            if (value > 24 || value < -24 || relative > 1) return;
+            if (relative != 0) value = Math.Clamp(_transpose + value, -7, 7);
+            _transpose = value;
+            foreach (var state in _parts) state?.Mc.Transpose(EffectiveTranspose(state, 24));
         }
     }
 
