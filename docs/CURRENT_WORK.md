@@ -1,6 +1,6 @@
 # Current work
 
-Updated 10 October 2026. This is the single plan and session handoff. Completed work and validation belong in [CHANGELOG](CHANGELOG.md); source knowledge belongs in the game references.
+Updated 14 October 2026. This is the single plan and session handoff. Completed work and validation belong in [CHANGELOG](CHANGELOG.md); source knowledge belongs in the game references.
 
 ## Status
 
@@ -9,9 +9,10 @@ Updated 10 October 2026. This is the single plan and session handoff. Completed 
 **S4b for Indy3Ega done (14 October).** `ScummGameSession` boots the English EGA game to Room 73 with nothing unsupported ([record](../.verification/indy3-session-20261014/README.md), [checkpoint](checkpoints/20261014-S4b-Indy3Ega.md), [tracker](indy3/SUPPORT_STATUS.md)). Next for the family: S5.
 
 **S5 for Indy3Ega done (14 October).** Every room of Indiana Jones and the Last Crusade EGA shows the first visit of the generic session (88 of 88 without a gap; the Objects cell stays partial until S6) ([record](../.verification/indy3-objects-20261014/README.md), [checkpoint](checkpoints/20261014-S5-Indy3Ega.md), [tracker](indy3/SUPPORT_STATUS.md)). Next for the family: S6 (Play).
+
 **S4b for MonkeyFloppy done (14 October).** `ScummGameSession` boots the four-disk floppy (`monkey1 ega en`) through the protection, the credits and the opening to Room 33 in 2522 frames with nothing unsupported; the eight-disk Spanish release boots the same way ([record](../.verification/monkey1-session-20261014/README.md), [checkpoint](checkpoints/20261014-S4b-MonkeyFloppy.md), [tracker](monkey1/SUPPORT_STATUS.md)). Proposed R-3.15, R-15.7, R-15.8. Next for the family: S5.
 
-**Scale-out plan (14 October).** Stage 0 is done: the support matrix is generated from `GameSupport` and pinned by tests; requirements are up to date ([review and stages](REQUIREMENTS_REVIEW_2026-10-14.md)). Next stage, when the user chooses: Objects level 2 (first-visit state through the entry scripts) for the v4/v5/v2 families, then Costumes/Walk boxes, then Play for one verb-based family. To raise a cell: implement the feature, change its level in `GameSupport.Families`, run the tests with `SCUMM_UPDATE_SUPPORT_MATRIX=1`, and keep the conformance test green.
+**Scale-out plan (14 October).** The procedure is [GAME_SUPPORT_INSTRUCTIONS.md](GAME_SUPPORT_INSTRUCTIONS.md); the support matrix is generated from `GameSupport`. Done so far: S2/S3 leftovers, S4a, S4b for Indy3Ega and MonkeyFloppy, S5 for Indy3Ega. The brief for the next session is `NEXT_SESSION_PROMPT.md`.
 
 The Advanced sound-player presentation is refreshed (12 October): compact card, labelled transport controls, real progress and available speech text. Tree appearance is unchanged at the user's request; the later requested waiting cursor is shown while branches with 1,000+ sounds expand. [WPF validation](../.verification/sound-layout-20261012/validation.md) covers speech/music, minimum window size and cursor cleanup; no remaining player-layout blocker was found.
 
