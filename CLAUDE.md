@@ -12,7 +12,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
 - `tests/SCUMMexplorer.Tests`: xUnit tests for Core.
 - `docs/`: `docs/README.md` is the index. `docs/CURRENT_WORK.md` is the single current plan, rules and session handoff; `docs/CHANGELOG.md` holds finished work with validation links. `docs/loom/` and `docs/indy3/` hold game references, `docs/engine/` holds generic SCUMM notes, and `docs/archive/` preserves dated plans/audits. `docs/loom/LOOM_SCRIPT_MAP.md` records decoded scripts, variables, verbs and rooms.
 - `.verification/`: UI harnesses (for example `WindowCheck`, which renders rooms from the real `MainWindow`), traces and evidence. Evidence from the Spanish-edition work (27 September to 4 October 2026) is in `.verification/archive/`; `.verification/README.md` says what is live and what is a record. `source-backup-2026-09-27/` holds the sources as they were before the 27 September changes.
-- `Games/`: the local game data. Never commit it.
+- `Games`: the local game data. **Since 15 October 2026 it lives outside the repository, in `D:\Juegos\Lucas`** (a worktree clean-up deleted the old in-repo folder through a `Games` junction). In this file and in `docs/`, `Games/<folder>` means that folder; tests and drivers find it through `SCUMM_GAMES_ROOT`, else a non-empty `Games` in the checkout, else `D:\Juegos\Lucas` (`tests/.../TestGames.Root`). Worktrees need no junction any more: **never create a `Games` junction**, and before removing any worktree list its reparse points and delete each junction on its own first (`git worktree remove` follows junctions on Windows). Never commit game data.
   - `Games/loom ega mt32 en`: DOS LOOM EGA, **English**, with the Roland (MT-32) upgrade installed. The reference edition: the tests, the harness drivers and `loom-replays.json` use it (since 4 October 2026).
   - `Games/loom ega mt32 es`: DOS LOOM EGA, Spanish, Roland upgrade installed. Comparison only (`SCUMM_LOOM_TEST_ROOT` points the tests at it; `.verification/ScriptDump objmap` compares object ids).
   - Other LOOM editions (plain English, Italian, French, German, v1.2) and the short/long demos are also plain folders under `Games`. English/Spanish/French/German and v1.2 comparison records are dated; current available folders may differ from that inventory. Hebrew support is dropped. Do not move/delete game data during documentation cleanup.
@@ -21,7 +21,7 @@ An audio-visual, interactive explorer for old SCUMM games. It is not meant as a 
   - `Games/mt32`: the user's MT-32/CM-32L ROM images for the Roland sound device. Never commit.
   - `Games/indy3 ega en`: Indy3 EGA, **English**. Set `SCUMM_INDY3_EGA_TEST_ROOT` to this absolute folder for Indy checks.
   - The other games (Indy editions and demo, Monkey Island, Maniac Mansion, Zak McKracken) are also plain folders under `Games`; the folder layout may change, so refer to `Games` without subfolders.
-- `scummvm/`: a ScummVM Windows build for comparing behaviour at runtime. It contains no source code.
+- ScummVM: a Windows build for comparing behaviour at runtime, in `D:\Juegos\scummvm` (moved out of the repository on 15 October 2026; older docs call it `scummvm/`). It contains no source code.
 - Build output goes to `Exe/<Project>/…` (see `Directory.Build.props`).
 
 ## Requirements and scope tags

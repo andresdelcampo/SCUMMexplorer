@@ -12,4 +12,4 @@ Run alone: the next candidates (S4b Indy3Vga, S6 Indy3Ega) touch the same sessio
 
 ## Result
 
-(written when the agent returns)
+**Not done.** At 17:48 the orchestrator's clean-up of six merged worktrees (`git worktree remove`) followed their `Games` junctions and deleted the whole game data folder. The agent found no data, committed unverified code (3b2bcf6 on `worktree-agent-ad93884c1135334c7`: v4 first visit in `ScummRoomFirstVisit`, `ScummProfile.HasFirstVisitScenes` by format and dialect, App stored-object filter, an unrun Monkey room audit) and stopped under hard stop 4.4.4. The user restored the data from backup to `D:\Juegos\Lucas`; tests now use `TestGames.Root` (275788e, full suite 985 passed, 5 skipped, 0 failed). The user then stopped the agent. **Do not merge 3b2bcf6 before a verification run.** Next run: resume S5 MonkeyFloppy from 3b2bcf6 (merge master first; no junctions).

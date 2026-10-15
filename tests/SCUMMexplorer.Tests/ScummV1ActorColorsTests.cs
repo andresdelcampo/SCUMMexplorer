@@ -13,7 +13,7 @@ public class ScummV1ActorColorsTests
     private static GameLibrary? Open(string folder)
     {
         var root = SupportMatrixTests.RepositoryRoot();
-        var candidate = Path.Combine(root, "Games", folder);
+        var candidate = Path.Combine(TestGames.Root, folder);
         return Directory.Exists(candidate) ? new GameFolderScanner().Scan(candidate) : null;
     }
 

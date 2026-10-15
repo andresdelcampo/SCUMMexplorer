@@ -2,20 +2,21 @@
 Usage: python .verification/known-editions/make.py   (from the repository root)
 Per edition: up to 14 LFL files (taken so that no two editions of a game share the whole sample) with their SHA-256. Raw file bytes are hashed; names are matched case-insensitively."""
 import glob, hashlib, json, os, itertools
+ROOT = os.environ.get("SCUMM_GAMES_ROOT") or r"D:\Juegos\Lucas"  # game data outside the repository since 15 October 2026
 EDITIONS = [  # (folder, game, label, demo)
- ("Games/loom ega mt32 en", "Loom", "English, Roland upgrade", False),
- ("Games/loom ega en", "Loom", "English", False),
- ("Games/loom ega es", "Loom", "Spanish", False),
- ("Games/loom ega mt32 es", "Loom", "Spanish, Roland upgrade", False),
- ("Games/loom ega fr", "Loom", "French", False),
- ("Games/loom ega de", "Loom", "German", False),
- ("Games/loom ega v1.2 es", "Loom", "Spanish, version 1.2", False),
- ("Games/loom ega it", "Loom", "Italian", False),
- ("Games/loom demo long ega en", "Loom", "English, long demo", True),
- ("Games/loom demo short ega en", "Loom", "English, short demo", True),
- ("Games/indy3 ega en", "IndianaJones3", "English", False),
- ("Games/indy3 ega es", "IndianaJones3", "Spanish", False),
- ("Games/indy3 demo en", "IndianaJones3", "English, demo", True),
+ (ROOT + "/loom ega mt32 en", "Loom", "English, Roland upgrade", False),
+ (ROOT + "/loom ega en", "Loom", "English", False),
+ (ROOT + "/loom ega es", "Loom", "Spanish", False),
+ (ROOT + "/loom ega mt32 es", "Loom", "Spanish, Roland upgrade", False),
+ (ROOT + "/loom ega fr", "Loom", "French", False),
+ (ROOT + "/loom ega de", "Loom", "German", False),
+ (ROOT + "/loom ega v1.2 es", "Loom", "Spanish, version 1.2", False),
+ (ROOT + "/loom ega it", "Loom", "Italian", False),
+ (ROOT + "/loom demo long ega en", "Loom", "English, long demo", True),
+ (ROOT + "/loom demo short ega en", "Loom", "English, short demo", True),
+ (ROOT + "/indy3 ega en", "IndianaJones3", "English", False),
+ (ROOT + "/indy3 ega es", "IndianaJones3", "Spanish", False),
+ (ROOT + "/indy3 demo en", "IndianaJones3", "English, demo", True),
 ]
 def hashes(folder):
     return {os.path.basename(f).upper(): hashlib.sha256(open(f, "rb").read()).hexdigest()

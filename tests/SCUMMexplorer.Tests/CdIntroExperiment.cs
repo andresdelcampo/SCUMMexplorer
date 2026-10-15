@@ -8,7 +8,7 @@ public sealed class CdIntroExperiment
     [Fact]
     public void Run()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_INTRO_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
@@ -41,7 +41,7 @@ public sealed class CdIntroDisasm
     [Fact]
     public void Dump()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var spec = Environment.GetEnvironmentVariable("CD_DIS");
         var outPath = Environment.GetEnvironmentVariable("CD_INTRO_OUT");
         if (spec is null || outPath is null || !Directory.Exists(folder)) return;
@@ -60,7 +60,7 @@ public sealed class CdVoiceTimingDump
     [Fact]
     public void Dump()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var rooms = Environment.GetEnvironmentVariable("CD_VOICE_ROOMS");
         var outPath = Environment.GetEnvironmentVariable("CD_INTRO_OUT");
         if (rooms is null || outPath is null || !Directory.Exists(folder)) return;

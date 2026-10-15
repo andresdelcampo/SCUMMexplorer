@@ -30,7 +30,7 @@ public sealed class LoomGameStatusTests
     public void PlainEnglishReleaseResolvesTheStatusSchemaDespiteItsOwnInitialNoteLimit()
     {
         // The plain English release's Room 01 opening assigns the note limit 8 where the Spanish and Roland copies assign 3; the schema reads the literal from the script.
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom ega en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom ega en"));
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));

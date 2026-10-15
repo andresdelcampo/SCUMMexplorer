@@ -10,7 +10,7 @@ public sealed class LoomStaffParityTests
     [InlineData("loom vga en")]
     public void CatalogVisitsKeepStaffAppearanceNotesAndMenuSuppressionTogether(string edition)
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", edition));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, edition));
         var game = new GameFolderScanner().Scan(folder);
         var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
         var session = new LoomExplorationSession(game, indexed);
@@ -56,7 +56,7 @@ public sealed class LoomStaffParityTests
     [InlineData("loom vga en")]
     public void AutomaticCatalogStaffUsesTheInitialThreeNotes(string edition)
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", edition));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, edition));
         var game = new GameFolderScanner().Scan(folder);
         var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
         var session = new LoomExplorationSession(game, indexed);

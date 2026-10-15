@@ -15,7 +15,7 @@ public sealed class LoomDirectSpeakerTests
     [InlineData("loom vga en", "Dead One", 4, 0x56)]
     public void ADirectResponseGetsItsMissingActorFromItsOwnEdition(string folder, string name, int actor, int verb)
     {
-        var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", folder)));
+        var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(TestGames.Root, folder)));
         var data = ScummDataSources.For(game);
         var room = data.ReadRoom(9);
         var target = room.Objects.Single(o => room.ObjectNames.TryGetValue(o.Id, out var bytes) && Encoding.Latin1.GetString(bytes).Trim() == name);

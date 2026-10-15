@@ -12,7 +12,7 @@ public sealed class CdStuckProbe
     [Fact]
     public void Dump()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_STUCK_OUT");
         var spec = Environment.GetEnvironmentVariable("CD_STUCK");
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;
@@ -67,7 +67,7 @@ public sealed class CdCueFind
     [Fact]
     public void Find()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_STUCK_OUT");
         var lo = Environment.GetEnvironmentVariable("CD_CUEFIND");
         if (outPath is null || lo is null || !Directory.Exists(folder)) return;
@@ -83,7 +83,7 @@ public sealed class CdLocalDisasm
     [Fact]
     public void Dump()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_STUCK_OUT");
         var spec = Environment.GetEnvironmentVariable("CD_LDIS"); // room:id (id 0 = entry, -1 = exit, g<id> = global)
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;
@@ -144,7 +144,7 @@ public sealed class CdNeedsProbe
     [Fact]
     public void Probe()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_NEEDS_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
@@ -178,7 +178,7 @@ public sealed class CdGuardProbe
     [Fact]
     public void Probe()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_GUARDS_OUT");
         var only = Environment.GetEnvironmentVariable("CD_GUARDS_ONLY"); // comma list of room numbers
         if (outPath is null || !Directory.Exists(folder)) return;
@@ -209,7 +209,7 @@ public sealed class CdGuardStateProbe
     [Fact]
     public void Probe()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_GSTATE_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
@@ -248,7 +248,7 @@ public sealed class CdWritersProbe
     [Fact]
     public void Probe()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_WRITERS_OUT");
         var vars = Environment.GetEnvironmentVariable("CD_WRITERS"); // bit[0x00E],bit[0x01B]
         if (outPath is null || vars is null || !Directory.Exists(folder)) return;
@@ -272,7 +272,7 @@ public sealed class CdBitWatch
     [Fact]
     public void Watch()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_BITWATCH_OUT");
         var key = Environment.GetEnvironmentVariable("CD_BITWATCH"); // bit[0x025]
         if (outPath is null || key is null || !Directory.Exists(folder)) return;
@@ -296,7 +296,7 @@ public sealed class CdBitWriter
     [Fact]
     public void Who()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_BITWATCH_OUT");
         var key = Environment.GetEnvironmentVariable("CD_BITWHO"); // bit[0x025]
         if (outPath is null || key is null || !Directory.Exists(folder)) return;
@@ -318,7 +318,7 @@ public sealed class CdSetupProbe
     [Fact]
     public void Derive()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_SETUP_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
@@ -347,7 +347,7 @@ public sealed class CdBoxProbe
     [Fact]
     public void Boxes()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_BOX_OUT");
         var spec = Environment.GetEnvironmentVariable("CD_BOX"); // room,box
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;
@@ -376,7 +376,7 @@ public sealed class CdGrepScripts
     [Fact]
     public void Grep()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_GREP_OUT");
         var needle = Environment.GetEnvironmentVariable("CD_GREP");
         if (outPath is null || needle is null || !Directory.Exists(folder)) return;

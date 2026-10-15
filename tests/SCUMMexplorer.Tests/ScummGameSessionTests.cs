@@ -13,7 +13,7 @@ public sealed class ScummGameSessionTests
     private static string? Folder()
     {
         var overridden = Environment.GetEnvironmentVariable("SCUMM_INDY3_EGA_TEST_ROOT");
-        var folder = string.IsNullOrWhiteSpace(overridden) ? Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games", "indy3 ega en") : overridden;
+        var folder = string.IsNullOrWhiteSpace(overridden) ? Path.Combine(TestGames.Root, "indy3 ega en") : overridden;
         return File.Exists(Path.Combine(folder, "00.LFL")) ? folder : null;
     }
 

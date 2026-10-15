@@ -8,7 +8,7 @@ public sealed class LoomCdReadableTests
     public void EntireCdScriptLibraryUsesReadablePresentation()
     {
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
-        var game = new GameFolderScanner().Scan(Path.Combine(root, "Games/loom vga en"));
+        var game = new GameFolderScanner().Scan(Path.Combine(TestGames.Root, "loom vga en"));
         var data = ScummDataSources.For(game);
         var glossary = LoomGlossary.Load(game);
         var counts = new Dictionary<string, int>();
@@ -46,7 +46,7 @@ public sealed class LoomCdReadableTests
     [Fact]
     public void CdReadableHelpersNameTheirOwnVariablesAndKeepRawAddressesAvailable()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
         var glossary = LoomGlossary.Load(game);

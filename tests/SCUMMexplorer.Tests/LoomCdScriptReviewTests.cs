@@ -7,7 +7,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class LoomCdScriptReviewTests
 {
     private static SCUMMexplorer.Core.Domain.GameLibrary Game() => new GameFolderScanner().Scan(
-        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom vga en")));
+        Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en")));
 
     [Fact]
     public void AllCdGlobalsHaveAnIndividualReviewAndTheirOwnEvidence()

@@ -26,7 +26,7 @@ public sealed class LoomEgaScriptReviewTests
 
     private static SCUMMexplorer.Core.Domain.GameLibrary Game(string language)
     {
-        var games = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games"));
+        var games = Path.GetFullPath(TestGames.Root);
         var folder = Path.Combine(games, "loom ega mt32 " + language);
         return new GameFolderScanner().Scan(folder);
     }

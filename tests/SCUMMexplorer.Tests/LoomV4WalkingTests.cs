@@ -87,7 +87,7 @@ public sealed class LoomV4WalkingTests
     [Fact]
     public void TheCdSessionUsesNativeV4WalkingOnTheRoom34Return()
     {
-        var folder=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../Games/loom vga en"));
+        var folder=Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if(!Directory.Exists(folder)) return;
         var game=new GameFolderScanner().Scan(folder);
         var session=new LoomExplorationSession(game,game.V4Archive!.ReadIndexedObjects(),completeBoot:false);
