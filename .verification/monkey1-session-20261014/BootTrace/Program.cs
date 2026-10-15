@@ -60,6 +60,38 @@ if (args[0] == "dump")
     }
     return;
 }
+if (args[0] == "visit")
+{
+    // BootTrace visit <folder> <room> [needle]: boot, visit the room without its route, settle, print the session trace (lines with needle).
+    var visitGame = new GameFolderScanner().Scan(args[1]);
+    var visitData = (ScummV4DiskSetDataSource)ScummDataSources.For(visitGame);
+    var visitSession = new ScummGameSession(visitGame, visitData.ReadIndexedObjects(), 0, null, visitData);
+    var bootLines = visitSession.SessionTrace.Count;
+    if (args.Length > 3) Console.WriteLine($"after the boot: {args[3]} = {visitSession.Snapshot.KnownGlobalVariables.GetValueOrDefault(args[3])}");
+    visitSession.VisitRoom(visitGame.Rooms.First(r => r.ResourceId == int.Parse(args[2])));
+    var needle = args.Length > 3 ? args[3] : "";
+    if (needle.StartsWith("var[", StringComparison.Ordinal))
+    {
+        // Watch one variable frame by frame and print the trace lines of the frame where it changed.
+        var last = visitSession.Snapshot.KnownGlobalVariables.GetValueOrDefault(needle);
+        Console.WriteLine($"after the visit's entry: {needle} = {last}");
+        for (var frame = 1; frame <= 300; frame++)
+        {
+            var before = visitSession.SessionTrace.Count;
+            visitSession.AdvanceFrame();
+            var now = visitSession.Snapshot.KnownGlobalVariables.GetValueOrDefault(needle);
+            if (now == last) continue;
+            Console.WriteLine($"frame {frame}: {needle} {last} -> {now}");
+            foreach (var line in visitSession.SessionTrace.Skip(before).Take(40)) Console.WriteLine("  " + line);
+            last = now;
+        }
+        return;
+    }
+    var settled = visitSession.Settle();
+    foreach (var line in visitSession.SessionTrace.Skip(bootLines).Where(l => l.Contains(needle)).Take(400)) Console.WriteLine(line);
+    Console.WriteLine($"outcome {settled.Outcome} frames {settled.Frames}; var[0x004] = {settled.State.Snapshot.KnownGlobalVariables.GetValueOrDefault("var[0x004]")}");
+    return;
+}
 var folder = args[0];
 var output = args[1];
 var extraFrames = args.Length > 2 ? int.Parse(args[2]) : 0;

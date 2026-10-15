@@ -1672,8 +1672,14 @@ public sealed class ScummBoundedScriptExecutor
                 break;
             }
             case "putActorInRoom":
-                actors.PutInRoom(number, Read(1), place, ego);
+            {
+                // A pseudo room number (o5_pseudoRoom) names its real room: ScummVM keeps the number and compares it with _currentRoom, which is the
+                // number the room was loaded as; the session keys rooms by the real room, so it stores that (getActorRoom gives the number back).
+                var room = Read(1);
+                if (room is >= 0x80 && runtime.PseudoRooms.TryGetValue(room.Value, out var realRoom)) room = realRoom;
+                actors.PutInRoom(number, room, place, ego);
                 break;
+            }
             case "walkActorTo":
                 actors.Walk(number, ReadSignedWord(parts[1], variables), ReadSignedWord(parts[2], variables), place, $"actor {number}'s {label}");
                 break;
@@ -1978,6 +1984,10 @@ public sealed class ScummBoundedScriptExecutor
             return true;
         }
         answer = value.Value;
+        // An actor in the current room of a room loaded as a pseudo room is in that number's room (ScummVM a->_room == _currentRoom == VAR_ROOM).
+        if (operation == "getActorRoom" && value == runtime.CurrentRoom && variables.TryGetValue(ScummVars.Room, out var loadedAs) &&
+            loadedAs >= 0x80 && runtime.PseudoRooms.GetValueOrDefault(loadedAs) == value)
+            answer = loadedAs;
         if (actor.Estimate is not null) estimate = $"actor {number}: {actor.Estimate}";
         detail = "known value";
         return true;

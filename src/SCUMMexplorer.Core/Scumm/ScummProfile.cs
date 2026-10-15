@@ -72,6 +72,13 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// </summary>
     public bool CameraFollowStartsScene => UsesV4Archive;
 
+    /// <summary>
+    /// Bit variables (<c>bit[n]</c>) are stored apart from the word variables (ScummVM <c>readVar</c>/<c>writeVar</c>, script.cpp, read 15 October 2026: up to
+    /// version 3 a bit is bit <c>n &amp; 15</c> of <c>_scummVars[n &gt;&gt; 4]</c>; from version 4 it lives in <c>_bitVars</c>). Without it a v4 game's bits
+    /// 0x040 to 0x04F would overwrite <c>VAR_ROOM</c> (S5 MonkeyFloppy). LOOM CD sets the same storage in its own session.
+    /// </summary>
+    public bool SeparateBitVariables => Version >= ScummVersion.V4;
+
     /// <summary>The boot is over only when the player has control, not when script 1 has ended (a game whose script 1 hands over to an opening scene).</summary>
     public bool BootEndsWhenPlayerHasControl { get; init; }
 

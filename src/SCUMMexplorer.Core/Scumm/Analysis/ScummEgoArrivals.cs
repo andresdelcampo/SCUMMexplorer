@@ -12,16 +12,26 @@ namespace SCUMMexplorer.Core.Scumm;
 /// </summary>
 public sealed record ScummEgoArrival(int TargetRoom, int ObjectId, int WalkX, int WalkY, string Source, int Offset, int? SourceRoom)
 {
-    /// <summary>Arrivals with the same key place the ego the same way.</summary>
-    public string PlacementKey => $"object {ObjectId}, walk {WalkX},{WalkY}";
+    /// <summary>
+    /// The pseudo room number the instruction names (0x80 and up, <c>o5_pseudoRoom</c>) when it loads <see cref="TargetRoom"/> under another number:
+    /// ScummVM <c>startScene</c> puts that number in <c>VAR_ROOM</c> and loads the real room, so the room's entry code can tell its uses apart.
+    /// </summary>
+    public int? PseudoRoom { get; init; }
 
-    public string Describe() => $"{Source} +0x{Offset:X4} (object {ObjectId}, " + (WalkX == -1 ? "no walk" : $"walk to ({WalkX}, {WalkY})") + ")";
+    /// <summary>The number the game's own code loads: the pseudo room number, or the room itself.</summary>
+    public int LoadedNumber => PseudoRoom ?? TargetRoom;
+
+    /// <summary>Arrivals with the same key place the ego the same way.</summary>
+    public string PlacementKey => $"room {LoadedNumber}, object {ObjectId}, walk {WalkX},{WalkY}";
+
+    public string Describe() => $"{Source} +0x{Offset:X4} (" + (PseudoRoom is int pseudo ? $"pseudo room {pseudo}, " : "") + $"object {ObjectId}, " + (WalkX == -1 ? "no walk" : $"walk to ({WalkX}, {WalkY})") + ")";
 }
 
 /// <summary>
 /// Every decoded <c>loadRoomWithEgo</c> with a literal object and room across the game's global scripts, room entry, exit and local scripts, and
 /// object verbs. These are possible arrivals (the conditions that lead to each are not evaluated); an arrival whose object is not in the target
-/// room's directory is left out. A room visit that does not play the route to the room takes one of them as its assumed arrival (S5, 14 October 2026).
+/// room's directory is left out. A load of a pseudo room (0x80 and up) counts for the real room the game's literal <c>pseudoRoom</c> instructions map it
+/// to (ScummVM <c>_resourceMapper</c>). A room visit that does not play the route to the room takes one of them as its assumed arrival (S5, 14 October 2026).
 /// </summary>
 public sealed class ScummEgoArrivalIndex
 {
@@ -35,6 +45,11 @@ public sealed class ScummEgoArrivalIndex
     /// <summary>The literal arrivals into <paramref name="room"/>, in source order.</summary>
     public IReadOnlyList<ScummEgoArrival> Into(int room) => _byRoom.TryGetValue(room, out var list) ? list : [];
 
+    private readonly Dictionary<int, int> _pseudoRooms = [];
+
+    /// <summary>The pseudo room numbers (0x80 and up) the game's literal <c>pseudoRoom</c> instructions map to <paramref name="room"/>, in ascending order.</summary>
+    public IReadOnlyList<int> PseudoNumbersOf(int room) => _pseudoRooms.Where(pair => pair.Value == room).Select(pair => pair.Key).Order().ToArray();
+
     public static ScummEgoArrivalIndex For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -47,6 +62,7 @@ public sealed class ScummEgoArrivalIndex
         var data = ScummDataSources.For(game);
         var objectsByRoom = new Dictionary<int, HashSet<int>>();
         var found = new List<ScummEgoArrival>();
+        var pseudoRooms = new Dictionary<int, int>();
 
         void Scan(string source, int? sourceRoom, Func<ScummScriptDisassembly?> decode)
         {
@@ -54,6 +70,14 @@ public sealed class ScummEgoArrivalIndex
             try { script = decode(); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or EndOfStreamException or ArgumentException) { return; }
             if (script is null) return;
+            // o5_pseudoRoom: the real room, then the bytes from 0x80 up that load it (the reader prints them without bit 7).
+            foreach (var instruction in script.Instructions.Where(item => item.Operation == "pseudoRoom"))
+            {
+                var parts = instruction.Operands.Split([',', '[', ']', ' '], StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 2 || !int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var real)) continue;
+                foreach (var item in parts.Skip(1))
+                    if (int.TryParse(item, NumberStyles.Integer, CultureInfo.InvariantCulture, out var pseudo)) pseudoRooms[pseudo | 0x80] = real;
+            }
             foreach (var instruction in script.Instructions.Where(item => item.Operation == "loadRoomWithEgo"))
             {
                 var match = LiteralOperands.Match(instruction.Operands);
@@ -97,12 +121,15 @@ public sealed class ScummEgoArrivalIndex
                     }
         }
 
-        foreach (var arrival in found)
+        foreach (var literal in found)
         {
+            var arrival = literal.TargetRoom >= 0x80 && pseudoRooms.TryGetValue(literal.TargetRoom, out var realRoom)
+                ? literal with { TargetRoom = realRoom, PseudoRoom = literal.TargetRoom } : literal;
             if (!objectsByRoom.TryGetValue(arrival.TargetRoom, out var objects) || !objects.Contains(arrival.ObjectId)) continue;
             if (!index._byRoom.TryGetValue(arrival.TargetRoom, out var list)) index._byRoom[arrival.TargetRoom] = list = [];
             list.Add(arrival);
         }
+        foreach (var (pseudo, real) in pseudoRooms) index._pseudoRooms[pseudo] = real;
         return index;
     }
 }

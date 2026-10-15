@@ -597,14 +597,14 @@ public abstract partial class ScummSession
             case ScummScriptEventKind.RoomLoaded when _dispatchScope > 0 && _requestedLoad is null &&
                                                       _executing.Count > 0 && _executing[^1].Global &&
                                                       scriptEvent.TargetId is int loadedRoom &&
-                                                      (loadedRoom == NullRoom || _game.Rooms.Any(room => room.ResourceId == loadedRoom)):
+                                                      (loadedRoom == NullRoom || IndexedRoom(loadedRoom) is not null):
                 // A global script survives startScene: pause it here, enter the
                 // room, then resume it there (DispatchRequestedLoads).
                 _requestedLoad = (scriptEvent, _executing[^1]);
                 return ScummBoundedScriptExecutor.PauseAfterEvent;
             case ScummScriptEventKind.RoomLoaded when _entersRoomLoads > 0 && _executing.Count > 0 && !_executing[^1].Global &&
                                                       scriptEvent.TargetId is int enteredRoom &&
-                                                      _game.Rooms.Any(room => room.ResourceId == enteredRoom):
+                                                      IndexedRoom(enteredRoom) is not null:
                 // ScummVM startScene ends the room, object or local script that
                 // loads the room (_currentScript = 0xFF); the session enters the room next.
                 _visitTrace.Add($"{scriptEvent.Operation} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4} ends this room-owned script (startScene); the session enters Room {enteredRoom:00}");
