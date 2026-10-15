@@ -20,6 +20,7 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | Boot parameter | `local[0]` of script 1 (0 in a normal start): other values jump to debug and test start points (`isEqual local[0], 0x1A6F`, 0x0457, 0x04BC, … put the ego in later rooms with the objects of that point of the story) | decoded | Script 1 +0x07F5 to +0x0E05 | 2026-10-14 |
 | First playable room | Room 33: Room 38's opening cutscene ends by `startObject` 494 verb 0x0A whose fallback verb loads Room 96; Room 96's local script 200 plays a sound and then `loadRoomWithEgo` object 435 into Room 33 walking to (346,133) with user input back on | decoded | Room 38 local script 203 +0x02CA; Room 38 object 494 fallback verb +0x0044; Room 96 local script 200 +0x0020 | 2026-10-14 |
 | Copy protection (Dial-A-Pirate) | Script 152 loads Room 90, runs script 151 ("WAIT! Before we begin ^ let's have a quick history quiz.", "Press ENTER to continue") and asks "When was this pirate hanged in <place>?" with four digits typed; the expected year is kept in `var[0x10A]` (+0x00EE) before it waits; a wrong answer repeats with new symbols and the fourth wrong one quits (`systemOps quit`, +0x002E) | decoded | Script 152 +0x0000 to +0x0213; Script 151 +0x0000 to +0x020E | 2026-10-14 |
+| Pseudo rooms | script 1 maps pseudo rooms 201 to 220 to Room 58 (`pseudoRoom 58, [73..92]` with bit 7) and 130 to 132 to Room 1 (`pseudoRoom 1, [2, 3, 4]`); every load of those rooms in the game's own code uses the pseudo number, and their entry scripts tell the uses apart by `VAR_ROOM` | decoded | Script 1 +0x06C4 to +0x0718 | 2026-10-15 |
 | Input scripts of the protection | 153 (area 1: `var[0x069]` = local 1; any other area: `var[0x069]` = 0xFFFF) and 155 (area 4 only: a key '0' to '9' sets `var[0x069]` to the digit, Backspace sets 0x0B) | decoded | Script 153 +0x0000; Script 155 +0x0000 | 2026-10-14 |
 
 ## Engine variables as this game uses them
@@ -30,6 +31,8 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | `var[0x030]` (sound card) | 3 (AdLib) and 4 (Roland) pick which music-timer marks the credits wait on (0x08, 0x0C, 0x1A, … up to 0xF7 for AdLib; 0x00.. for the others) | decoded | Script 149 +0x0020 to +0x0A2D | 2026-10-14 |
 | `var[0x00E]` (music timer) | the credits' lines wait until it passes fixed marks while the music (sound `var[0x057]`) plays | decoded | Script 149 +0x0027 to +0x09B0 | 2026-10-14 |
 | `var[0x027]` (debug mode, v4) | a start with a non-zero boot parameter needs it non-zero, otherwise script 1 prints "Debugging mode not active" and quits; it is 0 in a normal run | decoded | Script 1 +0x07FC to +0x0827 | 2026-10-14 |
+| `var[0x004]` (`VAR_ROOM`) | the number the room was loaded as: Room 58's entry draws one of twenty path layouts for `VAR_ROOM` 201 to 220 (none under 58), Room 1's entry sets its walk boxes and objects for 130, 131 or 132; Room 30's local script 212 compares `getActorRoom` of actor 11 with it | decoded | Room 58 entry +0x01E1 to +0x0979; Room 1 entry +0x0066 to +0x011A; Room 30 local script 212 +0x0040 | 2026-10-15 |
+| Bit variables | stored apart from the word variables (v4 `_bitVars`): the game's bits 0x040 to 0x04F are not `VAR_ROOM`; before 15 October the session aliased them and Room 30's entry left `VAR_ROOM` = 542 | engine | ScummVM `readVar`/`writeVar` (script.cpp); Room 30 first visit | 2026-10-15 |
 | `var[0x020]` (input script) | 4 in play: its first argument is the click area (1 verb, 2 room, 4 key) | decoded | Script 1 +0x060E; Script 4 +0x0034 | 2026-10-14 |
 
 ## Game variables and bits
@@ -67,7 +70,11 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | 10 | title and credits, entered by the credits cutscene | decoded | Script 149 +0x0051 | 2026-10-14 |
 | 38 | the opening scene: the entry script starts object 497 verb 0xFA; local script 203 is a cutscene that ends by walking to object 494 | decoded | Room 38 entry +0x003B; Room 38 local script 203 | 2026-10-14 |
 | 96 | title music: user input off, sound `var[0x051]` until it ends (skippable by the override), then the dock | decoded | Room 96 entry +0x0000; Room 96 local script 200 | 2026-10-14 |
-| 33 | the first playable room (a village dock at night; the ego's costume 1 stands at (346,133)); its entry script starts scripts 0xC9, 0xCA and 0xCB depending on `var[0x065]` and `var[0x0C3]`; local script 202 changes the ego's walk speed by walk box | decoded | Room 33 entry +0x0000 to +0x0056; Room 33 local script 202 | 2026-10-14 |
+| 33 | the first playable room (a village dock at night; the ego's costume 1 stands at (346,133)); its entry script starts scripts 0xC9, 0xCA and 0xCB depending on `var[0x065]` and `var[0x0C3]`; local script 202 changes the ego's walk speed by walk box. First visit (S5): no object image active, the ego only | decoded | Room 33 entry +0x0000 to +0x0056; Room 33 local script 202 | 2026-10-15 |
+| 58 | a forest maze loaded only as pseudo rooms 201 to 220: the entry `drawObject`s nine or ten path tiles (objects 638 to 669) at strip positions per `VAR_ROOM`, sets box flags and the untouchable class (24) of the edge exits; local scripts 201 animate actors 3 and 4 (costume 114). The map (Room 85) object 866 enters it as 218 with the ego at object 668 | decoded | Room 58 entry +0x0000 to +0x09B2; Room 85 object 866 verb 0x0A +0x0000 | 2026-10-15 |
+| 1 | a beach loaded only as pseudo rooms 130 to 132 (three parts of one beach picture); as 130 it sets objects 21 to 23 to state 1 and object 296 when `bit[0x215]` is 0; no `loadRoomWithEgo` with literal operands enters it | decoded | Room 1 entry +0x0066 to +0x00A0 | 2026-10-15 |
+| 30 | a shop: the entry starts local scripts 205 (three random prices in `var[0x0DC..0x0DE]`), 209 or 208 (objects 412 and 932 on or off by `var[0x064]`) and 203; the shopkeeper is actor 11 (costume 28) | decoded | Room 30 entry +0x008B to +0x00DA; Room 30 local scripts 203, 205, 208, 209 | 2026-10-15 |
+| 70 | objects 746 to 748 are set to state 1 by the entry only when `bit[0x17F]` is set (later in the story) | decoded | Room 70 entry +0x006B to +0x0078 | 2026-10-15 |
 
 ## Verbs and the input chain
 
@@ -100,6 +107,7 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 ## Open questions
 
 - The AdLib music timer the session gives the credits is an estimate (iMuse in the engine; the explorer plays the song's `AD` block at the browsed disks' half tempo). The length of the credits in the session was not measured against the bundled ScummVM (S5/S6).
-- The ego stands at (346,133) in Room 33 after the opening; whether the first-visit objects and the camera match the original was not compared (S5).
+- The ego stands at (346,133) in Room 33 after the opening; the first-visit objects were compared with the room's own scripts at source level only (S5 record), not with a ScummVM picture.
+- Which of Room 1's pseudo numbers (130 to 132) comes first in play is not decoded (the map rooms reach it through scripts with non-literal arguments); the first visit uses 130, labelled.
 - The index (`RN` block) names none of the rooms the boot enters (the scanner shows "Room NN"); Rooms 90, 10, 38 and 96 are described above by what their scripts do.
 - The "insert disk" and "unable to find" strings of script 1 (+0x00E0, +0x0110) are never reached: all disks are assumed inserted.

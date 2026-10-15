@@ -33,7 +33,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
 
     /// <summary>
     /// The room view and room cards of this game come from the first visit the generic session runs (<see cref="ScummRoomFirstVisit"/>, S5): a browsed game
-    /// of the old bundle whose boot the session follows (Indiana Jones and the Last Crusade EGA). LOOM has its own session and scenes.
+    /// whose boot the session follows, decided by the game's format and dialect (old-bundle v3 with the Indy3 dialect, v4 on several disks; S5 Indy3Ega and
+    /// MonkeyFloppy). LOOM has its own session and scenes.
     /// </summary>
     public bool HasFirstVisitScenes { get; init; }
 
@@ -71,6 +72,13 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// </summary>
     public bool CameraFollowStartsScene => UsesV4Archive;
 
+    /// <summary>
+    /// Bit variables (<c>bit[n]</c>) are stored apart from the word variables (ScummVM <c>readVar</c>/<c>writeVar</c>, script.cpp, read 15 October 2026: up to
+    /// version 3 a bit is bit <c>n &amp; 15</c> of <c>_scummVars[n &gt;&gt; 4]</c>; from version 4 it lives in <c>_bitVars</c>). Without it a v4 game's bits
+    /// 0x040 to 0x04F would overwrite <c>VAR_ROOM</c> (S5 MonkeyFloppy). LOOM CD sets the same storage in its own session.
+    /// </summary>
+    public bool SeparateBitVariables => Version >= ScummVersion.V4;
+
     /// <summary>The boot is over only when the player has control, not when script 1 has ended (a game whose script 1 hands over to an opening scene).</summary>
     public bool BootEndsWhenPlayerHasControl { get; init; }
 
@@ -88,7 +96,10 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
         return new ScummProfile(game.Version, dialect)
         {
             AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard,
-            HasFirstVisitScenes = game.Id == GameId.IndianaJones3 && game.Version == ScummVersion.V3,
+            // R-6.12a: every game the generic session boots shows its rooms' first visit. The session reads the old-bundle v3 scripts of Indiana Jones and the
+            // v4 scripts of a game on several disks; LOOM (EGA and CD) has its own session, and the 256-colour Indy3 (room files) has no boot yet (S4b).
+            HasFirstVisitScenes = game.Id is not (GameId.Loom or GameId.LoomVga) && !roomFileGame
+                && (dialect == ScummScriptDialect.V3Indy3 && game.Version == ScummVersion.V3 || dialect == ScummScriptDialect.V4 && game.V4Archive is null && game.V4Disks is not null),
             ExtraTimerVariables = game.Id == GameId.IndianaJones3 ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,

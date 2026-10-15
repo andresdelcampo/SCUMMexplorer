@@ -124,7 +124,7 @@ public abstract partial class ScummSession
             IsExecutedRoomLoad(item) &&
             !_dispatchedLoads.Contains(item));
         if (roomLoad is null || _currentRoom is null) return Snapshot;
-        var target = roomLoad.TargetId is int id ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
+        var target = roomLoad.TargetId is int id ? IndexedRoom(id) : null;
         if (target is null)
         {
             _uncertainties.Add($"Reached room load has no indexed destination ({roomLoad.Operands}).");
@@ -259,7 +259,7 @@ public abstract partial class ScummSession
             if (item is null) continue;
             _pending.Remove(item);
             _dispatchedLoads.Add(request.Event);
-            var target = request.Event.TargetId == NullRoom ? null : _game.Rooms.First(room => room.ResourceId == request.Event.TargetId);
+            var target = request.Event.TargetId == NullRoom ? null : IndexedRoom(request.Event.TargetId!.Value);
             // The script that loaded the room is still a live slot while the room is entered (ScummVM startScene runs inside the script's
             // own opcode), so the room's entry code sees it with isScriptRunning.
             _loadingFrames.Add(request.Frame);

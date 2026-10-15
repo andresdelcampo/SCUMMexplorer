@@ -120,16 +120,29 @@ public static class ScummRoomFirstVisit
     {
         ArgumentNullException.ThrowIfNull(game);
         var profile = ScummProfile.For(game);
-        if (profile.UsesV4Archive) throw new InvalidDataException("Only the old bundle (LFL files) is read for a first visit so far.");
         var resource = game.Rooms.FirstOrDefault(item => item.ResourceId == roomId) ?? throw new InvalidDataException($"Room {roomId:00} is not in this game.");
-        var indexed = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
-        var session = new ScummGameSession(game, indexed, randomSeed);
+        var data = ScummDataSources.For(game);
+        ScummIndexedObjectSnapshot indexed;
+        RoomImage room;
+        if (profile.UsesV4Archive)
+        {
+            // A v4 game (one archive, or several disks: S5 MonkeyFloppy): the index (000.LFL, the same on every disk) gives the starting states, the
+            // disk that holds the room gives its picture.
+            var index = game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault()
+                ?? throw new InvalidDataException("The game has no v4 archive to read its index from.");
+            var holder = game.V4ArchiveFor(resource) ?? throw new InvalidDataException($"Room {roomId:00} is on none of the game's disks.");
+            indexed = index.ReadIndexedObjects();
+            room = holder.DecodeRoom(roomId);
+        }
+        else
+        {
+            indexed = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+            room = new ScummV3EgaRoomDecoder().Decode(File.ReadAllBytes(resource.FilePath));
+        }
+        var session = new ScummGameSession(game, indexed, randomSeed, null, profile.UsesV4Archive ? data : null);
         var bootRoom = session.CurrentRoomId == roomId;
         if (!bootRoom) session.VisitRoom(resource);
         var settled = session.Settle();
-        var data = ScummDataSources.For(game);
-        var bytes = File.ReadAllBytes(resource.FilePath);
-        var room = new ScummV3EgaRoomDecoder().Decode(bytes);
         var records = data.ReadRoom(roomId).Objects;
         var images = data.ReadObjectImages(roomId);
         var snapshot = settled.State.Snapshot;

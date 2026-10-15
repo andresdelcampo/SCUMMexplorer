@@ -747,6 +747,17 @@ public partial class MainWindow : Window
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, ScummIndexedObjectSnapshot?> BrowsedObjectSnapshots = new();
 
+    /// <summary>
+    /// The named objects a browsed v4 or v5 room stores. With a first visit (R-6.12a) only those the game's own object search can select there
+    /// (<see cref="ScummRoomScene.IsHotspot"/>); without one, every stored object (raw stored data).
+    /// </summary>
+    private static IReadOnlyList<BrowsedObjectLabel> ReadStoredV4Objects(IBrowsableArchive archive, int roomId, ScummRoomScene? scene)
+    {
+        var labels = archive.ReadObjectLabels(roomId);
+        if (scene is null) return labels;
+        return labels.Where(label => scene.Records.Any(record => record.Id == label.Id && scene.IsHotspot(record))).ToList();
+    }
+
     private BrowsedObjectLabel? _browsedHover;
 
     /// <summary>The stored objects that are not doorways (a doorway has its own overlay, list and option, as in LOOM).</summary>
@@ -928,6 +939,10 @@ public partial class MainWindow : Window
                 return CreateRoomCardBitmap(cdRoom, cdRoom.Pixels.ToArray(), 0);
             }
         }
+        // First visit of a game the generic session boots (R-5.3, R-6.12a): the room as the session leaves it, with its actors; the plain background where that cannot run.
+        if (ScummProfile.For(game).HasFirstVisitScenes && roomResource.ResourceId is int firstVisitRoom &&
+            ScummRoomFirstVisit.Cached(game, firstVisitRoom) is { } firstVisit)
+            return CreateRoomCardBitmap(firstVisit.Room, firstVisit.ComposeWithActors(), firstVisit.State.CameraX ?? 0, firstVisit.DisplayPalette());
         if (game.V4Disks is not null && game.V4ArchiveFor(roomResource) is { } browsed)
         {
             // A browsed v4 game (not LOOM CD): the plain background out of the disk that holds the room.
@@ -939,10 +954,6 @@ public partial class MainWindow : Window
             var olderRoom = DecodeOlderRoom(game, File.ReadAllBytes(roomResource.FilePath));
             return CreateRoomCardBitmap(olderRoom, olderRoom.Pixels.ToArray(), 0, olderRoom.Palette);
         }
-        // First visit of a browsed old-bundle game (R-5.3): the room as the generic session leaves it, with its actors; the plain background where that cannot run.
-        if (ScummProfile.For(game).HasFirstVisitScenes && roomResource.ResourceId is int firstVisitRoom &&
-            ScummRoomFirstVisit.Cached(game, firstVisitRoom) is { } firstVisit)
-            return CreateRoomCardBitmap(firstVisit.Room, firstVisit.ComposeWithActors(), firstVisit.State.CameraX ?? 0, firstVisit.DisplayPalette());
         var bytes = File.ReadAllBytes(roomResource.FilePath);
         var decoder = new ScummV3EgaRoomDecoder();
         var room = decoder.Decode(bytes);
@@ -1365,8 +1376,8 @@ public partial class MainWindow : Window
                 _currentRoomResource = resource;
                 _lastViewedRoomResource = resource;
                 // Names the pointer reveals: the drawn objects of a v1 or v2 game; every named object of a v4 or v5 game (their starting states come from scripts).
-                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : browseArchive?.ReadObjectLabels(resource.ResourceId!.Value)
-                    ?? (_game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes, browsedScene) : []);
+                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : browseArchive is not null ? ReadStoredV4Objects(browseArchive, resource.ResourceId!.Value, browsedScene)
+                    : _game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes, browsedScene) : [];
                 _currentRoomObjectRecords = browsedScene?.Records ?? cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
                 _roomNavigationCandidates = [];

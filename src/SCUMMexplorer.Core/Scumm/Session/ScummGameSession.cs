@@ -17,6 +17,12 @@ public sealed class ScummGameSession : ScummSession
     {
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
         var profile = ScummProfile.For(game);
+        if (profile.SeparateBitVariables)
+        {
+            // readVar/writeVar: from version 4 the bit variables are _bitVars, not bits of the word variables.
+            _runtime.GlobalVariables[ScummBoundedScriptExecutor.SeparateBitStorage] = 1;
+            _runtime.EstimatedVariables.Add(ScummBoundedScriptExecutor.SeparateBitStorage);
+        }
         SoundCard = AdlibCard;
         if (profile.VideoMode is int videoMode) _runtime.SetGlobalVariable(ScummVars.VideoMode, (ushort)videoMode);
         _runtime.SetGlobalVariable(ScummVars.CharInc, ScummProfile.CharIncAtStart);
@@ -73,16 +79,20 @@ public sealed class ScummGameSession : ScummSession
         _uncertainties.StartStep();
         var arrival = $"Room {roomId:00} selected without playing the route to it (state preview): its entry scripts ran from the state the boot left.";
         _runtime.Messages.RouteSkipped($"Room {roomId:00} was entered without its route, so prints on the route to it did not run");
-        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !ScummActorTable.IsValid(ego)) return EnterRoom(room, arrival);
-        var candidates = ScummEgoArrivalIndex.For(_game).Into(roomId);
+        var arrivals = ScummEgoArrivalIndex.For(_game);
+        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !ScummActorTable.IsValid(ego)) return EnterWithoutEgo(room, arrival, arrivals);
+        var candidates = arrivals.Into(roomId);
         if (candidates.Count == 0)
         {
             _uncertainties.Add($"Room {roomId:00} has no decoded loadRoomWithEgo with literal operands that brings the ego into it, so the ego is not placed in it.");
-            return EnterRoom(room, arrival);
+            return EnterWithoutEgo(room, arrival, arrivals);
         }
         var previous = _currentRoom?.ResourceId;
         var fromPrevious = candidates.Where(item => item.SourceRoom is int source && source == previous).ToArray();
-        var pool = fromPrevious.Length > 0 ? fromPrevious : candidates.ToArray();
+        // A first visit comes into the room from elsewhere: an arrival in the room's own code (a pseudo room's cells leading into each other) moves
+        // within it, so it is a candidate only when the room has no other.
+        var fromElsewhere = candidates.Where(item => item.SourceRoom != roomId).ToArray();
+        var pool = fromPrevious.Length > 0 ? fromPrevious : fromElsewhere.Length > 0 ? fromElsewhere : candidates.ToArray();
         var choices = pool.GroupBy(item => item.PlacementKey).Select(group => group.ToArray()).ToArray();
         var index = 0;
         string how;
@@ -98,11 +108,30 @@ public sealed class ScummGameSession : ScummSession
         var label = $"Assumed arrival: the ego enters as {string.Join(" or ", chosen.Select(item => item.Describe()))} would bring it in ({how}). " +
                     "Which route led here was not played; the arrival is a possible outcome, not a reached one.";
         var load = new ScummScriptEvent(0, first.Source, first.Offset, ScummScriptEventKind.RoomLoaded, "loadRoomWithEgo",
-            $"assumed arrival into Room {roomId:00}", ResourceKind.Room, roomId, ScummScriptEventCertainty.Conditional,
-            ResolvedArguments: [first.ObjectId, roomId, first.WalkX, first.WalkY]);
+            $"assumed arrival into Room {roomId:00}", ResourceKind.Room, first.LoadedNumber, ScummScriptEventCertainty.Conditional,
+            ResolvedArguments: [first.ObjectId, first.LoadedNumber, first.WalkX, first.WalkY]);
         // o5_loadRoomWithEgo puts the ego in the room with the position it had (putActor(room)): the entry code sees it where the previous room left it.
         _uncertainties.Add($"Before its assumed arrival the ego keeps the position it had in the room the session was in (estimate: the route that would have moved it was not played).");
         return EnterRoom(room, $"{arrival} {label}", load, label);
+    }
+
+    // A visit with no arrival to follow. A room the game's pseudoRoom instructions map other numbers to is loaded under one of them, as every load of
+    // it in the game's own code would be (its entry code tells the uses apart by VAR_ROOM, so under its own number it would draw none of them):
+    // a seeded, labelled pick among those numbers, since no literal arrival says which comes first.
+    private ScummSessionSnapshot EnterWithoutEgo(GameResource room, string arrival, ScummEgoArrivalIndex arrivals)
+    {
+        var roomId = room.ResourceId!.Value;
+        var numbers = arrivals.PseudoNumbersOf(roomId).Where(number => _runtime.PseudoRooms.GetValueOrDefault(number) == roomId).ToArray();
+        if (numbers.Length == 0) return EnterRoom(room, arrival);
+        var index = numbers.Length == 1 ? 0 : _runtime.Random.Pick($"pseudo room of Room {roomId:00}", 0, numbers.Length - 1).Value;
+        var number = numbers[index];
+        var label = $"Assumed pseudo room: Room {roomId:00} is loaded as pseudo room {number} (VAR_ROOM), " +
+                    (numbers.Length == 1 ? "the only number the game's pseudoRoom instructions give it" : $"a seeded pick {index + 1} of {numbers.Length} among {string.Join(", ", numbers)}") +
+                    "; no decoded arrival says which comes first.";
+        _uncertainties.Add(label);
+        var load = new ScummScriptEvent(0, "explorer visit", 0, ScummScriptEventKind.RoomLoaded, "loadRoom",
+            $"assumed load of pseudo room {number}", ResourceKind.Room, number, ScummScriptEventCertainty.Conditional, ResolvedArguments: [number]);
+        return EnterRoom(room, $"{arrival} {label}", load);
     }
 
     /// <summary>

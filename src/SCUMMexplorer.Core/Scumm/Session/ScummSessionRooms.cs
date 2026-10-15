@@ -14,6 +14,16 @@ public abstract partial class ScummSession
     /// <summary>The game's costume with this number (EGA or CD data), or null when it is not indexed.</summary>
     public ScummCostume? ReadCostume(int id) => _data.ReadCostume(id);
 
+    /// <summary>
+    /// The indexed room a room load names: the room itself, or for a pseudo room (0x80 and up) the real room the game's <c>o5_pseudoRoom</c> mapped it to
+    /// (ScummVM <c>startScene</c>: <c>_roomResource = _resourceMapper[room &amp; 0x7F]</c>). Null when neither is indexed.
+    /// </summary>
+    protected GameResource? IndexedRoom(int number)
+    {
+        var real = number >= 0x80 && _runtime.PseudoRooms.TryGetValue(number, out var mapped) ? mapped : number;
+        return _game.Rooms.FirstOrDefault(item => item.ResourceId == real);
+    }
+
     protected ScummActorTable.Placement CurrentPlacement() =>
         new(_runtime.CurrentRoom, _runtime.WalkBoxes, _runtime.WalkBoxFlagsUnknown, _runtime.ObjectClasses);
 
@@ -87,7 +97,11 @@ public abstract partial class ScummSession
         _runtime.EstimatedVariables.Remove(ScummVars.CameraMaxX);
         foreach (var item in _currentObjects)
             _runtime.TryAddObjectPosition(item.Id, new RoomObjectPosition(item.X, item.Y));
-        _runtime.SetGlobalVariable(ScummVars.Room, (ushort)room.ResourceId!.Value);
+        // startScene (room.cpp): VAR_ROOM is the number the script loaded; a pseudo room (0x80 and up, o5_pseudoRoom) loads its real room under that number.
+        var loadedNumber = load?.TargetId is int number && number >= 0x80 && _runtime.PseudoRooms.GetValueOrDefault(number) == room.ResourceId ? number : room.ResourceId!.Value;
+        _runtime.SetGlobalVariable(ScummVars.Room, (ushort)loadedNumber);
+        if (loadedNumber != room.ResourceId)
+            _visitTrace.Add($"Room {room.ResourceId:00} entered as pseudo room {loadedNumber} (VAR_ROOM = {loadedNumber})");
         _roomSize = (roomWidth, roomData.Height);
         _pointer = null;
         PlaceVirtualMouse();

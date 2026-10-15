@@ -287,7 +287,7 @@ public abstract partial class ScummSession
         var roomLoad = _visitEvents.Skip(beforeEvents).FirstOrDefault(item =>
             IsExecutedRoomLoad(item) &&
             !_dispatchedLoads.Contains(item));
-        var target = roomLoad?.TargetId is int id ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
+        var target = roomLoad?.TargetId is int id ? IndexedRoom(id) : null;
         if (roomLoad is not null && target is not null)
         {
             action = action with { ReachedRoomLoad = roomLoad, DestinationRoomId = target.ResourceId };
@@ -362,7 +362,7 @@ public abstract partial class ScummSession
             !_dispatchedLoads.Contains(item));
         var targetId = roomLoad?.TargetId;
         var target = targetId is int id
-            ? _game.Rooms.FirstOrDefault(item => item.ResourceId == id) : null;
+            ? IndexedRoom(id) : null;
         if (roomLoad is not null && target is null)
             _uncertainties.Add($"Reached room load has no indexed destination ({roomLoad.Operands}).");
         var action = new ScummObjectActionResult(sourceRoomId, objectId, verbId,
