@@ -78,3 +78,9 @@ Open `Games/monkey1 ega en` in the app (Normal mode) and look at the room cards 
 ## Where the facts went (links to the script map / engine notes / tracker entries)
 
 [Monkey Island script map](../../docs/monkey1/MONKEY1_SCRIPT_MAP.md) (pseudo rooms, `VAR_ROOM`, bit variables, Rooms 1, 30, 33, 58, 70), [variables and opcode rules](../../docs/engine/SCUMM_SCRIPT_MAP.md) (bit variables v3/v4, pseudo rooms), [object states](../../docs/engine/SCUMM_OBJECT_STATES.md) (v4 first visit), [tracker and decision log (MonkeyFloppy block)](../../docs/monkey1/SUPPORT_STATUS.md).
+
+## Addendum (15 October, later): depth masks of the 11 October branch merged
+
+- The branch `claude/practical-mendeleev-628256` (R-6.16) adds the depth masks of 16-colour v4 rooms and object images; the 256-colour masks of this fixture were already read. The first visit's actors (`ScummRoomScene.ActorLayer`) are hidden behind them as before.
+- **This fixture (`monkey1 ega en`, 256 colours): audit unchanged.** Re-run with the same harness: 81 rooms, 81 without a gap; `room-audit.tsv` identical to the recorded one apart from the timing column.
+- **Eight-disk 16-colour copy (`monkey1 ega es`), first audit:** 81 rooms, 81 without a gap, 0 that could not run; objects in 30 rooms, actors in 57. Its actors now pass behind the foreground; `BrowsedMasksAndObjectsTests.FirstVisitActorsOfTheMonkeyIslandFloppyPassBehindTheForeground` checks it for rooms 33, 30 and 58 of both copies. Not compared with ScummVM.
