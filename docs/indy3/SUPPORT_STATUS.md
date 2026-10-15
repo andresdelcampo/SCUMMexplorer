@@ -1,6 +1,6 @@
 # Indiana Jones and the Last Crusade (EGA) support status
 
-Family: Indy3Ega | Fixture: `Games/indy3 ega en` | Last updated: 2026-10-14 | Owner: S5 agent
+Family: Indy3Ega | Fixture: `Games/indy3 ega en` | Last updated: 2026-10-15 | Owner: S6 requirement agent
 
 | Stage | State (not started / in progress / done / blocked) | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -9,13 +9,13 @@ Family: Indy3Ega | Fixture: `Games/indy3 ega en` | Last updated: 2026-10-14 | Ow
 | S3 Sound | done (earlier) | Sound | – | AdLib tempo unchecked by ear; see Open uncertainties |
 | S4b Session | **done** | – (unchanged) | `.verification/indy3-session-20261014` | boot trace: 1341 frames, rooms 76, 79, 0, 6, 1, 92, 1, 73, nothing unsupported |
 | S5 Objects | **done** (14 Oct; Objects stays partial until S6) | Objects (partial until S6) | `.verification/indy3-objects-20261014` | 88 rooms, 88 without a gap; room view, actors and room cards from the first visit of the generic session; Room 92 answered correctly; Script 73 no longer pending |
-| S6 Play | not started | Play, Objects | | Play requirement for a verb-based game still to be written as a Proposed row |
+| S6 Play | not started (Play requirement proposed 15 Oct: R-7.7 to R-7.18) | Play, Objects | | build on the Proposed rows of REQUIREMENTS §7.1 |
 | S7 Cutscenes | not started | Cutscenes | | |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | editions checked: none |
 
 Blocked on: nothing.
-Next: S6 (Play). It needs the Play requirement for a verb-based game as `Proposed` rows (sentence line, verb pick, inventory, the game's input scripts 4/15/16), the input constants as profile data (click gaps, `runInputScript` mode, camera 160), and clicks delivered to the game's own input script chain. Open S5 follow-ups (user's look at the rooms listed in the record): Rooms 20, 28, 32 show mostly black pictures; rooms 1, 6, 15 and 13 more never rest within 2400 frames; Script 23's `actorFollowCamera` of an ego in another room (ScummVM `setCameraFollows` loads that room) is not modelled; the first visit of the boot's own rooms (76, 79, 6, 1, 92) is the state a visit gives, not the opening scene as the boot plays it.
+Next: S6 (Play), building on the Proposed rows R-7.7 to R-7.18 (REQUIREMENTS §7.1, 15 Oct; the input facts are in the script map under "Verbs and the input chain"): the verb area drawn from the game's verbs with their string escapes (Script 96, sentence verb 0x64, inventory 0x65 to 0x6C), the crosshair cursor, one click per press delivered to whatever `var[0x020]` holds (4 in play, 18 in dialogues), verb keys, the sentence stack run through Script 2, and the acceptance route of R-7.18 from Room 73. Earlier note: the input constants as profile data (click gaps, `runInputScript` mode, camera 160), and clicks delivered to the game's own input script chain. Open S5 follow-ups (user's look at the rooms listed in the record): Rooms 20, 28, 32 show mostly black pictures; rooms 1, 6, 15 and 13 more never rest within 2400 frames; Script 23's `actorFollowCamera` of an ego in another room (ScummVM `setCameraFollows` loads that room) is not modelled; the first visit of the boot's own rooms (76, 79, 6, 1, 92) is the state a visit gives, not the opening scene as the boot plays it.
 Open uncertainties: the AdLib playback of the sound player uses LOOM's driver constants for Indy3 (R-13.9 Proposed); the PC-speaker music timer is not modelled; the boot's device is AdLib; no ScummVM runtime picture was compared in S5 (the bundled build showed a white window with the default renderer and failed with the software renderer); Rooms 47, 60, 66 start dark (room lights off) and are shown lit.
 ## Decision log
 
@@ -35,4 +35,5 @@ Open uncertainties: the AdLib playback of the sound player uses LOOM's driver co
 | 2026-10-14 | S5 | How to reach a room whose route needs unplayed state | invent flags / play the route / visit like ScummVM's `room` | visit from the post-boot state without a route, ego by a labelled `loadRoomWithEgo` pick; no flag written | none needed |
 | 2026-10-14 | S5 | When a room has settled | a fixed frame / until quiet | until nothing changed for 90 frames, ambient animators ignored; limit 2400; a script leaving the room keeps the last state in it | change `Settle` arguments |
 | 2026-10-14 | S5 | Runtime comparison with ScummVM | drive the bundled build / source only | the bundled build could not be captured (white window; the software renderer failed); source-level comparison only, recorded | retry with another renderer or a saved game |
+| 2026-10-15 | S6 (prerequisite) | What Play means for a verb-based game; how it relates to R-1.5 and §7 (LOOM's single click uses, double click looks) | apply LOOM's gestures to Indy3 / follow the game's own interface as ScummVM delivers it | the game's own interface (Proposed R-7.7 to R-7.18, own commit): one click per press to the input script in `VAR_VERB_SCRIPT`, verbs/sentence line/inventory drawn from the game's verbs, sentences only through the game's sentence script. R-1.5 is met through the game's default verb ("Walk to" runs on one click), so it is an extension, not a contradiction; LOOM's double-click look has no Indy3 counterpart. Kept unchanged where ScummVM differs: right click stays the Interact menu (R-6.9) instead of v3's Esc; restart and save/load keys are not delivered. Facts read from Scripts 4, 15, 16, 18, 20, 24, 96 and ScummVM master (15 Oct) | revert the proposal commit; S6 work on top of it is reverted with it |
 | 2026-10-14 | S5 | R-6.12 (Indy3 EGA background note) contradicts the S5 playbook | stop the item / propose a superseding row | propose R-6.12a and R-5.3a (own commit); the wiring follows the playbook, the old note remains only as the Advanced fallback note | revert the wiring commit and the proposal commit |
