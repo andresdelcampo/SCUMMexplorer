@@ -22,6 +22,12 @@ For a game with no game-specific session (Indiana Jones and the Last Crusade EGA
 - **No pixels are filled.** A gap that remains after a correct run means missing script behaviour, not a reason for a room-specific fill.
 - **Hotspots** follow `findObject` (`object.cpp`): an object is skipped when it is untouchable (class 24); its parent chain must be in the required states; its own state does not matter. The explorer also leaves out objects the room does not own and objects at 0, 0 (off the scene).
 
+### v4 (several disks, S5 MonkeyFloppy, 15 October 2026)
+
+- The same rules apply to a v4 game: the index (`000.LFL`) gives the starting states, the disk that holds the room gives its picture, objects and scripts (`ScummV4DiskSetDataSource`). The class numbers are the small-header ones (ScummVM `putClass`/`getClass` translate class 32 to 24 for `GF_SMALL_HEADER` games, which include the v4 floppies), so untouchable is class 24 as in v3; the scripts set it with `setClass obj, [0x98]` and clear it with `[0x18]`.
+- **A room the game only loads under pseudo room numbers** (see [pseudo rooms](SCUMM_SCRIPT_MAP.md)) is visited under the number a decoded `loadRoomWithEgo` into it uses (arrivals from the room's own code, which lead from one pseudo room to another, count only when no other exists); without such an arrival, under one of the numbers the game's `pseudoRoom` instructions give it (seeded, labelled). Visited under its own number its entry script would draw none of its layouts.
+- An arrival from the room's own code is never the first visit when another arrival exists (a first visit comes from elsewhere).
+
 ## Historical old-v3 format evidence
 
 The following byte offsets, object IDs and counts belong to the supplied Spanish EGA audits of 27 September. They remain source evidence for that edition, not a fresh English/VGA inventory.

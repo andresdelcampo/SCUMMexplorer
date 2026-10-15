@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 15 October: every Monkey Island floppy room shows its first visit (S5, MonkeyFloppy)
+
+- **Room view, actors and room cards** of the four-disk floppy release come from the generic session's first visit (`ScummRoomFirstVisit` on a v4 disk set, `ScummProfile.HasFirstVisitScenes` by format and dialect; the previous agent's commit 3b2bcf6, now verified). Room audit: **81 of 81 rooms without a gap**, objects in 30 rooms (before: none, the v4 index starts every object at 0), actors in 56; 70 settled, 9 reached the frame limit, 2 left the room.
+- **Engine, from ScummVM, each pinned by a test:** bit variables are kept apart from the word variables from version 4 (`readVar`; they had overwritten `VAR_ROOM`); pseudo rooms (`startScene`: the real room loads, `VAR_ROOM` is the pseudo number; actors put into a pseudo room; `getActorRoom`); the visit enters a room under the pseudo number its arrival uses and prefers arrivals from other rooms. Rooms 58 (a forest maze, was black) and 1 now show their layout. Also changes seven Indy3 EGA rooms (17, 18, 21, 23, 24, 33, 72: now with Indy and more objects); LOOM unchanged (room audit identical).
+- **Not compared with a ScummVM picture:** source-level comparison of 14 script-heavy rooms. Registry unchanged (Objects partial until S6). Tests: `ScummMonkeyFloppyFirstVisitTests` (4); whole project 994, 989 passed, 5 skipped. Record: [monkey1-objects-20261015](../.verification/monkey1-objects-20261015/README.md).
+
 ## 14 October: every Indiana Jones and the Last Crusade EGA room shows its first visit (S5, Indy3Ega)
 
 - **Room view, actors and room cards** of the browsed Indy3 EGA game come from the first visit the generic session runs (`ScummRoomFirstVisit`, `ScummRoomScene`; `ScummGameSession.VisitRoom` and `Settle`): the first playable room is the boot's own state, every other room is entered without its route (a labelled `loadRoomWithEgo` arrival pick) and played until it settles (ambient animators ignored, 2400-frame limit). **88 of 88 rooms open without a gap** (before: 1 with a gap by the same test, objects in 7 rooms; after: objects in 35 rooms, actors in 62). Stored-object boxes remain as the Advanced list, limited to what the game's own object search can select (class 24, owner, parent states, off-scene).
