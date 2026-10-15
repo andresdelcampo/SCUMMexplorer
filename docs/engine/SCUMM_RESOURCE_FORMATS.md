@@ -1,6 +1,6 @@
 # SCUMM resource formats the explorer reads (beyond LOOM and Indy3 EGA)
 
-Version scope is stated on every item. Everything here was checked against ScummVM's `engines/scumm` (resource, room, gfx, costume and palette sources) and against the local game data on 11 October 2026; pictures were checked in the real window (`.verification/generic-v4/README.md`). Only **rooms, costumes and sounds are read** for these games (plus, for v1/v2, the object pictures, below): their scripts and actors are not, so nothing here says what a script does (see [the script reference](SCUMM_SCRIPT_MAP.md) for the scope).
+Version scope is stated on every item. Everything here was checked against ScummVM's `engines/scumm` (resource, room, gfx, costume and palette sources) and against the local game data on 11 October 2026; pictures were checked in the real window (`.verification/generic-v4/README.md`). **Rooms, depth masks, costumes, sounds and the stored objects (v4, v5; for v1/v2 the object pictures, below) are read** for these games: their scripts and actors are not, so nothing here says what a script does (see [the script reference](SCUMM_SCRIPT_MAP.md) for the scope).
 
 ## Index and container layouts
 
@@ -19,8 +19,8 @@ In every layout a room is the file `NN.LFL` (v1/v2/old-v3/room files) or an `LF`
 
 | Format | Applies to | Description |
 |---|---|---|
-| Tiles | v1 | Header bytes 4 and 5 are the tiles across and down (8x8 pixels); word offsets at 10, 12, 14, 16 point at four run-length streams (`decodeV1Gfx`: four common bytes, then run codes): 256 character patterns of eight bytes (four 2-bit pixels, each drawn twice as wide), the character of each tile, a colour byte per tile and a mask character. Three room colours are header bytes 6 to 8, the fourth is the tile's colour byte & 7; the numbers are C64 colours that a per-game table turns into EGA colours. | `ScummV1RoomDecoder` |
-| One stream | enhanced v2 | Width, height at bytes 4 and 6, picture at the word offset in byte 10: column by column, top to bottom; code = run of one colour (high nibble count, low nibble colour) or, with bit 7, a run repeating what the column to the left shows (a dither); zero count takes the next byte. Depth masks follow (not read). Height at most 128. | `ScummV2RoomDecoder` |
+| Tiles | v1 | Header bytes 4 and 5 are the tiles across and down (8x8 pixels); word offsets at 10, 12, 14, 16 point at four run-length streams (`decodeV1Gfx`: four common bytes, then run codes): 256 character patterns of eight bytes (four 2-bit pixels, each drawn twice as wide), the character of each tile, a colour byte per tile and a mask character per tile (see Depth masks). Three room colours are header bytes 6 to 8, the fourth is the tile's colour byte & 7; the numbers are C64 colours that a per-game table turns into EGA colours. | `ScummV1RoomDecoder` |
+| One stream | enhanced v2 | Width, height at bytes 4 and 6, picture at the word offset in byte 10: column by column, top to bottom; code = run of one colour (high nibble count, low nibble colour) or, with bit 7, a run repeating what the column to the left shows (a dither); zero count takes the next byte. The depth mask follows the picture (see Depth masks). Height at most 128. | `ScummV2RoomDecoder` |
 | Strips, EGA | old v3, v4 EGA (Monkey Island EGA) | The old-v3 strip code (run, copy-left, alternating pair); in v4 EGA the BM body is a length word, a word offset per strip (from the body start) and the strips. No `PA` block: the fixed EGA palette. | `ScummV3EgaRoomDecoder.DecodeStrip` |
 | Strips, v5 | v5 | `ROOM` > `RMHD` (width, height, objects), `CLUT` (256 RGB; later versions `PALS` > `WRAP` > `APAL`), `RMIM` > `IM00` > `SMAP`: a dword offset per strip counted from the `SMAP` tag, then strips with the v4 codes plus the transparent twins 0x22-0x26 and 0x2C-0x30 (drawn as the plain ones) and the **major-minor** codes 0x40-0x44, 0x54-0x58, 0x68-0x6C, 0x7C-0x80 (row by row; first byte the colour; bit 0 keeps it, 10 sets a colour of `code % 10` bits, 11 and three bits minus four steps it, a step of zero repeats it for the next byte's count). | `ScummV4Archive.DecodeStrip`, `DecodeMajorMinorStrip` |
 | Strips, 256 colours | v4, Indy 256 | Strip codes 0x01 raw, 0x0E-0x12 and 0x18-0x1C bit codes (v4); 0x02 runs, 0x03 four-bit codes, 0x04 local palette and runs, 0x07 stepped colour (older 256-colour games, ScummVM `unkDecode8`-`11`). Palette from the `PA` block. | `ScummV4Archive.DecodeStrip`, `DecodeOld256Strip` |
@@ -64,6 +64,29 @@ ScummVM `script_v2.cpp` (`setupOpcodes`, the `o2_*` functions, `decodeParseStrin
 
 The v4 operand forms (word variables with the 0x2000 indexing flag, vararg lists, sub-opcode print, verbOps and so on; see the dialect notes in `ScummScriptReader`) with the v5 changes: `actorOps` sub-opcodes are the plain numbers (1 costume ... 23 shadow), opcodes 0x0F and 0x8F are `getObjectState` (result, object word) and `ifState`/`ifNotState` no longer exist. Blocks (all inside the room's `LFLF` except `SCRP`, which the `DSCR` directory places in the room named there): `SCRP` (global script, code from byte 8), `ROOM` > `ENCD`, `EXCD` (code from byte 8), `LSCR` (byte 8 is the script number, code from byte 9), `OBCD` > `VERB` (from byte 8: (verb, word offset) pairs ending in 0; **offsets count from the start of the VERB block**; the scripts are in the same block and may jump back into earlier code, so a verb is decoded from the whole block starting at its offset). A talkie line carries `FF 0A xx xx` speech-sample codes.
 
+## Depth masks (z-planes), read for every browsed layout
+
+One byte per pixel in `RoomImage.DepthMask` (0 or 1; a set bit hides what is drawn behind), more planes in `ExtraDepthMasks`. A plane is a table with one word per 8-pixel strip (offset from the plane's start; 0 = nothing masked) and, per strip, row codes of 8 mask bits each (bit 7 of a code: repeat the next byte for that many rows; otherwise copy that many bytes; 0 means 256). ScummVM `Gdi::getZPlanes`, `decodeMask`, `decompressMaskImg`.
+
+| Layout | Where the plane is | Reader |
+|---|---|---|
+| old v3 | the table follows the strips (no length word) | `ScummV3EgaRoomDecoder.DecodeDepthMask` (already) |
+| v4 VGA | after the strips (the BM body's first dword says where): a length word, then the table; further planes follow at the length | `ScummV4Archive.ReadMaskPlane` |
+| v4 EGA (Monkey Island EGA) | where the picture ends (the BM body's first word): the same length word and table | same |
+| v4, 256-colour Indy (`GF_OLD256`) | the same, but the table starts four bytes in; a first dword of zero means no mask | same (`tableAt`) |
+| v5 | `ZP01`.. blocks after `SMAP` in `IM00`; the table starts 8 bytes in (after the block header) | `ScummV5Archive.DecodeRoom` |
+| enhanced v2 | immediately after the picture stream: one run-coded stream of one byte per row per strip, strip after strip, runs may cross strips (`generateStripTable`) | `ScummV2RoomDecoder.ReadMask` |
+| classic v1 | a mask character per tile (the stream at word 16) picks 8 bytes of the patterns (word 18: a length word that is 8 too big, then the stream); the stored bytes are inverted | `ScummV1RoomDecoder.ReadMask` |
+
+Counts on the local copies (rooms with a plane / of all): Monkey Island 57/81 (EGA and VGA agree), Indy3 256 colours 62/87, Indy 4 72/96, Monkey Island 2 75/110, Maniac Mansion Enhanced 53/53 (28 not empty), Zak Enhanced 58/58 (40), Maniac Mansion classic 51/51 (31), Zak classic 58/58 (41). Checked by eye on overlays (foreground scenery: the Venice cafe railing and chairs, Monkey Island roofs, MI2 trunks, the Maniac Mansion porch railing, Zak's pipes). The 256-colour Indy masks were **wrong before** the table offset was fixed (the old reader looked two bytes too early and produced scrambled masks). No pixel comparison with ScummVM.
+
+## Objects
+
+- **v4** (`ScummV4Archive.ReadObjects`/`ReadObjectImages`): `OC` blocks (id, position, size in 8-pixel units, parent, walk-to, name offset, verb table, name) and `OI` images. Works for Monkey Island VGA and EGA and the 256-colour Indy unchanged. EGA object images are EGA bitmaps like the room's (length word, strip words, EGA strips, masks).
+- **v5** (`ScummV5Archive.ReadBrowsedObjects`): per object an `OBCD` (`CDHD`: id word, x, y, width, height in 8-pixel units, flags, parent, walk-to words, facing; `VERB`; `OBNA` the zero-ended name) and an `OBIM` (`IMHD`: id word, image count; then `IM01`, `IM02`.. one per state, each an `SMAP` read like the room's, sized by the CDHD).
+- An object with several stored images (states) shows each as its own entry (`BrowsedObjects.NumberStates`).
+- **v1 and v2 objects are not read (surveyed 11 October 2026).** Room header: object count at byte 20, image offsets from byte 28 (v3: 29), code offsets after them; the code header has the v3 fields (id at +4, position, parent, walk-to as bytes in units of 8, a name offset), but v2 object pictures are the one-stream picture of the size in the header with a mask after, and v1 object pictures are tile characters of the room's own pattern table plus a colour and a mask character per tile (`drawStripV1Object`). Two more image decoders and a header variant to verify without ScummVM's pictures: a feature of its own.
+
 ## Open
 
-Depth masks, object names and states, scripts, the actor colours of v1 costumes that depend on the run (10 Zak costumes), v2 and v1 sounds, and a pixel comparison of every picture against ScummVM. v5 sounds (`SOUN` with `ADL`, `ROL`, `SPK` parts), scripts and objects; Monkey Island 1's CD audio tracks; v6 and later.
+Object states of v1/v2 games, scripts, the actor colours of v1 costumes that depend on the run (10 Zak costumes), v2 and v1 sounds, and a pixel comparison of every picture and depth mask against ScummVM. v5 sounds (`SOUN` with `ADL`, `ROL`, `SPK` parts), scripts; Monkey Island 1's CD audio tracks; v6 and later.

@@ -5,7 +5,7 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <summary>
 /// Decodes the room backgrounds of the classic SCUMM v1 games (Maniac Mansion, Zak McKracken; ScummVM's <c>GdiV1</c>), XOR 0xFF. A room is a grid of 8x8 tiles
 /// (header bytes 4 and 5: tiles across and down). Four run-length streams (word offsets at 10, 12, 14, 16) give 256 character patterns of eight rows of four 2-bit
-/// pixels each (every pixel drawn twice as wide), the character of each tile, a colour for each tile and a mask character per tile (not read). A pixel is one of three
+/// pixels each (every pixel drawn twice as wide), the character of each tile, a colour for each tile and a mask character per tile (the depth mask). A pixel is one of three
 /// room colours (header bytes 6 to 8), the fourth being the tile's own (its colour byte, low three bits); the number is a C64 colour that the game's table
 /// (<c>v1ColorMaps</c>) turns into an EGA colour.
 /// </summary>
@@ -54,7 +54,37 @@ public sealed class ScummV1RoomDecoder(ScummV1Game game)
                 }
             }
         }
-        return new RoomImage(width, height, pixels, ScummV3EgaRoomDecoder.EgaPalette);
+        return new RoomImage(width, height, pixels, ScummV3EgaRoomDecoder.EgaPalette) { DepthMask = ReadMask(data, tilesAcross, tilesDown) };
+    }
+
+    /// <summary>
+    /// The depth mask: a mask character per tile (the stream at word 16) picks eight bytes of the mask patterns (stream at word 18: a length word that is 8 too big, then the
+    /// stream); a v1 mask is inverted compared to the later ones, so a set bit of the stored byte is a pixel the scenery does not cover. Null when the streams do not read.
+    /// </summary>
+    private static RoomDepthMask? ReadMask(byte[] data, int tilesAcross, int tilesDown)
+    {
+        try
+        {
+            var tileCount = tilesAcross * tilesDown;
+            var maskMap = DecodeStream(data, Word(data, 16), tileCount);
+            var patterns = Word(data, 18);
+            var maskChars = DecodeStream(data, patterns + 2, Math.Max(0, Word(data, patterns) - 8));
+            var width = tilesAcross * 8;
+            var pixels = new byte[width * tilesDown * 8];
+            for (var tx = 0; tx < tilesAcross; tx++)
+                for (var ty = 0; ty < tilesDown; ty++)
+                {
+                    var character = maskMap[ty + tx * tilesDown] * 8;
+                    for (var row = 0; row < 8; row++)
+                    {
+                        var bits = character + row < maskChars.Length ? (byte)(maskChars[character + row] ^ 0xFF) : (byte)0;
+                        for (var x = 0; x < 8; x++) pixels[(ty * 8 + row) * width + tx * 8 + x] = (byte)((bits & (0x80 >> x)) != 0 ? 1 : 0);
+                    }
+                }
+            return new RoomDepthMask(width, tilesDown * 8, pixels);
+        }
+        catch (InvalidDataException) { return null; }
+        catch (ArgumentOutOfRangeException) { return null; }
     }
 
     /// <summary>

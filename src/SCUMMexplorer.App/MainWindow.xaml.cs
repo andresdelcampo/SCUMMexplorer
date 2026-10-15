@@ -1366,6 +1366,13 @@ public partial class MainWindow : Window
                 : enhancedV2 ? DecodeOlderRoom(_game!, bytes) : DecodeBrowsedOldV3Room(_game!, _roomDecoder.Decode(bytes), bytes));
             ScummRoomData? cdRoom = isCd && _session is not null && _cdData is not null
                 ? await Task.Run(() => _cdData.ReadRoom(resource.ResourceId!.Value), token) : null;
+            // A browsed game without a first visit shows its stored object images and names, nothing run; a first visit (R-6.12a) decides the objects itself.
+            Core.Scumm.BrowsedObjects? browsedObjects = null;
+            if (browseArchive is not null && browsedScene is null)
+            {
+                try { browsedObjects = await Task.Run(() => browseArchive.ReadBrowsedObjects(resource.ResourceId!.Value), token); }
+                catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException or ArgumentOutOfRangeException or IndexOutOfRangeException) { }
+            }
             _currentWalkBoxes = isCd ? cdScene?.WalkBoxes ?? cdRoom?.WalkBoxes : browseArchive is not null ? browseArchive.ReadWalkBoxes(resource.ResourceId!.Value) : enhancedV2 ? TryReadOlderWalkBoxes(bytes) : TryReadWalkBoxes(bytes);
             _cdScene = cdScene;
             if (_game?.Id is GameId.IndianaJones3 or GameId.Unknown || isCd && cdRoom is null)
@@ -1381,8 +1388,10 @@ public partial class MainWindow : Window
                 _currentRoomObjectRecords = browsedScene?.Records ?? cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
                 _roomNavigationCandidates = [];
-                _objects = browsedScene?.Images ?? cdScene?.Images ?? [];
-                _objectSelection = browsedScene?.NewSelection() ?? cdScene?.Selection ?? new RoomObjectSelection([], background: room);
+                // First visit beats stored images; stored images (R-6.16) only where no first visit ran.
+                _objects = browsedScene?.Images ?? cdScene?.Images ?? browsedObjects?.Images ?? [];
+                _objectSelection = browsedScene?.NewSelection() ?? cdScene?.Selection ?? new RoomObjectSelection(_objects, background: room);
+                if (browsedObjects is not null) _roomObjectNames = browsedObjects.Names;
                 _estimatedObjectIds = new HashSet<int>();
                 _selectedObject = null;
                 ClearObjectList();
@@ -1391,8 +1400,10 @@ public partial class MainWindow : Window
                     : _game is { } fallbackGame && ScummProfile.For(fallbackGame).HasFirstVisitScenes
                         // The plain background shows where the first visit could not run: a note for Advanced only (R-1.13).
                         ? (IsAdvancedMode ? "Plain background: the room's first visit could not run in the generic session." : "")
-                        : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet." +
-                          (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");
+                        : browsedObjects is { Images.Count: > 0 }
+                            ? "Stored object images and names, as the game's data holds them. Choose one to show it; scripts, states and routes are not read for this game."
+                            : "Background preview only. Object art, scripts, and room routes are not decoded for this game yet." +
+                              (_olderObjects.Count > 0 ? " Object boxes are the room's stored objects; no script decides which ones are present." : "");
                 ObjectActionPanel.Visibility = Visibility.Collapsed;
                 RoomEntryTraceExpander.Visibility = Visibility.Collapsed;
                 RoomMusicPanel.Visibility = Visibility.Collapsed;
@@ -3688,12 +3699,14 @@ public partial class MainWindow : Window
         {
             var obj = _objects[index];
             var visible = _objectSelection.IsActive(obj);
+            // A browsed game has stored names; a later stored image of one object is numbered by BrowsedObjects.NumberStates.
+            var storedName = _game?.Id == GameId.Unknown && _roomObjectNames.TryGetValue(Core.Scumm.BrowsedObjects.BaseId(obj.Id), out var browsedName) ? browsedName : null;
             var button = new Button
             {
                 Content = interactive
                     ? $"Hotspot {index + 1} · interact{(_estimatedObjectIds.Contains(obj.Id) ? " · estimated image" : "")}" 
-                    : $"Scene detail {index + 1} · {(visible ? _objectSelection.HasAlternatives(obj) ? "next" : "selected" : "show")}{(_objectSelection.CanShowBackground(obj) ? " / background" : "")}",
-                ToolTip = $"Object {obj.Id} · {_objectSelection.GetPosition(obj).X}, {_objectSelection.GetPosition(obj).Y} · {obj.Width} × {obj.Height}" +
+                    : $"{(storedName is null ? "Scene detail" : storedName)} {index + 1} · {(visible ? _objectSelection.HasAlternatives(obj) ? "next" : "selected" : "show")}{(_objectSelection.CanShowBackground(obj) ? " / background" : "")}",
+                ToolTip = $"Object {Core.Scumm.BrowsedObjects.BaseId(obj.Id)}{(obj.Id >> 16 is var stateNumber and > 0 ? $" · stored image {stateNumber + 1}" : "")} · {_objectSelection.GetPosition(obj).X}, {_objectSelection.GetPosition(obj).Y} · {obj.Width} × {obj.Height}" +
                           (_estimatedObjectIds.Contains(obj.Id) ? " · artwork estimate; not a script-proven state" : ""),
                 Tag = obj.Id,
                 HorizontalContentAlignment = HorizontalAlignment.Left,

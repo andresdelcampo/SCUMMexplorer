@@ -28,4 +28,31 @@ public interface IBrowsableArchive
     IReadOnlyList<(int Pose, RoomImage Image)> DecodeCostumePoses(ScummV4Costume costume);
 
     IReadOnlyList<ScummV4Sound> ReadSounds();
+
+    /// <summary>The room's objects as stored: records (position, size, parent, walk-to point), every stored image (an object with several states has several, in file order) and the names. Nothing is run.</summary>
+    BrowsedObjects ReadBrowsedObjects(int room);
+}
+
+/// <summary>What the browse-only games show of a room's objects: the stored records, the stored images (palette indices of the room's palette) and the stored names (by object id; an object without a name is absent).</summary>
+public sealed record BrowsedObjects(IReadOnlyList<ScummRoomObjectRecord> Records, IReadOnlyList<RoomObjectImage> Images, IReadOnlyDictionary<int, string> Names)
+{
+    public static BrowsedObjects Empty { get; } = new([], [], new Dictionary<int, string>());
+
+    /// <summary>
+    /// An object with several stored images (its states, in file order) keeps its id for the first and gets <c>id | (n - 1) &lt;&lt; 16</c> for state n, so each image is its own
+    /// entry of <see cref="RoomObjectSelection"/> (which cycles the entries of one place); <see cref="BaseId"/> gives the object's id back.
+    /// </summary>
+    public static IReadOnlyList<RoomObjectImage> NumberStates(IEnumerable<RoomObjectImage> images)
+    {
+        var seen = new Dictionary<int, int>();
+        return images.Select(image =>
+        {
+            var n = seen.GetValueOrDefault(image.Id);
+            seen[image.Id] = n + 1;
+            return n == 0 ? image : image with { Id = image.Id | n << 16 };
+        }).ToArray();
+    }
+
+    /// <summary>The object's own id for an entry numbered by <see cref="NumberStates"/>.</summary>
+    public static int BaseId(int id) => id & 0xFFFF;
 }
