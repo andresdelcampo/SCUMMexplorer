@@ -33,7 +33,7 @@ Written 14 October 2026. The roadmap and the exact, repeatable procedure for rai
 
 - **Family**: a `GameFamily` (one matrix row). **Cell**: a family × feature level (✔ Full, ◐ Partial, – None). The meaning of each level per column is the table in REQUIREMENTS §3.1; this file does not redefine it.
 - **Fixture**: the local game folder the conformance test uses for the family (`SupportConformanceTests.Fixtures`). A family without a fixture cannot raise a level.
-- **Reference**: ScummVM `engines/scumm` source is the ground truth for engine behaviour (§5 lists the file per feature); the bundled `scummvm/` build is the ground truth for runtime comparison.
+- **Reference**: ScummVM `engines/scumm` source is the ground truth for engine behaviour (§5 lists the file per feature); the bundled ScummVM build (`D:\Juegos\scummvm`, formerly `scummvm/`) is the ground truth for runtime comparison.
 
 ### Roadmap
 
@@ -269,7 +269,7 @@ Rules:
 3. **Folder names:** `docs/<game>/` is lower case without spaces and one per *game*, not per edition or family (`maniac` covers classic and enhanced; `monkey1` covers floppy and CD). Editions go in the README's edition table.
 4. **Evidence levels** are the four of R-2.3. A row without a source is not written.
 5. `docs/loom/LOOM_SCRIPT_MAP.md` pre-dates the template (it has its own headings and a long history); keep it as it is and do not reformat it. Every other game starts from the template.
-5. Paths to game data name only a game's own folder under `Games` (`Games/<folder>`), never subfolders of `Games`.
+5. Paths to game data name only a game's own folder under `Games` (`Games/<folder>`), never subfolders of `Games`. `Games` is the game data root, outside the repository since 15 October 2026 (`D:\Juegos\Lucas`, or `SCUMM_GAMES_ROOT`); tests take it from `TestGames.Root`. Never create a `Games` junction in a worktree, and never remove a worktree before deleting any junction in it on its own (see `CLAUDE.md`).
 
 ## Appendix A. The brief for an agent
 

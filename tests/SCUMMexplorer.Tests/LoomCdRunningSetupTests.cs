@@ -7,7 +7,7 @@ public sealed class LoomCdRunningSetupTests
     [Fact]
     public void AnEarnedForemanPreludeIsNotRepeatedAndLaterStatusIsRetained()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
         var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
@@ -38,7 +38,7 @@ public sealed class LoomCdRunningSetupTests
     [Fact]
     public void MissingRepeatedSourceStagesAndUnknownResultsStayInTheSetup()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects());
         var repeated = new LoomCdSetupStep("scene", 41, 557, 0x36, 0, "Room 41 local 207 +0x0000", ResultVariable: "bit[0x077]", ResultValue: 1);

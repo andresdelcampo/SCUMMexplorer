@@ -9,7 +9,7 @@ public class SpeechSoundsTests
     [Fact]
     public void TalkieGamesListTheirSpeechAsSounds()
     {
-        var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Games"));
+        var root = Path.GetFullPath(TestGames.Root);
         if (!Directory.Exists(root)) return;
         foreach (var folder in Directory.GetDirectories(root).Where(d => Directory.GetFiles(d, "*.sou").Length > 0))
         {

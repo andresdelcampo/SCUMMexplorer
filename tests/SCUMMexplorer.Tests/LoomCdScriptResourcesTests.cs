@@ -8,7 +8,7 @@ public sealed class LoomCdScriptResourcesTests
     [Fact]
     public void CdScriptResourcesKeepGlobalAndRoomLocalNamespacesSeparate()
     {
-        var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom vga en")));
+        var game = new GameFolderScanner().Scan(Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en")));
         var scripts = game.Resources.Where(r => r.Kind == ResourceKind.Script).ToArray();
         Assert.Contains(scripts, r => r.ResourceId == 17 && r.ScriptRoom is null);
         Assert.Contains(scripts, r => r.ResourceId == 200 && r.ScriptRoom == 2);

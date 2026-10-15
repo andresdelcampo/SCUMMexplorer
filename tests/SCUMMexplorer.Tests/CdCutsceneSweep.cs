@@ -44,7 +44,7 @@ public sealed class CdCutsceneSweep
     [Fact]
     public void Sweep()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_SWEEP_OUT");
         if (outPath is null || !Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);

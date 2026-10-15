@@ -11,7 +11,7 @@ public sealed class LoomVgaTests
 {
     private static string? Folder(string name)
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", name));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, name));
         return Directory.Exists(folder) && DiscImage.FindImageIn(folder) is not null ? folder : null;
     }
 
@@ -438,7 +438,7 @@ public sealed class LoomVgaCharsetPerMessageTests
     [Fact]
     public void AMessageKeepsTheCharsetSetWhenItsPrintRan()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
@@ -459,7 +459,7 @@ public sealed class LoomVgaCharsetPerMessageTests
     [Fact]
     public void ASpokenLineKeepsItsVoiceCueAndNoLongerCountsAsUnmodelled()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
@@ -483,7 +483,7 @@ public sealed class LoomVgaCharsetPerMessageTests
         Assert.Equal(34305, cue.TrackStartFrame);
         Assert.Equal(207, cue.TrackFrameCount);
         Assert.True(new ScummVoiceCue(0, 0).IsStop);
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var disc = DiscImage.Open(folder);
         Assert.Equal(22335, disc.AudioStartSector);
@@ -502,7 +502,7 @@ public sealed class LoomVgaCharsetPerMessageTests
     [Fact]
     public void TheCdSoundsAreReadFromTheDiscAndRenderThroughTheEgaPlayers()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var archive = ScummV4Archive.Load(new DiscFileSource(folder));
         var sounds = archive.ReadSounds();
@@ -525,7 +525,7 @@ public sealed class LoomVgaCharsetPerMessageTests
     [Fact]
     public void TheCdAudioListHoldsEveryCueTheScriptsAskForAndTheDiscPlaysThem()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
         var cues = LoomCdCueIndex.Scan(ScummDataSources.For(game), game.Rooms.Select(r => r.ResourceId!.Value));
@@ -549,7 +549,7 @@ public sealed class LoomVgaCharsetPerMessageTests
     [Fact]
     public void TheCdStatusSchemaIsReadFromTheScriptsAndItsEditsShowTheDraftVerbs()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false);
@@ -608,7 +608,7 @@ public sealed class LoomVgaIntroTests
     [Fact]
     public void TheCdIntroPlaysFromTheSkillScreenThroughTheOvertureToTheGameStart()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
         var session = new LoomExplorationSession(game, game.V4Archive!.ReadIndexedObjects(), completeBoot: false, playCdIntro: true);
@@ -658,7 +658,7 @@ public sealed class LoomVgaVoiceTimingTests
     [Fact]
     public void AClicksVoiceLinesCarryTheGameTimeOfTheirPrints()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         if (!Directory.Exists(folder) || DiscImage.FindImageIn(folder) is null) return;
         var game = new GameFolderScanner().Scan(folder);
         var cd = ScummDataSources.For(game);

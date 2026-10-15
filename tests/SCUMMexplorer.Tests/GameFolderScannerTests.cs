@@ -11,7 +11,7 @@ public sealed class GameFolderScannerTests
     [InlineData("loom ega it", "Italian", false)]
     public void NamesTheEditionFromTheFilesAlone(string folderName, string edition, bool demo)
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/" + folderName));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, folderName));
         if (!File.Exists(Path.Combine(folder, "00.LFL")) && !File.Exists(Path.Combine(folder, "00.lfl"))) return;
         var game = new GameFolderScanner().Scan(folder);
         Assert.Equal(GameId.Loom, game.Id);
@@ -30,7 +30,7 @@ public sealed class GameFolderScannerTests
     [Fact]
     public void RecognizesTheLoomDemosWithoutTheirExecutable()
     {
-        var source = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games/loom demo short ega en"));
+        var source = Path.GetFullPath(Path.Combine(TestGames.Root, "loom demo short ega en"));
         if (!File.Exists(Path.Combine(source, "00.LFL"))) return;
         var folder = Path.Combine(Path.GetTempPath(), $"scummexplorer-{Guid.NewGuid():N}");
         Directory.CreateDirectory(folder);

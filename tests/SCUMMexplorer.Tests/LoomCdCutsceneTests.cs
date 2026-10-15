@@ -8,7 +8,7 @@ public sealed class LoomCdCutsceneTests
 {
     private static GameLibrary? Game()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         return Directory.Exists(folder) && SCUMMexplorer.Core.Scumm.DiscImage.FindImageIn(folder) is not null ? new GameFolderScanner().Scan(folder) : null;
     }
 

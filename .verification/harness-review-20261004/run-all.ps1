@@ -1,6 +1,7 @@
 param([string]$Filter = '*', [int]$TimeoutSec = 240, [string]$Tag = 'run1')
 $ErrorActionPreference = 'Continue'
 $root = 'D:\Documents\Personal\Code Projects\SCUMMexplorer'
+$games = if ($env:SCUMM_GAMES_ROOT) { $env:SCUMM_GAMES_ROOT } else { 'D:\Juegos\Lucas' }   # game data outside the repository since 15 October 2026
 $scratch = Join-Path $root '.verification\harness-review-20261004\out'   # results are written here (git-ignored)
 New-Item -ItemType Directory -Force $scratch | Out-Null
 Add-Type @"
@@ -17,8 +18,8 @@ $outRoot = Join-Path $scratch "out-$Tag"
 New-Item -ItemType Directory -Force $outRoot | Out-Null
 $results = Join-Path $scratch "results-$Tag.tsv"
 if (-not (Test-Path $results)) { "name`tbuild`texit`tseconds`tnote" | Out-File $results -Encoding utf8 }
-$env:SCUMM_SOUND_TEST_ROOT = "$root\Games\loom ega mt32 en"
-$env:SCUMM_INDY3_EGA_TEST_ROOT = "$root\Games\indy3 ega en"
+$env:SCUMM_SOUND_TEST_ROOT = "$games\loom ega mt32 en"
+$env:SCUMM_INDY3_EGA_TEST_ROOT = "$games\indy3 ega en"
 $env:SCUMM_HARNESS_FAILURE_LOG = "$scratch\failures-$Tag.log"
 $projects = Get-ChildItem "$root\.verification" -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '\\obj\\' } | Sort-Object FullName
 foreach ($p in $projects) {
@@ -37,7 +38,7 @@ foreach ($p in $projects) {
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $psi = New-Object Diagnostics.ProcessStartInfo
   $psi.FileName = $exe.FullName; $psi.WorkingDirectory = $root
-  $psi.Arguments = "`"$root\Games\loom ega mt32 en`" `"$out`""
+  $psi.Arguments = "`"$games\loom ega mt32 en`" `"$out`""
   $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.UseShellExecute = $false
   $proc = [Diagnostics.Process]::Start($psi)
   $so = $proc.StandardOutput.ReadToEndAsync(); $se = $proc.StandardError.ReadToEndAsync()

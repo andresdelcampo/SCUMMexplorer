@@ -10,7 +10,7 @@ public sealed class LoomStoryEditionTests
     [InlineData("loom vga en", 0x12, "bit[0x03D]", "bit[0x068]")]
     public void StoryControlsUseTheirOwnEditionAndChangeRustysSourceBranch(string edition, int first, string ghost, string restored)
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", edition));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, edition));
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
         var index = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));

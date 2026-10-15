@@ -13,7 +13,7 @@ public sealed class LoomDemoTests
 
     private static string? Folder(string name)
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", name));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, name));
         return File.Exists(Path.Combine(folder, "LOOMDEMO.EXE")) ? folder : null;
     }
 

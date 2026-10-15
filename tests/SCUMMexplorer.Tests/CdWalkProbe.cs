@@ -8,7 +8,7 @@ public sealed class CdWalkProbe
     [Fact]
     public void Walk()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_WALK_OUT");
         var spec = Environment.GetEnvironmentVariable("CD_WALK");
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;
@@ -40,7 +40,7 @@ public sealed class CdBoxSequenceProbe
     [Fact]
     public void Sequence()
     {
-        var folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Games", "loom vga en"));
+        var folder = Path.GetFullPath(Path.Combine(TestGames.Root, "loom vga en"));
         var outPath = Environment.GetEnvironmentVariable("CD_BOXSEQ_OUT");
         var spec = Environment.GetEnvironmentVariable("CD_BOXSEQ");
         if (outPath is null || spec is null || !Directory.Exists(folder)) return;

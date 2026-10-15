@@ -13,7 +13,7 @@ public sealed class ScummMonkeyFloppySessionTests
 {
     private static string? Folder()
     {
-        var path = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games", "monkey1 ega en");
+        var path = Path.Combine(TestGames.Root, "monkey1 ega en");
         return File.Exists(Path.Combine(path, "DISK01.LEC")) ? path : null;
     }
 
@@ -128,7 +128,7 @@ public sealed class ScummMonkeyFloppySessionTests
     {
         // S9 note (14 October): the 16-colour release on eight disks takes the same route; its video mode variable is still the VGA 19 (the profile does
         // not yet tell EGA from VGA for a v4 game), which no script of the boot reads for anything but CGA (4).
-        var path = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games", "monkey1 ega es");
+        var path = Path.Combine(TestGames.Root, "monkey1 ega es");
         if (!File.Exists(Path.Combine(path, "DISK08.LEC"))) return;
 
         var session = Boot(path, out var game);

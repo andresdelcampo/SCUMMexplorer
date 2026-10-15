@@ -1,4 +1,4 @@
-param([string]$OutputName = 'out-before', [string]$GameFolder = 'Games/loom vga en')
+param([string]$OutputName = 'out-before', [string]$GameFolder = ($(if ($env:SCUMM_GAMES_ROOT) { $env:SCUMM_GAMES_ROOT } else { 'D:\Juegos\Lucas' }) + '\loom vga en'))
 $ErrorActionPreference = 'Stop'
 $taskRtk = 'C:\Users\adelc\AppData\Local\Microsoft\WinGet\Links\rtk.exe'
 $taskBuild = (Join-Path $PSScriptRoot 'out-build').Replace('\', '/')

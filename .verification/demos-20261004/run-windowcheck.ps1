@@ -1,9 +1,10 @@
 # Opens a LOOM demo folder in the real MainWindow (WindowCheck) and shows the output or the error.
 # Usage: run-windowcheck.ps1 short|long <out folder> <room>...
 param([string]$Demo, [string]$Out, [int[]]$Rooms)
+$games = if ($env:SCUMM_GAMES_ROOT) { $env:SCUMM_GAMES_ROOT } else { 'D:\Juegos\Lucas' }   # game data outside the repository since 15 October 2026
 $root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $exe = Join-Path $root "Exe\WindowCheck\Debug\net10.0-windows\WindowCheck.exe"
-$folder = Join-Path $root "Games\loom demo $Demo ega en"
+$folder = Join-Path $games "loom demo $Demo ega en"
 if (Test-Path $Out) { Remove-Item $Out -Recurse -Force }
 $stdout = "$Out.stdout.txt"; $stderr = "$Out.stderr.txt"
 $arguments = @("`"$folder`"", "`"$Out`"") + ($Rooms | ForEach-Object { "$_" })

@@ -61,7 +61,7 @@ public class SupportConformanceTests
     private static string? Locate(string folder)
     {
         // The games sit directly under Games/.
-        var path = Path.Combine(SupportMatrixTests.RepositoryRoot(), "Games", folder);
+        var path = Path.Combine(TestGames.Root, folder);
         return Directory.Exists(path) ? path : null;
     }
 }
