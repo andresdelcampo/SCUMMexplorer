@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 16 October: the 256-colour Indiana Jones is played through its own verbs (S6, Indy3Vga)
+
+- Play is turned on by format and dialect (`ScummProfile.PlaysThroughVerbs` and the undelivered F5 for the Indy3 dialect run by the generic session), not by family: this release's interface scripts are EGA's instructions (Script 4 adds one Talk-on-inventory branch). The click mode and the charset follow the engine version (3): mode 0, `98.LFL`/`99.LFL`. The play screen shows the shadow palette on the whole screen as ScummVM's `updatePalette` does, so the gym's light switch (palette remapping in this release) dims verbs and text too. Play boots from the game's own index (`ScummGameSession.BootForPlay`).
+- The R-7.18 route from Room 73 passes headless (`ScummIndy3VgaPlayTests`, 4, sharing the route with `ScummIndy3PlayTests`) and in the real window (the EGA harness, unchanged). **Objects and Play ✔**; matrix regenerated. LOOM and neighbours: 897 passed, 5 skipped. Open: ScummVM's v3 crosshair is a 16 × 16 image, not the v2 one the shared play screen draws (EGA too). Record: [indy3vga-play-20261016](../.verification/indy3vga-play-20261016/README.md).
+
 ## 16 October: every 256-colour Indiana Jones room shows its first visit (S5, Indy3Vga)
 
 - The room view, actors and room cards of the one-file-per-room release come from the generic session's first visit (`ScummRoomFirstVisit`), which S4b's profile change opened (no new engine or App code). Room audit: **87 of 87 rooms without a gap**; 68 settle, 15 reach the frame limit, 4 are left by their own script; objects in 39 rooms, actors in 67. Rooms 73, 45 and 90 are pinned with the same objects as the EGA release (`ScummIndy3VgaFirstVisitTests`, 3); 74 of 87 rooms show the same objects as the EGA audit.

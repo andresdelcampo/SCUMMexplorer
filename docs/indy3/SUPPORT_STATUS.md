@@ -46,7 +46,7 @@ Open uncertainties: the AdLib playback of the sound player uses LOOM's driver co
 
 # Indiana Jones and the Last Crusade (256 colours) support status
 
-Family: Indy3Vga | Fixture: `Games/indy3 vga en` (data in `D:\Juegos\Lucas`) | Last updated: 2026-10-16 | Owner: S4b/S5 Indy3Vga agent
+Family: Indy3Vga | Fixture: `Games/indy3 vga en` (data in `D:\Juegos\Lucas`) | Last updated: 2026-10-16 | Owner: S4b/S5/S6 Indy3Vga agent
 
 | Stage | State (not started / in progress / done / blocked) | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -54,14 +54,14 @@ Family: Indy3Vga | Fixture: `Games/indy3 vga en` (data in `D:\Juegos\Lucas`) | L
 | S2 Reading | done (earlier) | Costumes, Scripts, Texts | – | costume limb commands are bytes (fixed in the session's reader, S4b) |
 | S3 Sound | done (earlier) | Sound | – | AdLib music at half tempo, set by ear |
 | S4b Session | **done** (15 Oct) | – (unchanged) | `.verification/indy3vga-session-20261015` | boot trace: 1002 frames, rooms 76, 79, 0, 6, 1, 73, nothing unsupported, no assumed input (no copy-protection room in this release) |
-| S5 Objects | **done** (16 Oct; Objects stays partial until S6) | Objects (partial until S6) | `.verification/indy3vga-objects-20261015` | 87 rooms, 87 without a gap; rooms compared with ScummVM pictures: 0/10 (not run, per the brief); 74 of 87 rooms show the same objects as the EGA audit |
-| S6 Play | not started | Play, Objects | | Play requirement: R-7.7 to R-7.18 (Proposed for Indy3 EGA) |
+| S5 Objects | **done** (16 Oct) | Objects ✔ with S6 | `.verification/indy3vga-objects-20261015` | 87 rooms, 87 without a gap; rooms compared with ScummVM pictures: 0/10 (not run, per the brief); 74 of 87 rooms show the same objects as the EGA audit |
+| S6 Play | **done** (16 Oct) | Play ✔, Objects ✔ | `.verification/indy3vga-play-20261016` | Play requirement: R-7.7 to R-7.18 (Proposed 15 Oct, Indy3Ega) / confirmed by user: no. R-7.18 route passes headless (`ScummIndy3VgaPlayTests`) and in the real window |
 | S7 Cutscenes | not started | Cutscenes | | |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | editions checked: none (`indy3 vga es` not tried) |
 
 Blocked on: nothing.
-Next: S6 (Play), after Indy3 EGA's S6 (the same game: reuse its input wiring through the profile). Open S5 follow-ups: a picture comparison of ten rooms with ScummVM; the one-object differences from EGA in Rooms 26, 36, 38, 55, 61; `actorFollowCamera` of an ego in another room (Rooms 6, 18, 78, 80) and started scripts with unknown arguments (Rooms 3, 12, 13, 77), both written down in the record.
+Next: S7 (Cutscenes) after Indy3 EGA's S7. Open S6 follow-ups (record): the v3 crosshair shape (ScummVM draws the 16 × 16 image of `resetCursors`, the app the 23 × 21 one of v2, for EGA too: owner of the shared play code); perceived timing in the window (user check). Open S5 follow-ups: a picture comparison of ten rooms with ScummVM; the one-object differences from EGA in Rooms 26, 36, 38, 55, 61; `actorFollowCamera` of an ego in another room (Rooms 6, 18, 78, 80) and started scripts with unknown arguments (Rooms 3, 12, 13, 77), both written down in the record.
 Open uncertainties: the session's AdLib music timer is the half-tempo estimate of the browsed disks; ScummVM facts of S4b were taken from memory of the source, not re-read; no runtime comparison with ScummVM.
 
 ## Decision log (Indy3Vga)
@@ -72,4 +72,9 @@ Open uncertainties: the session's AdLib music timer is the half-tempo estimate o
 | 2026-10-15 | S4b | The game's blocks are v4, its scripts and engine version 3 | key engine behaviour on the container (v4) / add an engine version to the profile | `ScummProfile.EngineVersion` (V3 for the room-file layout, by format): ScummVM runs indy3 VGA as version 3; with v4 settings `VAR_HEAPSPACE` (var 40) would overwrite an extra timer and bits would be kept apart from the words | remove `EngineVersion` (properties return to `Version`) |
 | 2026-10-15 | S4b | Indy3 extra timers for the VGA release, which the scanner gives no `GameId` | GameId test / family | by family in `ScummProfile` (the one place that maps games to variants) | return to `game.Id == GameId.IndianaJones3` |
 | 2026-10-15 | S4b | Walk boxes of the session's room data were 20 bytes | keep / read the archive's own size | the archive's `WalkBoxSize` (18 for room files), which browsing already used; the wrong size hung the boot | revert the two lines in `ScummV4DataSource.ReadRoom` |
+| 2026-10-16 | S6 | Which data turns play on for the 256-colour release | add `Indy3Vga` to the family test / derive from format and dialect | `ScummProfile.PlaysThroughVerbs` (and F5 undelivered) for the Indy3 dialect run by the generic session (old-bundle v3 or one file per room): the interface scripts are the same instructions (Script 4 differs by one branch), no family test | return to `FamilyOf(game) == GameFamily.Indy3Ega` |
+| 2026-10-16 | S6 | The click mode and charset gate read the container version (V4) | keep / read `EngineVersion` | `EngineVersion` (ScummVM `checkExecVerbs` tests `_game.version`, 3 here): mode 0, charsets `98.LFL`/`99.LFL` (same bytes as EGA) | revert the two lines |
+| 2026-10-16 | S6 | Verbs, messages and cursor during a `roomOps roomPalette` darkening | room palette / shadow-mapped palette | the shadow-mapped palette for the whole screen, as ScummVM's `updatePalette` with `_shadowPalRemap` (true for v3 outside CGA/Hercules/Mac b/w); also true for EGA, whose route never sets the shadow palette (EGA tests unchanged) | `basePalette = scene?.Room.Palette` in `ScummPlayScreen.Compose` |
+| 2026-10-16 | S6 | The crosshair shape differs from ScummVM's v3 cursor | change it here / leave to the shared play code's owner | leave: the shape is shared with EGA (which must not change in this run) and the file is owned by the MonkeyFloppy S6 agent; written down as an open follow-up | – |
+| 2026-10-16 | S6 | The route's ScummVM comparison | run ScummVM / describe | described, not run (the brief forbids running ScummVM) | run it in a later run |
 | 2026-10-16 | S5 | Ten-room comparison with ScummVM pictures | run the bundled ScummVM / compare with the EGA release's audit | the brief forbids running ScummVM this run: compared with the EGA audit of the same game (74 of 87 identical), the picture comparison left open in the tracker | run the comparison in a later run |
