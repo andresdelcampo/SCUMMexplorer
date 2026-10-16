@@ -1,0 +1,8 @@
+Play started: room 73, image visible Visible, cursor system pointer hidden, room view Collapsed, Normal-mode note ""
+click on Pick up: runInputScript(1, 11, 0) click on verb 0x0B at screen (106, 162)
+click on the mallet: runInputScript(2, 0, 0) click in the room at screen (176, 128), room (176, 112)
+sentence line: "Pick up mallet"
+second click on the mallet: runInputScript(2, 0, 0) click in the room at screen (176, 128), room (176, 112)
+inventory: [836], verb 0x65 "mallet"
+key 'x': last input key 'x', the shortcut of verb 0x09; sentence line "Look"
+frames played by the window: 65
