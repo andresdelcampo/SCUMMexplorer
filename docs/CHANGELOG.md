@@ -2,6 +2,10 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 16 October: every 256-colour Indiana Jones room shows its first visit (S5, Indy3Vga)
+
+- The room view, actors and room cards of the one-file-per-room release come from the generic session's first visit (`ScummRoomFirstVisit`), which S4b's profile change opened (no new engine or App code). Room audit: **87 of 87 rooms without a gap**; 68 settle, 15 reach the frame limit, 4 are left by their own script; objects in 39 rooms, actors in 67. Rooms 73, 45 and 90 are pinned with the same objects as the EGA release (`ScummIndy3VgaFirstVisitTests`, 3); 74 of 87 rooms show the same objects as the EGA audit.
+- Not compared with ScummVM pictures (not run this time). Registry unchanged (Objects partial until S6). Record: [indy3vga-objects-20261015](../.verification/indy3vga-objects-20261015/README.md).
 ## 15 October: the 256-colour Indiana Jones boots in the generic session (S4b, Indy3Vga)
 
 - **`ScummV4RoomFileDataSource`** (Core/Scumm/V4) serves the one-file-per-room release through `ScummDataSources.For`: version 3 scripts (`V3Indy3`), scripts named by their room file, 18-byte walk boxes (the session's room data had read 20 and the boot hung on Room 73's walk), one byte per costume limb command (`ScummCostume.ReadVga(..., byteCommands)`).

@@ -1,0 +1,851 @@
+Before S5 (index states only): rooms with a gap 0, gaps 0
+Rooms: 87; rooms without a gap: 87; rooms with remaining gaps: 0 (0 gaps); rooms that could not run: 0
+
+== Room 01 (38 images, 43 objects) outcome=Settled frames=880 lit=True 3,3s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 01 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 73 Object 830 Verb 0x0A +0x0025 (object 28, no walk) would bring it in (the only source-backed arrival in Room 73's own code). Which route led...
+   VAR_ROOM 1; active states: 29,34,35,40,45,48,49,54,56,58,62
+   static: room scripts 105 instructions; named by literal setState>0/drawObject: 2; named and shown: 1; named, not shown: 59 (local 203 +0x000B)
+   Room 01 was entered from the first room's state without playing the route to it (state preview), then ran 880 frames.
+   The room settled: nothing changed for a while.
+   active images: 11; paint order: 45,35,49,34,62,40,54,56,29,48,58
+   actors drawn: 4(costume 6 at 448,106), 1(costume 1 at 945,124); skipped: 
+   pending scripts: 14; camera 800; lights 11
+== Room 02 (6 images, 23 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 2 active images
+   Room 02 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Script 030 +0x05B7 (object 63, walk to (160, 120)) would bring it in (seeded pick 2 of 3 (seed 0)). Which route led here was not played; the arriva...
+   VAR_ROOM 2; active states: 63,65
+   static: room scripts 31 instructions; named by literal setState>0/drawObject: 1; named and shown: 1; named, not shown: 
+   Room 02 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 65,63
+   actors drawn: 1(costume 1 at 160,120); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 03 (28 images, 29 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 3; active states: 
+   static: room scripts 38 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 03 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 5 at 174,83); skipped: 
+   pending scripts: 1; camera 160; lights 11
+   NOT FOLLOWED: Room 03 entry script +0x006F: started script 200 has arguments depending on unknown variables; the parent continues without its effects.
+== Room 04 (2 images, 2 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 04 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 02 Object 63 Verb 0x0A +0x000C (object 116, no walk) would bring it in (the only source-backed arrival). Which route led here was not played; ...
+   VAR_ROOM 4; active states: 
+   static: room scripts 19 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 04 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 5 at 173,90), 1(costume 1 at 95,109); skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 06 (6 images, 11 objects) outcome=FrameLimit frames=2400 lit=True 1,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 06 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 15 local script 204 +0x004E (object 125, walk to (516, 86)) would bring it in (seeded pick 4 of 4 (seed 0)). Which route led here was not play...
+   VAR_ROOM 6; active states: 127
+   static: room scripts 49 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 06 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 1; paint order: 127
+   actors drawn: 10(costume 43 at 477,101), 11(costume 43 at 356,114); skipped: 
+   pending scripts: 4; camera ; lights 11
+   NOT FOLLOWED: Script 73 +0x00F4: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 09, which would load that room (not modelled) (+0x011E)
+== Room 07 (8 images, 25 objects) outcome=Settled frames=182 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 07 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 06 local script 200 +0x0038 (object 130, no walk) would bring it in (the only source-backed arrival). Which route led here was not played; the...
+   VAR_ROOM 7; active states: 
+   static: room scripts 15 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 07 was entered from the first room's state without playing the route to it (state preview), then ran 182 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 37,114); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 08 (0 images, 0 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 8; active states: 
+   static: room scripts 2 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 08 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 09 (0 images, 0 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 9; active states: 
+   static: room scripts 71 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 09 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 12 (1 images, 4 objects) outcome=Settled frames=261 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 12 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 77 Object 845 Verb 0x0A +0x0011 (object 155, walk to (160, 164)) would bring it in (seeded pick 3 of 4 (seed 0)). Which route led here was not...
+   VAR_ROOM 12; active states: 
+   static: room scripts 70 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 12 was entered from the first room's state without playing the route to it (state preview), then ran 261 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 42 at 150,166); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   NOT FOLLOWED: Script 131 +0x0038: started script 132 has arguments depending on unknown variables; the parent continues without its effects.
+== Room 13 (7 images, 9 objects) outcome=Settled frames=102 lit=True 0,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 13; active states: 
+   static: room scripts 178 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 13 was entered from the first room's state without playing the route to it (state preview), then ran 102 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 2; camera 160; lights 11
+   NOT FOLLOWED: Script 131 +0x0038: started script 132 has arguments depending on unknown variables; the parent continues without its effects.
+== Room 14 (11 images, 12 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 14; active states: 
+   static: room scripts 258 instructions; named by literal setState>0/drawObject: 6; named and shown: 0; named, not shown: 167 (local 209 +0x0033); 168 (local 209 +0x0048); 169 (local 209 +0x004F); 173 (local 212 +0x000E); 175 (local 209 +0x001C); 176 (local 212 +0x0015)
+   Room 14 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 15 (27 images, 29 objects) outcome=FrameLimit frames=2400 lit=True 3,4s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 15 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 53 Object 679 Verb 0x0A +0x005C (object 179, no walk) would bring it in (seeded pick 2 of 2 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 15; active states: 181,186,189,191,195,197,199,204
+   static: room scripts 178 instructions; named by literal setState>0/drawObject: 3; named and shown: 1; named, not shown: 190 (local 203 +0x0019); 192 (local 203 +0x0008)
+   Room 15 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 8; paint order: 186,195,197,199,189,181,191,204
+   actors drawn: 1(costume 2 at 313,117), 10(costume 82 at 61,121); skipped: 
+   pending scripts: 10; camera 312; lights 11
+== Room 16 (7 images, 17 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 16 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 15 Object 178 Verb 0x0A +0x0006 (object 208, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 16; active states: 
+   static: room scripts 43 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 16 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 160,97), 10(costume 74 at 271,118); skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 17 (17 images, 23 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 17 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 16 Object 211 Verb 0x0A +0x0000 (pseudo room 168, object 225, no walk) would bring it in (seeded pick 2 of 4 (seed 0)). Which route led here w...
+   VAR_ROOM 168; active states: 226,227,228
+   static: room scripts 130 instructions; named by literal setState>0/drawObject: 14; named and shown: 3; named, not shown: 229 (entry +0x00A0); 230 (entry +0x00B6); 231 (entry +0x008A); 232 (entry +0x00CC); 233 (entry +0x0032); 234 (entry +0x00E2); 235 (entry +0x00F8); 236 (entry +0x010E); 237 (entry +0x005E); 238 (entry +0x0074); 948 (entry +0x0134)
+   Room 17 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 228,227,226
+   actors drawn: 1(costume 1 at 302,118); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 18 (17 images, 32 objects) outcome=Settled frames=122 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 181; active states: 270,274
+   static: room scripts 224 instructions; named by literal setState>0/drawObject: 7; named and shown: 2; named, not shown: 271 (entry +0x004F); 273 (entry +0x0083); 275 (entry +0x00AF); 276 (entry +0x00C5); 277 (local 201 +0x0070)
+   Room 18 was entered from the first room's state without playing the route to it (state preview), then ran 122 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 274,270
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   NOT FOLLOWED: Script 23 +0x0000: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 73, which would load that room (not modelled) (+0x0022)
+== Room 19 (0 images, 2 objects) outcome=Settled frames=171 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 19 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 18 local script 201 +0x01F8 (object 278, no walk) would bring it in (the only source-backed arrival). Which route led here was not played; the...
+   VAR_ROOM 19; active states: 
+   static: room scripts 25 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 19 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 166,88); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 20 (16 images, 31 objects) outcome=FrameLimit frames=2400 lit=True 6,3s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 20 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 22 Object 318 Verb 0x0A +0x0003 (object 309, no walk) would bring it in (seeded pick 2 of 6 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 20; active states: 283,288,289,290,292,293,294,295
+   static: room scripts 17 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 20 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 8; paint order: 295,294,293,292,290,289,288,283
+   actors drawn: 10(costume 28 at 79,20), 1(costume 20 at 144,74), 11(costume 28 at 98,162); skipped: 
+   pending scripts: 4; camera 160; lights 11
+== Room 21 (3 images, 6 objects) outcome=Settled frames=171 lit=True 0,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 21 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 32 Object 497 Verb 0x0A +0x0000 (pseudo room 129, object 314, no walk) would bring it in (seeded pick 1 of 3 (seed 0)). Which route led here w...
+   VAR_ROOM 129; active states: 311
+   static: room scripts 67 instructions; named by literal setState>0/drawObject: 4; named and shown: 1; named, not shown: 314 (entry +0x00E6); 315 (entry +0x00A4); 316 (entry +0x00BA)
+   Room 21 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 311
+   actors drawn: 1(costume 1 at 158,103); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 22 (0 images, 4 objects) outcome=Settled frames=187 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 22 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 12 Object 153 Verb 0x0A +0x0005 (object 320, no walk) would bring it in (seeded pick 1 of 4 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 22; active states: 
+   static: room scripts 10 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 22 was entered from the first room's state without playing the route to it (state preview), then ran 187 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 30 at 100,112), 10(costume 8 at 68,112); skipped: 
+   pending scripts: 6; camera 160; lights 11
+== Room 23 (18 images, 18 objects) outcome=Settled frames=171 lit=True 0,5s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 23 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 28 Object 430 Verb 0x0A +0x0000 (pseudo room 141, object 328, no walk) would bring it in (seeded pick 15 of 22 (seed 0)). Which route led here...
+   VAR_ROOM 141; active states: 327,333
+   static: room scripts 303 instructions; named by literal setState>0/drawObject: 14; named and shown: 2; named, not shown: 321 (entry +0x008C); 322 (entry +0x0431); 323 (entry +0x0446); 325 (entry +0x0409); 326 (entry +0x041E); 328 (entry +0x046E); 329 (entry +0x0088); 330 (entry +0x00E6); 331 (entry +0x02E6); 332 (entry +0x0157); 335 (entry +0x035C); 338 (entry +0x0370)
+   Room 23 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 333,327
+   actors drawn: 1(costume 1 at 365,108); skipped: 
+   pending scripts: 1; camera 272; lights 11
+== Room 24 (20 images, 22 objects) outcome=Settled frames=171 lit=True 0,5s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 24 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 28 Object 436 Verb 0x0A +0x0000 (pseudo room 146, object 347, no walk) would bring it in (seeded pick 3 of 13 (seed 0)). Which route led here ...
+   VAR_ROOM 146; active states: 343,344,347
+   static: room scripts 142 instructions; named by literal setState>0/drawObject: 10; named and shown: 0; named, not shown: 339 (entry +0x0294); 340 (entry +0x029B); 345 (entry +0x02AE); 346 (entry +0x02C3); 352 (entry +0x0160); 353 (entry +0x0159); 355 (entry +0x00B3); 356 (entry +0x0086); 358 (entry +0x026A); 360 (entry +0x0137)
+   Room 24 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 344,347,343
+   actors drawn: 1(costume 1 at 41,112); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 25 (9 images, 12 objects) outcome=Settled frames=171 lit=True 2,2s
+   before S5 (index states only): 0 gaps, 1 active images
+   Room 25 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 20 Object 298 Verb 0x0A +0x0004 (object 361, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 25; active states: 368
+   static: room scripts 236 instructions; named by literal setState>0/drawObject: 5; named and shown: 0; named, not shown: 366 (local 203 +0x001A); 367 (local 203 +0x0091); 369 (local 203 +0x000F); 370 (local 204 +0x0098); 371 (local 204 +0x00A0)
+   Room 25 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 368
+   actors drawn: 1(costume 1 at 138,92); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 26 (29 images, 30 objects) outcome=Settled frames=171 lit=True 1,0s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 26 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 20 Object 307 Verb 0x0A +0x0004 (object 373, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 26; active states: 379,382
+   static: room scripts 100 instructions; named by literal setState>0/drawObject: 3; named and shown: 1; named, not shown: 374 (local 201 +0x0007); 397 (local 203 +0x0009)
+   Room 26 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 379,382
+   actors drawn: 1(costume 1 at 171,96); skipped: 
+   pending scripts: 3; camera 168; lights 11
+== Room 27 (4 images, 5 objects) outcome=Settled frames=171 lit=True 0,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 27 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 20 Object 299 Verb 0x0A +0x0004 (object 404, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 27; active states: 
+   static: room scripts 13 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 27 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 174,116); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 28 (20 images, 39 objects) outcome=FrameLimit frames=2400 lit=True 6,3s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 28 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 20 Object 296 Verb 0x0A +0x0000 (object 428, walk to (23, 53)) would bring it in (seeded pick 1 of 4 (seed 0)). Which route led here was not p...
+   VAR_ROOM 28; active states: 408,419,420,421,422,423,424,425,426,427
+   static: room scripts 17 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 28 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 10; paint order: 427,426,425,424,423,422,421,420,419,408
+   actors drawn: 1(costume 20 at 23,53), 11(costume 28 at 309,105), 10(costume 28 at 93,171); skipped: 
+   pending scripts: 4; camera 160; lights 11
+== Room 29 (4 images, 15 objects) outcome=Settled frames=171 lit=True 0,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 29 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 28 Object 433 Verb 0x0A +0x0004 (object 451, no walk) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 29; active states: 
+   static: room scripts 5 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 29 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 667,49); skipped: 
+   pending scripts: 1; camera 520; lights 11
+== Room 30 (1 images, 3 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 30 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 29 Object 449 Verb 0x0A +0x0006 (object 463, walk to (200, 118)) would bring it in (the only source-backed arrival). Which route led here was ...
+   VAR_ROOM 30; active states: 462
+   static: room scripts 17 instructions; named by literal setState>0/drawObject: 1; named and shown: 1; named, not shown: 
+   Room 30 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 462
+   actors drawn: 1(costume 1 at 200,118); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 31 (3 images, 5 objects) outcome=Settled frames=154 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 31 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 28 Object 446 Verb 0x0A +0x0004 (object 465, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 31; active states: 468
+   static: room scripts 29 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 31 was entered from the first room's state without playing the route to it (state preview), then ran 154 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 468
+   actors drawn: 1(costume 1 at 139,111), 8(costume 86 at 171,111); skipped: 
+   pending scripts: 7; camera 160; lights 11
+== Room 32 (18 images, 30 objects) outcome=FrameLimit frames=2400 lit=True 7,2s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 32 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 34 Object 516 Verb 0x0A +0x0000 (object 489, no walk) would bring it in (seeded pick 2 of 2 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 32; active states: 472,479,480,482,483,484,485,486,487
+   static: room scripts 17 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 32 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 9; paint order: 487,486,485,484,483,482,480,479,472
+   actors drawn: 1(costume 20 at 241,33), 10(costume 23 at 208,105), 12(costume 28 at 74,165); skipped: 
+   pending scripts: 4; camera 160; lights 11
+== Room 33 (16 images, 16 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 33 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 13 Object 157 Verb 0x0A +0x0006 (pseudo room 166, object 501, no walk) would bring it in (seeded pick 1 of 3 (seed 0)). Which route led here w...
+   VAR_ROOM 166; active states: 514,515
+   static: room scripts 125 instructions; named by literal setState>0/drawObject: 4; named and shown: 2; named, not shown: 500 (entry +0x0083); 501 (entry +0x006F)
+   Room 33 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 515,514
+   actors drawn: 1(costume 1 at 174,72); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 34 (4 images, 6 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 34 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 32 Object 489 Verb 0x0A +0x0011 (object 516, walk to (400, 118)) would bring it in (the only source-backed arrival). Which route led here was ...
+   VAR_ROOM 34; active states: 
+   static: room scripts 157 instructions; named by literal setState>0/drawObject: 1; named and shown: 0; named, not shown: 521 (local 201 +0x000D)
+   Room 34 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 9(costume 77 at 92,115), 1(costume 1 at 400,118); skipped: 
+   pending scripts: 2; camera 272; lights 11
+== Room 35 (12 images, 14 objects) outcome=Settled frames=304 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 35 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Script 117 +0x041D (object 522, walk to (36, 112)) or Room 36 Object 536 Verb 0x0A +0x0000 (object 522, walk to (36, 112)) or Room 77 Object 847 Ve...
+   VAR_ROOM 35; active states: 525,527,528,530,533
+   static: room scripts 324 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 35 was entered from the first room's state without playing the route to it (state preview), then ran 304 frames.
+   The room settled: nothing changed for a while.
+   active images: 5; paint order: 525,533,530,528,527
+   actors drawn: 11(costume 81 at 367,79), 10(costume 73 at 141,107), 1(costume 1 at 36,112), 2(costume 7 at 22,112); skipped: 
+   pending scripts: 8; camera 160; lights 11
+== Room 36 (13 images, 15 objects) outcome=Settled frames=171 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 36 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 37 local script 200 +0x0016 (object 537, no walk) would bring it in (seeded pick 2 of 2 (seed 0)). Which route led here was not played; the ar...
+   VAR_ROOM 36; active states: 543,545,548
+   static: room scripts 97 instructions; named by literal setState>0/drawObject: 2; named and shown: 2; named, not shown: 
+   Room 36 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 548,545,543
+   actors drawn: 1(costume 40 at 233,97), 11(costume 72 at 139,98), 10(costume 72 at 135,101); skipped: 
+   pending scripts: 4; camera 232; lights 11
+== Room 37 (21 images, 24 objects) outcome=RoomLeft frames=439 left to 36 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 37 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 36 Object 537 Verb 0x0A +0x0010 (object 551, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 37; active states: 557,561
+   static: room scripts 44 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 37 was entered from the first room's state without playing the route to it (state preview), then ran 439 frames.
+   A script left the room for Room 36: the room is shown as it was the last time it was current.
+   active images: 2; paint order: 561,557
+   actors drawn: ; skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 38 (6 images, 8 objects) outcome=Settled frames=460 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 38 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 39 Object 583 Verb 0x0A +0x0000 (object 575, walk to (631, 114)) would bring it in (the only source-backed arrival). Which route led here was ...
+   VAR_ROOM 38; active states: 576,578,580
+   static: room scripts 129 instructions; named by literal setState>0/drawObject: 5; named and shown: 3; named, not shown: 577 (local 205 +0x0024); 581 (local 203 +0x0024)
+   Room 38 was entered from the first room's state without playing the route to it (state preview), then ran 460 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 578,576,580
+   actors drawn: 10(costume 75 at 92,72), 1(costume 1 at 631,114); skipped: 
+   pending scripts: 5; camera 480; lights 11
+== Room 39 (6 images, 9 objects) outcome=FrameLimit frames=2400 lit=True 1,4s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 39 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 40 Object 592 Verb 0x0A +0x0013 (object 584, no walk) would bring it in (seeded pick 3 of 4 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 39; active states: 
+   static: room scripts 69 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 39 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 12(costume 88 at 176,30), 1(costume 1 at 88,115), 10(costume 4 at 155,118); skipped: 
+   pending scripts: 4; camera 160; lights 11
+== Room 40 (5 images, 5 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 40 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 39 Object 584 Verb 0x0A +0x003B (object 592, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 40; active states: 
+   static: room scripts 69 instructions; named by literal setState>0/drawObject: 1; named and shown: 0; named, not shown: 594 (local 201 +0x006F)
+   Room 40 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 7(costume 76 at 168,91), 1(costume 1 at 125,107); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 41 (1 images, 5 objects) outcome=RoomLeft frames=276 left to 42 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 1 active images
+   Room 41 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 43 Object 602 Verb 0x0A +0x0000 (object 598, walk to (42, 21)) would bring it in (seeded pick 2 of 4 (seed 0)). Which route led here was not p...
+   VAR_ROOM 41; active states: 597
+   static: room scripts 8 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 41 was entered from the first room's state without playing the route to it (state preview), then ran 276 frames.
+   A script left the room for Room 42: the room is shown as it was the last time it was current.
+   active images: 1; paint order: 597
+   actors drawn: 12(costume 29 at 407,18), 10(costume 29 at 42,21), 11(costume 29 at 475,21), 1(costume 21 at 42,21); skipped: 
+   pending scripts: 5; camera 160; lights 11
+== Room 42 (0 images, 0 objects) outcome=Settled frames=90 lit=True 0,5s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 42; active states: 
+   static: room scripts 1 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 42 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 43 (0 images, 8 objects) outcome=RoomLeft frames=138 left to 42 lit=True 0,5s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 43 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 44 Object 613 Verb 0x0A +0x0000 (object 607, walk to (661, 23)) would bring it in (seeded pick 7 of 8 (seed 0)). Which route led here was not ...
+   VAR_ROOM 43; active states: 
+   static: room scripts 6 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 43 was entered from the first room's state without playing the route to it (state preview), then ran 138 frames.
+   A script left the room for Room 42: the room is shown as it was the last time it was current.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 21 at 661,23), 11(costume 29 at 164,23), 12(costume 29 at 653,23), 10(costume 29 at 785,91); skipped: 
+   pending scripts: 5; camera 632; lights 11
+== Room 44 (0 images, 5 objects) outcome=FrameLimit frames=2400 lit=True 1,9s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 44 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 43 Object 603 Verb 0x0A +0x0000 (object 610, walk to (149, 52)) would bring it in (seeded pick 1 of 5 (seed 0)). Which route led here was not ...
+   VAR_ROOM 44; active states: 
+   static: room scripts 6 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 44 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 21 at 149,52), 11(costume 29 at 201,57), 12(costume 29 at 369,108), 10(costume 29 at 462,133); skipped: 
+   pending scripts: 5; camera 168; lights 11
+== Room 45 (9 images, 9 objects) outcome=Settled frames=96 lit=True 0,5s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 45; active states: 615,618,621
+   static: room scripts 35 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 45 was entered from the first room's state without playing the route to it (state preview), then ran 96 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 615,618,621
+   actors drawn: ; skipped: 
+   pending scripts: 7; camera 160; lights 11
+== Room 46 (0 images, 0 objects) outcome=Settled frames=90 lit=True 2,1s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 46; active states: 
+   static: room scripts 1 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 46 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 47 (0 images, 16 objects) outcome=FrameLimit frames=2400 lit=False 2,3s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 47 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 48 Object 640 Verb 0x0A +0x0000 (object 624, no walk) would bring it in (seeded pick 1 of 16 (seed 0)). Which route led here was not played; t...
+   VAR_ROOM 47; active states: 
+   static: room scripts 108 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 47 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 83 at 666,17), 1(costume 26 at 907,18); skipped: 
+   pending scripts: 3; camera 800; lights 12
+== Room 48 (21 images, 22 objects) outcome=Settled frames=171 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 3 active images
+   Room 48 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 60 Object 726 Verb 0x0A +0x0000 (object 641, no walk) would bring it in (seeded pick 3 of 3 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 48; active states: 645,649,653
+   static: room scripts 163 instructions; named by literal setState>0/drawObject: 20; named and shown: 3; named, not shown: 641 (local 200 +0x0048); 643 (local 200 +0x002F); 644 (local 200 +0x0038); 646 (local 201 +0x0019); 647 (local 201 +0x0038); 648 (local 201 +0x0057); 650 (local 201 +0x009F); 651 (local 201 +0x00BE); 652 (local 201 +0x00DD); 654 (local 201 +0x0125); 655 (local 201 +0x0144); 656 (local 201 +0x0163); 657 (local 201 +0x0010); 658 (local 201 +0x0096); 659 (local 201 +0x011C); 660 (local 200 +0x0073); 661 (local 200 +0x007E)
+   Room 48 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 653,649,645
+   actors drawn: 1(costume 1 at 203,106); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 49 (1 images, 3 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 49 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 47 Object 626 Verb 0x0A +0x0000 (object 663, no walk) would bring it in (seeded pick 1 of 3 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 49; active states: 
+   static: room scripts 10 instructions; named by literal setState>0/drawObject: 1; named and shown: 0; named, not shown: 662 (entry +0x0007)
+   Room 49 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 63,64); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 50 (1 images, 4 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 50 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 47 Object 630 Verb 0x0A +0x0000 (object 667, no walk) would bring it in (seeded pick 4 of 4 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 50; active states: 
+   static: room scripts 9 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 50 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 139,90); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 51 (2 images, 4 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 51 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 47 Object 631 Verb 0x0A +0x0000 (object 671, no walk) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 51; active states: 
+   static: room scripts 6 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 51 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 39,92); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 52 (2 images, 4 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 52 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 47 Object 635 Verb 0x0A +0x0000 (object 675, no walk) would bring it in (seeded pick 3 of 3 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 52; active states: 
+   static: room scripts 4 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 52 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 280,93); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 53 (3 images, 5 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 2 active images
+   Room 53 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 48 local script 200 +0x00ED (object 678, no walk) or Room 58 Object 721 Verb 0x0A +0x0000 (object 678, no walk) or Room 58 Object 719 Verb 0x0...
+   VAR_ROOM 53; active states: 680,681
+   static: room scripts 8 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 53 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 681,680
+   actors drawn: 1(costume 1 at 113,106); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 54 (18 images, 20 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 54 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 47 Object 637 Verb 0x0A +0x0000 (object 698, walk to (250, 112)) would bring it in (the only source-backed arrival). Which route led here was ...
+   VAR_ROOM 54; active states: 
+   static: room scripts 2 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 54 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 250,112); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 55 (4 images, 7 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 55 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 47 Object 638 Verb 0x0A +0x0012 (object 702, walk to (22, 51)) would bring it in (the only source-backed arrival). Which route led here was no...
+   VAR_ROOM 55; active states: 705
+   static: room scripts 5 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 55 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 705
+   actors drawn: 1(costume 1 at 17,51); skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 56 (0 images, 5 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 56 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 47 Object 638 Verb 0x0A +0x0007 (object 709, walk to (22, 51)) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not p...
+   VAR_ROOM 56; active states: 
+   static: room scripts 65 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 56 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 22,51); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 57 (1 images, 3 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 57 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 60 Object 733 Verb 0x0A +0x0000 (object 715, walk to (263, 100)) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not...
+   VAR_ROOM 57; active states: 714
+   static: room scripts 14 instructions; named by literal setState>0/drawObject: 1; named and shown: 1; named, not shown: 
+   Room 57 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 714
+   actors drawn: 1(costume 1 at 263,100); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 58 (5 images, 7 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 58 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 66 Object 777 Verb 0x0A +0x0000 (object 717, walk to (72, 97)) would bring it in (seeded pick 3 of 3 (seed 0)). Which route led here was not p...
+   VAR_ROOM 58; active states: 
+   static: room scripts 22 instructions; named by literal setState>0/drawObject: 1; named and shown: 0; named, not shown: 721 (local 200 +0x0015)
+   Room 58 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 72,97); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 59 (0 images, 2 objects) outcome=Settled frames=171 lit=True 1,0s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 59 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 60 Object 735 Verb 0x0A +0x0000 (object 724, no walk) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 59; active states: 
+   static: room scripts 4 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 59 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 32,107); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 60 (0 images, 11 objects) outcome=FrameLimit frames=2400 lit=False 2,1s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 60 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 57 Object 716 Verb 0x0A +0x0000 (object 734, no walk) would bring it in (seeded pick 4 of 11 (seed 0)). Which route led here was not played; t...
+   VAR_ROOM 60; active states: 
+   static: room scripts 113 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 60 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 11(costume 83 at 520,55), 1(costume 26 at 664,65), 10(costume 83 at 708,170); skipped: 
+   pending scripts: 4; camera 664; lights 12
+== Room 61 (20 images, 22 objects) outcome=Settled frames=171 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 61 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 60 Object 728 Verb 0x0A +0x0000 (object 757, walk to (67, 94)) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not p...
+   VAR_ROOM 61; active states: 740,748
+   static: room scripts 81 instructions; named by literal setState>0/drawObject: 14; named and shown: 2; named, not shown: 737 (local 200 +0x005A); 738 (local 200 +0x006C); 739 (local 200 +0x0081); 741 (local 200 +0x0009); 742 (local 200 +0x001B); 743 (local 200 +0x0030); 744 (local 200 +0x0042); 745 (local 200 +0x0010); 746 (local 200 +0x0022); 747 (local 200 +0x0037); 749 (entry +0x008D); 750 (entry +0x0091)
+   Room 61 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 740,748
+   actors drawn: 1(costume 1 at 67,94); skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 62 (10 images, 16 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 62 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 60 Object 730 Verb 0x0A +0x0000 (object 759, walk to (45, 88)) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not p...
+   VAR_ROOM 62; active states: 
+   static: room scripts 72 instructions; named by literal setState>0/drawObject: 3; named and shown: 0; named, not shown: 760 (local 200 +0x0049); 761 (local 200 +0x001B); 762 (local 200 +0x003E)
+   Room 62 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 45,88); skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 63 (0 images, 2 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 63 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 60 Object 729 Verb 0x0A +0x0000 (object 776, no walk) would bring it in (the only source-backed arrival). Which route led here was not played;...
+   VAR_ROOM 63; active states: 
+   static: room scripts 3 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 63 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 2 at 238,93); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 64 (0 images, 0 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 64; active states: 
+   static: room scripts 6 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 64 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 66 (0 images, 2 objects) outcome=FrameLimit frames=2400 lit=False 1,9s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 66 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 58 Object 717 Verb 0x0A +0x0000 (object 777, no walk) would bring it in (seeded pick 1 of 2 (seed 0)). Which route led here was not played; th...
+   VAR_ROOM 66; active states: 
+   static: room scripts 30 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 66 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 11(costume 83 at 666,51), 10(costume 83 at 682,123), 12(costume 83 at 742,140), 1(costume 26 at 867,151); skipped: 
+   pending scripts: 4; camera 800; lights 12
+== Room 67 (0 images, 0 objects) outcome=Settled frames=90 lit=True 0,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 67; active states: 
+   static: room scripts 8 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 67 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 68 (0 images, 0 objects) outcome=Settled frames=90 lit=True 2,2s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 68; active states: 
+   static: room scripts 6 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 68 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 69 (10 images, 10 objects) outcome=Settled frames=90 lit=True 0,9s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 69; active states: 779,780,781,782,783
+   static: room scripts 44 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 69 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 5; paint order: 779,780,781,782,783
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 70 (0 images, 0 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 70; active states: 
+   static: room scripts 353 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 70 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 90 at 160,1), 8(costume 94 at 1000,1000), 11(costume 91 at 1000,1000); skipped: 
+   pending scripts: 3; camera 160; lights 11
+== Room 71 (19 images, 21 objects) outcome=Settled frames=202 lit=True 0,9s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 71; active states: 791,795,797,799,801,803,805
+   static: room scripts 99 instructions; named by literal setState>0/drawObject: 5; named and shown: 1; named, not shown: 789 (local 203 +0x0007); 796 (local 202 +0x0014); 806 (local 201 +0x001C); 807 (local 201 +0x0011)
+   Room 71 was entered from the first room's state without playing the route to it (state preview), then ran 202 frames.
+   The room settled: nothing changed for a while.
+   active images: 7; paint order: 805,795,803,801,799,797,791
+   actors drawn: 1(costume 2 at 100,115), 2(costume 53 at 350,125); skipped: 
+   pending scripts: 10; camera 160; lights 11
+== Room 72 (15 images, 15 objects) outcome=Settled frames=918 lit=True 1,3s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 192; active states: 812,815,816,818,819,820,822
+   static: room scripts 119 instructions; named by literal setState>0/drawObject: 11; named and shown: 5; named, not shown: 810 (local 200 +0x0000); 811 (local 200 +0x001B); 817 (entry +0x010F); 821 (entry +0x0113); 823 (entry +0x00A9); 824 (local 202 +0x000F)
+   Room 72 was entered from the first room's state without playing the route to it (state preview), then ran 918 frames.
+   The room settled: nothing changed for a while.
+   active images: 7; paint order: 822,820,819,818,816,812,815
+   actors drawn: 10(costume 95 at 0,0), 1(costume 1 at 293,108), 11(costume 79 at 325,108), 2(costume 57 at 216,116); skipped: 
+   pending scripts: 7; camera 320; lights 11
+== Room 73 (10 images, 14 objects) outcome=Settled frames=587 lit=True 1,0s
+   before S5 (index states only): 0 gaps, 1 active images
+   VAR_ROOM 73; active states: 826,828,830,832
+   static: room scripts 145 instructions; named by literal setState>0/drawObject: 6; named and shown: 3; named, not shown: 825 (local 200 +0x0007); 829 (local 201 +0x0007); 833 (local 202 +0x0007)
+   Room 73 is the first room of the game: the boot's own state after 587 more frames.
+   The room settled: nothing changed for a while.
+   active images: 4; paint order: 830,832,828,826
+   actors drawn: 1(costume 1 at 119,83), 9(costume 38 at 256,86); skipped: 
+   pending scripts: 5; camera 160; lights 11
+== Room 74 (0 images, 0 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 74; active states: 
+   static: room scripts 5 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 74 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 75 (4 images, 4 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 75; active states: 839
+   static: room scripts 62 instructions; named by literal setState>0/drawObject: 4; named and shown: 1; named, not shown: 838 (entry +0x0042); 840 (entry +0x005E); 841 (entry +0x006C)
+   Room 75 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 839
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 76 (1 images, 3 objects) outcome=Settled frames=90 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 76; active states: 844
+   static: room scripts 91 instructions; named by literal setState>0/drawObject: 1; named and shown: 1; named, not shown: 
+   Room 76 was entered from the first room's state without playing the route to it (state preview), then ran 90 frames.
+   The room settled: nothing changed for a while.
+   active images: 1; paint order: 844
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 77 (3 images, 6 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 77 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 25 Object 363 Verb 0x0A +0x009F (object 848, walk to (165, 65)) would bring it in (seeded pick 3 of 3 (seed 0)). Which route led here was not ...
+   VAR_ROOM 77; active states: 848,850
+   static: room scripts 58 instructions; named by literal setState>0/drawObject: 2; named and shown: 2; named, not shown: 
+   Room 77 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 850,848
+   actors drawn: 1(costume 1 at 165,65); skipped: 
+   pending scripts: 3; camera 224; lights 11
+   NOT FOLLOWED: Script 131 +0x0038: started script 132 has arguments depending on unknown variables; the parent continues without its effects.
+== Room 78 (0 images, 0 objects) outcome=Settled frames=265 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 78; active states: 
+   static: room scripts 36 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 78 was entered from the first room's state without playing the route to it (state preview), then ran 265 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+   NOT FOLLOWED: Script 23 +0x0000: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 73, which would load that room (not modelled) (+0x0022)
+== Room 79 (7 images, 7 objects) outcome=FrameLimit frames=2400 lit=True 3,2s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 79; active states: 851,852
+   static: room scripts 232 instructions; named by literal setState>0/drawObject: 1; named and shown: 1; named, not shown: 
+   Room 79 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 2; paint order: 851,852
+   actors drawn: 1(costume 59 at 1145,19), 9(costume 99 at 1270,136); skipped: 
+   pending scripts: 4; camera 1120; lights 11
+== Room 80 (0 images, 0 objects) outcome=FrameLimit frames=2400 lit=True 1,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 80; active states: 
+   static: room scripts 71 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 80 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 10(costume 93 at 206,291); skipped: 
+   pending scripts: 2; camera 160; lights 11
+   NOT FOLLOWED: Script 23 +0x0000: camera x (var[0x002]) is unknown after actorFollowCamera: it follows actor 1 into Room 70, which would load that room (not modelled) (+0x0022)
+== Room 81 (0 images, 3 objects) outcome=Settled frames=487 lit=True 0,9s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 81; active states: 
+   static: room scripts 130 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 81 was entered from the first room's state without playing the route to it (state preview), then ran 487 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 2 at 140,108), 4(costume 15 at 30,110); skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 82 (12 images, 15 objects) outcome=RoomLeft frames=59 left to 94 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 82 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Script 122 +0x0238 (object 861, no walk) or Room 81 local script 200 +0x008F (object 861, no walk) or Room 83 local script 200 +0x01FC (object 861,...
+   VAR_ROOM 82; active states: 
+   static: room scripts 629 instructions; named by literal setState>0/drawObject: 12; named and shown: 0; named, not shown: 863 (local 202 +0x0028); 864 (local 202 +0x00AC); 865 (local 202 +0x0035); 866 (local 202 +0x0078); 867 (local 202 +0x006B); 868 (local 202 +0x0085); 869 (local 202 +0x0010); 870 (local 202 +0x001D); 871 (local 202 +0x0051); 872 (local 202 +0x005E); 874 (local 205 +0x003A); 875 (local 205 +0x0047)
+   Room 82 was entered from the first room's state without playing the route to it (state preview), then ran 59 frames.
+   A script left the room for Room 94: the room is shown as it was the last time it was current.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 2 at 138,111); skipped: 
+   pending scripts: 4; camera 160; lights 11
+== Room 83 (0 images, 3 objects) outcome=FrameLimit frames=2400 lit=True 1,9s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 83 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 82 local script 200 +0x0361 (object 876, walk to (40, 108)) would bring it in (the only source-backed arrival). Which route led here was not p...
+   VAR_ROOM 83; active states: 
+   static: room scripts 139 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 83 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 40,119); skipped: 
+   pending scripts: 3; camera 160; lights 11
+== Room 84 (0 images, 0 objects) outcome=FrameLimit frames=2400 lit=True 1,4s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 84; active states: 
+   static: room scripts 182 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 84 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 65 at 132,108); skipped: 
+   pending scripts: 2; camera 160; lights 11
+== Room 85 (0 images, 2 objects) outcome=Settled frames=256 lit=True 0,6s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 85; active states: 
+   static: room scripts 106 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 85 was entered from the first room's state without playing the route to it (state preview), then ran 256 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 18,96); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 86 (16 images, 18 objects) outcome=Settled frames=171 lit=True 0,8s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 86 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 85 local script 201 +0x010C (object 881, walk to (522, 90)) would bring it in (the only source-backed arrival). Which route led here was not p...
+   VAR_ROOM 86; active states: 882,885
+   static: room scripts 72 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 86 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 2; paint order: 882,885
+   actors drawn: 1(costume 1 at 522,90), 10(costume 84 at 192,110); skipped: 
+   pending scripts: 4; camera 480; lights 11
+== Room 87 (14 images, 14 objects) outcome=Settled frames=131 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 87; active states: 906,909,912
+   static: room scripts 44 instructions; named by literal setState>0/drawObject: 14; named and shown: 3; named, not shown: 899 (local 200 +0x0005); 900 (local 200 +0x0026); 901 (local 200 +0x002E); 902 (local 200 +0x0036); 903 (local 200 +0x003E); 904 (local 200 +0x0046); 905 (local 200 +0x004E); 907 (local 200 +0x0067); 908 (local 200 +0x0077); 910 (local 200 +0x006F); 911 (local 200 +0x007F)
+   Room 87 was entered from the first room's state without playing the route to it (state preview), then ran 131 frames.
+   The room settled: nothing changed for a while.
+   active images: 3; paint order: 906,909,912
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 90 (12 images, 12 objects) outcome=Settled frames=92 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 90; active states: 913,915,917,920,921,922
+   static: room scripts 36 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 90 was entered from the first room's state without playing the route to it (state preview), then ran 92 frames.
+   The room settled: nothing changed for a while.
+   active images: 6; paint order: 915,917,921,913,920,922
+   actors drawn: ; skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 91 (0 images, 4 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   Room 91 selected without playing the route to it (state preview): its entry scripts ran from the state the boot left. Assumed arrival: the ego enters as Room 61 Object 758 Verb 0x0A +0x0007 (object 925, walk to (160, 100)) would bring it in (the only source-backed arrival). Which route led here was ...
+   VAR_ROOM 91; active states: 
+   static: room scripts 58 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 91 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 1 at 160,100); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 93 (0 images, 2 objects) outcome=Settled frames=171 lit=True 0,7s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 93; active states: 
+   static: room scripts 8 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 93 was entered from the first room's state without playing the route to it (state preview), then ran 171 frames.
+   The room settled: nothing changed for a while.
+   active images: 0; paint order: 
+   actors drawn: 1(costume 71 at 136,101); skipped: 
+   pending scripts: 1; camera 160; lights 11
+== Room 94 (0 images, 1 objects) outcome=FrameLimit frames=2400 lit=True 1,5s
+   before S5 (index states only): 0 gaps, 0 active images
+   VAR_ROOM 94; active states: 
+   static: room scripts 192 instructions; named by literal setState>0/drawObject: 0; named and shown: 0; named, not shown: 
+   Room 94 was entered from the first room's state without playing the route to it (state preview), then ran 2400 frames.
+   The room never rested within the frame limit (ambient scripts keep changing it): the state at the limit is shown.
+   active images: 0; paint order: 
+   actors drawn: ; skipped: 
+   pending scripts: 4; camera 160; lights 11
