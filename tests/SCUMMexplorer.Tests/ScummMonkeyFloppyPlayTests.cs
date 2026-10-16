@@ -250,13 +250,32 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
 
         // The play screen: the room from the camera, the verb screen below row 144 and the version 4 cross-hair (cursor 0 of resetCursors, hotspot 8, 7)
         // in colour 15 of the room palette at the pointer.
-        var screen = new ScummPlayScreen(game, session, ScummGameSession.IndexedObjectsOf(game).States).Compose(0);
+        var screen = new ScummPlayScreen(game, session, ((ScummV4DiskSetDataSource)ScummDataSources.For(game)).ReadIndexedObjects().States).Compose(0);
         Assert.Equal(29, screen.RoomId);
         var (px, py) = session.ScreenPointer!.Value;
         var white = screen.Pixels[(py - 7) * ScummPlayFrame.Width + px];
         Assert.Equal(white, screen.Pixels[(py - 6) * ScummPlayFrame.Width + px]);
         Assert.Equal(white, screen.Pixels[py * ScummPlayFrame.Width + px - 7]);
         Assert.Equal(white, screen.Pixels[py * ScummPlayFrame.Width + px + 7]);
+    }
+
+    [Fact]
+    public void ThePlayCursorIsTheCrossHairOfResetCursors()
+    {
+        // ScummEngine_v5::resetCursors cursor 0 (versions 3 and 4 inherit it): arms 2 to 7 pixels from the hotspot (8, 7) across and up/down, none at it.
+        var points = ScummPlayScreen.CursorPoints;
+        Assert.Equal(24, points.Count);
+        Assert.DoesNotContain((0, 0), points);
+        foreach (var d in Enumerable.Range(2, 6))
+        {
+            Assert.Contains((d, 0), points);
+            Assert.Contains((-d, 0), points);
+            Assert.Contains((0, d), points);
+            Assert.Contains((0, -d), points);
+        }
+        // Not the 23 by 21 crosshair of ScummEngine_v2 (arms to 11 across, 10 down).
+        Assert.DoesNotContain((8, 0), points);
+        Assert.DoesNotContain((0, 8), points);
     }
 
     [Fact]

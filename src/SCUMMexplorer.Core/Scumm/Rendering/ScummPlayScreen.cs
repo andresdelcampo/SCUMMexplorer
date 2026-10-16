@@ -15,9 +15,11 @@ public sealed record ScummPlayFrame(uint[] Pixels, int? RoomId, int RoomTop, int
 /// <summary>
 /// Composes the game screen of a live verb-based session, as ScummVM shows it (engines/scumm gfx.cpp, verbs.cpp, cursor.cpp, read 15 October 2026):
 /// the text screen above the room screen (<c>initScreens</c>), the room with the objects and actors the scripts left (the same composition as a first
-/// visit, <see cref="ScummRoomScene"/>), the messages with the game's charset, the verb screen with its text and image verbs, and the built-in crosshair
-/// cursor of the v3 games other than LOOM (23 × 21, hotspot 11, 10; arms 5 to 11 pixels across and 3 to 10 down from it; colour 15, 15, 7, 8 by
-/// <c>animateCursor</c>, one step every two frames; ScummVM's drawing, evidence level <c>engine</c>).
+/// visit, <see cref="ScummRoomScene"/>), the messages with the game's charset, the verb screen with its text and image verbs, and the built-in cursor of the
+/// version 3 and 4 games other than LOOM: cursor 0 of <c>ScummEngine_v5::resetCursors</c>, a 16 × 16 cross-hair with its hotspot at (8, 7) in the gap of
+/// the cross (<see cref="CursorPoints"/>), in colour 15, 15, 7, 8 by <c>animateCursor</c>, one step every two frames (cursor.cpp and scumm_v4.h, read 16
+/// October 2026: <c>ScummEngine_v3 : ScummEngine_v4 : ScummEngine_v5</c>, so version 3 has it too; before 16 October the screen drew the 23 × 21 crosshair
+/// of <c>ScummEngine_v2</c>, found wrong by S6 Indy3Vga). Evidence level <c>engine</c>.
 /// </summary>
 public sealed class ScummPlayScreen
 {
@@ -34,10 +36,7 @@ public sealed class ScummPlayScreen
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _indexedStates = indexedStates ?? throw new ArgumentNullException(nameof(indexedStates));
         _data = ScummDataSources.For(game);
-        _bitmapCursor = ScummProfile.For(game).UsesBitmapCursor;
     }
-
-    private readonly bool _bitmapCursor;
 
     /// <summary>The scene of the current room at this frame (objects, actors, palettes), or null outside a room.</summary>
     public ScummRoomScene? Scene()
@@ -68,7 +67,10 @@ public sealed class ScummPlayScreen
         var (top, bottom) = _session.MainScreen;
         var viewLeft = _session.ViewLeft;
         var scene = Scene();
-        IReadOnlyList<uint> basePalette = scene?.Room.Palette ?? EgaPalette;
+        // updatePalette (palette.cpp): with _shadowPalRemap (set by the v3 constructor outside CGA/Hercules/Mac b/w, scumm.cpp, read 16 October 2026) the
+        // shadow palette of roomOps roomPalette remaps the whole displayed palette, so verbs, messages and the cursor follow it as the room does (S6 Indy3Vga:
+        // the 256-colour gym's light switch darkens the screen through it).
+        IReadOnlyList<uint> basePalette = scene?.DisplayPalette() ?? EgaPalette;
         if (scene is not null)
         {
             var room = scene.Compose();
@@ -108,39 +110,22 @@ public sealed class ScummPlayScreen
         if (cursor && _session.ScreenPointer is { } pointer)
         {
             var colour = Colour(basePalette, CursorColors[(frame >> 1) & 3]);
-            if (_bitmapCursor) DrawBitmapCursor(pixels, pointer.X, pointer.Y, colour);
-            else DrawCrosshair(pixels, pointer.X, pointer.Y, colour);
+            foreach (var (dx, dy) in CursorPoints)
+            {
+                var (px, py) = (pointer.X + dx, pointer.Y + dy);
+                if (px is >= 0 and < ScummPlayFrame.Width && py is >= 0 and < ScummPlayFrame.Height) pixels[py * ScummPlayFrame.Width + px] = colour;
+            }
         }
         return new ScummPlayFrame(pixels, scene?.RoomId, top, bottom, viewLeft, verbs, cursor);
     }
 
-        // ScummEngine_v5::resetCursors, cursor 0 (the cross-hair of every version 4 and 5 game; cursor.cpp, read 16 October 2026): 16 × 16, bit 15 is the
-    // left column, hotspot (8, 7); setBuiltinCursor paints the set bits in the cycling colour.
+    // ScummEngine_v5::resetCursors, cursor 0: one word per row, bit 15 is the left column; setBuiltinCursor paints the set bits.
     private static readonly ushort[] CrossHairImage =
         [0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0000, 0x7E3F, 0x0000, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0000];
 
-    private static void DrawBitmapCursor(uint[] pixels, int x, int y, uint colour)
-    {
-        for (var row = 0; row < 16; row++)
-            for (var bit = 0; bit < 16; bit++)
-            {
-                if ((CrossHairImage[row] & (1 << bit)) == 0) continue;
-                var (px, py) = (x - 8 + 15 - bit, y - 7 + row);
-                if (px is >= 0 and < ScummPlayFrame.Width && py is >= 0 and < ScummPlayFrame.Height) pixels[py * ScummPlayFrame.Width + px] = colour;
-            }
-    }
-
-    // setBuiltinCursor (v3 crosshair): from the hotspot, 7 pixels each side across starting 5 away, 8 pixels each side down starting 3 away.
-    private static void DrawCrosshair(uint[] pixels, int x, int y, uint colour)
-    {
-        void Set(int px, int py)
-        {
-            if (px is >= 0 and < ScummPlayFrame.Width && py is >= 0 and < ScummPlayFrame.Height) pixels[py * ScummPlayFrame.Width + px] = colour;
-        }
-        for (var i = 0; i < 7; i++) { Set(x - 5 - i, y); Set(x + 5 + i, y); }
-        for (var i = 0; i < 8; i++) { Set(x, y - 3 - i); Set(x, y + 3 + i); }
-    }
-
+    /// <summary>The cursor's lit pixels as offsets from the pointer (the hotspot, 8, 7 of the 16 × 16 image).</summary>
+    public static IReadOnlyList<(int Dx, int Dy)> CursorPoints { get; } =
+        [.. Enumerable.Range(0, 16).SelectMany(row => Enumerable.Range(0, 16).Where(bit => (CrossHairImage[row] & (1 << bit)) != 0).Select(bit => (15 - bit - 8, row - 7)))];
     private static uint Colour(IReadOnlyList<uint> palette, byte index) => index < palette.Count ? palette[index] | 0xFF000000u : 0xFF000000u;
 
     /// <summary>The 16 EGA colours (for the screen outside a room).</summary>

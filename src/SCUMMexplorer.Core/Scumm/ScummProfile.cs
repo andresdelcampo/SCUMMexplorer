@@ -92,28 +92,25 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <summary>
     /// The game is played through its own verb interface (REQUIREMENTS §7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
     /// from its verbs and the player's clicks and keys go to its input script (<see cref="ScummSession.ClickScreen"/>). True only for a family whose Play
-    /// cell is raised (R-7.17: no clicks reach the scripts of the others). S6 Indy3Ega.
+    /// cell is raised (R-7.17: no clicks reach the scripts of the others). S6 Indy3Ega; S6 Indy3Vga (16 October 2026) by the same data: a game whose
+    /// first visit the generic session runs with the Indy3 script dialect, whatever its container (old-bundle LFL or one file per room).
     /// </summary>
     public bool PlaysThroughVerbs { get; init; }
 
-        /// <summary>
-    /// The play cursor is the bitmap cross-hair of <c>ScummEngine_v5::resetCursors</c> (cursor 0, 16 × 16, hotspot 8, 7) from engine version 4; up to
-    /// version 3 it is the drawn crosshair of <c>setBuiltinCursor</c> (cursor.cpp, read 16 October 2026).
-    /// </summary>
-    public bool UsesBitmapCursor => EngineVersion >= ScummVersion.V4;
-
-    /// <summary>The variable holding the engine's save/load menu key (<c>VAR_MAINMENU_KEY</c>, from version 4); the engine opens its menu and the scripts never see the key.</summary>
     /// <summary><c>cursorCommand</c> copies the cursor state and user input into <c>VAR_CURSORSTATE</c>/<c>VAR_USERPUT</c> (from version 4, <c>o5_cursorCommand</c>).</summary>
     public bool PublishesCursorVariables => EngineVersion >= ScummVersion.V4;
 
+    /// <summary>The variable holding the engine's save/load menu key (<c>VAR_MAINMENU_KEY</c>, from version 4); the engine opens its menu and the scripts never see the key.</summary>
     public string? MainMenuKeyVariable => EngineVersion >= ScummVersion.V4 ? ScummVars.MainMenuKey : null;
-
-    /// <summary>The third argument of <c>runInputScript</c> for a left click: 0 up to version 3, 1 from version 4 (ScummVM <c>checkExecVerbs</c>).</summary>
-    public int ClickInputMode => Version > ScummVersion.V3 ? 1 : 0;
+    /// <summary>
+    /// The third argument of <c>runInputScript</c> for a left click: 0 up to version 3, 1 from version 4 (ScummVM <c>checkExecVerbs</c>: <c>_game.version &gt; 3</c>).
+    /// The engine version decides: the 256-colour Indiana Jones stores v4-style blocks but ScummVM runs it as version 3, so mode 0 (S6 Indy3Vga).
+    /// </summary>
+    public int ClickInputMode => EngineVersion > ScummVersion.V3 ? 1 : 0;
 
     /// <summary>
-    /// Keys not delivered to the game in play (R-7.11): a game's save/load key, whose script leaves the session's state (Indiana Jones EGA: F5 = 319,
-    /// Script 24 chains to Script 9 when <c>bit[0x5E4]</c> is 0). Edition data.
+    /// Keys not delivered to the game in play (R-7.11): a game's save/load key, whose script leaves the session's state (Indiana Jones EGA and 256 colours:
+    /// F5 = 319, Script 24 chains to Script 9 when <c>bit[0x5E4]</c> is 0; the two releases' Script 24 are the same instructions). Edition data.
     /// </summary>
     public IReadOnlyList<int> UndeliveredKeys { get; init; } = [];
 
@@ -140,9 +137,14 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
             BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
-            // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 MonkeyFloppy (16 October).
-            PlaysThroughVerbs = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.MonkeyFloppy,
-            UndeliveredKeys = GameSupport.FamilyOf(game) == GameFamily.Indy3Ega ? [0x13F] : []
+            // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
+            // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
+            PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
+            UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : []
         };
     }
+
+    // The generic session runs the Indy3 dialect (old-bundle v3 or one file per room): Indiana Jones EGA and 256 colours. LOOM has its own session.
+    private static bool PlaysIndy3Interface(GameLibrary game, ScummScriptDialect dialect, bool roomFileGame) =>
+        dialect == ScummScriptDialect.V3Indy3 && (game.Version == ScummVersion.V3 || roomFileGame) && game.Id is not (GameId.Loom or GameId.LoomVga);
 }

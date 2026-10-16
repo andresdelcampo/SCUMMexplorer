@@ -74,7 +74,8 @@ public sealed record GameSupport(GameFamily Family, FamilySupport Row)
         Row_(GameFamily.LoomEgaDemo, "**LOOM** demos", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         Row_(GameFamily.LoomCd, "**LOOM** CD", [F, F, F, F, F, F, F, F, P, F], Explore, ExplorePreview),
         Row_(GameFamily.Indy3Ega, "**Indiana Jones 3** EGA", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
-        Row_(GameFamily.Indy3Vga, "**Indiana Jones 3** 256 colours", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
+        // S6 Indy3Vga (16 October 2026): Objects and Play ✔ with the R-7.18 route (ScummIndy3VgaPlayTests).
+        Row_(GameFamily.Indy3Vga, "**Indiana Jones 3** 256 colours", [F, F, F, F, F, F, F, F, N, N], Explore, ExplorePreview),
         Row_(GameFamily.MonkeyFloppy, "**Monkey Island 1** floppy", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.MonkeyCd, "**Monkey Island 1** CD", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),
         Row_(GameFamily.Monkey2, "**Monkey Island 2**", [F, P, F, F, F, F, F, N, N, N], Browsed, BrowsedPreview),

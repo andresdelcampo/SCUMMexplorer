@@ -50,23 +50,21 @@ public sealed class ScummGameSession : ScummSession
     }
 
     /// <summary>
-    /// The game's starting object states and classes from its index: the v4 archive's (one archive, or the first of several disks: <c>000.LFL</c> is the
-    /// same on every disk) or the old-v3 <c>00.LFL</c> (S6, 16 October 2026: play starts from them for every <see cref="ScummProfile.PlaysThroughVerbs"/> game).
+    /// Boots a session for play with the starting object states of the game's own index: <c>00.LFL</c> for the old-bundle games, the v4-style index
+    /// (one file per room or several disks) with the game's data source otherwise, as the first visit does (S6 Indy3Vga, 16 October 2026).
     /// </summary>
-    public static ScummIndexedObjectSnapshot IndexedObjectsOf(GameLibrary game)
+    public static ScummGameSession BootForPlay(GameLibrary game, out ScummIndexedObjectSnapshot indexedObjects)
     {
         ArgumentNullException.ThrowIfNull(game);
-        if (!ScummProfile.For(game).UsesV4Archive) return new LflObjectStateReader().ReadSnapshot(System.IO.Path.Combine(game.FolderPath, "00.LFL"));
+        if (!ScummProfile.For(game).UsesV4Archive)
+        {
+            indexedObjects = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+            return new ScummGameSession(game, indexedObjects);
+        }
         var index = game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault()
-            ?? throw new InvalidDataException("The game has no v4 archive to read its index from.");
-        return index.ReadIndexedObjects();
-    }
-
-    /// <summary>A booted session of the game from its index (<see cref="IndexedObjectsOf"/>), reading v4 data through the game's data source.</summary>
-    public static ScummGameSession Start(GameLibrary game, ScummIndexedObjectSnapshot indexed, int randomSeed = 0)
-    {
-        ArgumentNullException.ThrowIfNull(game);
-        return new ScummGameSession(game, indexed, randomSeed, null, ScummProfile.For(game).UsesV4Archive ? ScummDataSources.For(game) : null);
+            ?? throw new InvalidDataException("The game has no v4 index to read its objects from.");
+        indexedObjects = index.ReadIndexedObjects();
+        return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game));
     }
 
     /// <summary><c>VAR_SOUNDCARD</c> for AdLib (vars.cpp: 0 PC speaker, 1 Tandy, 2 CMS, 3 AdLib, 4 Roland).</summary>
