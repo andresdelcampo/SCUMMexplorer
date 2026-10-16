@@ -65,3 +65,7 @@ Filter `Loom|FirstVisit|ScummGameSession|MonkeyFloppy|Indy3|ScummEngineOpcode|Su
 ## Addendum, 16 October: the right button stays the app's (R-7.16, Rule)
 
 User decisions of 16 October: "Right click goes to the game in verb-based games, as in ScummVM; keep the Interact menu elsewhere.", then "why not use right click only in the games that need it? -instead of everywhere?". This release runs as engine version 3 (as ScummVM does), so its scripts never see a right click (ScummVM's Esc outside LOOM, mode 0) and the right button stays the app's: `ScummProfile.RightClickReachesGame` is false (`ScummIndy3VgaPlayTests.TheProfilePlaysThroughTheVerbsWithTheVersionThreeClickAndTheSameKeys`). Nothing changes for the user. See the EGA record's addendum.
+
+## Addendum, 16–17 October: sound during play
+
+Sounds now play during play through the device the user picked (the "no sound during play" item above is superseded). The shared route pins this release's ids (`ScummIndy3PlayTests.AssertRouteSounds` through `ScummIndy3VgaPlayTests`): boot 35 (Room 76 local 201 +0x0023; this boot does not pass Room 92), Close door 3 (Script 27 +0x002B), the chain 13 (Room 73 local 205 +0x0058), the switch 13 at object 837 verb 0x06 +0x0002 and **+0x02B0** (EGA: +0x0063), Open door 2 (Script 26 +0x002B); here every route event is Reached (the EGA route's are labelled estimates). Not checked in the window for this release (the window check ran EGA and Monkey Island). Shared record: [Monkey Island play record, sound addendum](../monkey1-play-20261016/README.md).

@@ -116,6 +116,12 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 |---|---|---|---|---|
 | 35 (0x23) | opening music (AdLib part); the opening ends only once its music timer has passed 105 (0x69) | decoded | Room 76 local script 201 +0x0023; Script 1 +0x01CD | 2026-10-14 |
 | 30 | effect started by Room 92's answering script, ends before the next answer | decoded | Room 92 local script 204 +0x0005 | 2026-10-14 |
+| 3 | the door closing (Script 27, the gym door's Close cutscene) | run (S6 sound route, Room 73) | Script 27 +0x002B | 2026-10-16 |
+| 2 | the door opening (Script 26) | run (S6 sound route, Room 73) | Script 26 +0x002B | 2026-10-16 |
+| 13 | Room 73: the light switch (twice: lights out, lights back) and the chain that takes the mallet back | run (S6 sound route) | Room 73 object 837 verb 0x06 +0x0002 and +0x0063 (256 colours: +0x02B0); Room 73 local script 205 +0x0058 | 2026-10-16 |
+| (engine) | a music start (AD byte 2 = 0x80) ends the music playing (`Player_AD::startSound`), effects overlap | ScummVM source (16 Oct) | `ScummProfile.MusicStart` | 2026-10-16 |
+
+Script census (S6 sound, 16 October): `startSound` 138 (256 colours 137), `stopSound` 86 (87), `isSoundRunning` 26, no `stopMusic`, `startMusic` or `soundKludge` in any global, entry, exit or local script.
 
 ## First-visit facts (S5)
 

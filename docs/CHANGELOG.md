@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 16–17 October: sound during play in Indiana Jones (EGA, 256 colours) and Monkey Island floppy (S6 follow-up)
+
+- **Engine:** the generic session already ran `startSound`, `stopSound`, `isSoundRunning` and the music timer on its AdLib clock; it now also stops what the game's AdLib driver stops when music starts, by profile data (`ScummProfile.MusicStart`, ScummVM master read 16 October 2026: `Player_AD::startSound` ends the previous music for Indiana Jones; iMuse's `Sound::triggerSound` stops every sound for Monkey Island EGA/VGA). The engine's stops go on `SoundEvents` before the start. No script of the three games uses `soundKludge`, `stopMusic` or `startMusic`. LOOM's session is unchanged.
+- **App:** the play window plays the session's sound events through the device picked for browsing (`SceneSoundPlayer` now follows any `ScummSession` and renders with the sound player's own rendition); frames wait while a started track renders; Pause pauses the sounds; another room from the list, another kind of resource (which now leaves play) or another game stops them; Skip only aborts the cutscene and the scripts' stops follow.
+- **Tests:** route sound ids pinned in `ScummIndy3PlayTests` (both Indy3 releases: 35, 30, 3, 13, 2) and `ScummMonkeyFloppyPlayTests` (110, 108, 104, 2, 101 the SCUMM Bar's music, 100, 115, and the `triggerSound` stop); `ScummPlaySoundTests` (profile rule; the bar's music is not restarted while it plays). 86 play/sound/support tests and the LOOM filter (836 passed, 5 skipped) pass. A WPF check through the real window (`SoundWindowCheck`) shows the Indy3 door sound and the SCUMM Bar's music started on AdLib, paused and stopped. Matrix unchanged (Sound was already ✔). Listening checks are the user's. Record: sound addendum in [monkey1-play-20261016](../.verification/monkey1-play-20261016/README.md).
+
 ## 16 October: right click reaches the game only where its interface reads it (R-7.16, Rule)
 
 - User decisions of 16 October: "Right click goes to the game in verb-based games, as in ScummVM; keep the Interact menu elsewhere.", narrowed to "why not use right click only in the games that need it? -instead of everywhere?". R-7.16 reworded (Rule, confirmed by the user 16 Oct); R-6.9 and R-7.10 point to it.

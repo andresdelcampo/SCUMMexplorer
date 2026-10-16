@@ -125,6 +125,16 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 |---|---|---|---|---|
 | `var[0x057]` = 110 (non-Roland table) | the credits' music, started at the start of the credits and awaited to its end | decoded | Script 1 +0x0498; Script 149 +0x001D, +0x0A2E | 2026-10-14 |
 | `var[0x051]` = 104 (non-Roland table) | Room 96's title music, awaited to its end | decoded | Script 1 +0x047A; Room 96 local script 200 +0x0009 | 2026-10-14 |
+| `var[0x055]` = 108 | Room 38's music (the lookout scene of the opening); no script stops it: the engine's `triggerSound` workaround stops it when the title music starts | run (S6 sound) | Room 38 local script 203 +0x000E | 2026-10-16 |
+| `var[0x04B]` = 101 (0x65; Roland table 0x97) | the SCUMM Bar's music: Room 28's entry starts it only while `isSoundRunning` says it is silent; the bar's door stops it as Guybrush leaves; the pirates' conversation stops and restarts it | run (S6 sound route) | Script 1 +0x0466 (+0x0404 Roland); Room 28 entry +0x0080, +0x008A; Room 28 object 322 verb 0x0A +0x0006; Room 28 local script 220 +0x162A, +0x168E | 2026-10-16 |
+| 2 | a door opening (dock door, street door) | run (S6 sound route) | Script 25 +0x0034 | 2026-10-16 |
+| 3 | a door closing (Room 29) | run (S6 sound route) | Script 26 +0x002B | 2026-10-16 |
+| 100 | played by Script 117 on the first exit from the SCUMM Bar (Rooms 70, 72) | run (S6 sound route) | Script 117 +0x0031, stopped +0x053E | 2026-10-16 |
+| 115 | Room 29's music (the Voodoo shop), started by its local script 200; Room 70's entry stops it (and 111) | run (S6 sound route) | Room 29 local script 200 +0x0021; Room 70 entry +0x002C, +0x002F | 2026-10-16 |
+| `var[0x060]` = 117, `var[0x061]` = 118 (0x75, Roland 0xA7) | two pieces Script 140 plays one after the other (`isSoundRunning` +0x0004 between them); started by Script 135 and Room 83; Room 33's exit stops both | decoded | Script 1 +0x04BB (+0x0459 Roland); Script 140 +0x0000..+0x000E; Room 33 exit +0x0002, +0x0005 | 2026-10-16 |
+| (engine) | any music start (AD byte 2 = 0x80) stops every sound first: ScummVM runs this game through iMuse, whose `Sound::triggerSound` has a Monkey EGA/VGA workaround | ScummVM source (16 Oct) | `ScummProfile.MusicStart` | 2026-10-16 |
+
+Script census (S6 sound, 16 October): `startSound` 135, `stopSound` 68, `isSoundRunning` 24, no `stopMusic`, `startMusic` or `soundKludge` in any global, entry, exit or local script.
 
 ## Open questions
 

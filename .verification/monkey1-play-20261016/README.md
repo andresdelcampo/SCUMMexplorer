@@ -75,3 +75,51 @@ User decisions of 16 October: "Right click goes to the game in verb-based games,
 - **Window:** the PlayWindowCheck now ends with a right click on the poster through the window's own right-button path (`PlayRightClick`, called by the image's `MouseRightButtonDown` after mapping the pointer): `runInputScript(2, 0, 2) right click in the room at screen (84, 104), room (268, 104); Look at poster sentences 1 -> 2; messages [Re-elect Governor Marley.]` (`window/play-check.txt`, `window/play-04-right-click.png`). A first run of the check missed the poster with the earlier left click (the camera was still moving when the check computed its point; the check's own timing, not the app's) and was rerun.
 - **Interact menu:** the menu belongs to the LOOM session (its **Interact ▴** button and right click, R-6.9); Play in this game never offered it, so nothing moved. The check reports the button hidden during play.
 - Not done: ScummVM's both-buttons-at-once = Esc (version 4) is not modelled (the app's Esc/Skip gives it).
+
+## Addendum, 16–17 October: sound during play (shared by Indy3 EGA, Indy3 256 colours and Monkey Island floppy)
+
+Reference: ScummVM `engines/scumm` master read 16 October 2026 from raw.githubusercontent.com (no commit hash shown): `scumm.cpp` (`setupMusic`), `vars.cpp` (`setSoundCardVarToCurrentConfig`), `sound.cpp` (`triggerSound`, `soundKludge`, `isSoundRunning`, `stopSound`, `stopAllSounds`, `updateMusicTimer`, `convertADResource`, `readSoundResourceSmallHeader`), `players/player_ad.cpp` (`startSound`, `getSoundStatus`, `stopAllSounds`, `getMusicTimer`). The "no sound plays during play yet" line above is superseded.
+
+Already there and now used in play: the generic session runs `startSound`, `stopSound` and `isSoundRunning` on its AdLib sound clock (`ScummSoundClock`; R-13.9 constants by `ScummProfile.AdlibTiming`) and keeps `VAR_MUSIC_TIMER` (`ScummSessionFrames.UpdateMusicTimer`); the boots already waited on them (Indy3's opening music 35 and its timer marks, Monkey Island's credits music 110). A scan of every global, entry, exit and local script of the three games finds **no** `soundKludge`, `stopMusic` or `startMusic` (ScummVM's `soundKludge` only queues iMuse commands); `startSound`/`stopSound`/`isSoundRunning` occur 138/86/26 times (Indy3 EGA), 137/87/26 (256 colours), 135/68/24 (Monkey Island).
+
+| Piece | Where | ScummVM source |
+|---|---|---|
+| What a music start stops, by profile: Indiana Jones (both releases) the previous music, Monkey Island floppy every sound; the generic session puts the engine's stop on `SoundEvents` just before the start (labelled `Player_AD startSound` or `triggerSound`). LOOM's session is unchanged | `ScummProfile.MusicStart`, `ScummGameSession.BeforeSoundStarts`, `ScummSession.EngineStopsSounds`, `ScummSoundClock.IsMusic`/`Playing` | `setupMusic`: DOS + AdLib + (LOOM or Indy3) → `Player_AD`, other DOS v3+ → iMuse; `Player_AD::startSound`: byte 2 = 0x80 is music, `stopMusic()` first; `triggerSound`: Monkey EGA/VGA with iMuse, `stopAllSounds()` before any resource that is not `ASFX`; `convertADResource`: AD with 0x80 is `ADL ` music, else `ASFX` |
+| The play window plays the session's sound events through the device the user picked (the browsing setting): `SceneSoundPlayer` follows any `ScummSession` and renders with the sound player's own rendition (`RenderSoundWave`, AdLib at +6 dB). The boot's sounds are not played; frames wait while a started track renders (as LOOM); Pause (Space) pauses the sounds with the clock; picking another room, another kind of resource or another game stops them; Skip (Esc) only aborts the cutscene and the scripts' own stops follow (as LOOM) | `App/SceneSoundPlayer.cs`, `App/MainWindow.Play.cs` (audio output only), `App/MainWindow.xaml.cs` (`RenderSoundWave`; another kind of resource now calls `StopPlay`, before it the game ran on unseen) | — |
+
+**Sound ids on the routes** (pinned by `ScummIndy3PlayTests.AssertRouteSounds`, shared by both Indy3 releases, and `ScummMonkeyFloppyPlayTests.AssertRouteSounds`; `ScummPlaySoundTests` pins the profile rule and that the bar's entry does not start its music again while it plays):
+
+| Game | Step | Sound | Script and instruction |
+|---|---|---|---|
+| Indy3 (both) | boot | 35 opening music | Room 76 local script 201 +0x0023 |
+| Indy3 EGA | boot | 30 copy-protection screen | Room 92 local script 204 +0x0005 (and object 929's fallback verb +0x0005) |
+| Indy3 (both) | Close the door | 3 | Script 27 +0x002B |
+| Indy3 (both) | the chain takes the mallet back | 13 | Room 73 local script 205 +0x0058 |
+| Indy3 (both) | Push the switch, lights back | 13 twice | Room 73 object 837 verb 0x06 +0x0002 and +0x0063 (EGA) / +0x02B0 (256 colours) |
+| Indy3 (both) | Open the door | 2 | Script 26 +0x002B |
+| Monkey | boot | 110 credits, 108 lookout, 104 title (awaited by `isSoundRunning` +0x000D, stopped +0x0017: no stall) | Script 149 +0x001D; Room 38 local 203 +0x000E; Room 96 local 200 +0x0009 |
+| Monkey | boot | the engine stops every sound before 104 (108 is stopped by no script) | `triggerSound` workaround at Room 96 local 200 +0x0009 |
+| Monkey | Open a door (dock, street) | 2 | Script 25 +0x0034 |
+| Monkey | enter the SCUMM Bar | 101 bar music (`var[0x04B]` = 0x65, Script 1 +0x0466) | Room 28 entry +0x008A, after `isSoundRunning` +0x0080 |
+| Monkey | leave the bar | stop 101; first exit's Script 117 plays 100 and stops it | Room 28 object 322 verb 0x0A +0x0006; Script 117 +0x0031, +0x053E |
+| Monkey | the shop of Room 29 | 3 (door), 115 | Script 26 +0x002B; Room 29 local script 200 +0x0021 |
+
+**WPF check** (`SoundWindowCheck/`, private profile, run 17 October; `sound/sound-check.txt`):
+
+```
+rtk proxy dotnet build .verification/monkey1-play-20261016/SoundWindowCheck/PlaySoundWindowCheck.csproj
+Exe\PlaySoundWindowCheck\...\PlaySoundWindowCheck.exe "D:\Juegos\Lucas\indy3 ega en" "D:\Juegos\Lucas\monkey1 ega en" .verification\monkey1-play-20261016\sound
+```
+
+Result: Indy3 play in Room 73 with the scene-sound player following the play session; Close + door → Script 27 +0x002B sound 3 started on AdLib and its wave opened (0.50 s; labelled "Estimated preview route", the EGA route's label after the boot's assumed protection answer); opening Monkey Island stopped it ("play was left"); Monkey play from the dock, Room 28 picked from the list → the dock's exit script stops 117/118, the bar's entry starts 101 (music, AdLib, wave opened, 180 s preview length) and the session has it running; Space paused and resumed the sounds with the game; a sound picked in the tree stopped the play timer and its sounds. The agent cannot hear: how they sound is the user's check.
+
+Tests: the three play classes, `ScummPlaySoundTests`, sound/AdLib/support/architecture/session tests: 86 passed; LOOM filter: 836 passed, 5 skipped, 0 failed (after the merge with the R-7.16 right-click work).
+
+Kept differences: the scripts always see an AdLib card (`VAR_SOUNDCARD` 3, S4b decision) and `isSoundRunning`/the music timer follow the AdLib clock whatever the output device (ScummVM uses `Player_V2` for the PC speaker; not modelled); Monkey Island's music is an iMuse song in ScummVM (looping unless stopped), the session's clock and the rendition use the AD block at the browsed half tempo (S3 estimate); a rendered AdLib track lasts at most three minutes (the sound player's preview length), so a looping piece falls silent after that; tracks overlap as separate players (no OPL channel sharing, no three-slot effect limit of `Player_AD`); Indy3's AdLib rendition still uses LOOM's driver constants (R-13.9 S3 polish). Roland is not offered for these games (no MT-32 data, as when browsing). The App stops its own voices on a room-list pick while the session may still count a global sound as running.
+
+**Listening checks (the user's):**
+1. Device AdLib. Open `indy3 ega en`, pick Room 73. Click Close, then the door on the left twice: a short door sound. Push the light switch (left wall, after the door closes): a click as the lights go out, another as they come back (Esc skips to that). Open + the door: the opening sound. Nothing should sound at the moment play starts.
+2. Same in `indy3 vga en` (no copy-protection room in this release's boot).
+3. Open `monkey1 ega en`, pick Room 33 (the dock): silent at the start. Open + Walk to the SCUMM Bar's door: the door sound, then the bar's music as Guybrush enters. Press Space: the music pauses with the game; Space again: it goes on. Talk to the important-looking pirates: the music goes on under the conversation (the route's conversation branch has no sound command). Leave through the bar's door: the music stops, and the first exit's scene (Script 117, Rooms 70 and 72) plays its own piece. Pick Room 29 from the list (or walk there): the shop's music.
+4. Switch the device to PC speaker during play: current sounds stop; the next ones play on the speaker. Choose No Sound: nothing plays and the game goes on.
+5. Pick a sound or a script in the tree during play: the game's sounds stop.
