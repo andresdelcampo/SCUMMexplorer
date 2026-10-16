@@ -64,7 +64,11 @@ LOOM and the generic-session tests (filter `Loom|FirstVisit|ScummGameSession|Mon
 - `getActorFromPos` uses the session's costume drawing for the actor's strips and top/bottom, not ScummVM's screen usage bits.
 - Objects held in the inventory run no verb code of their own yet (`StartObjectScript` does not model held objects): "Look at" an inventory item does nothing.
 - The talk text position follows the shared message table (LOOM's layout, screen top 0); with Indy3's screen top 16 a line may sit up to 16 pixels off; not compared.
-- The app's control bar (Pause/Skip buttons) is not shown for Indy3 play; Space, Esc and '.' do the same from the keyboard. Right click is not delivered (R-7.16) and opens nothing in play.
+- The app's control bar (Pause/Skip buttons) is not shown for Indy3 play; Space, Esc and '.' do the same from the keyboard. Right click is not delivered (R-7.16) and opens nothing in play; confirmed as a Rule on 16 October (addendum below).
 - Picking another room from the list enters it from the session's state (state preview), as the first visit does; the room list does not follow a room change the game makes.
 - Dark rooms are shown lit (S5 decision); the flashlight is not drawn.
 - Perceived timing and audio are the user's checks (no sound is played during Indy3 play yet).
+
+## Addendum, 16 October: the right button stays the app's (R-7.16, Rule)
+
+User decisions of 16 October: "Right click goes to the game in verb-based games, as in ScummVM; keep the Interact menu elsewhere.", then "why not use right click only in the games that need it? -instead of everywhere?". ScummVM master (`processInput`, read 16 October 2026) turns a right press into the Esc key in version 3 games other than LOOM, and `checkExecVerbs` gives mode 0 up to version 3, so Indy3's scripts never see a right click and do not need it; Esc is already the app's Skip, with its override rule (R-7.11). `ScummProfile.RightClickReachesGame` is false here (engine version 3). Test: `ScummIndy3PlayTests.TheRightButtonStaysTheAppsAndNeverReachesTheGame` (refused, nothing queued, no cutscene skipped; the left click is unchanged, mode 0). Nothing changes for the user.

@@ -61,3 +61,7 @@ Filter `Loom|FirstVisit|ScummGameSession|MonkeyFloppy|Indy3|ScummEngineOpcode|Su
 - ScummVM's Room 46 palette enhancement for this release (`_roomPalette[11] = 86`, `[13] = 80`, an optional bug fix) is not modelled.
 - Everything the EGA record lists stays true here: assumed pointer and timing headless, `getActorFromPos` from the session's drawing, inventory objects run no verb code of their own, talk text position not compared, no right click, room-list picks are state previews, no sound during play.
 - Perceived timing and audio are the user's checks.
+
+## Addendum, 16 October: the right button stays the app's (R-7.16, Rule)
+
+User decisions of 16 October: "Right click goes to the game in verb-based games, as in ScummVM; keep the Interact menu elsewhere.", then "why not use right click only in the games that need it? -instead of everywhere?". This release runs as engine version 3 (as ScummVM does), so its scripts never see a right click (ScummVM's Esc outside LOOM, mode 0) and the right button stays the app's: `ScummProfile.RightClickReachesGame` is false (`ScummIndy3VgaPlayTests.TheProfilePlaysThroughTheVerbsWithTheVersionThreeClickAndTheSameKeys`). Nothing changes for the user. See the EGA record's addendum.
