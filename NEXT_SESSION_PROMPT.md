@@ -2,15 +2,14 @@
 
 You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261016-S6-Indy3Ega-S4b-S5-Indy3Vga.md` is the last run). Everything below is only what those do not say.
 
-## State (16 October)
-- Played through their own verbs (Objects ✔, Play ✔): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Depth masks for every browsed game are in. Suite on master: 1014 (1009 passed, 5 skipped, 0 failed).
-- **R-7.7 to R-7.18** (Play for verb-based games) are still `Proposed`; S6 for all three games was built on them.
+## State (17 October)
+- Played through their own verbs (Objects ✔, Play ✔), with sound and music during play (AdLib, PC speaker): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Depth masks for every browsed game are in. Suite on master: 1021 (1016 passed, 5 skipped, 0 failed).
+- **R-7.16** (right click) is confirmed: right click goes to the game only where its interface uses it (`ScummProfile.RightClickReachesGame`: verb-based and engine version 4 or later, today Monkey Island floppy); elsewhere it is the Interact menu. The rest of R-7.7 to R-7.18 is still `Proposed`.
 
 ## Ask the user first (one short question each, only if still open)
-1. **Right click** in verb-based games: keep the app's Interact menu (current) or send it to the game as ScummVM does? It matters now: Monkey Island's two-button default verb needs it.
-2. Restart and save/load keys (Indy3 F5, `VAR_MAINMENU_KEY`): refused (current) or working?
-3. R-1.5 met through the game's default verb; ScummVM's 16×16 cross-hair cursor: acceptable?
-4. What did they see in the user checks of the last checkpoint (play in the three games, mouse mapping, timing, cursor; Monkey/Indy rooms)?
+1. Restart and save/load keys (Indy3 F5, `VAR_MAINMENU_KEY`): refused (current) or working?
+2. R-1.5 met through the game's default verb; ScummVM's 16×16 cross-hair cursor: acceptable?
+3. What did they see and hear in the user checks of the last checkpoint (play and sound in the three games, right click in Monkey Island, mouse mapping, timing, cursor; Monkey/Indy rooms)?
 When answered, change those rows' Basis to `Rule (confirmed by the user <date>)` or adjust them.
 
 ## How this user wants the work run
@@ -22,10 +21,10 @@ When answered, change those rows' Basis to `Rule (confirmed by the user <date>)`
 - The agents cannot hear or see the real window and cannot drive ScummVM: collect those checks for the user in the checkpoint.
 
 ## Suggested next runs (pick with the user, or take the first if they say "keep going")
-- **Sound during play** for the three played games (the S3 sound players exist; the session's sound opcodes must reach them): the most visible gap.
 - `S7 Cutscenes` for Indy3Ega, Indy3Vga, MonkeyFloppy (the shared scan `LoomCutsceneIndex` moves to `Scumm/` when it first serves another game).
 - `S4b MonkeyCd` / `Monkey2` / `Indy4` (v5 needs an `IScummDataSource` first), then Maniac/Zak (v1/v2).
 - `S9` edition checks: `indy3 ega es`, `indy3 vga es`, `monkey1 ega es` (8-disk EGA), `monkey1 vga es`.
+- Sound polish: Monkey Island's music through iMuse instead of the AD block at the estimated half tempo; Indy3's AdLib driver constants (R-13.9); loops longer than the 3-minute rendering; PC speaker timing for `isSoundRunning`.
 - Polish with no cell effect: Indy3Vga rooms 26, 36, 38, 55, 61 differ from EGA by one object; `actorFollowCamera` of a hero in another room; a verb's click area is its text box; Zak's estimated costume colours.
 
 ## Housekeeping
