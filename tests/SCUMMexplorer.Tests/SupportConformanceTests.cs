@@ -56,6 +56,12 @@ public class SupportConformanceTests
         if (support[SupportFeature.Sound] != SupportLevel.None) Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Sound);
         if (support[SupportFeature.Scripts] != SupportLevel.None) Assert.Contains(game.Resources, r => r.Kind == ResourceKind.Script);
         if (support[SupportFeature.Texts] != SupportLevel.None) Assert.NotEmpty(new LoomTextExtractor().Extract(game).Entries);
+        // Play outside LOOM (S6): the game is played through its own verbs (REQUIREMENTS §7.1); ScummIndy3PlayTests plays the acceptance route of R-7.18.
+        if (support[SupportFeature.Play] != SupportLevel.None && game.Id is not (GameId.Loom or GameId.LoomVga))
+            Assert.True(ScummProfile.For(game).PlaysThroughVerbs);
+        // Objects ✔ outside LOOM needs the first visit (S5) and click responses (S6).
+        if (support[SupportFeature.Objects] == SupportLevel.Full && game.Id is not (GameId.Loom or GameId.LoomVga))
+            Assert.True(ScummProfile.For(game).HasFirstVisitScenes && ScummProfile.For(game).PlaysThroughVerbs);
     }
 
     private static string? Locate(string folder)

@@ -136,6 +136,7 @@ public partial class MainWindow : Window
         Deactivated += (_, _) => StopRoomPan();
         PreviewKeyUp += MainWindow_PreviewKeyUp;
         PreviewKeyDown += MainWindow_PreviewKeyDown;
+        PreviewTextInput += (_, e) => PlayTextInput(e);
         LoadViewOptions();
         PreviewTextInput += MainWindow_PreviewTextInput;
         _roomPanTimer.Tick += RoomPanTimer_Tick;
@@ -287,6 +288,9 @@ public partial class MainWindow : Window
 
     private void OpenGameFolder(string folder)
     {
+        StopPlay();
+        _play = null;
+        _playFolder = null;
         var game = _scanner.Scan(folder);
         // The session and game change step by step below; until ShowGame finishes (or if it fails) no Game Status.
         GameStatusButton.Visibility = Visibility.Collapsed;
@@ -1288,6 +1292,7 @@ public partial class MainWindow : Window
         _previewCancellation?.Cancel();
         _previewCancellation = new CancellationTokenSource();
         var token = _previewCancellation.Token;
+        StopPlay();
         ShowPageHeader(false); // the scene needs the height more than a title that only repeats the mode
         PageTitle.Text = "Explore the scene";
         PageTitle.ToolTip = resource.Name;
@@ -1427,6 +1432,9 @@ public partial class MainWindow : Window
                 PageSubtitle.Text = "Original artwork from the game";
                 StatusText.Text = "Ready";
                 StatusText.ToolTip = "Room background read from the game's own data.";
+                // S6: a game played through its verbs plays here once its first visit runs (R-7.7, R-7.17).
+                if (browsedScene is not null && _game is { } playGame && ScummProfile.For(playGame).PlaysThroughVerbs)
+                    await StartPlayAsync(resource, token);
                 return;
             }
             var objectRecords = cdRoom?.Objects ?? _objectDirectory.Decode(bytes);
@@ -2932,6 +2940,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (PlayKeyDown(e)) return;
         // Full screen: F11 toggles; Escape leaves it unless it is needed to skip a cutscene.
         if (e.Key == Key.F11 && _game is not null && RoomDisplayLayout.Visibility == Visibility.Visible) { e.Handled = true; SetFullscreen(!_fullscreen); return; }
         if (e.Key == Key.Escape && _fullscreen && !(GameClickActive && SessionInScene)) { e.Handled = true; SetFullscreen(false); return; }

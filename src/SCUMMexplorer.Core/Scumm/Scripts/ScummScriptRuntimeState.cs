@@ -130,6 +130,13 @@ public sealed class ScummScriptRuntimeState
     /// for the verb or a fallback). Answered by the session, which can read the room data; null outside a session.
     /// </summary>
     public Func<int, int, int?>? VerbEntrypoint { get; set; }
+    /// <summary>
+    /// ScummVM <c>getActorFromPos(x, y)</c>: the lowest-numbered touchable actor drawn on the point's strip whose drawn top and bottom enclose y, or 0;
+    /// null where the session does not model it (the instruction then stays unresolved).
+    /// </summary>
+    public Func<int, int, int>? ActorFromPosition { get; set; }
+    /// <summary>ScummVM <c>convertVerbMessage</c> (text code 5): the name of the verb in use with that number; null where the session does not model it.</summary>
+    public Func<int, byte[]?>? VerbName { get; set; }
     public bool AddToInventorySlots(int subject)
     {
         var free = Array.IndexOf(InventorySlots, 0);
@@ -260,6 +267,13 @@ public sealed class ScummScriptRuntimeState
     /// A message keeps the charset that was set when its <c>print</c> ran (<see cref="ScummMessage.Charset"/>).
     /// </summary>
     public int? Charset { get; set; }
+    /// <summary>ScummVM <c>_cursor.state</c>: <c>cursorCommand cursorOn</c>/<c>Off</c> set it to 1/0, the soft forms add or take one; the cursor shows while it is above 0.</summary>
+    public int CursorState { get; set; }
+    /// <summary>
+    /// The room (main) screen's rows from <c>roomOps setScreen</c> (ScummVM <c>initScreens(top, bottom)</c>): the text screen is above <c>Top</c>, the verb
+    /// screen from <c>Bottom</c> down. ScummVM's start value for these versions is (16, 144) (<c>resetScumm</c>), until a script sets it.
+    /// </summary>
+    public (int Top, int Bottom) MainScreen { get; set; } = (16, 144);
     public int UserPut
     {
         get => userPut;

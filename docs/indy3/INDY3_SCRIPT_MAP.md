@@ -87,6 +87,10 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | Script 18 (dialogue input script) | installed in `var[0x020]` by the dialogue scripts (which restore the previous value after); a choice 120 to 124 turns verbs 0x65 to 0x7C and 14 off, prints choices 120 to 122 as the ego's line and sets `var[0x072]` to the verb id; an inventory click during a dialogue offers the item ("Take this …") | decoded | Script 18 +0x0000 to +0x0108; Script 29 +0x0039, +0x05C8; Script 30 +0x005F, +0x0615 | 2026-10-15 |
 | Other input scripts | `var[0x020]` is also set to 10 (Script 83 +0x003E), 19 (Script 35 +0x0121), 28 (Script 25 +0x000D), 97 (Script 90 +0x0007) and 201 (Script 9 +0x004E) in special scenes | decoded | as listed | 2026-10-15 |
 | Sentence script 2 | called with verb, object A, object B as locals 0 to 2 | engine | Script 2 | 2026-10-14 |
+| Script 113 | turns Talk (0x0D) on when `var[0x032]` (the room's conversation script) is not 0, Travel (0x20) on when `var[0x033]` is not 0 | decoded | Script 113 +0x0000..+0x001C | 2026-10-16 |
+| `var[0x032]` | the conversation script of the room: Room 1's entry sets 29 (Marcus) while actor 4 is there; Script 2 +0x0041 starts it for Talk | decoded | Room 01 entry +0x00A4; Script 2 +0x003A | 2026-10-16 |
+| Room 73 objects in play | 836 the mallet (Pick up: pickupObject, starts local 205: the chain gives it back near the bell); 837 the light switch, a child of the door 830 (parent state 0: findable only with the door closed), Push/Pull/Use/Turn off: cutscene with `beginOverride` +0x0008; 830 the door: Open/Close (Scripts 26/27), Walk to leaves with `loadRoomWithEgo 0x1C, 0x01` (Room 1) | play | Room 73 objects 830, 836, 837; local 205 | 2026-10-16 |
+| Room screen | `roomOps setScreen 0x10, 0x90`: text rows 0–15, room rows 16–143, verb screen 144–199 | decoded | Script 1 +0x021B | 2026-10-16 |
 | Dialogue verbs 120 to 125 | see the conversations plan | reading | [INDY3_CONVERSATIONS_PLAN.md](INDY3_CONVERSATIONS_PLAN.md) | 2026-10-04 |
 
 ## Objects and classes

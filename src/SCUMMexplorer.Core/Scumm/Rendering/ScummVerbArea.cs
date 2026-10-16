@@ -11,7 +11,16 @@ public sealed record ScummVerbAreaItem(int Slot, int VerbId, int Mode, int X, in
     int ImageObject, int ImageRoom, string? Estimate)
 {
     public bool Contains(int x, int y) => x >= X && x < X + Width && y >= Y && y < Y + Height;
+
+    /// <summary>A text verb (its name drawn with the charset), not an image verb.</summary>
+    public bool IsText { get; init; }
 }
+
+/// <summary>
+/// How the text verbs of a verb-based game are drawn (ScummVM <c>drawVerb</c>, text branch): the charset, the verb's name as glyphs after the version's
+/// string escapes (<c>convertMessageToString</c>: verb names, object names, variables), and the slot under the pointer, drawn in its highlight colour.
+/// </summary>
+public sealed record ScummTextVerbDrawing(ScummV3Charset Charset, Func<ScummVerbSnapshot, IReadOnlyList<byte>> Glyphs, int? HoveredSlot);
 
 /// <summary>
 /// The verb area drawn from the session's verb slots: <see cref="Pixels"/> are
@@ -52,7 +61,7 @@ public static class ScummVerbArea
     /// the note heads of LOOM CD carry their own staff lines and sit at y values 0xAB to 0xAF, which only line up with the staff at 0xA8.
     /// </summary>
     public static ScummVerbAreaPicture Compose(IEnumerable<ScummVerbSnapshot> verbs, Func<int, int, RoomObjectImage?> image,
-        IEnumerable<ScummVerbErase>? erases = null, bool alignRows = false)
+        IEnumerable<ScummVerbErase>? erases = null, bool alignRows = false, ScummTextVerbDrawing? text = null)
     {
         ArgumentNullException.ThrowIfNull(verbs);
         ArgumentNullException.ThrowIfNull(image);
@@ -68,6 +77,18 @@ public static class ScummVerbArea
             if (verb.Mode is null)
             {
                 notes.Add($"verb 0x{verb.VerbId:X2}: whether it is on is unknown ({verb.Unknown ?? "not known"})");
+                continue;
+            }
+            if (text is not null && verb.Name is not null && verb.ImageObject is null)
+            {
+                if (verb.X is not int textX || verb.Y is not int textY) { notes.Add($"verb 0x{verb.VerbId:X2}: its position is unknown"); continue; }
+                // drawVerb: dim colour for a dim verb, the highlight colour under the pointer (only when it has one), else its colour; centred on x when asked.
+                var glyphs = text.Glyphs(verb);
+                var width = text.Charset.StringWidth(glyphs);
+                var textLeft = verb.Centered ? textX - width / 2 : textX;
+                var color = (byte)(verb.Mode == 2 ? verb.DimColor : text.HoveredSlot == verb.Slot && verb.HighlightColor != 0 ? verb.HighlightColor : verb.Color);
+                paints.Add((verb.DrawOrder, verb.Slot, () => ScummV3MessageRenderer.DrawPlainLine(pixels, Width, Top, text.Charset, glyphs, textLeft, textY, (byte)(color & 0x0F))));
+                items.Add(new ScummVerbAreaItem(verb.Slot, verb.VerbId, verb.Mode.Value, textLeft, textY, width, ScummV3Charset.GlyphRows, 0, 0, verb.Estimate) { IsText = true });
                 continue;
             }
             if (verb.ImageObject is not int objectId || verb.ImageRoom is not int room)

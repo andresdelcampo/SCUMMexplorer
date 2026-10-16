@@ -12,6 +12,8 @@ Updated 14 October 2026. This is the single plan and session handoff. Completed 
 
 **S4b for MonkeyFloppy done (14 October).** `ScummGameSession` boots the four-disk floppy (`monkey1 ega en`) through the protection, the credits and the opening to Room 33 in 2522 frames with nothing unsupported; the eight-disk Spanish release boots the same way ([record](../.verification/monkey1-session-20261014/README.md), [checkpoint](checkpoints/20261014-S4b-MonkeyFloppy.md), [tracker](monkey1/SUPPORT_STATUS.md)). Proposed R-3.15, R-15.7, R-15.8. Next for the family: S5.
 
+**S6 for Indy3Ega done (16 October).** Indiana Jones EGA is played through its own verbs, sentence line, inventory and dialogue choices; Objects and Play are ✔ ([record](../.verification/indy3-play-20261015/README.md), [tracker](indy3/SUPPORT_STATUS.md)). R-7.7 to R-7.18 stay Proposed until the user confirms them.
+
 **S5 for MonkeyFloppy done (15 October).** 81 of 81 rooms of the floppy release show their first visit without a gap; v4 bit variables and pseudo rooms fixed in the generic session ([record](../.verification/monkey1-objects-20261015/README.md), [checkpoint](checkpoints/20261015-S5-MonkeyFloppy.md)). The Play requirement for verb-based games is proposed (R-7.7 to R-7.18). Game data now lives outside the repository (`D:\Juegos\Lucas`, `TestGames.Root`).
 
 **Scale-out plan (14 October).** The procedure is [GAME_SUPPORT_INSTRUCTIONS.md](GAME_SUPPORT_INSTRUCTIONS.md); the support matrix is generated from `GameSupport`. Done so far: S2/S3 leftovers, S4a, S4b for Indy3Ega and MonkeyFloppy, S5 for Indy3Ega. The brief for the next session is `NEXT_SESSION_PROMPT.md`.

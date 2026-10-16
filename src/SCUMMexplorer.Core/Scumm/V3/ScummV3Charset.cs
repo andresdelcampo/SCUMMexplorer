@@ -274,6 +274,43 @@ public static class ScummV3MessageRenderer
         }
     }
 
+    /// <summary>
+    /// One line of glyphs in a plain colour (<c>drawString</c> of a text verb, ScummVM <c>drawVerb</c>) into an indexed buffer whose first row is screen row
+    /// <paramref name="originY"/>: glyph codes as the charset holds them, an escape (0xFF and its code) is skipped. Returns the right edge (exclusive)
+    /// the line reached, ScummVM's <c>_charset-&gt;_str.right</c>.
+    /// </summary>
+    public static int DrawPlainLine(byte[] pixels, int width, int originY, ScummV3Charset charset, IReadOnlyList<byte> glyphs, int left, int top, byte color)
+    {
+        ArgumentNullException.ThrowIfNull(pixels);
+        ArgumentNullException.ThrowIfNull(charset);
+        ArgumentNullException.ThrowIfNull(glyphs);
+        var height = pixels.Length / width;
+        for (var index = 0; index < glyphs.Count; index++)
+        {
+            int glyph = glyphs[index];
+            if (glyph == 0) break;
+            if (glyph == 0xFF) { index++; continue; }
+            if (glyph == '@') continue;
+            var glyphWidth = charset.CharWidth(glyph);
+            if (left + glyphWidth > ScreenWidth) break;
+            // drawBits1 reads one byte per 8 columns, row after row.
+            var bits = charset.Glyph(glyph);
+            var bytesPerRow = (glyphWidth + 7) / 8;
+            for (var y = 0; y < ScummV3Charset.GlyphRows; y++)
+                for (var x = 0; x < glyphWidth; x++)
+                {
+                    var at = y * bytesPerRow + x / 8;
+                    if (at >= bits.Length || (bits[at] & (0x80 >> (x % 8))) == 0) continue;
+                    var px = left + x;
+                    var py = top + y - originY;
+                    if (px < 0 || px >= width || py < 0 || py >= height) continue;
+                    pixels[py * width + px] = color;
+                }
+            left += glyphWidth;
+        }
+        return left;
+    }
+
     private enum Shadow { None, Normal, Outline }
 
     private sealed class Layer

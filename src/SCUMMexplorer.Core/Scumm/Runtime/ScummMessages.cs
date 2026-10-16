@@ -310,7 +310,7 @@ public sealed class ScummMessageTable
     private string ActorTalk(ScummPrintRequest request, Slot slot, ScummScriptRuntimeState runtime, List<string> estimates)
     {
         var buffer = ScummTextDecoder.ConvertMessage(request.Text!, request.Variables ?? runtime.GlobalVariables,
-            runtime.ObjectName, out var conversionNote);
+            runtime.ObjectName, runtime.VerbName, out var conversionNote);
         if (conversionNote is not null) estimates.Add(conversionNote);
         var actor = request.ActorToPrintFor;
         if (actor == NoActor)
@@ -363,7 +363,7 @@ public sealed class ScummMessageTable
     private string DrawString(ScummPrintRequest request, Slot slot, ScummScriptRuntimeState runtime, List<string> estimates)
     {
         var buffer = ScummTextDecoder.ConvertMessage(request.Text!, request.Variables ?? runtime.GlobalVariables,
-            runtime.ObjectName, out var conversionNote);
+            runtime.ObjectName, runtime.VerbName, out var conversionNote);
         if (conversionNote is not null) estimates.Add(conversionNote);
         if (slot.PositionEstimate is not null && !request.Operations.Any(item => item.Name == "position"))
             estimates.Add($"the position carries over from an earlier print: {slot.PositionEstimate}");

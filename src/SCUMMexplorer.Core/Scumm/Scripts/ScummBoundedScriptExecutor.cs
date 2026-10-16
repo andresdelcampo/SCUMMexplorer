@@ -895,6 +895,15 @@ public sealed class ScummBoundedScriptExecutor
                     pc = next;
                     continue;
                 }
+                // o5_cursorCommand cases 1 to 4: _cursor.state = 1 / 0, or one more / one less (the cursor shows while it is above 0).
+                runtime.CursorState = command switch
+                {
+                    "cursorOn" => 1,
+                    "cursorOff" => 0,
+                    "cursorSoftOn" => runtime.CursorState + 1,
+                    "cursorSoftOff" => runtime.CursorState - 1,
+                    _ => runtime.CursorState
+                };
                 var before = runtime.UserPut;
                 runtime.UserPut = command switch
                 {
@@ -1016,6 +1025,25 @@ public sealed class ScummBoundedScriptExecutor
                 RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
                 MarkEstimated(estimated, ScummVars.CameraPosX, cameraEstimated);
                 trace.Add($"camera x = {clamped} ({instruction.Operation} {instruction.Operands})");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "actorFromPos" && runtime?.ActorFromPosition is not null)
+            {
+                // o5_actorFromPos: result = getActorFromPos(x, y).
+                var at = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (at.Length != 3 || !TryGetVariableKey(at[0], knownVariables, out var actorKey) ||
+                    !TryReadValue(at[1], knownVariables, out var actorX, out _) || !TryReadValue(at[2], knownVariables, out var actorY, out _))
+                {
+                    unresolved = $"actorFromPos operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                var actorFound = runtime.ActorFromPosition((short)actorX, (short)actorY);
+                knownVariables[actorKey] = (ushort)actorFound;
+                RefreshBitAliases(actorKey, knownVariables);
+                MarkEstimated(estimated, actorKey, onEstimatedPath);
+                trace.Add($"{actorKey} = {actorFound}: actorFromPos at ({(short)actorX}, {(short)actorY})");
                 pc = next;
                 continue;
             }
@@ -1194,7 +1222,7 @@ public sealed class ScummBoundedScriptExecutor
                 }
                 var applied = runtime.Verbs.Apply(verbId, operations,
                     objectId => roomObjects.Any(record => record.Id == objectId), runtime.CurrentRoom,
-                    verbEstimated ? $"verbOps at +0x{instruction.Offset:X4} reads an estimate" : null);
+                    verbEstimated ? $"verbOps at +0x{instruction.Offset:X4} reads an estimate" : null, runtime.Charset);
                 if (runtime.Verbs.LastCover is { } cover) applied += runtime.Messages.VerbDrawn(cover);
                 trace.Add(applied + (verbEstimated ? " (estimate)" : ""));
                 pc = next;
@@ -2678,7 +2706,8 @@ public sealed class ScummBoundedScriptExecutor
         objectId = 0;
         classes = [];
         var open = operands.IndexOf(", [", StringComparison.Ordinal);
-        var close = open < 0 ? -1 : operands.IndexOf(']', open + 3);
+        // The list closes at the last bracket: a class can be a variable (Indiana Jones Script 20: ifClassOfIs local[0x002], [local[0x000]]).
+        var close = open < 0 ? -1 : operands.LastIndexOf(']');
         if (open < 0 || close < 0 || !TryReadValue(operands[..open], variables, out var rawObject, out _)) return false;
         var values = new List<int>();
         foreach (var item in operands[(open + 3)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
@@ -2997,7 +3026,16 @@ public sealed class ScummBoundedScriptExecutor
             case "resourceRoutines":
                 trace.Add($"resource routine {instruction.Operands}: every resource is available to the session");
                 return true;
-            case "roomOps" when head is "shakeOn" or "shakeOff" or "setScreen":
+            case "roomOps" when head == "setScreen":
+            {
+                // o5_roomOps case 3 (initScreens): the room screen spans rows a to b; the text screen is above it, the verb screen below.
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (parts.Length == 3 && TryReadValue(parts[1], knownVariables, out var top, out _) && TryReadValue(parts[2], knownVariables, out var bottom, out _))
+                    runtime.MainScreen = (top, bottom);
+                trace.Add($"{instruction.Operands}: the room screen is rows {runtime.MainScreen.Top} to {runtime.MainScreen.Bottom - 1} (initScreens)");
+                return true;
+            }
+            case "roomOps" when head is "shakeOn" or "shakeOff":
                 trace.Add($"{instruction.Operands}: screen shake and screen split are not part of the room picture");
                 return true;
             case "roomOps" when head == "roomColorLegacy":

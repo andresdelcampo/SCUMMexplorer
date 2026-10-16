@@ -89,6 +89,22 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <summary>The boot is over only when the player has control, not when script 1 has ended (a game whose script 1 hands over to an opening scene).</summary>
     public bool BootEndsWhenPlayerHasControl { get; init; }
 
+    /// <summary>
+    /// The game is played through its own verb interface (REQUIREMENTS §7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
+    /// from its verbs and the player's clicks and keys go to its input script (<see cref="ScummSession.ClickScreen"/>). True only for a family whose Play
+    /// cell is raised (R-7.17: no clicks reach the scripts of the others). S6 Indy3Ega.
+    /// </summary>
+    public bool PlaysThroughVerbs { get; init; }
+
+    /// <summary>The third argument of <c>runInputScript</c> for a left click: 0 up to version 3, 1 from version 4 (ScummVM <c>checkExecVerbs</c>).</summary>
+    public int ClickInputMode => Version > ScummVersion.V3 ? 1 : 0;
+
+    /// <summary>
+    /// Keys not delivered to the game in play (R-7.11): a game's save/load key, whose script leaves the session's state (Indiana Jones EGA: F5 = 319,
+    /// Script 24 chains to Script 9 when <c>bit[0x5E4]</c> is 0). Edition data.
+    /// </summary>
+    public IReadOnlyList<int> UndeliveredKeys { get; init; } = [];
+
     public static ScummProfile For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -111,7 +127,10 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             ExtraTimerVariables = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
-            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy
+            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
+            // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24).
+            PlaysThroughVerbs = GameSupport.FamilyOf(game) == GameFamily.Indy3Ega,
+            UndeliveredKeys = GameSupport.FamilyOf(game) == GameFamily.Indy3Ega ? [0x13F] : []
         };
     }
 }

@@ -10,6 +10,17 @@ namespace SCUMMexplorer.Core.Scumm;
 public sealed record ScummVerbSnapshot(int Slot, int VerbId, int? Mode, int? X, int? Y,
     int? ImageObject, int? ImageRoom, string? Name, string? Unknown, string? Estimate, int DrawOrder = 0)
 {
+    /// <summary>ScummVM <c>VerbSlot::color</c>, <c>hicolor</c>, <c>dimcolor</c> (<c>o5_verbOps new</c> gives 2, 0, 8).</summary>
+    public int Color { get; init; } = 2;
+    public int HighlightColor { get; init; }
+    public int DimColor { get; init; } = 8;
+    /// <summary>ScummVM <c>VerbSlot::key</c>: the key that clicks the verb (<c>checkExecVerbs</c>), 0 for none.</summary>
+    public int Key { get; init; }
+    /// <summary>ScummVM <c>VerbSlot::center</c>: the name is centred on x.</summary>
+    public bool Centered { get; init; }
+    /// <summary>The charset the verb was created with (<c>vs-&gt;charset_nr = _string[0]._default.charset</c>), null when none was set.</summary>
+    public int? Charset { get; init; }
+
     public string Describe()
     {
         var mode = Mode switch { 0 => "off", 1 => "on", 2 => "dim", _ => "mode unknown" };
@@ -78,7 +89,7 @@ public sealed class ScummVerbTable
     /// values (null when an operand could not be read). Returns what it did, for the trace.
     /// </summary>
     public string Apply(int verbId, IReadOnlyList<(string Name, int?[] Values, string? Text)> operations,
-        Func<int, bool?> objectInCurrentRoom, int? currentRoom, string? estimate)
+        Func<int, bool?> objectInCurrentRoom, int? currentRoom, string? estimate, int? charset = null)
     {
         var index = FindSlot(verbId);
         var slot = _slots[index];
@@ -97,6 +108,7 @@ public sealed class ScummVerbTable
                     }
                     slot = _slots[index];
                     slot.Reset(verbId);
+                    slot.Charset = charset;
                     notes.Add($"new in slot {index}");
                     break;
                 case "image" or "assignObject" when index == 0:
@@ -144,9 +156,14 @@ public sealed class ScummVerbTable
                     if (index != 0) slot.Reset(0);
                     notes.Add("deleted");
                     break;
+                // Colours, key and centring (o5_verbOps 3, 4, 0x10, 0x12, 0x13): kept for the text verbs of a verb-based game; an image verb ignores them.
+                case "color" when values.ElementAtOrDefault(0) is int color: slot.Color = color; break;
+                case "highlightColor" when values.ElementAtOrDefault(0) is int high: slot.HighlightColor = high; break;
+                case "dimColor" when values.ElementAtOrDefault(0) is int dim: slot.DimColor = dim; break;
+                case "key" when values.ElementAtOrDefault(0) is int key: slot.Key = key; break;
+                case "center": slot.Centered = true; break;
                 default:
-                    // Colours, key, centring and back colour do not change what a
-                    // verb shows or where; they are not kept.
+                    // The back colour does not change what a verb shows or where; it is not kept.
                     break;
             }
             if (estimate is not null) slot.Estimate ??= estimate;
@@ -273,6 +290,12 @@ public sealed class ScummVerbTable
         public string? Unknown { get; set; }
         public string? Estimate { get; set; }
         public int DrawOrder { get; set; }
+        public int Color { get; set; } = 2;
+        public int HighlightColor { get; set; }
+        public int DimColor { get; set; } = 8;
+        public int Key { get; set; }
+        public bool Centered { get; set; }
+        public int? Charset { get; set; }
         // curRect when the verb was last drawn (ScummVM oldRect): new and delete keep it, so a deleted verb clears it.
         public ScummScreenBox? DrawnBox { get; set; }
 
@@ -284,6 +307,12 @@ public sealed class ScummVerbTable
             ImageObject = ImageRoom = null;
             Name = null;
             Unknown = Estimate = null;
+            Color = 2;
+            HighlightColor = 0;
+            DimColor = 8;
+            Key = 0;
+            Centered = false;
+            Charset = null;
         }
 
         public void Forget(string reason)
@@ -294,6 +323,9 @@ public sealed class ScummVerbTable
         }
 
         public ScummVerbSnapshot ToSnapshot() =>
-            new(index, VerbId, Mode, X, Y, ImageObject, ImageRoom, Name, Unknown, Estimate, DrawOrder);
+            new(index, VerbId, Mode, X, Y, ImageObject, ImageRoom, Name, Unknown, Estimate, DrawOrder)
+            {
+                Color = Color, HighlightColor = HighlightColor, DimColor = DimColor, Key = Key, Centered = Centered, Charset = Charset
+            };
     }
 }

@@ -71,7 +71,14 @@ public static class ScummTextDecoder
     /// the variable holds, from <paramref name="objectName"/>. Actors' names (numbers below 13) are not modelled.
     /// </summary>
     public static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables,
-        Func<int, byte[]?>? objectName, out string? note)
+        Func<int, byte[]?>? objectName, out string? note) => ConvertMessage(text, variables, objectName, null, out note);
+
+    /// <summary>
+    /// As above, with code 5 (<c>convertVerbMessage</c>): the name of the verb in use whose number the variable holds, from
+    /// <paramref name="verbName"/> (null leaves code 5 unmodelled). A variable that holds 0 shows nothing.
+    /// </summary>
+    public static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables,
+        Func<int, byte[]?>? objectName, Func<int, byte[]?>? verbName, out string? note)
     {
         note = null;
         var output = new List<byte>();
@@ -112,6 +119,12 @@ public static class ScummTextDecoder
                         output.AddRange(ConvertMessage(name, variables, null, out _));
                     else
                         note = $"the text shows object {named}'s name, which the preview does not have (the object is not in the current room)";
+                    break;
+                case 5 when verbName is not null:
+                    if (!TryReadVariable(value, variables, out var verb))
+                        note = $"the text shows the name of the verb in variable 0x{value:X4}, which is unknown here";
+                    else if (verb != 0 && verbName(verb) is { } verbText)
+                        output.AddRange(ConvertMessage(verbText, variables, objectName, null, out _));
                     break;
                 case 5 or 7:
                     note = $"the text includes {(code == 5 ? "a verb's name" : "a string")} (code {code}), which is not modelled and left out";
