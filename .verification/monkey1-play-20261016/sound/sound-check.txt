@@ -1,0 +1,19 @@
+Indy3 play in Room 73; the scene sound player follows the play session: True
+-- Indy3 Room 73: Close + door (Script 27 +0x002B startSound 3) (device AdLib)
+   frame 36 11022 ms preview start 3 effect (AdLib) | Estimated preview route: Script 27 +0x002B startSound 0x03
+   frame 36 11391 ms opened 3 effect (AdLib) | audio True, duration 0,502 s; Estimated preview route: Script 27 +0x002B startSound 0x03
+sound 3 started True, wave opened True; last session sound events: SoundStarted 30 Room 92 local script 204 +0x0005; SoundStarted 30 Room 92 local script 204 +0x0005; SoundStarted 3 Script 27 +0x002B
+-- another game opened (device AdLib)
+   frame 39 11453 ms stop all   | play was left
+Monkey play in Room 33; follows True
+-- Room 28 picked from the list (entry +0x008A startSound var[0x04B] = 101) (device AdLib)
+   frame 1 17707 ms stop 117  | Room 33 exit script +0x0002 stopSound var[0x060]
+   frame 1 17707 ms stop 118  | Room 33 exit script +0x0005 stopSound var[0x061]
+   frame 1 20883 ms start 101 music (AdLib) | Room 28 entry script +0x008A startSound var[0x04B]
+   frame 1 21059 ms opened 101 music (AdLib) | audio True, duration 180 s; Room 28 entry script +0x008A startSound var[0x04B]
+Room 28; sound 101 started True, wave opened True; the session has 101 running: True
+Space: game paused True, sounds paused True
+Space again: game paused False, sounds paused False
+-- a sound picked in the tree (play left) (device AdLib)
+   frame 7 21963 ms stop all   | play was left
+play timer after leaving: stopped

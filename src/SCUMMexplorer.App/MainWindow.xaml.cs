@@ -1212,6 +1212,9 @@ public partial class MainWindow : Window
         StatusText.Visibility = Visibility.Visible;
         StatusText.HorizontalAlignment = HorizontalAlignment.Left;
         UpdateConnectionsButton();
+        // Another kind of resource leaves play: its frames stop and so do the sounds its scripts started (S6 sound; before, the game ran on unseen and
+        // its next sound stopped the sound player's).
+        if (resource.Kind != ResourceKind.Room) StopPlay();
         if (resource.Kind == ResourceKind.Sound)
         {
             await ShowAudio(resource);
