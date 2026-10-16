@@ -9,9 +9,9 @@ using SCUMMexplorer.Core.Scumm;
 namespace SCUMMexplorer.App;
 
 /// <summary>
-/// Play in a verb-based game (REQUIREMENTS §7.1, Proposed R-7.7 to R-7.18; S6 Indy3Ega, 15–16 October 2026): the room view becomes the game's own screen,
+/// Play in a verb-based game (REQUIREMENTS §7.1, Proposed R-7.7 to R-7.18; S6 Indy3Ega, 15–16 October 2026; S6 MonkeyFloppy, 16 October): the room view becomes the game's own screen,
 /// composed every frame from a live <see cref="ScummGameSession"/> (<see cref="ScummPlayScreen"/>): the room, its objects and actors, the messages, the verb
-/// area with the sentence line and inventory the game draws, and the game's crosshair cursor in place of the system pointer. Each press of the left button
+/// area with the sentence line and inventory the game draws, and the game's cursor (the v3 crosshair, the v4 bitmap cross-hair) in place of the system pointer. Each press of the left button
 /// is one click for the game's input script (<see cref="ScummSession.ClickScreen"/>); keys go as R-7.11 says. Space pauses, Esc skips a cutscene from
 /// its override point, '.' ends the current line. The app chooses no verb, object or sentence.
 /// </summary>
@@ -37,8 +37,8 @@ public partial class MainWindow
             if (_play is null || _playFolder != game.FolderPath)
             {
                 StopPlay();
-                var objects = await Task.Run(() => new LflObjectStateReader().ReadSnapshot(System.IO.Path.Combine(game.FolderPath, "00.LFL")), token);
-                var session = await Task.Run(() => new ScummGameSession(game, objects), token);
+                var objects = await Task.Run(() => ScummGameSession.IndexedObjectsOf(game), token);
+                var session = await Task.Run(() => ScummGameSession.Start(game, objects), token);
                 if (token.IsCancellationRequested) return;
                 _play = session;
                 _playScreen = new ScummPlayScreen(game, session, objects.States);

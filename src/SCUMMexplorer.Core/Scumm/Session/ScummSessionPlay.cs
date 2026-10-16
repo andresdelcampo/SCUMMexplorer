@@ -17,7 +17,7 @@ public abstract partial class ScummSession
     protected (int X, int Y)? _screenPointer;
     private readonly Queue<ScummPlayInput> _queuedInput = new();
     private readonly List<ScummPlayInput> _deliveredInput = [];
-    private readonly Dictionary<int, ScummV3Charset?> _charsets = [];
+    private readonly Dictionary<int, IScummTextCharset?> _charsets = [];
     private readonly Dictionary<int, IReadOnlyDictionary<int, byte[]>> _inventoryNameRooms = [];
 
     /// <summary>The inputs delivered to the input script so far (Advanced trace, R-7.17).</summary>
@@ -59,14 +59,31 @@ public abstract partial class ScummSession
         PlaceVirtualMouse();
     }
 
-    /// <summary>The charset a text verb or message is drawn with (the game's charset files, v3 only), cached; null when it cannot be read.</summary>
-    public ScummV3Charset? PlayCharset(int? number = null)
+    /// <summary>
+    /// The charset a text verb or message is drawn with, cached; null when it cannot be read: the old-v3 charset files (<c>99 - n</c>.LFL), or from
+    /// version 4 the charset blocks of the game's archive or disks (<c>CHAR</c>, <c>CharsetRendererClassic</c>).
+    /// </summary>
+    public IScummTextCharset? PlayCharset(int? number = null)
     {
         var chosen = number ?? _runtime.Charset ?? 0;
         if (!_charsets.TryGetValue(chosen, out var charset))
-            _charsets[chosen] = charset = _game.Version == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : null;
+            _charsets[chosen] = charset = _game.Version == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : ReadArchiveCharset(chosen);
         return charset;
     }
+
+    private ScummV4Charset? ReadArchiveCharset(int number)
+    {
+        IEnumerable<ScummV4Archive> archives = _game.V4Archive is { } single ? [single] : _game.V4Disks?.Disks.OfType<ScummV4Archive>() ?? [];
+        foreach (var archive in archives)
+        {
+            try { if (archive.ReadCharset(number) is { } charset) return charset; }
+            catch (InvalidDataException) { }
+        }
+        return null;
+    }
+
+    /// <summary>The charset the play screen's text starts from: the one the game set (<c>initCharset</c>), else charset 0.</summary>
+    public IScummTextCharset? CurrentPlayCharset() => PlayCharset(_runtime.Charset ?? 0) ?? PlayCharset(0);
 
     /// <summary>A verb's name as the engine draws it: <c>convertMessageToString</c> with variables, object names (code 6) and verb names (code 5).</summary>
     public IReadOnlyList<byte> VerbGlyphs(ScummVerbSnapshot verb)
@@ -103,14 +120,14 @@ public abstract partial class ScummSession
     /// </summary>
     public ScummVerbAreaPicture PlayVerbArea()
     {
-        var charset = PlayCharset(0);
+        var charset = PlayCharset(0) ?? CurrentPlayCharset();
         var verbs = _runtime.Verbs.Snapshot().Where(v => !HidesVerb(v)).ToArray();
         if (charset is null) return VerbArea();
-        var plain = ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, null));
+        var plain = ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, null, n => PlayCharset(n)));
         if (!CursorShown || _screenPointer is not { } pointer || pointer.Y < ScummVerbArea.Top) return plain;
         var over = ScummVerbArea.FindVerbAt(plain.Items, pointer.X, pointer.Y);
         return over is null ? plain
-            : ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, over.Slot));
+            : ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, over.Slot, n => PlayCharset(n)));
     }
 
     /// <summary>
@@ -153,6 +170,7 @@ public abstract partial class ScummSession
             : Is(RestartKeyVariable) ? "it is the engine's restart key (Restart is the app's)"
             : Is(PauseKeyVariable) ? "it is the pause key (the app's Pause)"
             : key is '.' or 0x1B ? "it is an engine key (the app's Skip line or Skip)"
+            : ScummProfile.For(_game).MainMenuKeyVariable is { } menu && Is(menu) ? "it is the engine's save/load menu key (VAR_MAINMENU_KEY), and the explorer's state is the session's"
             : ScummProfile.For(_game).UndeliveredKeys.Contains(key) ? "the game would save or load with it, and the explorer's state is the session's"
             : InputRefusal();
         if (refused is not null) return null;

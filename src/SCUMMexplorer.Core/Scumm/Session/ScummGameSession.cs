@@ -36,6 +36,7 @@ public sealed class ScummGameSession : ScummSession
             if (!_runtime.GlobalVariables.ContainsKey(key)) _runtime.SetGlobalVariable(key, 0);
         }
         _runtime.CameraFollowStartsScene = profile.CameraFollowStartsScene;
+        _runtime.PublishesCursorVariables = profile.PublishesCursorVariables;
         // getActorFromPos, from the actors as the last frame drew them (S6: Indiana Jones's Script 20 finds the person under the pointer with it).
         if (profile.PlaysThroughVerbs)
         {
@@ -46,6 +47,26 @@ public sealed class ScummGameSession : ScummSession
         _bootInput = profile.BootInput;
         _waitsForControl = profile.BootEndsWhenPlayerHasControl;
         if (boot) Boot();
+    }
+
+    /// <summary>
+    /// The game's starting object states and classes from its index: the v4 archive's (one archive, or the first of several disks: <c>000.LFL</c> is the
+    /// same on every disk) or the old-v3 <c>00.LFL</c> (S6, 16 October 2026: play starts from them for every <see cref="ScummProfile.PlaysThroughVerbs"/> game).
+    /// </summary>
+    public static ScummIndexedObjectSnapshot IndexedObjectsOf(GameLibrary game)
+    {
+        ArgumentNullException.ThrowIfNull(game);
+        if (!ScummProfile.For(game).UsesV4Archive) return new LflObjectStateReader().ReadSnapshot(System.IO.Path.Combine(game.FolderPath, "00.LFL"));
+        var index = game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault()
+            ?? throw new InvalidDataException("The game has no v4 archive to read its index from.");
+        return index.ReadIndexedObjects();
+    }
+
+    /// <summary>A booted session of the game from its index (<see cref="IndexedObjectsOf"/>), reading v4 data through the game's data source.</summary>
+    public static ScummGameSession Start(GameLibrary game, ScummIndexedObjectSnapshot indexed, int randomSeed = 0)
+    {
+        ArgumentNullException.ThrowIfNull(game);
+        return new ScummGameSession(game, indexed, randomSeed, null, ScummProfile.For(game).UsesV4Archive ? ScummDataSources.For(game) : null);
     }
 
     /// <summary><c>VAR_SOUNDCARD</c> for AdLib (vars.cpp: 0 PC speaker, 1 Tandy, 2 CMS, 3 AdLib, 4 Roland).</summary>

@@ -9,7 +9,7 @@ namespace SCUMMexplorer.Core.Scumm;
 /// and per glyph width, height, x offset and y offset (signed) bytes followed by the pixels, packed bits per pixel
 /// running on across rows. A glyph's advance is its width plus its x offset (<c>getCharWidth</c>).
 /// </summary>
-public sealed class ScummV4Charset
+public sealed class ScummV4Charset : IScummTextCharset
 {
     private const int FontStart = 21;
     private readonly byte[] _file;
@@ -105,5 +105,43 @@ public sealed class ScummV4Charset
                     numbits = 8;
                 }
             }
+    }
+
+    /// <summary><c>_str.bottom</c> of a drawn line: the font height (the glyphs' y offsets stay inside it).</summary>
+    public int LineRows => FontHeight;
+
+    /// <summary>
+    /// <c>drawString</c> of a text verb with <c>CharsetRendererClassic</c>: pixel value 1 takes the colour (a whole palette index), the others the charset's
+    /// colour map; an escape (0xFF and its code) and '@' draw nothing; a glyph that would run past the screen's width ends the line.
+    /// </summary>
+    public int DrawPlainLine(byte[] pixels, int width, int originY, IReadOnlyList<byte> glyphs, int left, int top, byte color)
+    {
+        ArgumentNullException.ThrowIfNull(pixels);
+        ArgumentNullException.ThrowIfNull(glyphs);
+        var height = pixels.Length / width;
+        for (var index = 0; index < glyphs.Count; index++)
+        {
+            int glyph = glyphs[index];
+            if (glyph == 0) break;
+            if (glyph is 0xFF or 0xFE) { index++; continue; }
+            if (glyph == '@') continue;
+            var glyphWidth = CharWidth(glyph);
+            if (left + glyphWidth > ScummV3MessageRenderer.ScreenWidth) break;
+            var (x0, y0) = (left, top - originY);
+            DrawGlyph(glyph, (x, y, value) =>
+            {
+                var (px, py) = (x0 + x, y0 + y);
+                if (px < 0 || px >= width || py < 0 || py >= height) return;
+                pixels[py * width + px] = value == 1 ? color : ColorMap[value - 1];
+            });
+            left += glyphWidth;
+        }
+        return left;
+    }
+
+    public ScummMessageLayer RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor)
+    {
+        ArgumentNullException.ThrowIfNull(charsetFor);
+        return ScummV4MessageRenderer.Render(messages, number => charsetFor(number) as ScummV4Charset ?? this);
     }
 }

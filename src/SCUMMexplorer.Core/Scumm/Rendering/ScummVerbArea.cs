@@ -19,8 +19,10 @@ public sealed record ScummVerbAreaItem(int Slot, int VerbId, int Mode, int X, in
 /// <summary>
 /// How the text verbs of a verb-based game are drawn (ScummVM <c>drawVerb</c>, text branch): the charset, the verb's name as glyphs after the version's
 /// string escapes (<c>convertMessageToString</c>: verb names, object names, variables), and the slot under the pointer, drawn in its highlight colour.
+/// <paramref name="CharsetFor"/> gives the charset a verb was created with (<c>vs-&gt;charset_nr</c>); <paramref name="Charset"/> stands in when it gives none.
 /// </summary>
-public sealed record ScummTextVerbDrawing(ScummV3Charset Charset, Func<ScummVerbSnapshot, IReadOnlyList<byte>> Glyphs, int? HoveredSlot);
+public sealed record ScummTextVerbDrawing(IScummTextCharset Charset, Func<ScummVerbSnapshot, IReadOnlyList<byte>> Glyphs, int? HoveredSlot,
+    Func<int, IScummTextCharset?>? CharsetFor = null);
 
 /// <summary>
 /// The verb area drawn from the session's verb slots: <see cref="Pixels"/> are
@@ -84,11 +86,12 @@ public static class ScummVerbArea
                 if (verb.X is not int textX || verb.Y is not int textY) { notes.Add($"verb 0x{verb.VerbId:X2}: its position is unknown"); continue; }
                 // drawVerb: dim colour for a dim verb, the highlight colour under the pointer (only when it has one), else its colour; centred on x when asked.
                 var glyphs = text.Glyphs(verb);
-                var width = text.Charset.StringWidth(glyphs);
+                var charset = (verb.Charset is int number ? text.CharsetFor?.Invoke(number) : null) ?? text.Charset;
+                var width = charset.StringWidth(glyphs);
                 var textLeft = verb.Centered ? textX - width / 2 : textX;
                 var color = (byte)(verb.Mode == 2 ? verb.DimColor : text.HoveredSlot == verb.Slot && verb.HighlightColor != 0 ? verb.HighlightColor : verb.Color);
-                paints.Add((verb.DrawOrder, verb.Slot, () => ScummV3MessageRenderer.DrawPlainLine(pixels, Width, Top, text.Charset, glyphs, textLeft, textY, (byte)(color & 0x0F))));
-                items.Add(new ScummVerbAreaItem(verb.Slot, verb.VerbId, verb.Mode.Value, textLeft, textY, width, ScummV3Charset.GlyphRows, 0, 0, verb.Estimate) { IsText = true });
+                paints.Add((verb.DrawOrder, verb.Slot, () => charset.DrawPlainLine(pixels, Width, Top, glyphs, textLeft, textY, color)));
+                items.Add(new ScummVerbAreaItem(verb.Slot, verb.VerbId, verb.Mode.Value, textLeft, textY, width, charset.LineRows, 0, 0, verb.Estimate) { IsText = true });
                 continue;
             }
             if (verb.ImageObject is not int objectId || verb.ImageRoom is not int room)

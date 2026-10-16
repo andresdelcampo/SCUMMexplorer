@@ -270,6 +270,11 @@ public sealed class ScummScriptRuntimeState
     /// <summary>ScummVM <c>_cursor.state</c>: <c>cursorCommand cursorOn</c>/<c>Off</c> set it to 1/0, the soft forms add or take one; the cursor shows while it is above 0.</summary>
     public int CursorState { get; set; }
     /// <summary>
+    /// From version 4 every <c>cursorCommand</c> copies <c>_cursor.state</c> and <c>_userPut</c> into <c>VAR_CURSORSTATE</c> (52) and <c>VAR_USERPUT</c> (53)
+    /// (script_v5.cpp <c>o5_cursorCommand</c>, read 16 October 2026); Monkey Island's interface loop (Script 23) reads the first. Off for older versions.
+    /// </summary>
+    public bool PublishesCursorVariables { get; set; }
+    /// <summary>
     /// The room (main) screen's rows from <c>roomOps setScreen</c> (ScummVM <c>initScreens(top, bottom)</c>): the text screen is above <c>Top</c>, the verb
     /// screen from <c>Bottom</c> down. ScummVM's start value for these versions is (16, 144) (<c>resetScumm</c>), until a script sets it.
     /// </summary>

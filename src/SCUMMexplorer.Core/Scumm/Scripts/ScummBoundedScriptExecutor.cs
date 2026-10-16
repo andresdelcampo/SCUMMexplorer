@@ -892,6 +892,7 @@ public sealed class ScummBoundedScriptExecutor
                     runtime.Charset = number is not null && number.StartsWith("0x", StringComparison.Ordinal)
                         ? int.Parse(number.AsSpan(2), System.Globalization.NumberStyles.HexNumber) : null;
                     trace.Add($"charset {(runtime.Charset?.ToString() ?? "unknown (a variable)")} (charsetSet at +0x{instruction.Offset:X4})");
+                    PublishCursorVariables(runtime, knownVariables);
                     pc = next;
                     continue;
                 }
@@ -919,6 +920,7 @@ public sealed class ScummBoundedScriptExecutor
                     else if (command is "userInputOn" or "userInputOff") runtime.UserPutEstimate = null;
                     trace.Add($"user input {(runtime.UserPut > 0 ? "on" : "off")} ({command}, _userPut = {runtime.UserPut})");
                 }
+                PublishCursorVariables(runtime, knownVariables);
                 pc = next;
                 continue;
             }
@@ -3254,6 +3256,14 @@ public sealed class ScummBoundedScriptExecutor
         variables[key] = bit;
         if (!variables.ContainsKey(SeparateBitStorage) && variables.TryGetValue(backingKey, out var word))
             variables[backingKey] = bit == 0 ? (ushort)(word & ~(1 << (bitIndex & 15))) : (ushort)(word | (1 << (bitIndex & 15)));
+    }
+
+    // o5_cursorCommand, version 4 and later: VAR(VAR_CURSORSTATE) = _cursor.state; VAR(VAR_USERPUT) = _userPut.
+    private static void PublishCursorVariables(ScummScriptRuntimeState runtime, IDictionary<string, ushort> variables)
+    {
+        if (!runtime.PublishesCursorVariables) return;
+        variables[ScummVars.CursorState] = unchecked((ushort)runtime.CursorState);
+        variables[ScummVars.UserPut] = unchecked((ushort)runtime.UserPut);
     }
 
     private static bool TryGetVariableKey(string operand, IDictionary<string, ushort> variables, out string variableKey)

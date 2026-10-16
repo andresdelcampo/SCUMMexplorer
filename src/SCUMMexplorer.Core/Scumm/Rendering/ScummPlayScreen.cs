@@ -34,7 +34,10 @@ public sealed class ScummPlayScreen
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _indexedStates = indexedStates ?? throw new ArgumentNullException(nameof(indexedStates));
         _data = ScummDataSources.For(game);
+        _bitmapCursor = ScummProfile.For(game).UsesBitmapCursor;
     }
+
+    private readonly bool _bitmapCursor;
 
     /// <summary>The scene of the current room at this frame (objects, actors, palettes), or null outside a room.</summary>
     public ScummRoomScene? Scene()
@@ -95,16 +98,36 @@ public sealed class ScummPlayScreen
                 if (screenY < bottom || screenY >= ScummPlayFrame.Height) continue;
                 pixels[screenY * ScummPlayFrame.Width + x] = Colour(basePalette, verbs.Pixels[y * verbs.Width + x]);
             }
-        if (_session.PlayCharset(0) is { } charset)
+        if ((_session.PlayCharset(0) ?? _session.CurrentPlayCharset()) is { } charset)
         {
-            var layer = ScummV3MessageRenderer.Render(_session.Messages.OnScreen, charset);
+            var layer = charset.RenderMessages(_session.Messages.OnScreen, number => number is int n ? _session.PlayCharset(n) : null);
             for (var i = 0; i < layer.Pixels.Length; i++)
                 if (layer.Pixels[i] != ScummV3MessageRenderer.Transparent) pixels[i] = Colour(basePalette, layer.Pixels[i]);
         }
         var cursor = _session.CursorShown;
         if (cursor && _session.ScreenPointer is { } pointer)
-            DrawCrosshair(pixels, pointer.X, pointer.Y, Colour(basePalette, CursorColors[(frame >> 1) & 3]));
+        {
+            var colour = Colour(basePalette, CursorColors[(frame >> 1) & 3]);
+            if (_bitmapCursor) DrawBitmapCursor(pixels, pointer.X, pointer.Y, colour);
+            else DrawCrosshair(pixels, pointer.X, pointer.Y, colour);
+        }
         return new ScummPlayFrame(pixels, scene?.RoomId, top, bottom, viewLeft, verbs, cursor);
+    }
+
+        // ScummEngine_v5::resetCursors, cursor 0 (the cross-hair of every version 4 and 5 game; cursor.cpp, read 16 October 2026): 16 × 16, bit 15 is the
+    // left column, hotspot (8, 7); setBuiltinCursor paints the set bits in the cycling colour.
+    private static readonly ushort[] CrossHairImage =
+        [0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0000, 0x7E3F, 0x0000, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0080, 0x0000];
+
+    private static void DrawBitmapCursor(uint[] pixels, int x, int y, uint colour)
+    {
+        for (var row = 0; row < 16; row++)
+            for (var bit = 0; bit < 16; bit++)
+            {
+                if ((CrossHairImage[row] & (1 << bit)) == 0) continue;
+                var (px, py) = (x - 8 + 15 - bit, y - 7 + row);
+                if (px is >= 0 and < ScummPlayFrame.Width && py is >= 0 and < ScummPlayFrame.Height) pixels[py * ScummPlayFrame.Width + px] = colour;
+            }
     }
 
     // setBuiltinCursor (v3 crosshair): from the hotspot, 7 pixels each side across starting 5 away, 8 pixels each side down starting 3 away.

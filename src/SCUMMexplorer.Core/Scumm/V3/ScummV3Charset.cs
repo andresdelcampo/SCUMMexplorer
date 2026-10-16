@@ -8,7 +8,7 @@ namespace SCUMMexplorer.Core.Scumm;
 /// at +4, the font height at +5, a width table, then 8 bytes per glyph (one
 /// byte per row, the high bit on the left).
 /// </summary>
-public sealed class ScummV3Charset
+public sealed class ScummV3Charset : IScummTextCharset
 {
     /// <summary>Every glyph is drawn 8 rows high (<c>getDrawHeightIntern</c>).</summary>
     public const int GlyphRows = 8;
@@ -103,6 +103,15 @@ public sealed class ScummV3Charset
     }
 
     internal ReadOnlySpan<byte> Glyph(int glyph) => _glyphs.AsSpan(glyph * GlyphRows, GlyphRows);
+
+    int IScummTextCharset.LineRows => GlyphRows;
+
+    // drawVerb for v3: the low 4 bits are the EGA colour.
+    int IScummTextCharset.DrawPlainLine(byte[] pixels, int width, int originY, IReadOnlyList<byte> glyphs, int left, int top, byte color) =>
+        ScummV3MessageRenderer.DrawPlainLine(pixels, width, originY, this, glyphs, left, top, (byte)(color & 0x0F));
+
+    ScummMessageLayer IScummTextCharset.RenderMessages(IEnumerable<ScummMessage> messages, Func<int?, IScummTextCharset?> charsetFor) =>
+        ScummV3MessageRenderer.Render(messages, this);
 }
 
 /// <summary>A message drawn into a screen-sized layer of palette indices.</summary>

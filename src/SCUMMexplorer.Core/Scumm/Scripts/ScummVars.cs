@@ -73,6 +73,11 @@ public static class ScummVars
     /// <summary><c>VAR_RESTART_KEY</c> and <c>VAR_PAUSE_KEY</c>: keys the engine handles itself.</summary>
     public const string RestartKey = "var[0x02A]";
     public const string PauseKey = "var[0x02B]";
+    /// <summary>Version 4 and later: <c>VAR_MAINMENU_KEY</c> (50), the key of the engine's save/load menu (vars.cpp <c>setupScummVars</c>; input.cpp <c>processKeyboard</c>).</summary>
+    public const string MainMenuKey = "var[0x032]";
+    /// <summary>Version 4 and later: <c>VAR_CURSORSTATE</c> (52) and <c>VAR_USERPUT</c> (53), copies of <c>_cursor.state</c> and <c>_userPut</c> after each <c>cursorCommand</c>.</summary>
+    public const string CursorState = "var[0x034]";
+    public const string UserPut = "var[0x035]";
     /// <summary><c>VAR_MOUSE_X</c>/<c>VAR_MOUSE_Y</c>: the pointer's screen point (<see cref="MouseX"/> is the virtual one in the room).</summary>
     public const string ScreenMouseX = "var[0x02C]";
     public const string ScreenMouseY = "var[0x02D]";

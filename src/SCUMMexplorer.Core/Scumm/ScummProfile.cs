@@ -96,6 +96,18 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// </summary>
     public bool PlaysThroughVerbs { get; init; }
 
+        /// <summary>
+    /// The play cursor is the bitmap cross-hair of <c>ScummEngine_v5::resetCursors</c> (cursor 0, 16 × 16, hotspot 8, 7) from engine version 4; up to
+    /// version 3 it is the drawn crosshair of <c>setBuiltinCursor</c> (cursor.cpp, read 16 October 2026).
+    /// </summary>
+    public bool UsesBitmapCursor => EngineVersion >= ScummVersion.V4;
+
+    /// <summary>The variable holding the engine's save/load menu key (<c>VAR_MAINMENU_KEY</c>, from version 4); the engine opens its menu and the scripts never see the key.</summary>
+    /// <summary><c>cursorCommand</c> copies the cursor state and user input into <c>VAR_CURSORSTATE</c>/<c>VAR_USERPUT</c> (from version 4, <c>o5_cursorCommand</c>).</summary>
+    public bool PublishesCursorVariables => EngineVersion >= ScummVersion.V4;
+
+    public string? MainMenuKeyVariable => EngineVersion >= ScummVersion.V4 ? ScummVars.MainMenuKey : null;
+
     /// <summary>The third argument of <c>runInputScript</c> for a left click: 0 up to version 3, 1 from version 4 (ScummVM <c>checkExecVerbs</c>).</summary>
     public int ClickInputMode => Version > ScummVersion.V3 ? 1 : 0;
 
@@ -128,8 +140,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
             BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
-            // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24).
-            PlaysThroughVerbs = GameSupport.FamilyOf(game) == GameFamily.Indy3Ega,
+            // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 MonkeyFloppy (16 October).
+            PlaysThroughVerbs = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.MonkeyFloppy,
             UndeliveredKeys = GameSupport.FamilyOf(game) == GameFamily.Indy3Ega ? [0x13F] : []
         };
     }
