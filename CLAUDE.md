@@ -1,6 +1,6 @@
 # SCUMMexplorer
 
-An audio-visual, interactive explorer for old SCUMM games. It is not meant as a technical SCUMM viewer. Users walk through rooms, trigger cutscenes, change objects and discover the games' secrets. **LOOM EGA (DOS) is the reference; LOOM CD/VGA also has live interaction, actors, scripts, scene playback, Game Status and CD audio.** Indiana Jones and the Last Crusade EGA is supported only for backgrounds and texts, including dialogue choices. Other games (Monkey Island 1 and 2, Indy3 256 colours, Indy 4, Maniac Mansion and Zak McKracken classic/enhanced) are browse-only: rooms, costumes and sounds where readable (`docs/engine/SCUMM_RESOURCE_FORMATS.md`).
+An audio-visual, interactive explorer for old SCUMM games. It is not meant as a technical SCUMM viewer. Users walk through rooms, trigger cutscenes, change objects and discover the games' secrets. **LOOM EGA (DOS) is the reference; LOOM CD/VGA also has live interaction, actors, scripts, scene playback, Game Status and CD audio.** Indiana Jones and the Last Crusade EGA is played through its own verbs in the generic session (`ScummGameSession`, S6, 16 October 2026). Indy3 256 colours and Monkey Island 1 floppy show first-visit rooms from the generic session (S5). Other games (Monkey Island 1 CD and 2, Indy 4, Maniac Mansion and Zak McKracken classic/enhanced) are browse-only: rooms, costumes and sounds where readable (`docs/engine/SCUMM_RESOURCE_FORMATS.md`).
 
 ## Layout
 
