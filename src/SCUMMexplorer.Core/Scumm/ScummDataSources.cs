@@ -64,6 +64,9 @@ public static class ScummDataSources
     {
         ArgumentNullException.ThrowIfNull(game);
         var profile = ScummProfile.For(game);
+        // A game stored as one file per room (the 256-colour Indiana Jones): its single archive is built from the room files (S4b Indy3Vga).
+        if (profile.UsesV4Archive && game.V4Archive is null && game.V4Disks?.Disks is [ScummV4Archive { IsRoomFileGame: true } roomFiles])
+            return new ScummV4RoomFileDataSource(roomFiles, profile.Dialect);
         // A v4 game on several disks (Monkey Island's floppy release): every disk behind one source (S4b MonkeyFloppy).
         if (profile.UsesV4Archive && game.V4Archive is null && game.V4Disks is { } disks && disks.Disks.OfType<ScummV4Archive>().Any())
             return new ScummV4DiskSetDataSource(disks, profile.Dialect);

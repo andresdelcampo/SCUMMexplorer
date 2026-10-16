@@ -94,8 +94,9 @@ public sealed class ScummCostume
             throw new InvalidDataException("The costume tables are outside the resource.");
     }
 
-    private ScummCostume(int id, byte[] body, bool vga)
+    private ScummCostume(int id, byte[] body, bool vga, bool byteCommands)
     {
+        _byteCommands = byteCommands;
         // The stored offsets count from the CO block's start, so the body sits behind the 6-byte header.
         _resource = new byte[VgaHeader + body.Length];
         body.CopyTo(_resource, VgaHeader);
@@ -114,7 +115,13 @@ public sealed class ScummCostume
     }
 
     /// <summary>A LOOM CD costume from the body of its CO block (colour 0 is transparent; the other colours go through the costume's table into the room palette).</summary>
-    public static ScummCostume ReadVga(byte[] blockBody, int id = 0) => new(id, blockBody, vga: true);
+    /// <remarks>
+    /// <paramref name="byteCommands"/>: an animation names each limb's first command with one byte (0xFF: none) instead of a word, as ScummVM's
+    /// <c>ClassicCostumeLoader::costumeDecodeData</c> reads it for a version 3 game; the 256-colour Indiana Jones stores its costumes that way (S4b Indy3Vga).
+    /// </remarks>
+    public static ScummCostume ReadVga(byte[] blockBody, int id = 0, bool byteCommands = false) => new(id, blockBody, vga: true, byteCommands);
+
+    private readonly bool _byteCommands;
 
     /// <summary>True for a CD costume, whose colours are room palette indices (up to 255) rather than EGA colours.</summary>
     public bool IsVga => _colorTable is not null;
@@ -168,7 +175,7 @@ public sealed class ScummCostume
         {
             if ((mask & 0x8000) == 0) continue;
             int command;
-            if (IsVga) { command = ReadWord(cursor); cursor += 2; }
+            if (IsVga && !_byteCommands) { command = ReadWord(cursor); cursor += 2; }
             else { command = Byte(cursor++); if (command == 0xFF) command = ScummCostumeAnimationState.None; }
             if ((useMask & 0x8000) != 0)
             {

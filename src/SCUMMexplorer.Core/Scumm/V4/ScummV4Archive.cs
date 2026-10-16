@@ -69,6 +69,9 @@ public sealed class ScummV4Archive : IBrowsableArchive
     /// <summary>True for the per-room-file layout (the 256-colour Indy3, a version 3 game): its scripts are not read with the v4 dialect.</summary>
     public bool IsRoomFileGame => _byteCostumeCommands;
 
+    /// <summary>The size of one walk box in the BX block: 18 bytes in the per-room-file layout (a version 3 game, ScummVM <c>Box</c> small-header form without the scale word), 20 in a disk's archive.</summary>
+    public int WalkBoxSize => _byteCostumeCommands ? ScummWalkBoxReader.BoxSize : ScummWalkBoxReader.BoxSizeV5;
+
     private ScummV4Archive(byte[] lec, byte[] index, IReadOnlyList<ScummV4Room> rooms)
     {
         _lec = lec;
@@ -410,7 +413,7 @@ public sealed class ScummV4Archive : IBrowsableArchive
     public ScummWalkBoxSet? ReadWalkBoxes(int number)
     {
         // The 256-colour Indy (per-room files) is a version 3 game in ScummVM: 18-byte boxes without the scale word.
-        try { return ReadWalkBoxBlock(number) is { } body ? ScummWalkBoxReader.ReadBlockBody(body, _byteCostumeCommands ? ScummWalkBoxReader.BoxSize : ScummWalkBoxReader.BoxSizeV5) : null; }
+        try { return ReadWalkBoxBlock(number) is { } body ? ScummWalkBoxReader.ReadBlockBody(body, WalkBoxSize) : null; }
         catch (Exception ex) when (ex is InvalidDataException or KeyNotFoundException) { return null; }
     }
 

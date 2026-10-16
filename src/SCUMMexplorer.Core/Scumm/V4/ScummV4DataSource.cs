@@ -82,7 +82,7 @@ public sealed class ScummV4DataSource : IScummDataSource
         {
             if (_archive.ReadWalkBoxBlock(room) is { } block)
             {
-                boxes = ScummWalkBoxReader.ReadBlockBody(block);
+                boxes = ScummWalkBoxReader.ReadBlockBody(block, _archive.WalkBoxSize);
                 if (_archive.ReadScaleSlotBlock(room) is { Length: >= 8 } sa)
                     boxes.ScaleSlots = Enumerable.Range(0, sa.Length / 8).Select(i =>
                         ((int)BinaryPrimitives.ReadUInt16LittleEndian(sa.AsSpan(i * 8)), (int)BinaryPrimitives.ReadUInt16LittleEndian(sa.AsSpan(i * 8 + 2)),
