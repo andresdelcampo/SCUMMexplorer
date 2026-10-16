@@ -64,7 +64,8 @@ public abstract partial class ScummSession
     {
         var chosen = number ?? _runtime.Charset ?? 0;
         if (!_charsets.TryGetValue(chosen, out var charset))
-            _charsets[chosen] = charset = _game.Version == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : null;
+            // A version 3 engine reads 99.LFL - n (the 256-colour Indiana Jones too: one file per room, the same charset files as EGA; S6 Indy3Vga).
+            _charsets[chosen] = charset = ScummProfile.For(_game).EngineVersion == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : null;
         return charset;
     }
 

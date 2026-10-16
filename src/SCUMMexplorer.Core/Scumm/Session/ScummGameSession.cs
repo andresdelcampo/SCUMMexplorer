@@ -48,6 +48,24 @@ public sealed class ScummGameSession : ScummSession
         if (boot) Boot();
     }
 
+    /// <summary>
+    /// Boots a session for play with the starting object states of the game's own index: <c>00.LFL</c> for the old-bundle games, the v4-style index
+    /// (one file per room or several disks) with the game's data source otherwise, as the first visit does (S6 Indy3Vga, 16 October 2026).
+    /// </summary>
+    public static ScummGameSession BootForPlay(GameLibrary game, out ScummIndexedObjectSnapshot indexedObjects)
+    {
+        ArgumentNullException.ThrowIfNull(game);
+        if (!ScummProfile.For(game).UsesV4Archive)
+        {
+            indexedObjects = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
+            return new ScummGameSession(game, indexedObjects);
+        }
+        var index = game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault()
+            ?? throw new InvalidDataException("The game has no v4 index to read its objects from.");
+        indexedObjects = index.ReadIndexedObjects();
+        return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game));
+    }
+
     /// <summary><c>VAR_SOUNDCARD</c> for AdLib (vars.cpp: 0 PC speaker, 1 Tandy, 2 CMS, 3 AdLib, 4 Roland).</summary>
     private const int AdlibCard = 3;
 

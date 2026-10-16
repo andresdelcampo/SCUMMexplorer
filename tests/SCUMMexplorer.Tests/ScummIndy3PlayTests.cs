@@ -78,7 +78,16 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         if (Folder() is not { } folder) return;
         var game = new GameFolderScanner().Scan(folder);
         var objects = new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"));
-        var play = new Player(new ScummGameSession(game, objects), output);
+        RunAcceptanceRoute(game, new ScummGameSession(game, objects), output);
+    }
+
+    /// <summary>
+    /// The R-7.18 route from Room 73, shared by the releases whose Room 73, Room 1 and interface scripts agree (EGA; the 256-colour release, S6 Indy3Vga,
+    /// whose objects, positions and Scripts 2, 12, 16, 18, 20, 23, 24, 27, 29, 96 and 113 are the same instructions).
+    /// </summary>
+    internal static void RunAcceptanceRoute(GameLibrary game, ScummGameSession bootedSession, ITestOutputHelper output)
+    {
+        var play = new Player(bootedSession, output);
         var session = play.Session;
         Assert.True(ScummProfile.For(game).PlaysThroughVerbs);
         play.Run(2);

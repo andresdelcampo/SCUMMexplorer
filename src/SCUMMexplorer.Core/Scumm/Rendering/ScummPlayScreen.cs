@@ -65,7 +65,10 @@ public sealed class ScummPlayScreen
         var (top, bottom) = _session.MainScreen;
         var viewLeft = _session.ViewLeft;
         var scene = Scene();
-        IReadOnlyList<uint> basePalette = scene?.Room.Palette ?? EgaPalette;
+        // updatePalette (palette.cpp): with _shadowPalRemap (set by the v3 constructor outside CGA/Hercules/Mac b/w, scumm.cpp, read 16 October 2026) the
+        // shadow palette of roomOps roomPalette remaps the whole displayed palette, so verbs, messages and the cursor follow it as the room does (S6 Indy3Vga:
+        // the 256-colour gym's light switch darkens the screen through it).
+        IReadOnlyList<uint> basePalette = scene?.DisplayPalette() ?? EgaPalette;
         if (scene is not null)
         {
             var room = scene.Compose();

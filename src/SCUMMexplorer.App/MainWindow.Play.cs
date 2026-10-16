@@ -37,11 +37,11 @@ public partial class MainWindow
             if (_play is null || _playFolder != game.FolderPath)
             {
                 StopPlay();
-                var objects = await Task.Run(() => new LflObjectStateReader().ReadSnapshot(System.IO.Path.Combine(game.FolderPath, "00.LFL")), token);
-                var session = await Task.Run(() => new ScummGameSession(game, objects), token);
+                ScummIndexedObjectSnapshot? objects = null;
+                var session = await Task.Run(() => ScummGameSession.BootForPlay(game, out objects), token);
                 if (token.IsCancellationRequested) return;
                 _play = session;
-                _playScreen = new ScummPlayScreen(game, session, objects.States);
+                _playScreen = new ScummPlayScreen(game, session, objects!.States);
                 _playFolder = game.FolderPath;
             }
             if (token.IsCancellationRequested) return;
