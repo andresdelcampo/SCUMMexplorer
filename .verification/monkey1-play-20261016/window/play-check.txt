@@ -3,8 +3,9 @@ verbs drawn: 0x01 "Open" (2,153), 0x02 "Close" (2,162), 0x06 "Push" (2,171), 0x0
 Guybrush at (346, 133) after 86 window frames
 click on Look at: runInputScript(1, 9, 1) click on verb 0x09 at screen (102, 164)
 pointer on the poster: sentence line "Look at poster"
-click on the poster: runInputScript(2, 0, 1) click in the room at screen (100, 104), room (276, 104)
+click on the poster: runInputScript(2, 0, 1) click in the room at screen (92, 104), room (276, 104)
 cutscene True, skippable True, messages [Re-elect Governor Marley.]
 Esc through the window's key handler: taken True; cutscene False; messages [ ]
 key 'l': last input key 'l', the shortcut of verb 0x09; sentence line "Look at poster"
-frames played by the window: 116
+right click on the poster through the window: runInputScript(2, 0, 2) right click in the room at screen (84, 104), room (268, 104); Look at poster sentences 1 -> 2; messages [Re-elect Governor Marley.]; Interact button visible False, enabled False
+frames played by the window: 121
