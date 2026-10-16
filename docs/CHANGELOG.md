@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 16 October: Indiana Jones and the Last Crusade EGA is played through its own verbs (S6, Indy3Ega)
+
+- **Play** (REQUIREMENTS §7.1, Proposed R-7.7 to R-7.18): the room view of Indy3 EGA is the game's screen composed every frame from the live generic session (`ScummPlayScreen`): room, objects, actors, messages, the verb area with the sentence line, inventory and dialogue choices drawn from the game's own verbs (colours, highlight, string escapes), and ScummVM's crosshair cursor. One press is one click for the input script in `VAR_VERB_SCRIPT` after the frame's scripts; verb keys click their verbs; sentences run only through Script 2.
+- **Engine, from ScummVM, additive:** verb colours/keys kept; `convertVerbMessage` (code 5); inventory objects keep their room's name; `_cursor.state`; `initScreens`; `getActorFromPos` (verb-based play only); `ifClassOfIs` with a variable class (a parser bug).
+- **Acceptance route of R-7.18** from Room 73: "Pick up mallet" composed and run, the mallet in the inventory, the light switch's cutscene skipped from its override point, the door leads to Room 1, Talk to Marcus and a dialogue choice answered by him (`ScummIndy3PlayTests`); a WPF check through the real window (`PlayWindowCheck`). Registry: Indy3Ega **Objects ✔, Play ✔**. LOOM/generic regression 886 passed, 5 skipped. Record: [indy3-play-20261015](../.verification/indy3-play-20261015/README.md).
+
 ## 15 October: every Monkey Island floppy room shows its first visit (S5, MonkeyFloppy)
 
 - **Room view, actors and room cards** of the four-disk floppy release come from the generic session's first visit (`ScummRoomFirstVisit` on a v4 disk set, `ScummProfile.HasFirstVisitScenes` by format and dialect; the previous agent's commit 3b2bcf6, now verified). Room audit: **81 of 81 rooms without a gap**, objects in 30 rooms (before: none, the v4 index starts every object at 0), actors in 56; 70 settled, 9 reached the frame limit, 2 left the room.
