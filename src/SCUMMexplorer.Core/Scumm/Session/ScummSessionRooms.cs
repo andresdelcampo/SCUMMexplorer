@@ -75,7 +75,7 @@ public abstract partial class ScummSession
         _currentObjects = roomData.Objects;
         // getObjOrActorName for text code 6: the stored names of this room's objects.
         var objectNames = roomData.ObjectNames;
-        _runtime.ObjectName = id => objectNames.TryGetValue(id, out var name) ? name : null;
+        _runtime.ObjectName = id => objectNames.TryGetValue(id, out var name) ? name : InventoryObjectName(id);
         _runtime.WalkBoxFlagsUnknown = null;
         _runtime.WalkBoxes = roomData.WalkBoxes;
         if (roomData.WalkBoxError is not null)
@@ -243,6 +243,20 @@ public abstract partial class ScummSession
     protected void PlaceVirtualMouse()
     {
         if (_roomSize is not { } size) return;
+        if (_screenPointer is { } screen)
+        {
+            // scummLoop: the virtual mouse is the pointer's screen point moved into the room (xstart, topline); VAR_MOUSE_X/Y keep the screen point.
+            var (virtualX, virtualY) = VirtualPoint(screen.X, screen.Y);
+            _runtime.SetGlobalVariable(ScummVars.MouseX, (ushort)virtualX);
+            _runtime.SetGlobalVariable(ScummVars.MouseY, (ushort)virtualY);
+            _runtime.SetGlobalVariable(ScummVars.ScreenMouseX, (ushort)screen.X);
+            _runtime.SetGlobalVariable(ScummVars.ScreenMouseY, (ushort)screen.Y);
+            foreach (var variable in new[] { ScummVars.MouseX, ScummVars.MouseY, ScummVars.ScreenMouseX, ScummVars.ScreenMouseY })
+                _runtime.EstimatedVariables.Remove(variable);
+            _runtime.VirtualMouse = (virtualX, virtualY);
+            _runtime.VirtualMouseAssumption = $"the player's pointer at screen ({screen.X}, {screen.Y})";
+            return;
+        }
         if (_pointer is { } pointer)
         {
             _runtime.SetGlobalVariable(ScummVars.MouseX, (ushort)pointer.X);

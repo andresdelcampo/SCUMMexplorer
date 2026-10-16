@@ -110,6 +110,8 @@ public abstract partial class ScummSession
                     item.EstimatedLocals, item.PathEstimated, item.Frame);
                 DispatchRequestedLoads("after a frame advance");
             }
+            // checkExecVerbs follows runAllScripts in scummLoop: the player's queued click or key runs the input script.
+            DeliverQueuedInput();
             // checkAndRunSentenceScript follows runAllScripts and the input check in scummLoop.
             if (RunSentenceScript()) DispatchRequestedLoads("after a frame advance");
         }

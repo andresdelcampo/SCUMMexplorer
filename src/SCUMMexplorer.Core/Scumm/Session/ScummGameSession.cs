@@ -36,6 +36,13 @@ public sealed class ScummGameSession : ScummSession
             if (!_runtime.GlobalVariables.ContainsKey(key)) _runtime.SetGlobalVariable(key, 0);
         }
         _runtime.CameraFollowStartsScene = profile.CameraFollowStartsScene;
+        // getActorFromPos, from the actors as the last frame drew them (S6: Indiana Jones's Script 20 finds the person under the pointer with it).
+        if (profile.PlaysThroughVerbs)
+        {
+            _runtime.ActorFromPosition = ActorFromPosition;
+            // convertVerbMessage for prints: Script 18 says a dialogue choice through code 5 of the chosen verb (+0x0068).
+            _runtime.VerbName = PlayVerbName;
+        }
         _bootInput = profile.BootInput;
         _waitsForControl = profile.BootEndsWhenPlayerHasControl;
         if (boot) Boot();
@@ -180,6 +187,24 @@ public sealed class ScummGameSession : ScummSession
         foreach (var pair in _runtime.ObjectPositions) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
         return values;
     }
+
+    // ScummVM getActorFromPos (actor.cpp): for i from 1, an actor drawn on the point's 8-pixel strip (the strip usage bits), not untouchable,
+    // with _top <= y <= _bottom of its drawing. The drawing is the session's own (the costume renderer).
+    private int ActorFromPosition(int x, int y)
+    {
+        if (_currentRoom?.ResourceId is not int room || _roomSize is not { } size) return 0;
+        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostume, classes: _runtime.ObjectClasses);
+        foreach (var actor in layer.Actors.OrderBy(item => item.Number))
+        {
+            if (actor.Bounds is not { } bounds || actor.Pixels == 0) continue;
+            if (_runtime.ObjectClasses.TryGetValue(actor.Number, out var bits) && ScummObjectClasses.Has(bits, ScummObjectClasses.Untouchable)) continue;
+            if (x / 8 >= bounds.Left / 8 && x / 8 <= (bounds.Right - 1) / 8 && y >= bounds.Top && y <= bounds.Bottom) return actor.Number;
+        }
+        return 0;
+    }
+
+    /// <summary>Everything the picture of the current room needs, at this frame (the live play view composes it every frame).</summary>
+    public ScummRoomCapture CaptureRoom() => Capture();
 
     private ScummRoomCapture Capture() => new(Snapshot, Actors, CameraX, _runtime.ShadowPalette.ToArray(), _runtime.RoomColors.ToArray(),
         _runtime.GlobalVariables.GetValueOrDefault(ScummVars.CurrentLights), _runtime.Flashlight, CurrentWalkBoxes);

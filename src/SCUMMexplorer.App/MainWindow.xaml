@@ -463,6 +463,11 @@
                                 </StackPanel>
                             </Expander>
                             <Grid x:Name="RoomViewportHost" Grid.Row="1" SizeChanged="RoomViewportHost_SizeChanged">
+                                <!-- Play in a verb-based game (R-7.8): the game's whole screen, composed every frame from the live session. -->
+                                <Image x:Name="PlayScreenImage" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True" Focusable="True"
+                                       RenderOptions.BitmapScalingMode="NearestNeighbor" AutomationProperties.Name="Game screen"
+                                       MouseMove="PlayScreenImage_MouseMove" MouseLeave="PlayScreenImage_MouseLeave"
+                                       MouseLeftButtonDown="PlayScreenImage_MouseLeftButtonDown"/>
                                 <StackPanel x:Name="RoomDisplayGroup" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <ScrollViewer x:Name="RoomViewport" HorizontalScrollBarVisibility="Auto"
                                                   VerticalScrollBarVisibility="Disabled" CanContentScroll="False"
