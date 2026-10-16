@@ -41,3 +41,11 @@ Masks integration about 80 tool calls; S6 about 300 (two sessions, one rate limi
 ## Next run
 
 `Run S6 for Indy3Vga and MonkeyFloppy` (both are v4-era verb interfaces on the play path S6 built), after the user answers the R-7 open questions; or `S4b MonkeyCd` (v5 needs an `IScummDataSource` first).
+
+## Continued (16 October): S6 Indy3Vga and S6 MonkeyFloppy, in parallel
+
+- **S6 Indy3Vga** (963c406, bba19b4, be9c339): play on by dialect; the R-7.18 route from Room 73 passes headless (`ScummIndy3VgaPlayTests`, sharing the route with EGA) and in the real window; the shadow palette dims the whole screen as ScummVM's `updatePalette` does. **Cells: Objects ◐→✔, Play –→✔.** Suite on master: 1011 (1006 passed, 5 skipped).
+- **S6 MonkeyFloppy** (df24f80, 2a10f91, daba5b0, c5c9acf): the play path generalised to v4 (`IScummTextCharset` over v3 charset files and v4 charset blocks; `VAR_CURSORSTATE`/`VAR_USERPUT` published from v4; `VAR_MAINMENU_KEY` refused). Route from Room 33: "Look at poster" composed and run, its cutscene skipped, the door to the SCUMM Bar, Talk to the important-looking pirates with a dialogue choice, the rubber chicken taken in Room 29; real-window check. The cursor is now ScummVM's 16×16 v3/v4 cross-hair (hotspot 8,7) for Indy3 too; R-7.9 wording corrected. **Cells: Objects ◐→✔, Play –→✔.** Suite on master: 1014 (1009 passed, 5 skipped, 0 failed).
+- Not done: sound during play (all three games); right click is not delivered (R-7.16), so Monkey's two-button default verb is not available (the game's `)` key switches to one-button mode); a verb's click area is its text box; no ScummVM runtime comparison; no S9 edition checks.
+- **User checks (added):** `Games/monkey1 ega en` Room 33: wait for Guybrush to walk in; "Look at" + the poster (line reads "Look at poster"), click, Esc during the speech; "Open" + the door, click the door again; in the bar "Talk to" the important-looking pirates and pick a line. `Games/indy3 vga en` Room 73: the EGA steps, and the switch dims the whole screen. Check the mouse mapping, the timing and the cursor look in all three.
+- **Next run:** the R-7 open questions (right click above all, now that Monkey's default verb depends on it); then `S7 Cutscenes` for the three played games, or `S4b MonkeyCd` (v5 needs an `IScummDataSource`), or sound during play.
