@@ -264,6 +264,38 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void ARightClickOnAnObjectRunsItsDefaultVerb()
+    {
+        // R-7.16 (Rule, 16 Oct): from version 4 a right click reaches the input script as the click with mode 2 (ScummVM checkExecVerbs). Monkey's
+        // default two-button interface (bit[0x223] = 0) reads it: Script 4 +0x0000 equalZero bit[0x223], +0x0005 isEqual local[0x002], 2,
+        // +0x000C equalZero var[0x06E] (no second object pending), +0x0011 notEqualZero var[0x0B5], +0x0016 move var[0x06B] = var[0x0B5]: the verb
+        // becomes the hovered object's default verb (Script 23 +0x0128..+0x0142 from the object's verb 0x5A; the poster's is 9, "Look at"); the area 2
+        // path then runs doSentence var[0x06B], var[0x06C], var[0x06D] (+0x044B), and sentence Script 2 runs the poster's verb 0x09.
+        if (Folder() is not { } folder) return;
+        var play = new Player(Boot(folder, out var game), output);
+        var session = play.Session;
+        Assert.True(ScummProfile.For(game).RightClickReachesGame);
+        Assert.True(play.RunUntil(() => !session.EgoMoving && play.Idle, 600), "Guybrush walks in from the cliffside");
+        Assert.Equal(0, play.Var("bit[0x223]"));
+        Assert.Equal("Walk to", play.Sentence);
+
+        play.Hover(268, 104);
+        Assert.Equal(438, play.Var("var[0x0B4]"));
+        Assert.Equal(9, play.Var("var[0x0B5]"));
+        var screenX = 268 - session.ViewLeft;
+        var input = session.ClickScreen(screenX, 104 + session.MainScreen.Top, true, out var refused);
+        Assert.True(input is not null, refused);
+        Assert.Equal((ScummSession.SceneClickArea, 0, 2), (input!.Area, input.Value, input.Mode));
+        play.Run(2);
+        play.Log("after the right click");
+        Assert.Contains(session.SessionTrace, line => line.StartsWith("sentence script 2 runs verb 0x09 with objects 438", StringComparison.Ordinal));
+        Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Text.StartsWith("Re-elect Governor Marley.", StringComparison.Ordinal)), 900),
+            "the poster is looked at");
+        // The app chose no verb: the only input was the right click.
+        Assert.Equal(2, Assert.Single(session.DeliveredInput).Mode);
+    }
+
+    [Fact]
     public void ThePlayCursorIsTheCrossHairOfResetCursors()
     {
         // ScummEngine_v5::resetCursors cursor 0 (versions 3 and 4 inherit it): arms 2 to 7 pixels from the hotspot (8, 7) across and up/down, none at it.

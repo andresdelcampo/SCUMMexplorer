@@ -109,6 +109,19 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     public int ClickInputMode => EngineVersion > ScummVersion.V3 ? 1 : 0;
 
     /// <summary>
+    /// R-7.16 (Rule, confirmed by the user 16 October 2026): in play, the right button goes to the game only where the game's own interface reads it,
+    /// decided by what the engine version hands the scripts (ScummVM master <c>processInput</c> and <c>checkExecVerbs</c>, read 16 October 2026). From
+    /// version 4 a right click is a click with mode 2 (<c>(_game.version &gt; 3) ? (left ? 1 : 2) : 0</c>), which the input script can tell from a left
+    /// click (Monkey Island floppy Script 4 +0x0005 <c>isEqual local[0x002], 2</c>: the two-button default verb). Up to version 3 the scripts never see
+    /// it: ScummVM turns it into the Esc key outside LOOM (the app's Skip already gives that), and LOOM's mode is 0 like a left click. Elsewhere the
+    /// right button stays the app's.
+    /// </summary>
+    public bool RightClickReachesGame => PlaysThroughVerbs && EngineVersion > ScummVersion.V3;
+
+    /// <summary>The third argument of <c>runInputScript</c> for a right click where <see cref="RightClickReachesGame"/> (ScummVM <c>checkExecVerbs</c>: 2 from version 4).</summary>
+    public int RightClickInputMode => EngineVersion > ScummVersion.V3 ? 2 : 0;
+
+    /// <summary>
     /// Keys not delivered to the game in play (R-7.11): a game's save/load key, whose script leaves the session's state (Indiana Jones EGA and 256 colours:
     /// F5 = 319, Script 24 chains to Script 9 when <c>bit[0x5E4]</c> is 0; the two releases' Script 24 are the same instructions). Edition data.
     /// </summary>
