@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 16 October: Monkey Island 1 floppy is played through its own verbs (S6, MonkeyFloppy)
+
+- The shared play path works on SCUMM v4: text verbs, the sentence line, the inventory and messages drawn with the game's v4 charsets (`IScummTextCharset` over the v3 and the classic renderer; each verb in the charset it was created with); `VAR_CURSORSTATE`/`VAR_USERPUT` copied after every `cursorCommand` from version 4 (Monkey's interface loop hovers nothing without them); the engine's save/load key `VAR_MAINMENU_KEY` (F5) is not delivered. The play cursor is now cursor 0 of ScummVM's `resetCursors` (16 × 16 cross-hair, hotspot 8, 7) for versions 3 and 4 alike, which fixes the v3 shape S6 Indy3Vga reported; R-7.9's wording follows.
+- The R-7.18 route from the dock passes headless (`ScummMonkeyFloppyPlayTests`, 3): Look at the poster composes "Look at poster" and runs it, its cutscene is skipped from the override, the door leads into the SCUMM Bar, Talk to the important-looking pirates gives the "I want to be a pirate" conversation and its choices, and the rubber chicken of the Voodoo shop is picked up into the inventory. The real window plays the first steps (`Monkey1PlayWindowCheck`). **Objects and Play ✔**; matrix regenerated; R-1.3, R-6.12a and §17 name the game. Regression: 913 passed, 5 skipped. Record: [monkey1-play-20261016](../.verification/monkey1-play-20261016/README.md).
+
 ## 16 October: the 256-colour Indiana Jones is played through its own verbs (S6, Indy3Vga)
 
 - Play is turned on by format and dialect (`ScummProfile.PlaysThroughVerbs` and the undelivered F5 for the Indy3 dialect run by the generic session), not by family: this release's interface scripts are EGA's instructions (Script 4 adds one Talk-on-inventory branch). The click mode and the charset follow the engine version (3): mode 0, `98.LFL`/`99.LFL`. The play screen shows the shadow palette on the whole screen as ScummVM's `updatePalette` does, so the gym's light switch (palette remapping in this release) dims verbs and text too. Play boots from the game's own index (`ScummGameSession.BootForPlay`).

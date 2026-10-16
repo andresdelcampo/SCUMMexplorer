@@ -119,7 +119,10 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
         var play = new Player(Boot(folder, out var game), output);
         var session = play.Session;
         Assert.True(ScummProfile.For(game).PlaysThroughVerbs);
-        play.Run(2);
+        // Room 96 local script 200 +0x0020 brings Guybrush in at the cliffside (object 435) walking to (346, 133): the player has control while he walks.
+        Assert.True(play.RunUntil(() => !session.EgoMoving, 600), "Guybrush walks in from the cliffside");
+        var ego = session.Actors.Single(actor => actor.Number == 1);
+        Assert.Equal((33, 346, 133), (ego.Room, ego.X, ego.Y));
         play.Log("after the boot");
         // The verb screen is the game's: Script 22's twelve verbs and the sentence line (verb 0x64, Script 12) drawn as text with the game's v4 charset
         // (CHAR blocks of the disks); the room screen is rows 0 to 143; the input script is Script 4; the cursor and user input are on, and from version 4
@@ -179,6 +182,7 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
         play.ClickRoom(428, 104);
         Assert.True(play.RunUntil(() => session.Verbs.Any(verb => verb.VerbId == 0x78 && verb.Mode == 1) && session.UserInputOn, 3000), "the dialogue offers its choices");
         play.Log("choices");
+        output.WriteLine("running: " + string.Join(" ; ", session.PendingScriptSummary));
         Assert.Contains(session.SessionTrace, line => line.StartsWith("sentence script 2 runs verb 0x0D with objects 332", StringComparison.Ordinal));
         // The conversation installs Script 14 as the input script and offers its lines as verbs 0x78 up, drawn with charset 1 (Script 17 case 5).
         Assert.Equal(["I want to be a fireman.", "I mean to kill you all!", "I want to be a pirate."], new[] { 0x78, 0x79, 0x7A }.Select(play.Glyphs).ToArray());

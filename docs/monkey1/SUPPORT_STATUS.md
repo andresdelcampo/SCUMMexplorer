@@ -32,7 +32,7 @@ Open uncertainties: disc track 21 (16 s) is started by no sound and stays unname
 
 # Monkey Island 1 floppy support status
 
-Family: MonkeyFloppy | Fixture: `Games/monkey1 ega en` (the four-disk 256-colour floppy release, SCUMM v4; the folder name says EGA, the data is VGA) | Last updated: 15 October 2026 | Owner: S5 MonkeyFloppy agent
+Family: MonkeyFloppy | Fixture: `Games/monkey1 ega en` (the four-disk 256-colour floppy release, SCUMM v4; the folder name says EGA, the data is VGA) | Last updated: 16 October 2026 | Owner: S6 MonkeyFloppy agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -40,15 +40,15 @@ Family: MonkeyFloppy | Fixture: `Games/monkey1 ega en` (the four-disk 256-colour
 | S2 Reading | done (before this file) | Costumes, Scripts, Texts | | |
 | S3 Sound | done (before this file) | Sound | | polish: AdLib music at half tempo, set by ear |
 | S4b Session | **done** (14 Oct) | unchanged (no cell changes in S4b) | [monkey1-session-20261014](../../.verification/monkey1-session-20261014/README.md) | boot to Room 33 in 2522 frames, unsupported list empty |
-| S5 Objects | **done** (15 Oct) | Objects (partial), unchanged because full needs S6 click responses (REQUIREMENTS 3.1) | [monkey1-objects-20261015](../../.verification/monkey1-objects-20261015/README.md) | 81/81 rooms without a gap; objects in 30 rooms, actors in 56; 14 rooms compared at source level (no ScummVM picture) |
-| S6 Play | not started | Play | | the interface loop (script 23) and the input script (script 4) already run |
+| S5 Objects | **done** (15 Oct) | Objects raised to full with S6 (16 Oct) | [monkey1-objects-20261015](../../.verification/monkey1-objects-20261015/README.md) | 81/81 rooms without a gap; objects in 30 rooms, actors in 56; 14 rooms compared at source level (no ScummVM picture) |
+| S6 Play | **done** (16 Oct) | Objects and Play raised to full | [monkey1-play-20261016](../../.verification/monkey1-play-20261016/README.md) | the R-7.18 route from the dock: sentence, cutscene skip, the SCUMM Bar, the pirates' conversation, the rubber chicken; WPF check |
 | S7 Cutscenes | not started | Cutscenes | | |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | the eight-disk Spanish EGA release boots the same way (record); its video-mode variable is the VGA value |
 
 Blocked on: nothing.
-Next: the user looks at the rooms listed in the S5 record (user checks); then S6 (needs the Play requirement for a verb-based game as Proposed rows first).
-Open uncertainties: the session's AdLib music timer for the credits is an estimate (iMuse in the engine); the profile gives `VAR_VIDEOMODE` 19 to every v4 game, wrong for the EGA release; the wrong-answer path of the protection (a fourth wrong answer quits) was not run. S5: no ScummVM picture compared; Room 1's first pseudo number (130) is a labelled pick; Room 39's unshown named objects not resolved one by one.
+Next: the user checks play in the real window (record, WPF section) and the S5 rooms; then S7 Cutscenes.
+Open uncertainties: the session's AdLib music timer for the credits is an estimate (iMuse in the engine); the profile gives `VAR_VIDEOMODE` 19 to every v4 game, wrong for the EGA release; the wrong-answer path of the protection (a fourth wrong answer quits) was not run. S5: no ScummVM picture compared; Room 1's first pseudo number (130) is a labelled pick; Room 39's unshown named objects not resolved one by one. S6: no ScummVM run of the route; a verb's click rectangle is its text width by the font height; the right click of the default two-button interface is not delivered (R-7.16; the game's ')' key gives its one-button interface); Ctrl+W (the game's own "win" key) is delivered.
 
 ## Decision log
 
@@ -70,3 +70,8 @@ Open uncertainties: the session's AdLib music timer for the credits is an estima
 | 2026-10-15 | S5 | Rooms the game loads only as pseudo rooms (Room 58 as 201..220, Room 1 as 130..132) showed nothing under their own number | room-specific numbers; follow `startScene` (load the real room, `VAR_ROOM` = the pseudo number) and enter under the number a decoded arrival uses | the engine rule, in shared code (also improves Indy3 rooms 17, 18, 21, 23, 24, 33, 72); a room without a literal arrival takes its first pseudo number (seeded pick when several), labelled "Assumed pseudo room" (R-1.4) | revert `IndexedRoom`, the `VAR_ROOM` line in `EnterRoom`, `EnterWithoutEgo` and the pseudo map of `ScummEgoArrivalIndex` |
 | 2026-10-15 | S5 | An arrival found in the room's own code (a maze cell leading to another) as the first visit | allow; prefer arrivals from elsewhere | arrivals from elsewhere first (a first visit comes into the room); the room's own arrivals only when nothing else exists | drop `fromElsewhere` in `VisitRoom` |
 | 2026-10-15 | S5 | The ScummVM picture comparison of ten rooms | run the bundled ScummVM; source-level comparison | source level (the run request says ScummVM cannot be driven headlessly; the Indy3 attempt failed): 14 rooms with the entry branches read, listed in the record | none |
+| 2026-10-16 | S6 | Which object to take on the route (the SCUMM Bar's mugs are untouchable, class 24, until the trials) | a mug after setting its class; the kitchen's meat while the cook is out; the rubber chicken of the Voodoo shop (two rooms further, free to take) | the rubber chicken: the game's own state allows it, nothing is forced (R-1.9) | change the route in `ScummMonkeyFloppyPlayTests` |
+| 2026-10-16 | S6 | `VAR_CURSORSTATE`/`VAR_USERPUT` (Script 23 hovers nothing without them) | leave them 0; copy them after every `cursorCommand` as ScummVM does from version 4 | copied for every engine version 4 game (`ScummProfile.PublishesCursorVariables`); v3 has no such variables | set the property false |
+| 2026-10-16 | S6 | F5 (`VAR_MAINMENU_KEY` = 0x13F, Script 1 +0x077F) | deliver it (Script 4 sends it to Script 20, which does nothing); refuse it as the engine's save/load menu | refused (R-7.11: a save/load key is not delivered), from the variable, not a key list | drop the `MainMenuKeyVariable` line of `PressPlayKey` |
+| 2026-10-16 | S6 | The play cursor (S6 Indy3Vga found the v2 crosshair drawn for v3) | keep the v2 shape for v3 and draw the bitmap for v4; the bitmap for both | the bitmap cross-hair of `resetCursors` for both, as ScummVM's class tree gives it to v3 and v4; R-7.9 wording corrected | restore `DrawCrosshair` in `ScummPlayScreen` |
+| 2026-10-16 | S6 | Ctrl+W (Script 4 key 0x17: "Are you sure you want to win?", then the ending) | refuse; deliver | delivered: it is the game's own key (R-7.11), not a save/load or engine key; the explorer never presses it | add 0x17 to `UndeliveredKeys` |

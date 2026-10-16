@@ -8,7 +8,7 @@ All rows come from the **four-disk 256-colour floppy release** (`Games/monkey1 e
 
 ## Row format (every table below)
 
-Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading` / `play`, R-2.3) | **source** (`Script NN +0xOFFS`, `Room NN local script NN`, `Room NN object NN verb 0xHH`) | **date**. A row without a source is not allowed. Unnamed things keep their raw form. `decoded` here means read from the disassembly and confirmed by a headless run of the generic session; nothing here is `play`.
+Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading` / `play`, R-2.3) | **source** (`Script NN +0xOFFS`, `Room NN local script NN`, `Room NN object NN verb 0xHH`) | **date**. A row without a source is not allowed. Unnamed things keep their raw form. `decoded` here means read from the disassembly and confirmed by a headless run of the generic session; `play` (from S6, 16 October) means seen on the played route of the [S6 record](../../.verification/monkey1-play-20261016/README.md), clicks and keys going through the game's own input script.
 
 ## Boot and hooks
 
@@ -33,7 +33,9 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | `var[0x027]` (debug mode, v4) | a start with a non-zero boot parameter needs it non-zero, otherwise script 1 prints "Debugging mode not active" and quits; it is 0 in a normal run | decoded | Script 1 +0x07FC to +0x0827 | 2026-10-14 |
 | `var[0x004]` (`VAR_ROOM`) | the number the room was loaded as: Room 58's entry draws one of twenty path layouts for `VAR_ROOM` 201 to 220 (none under 58), Room 1's entry sets its walk boxes and objects for 130, 131 or 132; Room 30's local script 212 compares `getActorRoom` of actor 11 with it | decoded | Room 58 entry +0x01E1 to +0x0979; Room 1 entry +0x0066 to +0x011A; Room 30 local script 212 +0x0040 | 2026-10-15 |
 | Bit variables | stored apart from the word variables (v4 `_bitVars`): the game's bits 0x040 to 0x04F are not `VAR_ROOM`; before 15 October the session aliased them and Room 30's entry left `VAR_ROOM` = 542 | engine | ScummVM `readVar`/`writeVar` (script.cpp); Room 30 first visit | 2026-10-15 |
-| `var[0x020]` (input script) | 4 in play: its first argument is the click area (1 verb, 2 room, 4 key) | decoded | Script 1 +0x060E; Script 4 +0x0034 | 2026-10-14 |
+| `var[0x020]` (input script) | 4 in play: its first argument is the click area (1 verb, 2 room, 4 key); 14 during a conversation (Room 28 local script 220); in the SCUMM Bar the room's own input script, Room 28 local script 202 (set by the entry +0x009A), which chains to 4 | decoded, play | Script 1 +0x060E; Script 4 +0x0034; Room 28 entry +0x009A; route of S6 | 2026-10-16 |
+| `var[0x032]` (`VAR_MAINMENU_KEY`) | 0x13F (F5): the engine's save/load menu key; the explorer does not deliver it in play | decoded | Script 1 +0x077F | 2026-10-16 |
+| `var[0x034]` (`VAR_CURSORSTATE`), `var[0x035]` (`VAR_USERPUT`) | the interface loop runs its object finder only while `var[0x034]` is above 0 (the engine copies `_cursor.state` there after every `cursorCommand`) | decoded, play | Script 23 +0x0000 | 2026-10-16 |
 
 ## Game variables and bits
 
@@ -45,14 +47,27 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | `var[0x127]`, `var[0x128]` | the symbol pair chosen at random for the question (position in the string table = `var[0x127]` * 7 + `var[0x128]`) | decoded | Script 150 +0x002D to +0x0057; Script 152 +0x00CD | 2026-10-14 |
 | `var[0x15F]` | counter of open cutscenes (+1 at the cutscene start script, −1 at the end script) | decoded | Script 18 +0x0000; Script 19 +0x0000 | 2026-10-14 |
 | `var[0x165]` | tested for 1 where the highlighted verb's colour is set to 4 instead of 2 (a mode flag; its meaning is not read) | decoded | Script 12 +0x004B; Script 18 +0x0028 | 2026-10-14 |
-| `var[0x06B]` | the verb of the sentence being built: the interface loop compares it with 13 (Talk to) and 3 (Give) | decoded | Script 23 +0x003F, +0x006A | 2026-10-14 |
+| `var[0x06B]` | the verb of the sentence being built: the interface loop compares it with 13 (Talk to) and 3 (Give); a verb click sets it (Script 4 +0x0368) | decoded | Script 23 +0x003F, +0x006A; Script 4 +0x0368 | 2026-10-16 |
+| `var[0x06C]`, `var[0x06D]` | the first and second object of the sentence being built: the interface loop puts the object under the pointer in `var[0x06C]` (`var[0x06D]` while a second object is awaited, `var[0x06E]` non-zero) | decoded, play | Script 23 +0x00C7..+0x010B | 2026-10-16 |
+| `var[0x0B4]`, `var[0x0B5]`, `var[0x0B6]` | the last object hovered; the default verb of the hovered object (each object's verb 0x5A sets it, e.g. the poster 9, a closed door 1, an open door 2); the verb drawn highlighted (colour 0x0E, back to 2 or 4 when it changes) | decoded, play | Script 23 +0x0110..+0x0142; Room 33 objects 437, 438 verb 0x5A | 2026-10-16 |
+| `var[0x0C1]` | the conversation choice: Script 14 puts the clicked verb (0x78 to 0x80) there after Guybrush says it; the conversation waits on it | decoded, play | Script 14 +0x0105; Room 28 local script 220 | 2026-10-16 |
+| `var[0x0C3]` | trials done ("Trials completed", debug key '#'): the bar's mugs and the important-looking pirates' scripts change above 3 | decoded | Script 4 +0x0139; Room 28 entry +0x0034; Room 28 object 332 verb 0x0D | 2026-10-16 |
+| `var[0x0E4]`, `var[0x0E5]`, `var[0x0F9..]`, `bit[0x180..]` | the next choice's line y and key, the choice's object, whether it was said already: Script 32 resets them, Script 14 reads them | decoded | Script 32; Script 14 +0x0013..+0x0078 | 2026-10-16 |
+| `bit[0x223]` | 0 (the start): the two-button interface, a right click (mode 2) on an object uses its default verb `var[0x0B5]`; 1: the one-button interface, a left click with "Walk to" selected uses the default verb; key 0x29 ')' toggles it and prints "Two button userface ON" / "One button userface ON" | decoded | Script 4 +0x0000..+0x002F, +0x0216 | 2026-10-16 |
 
 ## Global scripts
 
 | Script | Role | Evidence | Source | Date |
 |---|---|---|---|---|
 | 1 | boot | decoded | Script 1 | 2026-10-14 |
-| 4 | the input script of play: its first argument is the click area (4 tests a key: function keys and others, with debug-mode variants) | decoded | Script 4 +0x0034 | 2026-10-14 |
+| 2 | the sentence script (`var[0x021]`): walks the ego to the object (`walkActorToObject`, `waitFor`) and starts the object's code for the verb (`startObject local[2], local[0]`, +0x039D); without verb code it chains to Script 3; Give to an actor and pick-ups of held objects have their own branches | decoded, play | Script 2 +0x0000..+0x03B1 | 2026-10-16 |
+| 3 | the answer when an object has no code for the verb ("I can't…"), chained by Script 2 | decoded | Script 2 +0x0137; Script 3 | 2026-10-16 |
+| 4 | the input script of play: its first argument is the click area (4 tests a key: function keys and others, with debug-mode variants; other keys go to Script 20); area 1 sets the verb (+0x0368) or scrolls the inventory (0x6B/0x6C, +0x0307) or takes an inventory object (0x65..0x6A); area 2 runs `doSentence var[0x06B], var[0x06C], var[0x06D]` (+0x044B) when the sentence is complete, else walks to the pointer with "Walk to" (+0x0475). Key 0x17 (Ctrl+W) asks "Are you sure you want to win? (Y/N)" and starts Script 127 | decoded, play | Script 4 +0x0034..+0x049E | 2026-10-16 |
+| 9 | the inventory script (`var[0x022]`): names verbs 0x65 to 0x6A with code 6 of `var[0x086..0x08B]` (the held objects from `findInventory`), turns on the filled ones and the arrows | decoded, play | Script 9 +0x0048..+0x0105 | 2026-10-16 |
+| 14 | the input script of a conversation: a click on a choice verb (0x78 to 0x80) turns the choices off, makes Guybrush say it (`printEgo` code 5 of the verb, +0x00F7) and puts it in `var[0x0C1]` | decoded, play | Script 14 +0x007F..+0x0105 | 2026-10-16 |
+| 17 | saves and restores the verbs around cutscenes (cases 1, 2) and creates the conversation verbs 0x78 to 0x80 with charset 1, keys '1' to '9' (case 5) | decoded | Script 17 +0x008A..+0x0172 | 2026-10-16 |
+| 20 | keys the input script does not handle: Ctrl+V (0x16) prints the version string | decoded | Script 20 | 2026-10-16 |
+| 32 | resets a conversation's line y (`var[0x0E4]` = 0x91), key (`var[0x0E5]` = '1') and choice tables, cursor and input on | decoded | Script 32 | 2026-10-16 |
 | 12 | sets the sentence line (verb 0x64): blank when `var[0x06B]` is 100, else its name built from string codes, colour 3 (4 when `var[0x165]` is 1) | decoded | Script 12 | 2026-10-14 |
 | 18, 19 | cutscene start and end hooks: soft-off or soft-on of cursor and user input, freeze or unfreeze scripts, save or restore the verbs for cutscene type 1 or 3 | decoded | Script 18; Script 19 | 2026-10-14 |
 | 22 | defines the twelve verbs (Open, Close, Push, Pull, Walk to, Pick up, Talk to, Give, Use, Look at, Turn on, Turn off), the hidden insult verbs and the sentence and inventory verbs 0x64 to 0x6C | decoded | Script 22 | 2026-10-14 |
@@ -71,6 +86,10 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | 38 | the opening scene: the entry script starts object 497 verb 0xFA; local script 203 is a cutscene that ends by walking to object 494 | decoded | Room 38 entry +0x003B; Room 38 local script 203 | 2026-10-14 |
 | 96 | title music: user input off, sound `var[0x051]` until it ends (skippable by the override), then the dock | decoded | Room 96 entry +0x0000; Room 96 local script 200 | 2026-10-14 |
 | 33 | the first playable room (a village dock at night; the ego's costume 1 stands at (346,133)); its entry script starts scripts 0xC9, 0xCA and 0xCB depending on `var[0x065]` and `var[0x0C3]`; local script 202 changes the ego's walk speed by walk box. First visit (S5): no object image active, the ego only | decoded | Room 33 entry +0x0000 to +0x0056; Room 33 local script 202 | 2026-10-15 |
+| 33 (objects) | cliffside 435 → Room 38; archway 436 → Room 35 (`loadRoomWithEgo 0x1CA, 0x23`); door 437 (Open/Close start Scripts 25/26; Walk to, when open, `loadRoomWithEgo 0x142, 0x1C` → Room 28); poster 438 (the first Look at is a cutscene with an override, +0x00CF..+0x0134; later looks are lines chosen by bits 0x130, 0x055, 0x197) | decoded, play | Room 33 objects 435 to 438 | 2026-10-16 |
+| 28 | the SCUMM Bar: its entry sets the room's input script 202 (chains to 4); the mugs 373 to 377 are untouchable (class 24 from the index; the entry sets 24 on owned ones) until the trials; the important-looking pirates 332: Talk to starts local script 220 (the "I want to be a pirate" conversation) while `var[0x0C3]` is not above 3, Script 59 otherwise; door 322 (open) leads back to Room 33, its first use runs Script 117 once (`bit[0x1BE]`) | decoded, play | Room 28 entry; Room 28 objects 322, 332, 373 to 377; route of S6 | 2026-10-16 |
+| 35 | Mêlée's high street (from the dock's archway): door 452, when open, leads to Room 29 (`loadRoomWithEgo 0x17D, 0x1D`) | decoded, play | Room 35 object 452 verb 0x0A +0x002B..+0x0031 | 2026-10-16 |
+| 29 | the Voodoo shop: the rubber chicken 391 is taken with Pick up (`pickupObject var[0x007]`); Guybrush says "Maybe no one will miss just this one thing…" | decoded, play | Room 29 object 391 verb 0x0B; route of S6 | 2026-10-16 |
 | 58 | a forest maze loaded only as pseudo rooms 201 to 220: the entry `drawObject`s nine or ten path tiles (objects 638 to 669) at strip positions per `VAR_ROOM`, sets box flags and the untouchable class (24) of the edge exits; local scripts 201 animate actors 3 and 4 (costume 114). The map (Room 85) object 866 enters it as 218 with the ego at object 668 | decoded | Room 58 entry +0x0000 to +0x09B2; Room 85 object 866 verb 0x0A +0x0000 | 2026-10-15 |
 | 1 | a beach loaded only as pseudo rooms 130 to 132 (three parts of one beach picture); as 130 it sets objects 21 to 23 to state 1 and object 296 when `bit[0x215]` is 0; no `loadRoomWithEgo` with literal operands enters it | decoded | Room 1 entry +0x0066 to +0x00A0 | 2026-10-15 |
 | 30 | a shop: the entry starts local scripts 205 (three random prices in `var[0x0DC..0x0DE]`), 209 or 208 (objects 412 and 932 on or off by `var[0x064]`) and 203; the shopkeeper is actor 11 (costume 28) | decoded | Room 30 entry +0x008B to +0x00DA; Room 30 local scripts 203, 205, 208, 209 | 2026-10-15 |
@@ -82,6 +101,8 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 |---|---|---|---|---|
 | The twelve verbs | Open 1, Close 2, Push 6, Pull 7, Walk to 10, Pick up 11, Talk to 13, Give 3, Use 8, Look at 9, Turn on 4, Turn off 5; each has a key (o, c, s, y, w, p, t, g, u, l, n, f) | decoded | Script 22 +0x0003 to +0x00D8 | 2026-10-14 |
 | Verbs 0x64, 0x65 to 0x6A, 0x6B, 0x6C | 0x64 the sentence line; 0x65 to 0x6A the six inventory slots (keys '1' to '6'); 0x6B and 0x6C the inventory arrows (keys q and a) | decoded | Script 22 +0x022B to +0x0303 | 2026-10-14 |
+| Verbs 0x78 to 0x80 | the conversation choices, created by Script 17 case 5 (charset 1, colour 2, highlight 0x0E, keys '1' to '9'), named and placed one under the other by the conversation script; a click goes to Script 14 | decoded, play | Script 17 +0x00C7; Room 28 local script 220; Script 14 | 2026-10-16 |
+| The chain in play | a click: `runInputScript(area, value, 1)` → Script 4 (or the room's own input script) → `doSentence` → sentence Script 2 → the object's verb code; Script 23 runs every frame for the hover, the default verb and the sentence line (Script 12) | play | route of S6 ([record](../../.verification/monkey1-play-20261016/README.md)) | 2026-10-16 |
 
 ## Objects and classes
 
