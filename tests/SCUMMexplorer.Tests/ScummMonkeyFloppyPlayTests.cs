@@ -251,6 +251,10 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
         // answer is not among the player's inputs (R-15.7).
         Assert.DoesNotContain(session.DeliveredInput, input => input.Area == ScummSession.KeyClickArea);
         Assert.All(session.DeliveredInput, input => Assert.Equal(1, input.Mode));
+        foreach (var item in session.SoundEvents)
+            output.WriteLine($"sound: seq {item.Sequence} room {item.RoomId} {item.Event.Kind} {item.Event.TargetId} {item.Event.SourceLabel} +0x{item.Event.Offset:X4} {item.Event.Operation} {item.Event.Certainty} {item.Event.Executed}");
+        output.WriteLine("active at the end: " + string.Join(",", session.Snapshot.ActiveSounds));
+        AssertRouteSounds(session);
 
         // The play screen: the room from the camera, the verb screen below row 144 and the version 4 cross-hair (cursor 0 of resetCursors, hotspot 8, 7)
         // in colour 15 of the room palette at the pointer.
@@ -261,6 +265,38 @@ public sealed class ScummMonkeyFloppyPlayTests(ITestOutputHelper output)
         Assert.Equal(white, screen.Pixels[(py - 6) * ScummPlayFrame.Width + px]);
         Assert.Equal(white, screen.Pixels[py * ScummPlayFrame.Width + px - 7]);
         Assert.Equal(white, screen.Pixels[py * ScummPlayFrame.Width + px + 7]);
+    }
+
+    /// <summary>
+    /// S6 sound (16 October 2026): the sound commands the route's scripts executed, which the app plays through the chosen device. Ids are the
+    /// non-Roland table of Script 1 (VAR_SOUNDCARD 3): bar music <c>var[0x04B]</c> = 0x65 (+0x0466), title <c>var[0x051]</c> = 104.
+    /// </summary>
+    private static void AssertRouteSounds(ScummSession session)
+    {
+        var events = session.SoundEvents;
+        bool Has(ScummScriptEventKind kind, int? id, string source, int offset) => events.Any(item => item.Event.Kind == kind && item.Event.TargetId == id &&
+            item.Event.SourceLabel == source && item.Event.Offset == offset && item.Event.Executed);
+        // Boot: the credits' music (Script 149 +0x001D), the lookout's (Room 38 local 203 +0x000E), and the title music of Room 96, which local script 200
+        // awaits with isSoundRunning (+0x000D) and then stops (+0x0017): the wait ends, the boot reaches the dock.
+        Assert.True(Has(ScummScriptEventKind.SoundStarted, 110, "Script 149", 0x001D));
+        Assert.True(Has(ScummScriptEventKind.SoundStarted, 108, "Room 38 local script 203", 0x000E));
+        Assert.True(Has(ScummScriptEventKind.SoundStarted, 104, "Room 96 local script 200", 0x0009));
+        Assert.True(Has(ScummScriptEventKind.SoundStopped, 104, "Room 96 local script 200", 0x0017));
+        // iMuse's Monkey Island workaround (Sound::triggerSound): the title music's start stops the lookout's music first, which no script stops.
+        var title = events.Select((item, index) => (item, index)).First(pair => pair.item.Event.TargetId == 104).index;
+        Assert.Equal(ScummScriptEventKind.MusicStopped, events[title - 1].Event.Kind);
+        Assert.Equal("triggerSound", events[title - 1].Event.Operation);
+        // The route: the dock's door opens with sound 2 (Script 25 +0x0034); the SCUMM Bar's entry starts its music 101 (Room 28 entry +0x008A, after
+        // isSoundRunning +0x0080 found it silent); the bar's door stops it as Guybrush leaves (object 322 verb 0x0A +0x0006); the first exit's Script 117
+        // plays sound 100 and stops it (+0x0031, +0x053E); Room 29's local script 200 starts sound 115 (+0x0021), still playing at the end.
+        Assert.True(Has(ScummScriptEventKind.SoundStarted, 2, "Script 25", 0x0034));
+        Assert.True(Has(ScummScriptEventKind.SoundStarted, 101, "Room 28 entry script", 0x008A));
+        Assert.True(Has(ScummScriptEventKind.SoundStopped, 101, "Room 28 Object 322 Verb 0x0A", 0x0006));
+        Assert.True(Has(ScummScriptEventKind.SoundStarted, 100, "Script 117", 0x0031));
+        Assert.True(Has(ScummScriptEventKind.SoundStopped, 100, "Script 117", 0x053E));
+        Assert.True(Has(ScummScriptEventKind.SoundStarted, 115, "Room 29 local script 200", 0x0021));
+        Assert.Contains(115, session.Snapshot.ActiveSounds);
+        Assert.All(events.Where(item => item.Event.Kind is ScummScriptEventKind.SoundStarted), item => Assert.NotNull(item.Event.TargetId));
     }
 
     [Fact]

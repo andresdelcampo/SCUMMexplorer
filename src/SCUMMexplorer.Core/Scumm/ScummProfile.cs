@@ -114,6 +114,15 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// </summary>
     public IReadOnlyList<int> UndeliveredKeys { get; init; } = [];
 
+    /// <summary>
+    /// What the engine stops when a music sound starts on the session's AdLib device (S6 sound, 16 October 2026; ScummVM master read that day): the
+    /// AdLib player of LOOM and Indiana Jones (<c>Player_AD::startSound</c>: a resource whose third byte is 0x80 is music and <c>stopMusic()</c> ends the one
+    /// playing; effects take one of three slots) stops the previous music; Monkey Island EGA/VGA, which runs through iMuse, stops every sound
+    /// (<c>Sound::triggerSound</c>: "the music is never explicitly stopped", <c>stopAllSounds()</c> before any resource that is not an <c>ASFX</c>,
+    /// and <c>convertADResource</c> makes an <c>ASFX</c> of an AD block whose third byte is not 0x80). Only the generic session applies it; LOOM's session is unchanged.
+    /// </summary>
+    public ScummMusicStart MusicStart { get; init; }
+
     public static ScummProfile For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -140,11 +149,26 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
             PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
-            UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : []
+            UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],
+            // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) → Player_AD; the other DOS games of version 3 and later → iMuse (Monkey's workaround in triggerSound).
+            MusicStart = game.Id is GameId.Loom or GameId.LoomVga || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummMusicStart.StopsPreviousMusic
+                : GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? ScummMusicStart.StopsAllSounds
+                : ScummMusicStart.StopsNothing
         };
     }
 
     // The generic session runs the Indy3 dialect (old-bundle v3 or one file per room): Indiana Jones EGA and 256 colours. LOOM has its own session.
     private static bool PlaysIndy3Interface(GameLibrary game, ScummScriptDialect dialect, bool roomFileGame) =>
         dialect == ScummScriptDialect.V3Indy3 && (game.Version == ScummVersion.V3 || roomFileGame) && game.Id is not (GameId.Loom or GameId.LoomVga);
+}
+
+/// <summary>What the engine stops when a music sound starts (<see cref="ScummProfile.MusicStart"/>).</summary>
+public enum ScummMusicStart
+{
+    /// <summary>Nothing is known to stop: sounds overlap until a script stops them.</summary>
+    StopsNothing,
+    /// <summary><c>Player_AD</c>: one music at a time; the new music ends the previous one, effects play on.</summary>
+    StopsPreviousMusic,
+    /// <summary>Monkey Island EGA/VGA through iMuse: any music start stops every sound first.</summary>
+    StopsAllSounds
 }

@@ -184,5 +184,34 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Actor == 4 && message.Text.Length > 0), 900), "Marcus answers");
         play.Log("Marcus answers");
         Assert.Equal(0, session.DeliveredInput.Count(input => input.Area == ScummSession.KeyClickArea));
+        AssertRouteSounds(session, output);
+    }
+
+    /// <summary>
+    /// S6 sound (16 October 2026): the sound commands the boot and the route executed, which the app plays through the chosen device (same instructions
+    /// in the EGA and 256-colour releases). The boot's opening music is awaited through the music timer (Script 1 waits for 0x69): the boot reaching
+    /// Room 73 shows the wait did not stall.
+    /// </summary>
+    private static void AssertRouteSounds(ScummSession session, ITestOutputHelper output)
+    {
+        var events = session.SoundEvents;
+        foreach (var item in events)
+            output.WriteLine($"sound: room {item.RoomId} {item.Event.Kind} {item.Event.TargetId} {item.Event.SourceLabel} +0x{item.Event.Offset:X4} {item.Event.Certainty} {item.Event.Executed}");
+        bool Started(int id, string source, int offset) => events.Any(item => item.Event.Kind == ScummScriptEventKind.SoundStarted && item.Event.TargetId == id &&
+            item.Event.SourceLabel == source && item.Event.Offset == offset && item.Event.Executed);
+        // Boot: the opening music 35 (Room 76 local script 201 +0x0023, Reached); the EGA boot also passes the copy-protection screen, whose sound 30 is
+        // Room 92 local script 204 +0x0005 (the 256-colour boot does not show that room).
+        Assert.True(Started(35, "Room 76 local script 201", 0x0023));
+        if (session.SoundEvents.Any(item => item.RoomId == 92)) Assert.True(Started(30, "Room 92 local script 204", 0x0005));
+        // Room 73: closing the door (Script 27 +0x002B, sound 3), the switch (object 837 verb 0x06: +0x0002 as the lights go out, and again when they come
+        // back after the skip: +0x0063 in EGA, +0x02B0 in the 256-colour release), the chain taking the mallet back (Room 73 local script 205 +0x0058,
+        // sound 13), opening the door (Script 26 +0x002B, sound 2).
+        Assert.True(Started(3, "Script 27", 0x002B));
+        Assert.True(Started(13, "Room 73 Object 837 Verb 0x06", 0x0002));
+        Assert.Equal(2, events.Count(item => item.Event.TargetId == 13 && item.Event.SourceLabel == "Room 73 Object 837 Verb 0x06" && item.Event.Executed));
+        Assert.True(Started(13, "Room 73 local script 205", 0x0058));
+        Assert.True(Started(2, "Script 26", 0x002B));
+        // Effects end on their AdLib clock: none of the route's effects is still playing once the dialogue is reached.
+        Assert.DoesNotContain(session.Snapshot.ActiveSounds, id => id is 2 or 3 or 13);
     }
 }

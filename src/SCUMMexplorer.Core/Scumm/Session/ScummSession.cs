@@ -514,6 +514,43 @@ public abstract partial class ScummSession
         return result;
     }
 
+    /// <summary>
+    /// What the sound engine does before a started sound plays (the start is already on <see cref="SoundEvents"/>). Nothing here; the generic session
+    /// stops what its profile's driver stops (<see cref="ScummProfile.MusicStart"/>). LOOM's session keeps its own behaviour.
+    /// </summary>
+    protected virtual void BeforeSoundStarts(ScummScriptEvent start, int soundId) { }
+
+    /// <summary>
+    /// Stops sounds as the engine itself does (not a script instruction): the stop is put on <see cref="SoundEvents"/> just before the start that caused it,
+    /// so a player that follows the list stops the old sounds before it starts the new one. <paramref name="soundIds"/> null stops every sound.
+    /// </summary>
+    protected void EngineStopsSounds(ScummScriptEvent cause, IReadOnlyList<int>? soundIds, string operation, string why)
+    {
+        var at = Math.Max(0, _soundEvents.Count - 1);
+        var origin = _soundEvents.Count > 0 ? _soundEvents[^1].OriginRoomId : null;
+        void Add(ScummScriptEventKind kind, int? id)
+        {
+            var stop = new ScummScriptEvent(cause.SourceScriptId, cause.SourceLabel, cause.Offset, kind, operation, why,
+                id is null ? null : ResourceKind.Sound, id, cause.Certainty) { Executed = cause.Executed };
+            _soundEvents.Insert(at++, new ScummSessionSoundEvent(stop, _visitEvents.Count - 1, _runtime.CurrentRoom, origin));
+        }
+        if (soundIds is null)
+        {
+            Add(ScummScriptEventKind.MusicStopped, null);
+            _runtime.ActiveSounds.Clear();
+            _soundClock.StopAll();
+            _visitTrace.Add($"{operation} at {cause.SourceLabel} +0x{cause.Offset:X4}: every sound stops ({why})");
+            return;
+        }
+        foreach (var id in soundIds)
+        {
+            Add(ScummScriptEventKind.SoundStopped, id);
+            _runtime.ActiveSounds.Remove(id);
+            _soundClock.Stop(id, cause.Certainty != ScummScriptEventCertainty.Reached);
+            _visitTrace.Add($"{operation} at {cause.SourceLabel} +0x{cause.Offset:X4}: sound {id:00} stops ({why})");
+        }
+    }
+
     protected string? HandleEvent(ScummScriptEvent scriptEvent, int depth)
     {
         _visitEvents.Add(scriptEvent);
@@ -577,6 +614,7 @@ public abstract partial class ScummSession
             case ScummScriptEventKind.MusicStarted:
             case ScummScriptEventKind.SoundStarted:
                 if (scriptEvent.TargetId is not int soundId) return "sound target depends on an unknown variable";
+                BeforeSoundStarts(scriptEvent, soundId);
                 _runtime.ActiveSounds.Add(soundId);
                 _soundClock.Start(soundId, scriptEvent.Certainty != ScummScriptEventCertainty.Reached);
                 var soundStatus = _soundClock.Status(soundId);

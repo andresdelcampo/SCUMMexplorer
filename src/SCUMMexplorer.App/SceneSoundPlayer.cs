@@ -7,7 +7,7 @@ namespace SCUMMexplorer.App;
 
 /// <summary>
 /// Plays the sound commands actually executed by a session's scripts, on playback frames and interactive actions,
-/// from <see cref="LoomExplorationSession.SoundEvents"/>. Commands on an estimated preview route retain that label;
+/// from <see cref="ScummSession.SoundEvents"/> (LOOM's session, and since S6 sound, 16 October 2026, the generic play session of the verb-based games). Commands on an estimated preview route retain that label;
 /// commands collected from unexecuted possible branches stay silent. Each executed <c>startSound</c> starts
 /// its track on the frame that reached it; <c>stopSound</c> stops that track and <c>stopMusic</c> stops them all, as
 /// ScummVM's <c>stopAllSounds</c> does. Tracks overlap, as the game's sound channels do.
@@ -68,7 +68,9 @@ public sealed class SceneSoundPlayer
     private readonly List<Voice> _voices = [];
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private GameLibrary? _game;
-    private LoomExplorationSession? _session;
+    private ScummSession? _session;
+    // How a sound becomes a wave for a session whose game the built-in renderer does not cover (the browsed sound player's own rendering); null: built-in.
+    private Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? _render;
     private int _seen;
     private int _frames;
     private bool _paused;
@@ -91,20 +93,22 @@ public sealed class SceneSoundPlayer
     public event Action<string>? PreviewStarting;
 
     /// <summary>Follows <paramref name="session"/> from its next sound event on; a new session stops the old one's sounds.</summary>
-    public void Attach(GameLibrary game, LoomExplorationSession session)
+    /// <param name="render">Renders a sound with the device's rendition (AdLib already at its output level); null uses the built-in LOOM renderer.</param>
+    public void Attach(GameLibrary game, ScummSession session, Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? render = null)
     {
         StopAll("session replaced");
-        if (!ReferenceEquals(game, _game))
+        if (!ReferenceEquals(game, _game) || !Equals(render, _render))
         {
             _renders.Clear();
             _game = game;
+            _render = render;
         }
         _session = session;
         _seen = session.SoundEvents.Count;
         _frames = 0;
     }
 
-    public bool Follows(LoomExplorationSession? session) => session is not null && ReferenceEquals(session, _session);
+    public bool Follows(ScummSession? session) => session is not null && ReferenceEquals(session, _session);
 
     /// <summary>Plays the sound events the session reached since the last call (one playback frame).</summary>
     public void Update()
@@ -242,6 +246,13 @@ public sealed class SceneSoundPlayer
             {
                 try
                 {
+                    if (_render is { } render)
+                    {
+                        var (rendered, isMusic) = render(resource, mode, CancellationToken.None);
+                        var renderedPath = Path.Combine(Path.GetTempPath(), $"scummexplorer-scene-{Guid.NewGuid():N}.wav");
+                        File.WriteAllBytes(renderedPath, rendered);
+                        return (renderedPath, isMusic);
+                    }
                     bool music;
                     byte[] wave;
                     if (_game?.V4Archive is { } vga)

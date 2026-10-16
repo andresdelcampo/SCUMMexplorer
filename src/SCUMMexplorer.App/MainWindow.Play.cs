@@ -28,6 +28,23 @@ public partial class MainWindow
 
     private bool PlayActive => _playTimer is not null && _play is not null;
 
+    // The pause state the play sounds were last given (S6 sound).
+    private bool _playSoundPaused;
+
+    /// <summary>
+    /// S6 sound (16 October 2026): a sound the play session's scripts started, rendered as the sound player renders it for the device the user picked
+    /// (the same device setting as browsing; AdLib at its output level). Which ids play, and when, is the scripts' (<see cref="ScummSession.SoundEvents"/>).
+    /// </summary>
+    private (byte[] Wave, bool Music) RenderPlaySound(GameResource resource, SceneSoundPlayer.SoundMode mode, CancellationToken token)
+    {
+        var wave = RenderSoundWave(resource, mode, token);
+        if (mode == SceneSoundPlayer.SoundMode.Adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, SceneSoundPlayer.AdlibGainDb);
+        var music = _game?.V4ArchiveFor(resource) is { } archive
+            ? archive.ReadSounds().FirstOrDefault(sound => sound.Id == resource.ResourceId)?.IsMusic == true
+            : _adlibDecoder.HasMusic(resource);
+        return (wave, music);
+    }
+
     /// <summary>Starts (or continues) play in the room the user opened: the session boots once per game; another room is visited from its state (state preview).</summary>
     private async Task StartPlayAsync(GameResource resource, CancellationToken token)
     {
@@ -45,8 +62,15 @@ public partial class MainWindow
                 _playFolder = game.FolderPath;
             }
             if (token.IsCancellationRequested) return;
+            // S6 sound: from here on, the sounds the game's scripts start and stop play through the device the user picked (the boot's are not played).
+            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound);
             // A room the session is not in is entered as a state preview (the route to it is not played), as the room view's first visit is.
-            if (_play.CurrentRoomId != roomId) _play.VisitRoom(resource);
+            if (_play.CurrentRoomId != roomId)
+            {
+                // The sounds of the room the user leaves through the list stop; the new room's entry starts its own.
+                _sceneSound.StopAll("another room was picked from the list during play");
+                _play.VisitRoom(resource);
+            }
         }
         catch (Exception ex) when (ex is System.IO.IOException or System.IO.InvalidDataException or InvalidOperationException or NotSupportedException)
         {
@@ -72,6 +96,7 @@ public partial class MainWindow
     {
         _playTimer?.Stop();
         _playTimer = null;
+        if (_play is not null && _sceneSound.Follows(_play)) _sceneSound.StopAll("play was left");
         PlayScreenImage.Visibility = Visibility.Collapsed;
         PlayScreenImage.Cursor = null;
         RoomDisplayGroup.Visibility = Visibility.Visible;
@@ -79,8 +104,17 @@ public partial class MainWindow
 
     private void PlayTimer_Tick(object? sender, EventArgs e)
     {
-        if (_play is null || _playPaused) return;
+        if (_play is null) return;
+        // R-7.16 Pause stops the game's sounds with its clock and lets them go on with it (the app's Pause key only flips _playPaused).
+        if (_playPaused != _playSoundPaused)
+        {
+            _playSoundPaused = _playPaused;
+            if (_playPaused) _sceneSound.Pause(); else _sceneSound.Resume();
+        }
+        // As in LOOM, a sound the game just started holds the frames while it is rendered, so music and scene stay in step.
+        if (_playPaused || _sceneSound.IsPreparing) return;
         _play.AdvanceFrame();
+        _sceneSound.Update();
         _playFrame++;
         if (_playTimer is { } timer) timer.Interval = TimeSpan.FromMilliseconds(_play.FrameJiffies * 1000.0 / 60);
         ShowPlayFrame();

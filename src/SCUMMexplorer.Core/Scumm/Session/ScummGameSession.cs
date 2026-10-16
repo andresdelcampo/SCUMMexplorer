@@ -44,6 +44,7 @@ public sealed class ScummGameSession : ScummSession
             // convertVerbMessage for prints: Script 18 says a dialogue choice through code 5 of the chosen verb (+0x0068).
             _runtime.VerbName = PlayVerbName;
         }
+        _musicStart = profile.MusicStart;
         _bootInput = profile.BootInput;
         _waitsForControl = profile.BootEndsWhenPlayerHasControl;
         if (boot) Boot();
@@ -65,6 +66,25 @@ public sealed class ScummGameSession : ScummSession
             ?? throw new InvalidDataException("The game has no v4 index to read its objects from.");
         indexedObjects = index.ReadIndexedObjects();
         return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game));
+    }
+
+    // S6 sound (16 October 2026): a music start stops what the game's AdLib driver stops (ScummProfile.MusicStart). The session's device is AdLib whatever
+    // the app plays through, so this follows Player_AD or iMuse even when the user listens on the PC speaker (Player_V2 is not modelled).
+    private readonly ScummMusicStart _musicStart;
+
+    protected override void BeforeSoundStarts(ScummScriptEvent start, int soundId)
+    {
+        var rule = _musicStart;
+        if (rule == ScummMusicStart.StopsNothing || !_soundClock.IsMusic(soundId)) return;
+        if (rule == ScummMusicStart.StopsAllSounds)
+        {
+            if (_soundClock.Playing.Count > 0 || _runtime.ActiveSounds.Count > 0)
+                EngineStopsSounds(start, null, "triggerSound", $"music {soundId} starts; iMuse's Monkey Island workaround stops every sound first (Sound::triggerSound)");
+            return;
+        }
+        var previous = _soundClock.Playing.Where(id => id != soundId && _soundClock.IsMusic(id)).Order().ToArray();
+        if (previous.Length > 0)
+            EngineStopsSounds(start, previous, "Player_AD startSound", $"music {soundId} starts; the AdLib player has one music slot (Player_AD::startSound stopMusic)");
     }
 
     /// <summary><c>VAR_SOUNDCARD</c> for AdLib (vars.cpp: 0 PC speaker, 1 Tandy, 2 CMS, 3 AdLib, 4 Roland).</summary>

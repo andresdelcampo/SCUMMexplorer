@@ -30,6 +30,12 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
         _estimatedStops.Remove(id);
     }
 
+    /// <summary>The sound is music for the AdLib driver (its resource's third byte is 0x80, as <c>Player_AD</c> and iMuse's <c>convertADResource</c> test).</summary>
+    public bool IsMusic(int id) => resolve(id).Music;
+
+    /// <summary>The sounds the clock has playing now, in no particular order.</summary>
+    public IReadOnlyList<int> Playing => _voices.Keys.ToArray();
+
     public void Stop(int id, bool estimated = false)
     {
         if (_voices.TryGetValue(id, out var voice) && voice.Lifetime.KeepsMusicTimer)
