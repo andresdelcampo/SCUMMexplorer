@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 16 October: right click reaches the game only where its interface reads it (R-7.16, Rule)
+
+- User decisions of 16 October: "Right click goes to the game in verb-based games, as in ScummVM; keep the Interact menu elsewhere.", narrowed to "why not use right click only in the games that need it? -instead of everywhere?". R-7.16 reworded (Rule, confirmed by the user 16 Oct); R-6.9 and R-7.10 point to it.
+- **Engine:** `ScummProfile.RightClickReachesGame` (play through verbs and engine version 4 or later) and `RightClickInputMode` (2), from ScummVM master `processInput`/`checkExecVerbs` (read 16 October 2026); `ScummSession.ClickScreen(x, y, rightButton, …)` delivers the right press as the click with mode 2, or refuses it where the right button is the app's.
+- **Monkey Island 1 floppy:** a right click on an object runs its default verb (Script 4 +0x0005..+0x0016, then `doSentence` +0x044B; the poster: Look at). **Indiana Jones EGA and 256 colours, LOOM, browsed games:** unchanged (version 3 scripts never see a right click; ScummVM's Esc is the app's Skip). The Interact menu stays on its **Interact ▴** button and LOOM's right click; Play never offered it.
+- **App:** the play image's `MouseRightButtonDown` sends the press to the game only where the profile says so (`MainWindow.Play.cs`). Tests: `ScummMonkeyFloppyPlayTests.ARightClickOnAnObjectRunsItsDefaultVerb`, `ScummIndy3PlayTests.TheRightButtonStaysTheAppsAndNeverReachesTheGame`, the Indy3Vga profile test; the Monkey PlayWindowCheck ends with a right click through the window. Records: addenda in [monkey1-play-20261016](../.verification/monkey1-play-20261016/README.md), [indy3-play-20261015](../.verification/indy3-play-20261015/README.md), [indy3vga-play-20261016](../.verification/indy3vga-play-20261016/README.md).
+
 ## 16 October: Monkey Island 1 floppy is played through its own verbs (S6, MonkeyFloppy)
 
 - The shared play path works on SCUMM v4: text verbs, the sentence line, the inventory and messages drawn with the game's v4 charsets (`IScummTextCharset` over the v3 and the classic renderer; each verb in the charset it was created with); `VAR_CURSORSTATE`/`VAR_USERPUT` copied after every `cursorCommand` from version 4 (Monkey's interface loop hovers nothing without them); the engine's save/load key `VAR_MAINMENU_KEY` (F5) is not delivered. The play cursor is now cursor 0 of ScummVM's `resetCursors` (16 × 16 cross-hair, hotspot 8, 7) for versions 3 and 4 alike, which fixes the v3 shape S6 Indy3Vga reported; R-7.9's wording follows.

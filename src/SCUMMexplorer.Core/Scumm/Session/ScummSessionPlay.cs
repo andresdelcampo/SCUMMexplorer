@@ -136,24 +136,37 @@ public abstract partial class ScummSession
     /// <c>runInputScript(1, verb, mode)</c>; elsewhere outside the room screen <c>(1, 0, mode)</c>; in the room screen <c>(2, 0, mode)</c>. The pointer moves
     /// there first. Returns the queued input, or null with the reason when the game reads no click now (user input off, no input script).
     /// </summary>
-    public ScummPlayInput? ClickScreen(int x, int y, out string? refused)
+    public ScummPlayInput? ClickScreen(int x, int y, out string? refused) => ClickScreen(x, y, false, out refused);
+
+    /// <summary>
+    /// One press of the left or right button (R-7.10, R-7.16). A right press reaches the game only where <see cref="ScummProfile.RightClickReachesGame"/>
+    /// (from version 4: the same click with mode 2, ScummVM <c>checkExecVerbs</c>); elsewhere it is refused and the right button stays the app's.
+    /// </summary>
+    public ScummPlayInput? ClickScreen(int x, int y, bool rightButton, out string? refused)
     {
+        var profile = ScummProfile.For(_game);
+        if (rightButton && !profile.RightClickReachesGame)
+        {
+            refused = "the right button is the app's in this game (R-7.16): its scripts never see a right click";
+            return null;
+        }
         PointAtScreen((x, y));
         refused = InputRefusal();
         if (refused is not null) return null;
-        var mode = ScummProfile.For(_game).ClickInputMode;
+        var mode = rightButton ? profile.RightClickInputMode : profile.ClickInputMode;
+        var press = rightButton ? "right click" : "click";
         ScummPlayInput input;
         if (y >= _runtime.MainScreen.Top && y < _runtime.MainScreen.Bottom)
         {
             var (roomX, roomY) = VirtualPoint(x, y);
-            input = new(SceneClickArea, 0, mode, $"click in the room at screen ({x}, {y}), room ({roomX}, {roomY})");
+            input = new(SceneClickArea, 0, mode, $"{press} in the room at screen ({x}, {y}), room ({roomX}, {roomY})");
         }
         else
         {
             var verb = ScummVerbArea.FindVerbAt(PlayVerbArea().Items, x, y);
             input = verb is null
-                ? new(VerbClickArea, 0, mode, $"click at screen ({x}, {y}) outside the room, on no verb")
-                : new(VerbClickArea, verb.VerbId, mode, $"click on verb 0x{verb.VerbId:X2} at screen ({x}, {y})");
+                ? new(VerbClickArea, 0, mode, $"{press} at screen ({x}, {y}) outside the room, on no verb")
+                : new(VerbClickArea, verb.VerbId, mode, $"{press} on verb 0x{verb.VerbId:X2} at screen ({x}, {y})");
         }
         _queuedInput.Enqueue(input);
         return input;

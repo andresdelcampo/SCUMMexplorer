@@ -20,6 +20,8 @@ public sealed class ScummIndy3VgaPlayTests(ITestOutputHelper output)
         Assert.True(profile.PlaysThroughVerbs);
         // checkExecVerbs: mode is 0 while _game.version <= 3; ScummVM runs this release as version 3 although its blocks are v4-style.
         Assert.Equal(0, profile.ClickInputMode);
+        // R-7.16 (16 Oct): a version 3 game's scripts never see a right click, so the right button stays the app's.
+        Assert.False(profile.RightClickReachesGame);
         // Script 24 is the same instructions as EGA: F5 (319) chains to the save/load Script 9.
         Assert.Equal([0x13F], profile.UndeliveredKeys);
     }

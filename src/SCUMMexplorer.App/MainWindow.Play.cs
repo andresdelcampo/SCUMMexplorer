@@ -168,6 +168,27 @@ public partial class MainWindow
         if (_play!.ClickScreen(point.X, point.Y, out var refused) is null && IsAdvancedMode) StatusText.ToolTip = $"Click not delivered: {refused}";
     }
 
+    // R-7.16 (Rule, confirmed by the user 16 Oct): the right button goes to the game only where its scripts read it (ScummProfile.RightClickReachesGame:
+    // version 4 and later, mode 2; Monkey Island's two-button default verb). Elsewhere it is not taken here and stays the app's.
+    private void PlayScreenImage_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (!PlayRightClickReachesGame || PlayPoint(e) is not { } point) return;
+        PlayScreenImage.Focus();
+        e.Handled = true;
+        PlayRightClick(point.X, point.Y);
+    }
+
+    private bool PlayRightClickReachesGame => PlayActive && _game is { } game && ScummProfile.For(game).RightClickReachesGame;
+
+    // One right press at a game screen point, as the image's handler delivers it after mapping the pointer.
+    private ScummPlayInput? PlayRightClick(int x, int y)
+    {
+        if (!PlayRightClickReachesGame) return null;
+        var input = _play!.ClickScreen(x, y, true, out var refused);
+        if (input is null && IsAdvancedMode) StatusText.ToolTip = $"Right click not delivered: {refused}";
+        return input;
+    }
+
     /// <summary>The engine's keys and the game's keys while playing; true when the key was taken.</summary>
     private bool PlayKeyDown(KeyEventArgs e)
     {

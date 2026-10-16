@@ -467,7 +467,7 @@
                                 <Image x:Name="PlayScreenImage" Visibility="Collapsed" Stretch="Uniform" SnapsToDevicePixels="True" Focusable="True"
                                        RenderOptions.BitmapScalingMode="NearestNeighbor" AutomationProperties.Name="Game screen"
                                        MouseMove="PlayScreenImage_MouseMove" MouseLeave="PlayScreenImage_MouseLeave"
-                                       MouseLeftButtonDown="PlayScreenImage_MouseLeftButtonDown"/>
+                                       MouseLeftButtonDown="PlayScreenImage_MouseLeftButtonDown" MouseRightButtonDown="PlayScreenImage_MouseRightButtonDown"/>
                                 <StackPanel x:Name="RoomDisplayGroup" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <ScrollViewer x:Name="RoomViewport" HorizontalScrollBarVisibility="Auto"
                                                   VerticalScrollBarVisibility="Disabled" CanContentScroll="False"

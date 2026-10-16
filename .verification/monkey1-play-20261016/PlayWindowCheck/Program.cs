@@ -96,6 +96,25 @@ internal static class Program
                 session.PointAtScreen((60, 120));
                 await Task.Delay(300);
                 Save("play-03-after-skip.png");
+                // R-7.16 (Rule, 16 Oct): a right click on the poster goes through the window's own right-button path (PlayRightClick, which the image's
+                // MouseRightButtonDown calls after mapping the pointer) as runInputScript(2, 0, 2); Script 4 +0x0016 takes the default verb (Look at).
+                for (var n = 0; n < 100 && !session.UserInputOn; n++) await Task.Delay(100);
+                for (var n = 0; n < 40 && !Sentence().EndsWith("poster", StringComparison.Ordinal); n++)
+                {
+                    session.PointAtScreen((268 - session.ViewLeft, 104));
+                    await Task.Delay(100);
+                }
+                var sentencesBefore = session.SessionTrace.Count(line => line.StartsWith("sentence script 2 runs verb 0x09 with objects 438", StringComparison.Ordinal));
+                var right = (ScummPlayInput?)Call("PlayRightClick", 268 - session.ViewLeft, 104);
+                for (var n = 0; n < 50 && session.SessionTrace.Count(line => line.StartsWith("sentence script 2 runs verb 0x09 with objects 438", StringComparison.Ordinal)) == sentencesBefore; n++)
+                    await Task.Delay(100);
+                // The sentence script walks Guybrush to the poster before its look; wait for the game's answer (a line on screen).
+                for (var n = 0; n < 150 && !session.Messages.OnScreen.Any(m => m.Text.Trim().Length > 0); n++) await Task.Delay(100);
+                var interact = (Button)window.FindName("InteractButton");
+                report.Add($"right click on the poster through the window: {(right is null ? "not delivered" : $"runInputScript({right.Area}, {right.Value}, {right.Mode}) {right.Description}")}; " +
+                           $"Look at poster sentences {sentencesBefore} -> {session.SessionTrace.Count(line => line.StartsWith("sentence script 2 runs verb 0x09 with objects 438", StringComparison.Ordinal))}; " +
+                           $"messages [{string.Join(" | ", session.Messages.OnScreen.Select(m => m.Text))}]; Interact button visible {interact.IsVisible}, enabled {interact.IsEnabled}");
+                Save("play-04-right-click.png");
                 report.Add($"frames played by the window: {Field("_playFrame")}");
             }
             catch (Exception ex) { report.Add(ex.ToString()); Environment.ExitCode = 1; }

@@ -214,4 +214,27 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         // Effects end on their AdLib clock: none of the route's effects is still playing once the dialogue is reached.
         Assert.DoesNotContain(session.Snapshot.ActiveSounds, id => id is 2 or 3 or 13);
     }
+
+    [Fact]
+    public void TheRightButtonStaysTheAppsAndNeverReachesTheGame()
+    {
+        // R-7.16 (Rule, 16 Oct): version 3 scripts never see a right click (ScummVM processInput turns it into Esc outside LOOM, checkExecVerbs gives
+        // mode 0 up to version 3), so Indy3 does not need it: the right button is the app's, nothing is queued, and Esc keeps its override rule (R-7.11).
+        if (Folder() is not { } folder) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var session = new ScummGameSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL")));
+        session.AdvanceFrame();
+        session.AdvanceFrame();
+        Assert.True(session.UserInputOn);
+        Assert.False(ScummProfile.For(game).RightClickReachesGame);
+        var delivered = session.DeliveredInput.Count;
+
+        Assert.Null(session.ClickScreen(176, 112, true, out var refused));
+        Assert.Contains("R-7.16", refused);
+        session.AdvanceFrame();
+        Assert.Equal(delivered, session.DeliveredInput.Count);
+        Assert.False(session.CutsceneSkippable);
+        // The left button is unchanged: one click, mode 0.
+        Assert.Equal(0, session.ClickScreen(176, 112, out _)!.Mode);
+    }
 }
