@@ -1,4 +1,4 @@
-﻿# Indiana Jones and the Last Crusade script map
+# Indiana Jones and the Last Crusade script map
 
 This map records **Indy3-specific** script roles, variable meanings, verb ids and room behaviour. Engine-defined variables and opcode rules are in the [SCUMM script reference](../engine/SCUMM_SCRIPT_MAP.md); the engine's boot sequence is in [SCUMM_BOOT_SEQUENCE.md](../engine/SCUMM_BOOT_SEQUENCE.md).
 
@@ -123,6 +123,17 @@ Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading
 | Rooms whose first visit never rests | rooms 1, 6, 15, 20, 28, 32, 39, 44, 47, 60, 66, 79, 80, 83, 84, 94 keep changing within 2400 frames (ambient or long scenes); the state at the limit is shown | decoded | room audit (`.verification/indy3-objects-20261014`) | 2026-10-14 |
 | Rooms a script leaves | rooms 37, 41, 43, 82 load another room during the visit; the state at the last frame in the room is shown | decoded | room audit | 2026-10-14 |
 
+## VGA note: the 256-colour release (`Games/indy3 vga en`), where it differs
+
+Read on 15 October 2026 (S4b Indy3Vga) from `00.LFL` and the room files, dialect `V3Indy3`, confirmed by a headless boot of the generic session (record: `.verification/indy3vga-session-20261015`). Only differences from the EGA rows above are listed; everything not listed was not compared.
+
+| Item | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| Layout | one plain `NN.LFL` per room with v4-style blocks (RO, OC, OI, BX with 18-byte boxes, CO, SO, LS, EN, EX), `00.LFL` the index ("0R", "0S", "0C", "0N", "0O"); 130 global scripts in the "0S" directory; local scripts numbered from 200 | decoded | `00.LFL`; `ScummV4Archive.LoadRoomFiles` | 2026-10-15 |
+| Opening order | as EGA up to the lecture, but **no copy-protection room**: Script 1 loads rooms 76 (+0x01EA), 79 (+0x0208), 0 (+0x0223), 6 (+0x0248), 1 (+0x02DE) and 73 (+0x0461); the game has no Room 92 | decoded | Script 1 loadRoom instructions; room list of the index | 2026-10-15 |
+| End of the boot | `doSentence 0x0A, 0x0342, 0x0000` at +0x0466, `endCutscene` +0x04B0, `chainScript 0x77` +0x04B1 (the EGA offsets differ, same instructions) | decoded | Script 1 +0x0461 to +0x04B7 | 2026-10-15 |
+| Hook values at Room 73 | input script 4, sentence script 2, inventory script 12 (as EGA) | decoded | boot run, `var[0x020]`, `var[0x021]`, `var[0x022]` | 2026-10-15 |
+| Costumes | 101 costumes, all format 0x58 (16 colours through the costume's table into the room palette); one byte per limb command in an animation | decoded | CO blocks; `ScummIndy3VgaSessionTests` | 2026-10-15 |
 ## Open questions
 
 - Who sets the hook values at Room 73 (entry 5 and 6, exit 7, input 4).

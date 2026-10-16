@@ -37,3 +37,32 @@ Open uncertainties: the AdLib playback of the sound player uses LOOM's driver co
 | 2026-10-14 | S5 | Runtime comparison with ScummVM | drive the bundled build / source only | the bundled build could not be captured (white window; the software renderer failed); source-level comparison only, recorded | retry with another renderer or a saved game |
 | 2026-10-15 | S6 (prerequisite) | What Play means for a verb-based game; how it relates to R-1.5 and §7 (LOOM's single click uses, double click looks) | apply LOOM's gestures to Indy3 / follow the game's own interface as ScummVM delivers it | the game's own interface (Proposed R-7.7 to R-7.18, own commit): one click per press to the input script in `VAR_VERB_SCRIPT`, verbs/sentence line/inventory drawn from the game's verbs, sentences only through the game's sentence script. R-1.5 is met through the game's default verb ("Walk to" runs on one click), so it is an extension, not a contradiction; LOOM's double-click look has no Indy3 counterpart. Kept unchanged where ScummVM differs: right click stays the Interact menu (R-6.9) instead of v3's Esc; restart and save/load keys are not delivered. Facts read from Scripts 4, 15, 16, 18, 20, 24, 96 and ScummVM master (15 Oct) | revert the proposal commit; S6 work on top of it is reverted with it |
 | 2026-10-14 | S5 | R-6.12 (Indy3 EGA background note) contradicts the S5 playbook | stop the item / propose a superseding row | propose R-6.12a and R-5.3a (own commit); the wiring follows the playbook, the old note remains only as the Advanced fallback note | revert the wiring commit and the proposal commit |
+
+# Indiana Jones and the Last Crusade (256 colours) support status
+
+Family: Indy3Vga | Fixture: `Games/indy3 vga en` (data in `D:\Juegos\Lucas`) | Last updated: 2026-10-16 | Owner: S4b/S5 Indy3Vga agent
+
+| Stage | State (not started / in progress / done / blocked) | Registry cell | Record | Notes |
+|---|---|---|---|---|
+| S1 Intake | done (earlier; no tracker then) | Rooms | – | |
+| S2 Reading | done (earlier) | Costumes, Scripts, Texts | – | costume limb commands are bytes (fixed in the session's reader, S4b) |
+| S3 Sound | done (earlier) | Sound | – | AdLib music at half tempo, set by ear |
+| S4b Session | **done** (15 Oct) | – (unchanged) | `.verification/indy3vga-session-20261015` | boot trace: 1002 frames, rooms 76, 79, 0, 6, 1, 73, nothing unsupported, no assumed input (no copy-protection room in this release) |
+| S5 Objects | not started | Objects (partial until S6) | | rooms compared: 0/10 |
+| S6 Play | not started | Play, Objects | | Play requirement: R-7.7 to R-7.18 (Proposed for Indy3 EGA) |
+| S7 Cutscenes | not started | Cutscenes | | |
+| S8 State | not started | Status | | requested in a run: no |
+| S9 Editions | not started | – | | editions checked: none (`indy3 vga es` not tried) |
+
+Blocked on: nothing.
+Next: S5 (first-visit rooms through `ScummRoomFirstVisit`; the profile already offers them, R-6.12a).
+Open uncertainties: the session's AdLib music timer is the half-tempo estimate of the browsed disks; ScummVM facts of S4b were taken from memory of the source, not re-read; no runtime comparison with ScummVM.
+
+## Decision log (Indy3Vga)
+
+| Date | Stage | Open question | Options | Choice and why | How to undo |
+|---|---|---|---|---|---|
+| 2026-10-15 | S4b | A data source for the room-file layout | reuse the disk-set source (names `DISK01.LEC`) / a new source beside the readers | new `ScummV4RoomFileDataSource` delegating to `ScummV4DataSource` over the room-file archive: correct container names (`NN.LFL`), index object table, byte costume commands; the brief asks for one | return the disk-set source from `ScummDataSources.For` |
+| 2026-10-15 | S4b | The game's blocks are v4, its scripts and engine version 3 | key engine behaviour on the container (v4) / add an engine version to the profile | `ScummProfile.EngineVersion` (V3 for the room-file layout, by format): ScummVM runs indy3 VGA as version 3; with v4 settings `VAR_HEAPSPACE` (var 40) would overwrite an extra timer and bits would be kept apart from the words | remove `EngineVersion` (properties return to `Version`) |
+| 2026-10-15 | S4b | Indy3 extra timers for the VGA release, which the scanner gives no `GameId` | GameId test / family | by family in `ScummProfile` (the one place that maps games to variants) | return to `game.Id == GameId.IndianaJones3` |
+| 2026-10-15 | S4b | Walk boxes of the session's room data were 20 bytes | keep / read the archive's own size | the archive's `WalkBoxSize` (18 for room files), which browsing already used; the wrong size hung the boot | revert the two lines in `ScummV4DataSource.ReadRoom` |

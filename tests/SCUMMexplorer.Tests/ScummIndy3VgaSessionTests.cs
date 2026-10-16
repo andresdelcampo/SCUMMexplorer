@@ -101,7 +101,7 @@ public sealed class ScummIndy3VgaSessionTests
         Assert.False(report.HitFrameLimit);
         Assert.InRange(report.Frames, 500, 2000);
         Assert.Equal(73, report.FinalRoom);
-        // Opening (76, 79), the cleared screen (0), the lecture (6, 1), then Henry's house... Marcus's office (73). No copy-protection room.
+        // Opening (76, 79), the cleared screen (0), the lecture (6, 1), then the college gym (73). No copy-protection room.
         Assert.Equal([76, 79, 0, 6, 1, 73], report.RoomsEntered);
         Assert.Equal(73, session.Snapshot.RoomId);
         Assert.Equal(73, session.Snapshot.KnownGlobalVariables[ScummVars.Room]);
@@ -114,7 +114,7 @@ public sealed class ScummIndy3VgaSessionTests
         Assert.DoesNotContain(session.Snapshot.Uncertainties, item => item.Contains("presentation operation not applied:"));
         Assert.DoesNotContain(session.Snapshot.Uncertainties, item => item.StartsWith("Player input assumed", StringComparison.Ordinal));
 
-        // The first room: the ego with its own costume, Marcus (actor 9) beside it, and the interface scripts set by the game.
+        // The first room (the college gym): the ego with its own costume, the boxer in the ring (actor 9, costume 38), and the interface scripts set by the game.
         var ego = session.Actors.Single(actor => actor.Number == 1);
         Assert.Equal(73, ego.Room);
         Assert.Equal(1, ego.Look.Costume);

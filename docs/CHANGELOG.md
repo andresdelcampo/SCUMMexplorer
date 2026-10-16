@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 15 October: the 256-colour Indiana Jones boots in the generic session (S4b, Indy3Vga)
+
+- **`ScummV4RoomFileDataSource`** (Core/Scumm/V4) serves the one-file-per-room release through `ScummDataSources.For`: version 3 scripts (`V3Indy3`), scripts named by their room file, 18-byte walk boxes (the session's room data had read 20 and the boot hung on Room 73's walk), one byte per costume limb command (`ScummCostume.ReadVga(..., byteCommands)`).
+- **`ScummProfile.EngineVersion`**: V3 for the room-file layout (ScummVM runs indy3 VGA as version 3), so walking, bit storage and engine variables follow version 3; the Indy3 extra timers by family; `HasFirstVisitScenes` lifted by format and dialect.
+- **Boot:** rooms 76, 79, 0, 6, 1, 73 in 1002 frames, nothing unsupported, no assumed input (this release has no copy-protection room). Registry unchanged. Tests: `ScummIndy3VgaSessionTests` (4); LOOM and neighbours 863 (858 passed, 5 skipped). Record: [indy3vga-session-20261015](../.verification/indy3vga-session-20261015/README.md).
 ## 15 October: every Monkey Island floppy room shows its first visit (S5, MonkeyFloppy)
 
 - **Room view, actors and room cards** of the four-disk floppy release come from the generic session's first visit (`ScummRoomFirstVisit` on a v4 disk set, `ScummProfile.HasFirstVisitScenes` by format and dialect; the previous agent's commit 3b2bcf6, now verified). Room audit: **81 of 81 rooms without a gap**, objects in 30 rooms (before: none, the v4 index starts every object at 0), actors in 56; 70 settled, 9 reached the frame limit, 2 left the room.
