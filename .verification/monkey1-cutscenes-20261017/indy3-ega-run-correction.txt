@@ -1,0 +1,12 @@
+﻿<= 18/253/0x01 Room 18 · Open slab-I | run: begun frames 33 rooms []
+=> 18/253/0x01 Room 18 · Open slab-I | run: NOT begun frames 600 rooms []
+<= 31/466/0x08 Room 31 · Use grating | run: begun frames 23 rooms []
+=> 31/466/0x08 Room 31 · Use grating | run: NOT begun frames 600 rooms []
+<= 39/586/0x0A Room 39 · Walk to hatch | run: begun frames 6000 rooms []
+=> 39/586/0x0A Room 39 · Walk to hatch | run: NOT begun frames 600 rooms []
+<= 7/134/0x07 Room 07 · Pull table cloth | run: begun frames 46 rooms []
+=> 7/134/0x07 Room 07 · Pull table cloth | run: NOT begun frames 600 rooms []
+<= 7/136/0x01 Room 07 · Open old book | run: begun frames 46 rooms []
+=> 7/136/0x01 Room 07 · Open old book | run: NOT begun frames 600 rooms []
+=> runs 153, begun 90  | runs 153, begun 90
+<= runs 153, begun 95  | runs 153, begun 95
