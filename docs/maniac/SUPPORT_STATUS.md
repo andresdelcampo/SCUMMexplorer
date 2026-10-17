@@ -26,3 +26,9 @@ Open uncertainties: the skin/suit tables are ScummVM's data (`v1MMActorPalatte1/
 | 2026-10-14 | S2 | Raise Costumes to ✔? | raise on source evidence alone / keep ◐ until compared with a running ScummVM | keep ◐ (the stage requires the side-by-side comparison; none could be run) | superseded: the user decided (14 Oct) that Maniac Mansion classic is complete on the source evidence, and the cell is ✔; revert the one registry line to undo |
 
 Facts about the game's scripts: [MANIAC_SCRIPT_MAP.md](MANIAC_SCRIPT_MAP.md).
+
+## ManiacEnhanced v2 — S4b checkpoint, 17 October 2026
+
+S4b is in progress, blocked before player control; no support cell changes. The enhanced source adapter and bounded interpreter reach Room45, then genuine assumed party clicks select Syd and Bernard and start the opening. Route45→0→33→49→44 stops in Script131+012D waiting for incremental VAR_CHARCOUNT; the message model currently presents whole chunks. The exact incomplete endpoint is covered by `ScummManiacEnhancedSessionTests`.
+
+Evidence and reproducible inputs: [.verification/maniac-session-20261017](../../.verification/maniac-session-20261017/README.md). Next: source-backed v2 incremental character counting and remaining opcode/session blockers, then reassess S4b. S5–S7/S9 remain unattempted. Existing classic costume-colour acceptance is unchanged.
