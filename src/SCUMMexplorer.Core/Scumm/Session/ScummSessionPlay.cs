@@ -252,7 +252,8 @@ public abstract partial class ScummSession
                 _runtime.SetGlobalVariable(ScummVars.V2.ClickArea, (ushort)input.Area);
                 if (input.Area == VerbClickArea) _runtime.SetGlobalVariable(ScummVars.V2.ClickVerb, (ushort)input.Value);
                 if (input.Area == 3) _runtime.SetGlobalVariable(ScummVars.V2.ClickObject, (ushort)input.Value);
-                if (input.Area == KeyClickArea) _runtime.SetGlobalVariable(ScummVars.V2.Keypress, (ushort)input.Value);
+                // processKeyboard converts DOS F1..F9 to the old engine's 1..9 key values.
+                if (input.Area == KeyClickArea) _runtime.SetGlobalVariable(ScummVars.V2.Keypress, (ushort)(input.Value is >= 315 and <= 323 ? input.Value - 314 : input.Value));
             }
             _deliveredInput.Add(input);
             _visitTrace.Add($"input: {input.Description} runs script {script} with [{input.Area}, {input.Value}, {input.Mode}] (runInputScript)");

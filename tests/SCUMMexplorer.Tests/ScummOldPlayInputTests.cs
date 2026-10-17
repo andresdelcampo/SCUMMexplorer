@@ -78,5 +78,9 @@ public sealed class ScummOldPlayInputTests
         for (var frame = 0; frame < 1000 && session.CurrentRoomId == 44; frame++) session.AdvanceFrame();
         Assert.Equal(1, session.CurrentRoomId);
         Assert.DoesNotContain(session.Snapshot.Uncertainties, s => s.Contains("unsupported v2"));
+        Assert.NotNull(session.PressPlayKey(315, out _));
+        session.AdvanceFrame();
+        Assert.Equal(315, session.DeliveredInput.Last().Value); // input retains the platform key; old global uses 1.
+        Assert.InRange(session.Snapshot.KnownGlobalVariables[ScummVars.V2.Keypress], (ushort)0, (ushort)1);
     }
 }
