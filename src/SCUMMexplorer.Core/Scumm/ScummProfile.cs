@@ -1,4 +1,4 @@
-﻿using SCUMMexplorer.Core.Domain;
+using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
@@ -101,7 +101,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     public bool BootEndsWhenPlayerHasControl { get; init; }
 
     /// <summary>
-    /// The game is played through its own verb interface (REQUIREMENTS Â§7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
+    /// The game is played through its own verb interface (REQUIREMENTS §7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
     /// from its verbs and the player's clicks and keys go to its input script (<see cref="ScummSession.ClickScreen"/>). True only for a family whose Play
     /// cell is raised (R-7.17: no clicks reach the scripts of the others). S6 Indy3Ega; S6 Indy3Vga (16 October 2026) by the same data: a game whose
     /// first visit the generic session runs with the Indy3 script dialect, whatever its container (old-bundle LFL or one file per room).
@@ -181,7 +181,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
             PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
             UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],
-            // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) â†’ Player_AD; the other DOS games of version 3 and later â†’ iMuse (Monkey's workaround in triggerSound).
+            // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) → Player_AD; the other DOS games of version 3 and later → iMuse (Monkey's workaround in triggerSound).
             MusicStart = game.Id is GameId.Loom or GameId.LoomVga || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummMusicStart.StopsPreviousMusic
                 : GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? ScummMusicStart.StopsAllSounds
                 : ScummMusicStart.StopsNothing
