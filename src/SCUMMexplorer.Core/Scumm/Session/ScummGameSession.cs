@@ -1,4 +1,4 @@
-using SCUMMexplorer.Core.Domain;
+﻿using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
@@ -147,7 +147,34 @@ public sealed class ScummGameSession : ScummSession
                 ? adlib.ReadLifetime(part, timing, halfTempo: true)
                 : new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib part in the disks' sound blocks");
         }
+        // S4b Indy4 (17 October 2026): a v5 game plays its music through iMUSE; the AdLib part's own timeline (ScummImuseTimeline, the S3 player's default
+        // path: hooks at 0, markers not acted on) gives how long a sound plays. A song whose timeline jumps back loops until a script stops it.
+        if (game.V4Disks is { } v5Disks && v5Disks.Disks.OfType<ScummV5Archive>().FirstOrDefault() is { } v5)
+        {
+            var parts = new Dictionary<int, byte[]?>();
+            foreach (var sound in v5.ReadSounds()) parts.TryAdd(sound.Id, sound.ImuseAdlib);
+            var lifetimes = new Dictionary<int, ScummSoundLifetime>();
+            return resource => resource.ResourceId is not int id ? new(ScummSoundLifetimeKind.Unknown, null, false, "no sound id")
+                : lifetimes.TryGetValue(id, out var known) ? known : lifetimes[id] = ImuseLifetime(parts.GetValueOrDefault(id));
+        }
         return resource => adlib.ReadLifetime(resource, timing);
+    }
+
+    private static ScummSoundLifetime ImuseLifetime(byte[]? part)
+    {
+        if (part is null) return new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib iMUSE part in the sound block");
+        try
+        {
+            var timeline = ScummImuseTimeline.Build(ScummImuseSong.Parse(part));
+            const string why = "iMUSE default path (hooks 0, markers and script-set loops not simulated): an estimate";
+            return timeline.Loops
+                ? new(ScummSoundLifetimeKind.Looping, null, true, why)
+                : new(ScummSoundLifetimeKind.Finite, (int)Math.Min(int.MaxValue, Math.Ceiling(timeline.EndSeconds * 472)), true, why);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or ArgumentException or IndexOutOfRangeException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, $"the iMUSE part could not be read: {ex.Message}");
+        }
     }
 
     /// <summary>
