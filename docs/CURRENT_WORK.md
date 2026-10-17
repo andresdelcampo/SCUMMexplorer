@@ -1,6 +1,6 @@
 # Current work
 
-**S4b ManiacEnhanced in progress (17 October, Maniac/Zak orchestrator).** The isolated agent owns the new v2 data source and executor partial, plus small additive profile/variable/session changes. ZakEnhanced follows sequentially because it shares that engine work. LOOM, Indy3 and Monkey Island behavior and records are outside this item.
+**S4b Maniac/Zak done (17 October, separate orchestrator).** ManiacClassic and ManiacEnhanced reach stable Room 44 control through explicitly selected Syd/Bernard party inputs; ZakClassic and ZakEnhanced finish their full introductions in Room 1 with stable control. Registry levels are unchanged. [Checkpoint and validation](checkpoints/20261017-S4b-ManiacZak.md), [dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md). Next for these four families: S5, then S6 verb-based play, S7 and S9. LOOM, Indy3 and Monkey Island remain the other orchestrator's scope.
 
 Updated 14 October 2026. This is the single plan and session handoff. Completed work and validation belong in [CHANGELOG](CHANGELOG.md); source knowledge belongs in the game references.
 

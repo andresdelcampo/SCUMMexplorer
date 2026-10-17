@@ -118,6 +118,7 @@ Source: ScummVM `engines/scumm/vars.cpp`, `ScummEngine_v2::setupScummVars`, read
 | Machine speed / displayed character count | 6 / 7 | engine |
 | Active verb / active object 1 / active object 2 | 8 / 9 / 10 | engine |
 | Number of actors / lights / current drive | 11 / 12 / 13 | engine |
+| One-level indirect read aliases (writes address the original slot) | 14 / 15 / 16 | `script_v2.cpp::readVar` / `writeVar` |
 | Music timer / verb allowed | 17 / 18 | engine |
 | Actor range minimum / maximum | 19 / 20 | engine |
 | Cursor state | 21 | engine |
