@@ -4,6 +4,17 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummOldFirstVisitRulesTests
 {
+    [Fact]
+    public void DuplicateDirectoryImagesShareFlagsButRetainBothPositions()
+    {
+        var first = new RoomObjectImage(384, 8, 8, 1, 1, [3]);
+        var last = new RoomObjectImage(384, 16, 8, 1, 1, [4]);
+        var selection = new RoomObjectSelection([first, last], new Dictionary<int, byte> { [384] = 8 },
+            new Dictionary<int, RoomObjectPosition> { [384] = new(24, 8) }, intrinsicStateMask: 8);
+        Assert.Equal([last, first], selection.PaintOrder());
+        Assert.Equal(new RoomObjectPosition(8, 8), selection.GetPosition(first));
+        Assert.Equal(new RoomObjectPosition(24, 8), selection.GetPosition(last));
+    }
     [Theory]
     [InlineData(1, false)]
     [InlineData(2, false)]

@@ -41,6 +41,7 @@ public sealed class RoomObjectSelection
     private const double CutoutBlack = 0.9;
 
     private readonly IReadOnlyList<RoomObjectImage> _objects;
+    private readonly IReadOnlyDictionary<int, RoomObjectImage> _lastImages;
     private readonly Dictionary<int, byte> _states;
     private readonly HashSet<int> _knownStates = [];
     private readonly Dictionary<int, RoomObjectPosition> _positions;
@@ -66,17 +67,18 @@ public sealed class RoomObjectSelection
     {
         _intrinsicStateMask = intrinsicStateMask;
         _objects = objects;
+        _lastImages = objects.GroupBy(obj => obj.Id).ToDictionary(group => group.Key, group => group.Last());
         _background = background is { IsValid: true } ? background : null;
         if (roomRecords is not null)
         {
             _recordsById = roomRecords.GroupBy(record => record.Id).ToDictionary(group => group.Key, group => group.Last());
             _recordsByLocalIndex = roomRecords.ToDictionary(record => record.LocalIndex);
         }
-        _positions = objects.ToDictionary(obj => obj.Id, obj => new RoomObjectPosition(obj.X, obj.Y));
+        _positions = objects.GroupBy(obj => obj.Id).ToDictionary(group => group.Key, group => new RoomObjectPosition(group.Last().X, group.Last().Y));
         if (initialPositions is not null)
             foreach (var (id, position) in initialPositions)
                 if (_positions.ContainsKey(id)) _positions[id] = position;
-        _states = objects.ToDictionary(obj => obj.Id, obj =>
+        _states = objects.GroupBy(obj => obj.Id).Select(group => group.Last()).ToDictionary(obj => obj.Id, obj =>
             initialStates is null ? (byte)0 : initialStates.TryGetValue(obj.Id, out var state)
                 ? state : throw new InvalidDataException($"Object {obj.Id} is absent from the global state table."));
         _knownStates.UnionWith(_states.Keys);
@@ -100,7 +102,7 @@ public sealed class RoomObjectSelection
         {
             RememberBackgroundIfEmpty(obj);
             if (indexedStates is not null && Peers(obj).All(peer =>
-                    indexedStates.TryGetValue(peer.Id, out var state) && (state & 0x0F) == 0))
+                    indexedStates.TryGetValue(peer.Id, out var state) && (state & _intrinsicStateMask) == 0))
                 foreach (var peer in Peers(obj))
                 {
                     _backgroundPossible.Add(peer.Id);
@@ -266,7 +268,7 @@ public sealed class RoomObjectSelection
         // Entry/opening evidence and actual source draws still take precedence.
         bool KeepIndexedBackground(RoomObjectImage obj) => _background is not null &&
             _indexedBackground.Contains(obj.Id) && !IsBackgroundGap(obj) && RemovesBackgroundColours(obj) &&
-            !Peers(obj).Any(peer => entryStates?.TryGetValue(peer.Id, out var state) == true && (state.State & 0x0F) != 0) &&
+            !Peers(obj).Any(peer => entryStates?.TryGetValue(peer.Id, out var state) == true && (state.State & _intrinsicStateMask) != 0) &&
             !_batches.Any(batch => batch.Priority >= ScummSceneDrawBatches.EntryScriptPriority &&
                 batch.Steps.Any(step => Peers(obj).Any(peer => peer.Id == step.ObjectId)));
 
@@ -282,7 +284,7 @@ public sealed class RoomObjectSelection
         // fills the position (no gap): the entry reset wins over a later script's draw (Room 19's sphere stays a plain sphere
         // instead of showing the chicken that script 094 draws during the vision).
         bool EntryKeepsBackground(RoomObjectImage obj) => _background is not null && entryStates is not null && !IsBackgroundGap(obj) &&
-            Peers(obj).All(peer => entryStates.TryGetValue(peer.Id, out var evidence) && (evidence.State & 0x0F) == 0);
+            Peers(obj).All(peer => entryStates.TryGetValue(peer.Id, out var evidence) && (evidence.State & _intrinsicStateMask) == 0);
 
         bool Open(RoomObjectImage obj) => !_interfaceImages.Contains(obj.Id) && !KeepIndexedBackground(obj) && !EntryKeepsBackground(obj) &&
                                           !Peers(obj).Any(IsActive) &&
@@ -336,7 +338,7 @@ public sealed class RoomObjectSelection
             var evidence = entryStates is null ? [] : Peers(obj).Where(peer => entryStates.ContainsKey(peer.Id)).ToArray();
             if (evidence.Length > 0)
             {
-                foreach (var peer in evidence.Where(peer => (entryStates![peer.Id].State & 0x0F) != 0 && IsRoomArtwork(peer)))
+                foreach (var peer in evidence.Where(peer => (entryStates![peer.Id].State & _intrinsicStateMask) != 0 && IsRoomArtwork(peer)))
                 {
                     _states[peer.Id] = entryStates![peer.Id].State;
                     _knownStates.Add(peer.Id);
@@ -507,7 +509,10 @@ public sealed class RoomObjectSelection
         return value;
     }
 
-    public RoomObjectPosition GetPosition(RoomObjectImage obj) => _positions[obj.Id];
+    // drawRoomObjects draws directory entries, including repeated IDs; a script lookup selects the
+    // last entry (getObjectIndex). Earlier entries retain their own placement when that entry moves.
+    public RoomObjectPosition GetPosition(RoomObjectImage obj) => ReferenceEquals(obj, _lastImages[obj.Id])
+        ? _positions[obj.Id] : new RoomObjectPosition(obj.X, obj.Y);
 
     public bool SetState(int objectId, byte state)
     {
@@ -643,7 +648,7 @@ public sealed class RoomObjectSelection
     private void RememberBackgroundIfEmpty(RoomObjectImage obj)
     {
         var peers = Peers(obj);
-        if (peers.All(peer => (_states[peer.Id] & 0x0F) == 0))
+        if (peers.All(peer => (_states[peer.Id] & _intrinsicStateMask) == 0))
             foreach (var peer in peers) _backgroundPossible.Add(peer.Id);
     }
 
