@@ -1,0 +1,54 @@
+Boot: ScummBootReport { Frames = 5000, HitFrameLimit = True, FinalRoom = 45, RoomsEntered = System.Int32[] }; control False; cutscene True
+Click (76, 104): control False; cutscene True
+Click (196, 104): control False; cutscene True
+Click (292, 60): control False; cutscene True
+Final: room 44; control False; cutscene False; rooms 45,0,33,49,44; charcount 32
+Script 01 continues at +0x0260 in Room 45 after loadRoom
+boot: 5000 frames after script 001's first room load; now in Room 45
+stopScript 2 at Script 04 +0x02B9: script 2 was not running
+sentence script 2 runs verb 0x0D with objects 260 and 0
+Script 02 +0x01AD: startObject runs object 260 verb 0x0D
+Sound 54 completed on its native AdLib resource clock.
+stopScript 2 at Script 04 +0x02B9: script 2 was not running
+sentence script 2 runs verb 0x0D with objects 263 and 0
+Script 02 +0x01AD: startObject runs object 263 verb 0x0D
+Sound 54 completed on its native AdLib resource clock.
+stopScript 2 at Script 04 +0x02B9: script 2 was not running
+sentence script 2 runs verb 0x0D with objects 403 and 0
+Script 02 +0x01AD: startObject runs object 403 verb 0x0D
+Sound 54 completed on its native AdLib resource clock.
+Script 01 +0x032D: room 0 (no room) after a frame advance
+Script 01 continues at +0x032F in Room 00 after loadRoom
+Script 01 pauses after startScript +0x0347: nested execution froze its caller
+Script 120 continues at +0x0022 in Room 33 after loadRoom
+Sound 57 completed on its native AdLib resource clock.
+Script 120 continues at +0x01E5 in Room 49 after loadRoom
+stopScript 135 at Script 120 +0x01F0: script 135 was not running
+Script 131 +0x0004: camera x = 160 (actor 3's x) (estimate)
+Script 131 continues at +0x0006 in Room 44 after actorFollowCamera
+Sound 58 completed on its native AdLib resource clock.
+endCutscene follows ego at x = 160 (estimate)
+== Pending
+Script 177 +0x003F (frozen)
+== Uncertainties
+Script 01 +0x025E reached loadRoom during the boot.
+Room 45 entered by Script 01 +0x025E (loadRoom) during the boot.
+The boot (script 001) was still running after 5000 frames; the preview stopped following it.
+Assumed input: a room click at (76, 104) through v2 script 4
+Assumed input: a room click at (196, 104) through v2 script 4
+Assumed input: a room click at (292, 60) through v2 script 4
+v2 endCutscene cannot follow actor 3: its room or position is unresolved.
+Script 01 +0x032D reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 120 +0x0020 reached loadRoom after a frame advance.
+Room 33 entered by estimated execution at Script 120 +0x0020; execution continues without promoting the transition's certainty.
+Room 33 entered by Script 120 +0x0020 (loadRoom) after a frame advance.
+Sound 56 status is an estimate: the start followed a seeded route.
+Sound 57 status is an estimate: the start followed a seeded route.
+Sound 58 status is an estimate: the start followed a seeded route.
+Script 120 +0x01E3 reached loadRoom after a frame advance.
+Room 49 entered by estimated execution at Script 120 +0x01E3; execution continues without promoting the transition's certainty.
+Room 49 reached by Room 33 object 0, verb 0x00, code 0x01E3; loadRoom at Script 120 +0x01E3 ? Room 49 (estimated execution).
+Script 131 +0x0004 reached actorFollowCamera after a frame advance.
+Room 44 entered by estimated execution at Script 131 +0x0004; execution continues without promoting the transition's certainty.
+Room 44 reached by Room 49 object 0, verb 0x00, code 0x0004; actorFollowCamera at Script 131 +0x0004 ? Room 44 (estimated execution).
+Script 164 +0x0000: unsupported v2 verbOps (0x00, [delete var[0x06F]]) at +0x0004

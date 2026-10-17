@@ -29,6 +29,6 @@ Facts about the game's scripts: [MANIAC_SCRIPT_MAP.md](MANIAC_SCRIPT_MAP.md).
 
 ## ManiacEnhanced v2 — S4b checkpoint, 17 October 2026
 
-S4b is in progress, blocked before player control; no support cell changes. The enhanced source adapter and bounded interpreter reach Room45, then genuine assumed party clicks select Syd and Bernard and start the opening. Route45→0→33→49→44 stops in Script131+012D waiting for incremental VAR_CHARCOUNT; the message model currently presents whole chunks. The exact incomplete endpoint is covered by `ScummManiacEnhancedSessionTests`.
+S4b is blocked before player control; no support cell changes. The enhanced source adapter and bounded interpreter reach Room45, then genuine assumed party clicks select Syd and Bernard and start the opening. Route45→0→33→49→44 completes the opening cutscene, then Script164+0004 stops at unsupported v2 verbOps explicit-slot deletion. The exact incomplete endpoint is covered by `ScummManiacEnhancedSessionTests`.
 
-Evidence and reproducible inputs: [.verification/maniac-session-20261017](../../.verification/maniac-session-20261017/README.md). Next: source-backed v2 incremental character counting and remaining opcode/session blockers, then reassess S4b. S5–S7/S9 remain unattempted. Existing classic costume-colour acceptance is unchanged.
+Evidence and reproducible inputs: [.verification/maniac-session-20261017](../../.verification/maniac-session-20261017/README.md). Next: source-backed v2 explicit verb-slot operations and remaining opcode/session blockers, then reassess S4b. S5–S7/S9 remain unattempted. Existing classic costume-colour acceptance is unchanged.

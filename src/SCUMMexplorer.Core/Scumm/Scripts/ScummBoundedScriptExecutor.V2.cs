@@ -130,7 +130,12 @@ public sealed partial class ScummBoundedScriptExecutor
                 instruction = source with { Operands = source.Operands + ", []" };
                 return true;
             case "waitForMessage": instruction = source with { Operation = "waitFor", Operands = "message" }; return true;
-            case "printEgo": instruction = source with { Operation = "print", Operands = runtime.EgoVariable + source.Operands[3..] }; return true;
+            case "printEgo":
+                instruction = source with { Operation = "print", Operands = (runtime.EgoVariable + source.Operands[3..]).Replace("[text \"", "[text, \"", StringComparison.Ordinal) };
+                return true;
+            case "print":
+                instruction = source with { Operands = source.Operands.Replace("[text \"", "[text, \"", StringComparison.Ordinal) };
+                return true;
             case "actorOps":
                 if (p.Length < 3 || !Read(0, out var actor) || !Read(1, out var argument) || !p[2].StartsWith("sub=0x") ||
                     !int.TryParse(p[2].AsSpan(6), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var sub)) return false;
@@ -210,7 +215,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "equalZero": case "notEqualZero": case "delay": case "delayVariable": case "getRandomNr":
             case "startSound": case "stopSound": case "startMusic": case "stopMusic": case "stopScript": case "loadRoom":
             case "isScriptRunning": case "isSoundRunning": case "getObjectOwner": case "setOwnerOf":
-            case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor": case "print":
+            case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
             case "animateActor": case "faceActor": case "walkActorToActor": case "setBoxFlags":
             case "resourceRoutines": case "pseudoRoom": case "actorFollowCamera": case "drawObject": case "waitForSentence":

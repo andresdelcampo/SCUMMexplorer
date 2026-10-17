@@ -4,6 +4,15 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummV2ExecutorTests
 {
+    [Fact]
+    public void PrintNormalizesOldTextAndPreservesNativeCharacterCount()
+    {
+        var runtime = Runtime();
+        var run = Run(runtime, ("print", "0xFF, [text \"hello\"]"));
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(5, run.KnownVariables[ScummVars.V2.CharCount]);
+        Assert.Equal(5, runtime.GlobalVariables[ScummVars.V2.CharCount]);
+    }
     [Theory]
     [InlineData("Unpickupable", 0, 0)]
     [InlineData("Unpickupable", 1, 9)]

@@ -849,6 +849,8 @@ public sealed partial class ScummBoundedScriptExecutor
                 }
                 trace.Add(runtime.Messages.Print(request, runtime));
                 knownVariables[ScummMessageTable.HaveMsgVariable] = runtime.GlobalVariables[ScummMessageTable.HaveMsgVariable];
+                if (runtime.IsV2)
+                    knownVariables[ScummVars.V2.CharCount] = runtime.GlobalVariables[ScummVars.V2.CharCount];
                 pc = next;
                 continue;
             }

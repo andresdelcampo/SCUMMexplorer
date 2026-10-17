@@ -6,7 +6,7 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummManiacEnhancedSessionTests
 {
     [Fact]
-    public void SourceSelectionReachesOutsideMansionButRetainsCharacterCountBlocker()
+    public void SourceSelectionCompletesOpeningButRetainsVerbSlotBlocker()
     {
         var folder = Path.Combine(TestGames.Root, "mmansionE ega es");
         if (!Directory.Exists(folder)) return;
@@ -22,12 +22,11 @@ public sealed class ScummManiacEnhancedSessionTests
         for (var frame = 0; frame < 5000 && !session.PlayerHasControl; frame++) session.AdvanceFrame();
         Assert.Equal(44, session.CurrentRoomId);
         Assert.False(session.PlayerHasControl);
-        Assert.True(session.InCutscene);
-        Assert.Contains(session.PendingScriptSummary, s => s.Contains("Script 131 +0x012D"));
-        Assert.Equal(3, session.Snapshot.KnownGlobalVariables["var[0x06F]"]);
+        Assert.False(session.InCutscene);
+        Assert.Equal(32, session.Snapshot.KnownGlobalVariables[ScummVars.V2.CharCount]);
         Assert.Equal(1, session.Snapshot.KnownGlobalVariables["var[0x030]"]);
         Assert.Equal(5, session.Snapshot.KnownGlobalVariables["var[0x031]"]);
-        Assert.DoesNotContain(session.Snapshot.Uncertainties, s => s.Contains("unsupported v2"));
+        Assert.Contains(session.Snapshot.Uncertainties, s => s.Contains("Script 164 +0x0000: unsupported v2 verbOps") && s.Contains("+0x0004"));
     }
     [Fact]
     public void V2DataSourceReadsTheEnhancedLayoutWithoutV3IndexOrRoomOffsets()
