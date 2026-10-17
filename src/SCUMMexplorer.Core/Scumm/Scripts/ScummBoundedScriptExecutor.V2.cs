@@ -55,6 +55,16 @@ public sealed partial class ScummBoundedScriptExecutor
         switch (source.Operation)
         {
             case "dummy" when source.Opcode == 0xEE: handled = true; return true;
+            case "pseudoRoom":
+                if (!Read(0, out var realRoom)) return false;
+                var aliases = new List<int>();
+                foreach (var token in p.Skip(1))
+                {
+                    if (!TryReadValue(token.Trim('[', ']', ' '), variables, out var alias, out _)) return false;
+                    if ((alias & 128) != 0) aliases.Add(alias & 127);
+                }
+                instruction = source with { Operands = $"{realRoom}, [{string.Join(", ", aliases)}]" };
+                return true;
             case "roomOps":
                 if (!Read(0, out var roomA) || !Read(1, out var roomB) || p.Length != 3) return false;
                 if (p[2] == "sub=0x02")
@@ -284,7 +294,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
             case "animateActor": case "faceActor": case "walkActorToActor": case "setBoxFlags":
-            case "resourceRoutines": case "pseudoRoom": case "actorFollowCamera": case "drawObject": case "waitForSentence": case "pickupObject":
+            case "resourceRoutines": case "actorFollowCamera": case "drawObject": case "waitForSentence": case "pickupObject":
                 return true;
             default: return false;
         }
