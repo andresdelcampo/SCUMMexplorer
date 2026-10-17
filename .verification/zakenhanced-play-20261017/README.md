@@ -32,4 +32,14 @@ At `f5d2e5c`, boot reaches Room 1 with input enabled and screen rows 16–143. T
 | Native shop choice | Room 7 object 183 entry FD +0x002D/+0x003D creates Buy 17 and Sell 18. Merchandise Buy entries call Script 24 with their own item/price |
 | Purchase response and skip | Script 24 +0x0023 rejects a purchase without CashCard; funded route +0x007B says the selected merchandise name, +0x0094 opens an override targeting +0x014E |
 
-These candidates are inferred from this fixture, not forced story state. No Talk verb or later-engine dialogue menu is fabricated. Final route, tests and WPF coordinates are pending the shared prerequisites.
+These candidates are inferred from this fixture, not forced story state. No Talk verb or later-engine dialogue menu is fabricated.
+
+## Verified native input and first exit
+
+With shared input `f0f29f2`, movement `275b72e`, built-in charset `efe8ed5`, edition identification `720e439`, and interface `01c8ad8`, two focused tests pass. The drawer sequence now verifies the visible sentence **Open dresser drawer**, opening state, phone-bill ownership, drawn inventory pixels and the real inventory hit target. W/Open, screen(50,81), sentence(10,145), wait180; D/Pick up, screen(55,78), sentence(10,145), wait180. Two normal frames separate individual inputs.
+
+The bedroom door sequence also passes: W/Open, screen(307,81), sentence(10,145), wait180; E/Walk to, screen(307,81), wait240. Zak reaches Room2. The independently running Script126 (initial delay600) has by then opened its alien cutscene. Esc at its actual override resumes the skip jump, then wait120 restores Room2 and player input. Script126 +0x000D is `beginOverride`, whose jump targets +0x01B4; the trace describes resumption at the jump instruction +0x000E. If earlier actions take longer, wait for `CutsceneSkippable`, skip there, then wait for control before continuing: its timer is not tied to leaving the bedroom.
+
+The same route's engine interpretation is supported by ScummVM [`verbs.cpp`](https://raw.githubusercontent.com/scummvm/scummvm/master/engines/scumm/verbs.cpp), `ScummEngine_v2::checkExecVerbs`: native verb shortcuts, inventory keys i/o/k/l, and sentence-area dispatch. This is a source comparison, not a ScummVM runtime check.
+
+Walking across Room2 and opening its right door reaches Room3. Two further screen floor clicks and the 14th Avenue exit reach Room5. Both editions currently stop at (88,116) when walking toward the shop door; this is reported to the shared engine owner. Separately, selecting the picked-up bill with native inventory key O dispatches Read15, but the held-object distance lookup stops Script2. These are retained failed evidence; S6 is not yet accepted.

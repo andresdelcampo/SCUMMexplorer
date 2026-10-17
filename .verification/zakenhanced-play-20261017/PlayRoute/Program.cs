@@ -38,15 +38,24 @@ void Log(string label)
     lines.AddRange(session.Actors.Where(a => a.Number == 1).Select(a => $"ego room={a.Room} position={a.X},{a.Y}"));
 }
 Log("boot");
-foreach (var command in args.Skip(2))
+var commands = args.Skip(2).SelectMany(arg => arg.StartsWith('@') ? File.ReadAllLines(arg[1..]).Where(line => line.Length > 0 && !line.StartsWith('#')) : new[] { arg });
+foreach (var command in commands)
 {
     var fields = command.Split(',');
     if (fields[0] == "wait")
         for (var frame = 0; frame < int.Parse(fields[1]); frame++) session.AdvanceFrame();
+    else if (fields[0] is "untilskip" or "untilcontrol")
+    {
+        bool Reached() => fields[0] == "untilskip" ? session.CutsceneSkippable : session.UserInputOn && !session.InCutscene;
+        for (var frame = 0; frame < int.Parse(fields[1]) && !Reached(); frame++) session.AdvanceFrame();
+        if (!Reached()) throw new InvalidOperationException($"{command}: condition not reached");
+    }
     else if (fields[0] == "click")
         lines.Add($"input {session.ClickScreen(int.Parse(fields[1]), int.Parse(fields[2]), out var why)} refused={why}");
     else if (fields[0] == "key")
         lines.Add($"input {session.PressPlayKey(int.Parse(fields[1]), out var why)} refused={why}");
+    else if (fields[0] == "escape")
+        lines.Add($"escape {session.PressKey(27)}");
     else if (fields[0] == "roomclick")
     {
         var x = int.Parse(fields[1]) - session.ViewLeft;
@@ -55,7 +64,7 @@ foreach (var command in args.Skip(2))
     }
     Log(command);
 }
-foreach (var room in new[] { 1, 2, 3 })
+foreach (var room in new[] { 1, 2, 3, 5, 7 })
 {
     var raw = data.ReadRoom(room);
     foreach (var record in raw.Objects)
@@ -64,4 +73,4 @@ foreach (var room in new[] { 1, 2, 3 })
 lines.AddRange(session.SessionTrace.Where(s => !s.Contains(" waits ") && !s.Contains("delay ends")).TakeLast(150));
 lines.AddRange(session.Snapshot.Uncertainties.Distinct());
 File.WriteAllLines(args[1], lines);
-Console.WriteLine(string.Join(Environment.NewLine, lines.Take(25)));
+Console.WriteLine(string.Join(Environment.NewLine, lines.Where(line => line.StartsWith("==") || line.StartsWith("ego ") || line.StartsWith("escape ")).TakeLast(20)));
