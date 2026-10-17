@@ -14,7 +14,7 @@ public static class LoomCutsceneRun
     private const int TrialFrames = 600;
 
     /// <summary>The rooms other than the trigger's own that the run entered; null when the run could not be made or no cutscene began.</summary>
-    public static IReadOnlyList<int>? VisitedRooms(GameLibrary game, ScummIndexedObjectSnapshot snapshot, LoomCutscene trigger)
+    public static IReadOnlyList<int>? VisitedRooms(GameLibrary game, ScummIndexedObjectSnapshot snapshot, ScummCutscene trigger)
     {
         try
         {
@@ -38,9 +38,9 @@ public static class LoomCutsceneRun
 
     /// <summary>
     /// The category of a group once its run is known: a scene when it is the room's entry, when the run left the room, or when it is a silent Use
-    /// (the same silent-Use condition as <see cref="LoomCutsceneGroup.IsScene"/>). A run that could not be made (<paramref name="visited"/> null) falls back
+    /// (the same silent-Use condition as <see cref="ScummCutsceneGroup.IsScene"/>). A run that could not be made (<paramref name="visited"/> null) falls back
     /// to the static rule. Checked on 10 October against the 328-replay English EGA catalog: 320 agree, against 225 of the 238 grouped ones for the static rule alone.
     /// </summary>
-    public static bool IsScene(LoomCutsceneGroup group, IReadOnlyList<int>? visited) =>
+    public static bool IsScene(ScummCutsceneGroup group, IReadOnlyList<int>? visited) =>
         visited is null ? group.IsScene : group.First.IsRoomEntry || visited.Count > 0 || (group.First.Texts == 0 && group.First.VerbId == 0x38);
 }

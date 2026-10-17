@@ -67,10 +67,10 @@ internal static class Program
                 var indexed = game.V4Archive?.ReadIndexedObjects() ?? new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
                 if (game.Id == GameId.LoomVga)
                 {
-                    var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
+                    var triggers = LoomCutsceneVerbs.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value));
                     var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
                     Set("_cdSetupPlanner", new Lazy<LoomCdSceneSetupPlanner>(() => planner));
-                    var targets = LoomCutsceneIndex.Group(triggers).Where(g => g.First.Room == 9 && g.First.VerbId >= 0x39 && g.First.ObjectName is "Hetchel" or "Dead One").ToArray();
+                    var targets = ScummCutsceneIndex.Group(triggers).Where(g => g.First.Room == 9 && g.First.VerbId >= 0x39 && g.First.ObjectName is "Hetchel" or "Dead One").ToArray();
                     Save("triggers", targets);
                     Check(targets.Any(g => g.First.ObjectName == "Hetchel") && targets.Any(g => g.First.ObjectName == "Dead One"), "picker has both actor targets");
                     foreach (var group in targets)
@@ -178,9 +178,9 @@ internal static class Program
                 string title;
                 if (game.Id == GameId.LoomVga)
                 {
-                    var trigger = LoomCutsceneIndex.Scan(data, [13]).Single(t => t.ObjectId == crystal.Id && t.VerbId == 0x38);
+                    var trigger = LoomCutsceneVerbs.Scan(data, [13]).Single(t => t.ObjectId == crystal.Id && t.VerbId == 0x38);
                     title = (string)Call("CdCutsceneTitle", trigger)!;
-                    Call("PlayCdCutscene", new LoomCutsceneGroup(trigger, []));
+                    Call("PlayCdCutscene", new ScummCutsceneGroup(trigger, []));
                 }
                 else
                 {

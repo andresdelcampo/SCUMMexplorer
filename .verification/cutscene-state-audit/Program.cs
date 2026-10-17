@@ -10,13 +10,13 @@ using SCUMMexplorer.Core.Discovery;
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
 var rooms = game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).ToList();
-var groups = LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(data, rooms, LoomCutsceneTitles.Doorways(game), game));
+var groups = ScummCutsceneIndex.Group(LoomCutsceneVerbs.Scan(data, rooms, LoomCutsceneTitles.Doorways(game), game));
 var limit = args.Length > 1 ? int.Parse(args[1]) : int.MaxValue;
 var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
 var scanner = LoomSceneStateScanner.For(game);
 var firstBit = LoomStoryEvents.FirstBitFor(game);
 
-string Run(LoomCutscene t, Action<LoomExplorationSession>? edit)
+string Run(ScummCutscene t, Action<LoomExplorationSession>? edit)
 {
     try
     {

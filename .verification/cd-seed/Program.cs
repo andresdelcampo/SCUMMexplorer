@@ -9,8 +9,8 @@ using SCUMMexplorer.Core.Discovery;
 var game = new GameFolderScanner().Scan(args[0]);
 var vga = game.V4Archive ?? throw new InvalidOperationException("Not a LOOM CD game.");
 var data = ScummDataSources.For(game);
-var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game);
-var groups = LoomCutsceneIndex.Group(triggers);
+var triggers = LoomCutsceneVerbs.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game);
+var groups = ScummCutsceneIndex.Group(triggers);
 var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
 var rooms = new SortedDictionary<string, int[]>(StringComparer.Ordinal);
 var scenes = new SortedSet<string>(StringComparer.Ordinal); // by the run, for the printed comparison only

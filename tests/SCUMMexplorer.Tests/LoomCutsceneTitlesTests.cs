@@ -17,7 +17,7 @@ public class LoomCutsceneTitlesTests
     [Fact]
     public void TitlesNameTheVerbAndObjectLikeTheEgaCatalog()
     {
-        static LoomCutscene T(int obj, string name, int verb, params int[] to) => new(5, obj, name, verb, ["s"], 0, 0, 1, "", to);
+        static ScummCutscene T(int obj, string name, int verb, params int[] to) => new(5, obj, name, verb, ["s"], 0, 0, 1, "", to);
         Assert.Equal("Room 05 · Look at leaf", LoomCutsceneTitles.Title(T(1, "leaf", 0x36)));
         Assert.Equal("Room 05 · Use response", LoomCutsceneTitles.Title(T(1, "", 0x38)));
         Assert.Equal("Room 05 · Opening at sky", LoomCutsceneTitles.Title(T(1, "sky", 0x3A)));
@@ -29,16 +29,16 @@ public class LoomCutsceneTitlesTests
     [Fact]
     public void ARoomChangeMakesAScene()
     {
-        var withDoor = new LoomCutscene(5, 1, "door", 0x38, ["s"], 1, 0, 9, "", [3]);
-        var talk = new LoomCutscene(5, 2, "elder", 0x36, ["s"], 14, 0, 78, "");
-        Assert.True(new LoomCutsceneGroup(withDoor, []).IsScene);
-        Assert.False(new LoomCutsceneGroup(talk, []).IsScene);
+        var withDoor = LoomCutsceneVerbs.Trigger(5, 1, "door", 0x38, ["s"], 1, 0, 9, "", [3]);
+        var talk = LoomCutsceneVerbs.Trigger(5, 2, "elder", 0x36, ["s"], 14, 0, 78, "");
+        Assert.True(new ScummCutsceneGroup(withDoor, []).IsScene);
+        Assert.False(new ScummCutsceneGroup(talk, []).IsScene);
     }
 
     [Fact]
     public void ALiteralRoomLoadNamesAnUnnamedPlainVerbButNotANamedObjectOrADraft()
     {
-        static LoomCutscene Loads(string name, int verb) => new(13, 323, name, verb, ["s"], 0, 2, 88, "", null, [15, 13]);
+        static ScummCutscene Loads(string name, int verb) => new(13, 323, name, verb, ["s"], 0, 2, 88, "", null, [15, 13]);
         Assert.Equal("Room 13 · Reached Room 15", LoomCutsceneTitles.Title(Loads("", 0x38)));
         Assert.Equal("Room 13 · Use gate", LoomCutsceneTitles.Title(Loads("gate", 0x38)));
         Assert.Equal("Room 13 · Opening at gate", LoomCutsceneTitles.Title(Loads("gate", 0x3A)));
@@ -47,26 +47,26 @@ public class LoomCutsceneTitlesTests
     [Fact]
     public void ALoadAfterTheSpanOrASilentUseMakesASceneButASilentLookDoesNot()
     {
-        var after = new LoomCutscene(18, 369, "bell", 0x36, ["s"], 0, 0, 9, "", null, null, 1);
-        var silentUse = new LoomCutscene(24, 433, "sheep", 0x38, ["s"], 0, 0, 2, "");
-        var talkingUse = new LoomCutscene(30, 504, "", 0x38, ["s"], 3, 0, 7, "");
-        var silentLook = new LoomCutscene(30, 505, "", 0x36, ["s"], 0, 0, 7, "");
-        Assert.True(new LoomCutsceneGroup(after, []).IsScene);
-        Assert.True(new LoomCutsceneGroup(silentUse, []).IsScene);
-        Assert.False(new LoomCutsceneGroup(talkingUse, []).IsScene);
-        Assert.False(new LoomCutsceneGroup(silentLook, []).IsScene);
+        var after = LoomCutsceneVerbs.Trigger(18, 369, "bell", 0x36, ["s"], 0, 0, 9, "", null, null, 1);
+        var silentUse = LoomCutsceneVerbs.Trigger(24, 433, "sheep", 0x38, ["s"], 0, 0, 2, "");
+        var talkingUse = LoomCutsceneVerbs.Trigger(30, 504, "", 0x38, ["s"], 3, 0, 7, "");
+        var silentLook = LoomCutsceneVerbs.Trigger(30, 505, "", 0x36, ["s"], 0, 0, 7, "");
+        Assert.True(new ScummCutsceneGroup(after, []).IsScene);
+        Assert.True(new ScummCutsceneGroup(silentUse, []).IsScene);
+        Assert.False(new ScummCutsceneGroup(talkingUse, []).IsScene);
+        Assert.False(new ScummCutsceneGroup(silentLook, []).IsScene);
     }
 }
 
 public class LoomCutsceneRunTests
 {
-    private static (GameLibrary Game, ScummIndexedObjectSnapshot Snapshot, IReadOnlyList<LoomCutscene> Scan)? Load()
+    private static (GameLibrary Game, ScummIndexedObjectSnapshot Snapshot, IReadOnlyList<ScummCutscene> Scan)? Load()
     {
         var folder = Path.Combine(AppContext.BaseDirectory, TestGames.LoomRelative);
         if (!File.Exists(Path.Combine(folder, "00.LFL"))) return null;
         var game = new GameFolderScanner().Scan(folder);
         var data = ScummDataSources.For(game);
-        var scan = LoomCutsceneIndex.Scan(data, game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game);
+        var scan = LoomCutsceneVerbs.Scan(data, game.Rooms.Where(r => r.ResourceId.HasValue).Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game);
         return (game, new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL")), scan);
     }
 
@@ -93,9 +93,9 @@ public class LoomCutsceneRunTests
         Assert.Contains(3, LoomCutsceneRun.VisitedRooms(game, snapshot, goes)!);
         Assert.Empty(LoomCutsceneRun.VisitedRooms(game, snapshot, stays)!);
         Assert.True(stays.RoomLoads > 0);
-        Assert.True(LoomCutsceneRun.IsScene(new LoomCutsceneGroup(goes, []), [3]));
-        Assert.False(LoomCutsceneRun.IsScene(new LoomCutsceneGroup(stays, []), []));
-        Assert.True(new LoomCutsceneGroup(stays, []).IsScene); // the static rule over-reports it
+        Assert.True(LoomCutsceneRun.IsScene(new ScummCutsceneGroup(goes, []), [3]));
+        Assert.False(LoomCutsceneRun.IsScene(new ScummCutsceneGroup(stays, []), []));
+        Assert.True(new ScummCutsceneGroup(stays, []).IsScene); // the static rule over-reports it
     }
 }
 

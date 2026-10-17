@@ -86,8 +86,8 @@ if (args.Length > 2 && args[2] == "global") // EgaSeedStudy <folder> - global <n
 var game = new GameFolderScanner().Scan(args[0]);
 var data = ScummDataSources.For(game);
 var total = Stopwatch.StartNew();
-var triggers = LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game);
-var groups = LoomCutsceneIndex.Group(triggers);
+var triggers = LoomCutsceneVerbs.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game);
+var groups = ScummCutsceneIndex.Group(triggers);
 var scanSec = total.Elapsed.TotalSeconds;
 var planner = new LoomCdSceneSetupPlanner(game, triggers, data);
 var snapshot = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));

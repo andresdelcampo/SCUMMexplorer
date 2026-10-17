@@ -1,10 +1,46 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using SCUMMexplorer.Core.Domain;
 
-namespace SCUMMexplorer.Core.Loom;
+namespace SCUMMexplorer.Core.Scumm;
 
 /// <summary>
-/// A place where the CD game's own code can start a cutscene: a room's entry script (<see cref="ObjectId"/> 0) or an object's verb,
+/// What a game's verbs mean to the cutscene list: which verb numbers are its look, walk-to and use verbs (the representative of a group is the
+/// trigger the player meets first, and a silent Use is a scene), which verbs are their own entry even when another verb reaches the same scripts,
+/// and the words a title names a verb with. A game supplies them as data (LOOM: <c>LoomCutsceneVerbs</c>; a verb-based game: its own verbs'
+/// names read from its scripts); the scan itself knows no verb number.
+/// </summary>
+/// <param name="Look">The look verb, or null when the game has none the list should rank.</param>
+/// <param name="WalkTo">The walk-to verb, or null.</param>
+/// <param name="Use">The use verb, or null (no silent-Use scenes then).</param>
+/// <param name="SeparateFrom">Verbs from this number up are each their own entry (LOOM's drafts), or null when no verb is.</param>
+/// <param name="Word">The verb as a word for a title ("Look at", "Push"); null or empty when the game does not name it.</param>
+/// <param name="AimsAt">Verbs whose title reads "&lt;word&gt; at &lt;object&gt;" (LOOM's drafts) rather than "&lt;word&gt; &lt;object&gt;".</param>
+public sealed record ScummCutsceneVerbs(int? Look, int? WalkTo, int? Use, int? SeparateFrom = null,
+    Func<int, string?>? Word = null, Func<int, bool>? AimsAt = null)
+{
+    /// <summary>No verb has a role and none is named: every verb is listed by its number.</summary>
+    public static ScummCutsceneVerbs None { get; } = new(null, null, null);
+
+    /// <summary>One of the look, walk-to and use verbs.</summary>
+    public bool IsPlain(int verbId) => verbId == Look || verbId == WalkTo || verbId == Use;
+
+    /// <summary>The order the player meets triggers in: use, walk to, look, then the rest.</summary>
+    public int Rank(int verbId) => verbId == Use ? 1 : verbId == WalkTo ? 2 : verbId == Look ? 3 : 4;
+
+    /// <summary>The verb is its own entry even when another verb of the object reaches the same scripts.</summary>
+    public bool Separates(int verbId) => SeparateFrom is int from && verbId >= from;
+
+    /// <summary>The verb in a note: <c>verb 0x36 (look)</c> for the three plain verbs, <c>verb 0xHH</c> for the rest.</summary>
+    public string Label(int verbId) =>
+        verbId == Look ? $"verb 0x{verbId:X2} (look)" : verbId == WalkTo ? $"verb 0x{verbId:X2} (walk to)" : verbId == Use ? $"verb 0x{verbId:X2} (use)" : $"verb 0x{verbId:X2}";
+
+    /// <summary>The verb's word for a title, or <c>verb 0xHH</c> when the game gives none.</summary>
+    public string WordFor(int verbId) => Word?.Invoke(verbId) is { Length: > 0 } word ? word : $"verb 0x{verbId:X2}";
+}
+
+/// <summary>
+/// A place where a game's own code can start a cutscene: a room's entry script (<see cref="ObjectId"/> 0) or an object's verb,
 /// together with what the code it reaches does. Everything is read from the scripts; nothing is a list kept by hand.
 /// </summary>
 /// <param name="Scripts">The scripts, in the order they were reached, that hold a <c>cutscene</c> ... <c>endCutscene</c> span (for example "Room 4 local script 202").</param>
@@ -14,44 +50,43 @@ namespace SCUMMexplorer.Core.Loom;
 /// <param name="LoadTargets">The literal rooms the span's room loads name (a load with a computed room is counted in <paramref name="RoomLoads"/> only).</param>
 /// <param name="LoadsAfter">Room loads in the reached scripts outside any span (a cutscene that ends and then changes room).</param>
 /// <param name="Destinations">For a look, walk-to or use verb, the rooms its code leads to (the same doorway finder as the room hotspots, so loads in local scripts count); empty when none was asked for or found.</param>
-public sealed record LoomCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
+/// <param name="Verbs">The game's verb roles and words (<see cref="ScummCutsceneVerbs"/>); <see cref="ScummCutsceneVerbs.None"/> when not given.</param>
+public sealed record ScummCutscene(int Room, int ObjectId, string ObjectName, int VerbId, IReadOnlyList<string> Scripts,
     int Texts, int RoomLoads, int SpanInstructions, string FirstText, IReadOnlyList<int>? Destinations = null,
-    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0)
+    IReadOnlyList<int>? LoadTargets = null, int LoadsAfter = 0, ScummCutsceneVerbs? Verbs = null)
 {
     public IReadOnlyList<int> LeadsTo => Destinations ?? [];
 
     public bool IsRoomEntry => ObjectId == 0;
 
-    /// <summary>The verb as the game's own scripts use it: 0x36 look, 0x37 walk to, 0x38 use are the input scripts' verbs (005 to 007); others are draft-response or object verbs.</summary>
-    public string VerbLabel => IsRoomEntry ? "entry script" : VerbId switch
-    {
-        0x36 => "verb 0x36 (look)",
-        0x37 => "verb 0x37 (walk to)",
-        0x38 => "verb 0x38 (use)",
-        _ => $"verb 0x{VerbId:X2}"
-    };
+    /// <summary>The game's verb roles (never null).</summary>
+    public ScummCutsceneVerbs Roles => Verbs ?? ScummCutsceneVerbs.None;
+
+    /// <summary>The verb as the game's own scripts use it: <c>entry script</c>, or the verb with its role (LOOM: 0x36 look, 0x37 walk to, 0x38 use).</summary>
+    public string VerbLabel => IsRoomEntry ? "entry script" : Roles.Label(VerbId);
 }
 
 /// <summary>Triggers that run the same cutscene scripts: the one to play and the others that reach it.</summary>
-public sealed record LoomCutsceneGroup(LoomCutscene First, IReadOnlyList<LoomCutscene> Others)
+public sealed record ScummCutsceneGroup(ScummCutscene First, IReadOnlyList<ScummCutscene> Others)
 {
     /// <summary>
     /// A scene: the room's entry, a span that loads a room (or whose scripts load one right after it ends), a verb that leads to another
-    /// room, or a silent Use (Bobbin goes into a tent, the camera pans to something). Everything else, however many
-    /// lines it prints, is "dialogue and reactions". Checked on 10 October against the reference EGA catalog (328 replays, 238 of them in
+    /// room, or a silent Use (LOOM: Bobbin goes into a tent, the camera pans to something). Everything else, however many
+    /// lines it prints, is "dialogue and reactions". Checked on 10 October against the LOOM reference EGA catalog (328 replays, 238 of them in
     /// a group): the first three conditions agreed with its categories for 211 of the 238, the silent-use one brings it to 225. The rest
     /// depend on which branch runs (a load that only happens in some answers), which a scan of the code cannot tell.
     /// </summary>
     public bool IsScene => First.IsRoomEntry || First.RoomLoads > 0 || First.LeadsTo.Count > 0 || First.LoadsAfter > 0 ||
-                           (First.Texts == 0 && First.VerbId == 0x38);
+                           (First.Texts == 0 && First.Roles.Use is int use && First.VerbId == use);
 }
 
 /// <summary>
-/// Finds the CD game's cutscene triggers from its scripts: every room entry script and every object verb whose code (or a script it starts or
-/// chains by a literal number, up to <see cref="Depth"/> levels) holds a <c>cutscene</c> ... <c>endCutscene</c> span.
-/// A branch can keep a span from running; what a trigger "possibly" shows is not a measured outcome.
+/// Finds a game's cutscene triggers from its scripts (any SCUMM version with an <see cref="IScummDataSource"/>): every room entry script and every
+/// object verb whose code (or a script it starts or chains by a literal number, up to <see cref="Depth"/> levels) holds a <c>cutscene</c> ...
+/// <c>endCutscene</c> span. A branch can keep a span from running; what a trigger "possibly" shows is not a measured outcome. Moved from
+/// <c>LoomCutsceneIndex</c> to the engine layer on 17 October 2026 (S7, K-06); LOOM's verb table stays in <c>Loom/</c>.
 /// </summary>
-public static partial class LoomCutsceneIndex
+public static partial class ScummCutsceneIndex
 {
     public const int Depth = 3;
 
@@ -61,10 +96,13 @@ public static partial class LoomCutsceneIndex
     [GeneratedRegex(@"text, ""(.*?)""")]
     private static partial Regex TextOperand();
 
-    public static IReadOnlyList<LoomCutscene> Scan(IScummDataSource data, IEnumerable<int> rooms,
-        Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null)
+    /// <param name="doorways">The rooms a look, walk-to or use verb's code leads to (the game's doorway finder), or null.</param>
+    /// <param name="verbs">The game's verb roles and words; <see cref="ScummCutsceneVerbs.None"/> when null.</param>
+    public static IReadOnlyList<ScummCutscene> Scan(IScummDataSource data, IEnumerable<int> rooms,
+        Func<GameResource, ScummScriptDisassembly, IReadOnlyList<int>>? doorways = null, GameLibrary? game = null, ScummCutsceneVerbs? verbs = null)
     {
-        var found = new List<LoomCutscene>();
+        verbs ??= ScummCutsceneVerbs.None;
+        var found = new List<ScummCutscene>();
         foreach (var room in rooms)
         {
             ScummRoomData? roomData;
@@ -80,15 +118,15 @@ public static partial class LoomCutsceneIndex
                 Walk(data, room, script, label, 0, false, visited, scripts, texts, summary);
                 if (scripts.Count == 0) return;
                 IReadOnlyList<int>? destinations = null;
-                if (objectId != 0 && verbId is 0x36 or 0x37 or 0x38 && doorways is not null &&
+                if (objectId != 0 && verbs.IsPlain(verbId) && doorways is not null &&
                     game?.Rooms.FirstOrDefault(r => r.ResourceId == room) is { } resource)
                     destinations = doorways(resource, script);
                 found.Add(new(room, objectId, objectName, verbId, scripts, texts.Count, summary.RoomLoads, summary.Instructions, texts.FirstOrDefault() ?? "", destinations,
-                    summary.Targets.Distinct().ToArray(), summary.LoadsAfter));
+                    summary.Targets.Distinct().ToArray(), summary.LoadsAfter, verbs));
             }
             Trigger(0, "", 0, Try(() => data.RoomEntryScript(room)), $"Room {room} entry script");
-            var verbs = Try(() => data.ReadObjectVerbs(room, roomData.Objects)) ?? new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
-            foreach (var (objectId, entries) in verbs)
+            var objectVerbs = Try(() => data.ReadObjectVerbs(room, roomData.Objects)) ?? new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();
+            foreach (var (objectId, entries) in objectVerbs)
             {
                 var record = roomData.Objects.First(o => o.Id == objectId);
                 var name = roomData.ObjectNames.TryGetValue(objectId, out var raw) ? System.Text.Encoding.Latin1.GetString(raw).Trim().TrimEnd('@').Trim() : "";
@@ -100,28 +138,28 @@ public static partial class LoomCutsceneIndex
         return found.OrderBy(c => c.Room).ThenBy(c => c.ObjectId).ThenBy(c => c.VerbId).ToArray();
     }
 
-    /// <summary>Triggers that reach the same cutscene scripts are one scene (four owl holes, five wool piles); a script reached from more triggers than this is a shared helper (a generic reaction), not a scene of its own.</summary>
+    /// <summary>Triggers that reach the same cutscene scripts are one scene (LOOM: four owl holes, five wool piles); a script reached from more triggers than this is a shared helper (a generic reaction), not a scene of its own.</summary>
     public const int SharedHelperTriggers = 20;
 
     /// <summary>
     /// Groups the triggers by the cutscene scripts they reach and leaves out shared helpers. The representative is the trigger the player
-    /// meets first: an entry script, then the use, walk-to and look verbs (0x38, 0x37, 0x36), then the lowest verb and object number.
+    /// meets first: an entry script, then the use, walk-to and look verbs, then the lowest verb and object number.
     /// </summary>
-    public static IReadOnlyList<LoomCutsceneGroup> Group(IReadOnlyList<LoomCutscene> triggers)
+    public static IReadOnlyList<ScummCutsceneGroup> Group(IReadOnlyList<ScummCutscene> triggers)
     {
-        // A draft verb (0x39 and up) is its own scene even when another verb of the object reaches the same scripts: the EGA catalog lists
-        // each spell (Twisting, Sharpening, its reverse) separately, and the player casts them one by one.
-        static string ScriptsKey(LoomCutscene c) => string.Join("|", c.Scripts);
-        static string Key(LoomCutscene c) => ScriptsKey(c) + (c.IsRoomEntry || c.VerbId < 0x39 ? "" : $"#{c.VerbId}");
-        static int Rank(LoomCutscene c) => c.IsRoomEntry ? 0 : c.VerbId switch { 0x38 => 1, 0x37 => 2, 0x36 => 3, _ => 4 };
-        // Count uses before separating draft verbs: a generic response reached by many spells is still a shared helper.
+        // A verb the game's roles separate (LOOM's drafts, 0x39 and up) is its own scene even when another verb of the object reaches the same
+        // scripts: the EGA catalog lists each spell (Twisting, Sharpening, its reverse) separately, and the player casts them one by one.
+        static string ScriptsKey(ScummCutscene c) => string.Join("|", c.Scripts);
+        static string Key(ScummCutscene c) => ScriptsKey(c) + (c.IsRoomEntry || !c.Roles.Separates(c.VerbId) ? "" : $"#{c.VerbId}");
+        static int Rank(ScummCutscene c) => c.IsRoomEntry ? 0 : c.Roles.Rank(c.VerbId);
+        // Count uses before separating verbs: a generic response reached by many spells is still a shared helper.
         var helpers = triggers.GroupBy(ScriptsKey).Where(g => g.Count() > SharedHelperTriggers)
             .Select(g => g.Key).ToHashSet(StringComparer.Ordinal);
         return triggers.Where(c => !helpers.Contains(ScriptsKey(c))).GroupBy(Key)
             .Select(g =>
             {
                 var ordered = g.OrderBy(Rank).ThenBy(c => c.VerbId).ThenBy(c => c.ObjectId).ToArray();
-                return new LoomCutsceneGroup(ordered[0], ordered.Skip(1).ToArray());
+                return new ScummCutsceneGroup(ordered[0], ordered.Skip(1).ToArray());
             })
             .OrderBy(g => g.First.Room).ThenBy(g => Rank(g.First)).ThenBy(g => g.First.ObjectId).ThenBy(g => g.First.VerbId)
             .ToArray();

@@ -169,13 +169,13 @@ public partial class MainWindow
     }
 
     /// <summary>
-    /// The games whose cutscene lists come from their scripts (<see cref="LoomCutsceneIndex"/>, start setups by <see cref="LoomCdSceneSetupPlanner"/>, rooms by headless
+    /// The games whose cutscene lists come from their scripts (<see cref="ScummCutsceneIndex"/>, start setups by <see cref="LoomCdSceneSetupPlanner"/>, rooms by headless
     /// runs): LOOM CD, and an EGA edition without a validated replay catalog, which would otherwise offer only the four established starts. The reference
     /// edition keeps its hand-validated catalog.
     /// </summary>
     private bool ScannedCutscenes => _game is { Id: GameId.LoomVga } or { Id: GameId.Loom, IsDemo: false, Version: ScummVersion.V3 } && (_game.Id == GameId.LoomVga || _replayCatalog is { Replays.Length: 0 });
 
-    private IReadOnlyList<LoomCutsceneGroup>? _cdCutsceneGroups;
+    private IReadOnlyList<ScummCutsceneGroup>? _cdCutsceneGroups;
     private Lazy<LoomCdSceneSetupPlanner>? _cdSetupPlanner;
     /// <summary>Room lists saved by an earlier run (same build and game data), used until the background runs finish.</summary>
     private Dictionary<string, int[]>? _cdSavedRoomLists;
@@ -225,7 +225,7 @@ public partial class MainWindow
         var planner = new Lazy<LoomCdSceneSetupPlanner>(() =>
         {
             var data = ScummDataSources.For(game);
-            return new LoomCdSceneSetupPlanner(game, LoomCutsceneIndex.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game), data);
+            return new LoomCdSceneSetupPlanner(game, LoomCutsceneVerbs.Scan(data, game.Rooms.Select(r => r.ResourceId!.Value).ToList(), LoomCutsceneTitles.Doorways(game), game), data);
         });
         _cdSetupPlanner = planner;
         _cdRoomListsDone = seed is not null;
@@ -235,7 +235,7 @@ public partial class MainWindow
         {
             try
             {
-                var groups = LoomCutsceneIndex.Group(planner.Value.Triggers);
+                var groups = ScummCutsceneIndex.Group(planner.Value.Triggers);
                 // The EGA game boots in about a second per trial (the CD's session starts past its intro in milliseconds), so one fresh run per scene
                 // settles every scene a fresh start begins, and the room lists are usable as soon as those are done. The planner's long trials for the
                 // scenes a fresh start does not begin follow; until a scene's setup is derived its note says it is still being checked.
@@ -269,23 +269,23 @@ public partial class MainWindow
         });
     }
 
-    private string CdSetupNote(LoomCutscene trigger) =>
+    private string CdSetupNote(ScummCutscene trigger) =>
         _cdSetupPlanner is not { IsValueCreated: true } lazy || !lazy.Value.TryGet(trigger, out var setup)
             ? "Whether a fresh start begins it is still being checked (open the list again in a few seconds). "
             : setup == LoomCdStartSetup.None ? "A fresh start begins its cutscene (checked by a headless run). " : setup.Describe() + " ";
 
-    /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="LoomCutsceneIndex"/>).</summary>
-    private IReadOnlyList<LoomCutsceneGroup> CdCutsceneGroups() =>
+    /// <summary>The CD game's cutscene triggers, derived from its scripts once per opened game (<see cref="ScummCutsceneIndex"/>).</summary>
+    private IReadOnlyList<ScummCutsceneGroup> CdCutsceneGroups() =>
         _cdCutsceneGroups ??= ScannedCutscenes && _game is not null
-            ? LoomCutsceneIndex.Group(LoomCutsceneIndex.Scan(_cdData ?? ScummDataSources.For(_game), _game.Rooms.Select(r => r.ResourceId!.Value), LoomCutsceneTitles.Doorways(_game), _game))
+            ? ScummCutsceneIndex.Group(LoomCutsceneVerbs.Scan(_cdData ?? ScummDataSources.For(_game), _game.Rooms.Select(r => r.ResourceId!.Value), LoomCutsceneTitles.Doorways(_game), _game))
             : [];
 
-    private string CdCutsceneTitle(LoomCutscene trigger)
+    private string CdCutsceneTitle(ScummCutscene trigger)
     {
         return PickerVerbTitle(LoomCutsceneTitles.Title(trigger), trigger.IsRoomEntry ? 0 : trigger.VerbId);
     }
 
-    private string CdCutsceneNote(LoomCutsceneGroup group)
+    private string CdCutsceneNote(ScummCutsceneGroup group)
     {
         var first = group.First;
         var others = group.Others.Count == 0 ? "" : " The same scripts are reached from " + string.Join(", ",
@@ -307,7 +307,7 @@ public partial class MainWindow
                     group.IsScene ? "Scenes" : "Dialogue and reactions", CdCutsceneNote(group), () => PlayCdCutscene(group)))).ToList();
 
     /// <summary>Whether a headless run of the scene from its start (already derived in the background) was in this room at some point.</summary>
-    private bool CdPlaysIn(LoomCutsceneGroup group, int room) =>
+    private bool CdPlaysIn(ScummCutsceneGroup group, int room) =>
         _cdSavedRoomLists is { } saved && saved.TryGetValue($"{group.First.Room},{group.First.ObjectId},{group.First.VerbId}", out var savedRooms) && savedRooms.Contains(room) ||
         _cdSetupPlanner is { IsValueCreated: true } lazy && lazy.Value.TryGetVisitedRooms(group.First, out var rooms) && rooms.Contains(room);
 
@@ -317,7 +317,7 @@ public partial class MainWindow
         _cdSetupPlanner is { IsValueCreated: true } lazy && lazy.Value.IntroRoomsIfKnown?.Contains(room) == true;
 
     /// <summary>Plays a CD cutscene from its stated start: the session's room visit, then the room's entry script or the object's verb run directly, on the playback clock.</summary>
-    private void PlayCdCutscene(LoomCutsceneGroup group)
+    private void PlayCdCutscene(ScummCutsceneGroup group)
     {
         var trigger = group.First;
         if (!ScannedCutscenes || _game is null || !CanStartCutscene ||
