@@ -78,7 +78,7 @@ public abstract partial class ScummSession
         foreach (var sound in _soundClock.Advance(FrameJiffies))
         {
             _runtime.ActiveSounds.Remove(sound);
-            _visitTrace.Add($"Sound {sound:00} completed on its native AdLib resource clock.");
+            _visitTrace.Add($"Sound {sound:00} completed on its {(_runtime.IsV2 ? "Player_V2 control" : "native AdLib resource")} clock.");
         }
         UpdateMusicTimer();
         _runtime.Messages.StartFrame(FrameJiffies, _runtime);
