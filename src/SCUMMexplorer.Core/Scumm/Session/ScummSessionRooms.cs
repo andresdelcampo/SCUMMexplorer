@@ -169,7 +169,7 @@ public abstract partial class ScummSession
     {
         var arguments = load.ResolvedArguments!;
         var source = $"{load.SourceLabel} +0x{load.Offset:X4}";
-        if (!_runtime.Actors.EgoPositioned)
+        if (_runtime.IsV2 || !_runtime.Actors.EgoPositioned)
         {
             var record = arguments[0] is int objectId ? _currentObjects.FirstOrDefault(item => item.Id == objectId) : null;
             if (record is null)
@@ -196,8 +196,10 @@ public abstract partial class ScummSession
         // setCameraFollows(ego): the camera is already on the ego, so it only enters follow mode.
         _runtime.Camera.Mode = ScummCamera.FollowActor;
         _runtime.Camera.Follows = ego;
-        if (arguments[2] is int x && x != -1 && arguments[3] is int y)
+        if (arguments[2] is int x && x != -1 && arguments[3] is int y && (!_runtime.IsV2 || x >= 0 && y >= 0))
         {
+            // o2_loadRoomWithEgo stores signed native coordinates; Actor_v2 draws in 8x2 units.
+            if (_runtime.IsV2) { x *= 8; y *= 2; }
             // A catalog visit's assumed arrival shows the state after it, so its walk ends at once (estimate).
             _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), $"the ego's walk from {source}", atOnce: assumedArrival is not null);
             // The walk's destination comes from the same assumed or picked arrival.

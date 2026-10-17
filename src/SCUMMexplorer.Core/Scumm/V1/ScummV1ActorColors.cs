@@ -40,6 +40,16 @@ public sealed class ScummV1ActorColors
     private static readonly byte[] ManiacSkin = [8, 8, 8, 8, 4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
     private static readonly byte[] ManiacSuit = [0, 7, 2, 6, 9, 1, 3, 7, 7, 1, 1, 9, 1, 4, 5, 5, 4, 1, 0, 5, 4, 2, 2, 7, 7];
 
+    /// <summary>Live DOS v1 pixel colour: native actor identity and reached palette, never a static costume assignment estimate.</summary>
+    internal static byte LiveColor(ScummV1Game game, int actor, byte code, IReadOnlyList<byte>? palette)
+    {
+        var skin = game == ScummV1Game.ManiacMansion && actor >= 0 && actor < ManiacSkin.Length ? ManiacSkin[actor] : 8;
+        var suit = game == ScummV1Game.ManiacMansion && actor >= 0 && actor < ManiacSuit.Length ? ManiacSuit[actor]
+            : palette is not null && actor >= 0 && actor < palette.Count ? palette[actor] : 0;
+        var native = code switch { 1 => skin, 2 => suit, _ => 0 };
+        return ScummV1RoomDecoder.EgaColors(game)[native & 15];
+    }
+
     // ScummVM scumm.cpp runBootscript: the boot script is script 1; the palettes it leaves are the actors' palettes when the game starts.
     private const int BootScript = 1;
 

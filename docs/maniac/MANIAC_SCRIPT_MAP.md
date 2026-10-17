@@ -38,6 +38,13 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Room | What it is, entry/exit script facts, local scripts | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic 01 | The selected-party preview settles with visible images 56, 57, 62, 63, 64; state flags other than intrinsic visibility do not paint their images. | engine | Classic Room 01 entry; indexed states and reached session, `ScummManiacClassicFirstVisitTests`; [S5 record](../../.verification/maniacclassic-objects-20261017/README.md) | 2026-10-17 |
+| Classic 02 | The bounded preview settles with no active object image; objects 141 and 167 retain state 1, which is not the intrinsic visibility bit. | engine | Classic Room 02 entry and reached session; `ScummManiacClassicFirstVisitTests` | 2026-10-17 |
+| Classic 18 | Six 8-by-8 coin-slot rectangles already contain 58 black pixels each in the room background. The stored-image gap detector reports them even when the entire object composite equals the background; no filling is applied. | decoded | Classic Room 18 background; object records 242–247 at x=192/248/312/368/424/488, y=88; S5 audit and regression | 2026-10-17 |
+| Classic 30 | The entry tests object 176's intrinsic bit; the selected-party catalog preview reaches the 2400-frame settling bound. | engine | Classic Room 30 entry +0x001B; [source comparison](../../.verification/maniacclassic-objects-20261017/final/source-comparison.md) | 2026-10-17 |
+| Classic 44 | First playable room from the reviewed Syd/Bernard party clicks; object states 258=0 and 278=0, no active object image. | engine | Classic Room 44 reached through boot/input scripts; `ScummManiacClassicFirstVisitTests` | 2026-10-17 |
+| Enhanced 01, 02, 44 | Reviewed selected-party previews: Room 01 shows images 56, 57, 62, 63, 64; Rooms 02 and 44 show no active object image. These are edition-local test results, not reused classic state writes. | engine | Enhanced fixture's entry/index/boot scripts; `ScummManiacEnhancedFirstVisitTests`; [S5 record](../../.verification/maniacenhanced-objects-20261017/README.md) | 2026-10-17 |
+| Enhanced 30, 45 | Bounded previews reach the 2400-frame limit; all other 51 indexed rooms settle under the selected-party recipe. | engine | Enhanced room entries and reached child scripts; [source comparisons](../../.verification/maniacenhanced-objects-20261017/source-comparisons.md) | 2026-10-17 |
 
 ## Verbs and the input chain
 
