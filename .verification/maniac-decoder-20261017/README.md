@@ -22,3 +22,9 @@ rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-
 | mmansionE ega es | 221 | 1207/1207 | 0 |
 
 Existing Zak colour expectations changed because decoding now reaches instructions hidden after actor names. The regression pins the newly reachable source pairs: costume 1, Script 108 +00D8/+00EC (palette 13); costume 2, Script 102 +0164/+0168 (palette 2); costume 35, Room 44 entry +0099/+0090 (palette 1). Costume 13 remains an estimate: Script 50 +001D sets actor 5's palette 11, but its ordering against the costume's room entry depends on execution. Maniac's accepted costume colours remain unchanged. These are decoded facts, not observed gameplay; no support matrix level changes.
+
+## Actor allocation prerequisite
+
+`ScummActorTable` now accepts an optional actor count and exposes instance `Capacity`/`Contains`; its existing default remains 13 slots (12 usable actors). `ScummProfile.ActorCount` gives Maniac's two families 25, Zak and the existing families 13, following [scumm.cpp](https://raw.githubusercontent.com/scummvm/scummvm/master/engines/scumm/scumm.cpp) lines 1634–1647. Session/runtime owners connect that parameter separately. Existing static validity remains for legacy callers; version-aware callers must use the instance method.
+
+Validation: the same test command with filter `FullyQualifiedName~ScummActorCapacityTests|FullyQualifiedName~LoomActorTests|FullyQualifiedName~ScummV2OperandDecodingTests` passed 25 tests, 0 failed/skipped. Checks cover all four fixture profiles, actor 24 placement/talk colour, and unchanged default snapshot size. No gameplay fidelity claim.
