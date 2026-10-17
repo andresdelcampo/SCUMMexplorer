@@ -15,7 +15,9 @@ public sealed class ScummOldFirstVisitRulesTests
         Assert.Equal(new RoomObjectPosition(8, 8), selection.GetPosition(first));
         Assert.Equal(new RoomObjectPosition(24, 8), selection.GetPosition(last));
         var queued = new RoomObjectSelection([first, last], new Dictionary<int, byte> { [384] = 8 }, drawQueue: [384], intrinsicStateMask: 8);
-        Assert.Same(last, Assert.Single(queued.PaintOrder()));
+        Assert.Equal([first, last], queued.PaintOrder());
+        Assert.Same(first, queued.PaintOrder()[0]);
+        Assert.Same(last, queued.PaintOrder()[1]);
     }
     [Theory]
     [InlineData(1, false)]

@@ -1,4 +1,4 @@
-**S5 Maniac/Zak in progress (17 October, separate orchestrator).** Four family audits run in isolated worktrees. The ManiacEnhanced agent exclusively owns shared first-visit loading, arrival and session/profile prerequisites; the orchestrator owns App integration. Other families remain untouched. [Plan](checkpoints/20261017-S5-ManiacZak.md).
+**S5 Maniac/Zak source previews implemented (17 October, separate orchestrator); original-game visual acceptance open.** All 221 rooms open; 216 have no detector findings. Sixteen real-window checks pass. Retained black rectangles, Zak camera placement, old actor alignment and shown-lit previews remain disclosed in the [checkpoint](checkpoints/20261017-S5-ManiacZak.md). Objects stays Partial. Next: resolve those S5 findings, then S6 verb-based play, S7 and S9. [Dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md).
 
 # Current work
 

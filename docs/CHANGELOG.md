@@ -2,6 +2,12 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: Maniac/Zak first-visit source previews (S5; visual acceptance open)
+
+- Added reached first-visit object previews and hotspots for all four v1/v2 families, with a reviewed Maniac party-input recipe outside the engine. Corrected old object flags, duplicate image drawing, pseudo-room arrivals, settling and actor costume initialization.
+- All 221 rooms open without audit errors; 216 have no detector findings. Sixteen real-window checks pass. Retained black regions, camera/alignment uncertainty and shown-lit dark rooms remain explicit; source checks and app captures do not establish native visual equivalence.
+- Objects remains Partial; S6 was not started. [Checkpoint, family evidence and validation](checkpoints/20261017-S5-ManiacZak.md).
+
 ## 17 October: classic and enhanced Maniac Mansion and Zak boot in the generic session (S4b)
 
 - Added v1/v2 data sources, dialect-specific decoding and a separate bounded executor partial, with native engine variables, actor defaults, verb slots, sentence/object dispatch, cutscene restoration and sound clocks. Source-backed fixes also restore the wide classic Maniac introduction room and preserve native message character counts.

@@ -183,7 +183,9 @@ public sealed class RoomObjectSelection
         for (var index = _objects.Count - 1; index >= 0; index--)
         {
             var obj = _objects[index];
-            if (IsActive(obj) && !seen.Contains(obj.Id)) order.Add(obj);
+            // A queued ID resolves to its last local entry. Earlier entries with
+            // that ID still belong to the directory redraw.
+            if (IsActive(obj) && !(seen.Contains(obj.Id) && ReferenceEquals(obj, byId[obj.Id]))) order.Add(obj);
         }
         order.AddRange(queued);
         return order;
