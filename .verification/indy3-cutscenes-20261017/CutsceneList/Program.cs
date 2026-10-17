@@ -23,6 +23,59 @@ if (args.Length > 1 && args[1] == "loom")
     return;
 }
 
+// CutsceneList <folder> probe <room> <object> <verb>: one fresh run of a trigger (object 0 = the room's entry) with the session trace's cutscene lines
+// after the visit (Monkey Island floppy S7, 17 October 2026: which script began the cutscene a run counted).
+// CutsceneList <folder> prun <workers>: every group's fresh run on several threads, each with its own copy of the game (its own disk or archive
+// reader), as the App derives a disk game's list since 17 October 2026 (Monkey Island floppy S7); the lines must equal the single-threaded "scan run".
+if (args.Length > 2 && args[1] == "prun")
+{
+    var clock = System.Diagnostics.Stopwatch.StartNew();
+    var copies = new ThreadLocal<GameLibrary>(() => new GameFolderScanner().Scan(args[0]));
+    var planner = new ScummCutscenePlanner(game, () => ScummGameSession.BootForPlay(copies.Value!, out _));
+    Parallel.ForEach(planner.Groups, new ParallelOptions { MaxDegreeOfParallelism = int.Parse(args[2]) }, g => planner.Run(g.First));
+    Console.WriteLine($"{planner.Groups.Count} runs on {args[2]} workers: {clock.ElapsedMilliseconds} ms, begun {planner.Groups.Count(g => planner.Run(g.First).Begun)}");
+    foreach (var g in planner.Groups)
+    {
+        var r = planner.Run(g.First);
+        Console.WriteLine($"{g.First.Room}/{g.First.ObjectId}/0x{g.First.VerbId:X2} | run: {(r.Begun ? "begun" : "NOT begun")} frames {r.Frames} rooms [{string.Join(",", r.RoomsEntered)}]");
+    }
+    return;
+}
+
+// CutsceneList <folder> dump <room> <object> <verb>: the object verb's instructions (Monkey Island floppy S7, 17 October 2026).
+if (args.Length > 4 && args[1] == "dump")
+{
+    var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    var roomData = data.ReadRoom(room);
+    var script = data.ReadObjectVerb(room, roomData.Objects.First(o => o.Id == obj), verb, out _)!;
+    foreach (var i in script.Instructions) Console.WriteLine($"+0x{i.Offset:X4} {i.Operation} {i.Operands}");
+    return;
+}
+
+if (args.Length > 4 && args[1] == "probe")
+{
+    var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
+    var session = ScummGameSession.BootForPlay(game, out _);
+    var roomInfo = game.Rooms.First(r => r.ResourceId == room);
+    if (obj == 0) { var at = session.SessionTrace.Count; session.EnterRoomAgain(roomInfo); Print(at, "entry"); }
+    else
+    {
+        var at = session.SessionTrace.Count; session.VisitRoom(roomInfo); Print(at, $"visit (in cutscene {session.InCutscene})");
+        at = session.SessionTrace.Count; session.ActivateObjectVerb(obj, verb); Print(at, "verb");
+    }
+    for (var frame = 0; frame < 700; frame++)
+    {
+        var at = session.SessionTrace.Count; session.AdvanceFrame();
+        if (session.SessionTrace.Skip(at).Any(t => t.Contains("cutscene", StringComparison.OrdinalIgnoreCase) || t.Contains("Room", StringComparison.Ordinal) && t.Contains("enter", StringComparison.OrdinalIgnoreCase))) Print(at, $"frame {frame}");
+    }
+    void Print(int from, string what)
+    {
+        foreach (var t in session.SessionTrace.Skip(from).Where(t => t.Contains("cutscene", StringComparison.OrdinalIgnoreCase) || t.Contains("enter", StringComparison.OrdinalIgnoreCase)))
+            Console.WriteLine($"{what}: {t}");
+    }
+    return;
+}
+
 // CutsceneList <folder> scan [run] [room...]: the generic list of a game played through ScummGameSession (S7): triggers, groups, titles with the game's
 // verb names; with "run", a fresh headless run of each group (only the named rooms' groups when rooms are given), timed.
 if (args.Length > 1 && args[1] == "scan")
