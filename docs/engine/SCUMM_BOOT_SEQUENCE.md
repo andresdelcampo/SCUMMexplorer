@@ -1,5 +1,17 @@
 # SCUMM boot sequence by version
 
+## SCUMM v1/v2 foundation (17 October 2026)
+
+Engine evidence: ScummVM `engines/scumm/scumm.cpp`, `vars.cpp`, `room.cpp`, `script.cpp`, `script_v2.cpp`, `string.cpp`, `scumm.h`, read 17 October 2026. This section describes source rules; a family's completed boot is established only by its session record.
+
+- Indexed script 1 runs at boot. Version 2 uses its own object-state/owner index and room directories; it has no room-local script directory. The session reads these through `ScummV2DataSource`, not the old-v3 adapter (`resource_v2.cpp`, `room.cpp`).
+- The v3 timer, sound-card, video-mode and character-speed variable slots are not engine roles in v1/v2. Initializing or incrementing them would overwrite game state. The v2 roles are listed in [the script reference](SCUMM_SCRIPT_MAP.md#scumm-v1v2-engine-roles-17-october-2026).
+- `ScummEngine_v2::resetScummVars` sets Zak's machine-speed variable (slot 6) to `0x7FFF`, selecting its elaborate introduction. This is an engine initial value, not a supplied story flag (`vars.cpp`).
+- Room changes execute the embedded exit and entry scripts. The fixed engine script 5 runs **after** embedded entry. There are no v3 global entry/exit hook variables to read (`room.cpp`). Input runs fixed script 4 and queued sentences run fixed script 2 (`script.cpp`).
+- The script-visible camera position and virtual mouse x use eight-pixel units; virtual mouse y uses two-pixel units. Native actor/camera positions remain pixels. Text uses native `_defaultTextSpeed`, initially 6, and a base delay of 60; it does not read v3 `VAR_CHARINC`, which collides with v2 `VAR_LAST_SOUND` (`scumm.cpp`, `string.cpp`).
+- V2 cutscenes save the interface/user-input state and cursor value, freeze other scripts and stop the sentence script. Ending restores the saved input state and follows the ego (`script_v2.cpp`). Classic Maniac has additional room/camera restoration rules; v2 groundwork alone is not a completed classic boot.
+- The native PC-speaker timeline follows the Player_V2 stream: the music timer is channel 0 word 23, and commands can set it to arbitrary values. Natural sound completion retains the final timer; an explicit stop clears it. The implementation samples the stream at 236 Hz and uses the common 472 Hz lifetime scale. Priority and queued sound restart remain unmodelled (`players/player_v2.cpp`, `player_v2base.cpp`; [sound evidence](../../.verification/zak-session-20261017/README.md)).
+
 How each SCUMM version starts: which script the engine runs first, which engine variables it sets before that, and the order in which room, entry and exit hooks run. **One section per SCUMM version**; each statement carries its ScummVM source file and the date it was read. What a *game* puts into those variables is in the game's script map (`docs/<game>/<GAME>_SCRIPT_MAP.md`), not here.
 
 Section format (copy for a new version):
@@ -15,11 +27,11 @@ Section format (copy for a new version):
 
 ## SCUMM v1 (Maniac Mansion, Zak McKracken classic)
 
-Not documented yet.
+The shared rules above apply through the v1 dialect and `ScummV1DataSource`: fixed resource counts, the object table at index offset 2, tiled room dimensions and classic image decoding. Classic Maniac's saved camera mode/room at cutscene end remains an explicit session gap. See [the v1 adapter record](../../.verification/maniac-v1-adapter-20261017/README.md).
 
 ## SCUMM v2 (Maniac Mansion Enhanced, Zak McKracken Enhanced)
 
-Not documented yet.
+The shared rules above apply through `ScummV2DataSource`, with counts and directories read from the index. The current bounded implementation and remaining boot blockers are recorded in [the Maniac/Zak checkpoint](../checkpoints/20261017-S4b-ManiacZak.md); these foundations do not establish completed S4b acceptance.
 
 ## SCUMM v3 (LOOM EGA, Indiana Jones and the Last Crusade EGA)
 

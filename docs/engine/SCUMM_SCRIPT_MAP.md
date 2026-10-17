@@ -6,6 +6,8 @@ For LOOM's script IDs, story state, draft verbs and room examples, see the [LOOM
 
 ## Engine variables (v3/v4)
 
+The following v3/v4 slots must not be applied to v1/v2; those roles are recorded separately below.
+
 These slots belong to the engine contract. The game selects values such as the ego actor, hook script IDs, key bindings and text speed. Those selected values belong in a game map.
 
 | Slot (hex) | Engine name | Role |
@@ -104,6 +106,31 @@ Sources: ScummVM [actors](https://github.com/scummvm/scummvm/blob/master/engines
 ## Scope: games whose scripts are not read
 
 The browsed games (Monkey Island, Indy3 256 colours, Maniac Mansion and Zak McKracken, classic and enhanced) are read for rooms, costumes and sounds only: this reference says nothing about their scripts, variables or verbs, and the explorer shows no script page for them. Their `SC`/`LS` blocks (v4) and script directories exist in the data, but no dialect (`ScummProfile`) is defined for them; the v4 dialect of LOOM CD should not be assumed for Monkey Island without its own check, and the v1 and v2 script formats differ again. See [the resource formats](SCUMM_RESOURCE_FORMATS.md).
+
+## SCUMM v1/v2 engine roles (17 October 2026)
+
+Source: ScummVM `engines/scumm/vars.cpp`, `ScummEngine_v2::setupScummVars`, read 17 October 2026. These are engine slot meanings, not game story state. Code constants live in `ScummVars.V2`.
+
+| Role | Decimal slot | Evidence |
+|---|---:|---|
+| Ego | 0 | engine |
+| Camera x / message active / room / override | 2 / 3 / 4 / 5 | engine |
+| Machine speed / displayed character count | 6 / 7 | engine |
+| Active verb / active object 1 / active object 2 | 8 / 9 / 10 | engine |
+| Number of actors / lights / current drive | 11 / 12 / 13 | engine |
+| Music timer / verb allowed | 17 / 18 | engine |
+| Actor range minimum / maximum | 19 / 20 | engine |
+| Cursor state | 21 | engine |
+| Camera minimum / maximum / next-frame jiffies | 23 / 24 / 25 | engine |
+| Sentence verb / object 1 / object 2 / preposition | 26 / 27 / 28 / 29 | engine |
+| Virtual mouse x / y | 30 / 31 | engine |
+| Click area / verb / object | 32 / 33 / 35 | engine |
+| Room resource / last sound / backup verb | 36 / 37 / 38 | engine |
+| Keypress / cutscene exit key / talking actor | 39 / 40 / 41 | engine |
+
+Version 1 and version 2 actor operations differ in palette operand length. Actor-name operations carry a zero-terminated name. The delay instruction stores the complemented 24-bit duration, and `beginOverride` embeds a relative jump whose target must also be decoded. These corrections are pinned in the [decoder record](../../.verification/maniac-decoder-20261017/README.md), with source references and edition results. They do not establish gameplay support.
+
+The v2 engine's fixed scripts (input 4, sentence 2, post-entry 5), camera/mouse units and native text delay are described in [the boot sequence](SCUMM_BOOT_SEQUENCE.md#scumm-v1v2-foundation-17-october-2026). The classic and enhanced dialects remain distinct; neither uses the v3 global-hook slots or frame-timer variables.
 
 ## Explorer evidence
 
