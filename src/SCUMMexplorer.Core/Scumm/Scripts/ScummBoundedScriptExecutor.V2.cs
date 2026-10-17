@@ -32,6 +32,37 @@ public sealed partial class ScummBoundedScriptExecutor
         string Value(int n, int scale = 1) => Read(n, out var value) ? $"0x{unchecked((ushort)(value * scale)):X4}" : p[n];
         switch (source.Operation)
         {
+            case "setCameraAt": case "panCameraTo":
+                if (!Read(0, out _)) return false;
+                instruction = source with { Operands = Value(0, 8) };
+                return true;
+            case "setVarRange":
+                var listStart = source.Operands.IndexOf(", [", StringComparison.Ordinal);
+                if (listStart < 0) return false;
+                instruction = source with { Operands = source.Operands[..listStart] + $", count={p.Length - 1}" + source.Operands[listStart..] };
+                return true;
+            case "findObject":
+                if (!Read(1, out var findX) || !Read(2, out var findY)) return false;
+                var locals = objects.ToDictionary(o => o.LocalIndex);
+                var found = 0;
+                foreach (var record in objects)
+                {
+                    if (!states.TryGetValue(record.Id, out var objectState)) return false;
+                    if ((objectState & 2) != 0) continue;
+                    var at = runtime.ObjectPositions.TryGetValue(record.Id, out var moved) ? (moved.X, moved.Y) : (record.X, record.Y);
+                    if (findX * 8 < at.Item1 || findX * 8 >= at.Item1 + record.Width || findY * 2 < at.Item2 || findY * 2 >= at.Item2 + record.Height) continue;
+                    var current = record;
+                    var matches = true;
+                    for (var remaining = objects.Count; current.ParentLocalIndex != 0; remaining--)
+                    {
+                        if (remaining <= 0 || !locals.TryGetValue(current.ParentLocalIndex, out var parent) || !states.TryGetValue(parent.Id, out var parentState)) return false;
+                        if ((parentState & 8) != current.ParentRequiredState) { matches = false; break; }
+                        current = parent;
+                    }
+                    if (matches) { found = record.Id; break; }
+                }
+                instruction = source with { Operation = "move", Operands = $"{p[0]} = 0x{found:X4}" };
+                return true;
             case "lights":
                 if (!Read(0, out var light) || !Read(1, out var flashY) || !Read(2, out var lightMode)) return false;
                 if (lightMode == 0) { variables[runtime.CurrentLightsVariable] = light; RefreshBitAliases(runtime.CurrentLightsVariable, variables); }
@@ -154,11 +185,13 @@ public sealed partial class ScummBoundedScriptExecutor
                 if (p[3] == "sub=0x00") { instruction = source with { Operands = string.Join(", ", p.Take(3)) }; return true; }
                 if (p[3] == "sub=0x01")
                 {
-                    if (verb is 254 or 250 or 253) return false; // Different slot-reuse/background semantics, never silently use v3's.
-                    variables["var[0x008]"] = verb;
-                    variables["var[0x009]"] = objectA;
-                    variables["var[0x00A]"] = objectB;
-                    instruction = source with { Operation = "startObject", Operands = $"0x{objectA:X4}, 0x{verb:X2}, []" };
+                    if (verb is not (254 or 250 or 253))
+                    {
+                        variables["var[0x008]"] = verb;
+                        variables["var[0x009]"] = objectA;
+                        variables["var[0x00A]"] = objectB;
+                    }
+                    instruction = source with { Operation = "startObject", Operands = $"0x{objectA:X4}, 0x{(verb == 250 ? 253 : verb):X2}, []" };
                     return true;
                 }
                 if (p[3] != "sub=0x02") return false;
@@ -170,13 +203,13 @@ public sealed partial class ScummBoundedScriptExecutor
                 return true;
             case "stopObjectCode": case "breakHere": case "jumpRelative": case "increment": case "decrement":
             case "isNotEqual": case "isEqual": case "beginOverride":
-            case "equalZero": case "notEqualZero": case "setVarRange": case "delay": case "delayVariable": case "getRandomNr":
+            case "equalZero": case "notEqualZero": case "delay": case "delayVariable": case "getRandomNr":
             case "startSound": case "stopSound": case "startMusic": case "stopMusic": case "stopScript": case "loadRoom":
             case "isScriptRunning": case "isSoundRunning": case "getObjectOwner": case "setOwnerOf":
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor": case "print":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
             case "animateActor": case "faceActor": case "walkActorToActor": case "setBoxFlags":
-            case "resourceRoutines": case "pseudoRoom":
+            case "resourceRoutines": case "pseudoRoom": case "actorFollowCamera": case "drawObject":
                 return true;
             default: return false;
         }

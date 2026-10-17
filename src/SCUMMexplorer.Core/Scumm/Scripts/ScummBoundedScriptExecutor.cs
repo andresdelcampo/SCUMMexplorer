@@ -370,6 +370,17 @@ public sealed partial class ScummBoundedScriptExecutor
                     Certainty = head.Any(operand => OperandIsEstimated(operand, estimated, knownVariables))
                         ? ScummScriptEventCertainty.Conditional : scriptEvent.Certainty
                 };
+                if (runtime?.IsV2 == true)
+                {
+                    var raw = script.Instructions.FirstOrDefault(i => i.Offset == instruction.Offset);
+                    var rawVerb = raw?.Operands.Split(',')[0].Trim();
+                    if (rawVerb is not null && TryReadValue(rawVerb, knownVariables, out var v2Verb, out _))
+                        scriptEvent = scriptEvent with
+                        {
+                            Operation = v2Verb == 254 ? "v2StopObject" : "v2StartObject",
+                            ResolvedArguments = [Read(0), Read(1), v2Verb == 250 ? 1 : 0, v2Verb is 250 or 253 ? 1 : 0]
+                        };
+                }
             }
             if (scriptEvent is not null) events.Add(scriptEvent);
             string? eventHandling = null;
@@ -1056,7 +1067,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 }
                 runtime.Camera.Mode = ScummCamera.Normal;
                 var clamped = (ushort)Math.Clamp(cameraX, range.Min, range.Max);
-                knownVariables[ScummVars.CameraPosX] = clamped;
+                knownVariables[ScummVars.CameraPosX] = (ushort)(clamped / (runtime.IsV2 ? 8 : 1));
                 RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
                 MarkEstimated(estimated, ScummVars.CameraPosX, cameraEstimated);
                 trace.Add($"camera x = {clamped} ({instruction.Operation} {instruction.Operands})");
@@ -1184,7 +1195,8 @@ public sealed partial class ScummBoundedScriptExecutor
                         cameraUnknown = "the camera's position before it was unknown";
                     else
                     {
-                        var strip = actorX / 8 - ScummCamera.ScreenStartStrip(cameraBefore);
+                        var cameraPixels = cameraBefore * (runtime.IsV2 ? 8 : 1);
+                        var strip = actorX / 8 - ScummCamera.ScreenStartStrip(cameraPixels);
                         var wasEstimated = estimated.Contains(ScummVars.CameraPosX);
                         runtime.Camera.Mode = ScummCamera.FollowActor;
                         runtime.Camera.Follows = followed;
@@ -1193,10 +1205,10 @@ public sealed partial class ScummBoundedScriptExecutor
                             // setCameraAt in follow mode: the camera jumps only when the actor is more
                             // than half a screen away; otherwise moveCamera pans to the destination.
                             runtime.Camera.DestX = actorX;
-                            if (Math.Abs(actorX - cameraBefore) > 160)
+                            if (Math.Abs(actorX - cameraPixels) > 160)
                             {
                                 var clamped = (ushort)Math.Clamp(actorX, followRange.Min, followRange.Max);
-                                knownVariables[ScummVars.CameraPosX] = clamped;
+                                knownVariables[ScummVars.CameraPosX] = (ushort)(clamped / (runtime.IsV2 ? 8 : 1));
                                 RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
                                 trace.Add($"camera x = {clamped}: it follows actor {followed} at x = {actorX} (actorFollowCamera)");
                             }
@@ -2965,14 +2977,14 @@ public sealed partial class ScummBoundedScriptExecutor
             return false;
         }
         var objectId = (int)rawId;
-        var record = roomObjects.FirstOrDefault(item => item.Id == objectId);
+        var record = runtime?.IsV2 == true ? roomObjects.LastOrDefault(item => item.Id == objectId) : roomObjects.FirstOrDefault(item => item.Id == objectId);
         if (record is null || !states.ContainsKey(objectId))
         {
             detail = $"drawObject targets object {objectId}, which is not in the room state table";
             return false;
         }
 
-        var state = (byte)1;
+        var state = runtime?.IsV2 == true ? (byte)(states[objectId] | 8) : (byte)1;
         var position = positions[objectId];
         if (parts.Length > 1 && parts[1] == "state")
         {
@@ -3009,7 +3021,7 @@ public sealed partial class ScummBoundedScriptExecutor
             if (states.ContainsKey(peer.Id))
             {
                 if (runtime is null) states[peer.Id] = 0;
-                else runtime.SetObjectState(peer.Id, 0);
+                else runtime.SetObjectState(peer.Id, runtime.IsV2 ? (byte)(states[peer.Id] & ~8) : (byte)0);
             }
         }
         if (runtime is null) states[objectId] = state;
