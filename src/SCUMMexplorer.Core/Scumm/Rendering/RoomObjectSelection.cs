@@ -168,7 +168,7 @@ public sealed class RoomObjectSelection
     /// </summary>
     public IReadOnlyList<RoomObjectImage> PaintOrder()
     {
-        var byId = _objects.GroupBy(obj => obj.Id).ToDictionary(group => group.Key, group => group.First());
+        var byId = _lastImages;
         var queued = new List<RoomObjectImage>();
         var seen = new HashSet<int>();
         for (var index = _drawQueue.Count - 1; index >= 0; index--)
