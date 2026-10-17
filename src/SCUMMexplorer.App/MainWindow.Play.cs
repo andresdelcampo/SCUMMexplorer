@@ -139,7 +139,7 @@ public partial class MainWindow
         // R-7.9: the game's cursor replaces the system pointer while the game shows it, and nothing shows while it is off.
         PlayScreenImage.Cursor = Cursors.None;
         if (IsAdvancedMode)
-            PlayScreenImage.ToolTip = $"Room {frame.RoomId:00} · input script {_play.Snapshot.KnownGlobalVariables.GetValueOrDefault(ScummVars.VerbScript)} · " +
+            PlayScreenImage.ToolTip = $"Room {frame.RoomId:00} · input script {_play.PlayInputScript} · " +
                                       (_play.DeliveredInput.LastOrDefault() is { } last ? $"last input runInputScript({last.Area}, {last.Value}, {last.Mode}): {last.Description}" : "no input yet") +
                                       (_playPaused ? " · paused" : "");
         else PlayScreenImage.ToolTip = null;

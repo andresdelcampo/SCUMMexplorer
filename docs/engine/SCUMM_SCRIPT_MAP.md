@@ -4,6 +4,10 @@ This reference separates engine-defined variables and script behavior from the m
 
 For LOOM's script IDs, story state, draft verbs and room examples, see the [LOOM script map](../loom/LOOM_SCRIPT_MAP.md). Its EGA numeric tables are edition-specific evidence; CD/VGA uses SCUMM v4 and must be decoded independently.
 
+## SCUMM v1/v2 live input (17 October 2026)
+
+ScummVM `ScummEngine_v2::checkExecVerbs` and `runInputScript` dispatch through script 4 and the old click/keypress globals, not the later `VAR_VERB_SCRIPT` and local argument contract. Verb/scene clicks use mode 1; sentence area 5 and inventory area 3 use mode 0. The engine supplies the sentence and inventory hit regions and scrolling keys. Scripts still compose and execute the action; the explorer must not interpret a first object click as an automatically completed sentence. Source: `verbs.cpp`, `script.cpp`, read 17 October 2026. Implementation: `ScummSessionPlay`; proposed interface requirements R-7.19 to R-7.21. Game-specific keys and choices belong in the Maniac/Zak script maps.
+
 ## Engine variables (v3/v4)
 
 The following v3/v4 slots must not be applied to v1/v2; those roles are recorded separately below.

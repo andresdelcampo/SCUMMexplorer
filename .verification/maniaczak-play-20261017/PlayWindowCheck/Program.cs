@@ -80,17 +80,40 @@ internal static class Program
                         case "click":
                             Require(session.ClickScreen(step.X, step.Y, out var why) is not null, "Click refused: " + why);
                             break;
+                        case "roomclick":
+                            var screenX = step.X - session.ViewLeft;
+                            Require(screenX is >= 0 and < 320, "Room point is outside the current view");
+                            Require(session.ClickScreen(screenX, step.Y + session.MainScreen.Top, out var roomWhy) is not null, "Room click refused: " + roomWhy);
+                            break;
                         case "point": session.PointAtScreen((step.X, step.Y)); break;
                         case "text":
                             var composition = new TextComposition(InputManager.Current, window, step.Text!);
-                            Call("PlayTextInput", new TextCompositionEventArgs(Keyboard.PrimaryDevice, composition));
+                            Call("PlayTextInput", new TextCompositionEventArgs(Keyboard.PrimaryDevice, composition) { RoutedEvent = TextCompositionManager.TextInputEvent });
                             break;
                         case "escape":
                             var source = PresentationSource.FromVisual(window)!;
-                            Require((bool)Call("PlayKeyDown", new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Escape))!, "Escape not handled");
+                            Require((bool)Call("PlayKeyDown", new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Escape) { RoutedEvent = Keyboard.KeyDownEvent })!, "Escape not handled");
                             break;
                         case "frames": await Frames(step.Count); break;
                         case "room": Require(session.CurrentRoomId == step.Value, $"Expected room {step.Value}; got {session.CurrentRoomId}"); break;
+                        case "untilroom":
+                            for (var i = 0; i < step.Count && session.CurrentRoomId != step.Value; i++) await Frames(1);
+                            Require(session.CurrentRoomId == step.Value, $"Did not reach room {step.Value}");
+                            break;
+                        case "untilskip":
+                            for (var i = 0; i < step.Count && !session.CutsceneSkippable; i++) await Frames(1);
+                            Require(session.CutsceneSkippable, "Did not reach cutscene override");
+                            break;
+                        case "untilcontrol":
+                            for (var i = 0; i < step.Count && (!session.UserInputOn || session.InCutscene); i++) await Frames(1);
+                            Require(session.UserInputOn && !session.InCutscene, "Control did not return");
+                            break;
+                        case "owner": Require(session.Snapshot.ObjectOwners.GetValueOrDefault(step.X) == step.Value, $"Object {step.X} not owned by {step.Value}"); break;
+                        case "untilowner":
+                            for (var i = 0; i < step.Count && session.Snapshot.ObjectOwners.GetValueOrDefault(step.X) != step.Value; i++) await Frames(1);
+                            Require(session.Snapshot.ObjectOwners.GetValueOrDefault(step.X) == step.Value, $"Object {step.X} not owned by {step.Value}");
+                            break;
+                        case "variable": Require(session.Snapshot.KnownGlobalVariables.GetValueOrDefault(step.Text!) == step.Value, "Unexpected variable: " + step.Text); break;
                         case "trace": Require(session.SessionTrace.Any(s => s.Contains(step.Text!, StringComparison.Ordinal)), "Missing trace: " + step.Text); break;
                         case "message": Require(session.Messages.OnScreen.Any(m => m.Text.Contains(step.Text!, StringComparison.Ordinal)), "Missing message: " + step.Text); break;
                         case "control": Require(session.UserInputOn && !session.InCutscene, "No player control"); break;
@@ -98,6 +121,7 @@ internal static class Program
                         default: throw new Exception("Unknown action: " + step.Op);
                     }
                     report.Add($"{step.Op} {step.Text} ({step.X},{step.Y}) n={step.Count} value={step.Value}: room={session.CurrentRoomId}, inputs={session.DeliveredInput.Count}, frame={Field("_playFrame")}");
+                    File.WriteAllLines(Path.Combine(output, "progress.txt"), report);
                 }
                 report.Add("PASS");
             }
