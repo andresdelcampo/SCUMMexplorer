@@ -1,0 +1,3 @@
+# monkey1_ega_en : before/after ScummTextDecoder.DecodeLine in the cutscene scan (lines that changed; '-' before, '+' after)
+- 35/448/0x0D | Room 35 · Talk to Citizen of Mle | Dialogue | Room 35 local script 218 | t11 l0 i33 a0 | Excuse me, but do--  Oh, it's only you again. | others[]
++ 35/448/0x0D | Room 35 · Talk to Citizen of Mêlée | Dialogue | Room 35 local script 218 | t11 l0 i33 a0 | Excuse me, but do--  Oh, it's only you again. | others[]
