@@ -1,4 +1,4 @@
-using SCUMMexplorer.Core.Domain;
+﻿using SCUMMexplorer.Core.Domain;
 
 namespace SCUMMexplorer.Core.Scumm;
 
@@ -101,7 +101,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     public bool BootEndsWhenPlayerHasControl { get; init; }
 
     /// <summary>
-    /// The game is played through its own verb interface (REQUIREMENTS §7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
+    /// The game is played through its own verb interface (REQUIREMENTS Â§7.1, Proposed 15 October 2026): its verb area, sentence line and inventory are drawn
     /// from its verbs and the player's clicks and keys go to its input script (<see cref="ScummSession.ClickScreen"/>). True only for a family whose Play
     /// cell is raised (R-7.17: no clicks reach the scripts of the others). S6 Indy3Ega; S6 Indy3Vga (16 October 2026) by the same data: a game whose
     /// first visit the generic session runs with the Indy3 script dialect, whatever its container (old-bundle LFL or one file per room).
@@ -172,14 +172,16 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
-            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd,
+            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd
+                // S4b Indy4 (17 October 2026): script 1 loads Barnett College (Room 4) with user input off; the playable prologue starts when local script 206 turns it on.
+                || GameSupport.FamilyOf(game) == GameFamily.Indy4,
             // vars.cpp ScummEngine_v5::resetScummVars: if (_game.id == GID_MONKEY) _scummVars[74] = 1225 (the CD release).
             GameVariablesAtStart = GameSupport.FamilyOf(game) == GameFamily.MonkeyCd ? [("var[0x04A]", 1225)] : [],
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
             PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
             UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],
-            // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) → Player_AD; the other DOS games of version 3 and later → iMuse (Monkey's workaround in triggerSound).
+            // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) â†’ Player_AD; the other DOS games of version 3 and later â†’ iMuse (Monkey's workaround in triggerSound).
             MusicStart = game.Id is GameId.Loom or GameId.LoomVga || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummMusicStart.StopsPreviousMusic
                 : GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? ScummMusicStart.StopsAllSounds
                 : ScummMusicStart.StopsNothing
