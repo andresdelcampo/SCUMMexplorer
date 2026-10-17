@@ -151,8 +151,9 @@ public static class ScummRoomFirstVisit
         if (!bootRoom) session.VisitRoom(resource);
         var settled = session.Settle();
         var records = data.ReadRoom(roomId).Objects;
-        var images = data.ReadObjectImages(roomId);
         var snapshot = settled.State.Snapshot;
+        // A v5 object stores an image per state: the one its settled state shows (S4b Monkey2).
+        var images = data is ScummV5DataSource stateImages ? stateImages.ReadObjectImages(roomId, snapshot.ObjectStates) : data.ReadObjectImages(roomId);
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions, records, room, indexed.States, snapshot.DrawOrder);
         var notes = new List<string>
         {

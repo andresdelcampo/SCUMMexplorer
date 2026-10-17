@@ -43,6 +43,9 @@ public sealed record ScummV4ObjectImage(int Id, int X, int Y, int Width, int Hei
 {
     /// <summary>The image's own depth mask (one byte per pixel, 0 or 1), or null when it carries none.</summary>
     public byte[]? Mask { get; init; }
+
+    /// <summary>The object state that shows this image: 1 for a v4 object's only image; the number of its <c>IMnn</c> block in a v5 room (S4b Monkey2).</summary>
+    public int State { get; init; } = 1;
 }
 
 public sealed record ScummV4Room(int Number, string Name, int Offset, int Length);
