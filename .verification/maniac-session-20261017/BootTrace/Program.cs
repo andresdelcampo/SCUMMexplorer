@@ -10,6 +10,7 @@ if (args.Length > 1 && args[1] == "dump")
 var session = new ScummGameSession(game, data.ReadIndexedObjects(), data: data);
 var postBootFrames = 0;
 Console.WriteLine($"Boot: {session.BootReport}; control {session.PlayerHasControl}; cutscene {session.InCutscene}");
+Console.WriteLine($"Menu ego: {session.Actors.First(a => a.Number == 3)}");
 if (args.Length > 1 && args[1] == "select")
 {
     foreach (var point in new[] { (76, 104), (196, 104), (292, 60) })
