@@ -78,6 +78,17 @@ Sources: ScummVM [v3](https://github.com/scummvm/scummvm/blob/master/engines/scu
 
 Sources: ScummVM [verb operations](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v5.cpp) and [rendering](https://github.com/scummvm/scummvm/blob/master/engines/scumm/verbs.cpp). Screen partitions, positions and image objects belong to the game.
 
+## Play input, verbs, classes and charsets (v5, S6 MonkeyCd; ScummVM master read 17 October 2026)
+
+- **Untouchable class:** `getClass`/`putClass` (`object.cpp`) map `kObjectClassUntouchable` to 24 only with `GF_SMALL_HEADER` (versions 3 and 4); version 5 stores class 32 itself. `findObject` and `getActorFromPos` skip it (`ScummProfile.UntouchableClass`).
+- **`setVerbObject`** (`verbs.cpp`): with `GF_OLD_BUNDLE` or `GF_SMALL_HEADER` the image comes only from a local object of the current room; otherwise (version 5) from `findObjectInRoom(object, room)` in the room the script names, current or not (`ScummProfile.VerbImagesFromNamedRoom`).
+- **Input** (`verbs.cpp` `checkExecVerbs`): from version 4 a click passes mode 1 (left) or 2 (right) to `runInputScript`; areas 1 (verb, or outside the main screen), 2 (main screen), 4 (key, mode 1); a key equal to an enabled verb's key is that verb's click.
+- **Code 7 in a message** (`convertStringMessage`): versions 3 (and 6+) read the string number from a variable; versions 4 and 5 take the operand as the string number.
+- **`cursorCommand charsetColors`** (case 14): the list's values replace entries 0, 1, 2… of the current charset's colour map (`_charsetData`); entry 1 is replaced by the text's colour when drawn.
+- **Charsets:** a `CHAR` block (index directory `DCHR`) holds the font 29 bytes into the resource (8 header bytes, then the v4 layout: size, 0x0363, 15 colours, the font; `CharsetRendererCommon::setCurID`).
+- **Cursor:** `ScummEngine_v5::resetCursors` cursor 0 (the cross-hair, hotspot 8, 7) in colours 15, 15, 7, 8 (`default_cursor_colors`), animated every two frames; no DOS-specific branch. Monkey Island CD never changes it (no `cursorImage`/`cursorHotspot` in its global scripts).
+- **CD tracks** (`sound.cpp` `triggerSound`, `soundcd.cpp`): a `SOUN` block of chunk type 2 starts `playCDTrackFromSoundID`; `stopSound` calls `stopCDSound` first. The iMuse "stop all sounds on a new music" workaround is only for `GID_MONKEY_VGA`/`GID_MONKEY_EGA`, not the CD release.
+
 ## Messages and charset (DOS v3)
 
 - `print` selects text slots: actor `0xFE` uses drawn-string slot 1, `0xFD` debug slot 2, `0xFC` dialog slot 3, others talk slot 0. `0xFF` is a system line. v1–v3 retain position, height and color defaults, but not centering. Initial defaults are position (0, 0), height 0, color 15 and right edge 319.

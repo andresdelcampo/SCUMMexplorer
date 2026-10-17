@@ -181,3 +181,27 @@ Rows of this section come from the **CD release** only (`Games/monkey1 vga en`: 
 | Sound 110 | CD track 17 (disc track 18) from its start, once: the title credits' music | decoded | `SOUN` 110 (Room 10); Script 152 +0x0049 | 2026-10-17 |
 | Sound 108 | CD track 17 from frame 7173 to the end, once: the lookout's music; its end leads on to Room 96 | decoded | `SOUN` 108 (Room 38); Room 38 object 486 fallback verb +0x0045 | 2026-10-17 |
 | Sounds 104, 122 | CD track 6 (Room 96), CD track 22 looping (the dock) | decoded | `SOUN` 104, 122; boot trace with 900 more frames | 2026-10-17 |
+| Sounds 101, 100, 115 | CD track 8 looping (the SCUMM Bar, Room 28 entry +0x0071, stopped by the bar door's verb 0x0B +0x000C); CD track 12 looping (Script 120, the bar exit's flashback in Rooms 70 and 72, +0x0036 and its stop +0x053B); CD track 1 looping (the voodoo shop, Room 29 local script 200 +0x0021) | decoded | `SOUN` 101, 100, 115; `ScummMonkeyCdPlayTests` route | 2026-10-17 |
+| Sounds 2, 3 | not CD tracks: iMuse sounds of the resource file (door creak, Script 25 +0x003A; Script 26 +0x0031 in Room 29) | decoded | `SOUN` 2, 3 have `SOU ` parts; route | 2026-10-17 |
+| Room 33 exit script | stops sounds 122, 117, 118 (+0x0000, +0x0004, +0x0006) | decoded | Room 33 exit script | 2026-10-17 |
+
+### Verbs and the input chain (CD)
+
+| Item | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| Verb ids | 2 Open, 3 Close, 4 Give, 5 Push, 6 Pull, 7 Use, 8 Look at, 9 Pick up, 0x0A Talk to, 0x0B Walk to (off, the default), 0x64 the sentence line, 0x78 to 0x80 dialogue lines, 0xC8 to 0xCF inventory slots, 0xD0/0xD1 inventory arrows; the floppy's numbers differ | decoded | Script 22; verbs after the boot (`ScummMonkeyCdPlayTests`) | 2026-10-17 |
+| Script 22 | builds the nine text verbs with charset 6 (`cursorCommand charsetSet 6`, then `charsetColors [0, 6, 2]` at +0x0003), 14 rows high, in three columns from (6..113, 155..187) | decoded | Script 22 +0x0000, +0x0003; verb area | 2026-10-17 |
+| Script 4 (input) | `VAR_VERB_SCRIPT` after the boot. Right click (mode 2) with `bit[0x223]` = 0 and no pending second object takes the hovered object's default verb from `var[0x0B6]` (+0x0005 to +0x0016; the floppy uses `var[0x0B5]`); slots 0xC8..0xCF pick inventory objects `var[0x085+n]` (+0x0304 to +0x0333), 0xD0/0xD1 scroll (`var[0x076]`, chain to Script 9); `doSentence var[0x06B], var[0x06C], var[0x06D]` at +0x0407 | decoded | Script 4 +0x0000 to +0x0440 | 2026-10-17 |
+| Room 28 local script 202 | the SCUMM Bar's input script (`VAR_VERB_SCRIPT` = 202 in the bar; the floppy keeps Script 4) | decoded | route trace | 2026-10-17 |
+| Script 14 | the dialogue's input script; its lines are verbs 0x78 up drawn with charset 1 at rows 145 to 185 | decoded | route | 2026-10-17 |
+| Script 12 (sentence line) | verb 0x64 named "verb (code 5 of `var[0x06B]`) + string 49 (code 7, " " from `stringOps loadString 0x31`) + object (code 6)", colour 6 while composing, 3 after a run (Script 4 +0x0438) | decoded | Script 12 +0x0000 to +0x00DD | 2026-10-17 |
+| Script 9 (inventory) | eight slots per page from `var[0x076]`; each slot gets an icon: the object's verb 0x5B (started with `startObject`) leaves the icon's object number in `var[0x178]`, else 0x407; `verbOps assignObject icon, 99` takes it from Room 99 (the rubber chicken's icon is object 961); arrows 0x404/0x405 on, 0x409 dim | decoded | Script 9 +0x0000 to +0x0133 | 2026-10-17 |
+
+### Objects and classes (CD)
+
+| Item | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| Room 33 (dock) | 426 cliffside, 427 archway (to Room 35), 428 door (to Room 28), 429 poster (first look: cutscene with override +0x00CF..+0x0134, "Re-elect Governor Marley."), 430 unnamed | decoded | Room 33 object directory; object 429 verb 8 | 2026-10-17 |
+| Room 28 (SCUMM Bar) | 315 door (to Room 33, through Script 120), 322 important-looking pirates (Talk to: the three trials) | decoded | route | 2026-10-17 |
+| Room 35 and Room 29 | 444 door of Room 35 (to Room 29); 377 rubber chicken of Room 29 (Pick up) | decoded | route | 2026-10-17 |
+| Untouchable | class 32 (`kObjectClassUntouchable` without translation: the CD has no small header); a picked-up object gets it | engine | object.cpp `getClass`; `o5_pickupObject` | 2026-10-17 |

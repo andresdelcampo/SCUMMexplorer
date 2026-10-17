@@ -2,6 +2,19 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: play through Monkey Island CD's own interface (S6, MonkeyCd)
+
+- The R-7.18 route runs on the CD release through its own interface (v5): from the dock, where the game goes on to by itself after the lookout. It looks at the poster and skips that cutscene, goes through the door to the SCUMM Bar and holds the pirates' dialogue, then walks to the voodoo shop and picks up the rubber chicken. The chicken appears in the inventory as its Room 99 icon. A right click runs the default verb (`var[0x0B6]`). **Objects ✔ and Play ✔** for MonkeyCd.
+- Engine changes, all from the profile:
+  - `UntouchableClass`: 32 from version 5, used by `findObject`, `getActorFromPos` and the snapshot.
+  - `VerbImagesFromNamedRoom`: `setVerbObject` without the small header.
+  - v5 charsets (`ScummV5Archive.ReadCharset`).
+  - `cursorCommand charsetColors`.
+  - Code 7 (string) in play verb names, which the CD's sentence line uses.
+  - `BootForPlay` reads a v5 index.
+- Sound in play: a sound that starts a disc track plays that stretch of the disc's audio. Tracks with loop count 0xFF repeat until a script stops them, and effects keep the chosen device.
+- Validation: `ScummMonkeyCdPlayTests` (4 tests); the Monkey floppy, Indy3, cutscene and sound tests; the LOOM and Scumm regression (1055 passed); one WPF check through the real window. Record: [monkeycd-play-20261017](../.verification/monkeycd-play-20261017/README.md).
+
 ## 17 October: the Spanish eight-disk release, and accents in the cutscene list (S9, MonkeyFloppy)
 
 - `Games/monkey1 ega es` (Spanish, eight disks, 16 colours) checked against the English floppy: boot (protection answered from its own `var[0x10A]`), room audit (81/81 without a gap, equal to English in outcome, active images and gaps), the R-7.18 route with its sounds and the right click, the cutscene scan (294 triggers, 164 entries, 104 begin, equal per entry), accents (CP437 codes with a glyph in every charset), one window look. Differences are data: texts and the offsets that follow them (the route test reads its sound offsets from the copy's script), Room 87's entry, the 0xFA glyph. No cell changes.

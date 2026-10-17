@@ -79,7 +79,7 @@ The matrix is **generated** from the registry `GameSupport.Families` (`Core/Doma
 | **Indiana Jones 3** EGA | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
 | **Indiana Jones 3** 256 colours | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
 | **Monkey Island 1** floppy | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ◐ | – |
-| **Monkey Island 1** CD | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
+| **Monkey Island 1** CD | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – |
 | **Monkey Island 2** | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Indiana Jones 4** | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
 | **Maniac Mansion** enhanced | ✔ | ◐ | ✔ | ✔ | ✔ | ✔ | ✔ | – | – | – |
@@ -107,7 +107,7 @@ Family notes (what is behind a row):
 
 - `LoomEgaReference`: the English Roland edition (`GameSupport.ReferenceEditionLabel`); the replay catalog (328 replays, R-8.18) is enabled only for its fingerprint. `LoomEga`: the other editions (Spanish, plain English, French, German, v1.2, Italian) use the same code with the script-derived cutscene list (R-8.24); their first-visit state per edition is not recorded (I-07).
 - `LoomEgaDemo`: the short and long self-running demos; the picker offers only **The preview** (R-3.3). `LoomCd`: CD/VGA with voices and disc music; cutscenes derived from scripts (R-8.21, R-8.25).
-- `Indy3Ega`: backgrounds, costumes, sounds, scripts and texts including dialogue choices (R-11.6); since S5/S6 (14–16 Oct) every room's first visit and Play through the game's own verbs (§7.1; `ScummIndy3PlayTests`); no cutscene list, no state window. The browsed families (`Indy3Vga`, `MonkeyFloppy`, `MonkeyCd`, `Monkey2`, `Indy4`, `ManiacEnhanced`, `ManiacClassic`, `ZakEnhanced`, `ZakClassic`) share the same reading: rooms, costumes, walk boxes, sounds, scripts, texts and stored-object boxes (R-3.10 to R-3.14, R-13.8).
+- `Indy3Ega`: backgrounds, costumes, sounds, scripts and texts including dialogue choices (R-11.6); since S5/S6 (14–16 Oct) every room's first visit and Play through the game's own verbs (§7.1; `ScummIndy3PlayTests`); no cutscene list, no state window. The browsed families (`Indy3Vga`, `MonkeyFloppy`, `MonkeyCd`, `Monkey2`, `Indy4`, `ManiacEnhanced`, `ManiacClassic`, `ZakEnhanced`, `ZakClassic`) share the same reading: rooms, costumes, walk boxes, sounds, scripts, texts and stored-object boxes (R-3.10 to R-3.14, R-13.8). `Indy3Vga`, `MonkeyFloppy` (16 Oct) and `MonkeyCd` (17 Oct, `ScummMonkeyCdPlayTests`: its music plays from the disc's audio tracks) also show every room's first visit and play through their own verbs (§7.1).
 - Not in the matrix: `OtherV3` (any other old-v3 game whose `00.LFL` parses: rooms and texts, LOOM script dialect, may read wrongly) and `OtherBrowsed` (an unrecognised v1/v2/v4/v5 game, read like the browsed families).
 
 Every Rooms ✔ means the same thing: no gaps, objects and actors drawn by the shared engine code. The reference edition differs only in having a **replay catalog**, which is data, not room rendering.
