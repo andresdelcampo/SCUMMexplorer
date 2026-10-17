@@ -1,6 +1,6 @@
 # ManiacEnhanced S4b bounded session — 17 October 2026
 
-Result: **incomplete; no registry cell raised**. The v2 source, dialect, engine slots and bounded interpreter now execute the enhanced boot and real party selection, but the first gameplay room has not returned player control.
+Result: **S4b accepted for this enhanced fixture and explicitly selected route; no registry cell raised**. The v2 source, dialect, engine slots and bounded interpreter reach the first gameplay room with player control. S5-S7 remain separate acceptance stages.
 
 Fixture: `D:/Juegos/Lucas/mmansionE ega es`, detected ManiacEnhanced/v2. Own index declares 179 script slots and 780 objects. The all-room adapter regression reads every room's objects, entry/exit scripts, verb entries and images without the old-v3 offsets. It preserves all directory records; repeated object IDs resolve verb code from the last record, matching `getObjectIndex`.
 
@@ -14,7 +14,7 @@ rtk proxy dotnet run --project .verification/maniac-session-20261017/BootTrace -
 
 The constructor advances 5000 frames to the still-waiting Room 45 party menu. The harness explicitly assumes room clicks `(76,104)` on Syd/object260, `(196,104)` on Bernard/object263 and `(292,60)` on Start/object403, advancing 100 frames after each and then at most 5000 further frames. It sends genuine fixed-script-4 input; it does not write selection/story variables. Own Script114 and object403 establish party slots48=1,49=5 and selected count111=3. This is one labelled user route, not a source-established default party.
 
-Final observed route: `45 ? 0 ? 33 ? 49 ? 44`. Final room44, control=false, cutscene=false, character count variable7=32. Script131 completes the opening; Script164 stops at `+0x0004` with unsupported v2 `verbOps (0x00, [delete var[0x06F]])`. Explicit old verb-slot creation/deletion semantics remain the blocker before player control. Frozen Script177 is retained. The character-counter diagnostic found two integration bugs that are now fixed: old text operands needed normalization, and the native counter had to be imported back into executor state after Print. ScummVM displays complete chunks and preserves character count across FF03 boundaries; incremental rendering was not required.
+Final observed route: `45 -> 0 -> 33 -> 49 -> 44`. At 1490 post-constructor frames (6490 including the 5000-frame menu wait), room44 has control=true, cutscene=false and character count variable7=32. Script131 completes the opening and Script164 installs the source-defined verb slots. A further 120 frames retain room44, control and no cutscene/new unsupported opcode. Script177 remains scheduled normally. The exact endpoint and selected actors1/5 are regression-tested. Old text operand normalization and native character counter import were corrected. ScummVM displays complete chunks and preserves count across FF03 boundaries; incremental rendering was not required.
 
 The saved `boot-trace.txt` records constructor/menu and final endpoint separately. The initial `endCutscene` also reports that the ego's initial room/position is unresolved; it is not silently replaced with a made-up room. Seeded random choices and their downstream transitions/sounds remain estimates. Conservative v2 estimate propagation can mark the remainder of a bounded run conditional after an estimated operand read.
 
@@ -29,7 +29,7 @@ Read-only ScummVM source comparison, master retrieved 17 October 2026; ScummVM w
 
 New opcode execution lives in `ScummBoundedScriptExecutor.V2.cs`; shared executor changes are guarded/additive. Source instruction observations occur before operand normalization. The raw object code address space and declared entry offset are preserved, including backward branches.
 
-Remaining limits include v2 explicit verb-slot operations (Zak's first blocker), sentence UI rendering, unretained actor name/sound presentation fields, complete classic-specific cutscene semantics, independent sound voices without Player_V2 priority/restart arbitration, and bounded sound-lifetime analysis. Sound56 exceeded the native lifetime analysis bound in an earlier nonconditional diagnostic; current route reports estimated sound timing instead. S5 first-visit object acceptance, S6 verb play, S7 cutscene acceptance and S9 remain unattempted.
+Remaining limits include sentence UI rendering, unretained actor name/sound presentation fields, independent sound voices without Player_V2 priority/restart arbitration, and bounded sound-lifetime analysis. Sound56 exceeded the native lifetime analysis bound in an earlier nonconditional diagnostic; current route reports estimated sound timing instead. S5 first-visit object acceptance, S6 verb play, S7 cutscene acceptance and S9 remain unattempted.
 
 ## Validation
 

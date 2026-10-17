@@ -5,6 +5,22 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2ExecutorTests
 {
     [Fact]
+    public void PickupPreservesStateFlagsAndDoesNotLaunchAnInventoryScript()
+    {
+        var runtime = Runtime();
+        runtime.GlobalVariables[ScummVars.V2.Ego] = 3;
+        runtime.ObjectOwners[10] = 15;
+        runtime.ObjectStates[10] = 5;
+        var script = new ScummScriptDisassembly(1, 1, 0, 2, 2,
+            [new(0, 0, "pickupObject", "0x000A", "00"), new(1, 0, "stopObjectCode", "", "00")], null, null, [], []);
+        var run = new ScummBoundedScriptExecutor().Execute(script, runtime.ObjectStates,
+            [new(10, 1, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, null)], runtime: runtime);
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(15, runtime.ObjectStates[10]);
+        Assert.Equal(3, runtime.ObjectOwners[10]);
+        Assert.DoesNotContain(run.Events, e => e.Kind == ScummScriptEventKind.ScriptStarted);
+    }
+    [Fact]
     public void VerbSetupUsesTheExplicitSlotAndDynamicDelete()
     {
         var runtime = Runtime();

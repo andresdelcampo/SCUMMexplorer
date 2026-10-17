@@ -4,6 +4,28 @@ namespace SCUMMexplorer.Core.Scumm;
 
 public sealed partial class ScummBoundedScriptExecutor
 {
+    private static bool TryApplyV2Pickup(ScummScriptInstruction instruction, IDictionary<string, ushort> variables,
+        IReadOnlyList<ScummRoomObjectRecord> objects, ScummScriptRuntimeState runtime, List<int> drawQueue,
+        List<string> trace, ScummScriptEventCertainty certainty, out string problem)
+    {
+        problem = "v2 pickup needs a known object and ego";
+        if (!TryReadValue(instruction.Operands.Trim(), variables, out var obj, out _) || obj < 1) return false;
+        if (!objects.Any(o => o.Id == obj) || runtime.ObjectOwners.TryGetValue(obj, out var owner) && owner != RoomOwner)
+        { trace.Add($"v2 pickup {obj}: absent from room or already in inventory"); problem = ""; return true; }
+        if (!variables.TryGetValue(runtime.EgoVariable, out var ego) || !runtime.ObjectStates.TryGetValue(obj, out var state)) return false;
+        if (!runtime.AddToInventorySlots(obj)) { problem = "v2 inventory is full"; return false; }
+        if (runtime.CurrentRoom is int room) runtime.InventoryRooms[obj] = room;
+        runtime.SetObjectOwner(obj, (byte)ego);
+        runtime.AddInventoryObject(obj);
+        runtime.SetObjectState(obj, (byte)(state | 8 | 2));
+        runtime.StatesSetInRoom.Add(obj);
+        if (certainty != ScummScriptEventCertainty.Reached) runtime.EstimatedStates.Add(obj);
+        drawQueue.Clear();
+        // ScummEngine_v2::runInventoryScript only redraws the inventory; no script 1 is launched.
+        trace.Add($"v2 pickup {obj}: owner {ego}, intrinsic and untouchable flags set; inventory display redraw deferred");
+        problem = "";
+        return true;
+    }
     private static IReadOnlyList<ScummScriptInstruction> ExpandV2Overrides(IReadOnlyList<ScummScriptInstruction> source)
     {
         var result = new List<ScummScriptInstruction>();
@@ -244,7 +266,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
             case "animateActor": case "faceActor": case "walkActorToActor": case "setBoxFlags":
-            case "resourceRoutines": case "pseudoRoom": case "actorFollowCamera": case "drawObject": case "waitForSentence":
+            case "resourceRoutines": case "pseudoRoom": case "actorFollowCamera": case "drawObject": case "waitForSentence": case "pickupObject":
                 return true;
             default: return false;
         }

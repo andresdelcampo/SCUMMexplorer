@@ -1508,6 +1508,8 @@ public sealed partial class ScummBoundedScriptExecutor
     {
         inventoryStart = null;
         problem = "";
+        if (runtime.IsV2)
+            return TryApplyV2Pickup(instruction, variables, roomObjects, runtime, drawQueue, trace, certainty, out problem);
         // o5_pickupObject (version 5, script_v5.cpp read 17 October 2026): "object, room"; room 0 is the current room. It neither checks the room nor
         // the owner: addObjectToInventory, putOwner(VAR_EGO), class kObjectClassUntouchable (32, not translated without the small header), state 1.
         var v5Parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
