@@ -28,6 +28,11 @@ public sealed class ScummManiacEnhancedSessionTests
         Assert.Equal(5, session.Snapshot.KnownGlobalVariables["var[0x031]"]);
         Assert.DoesNotContain(session.Snapshot.Uncertainties, s => s.Contains("unsupported v2"));
         Assert.Contains(session.Verbs, v => v.Mode == 1 && v.Name is not null);
+        for (var frame = 0; frame < 120; frame++) session.AdvanceFrame();
+        Assert.Equal(44, session.CurrentRoomId);
+        Assert.True(session.PlayerHasControl);
+        Assert.False(session.InCutscene);
+        Assert.DoesNotContain(session.Snapshot.Uncertainties, s => s.Contains("unsupported v2"));
     }
     [Fact]
     public void V2DataSourceReadsTheEnhancedLayoutWithoutV3IndexOrRoomOffsets()

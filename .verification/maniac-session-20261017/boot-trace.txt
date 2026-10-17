@@ -1,8 +1,10 @@
+D:\Documents\Personal\Code Projects\SCUMMexplorer\.worktrees\maniac-enhanced-s4b\src\SCUMMexplorer.Core\SCUMMexplorer.Core.csproj : warning NU1900: Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.
 Boot: ScummBootReport { Frames = 5000, HitFrameLimit = True, FinalRoom = 45, RoomsEntered = System.Int32[] }; control False; cutscene True
 Click (76, 104): control False; cutscene True
 Click (196, 104): control False; cutscene True
 Click (292, 60): control False; cutscene True
-Final: room 44; control False; cutscene False; rooms 45,0,33,49,44; charcount 32
+Final: room 44; control True; cutscene False; rooms 45,0,33,49,44; charcount 32; post-boot frames 1490
+Stability +120: room 44; control True; cutscene False
 Script 01 continues at +0x0260 in Room 45 after loadRoom
 boot: 5000 frames after script 001's first room load; now in Room 45
 stopScript 2 at Script 04 +0x02B9: script 2 was not running
@@ -29,7 +31,7 @@ Script 131 continues at +0x0006 in Room 44 after actorFollowCamera
 Sound 58 completed on its native AdLib resource clock.
 endCutscene follows ego at x = 160 (estimate)
 == Pending
-Script 177 +0x003F (frozen)
+Script 177 +0x0009 (delay 62)
 == Uncertainties
 Script 01 +0x025E reached loadRoom during the boot.
 Room 45 entered by Script 01 +0x025E (loadRoom) during the boot.
@@ -37,7 +39,7 @@ The boot (script 001) was still running after 5000 frames; the preview stopped f
 Assumed input: a room click at (76, 104) through v2 script 4
 Assumed input: a room click at (196, 104) through v2 script 4
 Assumed input: a room click at (292, 60) through v2 script 4
-v2 endCutscene cannot follow actor 3: its room or position is unresolved.
+v1/v2 endCutscene cannot follow actor 3: its room or position is unresolved.
 Script 01 +0x032D reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
 Script 120 +0x0020 reached loadRoom after a frame advance.
 Room 33 entered by estimated execution at Script 120 +0x0020; execution continues without promoting the transition's certainty.
@@ -51,4 +53,3 @@ Room 49 reached by Room 33 object 0, verb 0x00, code 0x01E3; loadRoom at Script 
 Script 131 +0x0004 reached actorFollowCamera after a frame advance.
 Room 44 entered by estimated execution at Script 131 +0x0004; execution continues without promoting the transition's certainty.
 Room 44 reached by Room 49 object 0, verb 0x00, code 0x0004; actorFollowCamera at Script 131 +0x0004 ? Room 44 (estimated execution).
-Script 164 +0x0000: unsupported v2 verbOps (0x00, [delete var[0x06F]]) at +0x0004
