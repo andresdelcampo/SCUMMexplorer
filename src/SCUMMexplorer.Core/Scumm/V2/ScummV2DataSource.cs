@@ -3,18 +3,24 @@ using SCUMMexplorer.Core.Domain;
 namespace SCUMMexplorer.Core.Scumm;
 
 /// <summary>Enhanced v2 LFL resources. Layout: ScummVM resource_v2.cpp, room.cpp and object.cpp; 17 October 2026.</summary>
-public sealed class ScummV2DataSource : IScummDataSource
+public class ScummV2DataSource : IScummDataSource
 {
     private readonly GameLibrary _game;
-    private readonly ScummScriptReader _reader = new(ScummScriptDialect.V2);
-    public ScummV2DataSource(GameLibrary game)
+    private readonly ScummScriptReader _reader;
+    public ScummV2DataSource(GameLibrary game) : this(game, ScummScriptDialect.V2, ReadScriptCount(game)) { }
+    protected ScummV2DataSource(GameLibrary game, ScummScriptDialect dialect, int globalScriptCount)
+    {
+        _game = game;
+        _reader = new(dialect);
+        GlobalScriptCount = globalScriptCount;
+    }
+    private static int ReadScriptCount(GameLibrary game)
     {
         if (game.Version != ScummVersion.V2) throw new ArgumentException("The data source requires a v2 game.", nameof(game));
-        _game = game;
         var index = LflEncoding.DecodeXorFF(File.ReadAllBytes(Path.Combine(game.FolderPath, "00.LFL")));
         var position = 4 + Word(index, 2);
         for (var directory = 0; directory < 2; directory++) position += 1 + index[position] * 3;
-        GlobalScriptCount = index[position];
+        return index[position];
     }
     // v2 has no room-local script directory (room.cpp setupRoomSubBlocks).
     public int GlobalScriptCount { get; }
@@ -27,7 +33,7 @@ public sealed class ScummV2DataSource : IScummDataSource
     public IReadOnlyList<int> RoomLocalScriptIds(int room) => [];
     public ScummScriptDisassembly? RoomLocalScript(int room, int number) => null;
     public ScummCostume? ReadCostume(int id) => ScummCostume.Load(_game, id);
-    private byte[] RoomBytes(int room) => LflEncoding.DecodeXorFF(File.ReadAllBytes(
+    protected byte[] RoomBytes(int room) => LflEncoding.DecodeXorFF(File.ReadAllBytes(
         (_game.Rooms.FirstOrDefault(r => r.ResourceId == room) ?? throw new InvalidDataException($"Room {room:00} is not in this game.")).FilePath));
     private ScummScriptDisassembly? RoomScript(int room, string kind)
     {
@@ -37,7 +43,7 @@ public sealed class ScummV2DataSource : IScummDataSource
     private ScummScriptDisassembly Decode(OldScriptSource source, int id) =>
         _reader.DecodeCode(source.Code, id, source.Container, source.Offset, source.StartOffset) with { Context = source.Label, EntryOffset = source.StartOffset };
 
-    public ScummIndexedObjectSnapshot ReadIndexedObjects()
+    public virtual ScummIndexedObjectSnapshot ReadIndexedObjects()
     {
         var bytes = LflEncoding.DecodeXorFF(File.ReadAllBytes(Path.Combine(_game.FolderPath, "00.LFL")));
         if (bytes.Length < 4 || Word(bytes, 0) != 0x0100) throw new InvalidDataException("Invalid v2 index.");
@@ -73,9 +79,11 @@ public sealed class ScummV2DataSource : IScummDataSource
         ScummWalkBoxSet? boxes = null;
         string? error = null;
         try { boxes = ScummWalkBoxReader.ReadV2(bytes); } catch (InvalidDataException ex) { error = ex.Message; }
-        return new(records, names, boxes, error, Word(bytes, 4), Word(bytes, 6));
+        var (width, height) = ReadDimensions(bytes);
+        return new(records, names, boxes, error, width, height);
     }
-    public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) => ScummOldRoomObjects.ReadV2Images(RoomBytes(room));
+    protected virtual (int Width, int Height) ReadDimensions(byte[] bytes) => (Word(bytes, 4), Word(bytes, 6));
+    public virtual IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) => ScummOldRoomObjects.ReadV2Images(RoomBytes(room));
     public IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> ReadObjectVerbs(int room, IReadOnlyList<ScummRoomObjectRecord> records)
     {
         var sources = ScummOldScripts.ReadRoomScripts(RoomBytes(room), room).Where(s => s.ObjectId.HasValue).ToArray();
