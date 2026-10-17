@@ -50,11 +50,21 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 | Verb / script | Meaning | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic party menu | Native clicks on Syd `(76,104)`, Bernard `(196,104)` and Start `(292,60)` select actors 1/5 beside Dave. The menu supplies the player's choice; this edition has no Talk to verb. | engine | Room 45 object 260 fallback +0x0013/+0x0052; object 263 fallback +0x0013/+0x005D; object 403 fallback +0x0041; `ScummManiacClassicPlayTests` | 2026-10-17 |
+| Classic outdoor introduction skip | After the opening reaches Room 44, Escape at the established override resumes Script 131 at its skip jump +0x000A; the ending restores player control. | engine | Script 131 +0x0009 `beginOverride`, +0x0228 ending; native `PressKey(27)` regression | 2026-10-17 |
+| Classic verb strip | Fifteen verbs in five columns and three rows at y=160/168/176. Walk to is 13, Pick up 14, Read 12, What is 15, New kid 7, Unlock 8, Fix 6. | engine | Reached Script 164 verb setup after boot; `ScummManiacClassicPlayTests`; [S6 record](../../.verification/maniacclassic-play-20261017/README.md) | 2026-10-17 |
+| Classic input composition and execution | Pick up shortcut `d`, followed by a first mat click, displays `Pick up door mat`; the second click queues verb 14/object 54. The sentence script walks Dave and invokes the object's verb code. | engine | Script 4 +0x0242 `doSentence` sub 2 (draw), +0x026C sub 0 (queue); Script 2 +0x016C walk and +0x019F sub 1 (run object); `ScummManiacClassicPlayTests` | 2026-10-17 |
+| Classic inventory selection | Acquired object 55 paints the native first inventory slot (y=184); a click at `(8,188)` reaches area 3/object 55 and displays `Walk to key`. | engine | Script 4 inventory branch and native v1/v2 inventory renderer; key pickup at Room 1 object 55 verb 14 +0x0018; `ScummManiacClassicPlayTests` | 2026-10-17 |
+| Enhanced party menu and skip | Genuine selections 260/263 and Start 403 choose Syd/Bernard; Escape resumes the outdoor introduction at Script 131's skip jump +0x0008. | engine | Room 45 objects 260/263/403 fallback +0x0013; object 403 +0x0040 sets start variable 110; Script 131 override; `ScummManiacEnhancedPlayTests` | 2026-10-17 |
+| Enhanced sentence and inventory | Native input composes `Coger felpudo` and `Coger llave`; selecting the acquired inventory key displays `Ir a llave`. The continuous route takes 1554 frames and thirteen delivered inputs plus Escape. | engine | Script 4 +0x0291 composition/+0x02BB queue; Script 2 +0x01AD object execution/+0x01B2 repaint; [enhanced S6 record](../../.verification/maniacenhanced-play-20261017/README.md) | 2026-10-17 |
 
 ## Objects and classes
 
 | Object / class | Meaning | Evidence | Source | Date |
 |---|---|---|---|---|
+| Classic Room 44 object 258 | Walk-to response loads Room 1 at object 257. A native click reaches this exit in the continuous S6 route. | engine | Room 44 object 258 verb 13 +0x0013 `loadRoomWithEgo 0x0101, 0x01`; `ScummManiacClassicPlayTests` | 2026-10-17 |
+| Classic Room 1 objects 54/55 | Pick up mat 54 turns its intrinsic bit on; key 55 is parented to local record 4 with required state 8. Key's Pick up response performs `pickupObject`, giving it owner 3 (Dave) on the checked route. | engine | Room 1 object 54 verb 14 +0x001F/+0x0038; record 55 parent 4/8; object 55 verb 14 +0x0018; `ScummManiacClassicPlayTests` | 2026-10-17 |
+| Enhanced exit and mat/key | Exit 258 loads Room 1 at object 257. Lifting mat 54 reveals key 55; pickup gives key owner 3. Edition-local click points are `(376,84)` and `(416,84)` before camera/screen conversion. | engine | Room 44 object 258 verb 13 +0x0013; Room 1 object 54 verb 14 entry +0x001E/state-on +0x0034; object 55 verb 14 +0x001A pickup; `ScummManiacEnhancedPlayTests` | 2026-10-17 |
 
 ## Actors and costumes
 
@@ -63,7 +73,7 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 | `actorOps` sub 1 sound, 2 palette (v1: index = actor number), 3 name, 4 costume, 5 talk colour | how scripts set an actor's look | engine | ScummVM `script_v2.cpp` `o2_actorOps` | 2026-10-14 |
 | The only costume instruction in the global and room scripts sets costume 0 on actor `var[0x060]` | an actor is hidden | decoded | Script 61 +0x010E | 2026-10-14 |
 | Each actor's start costume is its own number; colours are `v1MMActorPalatte1/2[actor]` | costume to colour rule | engine | ScummVM `costume.cpp` | 2026-10-14 |
-| Global scripts 0 and 1 begin with actor-name/sound instructions on actors 1 to 8 | likely data tables; they decode only a handful of bytes | reading | Scripts 00, 01 | 2026-10-14 |
+| Classic Script 1 actor names and sounds | Genuine boot code, not a data table: initializes ego 3, then names actors beginning with Syd and Razor. The earlier few-instruction decode was superseded by the v1/v2 adapter. Script 0's role is not established here. | decoded | Classic Script 1 +0x0008, +0x0019, +0x0021, +0x0025, +0x002F | 2026-10-17 |
 
 ## Sounds and music
 
