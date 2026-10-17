@@ -86,7 +86,7 @@ public static class ScummActorRenderer
             var top = y - elevation * (engineVersion <= 2 ? 2 : 1);
             // Actor_v2::prepareDrawActorCostume: DOS strip offsets depend on
             // engine version and facing; runtime actor coordinates remain unchanged.
-            var drawX = x + (engineVersion <= 2 ? direction == 270 ? 16 : engineVersion == 2 ? 8 : 0 : 0);
+            var drawX = x + (engineVersion <= 2 ? look.Facing == 270 ? 16 : engineVersion == 2 ? 8 : 0 : 0);
             // Plane 1 is the only mask plane in v3; an unknown box draws the actor in front (noted as an estimate).
             var actorClasses = classes is not null && classes.TryGetValue(actor.Number, out var bits) ? bits : 0u;
             var forceClip = ScummObjectClasses.Has(actorClasses, AlwaysClipClass);

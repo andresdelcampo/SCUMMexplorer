@@ -4,6 +4,24 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummOldPlayInputTests
 {
+    [Theory]
+    [InlineData("mmansion ega en", 1, 270, 16)]
+    [InlineData("mmansion ega en", 1, 90, 0)]
+    [InlineData("mmansionE ega es", 2, 270, 16)]
+    [InlineData("mmansionE ega es", 2, 90, 8)]
+    public void OldActorDrawUsesNativeFacingStripOffsetAndElevation(string fixture, int version, int facing, int offset)
+    {
+        var folder = Path.Combine(TestGames.Root, fixture);
+        if (!Directory.Exists(folder)) return;
+        var scene = SCUMMexplorer.Core.Maniac.ManiacFirstVisit.Run(new GameFolderScanner().Scan(folder), 44);
+        var original = scene.State.Actors.Single(actor => actor.Number == 3);
+        var actor = original with { Look = original.Look with { Facing = facing, Elevation = 3 } };
+        var reference = Assert.Single(ScummActorRenderer.Render([actor], 44, scene.Room.Width, scene.Room.Height, scene.Costumes).Actors);
+        var native = Assert.Single(ScummActorRenderer.Render([actor], 44, scene.Room.Width, scene.Room.Height, scene.Costumes, engineVersion: version).Actors);
+        Assert.Equal(reference.Bounds!.Value.Left + offset, native.Bounds!.Value.Left);
+        Assert.Equal(reference.Bounds.Value.Top - 3, native.Bounds.Value.Top);
+        Assert.Equal(reference.X, native.X); // draw offsets never mutate the actor's engine position.
+    }
     [Fact]
     public void OldBoxMatrixUsesItsRowOffsetsAndSignedUnreachableEntries()
     {
