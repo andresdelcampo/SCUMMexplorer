@@ -47,6 +47,8 @@ CutsceneWindowCheck "D:\Juegos\Lucas\indy3 ega en" <scratch>\window     (private
 | One run | about 0.7 s (1.6 s for the 6000-frame ones) | about 0.45 s |
 | Background derivation in the window (8 workers) | 59 s for 153 runs | – |
 
+**Correction (17 October, MonkeyFloppy S7):** the shared run now counts only cutscenes begun by the trigger's own scripts (or a room it led to); five entries per release counted here were begun by the visit (Room 07 Pull table cloth and Open old book, Room 18 Open slab-I, Room 31 Use grating, Room 39 Walk to hatch), so a fresh start begins **90 of 153** in each release. The three acceptance scenes are unchanged. See [monkey1-cutscenes-20261017](../monkey1-cutscenes-20261017/README.md).
+
 Indy3 wraps most object actions in a short cutscene (the doors' Open/Close, `global script 26`/`27`), so most entries are "Dialogue and reactions"; 58 groups begin nothing from a fresh start (their code tests state the boot does not reach: the Room 1 office door with the students, `global script 55`; Room 21's door; Room 73's own entry, locals 205/206; several room entries whose locals wait for a story variable). No start setup is derived for those yet (R-8.33).
 
 **Acceptance (three scenes, each begins from a fresh start headless; `ScummIndy3CutsceneTests`, both releases, 4 of 4 passed):**

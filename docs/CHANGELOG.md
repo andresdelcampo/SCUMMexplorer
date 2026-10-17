@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: cutscenes from the scripts, playable (S7, MonkeyFloppy)
+
+- **List:** the floppy Monkey Island's verbs exist after the boot (Script 22), so the shared planner titles its entries with them (`Room 33 · Look at poster`); 294 triggers, 164 entries (63 scenes, 101 dialogue and reactions), 104 begin from a fresh start. Acceptance: the poster's first Look at (Room 33 object 438 verb 0x09), Room 37's entry (Script 60) and Room 19's entry (the ship, Part II, on to Room 7) begin from a fresh start (`ScummMonkeyFloppyCutsceneTests`); Script 117 (the bar's first exit) is found but needs the door open. Registry: Cutscenes – → ◐.
+- **Shared run fix:** `ScummCutsceneRun` counts a begin only from a script the trigger's code reaches, or a room it led to (from the session trace), not a room's background cutscenes (the SCUMM Bar's doors, global scripts 25/26) or a visit's still-open entry cutscene: Monkey 112 → 104 begun, Indy3 95 → 90 per release (five visit false positives); LOOM untouched (`LoomCutsceneRun`; its lists byte-identical).
+- **App:** a disk or archive game's background list reads from its own copies of the game (scan and one per worker, at most eight): 164 runs in 55 s in the window while playing (109 s on one thread); the scan no longer shares the play session's reader (one window run had lost 11 entries).
+- **Validation:** 4 of 4 Monkey cutscene tests, the Indy3 cutscene and support tests, regression `Loom|Cutscene|Play|Support|ScummGameSession|Architecture|MonkeyFloppy` 910 passed, 5 skipped; WPF check through the real window (the poster from Room 33's list, Room 37's entry from the picker). Record: [monkey1-cutscenes-20261017](../.verification/monkey1-cutscenes-20261017/README.md).
+
 ## 17 October: cutscenes from the scripts, playable (S7, Indy3Ega and Indy3Vga)
 
 - **Shared move (K-06):** `LoomCutsceneIndex`, `LoomCutscene`, `LoomCutsceneGroup` became `ScummCutsceneIndex`, `ScummCutscene`, `ScummCutsceneGroup` in `Core/Scumm/Analysis`; the title builder became `ScummCutsceneTitles` (`LoomCutsceneTitles` forwards and keeps LOOM's verb words). LOOM's verb numbers are data (`ScummCutsceneVerbs`, LOOM's in `LoomCutsceneVerbs`). LOOM's scan output is byte-identical before and after on the reference EGA (400 triggers, 218 groups, 94 scenes) and on the CD (404, 223, 98).

@@ -1,0 +1,168 @@
+﻿planner (one boot and the scan) 1785 ms
+verb words: 0x01 Open, 0x02 Close, 0x03 Give, 0x04 Turn on, 0x05 Turn off, 0x06 Push, 0x07 Pull, 0x08 Use, 0x09 Look at, 0x0A Walk to, 0x0B Pick up, 0x0D Talk to, 0x12 Taunt, 0x13 Tickle, 0x14 Prod, 0x15 Finger, 0x16 Fondle, 0x17 Tap, 0x18 Stroke, 0x19 Handle, 0x1A Feel, 0x1B Annoy, 0x1C Bother, 0x1D Poke, 0x3E <ADVERTISEMENT>, 0x81 in, 0x82 with, 0x83 on, 0x84 to
+triggers 294 groups 164 scenes 63
+1/0/0x00 | Room 01 · Entry | Scenes | Room 1 local script 200;global script 93 | t4 l0 i36 a0 | Hey, thanks!  I thought I'd never see this again!  Here, you can take this key to the Monkey Head back to the natives. | others[] | run: NOT begun frames 600 rooms [] 946 ms
+1/293/0x09 | Room 01 · Look at bottle | Dialogue | Room 1 object 293 verb 0x09;Room 1 local script 201;global script 161 | t0 l0 i105 a0 |  | others[1/293/0x0B] | run: begun frames 28 rooms [] 548 ms
+7/80/0x01 | Room 07 · Open dusty book | Dialogue | global script 145 | t0 l0 i58 a0 |  | others[7/80/0x09] | run: begun frames 925 rooms [] 599 ms
+7/83/0x3D | Room 07 · verb 0x3D chest | Dialogue | Room 7 object 83 verb 0x3D | t0 l0 i9 a0 |  | others[] | run: begun frames 51 rooms [] 525 ms
+7/87/0x0B | Room 07 · Pick up chest | Dialogue | Room 7 object 87 verb 0x0B | t0 l0 i28 a0 |  | others[] | run: begun frames 11 rooms [] 518 ms
+7/89/0x09 | Room 07 · Look at drawer | Dialogue | Room 7 object 89 verb 0x09 | t0 l0 i7 a0 |  | others[] | run: NOT begun frames 600 rooms [] 612 ms
+7/91/0x08 | Room 07 · Use piece of paper | Scenes | Room 7 object 91 verb 0x08 | t0 l1 i15 a0 |  | others[7/91/0x09] | run: begun frames 0 rooms [84] 523 ms
+8/93/0x0A | Room 08 · Walk to ladder | Scenes | Room 8 object 93 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 1 rooms [9] 521 ms
+8/96/0x09 | Room 08 · Look at chest | Dialogue | Room 8 object 96 verb 0x09 | t0 l0 i8 a0 |  | others[] | run: NOT begun frames 600 rooms [] 738 ms
+9/109/0x0A | Room 09 · Walk to ladder | Scenes | Room 9 object 109 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 625 rooms [19,7] 590 ms
+9/110/0x0A | Room 09 · Walk to hatch | Scenes | Room 9 object 110 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 1 rooms [8] 517 ms
+11/0/0x00 | Room 11 · Entry | Scenes | Room 11 local script 205;Room 11 local script 206;global script 93 | t4 l0 i107 a0 | Hey, thanks!  I thought I'd never see this again!  Here, you can take this key to the Monkey Head back to the natives. | others[] | run: NOT begun frames 600 rooms [] 689 ms
+11/123/0x06 | Room 11 · Push rock | Dialogue | Room 11 local script 200 | t0 l0 i153 a0 |  | others[] | run: begun frames 105 rooms [] 542 ms
+11/127/0x0B | Room 11 · Pick up heap o' rocks | Dialogue | Room 11 local script 203 | t0 l0 i30 a0 |  | others[] | run: begun frames 27 rooms [] 523 ms
+12/0/0x00 | Room 12 · Entry | Scenes | Room 12 local script 209 | t0 l0 i16 a0 |  | others[] | run: begun frames 91 rooms [] 554 ms
+12/62/0x0D | Room 12 · Talk to monkey | Dialogue | Room 12 object 62 verb 0x0D;global script 165 | t1 l0 i11 a0 | Ook  Ook  Eep | others[] | run: begun frames 34 rooms [] 534 ms
+12/143/0x09 | Room 12 · Look at totem pole | Dialogue | Room 12 local script 207 | t0 l0 i2 a0 |  | others[12/144/0x09] | run: begun frames 27 rooms [] 533 ms
+12/149/0x07 | Room 12 · Pull nose | Dialogue | Room 12 local script 204;Room 12 local script 202;Room 12 local script 203;Room 12 local script 205 | t0 l0 i79 a0 |  | others[] | run: begun frames 4 rooms [] 544 ms
+12/958/0x09 | Room 12 · Look at sign | Dialogue | Room 12 object 958 verb 0x09 | t0 l0 i2 a0 |  | others[] | run: begun frames 82 rooms [] 539 ms
+14/176/0x04 | Room 14 · Turn on cooking pot | Scenes | global script 105 | t8 l4 i117 a0 | Overcome by the fumes and stench, Guybrush quickly loses consciousness. | others[14/176/0x08] | run: NOT begun frames 600 rooms [] 699 ms
+14/182/0x01 | Room 14 · Open cereal | Dialogue | Room 14 object 182 verb 0x01 | t1 l0 i28 a0 | Crunch | others[] | run: begun frames 1 rooms [] 515 ms
+14/184/0x0A | Room 14 · Walk to ladder | Scenes | Room 14 object 184 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 1 rooms [9] 518 ms
+15/163/0x08 | Room 15 · Use rock on top of note | Dialogue | Room 15 object 163 verb 0x08;global script 44 | t0 l0 i113 a0 |  | others[] | run: NOT begun frames 600 rooms [] 979 ms
+15/163/0x09 | Room 15 · Look at rock on top of note | Dialogue | Room 15 object 163 verb 0x09 | t0 l0 i6 a0 |  | others[] | run: begun frames 67 rooms [] 563 ms
+15/163/0x0B | Room 15 · Pick up rock on top of note | Dialogue | Room 15 object 163 verb 0x0B;global script 164;global script 161 | t0 l0 i116 a0 |  | others[] | run: begun frames 285 rooms [] 720 ms
+15/185/0x08 | Room 15 · Use footholds | Scenes | Room 15 local script 203 | t0 l0 i6 a1 |  | others[15/185/0x0A] | run: begun frames 3 rooms [16] 530 ms
+15/295/0x09 | Room 15 · Look at note under rock | Dialogue | Room 15 object 295 verb 0x09;global script 164;global script 161 | t0 l0 i119 a0 |  | others[15/295/0x0B] | run: begun frames 283 rooms [] 712 ms
+16/246/0x08 | Room 16 · Use footholds | Scenes | Room 16 local script 201 | t0 l0 i7 a1 |  | others[16/246/0x0A] | run: begun frames 3 rooms [11] 522 ms
+16/248/0x06 | Room 16 · Push primitive art | Dialogue | Room 16 local script 200 | t0 l0 i22 a0 |  | others[16/249/0x06,16/248/0x07,16/249/0x07] | run: begun frames 3 rooms [] 520 ms
+16/249/0x09 | Room 16 · Look at primitive art | Dialogue | Room 16 object 249 verb 0x09 | t0 l0 i2 a0 |  | others[] | run: begun frames 70 rooms [] 524 ms
+16/291/0x09 | Room 16 · Look at note | Dialogue | Room 16 local script 202;global script 161 | t0 l0 i104 a0 |  | others[16/291/0x0B] | run: begun frames 132 rooms [] 527 ms
+18/161/0x08 | Room 18 · Use tree | Dialogue | Room 18 object 161 verb 0x08 | t0 l0 i3 a0 |  | others[] | run: NOT begun frames 600 rooms [] 608 ms
+18/256/0x08 | Room 18 · Use strong branch | Dialogue | Room 18 local script 202 | t0 l0 i52 a0 |  | others[18/257/0x08] | run: NOT begun frames 600 rooms [] 613 ms
+19/0/0x00 | Room 19 · Entry | Scenes | Room 19 local script 200;Room 19 local script 206 | t13 l0 i90 a0 | First of all^ | others[] | run: begun frames 624 rooms [7] 583 ms
+19/262/0x0A | Room 19 · Walk to hatch | Scenes | Room 19 object 262 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 1 rooms [9] 517 ms
+19/265/0x08 | Room 19 · Use cannon nozzle | Scenes | Room 19 object 265 verb 0x08;global script 104 | t0 l4 i115 a0 |  | others[] | run: NOT begun frames 600 rooms [] 579 ms
+19/266/0x0A | Room 19 · Walk to rope ladder | Scenes | Room 19 object 266 verb 0x0A | t0 l0 i3 a1 |  | others[] | run: begun frames 1 rooms [17] 524 ms
+19/267/0x06 | Room 19 · Push mutinous crew | Dialogue | Room 19 object 267 verb 0x06 | t1 l0 i6 a0 | What was that? | others[19/267/0x07] | run: begun frames 698 rooms [7] 588 ms
+19/267/0x09 | Room 19 · Look at mutinous crew | Dialogue | Room 19 object 267 verb 0x09 | t1 l0 i6 a0 | What was that? | others[] | run: begun frames 663 rooms [7] 587 ms
+19/267/0x0D | Room 19 · Talk to mutinous crew | Dialogue | Room 19 local script 204 | t10 l0 i420 a0 | Let us know when you've found the Governor^  ^we've got an extra chair she can use. | others[] | run: begun frames 6000 rooms [] 1119 ms
+20/0/0x00 | Room 20 · Entry | Scenes | Room 20 local script 202 | t6 l0 i61 a0 | ook | others[] | run: NOT begun frames 600 rooms [] 614 ms
+20/269/0x09 | Room 20 · Look at jungle | Dialogue | Room 20 object 269 verb 0x09 | t0 l0 i2 a0 |  | others[] | run: begun frames 0 rooms [] 520 ms
+20/271/0x09 | Room 20 · Look at rowboat | Dialogue | Room 20 object 271 verb 0x09 | t0 l0 i2 a0 |  | others[] | run: begun frames 0 rooms [] 518 ms
+20/290/0x09 | Room 20 · Look at piece of paper | Dialogue | Room 20 local script 203 | t0 l0 i4 a0 |  | others[] | run: begun frames 0 rooms [] 519 ms
+20/292/0x09 | Room 20 · Look at memo | Dialogue | global script 162;global script 161 | t0 l0 i65 a0 |  | others[] | run: begun frames 22 rooms [] 520 ms
+25/0/0x00 | Room 25 · Entry | Scenes | Room 25 local script 202;global script 102;Room 25 local script 204;Room 25 local script 214;Room 25 local script 213 | t24 l0 i206 a0 | Is that a banana in your pocket, or are you just glad to see us? | others[] | run: NOT begun frames 600 rooms [] 652 ms
+25/164/0x0D | Room 25 · Talk to Herman Toothrot | Dialogue | global script 93 | t4 l0 i30 a0 | Hey, thanks!  I thought I'd never see this again!  Here, you can take this key to the Monkey Head back to the natives. | others[25/164/0x50] | run: NOT begun frames 600 rooms [] 661 ms
+25/308/0x0A | Room 25 · Walk to jungle | Scenes | global script 168 | t1 l1 i8 a1 | After some more furious paddling^ | others[] | run: NOT begun frames 600 rooms [6] 720 ms
+25/309/0x0B | Room 25 · Pick up bananas | Dialogue | Room 25 local script 202;global script 102;global script 26;Room 25 local script 204 | t23 l0 i198 a0 | Is that a banana in your pocket, or are you just glad to see us? | others[] | run: begun frames 317 rooms [] 568 ms
+25/310/0x0D | Room 25 · Talk to friendly natives | Dialogue | Room 25 local script 216 | t4 l0 i62 a0 | Excuse us but we're in the middle of a serious discussion. | others[] | run: begun frames 61 rooms [] 530 ms
+25/310/0x50 | Room 25 · verb 0x50 friendly natives | Scenes | Room 25 local script 203;global script 101;global script 108;Room 25 local script 205 | t26 l1 i264 a0 | Ah, one of those newfangled magnetic compasses. | others[25/972/0x50] | run: NOT begun frames 600 rooms [] 657 ms
+25/311/0x01 | Room 25 · Open head of the navigator | Dialogue | global script 107;global script 108 | t3 l0 i67 a0 | Hmmm^ | others[] | run: begun frames 127 rooms [] 546 ms
+25/311/0x02 | Room 25 · Close head of the navigator | Dialogue | global script 108 | t0 l0 i9 a0 |  | others[] | run: NOT begun frames 600 rooms [] 650 ms
+25/311/0x08 | Room 25 · Use head of the navigator | Dialogue | global script 108;global script 107 | t3 l0 i67 a0 | Hmmm^ | others[] | run: begun frames 127 rooms [] 537 ms
+25/311/0x09 | Room 25 · Look at head of the navigator | Scenes | global script 107;global script 108;global script 100 | t3 l1 i81 a0 | Hmmm^ | others[] | run: begun frames 6000 rooms [86] 1689 ms
+25/311/0x0D | Room 25 · Talk to head of the navigator | Scenes | global script 137;global script 107;global script 108;Room 25 local script 202;Room 25 local script 214 | t27 l1 i423 a1 | Hello, Mr. Navigator. | others[] | run: begun frames 35 rooms [] 530 ms
+25/312/0x08 | Room 25 · Use necklace on navigator | Dialogue | Room 25 object 312 verb 0x08;global script 138 | t1 l0 i52 a0 | You can't have it.  It's mine. | others[25/312/0x0B] | run: NOT begun frames 600 rooms [] 655 ms
+25/963/0x09 | Room 25 · Look at hut | Dialogue | Room 25 object 963 verb 0x09 | t0 l0 i3 a0 |  | others[25/963/0x0A] | run: NOT begun frames 600 rooms [] 655 ms
+27/294/0x09 | Room 27 · Look at memo | Dialogue | global script 164;global script 161 | t0 l0 i114 a0 |  | others[1/296/0x09,40/297/0x09,27/294/0x0B,1/296/0x0B,40/297/0x0B] | run: begun frames 254 rooms [] 541 ms
+27/316/0x0A | Room 27 · Walk to loose board | Scenes | Room 27 object 316 verb 0x0A;Room 27 local script 200;global script 99 | t0 l1 i46 a0 |  | others[] | run: NOT begun frames 600 rooms [] 615 ms
+28/322/0x01 | Room 28 · Open door | Dialogue | Room 28 object 322 verb 0x01;global script 25 | t0 l0 i18 a0 |  | others[] | run: begun frames 4 rooms [] 550 ms
+28/322/0x02 | Room 28 · Close door | Dialogue | Room 28 object 322 verb 0x02;global script 26 | t0 l0 i13 a0 |  | others[] | run: NOT begun frames 600 rooms [] 933 ms
+28/322/0x0A | Room 28 · Walk to door | Scenes | global script 117 | t17 l3 i74 a2 | Meanwhile^ | others[] | run: NOT begun frames 600 rooms [] 930 ms
+28/323/0x01 | Room 28 · Open door | Dialogue | Room 28 local script 214;global script 25;global script 26 | t1 l0 i69 a0 | Hey!  You can't come back here! | others[] | run: begun frames 42 rooms [] 567 ms
+28/323/0x0A | Room 28 · Walk to door | Scenes | Room 28 local script 218 | t0 l0 i3 a1 |  | others[] | run: NOT begun frames 600 rooms [] 933 ms
+28/329/0x08 | Room 28 · Use fireplace | Dialogue | Room 28 object 329 verb 0x08 | t1 l0 i9 a0 | I'll just throw them all in. | others[] | run: NOT begun frames 600 rooms [] 931 ms
+28/332/0x09 | Room 28 · Look at important-looking pirates | Dialogue | Room 28 local script 220;global script 59 | t28 l0 i176 a0 | What be ye wantin', boy? | others[28/332/0x0D] | run: begun frames 23 rooms [] 562 ms
+28/332/0x50 | Room 28 · verb 0x50 important-looking pirates | Dialogue | Room 28 local script 220 | t22 l0 i131 a0 | What be ye wantin', boy? | others[] | run: NOT begun frames 600 rooms [] 936 ms
+28/341/0x09 | Room 28 · Look at pirate | Scenes | global script 88 | t2 l0 i11 a2 | Ahoy there, stranger.  New in town? | others[28/341/0x0D] | run: begun frames 40 rooms [79] 554 ms
+28/344/0x09 | Room 28 · Look at pirate | Scenes | global script 4 | t1 l0 i2 a3 | You beat the Sword Master. | others[28/344/0x0D] | run: NOT begun frames 600 rooms [82] 640 ms
+28/347/0x09 | Room 28 · Look at pirate | Scenes | global script 89;global script 4 | t3 l0 i13 a3 | What are you looking at me for? | others[28/347/0x0D] | run: begun frames 29 rooms [81] 554 ms
+28/373/0x08 | Room 28 · Use mug | Dialogue | global script 67;global script 25;global script 26 | t9 l0 i221 a0 | Hey, great, a drink!  I'm real thirsty. | others[28/374/0x08,28/375/0x08,28/376/0x08,28/377/0x08] | run: begun frames 482 rooms [] 856 ms
+29/381/0x01 | Room 29 · Open door | Dialogue | Room 29 object 381 verb 0x01;global script 25 | t0 l0 i18 a0 |  | others[] | run: begun frames 4 rooms [] 530 ms
+29/381/0x02 | Room 29 · Close door | Dialogue | Room 29 object 381 verb 0x02;global script 26 | t0 l0 i13 a0 |  | others[] | run: NOT begun frames 600 rooms [] 671 ms
+29/385/0x01 | Room 29 · Open baskets | Dialogue | Room 29 object 385 verb 0x01 | t0 l0 i5 a0 |  | others[] | run: begun frames 73 rooms [] 543 ms
+29/387/0x01 | Room 29 · Open baskets | Dialogue | Room 29 object 387 verb 0x01 | t0 l0 i5 a0 |  | others[] | run: begun frames 73 rooms [] 546 ms
+29/388/0x09 | Room 29 · Look at voodoo knickknacks | Dialogue | Room 29 object 388 verb 0x09 | t0 l0 i11 a0 |  | others[] | run: begun frames 155 rooms [] 557 ms
+29/391/0x09 | Room 29 · Look at chicken | Dialogue | Room 29 object 391 verb 0x09 | t0 l0 i6 a0 |  | others[] | run: begun frames 85 rooms [] 547 ms
+30/401/0x01 | Room 30 · Open door | Dialogue | Room 30 object 401 verb 0x01;global script 25 | t0 l0 i18 a0 |  | others[] | run: begun frames 4 rooms [] 520 ms
+30/401/0x02 | Room 30 · Close door | Dialogue | Room 30 object 401 verb 0x02;global script 26 | t0 l0 i13 a0 |  | others[] | run: NOT begun frames 600 rooms [] 614 ms
+30/401/0x0A | Room 30 · Walk to door | Scenes | Room 30 local script 204;Room 30 local script 211;global script 25;global script 26;global script 64 | t58 l0 i533 a1 | Looking for a Sword Master, are you?  Looking for a little 'five-finger discount' it looks like to me!  See if I ever trust you again, devious little shoplifting weasel-boy! | others[] | run: NOT begun frames 600 rooms [] 618 ms
+30/402/0x08 | Room 30 · Use sword | Dialogue | Room 30 object 402 verb 0x08 | t0 l0 i3 a0 |  | others[] | run: NOT begun frames 600 rooms [] 616 ms
+30/403/0x09 | Room 30 · Look at safe | Dialogue | Room 30 object 403 verb 0x09 | t0 l0 i5 a0 |  | others[] | run: begun frames 44 rooms [] 525 ms
+30/404/0x06 | Room 30 · Push handle | Dialogue | Room 30 local script 202;global script 25;global script 26 | t2 l0 i16 a0 | Hmmm^  There's nothing in here but this note. | others[30/404/0x07] | run: NOT begun frames 600 rooms [] 633 ms
+30/408/0x0D | Room 30 · Talk to storekeeper | Dialogue | Room 30 local script 211;global script 25;global script 26;global script 64 | t45 l0 i458 a0 | Figures. | others[30/408/0x50] | run: begun frames 113 rooms [] 555 ms
+30/411/0x09 | Room 30 · Look at storekeeper's note | Dialogue | Room 30 object 411 verb 0x09 | t1 l0 i4 a0 | I, the good and honorable storekeeper do hereby take liability for the debts of the bearer of this note for any amount up to 5000 pieces of eight. | others[] | run: begun frames 33 rooms [] 531 ms
+30/932/0x04 | Room 30 · Turn on bell | Dialogue | Room 30 local script 207;global script 25;global script 26;Room 30 local script 211;global script 64 | t48 l0 i502 a0 | It never fails!  I step away from the counter for two seconds and some idiot's already ringing that stupid bell! | others[30/932/0x06,30/932/0x08] | run: begun frames 124 rooms [] 550 ms
+31/415/0x08 | Room 31 · Use cell | Dialogue | Room 31 local script 206 | t0 l0 i3 a0 |  | others[] | run: NOT begun frames 600 rooms [] 865 ms
+31/418/0x0D | Room 31 · Talk to prisoner | Dialogue | Room 31 local script 202;Room 31 local script 209 | t23 l0 i161 a0 | So, have you come to release me? | others[] | run: begun frames 192 rooms [] 609 ms
+31/418/0x50 | Room 31 · verb 0x50 prisoner | Dialogue | Room 31 local script 203;global script 67;global script 25;global script 26;Room 31 local script 208;Room 31 local script 202;Room 31 local script 209 | t47 l0 i508 a0 | Ooooh!  Grog-O-Mint!  How refreshing!  Thanks. | others[] | run: begun frames 112 rooms [] 577 ms
+32/0/0x00 | Room 32 · Entry | Scenes | Room 32 local script 200 | t5 l0 i40 a0 | Hello? | others[] | run: begun frames 166 rooms [] 534 ms
+32/434/0x09 | Room 32 · Look at poster | Dialogue | Room 32 object 434 verb 0x09 | t0 l0 i4 a0 |  | others[] | run: begun frames 203 rooms [] 539 ms
+33/438/0x09 | Room 33 · Look at poster | Dialogue | Room 33 object 438 verb 0x09 | t0 l0 i4 a0 |  | others[] | run: begun frames 74 rooms [] 527 ms
+34/444/0x0A | Room 34 · Walk to town | Dialogue | Room 34 object 444 verb 0x0A | t0 l0 i85 a0 |  | others[] | run: begun frames 19 rooms [] 516 ms
+34/445/0x0A | Room 34 · Walk to archway | Dialogue | Room 34 object 445 verb 0x0A | t0 l0 i6 a0 |  | others[] | run: begun frames 61 rooms [] 521 ms
+35/0/0x00 | Room 35 · Entry | Scenes | Room 35 entry script;Room 35 local script 215;Room 35 local script 211;Room 35 local script 213;global script 26 | t8 l0 i227 a0 | Hey!!  Don't mess with my rat! | others[] | run: begun frames 26 rooms [] 524 ms
+35/116/0x08 | Room 35 · Use grim spectre | Dialogue | Room 35 local script 213;Room 35 local script 211 | t2 l0 i75 a0 | Excuse me. | others[] | run: begun frames 316 rooms [] 591 ms
+35/448/0x0D | Room 35 · Talk to Citizen of Mle | Dialogue | Room 35 local script 218 | t11 l0 i33 a0 | Excuse me, but do--  Oh, it's only you again. | others[] | run: begun frames 60 rooms [] 536 ms
+35/449/0x08 | Room 35 · Use map | Scenes | global script 120 | t0 l1 i73 a0 |  | others[35/449/0x09] | run: begun frames 6000 rooms [63] 1057 ms
+35/453/0x01 | Room 35 · Open door | Dialogue | Room 35 local script 207;global script 25;global script 26 | t0 l0 i37 a0 |  | others[35/454/0x01,35/455/0x01,35/456/0x01,35/453/0x08,35/454/0x08,35/455/0x08,35/456/0x08] | run: begun frames 121 rooms [] 553 ms
+35/457/0x09 | Room 35 · Look at clock | Dialogue | Room 35 local script 210 | t0 l0 i2 a0 |  | others[] | run: NOT begun frames 600 rooms [] 686 ms
+35/458/0x0A | Room 35 · Walk to archway | Scenes | Room 35 object 458 verb 0x0A | t0 l0 i20 a3 |  | others[] | run: begun frames 1 rooms [33] 523 ms
+35/459/0x0A | Room 35 · Walk to archway | Scenes | Room 35 object 459 verb 0x0A | t0 l0 i25 a1 |  | others[] | run: begun frames 47 rooms [34] 534 ms
+35/460/0x09 | Room 35 · Look at Men of Low Moral Fiber (pirates) | Dialogue | Room 35 object 460 verb 0x09 | t1 l0 i6 a0 | What are YOU looking at? | others[] | run: begun frames 48 rooms [] 528 ms
+35/461/0x08 | Room 35 · Use rat | Dialogue | Room 35 local script 215 | t6 l0 i88 a0 | Hey!!  Don't mess with my rat! | others[] | run: NOT begun frames 600 rooms [] 688 ms
+36/475/0x50 | Room 36 · verb 0x50 deadly piranha poodles | Dialogue | Room 36 local script 201 | t8 l0 i87 a0 | IMPORTANT NOTICE | others[] | run: NOT begun frames 600 rooms [] 764 ms
+37/0/0x00 | Room 37 · Entry | Scenes | global script 60;global script 25;Room 37 local script 201 | t39 l0 i413 a2 | Hey!  I don't like visitors!  Who are you? | others[] | run: begun frames 73 rooms [] 541 ms
+37/486/0x01 | Room 37 · Open door | Scenes | global script 49;Room 37 local script 207;global script 25 | t6 l1 i106 a1 | AAAAAAIIIIIEEEEE!!! | others[] | run: begun frames 6000 rooms [50] 3481 ms
+37/488/0x0A | Room 37 · Walk to tunnel | Scenes | Room 37 local script 207;global script 25 | t5 l0 i47 a1 | Trying to run away, eh?  I thought so. | others[] | run: begun frames 212 rooms [48] 582 ms
+38/0/0x00 | Room 38 · Entry | Scenes | Room 38 local script 203 | t6 l0 i53 a0 | Yikes!  Don't sneak up on me like that! | others[] | run: NOT begun frames 600 rooms [] 612 ms
+38/498/0x0D | Room 38 · Talk to lookout | Dialogue | Room 38 local script 202 | t3 l0 i11 a0 | None.  As I said, I fear we've seen the last of her. | others[] | run: NOT begun frames 600 rooms [] 608 ms
+39/0/0x00 | Room 39 · Entry | Scenes | global script 106;Room 39 local script 202 | t0 l1 i15 a1 |  | others[] | run: NOT begun frames 600 rooms [] 742 ms
+39/507/0x0A | Room 39 · Walk to cave | Scenes | global script 106 | t0 l1 i3 a3 |  | others[39/508/0x0A,39/509/0x0A,39/510/0x0A] | run: begun frames 1 rooms [0] 536 ms
+40/0/0x00 | Room 40 · Entry | Scenes | Room 40 local script 202;global script 93 | t4 l0 i36 a0 | Hey, thanks!  I thought I'd never see this again!  Here, you can take this key to the Monkey Head back to the natives. | others[] | run: NOT begun frames 600 rooms [] 648 ms
+41/0/0x00 | Room 41 · Entry | Scenes | Room 41 local script 202 | t0 l0 i48 a0 |  | others[] | run: NOT begun frames 600 rooms [] 738 ms
+41/324/0x01 | Room 41 · Open door | Dialogue | Room 41 local script 202;global script 25 | t0 l0 i53 a0 |  | others[41/324/0x08] | run: begun frames 0 rooms [] 531 ms
+41/380/0x08 | Room 41 · Use barrel | Dialogue | Room 41 local script 215 | t0 l0 i13 a0 |  | others[] | run: NOT begun frames 600 rooms [] 743 ms
+42/585/0x0A | Room 42 · Walk to ladder | Dialogue | Room 42 local script 200 | t2 l0 i33 a0 | Tried to complete trial    @ twice.  THIS IS BAD! | others[] | run: NOT begun frames 600 rooms [] 829 ms
+42/586/0x0B | Room 42 · Pick up fabulous idol | Dialogue | Room 42 local script 203;Room 42 local script 200 | t4 l0 i82 a0 | I guess I'll be needing a sword.  This one will do. | others[] | run: begun frames 9 rooms [33] 541 ms
+43/592/0x01 | Room 43 · Open door | Scenes | global script 57 | t2 l0 i41 a8 | What do you want, you wimpy little  spineless maggot? | others[] | run: begun frames 100 rooms [] 539 ms
+43/594/0x09 | Room 43 · Look at sign | Dialogue | Room 43 object 594 verb 0x09 | t0 l0 i4 a0 |  | others[] | run: begun frames 148 rooms [] 529 ms
+45/0/0x00 | Room 45 · Entry | Scenes | Room 45 local script 200;global script 130 | t9 l2 i417 a0 | You! | others[] | run: begun frames 27 rooms [33] 546 ms
+48/598/0x08 | Room 48 · Use pole | Dialogue | Room 48 local script 205;Room 48 local script 204 | t0 l0 i90 a0 |  | others[48/599/0x08,48/598/0x0A,48/599/0x0A] | run: begun frames 11 rooms [] 519 ms
+51/0/0x00 | Room 51 · Entry | Scenes | Room 51 entry script;Room 51 local script 207;Room 51 local script 203 | t40 l0 i246 a0 | I'd get in the cannon, but the gunpowder makes me sneeze. | others[] | run: begun frames 6000 rooms [] 2263 ms
+53/632/0x0A | Room 53 · Walk to door | Dialogue | Room 53 local script 210;global script 26;global script 25 | t9 l0 i586 a0 | No!  Not the red button! | others[] | run: NOT begun frames 600 rooms [] 614 ms
+53/886/0x0A | Room 53 · Walk to gaping hole | Scenes | Room 53 local script 211;Room 53 local script 212;global script 25;global script 26 | t28 l0 i485 a1 | Wheeeeee!! | others[] | run: NOT begun frames 600 rooms [] 618 ms
+57/637/0x0D | Room 57 · Talk to troll | Dialogue | global script 55 | t3 l0 i9 a0 | STOP!! | others[] | run: begun frames 33 rooms [] 523 ms
+57/637/0x50 | Room 57 · verb 0x50 troll | Dialogue | Room 57 local script 204 | t8 l0 i157 a0 | Ah!  A red herring! | others[] | run: begun frames 44 rooms [] 522 ms
+58/660/0x09 | Room 58 · Look at stump | Dialogue | Room 58 object 660 verb 0x09 | t3 l0 i24 a0 | Insert Disk 22 and Press Button to Continue. | others[] | run: begun frames 198 rooms [] 632 ms
+58/662/0x04 | Room 58 · Turn on sign | Dialogue | Room 58 local script 204;Room 58 local script 203 | t0 l0 i43 a0 |  | others[58/662/0x06,58/662/0x07,58/662/0x08] | run: begun frames 27 rooms [] 556 ms
+58/669/0x0A | Room 58 · Walk to path | Scenes | Room 58 local script 200 | t0 l0 i4 a15 |  | others[] | run: NOT begun frames 600 rooms [] 828 ms
+59/671/0x06 | Room 59 · Push grog machine | Dialogue | Room 59 local script 200 | t1 l0 i24 a0 | Rumble | others[59/671/0x07,59/671/0x08] | run: begun frames 42 rooms [] 534 ms
+59/671/0x09 | Room 59 · Look at grog machine | Dialogue | Room 59 object 671 verb 0x09 | t0 l0 i4 a0 |  | others[] | run: begun frames 110 rooms [] 557 ms
+59/712/0x09 | Room 59 · Look at sign | Dialogue | Room 59 object 712 verb 0x09 | t0 l0 i7 a0 |  | others[] | run: begun frames 144 rooms [] 565 ms
+59/800/0x09 | Room 59 · Look at magnetic compass | Dialogue | Room 59 object 800 verb 0x09 | t0 l0 i5 a0 |  | others[] | run: begun frames 109 rooms [] 556 ms
+59/924/0x08 | Room 59 · Use LeChuck | Scenes | global script 129;global script 134;global script 148;global script 135 | t24 l4 i549 a2 | --urk-- | others[32/935/0x08,83/936/0x08,43/939/0x08] | run: NOT begun frames 600 rooms [] 781 ms
+61/0/0x00 | Room 61 · Entry | Scenes | global script 121 | t12 l2 i264 a0 | I better just stay back here and eavesdrop. | others[] | run: NOT begun frames 600 rooms [] 682 ms
+61/720/0x0A | Room 61 · Walk to Sword Master | Scenes | global script 113;global script 61 | t7 l1 i32 a1 | Well^I hope you're happy.  You can go back and brag to all your friends about how you beat the Sword Master. | others[61/720/0x0D] | run: NOT begun frames 600 rooms [44,62] 691 ms
+61/720/0x50 | Room 61 · verb 0x50 Sword Master | Scenes | global script 136 | t7 l1 i121 a0 | What's this? | others[] | run: begun frames 26 rooms [] 528 ms
+64/724/0x09 | Room 64 · Look at plaque | Dialogue | Room 64 object 724 verb 0x09 | t0 l0 i8 a0 |  | others[] | run: begun frames 207 rooms [] 537 ms
+64/725/0x09 | Room 64 · Look at marker | Dialogue | Room 64 object 725 verb 0x09 | t0 l0 i5 a0 |  | others[] | run: begun frames 117 rooms [] 532 ms
+64/726/0x08 | Room 64 · Use X | Dialogue | Room 64 local script 200 | t4 l0 i137 a0 | Hours pass^ | others[] | run: NOT begun frames 600 rooms [] 623 ms
+64/726/0x09 | Room 64 · Look at X | Dialogue | Room 64 object 726 verb 0x09 | t0 l0 i5 a0 |  | others[] | run: begun frames 73 rooms [] 537 ms
+65/0/0x00 | Room 65 · Entry | Scenes | Room 65 local script 202;Room 65 local script 203;Room 65 local script 200;global script 108 | t0 l0 i53 a0 |  | others[] | run: NOT begun frames 600 rooms [] 703 ms
+65/731/0x0A | Room 65 · Walk to monkey head | Scenes | Room 65 local script 201;global script 108 | t0 l0 i31 a1 |  | others[] | run: begun frames 8 rooms [] 534 ms
+69/744/0x08 | Room 69 · Use gigantic monkey ear | Dialogue | global script 91 | t0 l0 i71 a0 |  | others[] | run: NOT begun frames 600 rooms [] 612 ms
+69/744/0x09 | Room 69 · Look at gigantic monkey ear | Dialogue | Room 69 object 744 verb 0x09 | t0 l0 i2 a0 |  | others[] | run: begun frames 0 rooms [] 515 ms
+70/0/0x00 | Room 70 · Entry | Scenes | Room 70 local script 204;Room 70 local script 205;Room 70 local script 200;global script 108 | t7 l0 i142 a0 | EEP!  You scared me half to death! | others[] | run: NOT begun frames 600 rooms [] 808 ms
+70/745/0x0A | Room 70 · Walk to cave | Scenes | global script 167 | t1 l1 i9 a2 | A long walk, a brief row, and a short hike later^ | others[] | run: NOT begun frames 600 rooms [65] 733 ms
+70/746/0x0A | Room 70 · Walk to ghost ship | Scenes | Room 70 object 746 verb 0x0A;global script 108 | t0 l0 i39 a1 |  | others[] | run: begun frames 6000 rooms [77] 1890 ms
+72/0/0x00 | Room 72 · Entry | Scenes | Room 72 local script 201 | t8 l0 i49 a0 | Arrr^  What be that noise? | others[] | run: NOT begun frames 600 rooms [] 679 ms
+74/0/0x00 | Room 74 · Entry | Scenes | Room 74 local script 203 | t0 l0 i11 a0 |  | others[] | run: NOT begun frames 600 rooms [] 739 ms
+75/781/0x08 | Room 75 · Use glowing crate | Dialogue | Room 75 object 781 verb 0x08;global script 25 | t5 l0 i86 a0 | Clank! | others[] | run: NOT begun frames 600 rooms [] 791 ms
+77/0/0x00 | Room 77 · Entry | Scenes | global script 75;global script 138 | t2 l0 i392 a1 | Uhh^ | others[] | run: NOT begun frames 600 rooms [] 947 ms
+77/803/0x01 | Room 77 · Open door | Dialogue | Room 77 object 803 verb 0x01 | t8 l0 i47 a0 | CRE | others[] | run: NOT begun frames 600 rooms [] 958 ms
+78/0/0x00 | Room 78 · Entry | Scenes | Room 78 local script 201 | t1 l0 i17 a0 | ^if there be any man with reason that these two^  ^er^  ^people should not be united in blissful matrimony^  ^let him speak now or forever hold his peace. | others[] | run: NOT begun frames 600 rooms [] 633 ms
+80/0/0x00 | Room 80 · Entry | Scenes | Room 80 local script 202;global script 93 | t9 l0 i74 a0 | Hey, nice spyglass.  Looks just like -- | others[] | run: NOT begun frames 600 rooms [] 654 ms
+80/843/0x09 | Room 80 · Look at spyglass | Dialogue | Room 80 object 843 verb 0x09 | t0 l0 i3 a0 |  | others[] | run: begun frames 35 rooms [] 531 ms
+80/844/0x06 | Room 80 · Push cannon | Dialogue | Room 80 local script 200 | t0 l0 i22 a0 |  | others[80/844/0x07] | run: begun frames 15 rooms [] 525 ms
+80/846/0x0B | Room 80 · Pick up cannon ball | Dialogue | Room 80 local script 201 | t0 l0 i7 a0 |  | others[80/848/0x0B] | run: begun frames 3 rooms [] 526 ms
+83/0/0x00 | Room 83 · Entry | Scenes | global script 62;Room 83 local script 200;global script 119;Room 83 local script 203;Room 83 local script 201 | t51 l4 i609 a1 | This is the end of the road, my little pantalooned pal. | others[] | run: NOT begun frames 600 rooms [] 619 ms
+83/940/0x09 | Room 83 · Look at note | Dialogue | Room 83 object 940 verb 0x09 | t0 l0 i63 a0 |  | others[] | run: begun frames 167 rooms [] 540 ms
+85/0/0x00 | Room 85 · Entry | Scenes | Room 85 local script 203 | t0 l0 i14 a2 |  | others[] | run: NOT begun frames 600 rooms [] 774 ms
+85/994/0x0A | Room 85 · Walk to Sword Master's | Scenes | Room 85 object 994 verb 0x0A;global script 64 | t0 l0 i149 a1 |  | others[] | run: begun frames 85 rooms [61] 562 ms
+runs 164, begun 104
