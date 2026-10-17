@@ -111,4 +111,33 @@ public sealed class ScummMonkeyFloppyCutsceneTests(ITestOutputHelper output)
         Assert.Equal("object 438", ScummCutsceneRun.ScriptKey("Room 33 Object 438 Verb 0x09 +0x00CF"));
         Assert.Equal("entry 35", ScummCutsceneRun.ScriptKey("Room 35 entry script +0x0133"));
     }
+
+    /// <summary>
+    /// S9 (17 October 2026): the Spanish eight-disk 16-colour release (<c>Games/monkey1 ega es</c>) gives the same list as English (294 triggers, 164
+    /// entries, 63 scenes, the same keys, scripts and groups; 104 begin from a fresh start in both, record
+    /// <c>.verification/monkey1-editions-20261017</c>); its titles and lines are its own, with the accents its texts hold (CP437 glyph codes, decoded by
+    /// <see cref="ScummTextDecoder"/> since the same day). The poster's span starts at +0x00D9 there (English +0x00CF): its lines are longer.
+    /// </summary>
+    [Fact]
+    public void TheSpanishReleaseListsTheSameScenesWithItsOwnAccentedTexts()
+    {
+        var folder = Path.Combine(TestGames.Root, "monkey1 ega es");
+        if (!File.Exists(Path.Combine(folder, "DISK08.LEC"))) return;
+        var planner = new ScummCutscenePlanner(new GameFolderScanner().Scan(folder));
+        output.WriteLine($"{planner.Triggers.Count} triggers, {planner.Groups.Count} groups, {planner.Groups.Count(g => g.IsScene)} scenes");
+        Assert.Equal("Mirar", planner.Verbs.WordFor(0x09));
+        Assert.Equal("Room 33 · Mirar poster", ScummCutsceneTitles.Title(GroupOf(planner, 33, 438, 0x09).First));
+        Assert.Equal("Room 19 · Empujar tripulación amotinada", ScummCutsceneTitles.Title(GroupOf(planner, 19, 267, 0x06).First));
+        Assert.Equal("Room 18 · Usar árbol", ScummCutsceneTitles.Title(GroupOf(planner, 18, 161, 0x08).First));
+        Assert.StartsWith("¡Oye!  ¡No me gustan las visitas!", GroupOf(planner, 37, 0, 0).First.FirstText, StringComparison.Ordinal);
+        if (Planner.Value is { } english)
+        {
+            static string Key(ScummCutsceneGroup g) => $"{g.First.Room}/{g.First.ObjectId}/{g.First.VerbId} {g.IsScene} {string.Join(";", g.First.Scripts)} " +
+                                                        string.Join(",", g.Others.Select(o => $"{o.Room}/{o.ObjectId}/{o.VerbId}"));
+            Assert.Equal(english.Triggers.Count, planner.Triggers.Count);
+            Assert.Equal(english.Groups.Select(Key), planner.Groups.Select(Key));
+        }
+        var poster = planner.Run(GroupOf(planner, 33, 438, 0x09).First);
+        Assert.True(poster.Begun, poster.Failure);
+    }
 }
