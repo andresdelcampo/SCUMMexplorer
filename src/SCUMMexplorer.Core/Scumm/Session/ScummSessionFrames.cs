@@ -11,10 +11,10 @@ public abstract partial class ScummSession
     /// </summary>
     public int FrameJiffies => Math.Max(1, _runtime.GlobalVariables.TryGetValue(TimerNextVariable, out var next) ? next : 0);
 
-    protected const string TimerNextVariable = ScummVars.TimerNext;
+    protected string TimerNextVariable => _runtime.IsV2 ? ScummVars.V2.TimerNext : ScummVars.TimerNext;
 
     /// <summary>ScummVM v3 <c>VAR_TMR_1</c>..<c>VAR_TMR_3</c> (vars 11–13): jiffies the frame loop adds every frame.</summary>
-    protected IEnumerable<string> EngineTimerVariables => [ScummVars.Timer1, ScummVars.Timer2, ScummVars.Timer3, .. _extraTimerVariables];
+    protected IEnumerable<string> EngineTimerVariables => _runtime.IsV2 ? [] : [ScummVars.Timer1, ScummVars.Timer2, ScummVars.Timer3, .. _extraTimerVariables];
 
     // The timers some games have besides these (ScummProfile.ExtraTimerVariables); scummLoop adds the frame's jiffies to them too.
     private readonly IReadOnlyList<string> _extraTimerVariables = [];
@@ -35,8 +35,8 @@ public abstract partial class ScummSession
     /// </summary>
     protected void UpdateTimersAndDelays(int delta)
     {
-        _runtime.SetGlobalVariable(TimerVariable, (ushort)delta);
-        foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
+        if (!_runtime.IsV2) _runtime.SetGlobalVariable(TimerVariable, (ushort)delta);
+        foreach (var timer in EngineTimerVariables.Concat(_runtime.IsV2 ? [] : new[] { TimerTotalVariable }))
             if (_runtime.GlobalVariables.TryGetValue(timer, out var value))
                 _runtime.SetGlobalVariable(timer, (ushort)(value + delta));
         var counted = Math.Min(delta, MaxFrameDelta);
@@ -66,7 +66,7 @@ public abstract partial class ScummSession
         _runtime.SetGlobalVariable(MusicTimerVariable, (ushort)timer);
     }
 
-    protected const string MusicTimerVariable = ScummVars.MusicTimer;
+    protected string MusicTimerVariable => _runtime.MusicTimerVariable;
 
     protected ScummSessionSnapshot AdvanceOneFrame()
     {
@@ -78,7 +78,7 @@ public abstract partial class ScummSession
         foreach (var sound in _soundClock.Advance(FrameJiffies))
         {
             _runtime.ActiveSounds.Remove(sound);
-            _visitTrace.Add($"Sound {sound:00} completed on its native AdLib resource clock.");
+            _visitTrace.Add($"Sound {sound:00} completed on its {(_runtime.IsV2 ? "Player_V2 control" : "native AdLib resource")} clock.");
         }
         UpdateMusicTimer();
         _runtime.Messages.StartFrame(FrameJiffies, _runtime);
@@ -144,7 +144,7 @@ public abstract partial class ScummSession
     protected bool RunSentenceScript()
     {
         if (_runtime.Sentences.Count == 0) return false;
-        var number = _runtime.GlobalVariables.GetValueOrDefault(ScummVars.SentenceScript);
+        var number = _runtime.IsV2 ? 2 : _runtime.GlobalVariables.GetValueOrDefault(ScummVars.SentenceScript);
         if (number != 0 && (_executing.Any(frame => frame.Number == number && !frame.Stopped && frame.FreezeCount == 0) ||
                             _pending.Any(item => item.ScriptNumber == number && !item.Frame.Stopped && item.Frame.FreezeCount == 0)))
             return false;
@@ -152,7 +152,14 @@ public abstract partial class ScummSession
         _runtime.Sentences.RemoveAt(_runtime.Sentences.Count - 1);
         if (number == 0) return false;
         _visitTrace.Add($"sentence script {number} runs verb 0x{verb:X2} with objects {objectA} and {objectB}");
-        RunStartedScript(number, 0, new Dictionary<string, ushort>
+        if (_runtime.IsV2)
+        {
+            _runtime.SetGlobalVariable(ScummVars.V2.ActiveVerb, (ushort)verb);
+            _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject1, (ushort)objectA);
+            _runtime.SetGlobalVariable(ScummVars.V2.ActiveObject2, (ushort)objectB);
+            _runtime.SetGlobalVariable(ScummVars.V2.VerbAllowed, (ushort)(ObjectVerbEntrypoint(objectA, verb) is > 0 ? 1 : 0));
+        }
+        RunStartedScript(number, 0, _runtime.IsV2 ? null : new Dictionary<string, ushort>
         {
             ["local[0x000]"] = (ushort)verb, ["local[0x001]"] = (ushort)objectA, ["local[0x002]"] = (ushort)objectB
         }, 0);
@@ -169,15 +176,15 @@ public abstract partial class ScummSession
         if (_currentRoom is null) return;
         var place = CurrentPlacement();
         _runtime.Actors.StepWalks(place);
-        if (!_runtime.GlobalVariables.TryGetValue(CameraVariable, out var camera) || _runtime.RoomCameraBounds is not { } bounds) return;
+        if (_runtime.ReadCameraPixels() is not int camera || _runtime.RoomCameraBounds is not { } bounds) return;
         var (min, max) = _runtime.CameraRange ?? bounds;
         var cameraState = _runtime.Camera;
         ScummActorSnapshot? followed = null;
         if (cameraState.Mode == ScummCamera.FollowActor || cameraState.MovingToActor)
-            followed = ScummActorTable.IsValid(cameraState.Follows) ? _runtime.Actors[cameraState.Follows] : null;
+            followed = _runtime.Actors.Contains(cameraState.Follows) ? _runtime.Actors[cameraState.Follows] : null;
         var moved = cameraState.Move(camera, min, max, bounds, followed?.X);
         if (moved == camera) return;
-        _runtime.SetGlobalVariable(CameraVariable, (ushort)moved);
+        _runtime.WriteCameraPixels(moved);
         if (followed?.Estimate is not null && _runtime.EstimatedVariables.Add(CameraVariable))
             _uncertainties.Add($"Camera x (var[0x002]) = {moved} is an estimate: it follows actor {followed.Number}, whose position is an estimate ({followed.Estimate}).");
     }
@@ -189,7 +196,7 @@ public abstract partial class ScummSession
     /// True while the ego (<c>VAR_EGO</c>) walks or turns. Playback waits for this, not for every actor: ambient
     /// actors (script 042's swan speck in Room 02) walk from point to point without end.
     /// </summary>
-    public bool EgoMoving => _runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && ScummActorTable.IsValid(ego) &&
+    public bool EgoMoving => _runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && _runtime.Actors.Contains(ego) &&
                              _runtime.Actors[ego] is { Moving: not 0 } actor && actor.Room == _currentRoom?.ResourceId;
 
     /// <summary>
@@ -205,7 +212,7 @@ public abstract partial class ScummSession
             var (min, max) = _runtime.CameraRange ?? bounds;
             var camera = _runtime.Camera;
             var target = camera.DestX;
-            if (camera.MovingToActor && ScummActorTable.IsValid(camera.Follows) && _runtime.Actors[camera.Follows].X is int actorX)
+            if (camera.MovingToActor && _runtime.Actors.Contains(camera.Follows) && _runtime.Actors[camera.Follows].X is int actorX)
                 target = actorX;
             target = Math.Clamp(Math.Clamp(target, min, Math.Max(min, max)), bounds.Min, bounds.Max);
             return x / 8 != target / 8;

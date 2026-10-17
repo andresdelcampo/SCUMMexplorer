@@ -78,7 +78,7 @@ public sealed class ScummV1ActorColors
     public static ScummV1ActorColors Read(GameLibrary game)
     {
         var gameKind = game.V1Game ?? throw new ArgumentException("Not a classic v1 game.", nameof(game));
-        var reader = new ScummScriptReader(ScummScriptDialect.V2);
+        var reader = new ScummScriptReader(ScummScriptDialect.V1);
         var settings = new List<ScummV1ActorSetting>();
         var unresolved = 0;
 

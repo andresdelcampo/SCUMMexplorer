@@ -4,9 +4,12 @@ namespace SCUMMexplorer.Core.Scumm;
 
 public enum ScummSoundLifetimeKind { Finite, Looping, Unknown }
 
+/// <summary>A sound-script timer value at a 472 Hz clock position (v2's 236 Hz tick is two callbacks).</summary>
+public sealed record ScummSoundTimerPoint(int Callback, ushort Value);
+
 /// <summary>472 Hz AdLib driver callbacks until native completion, never WAV duration.</summary>
 public sealed record ScummSoundLifetime(ScummSoundLifetimeKind Kind, int? Callbacks, bool Music, string? Reason = null, long[]? MarkerTicks = null,
-    bool KeepsMusicTimer = false);
+    bool KeepsMusicTimer = false, ScummSoundTimerPoint[]? TimerValues = null, int? LoopStartCallback = null, int? LoopEndCallback = null);
 
 /// <summary>
 /// Resource clocks for independent native AdLib voices. Output mode/mute do not alter game state.
@@ -21,11 +24,16 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
 
     // The music timer a song of the AdLib player left behind: that player's timer keeps its last value after the song stops, until the next song starts.
     private int _heldTimer;
+    private bool _heldTimerIsV2;
 
     public void Start(int id, bool estimated)
     {
         var lifetime = resolve(id);
-        if (lifetime.KeepsMusicTimer) _heldTimer = 0;
+        if (lifetime.KeepsMusicTimer)
+        {
+            _heldTimer = 0;
+            _heldTimerIsV2 = lifetime.TimerValues is not null;
+        }
         _voices[id] = new(lifetime, _jiffies, estimated);
         _estimatedStops.Remove(id);
     }
@@ -36,18 +44,22 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
     /// <summary>The sounds the clock has playing now, in no particular order.</summary>
     public IReadOnlyList<int> Playing => _voices.Keys.ToArray();
 
-    public void Stop(int id, bool estimated = false)
+    public void Stop(int id, bool estimated = false) => StopVoice(id, estimated, naturalEnd: false);
+
+    private void StopVoice(int id, bool estimated, bool naturalEnd)
     {
         if (_voices.TryGetValue(id, out var voice) && voice.Lifetime.KeepsMusicTimer)
-            _heldTimer = MarkersPassed(voice);
+            // Player_V2 stopSound clears every channel word; natural completion preserves the channel timer.
+            _heldTimer = voice.Lifetime.TimerValues is not null && !naturalEnd ? 0 : MarkersPassed(voice);
         _voices.Remove(id);
         if (estimated) _estimatedStops.Add(id); else _estimatedStops.Remove(id);
     }
 
     public void StopAll()
     {
+        if (_heldTimerIsV2) _heldTimer = 0;
         foreach (var voice in _voices.Values)
-            if (voice.Lifetime.KeepsMusicTimer) _heldTimer = Math.Max(_heldTimer, MarkersPassed(voice));
+            if (voice.Lifetime.KeepsMusicTimer && voice.Lifetime.TimerValues is null) _heldTimer = Math.Max(_heldTimer, MarkersPassed(voice));
         _voices.Clear();
         _estimatedStops.Clear();
     }
@@ -59,7 +71,7 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
         var ended = _voices.Where(pair => pair.Value.Lifetime is { Kind: ScummSoundLifetimeKind.Finite, Callbacks: int callbacks } &&
             (_jiffies - pair.Value.Started) * 472 >= callbacks * 60L).Select(pair => pair.Key).ToArray();
         // A song that ends within this advance has counted every marker it has by then.
-        foreach (var id in ended) Stop(id, _voices[id].Estimated);
+        foreach (var id in ended) StopVoice(id, _voices[id].Estimated, naturalEnd: true);
         return ended;
     }
 
@@ -78,6 +90,19 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
 
     private int MarkersPassed(Voice voice)
     {
+        if (voice.Lifetime.TimerValues is { } values)
+        {
+            var callback = (_jiffies - voice.Started) * 472 / 60;
+            if (voice.Lifetime.LoopStartCallback is int start && voice.Lifetime.LoopEndCallback is int end && end > start && callback >= end)
+                callback = start + (callback - start) % (end - start);
+            int lo = 0, hi = values.Length;
+            while (lo < hi)
+            {
+                var mid = (lo + hi) / 2;
+                if (values[mid].Callback <= callback) lo = mid + 1; else hi = mid;
+            }
+            return lo == 0 ? 0 : values[lo - 1].Value;
+        }
         if (voice.Lifetime.MarkerTicks is not { } markers) return 0;
         // A song that has run out has passed every marker it has (its clock is bounded by its own length).
         var elapsed = _jiffies - voice.Started;

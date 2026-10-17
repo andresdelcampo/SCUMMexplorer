@@ -9,6 +9,12 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - **Rooms:** 96 of 96 without a gap (Settled 60, FrameLimit 25, RoomLeft 11); Rooms 76, 77, 87 keep a camera-after-walk item. Objects stays partial until S6; registry unchanged.
 - **Validation:** `ScummIndy4SessionTests` (4), `ScummIndy4FirstVisitTests` (5, Rooms 32, 46, 50 pinned); regression filter 980 passed, 5 skipped, 0 failed. Records: [indy4-session-20261017](../.verification/indy4-session-20261017/README.md), [indy4-objects-20261017](../.verification/indy4-objects-20261017/README.md).
 
+## 17 October: classic and enhanced Maniac Mansion and Zak boot in the generic session (S4b)
+
+- Added v1/v2 data sources, dialect-specific decoding and a separate bounded executor partial, with native engine variables, actor defaults, verb slots, sentence/object dispatch, cutscene restoration and sound clocks. Source-backed fixes also restore the wide classic Maniac introduction room and preserve native message character counts.
+- ManiacClassic and ManiacEnhanced reach Room 44 with control after explicit Syd/Bernard selection; ZakClassic and ZakEnhanced reach Room 1 after their full introductions without player input. Each endpoint remains stable for 120 additional frames. Seeded choices and sound/movement estimates retain their labels; no native ScummVM run is claimed.
+- No support cells raised. ZakClassic's corrected static costume analysis is 24 derived and 11 estimates; its cell remains partial. S5, S6, S7 and S9 are separate next stages. [Checkpoint, evidence and validation](checkpoints/20261017-S4b-ManiacZak.md).
+
 ## 17 October: the Spanish eight-disk release, and accents in the cutscene list (S9, MonkeyFloppy)
 
 - `Games/monkey1 ega es` (Spanish, eight disks, 16 colours) checked against the English floppy: boot (protection answered from its own `var[0x10A]`), room audit (81/81 without a gap, equal to English in outcome, active images and gaps), the R-7.18 route with its sounds and the right click, the cutscene scan (294 triggers, 164 entries, 104 begin, equal per entry), accents (CP437 codes with a glyph in every charset), one window look. Differences are data: texts and the offsets that follow them (the route test reads its sound offsets from the copy's script), Room 87's entry, the 0xFA glyph. No cell changes.
