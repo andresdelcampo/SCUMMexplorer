@@ -4,9 +4,12 @@ namespace SCUMMexplorer.Core.Scumm;
 
 public enum ScummSoundLifetimeKind { Finite, Looping, Unknown }
 
+/// <summary>A sound-script timer value at a 472 Hz clock position (v2's 236 Hz tick is two callbacks).</summary>
+public sealed record ScummSoundTimerPoint(int Callback, ushort Value);
+
 /// <summary>472 Hz AdLib driver callbacks until native completion, never WAV duration.</summary>
 public sealed record ScummSoundLifetime(ScummSoundLifetimeKind Kind, int? Callbacks, bool Music, string? Reason = null, long[]? MarkerTicks = null,
-    bool KeepsMusicTimer = false);
+    bool KeepsMusicTimer = false, ScummSoundTimerPoint[]? TimerValues = null, int? LoopStartCallback = null, int? LoopEndCallback = null);
 
 /// <summary>
 /// Resource clocks for independent native AdLib voices. Output mode/mute do not alter game state.
@@ -78,6 +81,19 @@ public sealed class ScummSoundClock(Func<int, ScummSoundLifetime> resolve)
 
     private int MarkersPassed(Voice voice)
     {
+        if (voice.Lifetime.TimerValues is { } values)
+        {
+            var callback = (_jiffies - voice.Started) * 472 / 60;
+            if (voice.Lifetime.LoopStartCallback is int start && voice.Lifetime.LoopEndCallback is int end && end > start && callback >= end)
+                callback = start + (callback - start) % (end - start);
+            int lo = 0, hi = values.Length;
+            while (lo < hi)
+            {
+                var mid = (lo + hi) / 2;
+                if (values[mid].Callback <= callback) lo = mid + 1; else hi = mid;
+            }
+            return lo == 0 ? 0 : values[lo - 1].Value;
+        }
         if (voice.Lifetime.MarkerTicks is not { } markers) return 0;
         // A song that has run out has passed every marker it has (its clock is bounded by its own length).
         var elapsed = _jiffies - voice.Started;
