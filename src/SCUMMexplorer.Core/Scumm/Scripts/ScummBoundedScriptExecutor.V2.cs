@@ -55,6 +55,23 @@ public sealed partial class ScummBoundedScriptExecutor
         switch (source.Operation)
         {
             case "dummy" when source.Opcode == 0xEE: handled = true; return true;
+            case "roomOps":
+                if (!Read(0, out var roomA) || !Read(1, out var roomB) || p.Length != 3) return false;
+                if (p[2] == "sub=0x02")
+                {
+                    if (runtime.EngineVersion == SCUMMexplorer.Core.Domain.ScummVersion.V1)
+                    { runtime.RoomColors[0] = 255; runtime.RoomColors[1] = (byte)roomA; runtime.RoomColors[2] = (byte)roomB; }
+                    else runtime.RoomColors[roomB & 255] = (byte)roomA;
+                    trace.Add($"v2 room color operation {roomA},{roomB}");
+                }
+                else if (p[2] == "sub=0x01" && runtime.RoomCameraBounds is { } roomBounds)
+                {
+                    variables[runtime.CameraMinVariable] = (ushort)Math.Clamp(roomA * 8, roomBounds.Min, roomBounds.Max);
+                    variables[runtime.CameraMaxVariable] = (ushort)Math.Clamp(roomB * 8, roomBounds.Min, roomBounds.Max);
+                }
+                else return false;
+                handled = true;
+                return true;
             case "verbOps":
                 if (!Read(0, out var verbNumber)) return false;
                 var bracket = source.Operands.IndexOf('[');
