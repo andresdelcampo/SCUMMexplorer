@@ -20,6 +20,8 @@ public sealed record ScummVerbSnapshot(int Slot, int VerbId, int? Mode, int? X, 
     public bool Centered { get; init; }
     /// <summary>The charset the verb was created with (<c>vs-&gt;charset_nr = _string[0]._default.charset</c>), null when none was set.</summary>
     public int? Charset { get; init; }
+    /// <summary>v1/v2 verb-slot preposition byte from o2_verbOps.</summary>
+    public int Preposition { get; init; }
 
     public string Describe()
     {
@@ -47,7 +49,7 @@ public sealed record ScummVerbErase(int Order, ScummScreenBox Box);
 /// screen can be composed in the order the game drew it (<c>redrawVerbs</c>,
 /// in slot order, runs only on a complete screen redraw such as a restart).
 /// </summary>
-public sealed class ScummVerbTable
+public sealed partial class ScummVerbTable
 {
     public const int Count = 100;
     private readonly Slot[] _slots = Enumerable.Range(0, Count).Select(index => new Slot(index)).ToArray();
@@ -296,6 +298,7 @@ public sealed class ScummVerbTable
         public int Key { get; set; }
         public bool Centered { get; set; }
         public int? Charset { get; set; }
+        public int Preposition { get; set; }
         // curRect when the verb was last drawn (ScummVM oldRect): new and delete keep it, so a deleted verb clears it.
         public ScummScreenBox? DrawnBox { get; set; }
 
@@ -313,6 +316,7 @@ public sealed class ScummVerbTable
             Key = 0;
             Centered = false;
             Charset = null;
+            Preposition = 0;
         }
 
         public void Forget(string reason)
@@ -325,7 +329,8 @@ public sealed class ScummVerbTable
         public ScummVerbSnapshot ToSnapshot() =>
             new(index, VerbId, Mode, X, Y, ImageObject, ImageRoom, Name, Unknown, Estimate, DrawOrder)
             {
-                Color = Color, HighlightColor = HighlightColor, DimColor = DimColor, Key = Key, Centered = Centered, Charset = Charset
+                Color = Color, HighlightColor = HighlightColor, DimColor = DimColor, Key = Key, Centered = Centered, Charset = Charset,
+                Preposition = Preposition
             };
     }
 }
