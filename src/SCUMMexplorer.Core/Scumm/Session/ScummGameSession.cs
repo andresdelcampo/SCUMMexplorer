@@ -18,6 +18,7 @@ public sealed class ScummGameSession : ScummSession
         _cdTracks = ScummCdAudioTracks.For(game);
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
         var profile = ScummProfile.For(game);
+        _runtime.V2VerbYOffset = profile.V2VerbYOffset;
         if (profile.SeparateBitVariables)
         {
             // readVar/writeVar: from version 4 the bit variables are _bitVars, not bits of the word variables.
