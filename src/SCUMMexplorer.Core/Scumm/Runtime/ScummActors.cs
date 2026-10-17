@@ -50,7 +50,7 @@ public sealed record ScummActorLook(int? Costume, int? Elevation, int? Facing, i
 /// frame (<c>walkActor</c>, see <see cref="StepWalks"/>); only a walk from an
 /// unknown start is taken to end at its destination at once, labelled as an estimate.
 /// </summary>
-public sealed partial class ScummActorTable(bool useV4Walking = false)
+public sealed partial class ScummActorTable(bool useV4Walking = false, int actorCount = ScummActorTable.Count)
 {
     private readonly bool _useV4Walking = useV4Walking;
     /// <summary>ScummVM <c>_numActors</c> for this release family; actor 0 is not valid for scripts.</summary>
@@ -58,7 +58,12 @@ public sealed partial class ScummActorTable(bool useV4Walking = false)
     /// <summary>ScummVM <c>kObjectClassPlayer</c>: <c>Actor::isPlayer</c> for v3.</summary>
     public const int PlayerClass = 23;
 
-    private readonly Actor[] _actors = Enumerable.Range(0, Count).Select(number => new Actor(number)).ToArray();
+    private readonly Actor[] _actors = Enumerable.Range(0, actorCount > 0 ? actorCount : throw new ArgumentOutOfRangeException(nameof(actorCount)))
+        .Select(number => new Actor(number)).ToArray();
+    /// <summary>Allocated actor slots, including reserved slot zero (ScummVM _numActors).</summary>
+    public int Capacity => _actors.Length;
+    /// <summary>Whether this game's actor table contains a script-addressable actor.</summary>
+    public bool Contains(int number) => number >= 1 && number < Capacity;
     // Connected only by runtime lifetime accounting. Notifications never supply state or
     // estimates, invoke query callbacks, or consume the instruction observation sequence.
     internal Action<string, int?>? NativeMutation { get; set; }
@@ -160,10 +165,11 @@ public sealed partial class ScummActorTable(bool useV4Walking = false)
         }
         if (room == place.CurrentRoom)
         {
+            var wasVisible = actor.Visible == true;
             // putActor on a walking actor: stopActorMoving and the stand frame, then adjustActorPos.
             if (actor.Visible == true && actor.Moving != 0) StartAnimation(actor, actor.StandFrame, place);
             AdjustPosition(actor, place, show: true);
-            ShowCostume(actor, place);
+            if (!_v2Animations || !wasVisible) ShowCostume(actor, place);
         }
         else
         {
@@ -306,7 +312,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false)
             return;
         }
         actor.Animation.AnimationCounter = 0;
-        if (frame == actor.InitFrame) actor.Animation.Reset();
+        if (!_v2Animations && frame == actor.InitFrame) actor.Animation.Reset();
         CostumeData(costumeId)?.DecodeAnimation(actor.Animation, frame, ScummCostume.NewDirToOldDir(facing));
         actor.Frame = frame;
     }
@@ -339,8 +345,9 @@ public sealed partial class ScummActorTable(bool useV4Walking = false)
                 if (InRoom(actor, place)) TurnTo(actor, direction);
                 return $"turn to {direction}";
             default:
-                StartAnimation(actor, value, place);
-                return $"frame {value}";
+                var frame = _v2Animations ? value >> 2 : value;
+                StartAnimation(actor, frame, place);
+                return $"frame {frame}";
         }
     }
 
@@ -453,7 +460,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false)
     /// </summary>
     public void TalkAnimation(int number, bool start, Placement place)
     {
-        if (!IsValid(number)) return;
+        if (!Contains(number)) return;
         var actor = _actors[number];
         var frame = start ? actor.TalkStartFrame : actor.TalkStopFrame;
         if (!InRoom(actor, place) || actor.Frame == frame) return;
@@ -479,6 +486,17 @@ public sealed partial class ScummActorTable(bool useV4Walking = false)
     /// <summary><c>showActor</c> (v3): a costume that needs init starts its init frame.</summary>
     private void ShowCostume(Actor actor, Placement place)
     {
+        if (_v2Animations)
+        {
+            // Actor::showActor, versions 1/2: compose three partial animations after one reset.
+            // startAnimActor deliberately does not reset again for initFrame in these versions.
+            actor.Animation.Reset();
+            StartAnimation(actor, actor.StandFrame, place);
+            StartAnimation(actor, actor.InitFrame, place);
+            StartAnimation(actor, actor.TalkStopFrame, place);
+            actor.CostumeNeedsInit = false;
+            return;
+        }
         if (!actor.CostumeNeedsInit || actor.Costume == 0) return;
         StartAnimation(actor, actor.InitFrame, place);
         actor.CostumeNeedsInit = false;

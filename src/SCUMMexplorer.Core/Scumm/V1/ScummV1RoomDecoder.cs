@@ -25,7 +25,9 @@ public sealed class ScummV1RoomDecoder(ScummV1Game game)
 
         var tilesAcross = (int)data[4];
         var tilesDown = (int)data[5];
-        if (tilesAcross is < 1 or > 160 || tilesDown is < 1 or > 24) throw new InvalidDataException("Invalid v1 room dimensions.");
+        // Width is the full unsigned byte (room.cpp setupRoomSubBlocks): Maniac's intro room 49 is 200 tiles.
+        // At 255 by 24 tiles the pixel buffer is bounded to 391,680 bytes and all products fit int.
+        if (tilesAcross < 1 || tilesDown is < 1 or > 24) throw new InvalidDataException("Invalid v1 room dimensions.");
         var tileCount = tilesAcross * tilesDown;
         var characters = DecodeStream(data, Word(data, 10), 2048);
         var picture = DecodeStream(data, Word(data, 12), tileCount);

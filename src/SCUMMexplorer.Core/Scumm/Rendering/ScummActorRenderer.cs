@@ -95,7 +95,7 @@ public static class ScummActorRenderer
             // CD game: a box with a scale of its own (word or slot) sets it where the actor stands, else the actor's own (actorOps scale) holds.
             var scale = Math.Clamp((actor.WalkBox is int scaleBox && !actor.IgnoreBoxes.GetValueOrDefault() ? boxes?.BoxScale(scaleBox, y) : null) ?? look.Scale, 1, 255);
             int Scaled(int value) => scale < 255 ? (int)Math.Floor(value * (double)scale / 255) : value;
-            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 1 ? extraMasks![zPlane - 2] : zPlane > 0 ? depthMask : null, coverage, scale);
+            var written = costume.Compose(cels, pixels, width, height, x, top, look.Palette, zPlane > 1 ? extraMasks![zPlane - 2] : zPlane > 0 ? depthMask : null, coverage, scale, actor.Number);
             (int, int, int, int)? bounds = cels.Count == 0 ? null : (
                 x + Scaled(cels.Min(cel => cel.Left)), top + Scaled(cels.Min(cel => cel.Top)),
                 x + Scaled(cels.Max(cel => cel.Left + cel.Width)), top + Scaled(cels.Max(cel => cel.Top + cel.Height)));

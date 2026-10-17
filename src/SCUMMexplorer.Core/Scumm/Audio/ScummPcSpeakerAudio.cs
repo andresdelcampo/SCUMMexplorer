@@ -92,6 +92,58 @@ public sealed class ScummPcSpeakerAudio
         return RenderWave(data, 4, cancellationToken);
     }
 
+    /// <summary>
+    /// Runs only Player_V2's control ticks, not PCM. Native completion uses active channel timers; the v2 music timer is
+    /// channel zero's word at byte 46, set by the sound script (ScummVM player_v2base.cpp getMusicTimer, 17 October 2026).
+    /// A repeated complete control state proves a loop; exhausting the bound does not.
+    /// </summary>
+    public ScummSoundLifetime ReadV2Lifetime(GameResource resource)
+    {
+        try
+        {
+            if (resource.Kind != ResourceKind.Sound || resource.Offset is null)
+                throw new InvalidDataException("This is not an indexed v2 sound resource.");
+            var data = ScummPcSpeakerV1Audio.Slice(LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath)), resource.Offset.Value);
+            if (!ScummPcSpeakerV1Audio.IsV2Format(data))
+                throw new InvalidDataException("The sound is not in Player_V2 format.");
+            return ReadV2Lifetime(data);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or ArgumentException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
+    }
+
+    public ScummSoundLifetime ReadV2Lifetime(byte[] data)
+    {
+        try
+        {
+            if (data.Length < 14) throw new InvalidDataException("The v2 sound header is incomplete.");
+            var player = new Player(data, 4);
+            var seen = new Dictionary<string, int>();
+            var timer = new List<ScummSoundTimerPoint> { new(0, 0) };
+            for (var tick = 0; tick < MaxTicks; tick++)
+            {
+                if (!player.Playing)
+                    return new(ScummSoundLifetimeKind.Finite, tick * 2, timer.Any(p => p.Value != 0), TimerValues: timer.ToArray(), KeepsMusicTimer: true);
+                var key = player.ControlState();
+                if (seen.TryGetValue(key, out var start))
+                    return new(ScummSoundLifetimeKind.Looping, null, timer.Any(p => p.Value != 0), TimerValues: timer.ToArray(),
+                        KeepsMusicTimer: true, LoopStartCallback: start * 2, LoopEndCallback: tick * 2);
+                seen.Add(key, tick);
+                player.NextTick();
+                if (player.Overran) throw new InvalidDataException("The v2 sound script reads beyond its resource.");
+                if (timer[^1].Value != player.MusicTimer) timer.Add(new((tick + 1) * 2, player.MusicTimer));
+            }
+            return new(ScummSoundLifetimeKind.Unknown, null, timer.Any(p => p.Value != 0), "Player_V2 lifetime exceeded the bounded control trace.",
+                TimerValues: timer.ToArray(), KeepsMusicTimer: true);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or ArgumentException or IndexOutOfRangeException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, ex.Message);
+        }
+    }
+
     /// <summary>Renders the PCjr/Tandy part of a v2-format sound (Zak McKracken, enhanced Maniac Mansion): the channel pointers sit 10 bytes later in the header.</summary>
     public byte[] RenderPcjrWave(GameResource resource, CancellationToken cancellationToken = default)
     {
@@ -199,6 +251,10 @@ public sealed class ScummPcSpeakerAudio
         }
 
         public bool Playing => _channels.Take(4).Any(channel => channel[TimeLeft] != 0);
+
+        public ushort MusicTimer => _channels[0][23];
+        public bool Overran { get; private set; }
+        public string ControlState() => _returnAddress + ":" + string.Join(",", _channels.SelectMany(c => c));
 
         public bool HasWinner => WinningChannel() >= 0 || (_pcjr && _channels.Take(4).Any(channel => channel[Volume] != 0 && channel[TimeLeft] != 0));
 
@@ -445,7 +501,7 @@ public sealed class ScummPcSpeakerAudio
         private void ExecuteCommand(ushort[] current)
         {
             try { ExecuteCommandCore(current); }
-            catch (ScriptOverrun) { current[NextCmd] = 0; current[TimeLeft] = 0; }
+            catch (ScriptOverrun) { Overran = true; current[NextCmd] = 0; current[TimeLeft] = 0; }
         }
 
         /// <summary>execute_cmd: note that after 0xFD ScummVM keeps running the script on the cleared target channel.</summary>

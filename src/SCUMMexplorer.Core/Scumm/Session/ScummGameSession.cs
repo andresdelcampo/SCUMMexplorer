@@ -18,17 +18,20 @@ public sealed class ScummGameSession : ScummSession
         _cdTracks = ScummCdAudioTracks.For(game);
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
         var profile = ScummProfile.For(game);
+        if (_runtime.IsV2) _runtime.Actors.InitializeV2Game(profile.Dialect == ScummScriptDialect.V1);
+        _runtime.V2VerbYOffset = profile.V2VerbYOffset;
+        _runtime.IsClassicManiac = profile.RestoresClassicCutsceneScene;
         if (profile.SeparateBitVariables)
         {
             // readVar/writeVar: from version 4 the bit variables are _bitVars, not bits of the word variables.
             _runtime.GlobalVariables[ScummBoundedScriptExecutor.SeparateBitStorage] = 1;
             _runtime.EstimatedVariables.Add(ScummBoundedScriptExecutor.SeparateBitStorage);
         }
-        SoundCard = AdlibCard;
-        if (profile.VideoMode is int videoMode) _runtime.SetGlobalVariable(ScummVars.VideoMode, (ushort)videoMode);
-        _runtime.SetGlobalVariable(ScummVars.CharInc, ScummProfile.CharIncAtStart);
+        if (!_runtime.IsV2) SoundCard = AdlibCard;
+        if (!_runtime.IsV2 && profile.VideoMode is int videoMode) _runtime.SetGlobalVariable(ScummVars.VideoMode, (ushort)videoMode);
+        if (!_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.CharInc, ScummProfile.CharIncAtStart);
         // resetScummVars (scumm.cpp): the lights start as base palette, actors' own colours and room lights on (1 | 8 | 2).
-        _runtime.SetGlobalVariable(ScummVars.CurrentLights, 11);
+        _runtime.SetGlobalVariable(_runtime.CurrentLightsVariable, 11);
         foreach (var (variable, value) in profile.EngineVariablesAtStart) _runtime.SetGlobalVariable(variable, value);
         // The engine allocates every global variable zeroed (scumm.cpp: _scummVars = calloc), so a variable no script has written yet reads 0, not "unknown".
         for (var variable = 0; variable < profile.GlobalVariableCount; variable++)
@@ -59,6 +62,11 @@ public sealed class ScummGameSession : ScummSession
     public static ScummGameSession BootForPlay(GameLibrary game, out ScummIndexedObjectSnapshot indexedObjects)
     {
         ArgumentNullException.ThrowIfNull(game);
+        if (ScummDataSources.For(game) is ScummV2DataSource v2)
+        {
+            indexedObjects = v2.ReadIndexedObjects();
+            return new ScummGameSession(game, indexedObjects, data: v2);
+        }
         if (!ScummProfile.For(game).UsesV4Archive)
         {
             indexedObjects = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
@@ -133,6 +141,8 @@ public sealed class ScummGameSession : ScummSession
     // A resource that is not an old-bundle AdLib part has no established lifetime.
     private static Func<GameResource, ScummSoundLifetime> AdlibLifetime(GameLibrary game)
     {
+        if (game.Version is ScummVersion.V1 or ScummVersion.V2)
+            return new ScummPcSpeakerAudio().ReadV2Lifetime;
         var timing = ScummProfile.For(game).AdlibTiming;
         var adlib = new ScummAdlibAudio();
         // A game on several v4 disks stores its sounds in the disks' SO blocks (the AD part is the AdLib song); the browsed disks play at half the LOOM tempo
@@ -198,7 +208,7 @@ public sealed class ScummGameSession : ScummSession
         var arrival = $"Room {roomId:00} selected without playing the route to it (state preview): its entry scripts ran from the state the boot left.";
         _runtime.Messages.RouteSkipped($"Room {roomId:00} was entered without its route, so prints on the route to it did not run");
         var arrivals = ScummEgoArrivalIndex.For(_game);
-        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !ScummActorTable.IsValid(ego)) return EnterWithoutEgo(room, arrival, arrivals);
+        if (!_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) || !_runtime.Actors.Contains(ego)) return EnterWithoutEgo(room, arrival, arrivals);
         var candidates = arrivals.Into(roomId);
         if (candidates.Count == 0)
         {
@@ -309,8 +319,11 @@ public sealed class ScummGameSession : ScummSession
     private Dictionary<int, int> ObjectValues()
     {
         var values = new Dictionary<int, int>(_runtime.ObjectStates.Count);
-        foreach (var pair in _runtime.ObjectStates) values[pair.Key] = pair.Value;
-        foreach (var pair in _runtime.ObjectPositions) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
+        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
+        foreach (var pair in _runtime.ObjectStates)
+            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key] = pair.Value;
+        foreach (var pair in _runtime.ObjectPositions)
+            if (roomObjects is null || roomObjects.Contains(pair.Key)) values[pair.Key + 100000] = pair.Value.X * 1000 + pair.Value.Y;
         return values;
     }
 
@@ -333,16 +346,19 @@ public sealed class ScummGameSession : ScummSession
     public ScummRoomCapture CaptureRoom() => Capture();
 
     private ScummRoomCapture Capture() => new(Snapshot, Actors, CameraX, _runtime.ShadowPalette.ToArray(), _runtime.RoomColors.ToArray(),
-        _runtime.GlobalVariables.GetValueOrDefault(ScummVars.CurrentLights), _runtime.Flashlight, CurrentWalkBoxes);
+        _runtime.GlobalVariables.GetValueOrDefault(_runtime.CurrentLightsVariable), _runtime.Flashlight, CurrentWalkBoxes);
 
     private long Signature(Dictionary<int, Queue<int>> changes, int frame)
     {
         bool Ambient(int id) => changes.TryGetValue(id, out var queue) && queue.Count >= 4;
         var hash = new HashCode();
+        // v1/v2 background scripts animate objects in rooms that are not loaded. Their flags still
+        // belong to persistent state, but cannot keep the current room's picture from settling.
+        var roomObjects = _runtime.IsV2 ? _currentObjects.Select(item => item.Id).ToHashSet() : null;
         foreach (var pair in _runtime.ObjectStates.OrderBy(item => item.Key))
-            if (!Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
+            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key)) { hash.Add(pair.Key); hash.Add(pair.Value); }
         foreach (var pair in _runtime.ObjectPositions.OrderBy(item => item.Key))
-            if (!Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
+            if ((roomObjects is null || roomObjects.Contains(pair.Key)) && !Ambient(pair.Key + 100000)) { hash.Add(pair.Key); hash.Add(pair.Value.X); hash.Add(pair.Value.Y); }
         foreach (var actor in Actors) { hash.Add(actor.Number); hash.Add(actor.Room); hash.Add(actor.X); hash.Add(actor.Y); hash.Add(actor.Visible); hash.Add(actor.Look.Costume); }
         foreach (var colour in _runtime.ShadowPalette.Take(16)) hash.Add(colour);
         foreach (var colour in _runtime.RoomColors.Take(16)) hash.Add(colour);

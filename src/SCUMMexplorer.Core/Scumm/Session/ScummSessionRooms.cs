@@ -6,7 +6,7 @@ namespace SCUMMexplorer.Core.Scumm;
 public abstract partial class ScummSession
 {
     /// <summary>ScummVM <c>VAR_EGO</c>.</summary>
-    protected const string EgoVariable = ScummVars.Ego;
+    protected string EgoVariable => _runtime.EgoVariable;
 
     /// <summary>Actor rooms, positions and walk boxes as reached code left them (actors 1–12).</summary>
     public IReadOnlyList<ScummActorSnapshot> Actors => _runtime.Actors.Snapshot();
@@ -35,7 +35,7 @@ public abstract partial class ScummSession
         if (estimatedLoad)
             _uncertainties.Add($"Room {room.ResourceId:00} entered by estimated execution at {load!.SourceLabel} +0x{load.Offset:X4}; execution continues without promoting the transition's certainty.");
         var withEgo = load is { Operation: "loadRoomWithEgo", ResolvedArguments: { Count: 4 } } ? load : null;
-        int? ego = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoValue) && ScummActorTable.IsValid(egoValue) ? egoValue : null;
+        int? ego = _runtime.GlobalVariables.TryGetValue(EgoVariable, out var egoValue) && _runtime.Actors.Contains(egoValue) ? egoValue : null;
         if (withEgo is not null)
         {
             // o5_loadRoomWithEgo: ego->putActor(room) before startScene; the ego
@@ -75,7 +75,7 @@ public abstract partial class ScummSession
         _currentObjects = roomData.Objects;
         // getObjOrActorName for text code 6: the stored names of this room's objects.
         var objectNames = roomData.ObjectNames;
-        _runtime.ObjectName = id => objectNames.TryGetValue(id, out var name) ? name : InventoryObjectName(id);
+        _runtime.ObjectName = id => CurrentObjectName(id, objectNames.TryGetValue(id, out var name) ? name : InventoryObjectName(id));
         _runtime.WalkBoxFlagsUnknown = null;
         _runtime.WalkBoxes = roomData.WalkBoxes;
         if (roomData.WalkBoxError is not null)
@@ -87,19 +87,20 @@ public abstract partial class ScummSession
         _runtime.RoomCameraBounds = _runtime.CameraRange = (160, Math.Max(160, roomWidth - 160));
         _runtime.ResetShadowPalette();
         _runtime.ResetRoomColors();
-        _runtime.SetGlobalVariable(CameraVariable, 160);
+        _runtime.WriteCameraPixels(160);
         _runtime.EstimatedVariables.Remove(CameraVariable);
         _runtime.Camera.Reset(160);
         // startScene resets VAR_CAMERA_MIN_X and VAR_CAMERA_MAX_X (v3: vars 17 and 18).
-        _runtime.SetGlobalVariable(ScummVars.CameraMinX, 160);
-        _runtime.SetGlobalVariable(ScummVars.CameraMaxX, (ushort)Math.Max(160, roomWidth - 160));
-        _runtime.EstimatedVariables.Remove(ScummVars.CameraMinX);
-        _runtime.EstimatedVariables.Remove(ScummVars.CameraMaxX);
+        _runtime.SetGlobalVariable(_runtime.CameraMinVariable, (ushort)(_runtime.IsV2 ? 20 : 160));
+        _runtime.SetGlobalVariable(_runtime.CameraMaxVariable, (ushort)(Math.Max(160, roomWidth - 160) / (_runtime.IsV2 ? 8 : 1)));
+        _runtime.EstimatedVariables.Remove(_runtime.CameraMinVariable);
+        _runtime.EstimatedVariables.Remove(_runtime.CameraMaxVariable);
         foreach (var item in _currentObjects)
             _runtime.TryAddObjectPosition(item.Id, new RoomObjectPosition(item.X, item.Y));
         // startScene (room.cpp): VAR_ROOM is the number the script loaded; a pseudo room (0x80 and up, o5_pseudoRoom) loads its real room under that number.
         var loadedNumber = load?.TargetId is int number && number >= 0x80 && _runtime.PseudoRooms.GetValueOrDefault(number) == room.ResourceId ? number : room.ResourceId!.Value;
         _runtime.SetGlobalVariable(ScummVars.Room, (ushort)loadedNumber);
+        if (_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.V2.RoomResource, (ushort)room.ResourceId!.Value);
         if (loadedNumber != room.ResourceId)
             _visitTrace.Add($"Room {room.ResourceId:00} entered as pseudo room {loadedNumber} (VAR_ROOM = {loadedNumber})");
         _roomSize = (roomWidth, roomData.Height);
@@ -109,6 +110,7 @@ public abstract partial class ScummSession
 
         RunGlobalHook(ScummVars.EntryScript, "before room entry", estimatedLoad);
         RunEmbeddedRoomScript(room, exit: false, pathEstimated: estimatedLoad);
+        if (_runtime.IsV2) RunIndexedScript(5, 0, null, 0, pathEstimated: estimatedLoad); // room.cpp: fixed v1/v2 entry hook, after embedded entry.
         RunGlobalHook(ScummVars.EntryScript2, "after room entry", estimatedLoad);
         if (withEgo is not null && ego is int placedEgo) PlaceEgoAfterEntry(withEgo, placedEgo, assumedArrival);
         else if (placeAfterLoadRoom is not null && ego is int putEgo) placeAfterLoadRoom(putEgo);
@@ -146,12 +148,13 @@ public abstract partial class ScummSession
         _runtime.Actors.HideAll();
         _runtime.Messages.RoomEntered(_runtime);
         _currentObjects = [];
-        _runtime.ObjectName = _ => null;
+        _runtime.ObjectName = _runtime.IsV2 ? id => CurrentObjectName(id, InventoryObjectName(id)) : _ => null;
         _runtime.WalkBoxFlagsUnknown = null;
         _runtime.WalkBoxes = null;
         _runtime.RoomCameraBounds = _runtime.CameraRange = null;
         _roomSize = null;
         _runtime.SetGlobalVariable(ScummVars.Room, NullRoom);
+        if (_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.V2.RoomResource, NullRoom);
         _visitTrace.Add($"{load.SourceLabel} +0x{load.Offset:X4}: room {NullRoom} (no room) {when}");
     }
 
@@ -166,7 +169,7 @@ public abstract partial class ScummSession
     {
         var arguments = load.ResolvedArguments!;
         var source = $"{load.SourceLabel} +0x{load.Offset:X4}";
-        if (!_runtime.Actors.EgoPositioned)
+        if (_runtime.IsV2 || !_runtime.Actors.EgoPositioned)
         {
             var record = arguments[0] is int objectId ? _currentObjects.FirstOrDefault(item => item.Id == objectId) : null;
             if (record is null)
@@ -193,8 +196,10 @@ public abstract partial class ScummSession
         // setCameraFollows(ego): the camera is already on the ego, so it only enters follow mode.
         _runtime.Camera.Mode = ScummCamera.FollowActor;
         _runtime.Camera.Follows = ego;
-        if (arguments[2] is int x && x != -1 && arguments[3] is int y)
+        if (arguments[2] is int x && x != -1 && arguments[3] is int y && (!_runtime.IsV2 || x >= 0 && y >= 0))
         {
+            // o2_loadRoomWithEgo stores signed native coordinates; Actor_v2 draws in 8x2 units.
+            if (_runtime.IsV2) { x *= 8; y *= 2; }
             // A catalog visit's assumed arrival shows the state after it, so its walk ends at once (estimate).
             _runtime.Actors.Walk(ego, x, y, CurrentPlacement(), $"the ego's walk from {source}", atOnce: assumedArrival is not null);
             // The walk's destination comes from the same assumed or picked arrival.
@@ -247,11 +252,11 @@ public abstract partial class ScummSession
         {
             // scummLoop: the virtual mouse is the pointer's screen point moved into the room (xstart, topline); VAR_MOUSE_X/Y keep the screen point.
             var (virtualX, virtualY) = VirtualPoint(screen.X, screen.Y);
-            _runtime.SetGlobalVariable(ScummVars.MouseX, (ushort)virtualX);
-            _runtime.SetGlobalVariable(ScummVars.MouseY, (ushort)virtualY);
-            _runtime.SetGlobalVariable(ScummVars.ScreenMouseX, (ushort)screen.X);
-            _runtime.SetGlobalVariable(ScummVars.ScreenMouseY, (ushort)screen.Y);
-            foreach (var variable in new[] { ScummVars.MouseX, ScummVars.MouseY, ScummVars.ScreenMouseX, ScummVars.ScreenMouseY })
+            _runtime.SetGlobalVariable(_runtime.MouseXVariable, unchecked((ushort)(virtualX >> (_runtime.IsV2 ? 3 : 0))));
+            _runtime.SetGlobalVariable(_runtime.MouseYVariable, unchecked((ushort)(virtualY >> (_runtime.IsV2 ? 1 : 0))));
+            if (!_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.ScreenMouseX, (ushort)screen.X);
+            if (!_runtime.IsV2) _runtime.SetGlobalVariable(ScummVars.ScreenMouseY, (ushort)screen.Y);
+            foreach (var variable in new[] { _runtime.MouseXVariable, _runtime.MouseYVariable, ScummVars.ScreenMouseX, ScummVars.ScreenMouseY })
                 _runtime.EstimatedVariables.Remove(variable);
             _runtime.VirtualMouse = (virtualX, virtualY);
             _runtime.VirtualMouseAssumption = $"the player's pointer at screen ({screen.X}, {screen.Y})";
@@ -259,20 +264,20 @@ public abstract partial class ScummSession
         }
         if (_pointer is { } pointer)
         {
-            _runtime.SetGlobalVariable(ScummVars.MouseX, (ushort)pointer.X);
-            _runtime.SetGlobalVariable(ScummVars.MouseY, (ushort)pointer.Y);
-            _runtime.EstimatedVariables.Remove(ScummVars.MouseX);
-            _runtime.EstimatedVariables.Remove(ScummVars.MouseY);
+            _runtime.SetGlobalVariable(_runtime.MouseXVariable, unchecked((ushort)(pointer.X >> (_runtime.IsV2 ? 3 : 0))));
+            _runtime.SetGlobalVariable(_runtime.MouseYVariable, unchecked((ushort)(pointer.Y >> (_runtime.IsV2 ? 1 : 0))));
+            _runtime.EstimatedVariables.Remove(_runtime.MouseXVariable);
+            _runtime.EstimatedVariables.Remove(_runtime.MouseYVariable);
             _runtime.VirtualMouse = pointer;
             _runtime.VirtualMouseAssumption = $"assumed input: the pointer rests over the room at ({pointer.X}, {pointer.Y}), {_pointerNote}";
             return;
         }
         var x = CameraX ?? size.Width / 2;
         var y = size.Height;
-        _runtime.SetGlobalVariable(ScummVars.MouseX, (ushort)x);
-        _runtime.SetGlobalVariable(ScummVars.MouseY, (ushort)y);
-        _runtime.EstimatedVariables.Remove(ScummVars.MouseX);
-        _runtime.EstimatedVariables.Remove(ScummVars.MouseY);
+        _runtime.SetGlobalVariable(_runtime.MouseXVariable, unchecked((ushort)(x >> (_runtime.IsV2 ? 3 : 0))));
+        _runtime.SetGlobalVariable(_runtime.MouseYVariable, unchecked((ushort)(y >> (_runtime.IsV2 ? 1 : 0))));
+        _runtime.EstimatedVariables.Remove(_runtime.MouseXVariable);
+        _runtime.EstimatedVariables.Remove(_runtime.MouseYVariable);
         _runtime.VirtualMouse = (x, y);
         _runtime.VirtualMouseAssumption = $"assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at ({x}, {y})";
     }
@@ -304,7 +309,7 @@ public abstract partial class ScummSession
     public IReadOnlyList<ScummVerbSnapshot> Verbs => _runtime.Verbs.Snapshot();
 
     /// <summary>The camera's centre x in room pixels (<c>var[0x002]</c>), or null when it is unknown.</summary>
-    public int? CameraX => _runtime.GlobalVariables.TryGetValue(CameraVariable, out var x) ? x : null;
+    public int? CameraX => _runtime.ReadCameraPixels();
 
     /// <summary>True when <see cref="CameraX"/> comes from an estimate (a walk end, a seeded pick, an instant pan).</summary>
     public bool CameraEstimated => _runtime.EstimatedVariables.Contains(CameraVariable);
@@ -320,7 +325,7 @@ public abstract partial class ScummSession
     {
         var (min, max) = _runtime.CameraRange ?? (160, 160);
         var clamped = (ushort)Math.Clamp(x, min, max);
-        _runtime.SetGlobalVariable(CameraVariable, clamped);
+        _runtime.WriteCameraPixels(clamped);
         _runtime.Camera.DestX = x;
         _runtime.Camera.MovingToActor = false;
         if (estimate is null) _runtime.EstimatedVariables.Remove(CameraVariable);
@@ -348,7 +353,7 @@ public abstract partial class ScummSession
     /// </summary>
     protected void FollowEgoWalk(ScummActorSnapshot walked, string source)
     {
-        if (!_runtime.GlobalVariables.TryGetValue(CameraVariable, out var camera)) return;
+        if (_runtime.ReadCameraPixels() is not int camera) return;
         if (walked.X is not int endX || walked.Room != _currentRoom?.ResourceId)
         {
             ForgetCamera($"it follows the ego's walk from {source}, whose end is unknown");
@@ -384,6 +389,10 @@ public abstract partial class ScummSession
         }
         return images.FirstOrDefault(item => item.Id == objectId);
     }
+
+    // A renamed resource still has to be present in this room or inventory for getObjOrActorName to find it.
+    private byte[]? CurrentObjectName(int id, byte[]? storedName) =>
+        _runtime.IsV2 && storedName is not null && _runtime.ObjectNameOverrides.TryGetValue(id, out var renamed) ? renamed : storedName;
 
     /// <summary>A game whose room entry must also erase the previous room's strings from the verb screen (a menu room) says so here.</summary>
     protected virtual bool ErasesVerbScreenOnEntry => false;

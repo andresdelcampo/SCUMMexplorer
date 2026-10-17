@@ -706,6 +706,7 @@ public partial class MainWindow : Window
     internal static RoomImage DecodeOlderRoom(GameLibrary game, byte[] bytes)
     {
         var background = game is { Version: ScummVersion.V1, V1Game: { } v1 } ? new ScummV1RoomDecoder(v1).Decode(bytes) : new ScummV2RoomDecoder().Decode(bytes);
+        if (ScummProfile.For(game).HasFirstVisitScenes) return background;
         // The objects that are visible at the start of the game are painted over the background.
         var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
         return ScummOldRoomObjects.ComposeVisible(background, bytes, game.V1Game, states);
@@ -836,7 +837,9 @@ public partial class MainWindow : Window
             var button = new Button
             {
                 Content = text,
-                ToolTip = $"Object {label.Id} · {label.X}, {label.Y} · {label.Width} × {label.Height}. A stored object; the game's scripts decide whether it is present.",
+                ToolTip = $"Object {label.Id} · {label.X}, {label.Y} · {label.Width} × {label.Height}. " +
+                    (_browsedScene is not null ? "Selectable in the room state reached by its scripts."
+                        : "A stored object; the game's scripts decide whether it is present."),
                 HorizontalContentAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 3),
                 Padding = new Thickness(8, 3, 8, 3),
@@ -903,8 +906,10 @@ public partial class MainWindow : Window
         if (label is not null) Box(label, true);
     }
 
-    private static IReadOnlyList<BrowsedObjectLabel> ReadOlderObjects(GameLibrary game, byte[] bytes)
+    private static IReadOnlyList<BrowsedObjectLabel> ReadOlderObjects(GameLibrary game, byte[] bytes, ScummRoomScene? scene = null)
     {
+        if (scene is not null) return ReadOlderFirstVisitObjects(bytes, scene);
+        if (ScummProfile.For(game).HasFirstVisitScenes) return [];
         var states = OlderObjectStates.GetOrAdd(game.FolderPath, _ => ScummOldRoomObjects.ReadInitialStates(game.FolderPath, game.Version, game.V1Game));
         return ScummOldRoomObjects.Read(LflEncoding.DecodeXorFF(bytes), states).Where(entry => entry.Visible && entry.Name.Length > 0)
             .Select(entry => new BrowsedObjectLabel(entry.Id, entry.Name, entry.X, entry.Y, entry.Width, entry.Height)).ToList();
@@ -946,7 +951,7 @@ public partial class MainWindow : Window
         }
         // First visit of a game the generic session boots (R-5.3, R-6.12a): the room as the session leaves it, with its actors; the plain background where that cannot run.
         if (ScummProfile.For(game).HasFirstVisitScenes && roomResource.ResourceId is int firstVisitRoom &&
-            ScummRoomFirstVisit.Cached(game, firstVisitRoom) is { } firstVisit)
+            ReadFirstVisit(game, firstVisitRoom) is { } firstVisit)
             return CreateRoomCardBitmap(firstVisit.Room, firstVisit.ComposeWithActors(), firstVisit.State.CameraX ?? 0, firstVisit.DisplayPalette());
         if (game.V4Disks is not null && game.V4ArchiveFor(roomResource) is { } browsed)
         {
@@ -1368,7 +1373,7 @@ public partial class MainWindow : Window
             // First visit of a browsed old-bundle game (R-5.3): the entry hooks and scripts run in a fresh generic session; the plain background where that cannot run.
             ScummRoomScene? browsedScene = null;
             if (_game is { } sceneGame && ScummProfile.For(sceneGame).HasFirstVisitScenes && resource.ResourceId is int sceneRoomId)
-                browsedScene = await Task.Run(() => ScummRoomFirstVisit.Cached(sceneGame, sceneRoomId), token);
+                browsedScene = await Task.Run(() => ReadFirstVisit(sceneGame, sceneRoomId), token);
             _browsedScene = browsedScene;
             var room = browsedScene?.Room ?? cdScene?.Room ?? (isCd ? await Task.Run(() => _game!.V4Archive!.DecodeRoom(resource.ResourceId!.Value), token)
                 : browseArchive is not null ? await Task.Run(() => browseArchive.DecodeRoom(resource.ResourceId!.Value), token)
@@ -1392,7 +1397,7 @@ public partial class MainWindow : Window
                 _currentRoomResource = resource;
                 _lastViewedRoomResource = resource;
                 // Names the pointer reveals: the drawn objects of a v1 or v2 game; every named object of a v4 or v5 game (their starting states come from scripts).
-                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes) : browseArchive is not null ? ReadStoredV4Objects(browseArchive, resource.ResourceId!.Value, browsedScene)
+                _olderObjects = enhancedV2 ? ReadOlderObjects(_game!, bytes, browsedScene) : browseArchive is not null ? ReadStoredV4Objects(browseArchive, resource.ResourceId!.Value, browsedScene)
                     : _game?.Version == ScummVersion.V3 && !isCd ? ReadStoredV3Objects(bytes, browsedScene) : [];
                 _currentRoomObjectRecords = browsedScene?.Records ?? cdScene?.Records ?? [];
                 _roomVerbs = new Dictionary<int, IReadOnlyList<ScummObjectVerbEntry>>();

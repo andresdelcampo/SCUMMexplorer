@@ -9,6 +9,18 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - First visit: 107 of 110 rooms without a gap (Rooms 104–106 are image holders), 0 items not followed; Rooms 39, 55, 79 pinned.
 - Validation: `ScummMonkey2SessionTests`, `ScummMonkey2FirstVisitTests`; MonkeyCd, support, play and first-visit neighbours; LOOM regression. Records: [monkey2-session-20261017](../.verification/monkey2-session-20261017/README.md), [monkey2-objects-20261017](../.verification/monkey2-objects-20261017/README.md).
 
+## 17 October: Maniac/Zak first-visit source previews (S5; visual acceptance open)
+
+- Added reached first-visit object previews and hotspots for all four v1/v2 families, with a reviewed Maniac party-input recipe outside the engine. Corrected old object flags, duplicate image drawing, pseudo-room arrivals, settling and actor costume initialization.
+- All 221 rooms open without audit errors; 216 have no detector findings. Sixteen real-window checks pass. Retained black regions, camera/alignment uncertainty and shown-lit dark rooms remain explicit; source checks and app captures do not establish native visual equivalence.
+- Objects remains Partial; S6 was not started. [Checkpoint, family evidence and validation](checkpoints/20261017-S5-ManiacZak.md).
+
+## 17 October: classic and enhanced Maniac Mansion and Zak boot in the generic session (S4b)
+
+- Added v1/v2 data sources, dialect-specific decoding and a separate bounded executor partial, with native engine variables, actor defaults, verb slots, sentence/object dispatch, cutscene restoration and sound clocks. Source-backed fixes also restore the wide classic Maniac introduction room and preserve native message character counts.
+- ManiacClassic and ManiacEnhanced reach Room 44 with control after explicit Syd/Bernard selection; ZakClassic and ZakEnhanced reach Room 1 after their full introductions without player input. Each endpoint remains stable for 120 additional frames. Seeded choices and sound/movement estimates retain their labels; no native ScummVM run is claimed.
+- No support cells raised. ZakClassic's corrected static costume analysis is 24 derived and 11 estimates; its cell remains partial. S5, S6, S7 and S9 are separate next stages. [Checkpoint, evidence and validation](checkpoints/20261017-S4b-ManiacZak.md).
+
 ## 17 October: the Spanish eight-disk release, and accents in the cutscene list (S9, MonkeyFloppy)
 
 - `Games/monkey1 ega es` (Spanish, eight disks, 16 colours) checked against the English floppy: boot (protection answered from its own `var[0x10A]`), room audit (81/81 without a gap, equal to English in outcome, active images and gaps), the R-7.18 route with its sounds and the right click, the cutscene scan (294 triggers, 164 entries, 104 begin, equal per entry), accents (CP437 codes with a glyph in every charset), one window look. Differences are data: texts and the offsets that follow them (the route test reads its sound offsets from the copy's script), Room 87's entry, the 0xFA glyph. No cell changes.
