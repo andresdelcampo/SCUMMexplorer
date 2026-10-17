@@ -123,6 +123,7 @@ public sealed partial class ScummBoundedScriptExecutor
         var knownVariables = runtime is null
             ? new Dictionary<string, ushort>(StringComparer.Ordinal)
             : new Dictionary<string, ushort>(runtime.GlobalVariables, StringComparer.Ordinal);
+        if (runtime?.IsV2 == true) knownVariables[V2IndirectReads] = 1;
         for (var index = 0; index < 26; index++)
         {
             var key = $"local[0x{index:X3}]";
@@ -2163,7 +2164,9 @@ public sealed partial class ScummBoundedScriptExecutor
             }
             (x2, y2) = adjusted;
         }
-        distance = Math.Max(Math.Abs(pointA.Value.X - x2), Math.Abs(pointA.Value.Y - y2));
+        distance = runtime.IsV2
+            ? Math.Max(Math.Abs((pointA.Value.X >> 3) - (x2 >> 3)), Math.Abs((pointA.Value.Y >> 1) - (y2 >> 1)))
+            : Math.Max(Math.Abs(pointA.Value.X - x2), Math.Abs(pointA.Value.Y - y2));
         if (estimates.Count > 0) estimate = string.Join("; ", estimates);
         return true;
     }
@@ -3292,6 +3295,10 @@ public sealed partial class ScummBoundedScriptExecutor
             var key = $"{match.Groups[1].Value}[0x{int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]";
             if (variables.TryGetValue(key, out value))
             {
+                if (variables.ContainsKey(V2IndirectReads) && key is "var[0x00E]" or "var[0x00F]" or "var[0x010]")
+                {
+                    if (!variables.TryGetValue($"var[0x{value:X3}]", out value)) { detail = "v2 indirect read points outside known globals"; return false; }
+                }
                 detail = "known value";
                 return true;
             }

@@ -4,6 +4,7 @@ namespace SCUMMexplorer.Core.Scumm;
 
 public sealed partial class ScummBoundedScriptExecutor
 {
+    private const string V2IndirectReads = "engine:v2-indirect-reads";
     private static bool TryApplyV2Pickup(ScummScriptInstruction instruction, IDictionary<string, ushort> variables,
         IReadOnlyList<ScummRoomObjectRecord> objects, ScummScriptRuntimeState runtime, List<int> drawQueue,
         List<string> trace, ScummScriptEventCertainty certainty, out string problem)
@@ -54,6 +55,26 @@ public sealed partial class ScummBoundedScriptExecutor
         string Value(int n, int scale = 1) => Read(n, out var value) ? $"0x{unchecked((ushort)(value * scale)):X4}" : p[n];
         switch (source.Operation)
         {
+            case "setObjectName":
+                if (!Read(0, out var renamed)) return false;
+                var quote = source.Operands.IndexOf('"');
+                if (quote < 0 || !source.Operands.EndsWith('"')) return false;
+                if (runtime.ObjectName?.Invoke(renamed) is not null)
+                    runtime.ObjectNameOverrides[renamed] = ScummTextDecoder.ParseEscaped(source.Operands[(quote + 1)..^1]);
+                handled = true;
+                return true;
+            case "drawSentence":
+                if (runtime.IsClassicManiac && (runtime.V2UserState & 0x20) != 0 &&
+                    variables.TryGetValue("var[0x01B]", out var sentenceObject) && sentenceObject > 0 &&
+                    variables.TryGetValue("var[0x01D]", out var sentencePrep) && sentencePrep == 0 && variables.TryGetValue("var[0x01A]", out var sentenceVerbNumber))
+                {
+                    var sentenceVerb = runtime.Verbs.Snapshot().FirstOrDefault(v => v.VerbId == sentenceVerbNumber);
+                    if (sentenceVerb?.Preposition == 255) return false; // Requires old object header prep lookup.
+                    if (sentenceVerb is not null) variables["var[0x01D]"] = (ushort)sentenceVerb.Preposition;
+                }
+                trace.Add("v2 sentence display requested; sentence-line rendering remains S6");
+                handled = true;
+                return true;
             case "dummy" when source.Opcode == 0xEE: handled = true; return true;
             case "pseudoRoom":
                 if (!Read(0, out var realRoom)) return false;
@@ -141,7 +162,7 @@ public sealed partial class ScummBoundedScriptExecutor
                 return true;
             case "lights":
                 if (!Read(0, out var light) || !Read(1, out var flashY) || !Read(2, out var lightMode)) return false;
-                if (lightMode == 0) { variables[runtime.CurrentLightsVariable] = light; RefreshBitAliases(runtime.CurrentLightsVariable, variables); }
+                if (lightMode == 0) { variables[runtime.CurrentLightsVariable] = runtime.IsClassicManiac ? (ushort)(light == 2 ? 11 : light == 1 ? 4 : 0) : light; RefreshBitAliases(runtime.CurrentLightsVariable, variables); }
                 else if (lightMode == 1) runtime.Flashlight = (light, flashY);
                 handled = true;
                 return true;
@@ -157,7 +178,7 @@ public sealed partial class ScummBoundedScriptExecutor
                     Operands = $"{p[0]} {(source.Operation == "add" ? "+=" : source.Operation == "subtract" ? "-=" : "=")} {p[1]}" };
                 return true;
             case "assignVarWordIndirect": case "addIndirect": case "subIndirect":
-                if (!Read(0, out var target) || target >= 256 || !Read(1, out var right)) return false;
+                if (!variables.TryGetValue(p[0], out var target) || target >= 256 || !Read(1, out var right)) return false;
                 var key = $"var[0x{target:X3}]";
                 instruction = source with { Operation = source.Operation == "assignVarWordIndirect" ? "move" : source.Operation == "addIndirect" ? "add" : "subtract",
                     Operands = $"{key} {(source.Operation == "assignVarWordIndirect" ? "=" : source.Operation == "addIndirect" ? "+=" : "-=")} 0x{right:X4}" };
@@ -294,7 +315,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
             case "animateActor": case "faceActor": case "walkActorToActor": case "setBoxFlags":
-            case "resourceRoutines": case "actorFollowCamera": case "drawObject": case "waitForSentence": case "pickupObject":
+            case "resourceRoutines": case "actorFollowCamera": case "drawObject": case "waitForSentence": case "pickupObject": case "getDist":
                 return true;
             default: return false;
         }

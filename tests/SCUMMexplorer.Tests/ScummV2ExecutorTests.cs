@@ -5,6 +5,18 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2ExecutorTests
 {
     [Fact]
+    public void IndirectReadSlotsDereferenceOnceButTheirWritesRemainRaw()
+    {
+        var runtime = Runtime();
+        var run = Run(runtime, ("move", "var[0x050], 0x002A"), ("move", "var[0x00E], 0x0050"),
+            ("move", "var[0x051], var[0x00E]"), ("add", "var[0x00E], 0x0001"),
+            ("assignVarWordIndirect", "var[0x00E], 0x0007"));
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(81, run.KnownVariables["var[0x00E]"]);
+        Assert.Equal(7, run.KnownVariables["var[0x051]"]);
+        Assert.Equal(42, run.KnownVariables["var[0x050]"]);
+    }
+    [Fact]
     public void ActorCostumeNormalizationRetainsKnownPlacement()
     {
         var runtime = Runtime();
