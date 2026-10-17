@@ -20,7 +20,7 @@ Objects and Play are now Full for all four families, reflecting native first-vis
 
 The initial walking port regressed both Maniac Room 2 settling tests. The source direction tables corrected the turn loop; assertions were retained. Independent review found stale inventory scrolling after changing actors/ownership; the fix has a focused regression. Shared changes stay version-gated, with v1/v2 opcodes in their own partial.
 
-Master was merged in the integration worktree, preserving concurrent Monkey CD Play and Indy4 work. Conflicts in `ScummProfile` and charset loading retain both paths. The merged solution builds with zero warnings and errors. Final full-suite and matrix results are pending below.
+Master was merged in the integration worktree, preserving concurrent Monkey CD Play, Monkey2 and Indy4 work, including checkpoint `b320884`. Conflicts in `ScummProfile`, charset loading and documentation retain both sides. The final merged solution builds with zero warnings and errors; matrix regeneration passes three tests. The full suite passes **1197 tests, zero failed, five skipped** (1202 total, 6m58s), with `SCUMM_SOUND_TEST_ROOT=D:/Juegos/Lucas/loom ega mt32 en`, `SCUMM_INDY3_EGA_TEST_ROOT=D:/Juegos/Lucas/indy3 ega en`, and `SCUMM_MT32_ROM_ROOT=D:/Juegos/Lucas/mt32`. The generated report is `.verification/maniaczak-play-20261017/test-results/maniaczak-s6-final-merged.trx`; commands and build paths are in the integration record. An earlier pre-Monkey2 full run passed 1187 tests, zero failed, five skipped; it does not replace this final merged result.
 
 ## Not done and why
 

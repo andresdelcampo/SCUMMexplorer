@@ -8,6 +8,7 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Native box routing, direction remapping, player-actor identity and actor draw offsets support the checked routes. Both Maniac routes select the party, skip the opening, walk out and take/select the key. Both Zak routes take the phone bill, skip the reached alien scene, walk to the shop, choose Buy and finish its CashCard refusal with control restored.
 - Four real-window routes pass; Objects and Play become Full and both generated matrices are updated. This is bounded route support, not a complete playthrough or original-interpreter picture comparison. S5 visual findings, native darkness/flashlight, the generic closest-point walking approximation and untested editions remain disclosed. Proposed R-7.19 to R-7.21 are retained separately.
 - Parallel work used four family worktrees with one shared-engine owner. Concurrent master changes were retained. Build/full-suite evidence and exact window commands are in the [checkpoint](checkpoints/20261017-S6-ManiacZak.md) and [integration record](../.verification/maniaczak-play-20261017/README.md).
+- Final merged validation: build zero warnings/errors; 1197 tests passed, zero failed, five skipped; three matrix tests and four real-window routes passed.
 
 ## 17 October: Monkey Island 2 boots to the campfire and shows its first-visit rooms (S4b, S5, Monkey2)
 

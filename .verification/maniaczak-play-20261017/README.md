@@ -53,7 +53,7 @@ $env:SCUMM_MT32_ROM_ROOT = 'D:\Juegos\Lucas\mt32'
 rtk proxy dotnet test SCUMMexplorer.slnx --no-build --no-restore --verbosity quiet --logger "trx;LogFileName=maniaczak-s6-final-merged.trx" --results-directory ".verification/maniaczak-play-20261017/test-results"
 ```
 
-Before the latest master merge, the full suite passed 1187 tests, zero failed, five skipped (6m19s). Master then advanced with Monkey2 work; its changes were merged, both matrices regenerated (three tests passed), and the solution rebuilt with zero warnings/errors. The final merged full-suite result is recorded in the checkpoint and generated TRX file.
+Before the latest master merge, the full suite passed 1187 tests, zero failed, five skipped (6m19s). Master then advanced with Monkey2 work; its changes through checkpoint `b320884` were merged, both matrices regenerated (three tests passed), and the solution rebuilt with zero warnings/errors. The final merged full suite passes **1197 tests, zero failed, five skipped** (1202 total, 6m58s). The generated report is `test-results/maniaczak-s6-final-merged.trx`.
 
 ## Real-window method
 
