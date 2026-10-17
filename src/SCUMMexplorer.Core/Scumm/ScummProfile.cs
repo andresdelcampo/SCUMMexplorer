@@ -23,6 +23,13 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// </summary>
     public ScummVersion EngineVersion { get; init; } = Version;
 
+    /// <summary>ScummVM scumm.cpp: Maniac Mansion allocates 25 actor slots; these other families allocate 13, including reserved slot zero.</summary>
+    public int ActorCount { get; init; } = 13;
+    /// <summary>Maniac v1 o2_endCutscene restores the saved camera mode and, unless following ego, the saved room.</summary>
+    public bool RestoresClassicCutsceneScene { get; init; }
+    /// <summary>Classic Maniac verb rows are eight pixels below the stored coordinate (o2_verbOps).</summary>
+    public int V2VerbYOffset { get; init; }
+
     /// <summary>Actor walking follows the v4 routines (<c>Actor</c>) instead of the old-v3 ones (<c>Actor_v3</c>).</summary>
     public bool UsesV4Walking => EngineVersion >= ScummVersion.V4;
 
@@ -64,7 +71,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // VAR_V5_TALK_STRING_Y = -0x50 in ScummEngine_v5::resetScummVars, and the game's own GameVariablesAtStart below.
             ? [(ScummVars.HeapSpace, 1400), (ScummVars.FixedDisk, 1), (ScummVars.DebugMode, 0), (ScummVars.InputMode, 3), (ScummVars.FadeDelay, 3),
                (ScummVars.TalkStringY, unchecked((ushort)-0x50)), .. GameVariablesAtStart]
-            : EngineVersion >= ScummVersion.V4 ? [(ScummVars.HeapSpace, 1400), (ScummVars.FixedDisk, 1), (ScummVars.DebugMode, 0)] : [];
+            : EngineVersion >= ScummVersion.V4 ? [(ScummVars.HeapSpace, 1400), (ScummVars.FixedDisk, 1), (ScummVars.DebugMode, 0)]
+            : EngineVersion <= ScummVersion.V2 ? GameVariablesAtStart : [];
 
     /// <summary>
     /// Variables the engine sets for one game only (edition data): <c>ScummEngine_v5::resetScummVars</c> gives <c>GID_MONKEY</c> (The Secret of Monkey Island CD,
@@ -88,7 +96,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <c>actorFollowCamera</c> on an actor that is not in the current room starts that room's scene (ScummVM camera.cpp <c>setCameraFollows</c>, read 14 October 2026).
     /// Modelled for the generic session of the version 4 games (Monkey Island's boot ends script 1 that way); LOOM's sessions keep reporting it as not modelled.
     /// </summary>
-    public bool CameraFollowStartsScene => EngineVersion >= ScummVersion.V4;
+    public bool CameraFollowStartsScene => EngineVersion <= ScummVersion.V2 || EngineVersion >= ScummVersion.V4;
 
     /// <summary>
     /// Bit variables (<c>bit[n]</c>) are stored apart from the word variables (ScummVM <c>readVar</c>/<c>writeVar</c>, script.cpp, read 15 October 2026: up to
@@ -165,7 +173,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
         ArgumentNullException.ThrowIfNull(game);
         // The 256-colour Indy3 has v4-style blocks (one file per room) but version 3 scripts, with Indy3's opcode differences.
         var roomFileGame = game.V4Disks?.Disks.OfType<ScummV4Archive>().Any(disk => disk.IsRoomFileGame) == true;
-        var dialect = game.Version is ScummVersion.V1 or ScummVersion.V2 ? ScummScriptDialect.V2
+        var dialect = game.Version == ScummVersion.V1 ? ScummScriptDialect.V1
+            : game.Version == ScummVersion.V2 ? ScummScriptDialect.V2
             : roomFileGame ? ScummScriptDialect.V3Indy3
             : game.Version == ScummVersion.V5 ? ScummScriptDialect.V5
             : game.Version >= ScummVersion.V4 ? ScummScriptDialect.V4
@@ -174,6 +183,9 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
         return new ScummProfile(game.Version, dialect)
         {
             EngineVersion = roomFileGame ? ScummVersion.V3 : game.Version,
+            ActorCount = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced ? 25 : 13,
+            RestoresClassicCutsceneScene = GameSupport.FamilyOf(game) == GameFamily.ManiacClassic,
+            V2VerbYOffset = GameSupport.FamilyOf(game) == GameFamily.ManiacClassic ? 8 : 0,
             AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard,
             // R-6.12a: every game the generic session boots shows its rooms' first visit. The session reads the version 3 scripts of Indiana Jones (old-bundle
             // LFL files, and the 256-colour room files since S4b Indy3Vga) and the v4 scripts of a game on several disks; LOOM (EGA and CD) has its own session.
@@ -185,9 +197,16 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
-            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd,
+            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd
+                or GameFamily.ZakClassic or GameFamily.ZakEnhanced,
             // vars.cpp ScummEngine_v5::resetScummVars: if (_game.id == GID_MONKEY) _scummVars[74] = 1225 (the CD release).
-            GameVariablesAtStart = GameSupport.FamilyOf(game) == GameFamily.MonkeyCd ? [("var[0x04A]", 1225)] : [],
+            GameVariablesAtStart = GameSupport.FamilyOf(game) switch
+            {
+                GameFamily.MonkeyCd => [("var[0x04A]", 1225)],
+                // vars.cpp ScummEngine_v2::resetScummVars: Zak's engine speed enables the elaborate introduction.
+                GameFamily.ZakClassic or GameFamily.ZakEnhanced => [(ScummVars.V2.MachineSpeed, 0x7FFF)],
+                _ => []
+            },
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
             // S6 MonkeyCd (17 October 2026): the CD release plays through the same kind of interface (Script 4 input, Script 2 sentences) on version 5.

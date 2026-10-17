@@ -40,18 +40,23 @@ public class ScummV1ActorColorsTests
 
         // Script 01 (boot): actorOps(1, 30, costume), palette 0 at @15 and palette 14 at @10C; the palette persists, so the last one in the span wins.
         Assert.Equal((14, ScummV1ColorBasis.Script), (colors.ColorOf(30).Suit, colors.ColorOf(30).Basis));
-        // Zak's costume 1 is given to actor 1 by scripts that set no palette: the boot script's 14 is the estimate (labelled).
-        Assert.Equal((14, ScummV1ColorBasis.Estimate), (colors.ColorOf(1).Suit, colors.ColorOf(1).Basis));
+        // Inline actor names formerly stopped decoding before these later costume/palette pairs.
+        Assert.Equal((13, ScummV1ColorBasis.Script), (colors.ColorOf(1).Suit, colors.ColorOf(1).Basis));
+        Assert.Contains(colors.Settings, s => s.Source == "Script 108" && s.Offset == 0xD8 && s.Actor == 1 && s.IsCostume && s.Value == 1);
+        Assert.Contains(colors.Settings, s => s.Source == "Script 108" && s.Offset == 0xEC && s.Actor == 1 && !s.IsCostume && s.Value == 13);
         // Room 08 entry script: costume 23 on actor 10, palette 9 right after; Room 19 entry script: palette 1 right before costume 22.
         Assert.Equal(9, colors.ColorOf(23).Suit);
         Assert.Equal(1, colors.ColorOf(22).Suit);
         // Room 38 entry script: the actor is a variable, the costume and the palette name the same variable.
         Assert.Equal((9, ScummV1ColorBasis.Script), (colors.ColorOf(21).Suit, colors.ColorOf(21).Basis));
-        // Actor 5 never gets a palette, so its costumes stay black (palette 0 from ScummVM's initActor).
-        Assert.Equal((0, ScummV1ColorBasis.Script), (colors.ColorOf(13).Suit, colors.ColorOf(13).Basis));
-        // Costume 2 is only ever worn by actor 2 from the start.
-        Assert.Equal(ScummV1ColorBasis.InitialState, colors.ColorOf(2).Basis);
-        // Nothing decides costume 35 (no actor 35, no constant instruction): a labelled estimate.
-        Assert.Equal(ScummV1ColorBasis.Estimate, colors.ColorOf(35).Basis);
+        // Script 50 sets actor 5's palette; whether it precedes costume 13 depends on the run.
+        Assert.Equal((11, ScummV1ColorBasis.Estimate), (colors.ColorOf(13).Suit, colors.ColorOf(13).Basis));
+        Assert.Contains(colors.Settings, s => s.Source == "Script 50" && s.Offset == 0x1D && s.Actor == 5 && !s.IsCostume && s.Value == 11);
+        Assert.Equal((2, ScummV1ColorBasis.Script), (colors.ColorOf(2).Suit, colors.ColorOf(2).Basis));
+        Assert.Contains(colors.Settings, s => s.Source == "Script 102" && s.Offset == 0x164 && s.Actor == 10 && s.IsCostume && s.Value == 2);
+        Assert.Contains(colors.Settings, s => s.Source == "Script 102" && s.Offset == 0x168 && s.Actor == 10 && !s.IsCostume && s.Value == 2);
+        Assert.Equal((1, ScummV1ColorBasis.Script), (colors.ColorOf(35).Suit, colors.ColorOf(35).Basis));
+        Assert.Contains(colors.Settings, s => s.Source == "Room 44 / Entry script" && s.Offset == 0x99 && s.Actor == 12 && s.IsCostume && s.Value == 35);
+        Assert.Contains(colors.Settings, s => s.Source == "Room 44 / Entry script" && s.Offset == 0x90 && s.Actor == 12 && !s.IsCostume && s.Value == 1);
     }
 }

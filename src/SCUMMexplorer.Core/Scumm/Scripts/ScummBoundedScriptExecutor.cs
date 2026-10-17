@@ -67,7 +67,7 @@ public sealed record ScummBoundedScriptResult(
 /// Executes a small, bounded subset of old-v3 bytecode for inspection. It only
 /// commits object changes when the bytecode operands and the relevant path are known.
 /// </summary>
-public sealed class ScummBoundedScriptExecutor
+public sealed partial class ScummBoundedScriptExecutor
 {
     /// <summary>
     /// A marker key (in the variables and in the estimated set) for a game whose bit variables are a separate array: ScummVM aliases a bit onto its
@@ -123,6 +123,7 @@ public sealed class ScummBoundedScriptExecutor
         var knownVariables = runtime is null
             ? new Dictionary<string, ushort>(StringComparer.Ordinal)
             : new Dictionary<string, ushort>(runtime.GlobalVariables, StringComparer.Ordinal);
+        if (runtime?.IsV2 == true) knownVariables[V2IndirectReads] = 1;
         for (var index = 0; index < 26; index++)
         {
             var key = $"local[0x{index:X3}]";
@@ -140,7 +141,7 @@ public sealed class ScummBoundedScriptExecutor
         if (estimatedLocals is not null) estimated.UnionWith(estimatedLocals);
         var onEstimatedPath = pathEstimated;
         var picks = new List<ScummRandomPick>();
-        var instructions = NormalizeMatrixOps(script.Instructions);
+        var instructions = NormalizeMatrixOps(runtime is { IsV2: true } ? ExpandV2Overrides(script.Instructions) : script.Instructions);
         var indexByOffset = instructions.Select((instruction, index) => (instruction.Offset, index))
             .ToDictionary(item => item.Offset, item => item.index);
         var pc = startOffset;
@@ -195,6 +196,27 @@ public sealed class ScummBoundedScriptExecutor
                     observationRun, CallSite("instruction", instruction.Offset, instruction.Operation, instruction.Operands),
                     [], onEstimatedPath, instructionSequence);
                 dispatched = null;
+            }
+
+            if (runtime is { IsV2: true })
+            {
+                // Normalization can resolve operands into literals. Retain their uncertainty before doing so;
+                // conservatively keep the remainder of this bounded run conditional after any estimated read.
+                if (instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
+                    .Any(operand => OperandIsEstimated(operand, estimated, knownVariables))) onEstimatedPath = true;
+                var before = new Dictionary<string, ushort>(knownVariables);
+                if (!PrepareV2Instruction(instruction, knownVariables, states, runtime, roomObjects, trace, onEstimatedPath,
+                    out instruction, out var handled, out var branch, out var problem))
+                {
+                    unresolved = $"{problem} at +0x{pc:X4}";
+                    break;
+                }
+                foreach (var value in knownVariables.Where(pair => !before.TryGetValue(pair.Key, out var old) || old != pair.Value))
+                {
+                    MarkEstimated(estimated, value.Key, onEstimatedPath);
+                    runtime.NotifyGlobalMutation(value.Key);
+                }
+                if (handled) { pc = branch ?? next; continue; }
             }
 
             if (instruction.Operation == "stopObjectCode")
@@ -297,7 +319,7 @@ public sealed class ScummBoundedScriptExecutor
                 (followedActor == 0
                     // Actor 0 is a valid slot of the engine's actor array (derefActor) that is never in a room: following it starts room 0.
                     ? runtime.CurrentRoom is int currentRoom && currentRoom != 0
-                    : ScummActorTable.IsValid(followedActor) && runtime.Actors[followedActor].Room is int otherRoom && otherRoom != 0 && otherRoom != runtime.CurrentRoom))
+                    : runtime.Actors.Contains(followedActor) && runtime.Actors[followedActor].Room is int otherRoom && otherRoom != 0 && otherRoom != runtime.CurrentRoom))
                 scriptEvent = scriptEvent with
                 {
                     Kind = ScummScriptEventKind.RoomLoaded, TargetKind = ResourceKind.Room,
@@ -360,6 +382,17 @@ public sealed class ScummBoundedScriptExecutor
                     Certainty = head.Any(operand => OperandIsEstimated(operand, estimated, knownVariables))
                         ? ScummScriptEventCertainty.Conditional : scriptEvent.Certainty
                 };
+                if (runtime?.IsV2 == true)
+                {
+                    var raw = script.Instructions.FirstOrDefault(i => i.Offset == instruction.Offset);
+                    var rawVerb = raw?.Operands.Split(',')[0].Trim();
+                    if (rawVerb is not null && TryReadValue(rawVerb, knownVariables, out var v2Verb, out _))
+                        scriptEvent = scriptEvent with
+                        {
+                            Operation = v2Verb == 254 ? "v2StopObject" : "v2StartObject",
+                            ResolvedArguments = [Read(0), Read(1), v2Verb == 250 ? 1 : 0, v2Verb is 250 or 253 ? 1 : 0]
+                        };
+                }
             }
             if (scriptEvent is not null) events.Add(scriptEvent);
             string? eventHandling = null;
@@ -570,7 +603,7 @@ public sealed class ScummBoundedScriptExecutor
 
             if (instruction.Operation == "setClass" && runtime is not null &&
                 TryReadClassOperands(instruction.Operands, knownVariables, out var classActor, out var actorClasses) &&
-                ScummActorTable.IsValid(classActor))
+                runtime.Actors.Contains(classActor))
             {
                 // o5_setClass, small header: class 0 on an actor also clears its ignoreBoxes; putClass (v4 and older)
                 // calls Actor::classChanged, so class 22 (kObjectClassIgnoreBoxes) sets or clears it.
@@ -616,7 +649,7 @@ public sealed class ScummBoundedScriptExecutor
                 runtime.SetObjectOwner(objectId, (byte)owner);
                 // clearOwnerOf: owner 0 takes the object out of the inventory array.
                 if (owner == 0) runtime.RemoveFromInventorySlots(objectId);
-                if (knownVariables.TryGetValue(ScummVars.Ego, out var ego))
+                if (knownVariables.TryGetValue(runtime.EgoVariable, out var ego))
                 {
                     if (owner == ego) runtime.AddInventoryObject(objectId);
                     else runtime.RemoveInventoryObject(objectId);
@@ -633,8 +666,9 @@ public sealed class ScummBoundedScriptExecutor
             }
 
             if (instruction.Operation == "waitForSentence" && runtime?.ScriptRunning is not null &&
-                knownVariables.TryGetValue(ScummVars.SentenceScript, out var sentenceScriptNumber))
+                (runtime.IsV2 || knownVariables.ContainsKey(ScummVars.SentenceScript)))
             {
+                var sentenceScriptNumber = runtime.IsV2 ? 2 : knownVariables[ScummVars.SentenceScript];
                 // o5_wait (SO_WAIT_FOR_SENTENCE): the script waits while a sentence is queued (none is frozen here), and, with none queued,
                 // while the sentence script is in use. It breaks and tries again next frame.
                 var inUse = runtime.ScriptRunning(sentenceScriptNumber).Running;
@@ -816,6 +850,8 @@ public sealed class ScummBoundedScriptExecutor
                 }
                 trace.Add(runtime.Messages.Print(request, runtime));
                 knownVariables[ScummMessageTable.HaveMsgVariable] = runtime.GlobalVariables[ScummMessageTable.HaveMsgVariable];
+                if (runtime.IsV2)
+                    knownVariables[ScummVars.V2.CharCount] = runtime.GlobalVariables[ScummVars.V2.CharCount];
                 pc = next;
                 continue;
             }
@@ -836,7 +872,7 @@ public sealed class ScummBoundedScriptExecutor
 
             if (runtime is not null && IsActorWait(instruction) &&
                 TryReadValue(ActorWaitOperand(instruction), knownVariables, out var walkingActor, out _) &&
-                ScummActorTable.IsValid(walkingActor))
+                runtime.Actors.Contains(walkingActor))
             {
                 // o5_wait (SO_WAIT_FOR_ACTOR): while the actor's _moving is set (a walk or a
                 // turn), the script breaks here and tries again next frame; otherwise it goes on.
@@ -1066,7 +1102,7 @@ public sealed class ScummBoundedScriptExecutor
                 }
                 runtime.Camera.Mode = ScummCamera.Normal;
                 var clamped = (ushort)Math.Clamp(cameraX, range.Min, range.Max);
-                knownVariables[ScummVars.CameraPosX] = clamped;
+                knownVariables[ScummVars.CameraPosX] = (ushort)(clamped / (runtime.IsV2 ? 8 : 1));
                 RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
                 MarkEstimated(estimated, ScummVars.CameraPosX, cameraEstimated);
                 trace.Add($"camera x = {clamped} ({instruction.Operation} {instruction.Operands})");
@@ -1180,7 +1216,7 @@ public sealed class ScummBoundedScriptExecutor
                 // camera's triggers (strips 10 and 30 of the 40 on screen).
                 var operand = instruction.Operands.Trim();
                 string? cameraUnknown = null;
-                if (!TryReadValue(operand, knownVariables, out var followed, out _) || !ScummActorTable.IsValid(followed))
+                if (!TryReadValue(operand, knownVariables, out var followed, out _) || !runtime.Actors.Contains(followed))
                     cameraUnknown = $"it follows an actor the preview cannot read ({operand})";
                 else
                 {
@@ -1194,7 +1230,8 @@ public sealed class ScummBoundedScriptExecutor
                         cameraUnknown = "the camera's position before it was unknown";
                     else
                     {
-                        var strip = actorX / 8 - ScummCamera.ScreenStartStrip(cameraBefore);
+                        var cameraPixels = cameraBefore * (runtime.IsV2 ? 8 : 1);
+                        var strip = actorX / 8 - ScummCamera.ScreenStartStrip(cameraPixels);
                         var wasEstimated = estimated.Contains(ScummVars.CameraPosX);
                         runtime.Camera.Mode = ScummCamera.FollowActor;
                         runtime.Camera.Follows = followed;
@@ -1203,10 +1240,10 @@ public sealed class ScummBoundedScriptExecutor
                             // setCameraAt in follow mode: the camera jumps only when the actor is more
                             // than half a screen away; otherwise moveCamera pans to the destination.
                             runtime.Camera.DestX = actorX;
-                            if (Math.Abs(actorX - cameraBefore) > 160)
+                            if (Math.Abs(actorX - cameraPixels) > 160)
                             {
                                 var clamped = (ushort)Math.Clamp(actorX, followRange.Min, followRange.Max);
-                                knownVariables[ScummVars.CameraPosX] = clamped;
+                                knownVariables[ScummVars.CameraPosX] = (ushort)(clamped / (runtime.IsV2 ? 8 : 1));
                                 RefreshBitAliases(ScummVars.CameraPosX, knownVariables);
                                 trace.Add($"camera x = {clamped}: it follows actor {followed} at x = {actorX} (actorFollowCamera)");
                             }
@@ -1492,6 +1529,8 @@ public sealed class ScummBoundedScriptExecutor
     {
         inventoryStart = null;
         problem = "";
+        if (runtime.IsV2)
+            return TryApplyV2Pickup(instruction, variables, roomObjects, runtime, drawQueue, trace, certainty, out problem);
         // o5_pickupObject (version 5, script_v5.cpp read 17 October 2026): "object, room"; room 0 is the current room. It neither checks the room nor
         // the owner: addObjectToInventory, putOwner(VAR_EGO), class kObjectClassUntouchable (32, not translated without the small header), state 1.
         var v5Parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
@@ -1703,7 +1742,7 @@ public sealed class ScummBoundedScriptExecutor
     {
         var actors = runtime.Actors;
         var place = PlacementOf(runtime);
-        int? ego = variables.TryGetValue(ScummVars.Ego, out var egoValue) ? egoValue : null;
+        int? ego = variables.TryGetValue(runtime.EgoVariable, out var egoValue) ? egoValue : null;
         var label = $"{instruction.Operation} at +0x{instruction.Offset:X4}";
         var operands = instruction.Operands;
         var parts = operands.Split(',', StringSplitOptions.TrimEntries);
@@ -1739,7 +1778,7 @@ public sealed class ScummBoundedScriptExecutor
             return;
         }
         int number = rawNumber;
-        if (!ScummActorTable.IsValid(number))
+        if (!runtime.Actors.Contains(number))
         {
             trace.Add($"{label}: actor {number} is not a valid actor; ignored");
             return;
@@ -1785,7 +1824,7 @@ public sealed class ScummBoundedScriptExecutor
             {
                 // o5_walkActorToActor: both actors must be in the current room; the walk
                 // ends dist pixels to the near side of the other actor (0xFF: by width).
-                var target = Read(1) is int other && ScummActorTable.IsValid(other) ? actors[other] : null;
+                var target = Read(1) is int other && runtime.Actors.Contains(other) ? actors[other] : null;
                 var walker = actors[number];
                 if (walker.Room is null || Read(1) is null || (target is not null && target.Room is null))
                 {
@@ -1858,7 +1897,7 @@ public sealed class ScummBoundedScriptExecutor
                 // o5_faceActor: faceToObject(obj), with an actor's position and width (24) or the object's walk point and width.
                 if (Read(1) is not int target) break;
                 int? x = null, y = null, width = null;
-                if (ScummActorTable.IsValid(target))
+                if (runtime.Actors.Contains(target))
                 {
                     (x, y, width) = (actors[target].X, actors[target].Y, 24);
                     if (actors[target].Room != place.CurrentRoom) break;
@@ -1958,14 +1997,14 @@ public sealed class ScummBoundedScriptExecutor
         {
             if (TryReadValue(operand, variables, out var paletteActor, out _))
             {
-                if (ScummActorTable.IsValid(paletteActor)) runtime.Actors.MarkPaletteEstimate(paletteActor, reason);
+                if (runtime.Actors.Contains(paletteActor)) runtime.Actors.MarkPaletteEstimate(paletteActor, reason);
             }
             else foreach (var actor in runtime.Actors.Snapshot()) runtime.Actors.MarkPaletteEstimate(actor.Number, reason);
             return;
         }
         if (TryReadValue(operand, variables, out var number, out _))
         {
-            if (ScummActorTable.IsValid(number)) runtime.Actors.Forget(number, reason);
+            if (runtime.Actors.Contains(number)) runtime.Actors.Forget(number, reason);
         }
         else runtime.Actors.ForgetAll(reason);
     }
@@ -2012,7 +2051,7 @@ public sealed class ScummBoundedScriptExecutor
                 detail = "known value";
                 return true;
             }
-            if (number >= ScummActorTable.Count)
+            if (number >= runtime.Actors.Capacity)
             {
                 var (found, point) = FindObjectWalkPoint(number, roomObjects, runtime);
                 if (found && point is null)
@@ -2025,7 +2064,7 @@ public sealed class ScummBoundedScriptExecutor
                 return true;
             }
         }
-        if (!ScummActorTable.IsValid(number))
+        if (!runtime.Actors.Contains(number))
         {
             if (operation == "getActorRoom")
             {
@@ -2100,8 +2139,8 @@ public sealed class ScummBoundedScriptExecutor
             detail = $"getDist reads an object or actor the preview cannot read ({first}, {second})";
             return false;
         }
-        var actorA = ScummActorTable.IsValid(a) ? runtime.Actors[a] : null;
-        var actorB = ScummActorTable.IsValid(b) ? runtime.Actors[b] : null;
+        var actorA = runtime.Actors.Contains(a) ? runtime.Actors[a] : null;
+        var actorB = runtime.Actors.Contains(b) ? runtime.Actors[b] : null;
         if (actorA is not null && actorB is not null)
         {
             if (actorA.Room is null || actorB.Room is null)
@@ -2115,7 +2154,7 @@ public sealed class ScummBoundedScriptExecutor
         (int X, int Y)? Locate(int number, ScummActorSnapshot? actor, out string? unknown)
         {
             unknown = null;
-            if (number < ScummActorTable.Count)
+            if (number < runtime.Actors.Capacity)
             {
                 // getObjectOrActorXY: an actor counts only in the current room.
                 if (actor is null) return null;
@@ -2145,7 +2184,9 @@ public sealed class ScummBoundedScriptExecutor
             }
             (x2, y2) = adjusted;
         }
-        distance = Math.Max(Math.Abs(pointA.Value.X - x2), Math.Abs(pointA.Value.Y - y2));
+        distance = runtime.IsV2
+            ? Math.Max(Math.Abs((pointA.Value.X >> 3) - (x2 >> 3)), Math.Abs((pointA.Value.Y >> 1) - (y2 >> 1)))
+            : Math.Max(Math.Abs(pointA.Value.X - x2), Math.Abs(pointA.Value.Y - y2));
         if (estimates.Count > 0) estimate = string.Join("; ", estimates);
         return true;
     }
@@ -2162,7 +2203,7 @@ public sealed class ScummBoundedScriptExecutor
             detail = $"isActorInBox operands are unknown ({operands})";
             return false;
         }
-        if (!ScummActorTable.IsValid(number))
+        if (!runtime.Actors.Contains(number))
         {
             detail = $"isActorInBox names actor {number}, which is not a valid actor";
             return false;
@@ -2676,10 +2717,10 @@ public sealed class ScummBoundedScriptExecutor
         }
         if (IsActorQuery(op))
         {
-            if (selector.Value is not { } id || !ScummActorTable.IsValid(id) || runtime is null)
+            if (selector.Value is not { } id || runtime is null || !runtime.Actors.Contains(id))
             {
                 var missing = new[] { Missing(op, selector, "actor field unavailable; object fallback dependencies not captured") };
-                return Array.AsReadOnly(op is "getActorX" or "getActorY" && selector.Value >= ScummActorTable.Count
+                return Array.AsReadOnly(op is "getActorX" or "getActorY" && selector.Value >= (runtime?.Actors.Capacity ?? ScummActorTable.Count)
                     ? missing.Concat(ObjectPositionDependencies(selector, runtime)).ToArray() : missing);
             }
             var actor = runtime.Actors[id];
@@ -2744,7 +2785,10 @@ public sealed class ScummBoundedScriptExecutor
     {
         var indexed = IndexedPattern.Match(operand.Trim());
         if (indexed.Success && OperandIsEstimated(indexed.Groups[3].Value, estimated, variables)) return true;
-        return !indexOnly && TryNormalizeKey(operand, variables, out var key) && IsEstimated(key, estimated);
+        if (indexOnly || !TryNormalizeKey(operand, variables, out var key)) return false;
+        if (IsEstimated(key, estimated)) return true;
+        return variables.ContainsKey(V2IndirectReads) && key is "var[0x00E]" or "var[0x00F]" or "var[0x010]" &&
+            variables.TryGetValue(key, out var target) && IsEstimated($"var[0x{target:X3}]", estimated);
     }
 
     private static void MarkEstimated(HashSet<string> estimated, string key, bool value)
@@ -2975,14 +3019,14 @@ public sealed class ScummBoundedScriptExecutor
             return false;
         }
         var objectId = (int)rawId;
-        var record = roomObjects.FirstOrDefault(item => item.Id == objectId);
+        var record = runtime?.IsV2 == true ? roomObjects.LastOrDefault(item => item.Id == objectId) : roomObjects.FirstOrDefault(item => item.Id == objectId);
         if (record is null || !states.ContainsKey(objectId))
         {
             detail = $"drawObject targets object {objectId}, which is not in the room state table";
             return false;
         }
 
-        var state = (byte)1;
+        var state = runtime?.IsV2 == true ? (byte)(states[objectId] | 8) : (byte)1;
         var position = positions[objectId];
         if (parts.Length > 1 && parts[1] == "state")
         {
@@ -3019,7 +3063,7 @@ public sealed class ScummBoundedScriptExecutor
             if (states.ContainsKey(peer.Id))
             {
                 if (runtime is null) states[peer.Id] = 0;
-                else runtime.SetObjectState(peer.Id, 0);
+                else runtime.SetObjectState(peer.Id, runtime.IsV2 ? (byte)(states[peer.Id] & ~8) : (byte)0);
             }
         }
         if (runtime is null) states[objectId] = state;
@@ -3274,6 +3318,10 @@ public sealed class ScummBoundedScriptExecutor
             var key = $"{match.Groups[1].Value}[0x{int.Parse(match.Groups[2].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture):X3}]";
             if (variables.TryGetValue(key, out value))
             {
+                if (variables.ContainsKey(V2IndirectReads) && key is "var[0x00E]" or "var[0x00F]" or "var[0x010]")
+                {
+                    if (!variables.TryGetValue($"var[0x{value:X3}]", out value)) { detail = "v2 indirect read points outside known globals"; return false; }
+                }
                 detail = "known value";
                 return true;
             }

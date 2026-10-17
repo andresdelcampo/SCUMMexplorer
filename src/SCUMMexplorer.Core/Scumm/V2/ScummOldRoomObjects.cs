@@ -111,6 +111,35 @@ public static class ScummOldRoomObjects
         return room with { Pixels = pixels };
     }
 
+    /// <summary>Stored v2 images for the session; no initial visibility is assumed.</summary>
+    public static IReadOnlyList<RoomObjectImage> ReadV2Images(byte[] decoded)
+    {
+        var images = new List<RoomObjectImage>();
+        foreach (var entry in Read(decoded, null))
+        {
+            if (entry.ImageOffset == 0 || entry.Width == 0 || entry.Height == 0) continue;
+            var pixels = new byte[entry.Width * entry.Height];
+            PaintV2(decoded, entry.ImageOffset, 0, 0, entry.Width, entry.Height, pixels, entry.Width);
+            images.Add(new(entry.Id, entry.X, entry.Y, entry.Width, entry.Height, pixels));
+        }
+        return images;
+    }
+
+    /// <summary>Stored classic tiled images using this game's native colour map, without initial visibility filtering.</summary>
+    public static IReadOnlyList<RoomObjectImage> ReadV1Images(byte[] decoded, ScummV1Game game)
+    {
+        var images = new List<RoomObjectImage>();
+        byte[]? characters = null;
+        foreach (var entry in Read(decoded, null))
+        {
+            if (entry.ImageOffset == 0 || entry.Width == 0 || entry.Height == 0) continue;
+            var pixels = new byte[entry.Width * entry.Height];
+            PaintV1(decoded, entry.ImageOffset, 0, 0, entry.Width, entry.Height, game, pixels, entry.Width, ref characters);
+            images.Add(new(entry.Id, entry.X, entry.Y, entry.Width, entry.Height, pixels));
+        }
+        return images;
+    }
+
     private static void PaintV2(byte[] data, int pos, int x, int y, int width, int height, byte[] canvas, int canvasWidth)
     {
         var run = 1;
