@@ -18,6 +18,7 @@ public sealed class ScummGameSession : ScummSession
         _cdTracks = ScummCdAudioTracks.For(game);
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
         var profile = ScummProfile.For(game);
+        if (_runtime.IsV2) _runtime.Actors.InitializeV2Game(profile.Dialect == ScummScriptDialect.V1);
         _runtime.V2VerbYOffset = profile.V2VerbYOffset;
         _runtime.IsClassicManiac = profile.RestoresClassicCutsceneScene;
         if (profile.SeparateBitVariables)
