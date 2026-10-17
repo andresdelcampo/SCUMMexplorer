@@ -59,6 +59,12 @@ public sealed partial class ScummVerbTable
     /// <summary>An image's width and height (an object of a room), for the rectangle a drawn verb covers.</summary>
     public Func<int, int, (int Width, int Height)?>? ImageSize { get; set; }
 
+    /// <summary>
+    /// <c>verbOps assignObject</c> takes the image from the room it names even when that room is not the current one (ScummVM <c>setVerbObject</c> without
+    /// <c>GF_SMALL_HEADER</c>: version 5; <see cref="ScummProfile.VerbImagesFromNamedRoom"/>). Off: only a local object of the current room gives its image.
+    /// </summary>
+    public bool ImagesFromNamedRoom { get; set; }
+
     /// <summary>What the last <see cref="Apply"/> drew or cleared on the verb screen (screen coordinates), or null.</summary>
     public ScummScreenBox? LastCover { get; private set; }
 
@@ -130,7 +136,9 @@ public sealed partial class ScummVerbTable
                     if (name == "assignObject" && slot.ImageObject == image) break;
                     // setVerbObject copies the image only when the object is one of the
                     // current room's local objects; otherwise the slot keeps its image.
-                    if (objectInCurrentRoom(image.Value) is not true)
+                    // From version 5 (no small header) it reads the object's image from the
+                    // named room, current or not (verbs.cpp, master read 17 October 2026).
+                    if (!ImagesFromNamedRoom && objectInCurrentRoom(image.Value) is not true)
                     {
                         notes.Add($"image of object {image} not taken: it is not in Room {currentRoom:00}");
                         break;

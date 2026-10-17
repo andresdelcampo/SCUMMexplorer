@@ -42,6 +42,8 @@ public sealed class ScummGameSession : ScummSession
         }
         _runtime.CameraFollowStartsScene = profile.CameraFollowStartsScene;
         _runtime.PublishesCursorVariables = profile.PublishesCursorVariables;
+        _runtime.UntouchableClass = profile.UntouchableClass;
+        _runtime.Verbs.ImagesFromNamedRoom = profile.VerbImagesFromNamedRoom;
         // getActorFromPos, from the actors as the last frame drew them (S6: Indiana Jones's Script 20 finds the person under the pointer with it). An engine
         // query, not a click: since S4b MonkeyCd (17 October 2026) every generic session answers it (Monkey Island CD's interface loop, Script 23, asks it from the boot on).
         _runtime.ActorFromPosition = ActorFromPosition;
@@ -73,9 +75,10 @@ public sealed class ScummGameSession : ScummSession
             indexedObjects = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
             return new ScummGameSession(game, indexedObjects);
         }
-        var index = game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault()
-            ?? throw new InvalidDataException("The game has no v4 index to read its objects from.");
-        indexedObjects = index.ReadIndexedObjects();
+        // S6 MonkeyCd (17 October 2026): a v5 game reads its starting objects from its own index (MONKEY.000's DOBJ), as its first visit does.
+        indexedObjects = (game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault())?.ReadIndexedObjects()
+            ?? game.V4Disks?.Disks.OfType<ScummV5Archive>().FirstOrDefault()?.ReadIndexedObjects()
+            ?? throw new InvalidDataException("The game has no v4 or v5 index to read its objects from.");
         return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game));
     }
 
@@ -158,7 +161,34 @@ public sealed class ScummGameSession : ScummSession
                 ? adlib.ReadLifetime(part, timing, halfTempo: true)
                 : new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib part in the disks' sound blocks");
         }
+        // S4b Indy4 (17 October 2026): a v5 game plays its music through iMUSE; the AdLib part's own timeline (ScummImuseTimeline, the S3 player's default
+        // path: hooks at 0, markers not acted on) gives how long a sound plays. A song whose timeline jumps back loops until a script stops it.
+        if (game.V4Disks is { } v5Disks && v5Disks.Disks.OfType<ScummV5Archive>().FirstOrDefault() is { } v5)
+        {
+            var parts = new Dictionary<int, byte[]?>();
+            foreach (var sound in v5.ReadSounds()) parts.TryAdd(sound.Id, sound.ImuseAdlib);
+            var lifetimes = new Dictionary<int, ScummSoundLifetime>();
+            return resource => resource.ResourceId is not int id ? new(ScummSoundLifetimeKind.Unknown, null, false, "no sound id")
+                : lifetimes.TryGetValue(id, out var known) ? known : lifetimes[id] = ImuseLifetime(parts.GetValueOrDefault(id));
+        }
         return resource => adlib.ReadLifetime(resource, timing);
+    }
+
+    private static ScummSoundLifetime ImuseLifetime(byte[]? part)
+    {
+        if (part is null) return new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib iMUSE part in the sound block");
+        try
+        {
+            var timeline = ScummImuseTimeline.Build(ScummImuseSong.Parse(part));
+            const string why = "iMUSE default path (hooks 0, markers and script-set loops not simulated): an estimate";
+            return timeline.Loops
+                ? new(ScummSoundLifetimeKind.Looping, null, true, why)
+                : new(ScummSoundLifetimeKind.Finite, (int)Math.Min(int.MaxValue, Math.Ceiling(timeline.EndSeconds * 472)), true, why);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or ArgumentException or IndexOutOfRangeException)
+        {
+            return new(ScummSoundLifetimeKind.Unknown, null, false, $"the iMUSE part could not be read: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -304,7 +334,7 @@ public sealed class ScummGameSession : ScummSession
         foreach (var actor in layer.Actors.OrderBy(item => item.Number))
         {
             if (actor.Bounds is not { } bounds || actor.Pixels == 0) continue;
-            if (_runtime.ObjectClasses.TryGetValue(actor.Number, out var bits) && ScummObjectClasses.Has(bits, ScummObjectClasses.Untouchable)) continue;
+            if (_runtime.ObjectClasses.TryGetValue(actor.Number, out var bits) && ScummObjectClasses.Has(bits, _runtime.UntouchableClass)) continue;
             if (x / 8 >= bounds.Left / 8 && x / 8 <= (bounds.Right - 1) / 8 && y >= bounds.Top && y <= bounds.Bottom) return actor.Number;
         }
         return 0;

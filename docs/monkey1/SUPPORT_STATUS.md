@@ -1,6 +1,6 @@
 # Monkey Island 1 CD support status
 
-Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 17 October 2026 | Owner: S4b MonkeyCd agent
+Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 17 October 2026 | Owner: S6 MonkeyCd agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
@@ -8,14 +8,14 @@ Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island
 | S2 Reading | done (before this file) | Costumes, Scripts, Texts | | polish: ~3% of v5 script blocks unresolved |
 | S3 Sound | in progress, **partial** | Sound | [v5-sound-leftovers-20261014](../../.verification/v5-sound-leftovers-20261014/README.md) | listening check listed in the run report: yes; result: pending |
 | S4b Session | **done (17 Oct)** | – (unchanged: S4b changes no cell) | [monkeycd-session-20261017](../../.verification/monkeycd-session-20261017/README.md) | boots to the lookout (Room 38) in 1573 frames, player in control, unsupported 0; left alone it goes on to Room 96 and the dock (Room 33); `ScummMonkeyCdSessionTests` |
-| S5 Objects | **done (17 Oct), three rooms written down** | Objects (partial, unchanged until S6) | [monkeycd-objects-20261017](../../.verification/monkeycd-objects-20261017/README.md) | 82 of 83 rooms run without a gap; Room 99 cannot run, Rooms 88 and 89 not followed; ten-room ScummVM picture comparison not done (user check) |
-| S6 Play | not started | Play | | the script-driven sound hooks wait for this |
+| S5 Objects | **done (17 Oct), three rooms written down** | Objects ✔ with S6 (17 Oct) | [monkeycd-objects-20261017](../../.verification/monkeycd-objects-20261017/README.md) | 82 of 83 rooms run without a gap; Room 99 cannot run, Rooms 88 and 89 not followed; ten-room ScummVM picture comparison not done (user check) |
+| S6 Play | **done (17 Oct)** | Play ✔, Objects ✔ | [monkeycd-play-20261017](../../.verification/monkeycd-play-20261017/README.md) | R-7.18 route from the dock (poster sentence, its cutscene skipped, door to the SCUMM Bar, the pirates' dialogue, the rubber chicken in Room 29) passes headless (`ScummMonkeyCdPlayTests`) and in the real window; music plays from the disc's tracks in play; Rooms 88, 89, 99 not needed by the route |
 | S7 Cutscenes | not started | Cutscenes | | |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | the disc also carries ENGLISH, FRENCH, GERMAN, ITALIAN, SPANISH data folders |
 
-Blocked on: S6 for the sound hooks (see the record, section 4).
-Next: the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); then S6 (a Play requirement exists for verb games; `BootForPlay` still reads the index through `ScummV4Archive` only; the v5 untouchable class 32 is not the hit test's 24).
+Blocked on: nothing.
+Next: S7 Cutscenes (the shared planner, as for the floppy); the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); the user's listening and timing check of play (see the S6 record).
 Open uncertainties: disc track 21 (16 s) is started by no sound and stays unnamed; six `startSound` operands are variables (script 101 `var[100]`, script 162 `local[4]`, room 75 local script 205 `local[0]`), which sound they start needs running scripts.
 
 ## Decision log
@@ -31,7 +31,12 @@ Open uncertainties: disc track 21 (16 s) is started by no sound and stays unname
 | 2026-10-17 | S4b | `getActorFromPos` (Script 23 asks it from the boot on) was answered only for families that play through verbs | keep it Play-only (reported unsupported); answer it in every generic session | every generic session: it is an engine query, not a click (R-7.17 concerns clicks); the families with Play already had it | restore the `PlaysThroughVerbs` guard |
 | 2026-10-17 | S4b | `VAR_V5_TALK_STRING_Y` = -0x50: ScummVM sets it for versions 4 and 5 | set it for both; v5 only | v5 only (smaller change; the v4 families' tests and records stay as they are); the v4 omission is noted for their owners | add V4 to the condition in `ScummProfile.EngineVariablesAtStart` |
 | 2026-10-17 | S5 | Which v5 games get first-visit scenes | the v5 format (also Monkey Island 2, Indy 4, never booted); MonkeyCd only | the v5 format and the MonkeyCd family, in `ScummProfile.For`: a game whose boot was never followed would only show failed runs | drop the family term when another v5 game passes S4b |
-| 2026-10-17 | S4b | Untouchable class of `o5_pickupObject` | 24 (the small-header number the hit test uses); 32 (ScummVM `kObjectClassUntouchable` without translation) | 32 for the v5 form, as ScummVM; the hit test's class number for v5 is an S5/S6 item (step 4 of S5: read the class bits from the source) | change the constant in `TryApplyPickupObject` |
+| 2026-10-17 | S6 | Where the route starts: the boot ends at the lookout (Room 38) | (a) a route from the lookout; (b) let the game play on, without input, to the dock and run the floppy's route there | (b): the game goes to the dock by itself once the lookout's track ends (S4b record), the dock route covers all five R-7.18 steps with the CD's own ids, and it compares one to one with the floppy record | start the test at the lookout instead (`AtTheDock`) |
+| 2026-10-17 | S6 | Class number of `kObjectClassUntouchable` for the hit test, the snapshot and actors | keep 24; 32 from version 5 | `ScummProfile.UntouchableClass` (32 when the game has no small header, object.cpp `getClass`); the runtime and the snapshot carry it, so v3/v4 stay 24 | set the profile property to 24 |
+| 2026-10-17 | S6 | `verbOps assignObject` with an object of another room (Script 9: the inventory icons of Room 99) | keep the small-header rule (only a local object of the current room); read from the named room from version 5 | version 5 reads the named room (verbs.cpp `setVerbObject` without `GF_SMALL_HEADER`): `ScummProfile.VerbImagesFromNamedRoom` | set the property to false |
+| 2026-10-17 | S6 | Code 7 (string) in a verb name: Script 12 puts string 49 (" ") between verb and object | leave it out (the sentence reads "Look atposter"); model `convertStringMessage` | modelled for the play verb names only: version 3 reads the string number from a variable, 4 and 5 take it literally (ScummVM); messages are unchanged | drop `PlayStringText` from `VerbGlyphs` |
+| 2026-10-17 | S6 | `cursorCommand charsetColors` (Script 22: charset 6 gets 0, 6, 2) was ignored | keep the file's colour map; apply the script's entries | applied per charset (`ScummScriptRuntimeState.CharsetColors`, `ScummV4Charset.WithColors`): the verbs' value-2 pixels take colour 2 as ScummVM's `_charsetData`. This also reaches the floppy's verbs where its scripts use the command | remove the executor branch |
+| 2026-10-17 | S6 | How a CD-track sound plays in play | through the device renderer (no card part: silent); the disc's audio | the disc's stretch for the sound (start to end frame, finite loops repeated, 0xFF tracks restarted when they end), whatever the device, as the room's music panel plays the tracks; effects (sounds 2, 3) keep the device renderer | drop the CD branch of `RenderPlaySound` || 2026-10-17 | S4b | Untouchable class of `o5_pickupObject` | 24 (the small-header number the hit test uses); 32 (ScummVM `kObjectClassUntouchable` without translation) | 32 for the v5 form, as ScummVM; the hit test's class number for v5 is an S5/S6 item (step 4 of S5: read the class bits from the source) | change the constant in `TryApplyPickupObject` |
 
 
 ---

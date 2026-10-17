@@ -14,15 +14,44 @@ namespace SCUMMexplorer.Core.Scumm;
 public sealed class ScummCdAudioTracks
 {
     private readonly Dictionary<int, (ScummCdTrackSound Sound, int? TrackFrames)> _sounds = [];
+    private DiscImage? _disc;
 
     private ScummCdAudioTracks() { }
+
+    /// <summary>The sound's track repeats until a script stops it (loop count 0xFF).</summary>
+    public bool LoopsForever(int soundId) => _sounds.TryGetValue(soundId, out var item) && item.Sound.Loops == 0xFF;
+
+    /// <summary>
+    /// What the drive plays for the sound, as a WAV file's bytes (S6 MonkeyCd play, 17 October 2026; <c>playCDTrackFromSoundID</c>): the sound's stretch of its
+    /// track (start frame to end frame, or to the end of the track), repeated for a finite loop count above 1; one pass for a track that loops for ever (the player
+    /// repeats it, <see cref="LoopsForever"/>). Empty when the sound plays no track of the image.
+    /// </summary>
+    public byte[] ReadWave(int soundId)
+    {
+        if (_disc is not { } disc || !_sounds.TryGetValue(soundId, out var item) || item.Sound.Track < 1 || item.Sound.Track > disc.AudioTracks.Count) return [];
+        var track = disc.AudioTracks[item.Sound.Track - 1];
+        var end = item.Sound.EndFrame > item.Sound.StartFrame ? Math.Min(item.Sound.EndFrame, track.Frames) : track.Frames;
+        var frames = end - item.Sound.StartFrame;
+        if (frames <= 0) return [];
+        var wave = disc.ReadSectorsWave(track.StartSector + item.Sound.StartFrame, frames);
+        var repeats = item.Sound.Loops is > 1 and < 0xFF ? (int)item.Sound.Loops : 1;
+        if (repeats == 1 || wave.Length <= 44) return wave;
+        // A finite loop count: the same samples again after the first pass, under one header (the data size is patched).
+        var pcm = wave.Length - 44;
+        var looped = new byte[44 + pcm * repeats];
+        Array.Copy(wave, looped, wave.Length);
+        for (var i = 1; i < repeats; i++) Array.Copy(wave, 44, looped, 44 + pcm * i, pcm);
+        System.Buffers.Binary.BinaryPrimitives.WriteInt32LittleEndian(looped.AsSpan(4), 36 + pcm * repeats);
+        System.Buffers.Binary.BinaryPrimitives.WriteInt32LittleEndian(looped.AsSpan(40), pcm * repeats);
+        return looped;
+    }
 
     /// <summary>The game's CD-track sounds, or null when the game plays no disc track (no v5 archive with track sounds, or no disc image with audio).</summary>
     public static ScummCdAudioTracks? For(GameLibrary game)
     {
         ArgumentNullException.ThrowIfNull(game);
         if (game.AudioDisc is not { } disc || disc.AudioTracks.Count == 0 || game.V4Disks is null) return null;
-        var tracks = new ScummCdAudioTracks();
+        var tracks = new ScummCdAudioTracks { _disc = disc };
         foreach (var archive in game.V4Disks.Disks.OfType<ScummV5Archive>())
             foreach (var sound in archive.ReadCdTrackSounds())
                 tracks._sounds.TryAdd(sound.SoundId, (sound, sound.Track >= 1 && sound.Track <= disc.AudioTracks.Count ? disc.AudioTracks[sound.Track - 1].Frames : null));

@@ -114,7 +114,14 @@ public static class ScummTextDecoder
     /// <paramref name="verbName"/> (null leaves code 5 unmodelled). A variable that holds 0 shows nothing.
     /// </summary>
     public static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables,
-        Func<int, byte[]?>? objectName, Func<int, byte[]?>? verbName, out string? note)
+        Func<int, byte[]?>? objectName, Func<int, byte[]?>? verbName, out string? note) => ConvertMessage(text, variables, objectName, verbName, null, out note);
+
+    /// <summary>
+    /// As above, with code 7 (<c>convertStringMessage</c>): the string resource the operand names, from <paramref name="stringText"/>, which receives the
+    /// operand as the code holds it (the caller reads a variable first where the version does: ScummVM reads it in version 3 only). Null leaves code 7 unmodelled.
+    /// </summary>
+    public static List<byte> ConvertMessage(IReadOnlyList<byte> text, IReadOnlyDictionary<string, ushort> variables,
+        Func<int, byte[]?>? objectName, Func<int, byte[]?>? verbName, Func<int, byte[]?>? stringText, out string? note)
     {
         note = null;
         var output = new List<byte>();
@@ -161,6 +168,9 @@ public static class ScummTextDecoder
                         note = $"the text shows the name of the verb in variable 0x{value:X4}, which is unknown here";
                     else if (verb != 0 && verbName(verb) is { } verbText)
                         output.AddRange(ConvertMessage(verbText, variables, objectName, null, out _));
+                    break;
+                case 7 when stringText is not null:
+                    if (stringText(value) is { } stored) output.AddRange(ConvertMessage(stored, variables, objectName, verbName, null, out _));
                     break;
                 case 5 or 7:
                     note = $"the text includes {(code == 5 ? "a verb's name" : "a string")} (code {code}), which is not modelled and left out";

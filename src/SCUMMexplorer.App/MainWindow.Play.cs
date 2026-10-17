@@ -25,6 +25,8 @@ public partial class MainWindow
     private int _playFrame;
     private ScummPlayFrame? _playShown;
     private WriteableBitmap? _playBitmap;
+    // The play game's sounds that play a track of its disc (null for a game without them).
+    private ScummCdAudioTracks? _playCdTracks;
 
     private bool PlayActive => _playTimer is not null && _play is not null;
 
@@ -37,6 +39,14 @@ public partial class MainWindow
     /// </summary>
     private (byte[] Wave, bool Music) RenderPlaySound(GameResource resource, SceneSoundPlayer.SoundMode mode, CancellationToken token)
     {
+        // S6 MonkeyCd (17 October 2026): a sound that plays a track of the game's disc (ScummVM playCDTrackFromSoundID) plays that stretch of the disc's audio,
+        // the same samples the room's music panel plays for the track, whatever the device (a CD drive is not a sound card).
+        if (_playCdTracks is { } cd && resource.ResourceId is int cdSound && cd.Plays(cdSound))
+        {
+            var cdWave = cd.ReadWave(cdSound);
+            if (cdWave.Length == 0) throw new System.IO.InvalidDataException($"Sound {cdSound}'s CD track is not on the disc image.");
+            return (cdWave, true);
+        }
         var wave = RenderSoundWave(resource, mode, token);
         if (mode == SceneSoundPlayer.SoundMode.Adlib) wave = ScummAdlibAudio.ApplyOutputGain(wave, SceneSoundPlayer.AdlibGainDb);
         var music = _game?.V4ArchiveFor(resource) is { } archive
@@ -61,10 +71,12 @@ public partial class MainWindow
                 _play = session;
                 _playScreen = new ScummPlayScreen(game, session, objects!.States);
                 _playFolder = game.FolderPath;
+                _playCdTracks = ScummCdAudioTracks.For(game);
             }
             if (token.IsCancellationRequested) return;
             // S6 sound: from here on, the sounds the game's scripts start and stop play through the device the user picked (the boot's are not played).
-            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound);
+            // A CD track that loops for ever (loop count 0xFF) starts again when it ends, until a script stops it (S6 MonkeyCd).
+            if (!_sceneSound.Follows(_play)) _sceneSound.Attach(game, _play, RenderPlaySound, _playCdTracks is { } loops ? loops.LoopsForever : null);
             // A room the session is not in is entered as a state preview (the route to it is not played), as the room view's first visit is.
             // The old engine's opening can wait on the player's party choice.
             // Its first Play screen must retain that live input, not visit the

@@ -33,6 +33,20 @@ public sealed class ScummV4Charset : IScummTextCharset
     /// <summary>The 15-entry colour map the file carries (ScummVM <c>_charsetData</c>): pixel value n draws entry n - 1; the message colour replaces entry 0 (value 1). A 2-bit font's value 2 is black here, its outline.</summary>
     public byte[] ColorMap => _file[6..21];
 
+    /// <summary>
+    /// The same font with colour-map entries a script replaced (<c>cursorCommand charsetColors</c>: entry n is what pixel value n draws; entry 0 is never drawn
+    /// and entry 1 is the text's own colour), or this charset when nothing changes.
+    /// </summary>
+    public ScummV4Charset WithColors(IReadOnlyDictionary<int, byte> entries)
+    {
+        ArgumentNullException.ThrowIfNull(entries);
+        var file = (byte[])_file.Clone();
+        var changed = false;
+        foreach (var (entry, colour) in entries)
+            if (entry is >= 1 and <= 15 && file[5 + entry] != colour) { file[5 + entry] = colour; changed = true; }
+        return changed ? new ScummV4Charset(Number, file, BitsPerPixel, FontHeight, _offsets) : this;
+    }
+
     public static ScummV4Charset Parse(byte[] file, int number = 0)
     {
         if (file.Length < FontStart + 4 || BinaryPrimitives.ReadUInt16LittleEndian(file.AsSpan(4)) != 0x0363)
