@@ -59,7 +59,7 @@ public sealed record ScummCostumeCel(int Limb, int Left, int Top, int Width, int
 /// The LOOM CD game's costumes (SCUMM v4, <see cref="ReadVga"/>) share the animation logic; they differ in the header
 /// (a 16-entry colour table to the room palette), the limb and animation tables, and a word for each limb's start command.
 /// </summary>
-public sealed class ScummCostume
+public sealed partial class ScummCostume
 {
     private const int FrameOffsetsStart = 9;
     private const int AnimationOffsetsStart = 41;
@@ -81,12 +81,23 @@ public sealed class ScummCostume
     public byte PaletteColor { get; }
     public int AnimationCommandsOffset { get; }
 
-    private ScummCostume(int id, byte[] resource)
+    private ScummCostume(int id, byte[] resource, ScummV1Game? classicGame = null)
     {
         Id = id;
         _resource = resource;
         AnimationLimit = resource[4];
         var format = resource[5] & 0x7F;
+        if (format == 0x57)
+        {
+            _classicGame = classicGame ?? throw new InvalidDataException("A classic costume requires its v1 palette policy.");
+            _frameOffsetsStart = 8;
+            _animationOffsetsStart = 24;
+            Mirror = (resource[5] & 0x80) != 0;
+            AnimationCommandsOffset = 4 + ReadWord(6);
+            if (AnimationCommandsOffset >= resource.Length || _animationOffsetsStart + (AnimationLimit + 1) * 2 > resource.Length)
+                throw new InvalidDataException("The classic costume tables are outside the resource.");
+            return;
+        }
         if (format != 0x58)
             throw new NotSupportedException($"Costume format 0x{format:X2} is not the DOS LOOM format 0x58.");
         Mirror = (resource[5] & 0x80) != 0;
@@ -137,14 +148,14 @@ public sealed class ScummCostume
     /// <summary>True for a CD costume, whose colours are room palette indices (up to 255) rather than EGA colours.</summary>
     public bool IsVga => _colorTable is not null;
 
-    public static ScummCostume Read(ReadOnlySpan<byte> decodedContainer, int resourceOffset, int id = 0)
+    public static ScummCostume Read(ReadOnlySpan<byte> decodedContainer, int resourceOffset, int id = 0, ScummV1Game? classicGame = null)
     {
         if (resourceOffset < 0 || resourceOffset > decodedContainer.Length - 2)
             throw new InvalidDataException("The costume offset is outside its LFL container.");
         var length = BinaryPrimitives.ReadUInt16LittleEndian(decodedContainer[resourceOffset..]);
-        if (length < AnimationOffsetsStart || length > decodedContainer.Length - resourceOffset)
+        if (length < 24 || length > decodedContainer.Length - resourceOffset)
             throw new InvalidDataException("The costume resource length is invalid.");
-        return new ScummCostume(id, decodedContainer.Slice(resourceOffset, length).ToArray());
+        return new ScummCostume(id, decodedContainer.Slice(resourceOffset, length).ToArray(), classicGame);
     }
 
     /// <summary>Reads costume <paramref name="id"/> from the game's indexed resources, or returns null when it is not indexed.</summary>
@@ -152,7 +163,7 @@ public sealed class ScummCostume
     {
         var resource = game.Resources.FirstOrDefault(entry => entry.Kind == ResourceKind.Costume && entry.ResourceId == id);
         if (resource?.Offset is not int offset || !File.Exists(resource.FilePath)) return null;
-        return Read(LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath)), offset, id);
+        return Read(LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath)), offset, id, game.V1Game);
     }
 
     /// <summary>ScummVM <c>newDirToOldDir</c>: 0 left (W), 1 right (E), 2 down (S), 3 up (N).</summary>
@@ -180,8 +191,9 @@ public sealed class ScummCostume
         var cursor = ReadWord(_animationOffsetsStart + animation * 2);
         if (cursor == 0) return false;
 
-        var mask = (uint)ReadWord(cursor);
-        cursor += 2;
+        if (_classicGame is not null) cursor += 4;
+        var mask = _classicGame is not null ? (uint)Byte(cursor++) << 8 : (uint)ReadWord(cursor);
+        if (_classicGame is null) cursor += 2;
         for (var limb = 0; (mask & 0xFFFF) != 0; limb++, useMask <<= 1, mask <<= 1)
         {
             if ((mask & 0x8000) == 0) continue;
@@ -276,6 +288,7 @@ public sealed class ScummCostume
     /// </summary>
     public IReadOnlyList<ScummCostumeCel> Draw(ScummCostumeAnimationState state, int direction)
     {
+        if (_classicGame is not null) return DrawClassic(state, direction);
         var drawToRight = direction != 0 || Mirror;
         // The old bundle starts the move at (-72, -100); the later formats (the CD game) at the actor's point.
         var xMove = IsVga ? 0 : -72;
@@ -315,7 +328,8 @@ public sealed class ScummCostume
     /// Maps a costume colour to the EGA colour drawn (<c>ClassicCostumeRenderer::setPalette</c> for GF_OLD_BUNDLE with
     /// the lights on): entry c of the actor's palette, except the costume's palette colour, which draws entry 0.
     /// </summary>
-    public byte MapColor(byte color, IReadOnlyList<byte>? actorPalette) =>
+    public byte MapColor(byte color, IReadOnlyList<byte>? actorPalette, int actorNumber = 0) =>
+        _classicGame is { } classic ? ScummV1ActorColors.LiveColor(classic, actorNumber, color, actorPalette) :
         _colorTable is not null ? _colorTable[color % _colorTable.Length] :
         actorPalette is null
             ? color == PaletteColor ? (byte)0 : color
@@ -326,9 +340,9 @@ public sealed class ScummCostume
     /// (costume colour 0) are skipped. Returns the number of pixels written.
     /// </summary>
     public int Compose(IReadOnlyList<ScummCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
-        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null, bool[]? coverage = null, int scale = 255)
+        int x, int y, IReadOnlyList<byte>? actorPalette = null, byte[]? mask = null, bool[]? coverage = null, int scale = 255, int actorNumber = 0)
     {
-        if (scale < 255) return ComposeScaled(cels, target, targetWidth, targetHeight, x, y, actorPalette, mask, coverage, scale);
+        if (scale < 255) return ComposeScaled(cels, target, targetWidth, targetHeight, x, y, actorPalette, mask, coverage, scale, actorNumber);
         // mask: the z-plane the actor is drawn behind (same size as the target); a set pixel hides the actor's pixel
         // (ScummVM byleRLEDecode: masked when mask[0] & maskbit).
         var written = 0;
@@ -344,7 +358,7 @@ public sealed class ScummCostume
                 var color = cel.Pixels[row * cel.Width + column];
                 if (color == 0) continue;
                 if (mask is not null && mask[ty * targetWidth + tx] != 0) continue;
-                target[ty * targetWidth + tx] = MapColor(color, actorPalette);
+                target[ty * targetWidth + tx] = MapColor(color, actorPalette, actorNumber);
                 if (coverage is not null) coverage[ty * targetWidth + tx] = true;
                 written++;
             }
@@ -357,7 +371,7 @@ public sealed class ScummCostume
     /// neighbouring cels so limbs still meet; pixels are taken nearest-neighbour. An estimate of ScummVM's scale table drawing.
     /// </summary>
     private int ComposeScaled(IReadOnlyList<ScummCostumeCel> cels, byte[] target, int targetWidth, int targetHeight,
-        int x, int y, IReadOnlyList<byte>? actorPalette, byte[]? mask, bool[]? coverage, int scale)
+        int x, int y, IReadOnlyList<byte>? actorPalette, byte[]? mask, bool[]? coverage, int scale, int actorNumber)
     {
         var written = 0;
         foreach (var cel in cels)
@@ -377,7 +391,7 @@ public sealed class ScummCostume
                     var color = cel.Pixels[row * cel.Width + Math.Min(cel.Width - 1, (tx - left) * cel.Width / (right - left))];
                     if (color == 0) continue;
                     if (mask is not null && mask[py * targetWidth + px] != 0) continue;
-                    target[py * targetWidth + px] = MapColor(color, actorPalette);
+                    target[py * targetWidth + px] = MapColor(color, actorPalette, actorNumber);
                     if (coverage is not null) coverage[py * targetWidth + px] = true;
                     written++;
                 }
