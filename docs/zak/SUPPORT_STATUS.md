@@ -35,6 +35,14 @@ Family: ZakEnhanced | Fixture: `D:/Juegos/Lucas/zakE ega en` | Owner: Zak S4b wo
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
 | S4b Session | done | unchanged | [.verification/zak-session-20261017](../../.verification/zak-session-20261017/README.md) | Adapter reads all 58 rooms / 148 present scripts; own opening reaches Room 1 in 1828 frames, control on, no cutscene; stable for 120 more frames |
-| S5 Objects / S6 verb-based Play / S7 Cutscenes / S9 Editions | not started | unchanged | same | Next after bounded S4b acceptance |
+| S5 Objects | source preview implemented; visual acceptance open | Objects ◐ unchanged | [.verification/zakenhanced-objects-20261017](../../.verification/zakenhanced-objects-20261017/README.md) | All-room source audit and three settled-state regressions; see record for retained gap flags and comparison limits |
+| S6 verb-based Play / S7 Cutscenes / S9 Editions | not started | unchanged | same | S5 acceptance limits remain explicit |
 
 Both editions run their own source-defined full opening and Script 108 post-dream action; no game variable, room or answer was forced. Random bedroom events and propagated effects remain labelled estimates. No unsupported opcode remains on the bounded acceptance routes. Shared slot dispatch and individual sound timelines are implemented; inventory-held code, active nested object-slot replacement continuation and Player_V2 priority/next-sound arbitration remain explicit limitations if reached. Sentence presentation belongs to S6. No native ScummVM was executed, and no registry cell was raised.
+
+Enhanced S5 acceptance remains open: the requested run prohibits executing ScummVM, so the required ten-room original-game picture comparison was replaced by explicitly labelled source comparisons, not claimed as completed. Residual geometric gap flags are retained; no pixels or story state were filled. See the record for exact results. Shared corrections are version-level, not Zak room exceptions.
+
+| Date | Stage | Open question | Options | Choice and why | How to undo |
+|---|---|---|---|---|---|
+| 2026-10-17 | S5 Enhanced | Treat source comparison as original-game visual acceptance? | claim completion / retain distinction | retain distinction, following R-2.4 and the run's prohibition on launching ScummVM; Objects remains Partial | complete the original-game comparison in a later authorized run |
+| 2026-10-17 | S5 Enhanced | Force inactive stored images into flagged rectangles? | fill / preserve source state | preserve reached intrinsic/touch flags; the detector alone does not justify a state change | no state workaround was introduced |

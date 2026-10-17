@@ -45,6 +45,16 @@ S4b execution, 17 October 2026: each English fixture independently traverses roo
 
 | Room | What it is, entry/exit script facts, local scripts | Evidence | Source | Date |
 |---|---|---|---|---|
+| Enhanced 23, loaded as 207 | Clears 403–411's intrinsic/touch flags, then selects 403, 406, 407 and 411 for this layout; other literal draws belong to other pseudo numbers | decoded | Entry +0x0004–0x0014, +0x0082–0x00CB | 2026-10-17 |
+| Enhanced 36, loaded as 199 | Initial clear loop followed by the 199 branch draws 568, 566, 567, 564; object 565 is conditional on object 302 being intrinsic-on | decoded | Entry +0x0004–0x000E, +0x0110–0x0179 | 2026-10-17 |
+| Enhanced 53, loaded as 158 | Draws 748, 749, 747, 741–745 in the wide-layout branch; the two extra ornaments 739/740 belong to 156 and are not drawn for 158 | decoded | Entry +0x003C–0x007F, +0x0092–0x00CA, +0x00FE–0x012C | 2026-10-17 |
+| Enhanced 8, loaded as 144 | Draws object 197, clears/touches 192; other travel-office layouts select different images. Entry starts native object scripts; the preview can leave the room | decoded | Entry +0x024F–0x0282, +0x000E/+0x0022 | 2026-10-17 |
+| Enhanced 14, loaded as 129 | Makes 309 intrinsic-on and touchable; 298 is conditional on its lock bit. Other layouts' 294/299–308 writes are not this branch | decoded | Entry +0x002C–0x006A | 2026-10-17 |
+| Enhanced 9, loaded as 146 | Sets 222 intrinsic-on and draws 224 after clearing the shared alternatives | decoded | Entry +0x001F–0x0031, +0x004D–0x0079 | 2026-10-17 |
+| Enhanced 33, loaded as 182 | First branch sets walk-box flags and resources, then skips the object writes used by 189–191 | decoded | Entry +0x0004–0x007D | 2026-10-17 |
+| Enhanced 37, loaded as 170 | Clears 572–575, runs object 570's background verb; draws 572/573 or their closed alternatives based on variables, then optional 574/575 | decoded | Entry +0x0085–0x00F2 | 2026-10-17 |
+| Enhanced 35, loaded as 195 | Takes projection-room branch, not the 194 branch that draws 559/560; object-script background work is distinct from entry's literal draws | decoded | Entry +0x000B–0x00A1 and +0x00AB/+0x00B0 | 2026-10-17 |
+| Enhanced 27, loaded as 185 | Clears 445 and runs object 460's background verb; 446/454/456 writes belong to the alternative 184 layout. Object 451's script is conditional on its intrinsic state | decoded | Entry +0x002C–0x00A0, +0x00A3–0x00C6 | 2026-10-17 |
 
 ## Verbs and the input chain
 
