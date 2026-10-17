@@ -181,7 +181,7 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
                     // S5 MonkeyCd (17 October 2026): the v5 format, for the one v5 family whose boot the session follows (S4b); Monkey Island 2 and Indy 4 have no S4b yet.
                     || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.MonkeyCd
                     // S5 Indy4 (17 October 2026): Indiana Jones and the Fate of Atlantis, the second v5 family with an S4b boot.
-                    || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.Indy4)
+                    || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.Indy4
                     || GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced or GameFamily.ZakClassic or GameFamily.ZakEnhanced),
             ExtraTimerVariables = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
