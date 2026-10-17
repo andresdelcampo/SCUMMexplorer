@@ -1,0 +1,77 @@
+game: Indiana Jones and the Last Crusade (Unknown, V4), folder indy3 vga es, room files
+boot: 1002 frames (limit 5000), hit limit: False, wall time 1,5 s
+final room: 73; rooms entered in order: 76, 79, 0, 6, 1, 73
+rooms by name: 76 Room 76, 79 Room 79, 0 (none), 6 Room 06, 1 Room 01, 73 Room 73
+extra frames played after the boot: 0; room now 73
+in cutscene: False; pending scripts: 6
+
+== pending scripts
+  Script 17 +0x0004
+  Room 73 local script 200 +0x007A
+  Room 73 local script 201 +0x0046 (delay 114)
+  Room 73 local script 202 +0x0036 (delay 54)
+  Room 73 local script 204 +0x0013
+  Script 119 +0x0185
+
+== session trace (waits omitted)
+  cutscene at Script 01 +0x01C0 runs script 0
+  Room 76 entry script +0x0013: startObject runs object 842 verb 0xFA
+  Script 01 continues at +0x01EC in Room 76 after loadRoom
+  Script 01 continues at +0x020A in Room 79 after loadRoom
+  script 204 started again: runScript ended its running copy first
+  stopScript 204 at Room 79 local script 205 +0x00EB: script 204 was not running
+  Sound 35 completed on its native AdLib resource clock.
+  endCutscene at Script 01 +0x0222 runs script 0
+  Script 01 +0x0223: room 0 (no room) after a frame advance
+  Script 01 continues at +0x0225 in Room 00 after loadRoom
+  cutscene at Script 01 +0x023A runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 17
+  script 21 started again: runScript ended its running copy first
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x024A in Room 06 after loadRoom
+  script 21 started again: runScript ended its running copy first
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x02E0 in Room 01 after loadRoom
+  stopScript 201 at Script 01 +0x0311: ended its pending run
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 continues at +0x0463 in Room 73 after loadRoom
+  sentence script 2 runs verb 0x0A with objects 834 and 0
+  Script 02 +0x0335: startObject runs object 834 verb 0x0A
+  cutscene at Room 73 local script 203 +0x0000 runs script 22
+  freezeScripts 0x7F at Script 22 +0x0010: frozen: Script 02, Room 73 Object 834 Verb 0x0A, Script 17, Script 01
+  Room 73 Object 834 Verb 0x0A pauses after startScript +0x0000: nested execution froze its caller
+  Script 02 pauses after startObject +0x0335: nested execution froze its caller
+  endCutscene at Room 73 local script 203 +0x008C runs script 23
+  stopScript 2 at Script 23 +0x0017: ended its running run
+  freezeScripts 0x00 at Script 23 +0x0025: frozen: Script 17
+  endCutscene at Script 01 +0x04B0 runs script 23
+  stopScript 2 at Script 23 +0x0017: script 2 was not running
+  freezeScripts 0x00 at Script 23 +0x0025: no script is frozen
+  Script 01 chains to script 119
+  boot: 1002 frames after script 001's first room load; now in Room 73
+
+== operations reported as not applied (presentation only, nothing in game state)
+
+== unsupported (opcode, operand or state the run could not follow): 0
+
+== random picks: 1035 (seeded; each is labelled an estimate)
+== all other uncertainties
+  Script 01 +0x01EA reached loadRoom during the boot.
+  Room 76 entered by Script 01 +0x01EA (loadRoom) during the boot.
+  Script 01 +0x0208 reached loadRoom after a frame advance.
+  Room 79 entered by Script 01 +0x0208 (loadRoom) after a frame advance.
+  Script 01 +0x0223 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 01 +0x0248 reached loadRoom after a frame advance.
+  Room 06 entered by Script 01 +0x0248 (loadRoom) after a frame advance.
+  Script 01 +0x02DE reached loadRoom after a frame advance.
+  Room 01 entered by Script 01 +0x02DE (loadRoom) after a frame advance.
+  Script 01 +0x0461 reached loadRoom after a frame advance.
+  Room 73 entered by Script 01 +0x0461 (loadRoom) after a frame advance.
+
+== actors
+  actor 1: room 73, (119,83), costume 1, visible True
+  actor 4: room 1, (700,106), costume 6, visible False
+  actor 7: room 40, (168,91), costume 76, visible False
+  actor 9: room 73, (256,86), costume 38, visible True
+
+== room 73: 14 objects, 10 stored images, 2 actors drawn, 0 skipped
