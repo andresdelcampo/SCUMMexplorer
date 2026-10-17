@@ -9,21 +9,34 @@ public sealed class ScummZakEnhancedSessionTests
         return File.Exists(Path.Combine(folder, "00.LFL")) ? folder : null;
     }
 
-    [Fact]
-    public void EnhancedZakDoesNotClaimAPlayableBootPastUnsupportedVerbSlots()
+    [Theory]
+    [InlineData("zakE ega en", GameFamily.ZakEnhanced)]
+    [InlineData("zak ega en", GameFamily.ZakClassic)]
+    public void ZaksOwnOpeningReachesItsStableFirstPlayableRoom(string edition, GameFamily family)
     {
-        if (Folder() is not { } folder) return;
+        var folder = Path.Combine(TestGames.Root, edition);
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
         var game = new GameFolderScanner().Scan(folder);
-        var data = new ScummV2DataSource(game);
+        Assert.Equal(family, GameSupport.For(game).Family);
+        var data = Assert.IsAssignableFrom<ScummV2DataSource>(ScummDataSources.For(game));
         var session = new ScummGameSession(game, data.ReadIndexedObjects(), data: data);
-        Assert.Null(session.BootReport!.FinalRoom);
-        Assert.Empty(session.BootReport.RoomsEntered);
-        Assert.False(session.PlayerHasControl);
-        Assert.Contains(session.Snapshot.Uncertainties,
-            item => item.Contains("unsupported v2 verbOps", StringComparison.Ordinal) && item.Contains("+0x003B", StringComparison.Ordinal));
+        Assert.Equal(1, session.BootReport!.FinalRoom);
+        Assert.False(session.BootReport.HitFrameLimit);
+        Assert.Equal(new[] { 46, 0, 46, 0, 58, 51, 55, 49, 56, 0, 0, 0, 1 }, session.BootReport.RoomsEntered);
+        Assert.True(session.PlayerHasControl);
+        Assert.False(session.InCutscene);
+        Assert.Equal((ushort)32767, session.Snapshot.KnownGlobalVariables["var[0x006]"]);
+        Assert.Contains(session.Actors, actor => actor.Number == 1 && actor.Room == 1 && actor.Look.Costume == 1);
         for (var frame = 0; frame < 120; frame++) session.AdvanceFrame();
-        Assert.Null(session.Snapshot.RoomId);
-        Assert.False(session.PlayerHasControl);
+        Assert.Equal(1, session.Snapshot.RoomId);
+        Assert.True(session.PlayerHasControl);
+        Assert.False(session.InCutscene);
+        Assert.DoesNotContain(session.Snapshot.Uncertainties, item =>
+            item.Contains("unsupported", StringComparison.OrdinalIgnoreCase) ||
+            item.Contains("not model", StringComparison.OrdinalIgnoreCase) ||
+            item.Contains("cannot", StringComparison.OrdinalIgnoreCase) ||
+            item.Contains("could not", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(session.Snapshot.Uncertainties, item => item.Contains("seeded pick", StringComparison.Ordinal));
     }
 
     [Fact]

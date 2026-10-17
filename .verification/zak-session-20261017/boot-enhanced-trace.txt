@@ -1,0 +1,140 @@
+Zak McKracken and the Alien Mindbenders (Enhanced); V2; zakE ega en
+boot frames 1828; limit hit False; final room 1; rooms 46,0,46,0,58,51,55,49,56,0,0,0,1
+player control True; in cutscene False
+== pending
+Script 06 +0x0078
+Script 06 +0x0078
+Script 06 +0x0078
+Script 06 +0x0078
+Script 06 +0x0078
+Script 06 +0x0078
+Script 09 +0x0004 (delay 54)
+Room 01 / Object 101 / Verb 0xFD +0x0022
+Room 01 / Object 95 / Verb 0xFD +0x009D (delay 54)
+Room 01 / Object 107 / Verb 0xFD +0x0058
+Script 06 +0x0078
+Script 06 +0x0078
+== trace
+Script 01 continues at +0x005A in Room 46 after loadRoom
+Script 127 +0x0000: room 0 (no room) after a frame advance
+Script 127 continues at +0x0002 in Room 00 after loadRoom
+Script 127 continues at +0x0020 in Room 46 after loadRoom
+Script 127 +0x0022: startObject runs object 671 verb 0xFD
+stopScript 127 at Script 01 +0x0082: script 127 was not running
+Script 01 +0x0084: room 0 (no room) after a frame advance
+Script 01 continues at +0x0086 in Room 00 after loadRoom
+Script 01 continues at +0x011E in Room 58 after loadRoom
+Sound 81 completed on its Player_V2 control clock.
+Script 01 continues at +0x014D in Room 51 after loadRoom
+Script 01 continues at +0x0166 in Room 55 after loadRoom
+Script 01 continues at +0x01CA in Room 49 after loadRoom
+stopScript 109 at Script 01 +0x034B: ended its pending run
+Script 01 continues at +0x0359 in Room 56 after loadRoom
+stopScript 109 at Script 01 +0x0385: ended its pending run
+Sound 95 completed on its Player_V2 control clock.
+stopScript 122 at Script 01 +0x0531: ended its pending run
+Script 01 +0x0533: room 0 (no room) after a frame advance
+Script 01 continues at +0x0534 in Room 00 after actorFollowCamera
+Script 01 +0x0537: room 0 (no room) after a frame advance
+Script 01 continues at +0x0539 in Room 00 after loadRoom
+Script 108 +0x0000: room 0 (no room) after a frame advance
+Script 108 continues at +0x0002 in Room 00 after loadRoom
+stopScript 111 at Script 108 +0x0005: script 111 was not running
+stopScript 109 at Script 108 +0x0007: script 109 was not running
+stopScript 127 at Script 108 +0x0009: script 127 was not running
+Room 01 / Entry script +0x0005: startObject runs object 101 verb 0xFD
+Room 01 / Entry script +0x001B: startObject runs object 104 verb 0xFD
+Room 01 / Entry script +0x0027: startObject runs object 95 verb 0xFD
+Room 01 / Entry script +0x002E: startObject runs object 108 verb 0xFD
+Room 01 / Entry script +0x004D: startObject runs object 109 verb 0xFD
+Room 01 / Entry script +0x0054: startObject runs object 107 verb 0xFD
+Script 108 +0x0297: camera x = 160 (actor 1's x)
+Script 108 continues at +0x0299 in Room 01 after actorFollowCamera
+Sound 02 completed on its Player_V2 control clock.
+Sound 02 completed on its Player_V2 control clock.
+sentence script 2 runs verb 0x01 with objects 90 and 0
+Sound 02 completed on its Player_V2 control clock.
+Script 02 +0x0235: startObject runs object 90 verb 0x01
+Room 01 / Object 90 / Verb 0x01 +0x0032: startObject runs object 104 verb 0xFD
+Sound 02 completed on its Player_V2 control clock.
+boot: 1828 frames after script 001's first room load; now in Room 01
+== uncertainties
+Script 01 +0x0058 reached loadRoom during the boot.
+Room 46 entered by Script 01 +0x0058 (loadRoom) during the boot.
+Script 127 +0x0000 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 127 +0x001E reached loadRoom after a frame advance.
+Room 46 entered by Script 127 +0x001E (loadRoom) after a frame advance.
+Script 01 +0x0084 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 01 +0x011C reached loadRoom after a frame advance.
+Room 58 entered by Script 01 +0x011C (loadRoom) after a frame advance.
+Script 01 +0x014B reached loadRoom after a frame advance.
+Room 51 entered by Script 01 +0x014B (loadRoom) after a frame advance.
+Script 01 +0x0164 reached loadRoom after a frame advance.
+Room 55 entered by Script 01 +0x0164 (loadRoom) after a frame advance.
+Script 01 +0x01C8 reached loadRoom after a frame advance.
+Room 49 entered by Script 01 +0x01C8 (loadRoom) after a frame advance.
+Script 01 +0x0357 reached loadRoom after a frame advance.
+Room 56 entered by Script 01 +0x0357 (loadRoom) after a frame advance.
+Script 01 +0x0533 reached actorFollowCamera to room 0 after a frame advance: no room is current until the next room load.
+Script 01 +0x0537 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 108 +0x0000 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 108 +0x0297 reached actorFollowCamera after a frame advance.
+Room 01 entered by Script 108 +0x0297 (actorFollowCamera) after a frame advance.
+Sound 63 status is an estimate: the start followed a seeded route.
+Script 02 +0x01E8: getDist reads actor 1: actor 1's walkActorToObject at +0x01E5 follows a seeded pick, so what follows is an estimate (+0x01EA)
+Script 09 +0x0004: getActorRoom reads actor 1: actor 1's walkActorToObject at +0x01E5 follows a seeded pick, so what follows is an estimate (+0x005E)
+Room 01 / Object 101 / Verb 0xFD +0x0029: getDist reads actor 1: actor 1's walkActorToObject at +0x01E5 follows a seeded pick, so what follows is an estimate (+0x0029)
+36 labelled getRandomNr estimate notices; first four samples follow (all other uncertainties retained).
+Room 01 / Object 101 / Verb 0xFD +0x0013: getRandomNr at +0x0013 picked 2 of 0..6 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+Room 01 / Object 107 / Verb 0xFD +0x0054: getRandomNr at +0x0054 picked 0 of 0..1 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+Room 01 / Object 107 / Verb 0xFD +0x0058: getRandomNr at +0x0054 picked 1 of 0..1 (seeded pick, seed 0, draw 1); what follows from it is an estimate, not a reached game state.
+Room 01 / Object 107 / Verb 0xFD +0x0058: getRandomNr at +0x0054 picked 0 of 0..1 (seeded pick, seed 0, draw 2); what follows from it is an estimate, not a reached game state.
+== engine/source variables
+var[0x000] = 1
+var[0x002] = 20
+var[0x003] = 255
+var[0x004] = 1
+var[0x005] = 0
+var[0x006] = 32767
+var[0x011] = 0
+var[0x019] = 6
+var[0x027] = 0
+var[0x07A] = 0
+== actors
+actor 1 room 1 position 96,90 costume 1
+actor 2 room 6 position 160,32 costume 2
+actor 3 room 26 position 0,0 costume 0
+actor 4 room 26 position 0,0 costume 0
+actor 7 room 4 position 176,104 costume 28
+actor 8 room 18 position 80,120 costume 26
+after 120 frames: room 1; control True; cutscene False
+Script 01 +0x0058 reached loadRoom during the boot.
+Room 46 entered by Script 01 +0x0058 (loadRoom) during the boot.
+Script 127 +0x0000 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 127 +0x001E reached loadRoom after a frame advance.
+Room 46 entered by Script 127 +0x001E (loadRoom) after a frame advance.
+Script 01 +0x0084 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 01 +0x011C reached loadRoom after a frame advance.
+Room 58 entered by Script 01 +0x011C (loadRoom) after a frame advance.
+Script 01 +0x014B reached loadRoom after a frame advance.
+Room 51 entered by Script 01 +0x014B (loadRoom) after a frame advance.
+Script 01 +0x0164 reached loadRoom after a frame advance.
+Room 55 entered by Script 01 +0x0164 (loadRoom) after a frame advance.
+Script 01 +0x01C8 reached loadRoom after a frame advance.
+Room 49 entered by Script 01 +0x01C8 (loadRoom) after a frame advance.
+Script 01 +0x0357 reached loadRoom after a frame advance.
+Room 56 entered by Script 01 +0x0357 (loadRoom) after a frame advance.
+Script 01 +0x0533 reached actorFollowCamera to room 0 after a frame advance: no room is current until the next room load.
+Script 01 +0x0537 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 108 +0x0000 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+Script 108 +0x0297 reached actorFollowCamera after a frame advance.
+Room 01 entered by Script 108 +0x0297 (actorFollowCamera) after a frame advance.
+Sound 63 status is an estimate: the start followed a seeded route.
+Script 02 +0x01E8: getDist reads actor 1: actor 1's walkActorToObject at +0x01E5 follows a seeded pick, so what follows is an estimate (+0x01EA)
+Script 09 +0x0004: getActorRoom reads actor 1: actor 1's walkActorToObject at +0x01E5 follows a seeded pick, so what follows is an estimate (+0x005E)
+Room 01 / Object 101 / Verb 0xFD +0x0029: getDist reads actor 1: actor 1's walkActorToObject at +0x01E5 follows a seeded pick, so what follows is an estimate (+0x0029)
+158 labelled getRandomNr estimate notices; first four samples follow (all other uncertainties retained).
+Room 01 / Object 101 / Verb 0xFD +0x0013: getRandomNr at +0x0013 picked 2 of 0..6 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+Room 01 / Object 107 / Verb 0xFD +0x0054: getRandomNr at +0x0054 picked 0 of 0..1 (seeded pick, seed 0, draw 0); what follows from it is an estimate, not a reached game state.
+Room 01 / Object 107 / Verb 0xFD +0x0058: getRandomNr at +0x0054 picked 1 of 0..1 (seeded pick, seed 0, draw 1); what follows from it is an estimate, not a reached game state.
+Room 01 / Object 107 / Verb 0xFD +0x0058: getRandomNr at +0x0054 picked 0 of 0..1 (seeded pick, seed 0, draw 2); what follows from it is an estimate, not a reached game state.

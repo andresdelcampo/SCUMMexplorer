@@ -41,6 +41,8 @@ Values this game selects for engine-defined slots (see the engine table). One ro
 
 ## Rooms
 
+S4b execution, 17 October 2026: each English fixture independently traverses rooms `46,0,46,0,58,51,55,49,56,0,0,0,1`. Enhanced reaches control in 1828 frames; Classic in 1804. Both remain in Room 1 with control and no cutscene for 120 more frames. Script 108 finishes its post-dream sentence/walk and input restoration. Bedroom random scripts are seeded, labelled estimates. See [.verification/zak-session-20261017](../../.verification/zak-session-20261017/README.md); this runtime evidence supplements, rather than transfers between, the edition-specific static rows above.
+
 | Room | What it is, entry/exit script facts, local scripts | Evidence | Source | Date |
 |---|---|---|---|---|
 

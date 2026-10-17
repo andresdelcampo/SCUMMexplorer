@@ -23,7 +23,7 @@ else if (args[0] == "sound")
 }
 else if (args[0] == "dump")
 {
-    var reader = new ScummScriptReader(ScummScriptDialect.V2);
+    var reader = new ScummScriptReader(ScummProfile.For(game).Dialect);
     foreach (var resource in game.Resources.Where(r => r.Kind == ResourceKind.Script && r.Offset.HasValue))
     {
         var code = ScummOldScripts.ReadGlobalScript(LflEncoding.DecodeXorFF(File.ReadAllBytes(resource.FilePath)), resource.Offset!.Value);
@@ -52,8 +52,8 @@ else
     lines.Add("== trace");
     lines.AddRange(session.SessionTrace.Where(s => !s.Contains(" waits ") && !s.Contains("delay ends")));
     lines.Add("== uncertainties");
-    lines.AddRange(session.Snapshot.Uncertainties.Distinct());
-    Console.WriteLine(string.Join(Environment.NewLine, session.Snapshot.Uncertainties.Distinct().Take(12)));
+    lines.AddRange(CompactUncertainties(session.Snapshot.Uncertainties));
+    Console.WriteLine(string.Join(Environment.NewLine, CompactUncertainties(session.Snapshot.Uncertainties).TakeLast(12)));
     lines.Add("== engine/source variables");
     foreach (var variable in new[] { 0, 2, 3, 4, 5, 6, 17, 25, 39, 122 })
     {
@@ -64,7 +64,17 @@ else
     lines.AddRange(session.Actors.Where(a => a.Room is not null and not 0).Select(a => $"actor {a.Number} room {a.Room} position {a.X},{a.Y} costume {a.Look.Costume}"));
     for (var i = 0; i < 120; i++) session.AdvanceFrame();
     lines.Add($"after 120 frames: room {session.CurrentRoomId}; control {session.PlayerHasControl}; cutscene {session.InCutscene}");
-    lines.AddRange(session.Snapshot.Uncertainties.Distinct());
+    lines.AddRange(CompactUncertainties(session.Snapshot.Uncertainties));
 }
 File.WriteAllLines(args[2], lines);
 Console.WriteLine(string.Join(Environment.NewLine, lines.Take(4)));
+
+static IEnumerable<string> CompactUncertainties(IEnumerable<string> source)
+{
+    var items = source.Distinct().ToArray();
+    var random = items.Where(item => item.Contains("getRandomNr at", StringComparison.Ordinal)).ToArray();
+    foreach (var item in items.Where(item => !item.Contains("getRandomNr at", StringComparison.Ordinal))) yield return item;
+    if (random.Length == 0) yield break;
+    yield return $"{random.Length} labelled getRandomNr estimate notices; first four samples follow (all other uncertainties retained).";
+    foreach (var item in random.Take(4)) yield return item;
+}

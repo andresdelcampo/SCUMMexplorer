@@ -1,62 +1,72 @@
-# Zak Enhanced S4b: own-script boot verification
+# Zak Classic / Enhanced S4b: own-script boot verification
 
 | | |
 |---|---|
-| Family / stage | ZakEnhanced / S4b |
-| Fixture and edition | `D:/Juegos/Lucas/zakE ega en` (DOS enhanced, English; no Games junction) |
+| Families / stage | ZakClassic and ZakEnhanced / S4b |
+| Fixtures | `D:/Juegos/Lucas/zak ega en` (DOS v1 English); `D:/Juegos/Lucas/zakE ega en` (DOS v2 English) |
 | Date and author | 2026-10-17, Zak worktree agent |
-| Commits | Shared source foundation `632a0d7`, executor `494ebc0`/`e3a0fc4`, session `a568445`/`2797a4d`; sound `8873073`/`e9196fd`; object dispatch `a560392` |
-| Registry change | Unchanged: S4b is a prerequisite, not a published feature cell |
+| Engine baseline | Shared branch through `9937aa6`, actor defaults `022d4c0`, boot-to-control `a01b992` |
+| Own shared changes | sound `8873073`/`e9196fd`, object dispatch `a560392`, explicit verb slots `71f6cbf` |
+| Registry | unchanged: S4b is a prerequisite, not a published feature cell |
 
 ## What was done
 
-The reproducible `BootTrace` harness reads the fixture's global and room scripts (`dump`), traces v2 sound control (`sound`), or runs the generic session (`boot`). It never edits game variables. The first dump exposed the existing actor palette/name decoding gaps; these were reported to the shared v2 owner.
+The `BootTrace` harness runs each fixture's own boot through the generic session. No game variable, room, answer or game data was forced; no Games junction was created. Source-defined initialization includes Zak's machine-speed value 32767. Script 1 starts Script 108, which finishes the post-dream action and enables input, so the profile uses the existing boot-until-control rule.
 
-The adapter audit reads every room, entry/exit, object verb and object image: 58 rooms, 780 indexed object states, global capacity 155 and 148 present scripts. Room 19's duplicate object 384 and one-object script directories exposed shared reader issues, now corrected by the shared owner. The decoded later opening path is recorded separately from execution in the script map.
+The Enhanced adapter audit reads all 58 rooms, entry/exit scripts, object verbs and images, 780 indexed states, and 148 present global scripts (capacity 155). Duplicate object 384 in Room 19 and one-object directories exposed shared reader bugs, fixed before acceptance. Classic uses its own V1 adapter and fixture, retaining the earlier adapter evidence in `.verification/ClassicBoot` and `.verification/maniac-v1-adapter-20261017`.
 
-Immediate v2 object dispatch preserves the source's ordinary/FD/FA flag combinations and replaces only a matching object slot. FE stops every slot of that object, including nested callers, without stopping a same-numbered global script. The two focused slot tests cover flag separation, replacement and cancellation; actively executing replacement pointer continuation is explicitly unresolved.
-
-`ScummPcSpeakerAudio.ReadV2Lifetime` runs the existing Player_V2 control interpreter without PCM synthesis. It records the sound script's channel-zero music timer, including decreases, and proves loops only when the complete control state repeats. The existing sound clock accepts these optional timelines; older formats keep their existing behavior. Native duration excludes PCM filter release. A truncated script or exhausted bound remains Unknown.
+V2 sound lifetimes run Player_V2 control without PCM, preserving channel-zero music-timer changes. Verb operations address physical slots: delete uses raw slot + 1, create replaces that explicit slot, mode finds the first unsaved matching verb ID. Duplicate IDs stay distinct. Immediate object calls preserve ordinary/FD/FA flags; FE cancels object slots without cancelling same-numbered global scripts.
 
 ## Commands run (through RTK)
 
-From the isolated Zak worktree:
+Working directory: `D:/Documents/Personal/Code Projects/SCUMMexplorer/.worktrees/zak-enhanced-s4b`.
 
 ```powershell
-rtk proxy dotnet run --no-restore --project .verification/zak-session-20261017/BootTrace -- dump "D:/Juegos/Lucas/zakE ega en" .verification/zak-session-20261017/scripts.txt
-rtk proxy dotnet run --no-restore --project .verification/zak-session-20261017/BootTrace -- sound "D:/Juegos/Lucas/zakE ega en" .verification/zak-session-20261017/sounds.txt
-rtk proxy dotnet run --no-restore --project .verification/zak-session-20261017/BootTrace -- boot "D:/Juegos/Lucas/zakE ega en" .verification/zak-session-20261017/boot-trace.txt
-rtk proxy dotnet test tests/SCUMMexplorer.Tests/SCUMMexplorer.Tests.csproj --no-restore --filter "FullyQualifiedName~ScummV2SoundLifetimeTests|FullyQualifiedName~LoomSoundClockTests|FullyQualifiedName~LoomPcSpeakerAudioTests" --verbosity quiet
-rtk proxy dotnet test tests/SCUMMexplorer.Tests --no-restore --filter "FullyQualifiedName~ScummV2ObjectSlotTests|FullyQualifiedName~ScummZakEnhancedSessionTests|FullyQualifiedName~ScummV2SoundLifetimeTests|FullyQualifiedName~ScummV2ExecutorTests|FullyQualifiedName~ScummV2SessionVariableTests|FullyQualifiedName~LoomSoundClockTests|FullyQualifiedName~LoomPcSpeakerAudioTests" -v minimal
+rtk proxy dotnet run --no-restore --project .verification/zak-session-20261017/BootTrace -- boot "D:/Juegos/Lucas/zakE ega en" .verification/zak-session-20261017/boot-enhanced-trace.txt
+rtk proxy dotnet run --no-build --no-restore --project .verification/zak-session-20261017/BootTrace -- boot "D:/Juegos/Lucas/zak ega en" .verification/zak-session-20261017/boot-classic-trace.txt
+rtk proxy dotnet run --no-build --no-restore --project .verification/zak-session-20261017/BootTrace -- dump "D:/Juegos/Lucas/zakE ega en" .verification/zak-session-20261017/scripts.txt
+rtk proxy dotnet run --no-build --no-restore --project .verification/zak-session-20261017/BootTrace -- sound "D:/Juegos/Lucas/zakE ega en" .verification/zak-session-20261017/sounds.txt
+rtk proxy dotnet test tests/SCUMMexplorer.Tests --no-restore --filter "FullyQualifiedName~ScummZakEnhancedSessionTests|FullyQualifiedName~ScummV2VerbTableTests|FullyQualifiedName~ScummV2ObjectSlotTests|FullyQualifiedName~ScummV2SoundLifetimeTests|FullyQualifiedName~ScummV2ExecutorTests|FullyQualifiedName~ScummV2SessionVariableTests|FullyQualifiedName~LoomSoundClockTests|FullyQualifiedName~LoomPcSpeakerAudioTests" -v minimal
 ```
 
 ## Results (numbers)
 
-Sound control and LOOM clock/speaker regression: 12 passed, 0 failed. Zak's Sound 81 finishes after 2,857 ticks at 236 Hz (5,714 common-clock callbacks); Sound 95 finishes after 20,545 ticks (41,090 callbacks) and supplies timer values through 42. Synthetic tests also pin a timer decrease, exact recurring-state loop detection and truncated-code rejection.
+**S4b done for both fixtures.** Each own opening reaches Room 1 with player control enabled and no open cutscene; 120 further frames preserve that endpoint. No reached unsupported/unmodelled opcode remains on these bounded routes.
 
-Final integrated targeted suite: **34 passed, 0 failed, 0 skipped**, including Zak adapter/blocked-boot assertions, v2 object slots, executor and session variables, sound timelines and existing sound regressions. Parent performs the required full suite after merging current master.
+| Own fixture | Boot frames | Frame limit hit | Endpoint | After 120 frames |
+|---|---:|---|---|---|
+| ZakEnhanced English | 1828 | no | Room 1, control on, no cutscene | same |
+| ZakClassic English | 1804 | no | Room 1, control on, no cutscene | same |
 
-**S4b remains blocked.** With the integrated v2 foundation, the unmodified boot records 0 frames, no room entered, no pending scripts, no player control, and this uncertainty: `Script 01 +0x0000: unsupported v2 verbOps (0x00, [delete var[0x042]]) at +0x003B`. Advancing another 120 frames preserves that unresolved state. The later Room 1 path in Script 108 has only been decoded, never reached. No state was edited or opcode skipped to make progress.
+Both room sequences: `46,0,46,0,58,51,55,49,56,0,0,0,1`. Actor 1 ends at engine pixel coordinates (96,90), costume 1. This is output, not an original-game visual match. Random bedroom scripts and their propagated movement/sound effects remain labelled estimates. The trace compacts repeated random notices to a count and four samples; every other uncertainty is retained.
 
-The next bounded task is a source-backed v2 verb-slot table (`o2_verbOps`): deletion addresses raw slot + 1, creation supplies its own slot, while enable/disable looks up a verb ID. The later-version table keyed only by verb ID is not a faithful substitute. Keep S4b open and S5/S6/S7/S9 unstarted until real boot acceptance is met.
+Sound 81 ends after 2857 control ticks at 236 Hz (5714 common callbacks); Sound 95 after 20545 ticks (41090 callbacks), supplying music-timer values through 42. Earlier sound/LOOM clock tests passed 12/12. Verb regression passed 49, failed 0, with one optional LOOM audit skipped. Parent performs the required full suite against current master.
 
-## Comparison with ScummVM (source files and date; runtime comparison if any)
+Final integrated targeted suite above: **46 passed, 0 failed, 0 skipped**, including both independent Zak opening/120-frame stability cases.
 
-Source read 17 October 2026: [player_v2.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/players/player_v2.cpp), [player_v2base.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/players/player_v2base.cpp) and [player_v2base.h](https://github.com/scummvm/scummvm/blob/master/engines/scumm/players/player_v2base.h). `nextTick` uses 236 Hz; for versions before 3, `getMusicTimer` returns channel zero's word at byte 46, written by the sound stream. No ScummVM executable was run.
+## Comparison with ScummVM
 
-Object dispatch and verb-table evidence: [script_v2.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v2.cpp), `o2_doSentence` and `o2_verbOps`; [script.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script.cpp), `runObjectScript`, `runScriptNested` and `stopObjectScript`. Source evidence only, read 17 October 2026.
+Source read 17 October 2026; no ScummVM executable was run:
+
+- [script_v2.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script_v2.cpp): verb slots, immediate object calls, pickup, colors, inventory redraw and sentence behavior.
+- [script.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/script.cpp): object execution, cancellation and nested continuation.
+- [verbs.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/verbs.cpp): EGA highlight 14; [resource_v4.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/resource_v4.cpp): inherited 100-slot allocation.
+- [player_v2.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/players/player_v2.cpp), [player_v2base.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/players/player_v2base.cpp), [player_v2base.h](https://github.com/scummvm/scummvm/blob/master/engines/scumm/players/player_v2base.h): 236 Hz control, timer at byte 46, termination and recurring-state loops.
+- [object.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/object.cpp): duplicate lookup and v1/v2 distance units.
 
 ## Differences and uncertainties kept
 
-- The generic sound clock tracks independent resources; Player_V2 priority and restartable-next-sound arbitration are not represented. These lifetime results establish individual control streams, not competing voices.
-- The sound control trace is capped at 180 seconds; exhausting it is Unknown, not evidence of a loop. The all-sounds report includes such cases.
-- No original-game observation, listening, picture or timing comparison is claimed.
-- Initial harness compilation required corrections to the project-relative path and the resource collection property. A sandbox testhost stalled; the same targeted tests completed with the authorized elevated invocation. NuGet audit endpoint access was unavailable during the initial harness restore.
+- Bounded S4b acceptance is not all-room objects, playable UI, cutscene catalog or edition parity. S5, verb-based S6, S7 and S9 remain next.
+- Individual sound timelines do not implement Player_V2 priority/restartable-next arbitration. Exhausting the 180-second control bound yields Unknown, not proof of a loop. No original-game listening/timing comparison is claimed.
+- Inventory-held script execution and replaced actively executing object-slot continuation remain explicit limitations if reached; neither produced an unresolved step on these routes.
+- Sentence rendering remains S6 presentation work. Seeded random paths remain estimates.
+- Classic S2 stays 24 derived colors / 11 estimates; its cell and missing comparisons are unchanged.
+- A sandbox testhost stalled earlier; authorized elevated execution completed. NuGet audit access was unavailable for the harness restore. An attempted simultaneous rebuild/run hit a transient file lock; final traces use one build and sequential runs.
 
-## User checks (exact steps and where; none if none)
+## User checks
 
-None: the recorded boot is blocked before any room. The harness reproduces the diagnostic without launching a native engine.
+None required to reproduce engine acceptance: run the two boot commands above. No native engine or app screenshot comparison was performed.
 
-## Where the facts went (links to the script map / engine notes / tracker entries)
+## Where the facts went
 
-[Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [Zak tracker](../../docs/zak/SUPPORT_STATUS.md). Parent orchestrator owns the shared engine notes, roadmap, checkpoint and handoff. Registry cells remain unchanged.
+[Zak script map](../../docs/zak/ZAK_SCRIPT_MAP.md), [Zak tracker](../../docs/zak/SUPPORT_STATUS.md), [Enhanced trace](boot-enhanced-trace.txt), [Classic trace](boot-classic-trace.txt). This supersedes the earlier verb-slot blockers here and in `.verification/ClassicBoot` for Zak only. Parent owns roadmap, checkpoint, changelog and handoff.
