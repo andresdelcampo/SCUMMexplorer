@@ -289,6 +289,10 @@ public sealed class ScummBoundedScriptExecutor
             // An event behind a branch on a seeded pick is a possible outcome, not a reached one.
             var scriptEvent = inventoryScriptStart ?? ScummScriptEvent.FromInstruction(script, instruction,
                 onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached);
+            if (instruction.Operation == "soundKludge" && runtime is not null &&
+                SoundKludgeEvent(script, instruction, knownVariables, estimated,
+                    onEstimatedPath ? ScummScriptEventCertainty.Conditional : ScummScriptEventCertainty.Reached) is { } kludge)
+                scriptEvent = kludge;
             if (scriptEvent is not null) scriptEvent = scriptEvent with { Executed = true };
             // o5_actorFollowCamera -> setCameraFollows (actor.cpp): an actor that is not in the current room starts that room's scene (startScene), then the
             // camera is put on the actor. The first game that relies on it is Monkey Island's boot (script 1 ends with the ego put in room 38 while room 0 is current).
@@ -3209,7 +3213,26 @@ public sealed class ScummBoundedScriptExecutor
         return bytes.ToArray();
     }
 
-    private static bool IsPresentationOperation(string operation) => operation is
+    // o5_soundKludge (0x4C in v4/v5) hands its word list to iMUSE (Sound::soundKludge, then IMuseInternal::doCommand_internal, imuse.cpp, ScummVM master
+    // read 17 October 2026): a[0] = param << 8 | command. Param 0: 8 startSound, 9 stopSound, 10 and 11 stopAllSounds; these change which sounds play
+    // and become the same events as startSound/stopSound/stopMusic. A lone -1 only flushes the sound queue. Every other command (priority, volume, pan,
+    // transpose, speed, jump, loop, hook, fade, trigger queue) changes how a playing song sounds or when its markers fire, never which sounds play:
+    // it stays a presentation operation not applied (IsPresentationOperation), reported in the limitations.
+    private static ScummScriptEvent? SoundKludgeEvent(ScummScriptDisassembly script, ScummScriptInstruction instruction,
+        IDictionary<string, ushort> knownVariables, IReadOnlySet<string> estimated, ScummScriptEventCertainty certainty)
+    {
+        var items = instruction.Operands.Trim().TrimStart('[').TrimEnd(']').Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (items.Length < 1 || !TryReadValue(items[0], knownVariables, out var head, out _) || head >> 8 != 0) return null;
+        var command = head & 0xFF;
+        if (command is 10 or 11)
+            return ScummScriptEvent.FromInstruction(script, instruction with { Operation = "stopMusic", Operands = "" }, certainty);
+        if (command is not (8 or 9) || items.Length < 2 || !TryReadValue(items[1], knownVariables, out var sound, out _)) return null;
+        if (OperandIsEstimated(items[1], estimated, knownVariables)) certainty = ScummScriptEventCertainty.Conditional;
+        return ScummScriptEvent.FromInstruction(script,
+            instruction with { Operation = command == 8 ? "startSound" : "stopSound", Operands = $"0x{sound:X4}" }, certainty);
+    }
+
+    private static bool IsPresentationOperation(string operation) => operation is "soundKludge" or
         "matrixOps" or "roomOps" or "actorOps" or "setClass" or "animateActor" or "putActor" or "putActorInRoom" or
         "faceActor" or "walkActorTo" or "walkActorToActor" or "walkActorToObject" or "putActorAtObject" or
         "setCameraAt" or "panCameraTo" or "lights" or "resourceRoutines" or "print" or "printEgo" or
