@@ -207,6 +207,7 @@ public abstract partial class ScummSession
     public ScummObjectActionResult PressKey(int key)
     {
         BeforeInput();
+        if (_runtime.IsV2) return PressV2Key(key);
         // Room 0 (the null room, ScummVM startScene(0)) has no room, but the engine still reads keys there: a game's credits or boot waits in it.
         if (_currentRoom is null && _runtime.CurrentRoom != NullRoom)
             throw new InvalidOperationException("Visit a room before pressing a key.");
@@ -272,6 +273,31 @@ public abstract partial class ScummSession
             _entersRoomLoads--;
         }
         return FinishInput(beforeUncertainties, beforeEvents);
+    }
+
+    private ScummObjectActionResult PressV2Key(int key)
+    {
+        var room = _currentRoom?.ResourceId ?? NullRoom;
+        _uncertainties.StartStep();
+        var beforeNotes = _uncertainties.Count;
+        var beforeEvents = _visitEvents.Count;
+        var input = $"Assumed input: {DescribeKey(key)} through the v2 engine input script";
+        LastAction = new ScummObjectActionResult(room, 0, 0, 0, null, null, null, null, [], input);
+        _uncertainties.Add(input);
+        _runtime.SetGlobalVariable(ScummVars.V2.Keypress, (ushort)key);
+        if (key == 0x1B && _runtime.GlobalVariables.GetValueOrDefault(CutsceneExitKeyVariable) != 0)
+            _uncertainties.Add(AbortCutscene());
+        if (_runtime.UserPut <= 0) return FinishInput(beforeNotes, beforeEvents);
+        _dispatchScope++;
+        _entersRoomLoads++;
+        try
+        {
+            _runtime.SetGlobalVariable(ScummVars.V2.ClickArea, KeyClickArea);
+            // runInputScript (v1/v2): fixed script 4; keyboard state is VAR_KEYPRESS, not v3 locals.
+            RunStartedScript(4, 0, null, 0);
+        }
+        finally { _dispatchScope--; _entersRoomLoads--; }
+        return FinishInput(beforeNotes, beforeEvents);
     }
 
     // After an input script ran: dispatch the loads it requested, or visit the room a reached load names.

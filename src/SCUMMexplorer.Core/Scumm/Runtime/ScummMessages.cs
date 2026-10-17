@@ -535,7 +535,7 @@ public sealed class ScummMessageTable
         TalkDelay = DefaultTalkDelay;
         if (!_keepText) _shown.Clear();
         if (_shown.Count == 0) _shown.Add([]);
-        var charInc = runtime.GlobalVariables.TryGetValue(CharIncVariable, out var inc) ? (short)inc : 0;
+        var charInc = runtime.IsV2 ? runtime.V2TextSpeed : runtime.GlobalVariables.TryGetValue(CharIncVariable, out var inc) ? (short)inc : 0;
         var estimates = new List<string>();
         while (true)
         {
@@ -554,6 +554,8 @@ public sealed class ScummMessageTable
                 continue;
             }
             _shown[^1].Add((byte)c);
+            if (runtime.IsV2)
+                runtime.SetGlobalVariable(ScummVars.V2.CharCount, (ushort)(runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.CharCount) + 1));
             TalkDelay += charInc;
         }
         var source = _source!;

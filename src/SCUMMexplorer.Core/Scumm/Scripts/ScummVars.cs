@@ -11,6 +11,37 @@ namespace SCUMMexplorer.Core.Scumm;
 /// </summary>
 public static class ScummVars
 {
+    /// <summary>SCUMM v1/v2 slots (ScummVM vars.cpp setupScummVars, read 17 October 2026). Absent v3 roles must not write game variables.</summary>
+    public static class V2
+    {
+        public const string Ego = "var[0x000]";
+        public const string MachineSpeed = "var[0x006]";
+        public const string CharCount = "var[0x007]";
+        public const string ActiveVerb = "var[0x008]";
+        public const string ActiveObject1 = "var[0x009]";
+        public const string ActiveObject2 = "var[0x00A]";
+        public const string CurrentLights = "var[0x00C]";
+        public const string MusicTimer = "var[0x011]";
+        public const string VerbAllowed = "var[0x012]";
+        public const string CursorState = "var[0x015]";
+        public const string CameraMinX = "var[0x017]";
+        public const string CameraMaxX = "var[0x018]";
+        public const string TimerNext = "var[0x019]";
+        public const string SentenceVerb = "var[0x01A]";
+        public const string SentenceObject1 = "var[0x01B]";
+        public const string SentenceObject2 = "var[0x01C]";
+        public const string SentencePreposition = "var[0x01D]";
+        public const string MouseX = "var[0x01E]";
+        public const string MouseY = "var[0x01F]";
+        public const string ClickArea = "var[0x020]";
+        public const string ClickVerb = "var[0x021]";
+        public const string ClickObject = "var[0x023]";
+        public const string RoomResource = "var[0x024]";
+        public const string LastSound = "var[0x025]";
+        public const string Keypress = "var[0x027]";
+        public const string CutsceneExitKey = "var[0x028]";
+        public const string TalkActor = "var[0x029]";
+    }
     /// <summary><c>VAR_RESULT</c>: where <c>getActor*</c>-style opcodes leave their answer.</summary>
     public const string Result = "var[0x000]";
     /// <summary><c>VAR_EGO</c>: the actor the player controls.</summary>

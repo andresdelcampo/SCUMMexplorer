@@ -52,6 +52,7 @@ public abstract partial class ScummSession
         _runtime = new ScummScriptRuntimeState(indexedObjects.States, indexedObjects.Owners, indexedObjects.Classes,
             useV4Walking: ScummProfile.For(game).UsesV4Walking)
         {
+            EngineVersion = ScummProfile.For(game).EngineVersion,
             Random = new ScummSeededRandom(randomSeed),
             MutationObserver = observer
         };
@@ -60,12 +61,13 @@ public abstract partial class ScummSession
         _runtime.VerbEntrypoint = ObjectVerbEntrypoint;
         _runtime.SoundRunning = _soundClock.Status;
         _runtime.OverrideChanged = RecordOverride;
+        _runtime.V2FreezeScripts = FreezeV2Scripts;
         _runtime.Actors.CostumeSource = _data.ReadCostume;
         _runtime.Verbs.ImageSize = (room, image) => VerbImage(room, image) is { } picture ? (picture.Width, picture.Height) : null;
         _runtime.Messages.TalkAnimation = (actor, start) => _runtime.Actors.TalkAnimation(actor, start, CurrentPlacement());
         _extraTimerVariables = ScummProfile.For(game).ExtraTimerVariables;
         // The engine starts with every variable at 0; the frame loop adds to the timers from there.
-        foreach (var timer in EngineTimerVariables.Append(TimerTotalVariable))
+        foreach (var timer in EngineTimerVariables.Concat(_runtime.IsV2 ? [] : new[] { TimerTotalVariable }))
             _runtime.SetGlobalVariable(timer, 0);
     }
 
@@ -154,7 +156,7 @@ public abstract partial class ScummSession
         new Dictionary<int, byte>(_runtime.ObjectOwners),
         new Dictionary<string, ushort>(_runtime.GlobalVariables),
         KnownInventory(),
-        _runtime.GlobalVariables.ContainsKey(ScummVars.Ego),
+        _runtime.GlobalVariables.ContainsKey(_runtime.EgoVariable),
         _runtime.ActiveSounds.Order().ToArray(),
         _pending.Count,
         _uncertainties.ToArray(),
@@ -173,7 +175,7 @@ public abstract partial class ScummSession
     /// <summary>The message state: the talk message, its delay and <c>VAR_HAVE_MSG</c>, and drawn strings.</summary>
     public ScummMessageTable Messages => _runtime.Messages;
 
-    protected int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue(ScummVars.Ego, out var ego)
+    protected int[] KnownInventory() => _runtime.GlobalVariables.TryGetValue(_runtime.EgoVariable, out var ego)
         ? _runtime.ObjectOwners.Where(pair => pair.Value == ego).Select(pair => pair.Key).Order().ToArray()
         : [];
 
@@ -183,7 +185,7 @@ public abstract partial class ScummSession
         item.Certainty is ScummScriptEventCertainty.Reached or ScummScriptEventCertainty.Conditional;
 
     /// <summary>ScummVM <c>VAR_CUTSCENEEXIT_KEY</c> (v3: var 24); the boot sets it to 0x1B (script 001 +0x012C).</summary>
-    protected const string CutsceneExitKeyVariable = ScummVars.CutsceneExitKey;
+    protected string CutsceneExitKeyVariable => _runtime.IsV2 ? ScummVars.V2.CutsceneExitKey : ScummVars.CutsceneExitKey;
 
     /// <summary>
     /// ScummEngine::isScriptRunning: a global or local script slot with this
@@ -249,6 +251,7 @@ public abstract partial class ScummSession
     // beginCutscene's vm.cutSceneData stack, and the script whose cutscene start
     // script is running (vm.cutSceneScriptIndex), which freezeScripts leaves running.
     protected readonly Stack<(ushort Data, ScriptFrame? Owner)> _cutscenes = new();
+    private readonly Stack<(int UserState, ushort Cursor)> _v2CutsceneState = new();
     // ScummVM vm.cutScenePtr/cutSceneScript per cutscene depth (0: no cutscene open).
     protected readonly Dictionary<int, (ScriptFrame Frame, int JumpOffset)> _overrides = new();
     protected ScriptFrame? _cutsceneOwner;
@@ -279,6 +282,7 @@ public abstract partial class ScummSession
 
     protected void RunGlobalHook(string key, string phase, bool pathEstimated = false)
     {
+        if (_runtime.IsV2) return; // v1/v2 have fixed engine scripts, not the v3 hook-variable slots.
         if (!_runtime.GlobalVariables.TryGetValue(key, out var scriptId))
         {
             _uncertainties.Add($"Global {phase} hook {key} is unknown because startup has not established it.");
@@ -668,6 +672,19 @@ public abstract partial class ScummSession
     /// </summary>
     protected string BeginCutscene(ScummScriptEvent scriptEvent, int depth)
     {
+        if (_runtime.IsV2)
+        {
+            _v2CutsceneState.Push((_runtime.V2UserState | (_runtime.UserPut > 0 ? 16 : 0),
+                _runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.CursorState)));
+            _cutscenes.Push((0, _executing.Count > 0 ? _executing[^1] : null));
+            CutscenesBegun++;
+            _overrides.Remove(_cutscenes.Count);
+            _runtime.SetGlobalVariable(ScummVars.V2.CursorState, 200);
+            _runtime.ApplyV2UserState(4 | 2 | 1 | 8);
+            _runtime.Sentences.Clear();
+            StopRunningScript(2);
+            return "";
+        }
         if (!TryReadLocalArguments(scriptEvent.Operands, _runtime.GlobalVariables, out var arguments))
             return "cutscene arguments depend on unknown variables";
         _cutscenes.Push((arguments.GetValueOrDefault("local[0x000]"), _executing.Count > 0 ? _executing[^1] : null));
@@ -709,6 +726,23 @@ public abstract partial class ScummSession
         _overrides.Remove(_cutscenes.Count);
         if (_cutscenes.Count > 0) data = _cutscenes.Pop().Data;
         else _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: endCutscene without a cutscene begun on this route; its data is taken as 0.");
+        if (_runtime.IsV2)
+        {
+            if (_v2CutsceneState.TryPop(out var saved))
+            {
+                _runtime.SetGlobalVariable(ScummVars.V2.CursorState, saved.Cursor);
+                _runtime.ApplyV2UserState(saved.UserState | 4 | 2 | 1);
+            }
+            if (_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && ScummActorTable.IsValid(ego))
+            {
+                _runtime.Camera.Mode = ScummCamera.FollowActor;
+                _runtime.Camera.Follows = ego;
+                if (_runtime.Actors[ego].Room == _runtime.CurrentRoom && _runtime.Actors[ego].X is int x)
+                    SetCamera(x, _runtime.Actors[ego].Estimate, "endCutscene follows ego at x = {0}");
+                else _uncertainties.Add("v2 endCutscene follows an ego outside the current room; its room transition is not yet modelled.");
+            }
+            return "";
+        }
         if (!_runtime.GlobalVariables.TryGetValue(CutsceneEndScriptVariable, out var endScript))
         {
             _uncertainties.Add($"{scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: the cutscene end script ({CutsceneEndScriptVariable}) is unknown; its effects were not applied.");
@@ -801,6 +835,18 @@ public abstract partial class ScummSession
         _visitTrace.Add($"freezeScripts {operand} at {scriptEvent.SourceLabel} +0x{scriptEvent.Offset:X4}: " +
                         (frozen.Length == 0 ? "no script is frozen" : $"frozen: {string.Join(", ", frozen)}"));
         return "";
+    }
+
+    private void FreezeV2Scripts(bool freeze)
+    {
+        var current = _executing.LastOrDefault();
+        var slots = _executing.Concat(_pending.Select(item => item.Frame)).Concat(_frameScripts.Select(item => item.Frame))
+            .Where(frame => frame != current && !frame.Stopped).Distinct();
+        foreach (var slot in slots)
+        {
+            if (freeze && !slot.FreezeResistant) slot.FreezeCount++;
+            else if (!freeze && slot.FreezeCount > 0) slot.FreezeCount--;
+        }
     }
 
     /// <summary>

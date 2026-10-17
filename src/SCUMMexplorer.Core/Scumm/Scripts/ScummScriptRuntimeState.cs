@@ -4,6 +4,29 @@ namespace SCUMMexplorer.Core.Scumm;
 /// <summary>Known state shared by bounded script runs in one exploration route.</summary>
 public sealed class ScummScriptRuntimeState
 {
+    public SCUMMexplorer.Core.Domain.ScummVersion EngineVersion { get; set; } = SCUMMexplorer.Core.Domain.ScummVersion.V3;
+    public bool IsV2 => EngineVersion is SCUMMexplorer.Core.Domain.ScummVersion.V1 or SCUMMexplorer.Core.Domain.ScummVersion.V2;
+    public string EgoVariable => IsV2 ? ScummVars.V2.Ego : ScummVars.Ego;
+    public string CurrentLightsVariable => IsV2 ? ScummVars.V2.CurrentLights : ScummVars.CurrentLights;
+    public string CameraMinVariable => IsV2 ? ScummVars.V2.CameraMinX : ScummVars.CameraMinX;
+    public string CameraMaxVariable => IsV2 ? ScummVars.V2.CameraMaxX : ScummVars.CameraMaxX;
+    public string CameraPosVariable => ScummVars.CameraPosX;
+    public string MusicTimerVariable => IsV2 ? ScummVars.V2.MusicTimer : ScummVars.MusicTimer;
+    public string MouseXVariable => IsV2 ? ScummVars.V2.MouseX : ScummVars.MouseX;
+    public string MouseYVariable => IsV2 ? ScummVars.V2.MouseY : ScummVars.MouseY;
+    public int? ReadCameraPixels() => GlobalVariables.TryGetValue(CameraPosVariable, out var value) ? value * (IsV2 ? 8 : 1) : null;
+    public void WriteCameraPixels(int pixels) => SetGlobalVariable(CameraPosVariable, (ushort)(pixels / (IsV2 ? 8 : 1)));
+    public int V2DefaultTalkColor { get; set; } = 15;
+    public int V2TextSpeed { get; set; } = 6; // scumm.cpp resetScumm: _defaultTextSpeed.
+    public int V2UserState { get; private set; }
+    public Action<bool>? V2FreezeScripts { get; set; }
+    /// <summary>script_v2.cpp setUserState, scumm.h USERSTATE flags (17 October 2026).</summary>
+    public void ApplyV2UserState(int state)
+    {
+        if ((state & 4) != 0) V2UserState = state & 0xE0;
+        if ((state & 1) != 0) V2FreezeScripts?.Invoke((state & 8) != 0);
+        if ((state & 2) != 0) UserPut = CursorState = (state & 0x10) != 0 ? 1 : 0;
+    }
     public ScummScriptRuntimeState(IReadOnlyDictionary<int, byte> initialStates,
         IReadOnlyDictionary<int, byte>? initialOwners = null,
         IReadOnlyDictionary<int, uint>? initialClasses = null, bool useV4Walking = false)
