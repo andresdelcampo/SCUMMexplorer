@@ -17,6 +17,8 @@ public sealed class ScummScriptRuntimeState
     public int? ReadCameraPixels() => GlobalVariables.TryGetValue(CameraPosVariable, out var value) ? value * (IsV2 ? 8 : 1) : null;
     public void WriteCameraPixels(int pixels) => SetGlobalVariable(CameraPosVariable, (ushort)(pixels / (IsV2 ? 8 : 1)));
     public int V2DefaultTalkColor { get; set; } = 15;
+    /// <summary>The source-defined classic Maniac verb screen offset; other v1/v2 games use zero.</summary>
+    public int V2VerbYOffset { get; set; }
     public int V2TextSpeed { get; set; } = 6; // scumm.cpp resetScumm: _defaultTextSpeed.
     public int V2UserState { get; private set; }
     public Action<bool>? V2FreezeScripts { get; set; }
