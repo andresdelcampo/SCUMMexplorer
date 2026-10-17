@@ -114,7 +114,9 @@ public sealed partial class ScummBoundedScriptExecutor
                 if (mask == 0) return false;
                 if (source.Operation == "ifState")
                 {
-                    if (((state & mask) != 0) != on)
+                    // o2_ifStateZero/NotZero encode the named state as the jump case,
+                    // unlike v3's ifState equality fall-through convention.
+                    if (((state & mask) != 0) == on)
                     { if (!TryGetBranchTarget(source.Operands, out var jump)) return false; branch = jump; }
                     handled = true;
                 }
@@ -211,7 +213,7 @@ public sealed partial class ScummBoundedScriptExecutor
             case "putActorInRoom": case "putActorAtObject": case "walkActorToObject": case "waitForActor": case "print":
             case "getActorRoom": case "getActorCostume": case "getActorMoving": case "getActorWalkBox": case "getActorFacing":
             case "animateActor": case "faceActor": case "walkActorToActor": case "setBoxFlags":
-            case "resourceRoutines": case "pseudoRoom": case "actorFollowCamera": case "drawObject":
+            case "resourceRoutines": case "pseudoRoom": case "actorFollowCamera": case "drawObject": case "waitForSentence":
                 return true;
             default: return false;
         }

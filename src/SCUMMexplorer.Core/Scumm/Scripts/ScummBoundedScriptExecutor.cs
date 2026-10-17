@@ -665,8 +665,9 @@ public sealed partial class ScummBoundedScriptExecutor
             }
 
             if (instruction.Operation == "waitForSentence" && runtime?.ScriptRunning is not null &&
-                knownVariables.TryGetValue(ScummVars.SentenceScript, out var sentenceScriptNumber))
+                (runtime.IsV2 || knownVariables.ContainsKey(ScummVars.SentenceScript)))
             {
+                var sentenceScriptNumber = runtime.IsV2 ? 2 : knownVariables[ScummVars.SentenceScript];
                 // o5_wait (SO_WAIT_FOR_SENTENCE): the script waits while a sentence is queued (none is frozen here), and, with none queued,
                 // while the sentence script is in use. It breaks and tries again next frame.
                 var inUse = runtime.ScriptRunning(sentenceScriptNumber).Running;

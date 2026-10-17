@@ -4,6 +4,19 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummV2ExecutorTests
 {
+    [Theory]
+    [InlineData("Unpickupable", 0, 0)]
+    [InlineData("Unpickupable", 1, 9)]
+    [InlineData("Pickupable", 1, 1)]
+    [InlineData("Pickupable", 0, 8)]
+    public void StateBranchJumpsWhenTheNamedFlagMatches(string condition, byte initial, byte expected)
+    {
+        var runtime = Runtime();
+        runtime.ObjectStates[10] = initial;
+        var run = Run(runtime, ("ifState", $"0x000A, {condition}, branch 1 -> 0x0002"), ("setState", "0x000A, IntrinsicOn"));
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(expected, run.ObjectStates[10]);
+    }
     [Fact]
     public void RangeOperandsKeepTheirByteValues()
     {
