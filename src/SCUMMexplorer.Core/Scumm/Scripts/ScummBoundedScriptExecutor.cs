@@ -872,6 +872,22 @@ public sealed partial class ScummBoundedScriptExecutor
                 continue;
             }
 
+            if (runtime is not null && instruction.Operation == "waitFor" && instruction.Operands == "sentence" && runtime.ScriptRunning is not null)
+            {
+                // o5_wait (SO_WAIT_FOR_SENTENCE, S5 Monkey2): goes on when no sentence is queued and the sentence script (VAR_SENTENCE_SCRIPT) is not running;
+                // otherwise breaks and runs the instruction again next frame.
+                var sentenceScript = knownVariables.GetValueOrDefault(ScummVars.SentenceScript);
+                var sentenceRunning = sentenceScript != 0 && runtime.ScriptRunning(sentenceScript).Running;
+                if (runtime.Sentences.Count > 0 || sentenceRunning)
+                {
+                    trace.Add($"waiting for the sentence at +0x{instruction.Offset:X4} ({runtime.Sentences.Count} queued, script {sentenceScript} {(sentenceRunning ? "running" : "idle")})");
+                    resumeOffset = instruction.Offset;
+                    break;
+                }
+                pc = next;
+                continue;
+            }
+
             if (runtime is not null && instruction.Operation is "delay" or "delayVariable" &&
                 TryReadDelay(instruction, knownVariables, out var jiffies))
             {
@@ -1602,7 +1618,7 @@ public sealed partial class ScummBoundedScriptExecutor
 
     private static bool IsActorQuery(string operation) => operation is
         "getActorWalkBox" or "getActorX" or "getActorY" or "getActorRoom" or
-        "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving";
+        "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale";
 
     private static bool IsActorPlacement(string operation) => operation is
         "putActor" or "putActorAtObject" or "putActorInRoom" or "walkActorTo" or "walkActorToObject" or
@@ -2042,6 +2058,8 @@ public sealed partial class ScummBoundedScriptExecutor
             "getActorFacing" => actor.Look.Direction,
             // o5_getActorMoving: the actor's _moving flags.
             "getActorMoving" => actor.Moving,
+            // o5_getActorScale (S5 Monkey2): the actor's _scalex.
+            "getActorScale" => actor.Look.Scale,
             _ => actor.Y
         };
         if (value is null)
@@ -2058,7 +2076,7 @@ public sealed partial class ScummBoundedScriptExecutor
             detail = $"{operation} reads actor {number}, whose {what} the preview does not know ({actor.Look.Estimate ?? actor.Unknown ?? "not known"})";
             return false;
         }
-        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving")
+        if (operation is "getActorCostume" or "getActorElevation" or "getActorFacing" or "getActorMoving" or "getActorScale")
         {
             answer = value.Value;
             if (operation == "getActorFacing" && actor.Look.Estimate is not null) estimate = $"actor {number}: {actor.Look.Estimate}";
@@ -2187,9 +2205,11 @@ public sealed partial class ScummBoundedScriptExecutor
         detail = "expression operands are unsupported";
         int separator = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
         if (separator < 0 || !instruction.Operands.EndsWith(']') ||
-            !TryGetVariableKey(instruction.Operands[..separator], variables, out var destination)) return false;
+            !(TryGetVariableKey(instruction.Operands[..separator], variables, out var destination) ||
+              // From version 4 the bit variables are stored apart (readVar/writeVar), so an expression may write one (Monkey Island 2 Room 33 local script 206 +0x0084).
+              variables.ContainsKey(SeparateBitStorage) && TryNormalizeKey(instruction.Operands[..separator], variables, out destination))) return false;
         string body = instruction.Operands[(separator + 3)..^1];
-        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:getInventoryCount|getActor[A-Za-z]+)\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:getInventoryCount|getActor[A-Za-z]+)\([^)]*\)|(?:var|local|bit)\[(?:[^\[\]]|\[[^\]]*\])+\]|0x[0-9A-Fa-f]+|[+*/-]");
         if (tokens.Count is 0 or > 4096) return false;
         int end = 0;
         foreach (Match token in tokens)

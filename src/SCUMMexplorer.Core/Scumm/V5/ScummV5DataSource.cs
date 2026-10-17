@@ -110,7 +110,7 @@ public sealed class ScummV5DataSource : IScummDataSource
     public ScummScriptDisassembly ReadObjectVerb(int room, ScummRoomObjectRecord record, int verbId, out ScummObjectVerbEntry selectedEntry)
     {
         var verbs = Verbs(room).Where(v => v.ObjectId == record.Id).ToArray();
-        if (verbs.Length == 0) throw new InvalidDataException($"Object {record.Id} of Room {room:00} has no VERB block.");
+        if (verbs.Length == 0) throw new InvalidDataException($"Object {record.Id} of Room {room:00} has no verb 0x{verbId:X2}: it has no VERB block.");
         var entries = Entries(verbs, record.Id);
         var entry = entries.FirstOrDefault(item => item.VerbId == verbId) ?? entries.FirstOrDefault(item => item.IsFallback)
             ?? throw new InvalidDataException($"Object {record.Id} has no verb 0x{verbId:X2} or fallback entry.");
