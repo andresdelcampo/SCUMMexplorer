@@ -83,6 +83,8 @@ public class ScummV2DataSource : IScummDataSource
         return new(records, names, boxes, error, width, height);
     }
     protected virtual (int Width, int Height) ReadDimensions(byte[] bytes) => (Word(bytes, 4), Word(bytes, 6));
+    public virtual RoomImage ReadBackground(int room) => new ScummV2RoomDecoder().Decode(File.ReadAllBytes(
+        _game.Rooms.First(r => r.ResourceId == room).FilePath));
     public virtual IReadOnlyList<RoomObjectImage> ReadObjectImages(int room) => ScummOldRoomObjects.ReadV2Images(RoomBytes(room));
     public IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> ReadObjectVerbs(int room, IReadOnlyList<ScummRoomObjectRecord> records)
     {

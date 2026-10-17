@@ -54,6 +54,7 @@ public sealed class RoomObjectSelection
     private readonly HashSet<int> _interfaceImages = [];
     private IReadOnlyList<RoomDrawBatch> _batches = [];
     private int _seed;
+    private readonly byte _intrinsicStateMask;
 
     public RoomObjectSelection(IReadOnlyList<RoomObjectImage> objects,
         IReadOnlyDictionary<int, byte>? initialStates = null,
@@ -61,13 +62,14 @@ public sealed class RoomObjectSelection
         IReadOnlyList<ScummRoomObjectRecord>? roomRecords = null,
         RoomImage? background = null,
         IReadOnlyDictionary<int, byte>? indexedStates = null,
-        IReadOnlyList<int>? drawQueue = null)
+        IReadOnlyList<int>? drawQueue = null, byte intrinsicStateMask = 0x0F)
     {
+        _intrinsicStateMask = intrinsicStateMask;
         _objects = objects;
         _background = background is { IsValid: true } ? background : null;
         if (roomRecords is not null)
         {
-            _recordsById = roomRecords.ToDictionary(record => record.Id);
+            _recordsById = roomRecords.GroupBy(record => record.Id).ToDictionary(group => group.Key, group => group.Last());
             _recordsByLocalIndex = roomRecords.ToDictionary(record => record.LocalIndex);
         }
         _positions = objects.ToDictionary(obj => obj.Id, obj => new RoomObjectPosition(obj.X, obj.Y));
@@ -117,7 +119,7 @@ public sealed class RoomObjectSelection
 
     public bool IsActive(RoomObjectImage obj)
     {
-        return _states.TryGetValue(obj.Id, out var state) && (state & 0x0F) != 0 &&
+        return _states.TryGetValue(obj.Id, out var state) && (state & _intrinsicStateMask) != 0 &&
                ParentStateMatches(obj);
     }
 
@@ -130,7 +132,7 @@ public sealed class RoomObjectSelection
         {
             if (--remaining < 0 || !_recordsByLocalIndex.TryGetValue(record.ParentLocalIndex, out var parent) ||
                 !_knownStates.Contains(parent.Id) || !_states.TryGetValue(parent.Id, out var parentState) ||
-                (parentState & 0x0F) != record.ParentRequiredState)
+                (parentState & _intrinsicStateMask) != record.ParentRequiredState)
                 return false;
             record = parent;
         }
