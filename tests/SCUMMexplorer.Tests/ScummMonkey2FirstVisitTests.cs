@@ -26,6 +26,23 @@ public sealed class ScummMonkey2FirstVisitTests
         Assert.True(ScummProfile.For(game).HasFirstVisitScenes);
     }
 
+    [Fact]
+    public void ObjectImagesLeaveTheRoomsTransparentColourUndrawn()
+    {
+        if (Game() is not { } game) return;
+
+        var scene = ScummRoomFirstVisit.Run(game, 55);
+
+        // The party guests of Room 55 are coded with transparent strips (gdi.cpp transpCheck): the room shows through around them.
+        var guest = scene.Images.Single(image => image.Id == 615);
+        Assert.NotNull(guest.Transparent);
+        Assert.Contains(true, guest.Transparent!);
+        var composed = scene.Selection.Compose(scene.Room);
+        var hole = Array.IndexOf(guest.Transparent!, true);
+        var (x, y) = (guest.X + hole % guest.Width, guest.Y + hole / guest.Width);
+        Assert.NotEqual(guest.Pixels[hole], composed[y * scene.Room.Width + x]);
+    }
+
     [Theory]
     [InlineData(39, new[] { 391, 409 })]
     [InlineData(55, new[] { 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 647 })]
