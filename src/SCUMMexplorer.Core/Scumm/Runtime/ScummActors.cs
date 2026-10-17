@@ -959,8 +959,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
     /// <summary><c>Actor::adjustXYToBeInBox</c> with the actor's last valid point (null when that point matters and is unknown).</summary>
     private static BoxAdjustment? AdjustXY(Actor actor, int x, int y, Placement place)
     {
-        var isPlayer = place.Classes is not null && place.Classes.TryGetValue(actor.Number, out var bits) &&
-                       ScummObjectClasses.Has(bits, PlayerClass);
+        var isPlayer = place.IsPlayer(actor.Number);
         var result = place.Boxes!.Adjust(x, y, isPlayer, actor.LastValidX ?? 0, actor.LastValidY ?? 0);
         // The last valid point comes back only when no box was within reach.
         if (result.Box == ScummWalkBoxSet.InvalidBox && actor.LastValidX is null) return null;
@@ -973,7 +972,11 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
 
     /// <summary>The room the actor calls are made in: its number, its walk boxes, and class bits for <c>isPlayer</c>.</summary>
     public readonly record struct Placement(int? CurrentRoom, ScummWalkBoxSet? Boxes, string? BoxesUnknown,
-        IReadOnlyDictionary<int, uint>? Classes);
+        IReadOnlyDictionary<int, uint>? Classes, Func<int, bool>? PlayerPredicate = null)
+    {
+        public bool IsPlayer(int number) => PlayerPredicate?.Invoke(number) ??
+            (Classes is not null && Classes.TryGetValue(number, out var bits) && ScummObjectClasses.Has(bits, PlayerClass));
+    }
 
     private sealed class Actor(int number)
     {

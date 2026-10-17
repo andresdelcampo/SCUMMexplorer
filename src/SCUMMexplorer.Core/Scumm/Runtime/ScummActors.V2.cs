@@ -43,7 +43,7 @@ public sealed partial class ScummActorTable
                 return;
             }
             var flags = place.Boxes!.GetFlags(box);
-            var isPlayer = place.Classes is not null && place.Classes.TryGetValue(actor.Number, out var classes) && ScummObjectClasses.Has(classes, PlayerClass);
+            var isPlayer = place.IsPlayer(actor.Number);
             if ((flags & 0x40) != 0 && !((flags & 0x20) != 0 && !isPlayer))
             { actor.Moving |= MoveLastLeg; actor.DestDir = -1; }
             actor.CurBox = box;

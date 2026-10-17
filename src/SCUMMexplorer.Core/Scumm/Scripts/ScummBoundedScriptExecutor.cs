@@ -1716,7 +1716,7 @@ public sealed partial class ScummBoundedScriptExecutor
         TryReadValue(operand, variables, out var value, out _) ? unchecked((short)value) : null;
 
     private static ScummActorTable.Placement PlacementOf(ScummScriptRuntimeState runtime) =>
-        new(runtime.CurrentRoom, runtime.WalkBoxes, runtime.WalkBoxFlagsUnknown, runtime.ObjectClasses);
+        new(runtime.CurrentRoom, runtime.WalkBoxes, runtime.WalkBoxFlagsUnknown, runtime.ObjectClasses, runtime.IsPlayerActor);
 
     /// <summary>
     /// ScummVM <c>whereIsObject</c> then <c>getObjectXYPos</c> for v3: an object of
