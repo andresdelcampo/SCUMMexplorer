@@ -251,7 +251,7 @@ public abstract partial class ScummSession
     // beginCutscene's vm.cutSceneData stack, and the script whose cutscene start
     // script is running (vm.cutSceneScriptIndex), which freezeScripts leaves running.
     protected readonly Stack<(ushort Data, ScriptFrame? Owner)> _cutscenes = new();
-    private readonly Stack<(int UserState, ushort Cursor)> _v2CutsceneState = new();
+    private readonly Stack<(int UserState, ushort Cursor, int Room, int CameraMode)> _v2CutsceneState = new();
     // ScummVM vm.cutScenePtr/cutSceneScript per cutscene depth (0: no cutscene open).
     protected readonly Dictionary<int, (ScriptFrame Frame, int JumpOffset)> _overrides = new();
     protected ScriptFrame? _cutsceneOwner;
@@ -690,7 +690,8 @@ public abstract partial class ScummSession
         if (_runtime.IsV2)
         {
             _v2CutsceneState.Push((_runtime.V2UserState | (_runtime.UserPut > 0 ? 16 : 0),
-                _runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.CursorState)));
+                _runtime.GlobalVariables.GetValueOrDefault(ScummVars.V2.CursorState),
+                _runtime.CurrentRoom ?? NullRoom, _runtime.Camera.Mode));
             _cutscenes.Push((0, _executing.Count > 0 ? _executing[^1] : null));
             CutscenesBegun++;
             _overrides.Remove(_cutscenes.Count);
@@ -751,6 +752,9 @@ public abstract partial class ScummSession
             {
                 _runtime.SetGlobalVariable(ScummVars.V2.CursorState, saved.Cursor);
                 _runtime.ApplyV2UserState(saved.UserState | 4 | 2 | 1);
+                if (ScummProfile.For(_game).RestoresClassicCutsceneScene &&
+                    RestoreClassicCutsceneScene(saved.Room, saved.CameraMode, scriptEvent, depth) is { } restored)
+                    return restored;
             }
             if (_runtime.GlobalVariables.TryGetValue(EgoVariable, out var ego) && _runtime.Actors.Contains(ego))
             {
@@ -758,7 +762,7 @@ public abstract partial class ScummSession
                 _runtime.Camera.Follows = ego;
                 if (_runtime.Actors[ego].Room == _runtime.CurrentRoom && _runtime.Actors[ego].X is int x)
                     SetCamera(x, _runtime.Actors[ego].Estimate, "endCutscene follows ego at x = {0}");
-                else if (_runtime.Actors[ego].Room is int targetRoom && _runtime.EngineVersion == ScummVersion.V2)
+                else if (_runtime.Actors[ego].Room is int targetRoom)
                 {
                     // o2_endCutscene calls actorFollowCamera; its startScene must use the same bounded dispatch as a script load.
                     return HandleEvent(scriptEvent with
@@ -768,9 +772,7 @@ public abstract partial class ScummSession
                         ResolvedArguments = [ego]
                     }, depth) ?? "";
                 }
-                else _uncertainties.Add(_runtime.EngineVersion == ScummVersion.V1
-                    ? "Classic endCutscene room/camera restoration is not yet modelled."
-                    : $"v2 endCutscene cannot follow actor {ego}: its room or position is unresolved.");
+                else _uncertainties.Add($"v1/v2 endCutscene cannot follow actor {ego}: its room or position is unresolved.");
             }
             return "";
         }

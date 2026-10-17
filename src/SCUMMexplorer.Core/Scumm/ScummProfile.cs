@@ -25,6 +25,10 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
 
     /// <summary>ScummVM scumm.cpp: Maniac Mansion allocates 25 actor slots; these other families allocate 13, including reserved slot zero.</summary>
     public int ActorCount { get; init; } = 13;
+    /// <summary>Maniac v1 o2_endCutscene restores the saved camera mode and, unless following ego, the saved room.</summary>
+    public bool RestoresClassicCutsceneScene { get; init; }
+    /// <summary>Classic Maniac verb rows are eight pixels below the stored coordinate (o2_verbOps).</summary>
+    public int V2VerbYOffset { get; init; }
 
     /// <summary>Actor walking follows the v4 routines (<c>Actor</c>) instead of the old-v3 ones (<c>Actor_v3</c>).</summary>
     public bool UsesV4Walking => EngineVersion >= ScummVersion.V4;
@@ -167,6 +171,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
         {
             EngineVersion = roomFileGame ? ScummVersion.V3 : game.Version,
             ActorCount = GameSupport.FamilyOf(game) is GameFamily.ManiacClassic or GameFamily.ManiacEnhanced ? 25 : 13,
+            RestoresClassicCutsceneScene = GameSupport.FamilyOf(game) == GameFamily.ManiacClassic,
+            V2VerbYOffset = GameSupport.FamilyOf(game) == GameFamily.ManiacClassic ? 8 : 0,
             AdlibTiming = game.Id is GameId.Loom or GameId.LoomVga ? ScummAdlibTiming.Loom : ScummAdlibTiming.Standard,
             // R-6.12a: every game the generic session boots shows its rooms' first visit. The session reads the version 3 scripts of Indiana Jones (old-bundle
             // LFL files, and the 256-colour room files since S4b Indy3Vga) and the v4 scripts of a game on several disks; LOOM (EGA and CD) has its own session.
