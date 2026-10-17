@@ -13,7 +13,7 @@ public sealed class ScummV1DataSourceTests
         var folder = Path.Combine(TestGames.Root, folderName);
         if (!Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
-        var data = new ScummV1DataSource(game);
+        var data = Assert.IsType<ScummV1DataSource>(ScummDataSources.For(game));
         Assert.Equal(scriptCount, data.GlobalScriptCount);
         Assert.NotNull(data.GlobalScript(1));
         Assert.Empty(data.GlobalScript(1)!.Issues ?? []);
