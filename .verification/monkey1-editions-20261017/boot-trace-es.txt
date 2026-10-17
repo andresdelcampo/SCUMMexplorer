@@ -1,0 +1,97 @@
+game: The Secret of Monkey Island (Unknown, V4), folder monkey1 ega es, 8 disks
+boot: 2534 frames (limit 5000), hit limit: False, wall time 1,6 s
+final room: 33; rooms entered in order: 90, 0, 10, 0, 0, 38, 96, 33
+rooms by name: 90 Room 90, 0 (none), 10 Room 10, 38 Room 38, 96 Room 96, 33 Room 33
+extra frames played after the boot: 0; room now 33
+in cutscene: False; pending scripts: 3
+
+== pending scripts
+  Script 156 +0x0005
+  Script 23 +0x0155
+  Room 33 local script 202 +0x0001
+
+== session trace (waits omitted)
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 152 continues at +0x0032 in Room 90 after loadRoom
+  boot: Player input assumed: key Ctrl+M after the boot stood still 400 frames
+  key: Ctrl+M runs script 153 with [4, 0x0D, 1] (runInputScript)
+  boot: Player input assumed: the digits of var[0x10A] = 1690, the answer the game's own script derived after the boot stood still 400 frames
+  key: '1' runs script 155 with [4, 0x31, 1] (runInputScript)
+  key: '6' runs script 155 with [4, 0x36, 1] (runInputScript)
+  key: '9' runs script 155 with [4, 0x39, 1] (runInputScript)
+  key: '0' runs script 155 with [4, 0x30, 1] (runInputScript)
+  cutscene at Script 149 +0x0000 runs script 18
+  stopScript 2 at Script 18 +0x0010: script 2 was not running
+  freezeScripts 0x7F at Script 18 +0x0052: frozen: Script 01, Script 156
+  Script 01 pauses after startScript +0x0779: nested execution froze its caller
+  Script 149 +0x0014: room 0 (no room) after a frame advance
+  Script 149 continues at +0x0016 in Room 00 after loadRoom
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 149 continues at +0x0053 in Room 10 after loadRoom
+  Sound 110 completed on its native AdLib resource clock.
+  endCutscene at Script 149 +0x08EB runs script 19
+  freezeScripts 0x00 at Script 19 +0x0024: no script is frozen
+  stopScript 2 at Script 19 +0x002D: script 2 was not running
+  Script 19 +0x003C: room 0 (no room) after a frame advance
+  Script 19 continues at +0x003F in Room 00 after actorFollowCamera
+  Script 01 +0x079D: room 0 (no room) after a frame advance
+  Script 01 continues at +0x079F in Room 00 after loadRoom
+  Room 38 entry script +0x003B: startObject runs object 497 verb 0xFA
+  cutscene at Room 38 local script 203 +0x0000 runs script 18
+  stopScript 2 at Script 18 +0x0010: script 2 was not running
+  freezeScripts 0x7F at Script 18 +0x0052: frozen: Room 38 entry script, Script 156, Script 23
+  Room 38 entry script pauses after startScript +0x0049: nested execution froze its caller
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Script 01 +0x0E2E: camera x = 160 (actor 1's x)
+  Script 01 continues at +0x0E31 in Room 38 after actorFollowCamera
+  endCutscene at Room 38 local script 203 +0x02D2 runs script 19
+  freezeScripts 0x00 at Script 19 +0x0024: no script is frozen
+  stopScript 2 at Script 19 +0x002D: script 2 was not running
+  Room 38 local script 203 +0x02D3: startObject runs object 494 verb 0x0A
+  loadRoom at Room 38 Object 494 Fallback verb +0x0044 ends this room-owned script (startScene); the session enters Room 96
+  stopScript 23 at Script 17 +0x0099: ended its pending run
+  triggerSound at Room 96 local script 200 +0x0009: every sound stops (music 104 starts; iMuse's Monkey Island workaround stops every sound first (Sound::triggerSound))
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Sound 104 completed on its native AdLib resource clock.
+  loadRoomWithEgo at Room 96 local script 200 +0x0020 ends this room-owned script (startScene); the session enters Room 33
+  stopScript 2 at Script 06 +0x000B: script 2 was not running
+  Room 96 local script 200 +0x0020: camera x = 160 (the ego's x)
+  Room 96 local script 200 +0x0020: the ego (actor 1) stands at (9, 76), box 0
+  boot: 2534 frames after script 001's first room load; now in Room 33
+
+== operations reported as not applied (presentation only, nothing in game state)
+  roomOps: 3 runs
+
+== unsupported (opcode, operand or state the run could not follow): 0
+
+== random picks: 1079 (seeded; each is labelled an estimate)
+== all other uncertainties
+  Script 152 +0x0030 reached loadRoom during the boot.
+  Room 90 entered by Script 152 +0x0030 (loadRoom) during the boot.
+  The key Ctrl+M (0x0D) in Room 90, sent to the game's input script as assumed input. ScummVM checkExecVerbs: runInputScript(4, 0x0D, 1) runs script 153 (var[0x020], VAR_VERB_SCRIPT); the key is the explorer's, not the game's.
+  The key '1' (0x31) in Room 90, sent to the game's input script as assumed input. ScummVM checkExecVerbs: runInputScript(4, 0x31, 1) runs script 155 (var[0x020], VAR_VERB_SCRIPT); the key is the explorer's, not the game's.
+  The key '6' (0x36) in Room 90, sent to the game's input script as assumed input. ScummVM checkExecVerbs: runInputScript(4, 0x36, 1) runs script 155 (var[0x020], VAR_VERB_SCRIPT); the key is the explorer's, not the game's.
+  The key '9' (0x39) in Room 90, sent to the game's input script as assumed input. ScummVM checkExecVerbs: runInputScript(4, 0x39, 1) runs script 155 (var[0x020], VAR_VERB_SCRIPT); the key is the explorer's, not the game's.
+  The key '0' (0x30) in Room 90, sent to the game's input script as assumed input. ScummVM checkExecVerbs: runInputScript(4, 0x30, 1) runs script 155 (var[0x020], VAR_VERB_SCRIPT); the key is the explorer's, not the game's.
+  Script 149 +0x0014 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 149 +0x0051 reached loadRoom after a frame advance.
+  Room 10 entered by Script 149 +0x0051 (loadRoom) after a frame advance.
+  Script 19 +0x003C reached actorFollowCamera to room 0 after a frame advance: no room is current until the next room load.
+  Script 01 +0x079D reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 01 +0x0E2E reached actorFollowCamera after a frame advance.
+  Room 38 entered by Script 01 +0x0E2E (actorFollowCamera) after a frame advance.
+  Room 38 Object 494 Fallback verb +0x0044 reached loadRoom after a frame advance.
+  Room 96 entered by Room 38 Object 494 Fallback verb +0x0044 (loadRoom) after a frame advance.
+  Room 96 local script 200 +0x0020 reached loadRoomWithEgo after a frame advance.
+  Script 23 +0x0000: findObject at +0x0038 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (160, 200)
+  Room 33 entered by Room 96 local script 200 +0x0020 (loadRoomWithEgo) after a frame advance.
+
+== actors
+  actor 1: room 33, (9,76), costume 1, visible True
+  actor 2: room 38, (107,106), costume 33, visible False
+  actor 3: room 38, (134,97), costume 48, visible False
+  actor 7: room 10, (-151,84), costume 59, visible False
+  actor 8: room 10, (-31,84), costume 59, visible False
+  actor 9: room 10, (89,84), costume 59, visible False
+
+== room 33: 5 objects, 2 stored images, 1 actors drawn, 0 skipped

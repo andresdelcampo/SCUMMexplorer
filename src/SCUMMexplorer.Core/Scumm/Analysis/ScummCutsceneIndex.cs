@@ -132,7 +132,7 @@ public static partial class ScummCutsceneIndex
             foreach (var (objectId, entries) in objectVerbs)
             {
                 var record = roomData.Objects.First(o => o.Id == objectId);
-                var name = roomData.ObjectNames.TryGetValue(objectId, out var raw) ? System.Text.Encoding.Latin1.GetString(raw).Trim().TrimEnd('@').Trim() : "";
+                var name = roomData.ObjectNames.TryGetValue(objectId, out var raw) ? ScummTextDecoder.DecodeGlyphs(raw).Trim().TrimEnd('@').Trim() : "";
                 // Verbs whose entries point at the same code run one script (Indy3's light switch: Push, Pull, Use and Turn off), so the code is
                 // named after the lowest of them and the triggers group as one scene.
                 var real = entries.Where(v => !v.IsFallback).ToArray();
@@ -204,7 +204,7 @@ public static partial class ScummCutsceneIndex
             }
             if (i.Operation == "print" && TextOperand().Match(i.Operands) is { Success: true } m)
             {
-                var text = Regex.Replace(m.Groups[1].Value, @"\\x[0-9A-F]{2}", " ").Trim();
+                var text = ScummTextDecoder.DecodeLine(m.Groups[1].Value).Trim();
                 if (text.Length > 0 && !texts.Contains(text)) texts.Add(text);
             }
         }

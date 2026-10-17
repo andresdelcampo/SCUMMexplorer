@@ -138,6 +138,12 @@ public sealed class ScummMonkeyFloppySessionTests
         Assert.Equal(33, session.BootReport.FinalRoom);
         string[] unsupported = ["not modeled", "could not", "disassembly stops", "undecoded", "cannot", "needs a session", "unknown", "depends on"];
         Assert.DoesNotContain(session.Snapshot.Uncertainties, item => unsupported.Any(item.Contains) && !item.Contains("seeded pick"));
+        // S9 (17 October 2026): its copy protection is answered from its own var[0x10A] (the year its script derived, 1690 for the seeded run;
+        // English 1543), with the same five labelled keys through scripts 153 and 155, and the game goes on.
+        var answer = Assert.Single(session.SessionTrace, item => item.StartsWith("boot: Player input assumed: the digits of var[0x10A]", StringComparison.Ordinal));
+        Assert.Contains("the answer the game's own script derived", answer);
+        Assert.Equal(5, session.SessionTrace.Count(item => item.StartsWith("key: ", StringComparison.Ordinal)));
+        Assert.DoesNotContain(session.SessionTrace, item => item.Contains("quit"));
     }
 
     [Fact]

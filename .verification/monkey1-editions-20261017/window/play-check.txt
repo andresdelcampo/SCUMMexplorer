@@ -1,0 +1,11 @@
+Play started: room 33, image visible Visible, cursor system pointer hidden, room view Collapsed, Normal-mode note "", tooltip none
+verbs drawn: 0x01 "Abrir" (2,153), 0x02 "Cerrar" (2,162), 0x06 "Empujar" (2,171), 0x07 "Tirar" (2,180), 0x0A "Ir a" (48,153), 0x0B "Coger" (48,162), 0x0D "Hablar a" (48,171), 0x03 "Dar" (48,180), 0x08 "Usar" (100,153), 0x09 "Mirar" (100,162), 0x04 "Encender" (100,171), 0x05 "Apagar" (100,180), 0x64 "Ir a" (147,144)
+Guybrush at (346, 133) after 86 window frames
+click on Look at: runInputScript(1, 9, 1) click on verb 0x09 at screen (102, 164)
+pointer on the poster: sentence line "Mirar poster"
+click on the poster: runInputScript(2, 0, 1) click in the room at screen (92, 104), room (276, 104)
+cutscene True, skippable True, messages [Re-eliga a la Gobernadora Marley.]
+Esc through the window's key handler: taken True; cutscene False; messages [ ]
+key 'l': last input key 'l', the shortcut of verb 0x09; sentence line "Mirar poster"
+right click on the poster through the window: runInputScript(2, 0, 2) right click in the room at screen (84, 104), room (268, 104); Look at poster sentences 1 -> 2; messages [Re-eliga a la Gobernadora Marley.]; Interact button visible False, enabled False
+frames played by the window: 121

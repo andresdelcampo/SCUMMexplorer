@@ -1,0 +1,1 @@
+# indy3_ega_en : before/after ScummTextDecoder.DecodeLine in the cutscene scan (lines that changed; '-' before, '+' after)

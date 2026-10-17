@@ -1,0 +1,9 @@
+# indy3_vga_es : before/after ScummTextDecoder.DecodeLine in the cutscene scan (lines that changed; '-' before, '+' after)
+- 62/769/0x06 | Room 62 · Empujar cr neo | Dialogue | Room 62 local script 202 | t0 l0 i15 a0 |  | others[62/770/0x06,62/771/0x06,62/772/0x06,62/773/0x06,62/774/0x06,62/769/0x08,62/770/0x08,62/771/0x08,62/772/0x08,62/773/0x08,62/774/0x08]
++ 62/769/0x06 | Room 62 · Empujar cráneo | Dialogue | Room 62 local script 202 | t0 l0 i15 a0 |  | others[62/770/0x06,62/771/0x06,62/772/0x06,62/773/0x06,62/774/0x06,62/769/0x08,62/770/0x08,62/771/0x08,62/772/0x08,62/773/0x08,62/774/0x08]
+- 80/0/0x00 | Room 80 · Entry | Scenes | Room 80 local script 201 | t4 l0 i31 a0 | Pap   Como llegaste antes que yo? | others[]
++ 80/0/0x00 | Room 80 · Entry | Scenes | Room 80 local script 201 | t4 l0 i31 a0 | Papá  Como llegaste antes que yo? | others[]
+- 85/0/0x00 | Room 85 · Entry | Scenes | Room 85 local script 202 | t2 l0 i11 a0 | Indy!!!  Deprisa!  Tu padre est  cada vez peor! | others[]
++ 85/0/0x00 | Room 85 · Entry | Scenes | Room 85 local script 202 | t2 l0 i11 a0 | Indy!!!  Deprisa!  Tu padre está cada vez peor! | others[]
+- 91/926/0x09 | Room 91 · Mirar inscripcion | Dialogue | Room 91 local script 200 | t3 l0 i53 a0 | El diario est  bien.      ^ | others[91/927/0x09,91/928/0x09]
++ 91/926/0x09 | Room 91 · Mirar inscripcion | Dialogue | Room 91 local script 200 | t3 l0 i53 a0 | El diario está bien.      ^ | others[91/927/0x09,91/928/0x09]

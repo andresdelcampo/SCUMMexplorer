@@ -1,15 +1,17 @@
 # Next session: orchestrator brief
 
-You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261016-S6-Indy3Ega-S4b-S5-Indy3Vga.md` is the last run). Everything below is only what those do not say.
+You are the orchestrator of the game-support work. Read, in this order: `docs/GAME_SUPPORT_INSTRUCTIONS.md` (the procedure, the autonomy rules and the checkpoint format), `docs/CURRENT_WORK.md` (state) and the latest files in `docs/checkpoints/` (`20261017-S7-S9-S4b-MonkeyCd.md` is the last run). Everything below is only what those do not say.
 
-## State (17 October)
-- Played through their own verbs (Objects ✔, Play ✔), with sound and music during play (AdLib, PC speaker): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Depth masks for every browsed game are in. Suite on master: 1021 (1016 passed, 5 skipped, 0 failed).
+## State (17 October, end)
+- Played through their own verbs (Objects ✔, Play ✔), with sound during play and script-derived cutscene lists (Cutscenes ◐): Indy3 EGA, Indy3 256 colours, Monkey Island 1 floppy, besides LOOM. Spanish copies of all three checked (S9). Monkey Island CD (first v5 game) boots and shows first-visit rooms (S4b, S5). Suite on master: 1056 (1051 passed, 5 skipped, 0 failed).
+- A separate orchestrator may be running Maniac Mansion and Zak McKracken (v1/v2) on its own (`NEXT_SESSION_PROMPT_MANIAC_ZAK.md`, checkpoints `*-ManiacZak.md`): leave those families to it; merge master before fast-forwarding, and retry if master moved.
 - **R-7.16** (right click) is confirmed: right click goes to the game only where its interface uses it (`ScummProfile.RightClickReachesGame`: verb-based and engine version 4 or later, today Monkey Island floppy); elsewhere it is the Interact menu. The rest of R-7.7 to R-7.18 is still `Proposed`.
 
 ## Ask the user first (one short question each, only if still open)
 1. Restart and save/load keys (Indy3 F5, `VAR_MAINMENU_KEY`): refused (current) or working?
 2. R-1.5 met through the game's default verb; ScummVM's 16×16 cross-hair cursor: acceptable?
-3. What did they see and hear in the user checks of the last checkpoint (play and sound in the three games, right click in Monkey Island, mouse mapping, timing, cursor; Monkey/Indy rooms)?
+3. R-8.32, R-8.33 (cutscene lists and fresh-start runs for the generic session) are `Proposed`.
+4. What did they see and hear in the user checks of the last checkpoint (play, sound and cutscenes in the three games, right click in Monkey Island, the Spanish copies, Monkey Island CD rooms; see the last checkpoint)?
 When answered, change those rows' Basis to `Rule (confirmed by the user <date>)` or adjust them.
 
 ## How this user wants the work run
@@ -21,9 +23,9 @@ When answered, change those rows' Basis to `Rule (confirmed by the user <date>)`
 - The agents cannot hear or see the real window and cannot drive ScummVM: collect those checks for the user in the checkpoint.
 
 ## Suggested next runs (pick with the user, or take the first if they say "keep going")
-- `S7 Cutscenes` for Indy3Ega, Indy3Vga, MonkeyFloppy (the shared scan `LoomCutsceneIndex` moves to `Scumm/` when it first serves another game).
-- `S4b MonkeyCd` / `Monkey2` / `Indy4` (v5 needs an `IScummDataSource` first), then Maniac/Zak (v1/v2).
-- `S9` edition checks: `indy3 ega es`, `indy3 vga es`, `monkey1 ega es` (8-disk EGA), `monkey1 vga es`.
+- `S6 MonkeyCd` (play on v5: `BootForPlay` through the data source, untouchable class 32, v5 verbs), then `S7 MonkeyCd`; in parallel `S4b Monkey2` / `Indy4` on `ScummV5DataSource`.
+- MonkeyCd Rooms 88, 89, 99; cutscene start setups for entries that begin nothing from a fresh start (R-8.33); the `printEgo` first-text offer.
+- `S9` for `monkey1 vga es` (MonkeyCd family) after its S6.
 - Sound polish: Monkey Island's music through iMuse instead of the AD block at the estimated half tempo; Indy3's AdLib driver constants (R-13.9); loops longer than the 3-minute rendering; PC speaker timing for `isSoundRunning`.
 - Polish with no cell effect: Indy3Vga rooms 26, 36, 38, 55, 61 differ from EGA by one object; `actorFollowCamera` of a hero in another room; a verb's click area is its text box; Zak's estimated costume colours.
 

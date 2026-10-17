@@ -52,6 +52,16 @@ if (args.Length > 4 && args[1] == "dump")
     return;
 }
 
+// CutsceneList <folder> local <room> <id>: a room-local script's print instructions, raw and as the scan's first-text decoding reads them
+// (S9 MonkeyFloppy, 17 October 2026: which escaped bytes changed a line count when the scan moved to ScummTextDecoder.DecodeLine).
+if (args.Length > 3 && args[1] == "local")
+{
+    var script = data.RoomLocalScript(int.Parse(args[2]), int.Parse(args[3]))!;
+    foreach (var i in script.Instructions.Where(i => i.Operation == "print"))
+        Console.WriteLine($"+0x{i.Offset:X4} {i.Operands}\n        => {string.Join(" / ", System.Text.RegularExpressions.Regex.Matches(i.Operands, @"text, ""(.*?)""").Select(m => ScummTextDecoder.DecodeLine(m.Groups[1].Value).Trim()))}");
+    return;
+}
+
 if (args.Length > 4 && args[1] == "probe")
 {
     var room = int.Parse(args[2]); var obj = int.Parse(args[3]); var verb = Convert.ToInt32(args[4], 16);
