@@ -35,9 +35,8 @@ public sealed class ScummIndy3CutsceneTests(ITestOutputHelper output)
     private sealed record Texts(string Push, string PickUp, string Lights, string LightsTitle, string Castle, string Grail);
 
     private static readonly Texts English = new("Push", "Pick up", "HEY!! WHO TURNED OUT THE LIGHTS!!", "Room 73 · Push light switch", "Meanwhile, elsewhere in the castle", "Dad!");
-    // The two Spanish copies are separate translations (Walk to is "Andar hacia" in EGA, "Ir a" in 256 colours). The scan's first text replaces every
-    // escaped byte with a space (ScummCutsceneIndex, owned by the S7 Monkey Island work), so the switch's line and the grail line are checked by a
-    // fragment without accented letters or inverted marks, which holds before and after that is fixed.
+    // The two Spanish copies are separate translations (Walk to is "Andar hacia" in EGA, "Ir a" in 256 colours). The fragments below hold in every
+    // copy; the whole Spanish lines, with their inverted marks and accents, are pinned in TheSpanishLinesAndNamesKeepTheirCharacters.
     private static readonly Dictionary<string, Texts> TextsByRelease = new()
     {
         ["ega"] = English,
@@ -99,5 +98,24 @@ public sealed class ScummIndy3CutsceneTests(ITestOutputHelper output)
             Assert.True(run.Begun, $"{release} Room {room} object {objectId} verb 0x{verb:X2}: {run.Failure}");
             Assert.StartsWith("A fresh start begins its cutscene", planner.StartNote(group.First), StringComparison.Ordinal);
         }
+    }
+
+    /// <summary>
+    /// S9 open item fixed on 17 October 2026: the scan decodes a first line and an object name with <see cref="ScummTextDecoder"/> (the copy's glyph
+    /// codes as CP437, as the play screen and Game Texts show them), so the Spanish lines keep their ¡ ¿ and accents (a name its ñ: <c>ScummMonkeyFloppyCutsceneTests</c>). Until then every
+    /// escaped byte became a space ("EH!  QUIEN…") and names were read as Latin-1 ("esta¤o").
+    /// </summary>
+    [Fact]
+    public void TheSpanishLinesAndNamesKeepTheirCharacters()
+    {
+        if (Planners["ega es"].Value is { } ega)
+        {
+            Assert.Equal("¡EH! ¿QUIEN HA APAGADO LAS LUCES?", GroupOf(ega, 73, 837, 0x06).First.FirstText);
+            Assert.Equal("¡Papa! ¿Como has llegado aqui antes que yo?", GroupOf(ega, 80, 0, 0).First.FirstText);
+            // No first line of this copy shows a Latin-1 reading of its ñ (0xA4).
+            Assert.DoesNotContain(ega.Triggers, t => t.ObjectName.Contains('¤', StringComparison.Ordinal) || t.FirstText.Contains('¤', StringComparison.Ordinal));
+        }
+        if (Planners["vga es"].Value is { } vga)
+            Assert.StartsWith("Papá", GroupOf(vga, 80, 0, 0).First.FirstText, StringComparison.Ordinal);
     }
 }

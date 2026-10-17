@@ -39,6 +39,42 @@ public static class ScummTextDecoder
         return output.ToString();
     }
 
+    /// <summary>
+    /// A disassembler string literal's escaped contents (without the quotes) as one plain line for a list (the cutscene scan's first text):
+    /// a glyph code from 0x80 is the copy's own character in CP437, as the play screen and Game Texts show it (Spanish ¿ ¡ ñ á); a text control
+    /// (0xFF, its code and, for codes with operands, their two bytes) and every other escaped byte become a space, so a line keeps its words apart.
+    /// </summary>
+    public static string DecodeLine(string escaped)
+    {
+        var output = new StringBuilder(escaped.Length);
+        var control = 0; // bytes of a text control still to come: its code, then its operands
+        var operands = false;
+        for (var i = 0; i < escaped.Length; i++)
+        {
+            int? value = null;
+            if (escaped[i] == '\\' && i + 3 < escaped.Length && escaped[i + 1] == 'x' &&
+                byte.TryParse(escaped.AsSpan(i + 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var hex))
+            {
+                value = hex;
+                i += 3;
+            }
+            if (control > 0)
+            {
+                // The code decides whether two operand bytes follow (ScummVM convertMessageToString, v3).
+                if (!operands && value is int code) { operands = code is not (1 or 2 or 3 or 8); control = operands ? 2 : 0; }
+                else control--;
+                output.Append(value is null ? escaped[i] : ' ');
+                continue;
+            }
+            if (value is not int b) { output.Append(escaped[i]); continue; }
+            // 0xFE leads a control as 0xFF does up to v6 (ScummVM handleNextCharsetCode: c == 0xFF || (version <= 6 && c == 0xFE)):
+            // Monkey Island's "The three trials!\xFE\x01\xFF\x02".
+            if (b is 0xFF or 0xFE) { control = 1; operands = false; output.Append(' '); continue; }
+            output.Append(b >= 0x80 ? DecodeByte((byte)b) : " ");
+        }
+        return output.ToString();
+    }
+
     /// <summary>The bytes of a disassembler string literal's escaped contents (without the quotes).</summary>
     public static byte[] ParseEscaped(string value) => ParseBytes(value).ToArray();
 

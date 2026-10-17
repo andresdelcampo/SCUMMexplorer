@@ -86,6 +86,18 @@ public sealed class ScummMonkeyFloppyCutsceneTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void TheScansFirstLineKeepsTheCopysCharactersAndSpacesItsControls()
+    {
+        // ScummTextDecoder.DecodeLine (17 October 2026, the S9 open item of Indy3): a glyph code from 0x80 is the copy's character in CP437; a text
+        // control (0xFF, or 0xFE as ScummVM reads it up to v6, its code and the two operand bytes of codes such as 0x0A) and other escapes are spaces.
+        Assert.Equal("Treasure of Mêlée Island  and", ScummTextDecoder.DecodeLine(@"Treasure of M\x88l\x82e Island\x0F and"));
+        Assert.Equal("The three trials!    ", ScummTextDecoder.DecodeLine(@"The three trials!\xFE\x01\xFF\x02"));
+        Assert.Equal("¡EH! ¿QUIEN", ScummTextDecoder.DecodeLine(@"\xADEH! \xA8QUIEN"));
+        Assert.Equal("a    b", ScummTextDecoder.DecodeLine(@"a\xFF\x0A\x80\x00b"));
+        Assert.Equal("one  two", ScummTextDecoder.DecodeLine(@"one\xFF\x03two"));
+    }
+
+    [Fact]
     public void ACutsceneTheRoomsOwnScriptsBeginIsNotTheTriggers()
     {
         if (Planner.Value is not { } planner) return;
