@@ -2,6 +2,13 @@
 
 ## ScummVM
 
+The DOS v1/v2 built-in charset and language replacement tables in
+`src/SCUMMexplorer.Core/Scumm/V2/ScummV2Charset.cs` adapt
+[charset-fontdata.cpp](https://github.com/scummvm/scummvm/blob/master/engines/scumm/charset-fontdata.cpp)
+and `CharsetRendererV2` (read 17 October 2026). Copyright the ScummVM
+contributors; GPL-3.0-or-later. Drawing reuses the v3 one-bit renderer, as
+ScummVM's v2 renderer does.
+
 The PC speaker envelope, modulation and synthesis implementation in
 `src/SCUMMexplorer.Core/Scumm/Audio/ScummPcSpeakerAudio.cs` and the companion
 `LoomPcSpeakerModulationTable.cs` adapt the ScummVM
