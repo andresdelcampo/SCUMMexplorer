@@ -38,6 +38,8 @@ In v4 `resetScummVars` also gives `VAR_HEAPSPACE` (`0x028`) = 1400 and `VAR_FIXE
 
 The v4 contract additionally defines `VAR_SCROLL_SCRIPT` (`0x01B`), `VAR_DEBUGMODE` (`0x027`), `VAR_MAINMENU_KEY` (`0x032`), `VAR_FIXEDDISK` (`0x033`), `VAR_CURSORSTATE` (`0x034`) and `VAR_USERPUT` (`0x035`). Thus a slot holding game data in v3 may be reserved in v4. Source: ScummVM [variable setup](https://github.com/scummvm/scummvm/blob/master/engines/scumm/vars.cpp), checked 11 October 2026. This is a selected reference, not a complete table for every platform or version.
 
+**Version 5 slots** (`vars.cpp` `setupScummVars`, `_game.version >= 5`, ScummVM master read 17 October 2026; `ScummVars`): `VAR_V5_TALK_STRING_Y` (`0x036`, versions 4 and 5, -0x50 at start), `VAR_SOUNDRESULT` (`0x038`), `VAR_TALKSTOP_KEY` (`0x039`), `VAR_FADE_DELAY` (`0x03B`, 3 at start), `VAR_NOSUBTITLES` (`0x03C`), `VAR_SOUNDPARAM`..`VAR_SOUNDPARAM3` (`0x040` to `0x042`), `VAR_INPUTMODE` (`0x043`: 1 keyboard, 2 joystick, 3 mouse; 3 at start), `VAR_MEMORY_PERFORMANCE` (`0x044`), `VAR_VIDEO_PERFORMANCE` (`0x045`), `VAR_ROOM_FLAG` (`0x046`), `VAR_GAME_LOADED` (`0x047`), `VAR_NEW_ROOM` (`0x048`). The v5 opcode differences met so far are in the [boot sequence](SCUMM_BOOT_SEQUENCE.md), v5 section.
+
 ## Script operands, input and scheduling (v3/v4)
 
 - Variable/direct flags and local arguments are bytecode rules. Script targets can be variable operands; arguments are copied into the child's locals. A script number's story role comes from the game.

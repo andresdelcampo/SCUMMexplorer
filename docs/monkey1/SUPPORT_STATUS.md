@@ -1,21 +1,21 @@
 # Monkey Island 1 CD support status
 
-Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 14 October 2026 | Owner: S3-leftovers agent
+Family: MonkeyCd | Fixture: `Games/monkey1 vga en` (`The_Secret_of_Monkey_Island.cue`) | Last updated: 17 October 2026 | Owner: S4b MonkeyCd agent
 
 | Stage | State | Registry cell | Record | Notes |
 |---|---|---|---|---|
 | S1 Intake | done (before this file) | Rooms | | |
 | S2 Reading | done (before this file) | Costumes, Scripts, Texts | | polish: ~3% of v5 script blocks unresolved |
 | S3 Sound | in progress, **partial** | Sound | [v5-sound-leftovers-20261014](../../.verification/v5-sound-leftovers-20261014/README.md) | listening check listed in the run report: yes; result: pending |
-| S4b Session | not started | – | | |
-| S5 Objects | not started | Objects (partial) | | |
+| S4b Session | **done (17 Oct)** | – (unchanged: S4b changes no cell) | [monkeycd-session-20261017](../../.verification/monkeycd-session-20261017/README.md) | boots to the lookout (Room 38) in 1573 frames, player in control, unsupported 0; left alone it goes on to Room 96 and the dock (Room 33); `ScummMonkeyCdSessionTests` |
+| S5 Objects | **done (17 Oct), three rooms written down** | Objects (partial, unchanged until S6) | [monkeycd-objects-20261017](../../.verification/monkeycd-objects-20261017/README.md) | 82 of 83 rooms run without a gap; Room 99 cannot run, Rooms 88 and 89 not followed; ten-room ScummVM picture comparison not done (user check) |
 | S6 Play | not started | Play | | the script-driven sound hooks wait for this |
 | S7 Cutscenes | not started | Cutscenes | | |
 | S8 State | not started | Status | | requested in a run: no |
 | S9 Editions | not started | – | | the disc also carries ENGLISH, FRENCH, GERMAN, ITALIAN, SPANISH data folders |
 
 Blocked on: S6 for the sound hooks (see the record, section 4).
-Next: the user listens to the loops (list in the run report); S4b.
+Next: the three S5 rooms (88 undecoded entry byte, 89 `saveRestoreVerbs` sub-opcode 0x00, 99 object 1000 outside the state table); then S6 (a Play requirement exists for verb games; `BootForPlay` still reads the index through `ScummV4Archive` only; the v5 untouchable class 32 is not the hit test's 24).
 Open uncertainties: disc track 21 (16 s) is started by no sound and stays unnamed; six `startSound` operands are variables (script 101 `var[100]`, script 162 `local[4]`, room 75 local script 205 `local[0]`), which sound they start needs running scripts.
 
 ## Decision log
@@ -26,6 +26,12 @@ Open uncertainties: disc track 21 (16 s) is started by no sound and stays unname
 | 14 Oct | S3 | Name disc track 21? | name it from a guess / leave unnamed | unnamed: no sound, no direct start (only LOOM CD has one) and no literal script start names it (R-2.1) | none needed |
 | 14 Oct | S3 | How long a looping song is rendered | one pass; 3 minutes (the preview limit already used by the other devices); more | 3 minutes, ending at the first jump back at or after it (hard cap 420 s) | `ScummImuseTimeline.MinLoopSeconds` |
 | 2026-10-14 | S3 | Raise Sound to Full? | keep partial until S6 hooks / raise now | raised: the user listened and accepted the v5 sounds (loops, hooks with id 0, MI1 CD track list); the script-driven hooks stay a known limit for S6 | revert the one registry line |
+| 2026-10-17 | S4b | Where the boot ends: the brief expected the dock (Room 33) | (a) end when the player first has control (the rule the floppy uses); (b) play on until Room 33 | (a): `BootEndsWhenPlayerHasControl` for MonkeyCd as for the floppy; on the CD the player has control at the lookout (Room 38) while the opening's CD track plays, which is the game's own first playable state; Room 33 follows only if the player waits (pinned by `LeftAloneTheLookoutsMusicEndsAndTheGameGoesOnToTheDock`) | drop MonkeyCd from `BootEndsWhenPlayerHasControl` (the boot then ends when script 1 ends, also in Room 38) |
+| 2026-10-17 | S4b | How `VAR_MUSIC_TIMER` runs while a CD track plays (the credits wait on it) | the AdLib/iMuse timer (no AdLib part: never moves, the boot hangs in Room 10); ScummVM's CD timer | the CD timer of soundcd.cpp, decided by data (`ScummCdAudioTracks`: track sounds on a disc image), lengths from the cue sheet; track 17's user offset taken as 0 | remove the `_cdTracks` branch of `ScummGameSession.UpdateMusicTimer` |
+| 2026-10-17 | S4b | `getActorFromPos` (Script 23 asks it from the boot on) was answered only for families that play through verbs | keep it Play-only (reported unsupported); answer it in every generic session | every generic session: it is an engine query, not a click (R-7.17 concerns clicks); the families with Play already had it | restore the `PlaysThroughVerbs` guard |
+| 2026-10-17 | S4b | `VAR_V5_TALK_STRING_Y` = -0x50: ScummVM sets it for versions 4 and 5 | set it for both; v5 only | v5 only (smaller change; the v4 families' tests and records stay as they are); the v4 omission is noted for their owners | add V4 to the condition in `ScummProfile.EngineVariablesAtStart` |
+| 2026-10-17 | S5 | Which v5 games get first-visit scenes | the v5 format (also Monkey Island 2, Indy 4, never booted); MonkeyCd only | the v5 format and the MonkeyCd family, in `ScummProfile.For`: a game whose boot was never followed would only show failed runs | drop the family term when another v5 game passes S4b |
+| 2026-10-17 | S4b | Untouchable class of `o5_pickupObject` | 24 (the small-header number the hit test uses); 32 (ScummVM `kObjectClassUntouchable` without translation) | 32 for the v5 form, as ScummVM; the hit test's class number for v5 is an S5/S6 item (step 4 of S5: read the class bits from the source) | change the constant in `TryApplyPickupObject` |
 
 
 ---

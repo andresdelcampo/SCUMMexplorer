@@ -70,6 +70,9 @@ public static class ScummDataSources
         // A v4 game on several disks (Monkey Island's floppy release): every disk behind one source (S4b MonkeyFloppy).
         if (profile.UsesV4Archive && game.V4Archive is null && game.V4Disks is { } disks && disks.Disks.OfType<ScummV4Archive>().Any())
             return new ScummV4DiskSetDataSource(disks, profile.Dialect);
+        // A v5 game (NAME.000/NAME.001, Monkey Island CD): its one resource file (S4b MonkeyCd).
+        if (game.V4Disks?.Disks.OfType<ScummV5Archive>().FirstOrDefault() is { } v5)
+            return new ScummV5DataSource(v5, profile.Dialect);
         return profile.UsesV4Archive ? new ScummV4DataSource(game) : new ScummV3DataSource(game);
     }
 }

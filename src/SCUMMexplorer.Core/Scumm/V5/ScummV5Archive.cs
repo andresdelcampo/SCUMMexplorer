@@ -22,7 +22,7 @@ public sealed record ScummV5ObjectVerb(int ObjectId, string? ObjectName, int Ver
 /// per resource. <c>NAME.001</c> is <c>LECF</c> holding <c>LOFF</c> (each room's offset: the first block inside its <c>LFLF</c>) and the <c>LFLF</c> blocks, which hold
 /// <c>ROOM SCRP SOUN COST CHAR</c>; a resource of the directories sits at its room's offset plus its own. Read for browsing: rooms (picture, palette, depth masks) and costumes.
 /// </summary>
-public sealed class ScummV5Archive : IBrowsableArchive
+public sealed partial class ScummV5Archive : IBrowsableArchive
 {
     private const byte Xor = 0x69;
 

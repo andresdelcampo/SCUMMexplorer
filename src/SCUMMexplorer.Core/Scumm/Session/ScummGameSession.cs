@@ -13,8 +13,9 @@ public sealed class ScummGameSession : ScummSession
     public ScummGameSession(GameLibrary game, ScummIndexedObjectSnapshot indexedObjects, int randomSeed = 0,
         ScummScriptObserver? observer = null, IScummDataSource? data = null, bool boot = true)
         : base(game, indexedObjects, randomSeed, observer, data,
-            AdlibLifetime(game))
+            AdlibLifetime(game), ScummCdAudioTracks.For(game) is { } cd ? cd.Lifetime : null)
     {
+        _cdTracks = ScummCdAudioTracks.For(game);
         // ScummEngine::resetScummVars (vars.cpp): the sound card the session plays through (AdLib is 3), the video mode, the text speed.
         var profile = ScummProfile.For(game);
         if (profile.SeparateBitVariables)
@@ -37,10 +38,11 @@ public sealed class ScummGameSession : ScummSession
         }
         _runtime.CameraFollowStartsScene = profile.CameraFollowStartsScene;
         _runtime.PublishesCursorVariables = profile.PublishesCursorVariables;
-        // getActorFromPos, from the actors as the last frame drew them (S6: Indiana Jones's Script 20 finds the person under the pointer with it).
+        // getActorFromPos, from the actors as the last frame drew them (S6: Indiana Jones's Script 20 finds the person under the pointer with it). An engine
+        // query, not a click: since S4b MonkeyCd (17 October 2026) every generic session answers it (Monkey Island CD's interface loop, Script 23, asks it from the boot on).
+        _runtime.ActorFromPosition = ActorFromPosition;
         if (profile.PlaysThroughVerbs)
         {
-            _runtime.ActorFromPosition = ActorFromPosition;
             // convertVerbMessage for prints: Script 18 says a dialogue choice through code 5 of the chosen verb (+0x0068).
             _runtime.VerbName = PlayVerbName;
         }
@@ -72,8 +74,45 @@ public sealed class ScummGameSession : ScummSession
     // the app plays through, so this follows Player_AD or iMuse even when the user listens on the PC speaker (Player_V2 is not modelled).
     private readonly ScummMusicStart _musicStart;
 
+    // S4b MonkeyCd (17 October 2026): a game whose sounds play tracks of its disc (ScummCdAudioTracks; ScummVM GF_AUDIOTRACKS). The drive plays one track at a
+    // time, and VAR_MUSIC_TIMER follows the CD timer, which playCDTrack sets to 0 and which then adds one per jiffy (soundcd.cpp, sound.cpp updateMusicTimer).
+    private readonly ScummCdAudioTracks? _cdTracks;
+    private int? _cdSound;
+    private int _cdTimer;
+    private bool _cdTimerRunning;
+
+    protected override void UpdateMusicTimer()
+    {
+        if (_cdTracks is null)
+        {
+            base.UpdateMusicTimer();
+            return;
+        }
+        // The timer keeps counting after the track has ended on its own (only stopCDSound removes it).
+        if (_cdTimerRunning) _cdTimer += FrameJiffies;
+        if (_cdTimerRunning || _cdTimer > 0) _runtime.SetGlobalVariable(MusicTimerVariable, (ushort)Math.Min(_cdTimer, ushort.MaxValue));
+    }
+
+    // stopCDSound / stopAllCDSounds (soundcd.cpp): a script's stop of the playing CD sound removes the timer; its value stays.
+    protected override void AfterScriptStopsSound(int? soundId)
+    {
+        if (_cdTracks is null || _cdSound is not int playing || soundId is int stopped && stopped != playing) return;
+        _cdTimerRunning = false;
+        _cdSound = null;
+    }
+
     protected override void BeforeSoundStarts(ScummScriptEvent start, int soundId)
     {
+        if (_cdTracks?.Plays(soundId) == true)
+        {
+            if (_cdSound is int previousTrack && previousTrack != soundId && _soundClock.Playing.Contains(previousTrack))
+                EngineStopsSounds(start, [previousTrack],"playCDTrack", $"{_cdTracks.Describe(soundId)}; the drive plays one track at a time (SoundCD::playCDTrack)");
+            _cdSound = soundId;
+            _cdTimer = 0;
+            _cdTimerRunning = true;
+            _visitTrace.Add($"CD: {_cdTracks.Describe(soundId)}; VAR_MUSIC_TIMER restarts at 0 and counts jiffies (SoundCD::playCDTrack, cdTimerHandler).");
+            return;
+        }
         var rule = _musicStart;
         if (rule == ScummMusicStart.StopsNothing || !_soundClock.IsMusic(soundId)) return;
         if (rule == ScummMusicStart.StopsAllSounds)

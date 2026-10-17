@@ -124,7 +124,14 @@ public static class ScummRoomFirstVisit
         var data = ScummDataSources.For(game);
         ScummIndexedObjectSnapshot indexed;
         RoomImage room;
-        if (profile.UsesV4Archive)
+        if (data is ScummV5DataSource v5)
+        {
+            // A v5 game (S5 MonkeyCd): the index's DOBJ gives the starting states, the resource file the room's picture.
+            var holder = game.V4ArchiveFor(resource) ?? throw new InvalidDataException($"Room {roomId:00} is not in the game's resource file.");
+            indexed = v5.ReadIndexedObjects();
+            room = holder.DecodeRoom(roomId);
+        }
+        else if (profile.UsesV4Archive)
         {
             // A v4 game (one archive, or several disks: S5 MonkeyFloppy): the index (000.LFL, the same on every disk) gives the starting states, the
             // disk that holds the room gives its picture.

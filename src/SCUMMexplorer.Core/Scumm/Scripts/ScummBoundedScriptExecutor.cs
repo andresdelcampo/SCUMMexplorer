@@ -441,7 +441,7 @@ public sealed class ScummBoundedScriptExecutor
                 }
                 if (!TryApplyExpression(instruction, script, knownVariables, estimated, runtime,
                         onEstimatedPath, picks, trace, out var expressionDetail,
-                        observation?.Observer.CapturesExpressions == true ? ObserveExpression : null))
+                        observation?.Observer.CapturesExpressions == true ? ObserveExpression : null, roomObjects))
                 {
                     ObserveExpression("barrier", [], expressionDetail);
                     unresolved = $"{expressionDetail} at +0x{instruction.Offset:X4}";
@@ -664,6 +664,29 @@ public sealed class ScummBoundedScriptExecutor
                 RefreshBitAliases(entryKey, knownVariables);
                 MarkEstimated(estimated, entryKey, onEstimatedPath || parts.Skip(1).Any(operand => OperandIsEstimated(operand, estimated, knownVariables)));
                 trace.Add($"{entryKey} = {entrypoint}: getVerbEntrypoint object {entryObject} verb 0x{entryVerb:X2}");
+                pc = next;
+                continue;
+            }
+
+            if (instruction.Operation == "getObjectState" && runtime is not null)
+            {
+                // o5_getObjectState (v5 0x0F/0x8F, script_v5.cpp read 17 October 2026): VAR_RESULT-style store of getState(obj), the object's state byte.
+                var parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+                if (parts.Length != 2 || !TryGetVariableKey(parts[0], knownVariables, out var stateKey) ||
+                    !TryReadValue(parts[1], knownVariables, out var stateObject, out _))
+                {
+                    unresolved = $"getObjectState operands are unknown ({instruction.Operands}) at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                if (!runtime.ObjectStates.TryGetValue(stateObject, out var objectState))
+                {
+                    unresolved = $"getObjectState: object {stateObject} is not in the state table at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                knownVariables[stateKey] = objectState;
+                RefreshBitAliases(stateKey, knownVariables);
+                MarkEstimated(estimated, stateKey, onEstimatedPath || OperandIsEstimated(parts[1], estimated, knownVariables));
+                trace.Add($"{stateKey} = {objectState}: getObjectState {parts[1]}");
                 pc = next;
                 continue;
             }
@@ -1449,7 +1472,21 @@ public sealed class ScummBoundedScriptExecutor
     {
         inventoryStart = null;
         problem = "";
-        if (!TryReadValue(instruction.Operands.Trim(), variables, out var obj, out var detail))
+        // o5_pickupObject (version 5, script_v5.cpp read 17 October 2026): "object, room"; room 0 is the current room. It neither checks the room nor
+        // the owner: addObjectToInventory, putOwner(VAR_EGO), class kObjectClassUntouchable (32, not translated without the small header), state 1.
+        var v5Parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+        var v5Form = v5Parts.Length == 2;
+        int? v5Room = null;
+        if (v5Form)
+        {
+            if (!TryReadValue(v5Parts[1], variables, out var rawRoom, out var roomDetail))
+            {
+                problem = $"pickupObject names an unknown room ({roomDetail})";
+                return false;
+            }
+            v5Room = rawRoom == 0 ? runtime.CurrentRoom : (int)rawRoom;
+        }
+        if (!TryReadValue(v5Form ? v5Parts[0] : instruction.Operands.Trim(), variables, out var obj, out var detail))
         {
             problem = $"pickupObject names an unknown object ({detail})";
             return false;
@@ -1464,12 +1501,12 @@ public sealed class ScummBoundedScriptExecutor
             problem = "pickupObject needs VAR_EGO, which is not established";
             return false;
         }
-        if (roomObjects.All(item => item.Id != obj))
+        if (!v5Form && roomObjects.All(item => item.Id != obj))
         {
             trace.Add($"pickupObject {obj}: the room has no such object, so nothing happens");
             return true;
         }
-        if (runtime.ObjectOwners.TryGetValue((int)obj, out var owner) && owner != RoomOwner)
+        if (!v5Form && runtime.ObjectOwners.TryGetValue((int)obj, out var owner) && owner != RoomOwner)
         {
             trace.Add($"pickupObject {obj}: already owned by {owner}, so it is not taken twice");
             return true;
@@ -1479,10 +1516,10 @@ public sealed class ScummBoundedScriptExecutor
             problem = "pickupObject: the inventory is full (80 objects)";
             return false;
         }
-        if (runtime.CurrentRoom is int takenFrom) runtime.InventoryRooms[(int)obj] = takenFrom;
+        if ((v5Form ? v5Room : runtime.CurrentRoom) is int takenFrom) runtime.InventoryRooms[(int)obj] = takenFrom;
         runtime.SetObjectOwner((int)obj, (byte)ego);
         runtime.AddInventoryObject((int)obj);
-        var classes = runtime.ObjectClasses.GetValueOrDefault((int)obj) | (1u << (ScummObjectClasses.Untouchable - 1));
+        var classes = runtime.ObjectClasses.GetValueOrDefault((int)obj) | (1u << ((v5Form ? 32 : ScummObjectClasses.Untouchable) - 1));
         runtime.SetObjectClasses((int)obj, classes);
         runtime.SetObjectState((int)obj, 1);
         runtime.StatesSetInRoom.Add((int)obj);
@@ -2130,14 +2167,14 @@ public sealed class ScummBoundedScriptExecutor
     private static bool TryApplyExpression(ScummScriptInstruction instruction, ScummScriptDisassembly script,
         Dictionary<string, ushort> variables, HashSet<string> estimated, ScummScriptRuntimeState? runtime,
         bool pathEstimated, List<ScummRandomPick> picks, List<string> trace, out string detail,
-        Action<string, (string Role, string Operand)[], string?>? observe = null)
+        Action<string, (string Role, string Operand)[], string?>? observe = null, IReadOnlyList<ScummRoomObjectRecord>? roomObjects = null)
     {
         detail = "expression operands are unsupported";
         int separator = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
         if (separator < 0 || !instruction.Operands.EndsWith(']') ||
             !TryGetVariableKey(instruction.Operands[..separator], variables, out var destination)) return false;
         string body = instruction.Operands[(separator + 3)..^1];
-        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:getInventoryCount|getActor[A-Za-z]+)\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
         if (tokens.Count is 0 or > 4096) return false;
         int end = 0;
         foreach (Match token in tokens)
@@ -2185,6 +2222,31 @@ public sealed class ScummBoundedScriptExecutor
                 trace.Add($"{randomDestination} = {pick.Value}: nested seeded pick of 0..{max} (seed {pick.Seed}, draw {pick.Draw})");
                 observe?.Invoke("nested-write", [("destination-after", randomDestination)], null);
                 observe?.Invoke("scratch-read", [("implicit-scratch", ScummVars.Result)], null);
+                if (!TryReadValue(ScummVars.Result, variables, out var scratch, out _))
+                { detail = "nested expression opcode leaves var[0x000] unknown"; return false; }
+                stack.Push((unchecked((short)scratch), IsEstimated(ScummVars.Result, estimated)));
+            }
+            else if (term.Contains('(', StringComparison.Ordinal))
+            {
+                // o5_expression case 6 runs a nested opcode and reads VAR_RESULT. Modelled here: o5_getInventoryCount (the inventory slots the actor
+                // owns, as the plain instruction; S4b MonkeyCd: Script 9 +0x0000) and the actor queries the plain instruction answers (S5 MonkeyCd:
+                // getActorX/Y, getActorFacing in Scripts 34, 35, 37, 43). Any other nested opcode stays unsupported.
+                var name = term[..term.IndexOf('(')];
+                var parts = term[(name.Length + 1)..^1].Split(',', StringSplitOptions.TrimEntries);
+                if (runtime is null || parts.Length != 2 || name != "getInventoryCount" && !IsActorQuery(name) ||
+                    !TryGetVariableKey(parts[0], variables, out var countDestination) ||
+                    !TryReadValue(parts[1], variables, out var actor, out _))
+                { detail = $"nested {name} is unsupported or its operands are unknown"; return false; }
+                int count;
+                if (name == "getInventoryCount")
+                    count = runtime.InventorySlots.Count(item => item != 0 && runtime.ObjectOwners.TryGetValue(item, out var o) && o == actor);
+                else if (!TryAnswerActorQuery(name, parts[1], runtime, roomObjects ?? [], variables, out count, out var queryDetail, out var queryEstimate))
+                { detail = $"nested {queryDetail}"; return false; }
+                else if (queryEstimate is not null) trace.Add($"nested {name}: {queryEstimate}");
+                variables[countDestination] = unchecked((ushort)count);
+                RefreshBitAliases(countDestination, variables);
+                MarkEstimated(estimated, countDestination, pathEstimated || OperandIsEstimated(parts[1], estimated, variables));
+                trace.Add($"{countDestination} = {count}: nested {name} {parts[1]}");
                 if (!TryReadValue(ScummVars.Result, variables, out var scratch, out _))
                 { detail = "nested expression opcode leaves var[0x000] unknown"; return false; }
                 stack.Push((unchecked((short)scratch), IsEstimated(ScummVars.Result, estimated)));

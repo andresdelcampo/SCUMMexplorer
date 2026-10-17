@@ -1,0 +1,71 @@
+game: The Secret of Monkey Island (Unknown, V5), folder monkey1 vga en, v5 resource file
+boot: 1573 frames (limit 5000), hit limit: False, wall time 1,1 s
+final room: 38; rooms entered in order: 0, 10, 0, 0, 38
+rooms by name: 0 (none), 10 Room 10, 38 Room 38
+extra frames played after the boot: 0; room now 38
+in cutscene: False; pending scripts: 3
+
+== pending scripts
+  Script 159 +0x0005
+  Script 23 +0x0199
+  Room 38 Object 486 Fallback verb +0x0045
+
+== session trace (waits omitted)
+  cutscene at Script 152 +0x0000 runs script 18
+  stopScript 2 at Script 18 +0x0010: script 2 was not running
+  freezeScripts 0x7F at Script 18 +0x0070: frozen: Script 01, Script 159
+  Script 01 pauses after startScript +0x070F: nested execution froze its caller
+  Script 152 +0x0010: room 0 (no room) after a frame advance
+  Script 152 continues at +0x0012 in Room 00 after loadRoom
+  Script 152 continues at +0x001A in Room 10 after loadRoom
+  CD: sound 110 plays CD track 17 from frame 0; VAR_MUSIC_TIMER restarts at 0 and counts jiffies (SoundCD::playCDTrack, cdTimerHandler).
+  endCutscene at Script 152 +0x08A2 runs script 19
+  freezeScripts 0x00 at Script 19 +0x004B: no script is frozen
+  stopScript 2 at Script 19 +0x0054: script 2 was not running
+  Script 19 +0x0063: room 0 (no room) after a frame advance
+  Script 19 continues at +0x0066 in Room 00 after actorFollowCamera
+  Script 01 +0x081C: room 0 (no room) after a frame advance
+  Script 01 continues at +0x081E in Room 00 after loadRoom
+  Script 09 +0x00AA: startObject runs object 488 verb 0x5B
+  Room 38 entry script +0x0040: startObject runs object 488 verb 0xFA
+  cutscene at Room 38 local script 203 +0x0000 runs script 18
+  stopScript 2 at Script 18 +0x0010: script 2 was not running
+  freezeScripts 0x7F at Script 18 +0x0070: frozen: Room 38 entry script, Script 159, Script 23
+  Room 38 entry script pauses after startScript +0x0059: nested execution froze its caller
+  Script 01 +0x14C3: camera x = 160 (actor 1's x)
+  Script 01 continues at +0x14C6 in Room 38 after actorFollowCamera
+  CD: sound 108 plays CD track 17 from frame 7173; VAR_MUSIC_TIMER restarts at 0 and counts jiffies (SoundCD::playCDTrack, cdTimerHandler).
+  endCutscene at Room 38 local script 203 +0x02CA runs script 19
+  freezeScripts 0x00 at Script 19 +0x004B: no script is frozen
+  stopScript 2 at Script 19 +0x0054: script 2 was not running
+  Room 38 local script 203 +0x02CB: startObject runs object 486 verb 0x0B
+  boot: 1573 frames after script 001's first room load; now in Room 38
+
+== operations reported as not applied (presentation only, nothing in game state)
+  roomOps: 3 runs
+
+== unsupported (opcode, operand or state the run could not follow): 0
+
+== random picks: 5 (seeded; each is labelled an estimate)
+== all other uncertainties
+  Script 178 +0x0290: script requests Room dynamic; room transition awaits bounded session dispatch at +0x0296
+  Script 152 +0x0010 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 152 +0x0018 reached loadRoom after a frame advance.
+  Room 10 entered by Script 152 +0x0018 (loadRoom) after a frame advance.
+  Script 06 +0x0020: script requests Room dynamic; room transition awaits bounded session dispatch at +0x0026
+  Reached room load has no indexed destination (var[0x182], var[0x183], walkTo=(388, 1540)).
+  Script 19 +0x0063 reached actorFollowCamera to room 0 after a frame advance: no room is current until the next room load.
+  Script 01 +0x081C reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 23 +0x0000: findObject at +0x0075 reads the virtual mouse: assumed input: no pointer over the room, so the virtual mouse (var[0x014], var[0x015]) is taken to rest just below the room picture at (160, 200)
+  Script 01 +0x14C3 reached actorFollowCamera after a frame advance.
+  Room 38 entered by Script 01 +0x14C3 (actorFollowCamera) after a frame advance.
+
+== actors
+  actor 1: room 38, (256,166), costume 1, visible True
+  actor 2: room 38, (107,106), costume 33, visible True
+  actor 3: room 38, (134,97), costume 48, visible True
+  actor 7: room 10, (-163,84), costume 59, visible False
+  actor 8: room 10, (-43,84), costume 59, visible False
+  actor 9: room 10, (77,84), costume 59, visible False
+
+== room 38: 4 objects, 0 stored images, 3 actors drawn, 0 skipped

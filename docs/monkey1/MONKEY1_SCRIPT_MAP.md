@@ -150,3 +150,33 @@ Script census (S6 sound, 16 October): `startSound` 135, `stopSound` 68, `isSound
 - Which of Room 1's pseudo numbers (130 to 132) comes first in play is not decoded (the map rooms reach it through scripts with non-literal arguments); the first visit uses 130, labelled.
 - The index (`RN` block) names none of the rooms the boot enters (the scanner shows "Room NN"); Rooms 90, 10, 38 and 96 are described above by what their scripts do.
 - The "insert disk" and "unable to find" strings of script 1 (+0x00E0, +0x0110) are never reached: all disks are assumed inserted.
+
+## CD release (MonkeyCd, SCUMM v5)
+
+Rows of this section come from the **CD release** only (`Games/monkey1 vga en`: `The_Secret_of_Monkey_Island.cue`/`.bin`, `MONKEY.000`/`MONKEY.001` on the data track, music on 24 audio tracks), SCUMM v5, dialect `V5`, read on 17 October 2026 (S4b MonkeyCd, [record](../../.verification/monkeycd-session-20261017/README.md)). Script numbers differ from the floppy's (R-14.2): no row of the sections above applies to the CD unless repeated here. Same row format.
+
+### Boot and hooks (CD)
+
+| Item | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| Script 1 | boot script: clears `var[0x049]`, `var[0x03C]`, sets `var[0x033]` = 1, `var[0x006]` = 2, cursor and input off, builds strings 0x16, 0x15, 0x25, the cutscene skip key `var[0x018]` = 0x1B, restart 0x142, pause 0x20, main-menu key `var[0x032]` = 0 (no save/load key at this point), loads charsets 2 and 4; then the opening | decoded | Script 1 +0x0000 to +0x00A9 | 2026-10-17 |
+| No copy protection | the boot enters no protection room and waits for no input: rooms entered 0, 10, 0, 0, 38 (the floppy's Room 90 and its Script 152 question are absent; the CD's Script 152 is the title credits) | decoded | boot trace of the record | 2026-10-17 |
+| Script 152 | title and credits as a cutscene (`var[0x020]` = 0xC9 during it): loads Room 0 then Room 10, `startSound 0x6E` (sound 110, CD track 17) and waits until `var[0x00E]` (the CD music timer) passes 0xFA before the credits (`startScript 0xCC`, "Deep in the Caribbean", "The Island of Mêlée") | decoded | Script 152 +0x0000 to +0x00D6 | 2026-10-17 |
+| Opening | Room 38's entry starts object 488 verb 0xFA, whose local script 203 is the opening cutscene; sound 108 (CD track 17 from frame 7173) plays; after `endCutscene` local script 203 starts object 486 verb 0x0B | decoded | Room 38 entry +0x0040; Room 38 local script 203 +0x0000 to +0x02CB | 2026-10-17 |
+| First playable room | **Room 38 (the lookout)**: after the opening the player has control while object 486's fallback verb waits for sound 108 (`isSoundRunning 0x6C`, +0x0045) with `bit[0x18B]` = 0; when the track has ended it loads Room 96 (room name "part1"), whose local script 200 puts the ego into Room 33 at (346,133) | decoded | Room 38 object 486 fallback verb +0x003A to +0x0050; Room 96 local script 200 +0x003B | 2026-10-17 |
+
+### Engine variables as this game uses them (CD)
+
+| Variable | This game's use | Evidence | Source | Date |
+|---|---|---|---|---|
+| `var[0x00E]` (music timer) | jiffies since the CD track started (`playCDTrack` resets it); the credits wait for it to pass 0xFA | decoded, engine | Script 152 +0x0055; ScummVM soundcd.cpp | 2026-10-17 |
+| `var[0x04A]` (74) | 1225 at start (ScummVM `resetScummVars` for `GID_MONKEY`); Script 176 compares it with 0x04B0..0x04E2 (1200..1250) | decoded, engine | Script 176 +0x0017, +0x001E; vars.cpp | 2026-10-17 |
+| `var[0x020]` (input script) | 0xC9 during the credits (Script 152 +0x0002), 4 after the boot | decoded | Script 152 +0x0002; boot trace | 2026-10-17 |
+
+### Sounds and music (CD)
+
+| Item | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| Sound 110 | CD track 17 (disc track 18) from its start, once: the title credits' music | decoded | `SOUN` 110 (Room 10); Script 152 +0x0049 | 2026-10-17 |
+| Sound 108 | CD track 17 from frame 7173 to the end, once: the lookout's music; its end leads on to Room 96 | decoded | `SOUN` 108 (Room 38); Room 38 object 486 fallback verb +0x0045 | 2026-10-17 |
+| Sounds 104, 122 | CD track 6 (Room 96), CD track 22 looping (the dock) | decoded | `SOUN` 104, 122; boot trace with 900 more frames | 2026-10-17 |

@@ -2,6 +2,18 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: first-visit rooms of Monkey Island CD (S5, MonkeyCd)
+
+- The CD release's rooms come from the generic session's first visit (`HasFirstVisitScenes` for the v5 format of MonkeyCd): 82 of 83 rooms run without a gap; Room 99 cannot run (object 1000 outside the state table), Rooms 88 and 89 have one unfollowed item each. Fixed on the way: `o5_getObjectState`, nested actor queries in `expression`, 32-colour costumes (format 0x59, the SCUMM Bar's pirates). Objects stays partial until S6.
+- Validation: `ScummMonkeyCdFirstVisitTests` (Rooms 30, 37, 70 pinned; Room 28 runs); regression filter 953 passed, 5 skipped. Record: [monkeycd-objects-20261017](../.verification/monkeycd-objects-20261017/README.md).
+
+## 17 October: the first v5 game boots in the generic session (S4b, MonkeyCd)
+
+- **Data source:** `ScummV5DataSource` (Core/Scumm/V5) reads scripts, objects, object images with masks, walk boxes with the box matrix, scale slots, costumes and the `DOBJ` object table of `MONKEY.000`/`MONKEY.001` through `ScummV5Archive`; `ScummDataSources.For` returns it for a v5 game.
+- **Engine:** the v5 variables (`ScummVars`, vars.cpp) and their start values (`VAR_INPUTMODE`, `VAR_FADE_DELAY`, `VAR_V5_TALK_STRING_Y`, `GID_MONKEY`'s var 74); the CD music timer of a game whose sounds play disc tracks (`ScummCdAudioTracks`, soundcd.cpp); v5 `drawObject` sub-opcodes and `pickupObject` (0x25 family), nested `getInventoryCount`; `getActorFromPos` answered in every generic session.
+- **Boot:** no copy protection; rooms 0, 10, 0, 0, 38; 1573 frames; the player has control at the lookout (Room 38) while the opening's track plays; unsupported 0, no assumed input; left alone it reaches Room 96 and the dock (Room 33). Registry unchanged.
+- **Validation:** `ScummMonkeyCdSessionTests` (5); session, play, first-visit, support and reader neighbours 191 passed; LOOM 836 passed, 5 skipped. Record: [monkeycd-session-20261017](../.verification/monkeycd-session-20261017/README.md).
+
 ## 17 October: the Spanish copies (S9, Indy3Ega and Indy3Vga)
 
 - **Checked:** `indy3 ega es` and `indy3 vga es` against the English references for S4b, S5, S6 (route of R-7.18 and its sounds) and S7: same boot (the EGA copy-protection answer derived from its own script), room audits 88/88 and 87/87 without a gap and equal to English per room, the route through the same ids, the cutscene scan equal per entry (90 begin from a fresh start after the shared run fix). No edition failed; registry unchanged.
