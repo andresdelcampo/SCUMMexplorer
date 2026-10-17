@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: Indiana Jones and the Fate of Atlantis boots and shows its first-visit rooms (S4b and S5, Indy4)
+
+- **Boot:** the talkie CD (`indy4 vga en`) runs through the logo (Room 68), no room, and Barnett College (Room 4) until local script 206 gives the player control: 721 frames, unsupported 0, no assumed input (script 1 takes the same branch for boot parameter 0 and ScummVM's copy-protection bypass -7873). `BootEndsWhenPlayerHasControl` for Indy4.
+- **Engine, shared and additive:** `o5_soundKludge` commands 8, 9, 10/11 become start/stop/stop-all events (others are presentation); a v5 game's sound lengths come from the iMUSE AdLib timeline's default path, labelled estimates; v5 objects keep one image per state and the first visit draws the settled state's image (43 of 96 rooms could not run before); `getActorScale` (estimate); the v5 wait for the sentence script.
+- **Rooms:** 96 of 96 without a gap (Settled 60, FrameLimit 25, RoomLeft 11); Rooms 76, 77, 87 keep a camera-after-walk item. Objects stays partial until S6; registry unchanged.
+- **Validation:** `ScummIndy4SessionTests` (4), `ScummIndy4FirstVisitTests` (5, Rooms 32, 46, 50 pinned); regression filter 980 passed, 5 skipped, 0 failed. Records: [indy4-session-20261017](../.verification/indy4-session-20261017/README.md), [indy4-objects-20261017](../.verification/indy4-objects-20261017/README.md).
+
 ## 17 October: the Spanish eight-disk release, and accents in the cutscene list (S9, MonkeyFloppy)
 
 - `Games/monkey1 ega es` (Spanish, eight disks, 16 colours) checked against the English floppy: boot (protection answered from its own `var[0x10A]`), room audit (81/81 without a gap, equal to English in outcome, active images and gaps), the R-7.18 route with its sounds and the right click, the cutscene scan (294 triggers, 164 entries, 104 begin, equal per entry), accents (CP437 codes with a glyph in every charset), one window look. Differences are data: texts and the offsets that follow them (the route test reads its sound offsets from the copy's script), Room 87's entry, the 0xFA glyph. No cell changes.
