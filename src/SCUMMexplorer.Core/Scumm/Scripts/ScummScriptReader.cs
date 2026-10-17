@@ -358,6 +358,12 @@ internal static partial class ScummScriptDisassembler
         if (Is(opcode, 0x04, 0x08, 0x38, 0x44, 0x48, 0x78, 0x84, 0x88, 0xB8, 0xC4, 0xC8, 0xF8, 0x28, 0xA8))
             return DecodeConditional(cursor, opcode);
 
+        // v5 (script_v5.cpp, ScummVM master read 17 October 2026): 0x05/0x45/0x85/0xC5 are o5_drawObject with a sub-opcode, 0x25/0x65/0xA5/0xE5 are
+        // o5_pickupObject (object word, room byte); the small-header games (v3, v4) read both as the three-operand drawObject.
+        if (cursor.Dialect == ScummScriptDialect.V5 && Is(opcode, 0x05, 0x45, 0x85, 0xC5))
+            return DecodeDrawObjectV5(cursor, opcode);
+        if (cursor.Dialect == ScummScriptDialect.V5 && Is(opcode, 0x25, 0x65, 0xA5, 0xE5))
+            return ("pickupObject", Join(ReadParam(cursor, 2, opcode, 0x80), ReadParam(cursor, 1, opcode, 0x40)));
         if (Is(opcode, 0x05, 0x25, 0x45, 0x65, 0x85, 0xA5, 0xC5, 0xE5))
             return DecodeDrawObject(cursor, opcode);
         // v5 dropped ifState/ifNotState: 0x0F and 0x8F read an object's state into a variable (ScummVM o5_getObjectState); the other forms are not registered.
@@ -600,6 +606,23 @@ internal static partial class ScummScriptDisassembler
         var x = ReadParam(cursor, 2, opcode, 0x40);
         var y = ReadParam(cursor, 2, opcode, 0x20);
         return ("drawObject", Join(objectNumber, "at", x, y));
+    }
+
+    /// <summary>
+    /// <c>o5_drawObject</c> (version 5): the object, then a sub-opcode whose low five bits say what follows: 1 a position (x, y in 8-pixel units),
+    /// 2 a state, 0x1F nothing (state 1, the stored position).
+    /// </summary>
+    private static (string, string) DecodeDrawObjectV5(Cursor cursor, byte opcode)
+    {
+        var objectNumber = ReadParam(cursor, 2, opcode, 0x80);
+        var sub = cursor.ReadByte();
+        return (sub & 0x1F) switch
+        {
+            1 => ("drawObject", Join(objectNumber, "at", ReadParam(cursor, 2, sub, 0x80), ReadParam(cursor, 2, sub, 0x40))),
+            2 => ("drawObject", Join(objectNumber, "state", ReadParam(cursor, 2, sub, 0x80))),
+            0x1F => ("drawObject", Join(objectNumber, "default state and position")),
+            _ => throw new UnsupportedBytecodeException($"drawObject subopcode 0x{sub:X2} is not defined in SCUMM v5")
+        };
     }
 
     private static (string, string) DecodeVariableOperation(Cursor cursor, byte opcode, string name, string symbol) =>

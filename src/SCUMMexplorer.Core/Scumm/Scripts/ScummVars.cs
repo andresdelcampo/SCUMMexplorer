@@ -78,6 +78,30 @@ public static class ScummVars
     /// <summary>Version 4 and later: <c>VAR_CURSORSTATE</c> (52) and <c>VAR_USERPUT</c> (53), copies of <c>_cursor.state</c> and <c>_userPut</c> after each <c>cursorCommand</c>.</summary>
     public const string CursorState = "var[0x034]";
     public const string UserPut = "var[0x035]";
+    /// <summary>
+    /// Version 4 and 5: <c>VAR_V5_TALK_STRING_Y</c> (54), the y of a talking actor's text; <c>ScummEngine_v5::resetScummVars</c> sets it to -0x50 (vars.cpp,
+    /// ScummVM master read 17 October 2026). The generic session sets it for version 5 only (S4b MonkeyCd); the version 4 games are left as they were.
+    /// </summary>
+    public const string TalkStringY = "var[0x036]";
+    /// <summary>
+    /// Version 5 (vars.cpp <c>setupScummVars</c>, <c>_game.version &gt;= 5</c>, read 17 October 2026): <c>VAR_SOUNDRESULT</c> (56), <c>VAR_TALKSTOP_KEY</c> (57),
+    /// <c>VAR_FADE_DELAY</c> (59, 3 at start), <c>VAR_NOSUBTITLES</c> (60), <c>VAR_SOUNDPARAM</c>..<c>VAR_SOUNDPARAM3</c> (64 to 66), <c>VAR_INPUTMODE</c> (67: 1 keyboard,
+    /// 2 joystick, 3 mouse; 3 at start), <c>VAR_MEMORY_PERFORMANCE</c> (68), <c>VAR_VIDEO_PERFORMANCE</c> (69), <c>VAR_ROOM_FLAG</c> (70), <c>VAR_GAME_LOADED</c> (71),
+    /// <c>VAR_NEW_ROOM</c> (72).
+    /// </summary>
+    public const string SoundResult = "var[0x038]";
+    public const string TalkStopKey = "var[0x039]";
+    public const string FadeDelay = "var[0x03B]";
+    public const string NoSubtitles = "var[0x03C]";
+    public const string SoundParam = "var[0x040]";
+    public const string SoundParam2 = "var[0x041]";
+    public const string SoundParam3 = "var[0x042]";
+    public const string InputMode = "var[0x043]";
+    public const string MemoryPerformance = "var[0x044]";
+    public const string VideoPerformance = "var[0x045]";
+    public const string RoomFlag = "var[0x046]";
+    public const string GameLoaded = "var[0x047]";
+    public const string NewRoom = "var[0x048]";
     /// <summary><c>VAR_MOUSE_X</c>/<c>VAR_MOUSE_Y</c>: the pointer's screen point (<see cref="MouseX"/> is the virtual one in the room).</summary>
     public const string ScreenMouseX = "var[0x02C]";
     public const string ScreenMouseY = "var[0x02D]";

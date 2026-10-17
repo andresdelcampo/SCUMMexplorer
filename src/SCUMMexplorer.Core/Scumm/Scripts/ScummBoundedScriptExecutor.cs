@@ -1449,7 +1449,21 @@ public sealed class ScummBoundedScriptExecutor
     {
         inventoryStart = null;
         problem = "";
-        if (!TryReadValue(instruction.Operands.Trim(), variables, out var obj, out var detail))
+        // o5_pickupObject (version 5, script_v5.cpp read 17 October 2026): "object, room"; room 0 is the current room. It neither checks the room nor
+        // the owner: addObjectToInventory, putOwner(VAR_EGO), class kObjectClassUntouchable (32, not translated without the small header), state 1.
+        var v5Parts = instruction.Operands.Split(',', StringSplitOptions.TrimEntries);
+        var v5Form = v5Parts.Length == 2;
+        int? v5Room = null;
+        if (v5Form)
+        {
+            if (!TryReadValue(v5Parts[1], variables, out var rawRoom, out var roomDetail))
+            {
+                problem = $"pickupObject names an unknown room ({roomDetail})";
+                return false;
+            }
+            v5Room = rawRoom == 0 ? runtime.CurrentRoom : (int)rawRoom;
+        }
+        if (!TryReadValue(v5Form ? v5Parts[0] : instruction.Operands.Trim(), variables, out var obj, out var detail))
         {
             problem = $"pickupObject names an unknown object ({detail})";
             return false;
@@ -1464,12 +1478,12 @@ public sealed class ScummBoundedScriptExecutor
             problem = "pickupObject needs VAR_EGO, which is not established";
             return false;
         }
-        if (roomObjects.All(item => item.Id != obj))
+        if (!v5Form && roomObjects.All(item => item.Id != obj))
         {
             trace.Add($"pickupObject {obj}: the room has no such object, so nothing happens");
             return true;
         }
-        if (runtime.ObjectOwners.TryGetValue((int)obj, out var owner) && owner != RoomOwner)
+        if (!v5Form && runtime.ObjectOwners.TryGetValue((int)obj, out var owner) && owner != RoomOwner)
         {
             trace.Add($"pickupObject {obj}: already owned by {owner}, so it is not taken twice");
             return true;
@@ -1479,10 +1493,10 @@ public sealed class ScummBoundedScriptExecutor
             problem = "pickupObject: the inventory is full (80 objects)";
             return false;
         }
-        if (runtime.CurrentRoom is int takenFrom) runtime.InventoryRooms[(int)obj] = takenFrom;
+        if ((v5Form ? v5Room : runtime.CurrentRoom) is int takenFrom) runtime.InventoryRooms[(int)obj] = takenFrom;
         runtime.SetObjectOwner((int)obj, (byte)ego);
         runtime.AddInventoryObject((int)obj);
-        var classes = runtime.ObjectClasses.GetValueOrDefault((int)obj) | (1u << (ScummObjectClasses.Untouchable - 1));
+        var classes = runtime.ObjectClasses.GetValueOrDefault((int)obj) | (1u << ((v5Form ? 32 : ScummObjectClasses.Untouchable) - 1));
         runtime.SetObjectClasses((int)obj, classes);
         runtime.SetObjectState((int)obj, 1);
         runtime.StatesSetInRoom.Add((int)obj);
@@ -2137,7 +2151,7 @@ public sealed class ScummBoundedScriptExecutor
         if (separator < 0 || !instruction.Operands.EndsWith(']') ||
             !TryGetVariableKey(instruction.Operands[..separator], variables, out var destination)) return false;
         string body = instruction.Operands[(separator + 3)..^1];
-        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|getInventoryCount\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
         if (tokens.Count is 0 or > 4096) return false;
         int end = 0;
         foreach (Match token in tokens)
@@ -2185,6 +2199,24 @@ public sealed class ScummBoundedScriptExecutor
                 trace.Add($"{randomDestination} = {pick.Value}: nested seeded pick of 0..{max} (seed {pick.Seed}, draw {pick.Draw})");
                 observe?.Invoke("nested-write", [("destination-after", randomDestination)], null);
                 observe?.Invoke("scratch-read", [("implicit-scratch", ScummVars.Result)], null);
+                if (!TryReadValue(ScummVars.Result, variables, out var scratch, out _))
+                { detail = "nested expression opcode leaves var[0x000] unknown"; return false; }
+                stack.Push((unchecked((short)scratch), IsEstimated(ScummVars.Result, estimated)));
+            }
+            else if (term.StartsWith("getInventoryCount(", StringComparison.Ordinal))
+            {
+                // o5_expression case 6 runs a nested opcode and reads VAR_RESULT; o5_getInventoryCount counts the inventory slots the actor owns
+                // (as the plain instruction above; S4b MonkeyCd: the inventory script, Script 9 +0x0000).
+                var parts = term[18..^1].Split(',', StringSplitOptions.TrimEntries);
+                if (runtime is null || parts.Length != 2 ||
+                    !TryGetVariableKey(parts[0], variables, out var countDestination) ||
+                    !TryReadValue(parts[1], variables, out var actor, out _))
+                { detail = "nested getInventoryCount operands are unknown"; return false; }
+                var count = runtime.InventorySlots.Count(item => item != 0 && runtime.ObjectOwners.TryGetValue(item, out var o) && o == actor);
+                variables[countDestination] = (ushort)count;
+                RefreshBitAliases(countDestination, variables);
+                MarkEstimated(estimated, countDestination, pathEstimated || OperandIsEstimated(parts[1], estimated, variables));
+                trace.Add($"{countDestination} = {count}: nested getInventoryCount {parts[1]}");
                 if (!TryReadValue(ScummVars.Result, variables, out var scratch, out _))
                 { detail = "nested expression opcode leaves var[0x000] unknown"; return false; }
                 stack.Push((unchecked((short)scratch), IsEstimated(ScummVars.Result, estimated)));

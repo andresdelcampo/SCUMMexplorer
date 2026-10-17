@@ -28,7 +28,8 @@ public abstract partial class ScummSession
     /// <summary>The soundcard-independent part of the session's set-up: data, runtime state and the script clock hooks.</summary>
     /// <param name="soundLifetime">Reads how long a native sound resource plays (the game's own sound formats are the caller's knowledge).</param>
     protected ScummSession(GameLibrary game, ScummIndexedObjectSnapshot indexedObjects, int randomSeed,
-        ScummScriptObserver? observer, IScummDataSource? data, Func<GameResource, ScummSoundLifetime> soundLifetime)
+        ScummScriptObserver? observer, IScummDataSource? data, Func<GameResource, ScummSoundLifetime> soundLifetime,
+        Func<int, ScummSoundLifetime?>? soundLifetimeById = null)
     {
         ArgumentNullException.ThrowIfNull(game);
         ArgumentNullException.ThrowIfNull(indexedObjects);
@@ -40,10 +41,11 @@ public abstract partial class ScummSession
         var soundLifetimes = new Dictionary<int, ScummSoundLifetime>();
         _soundClock = new ScummSoundClock(id =>
         {
+            // A sound that is not an indexed resource of its own (a v5 sound that starts a CD track, S4b MonkeyCd) can get its lifetime from the game's session.
             if (!soundLifetimes.TryGetValue(id, out var lifetime))
-                soundLifetimes[id] = lifetime = soundResources.TryGetValue(id, out var resource)
+                soundLifetimes[id] = lifetime = soundLifetimeById?.Invoke(id) ?? (soundResources.TryGetValue(id, out var resource)
                     ? soundLifetime(resource)
-                    : new(ScummSoundLifetimeKind.Unknown, null, false, "no indexed native sound resource");
+                    : new(ScummSoundLifetimeKind.Unknown, null, false, "no indexed native sound resource"));
             return lifetime;
         });
         _data = data ?? ScummDataSources.For(game);
@@ -520,6 +522,9 @@ public abstract partial class ScummSession
     /// </summary>
     protected virtual void BeforeSoundStarts(ScummScriptEvent start, int soundId) { }
 
+    /// <summary>A script stopped one sound (<paramref name="soundId"/>) or every sound (null); the game's session may follow what the engine stops with it.</summary>
+    protected virtual void AfterScriptStopsSound(int? soundId) { }
+
     /// <summary>
     /// Stops sounds as the engine itself does (not a script instruction): the stop is put on <see cref="SoundEvents"/> just before the start that caused it,
     /// so a player that follows the list stops the old sounds before it starts the new one. <paramref name="soundIds"/> null stops every sound.
@@ -624,11 +629,13 @@ public abstract partial class ScummSession
             case ScummScriptEventKind.MusicStopped:
                 _runtime.ActiveSounds.Clear();
                 _soundClock.StopAll();
+                AfterScriptStopsSound(null);
                 return "";
             case ScummScriptEventKind.SoundStopped:
                 if (scriptEvent.TargetId is not int stoppedId) return "stopped sound target depends on an unknown variable";
                 _runtime.ActiveSounds.Remove(stoppedId);
                 _soundClock.Stop(stoppedId, scriptEvent.Certainty != ScummScriptEventCertainty.Reached);
+                AfterScriptStopsSound(stoppedId);
                 return "";
             case ScummScriptEventKind.RoomLoaded when !IsExecutedRoomLoad(scriptEvent):
                 return "room load was not executed; a discovered possibility cannot change the session room";
