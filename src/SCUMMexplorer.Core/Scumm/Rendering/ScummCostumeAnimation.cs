@@ -69,6 +69,8 @@ public sealed class ScummCostume
     private readonly int _frameOffsetsStart = FrameOffsetsStart;
     private readonly int _animationOffsetsStart = AnimationOffsetsStart;
     private readonly byte[]? _colorTable;
+    // A cel's run byte: colour index in the high bits, run length in the low ones (4 and 4 for 16 colours, 3 and 5 for 32).
+    private readonly int _colourShift = 4;
 
     public int Id { get; }
     /// <summary>The highest animation index (ScummVM <c>_numAnim</c>).</summary>
@@ -101,15 +103,24 @@ public sealed class ScummCostume
         _resource = new byte[VgaHeader + body.Length];
         body.CopyTo(_resource, VgaHeader);
         Id = id;
-        _frameOffsetsStart = VgaHeader + 20;
-        _animationOffsetsStart = VgaHeader + 52;
-        if (body.Length < 52 + 2) throw new InvalidDataException("The costume is too short.");
+        if (body.Length < 2) throw new InvalidDataException("The costume is too short.");
         AnimationLimit = body[0];
         var format = body[1] & 0x7F;
-        if (format != 0x58) throw new NotSupportedException($"Costume format 0x{format:X2} is not the 16-colour format 0x58.");
+        // ScummVM ClassicCostumeLoader::loadCostume (costume.cpp): format 0x58 has 16 colours, 0x59 has 32 (S5 MonkeyCd, 17 October 2026: Room 28's
+        // pirates); the tables after the colour table move by its size, and a 32-colour cel's run byte is 3 bits of colour index and 5 of length.
+        var colours = format switch
+        {
+            0x58 => 16,
+            0x59 => 32,
+            _ => throw new NotSupportedException($"Costume format 0x{format:X2} is neither the 16-colour format 0x58 nor the 32-colour 0x59.")
+        };
+        _colourShift = colours == 32 ? 3 : 4;
+        _frameOffsetsStart = VgaHeader + 4 + colours;
+        _animationOffsetsStart = VgaHeader + 36 + colours;
+        if (body.Length < 36 + colours + 2) throw new InvalidDataException("The costume is too short.");
         Mirror = (body[1] & 0x80) != 0;
-        _colorTable = body.AsSpan(2, 16).ToArray();
-        AnimationCommandsOffset = ReadWord(VgaHeader + 18);
+        _colorTable = body.AsSpan(2, colours).ToArray();
+        AnimationCommandsOffset = ReadWord(VgaHeader + 2 + colours);
         if (AnimationCommandsOffset >= _resource.Length || _animationOffsetsStart + (AnimationLimit + 1) * 2 > _resource.Length)
             throw new InvalidDataException("The costume tables are outside the resource.");
     }
@@ -305,7 +316,7 @@ public sealed class ScummCostume
     /// the lights on): entry c of the actor's palette, except the costume's palette colour, which draws entry 0.
     /// </summary>
     public byte MapColor(byte color, IReadOnlyList<byte>? actorPalette) =>
-        _colorTable is not null ? _colorTable[color & 15] :
+        _colorTable is not null ? _colorTable[color % _colorTable.Length] :
         actorPalette is null
             ? color == PaletteColor ? (byte)0 : color
             : color == PaletteColor ? actorPalette[0] : actorPalette[color & 15];
@@ -392,8 +403,8 @@ public sealed class ScummCostume
         {
             if (source >= _resource.Length) return null;
             var run = _resource[source++];
-            var color = (byte)(run >> 4);
-            var length = run & 0x0F;
+            var color = (byte)(run >> _colourShift);
+            var length = run & ((1 << _colourShift) - 1);
             if (length == 0)
             {
                 if (source >= _resource.Length) return null;

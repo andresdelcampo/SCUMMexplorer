@@ -165,7 +165,9 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             // R-6.12a: every game the generic session boots shows its rooms' first visit. The session reads the version 3 scripts of Indiana Jones (old-bundle
             // LFL files, and the 256-colour room files since S4b Indy3Vga) and the v4 scripts of a game on several disks; LOOM (EGA and CD) has its own session.
             HasFirstVisitScenes = game.Id is not (GameId.Loom or GameId.LoomVga)
-                && (dialect == ScummScriptDialect.V3Indy3 && (game.Version == ScummVersion.V3 || roomFileGame) || dialect == ScummScriptDialect.V4 && game.V4Archive is null && game.V4Disks is not null),
+                && (dialect == ScummScriptDialect.V3Indy3 && (game.Version == ScummVersion.V3 || roomFileGame) || dialect == ScummScriptDialect.V4 && game.V4Archive is null && game.V4Disks is not null
+                    // S5 MonkeyCd (17 October 2026): the v5 format, for the one v5 family whose boot the session follows (S4b); Monkey Island 2 and Indy 4 have no S4b yet.
+                    || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.MonkeyCd),
             ExtraTimerVariables = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
             BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
