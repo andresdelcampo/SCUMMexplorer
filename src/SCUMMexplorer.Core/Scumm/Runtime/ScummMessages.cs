@@ -352,6 +352,8 @@ public sealed class ScummMessageTable
         TalkDelay = 0;
         HaveMsg = 0xFF;
         runtime.SetGlobalVariable(HaveMsgVariable, 0xFF);
+        // actor.cpp actorTalk resets v1/v2 CHARCOUNT once per new message, not at its FF03 chunk boundaries.
+        if (runtime.IsV2) runtime.SetGlobalVariable(ScummVars.V2.CharCount, 0);
         DisplayDialog(runtime);
         return Talk is null
             ? $"print for actor {actor}: no text shown"
