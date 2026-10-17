@@ -184,16 +184,6 @@ public sealed partial class ScummBoundedScriptExecutor
 
             var instruction = instructions[instructionIndex];
             var next = instruction.Offset + EncodedLength(instruction.Bytes);
-            if (runtime is { IsV2: true })
-            {
-                if (!PrepareV2Instruction(instruction, knownVariables, states, runtime, roomObjects, trace,
-                    out instruction, out var handled, out var branch, out var problem))
-                {
-                    unresolved = $"{problem} at +0x{pc:X4}";
-                    break;
-                }
-                if (handled) { pc = branch ?? next; continue; }
-            }
             var instructionSequence = observation?.Observer.Observe(observation.Slot, observation.ParentSlot, observationRun, script,
                 "instruction", instruction.Offset, instruction.Operation, instruction.Operands,
                 knownVariables, estimated, onEstimatedPath,
@@ -205,6 +195,27 @@ public sealed partial class ScummBoundedScriptExecutor
                     observationRun, CallSite("instruction", instruction.Offset, instruction.Operation, instruction.Operands),
                     [], onEstimatedPath, instructionSequence);
                 dispatched = null;
+            }
+
+            if (runtime is { IsV2: true })
+            {
+                // Normalization can resolve operands into literals. Retain their uncertainty before doing so;
+                // conservatively keep the remainder of this bounded run conditional after any estimated read.
+                if (instruction.Operands.Split(',', StringSplitOptions.TrimEntries)
+                    .Any(operand => OperandIsEstimated(operand, estimated, knownVariables))) onEstimatedPath = true;
+                var before = new Dictionary<string, ushort>(knownVariables);
+                if (!PrepareV2Instruction(instruction, knownVariables, states, runtime, roomObjects, trace,
+                    out instruction, out var handled, out var branch, out var problem))
+                {
+                    unresolved = $"{problem} at +0x{pc:X4}";
+                    break;
+                }
+                foreach (var value in knownVariables.Where(pair => !before.TryGetValue(pair.Key, out var old) || old != pair.Value))
+                {
+                    MarkEstimated(estimated, value.Key, onEstimatedPath);
+                    runtime.NotifyGlobalMutation(value.Key);
+                }
+                if (handled) { pc = branch ?? next; continue; }
             }
 
             if (instruction.Operation == "stopObjectCode")

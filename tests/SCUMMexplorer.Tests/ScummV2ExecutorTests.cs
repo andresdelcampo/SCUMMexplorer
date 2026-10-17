@@ -5,6 +5,29 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2ExecutorTests
 {
     [Fact]
+    public void RangeOperandsKeepTheirByteValues()
+    {
+        var run = Run(Runtime(), ("setVarRange", "var[0x0EA], [0x00, 0x01]"));
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(0, run.KnownVariables["var[0x0EA]"]);
+        Assert.Equal(1, run.KnownVariables["var[0x0EB]"]);
+    }
+
+    [Theory]
+    [InlineData(250, "v2StartObject", 253, 1, 1)]
+    [InlineData(253, "v2StartObject", 253, 0, 1)]
+    [InlineData(254, "v2StopObject", 254, 0, 0)]
+    [InlineData(13, "v2StartObject", 13, 0, 0)]
+    public void ImmediateSentencePreservesSpecialDispatchFlags(int verb, string operation, int effectiveVerb, int background, int special)
+    {
+        var runtime = Runtime();
+        var run = Run(runtime, ("doSentence", $"0x{verb:X2}, 0x002A, 0x0000, sub=0x01"));
+        var call = Assert.Single(run.Events, e => e.Kind == ScummScriptEventKind.ObjectScriptStarted);
+        Assert.Equal(operation, call.Operation);
+        Assert.Equal(new int?[] { 42, effectiveVerb, background, special }, call.ResolvedArguments);
+    }
+
+    [Fact]
     public void UnsignedComparisonDoesNotTakeTheV3SignedPath()
     {
         var runtime = Runtime();

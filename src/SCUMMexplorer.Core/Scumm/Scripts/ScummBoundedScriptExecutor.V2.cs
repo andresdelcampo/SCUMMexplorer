@@ -134,6 +134,8 @@ public sealed partial class ScummBoundedScriptExecutor
                     !int.TryParse(p[2].AsSpan(6), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var sub)) return false;
                 if (actor == 0 && sub == 5) { runtime.V2DefaultTalkColor = argument; handled = true; return true; }
                 var operation = sub switch { 1 => $"sound, {argument}", 4 => $"costume, {argument}", 5 => $"talkColor, {argument}", _ => null };
+                if (sub == 2 && runtime.EngineVersion == SCUMMexplorer.Core.Domain.ScummVersion.V1)
+                    operation = $"palette, {actor}, {argument}";
                 if (sub == 2 && p.Length > 3 && p[3].StartsWith("palette=0x") && int.TryParse(p[3].AsSpan(10), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var color))
                     operation = $"palette, {color}, {argument}";
                 if (sub == 3)
