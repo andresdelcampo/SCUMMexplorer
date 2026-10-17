@@ -5,6 +5,22 @@ namespace SCUMMexplorer.Tests;
 
 public sealed class ScummV1DataSourceTests
 {
+    [Fact]
+    public void ClassicIntroRoom49RetainsItsUnsignedByteWidth()
+    {
+        var folder = Path.Combine(TestGames.Root, "mmansion ega en");
+        if (!Directory.Exists(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var room = Assert.Single(game.Rooms, room => room.ResourceId == 49);
+        var image = new ScummV1RoomDecoder(ScummV1Game.ManiacMansion).Decode(File.ReadAllBytes(room.FilePath));
+        Assert.Equal(1600, image.Width);
+        Assert.Equal(136, image.Height);
+        Assert.Equal(217600, image.Pixels.Length);
+        var data = new ScummV1DataSource(game);
+        Assert.Equal(1600, data.ReadRoom(49).Width);
+        Assert.NotNull(data.RoomEntryScript(49));
+    }
+
     [Theory]
     [InlineData("mmansion ega en", 200, 800, ScummV1Game.ManiacMansion)]
     [InlineData("zak ega en", 155, 775, ScummV1Game.ZakMcKracken)]

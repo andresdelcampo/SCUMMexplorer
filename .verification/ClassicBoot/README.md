@@ -1,5 +1,17 @@
 # Classic bounded boot diagnostics — 17 October 2026
 
+## Final ManiacClassic S4b endpoint
+
+After b1999c4 and the v1 room-width correction, genuine assumed clicks `(76,104)`, `(196,104)`, `(292,60)` select Syd/Bernard/Start through Script4, fixed sentence Script2 and object verbs260/263/403. Each click is followed by100frames, then bounded frame advances until control. The route reaches rooms45,0,0,33,49,0,44; after1567post-boot frames Room44 has player control, no active cutscene, and named enabled verbs. Another120frames preserve room/control/cutscene state. No direct story-variable writes or synthetic room data were used. `ScummManiacClassicSessionTests` verifies this route and selected party variables48=1,49=5.
+
+Room49 was previously omitted because the v1 decoder capped width at160tiles. The fixture stores200tiles (1600pixels) and17tile rows (136pixels). [ScummVM room.cpp653–654](https://github.com/scummvm/scummvm/blob/master/engines/scumm/room.cpp#L653) uses the complete unsigned width byte. The decoder now accepts that byte; with existing24-row limit, its maximum pixel allocation is391680bytes and integer products remain bounded. The actual room decodes217600pixels and its indexed entry script executes; no scanner fallback was added.
+
+Validation:11passed,0failed for `ScummV1DataSourceTests`, `ScummManiacClassicSessionTests`, `ScummClassicCutsceneRestoreTests`. Trace: `maniac-trace.txt`, generated with `.verification/maniac-session-20261017/BootTrace` against `mmansion ega en select`.
+
+S4b is complete for this bounded input route. Remaining explicit limitations: the constructor's5000-frame menu wait is expected pending input; sound54 is not recognized by the current Player_V2 lifetime reader; seeded random paths and movement/camera estimates remain labelled. This does not establish S5/S6/S7/S9, other party choices, or runtime costume-colour comparison. The historical endpoints below are superseded for ManiacClassic; ZakClassic's endpoint awaits a fresh run.
+
+## Historical groundwork endpoint
+
 Foundation: a568445, f9eee73 and 2797a4d (including Zak's MachineSpeed reset), plus ScummV1DataSource and factory dispatch. This record is groundwork only: neither classic S4b stage is complete. No support-registry cells changed; Maniac's accepted costume status and Zak's partial status remain.
 
 Command from `.worktrees/maniac-classic-s4b`:
