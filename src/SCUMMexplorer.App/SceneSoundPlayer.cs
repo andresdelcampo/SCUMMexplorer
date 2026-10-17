@@ -71,6 +71,7 @@ public sealed class SceneSoundPlayer
     private ScummSession? _session;
     // How a sound becomes a wave for a session whose game the built-in renderer does not cover (the browsed sound player's own rendering); null: built-in.
     private Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? _render;
+    private Func<int, bool>? _loopsForever;
     private int _seen;
     private int _frames;
     private bool _paused;
@@ -94,9 +95,12 @@ public sealed class SceneSoundPlayer
 
     /// <summary>Follows <paramref name="session"/> from its next sound event on; a new session stops the old one's sounds.</summary>
     /// <param name="render">Renders a sound with the device's rendition (AdLib already at its output level); null uses the built-in LOOM renderer.</param>
-    public void Attach(GameLibrary game, ScummSession session, Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? render = null)
+    /// <param name="loopsForever">Sounds that start again when they end until a script stops them (a CD track with loop count 0xFF; S6 MonkeyCd); null: none.</param>
+    public void Attach(GameLibrary game, ScummSession session, Func<GameResource, SoundMode, CancellationToken, (byte[] Wave, bool Music)>? render = null,
+        Func<int, bool>? loopsForever = null)
     {
         StopAll("session replaced");
+        _loopsForever = loopsForever;
         if (!ReferenceEquals(game, _game) || !Equals(render, _render))
         {
             _renders.Clear();
@@ -227,7 +231,16 @@ public sealed class SceneSoundPlayer
             if (late > TimeSpan.FromMilliseconds(100)) player.Position = late;
             if (!_paused) player.Play();
         };
-        player.MediaEnded += (_, _) => End(voice);
+        player.MediaEnded += (_, _) =>
+        {
+            if (!voice.Stopped && _loopsForever?.Invoke(id) == true)
+            {
+                player.Position = TimeSpan.Zero;
+                player.Play();
+                return;
+            }
+            End(voice);
+        };
         player.MediaFailed += (_, error) =>
         {
             Log.Add(new(frame, _clock.ElapsedMilliseconds, "failed", id, kind, error.ErrorException.Message));
@@ -240,6 +253,10 @@ public sealed class SceneSoundPlayer
     {
         if (_renders.TryGetValue((mode, id), out var cached)) return cached;
         var resource = _game?.Resources.FirstOrDefault(item => item.Kind == ResourceKind.Sound && item.ResourceId == id);
+        // A sound the game's list does not show (a CD-track sound of Monkey Island CD has no card parts, so only its track is listed) still goes to the session's
+        // own renderer, which knows it by number (S6 MonkeyCd).
+        if (resource is null && _render is not null && _game is { } game)
+            resource = new GameResource($"Sound {id:00}", ResourceKind.Sound, game.FolderPath, id, "A sound the scripts started.", null, null);
         var task = resource is null
             ? Task.FromResult<(string?, bool)>((null, false))
             : Task.Run<(string?, bool)>(() =>

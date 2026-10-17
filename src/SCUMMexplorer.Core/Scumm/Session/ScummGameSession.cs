@@ -38,6 +38,8 @@ public sealed class ScummGameSession : ScummSession
         }
         _runtime.CameraFollowStartsScene = profile.CameraFollowStartsScene;
         _runtime.PublishesCursorVariables = profile.PublishesCursorVariables;
+        _runtime.UntouchableClass = profile.UntouchableClass;
+        _runtime.Verbs.ImagesFromNamedRoom = profile.VerbImagesFromNamedRoom;
         // getActorFromPos, from the actors as the last frame drew them (S6: Indiana Jones's Script 20 finds the person under the pointer with it). An engine
         // query, not a click: since S4b MonkeyCd (17 October 2026) every generic session answers it (Monkey Island CD's interface loop, Script 23, asks it from the boot on).
         _runtime.ActorFromPosition = ActorFromPosition;
@@ -64,9 +66,10 @@ public sealed class ScummGameSession : ScummSession
             indexedObjects = new LflObjectStateReader().ReadSnapshot(Path.Combine(game.FolderPath, "00.LFL"));
             return new ScummGameSession(game, indexedObjects);
         }
-        var index = game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault()
-            ?? throw new InvalidDataException("The game has no v4 index to read its objects from.");
-        indexedObjects = index.ReadIndexedObjects();
+        // S6 MonkeyCd (17 October 2026): a v5 game reads its starting objects from its own index (MONKEY.000's DOBJ), as its first visit does.
+        indexedObjects = (game.V4Archive as ScummV4Archive ?? game.V4Disks?.Disks.OfType<ScummV4Archive>().FirstOrDefault())?.ReadIndexedObjects()
+            ?? game.V4Disks?.Disks.OfType<ScummV5Archive>().FirstOrDefault()?.ReadIndexedObjects()
+            ?? throw new InvalidDataException("The game has no v4 or v5 index to read its objects from.");
         return new ScummGameSession(game, indexedObjects, 0, null, ScummDataSources.For(game));
     }
 
@@ -290,7 +293,7 @@ public sealed class ScummGameSession : ScummSession
         foreach (var actor in layer.Actors.OrderBy(item => item.Number))
         {
             if (actor.Bounds is not { } bounds || actor.Pixels == 0) continue;
-            if (_runtime.ObjectClasses.TryGetValue(actor.Number, out var bits) && ScummObjectClasses.Has(bits, ScummObjectClasses.Untouchable)) continue;
+            if (_runtime.ObjectClasses.TryGetValue(actor.Number, out var bits) && ScummObjectClasses.Has(bits, _runtime.UntouchableClass)) continue;
             if (x / 8 >= bounds.Left / 8 && x / 8 <= (bounds.Right - 1) / 8 && y >= bounds.Top && y <= bounds.Bottom) return actor.Number;
         }
         return 0;

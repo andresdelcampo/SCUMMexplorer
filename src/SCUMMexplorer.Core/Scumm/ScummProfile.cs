@@ -111,6 +111,19 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
     /// <summary><c>cursorCommand</c> copies the cursor state and user input into <c>VAR_CURSORSTATE</c>/<c>VAR_USERPUT</c> (from version 4, <c>o5_cursorCommand</c>).</summary>
     public bool PublishesCursorVariables => EngineVersion >= ScummVersion.V4;
 
+    /// <summary>
+    /// The class number of <c>kObjectClassUntouchable</c> as the game's data stores it (object.cpp <c>getClass</c>/<c>putClass</c>, ScummVM master read 17 October 2026):
+    /// the small-header games (up to version 4) map it to 24; from version 5 it is 32 itself. <c>findObject</c> skips an object with it.
+    /// </summary>
+    public int UntouchableClass => Version >= ScummVersion.V5 ? 32 : ScummObjectClasses.Untouchable;
+
+    /// <summary>
+    /// <c>setVerbObject</c> (verbs.cpp, ScummVM master read 17 October 2026) reads an image verb's picture from the room the script names (<c>findObjectInRoom</c>)
+    /// in the games without the small header (version 5); the small-header and old-bundle games take it only from a local object of the current room.
+    /// Monkey Island CD's inventory script (Script 9) assigns the icons of Room 99 that way.
+    /// </summary>
+    public bool VerbImagesFromNamedRoom => Version >= ScummVersion.V5;
+
     /// <summary>The variable holding the engine's save/load menu key (<c>VAR_MAINMENU_KEY</c>, from version 4); the engine opens its menu and the scripts never see the key.</summary>
     public string? MainMenuKeyVariable => EngineVersion >= ScummVersion.V4 ? ScummVars.MainMenuKey : null;
     /// <summary>
@@ -177,7 +190,8 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
             GameVariablesAtStart = GameSupport.FamilyOf(game) == GameFamily.MonkeyCd ? [("var[0x04A]", 1225)] : [],
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
             // 256-colour release has the same sentence, inventory and key scripts (Script 4 differs by one branch), so the dialect decides, not the family. S6 MonkeyFloppy (16 October 2026): Monkey Island floppy.
-            PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy,
+            // S6 MonkeyCd (17 October 2026): the CD release plays through the same kind of interface (Script 4 input, Script 2 sentences) on version 5.
+            PlaysThroughVerbs = PlaysIndy3Interface(game, dialect, roomFileGame) || GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd,
             UndeliveredKeys = PlaysIndy3Interface(game, dialect, roomFileGame) ? [0x13F] : [],
             // scumm.cpp setupMusic: DOS + AdLib + (LOOM or Indy3) → Player_AD; the other DOS games of version 3 and later → iMuse (Monkey's workaround in triggerSound).
             MusicStart = game.Id is GameId.Loom or GameId.LoomVga || GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? ScummMusicStart.StopsPreviousMusic

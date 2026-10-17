@@ -149,6 +149,23 @@ public sealed class DiscImage
         return Wave(pcm);
     }
 
+    /// <summary>
+    /// CD audio as a WAV file's bytes: <paramref name="frames"/> sectors from <paramref name="startSector"/> counted from the image's start (as <see cref="DiscAudioTrack.StartSector"/>),
+    /// cut short at the end of the image; empty when the image has no raw audio sectors there.
+    /// </summary>
+    public byte[] ReadSectorsWave(int startSector, int frames)
+    {
+        if (_sectorSize != AudioSectorBytes || startSector < 0 || frames <= 0) return [];
+        using var stream = new FileStream(BinPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var offset = (long)startSector * AudioSectorBytes;
+        if (offset >= stream.Length) return [];
+        var count = (int)Math.Min(frames, (stream.Length - offset) / AudioSectorBytes);
+        var pcm = new byte[count * AudioSectorBytes];
+        stream.Seek(offset, SeekOrigin.Begin);
+        stream.ReadExactly(pcm);
+        return Wave(pcm);
+    }
+
     /// <summary>The same audio as a WAV file's bytes (see <see cref="ReadAudio"/>), or empty.</summary>
     public byte[] ReadAudioWave(int startFrame, int frames)
     {

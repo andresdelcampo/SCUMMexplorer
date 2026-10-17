@@ -163,7 +163,7 @@ public abstract partial class ScummSession
         _picks.ToArray(),
         _runtime.EstimatedStates.Order().ToArray(),
         new Dictionary<int, uint>(_runtime.ObjectClasses),
-        _runtime.Messages.OnScreen);
+        _runtime.Messages.OnScreen) { UntouchableClass = _runtime.UntouchableClass };
 
     /// <summary>The scripts waiting for a later frame, as "label +offset" (evidence for what a stopped run is waiting on).</summary>
     public IReadOnlyList<string> PendingScriptSummary => _pending

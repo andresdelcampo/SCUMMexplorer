@@ -919,6 +919,26 @@ public sealed class ScummBoundedScriptExecutor
                     pc = next;
                     continue;
                 }
+                if (command == "charsetColors")
+                {
+                    // o5_cursorCommand case 14 (script_v5.cpp, master read 17 October 2026): the list's values become entries 0, 1, 2… of the current charset's
+                    // colour map (_charsetColorMap and _charsetData[_string[1]._default.charset]); a value that cannot be read leaves its entry alone.
+                    var open = instruction.Operands.IndexOf('[');
+                    var close = instruction.Operands.LastIndexOf(']');
+                    var colours = new Dictionary<int, byte>();
+                    if (open >= 0 && close > open)
+                    {
+                        var items = instruction.Operands[(open + 1)..close].Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                        for (var i = 0; i < items.Length && i < 16; i++)
+                            if (TryReadValue(items[i], knownVariables, out var colour, out _)) colours[i] = (byte)colour;
+                    }
+                    var target = runtime.Charset ?? 0;
+                    if (!runtime.CharsetColors.TryGetValue(target, out var map)) runtime.CharsetColors[target] = map = [];
+                    foreach (var (entry, colour) in colours) map[entry] = colour;
+                    trace.Add($"charset {target} colours {string.Join(", ", colours.Select(pair => $"{pair.Key}={pair.Value}"))} (charsetColors at +0x{instruction.Offset:X4})");
+                    pc = next;
+                    continue;
+                }
                 // o5_cursorCommand cases 1 to 4: _cursor.state = 1 / 0, or one more / one less (the cursor shows while it is above 0).
                 runtime.CursorState = command switch
                 {
@@ -1458,7 +1478,7 @@ public sealed class ScummBoundedScriptExecutor
     /// </summary>
     private static (int Found, string? Unknown) FindObjectAt(IReadOnlyList<ScummRoomObjectRecord> roomObjects,
         IReadOnlyDictionary<int, byte> states, ScummScriptRuntimeState runtime, int x, int y)
-        => ScummObjectHitTest.Find(roomObjects, states, runtime.ObjectPositions, runtime.ObjectClasses, x, y);
+        => ScummObjectHitTest.Find(roomObjects, states, runtime.ObjectPositions, runtime.ObjectClasses, x, y, runtime.UntouchableClass);
 
     /// <summary>
     /// ScummVM <c>ScummEngine_v4::o4_pickupObject</c> (script_v4.cpp, which v3 shares): an object the room does not have, or one already held
