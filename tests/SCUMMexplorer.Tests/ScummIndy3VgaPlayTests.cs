@@ -39,6 +39,20 @@ public sealed class ScummIndy3VgaPlayTests(ITestOutputHelper output)
         Assert.All(session.DeliveredInput.Where(input => input.Area != ScummSession.KeyClickArea), input => Assert.Equal(0, input.Mode));
     }
 
+    /// <summary>
+    /// S9 (17 October 2026): the Spanish 256-colour copy (<c>Games/indy3 vga es</c>), a translation of its own (Walk to is "Ir a"), plays the same route
+    /// through the same ids with its own texts. Skips when the folder is absent.
+    /// </summary>
+    [Fact]
+    public void TheAcceptanceRouteRunsInTheSpanishCopy()
+    {
+        var folder = Path.Combine(TestGames.Root, "indy3 vga es");
+        if (!File.Exists(Path.Combine(folder, "00.LFL")) || !File.Exists(Path.Combine(folder, "73.LFL"))) return;
+        var session = ScummIndy3VgaSessionTests.Boot(folder, out var game);
+        Assert.NotNull(session.PlayCharset(0));
+        ScummIndy3PlayTests.RunAcceptanceRoute(game, session, output, ScummIndy3PlayTests.RouteTexts.SpanishVga);
+    }
+
     [Fact]
     public void TheGameScreenUsesTheRoomPaletteForVerbsMessagesAndTheCrosshair()
     {

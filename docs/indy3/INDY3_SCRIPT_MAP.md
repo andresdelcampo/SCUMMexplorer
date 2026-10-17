@@ -6,6 +6,15 @@ This map records **Indy3-specific** script roles, variable meanings, verb ids an
 
 All rows come from the EGA English edition (`Games/indy3 ega en`, DOS floppy, old-v3 LFL files, dialect `V3Indy3`), read on 14 October 2026 (S4b). Numbers are not transferred to other editions (R-14.2). The index declares 139 global scripts (`00.LFL`); local scripts of a room are numbered from 200.
 
+Spanish copies (S9, 17 October 2026, record `.verification/indy3-editions-20261017`): the rows hold for `Games/indy3 ega es` and `Games/indy3 vga es` (same script, object and verb numbers) except where the table says.
+
+| Item | Meaning | Evidence | Source | Date |
+|---|---|---|---|---|
+| Texts (both Spanish copies) | CP437 bytes: EGA Spanish writes 0xA4/0xA5 (ñ Ñ), 0xA8 (¿), 0xAD (¡) and no accented vowels; 256-colour Spanish writes 0xA0 (á), ñ as 0x7E and also 0xA8/0xAD | decoded | string literals of every script and object name; `ScummIndy3PlayTests.EveryTextByteAboveAsciiHasAGlyphInTheCopysCharset` | 2026-10-17 |
+| Charsets `98.LFL`/`99.LFL` | 226 glyphs in every copy; EGA Spanish adds glyphs at 0xA4, 0xA5, 0xA8, 0xAD; 256-colour Spanish only redraws 0x7E as ñ and has no glyph (width 0) at 0xA8/0xAD | decoded | width tables and glyph bytes compared with English | 2026-10-17 |
+| Verb names (Script 96) | same verbs, keys' positions and layout; names translated, and the two Spanish copies differ (Walk to: "Andar hacia" EGA, "Ir a" 256 colours) | decoded | Script 96 verbOps; booted session | 2026-10-17 |
+| Room 73 local script 205 | the chain's startSound 0x0D is at +0x005C in EGA Spanish (+0x0058 English): offsets after a text follow its length (also Script 1's loadRooms) | decoded | Room 73 local script 205; boot trace | 2026-10-17 |
+
 ## Row format (every table below)
 
 Each row: **item** | **meaning** | **evidence** (`decoded` / `engine` / `reading` / `play`, R-2.3) | **source** (`Script NN +0xOFFS`, `Room NN local script NN`, `Room NN object NN verb 0xHH`) | **date**. A row without a source is not allowed. Unnamed things keep their raw form. `decoded` here means read from the disassembly and confirmed by a headless run of the generic session; nothing here is `play`.

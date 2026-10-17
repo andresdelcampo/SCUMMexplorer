@@ -1,0 +1,12 @@
+Play started: room 73; verbs: Abrir | Cerrar | Dar | Encender | Apagar | Empujar | Tirar | Usar | Mirar | Andar hacia | Coger | Que es
+click on the open door (Walk to): click in the room at screen (56, 76), room (56, 60)
+left Room 73: True
+Talk on in Room 1: True
+click on Talk: click on verb 0x0D at screen (258, 154)
+click on Marcus: click in the room at screen (60, 102), room (700, 86)
+second click on Marcus: click in the room at screen (60, 102), room (700, 86)
+choices offered: True
+verb 0x78: "No seas bobo, Marcus, se lo tenia merecido." bytes []
+verb 0x79: "Pero Marcus,  ¿ has perdido tu sentido del humor ?" bytes [A8]
+verb 0x7A: "¿ Que significa: considerando su situacion ?" bytes [A8]
+frames played by the window: 280

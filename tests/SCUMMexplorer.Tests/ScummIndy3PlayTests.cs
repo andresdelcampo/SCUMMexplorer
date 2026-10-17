@@ -85,10 +85,12 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
     /// The R-7.18 route from Room 73, shared by the releases whose Room 73, Room 1 and interface scripts agree (EGA; the 256-colour release, S6 Indy3Vga,
     /// whose objects, positions and Scripts 2, 12, 16, 18, 20, 23, 24, 27, 29, 96 and 113 are the same instructions).
     /// </summary>
-    internal static void RunAcceptanceRoute(GameLibrary game, ScummGameSession bootedSession, ITestOutputHelper output)
+    internal static void RunAcceptanceRoute(GameLibrary game, ScummGameSession bootedSession, ITestOutputHelper output, RouteTexts? texts = null)
     {
+        texts ??= RouteTexts.English;
         var play = new Player(bootedSession, output);
         var session = play.Session;
+        output.WriteLine("verbs: " + string.Join(" | ", session.Verbs.Select(v => $"0x{v.VerbId:X2} {play.Glyphs(v.VerbId)}")));
         Assert.True(ScummProfile.For(game).PlaysThroughVerbs);
         play.Run(2);
         play.Log("after the boot");
@@ -100,21 +102,21 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         var area = session.PlayVerbArea();
         Assert.Equal(12, area.Items.Count(item => item.IsText && item.Mode == 1 && item.VerbId is >= 0x01 and <= 0x0C));
         Assert.Contains(area.Items, item => item.VerbId == 0x0D && item.Mode == 2);
-        Assert.Equal("Walk to", play.Sentence);
+        Assert.Equal(texts.WalkTo, play.Sentence);
         Assert.Equal(4, play.Var(ScummVars.VerbScript));
 
         // (1) and (3): "Pick up" (verb 0x0B), then the mallet (object 836): Script 4 +0x0114 sets var[0x03B], Script 20 finds the object under the
         // pointer, Script 16 names the sentence line "Pick up mallet"; the second click on the same object runs it (+0x01B9, doSentence +0x025D).
         play.ClickVerb(0x0B);
-        Assert.Equal("Pick up", play.Sentence);
+        Assert.Equal(texts.PickUp, play.Sentence);
         play.ClickRoom(176, 112);
-        Assert.Equal("Pick up mallet", play.Sentence);
+        Assert.Equal($"{texts.PickUp} {texts.Mallet}", play.Sentence);
         play.ClickRoom(176, 112);
         Assert.Contains(session.SessionTrace, line => line.StartsWith("sentence script 2 runs verb 0x0B with objects 836", StringComparison.Ordinal));
         Assert.True(play.RunUntil(() => session.Snapshot.Inventory.Contains(836)), "the mallet reaches the inventory (Room 73 object 836 verb 0x0B: pickupObject)");
         play.Run(5);
         // Script 12 (the inventory script, runInventoryScript after pickupObject) names verb 0x65 with code 6 of var[0x053+1].
-        Assert.Equal("mallet", play.Glyphs(0x65));
+        Assert.Equal(texts.Mallet, play.Glyphs(0x65));
         play.Log("mallet taken");
 
         // (5) A cutscene skipped from its override point. The light switch (object 837) is a child of the door (object 830, parent state 0): the game's
@@ -173,7 +175,7 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         Assert.Contains(session.SessionTrace, line => line == "sentence script 2 runs verb 0x0D with objects 0 and 4");
         Assert.Equal(18, play.Var(ScummVars.VerbScript));
         play.Log("dialogue choices");
-        Assert.Equal("Don't be a twit, Marcus.  He had it coming to him.", play.Glyphs(0x78));
+        Assert.Equal(texts.FirstChoice, play.Glyphs(0x78));
         play.ClickVerb(0x79);
         // Script 18 prints choices 120 to 122 as the ego's line (+0x0068), waits 120 jiffies and puts the choice in var[0x072] (+0x0077); Script 29 waits on it (+0x025E) and its branch for 0x79 answers with Marcus's line (actor 4).
         var said = play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Actor == 1 && message.Text.Length > 0), 300);
@@ -184,7 +186,7 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         Assert.True(play.RunUntil(() => session.Messages.OnScreen.Any(message => message.Actor == 4 && message.Text.Length > 0), 900), "Marcus answers");
         play.Log("Marcus answers");
         Assert.Equal(0, session.DeliveredInput.Count(input => input.Area == ScummSession.KeyClickArea));
-        AssertRouteSounds(session, output);
+        AssertRouteSounds(game, session, output);
     }
 
     /// <summary>
@@ -192,7 +194,7 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
     /// in the EGA and 256-colour releases). The boot's opening music is awaited through the music timer (Script 1 waits for 0x69): the boot reaching
     /// Room 73 shows the wait did not stall.
     /// </summary>
-    private static void AssertRouteSounds(ScummSession session, ITestOutputHelper output)
+    private static void AssertRouteSounds(GameLibrary game, ScummSession session, ITestOutputHelper output)
     {
         var events = session.SoundEvents;
         foreach (var item in events)
@@ -209,12 +211,90 @@ public sealed class ScummIndy3PlayTests(ITestOutputHelper output)
         Assert.True(Started(3, "Script 27", 0x002B));
         Assert.True(Started(13, "Room 73 Object 837 Verb 0x06", 0x0002));
         Assert.Equal(2, events.Count(item => item.Event.TargetId == 13 && item.Event.SourceLabel == "Room 73 Object 837 Verb 0x06" && item.Event.Executed));
-        Assert.True(Started(13, "Room 73 local script 205", 0x0058));
+        // The chain's sound follows its line, so its offset is the edition's own (+0x0058 in English, +0x005C in Spanish EGA): read from the script.
+        var chain = ScummDataSources.For(game).RoomLocalScript(73, 205)!.Instructions.First(instruction => instruction.Operation.Contains("startSound", StringComparison.OrdinalIgnoreCase));
+        output.WriteLine($"chain sound: {chain.Operation} {chain.Operands} +0x{chain.Offset:X4}");
+        Assert.True(Started(13, "Room 73 local script 205", chain.Offset));
         Assert.True(Started(2, "Script 26", 0x002B));
         // Effects end on their AdLib clock: none of the route's effects is still playing once the dialogue is reached.
         Assert.DoesNotContain(session.Snapshot.ActiveSounds, id => id is 2 or 3 or 13);
     }
 
+    /// <summary>
+    /// The texts the route reads on the screen, which are the edition's own (S9, 17 October 2026): object ids, verb ids, positions and the branches the
+    /// route takes are the same instructions in the English and Spanish copies (record <c>.verification/indy3-editions-20261017</c>); only the strings differ.
+    /// </summary>
+    internal sealed record RouteTexts(string WalkTo, string PickUp, string Mallet, string FirstChoice)
+    {
+        public static readonly RouteTexts English = new("Walk to", "Pick up", "mallet", "Don't be a twit, Marcus.  He had it coming to him.");
+        public static readonly RouteTexts SpanishEga = new("Andar hacia", "Coger", "mazo", "No seas bobo, Marcus, se lo tenia merecido.");
+        public static readonly RouteTexts SpanishVga = new("Ir a", "Coger", "mazo", "No seas bobo, Marcus. Se lo tenia merecido       .");
+    }
+
+    /// <summary>The Spanish EGA copy (<c>Games/indy3 ega es</c>, S9): the same route through the same ids, with the copy's own texts. Skips when absent.</summary>
+    [Fact]
+    public void TheAcceptanceRouteRunsInTheSpanishEgaCopy()
+    {
+        var folder = Path.Combine(TestGames.Root, "indy3 ega es");
+        if (!File.Exists(Path.Combine(folder, "00.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        RunAcceptanceRoute(game, new ScummGameSession(game, new LflObjectStateReader().ReadSnapshot(Path.Combine(folder, "00.LFL"))), output, RouteTexts.SpanishEga);
+    }
+
+    /// <summary>
+    /// S9 accents (17 October 2026): every byte from 0x80 up that a copy's texts hold (string literals of every global, entry, exit, local and object-verb
+    /// script, and the object names; escape codes and their operands skipped) has a glyph in the copy's own charset (<c>99.LFL</c>, 226 glyphs). The
+    /// Spanish EGA copy adds 0xA4/0xA5 (n tilde), 0xA8 and 0xAD (the inverted marks) to the English set; the Spanish 256-colour copy writes a acute (0xA0),
+    /// which every copy's charset has, writes n tilde as 0x7E (its charset redraws that glyph), and its 0xA8/0xAD have no glyph. The play screen draws glyph codes as the data holds them, so no table.
+    /// </summary>
+    [Theory]
+    [InlineData("indy3 ega en", "")]
+    [InlineData("indy3 ega es", "")]
+    [InlineData("indy3 vga en", "")]
+    [InlineData("indy3 vga es", "A8 AD")]
+    public void EveryTextByteAboveAsciiHasAGlyphInTheCopysCharset(string folderName, string withoutGlyph)
+    {
+        var folder = Path.Combine(TestGames.Root, folderName);
+        if (!File.Exists(Path.Combine(folder, "99.LFL")) || !File.Exists(Path.Combine(folder, "73.LFL"))) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var data = ScummDataSources.For(game);
+        var charset = ScummV3Charset.TryLoad(folder, 0, out var error) ?? throw new InvalidOperationException(error);
+        var found = new Dictionary<byte, int>();
+        void Text(IReadOnlyList<byte> bytes)
+        {
+            for (var i = 0; i < bytes.Count; i++)
+            {
+                if (bytes[i] == 0) break;
+                if (bytes[i] == 0xFF) { i += i + 1 < bytes.Count && bytes[i + 1] is 1 or 2 or 3 or 8 ? 1 : 3; continue; }
+                if (bytes[i] >= 0x80) found[bytes[i]] = found.GetValueOrDefault(bytes[i]) + 1;
+            }
+        }
+        var literal = new System.Text.RegularExpressions.Regex("\"((?:\\\\.|[^\"\\\\])*)\"");
+        void Script(ScummScriptDisassembly? script)
+        {
+            if (script is null) return;
+            foreach (var instruction in script.Instructions)
+                foreach (System.Text.RegularExpressions.Match match in literal.Matches(instruction.Operands))
+                    Text(ScummTextDecoder.ParseEscaped(match.Groups[1].Value));
+        }
+        foreach (var id in data.GlobalScriptIds()) Script(data.GlobalScript(id));
+        foreach (var room in game.Rooms.Where(r => r.ResourceId is not null).Select(r => r.ResourceId!.Value).Distinct())
+        {
+            ScummRoomData roomData;
+            try { roomData = data.ReadRoom(room); } catch (Exception ex) when (ex is IOException or InvalidDataException) { continue; }
+            Script(data.RoomEntryScript(room));
+            Script(data.RoomExitScript(room));
+            foreach (var id in data.RoomLocalScriptIds(room)) Script(data.RoomLocalScript(room, id));
+            foreach (var name in roomData.ObjectNames.Values) Text(name);
+            foreach (var (_, entries) in data.ReadObjectVerbs(room, roomData.Objects))
+                foreach (var entry in entries)
+                    Script(data.ReadObjectVerb(room, roomData.Objects.First(o => o.Id == entry.ObjectId), entry.VerbId, out _));
+        }
+        output.WriteLine($"{folderName}: {charset.GlyphCount} glyphs; text bytes from 0x80: {string.Join(" ", found.OrderBy(p => p.Key).Select(p => $"{p.Key:X2}x{p.Value}"))}");
+        // The 256-colour Spanish copy uses the inverted marks 50 times but its charset has no glyph for them (width 0: the original draws nothing
+        // there either, CharsetRendererV3 reads the width table); its n tilde is drawn by the tilde glyph 0x7E, which is the one glyph its charset changes.
+        Assert.Equal(withoutGlyph, string.Join(" ", found.Keys.Where(code => charset.CharWidth(code) == 0).Order().Select(code => code.ToString("X2"))));
+    }
     [Fact]
     public void TheRightButtonStaysTheAppsAndNeverReachesTheGame()
     {
