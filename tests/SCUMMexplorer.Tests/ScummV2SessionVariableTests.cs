@@ -6,6 +6,35 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2SessionVariableTests
 {
     [Fact]
+    public void OldObjectEntrySkipsItsHeaderAndCutsceneRestoresTheSentenceVerb()
+    {
+        var folder = Path.Combine(TestGames.Root, "mmansionE ega es");
+        if (!Directory.Exists(folder)) return;
+        var game = new GameFolderScanner().Scan(folder);
+        var data = new ScummV2DataSource(game);
+        var session = new ScummGameSession(game, data.ReadIndexedObjects(), data: data, boot: false);
+        session.SetGlobalWord(38, 13); // Backup sentence verb, as the selection script initializes it.
+        session.SetGlobalWord(26, 9);
+        session.SetGlobalWord(27, 260);
+        session.SetGlobalWord(28, 263);
+        session.SetGlobalWord(29, 1);
+        ScummScriptInstruction[] instructions =
+        [
+            new(0, 0, "stopObjectCode", "", "00"),
+            new(3, 0x40, "cutscene", "", "40"),
+            new(4, 0, "stopObjectCode", "", "00")
+        ];
+        var script = new ScummScriptDisassembly(1, 1, 0, 5, 5, instructions, null, null, [], []) { EntryOffset = 3 };
+        session.RunTopLevelScript(script);
+        Assert.Equal(1, session.CutscenesBegun);
+        var variables = session.Snapshot.KnownGlobalVariables;
+        Assert.Equal((ushort)13, variables[ScummVars.V2.SentenceVerb]);
+        Assert.Equal((ushort)0, variables[ScummVars.V2.SentenceObject1]);
+        Assert.Equal((ushort)0, variables[ScummVars.V2.SentenceObject2]);
+        Assert.Equal((ushort)0, variables[ScummVars.V2.SentencePreposition]);
+    }
+
+    [Fact]
     public void V2FrameDoesNotIncrementV3TimersOrOverwriteItsOwnGameSlots()
     {
         var folder = Path.Combine(TestGames.Root, "mmansionE ega es");
