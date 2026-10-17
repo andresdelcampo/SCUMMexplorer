@@ -2765,7 +2765,10 @@ public sealed partial class ScummBoundedScriptExecutor
     {
         var indexed = IndexedPattern.Match(operand.Trim());
         if (indexed.Success && OperandIsEstimated(indexed.Groups[3].Value, estimated, variables)) return true;
-        return !indexOnly && TryNormalizeKey(operand, variables, out var key) && IsEstimated(key, estimated);
+        if (indexOnly || !TryNormalizeKey(operand, variables, out var key)) return false;
+        if (IsEstimated(key, estimated)) return true;
+        return variables.ContainsKey(V2IndirectReads) && key is "var[0x00E]" or "var[0x00F]" or "var[0x010]" &&
+            variables.TryGetValue(key, out var target) && IsEstimated($"var[0x{target:X3}]", estimated);
     }
 
     private static void MarkEstimated(HashSet<string> estimated, string key, bool value)

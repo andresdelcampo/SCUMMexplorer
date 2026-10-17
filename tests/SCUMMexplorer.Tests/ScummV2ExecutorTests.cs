@@ -5,6 +5,39 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummV2ExecutorTests
 {
     [Fact]
+    public void AliasReadRetainsThePointedValuesEstimate()
+    {
+        var runtime = Runtime();
+        runtime.GlobalVariables["var[0x00E]"] = 80;
+        runtime.GlobalVariables["var[0x050]"] = 42;
+        runtime.EstimatedVariables.Add("var[0x050]");
+        var run = Run(runtime, ("move", "var[0x051], var[0x00E]"));
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(42, run.KnownVariables["var[0x051]"]);
+        Assert.Contains("var[0x051]", runtime.EstimatedVariables);
+        Assert.True(run.PathEstimated);
+    }
+    [Fact]
+    public void DistanceUsesNativeOldCoordinatesBeforeTakingMaximum()
+    {
+        var runtime = Runtime();
+        runtime.CurrentRoom = 1;
+        var run = Run(runtime, ("putActorInRoom", "0x01, 0x01"), ("putActorInRoom", "0x02, 0x01"),
+            ("putActor", "0x01, 0x0A, 0x14"), ("putActor", "0x02, 0x0D, 0x19"),
+            ("getDist", "var[0x050], 0x01, 0x02"));
+        Assert.Null(run.UnresolvedReason);
+        Assert.Equal(5, run.KnownVariables["var[0x050]"]);
+    }
+
+    [Fact]
+    public void ClassicLightsMapLegacyModesButEnhancedKeepsItsMask()
+    {
+        var classic = Runtime();
+        classic.IsClassicManiac = true;
+        Assert.Equal(11, Run(classic, ("lights", "0x02, 0x00, 0x00")).KnownVariables[ScummVars.V2.CurrentLights]);
+        Assert.Equal(2, Run(Runtime(), ("lights", "0x02, 0x00, 0x00")).KnownVariables[ScummVars.V2.CurrentLights]);
+    }
+    [Fact]
     public void IndirectReadSlotsDereferenceOnceButTheirWritesRemainRaw()
     {
         var runtime = Runtime();
