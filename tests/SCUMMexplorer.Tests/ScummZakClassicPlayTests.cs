@@ -80,5 +80,112 @@ public sealed class ScummZakClassicPlayTests
         Assert.Contains(session.SessionTrace, line => line.Contains("Script 126 continues at its skip jump"));
         Assert.Contains(session.SessionTrace, line => line.Contains("Object 84") && line.Contains("0x0066"));
     }
+    [Fact]
+    public void NativeRoutePicksUpExitsSkipsAndChoosesBuyWithShopkeeperResponse()
+    {
+        if (Boot() is not { } session) return;
+        const string route = """
+wait,150
+key,119
+wait,2
+roomclick,50,65
+wait,2
+click,10,145
+wait,180
+key,100
+wait,2
+roomclick,55,62
+wait,2
+click,10,145
+wait,180
+key,119
+wait,2
+roomclick,307,65
+wait,2
+click,10,145
+wait,180
+key,101
+wait,2
+roomclick,307,65
+untilroom,16,1200
+untilskip,120
+escape
+untilcontrol,300
+key,101
+wait,2
+click,300,125
+wait,180
+click,300,125
+wait,180
+click,300,125
+wait,180
+key,119
+wait,2
+roomclick,625,65
+wait,2
+click,10,145
+wait,180
+key,101
+wait,2
+roomclick,625,65
+wait,180
+key,101
+wait,2
+click,300,125
+wait,180
+click,300,125
+wait,180
+roomclick,750,30
+wait,180
+key,119
+wait,2
+roomclick,270,40
+wait,2
+click,10,145
+wait,180
+key,101
+wait,2
+roomclick,270,40
+wait,180
+click,105,161
+wait,2
+roomclick,330,16
+wait,2
+click,10,145
+wait,120
+wait,60
+untilcontrol,1200
+""";
+        var responseSeen = false;
+        foreach (var step in route.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var fields = step.Split(',');
+            switch (fields[0])
+            {
+                case "wait": Run(session, int.Parse(fields[1])); break;
+                case "key": Assert.NotNull(session.PressPlayKey(int.Parse(fields[1]), out _)); break;
+                case "click": Assert.NotNull(session.ClickScreen(int.Parse(fields[1]), int.Parse(fields[2]), out _)); break;
+                case "roomclick":
+                    var x = int.Parse(fields[1]) - session.ViewLeft;
+                    Assert.InRange(x, 0, 319);
+                    Assert.NotNull(session.ClickScreen(x, int.Parse(fields[2]) + session.MainScreen.Top, out _));
+                    break;
+                case "escape": Assert.True(session.CutsceneSkippable); session.PressKey(27); break;
+                default:
+                    bool Reached() => fields[0] == "untilroom" ? session.CurrentRoomId == int.Parse(fields[1])
+                        : fields[0] == "untilskip" ? session.CutsceneSkippable : session.UserInputOn && !session.InCutscene;
+                    for (var frame = 0; frame < int.Parse(fields[^1]) && !Reached(); frame++) Run(session, 1);
+                    Assert.True(Reached(), step);
+                    break;
+            }
+            responseSeen |= session.Messages.OnScreen.Any(message => message.Text.Contains("CashCards only!"));
+        }
+        Assert.True(responseSeen);
+        Assert.Equal(7, session.CurrentRoomId);
+        Assert.Equal(1, session.Snapshot.ObjectOwners[15]);
+        Assert.True(session.UserInputOn);
+        Assert.Contains(session.SessionTrace, line => line.Contains("sentence script 2 runs verb 0x11 with objects 40 and 0"));
+        Assert.Contains(session.SessionTrace, line => line.Contains("Script 126 continues at its skip jump"));
+    }
 }
 

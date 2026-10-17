@@ -36,6 +36,8 @@ void Log(string label)
     lines.AddRange(session.Snapshot.ObjectOwners.Where(p => p.Value == 1).Select(p => $"owner {p.Key}={p.Value}"));
     lines.AddRange(new[] { 0, 4, 8, 9, 10, 26, 27, 28, 29, 30, 31, 32, 33, 35 }.Select(n => $"var{n}={session.Snapshot.KnownGlobalVariables.GetValueOrDefault($"var[0x{n:X3}]")}"));
     lines.AddRange(session.Actors.Where(a => a.Number == 1).Select(a => $"ego room={a.Room} position={a.X},{a.Y}"));
+    if (session.CurrentRoomId == 7)
+        lines.AddRange(data.ReadRoom(7).Objects.Select(record => $"shop object {record.Id} state={session.Snapshot.ObjectStates.GetValueOrDefault(record.Id)} owner={session.Snapshot.ObjectOwners.GetValueOrDefault(record.Id, (byte)15)} at{record.X},{record.Y} name={ScummTextDecoder.DecodeGlyphs(data.ReadRoom(7).ObjectNames.GetValueOrDefault(record.Id) ?? [])}"));
 }
 Log("boot");
 var commands = args.Skip(2).SelectMany(arg => arg.StartsWith('@') ? File.ReadAllLines(arg[1..]).Where(line => line.Length > 0 && !line.StartsWith('#')) : new[] { arg });
@@ -44,6 +46,19 @@ foreach (var command in commands)
     var fields = command.Split(',');
     if (fields[0] == "wait")
         for (var frame = 0; frame < int.Parse(fields[1]); frame++) session.AdvanceFrame();
+    else if (fields[0] is "untilskip" or "untilcontrol" or "untilroom")
+    {
+        bool Reached() => fields[0] == "untilroom" ? session.CurrentRoomId == int.Parse(fields[1]) : fields[0] == "untilskip" ? session.CutsceneSkippable : session.UserInputOn && !session.InCutscene;
+        for (var frame = 0; frame < int.Parse(fields[^1]) && !Reached(); frame++) session.AdvanceFrame();
+        if (!Reached())
+        {
+            Log($"FAILED {command}");
+            lines.AddRange(session.PendingScriptSummary);
+            lines.AddRange(session.SessionTrace.TakeLast(100));
+            File.WriteAllLines(args[1], lines);
+            throw new InvalidOperationException($"{command}: condition not reached");
+        }
+    }
     else if (fields[0] == "click")
         lines.Add($"input {session.ClickScreen(int.Parse(fields[1]), int.Parse(fields[2]), out var why)} refused={why}");
     else if (fields[0] == "key")
@@ -68,3 +83,4 @@ lines.AddRange(session.SessionTrace.Where(s => !s.Contains(" waits ") && !s.Cont
 lines.AddRange(session.Snapshot.Uncertainties.Distinct());
 File.WriteAllLines(args[1], lines);
 Console.WriteLine(string.Join(Environment.NewLine, lines.Where(line => line.StartsWith("==") || line.StartsWith("ego ") || line.StartsWith("escape ")).TakeLast(20)));
+
