@@ -22,6 +22,7 @@ public sealed class ScummScriptRuntimeState
     public bool IsClassicManiac { get; set; }
     public int V2TextSpeed { get; set; } = 6; // scumm.cpp resetScumm: _defaultTextSpeed.
     public int V2UserState { get; private set; }
+    public (int Verb, int Object1, int Object2, int Preposition)? V2DrawnSentence { get; set; }
     public Action<bool>? V2FreezeScripts { get; set; }
     /// <summary>script_v2.cpp setUserState, scumm.h USERSTATE flags (17 October 2026).</summary>
     public void ApplyV2UserState(int state)

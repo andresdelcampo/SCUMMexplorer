@@ -23,7 +23,9 @@ public sealed class ScummOldPlayInputTests
         var folder = Path.Combine(TestGames.Root, "mmansionE ega es");
         if (!Directory.Exists(folder)) return;
         var game = new GameFolderScanner().Scan(folder);
-        var session = ScummGameSession.BootForPlay(game, out _);
+        var session = ScummGameSession.BootForPlay(game, out var indexed);
+        Assert.IsType<ScummV2Charset>(session.PlayCharset());
+        Assert.Equal(4, session.PlayInputScript);
         Assert.Equal(45, session.CurrentRoomId);
         foreach (var point in new[] { (76, 104), (196, 104), (292, 60) })
         {
@@ -42,6 +44,14 @@ public sealed class ScummOldPlayInputTests
         Assert.Equal(verb.VerbId, session.Snapshot.KnownGlobalVariables[ScummVars.V2.SentenceVerb]);
         Assert.Equal(input, session.DeliveredInput.Last());
         Assert.Equal(4, session.DeliveredInput.Count);
+        Assert.NotEmpty(session.PlaySentenceGlyphs());
+        var rendered = new ScummPlayScreen(game, session, indexed.States).Compose(0);
+        Assert.Contains(rendered.Verbs.Items, item => item.IsText);
+        Assert.Contains(rendered.Verbs.Pixels.Take(8 * 320), color => color == 13);
+        Assert.Null(session.PressPlayKey(319, out var saveRefusal));
+        Assert.NotNull(saveRefusal);
+        Assert.Null(session.PressPlayKey(322, out var restartRefusal));
+        Assert.NotNull(restartRefusal);
         Assert.DoesNotContain(session.Snapshot.Uncertainties, s => s.Contains("unsupported v2"));
         var walk = session.Verbs.First(v => v.VerbId == 13 && v.Mode == 1);
         session.PressPlayKey(walk.Key, out _);

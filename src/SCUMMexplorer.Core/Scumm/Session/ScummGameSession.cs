@@ -21,6 +21,7 @@ public sealed class ScummGameSession : ScummSession
         if (_runtime.IsV2) _runtime.Actors.InitializeV2Game(profile.Dialect == ScummScriptDialect.V1);
         _runtime.V2VerbYOffset = profile.V2VerbYOffset;
         _runtime.IsClassicManiac = profile.RestoresClassicCutsceneScene;
+        if (_runtime.IsClassicManiac) _runtime.MainScreen = (16, 152); // resetScumm: classic DOS Maniac's 136-row room.
         if (profile.SeparateBitVariables)
         {
             // readVar/writeVar: from version 4 the bit variables are _bitVars, not bits of the word variables.

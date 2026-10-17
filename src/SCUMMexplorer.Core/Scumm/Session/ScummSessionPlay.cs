@@ -22,6 +22,8 @@ public abstract partial class ScummSession
 
     /// <summary>The inputs delivered to the input script so far (Advanced trace, R-7.17).</summary>
     public IReadOnlyList<ScummPlayInput> DeliveredInput => _deliveredInput;
+    /// <summary>The native input script: fixed script 4 before v3, VAR_VERB_SCRIPT thereafter.</summary>
+    public int PlayInputScript => _runtime.IsV2 ? 4 : _runtime.GlobalVariables.GetValueOrDefault(VerbScriptVariable);
 
     /// <summary>The room screen's rows (<c>initScreens</c>): the text screen is above, the verb screen from <c>Bottom</c> down.</summary>
     public (int Top, int Bottom) MainScreen => _runtime.MainScreen;
@@ -68,7 +70,8 @@ public abstract partial class ScummSession
         var chosen = number ?? _runtime.Charset ?? 0;
         if (!_charsets.TryGetValue(chosen, out var charset))
             // A version 3 engine reads 99.LFL - n (the 256-colour Indiana Jones too: one file per room, the same charset files as EGA; S6 Indy3Vga).
-            _charsets[chosen] = charset = ScummProfile.For(_game).EngineVersion == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : ReadArchiveCharset(chosen);
+            _charsets[chosen] = charset = _runtime.IsV2 ? new ScummV2Charset((int)_runtime.EngineVersion, OldPlayLanguage)
+                : ScummProfile.For(_game).EngineVersion == ScummVersion.V3 ? ScummV3Charset.TryLoad(_game.FolderPath, chosen, out _) : ReadArchiveCharset(chosen);
         return charset;
     }
 
@@ -122,13 +125,13 @@ public abstract partial class ScummSession
     public ScummVerbAreaPicture PlayVerbArea()
     {
         var charset = PlayCharset(0) ?? CurrentPlayCharset();
-        var verbs = _runtime.Verbs.Snapshot().Where(v => !HidesVerb(v)).ToArray();
+        var verbs = _runtime.Verbs.Snapshot().Where(v => !HidesVerb(v) && (!_runtime.IsV2 || (_runtime.V2UserState & 0x40) != 0)).ToArray();
         if (charset is null) return VerbArea();
         var plain = ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, null, n => PlayCharset(n)));
-        if (!CursorShown || _screenPointer is not { } pointer || pointer.Y < ScummVerbArea.Top) return plain;
+        if (!CursorShown || _screenPointer is not { } pointer || pointer.Y < ScummVerbArea.Top) return DrawOldInterface(plain, charset);
         var over = ScummVerbArea.FindVerbAt(plain.Items, pointer.X, pointer.Y);
-        return over is null ? plain
-            : ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, over.Slot, n => PlayCharset(n)));
+        return DrawOldInterface(over is null ? plain
+            : ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, over.Slot, n => PlayCharset(n))), charset);
     }
 
     /// <summary>
@@ -197,6 +200,7 @@ public abstract partial class ScummSession
     {
         bool Is(string variable) => _runtime.GlobalVariables.TryGetValue(variable, out var value) && value != 0 && value == key;
         refused = key <= 0 || key > 0x1FF ? "it is not a key code the engine sends"
+            : _runtime.IsV2 && key is 319 or 322 or 32 ? "it is an engine save/load, restart or pause key (the app's controls)"
             : Is(RestartKeyVariable) ? "it is the engine's restart key (Restart is the app's)"
             : Is(PauseKeyVariable) ? "it is the pause key (the app's Pause)"
             : key is '.' or 0x1B ? "it is an engine key (the app's Skip line or Skip)"
