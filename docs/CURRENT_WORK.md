@@ -1,5 +1,7 @@
 **S5 Maniac/Zak source previews implemented (17 October, separate orchestrator); original-game visual acceptance open.** All 221 rooms open; 216 have no detector findings. Sixteen real-window checks pass. Retained black rectangles, Zak camera placement, old actor alignment and shown-lit previews remain disclosed in the [checkpoint](checkpoints/20261017-S5-ManiacZak.md). Objects stays Partial. Next: resolve those S5 findings, then S6 verb-based play, S7 and S9. [Dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md).
 
+**S6 Maniac/Zak in progress (17 October, separate orchestrator).** Four family routes in isolated worktrees; ManiacEnhanced owns shared v1/v2 engine prerequisites, parent owns App play integration and matrix. S5 visual limits remain explicit. [Plan](checkpoints/20261017-S6-ManiacZak.md).
+
 # Current work
 
 **S4b Maniac/Zak done (17 October, separate orchestrator).** ManiacClassic and ManiacEnhanced reach stable Room 44 control through explicitly selected Syd/Bernard party inputs; ZakClassic and ZakEnhanced finish their full introductions in Room 1 with stable control. Registry levels are unchanged. [Checkpoint and validation](checkpoints/20261017-S4b-ManiacZak.md), [dedicated handoff](../NEXT_SESSION_PROMPT_MANIAC_ZAK.md). Next for these four families: S5, then S6 verb-based play, S7 and S9. LOOM, Indy3 and Monkey Island remain the other orchestrator's scope.
