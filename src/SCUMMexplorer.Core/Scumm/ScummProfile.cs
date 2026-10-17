@@ -12,7 +12,12 @@ namespace SCUMMexplorer.Core.Scumm;
 /// the digits of the value in <paramref name="AnswerVariable"/> when the game has put an expected answer there (read, never written: the game's
 /// own script derived it), else <paramref name="ContinueKey"/> (Enter). Keys go through the game's own input script like a player's.
 /// </summary>
-public sealed record ScummBootInputPlan(string? AnswerVariable, int ContinueKey = 13);
+/// <remarks>
+/// <paramref name="ClickObject"/> (S4b Monkey2, 17 October 2026): the boot waits for a click on a screen of choices instead (Monkey Island 2's "Monkey Island 2"
+/// or "Monkey 2 Lite"); the session clicks the middle of that object's box through the game's input script, as a player would. Edition data: the object of
+/// the choice the explorer takes (§4.5: the full game).
+/// </remarks>
+public sealed record ScummBootInputPlan(string? AnswerVariable, int ContinueKey = 13, int? ClickObject = null);
 
 public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Dialect)
 {
@@ -170,9 +175,13 @@ public sealed record ScummProfile(ScummVersion Version, ScummScriptDialect Diale
                     || dialect == ScummScriptDialect.V5 && game.V4Disks?.Disks.OfType<ScummV5Archive>().Any() == true && GameSupport.FamilyOf(game) == GameFamily.MonkeyCd),
             ExtraTimerVariables = GameSupport.FamilyOf(game) is GameFamily.Indy3Ega or GameFamily.Indy3Vga ? [ScummVars.ExtraTimer1, ScummVars.ExtraTimer2, ScummVars.ExtraTimer3] : [],
             // The Secret of Monkey Island (floppy): script 152 (room 90) asks the copy-protection question and keeps the right year in var[0x10A] (+0x00EE) before it waits.
-            BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]") : null,
+            BootInput = GameSupport.FamilyOf(game) == GameFamily.MonkeyFloppy ? new ScummBootInputPlan("var[0x10A]")
+                // Monkey Island 2 (S4b, 17 October 2026): Script 130 +0x034A waits for the choice between "Monkey Island 2" (object 1156, Script 131 +0x0067:
+                // bit[0x237] = 0, "Regular Mode") and "Monkey 2 Lite" (object 1157); the explorer takes the full game (§4.5), labelled as assumed input.
+                : GameSupport.FamilyOf(game) == GameFamily.Monkey2 ? new ScummBootInputPlan(null, ClickObject: 0x484)
+                : null,
             // Monkey Island floppy and CD: script 1 ends by following the ego into the opening (Room 38), the player gets control later (S4b MonkeyCd: the CD boot too).
-            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd,
+            BootEndsWhenPlayerHasControl = GameSupport.FamilyOf(game) is GameFamily.MonkeyFloppy or GameFamily.MonkeyCd or GameFamily.Monkey2,
             // vars.cpp ScummEngine_v5::resetScummVars: if (_game.id == GID_MONKEY) _scummVars[74] = 1225 (the CD release).
             GameVariablesAtStart = GameSupport.FamilyOf(game) == GameFamily.MonkeyCd ? [("var[0x04A]", 1225)] : [],
             // S6 (15 October 2026): Indiana Jones EGA plays through its verbs; F5 is its save/load key (Script 24). S6 Indy3Vga (16 October 2026): the
