@@ -27,3 +27,14 @@ Open uncertainties: see the record (variable actor in Room 38; control flow insi
 | 2026-10-14 | S2 | Raise Costumes to ✔? | yes / no | no: 10 costumes are estimates and no comparison with a running ScummVM could be made | one-line commit later |
 
 Facts about the game's scripts: [ZAK_SCRIPT_MAP.md](ZAK_SCRIPT_MAP.md).
+
+## Enhanced v2 — 17 October 2026
+
+Family: ZakEnhanced | Fixture: `D:/Juegos/Lucas/zakE ega en` | Owner: Zak S4b worktree agent
+
+| Stage | State | Registry cell | Record | Notes |
+|---|---|---|---|---|
+| S4b Session | blocked | unchanged | [.verification/zak-session-20261017](../../.verification/zak-session-20261017/README.md) | v2 adapter reads all 58 rooms and 148 present global scripts; own boot stops before any room at Script 1 +0x003B, `verbOps [delete var[0x042]]` |
+| S5 Objects / S6 verb-based Play / S7 Cutscenes / S9 Editions | not started | unchanged | same | S4b acceptance is not met |
+
+The missing behavior is the source-defined v2 verb **slot** table (`script_v2.cpp::o2_verbOps`), including variable deletion and explicit-slot creation; mapping this onto a later-version table keyed only by verb ID would silently change semantics. Resume with a bounded engine-table implementation and rerun the unmodified boot. The decoded later Script 108 endpoint in the script map is static evidence, not a reached playable room. Shared object-slot dispatch and individual sound timelines are implemented; inventory code, active nested object-slot replacement continuation and Player_V2 priority/next-sound arbitration remain explicit limitations. No native ScummVM was executed.
