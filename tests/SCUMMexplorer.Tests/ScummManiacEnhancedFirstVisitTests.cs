@@ -6,6 +6,21 @@ namespace SCUMMexplorer.Tests;
 public sealed class ScummManiacEnhancedFirstVisitTests
 {
     [Theory]
+    [InlineData("mmansionE ega es")]
+    [InlineData("mmansion ega en")]
+    public void NativeShowSequenceKeepsAllThreePartyBodiesOnScreen(string fixture)
+    {
+        var folder = Path.Combine(TestGames.Root, fixture);
+        if (!Directory.Exists(folder)) return;
+        var scene = ManiacFirstVisit.Run(new GameFolderScanner().Scan(folder), 44);
+        foreach (var id in new[] { 1, 3, 5 })
+        {
+            var actor = Assert.Single(scene.ActorLayer().Actors, actor => actor.Number == id);
+            Assert.True(actor.Pixels > 500, $"Actor {id} must have visible body pixels, not just an entry in the layer.");
+            Assert.True(actor.Bounds is { } bounds && bounds.Top > 0 && bounds.Bottom - bounds.Top > 60 && bounds.Bottom <= scene.Room.Height);
+        }
+    }
+    [Theory]
     [InlineData(1, new int[] { 56, 57, 62, 63, 64 })]
     [InlineData(2, new int[] { })]
     [InlineData(44, new int[] { })]

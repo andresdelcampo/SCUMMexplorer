@@ -9,8 +9,8 @@ public sealed partial class ScummCostume
     private IReadOnlyList<ScummCostumeCel> DrawClassic(ScummCostumeAnimationState state, int direction)
     {
         var right = direction != 0 || Mirror;
-        var xMove = -72;
-        var yMove = -100;
+        var xMove = 0;
+        var yMove = 0;
         var cels = new List<ScummCostumeCel>();
         for (var limb = 0; limb < 8; limb++)
         {
