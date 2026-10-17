@@ -1,0 +1,130 @@
+game: Monkey Island 2: LeChuck's Revenge (Unknown, V5), folder mi2 talkie en, v5 resource file
+boot: 3409 frames (limit 5000), hit limit: False, wall time 2,2 s
+final room: 4; rooms entered in order: 108, 0, 87, 0, 3, 103, 109, 0, 5, 4
+rooms by name: 108 Room 108, 0 (none), 87 Room 87, 3 Room 03, 103 Room 103, 109 Room 109, 5 Room 05, 4 Room 04
+extra frames played after the boot: 0; room now 4
+in cutscene: False; pending scripts: 3
+
+== pending scripts
+  Script 22 +0x01A0
+  Room 04 local script 205 +0x001B
+  Room 04 entry script +0x0035
+
+== session trace (waits omitted)
+  Script 01 continues at +0x0167 in Room 108 after loadRoom
+  Script 130 continues at +0x0037 in Room 108 after loadRoom
+  stopScript 142 at Script 128 +0x0260: script 142 was not running
+  boot: Player input assumed: a click on object 1156 in Room 108 at screen (28, 64) (the choice the explorer takes), after the boot stood still 400 frames
+  input: click in the room at screen (28, 64), room (28, 64) runs script 131 with [2, 0, 1] (runInputScript)
+  stopScript 49 at Script 07 +0x0026: script 49 was not running
+  stopScript 167 at Script 07 +0x0028: script 167 was not running
+  stopScript 54 at Script 07 +0x002A: script 54 was not running
+  Script 01 +0x0A1D: room 0 (no room) after a frame advance
+  Script 01 continues at +0x0A1F in Room 00 after loadRoom
+  script 16 started again: runScript ended its running copy first
+  stopScript 22 at Script 16 +0x0068: script 22 was not running
+  stopScript 2 at Script 06 +0x0065: script 2 was not running
+  Script 92 continues at +0x001D in Room 87 after loadRoom
+  Sound 12 completed on its native AdLib resource clock.
+  stopScript 49 at Script 07 +0x0026: script 49 was not running
+  stopScript 167 at Script 07 +0x0028: script 167 was not running
+  stopScript 54 at Script 07 +0x002A: script 54 was not running
+  Script 92 +0x032B: room 0 (no room) after a frame advance
+  Script 92 continues at +0x032D in Room 00 after loadRoom
+  stopScript 22 at Script 16 +0x0068: ended its pending run
+  stopScript 2 at Script 06 +0x0065: script 2 was not running
+  Script 52 continues at +0x000C in Room 03 after loadRoom
+  Sound 154 completed on its native AdLib resource clock.
+  stopScript 49 at Script 07 +0x0026: script 49 was not running
+  stopScript 167 at Script 07 +0x0028: script 167 was not running
+  stopScript 54 at Script 07 +0x002A: script 54 was not running
+  stopScript 2 at Script 06 +0x0065: script 2 was not running
+  Script 52 continues at +0x00D9 in Room 103 after loadRoom
+  stopScript 200 at Script 52 +0x1682: script 200 was not running
+  stopScript 49 at Script 07 +0x0026: script 49 was not running
+  stopScript 167 at Script 07 +0x0028: script 167 was not running
+  stopScript 54 at Script 07 +0x002A: script 54 was not running
+  stopScript 2 at Script 06 +0x0065: script 2 was not running
+  Script 52 +0x1693: camera x = 160 (actor 1's x) (estimate)
+  Script 52 continues at +0x1695 in Room 109 after actorFollowCamera
+  stopScript 49 at Script 07 +0x0026: script 49 was not running
+  stopScript 167 at Script 07 +0x0028: script 167 was not running
+  stopScript 54 at Script 07 +0x002A: script 54 was not running
+  Script 52 +0x1879: room 0 (no room) after a frame advance
+  Script 52 continues at +0x187B in Room 00 after loadRoom
+  cutscene at Room 05 local script 202 +0x0000 runs script 17
+  stopScript 2 at Script 17 +0x001A: script 2 was not running
+  freezeScripts 0x7F at Script 17 +0x0074: frozen: Room 05 entry script, Room 05 local script 200
+  Room 05 local script 200 pauses after startScript +0x0040: nested execution froze its caller
+  Room 05 entry script pauses after startScript +0x0047: nested execution froze its caller
+  stopScript 2 at Script 06 +0x0065: script 2 was not running
+  Script 52 +0x188A: camera x = 160 (actor 1's x) (estimate)
+  Script 52 continues at +0x188D in Room 05 after actorFollowCamera
+  endCutscene at Room 05 local script 202 +0x0669 runs script 18
+  freezeScripts 0x00 at Script 18 +0x0053: no script is frozen
+  stopScript 2 at Script 18 +0x005C: script 2 was not running
+  script 22 started again: runScript ended its running copy first
+  actorFollowCamera at Room 05 local script 202 +0x0677 ends this room-owned script (startScene); the session enters Room 04
+  stopScript 49 at Script 07 +0x0026: script 49 was not running
+  stopScript 167 at Script 07 +0x0028: script 167 was not running
+  stopScript 54 at Script 07 +0x002A: script 54 was not running
+  script 200 started again: runScript ended its running copy first
+  cutscene at Room 04 local script 206 +0x0000 runs script 17
+  freezeScripts 0x7F at Script 17 +0x0074: frozen: Room 04 entry script, Script 22, Room 05 entry script
+  Room 04 entry script pauses after startScript +0x0031: nested execution froze its caller
+  stopScript 2 at Script 06 +0x0065: script 2 was not running
+  Script 18 +0x006B: camera x = 472 (actor 1's x) (estimate)
+  Script 18 continues at +0x006E in Room 04 after actorFollowCamera
+  endCutscene at Room 04 local script 206 +0x0031 runs script 18
+  freezeScripts 0x00 at Script 18 +0x0053: no script is frozen
+  boot: 3409 frames after script 001's first room load; now in Room 04
+
+== operations reported as not applied (presentation only, nothing in game state)
+  roomOps: 27 runs
+
+== unsupported (opcode, operand or state the run could not follow): 0
+
+== random picks: 780 (seeded; each is labelled an estimate)
+== all other uncertainties
+  Script 01 +0x0165 reached loadRoom during the boot.
+  Room 108 entered by Script 01 +0x0165 (loadRoom) during the boot.
+  Script 130 +0x0035 reached loadRoom during the boot.
+  Script 131 +0x0000: findObject at +0x0046 reads the virtual mouse: the player's pointer at screen (28, 64)
+  Script 01 +0x0A1D reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 92 +0x001B reached loadRoom after a frame advance.
+  Room 87 entered by Script 92 +0x001B (loadRoom) after a frame advance.
+  Script 92 +0x032B reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 52 +0x000A reached loadRoom after a frame advance.
+  Room 03 entered by Script 52 +0x000A (loadRoom) after a frame advance.
+  Script 52 +0x0010: soundKludge clear the marker queue: VAR_SOUNDRESULT = 0 is an estimate (the song's markers are not followed, so queued commands never run) (+0x001E); soundKludge trigger on sound 154 marker 0: VAR_SOUNDRESULT = 0 is an estimate (the song's markers are not followed, so queued comma...
+  Script 52 +0x0068: soundKludge player command 0 for playing sound 154: VAR_SOUNDRESULT = 0 is an estimate (the session's song clock does not follow player commands (volume, parts, hooks, loops, jumps, parameters)) (+0x0083)
+  Script 52 +0x00AF: soundKludge player command 0 for playing sound 154: VAR_SOUNDRESULT = 0 is an estimate (the session's song clock does not follow player commands (volume, parts, hooks, loops, jumps, parameters)) (+0x0083)
+  Script 52 +0x00D7 reached loadRoom after a frame advance.
+  Room 103 entered by estimated execution at Script 52 +0x00D7; execution continues without promoting the transition's certainty.
+  Room 103 entered by Script 52 +0x00D7 (loadRoom) after a frame advance.
+  Script 52 +0x0177: soundKludge query of the marker queue (0): VAR_SOUNDRESULT = 0 is an estimate (the song's markers are not followed, so the queue is taken as empty) (+0x018E)
+  Script 52 +0x1693 reached actorFollowCamera after a frame advance.
+  Room 109 entered by estimated execution at Script 52 +0x1693; execution continues without promoting the transition's certainty.
+  Room 109 entered by Script 52 +0x1693 (actorFollowCamera) after a frame advance.
+  Script 52 +0x1879 reached loadRoom to room 0 after a frame advance: no room is current until the next room load.
+  Script 52 +0x188A reached actorFollowCamera after a frame advance.
+  Room 05 entered by estimated execution at Script 52 +0x188A; execution continues without promoting the transition's certainty.
+  Room 05 entered by Script 52 +0x188A (actorFollowCamera) after a frame advance.
+  Sound 108 status is an estimate: the start followed a seeded route.
+  Sound 16 status is an estimate: the start followed a seeded route.
+  Script 52 +0x188D: soundKludge player command 22 for playing sound 108: VAR_SOUNDRESULT = 0 is an estimate (the session's song clock does not follow player commands (volume, parts, hooks, loops, jumps, parameters)) (+0x18F3); soundKludge player command 22 for playing sound 108: VAR_SOUNDRESULT = 0 i...
+  Script 52 +0x1985: soundKludge player command 22 for playing sound 108: VAR_SOUNDRESULT = 0 is an estimate (the session's song clock does not follow player commands (volume, parts, hooks, loops, jumps, parameters)) (+0x18F3); soundKludge player command 22 for playing sound 108: VAR_SOUNDRESULT = 0 i...
+  Script 22 +0x0000: findObject at +0x0075 reads the virtual mouse: the player's pointer at screen (28, 64)
+  Script 18 +0x006B reached actorFollowCamera after a frame advance.
+  Room 04 entered by estimated execution at Script 18 +0x006B; execution continues without promoting the transition's certainty.
+  Room 04 entered by Script 18 +0x006B (actorFollowCamera) after a frame advance.
+  Room 05 local script 202 +0x0677 reached actorFollowCamera after a frame advance.
+
+== actors
+  actor 1: room 4, (589,141), costume 1, visible True
+  actor 7: room 4, (541,127), costume 27, visible True
+  actor 8: room 103, (340,130), costume 160, visible False
+  actor 11: room 5, (180,85), costume 33, visible False
+  actor 12: room 5, (103,42), costume 32, visible False
+
+== room 4: 9 objects, 4 stored images, 2 actors drawn, 0 skipped

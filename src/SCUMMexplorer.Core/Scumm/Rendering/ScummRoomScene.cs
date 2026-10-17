@@ -162,7 +162,7 @@ public static class ScummRoomFirstVisit
         var settled = session.Settle();
         var records = data.ReadRoom(roomId).Objects;
         var snapshot = settled.State.Snapshot;
-        // v5 objects store one image per state (S5 Indy4): the settled state picks it.
+        // v5 objects store one image per state (S5 Indy4, S4b Monkey2): the settled state picks it.
         var images = data is ScummV5DataSource stateImages ? stateImages.ReadObjectImages(roomId, snapshot.ObjectStates) : data.ReadObjectImages(roomId);
         var stateMask = (byte)(profile.EngineVersion <= ScummVersion.V2 ? 8 : 15);
         var selection = new RoomObjectSelection(images, snapshot.ObjectStates, snapshot.ObjectPositions, records, room, indexed.States, snapshot.DrawOrder, stateMask);

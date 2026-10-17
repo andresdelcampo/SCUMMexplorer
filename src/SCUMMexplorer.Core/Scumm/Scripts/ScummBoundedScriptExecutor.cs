@@ -1064,6 +1064,18 @@ public sealed partial class ScummBoundedScriptExecutor
                 continue;
             }
 
+            // o5_soundKludge's answer (S4b Monkey2; reconciled with S4b Indy4's sound events above, 17 October 2026): VAR_SOUNDRESULT, labelled where estimated.
+            if (instruction.Operation == "soundKludge")
+            {
+                if (ApplySoundKludge(instruction, runtime, knownVariables, estimated, onEstimatedPath, limitations, trace) is { } kludgeProblem)
+                {
+                    unresolved = $"{kludgeProblem} at +0x{instruction.Offset:X4}";
+                    break;
+                }
+                pc = next;
+                continue;
+            }
+
             if (instruction.Operation == "isScriptRunning")
             {
                 // o5_isScriptRunning: whether a global or local script slot with
@@ -2249,9 +2261,11 @@ public sealed partial class ScummBoundedScriptExecutor
         detail = "expression operands are unsupported";
         int separator = instruction.Operands.IndexOf(", [", StringComparison.Ordinal);
         if (separator < 0 || !instruction.Operands.EndsWith(']') ||
-            !TryGetVariableKey(instruction.Operands[..separator], variables, out var destination)) return false;
+            !(TryGetVariableKey(instruction.Operands[..separator], variables, out var destination) ||
+              // From version 4 the bit variables are stored apart (readVar/writeVar), so an expression may write one (Monkey Island 2 Room 33 local script 206 +0x0084).
+              variables.ContainsKey(SeparateBitStorage) && TryNormalizeKey(instruction.Operands[..separator], variables, out destination))) return false;
         string body = instruction.Operands[(separator + 3)..^1];
-        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:getInventoryCount|getActor[A-Za-z]+)\([^)]*\)|(?:var|local|bit)\[[^\]]+\]|0x[0-9A-Fa-f]+|[+*/-]");
+        var tokens = Regex.Matches(body, @"getRandomNr\([^)]*\)|(?:getInventoryCount|getActor[A-Za-z]+)\([^)]*\)|(?:var|local|bit)\[(?:[^\[\]]|\[[^\]]*\])+\]|0x[0-9A-Fa-f]+|[+*/-]");
         if (tokens.Count is 0 or > 4096) return false;
         int end = 0;
         foreach (Match token in tokens)

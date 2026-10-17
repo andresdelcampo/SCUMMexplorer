@@ -11,6 +11,12 @@ public sealed record RoomObjectImage(int Id, int X, int Y, int Width, int Height
     /// Null when the mask table cannot be read.
     /// </summary>
     public byte[]? Mask { get; init; }
+
+    /// <summary>
+    /// Pixels the image does not draw (S5 Monkey2, 17 October 2026): a v5 strip coded with a transparent codec leaves the room's pixel where it has the room's
+    /// transparent colour (ScummVM <c>Gdi::decompressBitmap</c> with <c>transpCheck</c>, the colour from the room's <c>TRNS</c> block). Null: every pixel is drawn.
+    /// </summary>
+    public bool[]? Transparent { get; init; }
 }
 
 /// <summary>Reads placed object images from the supplied DOS EGA old-v3 LOOM rooms.</summary>

@@ -161,7 +161,7 @@ public sealed class ScummGameSession : ScummSession
                 ? adlib.ReadLifetime(part, timing, halfTempo: true)
                 : new(ScummSoundLifetimeKind.Unknown, null, false, "no AdLib part in the disks' sound blocks");
         }
-        // S4b Indy4 (17 October 2026): a v5 game plays its music through iMUSE; the AdLib part's own timeline (ScummImuseTimeline, the S3 player's default
+        // S4b Indy4 and S4b Monkey2 (17 October 2026, written independently and reconciled on this one): a v5 game plays its music through iMUSE; the AdLib part's own timeline (ScummImuseTimeline, the S3 player's default
         // path: hooks at 0, markers not acted on) gives how long a sound plays. A song whose timeline jumps back loops until a script stops it.
         if (game.V4Disks is { } v5Disks && v5Disks.Disks.OfType<ScummV5Archive>().FirstOrDefault() is { } v5)
         {
@@ -378,6 +378,19 @@ public sealed class ScummGameSession : ScummSession
     // never written), else the continue key. The keys reach the game through VAR_VERB_SCRIPT, like a player's.
     private int PressBootKeys(ScummBootInputPlan plan)
     {
+        // A screen of choices (S4b Monkey2): a click in the middle of the chosen object's box, delivered to the game's input script like a player's.
+        if (plan.ClickObject is int clicked && _currentObjects.FirstOrDefault(item => item.Id == clicked) is { } choice)
+        {
+            var (x, y) = _runtime.ObjectPositions.TryGetValue(clicked, out var moved) ? (moved.X, moved.Y) : (choice.X, choice.Y);
+            var screen = (X: x + choice.Width / 2 - ViewLeft, Y: y + choice.Height / 2 + _runtime.MainScreen.Top);
+            PointAtScreen(screen);
+            var input = ClickScreen(screen.X, screen.Y, out var refused);
+            _visitTrace.Add($"boot: Player input assumed: a click on object {clicked} in Room {_currentRoom?.ResourceId} at screen {screen} (the choice the explorer takes), " +
+                            $"after the boot stood still {BootStallFrames} frames{(input is null ? $"; not delivered: {refused}" : "")}");
+            return 1;
+        }
+        // A plan that answers with a click presses no key: a later stall (a long delay, music) is not a question.
+        if (plan.ClickObject is not null) return 0;
         var answer = plan.AnswerVariable is null ? 0 : _runtime.GlobalVariables.GetValueOrDefault(plan.AnswerVariable);
         var keys = answer != 0 ? answer.ToString(System.Globalization.CultureInfo.InvariantCulture).Select(digit => (int)digit).ToArray() : [plan.ContinueKey];
         _visitTrace.Add($"boot: Player input assumed: {(answer != 0 ? $"the digits of {plan.AnswerVariable} = {answer}, the answer the game's own script derived" : $"key {DescribeKey(plan.ContinueKey)}")} " +

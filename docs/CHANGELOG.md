@@ -9,6 +9,13 @@ Entries describe the state at their dated checkpoint. Current state, priorities 
 - Four real-window routes pass; Objects and Play become Full and both generated matrices are updated. This is bounded route support, not a complete playthrough or original-interpreter picture comparison. S5 visual findings, native darkness/flashlight, the generic closest-point walking approximation and untested editions remain disclosed. Proposed R-7.19 to R-7.21 are retained separately.
 - Parallel work used four family worktrees with one shared-engine owner. Concurrent master changes were retained. Build/full-suite evidence and exact window commands are in the [checkpoint](checkpoints/20261017-S6-ManiacZak.md) and [integration record](../.verification/maniaczak-play-20261017/README.md).
 
+## 17 October: Monkey Island 2 boots to the campfire and shows its first-visit rooms (S4b, S5, Monkey2)
+
+- The generic session boots `mi2 talkie en` in 3409 frames to Room 4 (the campfire on Scabb Island) with the player in control and nothing unsupported; the one assumed input is a click on "Monkey Island 2" (the full game) in the choice screen (Room 108), through the game's own input script (`ScummBootInputPlan.ClickObject`). No copy protection at boot parameter 0 in this edition.
+- Engine: `soundKludge` answers in `VAR_SOUNDRESULT` (-1 for a song not playing; steered songs labelled), on top of Indy4's sound events and iMUSE sound lengths (the two independent implementations reconciled into one); v5 `roomOps` palette colour; `waitFor sentence`; `getActorScale`; indexed variables and bit destinations in expressions; objects without `VERB`; v5 object images per state (`IMnn`) and transparent strips (`TRNS`).
+- First visit: 107 of 110 rooms without a gap (Rooms 104–106 are image holders), 0 items not followed; Rooms 39, 55, 79 pinned.
+- Validation: `ScummMonkey2SessionTests`, `ScummMonkey2FirstVisitTests`; MonkeyCd, support, play and first-visit neighbours; LOOM regression. Records: [monkey2-session-20261017](../.verification/monkey2-session-20261017/README.md), [monkey2-objects-20261017](../.verification/monkey2-objects-20261017/README.md).
+
 ## 17 October: play through Monkey Island CD's own interface (S6, MonkeyCd)
 
 - The R-7.18 route runs on the CD release through its own interface (v5): from the dock, where the game goes on to by itself after the lookout. It looks at the poster and skips that cutscene, goes through the door to the SCUMM Bar and holds the pirates' dialogue, then walks to the voodoo shop and picks up the rubber chicken. The chicken appears in the inventory as its Room 99 icon. A right click runs the default verb (`var[0x0B6]`). **Objects ✔ and Play ✔** for MonkeyCd.

@@ -931,6 +931,9 @@ internal static partial class ScummScriptDisassembler
             // The CD game has small-header (two-letter) blocks, so ScummVM's GF_SMALL_HEADER branches apply: 2 and 4 take two words.
             0x02 => Join("roomColor", Word(sub, 0x80), Word(sub, 0x40)),
             0x03 => Join("setScreen", Word(sub, 0x80), Word(sub, 0x40)),
+            // Version 5 (big headers; ScummVM o5_roomOps SO_ROOM_PALETTE without GF_SMALL_HEADER): red, green, blue words, a second sub byte, then the
+            // palette index: setPalColor(index, r, g, b). Monkey Island 2 Script 6 +0x0007 (S4b Monkey2, 17 October 2026).
+            0x04 when cursor.Dialect == ScummScriptDialect.V5 => DecodeRoomPalColor(cursor, sub),
             0x04 => Join("roomShadowPalette", Word(sub, 0x80), Word(sub, 0x40)),
             0x05 => "shakeOn",
             0x06 => "shakeOff",
@@ -946,6 +949,15 @@ internal static partial class ScummScriptDisassembler
             _ => throw new UnsupportedBytecodeException($"roomOps subopcode 0x{sub:X2} is not defined")
         };
         return ("roomOps", args);
+    }
+
+    private static string DecodeRoomPalColor(Cursor cursor, byte sub)
+    {
+        var red = ReadParam(cursor, 2, sub, 0x80);
+        var green = ReadParam(cursor, 2, sub, 0x40);
+        var blue = ReadParam(cursor, 2, sub, 0x20);
+        var next = cursor.ReadByte();
+        return Join("setPalColor", ReadParam(cursor, 1, next, 0x80), red, green, blue);
     }
 
     private static string DecodeRoomRgb(Cursor cursor, byte sub, string name)

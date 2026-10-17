@@ -46,6 +46,8 @@ public sealed record ScummV4ObjectImage(int Id, int X, int Y, int Width, int Hei
 
     /// <summary>The object state this image is drawn for (v5 <c>IMnn</c>, nn the state in hex; ScummVM <c>getObjectImage(ptr, getState(obj))</c>). 1 before v5.</summary>
     public int State { get; init; } = 1;
+    /// <summary>Pixels the image does not draw (a v5 strip with a transparent codec, at the room's transparent colour); null when it draws all.</summary>
+    public bool[]? Transparent { get; init; }
 }
 
 public sealed record ScummV4Room(int Number, string Name, int Offset, int Length);
