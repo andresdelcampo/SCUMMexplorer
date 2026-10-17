@@ -300,7 +300,7 @@ public sealed class ScummGameSession : ScummSession
     private int ActorFromPosition(int x, int y)
     {
         if (_currentRoom?.ResourceId is not int room || _roomSize is not { } size) return 0;
-        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostume, classes: _runtime.ObjectClasses);
+        var layer = ScummActorRenderer.Render(_runtime.Actors.Snapshot(), room, size.Width, size.Height, ReadCostume, classes: _runtime.ObjectClasses, engineVersion: (int)_runtime.EngineVersion);
         foreach (var actor in layer.Actors.OrderBy(item => item.Number))
         {
             if (actor.Bounds is not { } bounds || actor.Pixels == 0) continue;

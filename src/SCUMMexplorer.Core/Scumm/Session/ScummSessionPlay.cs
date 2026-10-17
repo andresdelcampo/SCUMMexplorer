@@ -125,7 +125,7 @@ public abstract partial class ScummSession
     public ScummVerbAreaPicture PlayVerbArea()
     {
         var charset = PlayCharset(0) ?? CurrentPlayCharset();
-        var verbs = _runtime.Verbs.Snapshot().Where(v => !HidesVerb(v) && (!_runtime.IsV2 || (_runtime.V2UserState & 0x40) != 0)).ToArray();
+        var verbs = _runtime.Verbs.Snapshot().Where(v => !HidesVerb(v) && (!_runtime.IsV2 || (_runtime.V2UserState & 0x80) != 0)).ToArray();
         if (charset is null) return VerbArea();
         var plain = ScummVerbArea.Compose(verbs, VerbImage, _runtime.Verbs.Erases(), AlignVerbRows, new ScummTextVerbDrawing(charset, VerbGlyphs, null, n => PlayCharset(n)));
         if (!CursorShown || _screenPointer is not { } pointer || pointer.Y < ScummVerbArea.Top) return DrawOldInterface(plain, charset);

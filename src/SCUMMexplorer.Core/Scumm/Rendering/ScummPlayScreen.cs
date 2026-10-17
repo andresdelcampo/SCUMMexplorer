@@ -57,7 +57,7 @@ public sealed class ScummPlayScreen
         var selection = new RoomObjectSelection(room.Images, snapshot.ObjectStates, snapshot.ObjectPositions, room.Records, room.Room, _indexedStates, snapshot.DrawOrder, intrinsicStateMask: intrinsicMask);
         return new ScummRoomScene(roomId, room.Room, room.Records, room.Images, capture, selection, ScummSettleOutcome.Settled, 0, null,
             id => { try { return _session.ReadCostume(id); } catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException) { return null; } },
-            false, []) { IndexedStates = _indexedStates, IntrinsicStateMask = intrinsicMask };
+            false, []) { IndexedStates = _indexedStates, IntrinsicStateMask = intrinsicMask, EngineVersion = (int)ScummProfile.For(_game).EngineVersion };
     }
 
     /// <summary>The screen at this frame; <paramref name="frame"/> drives the cursor's colour cycle.</summary>

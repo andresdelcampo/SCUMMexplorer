@@ -1009,6 +1009,7 @@ public sealed partial class ScummActorTable(bool useV4Walking = false, int actor
         public int DestY { get; set; }
         public int DestDir { get; set; }
         public int CurBox { get; set; }
+        public int V2WalkFacing { get; set; }
         public ScummBoxPoint Next { get; set; }
         public ScummBoxPoint LegStart { get; set; }
         public ScummBoxPoint? Point3 { get; set; }

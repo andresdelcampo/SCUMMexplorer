@@ -32,7 +32,7 @@ public abstract partial class ScummSession
         if (!_runtime.IsV2) return picture;
         var top = MainScreen.Bottom;
         charset.DrawPlainLine(picture.Pixels, 320, ScummVerbArea.Top, PlaySentenceGlyphs(), 0, top, 13);
-        if ((_runtime.V2UserState & 0x80) == 0) return picture;
+        if ((_runtime.V2UserState & 0x40) == 0) return picture;
         var inventory = V2Inventory();
         for (var slot = 0; slot < 4 && _v2InventoryOffset + slot < inventory.Length; slot++)
         {

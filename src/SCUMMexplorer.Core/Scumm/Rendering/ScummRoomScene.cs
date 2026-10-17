@@ -14,6 +14,7 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
     public ScummSessionSnapshot Snapshot => State.Snapshot;
     /// <summary>v1/v2 draw only intrinsic bit 8; later engines use the whole state nibble.</summary>
     public byte IntrinsicStateMask { get; init; } = 0x0F;
+    public int EngineVersion { get; init; } = 3;
 
     /// <summary>The object states the game's index gives (the picture selection needs them for objects the scripts did not touch).</summary>
     public IReadOnlyDictionary<int, byte> IndexedStates { get; init; } = new Dictionary<int, byte>();
@@ -33,7 +34,7 @@ public sealed record ScummRoomScene(int RoomId, RoomImage Room, IReadOnlyList<Sc
 
     /// <summary>The actors the scripts left in the room, as an indexed layer the size of the room.</summary>
     public ScummActorLayer ActorLayer() => ScummActorRenderer.Render(State.Actors, RoomId, Room.Width, Room.Height, Costumes,
-        Selection.ComposeDepthMask(Room), State.WalkBoxes, Snapshot.ObjectClasses, Room.ExtraDepthMasks.Select(plane => plane.Pixels.ToArray()).ToArray());
+        Selection.ComposeDepthMask(Room), State.WalkBoxes, Snapshot.ObjectClasses, Room.ExtraDepthMasks.Select(plane => plane.Pixels.ToArray()).ToArray(), EngineVersion);
 
     /// <summary>The objects with the actors over them.</summary>
     public byte[] ComposeWithActors()
@@ -177,6 +178,6 @@ public static class ScummRoomFirstVisit
         };
         return new ScummRoomScene(roomId, room, records, images, settled.State, selection, settled.Outcome, settled.Frames, settled.LeftTo,
             id => { try { return session.ReadCostume(id); } catch (Exception ex) when (ex is InvalidDataException or NotSupportedException or IOException) { return null; } },
-            bootRoom, notes) { IndexedStates = indexed.States, IntrinsicStateMask = stateMask };
+            bootRoom, notes) { IndexedStates = indexed.States, IntrinsicStateMask = stateMask, EngineVersion = (int)ScummProfile.For(game).EngineVersion };
     }
 }
