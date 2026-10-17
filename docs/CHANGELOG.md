@@ -2,6 +2,11 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: the Spanish eight-disk release, and accents in the cutscene list (S9, MonkeyFloppy)
+
+- `Games/monkey1 ega es` (Spanish, eight disks, 16 colours) checked against the English floppy: boot (protection answered from its own `var[0x10A]`), room audit (81/81 without a gap, equal to English in outcome, active images and gaps), the R-7.18 route with its sounds and the right click, the cutscene scan (294 triggers, 164 entries, 104 begin, equal per entry), accents (CP437 codes with a glyph in every charset), one window look. Differences are data: texts and the offsets that follow them (the route test reads its sound offsets from the copy's script), Room 87's entry, the 0xFA glyph. No cell changes.
+- The shared cutscene scan decodes first lines and object names with `ScummTextDecoder` (`DecodeLine`, `DecodeGlyphs`): Spanish LOOM, Indy3 and Monkey titles and lines keep ¿ ¡ ñ á; English LOOM EGA/CD and Indy3 lists byte-identical, Monkey's "Citizen of Mêlée" gains its accents. Closes the Indy3 S9 open item.
+- Validation: `ScummMonkeyFloppyPlayTests` (route, right click and charsets per copy), `ScummMonkeyFloppySessionTests`, `ScummMonkeyFloppyCutsceneTests`, `ScummIndy3CutsceneTests`; LOOM regression. Record: [monkey1-editions-20261017](../.verification/monkey1-editions-20261017/README.md).
 ## 17 October: first-visit rooms of Monkey Island CD (S5, MonkeyCd)
 
 - The CD release's rooms come from the generic session's first visit (`HasFirstVisitScenes` for the v5 format of MonkeyCd): 82 of 83 rooms run without a gap; Room 99 cannot run (object 1000 outside the state table), Rooms 88 and 89 have one unfollowed item each. Fixed on the way: `o5_getObjectState`, nested actor queries in `expression`, 32-colour costumes (format 0x59, the SCUMM Bar's pirates). Objects stays partial until S6.
