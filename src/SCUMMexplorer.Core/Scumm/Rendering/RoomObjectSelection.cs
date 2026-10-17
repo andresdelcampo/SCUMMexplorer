@@ -627,8 +627,18 @@ public sealed class RoomObjectSelection
         var bottom = Math.Min(height, position.Y + obj.Height);
         for (var y = top; y < bottom; y++)
             if (left < right)
-                Array.Copy(obj.Pixels, (y - position.Y) * obj.Width + left - position.X,
-                    pixels, y * width + left, right - left);
+            {
+                if (obj.Transparent is not { } transparent)
+                {
+                    Array.Copy(obj.Pixels, (y - position.Y) * obj.Width + left - position.X, pixels, y * width + left, right - left);
+                    continue;
+                }
+                for (var x = left; x < right; x++)
+                {
+                    var source = (y - position.Y) * obj.Width + x - position.X;
+                    if (!transparent[source]) pixels[y * width + x] = obj.Pixels[source];
+                }
+            }
     }
 
     private void Paint(RoomObjectImage obj, byte[] pixels, int width, int height) =>

@@ -73,6 +73,9 @@ public sealed partial class ScummV5Archive
     /// The images of the room's objects (<c>OBIM</c> &gt; <c>IMHD</c>, then <c>IM01</c>, <c>IM02</c>… one per state, in that order), each an <c>SMAP</c> sized by the
     /// object's <c>CDHD</c> and, when it has one, its first depth mask (<c>ZP01</c>, coded as the room's). An image that does not decode is left out.
     /// </summary>
+    // gdi.cpp decompressBitmap: the codecs whose pixels at the transparent colour are skipped (0x22-0x26, 0x2C-0x30 bit codes; 0x54-0x58, 0x7C-0x80 major-minor).
+    private static bool IsTransparentCodec(byte codec) => codec is >= 0x22 and <= 0x26 or >= 0x2C and <= 0x30 or >= 0x54 and <= 0x58 or >= 0x7C and <= 0x80;
+
     public IReadOnlyList<ScummV4ObjectImage> ReadObjectImages(int number)
     {
         var room = Room(number);
@@ -85,6 +88,8 @@ public sealed partial class ScummV5Archive
                 sizes[BinaryPrimitives.ReadUInt16LittleEndian(_resources.AsSpan(h))] = (_resources[h + 2] * 8, _resources[h + 3] * 8, _resources[h + 4] * 8, _resources[h + 5] * 8);
             }
         var images = new List<ScummV4ObjectImage>();
+        // The room's transparent colour (TRNS, a word): ScummVM gdi.cpp skips it in strips coded with a transparent codec (S5 Monkey2).
+        var trns = children.FirstOrDefault(b => b.Tag == "TRNS") is { Size: >= 10 } trnsBlock ? _resources[trnsBlock.Start + 8] : (int?)null;
         foreach (var obim in children.Where(b => b.Tag == "OBIM"))
         {
             var parts = Blocks(_resources, obim.Start + 8, obim.Start + obim.Size);
@@ -97,6 +102,7 @@ public sealed partial class ScummV5Archive
                 if (inner.FirstOrDefault(b => b.Tag == "SMAP") is not { } smap) continue;
                 var pixels = new byte[box.W * box.H];
                 byte[]? mask = null;
+                bool[]? transparent = null;
                 try
                 {
                     for (var strip = 0; strip < box.W / 8; strip++)
@@ -104,13 +110,20 @@ public sealed partial class ScummV5Archive
                         var start = smap.Start + (int)BinaryPrimitives.ReadUInt32LittleEndian(_resources.AsSpan(smap.Start + 8 + strip * 4));
                         if (start >= smap.Start + smap.Size) throw new InvalidDataException("strip outside the image");
                         ScummV4Archive.DecodeStrip(_resources, start, smap.Start + smap.Size, pixels, box.W, box.H, strip * 8);
+                        if (trns is int clear && IsTransparentCodec(_resources[start]))
+                        {
+                            transparent ??= new bool[pixels.Length];
+                            for (var y = 0; y < box.H; y++)
+                                for (var x = strip * 8; x < strip * 8 + 8 && x < box.W; x++)
+                                    if (pixels[y * box.W + x] == clear) transparent[y * box.W + x] = true;
+                        }
                     }
                     if (inner.FirstOrDefault(b => b.Tag == "ZP01") is { } zp)
                         mask = ScummV4Archive.DecodeMaskStrips(_resources, zp.Start, 8, zp.Start + zp.Size, box.W, box.H);
                 }
                 catch (Exception ex) when (ex is InvalidDataException or ArgumentOutOfRangeException or IndexOutOfRangeException) { continue; }
                 var stateNumber = int.TryParse(state.Tag.AsSpan(2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var n) ? n : 1;
-                images.Add(new ScummV4ObjectImage(id, box.X, box.Y, box.W, box.H, pixels) { Mask = mask, State = stateNumber });
+                images.Add(new ScummV4ObjectImage(id, box.X, box.Y, box.W, box.H, pixels) { Mask = mask, State = stateNumber, Transparent = transparent });
             }
         }
         return images;

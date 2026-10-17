@@ -46,6 +46,9 @@ public sealed record ScummV4ObjectImage(int Id, int X, int Y, int Width, int Hei
 
     /// <summary>The object state that shows this image: 1 for a v4 object's only image; the number of its <c>IMnn</c> block in a v5 room (S4b Monkey2).</summary>
     public int State { get; init; } = 1;
+
+    /// <summary>Pixels the image does not draw (a v5 strip with a transparent codec, at the room's transparent colour); null when it draws all.</summary>
+    public bool[]? Transparent { get; init; }
 }
 
 public sealed record ScummV4Room(int Number, string Name, int Offset, int Length);

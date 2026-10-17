@@ -93,7 +93,7 @@ public sealed class ScummV5DataSource : IScummDataSource
     public IReadOnlyList<RoomObjectImage> ReadObjectImages(int room, IReadOnlyDictionary<int, byte> states) =>
         Read(() => _archive.ReadObjectImages(room)).GroupBy(i => i.Id)
             .Select(group => group.FirstOrDefault(i => states.TryGetValue(i.Id, out var state) && (state & 0x0F) == i.State) ?? group.First())
-            .Select(i => new RoomObjectImage(i.Id, i.X, i.Y, i.Width, i.Height, i.Pixels) { Mask = i.Mask }).ToArray();
+            .Select(i => new RoomObjectImage(i.Id, i.X, i.Y, i.Width, i.Height, i.Pixels) { Mask = i.Mask, Transparent = i.Transparent }).ToArray();
 
     public IReadOnlyDictionary<int, IReadOnlyList<ScummObjectVerbEntry>> ReadObjectVerbs(int room, IReadOnlyList<ScummRoomObjectRecord> records)
     {
