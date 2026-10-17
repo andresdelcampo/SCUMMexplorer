@@ -312,6 +312,10 @@ internal static partial class ScummScriptDisassembler
                 // the code after that jump is the cutscene's normal path.
                 if (dialect is not (ScummScriptDialect.V1 or ScummScriptDialect.V2) && operation == "beginOverride" && end + 3 <= code.Length && code[end] == 0x18)
                     queued.Enqueue(end + 3);
+                // o2_beginOverride consumes the embedded jump; skipping the scene takes
+                // that jump, while normal execution continues after all four bytes.
+                if (dialect is ScummScriptDialect.V1 or ScummScriptDialect.V2 && operation == "beginOverride")
+                    queued.Enqueue(end + BinaryPrimitives.ReadInt16LittleEndian(code.AsSpan(end - 2, 2)));
                 if (IsBranchOperation(operation))
                 {
                     var displacement = BinaryPrimitives.ReadInt16LittleEndian(code.AsSpan(end - 2, 2));

@@ -9,6 +9,19 @@ public sealed class ScummV2OperandDecodingTests
     [Theory]
     [InlineData(ScummScriptDialect.V1)]
     [InlineData(ScummScriptDialect.V2)]
+    public void OverrideDecodesNormalAndSkippedPaths(ScummScriptDialect dialect)
+    {
+        // Normal path stops at4. The embedded jump reaches6 only when the player skips.
+        var result = ScummScriptDisassembler.Disassemble([0x58, 0x18, 2, 0, 0, 0xFF, 0x80, 0], dialect);
+        Assert.Empty(result.Issues);
+        Assert.Equal([0, 4, 6, 7], result.Instructions.Select(i => i.Offset));
+        Assert.Equal("beginOverride", result.Instructions[0].Operation);
+        Assert.Equal("breakHere", result.Instructions[2].Operation);
+    }
+
+    [Theory]
+    [InlineData(ScummScriptDialect.V1)]
+    [InlineData(ScummScriptDialect.V2)]
     public void ActorNameConsumesInlineTextBeforeNextInstruction(ScummScriptDialect dialect)
     {
         byte[] code = [0x13, 3, 0, 3, .. "Dave"u8.ToArray(), 0, 0x80, 0];
