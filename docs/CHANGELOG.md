@@ -2,6 +2,13 @@
 
 Entries describe the state at their dated checkpoint. Current state, priorities and handoff are in [CURRENT_WORK](CURRENT_WORK.md).
 
+## 17 October: Monkey Island 2 boots to the campfire and shows its first-visit rooms (S4b, S5, Monkey2)
+
+- The generic session boots `mi2 talkie en` in 3409 frames to Room 4 (the campfire on Scabb Island) with the player in control and nothing unsupported; the one assumed input is a click on "Monkey Island 2" (the full game) in the choice screen (Room 108), through the game's own input script (`ScummBootInputPlan.ClickObject`). No copy protection at boot parameter 0 in this edition.
+- Engine: `soundKludge` (iMUSE doCommand answers in `VAR_SOUNDRESULT`, sound events, labelled estimates for steered songs); v5 sound lengths from S3's iMUSE timeline; v5 `roomOps` palette colour; `waitFor sentence`; `getActorScale`; indexed variables and bit destinations in expressions; objects without `VERB`; v5 object images per state (`IMnn`) and transparent strips (`TRNS`).
+- First visit: 107 of 110 rooms without a gap (Rooms 104–106 are image holders), 0 items not followed; Rooms 39, 55, 79 pinned.
+- Validation: `ScummMonkey2SessionTests`, `ScummMonkey2FirstVisitTests`; MonkeyCd, support, play and first-visit neighbours; LOOM regression. Records: [monkey2-session-20261017](../.verification/monkey2-session-20261017/README.md), [monkey2-objects-20261017](../.verification/monkey2-objects-20261017/README.md).
+
 ## 17 October: the Spanish eight-disk release, and accents in the cutscene list (S9, MonkeyFloppy)
 
 - `Games/monkey1 ega es` (Spanish, eight disks, 16 colours) checked against the English floppy: boot (protection answered from its own `var[0x10A]`), room audit (81/81 without a gap, equal to English in outcome, active images and gaps), the R-7.18 route with its sounds and the right click, the cutscene scan (294 triggers, 164 entries, 104 begin, equal per entry), accents (CP437 codes with a glyph in every charset), one window look. Differences are data: texts and the offsets that follow them (the route test reads its sound offsets from the copy's script), Room 87's entry, the 0xFA glyph. No cell changes.

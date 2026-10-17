@@ -1,5 +1,5 @@
 game: Monkey Island 2: LeChuck's Revenge (Unknown, V5), folder mi2 talkie en, v5 resource file
-boot: 3409 frames (limit 5000), hit limit: False, wall time 2,0 s
+boot: 3409 frames (limit 5000), hit limit: False, wall time 2,2 s
 final room: 4; rooms entered in order: 108, 0, 87, 0, 3, 103, 109, 0, 5, 4
 rooms by name: 108 Room 108, 0 (none), 87 Room 87, 3 Room 03, 103 Room 103, 109 Room 109, 5 Room 05, 4 Room 04
 extra frames played after the boot: 0; room now 4
